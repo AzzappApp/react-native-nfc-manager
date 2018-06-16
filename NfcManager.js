@@ -15,6 +15,10 @@ const Events = {
   StateChanged: 'NfcManagerStateChanged',
 }
 
+const NfcTech = {
+  Ndef: 'Ndef'
+}
+
 const LOG = 'NfcManagerJs';
 
 class NfcManager {
@@ -162,6 +166,9 @@ class NfcManager {
     return Promise.resolve(NfcManagerEmitter.addListener(Events.StateChanged, listener));
   }
 
+  // -------------------------------------
+  // NfcTech requesting API  
+  // -------------------------------------
   requestTechnology(tech) {
     if (Platform.OS === 'ios') {
       return Promise.reject('not implemented');
@@ -207,6 +214,9 @@ class NfcManager {
     })
   }
 
+  // -------------------------------------
+  // NfcTech.Ndef
+  // -------------------------------------
   writeNdefMessage(bytes) {
     if (Platform.OS === 'ios') {
       return Promise.reject('not implemented');
@@ -256,5 +266,6 @@ class NfcManager {
 export default new NfcManager();
 
 export {
-  NdefParser
+  NdefParser,
+  NfcTech,
 }
