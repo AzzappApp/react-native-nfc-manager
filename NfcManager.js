@@ -16,7 +16,8 @@ const Events = {
 }
 
 const NfcTech = {
-  Ndef: 'Ndef'
+  Ndef: 'Ndef',
+  NfcA: 'NfcA',
 }
 
 const LOG = 'NfcManagerJs';
@@ -290,6 +291,25 @@ class NfcManager {
 
     return new Promise((resolve, reject) => {
       NativeNfcManager.getCachedNdefMessage((err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      })
+    })
+  }
+
+  // -------------------------------------
+  // NfcTech.NfcA API
+  // -------------------------------------
+  transceive(bytes) {
+    if (Platform.OS === 'ios') {
+      return Promise.reject('not implemented');
+    }
+
+    return new Promise((resolve, reject) => {
+      NativeNfcManager.transceive(bytes, (err, result) => {
         if (err) {
           reject(err);
         } else {
