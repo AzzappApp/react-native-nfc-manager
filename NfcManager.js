@@ -28,6 +28,7 @@ const NfcTech = {
   IsoDep: 'IsoDep',
   MifareClassic: 'MifareClassic',
   MifareUltralight: 'MifareUltralight',
+  MifareIOS: 'mifare',
 }
 
 const NfcAdapter = {
