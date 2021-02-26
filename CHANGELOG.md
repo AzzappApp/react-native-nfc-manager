@@ -1,160 +1,98 @@
-## 2.1.0-canary.30
+## [3.0.2](https://github.com/whitedogg13/react-native-nfc-manager/compare/v3.0.1...v3.0.2) (2021-02-22)
 
-* **fix:**  - review tooltips registration, no need to register tooltips ref when the component is not mounted ([#9373](https://github.com/AzzappApp/azzapp/pull/9373))
-* **fix:**  - add one way share subtitle in offline screen ([#9374](https://github.com/AzzappApp/azzapp/pull/9374))
 
-## 2.1.0-canary.29
+### Features
 
-* **fix:**  - avoid setStateInPhoneInput ([#9365](https://github.com/AzzappApp/azzapp/pull/9365))
-* **fix:**  - avoid setState in Screen Dimension management ([#9366](https://github.com/AzzappApp/azzapp/pull/9366))
+* **android:** allow requestTechnology resolves to tags even when tech ([8b7f862](https://github.com/whitedogg13/react-native-nfc-manager/commit/8b7f8629a8e46304f2a68d62f01e745047fe01dc))
 
-## 2.1.0-canary.28
 
-* **fix:**  - avoid unnecessary setLogo(null) call ([#9364](https://github.com/AzzappApp/azzapp/pull/9364))
 
-## 2.1.0-canary.27
+## [3.0.1](https://github.com/whitedogg13/react-native-nfc-manager/compare/v3.0.0...v3.0.1) (2021-02-20)
 
 
+### Bug Fixes
 
-## 2.1.0-canary.26
+* [#371](https://github.com/whitedogg13/react-native-nfc-manager/issues/371) missing MIFARE_BLOCK_SIZE for mifareClassicHandlerAndroid ([b136419](https://github.com/whitedogg13/react-native-nfc-manager/commit/b1364197c80ab16542bbb823483a2079a896e169))
 
-* **fix:**  - avoid bad data access ([#9358](https://github.com/AzzappApp/azzapp/pull/9358))
-* **fix:**  - remove useless state in following screen ([#9359](https://github.com/AzzappApp/azzapp/pull/9359))
-* **fix:**  - remove set state and menage logos list directly from debouncedSearch value ([#9360](https://github.com/AzzappApp/azzapp/pull/9360))
 
-## 2.1.0-canary.25
 
-* **fix:**  - remove state in mediaSuggestionScreen ([#9351](https://github.com/AzzappApp/azzapp/pull/9351))
-* **fix:**  - remove unnecessary state in search bar ([#9354](https://github.com/AzzappApp/azzapp/pull/9354))
+# [3.0.0](https://github.com/whitedogg13/react-native-nfc-manager/compare/v3.0.0-0...v3.0.0) (2021-02-18)
 
-## 2.1.0-canary.24
 
-* **fix:**  - remove state from recent search ([#9348](https://github.com/AzzappApp/azzapp/pull/9348))
-* **fix:**  - remove unnecessary State in bottom Panel ([#9352](https://github.com/AzzappApp/azzapp/pull/9352))
-* **fix:**  - replace setState by memo in camera View ([#9345](https://github.com/AzzappApp/azzapp/pull/9345))
-* **fix:**  - simplify like counter management ([#9353](https://github.com/AzzappApp/azzapp/pull/9353))
+### Features
 
-## 2.1.0-canary.23
+* expose RTD_URI_PROTOCOLS ([26516a7](https://github.com/whitedogg13/react-native-nfc-manager/commit/26516a7ce8309ade21464df13a8e5c799c0e417c))
 
-* **fix:**  - replace state by memo in sortable links ([#9349](https://github.com/AzzappApp/azzapp/pull/9349))
 
-## 2.1.0-canary.22
 
-* **fix:**  - search header color in dark mode ([#9339](https://github.com/AzzappApp/azzapp/pull/9339))
+# [3.0.0-0](https://github.com/whitedogg13/react-native-nfc-manager/compare/v2.0.0-beta.1...v3.0.0-0) (2021-02-10)
 
-## 2.1.0-canary.21
 
-* **fix:**  - remove setState in useEffect in Search ([#9344](https://github.com/AzzappApp/azzapp/pull/9344))
+### Bug Fixes
 
-## 2.1.0-canary.20
+* disable 18092 polling (cause iOS freeze) ([64115f8](https://github.com/whitedogg13/react-native-nfc-manager/commit/64115f80f8cd93ed5ef3b01987d6c628a5a9127b))
+* **ios:** add polling for iso18092 ([b7984a5](https://github.com/whitedogg13/react-native-nfc-manager/commit/b7984a59ea27076d7fd34a2614592f468c80f5e1))
+* add callback type null possible ([1371533](https://github.com/whitedogg13/react-native-nfc-manager/commit/13715334ea908b89654b42eba4ec902bcc6f4229))
+* cancelTechnology might cause exception if there's a connected tag ([af2f1f9](https://github.com/whitedogg13/react-native-nfc-manager/commit/af2f1f92bbd7bfcf8c604db48b790289c3ca4946))
+* cancelTechnology might cause exception if there's a connected tag ([dcb26b8](https://github.com/whitedogg13/react-native-nfc-manager/commit/dcb26b85a955ce17ae633e00f6f189a895e8adcb))
+* getNdefMessage should use the same structure for platforms ([73859fb](https://github.com/whitedogg13/react-native-nfc-manager/commit/73859fbac8939277f1e7fc2ad13ececee8c9d4c7))
+* import NfcManager from new location ([c95cc76](https://github.com/whitedogg13/react-native-nfc-manager/commit/c95cc76a0a3b52c751c1a0f00895cf1b34b66b28))
+* ios isSupported ([adcc966](https://github.com/whitedogg13/react-native-nfc-manager/commit/adcc966c8ed4a565c2800fabc5e5a0cad07ea376))
+* promise won't be rejected when calling cancelTechnologyRequest in ([64c9cbd](https://github.com/whitedogg13/react-native-nfc-manager/commit/64c9cbd05e34e975fa4744727859efd08ea610bf))
+* reject tech request promise when native iOS cancel button is pressed ([7915b98](https://github.com/whitedogg13/react-native-nfc-manager/commit/7915b98132cf5c6f86eb96dfe242b67bef32e8a7))
+* remove getNdefMessage's parameter declaration ([6fc257e](https://github.com/whitedogg13/react-native-nfc-manager/commit/6fc257e61e1da5600a7aac44d9a8a97a7ecc988c))
 
-* **fix:**  - enable no no-color-literals eslint rule ([#9337](https://github.com/AzzappApp/azzapp/pull/9337))
 
-## 2.1.0-canary.19
+### Features
 
-* **fix:**  - **wallet:** [#9328](https://github.com/AzzappApp/azzapp/pull/9328) update route after next 15 upgrade ([#9331](https://github.com/AzzappApp/azzapp/pull/9331))
-* **fix:**  - **ui:** [#9321](https://github.com/AzzappApp/azzapp/pull/9321) missing IconButton borders ([#9324](https://github.com/AzzappApp/azzapp/pull/9324))
-* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) desapprove canceled enrichments ([#9323](https://github.com/AzzappApp/azzapp/pull/9323))
-* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) hide avatar before submit ([#9317](https://github.com/AzzappApp/azzapp/pull/9317))
-* **fix:**  - **ContactScan:** allows any user of a multiuser WebCard unlimited scans ([#9318](https://github.com/AzzappApp/azzapp/pull/9318))
-* **fix:**  - **CoverEditorLink:** fix panel height
-* **fix:**  - **contact:** [#9310](https://github.com/AzzappApp/azzapp/pull/9310) only count completed enrichments ([#9311](https://github.com/AzzappApp/azzapp/pull/9311))
-* **fix:**  - **imagePicker:** [#9307](https://github.com/AzzappApp/azzapp/pull/9307) wrong back button ([#9309](https://github.com/AzzappApp/azzapp/pull/9309))
-* **fix:**  - **posts:** [#9301](https://github.com/AzzappApp/azzapp/pull/9301) wrong iconButton on header ([#9304](https://github.com/AzzappApp/azzapp/pull/9304))
-* **fix:**  - **contact:** [#9299](https://github.com/AzzappApp/azzapp/pull/9299) dynamic sizing requires BottomSheetView ([#9303](https://github.com/AzzappApp/azzapp/pull/9303))
-* **fix:**  - **analytics:** [#9297](https://github.com/AzzappApp/azzapp/pull/9297) wrong use of iconButton ([#9298](https://github.com/AzzappApp/azzapp/pull/9298))
-* **fix:**  - **contact:** [#9292](https://github.com/AzzappApp/azzapp/pull/9292) count all unapproved enrichments ([#9294](https://github.com/AzzappApp/azzapp/pull/9294))
-* **fix:**  - **contact:** [#9290](https://github.com/AzzappApp/azzapp/pull/9290) don’t display hidden avatar ([#9293](https://github.com/AzzappApp/azzapp/pull/9293))
-* **fix:**  - IconButton display + bottom sheet behavior ([#9289](https://github.com/AzzappApp/azzapp/pull/9289))
-* **fix:**  - **tools:** [#9286](https://github.com/AzzappApp/azzapp/pull/9286) editor can access to cover edition ([#9287](https://github.com/AzzappApp/azzapp/pull/9287))
-* **feat:**  - **contact:** [#9272](https://github.com/AzzappApp/azzapp/pull/9272) notification of finished enrichments ([#9279](https://github.com/AzzappApp/azzapp/pull/9279))
+* extract more NfcTech handlers ([0032408](https://github.com/whitedogg13/react-native-nfc-manager/commit/0032408af21cafa3f5f92c16083f914325450524))
+* **android:** getNdefStatus ([4cc68ce](https://github.com/whitedogg13/react-native-nfc-manager/commit/4cc68ce233d81c03760b791fc2f568fe4b8415c4))
+* **ios:** enhance didDetectTags and add queryNDEFStatus / makeReadOnly ([32dd3be](https://github.com/whitedogg13/react-native-nfc-manager/commit/32dd3be2968abbe095ae42fd12793a9a8c0725c6))
+* invalidateSessionWithErrorIOS ([c631110](https://github.com/whitedogg13/react-native-nfc-manager/commit/c631110b6454c08821607014a28b8dffb20fe8b0))
+* ios 13 ndef read and write ([31a3ae6](https://github.com/whitedogg13/react-native-nfc-manager/commit/31a3ae6e141e41f3f36a102d5c2bb5ce04ba78a5))
+* requestTechnology support multi-techs ([65e8f02](https://github.com/whitedogg13/react-native-nfc-manager/commit/65e8f02b83820cb72e65c8443a607b6dca2c8fae))
 
-## 2.1.0-canary.18
 
-* **fix:**  - remove last remaining companyActivityId and webcardCategories apis ([#8270](https://github.com/AzzappApp/azzapp/pull/8270))
 
-## 2.1.0-canary.17
+# [2.0.0-beta.1](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.9...v2.0.0-beta.1) (2019-07-13)
 
-* **feat:**  - add new version available on store popup ([#9316](https://github.com/AzzappApp/azzapp/pull/9316))
 
-## 2.1.0-canary.16
+### Bug Fixes
 
+* call the correct method `mifareUltralightReadPages` (notice the tailing s) ([60feee8](https://github.com/whitedogg13/react-native-nfc-manager/commit/60feee88c2d20bc18af23b3abb6d8cb22fe17e16))
+* ios crash on registerTagEvent ([e654d93](https://github.com/whitedogg13/react-native-nfc-manager/commit/e654d9359751327284d20b3bee1139c78657dcb4))
+* MifareClassic should also support `transceive` ([dd4a902](https://github.com/whitedogg13/react-native-nfc-manager/commit/dd4a902257a402e5d6d3eae8bd43f9d37c03928b))
+* use non-cached ndef for getNdefMessage API ([49f8541](https://github.com/whitedogg13/react-native-nfc-manager/commit/49f85415a5bc6d0218992dc6ba2b9303cee8e3ac))
 
 
-## 2.1.0-canary.15
+### Features
 
+* mifareultralight support ([4a53a13](https://github.com/whitedogg13/react-native-nfc-manager/commit/4a53a135c594ef340927ae053dfc142ebfd0b9b6))
+* support `getMaxTransceiveLength` and `setTimeout` ([e759c39](https://github.com/whitedogg13/react-native-nfc-manager/commit/e759c399008e9060ae6f5fe23d7b31a61b1f8037))
 
 
-## 2.1.0-canary.14
 
-* **fix:**  - ensure we don't allow validatation empty code ([#9305](https://github.com/AzzappApp/azzapp/pull/9305))
-* **build:**  - upgrade native deps ([#9291](https://github.com/AzzappApp/azzapp/pull/9291))
+## [0.0.9](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.8...0.0.9) (2018-01-02)
 
-## 2.1.0-canary.13
 
-* **fix:**  - refactor meetingPlace management ([#9288](https://github.com/AzzappApp/azzapp/pull/9288))
 
-## 2.1.0-canary.12
+## [0.0.8](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.7...0.0.8) (2017-12-09)
 
-* **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
-* **feat:**  - add relai eslint plugin ([#9249](https://github.com/AzzappApp/azzapp/pull/9249))
-* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
-* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
-* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
 
-## 2.1.0-canary.11
 
+## [0.0.7](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.6...0.0.7) (2017-12-04)
 
 
-## 2.1.0-canary.10
 
-* **fix:**  - **home:** [#8484](https://github.com/AzzappApp/azzapp/pull/8484) home link not pressable after logout on android ([#9252](https://github.com/AzzappApp/azzapp/pull/9252))
+## [0.0.6](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.3...0.0.6) (2017-11-17)
 
-## 2.1.0-canary.9
 
-* **feat:**  - add relai eslint plugin ([#9249](https://github.com/AzzappApp/azzapp/pull/9249))
 
-## 2.1.0-canary.8
+## [0.0.3](https://github.com/whitedogg13/react-native-nfc-manager/compare/0.0.2...0.0.3) (2017-09-27)
 
-* **fix:**  - **android:** [#9238](https://github.com/AzzappApp/azzapp/pull/9238) wrong background color ([#9243](https://github.com/AzzappApp/azzapp/pull/9243))
 
-## 2.1.0-canary.7
 
-* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
-* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
-* **fix:**  - case contactCardAccess already created ([#9230](https://github.com/AzzappApp/azzapp/pull/9230))
-* **fix:**  - display of country code ([#9225](https://github.com/AzzappApp/azzapp/pull/9225))
-* **fix:**  - url api staging ([#9224](https://github.com/AzzappApp/azzapp/pull/9224))
-* **fix:**  - **contact:** [#9212](https://github.com/AzzappApp/azzapp/pull/9212) wrong url on contact creation ([#9214](https://github.com/AzzappApp/azzapp/pull/9214))
-* **fix:**  - [#9215](https://github.com/AzzappApp/azzapp/pull/9215) use explicitly process.env for babel plugin on mobile app ([#9216](https://github.com/AzzappApp/azzapp/pull/9216))
+## 0.0.2 (2017-08-01)
 
-## 2.1.0-canary.6
 
-* **perf:**  - **home:** [#8780](https://github.com/AzzappApp/azzapp/pull/8780) reduce amounts of queries and amount requested data ([#9223](https://github.com/AzzappApp/azzapp/pull/9223))
 
-## 2.1.0-canary.5
-
-
-
-## 2.1.0-canary.4
-
-
-
-## 2.1.0-canary.3
-
-
-
-## 2.1.0-canary.2
-
-
-
-## 2.1.0-canary.1
-
-* **build:**  - fix release script
-* **fix:**  - freeSeat calcul ([#8875](https://github.com/AzzappApp/azzapp/pull/8875))
-* **fix:**  - IAP database duplication, extradata function flashlist
-* **feat:**  - [#8777](https://github.com/AzzappApp/azzapp/pull/8777) add link to switch to offline mode in loader ([#8782](https://github.com/AzzappApp/azzapp/pull/8782))
-* **fix:**  - missing env vars
-* **fix:**  - remove unused import
-* **fix:**  - publish android paywall ([#8697](https://github.com/AzzappApp/azzapp/pull/8697))
-* **fix:**  - lint
