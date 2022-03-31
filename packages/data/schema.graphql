@@ -1,0 +1,151 @@
+"""GraphQL Schema Root Query object"""
+type Query {
+  viewer: Viewer!
+
+  """Fetches an object given its ID"""
+  node(
+    """The ID of an object"""
+    id: ID!
+  ): Node
+}
+
+"""Represent an Application Viewer"""
+type Viewer {
+  user: User
+
+  """
+  Return a list of User that this user might possibility be interested in (followed User or promoted one)
+  """
+  recommandedUsers(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): UserConnection!
+}
+
+"""Represent an Azzapp User"""
+type User implements Node {
+  """The ID of an object"""
+  id: ID!
+  firstName: String
+  lastName: String
+  card: UserCard
+}
+
+"""An object with an ID"""
+interface Node {
+  id: ID!
+}
+
+"""An azzapp User card"""
+type UserCard implements Node {
+  """The ID of an object"""
+  id: ID!
+
+  """Card cover display informations"""
+  cover: UserCardCover!
+
+  """Definitions of the cards modules"""
+  modules: [UserCardModule!]!
+}
+
+"""UserCard cover display informations"""
+type UserCardCover {
+  """the title of the card"""
+  title: String!
+
+  """the picture of the card"""
+  picture: String!
+}
+
+"""User Card module"""
+union UserCardModule = SocialModule | MediaModule | TextModule
+
+"""User Card social module"""
+type SocialModule {
+  data: SocialModuleData
+}
+
+"""User Card social module"""
+type SocialModuleData {
+  facebook: String
+  instagram: String
+  twitter: String
+  linkdedIn: String
+  youtube: String
+  snapshat: String
+  tiktok: String
+  website: String
+  pinterest: String
+}
+
+"""User Card media module"""
+type MediaModule {
+  data: [MediaModuleMedia!]!
+}
+
+"""User Card media module media"""
+type MediaModuleMedia {
+  kind: MediaModuleMediaKind!
+  src: String!
+}
+
+enum MediaModuleMediaKind {
+  video
+  picture
+}
+
+"""User Card text module"""
+type TextModule {
+  data: String!
+}
+
+"""A connection to a list of items."""
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """The item at the end of the edge"""
+  node: User
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Mutation {
+  updateCover(input: UpdateCoverInput!): UpdateCoverPayload
+}
+
+type UpdateCoverPayload {
+  user: User!
+  clientMutationId: String
+}
+
+input UpdateCoverInput {
+  picture: String
+  title: String
+  clientMutationId: String
+}

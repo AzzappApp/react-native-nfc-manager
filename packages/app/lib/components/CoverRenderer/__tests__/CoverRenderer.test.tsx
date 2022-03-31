@@ -1,0 +1,54 @@
+import { render, cleanup } from '@testing-library/react-native';
+import {
+  graphql,
+  RelayEnvironmentProvider,
+  useLazyLoadQuery,
+} from 'react-relay';
+import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+import CoverRenderer from '../CoverRenderer';
+import type { CoverRendererTestQuery } from './__generated__/CoverRendererTestQuery.graphql';
+
+const TestRenderer = () => {
+  const data = useLazyLoadQuery<CoverRendererTestQuery>(
+    graphql`
+      query CoverRendererTestQuery @relay_test_operation {
+        card: node(id: "test-id") {
+          ... on UserCard {
+            cover {
+              ...CoverRenderer_cover
+            }
+          }
+        }
+      }
+    `,
+    {},
+  );
+  return <CoverRenderer cover={data.card?.cover} userId="userId" />;
+};
+
+describe('CoverRenderer', () => {
+  afterEach(cleanup);
+
+  it('should render the card image and title', () => {
+    const environement = createMockEnvironment();
+    environement.mock.queueOperationResolver(operation =>
+      MockPayloadGenerator.generate(operation, {
+        UserCard: (_, generateId) => ({
+          id: generateId(),
+          cover: {
+            picture: 'http://fakePicture.com',
+            title: 'fake title',
+          },
+        }),
+      }),
+    );
+    const { getByText, getByTestId } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <TestRenderer />
+      </RelayEnvironmentProvider>,
+    );
+
+    expect(getByText('fake title')).toBeTruthy();
+    expect(getByTestId('cover-userId-picture')).toBeTruthy();
+  });
+});

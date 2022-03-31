@@ -1,0 +1,12 @@
+{
+  "name": "@azzapp/shared",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "react-relay": "^13.2.0",
+    "react-relay-network-modern": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/react-relay": "^13.0.2"
+  }
+}

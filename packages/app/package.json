@@ -1,0 +1,29 @@
+{
+  "name": "@azzapp/app",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "relay": "relay-compiler",
+    "relay-watch": "relay-compiler --watch",
+    "build": "yarn relay"
+  },
+  "dependencies": {
+    "@azzapp/shared": "*",
+    "lodash": "^4.17.21",
+    "react-relay": "^13.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.1.0",
+    "react-native": "^0.68.1",
+    "react-native-web": "^0.17.7"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^9.1.0",
+    "@types/react": "^18.0.3",
+    "@types/react-native": "^0.67.3",
+    "@types/react-relay": "^13.0.2",
+    "@types/relay-test-utils": "^6.0.5",
+    "relay-compiler": "^13.2.0",
+    "relay-test-utils": "^13.2.0"
+  }
+}
