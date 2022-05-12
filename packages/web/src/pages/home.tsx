@@ -36,9 +36,13 @@ const HomePage = () => {
 export const getServerSideProps: GetServerSideProps = withSessionSsr(
   async ({ req }) => {
     const authInfos = await getRequestAuthInfos(req);
-    const queryInfos = await preloadServerQuery(homeScreenQuery, {}, authInfos);
+    const { initialRecords } = await preloadServerQuery(
+      homeScreenQuery,
+      {},
+      authInfos,
+    );
     return {
-      props: queryInfos,
+      props: { initialRecords },
     };
   },
 );

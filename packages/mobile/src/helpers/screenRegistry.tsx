@@ -21,7 +21,7 @@ export type RelayScreenOptions<
   U extends OperationType,
 > = {
   component: ComponentType<T>;
-  query: GraphQLTaggedNode;
+  query: GraphQLTaggedNode | ((params: T['params']) => GraphQLTaggedNode);
   fallback?: React.ComponentType<any> | null;
   getVariables?: (params: T['params']) => U['variables'];
   options?: Options | ((props: T) => Options | null);
@@ -36,11 +36,7 @@ export const registerScreens = (options: ScreenRegistryOptions) => {
   Object.entries(options).forEach(([route, screenDef]) => {
     let component = screenDef.component;
     if (isRelayScreen(screenDef)) {
-      component = wrapRelayScreen(
-        screenDef.component,
-        screenDef.query,
-        screenDef.fallback,
-      );
+      component = wrapRelayScreen(screenDef.component, screenDef.fallback);
       registerComponentQuery(route, screenDef);
     }
     Navigation.registerComponent(
@@ -96,13 +92,11 @@ function createScreenProvider<T>(
 function wrapRelayScreen<
   T extends { data: U['response']; params?: any },
   U extends OperationType,
->(
-  Component: ComponentType<T>,
-  query: GraphQLTaggedNode,
-  Fallback?: React.ComponentType<any> | null,
-) {
+>(Component: ComponentType<T>, Fallback?: React.ComponentType<any> | null) {
   const RelayWrapper = (props: Omit<T, 'data'>) => {
-    const preloadedQuery = useQueryLoaderQuery((props as any).componentId)!;
+    const [query, preloadedQuery] = useQueryLoaderQuery(
+      (props as any).componentId,
+    )!;
     return (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
         {preloadedQuery && (

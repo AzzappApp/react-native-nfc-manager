@@ -16,7 +16,8 @@
     "dev:mobile": "yarn workspace @azzapp/mobile dev",
     "dev": "ttab yarn dev:relay && ttab yarn dev:web && ttab yarn dev:mobile",
     "run-ios": "yarn workspace @azzapp/mobile run-ios",
-    "run-android": "yarn workspace @azzapp/mobile run-android"
+    "run-android": "yarn workspace @azzapp/mobile run-android",
+    "update-graphql-schema": "yarn workspace @azzapp/data update-schema"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

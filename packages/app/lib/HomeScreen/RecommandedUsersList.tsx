@@ -32,6 +32,7 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
             node {
               id
               ... on User {
+                userName
                 card {
                   cover {
                     ...CoverRenderer_cover
@@ -43,6 +44,7 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
         }
         user {
           id
+          userName
           card {
             cover {
               ...CoverRenderer_cover
@@ -96,6 +98,7 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
           route={ROUTES.USER}
           params={{
             userId: item.id,
+            userName: item.userName,
             useSharedAnimation: item.card?.cover != null,
           }}
           onPressIn={() => setUserPressed(item.id)}
@@ -105,7 +108,7 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
           {({ pressed }) => (
             <CoverRenderer
               cover={item.card?.cover}
-              userId={item.id}
+              userName={item.userName}
               style={[styles.item, pressed && { opacity: 0.8 }]}
               useLargeImage={userPressed === item.id || activeUser === item.id}
             />

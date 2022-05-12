@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { getUserMainUserCard } from '../domains/UserCard';
 import NodeGraphQL from './NodeGraphQL';
@@ -20,6 +20,9 @@ const UserGraphQL: GraphQLObjectType = new GraphQLObjectType<
     },
     lastName: {
       type: GraphQLString,
+    },
+    userName: {
+      type: new GraphQLNonNull(GraphQLString),
     },
     card: {
       type: UserCardGraphQL,

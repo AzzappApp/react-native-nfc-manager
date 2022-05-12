@@ -37,11 +37,10 @@ export const preloadServerQuery = async <T extends OperationType>(
 ) => {
   const environment = createServerEnvironment(authInfos);
 
-  await fetchQuery<T>(environment, query, variables, {
-    fetchPolicy: 'network-only',
-  }).toPromise();
-
   return {
+    data: await fetchQuery<T>(environment, query, variables, {
+      fetchPolicy: 'network-only',
+    }).toPromise(),
     initialRecords: environment.getStore().getSource().toJSON(),
   };
 };

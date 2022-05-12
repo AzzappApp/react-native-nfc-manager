@@ -4,12 +4,12 @@ const routesMap: { [key in Routes]: string } = {
   HOME: '/home',
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
-  USER: '/[userId]',
+  USER: '/[userName]',
   CHAT: '/chat',
-  NEW_POST: '/[userId]/newPost',
+  NEW_POST: '/[userName]/newPost',
   PROFILE: '/profile',
   SEARCH: '/search',
-  POST: '/[userId]/[postId]',
+  POST: '/[userName]/[postId]',
 };
 
 const inverseRoutesMap: { [key: string]: Routes } = Object.fromEntries(

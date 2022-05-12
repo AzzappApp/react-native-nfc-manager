@@ -13,7 +13,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverRendererProps = {
   cover: CoverRenderer_cover$key | null | undefined;
-  userId: string;
+  userName: string;
   fullScreen?: boolean;
   useLargeImage?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -21,7 +21,7 @@ type CoverRendererProps = {
 
 const CoverRenderer = ({
   cover: coverKey,
-  userId,
+  userName,
   style,
   fullScreen,
   useLargeImage,
@@ -59,18 +59,18 @@ const CoverRenderer = ({
   return (
     <View
       style={[styles.container, { borderRadius }, style]}
-      nativeID={`cover-${userId}`}
+      nativeID={`cover-${userName}`}
     >
       <CoverRendererImage
         picture={cover?.picture}
         style={[{ borderRadius }, styles.coverImage]}
-        nativeID={`cover-${userId}-image`}
-        testID={`cover-${userId}-picture`}
+        nativeID={`cover-${userName}-image`}
+        testID={`cover-${userName}-picture`}
         useLargeImage={useLargeImage ?? fullScreen}
       />
       <Text
         style={[styles.text, { fontSize }]}
-        nativeID={`cover-${userId}-text`}
+        nativeID={`cover-${userName}-text`}
       >
         {cover?.title}
       </Text>

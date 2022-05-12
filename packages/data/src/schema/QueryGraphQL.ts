@@ -1,8 +1,15 @@
-import { GraphQLID, GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import {
+  GraphQLID,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { getUserById } from '../domains/User';
+import { getUserById, getUserByUserName } from '../domains/User';
 import { getUserCardById } from '../domains/UserCard';
 import NodeGraphQL from './NodeGraphQL';
+import UserGraphQL from './UserGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
 import type { Viewer } from '../domains/Viewer';
 import type { GraphQLContext } from './GraphQLContext';
@@ -14,7 +21,7 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
       resolve: (_root, _args, context): Viewer => {
-        // We might store temporary viewer in database later ???
+        // TODO We might store anonymous viewer in database later ???
         return {
           userId: context.userId,
           isAnonymous: context.isAnonymous,
@@ -30,30 +37,46 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
           description: 'The ID of an object',
         },
       },
-      resolve: (_, { id: gqlId }) => {
-        const { id, type } = fromGlobalId(gqlId);
-        if (type === 'User') {
-          return getUserById(id);
-        } else if (type === 'UserCard') {
-          const [userId, cardId] = JSON.parse(id);
-          return getUserCardById(userId, cardId);
-        }
-      },
+      resolve: (_, { id: gqlId }) => fetchNode(gqlId),
     },
-    // TODO
-    // nodes: {
-    //   description: 'Fetches objects given their IDs',
-    //   type: new GraphQLNonNull(new GraphQLList(NodeGraphQL)),
-    //   args: {
-    //     ids: {
-    //       type: new GraphQLNonNull(
-    //         new GraphQLList(new GraphQLNonNull(GraphQLID)),
-    //       ),
-    //       description: 'The IDs of objects',
-    //     },
-    //   },
-    // },
+    nodes: {
+      description: 'Fetches objects given their IDs',
+      type: new GraphQLNonNull(new GraphQLList(NodeGraphQL)),
+      args: {
+        ids: {
+          type: new GraphQLNonNull(
+            new GraphQLList(new GraphQLNonNull(GraphQLID)),
+          ),
+          description: 'The IDs of objects',
+        },
+      },
+      // TODO implement with batch ?
+      resolve: (_, { ids: gqlIds }: { ids: string[] }) =>
+        Promise.all(gqlIds.map(fetchNode)),
+    },
+    user: {
+      description: 'Fetches an user given its user name',
+      type: UserGraphQL,
+      args: {
+        userName: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The user name of the user',
+        },
+      },
+      resolve: (_, { userName }: { userName: string }) =>
+        getUserByUserName(userName),
+    },
   },
 });
 
 export default QueryGraphQL;
+
+const fetchNode = (gqlId: string) => {
+  const { id, type } = fromGlobalId(gqlId);
+  if (type === 'User') {
+    return getUserById(id);
+  } else if (type === 'UserCard') {
+    const [userId, cardId] = JSON.parse(id);
+    return getUserCardById(userId, cardId);
+  }
+};

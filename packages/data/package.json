@@ -4,7 +4,7 @@
   "private": true,
   "main": "./src",
   "scripts": {
-    "updateSchema": "ts-node ./scripts/updateSchema.ts"
+    "update-schema": "ts-node ./scripts/updateSchema.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.181",

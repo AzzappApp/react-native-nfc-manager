@@ -1,11 +1,14 @@
 /* eslint-disable react/display-name */
-import UserScreen, { userScreenQuery } from '@azzapp/app/lib/UserScreen';
 import ROUTES from '@azzapp/shared/lib/routes';
 import { View } from 'react-native';
 import { registerScreens } from './helpers/screenRegistry';
 import HomeMobileScreen, { homeScreenQuery } from './screens/HomeMobileScreen';
 import SignInMobileScreen from './screens/SignInMobileScreen';
 import SignUpMobileScreen from './screens/SignUpMobileScreen';
+import UserMobileScreen, {
+  userScreenByIdQuery,
+  userScreenByNameQuery,
+} from './screens/UserMobileScreen';
 import type { ScreenRegistryOptions } from './helpers/screenRegistry';
 
 const screens: ScreenRegistryOptions = {
@@ -14,52 +17,11 @@ const screens: ScreenRegistryOptions = {
     query: homeScreenQuery,
   },
   USER: {
-    component: UserScreen,
-    query: userScreenQuery,
-    getVariables({ userId }) {
-      return { userId };
-    },
-    options({ params: { userId, useSharedAnimation } }) {
-      if (useSharedAnimation === false) {
-        return null;
-      }
-      return {
-        animations: {
-          push: {
-            sharedElementTransitions: [
-              {
-                fromId: `cover-${userId}-image`,
-                toId: `cover-${userId}-image`,
-                interpolation: { type: 'spring' },
-                duration: 300,
-              },
-              {
-                fromId: `cover-${userId}-text`,
-                toId: `cover-${userId}-text`,
-                interpolation: { type: 'spring' },
-                duration: 300,
-              },
-            ],
-          },
-          pop: {
-            sharedElementTransitions: [
-              {
-                fromId: `cover-${userId}-image`,
-                toId: `cover-${userId}-image`,
-                interpolation: { type: 'spring' },
-                duration: 300,
-              },
-              {
-                fromId: `cover-${userId}-text`,
-                toId: `cover-${userId}-text`,
-                interpolation: { type: 'spring' },
-                duration: 300,
-              },
-            ],
-          },
-        },
-      };
-    },
+    component: UserMobileScreen,
+    query: ({ userId }) =>
+      userId ? userScreenByIdQuery : userScreenByNameQuery,
+    getVariables: ({ userId, userName }) => ({ userId, userName }),
+    options: UserMobileScreen.screenOptions,
   },
   SIGN_IN: { component: SignInMobileScreen },
   SIGN_UP: { component: SignUpMobileScreen },

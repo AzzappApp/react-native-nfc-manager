@@ -7,6 +7,18 @@ type Query {
     """The ID of an object"""
     id: ID!
   ): Node
+
+  """Fetches objects given their IDs"""
+  nodes(
+    """The IDs of objects"""
+    ids: [ID!]!
+  ): [Node]!
+
+  """Fetches an user given its user name"""
+  user(
+    """The user name of the user"""
+    userName: String!
+  ): User
 }
 
 """Represent an Application Viewer"""
@@ -31,6 +43,7 @@ type User implements Node {
   id: ID!
   firstName: String
   lastName: String
+  userName: String!
   card: UserCard
 }
 
@@ -43,6 +56,7 @@ interface Node {
 type UserCard implements Node {
   """The ID of an object"""
   id: ID!
+  user: User!
 
   """Card cover display informations"""
   cover: UserCardCover!

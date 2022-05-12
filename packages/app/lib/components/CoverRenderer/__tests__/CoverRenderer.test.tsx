@@ -23,7 +23,7 @@ const TestRenderer = () => {
     `,
     {},
   );
-  return <CoverRenderer cover={data.card?.cover} userId="userId" />;
+  return <CoverRenderer cover={data.card?.cover} userName="userName" />;
 };
 
 describe('CoverRenderer', () => {
@@ -49,6 +49,6 @@ describe('CoverRenderer', () => {
     );
 
     expect(getByText('fake title')).toBeTruthy();
-    expect(getByTestId('cover-userId-picture')).toBeTruthy();
+    expect(getByTestId('cover-userName-picture')).toBeTruthy();
   });
 });

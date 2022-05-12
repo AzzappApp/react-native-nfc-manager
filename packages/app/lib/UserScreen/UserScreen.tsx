@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { graphql } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import CoverRenderer from '../components/CoverRenderer';
 import EditButton from '../components/EditButton';
 import Header from '../components/Header';
@@ -9,20 +9,22 @@ import TextHeaderButton from '../components/TextHeaderButton';
 import { useRouter } from '../PlatformEnvironment';
 import CoverEditPanel from './CoverEditPanel';
 import ModuleEditorContext from './ModuleEditorContext';
-import type { UserScreenQuery$data } from './__generated__/UserScreenQuery.graphql';
+import type { UserScreenFramgent_user$key } from './__generated__/UserScreenFramgent_user.graphql';
+import type { UserScreenFramgent_viewer$key } from './__generated__/UserScreenFramgent_viewer.graphql';
 import type { ModuleEditor } from './ModuleEditorContext';
 import type { ReactElement } from 'react';
 
-export const userScreenQuery = graphql`
-  query UserScreenQuery($userId: ID!) {
-    viewer {
-      user {
+type UserScreenProps = {
+  user: UserScreenFramgent_user$key | null;
+  viewer: UserScreenFramgent_viewer$key;
+};
+
+const UserScreen = ({ user: userKey, viewer: viewerKey }: UserScreenProps) => {
+  const user = useFragment(
+    graphql`
+      fragment UserScreenFramgent_user on User {
         id
-      }
-    }
-    user: node(id: $userId) {
-      ... on User {
-        id
+        userName
         card {
           id
           cover {
@@ -31,21 +33,28 @@ export const userScreenQuery = graphql`
           }
         }
       }
-    }
-  }
-`;
-
-type UserScreenProps = {
-  data: UserScreenQuery$data;
-  params: { userId: string };
-};
-
-const UserScreen = ({ data: { user, viewer } }: UserScreenProps) => {
-  const router = useRouter();
-  const canEdit = !!user && user?.id === viewer.user?.id;
-  const [creatingCard, setCreatingCard] = useState(
-    canEdit && user.card === null,
+    `,
+    userKey,
   );
+
+  const viewer = useFragment(
+    graphql`
+      fragment UserScreenFramgent_viewer on Viewer {
+        user {
+          id
+        }
+      }
+    `,
+    viewerKey,
+  );
+
+  const canEdit = viewer?.user?.id === user?.id;
+
+  const router = useRouter();
+  const [creatingCard, setCreatingCard] = useState(
+    canEdit && user?.card === null,
+  );
+
   const [isEditing, setIsEditing] = useState(creatingCard);
   const [editedBlock, setEditedBlock] = useState<number | 'cover' | null>(
     creatingCard ? 'cover' : null,
@@ -158,7 +167,7 @@ const UserScreen = ({ data: { user, viewer } }: UserScreenProps) => {
           {typeof editedBlock !== 'number' && (
             <CoverRenderer
               cover={user.card?.cover}
-              userId={user.id}
+              userName={user.userName}
               style={isEditing ? styles.coverEditing : styles.cover}
               fullScreen={!isEditing}
             />

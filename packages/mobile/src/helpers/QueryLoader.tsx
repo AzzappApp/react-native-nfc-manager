@@ -8,13 +8,13 @@ import {
 import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
 
 type QueryEntry = {
-  query: GraphQLTaggedNode;
+  query: GraphQLTaggedNode | ((params: any) => GraphQLTaggedNode);
   getVariables?: (params: any) => Variables;
 };
 
 const queryRegistry = new Map<string, QueryEntry>();
 
-const activeQuery = new Map<
+const activeQueries = new Map<
   string,
   {
     preloadedQuery: PreloadedQuery<any>;
@@ -75,7 +75,7 @@ export const init = () => {
     }
   });
   addEnvironmentListener(() => {
-    [...activeQuery.entries()].forEach(([componentId, entry]) => {
+    [...activeQueries.entries()].forEach(([componentId, entry]) => {
       const { preloadedQuery, query, variables } = entry;
       preloadedQuery.dispose();
       entry.preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
@@ -93,12 +93,19 @@ export const registerComponentQuery = (
   queryRegistry.set(componentName, query);
 };
 
+const getQueryInfos = (componentId: string) => {
+  const entry = activeQueries.get(componentId);
+  return entry ? ([entry?.query, entry?.preloadedQuery] as const) : null;
+};
+
 export const useQueryLoaderQuery = (componentId: string) => {
-  const [query, setQuery] = useState<PreloadedQuery<any> | null>(
-    activeQuery.get(componentId)?.preloadedQuery ?? null,
+  const [queryInfos, setQueryInfos] = useState(getQueryInfos(componentId));
+  useEffect(
+    () =>
+      addListener(componentId, () => setQueryInfos(getQueryInfos(componentId))),
+    [componentId],
   );
-  useEffect(() => addListener(componentId, setQuery), [componentId]);
-  return query;
+  return queryInfos;
 };
 
 export const loadQueryFor = (
@@ -108,19 +115,23 @@ export const loadQueryFor = (
   refresh?: boolean,
 ) => {
   const entry = queryRegistry.get(componentName);
-  if (entry && (!activeQuery.has(componentId) || refresh)) {
-    const { query, getVariables } = entry;
+  if (entry && (!activeQueries.has(componentId) || refresh)) {
+    const { query: queryOrFactory, getVariables } = entry;
     const variables = getVariables?.(params) ?? {};
+    const query =
+      typeof queryOrFactory === 'function'
+        ? queryOrFactory(params)
+        : queryOrFactory;
     const preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
-    activeQuery.set(componentId, { query, preloadedQuery, variables });
+    activeQueries.set(componentId, { query, preloadedQuery, variables });
     listeners.get(componentId)?.forEach(callback => callback(preloadedQuery));
   }
 };
 
 export const disposeQueryFor = (componentId: string) => {
-  const query = activeQuery.get(componentId);
+  const query = activeQueries.get(componentId);
   if (query) {
     query.preloadedQuery.dispose();
-    activeQuery.delete(componentId);
+    activeQueries.delete(componentId);
   }
 };
