@@ -15,8 +15,9 @@
     "dev:web": "yarn workspace @azzapp/web dev",
     "dev:mobile": "yarn workspace @azzapp/mobile dev",
     "dev": "ttab yarn dev:relay && ttab yarn dev:web && ttab yarn dev:mobile",
-    "run-ios": "yarn workspace @azzapp/mobile run-ios",
-    "run-android": "yarn workspace @azzapp/mobile run-android",
+    "run:ios": "yarn workspace @azzapp/mobile run:ios",
+    "run:android": "yarn workspace @azzapp/mobile run:android",
+    "build:ios": "yarn workspace @azzapp/mobile build:ios",
     "update-graphql-schema": "yarn workspace @azzapp/data update-schema"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest": "^28.1.0",
     "metro-react-native-babel-preset": "^0.67.0",
+    "node-fetch": "2",
     "prettier": "^2.6.0",
     "typescript": "^4.7.1-rc"
   },

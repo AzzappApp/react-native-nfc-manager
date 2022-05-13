@@ -1,0 +1,80 @@
+name: Test
+on:
+  push:
+    branches:
+      - main
+      - stable
+  pull_request:
+    branches: 
+      - main
+      - stable
+jobs:
+  continuous-integration :
+    name: Validate and test and Build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+          
+      - run: yarn install --frozen-lockfile
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: packages/mobile
+          bundler-cache: true
+
+      # JavaScript build
+      - name: Relay Compiler 
+        run: yarn workspace @azzapp/app relay
+      
+      # Testing
+      - name: Lint
+        run: yarn lint
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+
+      # Retrieves Vercel url
+      - name: Get Vercel Preview Url
+        run: node ./scripts/getVercelPreviewUrl.js $GITHUB_REF $GITHUB_SHA  ${{ secrets.VERCEL_TOKEN }}
+        id: vercel_preview_url
+
+      # IOS App build
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: packages/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('packages/mobile/ios/Podfile.lock') }}
+
+      - name: Pod install
+        run: cd packages/mobile/ios/ && bundle exec pod install
+        env: 
+          RCT_NEW_ARCH_ENABLED : 1
+
+      - name: Setup faslane AppStore API Key
+        run: echo $FASTLANE_APPSTORE_API_KEY | base64 --decode > ./packages/mobile/fastlane/appstore_api_key.json
+        env:
+          FASTLANE_APPSTORE_API_KEY: ${{ secrets.FASTLANE_APPSTORE_API_KEY }}
+
+      - name: Fix FlipperFoly
+        run: cd packages/mobile && sh ./scripts/fix-m1-flipper-foly.sh
+        
+      - name: Build ios application
+        run: yarn build:ios
+        env:
+          CI: true
+          MATCH_PASSWORD: ${{ secrets.FASTLANE_MATCH_PASSWORD }}
+          GIT_BASIC_AUTH: ${{ secrets.FASTLANE_GIT_BASIC_AUTH }}
+          EXPORT_METHOD: "development"
+          MATCH_TYPE: "development"
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "azzapp"
+          NEXT_PUBLIC_CLOUDINARY_API_KEY: "281326962786824"
+          NEXT_PUBLIC_API_ENDPOINT: "https://${{ steps.vercel_preview_url.outputs.vercel_url }}/api"
+  
