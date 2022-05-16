@@ -18,6 +18,7 @@
     "run:ios": "yarn workspace @azzapp/mobile run:ios",
     "run:android": "yarn workspace @azzapp/mobile run:android",
     "build:ios": "yarn workspace @azzapp/mobile build:ios",
+    "deploy:ios": "yarn workspace @azzapp/mobile deploy:ios",
     "update-graphql-schema": "yarn workspace @azzapp/data update-schema"
   },
   "devDependencies": {

@@ -78,3 +78,31 @@ jobs:
           NEXT_PUBLIC_CLOUDINARY_API_KEY: "281326962786824"
           NEXT_PUBLIC_API_ENDPOINT: "https://${{ steps.vercel_preview_url.outputs.vercel_url }}/api"
   
+      # IOS App Deployments
+      - name: Set App Center env for staging
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "app_center_ios_app_name=${{ secrets.APPCENTER_STAGING_IOS_APP_NAME }}" >> $GITHUB_ENV
+          echo "app_center_ios_api_token=${{ secrets.APPCENTER_STAGING_IOS_API_TOKEN }}" >> $GITHUB_ENV
+          
+      - name: Set App Center env for dev
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "app_center_ios_app_name=${{ secrets.APPCENTER_DEV_IOS_APP_NAME }}" >> $GITHUB_ENV
+          echo "app_center_ios_api_token=${{ secrets.APPCENTER_DEV_IOS_API_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Deploy on App Center
+        run: yarn deploy:ios
+        id: appcenter_deploy_ios
+        env:
+          APPCENTER_OWNER_NAME: azzapp
+          APPCENTER_IOS_APP_NAME: ${{ env.app_center_ios_app_name }}
+          APPCENTER_IOS_API_TOKEN: ${{ env.app_center_ios_api_token }}
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          message: |
+            Application deployed to Microsoft App Center
+            sha: ${{ github.sha }}
+            url: ${{ steps.appcenter_deploy_ios.outputs.install_url }}

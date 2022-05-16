@@ -6,7 +6,8 @@
     "run:android": "react-native run-android --no-packager",
     "run:ios": "react-native run-ios --no-packager",
     "dev": "react-native start",
-    "build:ios": "bundle exec fastlane ios build"
+    "build:ios": "bundle exec fastlane ios build",
+    "deploy:ios": "bundle exec fastlane ios deploy"
   },
   "dependencies": {
     "@azzapp/app": "*",
