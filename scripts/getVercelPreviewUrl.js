@@ -7,6 +7,10 @@ const TIMEOUT = 300;
 const VERCEL_TEAM_ID = 'fadio-it';
 const VERCEL_PROJECT_NAME = 'azzapp';
 
+console.log(
+  `Searching vercel deployment for ref: ${GITHUB_REF} sha: ${GITHUB_SHA}`,
+);
+
 const setOutPut = value =>
   console.log(`::set-output name=vercel_url::${value}`);
 
@@ -53,7 +57,7 @@ fetchVercelUrl().then(
     process.exit(0);
   },
   e => {
-    console.err(e.message);
+    console.error(e.message);
     process.exit(1);
   },
 );

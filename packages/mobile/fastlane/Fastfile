@@ -84,7 +84,7 @@ platform :ios do
 
     release = Actions.lane_context[SharedValues::APPCENTER_BUILD_INFORMATION]
     installUrl = "https://install.appcenter.ms/orgs/#{ownerName}/apps/#{appName}/releases/#{release["id"]}"
-    puts "::set-output name=install_url::#{installUrl}"
+    sh("echo IOS_INSTALL_URL=#{installUrl} >> $GITHUB_ENV")
   end 
 end
 

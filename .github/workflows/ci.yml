@@ -43,7 +43,7 @@ jobs:
 
       # Retrieves Vercel url
       - name: Get Vercel Preview Url
-        run: node ./scripts/getVercelPreviewUrl.js $GITHUB_REF $GITHUB_SHA  ${{ secrets.VERCEL_TOKEN }}
+        run: node ./scripts/getVercelPreviewUrl.js ${{ github.ref }} ${{ github.event.pull_request.head.sha }}  ${{ secrets.VERCEL_TOKEN }}
         id: vercel_preview_url
 
       # IOS App build
@@ -99,10 +99,11 @@ jobs:
           APPCENTER_IOS_APP_NAME: ${{ env.app_center_ios_app_name }}
           APPCENTER_IOS_API_TOKEN: ${{ env.app_center_ios_api_token }}
 
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - name: Pull Request deploy command
+        uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
         with:
           message: |
             Application deployed to Microsoft App Center
-            sha: ${{ github.sha }}
-            url: ${{ steps.appcenter_deploy_ios.outputs.install_url }}
+            sha: ${{ github.event.pull_request.head.sha }}
+            url: ${{ env.IOS_INSTALL_URL }}
