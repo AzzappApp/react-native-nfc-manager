@@ -5,6 +5,8 @@ import {
   GraphQLString,
   GraphQLEnumType,
   GraphQLUnionType,
+  GraphQLInt,
+  GraphQLFloat,
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { getUserById } from '../domains/User';
@@ -54,13 +56,60 @@ export const UserCardCoverGraphQL = new GraphQLObjectType<
   name: 'UserCardCover',
   description: 'UserCard cover display informations',
   fields: () => ({
+    backgroundColor: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the background color of the card',
+    },
+    pictures: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      ),
+      description: 'the pictures of the card cover',
+    },
+    pictureTransitionTimer: {
+      type: new GraphQLNonNull(GraphQLFloat),
+      description:
+        'the time, in seconds, a picture stay displayed before transition in case of multiple pictures',
+    },
+    overlayEffect: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the overlay effect applied to the card cover',
+    },
     title: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'the title of the card',
+      description: 'the title of the card cover',
     },
-    picture: {
+    titlePosition: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'the picture of the card',
+      description: 'the title position in the card cover',
+    },
+    titleFont: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the font family used to display the title',
+    },
+    titleFontSize: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'the font size of used to display the title',
+    },
+    titleColor: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the color used to display the title',
+    },
+    titleRotation: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'the rotation of the title',
+    },
+    qrCodePosition: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the position of the qr code in the card',
+    },
+    desktopLayout: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the layout used to display the cover on desktop',
+    },
+    dektopImagePosition: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the position of the backround image on desktop',
     },
   }),
 });

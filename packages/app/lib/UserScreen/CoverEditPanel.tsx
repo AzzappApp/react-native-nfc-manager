@@ -1,77 +1,90 @@
+import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
+import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import omitBy from 'lodash/omitBy';
 import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-
-import {
-  applyOptimisticMutation,
-  graphql,
-  useRelayEnvironment,
-  commitMutation,
-  useFragment,
-} from 'react-relay';
-import EditionPanelTabs from '../components/EditionPanelTabs';
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { graphql, useFragment } from 'react-relay';
+import { Observable } from 'relay-runtime';
+import ColorPicker from '../components/ColorPicker';
+import { QR_CODE_POSITION_CHANGE_EVENT } from '../components/CoverRenderer/CoverRenderer';
+import TabsBar from '../components/TabsBar';
+import useFormMutation from '../hooks/useFormMutation';
 import { useImagePicker, useWebAPI } from '../PlatformEnvironment';
+import CoverEditPanelEffectTab from './CoverEditPanelEffectTab';
+import CoverEditPanelImagePanel from './CoverEditPanelImageTab';
+import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
 import ModuleEditorContext from './ModuleEditorContext';
-import type { CoverEditPanel_cover$key } from './__generated__/CoverEditPanel_cover.graphql';
-import type { UpdateCoverInput } from './__generated__/CoverEditPanelMutation.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { Disposable } from 'react-relay';
+import UploadProgressModal from './UploadProgressModal';
+import type {
+  CoverEditPanel_cover$data,
+  CoverEditPanel_cover$key,
+} from './__generated__/CoverEditPanel_cover.graphql';
+import type {
+  CoverEditPanelMutation,
+  UpdateCoverInput,
+} from './__generated__/CoverEditPanelMutation.graphql';
+import type { EventEmitter } from 'events';
+import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type CoverEditPanelProps = {
-  style: StyleProp<ViewStyle>;
   userId: string;
   cover?: CoverEditPanel_cover$key | null;
+  cardId?: string;
+  imageIndex: number | undefined;
+  setImageIndex: (index: number | undefined) => void;
+  eventEmitter?: EventEmitter;
+  style: StyleProp<ViewStyle>;
 };
 
-const CoverEditPanel = ({ style, userId, cover }: CoverEditPanelProps) => {
-  const data = useFragment(
+export type CoverUpdates = Omit<UpdateCoverInput, 'pictures'> & {
+  pictures?: Array<string | { uri: string; file: File }>;
+};
+
+const CoverEditPanel = ({
+  userId,
+  cover: coverKey,
+  cardId,
+  imageIndex,
+  setImageIndex,
+  eventEmitter,
+  style,
+}: CoverEditPanelProps) => {
+  const cover = useFragment(
     graphql`
       fragment CoverEditPanel_cover on UserCardCover {
-        picture
+        backgroundColor
+        pictures
+        pictureTransitionTimer
+        overlayEffect
         title
+        titlePosition
+        titleFont
+        titleFontSize
+        titleColor
+        titleRotation
+        qrCodePosition
+        desktopLayout
+        dektopImagePosition
       }
     `,
-    cover ?? null,
+    coverKey ?? null,
   );
 
-  const moduleEditor = useContext(ModuleEditorContext)!;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialData = useMemo(() => cover, []);
+  const coverUpdatesRef = useRef<CoverUpdates>({});
 
-  const initialData = useMemo(
-    () => ({
-      picture: data?.picture,
-      title: data?.title,
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const updates = useRef<UpdateCoverInput>(initialData);
-  const pictureRef = useRef<any>(null);
-
-  const environment = useRelayEnvironment();
-  const mutationRef = useRef<{
-    pending: boolean;
-    revert: () => void;
-    commit: () => Disposable;
-  } | null>(null);
-
-  const WebAPI = useWebAPI();
-  const updateField = <T extends keyof UpdateCoverInput>(
-    key: T,
-    value: UpdateCoverInput[T],
-  ) => {
-    if (updates.current[key] === value) {
-      return;
-    }
-    updates.current = { ...updates.current, [key]: value };
-    const updateCoverMutation = graphql`
+  const { commit, revert, applyOptimistic } =
+    useFormMutation<CoverEditPanelMutation>(graphql`
       mutation CoverEditPanelMutation($input: UpdateCoverInput!) {
         updateCover(input: $input) {
           user {
@@ -84,217 +97,366 @@ const CoverEditPanel = ({ style, userId, cover }: CoverEditPanelProps) => {
           }
         }
       }
-    `;
+    `);
 
-    const hasUnsavedChange = !isEqual(initialData, updates.current);
-    const isValid = !!updates.current.picture && !!updates.current.title;
-    const previousMutation = mutationRef.current;
-    moduleEditor.setCanSave(hasUnsavedChange && isValid);
+  const moduleEditor = useContext(ModuleEditorContext)!;
 
-    if (hasUnsavedChange) {
-      const optimisticDisposable = applyOptimisticMutation(environment, {
-        mutation: updateCoverMutation,
-        variables: { input: updates.current },
-        optimisticResponse: {
-          updateCover: {
-            user: {
-              id: userId,
-              card: {
-                id: `temp-${userId}-mainCard`,
-                cover: {
-                  title: updates.current.title ?? '',
-                  picture: updates.current.picture ?? '',
-                },
-              },
-            },
-          },
-        },
-      });
+  const applyUpdates = (updates: Partial<CoverUpdates>) => {
+    const coverUpdates: CoverUpdates = omitBy(
+      { ...coverUpdatesRef.current, ...updates },
+      (val, key) => isEqual((initialData as any)?.[key], val),
+    );
 
-      mutationRef.current = {
-        pending: true,
-        revert() {
-          optimisticDisposable.dispose();
-          this.pending = false;
-        },
-        commit() {
-          let innerDisposable: Disposable | null;
-          let canceled = false;
-
-          const dispose = () => {
-            canceled = true;
-            innerDisposable?.dispose();
-          };
-
-          const commit = async () => {
-            if (
-              updates.current.picture !== initialData.picture &&
-              pictureRef.current
-            ) {
-              if (canceled) {
-                return;
-              }
-              const uploadSettings = await WebAPI.uploadSign({
-                kind: 'image',
-                target: 'cover',
-              });
-
-              if (canceled) {
-                return;
-              }
-              const { promise, progress } = WebAPI.uploadMedia(
-                pictureRef.current as File,
-                uploadSettings,
-              );
-              progress.subscribe({
-                next(val) {
-                  console.log(val);
-                },
-              });
-              const res = await promise;
-              updates.current.picture = res.public_id;
-            }
-            if (canceled) {
-              return;
-            }
-
-            innerDisposable = commitMutation(environment, {
-              mutation: updateCoverMutation,
-              variables: { input: updates.current },
-              onCompleted() {
-                optimisticDisposable.dispose();
-                moduleEditor.onSaved();
-              },
-              onError(e) {
-                // eslint-disable-next-line no-alert
-                alert('Error');
-                console.log(e);
-              },
-            });
-          };
-
-          commit().catch(e => {
-            // eslint-disable-next-line no-alert
-            alert('Error');
-            console.log(e);
-          });
-
-          this.pending = false;
-          return { dispose };
-        },
-      };
-    } else {
-      mutationRef.current = null;
+    if (isEqual(coverUpdates, coverUpdatesRef.current)) {
+      return;
     }
+    coverUpdatesRef.current = coverUpdates;
 
-    previousMutation?.revert();
+    const isDirty = !!Object.keys(coverUpdates).length;
+
+    const pictures = coverUpdates.pictures ?? initialData?.pictures;
+    const title = coverUpdates.title ?? initialData?.title;
+    const isValid = !!pictures?.length && !!title;
+
+    moduleEditor.setCanSave(isDirty && isValid);
+
+    if (isDirty) {
+      applyOptimistic(
+        getOptimisticResponse(initialData, coverUpdates, userId, cardId),
+      );
+    } else {
+      revert();
+    }
   };
 
-  useEffect(
-    () => () => {
-      if (mutationRef.current?.pending) {
-        mutationRef.current?.revert();
+  const WebAPI = useWebAPI();
+
+  const [uploadProgress, setUploadProgress] =
+    useState<Observable<number> | null>(null);
+
+  const onSave = useCallback(async () => {
+    const { pictures, ...coverUpdates } = coverUpdatesRef.current;
+
+    const updateCoverInput: UpdateCoverInput = coverUpdates;
+    try {
+      if (pictures) {
+        const picturesToUpload: Array<{ index: number; file: File }> = [];
+        pictures.forEach((picture, index) => {
+          if (typeof picture === 'object') {
+            picturesToUpload.push({ file: picture.file, index });
+          }
+        });
+
+        if (picturesToUpload.length) {
+          const uploadSettings = await Promise.all(
+            picturesToUpload.map(() =>
+              WebAPI.uploadSign({
+                kind: 'image',
+                target: 'cover',
+              }),
+            ),
+          );
+
+          const uploads = picturesToUpload.map(({ file, index }, i) => ({
+            index,
+            upload: WebAPI.uploadMedia(file, uploadSettings[i]),
+          }));
+
+          const nbObservables = uploads.length;
+          if (nbObservables) {
+            const totals: number[] = uploads.map(() => 0);
+            setUploadProgress(
+              Observable.create(sink => {
+                sink.next(0);
+                const subscriptions = uploads.map(
+                  ({ upload: { progress } }, index) =>
+                    progress.subscribe({
+                      next: value => {
+                        totals[index] = value;
+                        sink.next(
+                          totals.reduce(
+                            (value: number, uploadValue: number) =>
+                              value + uploadValue / nbObservables,
+                            0,
+                          ),
+                        );
+                      },
+                    }),
+                );
+
+                return () => {
+                  subscriptions.forEach(subscription => {
+                    subscription.unsubscribe();
+                  });
+                };
+              }),
+            );
+          }
+
+          const results = await Promise.all(
+            uploads.map(({ upload, index }) =>
+              upload.promise.then(res => ({
+                index,
+                publicId: res.public_id as string,
+              })),
+            ),
+          );
+
+          updateCoverInput.pictures = pictures.map((picture, index) => {
+            const uploadedImage = results.find(
+              result => result.index === index,
+            );
+            return uploadedImage?.publicId ?? (picture as string);
+          });
+        } else {
+          updateCoverInput.pictures = pictures as string[];
+        }
       }
-    },
-    [environment, updates, userId],
-  );
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert('Error');
+      console.log(e);
+      moduleEditor.onSaveError(e as Error);
+      return;
+    }
+    setUploadProgress(null);
+    commit({
+      variables: { input: updateCoverInput },
+      optimisticResponse: getOptimisticResponse(
+        initialData,
+        coverUpdatesRef.current,
+        userId,
+        cardId,
+      ),
+      onCompleted() {
+        moduleEditor.onSaved();
+      },
+      onError(e) {
+        // eslint-disable-next-line no-alert
+        alert('Error');
+        console.log(e);
+        moduleEditor.onSaveError(e);
+      },
+    });
+  }, [WebAPI, cardId, commit, initialData, moduleEditor, userId]);
+
+  const onCancel = useCallback(() => {
+    revert();
+  }, [revert]);
 
   useEffect(() => {
-    const saveSubscription = moduleEditor.setSaveListener(() => {
-      mutationRef.current?.commit();
-    });
-    const cancelSubscription = moduleEditor.setCancelListener(() => {
-      mutationRef.current?.revert();
-    });
+    const saveSubscription = moduleEditor.setSaveListener(onSave);
+    const cancelSubscription = moduleEditor.setCancelListener(onCancel);
 
     return () => {
       saveSubscription.dispose();
       cancelSubscription.dispose();
     };
-  }, [moduleEditor]);
+  }, [moduleEditor, onSave, onCancel]);
+
+  useEffect(() => revert, [revert]);
 
   const launchImagePicker = useImagePicker();
 
-  const onSelectPhoto = async () => {
-    const { didCancel, error, uri, file } = await launchImagePicker();
-
-    if (didCancel || error || !uri) {
+  const onSelectPhoto = async (index: number | undefined, force = false) => {
+    if (index === undefined || (cover?.pictures[index] && !force)) {
+      setImageIndex(index);
       return;
     }
-    updateField('picture', uri);
-    pictureRef.current = file;
+    const { didCancel, error, uri, file } = await launchImagePicker();
+
+    if (didCancel || error || !uri || !file) {
+      return;
+    }
+    const coverUpdates = coverUpdatesRef.current;
+    const pictures = [
+      ...(coverUpdates.pictures ?? initialData?.pictures ?? []),
+    ];
+    index = Math.min(index, pictures.length);
+
+    pictures[index] = { uri, file };
+    setImageIndex(index);
+    applyUpdates({ pictures });
   };
 
-  const onTitleChange = (title: string) => {
-    updateField('title', title);
+  const onRemovePicture = () => {
+    if (imageIndex === undefined) {
+      return;
+    }
+    const coverUpdates = coverUpdatesRef.current;
+    const pictures = [
+      ...(coverUpdates.pictures ?? initialData?.pictures ?? []),
+    ];
+    pictures.splice(imageIndex, 1);
+    applyUpdates({ pictures });
+    setImageIndex(clamp(imageIndex, 0, pictures.length - 1));
   };
+
+  const onUpdatePicture = () => {
+    void onSelectPhoto(imageIndex, true);
+  };
+
+  const updateField = <T extends keyof CoverUpdates>(
+    key: T,
+    value: CoverUpdates[T],
+  ) => {
+    applyUpdates({ [key]: value });
+  };
+
+  const updateFieldRef = useRef(updateField);
+  updateFieldRef.current = updateField;
+  useEffect(() => {
+    const handler = (position: string) => {
+      updateFieldRef.current('qrCodePosition', position);
+    };
+
+    eventEmitter?.on(QR_CODE_POSITION_CHANGE_EVENT, handler);
+
+    return () => {
+      eventEmitter?.off(QR_CODE_POSITION_CHANGE_EVENT, handler);
+    };
+  }, [eventEmitter]);
 
   const [currenTab, setCurrentTab] = useState('picture');
-  const tabs = useMemo(
-    () => [
-      {
-        key: 'picture',
-        accessibilityLabel: 'Picture Tab',
-        icon: require('./assets/picture-icon.png'),
-      },
-      {
-        key: 'title',
-        accessibilityLabel: 'Title Tab',
-        icon: require('./assets/title-icon.png'),
-      },
-      {
-        key: 'effect',
-        accessibilityLabel: 'Effect Tab',
-        icon: require('./assets/effect-icon.png'),
-      },
-      {
-        key: 'desktop',
-        accessibilityLabel: 'Desktop Tab',
-        icon: require('./assets/desktop-icon.png'),
-      },
-    ],
-    [],
-  );
+
+  const displayedCover = {
+    pictures: [],
+    title: '',
+    ...DEFAULT_CARD_COVER,
+    ...cover,
+  };
+
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  const onTabPress = (tab: string) => {
+    if (tab === 'color-picker') {
+      setShowColorPicker(true);
+      return;
+    }
+    setImageIndex(0);
+    setCurrentTab(tab);
+  };
+
+  const [bottomSheetHeights, setBottomSheetsHeight] = useState<number>(0);
+
+  const { bottom } = useSafeAreaInsets();
+  const onLayout = (e: LayoutChangeEvent) =>
+    setBottomSheetsHeight(e.nativeEvent.layout.height + bottom);
 
   return (
-    <View style={style}>
-      {currenTab === 'picture' && (
-        <ScrollView style={styles.scrollView}>
-          <Pressable
-            onPress={onSelectPhoto}
-            style={{ alignSelf: 'center', marginTop: 60 }}
-          >
-            <Text style={{ color: 'white', fontSize: 20 }}>Select Picture</Text>
-          </Pressable>
-        </ScrollView>
-      )}
-      {currenTab === 'title' && (
-        <ScrollView style={styles.scrollView}>
-          <TextInput
-            value={data?.title ?? ''}
-            onChangeText={onTitleChange}
-            style={{
-              alignSelf: 'center',
-              marginTop: 60,
-              backgroundColor: 'white',
-              width: 200,
-            }}
+    <>
+      <View style={[styles.container, style]} onLayout={onLayout}>
+        {currenTab === 'picture' && (
+          <CoverEditPanelImagePanel
+            pictures={displayedCover.pictures}
+            timer={displayedCover.pictureTransitionTimer}
+            imageIndex={imageIndex}
+            onSelectPhoto={onSelectPhoto}
+            onRemovePicture={onRemovePicture}
+            onUpdatePicture={onUpdatePicture}
+            onUpdatTimer={timer => updateField('pictureTransitionTimer', timer)}
+            style={styles.tab}
           />
-        </ScrollView>
-      )}
-      <EditionPanelTabs
-        currentTab={currenTab}
-        tabs={tabs}
-        onTabChange={tab => setCurrentTab(tab)}
-        style={styles.tabs}
+        )}
+        {currenTab === 'title' && (
+          <CoverEditPanelTitleTab
+            title={displayedCover.title}
+            titleColor={displayedCover.titleColor}
+            titleFont={displayedCover.titleFont}
+            titleFontSize={displayedCover.titleFontSize}
+            titleRotation={displayedCover.titleRotation}
+            titlePosition={displayedCover.titlePosition}
+            updateField={updateField}
+            style={styles.tab}
+            bottomSheetHeights={bottomSheetHeights}
+          />
+        )}
+        {currenTab === 'effect' && (
+          <CoverEditPanelEffectTab
+            overlayEffect={displayedCover.overlayEffect}
+            updateField={updateField}
+            style={styles.tab}
+          />
+        )}
+        <TabsBar
+          currentTab={currenTab}
+          tabs={[
+            {
+              key: 'picture',
+              accessibilityLabel: 'Picture Tab',
+              icon: 'picture',
+            },
+            {
+              key: 'title',
+              accessibilityLabel: 'Title Tab',
+              icon: 'title',
+            },
+            {
+              key: 'effect',
+              accessibilityLabel: 'Effect Tab',
+              icon: 'effect',
+            },
+            {
+              key: 'color-picker',
+              accessibilityLabel: 'Effect Tab',
+              icon: 'color-picker',
+              tint: false,
+            },
+            {
+              key: 'desktop',
+              accessibilityLabel: 'Desktop Tab',
+              icon: 'desktop',
+            },
+          ]}
+          onTabPress={onTabPress}
+        />
+      </View>
+      <ColorPicker
+        title="Background color"
+        visible={showColorPicker}
+        onRequestClose={() => setShowColorPicker(false)}
+        initialValue={displayedCover.backgroundColor}
+        onChange={value => updateField('backgroundColor', value)}
+        height={bottomSheetHeights}
       />
-    </View>
+      <UploadProgressModal
+        visible={!!uploadProgress}
+        progressIndicator={uploadProgress}
+      />
+    </>
   );
 };
 
 export default CoverEditPanel;
 
 const styles = StyleSheet.create({
-  scrollView: { flex: 1 },
-  tabs: { alignSelf: 'center' },
+  container: { flex: 1 },
+  tab: { flex: 1, marginTop: 20 },
+});
+
+const getOptimisticResponse = (
+  intialData: CoverEditPanel_cover$data | null,
+  coverUpdates: CoverUpdates,
+  userId: string,
+  cardId?: string,
+) => ({
+  updateCover: {
+    user: {
+      id: userId,
+      card: {
+        id: cardId ?? `tmp-${userId}-mainCard`,
+        cover: {
+          ...DEFAULT_CARD_COVER,
+          ...intialData,
+          ...coverUpdates,
+          title: coverUpdates.title ?? intialData?.title ?? '',
+          pictures: coverUpdates.pictures
+            ? coverUpdates.pictures?.map(picture =>
+                typeof picture === 'string' ? picture : picture.uri,
+              )
+            : intialData?.pictures ?? [],
+        },
+      },
+    },
+  },
 });

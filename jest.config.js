@@ -1,7 +1,6 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   clearMocks: true,
-  reporters: ['default', 'github-actions'],
   projects: [
     {
       displayName: 'app',
@@ -10,6 +9,9 @@ module.exports = {
         '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
       },
       testMatch: ['<rootDir>/packages/app/**/*.test.{js,jsx,ts,tsx}'],
+      transformIgnorePatterns: [
+        'node_modules/(?!((jest-)?react-native|@react-native(-community)?|react-native-qrcode-svg)/)',
+      ],
     },
   ],
 };

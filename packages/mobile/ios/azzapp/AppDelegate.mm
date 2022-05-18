@@ -15,7 +15,7 @@
 #import <ReactCommon/RCTTurboModuleManager.h>
 
 #import <react/config/ReactNativeConfig.h>
-
+// TODO CONCURRENT MODE SEE https://raw.githubusercontent.com/react-native-community/rn-diff-purge/release/0.69.0-rc.3/RnDiffApp/ios/RnDiffApp/AppDelegate.mm
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
   RCTTurboModuleManager *_turboModuleManager;
   RCTSurfacePresenterBridgeAdapter *_bridgeAdapter;

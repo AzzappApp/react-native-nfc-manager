@@ -1,6 +1,12 @@
 import * as uuid from 'uuid';
-import { createObjectMapper, uuidMapping } from '../helpers/databaseUtils';
+import {
+  camelCaseObjectKeys,
+  createObjectMapper,
+  snakeCaseObjectKeys,
+  uuidMapping,
+} from '../helpers/databaseUtils';
 import { getClient } from './db';
+
 export type UserCard = {
   userId: string;
   cardId: string;
@@ -10,8 +16,19 @@ export type UserCard = {
 };
 
 export type UserCardCover = {
-  picture: string;
+  backgroundColor?: string;
+  pictures: string[];
+  pictureTransitionTimer: number;
+  overlayEffect: string;
   title: string;
+  titlePosition: string;
+  titleFont: string;
+  titleFontSize: number;
+  titleColor: string;
+  titleRotation: number;
+  qrCodePosition: string;
+  desktopLayout: string;
+  dektopImagePosition: string;
 };
 
 export type UserCardModule = MediaModule | SocialModule | TextModule;
@@ -47,6 +64,10 @@ const userCardMaper = createObjectMapper<UserCard>(
   {
     userId: uuidMapping,
     cardId: uuidMapping,
+    cover: {
+      parse: camelCaseObjectKeys,
+      serialize: snakeCaseObjectKeys,
+    },
     modules: {
       parse: modules =>
         modules

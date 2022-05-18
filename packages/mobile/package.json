@@ -7,18 +7,23 @@
     "run:ios": "react-native run-ios --no-packager",
     "dev": "react-native start",
     "build:ios": "bundle exec fastlane ios build",
-    "deploy:ios": "bundle exec fastlane ios deploy"
+    "deploy:ios": "bundle exec fastlane ios deploy",
+    "pod-install": "cd ios && bundle exec pod install"
   },
   "dependencies": {
     "@azzapp/app": "*",
     "@azzapp/shared": "*",
     "react": "^18.1.0",
-    "react-native": "^0.68.1",
+    "react-native": "^0.69.0-rc.3",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-image-picker": "^4.7.3",
-    "react-native-navigation": "^7.27.1",
-    "react-relay-network-modern": "^6.2.1",
-    "react-relay": "^13.2.0"
+    "react-native-linear-gradient": "^2.5.6",
+    "react-native-navigation": "^7.28.0",
+    "react-native-reanimated": "^3.0.0-rc.0",
+    "react-native-safe-area-context": "^4.2.5",
+    "react-native-svg": "^12.3.0",
+    "react-relay": "^13.2.0",
+    "react-relay-network-modern": "^6.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.3",

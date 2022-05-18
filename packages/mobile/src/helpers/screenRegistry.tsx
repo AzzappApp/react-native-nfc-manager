@@ -1,6 +1,10 @@
 import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
 import { useMemo, Suspense } from 'react';
 import { Navigation } from 'react-native-navigation';
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider, usePreloadedQuery } from 'react-relay';
 import createPlatformEnvironment from './createPlatformEnvironment';
 import { useQueryLoaderQuery, registerComponentQuery } from './QueryLoader';
@@ -70,7 +74,9 @@ function createScreenProvider<T>(
     return (
       <RelayEnvironmentProvider environment={getRelayEnvironment()}>
         <PlatformEnvironmentProvider value={platformEnvironment}>
-          <Component {...props} />
+          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+            <Component {...props} />
+          </SafeAreaProvider>
         </PlatformEnvironmentProvider>
       </RelayEnvironmentProvider>
     );

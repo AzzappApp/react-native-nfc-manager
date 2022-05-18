@@ -1,5 +1,12 @@
+import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
 import ERRORS from '@azzapp/shared/lib/errors';
-import { GraphQLNonNull, GraphQLString } from 'graphql';
+import {
+  GraphQLFloat,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { getUserById } from '../../domains/User';
 import {
@@ -15,20 +22,67 @@ import type { GraphQLContext } from '../GraphQLContext';
 const updateCover = mutationWithClientMutationId({
   name: 'UpdateCover',
   inputFields: {
-    picture: {
+    backgroundColor: {
       type: GraphQLString,
+      description: 'the background color of the card',
+    },
+    pictures: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'the pictures of the card cover',
+    },
+    pictureTransitionTimer: {
+      type: GraphQLFloat,
+      description:
+        'the time, in seconds, a picture stay displayed before transition in case of multiple pictures',
+    },
+    overlayEffect: {
+      type: GraphQLString,
+      description: 'the overlay effect applied to the card cover',
     },
     title: {
       type: GraphQLString,
+      description: 'the title of the card cover',
+    },
+    titlePosition: {
+      type: GraphQLString,
+      description: 'the title position in the card cover',
+    },
+    titleFont: {
+      type: GraphQLString,
+      description: 'the font family used to display the title',
+    },
+    titleFontSize: {
+      type: GraphQLInt,
+      description: 'the font size of used to display the title',
+    },
+    titleColor: {
+      type: GraphQLString,
+      description: 'the color used to display the title',
+    },
+    titleRotation: {
+      type: GraphQLInt,
+      description: 'the rotation of the title',
+    },
+    qrCodePosition: {
+      type: GraphQLString,
+      description: 'the position of the qr code in the card',
+    },
+    desktopLayout: {
+      type: GraphQLString,
+      description: 'the layout used to display the cover on desktop',
+    },
+    dektopImagePosition: {
+      type: GraphQLString,
+      description: 'the position of the backround image on desktop',
     },
   },
   outputFields: {
     user: {
-      type: new GraphQLNonNull(UserGraphQL),
+      type: UserGraphQL,
     },
   },
   mutateAndGetPayload: async (
-    { picture, title }: { picture: string | null; title: string | null },
+    updates: Partial<UserCardCover>,
     { userId, isAnonymous }: GraphQLContext,
   ) => {
     if (!userId || isAnonymous) {
@@ -54,18 +108,18 @@ const updateCover = mutationWithClientMutationId({
 
     let cover: UserCardCover | null = card?.cover ?? null;
     if (!cover) {
-      if (!picture || !title) {
+      const { pictures, title } = updates;
+      if (!pictures || !title) {
         throw new Error(ERRORS.INVALID_REQUEST);
       }
-      cover = { picture, title };
-    } else {
-      if (picture) {
-        cover.picture = picture;
-      }
-      if (title) {
-        cover.title = title;
-      }
+      cover = { ...DEFAULT_CARD_COVER, pictures, title };
     }
+
+    Object.entries(updates).forEach(([key, val]) => {
+      if (val != null) {
+        (cover as any)[key] = val;
+      }
+    });
     try {
       if (!card) {
         await createUserCard({ userId, main: true, cover, modules: [] });

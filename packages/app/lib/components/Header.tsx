@@ -1,5 +1,6 @@
 import { cloneElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { textStyles } from '../../theme';
 import type { ReactElement } from 'react';
 
 type HeaderProps = {
@@ -15,7 +16,7 @@ const Header = ({ title, leftButton, rightButton, dark }: HeaderProps) => (
       {leftButton && cloneElement(leftButton, { dark })}
     </View>
 
-    <Text style={[styles.title, dark && styles.darkTitle]}>{title}</Text>
+    <Text style={[textStyles.title, dark && styles.darkTitle]}>{title}</Text>
     <View style={[styles.headerSegment, styles.headerSegmentRight]}>
       {rightButton && cloneElement(rightButton, { dark })}
     </View>
@@ -24,20 +25,18 @@ const Header = ({ title, leftButton, rightButton, dark }: HeaderProps) => (
 
 export default Header;
 
+export const HEADER_HEIGHT = 44;
+
 const styles = StyleSheet.create({
   header: {
-    height: 50,
+    height: HEADER_HEIGHT,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#FFF',
     paddingHorizontal: 20,
+    alignItems: 'center',
   },
   darkHeader: {
     backgroundColor: '#000',
-  },
-  title: {
-    fontSize: 18,
-    alignSelf: 'center',
   },
   darkTitle: {
     color: '#fff',

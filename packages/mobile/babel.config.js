@@ -13,5 +13,6 @@ module.exports = {
     // TODO allowList to avoid bad env injected ?
     ['module:react-native-dotenv', { moduleName: 'process.env' }],
     'relay',
+    'react-native-reanimated/plugin',
   ],
 };

@@ -15,8 +15,19 @@ CREATE INDEX ON users(user_name);
 
 
 CREATE TYPE card_cover (
-    picture text,
+    background_color text,
+    pictures list<text>,
+    picture_transition_timer smallint,
+    overlay_effect text,
     title text,
+    title_position text,
+    title_font text,
+    title_font_size smallint,
+    title_color text,
+    title_rotation smallint,
+    qr_code_position text
+    desktop_layout text,
+    dektop_image_position text
 );
 
 CREATE TYPE card_module (

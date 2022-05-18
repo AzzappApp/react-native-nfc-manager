@@ -1,14 +1,11 @@
+import { COVER_RATIO } from '@azzapp/shared/lib/imagesFormats';
 import { useMemo, useRef, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import CoverRenderer from '../components/CoverRenderer';
-import EditButton from '../components/EditButton';
-import Header from '../components/Header';
-import IconHeaderButton from '../components/IconHeaderButton';
-import TextHeaderButton from '../components/TextHeaderButton';
 import { useRouter } from '../PlatformEnvironment';
 import CoverEditPanel from './CoverEditPanel';
 import ModuleEditorContext from './ModuleEditorContext';
+import UserScreenLayout from './UserScreenLayout';
 import type { UserScreenFramgent_user$key } from './__generated__/UserScreenFramgent_user.graphql';
 import type { UserScreenFramgent_viewer$key } from './__generated__/UserScreenFramgent_viewer.graphql';
 import type { ModuleEditor } from './ModuleEditorContext';
@@ -17,9 +14,14 @@ import type { ReactElement } from 'react';
 type UserScreenProps = {
   user: UserScreenFramgent_user$key | null;
   viewer: UserScreenFramgent_viewer$key;
+  canPlay?: boolean;
 };
 
-const UserScreen = ({ user: userKey, viewer: viewerKey }: UserScreenProps) => {
+const UserScreen = ({
+  user: userKey,
+  canPlay = true,
+  viewer: viewerKey,
+}: UserScreenProps) => {
   const user = useFragment(
     graphql`
       fragment UserScreenFramgent_user on User {
@@ -30,6 +32,7 @@ const UserScreen = ({ user: userKey, viewer: viewerKey }: UserScreenProps) => {
           cover {
             ...CoverRenderer_cover
             ...CoverEditPanel_cover
+            backgroundColor
           }
         }
       }
@@ -56,24 +59,30 @@ const UserScreen = ({ user: userKey, viewer: viewerKey }: UserScreenProps) => {
   );
 
   const [isEditing, setIsEditing] = useState(creatingCard);
-  const [editedBlock, setEditedBlock] = useState<number | 'cover' | null>(
+  const [editedBlock, setEditedBlock] = useState<number | string | null>(
     creatingCard ? 'cover' : null,
   );
-  const [hasUnsavedChange, setCanSave] = useState(false);
+  const [canSave, setCanSave] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [imageIndex, setImageIndex] = useState<number | undefined>(undefined);
 
   const saveListenerRef = useRef<(() => void) | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  const cancelListenerRef = useRef<(() => Promise<boolean> | void) | null>(
-    null,
-  );
+  const cancelListenerRef = useRef<
+    (() => Promise<boolean>) | (() => void) | null
+  >(null);
 
   const moduleEditor = useMemo<ModuleEditor>(
     () => ({
       setCanSave,
       onSaved() {
         setEditedBlock(null);
+        setSaving(false);
         setCanSave(false);
         setCreatingCard(false);
+        setImageIndex(0);
+      },
+      onSaveError() {
+        setSaving(false);
       },
       setSaveListener(save) {
         saveListenerRef.current = save;
@@ -105,120 +114,93 @@ const UserScreen = ({ user: userKey, viewer: viewerKey }: UserScreenProps) => {
 
   const onSave = () => {
     if (editedBlock) {
+      setSaving(true);
       saveListenerRef.current?.();
     }
   };
 
   const onEdit = () => {
     setIsEditing(true);
+    setImageIndex(0);
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const onFollow = () => {};
 
   const onCancel = async () => {
     if (editedBlock) {
       const prevented = await cancelListenerRef.current?.();
-      if (prevented) {
+      if (prevented === true) {
         return;
       }
       setEditedBlock(null);
+      setImageIndex(0);
     } else {
       setIsEditing(false);
+      setImageIndex(undefined);
     }
   };
 
-  let leftButton: ReactElement | null = null;
-  let rightButton: ReactElement | null = null;
-  if (editedBlock) {
-    if (!creatingCard) {
-      leftButton = <TextHeaderButton text="Cancel" onPress={onCancel} />;
-    }
-    if (hasUnsavedChange) {
-      rightButton = (
-        <TextHeaderButton text="Save" onPress={onSave} whiteButton />
-      );
-    }
-  } else if (isEditing) {
-    leftButton = <TextHeaderButton text="Cancel" onPress={onCancel} />;
-  } else {
-    leftButton = <IconHeaderButton icon="chevron" onPress={onBack} />;
-    rightButton = <IconHeaderButton icon="edit" circled onPress={onEdit} />;
-  }
-
   if (!user?.id) {
-    // TODO redirect
+    // TODO redirect ?
     return null;
   }
 
+  const cardBackgroundColor = user?.card?.cover.backgroundColor ?? '#FFF';
+
+  const blocks: Array<{
+    key: number | string;
+    measure(width: number): number;
+    blockContent: ReactElement;
+    editPanel: ReactElement;
+  }> = [
+    {
+      key: 'cover',
+      blockContent: (
+        <CoverRenderer
+          cover={user.card?.cover}
+          userName={user.userName}
+          imageIndex={imageIndex}
+          fullScreen
+          isEditing={isEditing}
+          isEditedBlock={editedBlock === 'cover'}
+          play={imageIndex === undefined && canPlay}
+        />
+      ),
+      editPanel: (
+        <CoverEditPanel
+          userId={user.id}
+          cardId={user.card?.id}
+          cover={user.card?.cover}
+          imageIndex={imageIndex}
+          setImageIndex={setImageIndex}
+          style={{ flex: 1 }}
+        />
+      ),
+      measure: width => width / COVER_RATIO,
+    },
+  ];
+
   return (
     <ModuleEditorContext.Provider value={moduleEditor}>
-      <SafeAreaView
-        style={[styles.container, isEditing && styles.containerEditing]}
-      >
-        <Header
-          title="Profile"
-          leftButton={leftButton}
-          rightButton={rightButton}
-          dark={isEditing}
-        />
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContainer}
-          scrollEnabled={editedBlock == null}
-        >
-          {typeof editedBlock !== 'number' && (
-            <CoverRenderer
-              cover={user.card?.cover}
-              userName={user.userName}
-              style={isEditing ? styles.coverEditing : styles.cover}
-              fullScreen={!isEditing}
-            />
-          )}
-          {isEditing && editedBlock == null && (
-            <EditButton
-              onPress={() => setEditedBlock('cover')}
-              style={styles.editButton}
-            />
-          )}
-          {editedBlock === 'cover' && (
-            <CoverEditPanel
-              userId={user.id}
-              style={{ flex: 1 }}
-              cover={user.card?.cover}
-            />
-          )}
-        </ScrollView>
-      </SafeAreaView>
+      <UserScreenLayout
+        creatingCard={creatingCard}
+        isEditing={isEditing}
+        saving={saving}
+        canSave={canSave}
+        canEdit={canEdit}
+        editedBlock={editedBlock}
+        cardBackgroundColor={cardBackgroundColor}
+        blocks={blocks}
+        onBack={onBack}
+        onEdit={onEdit}
+        onCancel={onCancel}
+        onSave={onSave}
+        onFollow={onFollow}
+        setEditedBlock={setEditedBlock}
+      />
     </ModuleEditorContext.Provider>
   );
 };
 
 export default UserScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  containerEditing: {
-    backgroundColor: 'black',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollViewContainer: {
-    flexGrow: 1,
-  },
-  cover: {
-    width: '100%',
-    maxWidth: 600,
-    alignSelf: 'center',
-  },
-  coverEditing: {
-    width: '50%',
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  editButton: {
-    alignSelf: 'center',
-    marginVertical: 20,
-  },
-});

@@ -67,11 +67,46 @@ type UserCard implements Node {
 
 """UserCard cover display informations"""
 type UserCardCover {
-  """the title of the card"""
+  """the background color of the card"""
+  backgroundColor: String!
+
+  """the pictures of the card cover"""
+  pictures: [String!]!
+
+  """
+  the time, in seconds, a picture stay displayed before transition in case of multiple pictures
+  """
+  pictureTransitionTimer: Float!
+
+  """the overlay effect applied to the card cover"""
+  overlayEffect: String!
+
+  """the title of the card cover"""
   title: String!
 
-  """the picture of the card"""
-  picture: String!
+  """the title position in the card cover"""
+  titlePosition: String!
+
+  """the font family used to display the title"""
+  titleFont: String!
+
+  """the font size of used to display the title"""
+  titleFontSize: Int!
+
+  """the color used to display the title"""
+  titleColor: String!
+
+  """the rotation of the title"""
+  titleRotation: Int!
+
+  """the position of the qr code in the card"""
+  qrCodePosition: String!
+
+  """the layout used to display the cover on desktop"""
+  desktopLayout: String!
+
+  """the position of the backround image on desktop"""
+  dektopImagePosition: String!
 }
 
 """User Card module"""
@@ -154,12 +189,50 @@ type Mutation {
 }
 
 type UpdateCoverPayload {
-  user: User!
+  user: User
   clientMutationId: String
 }
 
 input UpdateCoverInput {
-  picture: String
+  """the background color of the card"""
+  backgroundColor: String
+
+  """the pictures of the card cover"""
+  pictures: [String!]
+
+  """
+  the time, in seconds, a picture stay displayed before transition in case of multiple pictures
+  """
+  pictureTransitionTimer: Float
+
+  """the overlay effect applied to the card cover"""
+  overlayEffect: String
+
+  """the title of the card cover"""
   title: String
+
+  """the title position in the card cover"""
+  titlePosition: String
+
+  """the font family used to display the title"""
+  titleFont: String
+
+  """the font size of used to display the title"""
+  titleFontSize: Int
+
+  """the color used to display the title"""
+  titleColor: String
+
+  """the rotation of the title"""
+  titleRotation: Int
+
+  """the position of the qr code in the card"""
+  qrCodePosition: String
+
+  """the layout used to display the cover on desktop"""
+  desktopLayout: String
+
+  """the position of the backround image on desktop"""
+  dektopImagePosition: String
   clientMutationId: String
 }

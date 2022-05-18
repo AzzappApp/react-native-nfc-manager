@@ -55,6 +55,7 @@ fastlane/screenshots
 fastlane/builds
 fastlane/keys
 fastlane/appstore_api_key.json
+fastlane/test_output
 
 # Bundle artifact
 *.jsbundle

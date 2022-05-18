@@ -3,7 +3,7 @@ import UserScreen from './UserScreen';
 import type { UserScreenByIdQuery } from './__generated__/UserScreenByIdQuery.graphql';
 import type { UserScreenByUserNameQuery } from './__generated__/UserScreenByUserNameQuery.graphql';
 
-// Perhaps this query should be defined directly in UserMobileScreen
+// TODO: Perhaps this query should be defined directly in UserMobileScreen
 // since it's prety specific
 export const userScreenByIdQuery = graphql`
   query UserScreenByIdQuery($userId: ID!) {

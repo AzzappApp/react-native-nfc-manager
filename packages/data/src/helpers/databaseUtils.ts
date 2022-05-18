@@ -59,10 +59,10 @@ export const createObjectMapper = <T>(
   },
 
   createInsert(table: string, data: T): [string, any[]] {
-    const updateEntries = Object.entries(this.serialize(data));
-    const rows = updateEntries.map(([key]) => `${key}`).join(',');
-    const values = updateEntries.map(() => '?').join(',');
-    const params = updateEntries.map(([, value]) => value);
+    const insertEntries = Object.entries(this.serialize(data));
+    const rows = insertEntries.map(([key]) => `${key}`).join(',');
+    const values = insertEntries.map(() => '?').join(',');
+    const params = insertEntries.map(([, value]) => value);
     return [`INSERT INTO ${table} (${rows}) VALUES(${values})`, params];
   },
 });
@@ -70,3 +70,26 @@ export const createObjectMapper = <T>(
 export const uuidMapping: ColumMappingOptions<string> = {
   parse: uuid => (uuid ? uuid.toString() : null),
 };
+
+export const transformKeys = (
+  object: any,
+  transorm: (key: string) => string,
+): any => {
+  if (!object || typeof object !== 'object') {
+    return object;
+  }
+  if (Array.isArray(object)) {
+    return object.map(val => transformKeys(val, transorm));
+  }
+  const result: Record<string, any> = {};
+  for (const key in object) {
+    result[transorm(key)] = transformKeys(object[key], transorm);
+  }
+  return result;
+};
+
+export const camelCaseObjectKeys = (object: any) =>
+  transformKeys(object, camelCase);
+
+export const snakeCaseObjectKeys = (object: any) =>
+  transformKeys(object, snakeCase);

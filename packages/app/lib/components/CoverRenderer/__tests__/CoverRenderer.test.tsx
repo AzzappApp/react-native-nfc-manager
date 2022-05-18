@@ -1,3 +1,4 @@
+import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
 import { render, cleanup } from '@testing-library/react-native';
 import {
   graphql,
@@ -36,8 +37,9 @@ describe('CoverRenderer', () => {
         UserCard: (_, generateId) => ({
           id: generateId(),
           cover: {
-            picture: 'http://fakePicture.com',
+            pictures: ['http://fakePicture.com'],
             title: 'fake title',
+            ...DEFAULT_CARD_COVER,
           },
         }),
       }),
@@ -49,6 +51,6 @@ describe('CoverRenderer', () => {
     );
 
     expect(getByText('fake title')).toBeTruthy();
-    expect(getByTestId('cover-userName-picture')).toBeTruthy();
+    expect(getByTestId('cover-userName-image-0')).toBeTruthy();
   });
 });
