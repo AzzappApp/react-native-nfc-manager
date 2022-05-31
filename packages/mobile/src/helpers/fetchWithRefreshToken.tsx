@@ -1,7 +1,7 @@
 import ERRORS from '@azzapp/shared/lib/errors';
 import { fetchJSON } from '@azzapp/shared/lib/networkHelpers';
 import { refreshTokens } from '@azzapp/shared/lib/WebAPI';
-import { getTokens, setTokens } from './tokensStore';
+import { clearTokens, getTokens, setTokens } from './tokensStore';
 
 async function fetchWithRefreshToken<JSON = unknown>(
   input: RequestInfo,
@@ -20,6 +20,7 @@ async function fetchWithRefreshToken<JSON = unknown>(
         const tokens = await refreshTokens(refreshToken);
         await setTokens(tokens);
       } catch {
+        await clearTokens();
         throw e;
       }
       const token = getTokens()?.token;

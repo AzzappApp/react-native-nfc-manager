@@ -11,7 +11,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { colors, textStyles } from '../../theme';
+import { colors, fontFamilies, textStyles } from '../../theme';
 import DashedSlider from '../components/DashedSlider';
 import Icon from '../components/Icon';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -52,21 +52,30 @@ const CoverEditPanelImageTab = ({
     <View style={style}>
       <View style={{ flex: 1 }}>
         {imageIndex === undefined ? (
-          <View style={styles.sliderContainer}>
-            <Text
-              style={{ fontSize: 48, marginBottom: 12, alignSelf: 'center' }}
-            >
-              {' '}
-              {timer}’
-            </Text>
-            <DashedSlider
-              value={timer}
-              max={30}
-              min={1}
-              step={0.25}
-              onChange={onUpdatTimer}
-            />
-          </View>
+          pictures.length > 1 ? (
+            <View style={styles.sliderContainer}>
+              <Text
+                style={{
+                  fontFamily: fontFamilies.normal,
+                  fontSize: 48,
+                  marginBottom: 12,
+                  alignSelf: 'center',
+                }}
+              >
+                {' '}
+                {timer}’
+              </Text>
+              <DashedSlider
+                value={timer}
+                max={30}
+                min={1}
+                step={0.25}
+                onChange={onUpdatTimer}
+              />
+            </View>
+          ) : (
+            <View style={{ flex: 1 }} />
+          )
         ) : (
           <View style={{ marginTop: 20, alignItems: 'center' }}>
             {currentPicture ? (

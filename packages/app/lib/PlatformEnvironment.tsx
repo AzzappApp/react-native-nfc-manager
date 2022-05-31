@@ -16,20 +16,18 @@ export type PlatformEnvironment = {
   WebAPI: typeof WebAPI;
 };
 
+export type RouteListener = (route: Routes, params: any) => void;
+
 export type Router = {
-  push(route: Routes, params?: any, options?: any): void;
-  replace(route: Routes, params?: any, options?: any): void;
-  showModal(route: Routes, params?: any, options?: any): void;
-  back(options?: any): void;
-  getCurrenRoute(): { route: Routes; params: any };
-  addRouteWillChangeListener: (
-    listener: (route: Routes, params: any) => void,
-  ) => {
+  push(route: Routes, params?: any): void;
+  replace(route: Routes, params?: any): void;
+  showModal(route: Routes, params?: any): void;
+  back(): void;
+  getCurrentRoute(): { route: Routes; params?: any };
+  addRouteWillChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
-  addRouteDidChangeListener: (
-    listener: (route: Routes, params: any) => void,
-  ) => {
+  addRouteDidChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
 };
@@ -39,7 +37,6 @@ export type LinkProps = PressableProps & {
   replace?: boolean;
   modal?: boolean;
   params?: any;
-  options?: any;
 };
 
 const PlatformEnvironmentContext = createContext<PlatformEnvironment>(
@@ -62,7 +59,7 @@ export const useCurrentRoute = (
   usedEvent: 'didChange' | 'willChange' = 'willChange',
 ) => {
   const router = useRouter();
-  const [currentRoute, setCurrentRoute] = useState(router.getCurrenRoute());
+  const [currentRoute, setCurrentRoute] = useState(router.getCurrentRoute());
   useEffect(() => {
     let subscription: { dispose(): void };
 

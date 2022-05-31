@@ -1,18 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Navigation } from 'react-native-navigation';
 import { loadQuery } from 'react-relay';
 import {
   addEnvironmentListener,
   getRelayEnvironment,
 } from './relayEnvironment';
 import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
-
-type QueryEntry = {
-  query: GraphQLTaggedNode | ((params: any) => GraphQLTaggedNode);
-  getVariables?: (params: any) => Variables;
-};
-
-const queryRegistry = new Map<string, QueryEntry>();
 
 const activeQueries = new Map<
   string,
@@ -50,30 +42,6 @@ const addListener = (
 };
 
 export const init = () => {
-  Navigation.events().registerCommandListener((name: string, params: any) => {
-    switch (name) {
-      case 'push': {
-        const {
-          layout: {
-            id: componentId,
-            type,
-            data: { name: componentName, passProps },
-          },
-        } = params;
-        if (type === 'Component') {
-          loadQueryFor(componentId, componentName, passProps.params);
-        }
-        break;
-      }
-      case 'pop': {
-        const { componentId } = params;
-        disposeQueryFor(componentId);
-        break;
-      }
-      default:
-        return;
-    }
-  });
   addEnvironmentListener(() => {
     [...activeQueries.entries()].forEach(([componentId, entry]) => {
       const { preloadedQuery, query, variables } = entry;
@@ -86,42 +54,37 @@ export const init = () => {
   });
 };
 
-export const registerComponentQuery = (
-  componentName: string,
-  query: QueryEntry,
-) => {
-  queryRegistry.set(componentName, query);
-};
-
-const getQueryInfos = (componentId: string) => {
-  const entry = activeQueries.get(componentId);
-  return entry ? ([entry?.query, entry?.preloadedQuery] as const) : null;
-};
-
 export const useQueryLoaderQuery = (componentId: string) => {
-  const [queryInfos, setQueryInfos] = useState(getQueryInfos(componentId));
+  const [queryInfos, setQueryInfos] = useState(
+    activeQueries.get(componentId)?.preloadedQuery,
+  );
   useEffect(
     () =>
-      addListener(componentId, () => setQueryInfos(getQueryInfos(componentId))),
+      addListener(componentId, () =>
+        setQueryInfos(activeQueries.get(componentId)?.preloadedQuery),
+      ),
     [componentId],
   );
-  return queryInfos;
+  return queryInfos ?? null;
 };
 
-export const loadQueryFor = (
+export type LoadQueryOptions<T> = {
+  query: GraphQLTaggedNode | ((params: T) => GraphQLTaggedNode);
+  getVariables?: (params: T) => Variables;
+};
+
+export const loadQueryFor = <T>(
   componentId: string,
-  componentName: string,
-  params?: any,
-  refresh?: boolean,
+  options: LoadQueryOptions<T>,
+  params: T = {} as T,
+  refresh = false,
 ) => {
-  const entry = queryRegistry.get(componentName);
-  if (entry && (!activeQueries.has(componentId) || refresh)) {
-    const { query: queryOrFactory, getVariables } = entry;
-    const variables = getVariables?.(params) ?? {};
+  if (!activeQueries.has(componentId) || refresh) {
     const query =
-      typeof queryOrFactory === 'function'
-        ? queryOrFactory(params)
-        : queryOrFactory;
+      typeof options.query === 'function'
+        ? options.query(params)
+        : options.query;
+    const variables = options.getVariables?.(params) ?? {};
     const preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
     activeQueries.set(componentId, { query, preloadedQuery, variables });
     listeners.get(componentId)?.forEach(callback => callback(preloadedQuery));

@@ -1,6 +1,7 @@
 import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 import { Suspense, useMemo } from 'react';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { RecordSource } from 'relay-runtime';
@@ -8,6 +9,7 @@ import createPlatformEnvironment from '../helpers/createPlatformEnvironment';
 import { getRelayEnvironment } from '../helpers/relayClient';
 import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';
 import type { AppProps } from 'next/app';
+import './styles.css';
 
 const App = ({ Component, pageProps }: AppProps) => {
   const environment = getRelayEnvironment();
@@ -50,8 +52,18 @@ const App = ({ Component, pageProps }: AppProps) => {
           </Suspense>
         </RelayEnvironmentProvider>
       </PlatformEnvironmentProvider>
+
+      <Script id="vh-fix">{vhFixScript}</Script>
     </>
   );
 };
 
 export default App;
+
+const vhFixScript = `
+function applyVH() {
+  document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+}
+applyVH();
+window.addEventListener('resize', applyVH);
+`;

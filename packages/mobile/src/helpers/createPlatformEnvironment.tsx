@@ -1,90 +1,16 @@
-import ROUTES from '@azzapp/shared/lib/routes';
 import * as WebAPI from '@azzapp/shared/lib/WebAPI';
 import { Platform } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { Navigation } from 'react-native-navigation';
 import Link from '../components/Link';
 import fetchWithRefreshToken, { injectToken } from './fetchWithRefreshToken';
 import { getTokens } from './tokensStore';
+import type { NativeRouter } from '../components/NativeRouter';
 import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';
-import type { Routes } from '@azzapp/shared/lib/routes';
-
-let currentRoute: { route: Routes; params: any } = {
-  route: ROUTES.HOME,
-  params: null,
-};
-
-Navigation.events().registerComponentWillAppearListener(({ passProps }) => {
-  currentRoute = {
-    route: (passProps as any).route as Routes,
-    params: (passProps as any).params,
-  };
-});
 
 const createPlatformEnvironment = (
-  componentId: string,
+  router: NativeRouter,
 ): PlatformEnvironment => ({
-  router: {
-    push(route, params, options) {
-      void Navigation.push(componentId, {
-        component: { name: route, passProps: { params, route }, options },
-      });
-    },
-    replace(route, params, options) {
-      // TODO should this works ?
-      console.error('replace does not works on native app');
-      this.push(route, params, options);
-    },
-    showModal(route, params, options) {
-      void Navigation.showModal({
-        stack: {
-          children: [
-            {
-              component: { name: route, passProps: { params, route }, options },
-            },
-          ],
-        },
-      });
-    },
-    back(options) {
-      void Navigation.pop(componentId, options);
-    },
-    getCurrenRoute() {
-      return currentRoute;
-    },
-    addRouteWillChangeListener(callback) {
-      const subscription =
-        Navigation.events().registerComponentWillAppearListener(
-          ({ passProps }) => {
-            const route = (passProps as any).route as Routes;
-            const params = (passProps as any).params as Routes;
-            callback(route, params);
-          },
-        );
-
-      return {
-        dispose() {
-          subscription.remove();
-        },
-      };
-    },
-    addRouteDidChangeListener(callback) {
-      const subscription =
-        Navigation.events().registerComponentDidAppearListener(
-          ({ passProps }) => {
-            const route = (passProps as any).route as Routes;
-            const params = (passProps as any).params as Routes;
-            callback(route, params);
-          },
-        );
-
-      return {
-        dispose() {
-          subscription.remove();
-        },
-      };
-    },
-  },
+  router,
   LinkComponent: Link,
   async launchImagePicker() {
     const { didCancel, errorCode, assets } = await launchImageLibrary({

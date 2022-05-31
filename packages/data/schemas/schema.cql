@@ -25,14 +25,14 @@ CREATE TYPE card_cover (
     title_font_size smallint,
     title_color text,
     title_rotation smallint,
-    qr_code_position text
+    qr_code_position text,
     desktop_layout text,
     dektop_image_position text
 );
 
 CREATE TYPE card_module (
     kind text,
-    data text,
+    data text
 );
 
 CREATE TABLE users_cards (

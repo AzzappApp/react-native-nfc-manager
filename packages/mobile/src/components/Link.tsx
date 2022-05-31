@@ -6,19 +6,19 @@ import type { GestureResponderEvent } from 'react-native';
 const Link = ({
   route,
   params,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   replace,
   modal,
-  options,
   onPress,
   ...props
 }: LinkProps) => {
   const router = useRouter();
   const onLinkPress = (event: GestureResponderEvent) => {
-    if (modal) {
-      router.showModal(route, params, options);
+    if (replace) {
+      router.replace(route, params);
+    } else if (modal) {
+      router.showModal(route, params);
     } else {
-      router.push(route, params, options);
+      router.push(route, params);
     }
     onPress?.(event);
   };

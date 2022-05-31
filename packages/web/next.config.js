@@ -11,6 +11,11 @@ const config = {
     disableStaticImages: true,
   },
   webpack: config => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'react-native$': 'react-native-web',
+      'react-native-linear-gradient': 'react-native-web-linear-gradient',
+    };
     config.resolve.extensions = [
       '.web.js',
       '.web.jsx',
@@ -27,6 +32,12 @@ const config = {
       },
       loader: 'react-native-web-image-loader',
     });
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack'],
+    });
+
     return config;
   },
 };
@@ -35,6 +46,9 @@ const withTM = require('next-transpile-modules')([
   '@azzapp/shared',
   '@azzapp/data',
   '@azzapp/app',
+  '@azzapp/relay',
+  // TODO I Don't understand why we have to use this
+  'react-native-web-linear-gradient',
 ]);
 
 module.exports = withTM(config);

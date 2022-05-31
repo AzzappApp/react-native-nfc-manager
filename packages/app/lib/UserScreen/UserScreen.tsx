@@ -6,14 +6,14 @@ import { useRouter } from '../PlatformEnvironment';
 import CoverEditPanel from './CoverEditPanel';
 import ModuleEditorContext from './ModuleEditorContext';
 import UserScreenLayout from './UserScreenLayout';
-import type { UserScreenFramgent_user$key } from './__generated__/UserScreenFramgent_user.graphql';
-import type { UserScreenFramgent_viewer$key } from './__generated__/UserScreenFramgent_viewer.graphql';
 import type { ModuleEditor } from './ModuleEditorContext';
+import type { UserScreenFramgent_user$key } from '@azzapp/relay/artifacts/UserScreenFramgent_user.graphql';
+import type { UserScreenFramgent_viewer$key } from '@azzapp/relay/artifacts/UserScreenFramgent_viewer.graphql';
 import type { ReactElement } from 'react';
 
 type UserScreenProps = {
   user: UserScreenFramgent_user$key | null;
-  viewer: UserScreenFramgent_viewer$key;
+  viewer: UserScreenFramgent_viewer$key | null;
   canPlay?: boolean;
 };
 
@@ -165,6 +165,7 @@ const UserScreen = ({
           isEditing={isEditing}
           isEditedBlock={editedBlock === 'cover'}
           play={imageIndex === undefined && canPlay}
+          hideBorderRadius={!isEditing}
         />
       ),
       editPanel: (
@@ -174,7 +175,6 @@ const UserScreen = ({
           cover={user.card?.cover}
           imageIndex={imageIndex}
           setImageIndex={setImageIndex}
-          style={{ flex: 1 }}
         />
       ),
       measure: width => width / COVER_RATIO,

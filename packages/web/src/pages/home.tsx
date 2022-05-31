@@ -22,7 +22,7 @@ const HomePage = () => {
       });
   };
   return (
-    <div>
+    <div className="root">
       <Head>
         <title>Azzapp</title>
         <meta charSet="utf-8" />

@@ -9,7 +9,7 @@ import { useCurrentRoute } from '../PlatformEnvironment';
 import type {
   RecommandedUsersList_viewer$data,
   RecommandedUsersList_viewer$key,
-} from './__generated__/RecommandedUsersList_viewer.graphql';
+} from '@azzapp/relay/artifacts/RecommandedUsersList_viewer.graphql';
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
 type RecommandedUsersListProps = {

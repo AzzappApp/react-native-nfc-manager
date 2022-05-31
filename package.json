@@ -8,10 +8,14 @@
     ]
   },
   "scripts": {
+    "postinstall": "yarn create-query-map-file",
     "lint": "eslint .",
     "typecheck": "tsc",
     "test": "jest",
-    "dev:relay": "yarn workspace @azzapp/app relay-watch",
+    "create-query-map-file": "touch ./packages/relay/query-map.json",
+    "relay": "relay-compiler",
+    "build": "yarn relay",
+    "dev:relay": "relay-compiler --watch",
     "dev:web": "yarn workspace @azzapp/web dev",
     "dev:mobile": "yarn workspace @azzapp/mobile dev",
     "dev": "ttab yarn dev:relay && ttab yarn dev:web && ttab yarn dev:mobile",
@@ -19,17 +23,18 @@
     "run:android": "yarn workspace @azzapp/mobile run:android",
     "build:ios": "yarn workspace @azzapp/mobile build:ios",
     "deploy:ios": "yarn workspace @azzapp/mobile deploy:ios",
-    "update-graphql-schema": "yarn workspace @azzapp/data update-schema"
+    "update-graphql-schema": "ts-node ./scripts/updateGraphQLSchema.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/plugin-transform-react-jsx": "^7.17.3",
     "@babel/runtime": "^7.12.5",
+    "@svgr/webpack": "^6.2.1",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "babel-jest": "^26.6.3",
-    "babel-plugin-relay": "^13.2.0",
+    "babel-plugin-relay": "^14.0.0",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -41,15 +46,14 @@
     "metro-react-native-babel-preset": "^0.70.3",
     "node-fetch": "2",
     "prettier": "^2.6.0",
-    "typescript": "^4.7.1-rc"
+    "relay-compiler": "^14.0.0",
+    "ts-node": "^10.7.0",
+    "ttab": "^0.7.2",
+    "typescript": "^4.7.2"
   },
   "resolutions": {
-    "@types/react": "^18.0.3",
-    "@react-native-community/cli": "^7.0.3",
-    "@react-native-community/cli-platform-android": "^7.0.1",
-    "@react-native-community/cli-platform-ios": "^7.0.1"
-  },
-  "dependencies": {
-    "ttab": "^0.7.2"
+    "@babel/core": "7.17.12",
+    "@babel/plugin-transform-typescript": "7.17.12",
+    "@types/react": "^18.0.3"
   }
 }

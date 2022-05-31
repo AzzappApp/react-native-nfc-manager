@@ -1,5 +1,5 @@
 import HomeScreen, { homeScreenQuery } from './HomeScreen';
-import type { HomeScreenQuery } from './__generated__/HomeScreenQuery.graphql';
+import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
 
 export default HomeScreen;
 

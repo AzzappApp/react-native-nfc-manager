@@ -7,7 +7,7 @@ import RecommandedUsersList from './RecommandedUsersList';
 import type {
   HomeScreenQuery,
   HomeScreenQuery$data,
-} from './__generated__/HomeScreenQuery.graphql';
+} from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
 
 type HomeScreenProps = {
   data: HomeScreenQuery$data;

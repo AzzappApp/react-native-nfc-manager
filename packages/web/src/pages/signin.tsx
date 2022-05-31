@@ -13,7 +13,7 @@ const SignInPage = () => {
     });
 
   return (
-    <div>
+    <div className="root">
       <Head>
         <title>Sign in</title>
         <meta charSet="utf-8" />

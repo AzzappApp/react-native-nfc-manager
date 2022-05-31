@@ -1,20 +1,33 @@
 package com.azzapp;
 
-import com.reactnativenavigation.NavigationActivity;
+import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
-public class MainActivity extends NavigationActivity {
+public class MainActivity extends ReactActivity {
 
-  
+  /**
+   * Returns the name of the main component registered from JavaScript. This is used to schedule
+   * rendering of the component.
+   */
+  @Override
+  protected String getMainComponentName() {
+    return "azzapp";
+  }
 
   /**
    * Returns the instance of the {@link ReactActivityDelegate}. There the RootView is created and
-   * you can specify the rendered you wish to use (Fabric or the older renderer).
+   * you can specify the renderer you wish to use - the new renderer (Fabric) or the old renderer
+   * (Paper).
    */
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new MainActivityDelegate(this, getMainComponentName());
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
   }
 
   public static class MainActivityDelegate extends ReactActivityDelegate {
@@ -30,12 +43,11 @@ public class MainActivity extends NavigationActivity {
       return reactRootView;
     }
 
-    // TODO it comes from react native 0.69 but is it compatible with react native navigation ?
-    // @Override
-    // protected boolean isConcurrentRootEnabled() {
-    //   // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
-    //   // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
-    //   return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
-    // }
+    @Override
+    protected boolean isConcurrentRootEnabled() {
+      // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
+      // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
+      return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+    }
   }
 }

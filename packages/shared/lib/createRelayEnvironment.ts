@@ -66,11 +66,9 @@ const createNetwork = (
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        // TODO consider using query
-        query: text,
-        variables,
-      }),
+      body: JSON.stringify(
+        text ? { query: text, variables } : { id, variables },
+      ),
     });
   };
 

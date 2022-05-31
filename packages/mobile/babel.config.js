@@ -1,3 +1,9 @@
+const path = require('path');
+
+const relayArtifactDirectory = path.join(
+  path.dirname(require.resolve('@azzapp/relay/package.json')),
+  'artifacts',
+);
 module.exports = {
   presets: [
     [
@@ -12,7 +18,7 @@ module.exports = {
     ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
     // TODO allowList to avoid bad env injected ?
     ['module:react-native-dotenv', { moduleName: 'process.env' }],
-    'relay',
+    ['relay', { artifactDirectory: relayArtifactDirectory }],
     'react-native-reanimated/plugin',
   ],
 };

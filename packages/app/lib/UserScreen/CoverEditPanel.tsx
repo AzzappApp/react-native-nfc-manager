@@ -11,7 +11,6 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import ColorPicker from '../components/ColorPicker';
@@ -27,11 +26,11 @@ import UploadProgressModal from './UploadProgressModal';
 import type {
   CoverEditPanel_cover$data,
   CoverEditPanel_cover$key,
-} from './__generated__/CoverEditPanel_cover.graphql';
+} from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type {
   CoverEditPanelMutation,
   UpdateCoverInput,
-} from './__generated__/CoverEditPanelMutation.graphql';
+} from '@azzapp/relay/artifacts/CoverEditPanelMutation.graphql';
 import type { EventEmitter } from 'events';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
@@ -42,7 +41,7 @@ type CoverEditPanelProps = {
   imageIndex: number | undefined;
   setImageIndex: (index: number | undefined) => void;
   eventEmitter?: EventEmitter;
-  style: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
 export type CoverUpdates = Omit<UpdateCoverInput, 'pictures'> & {
@@ -339,9 +338,8 @@ const CoverEditPanel = ({
 
   const [bottomSheetHeights, setBottomSheetsHeight] = useState<number>(0);
 
-  const { bottom } = useSafeAreaInsets();
   const onLayout = (e: LayoutChangeEvent) =>
-    setBottomSheetsHeight(e.nativeEvent.layout.height + bottom);
+    setBottomSheetsHeight(e.nativeEvent.layout.height);
 
   return (
     <>

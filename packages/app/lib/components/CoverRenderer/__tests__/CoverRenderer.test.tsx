@@ -7,7 +7,7 @@ import {
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import CoverRenderer from '../CoverRenderer';
-import type { CoverRendererTestQuery } from './__generated__/CoverRendererTestQuery.graphql';
+import type { CoverRendererTestQuery } from '@azzapp/relay/artifacts/CoverRendererTestQuery.graphql';
 
 const TestRenderer = () => {
   const data = useLazyLoadQuery<CoverRendererTestQuery>(

@@ -1,7 +1,8 @@
 import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
+import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/lib/errors';
-import { ApolloServer } from 'apollo-server-micro';
 import Cors from 'cors';
+import { graphql } from 'graphql';
 import initMiddleware from '../../helpers/initMiddleware';
 import {
   getRequestAuthInfos,
@@ -15,57 +16,59 @@ const cors = initMiddleware(
   Cors(),
 );
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-let handler: NextApiHandler | null;
-
-const getServerHandler = async () => {
-  if (handler == null) {
-    const server = new ApolloServer({
-      schema: graphQLSchema,
-      context: ({ req }: { req: { authInfos: AuthInfos } }) =>
-        createGraphQLContext(req.authInfos),
-    });
-
-    await server.start();
-
-    handler = server.createHandler({ path: '/api/graphql' });
-  }
-  return handler;
-};
-
-void getServerHandler();
-
-async function graphql(req: NextApiRequest, res: NextApiResponse) {
+async function graphqlHandler(req: NextApiRequest, res: NextApiResponse) {
   await cors(req, res);
 
-  const handler = await getServerHandler();
-  if (req.method === 'OPTION') {
-    res.status(200).end();
-    return;
+  if (req.method === 'OPTIONS') {
+    res.end();
+    return false;
   }
-  if (process.env.NODE_ENV !== 'production' && req.method === 'GET') {
-    await handler(req, res);
-  } else if (req.method === 'POST') {
+
+  if (req.method === 'POST') {
+    let authInfos: AuthInfos;
     try {
-      const authInfos = await getRequestAuthInfos(req);
-      // We inject authInfos in request so we can use them in context
-      (req as any).authInfos = authInfos;
+      authInfos = await getRequestAuthInfos(req);
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
-        res.status(401).send({ message: e.message });
-        return;
+        res.status(401).send({ message: ERRORS.INVALID_TOKEN });
+      } else {
+        res.status(400).send({ message: ERRORS.INVALID_REQUEST });
       }
-      res.status(400).send({ message: ERRORS.INVALID_REQUEST });
+      return;
     }
-    await handler(req, res);
+
+    // TODO from relay examples, but do we really need to decode it manually ?
+    const buffers = [];
+    for await (const chunk of req) {
+      buffers.push(chunk);
+    }
+    const requestParams = JSON.parse(Buffer.concat(buffers).toString());
+    try {
+      res.json(
+        await graphql({
+          schema: graphQLSchema,
+          rootValue: {},
+          source: requestParams.id
+            ? (queryMap as any)[requestParams.id]
+            : requestParams.query,
+          variableValues: requestParams.variables,
+          contextValue: createGraphQLContext(authInfos),
+        }),
+      );
+    } catch (e) {
+      console.log(e);
+      res.status(500).send({ message: ERRORS.INTERNAL_SERVER_ERROR });
+    }
+    return;
   }
 
   res.status(404).end();
 }
 
-export default withSessionAPIRoute(graphql as NextApiHandler);
+export default withSessionAPIRoute(graphqlHandler as NextApiHandler);
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

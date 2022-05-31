@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 
 const IndexPage = () => (
-  <div>
+  <div className="root">
     <Head>
       <title>Welcom to AZZAPP</title>
       <meta charSet="utf-8" />

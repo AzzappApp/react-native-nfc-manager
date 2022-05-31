@@ -1,0 +1,21 @@
+module.exports = {
+  name: 'azzapp',
+  root: '.',
+  sources: {
+    'packages/app/lib': 'azzapp',
+    'packages/web/src': 'azzapp',
+    'packages/mobile/src': 'azzapp',
+  },
+  projects: {
+    azzapp: {
+      schema: 'schema.graphql',
+      language: 'typescript',
+      testPathRegex: '__tests__',
+      requireCustomScalarTypes: true,
+      output: 'packages/relay/artifacts',
+      persist: {
+        file: 'packages/relay/query-map.json',
+      },
+    },
+  },
+};

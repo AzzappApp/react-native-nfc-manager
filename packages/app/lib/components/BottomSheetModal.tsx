@@ -7,8 +7,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../theme';
+import useSafeAreaInsets from '../hooks/useSafeAreaInsets.web';
 import type { ModalProps } from 'react-native';
 
 type BottomSheetModal = Omit<
@@ -65,13 +65,13 @@ const BottomSheetModal = ({
         <Animated.View
           style={[
             styles.bottomSheetContainer,
-            { height, paddingBottom: bottom },
+            { height: height + bottom, paddingBottom: bottom },
             {
               transform: [
                 {
                   translateY: animation.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, -height],
+                    outputRange: [0, -(height + bottom)],
                   }),
                 },
               ],

@@ -11,7 +11,7 @@ const createPlatformEnvironment = (nextRoute?: {
 }): PlatformEnvironment => {
   return {
     router: {
-      getCurrenRoute() {
+      getCurrentRoute() {
         return {
           route: pathRoRoutes(nextRoute ? nextRoute.pathname : Router.pathname),
           params: nextRoute ? nextRoute.query : Router.query,
@@ -33,7 +33,7 @@ const createPlatformEnvironment = (nextRoute?: {
       addRouteDidChangeListener(callbak) {
         const listener = () => {
           // TODO does this route is good at this moment ?
-          const { route, params } = this.getCurrenRoute();
+          const { route, params } = this.getCurrentRoute();
           callbak(route, params);
         };
 
@@ -48,7 +48,7 @@ const createPlatformEnvironment = (nextRoute?: {
       addRouteWillChangeListener(callbak) {
         const listener = () => {
           // TODO does this route is good at this moment ?
-          const { route, params } = this.getCurrenRoute();
+          const { route, params } = this.getCurrentRoute();
           callbak(route, params);
         };
 

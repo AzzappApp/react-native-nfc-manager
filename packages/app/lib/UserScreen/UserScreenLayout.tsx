@@ -39,9 +39,9 @@ type UserScreenLayoutProps = {
   cardBackgroundColor: string;
   blocks: Array<{
     key: number | string;
-    measure(width: number): number;
     blockContent: ReactElement;
     editPanel: ReactElement;
+    measure(width: number): number;
   }>;
   onBack: () => void;
   onEdit: () => void;
@@ -106,10 +106,7 @@ const UserScreenLayout = ({
     ? blocks.filter(block => block.key === editedBlock)
     : blocks;
   return (
-    <Animated.View
-      style={[styles.container, containerStyles]}
-      exiting={FadeOut}
-    >
+    <Animated.View style={[styles.container, containerStyles]}>
       <Animated.View style={headerStyles}>
         <Header
           title="Edit your profile"
@@ -166,7 +163,6 @@ const UserScreenLayout = ({
         {displayedBlocks.map(({ blockContent, editPanel, key, measure }) => (
           <Block
             key={key}
-            measure={measure}
             blockContent={blockContent}
             editPanel={editPanel}
             isEditing={isEditing}
@@ -174,6 +170,7 @@ const UserScreenLayout = ({
             isEditingAnimatedValue={isEditingAnimatedValue}
             windowWidth={windowWidth}
             editedWidth={editedWidth}
+            measure={measure}
             onPress={() => setEditedBlock(key)}
           />
         ))}
@@ -185,7 +182,6 @@ const UserScreenLayout = ({
 export default UserScreenLayout;
 
 type BlockProps = {
-  measure(width: number): number;
   blockContent: ReactElement;
   editPanel: ReactElement;
   isEditing: boolean;
@@ -193,6 +189,7 @@ type BlockProps = {
   isEditingAnimatedValue: SharedValue<number>;
   windowWidth: number;
   editedWidth: number;
+  measure(width: number): number;
   onPress: () => void;
 };
 
@@ -207,13 +204,13 @@ const Block = ({
   editedWidth,
   onPress,
 }: BlockProps) => {
+  const eventEmitter = useRef(new EventEmitter()).current;
+
   const blockHeight = measure(windowWidth);
   const isEditingHeight = measure(editedWidth);
   const isEditedBlockWithDelta = 20;
   const isEditedBlockHeightDelta = measure(isEditedBlockWithDelta);
   const isEditedBlockAnimatedValue = useSharedValue(0);
-
-  const eventEmitter = useRef(new EventEmitter()).current;
 
   useEffect(() => {
     isEditedBlockAnimatedValue.value = withSpring(isEditedBlock ? 1 : 0, {

@@ -1,4 +1,5 @@
 import { graphQLSchema, createGraphQLContext } from '@azzapp/data';
+import queryMap from '@azzapp/relay/query-map.json';
 import { graphql } from 'graphql';
 import { fetchQuery } from 'react-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
@@ -11,11 +12,13 @@ import type {
 } from 'relay-runtime';
 
 export function createServerNetwork(authInfos?: AuthInfos) {
-  return Network.create(async (text, variables) => {
+  return Network.create(async (requestParams, variables) => {
     const context = createGraphQLContext(authInfos);
     const results = await graphql({
       schema: graphQLSchema,
-      source: text.text!,
+      source: requestParams.text
+        ? requestParams.text
+        : (queryMap as any)[requestParams.id!],
       variableValues: variables,
       contextValue: context,
     });

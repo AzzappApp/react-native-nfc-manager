@@ -5,12 +5,12 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   Image,
   Platform,
   Pressable,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -20,7 +20,7 @@ import useInterval from '../../hooks/useInterval';
 import CoverOverlayEffects from './CoverOverlayEffects';
 import CoverRendererImage from './CoverRendererImage';
 import QRCodeModal from './QRCodeModal';
-import type { CoverRenderer_cover$key } from './__generated__/CoverRenderer_cover.graphql';
+import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { EventEmitter } from 'events';
 import type {
   StyleProp,
@@ -39,6 +39,7 @@ type CoverRendererProps = {
   useLargeImage?: boolean;
   isEditing?: boolean;
   isEditedBlock?: boolean;
+  hideBorderRadius?: boolean;
   eventEmitter?: EventEmitter;
   style?: StyleProp<ViewStyle>;
 };
@@ -54,6 +55,7 @@ const CoverRenderer = ({
   useLargeImage,
   eventEmitter,
   style,
+  hideBorderRadius = false,
 }: CoverRendererProps) => {
   const cover = useFragment(
     graphql`
@@ -92,6 +94,9 @@ const CoverRenderer = ({
   const playInterval = (cover?.pictureTransitionTimer ?? 0) * 1000;
   useInterval(
     () => {
+      if (pictures.length === 1) {
+        return;
+      }
       const nextIndex = (currentImageIndex + 1) % pictures.length;
       setCurrentImageIndex(nextIndex);
       imageFade.setValue(0);
@@ -106,13 +111,12 @@ const CoverRenderer = ({
   /**
    * Layout calculation
    */
-  const { width: windowWidth } = useWindowDimensions();
-  const width = fullScreen ? windowWidth : COVER_BASE_WIDTH;
-
-  const borderRadius: number = Platform.select({
-    web: '6%' as any,
-    default: 0.06 * width,
-  });
+  const borderRadius: number = hideBorderRadius
+    ? 0
+    : Platform.select({
+        web: '6%' as any,
+        default: getScaledStyle(0.06 * COVER_BASE_WIDTH, fullScreen),
+      });
 
   const [textSize, setTextSize] = useState<{
     width: number;
@@ -169,24 +173,38 @@ const CoverRenderer = ({
   const titleStyles = textStylesMap[titlePosition];
 
   let titleTransform: TransformsStyle | null = null;
-  if (textSize && titleRotation && Number.isFinite(titleRotation)) {
+  if (titleRotation && Number.isFinite(titleRotation)) {
     const { x, y, rotateDirection } = TITLE_TRANSFORM_SETTINGS[titlePosition];
-    titleTransform = withAnchorPoint(
-      { transform: [{ rotate: `${rotateDirection * titleRotation}deg` }] },
-      { x, y },
-      textSize,
-    );
+    if (Platform.OS === 'web') {
+      titleTransform = {
+        transform: [{ rotate: `${rotateDirection * titleRotation}deg` }],
+        //@ts-expect-error transformOrigin is only supported on web
+        transformOrigin: `${x * 100}% ${y * 100}%`,
+      };
+    } else if (textSize) {
+      titleTransform = withAnchorPoint(
+        { transform: [{ rotate: `${rotateDirection * titleRotation}deg` }] },
+        { x, y },
+        textSize,
+      );
+    }
   }
+
+  const qrCodeStyles = {
+    width: getScaledStyle(16, fullScreen),
+    height: getScaledStyle(16, fullScreen),
+    borderRadius: getScaledStyle(2, fullScreen),
+  };
 
   const displayedPictures = play ? pictures : [pictures[currentImageIndex]];
 
-  const scale = width / COVER_BASE_WIDTH;
+  const idPrefix = fullScreen ? 'user-screen-cover-' : 'cover-';
 
   return (
     <>
       <View
         style={[styles.container, { borderRadius }, style]}
-        nativeID={`cover-${userName}`}
+        nativeID={`${idPrefix}${userName}`}
       >
         {displayedPictures.map((picture, index) => {
           const isCurrent = index === currentImageIndex;
@@ -195,11 +213,22 @@ const CoverRenderer = ({
               index === displayedPictures.length - 1) ||
             index === currentImageIndex - 1;
 
-          const opacity = isCurrent
-            ? imageFade.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
-            : isPrevious
-            ? imageFade.interpolate({ inputRange: [0, 1], outputRange: [1, 0] })
-            : 0;
+          const imageOpacity = Platform.select({
+            default: !play
+              ? 1
+              : isCurrent
+              ? imageFade.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 1],
+                })
+              : isPrevious
+              ? imageFade.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 0],
+                })
+              : 0,
+            web: isCurrent ? 1 : 0,
+          });
 
           return (
             <CoverRendererImage
@@ -210,39 +239,43 @@ const CoverRenderer = ({
                 {
                   borderRadius,
                   backgroundColor,
+                  opacity: play ? imageOpacity : 1,
                 },
-                play && { opacity },
               ]}
-              nativeID={`cover-${userName}-image-${index}`}
-              testID={`cover-${userName}-image-${index}`}
+              nativeID={`${idPrefix}${userName}-image-${index}`}
+              testID={`${idPrefix}${userName}-image-${index}`}
               useLargeImage={useLargeImage ?? fullScreen}
             />
           );
         })}
 
-        <View style={[styles.container, { justifyContent: 'flex-end' }]}>
+        <View
+          style={[styles.containers, styles.overlayContainer, { borderRadius }]}
+        >
           <CoverOverlayEffects
             overlayEffect={overlayEffect}
             color={backgroundColor}
             width="100%"
             height="100%"
-            nativeID={`cover-${userName}-overlay`}
+            nativeID={`${idPrefix}${userName}-overlay`}
           />
         </View>
-        <View style={[styles.containers, titleStyles.position]}>
+        <View
+          style={[styles.containers, titleStyles.position]}
+          nativeID={`${idPrefix}${userName}-text`}
+        >
           <Text
             style={[
               { zIndex: 1 },
-              titleStyles.position,
-              {
-                fontSize: scale * titleFontSize,
-                color: titleColor,
-                fontFamily: titleFont,
-                opacity: textSize ? 1 : 0,
-              },
+              titleStyles.alignment,
               titleTransform,
+              {
+                fontSize: getScaledStyle(titleFontSize, fullScreen),
+                fontFamily: titleFont,
+                color: titleColor,
+                opacity: Platform.select({ default: textSize ? 1 : 0, web: 1 }),
+              },
             ]}
-            nativeID={`cover-${userName}-text`}
             onLayout={onTextLayout}
           >
             {title}
@@ -263,13 +296,9 @@ const CoverRenderer = ({
             disabled={isEditing}
           >
             <Image
-              nativeID={`cover-${userName}-qrCode`}
+              nativeID={`${idPrefix}${userName}-qrCode`}
               source={require('./assets/qr-code.png')}
-              style={{
-                width: 16 * scale,
-                height: 16 * scale,
-                borderRadius: 2 * scale,
-              }}
+              style={qrCodeStyles}
             />
           </Pressable>
         </View>
@@ -288,12 +317,8 @@ const CoverRenderer = ({
                 onPress={() => onSelectQRCodePosition(position)}
                 style={({ pressed }) => [
                   { zIndex: 1 },
-                  {
-                    width: 16 * scale,
-                    height: 16 * scale,
-                    borderRadius: 2 * scale,
-                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                  },
+                  qrCodeStyles,
+                  { backgroundColor: 'rgba(255, 255, 255, 0.6)' },
                   pressed && { opacity: 0.6 },
                 ]}
               />
@@ -331,6 +356,14 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: '5%',
     overflow: 'hidden',
+  },
+  overlayContainer: {
+    padding: 0,
+    // this fix is meant for web wich display a gap otherwise
+    height: Platform.select({
+      web: '100.5%',
+      default: '100%',
+    }),
   },
 });
 
@@ -444,4 +477,14 @@ const QR_CODE_POSITIONS: Record<string, ViewStyle> = {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
   },
+};
+
+const getScaledStyle = (value: number, fullScreen = false): any => {
+  if (!fullScreen) {
+    return value;
+  }
+  if (Platform.OS === 'web') {
+    return `calc(${value} * 100vw / ${COVER_BASE_WIDTH})`;
+  }
+  return (Dimensions.get('window').width / COVER_BASE_WIDTH) * value;
 };

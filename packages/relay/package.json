@@ -1,0 +1,8 @@
+{
+  "name": "@azzapp/relay",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "relay-runtime": "^14.0.0"
+  }
+}

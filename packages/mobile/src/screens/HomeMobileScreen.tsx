@@ -1,14 +1,17 @@
 import HomeScreen, { homeScreenQuery } from '@azzapp/app/lib/HomeScreen';
+import { usePreloadedQuery } from 'react-relay';
 import { resetEnvironment } from '../helpers/relayEnvironment';
+import relayScreen from '../helpers/relayScreen';
 import { clearTokens } from '../helpers/tokensStore';
 import type { HomeScreenQuery } from '@azzapp/app/lib/HomeScreen';
+import type { PreloadedQuery } from 'react-relay';
 
 const HomeMobileScreen = ({
-  data,
+  preloadedQuery,
 }: {
-  data: HomeScreenQuery['response'];
-  componentId: string;
+  preloadedQuery: PreloadedQuery<HomeScreenQuery>;
 }) => {
+  const data = usePreloadedQuery(homeScreenQuery, preloadedQuery);
   const logout = async () => {
     await clearTokens();
     resetEnvironment();
@@ -16,6 +19,6 @@ const HomeMobileScreen = ({
   return <HomeScreen data={data} logout={logout} />;
 };
 
-export { homeScreenQuery };
-
-export default HomeMobileScreen;
+export default relayScreen(HomeMobileScreen, {
+  query: homeScreenQuery,
+});
