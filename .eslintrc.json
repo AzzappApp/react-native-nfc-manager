@@ -22,7 +22,7 @@
     "plugin:react-hooks/recommended",
     "plugin:prettier/recommended"
   ],
-  "ignorePatterns": ["**/__generated__/*", "./packages/relay/artifacts/*"],
+  "ignorePatterns": ["**/__generated__/*", "packages/relay/artifacts/"],
   "rules": {
     "array-callback-return": "error",
     "no-promise-executor-return": "error",
