@@ -29,7 +29,7 @@ jobs:
 
       # JavaScript build
       - name: Relay Compiler 
-        run: yarn relay
+        run: yarn build
       
       # Testing
       - name: Lint
