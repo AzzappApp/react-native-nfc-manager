@@ -8,13 +8,13 @@
     ]
   },
   "scripts": {
-    "postinstall": "yarn create-query-map-file && patch-package",
+    "postinstall": "patch-package",
     "lint": "eslint .",
     "typecheck": "tsc",
     "test": "jest",
     "create-query-map-file": "touch ./packages/relay/query-map.json",
     "relay": "relay-compiler",
-    "build": "yarn relay",
+    "build": "yarn create-query-map-file && yarn relay",
     "dev:relay": "relay-compiler --watch",
     "dev:web": "yarn workspace @azzapp/web dev",
     "dev:mobile": "yarn workspace @azzapp/mobile dev",

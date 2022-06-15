@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "(cd ../../ && yarn relay) && next build",
+    "build": "(cd ../../ && yarn build) && next build",
     "start": "next start"
   },
   "dependencies": {
