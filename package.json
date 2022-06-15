@@ -8,7 +8,7 @@
     ]
   },
   "scripts": {
-    "postinstall": "yarn create-query-map-file",
+    "postinstall": "yarn create-query-map-file && patch-package",
     "lint": "eslint .",
     "typecheck": "tsc",
     "test": "jest",
@@ -45,6 +45,7 @@
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.70.3",
     "node-fetch": "2",
+    "patch-package": "^6.4.7",
     "prettier": "^2.6.0",
     "relay-compiler": "^14.0.0",
     "ts-node": "^10.7.0",
