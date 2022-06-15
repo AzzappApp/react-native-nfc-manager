@@ -63,8 +63,8 @@ jobs:
         env:
           FASTLANE_APPSTORE_API_KEY: ${{ secrets.FASTLANE_APPSTORE_API_KEY }}
 
-      # - name: Fix FlipperFoly
-      #   run: cd packages/mobile && sh ./scripts/fix-m1-flipper-foly.sh
+      - name: Fix FlipperFoly
+        run: cd packages/mobile && sh ./scripts/fix-m1-flipper-foly.sh
         
       - name: Build ios application
         run: yarn build:ios
