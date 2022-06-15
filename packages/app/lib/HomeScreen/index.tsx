@@ -1,8 +1,3 @@
-import HomeScreen, { homeScreenQuery } from './HomeScreen';
-import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
+import HomeScreen from './HomeScreen';
 
 export default HomeScreen;
-
-export { homeScreenQuery };
-
-export type { HomeScreenQuery };

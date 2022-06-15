@@ -1,13 +1,8 @@
 import UserScreen from '@azzapp/app/lib/UserScreen';
 import Head from 'next/head';
-import { useEffect } from 'react';
-import {
-  fetchQuery,
-  graphql,
-  useLazyLoadQuery,
-  useRelayEnvironment,
-} from 'react-relay';
+import { graphql, useLazyLoadQuery } from 'react-relay';
 import { preloadServerQuery } from '../helpers/relayServer';
+import useClientLazyLoadQuery from '../helpers/useClientLazyLoadQuery';
 import type { UserNamePageUserQuery } from '@azzapp/relay/artifacts/UserNamePageUserQuery.graphql';
 import type { UserNamePageViewerQuery } from '@azzapp/relay/artifacts/UserNamePageViewerQuery.graphql';
 import type { GetStaticPaths, GetStaticProps } from 'next';
@@ -34,28 +29,10 @@ const UserPage = ({ userName }: { userName: string }) => {
     { userName },
   );
 
-  const environment = useRelayEnvironment();
-  const { viewer } = useLazyLoadQuery<UserNamePageViewerQuery>(
+  const { viewer } = useClientLazyLoadQuery<UserNamePageViewerQuery>(
     userScreenViewerQuery,
     {},
-    { fetchPolicy: 'store-only' },
   );
-
-  useEffect(() => {
-    const subscribtion = fetchQuery<UserNamePageViewerQuery>(
-      environment,
-      userScreenViewerQuery,
-      {},
-    ).subscribe({
-      error(error: Error) {
-        console.error(error);
-      },
-    });
-
-    return () => {
-      subscribtion.unsubscribe();
-    };
-  }, [environment]);
 
   return (
     <div className="root">

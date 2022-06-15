@@ -1,15 +1,23 @@
-import HomeScreen, { homeScreenQuery } from '@azzapp/app/lib/HomeScreen';
+import HomeScreen from '@azzapp/app/lib/HomeScreen';
 import { useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
 import Head from 'next/head';
-import { useLazyLoadQuery } from 'react-relay';
-import { preloadServerQuery } from '../helpers/relayServer';
-import { getRequestAuthInfos, withSessionSsr } from '../helpers/session';
-import type { HomeScreenQuery } from '@azzapp/app/lib/HomeScreen';
-import type { GetServerSideProps } from 'next';
+import { graphql } from 'react-relay';
+import ClientOnlySuspense from '../components/ClientSuspence';
+import useClientLazyLoadQuery from '../helpers/useClientLazyLoadQuery';
+import type { homePageQuery } from '@azzapp/relay/artifacts/homePageQuery.graphql';
 
 const HomePage = () => {
   const WebAPI = useWebAPI();
-  const data = useLazyLoadQuery<HomeScreenQuery>(homeScreenQuery, {});
+  const data = useClientLazyLoadQuery<homePageQuery>(
+    graphql`
+      query homePageQuery {
+        viewer {
+          ...HomeScreen_viewer
+        }
+      }
+    `,
+    {},
+  );
   const logout = () => {
     WebAPI.logout()
       .then(() => {
@@ -28,23 +36,11 @@ const HomePage = () => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <HomeScreen data={data} logout={logout} />
+      <ClientOnlySuspense fallback={null}>
+        <HomeScreen viewer={data.viewer} logout={logout} />
+      </ClientOnlySuspense>
     </div>
   );
 };
-
-export const getServerSideProps: GetServerSideProps = withSessionSsr(
-  async ({ req }) => {
-    const authInfos = await getRequestAuthInfos(req);
-    const { initialRecords } = await preloadServerQuery(
-      homeScreenQuery,
-      {},
-      authInfos,
-    );
-    return {
-      props: { initialRecords },
-    };
-  },
-);
 
 export default HomePage;

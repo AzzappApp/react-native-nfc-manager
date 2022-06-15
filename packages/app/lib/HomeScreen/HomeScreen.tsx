@@ -1,55 +1,52 @@
 import ROUTES from '@azzapp/shared/lib/routes';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { graphql } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import RecommandedUsersList from './RecommandedUsersList';
-import type {
-  HomeScreenQuery,
-  HomeScreenQuery$data,
-} from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
+import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
 type HomeScreenProps = {
-  data: HomeScreenQuery$data;
   logout: () => void;
+  viewer: HomeScreen_viewer$key;
 };
 
-export const homeScreenQuery = graphql`
-  query HomeScreenQuery {
-    viewer {
-      user {
-        id
+const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
+  const viewer = useFragment(
+    graphql`
+      fragment HomeScreen_viewer on Viewer {
+        user {
+          id
+        }
+        ...RecommandedUsersList_viewer
       }
-      ...RecommandedUsersList_viewer
-    }
-  }
-`;
-
-const HomeScreen = ({ data, logout }: HomeScreenProps) => (
-  <SafeAreaView style={styles.container}>
-    <Header title="AZZAPP" />
-    <RecommandedUsersList
-      viewer={data.viewer}
-      style={styles.recommandedUsersList}
-    />
-    {data.viewer.user ? (
-      <TouchableOpacity onPress={logout}>
-        <Text>Logout</Text>
-      </TouchableOpacity>
-    ) : (
-      <>
-        <Link modal route={ROUTES.SIGN_IN}>
-          <Text>Signin</Text>
-        </Link>
-        <Link modal route={ROUTES.SIGN_UP}>
-          <Text>Signup</Text>
-        </Link>
-      </>
-    )}
-  </SafeAreaView>
-);
-
-export type { HomeScreenQuery };
+    `,
+    viewerRef,
+  );
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header title="AZZAPP" />
+      <RecommandedUsersList
+        viewer={viewer}
+        style={styles.recommandedUsersList}
+      />
+      {viewer.user ? (
+        <TouchableOpacity onPress={logout}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      ) : (
+        <>
+          <Link modal route={ROUTES.SIGN_IN}>
+            <Text>Signin</Text>
+          </Link>
+          <Link modal route={ROUTES.SIGN_UP}>
+            <Text>Signup</Text>
+          </Link>
+        </>
+      )}
+    </SafeAreaView>
+  );
+};
 
 export default HomeScreen;
 
