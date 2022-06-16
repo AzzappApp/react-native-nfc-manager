@@ -55,8 +55,6 @@ jobs:
 
       - name: Pod install
         run: cd packages/mobile/ios/ && bundle exec pod install
-        env: 
-          RCT_NEW_ARCH_ENABLED : 1
 
       - name: Setup faslane AppStore API Key
         run: echo $FASTLANE_APPSTORE_API_KEY | base64 --decode > ./packages/mobile/fastlane/appstore_api_key.json
