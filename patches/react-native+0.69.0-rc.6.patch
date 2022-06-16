@@ -6,19 +6,16 @@ index 0000000..361f5fb
 @@ -0,0 +1 @@
 +export RCT_METRO_PORT=8081
 diff --git a/node_modules/react-native/scripts/react-native-xcode.sh b/node_modules/react-native/scripts/react-native-xcode.sh
-index 6f95a29..4882f53 100755
+index 6f95a29..49cbfb2 100755
 --- a/node_modules/react-native/scripts/react-native-xcode.sh
 +++ b/node_modules/react-native/scripts/react-native-xcode.sh
-@@ -159,6 +159,12 @@ fi
-   $EXTRA_ARGS \
-   $EXTRA_PACKAGER_ARGS
+@@ -148,6 +148,9 @@ if [[ $USE_HERMES == true && $DEV == false ]]; then
+   EXTRA_ARGS="$EXTRA_ARGS --minify false"
+ fi
  
-+echo "BUNDLE_FILE"
-+echo $BUNDLE_FILE
-+echo "DEST"
-+echo $DEST
++# There is a bug in minifer so we disable it for the moment
++EXTRA_ARGS="$EXTRA_ARGS --minify false"
 +
-+
- if [[ $USE_HERMES != true ]]; then
-   cp "$BUNDLE_FILE" "$DEST/"
-   BUNDLE_FILE="$DEST/main.jsbundle"
+ "$NODE_BINARY" $NODE_ARGS "$CLI_PATH" $BUNDLE_COMMAND \
+   $CONFIG_ARG \
+   --entry-file "$ENTRY_FILE" \

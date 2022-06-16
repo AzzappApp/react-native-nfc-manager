@@ -67,7 +67,7 @@ jobs:
       - name: Setup Xcode env
         run: |
           echo "Setup node for xcode to $(command -v node)"
-          echo "export NODE_BINARY=$(command -v node)" > ./packages/mobile/ios/xcode.env
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/mobile/ios/.xcode.env
         
       - name: Build ios application
         run: yarn build:ios
