@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 const [, , GITHUB_REF, GITHUB_SHA, VERCEL_TOKEN] = process.argv;
 
-const STAGING = 'https://azzap-staging.vercel.app';
-const PRODUCTION = 'https://azzap.vercel.app';
+const STAGING = 'azzap-staging.vercel.app';
+const PRODUCTION = 'azzap.vercel.app';
 const TIMEOUT = 300;
 const VERCEL_TEAM_ID = 'fadio-it';
 const VERCEL_PROJECT_NAME = 'azzapp';
@@ -44,7 +44,7 @@ const fetchVercelUrl = async () => {
         ({ meta }) => meta.githubCommitSha === GITHUB_SHA,
       );
       if (deployment) {
-        return `https://${deployment.url}`;
+        return deployment.url;
       }
     }
   }
