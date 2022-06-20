@@ -15,9 +15,14 @@ export type UserCard = {
   modules: UserCardModule[];
 };
 
+export type Media = {
+  kind: 'picture' | 'video';
+  source: string;
+};
+
 export type UserCardCover = {
   backgroundColor?: string;
-  pictures: string[];
+  pictures: Media[];
   pictureTransitionTimer: number;
   overlayEffect: string;
   title: string;

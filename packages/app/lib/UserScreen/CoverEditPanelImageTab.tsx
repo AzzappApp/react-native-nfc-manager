@@ -14,10 +14,12 @@ import {
 import { colors, fontFamilies, textStyles } from '../../theme';
 import DashedSlider from '../components/DashedSlider';
 import Icon from '../components/Icon';
+import VideoThumbnail from '../components/VideoThumbnail';
+import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
-  pictures: readonly string[];
+  pictures: ReadonlyArray<Readonly<{ source: string; kind: MediaKind }>>;
   timer: number;
   imageIndex: number | undefined;
   onSelectPhoto: (index: number | undefined) => void;
@@ -120,17 +122,24 @@ const CoverEditPanelImageTab = ({
             >
               {({ pressed }) =>
                 pictures?.[index] ? (
-                  <Image
-                    style={[styles.image, pressed && styles.imagePressed]}
-                    source={{
-                      uri: getCoverURLForSize(
-                        getMostAdaptedCoverSizeForWidth(
-                          PixelRatio.getPixelSizeForLayoutSize(50),
+                  pictures[index].kind === 'video' ? (
+                    <VideoThumbnail
+                      style={[styles.image, pressed && styles.imagePressed]}
+                      uri={pictures[index].source}
+                    />
+                  ) : (
+                    <Image
+                      style={[styles.image, pressed && styles.imagePressed]}
+                      source={{
+                        uri: getCoverURLForSize(
+                          getMostAdaptedCoverSizeForWidth(
+                            PixelRatio.getPixelSizeForLayoutSize(50),
+                          ),
+                          pictures[index].source,
                         ),
-                        pictures[index],
-                      ),
-                    }}
-                  />
+                      }}
+                    />
+                  )
                 ) : (
                   <Icon
                     icon="plus"

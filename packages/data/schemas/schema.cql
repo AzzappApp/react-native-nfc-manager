@@ -14,9 +14,14 @@ CREATE INDEX ON users(email);
 CREATE INDEX ON users(user_name);
 
 
+CREATE TYPE media (
+    kind text,
+    source text
+);
+
 CREATE TYPE card_cover (
     background_color text,
-    pictures list<text>,
+    pictures list<frozen<media>>,
     picture_transition_timer smallint,
     overlay_effect text,
     title text,

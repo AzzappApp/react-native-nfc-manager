@@ -37,7 +37,7 @@ describe('CoverRenderer', () => {
         UserCard: (_, generateId) => ({
           id: generateId(),
           cover: {
-            pictures: ['http://fakePicture.com'],
+            pictures: [{ kind: 'picture', source: 'http://fakePicture.com' }],
             title: 'fake title',
             ...DEFAULT_CARD_COVER,
           },

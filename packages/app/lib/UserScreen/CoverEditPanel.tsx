@@ -19,7 +19,7 @@ import TabsBar from '../components/TabsBar';
 import useFormMutation from '../hooks/useFormMutation';
 import { useImagePicker, useWebAPI } from '../PlatformEnvironment';
 import CoverEditPanelEffectTab from './CoverEditPanelEffectTab';
-import CoverEditPanelImagePanel from './CoverEditPanelImageTab';
+import CoverEditPanelImageTab from './CoverEditPanelImageTab';
 import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
 import ModuleEditorContext from './ModuleEditorContext';
 import UploadProgressModal from './UploadProgressModal';
@@ -29,6 +29,7 @@ import type {
 } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type {
   CoverEditPanelMutation,
+  MediaKind,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditPanelMutation.graphql';
 import type { EventEmitter } from 'events';
@@ -45,7 +46,10 @@ type CoverEditPanelProps = {
 };
 
 export type CoverUpdates = Omit<UpdateCoverInput, 'pictures'> & {
-  pictures?: Array<string | { uri: string; file: File }>;
+  pictures?: Array<{
+    kind: MediaKind;
+    source: string | { uri: string; file: File };
+  }>;
 };
 
 const CoverEditPanel = ({
@@ -61,7 +65,10 @@ const CoverEditPanel = ({
     graphql`
       fragment CoverEditPanel_cover on UserCardCover {
         backgroundColor
-        pictures
+        pictures {
+          source
+          kind
+        }
         pictureTransitionTimer
         overlayEffect
         title
@@ -139,18 +146,26 @@ const CoverEditPanel = ({
     const updateCoverInput: UpdateCoverInput = coverUpdates;
     try {
       if (pictures) {
-        const picturesToUpload: Array<{ index: number; file: File }> = [];
+        const picturesToUpload: Array<{
+          kind: MediaKind;
+          index: number;
+          file: File;
+        }> = [];
         pictures.forEach((picture, index) => {
-          if (typeof picture === 'object') {
-            picturesToUpload.push({ file: picture.file, index });
+          if (typeof picture.source === 'object') {
+            picturesToUpload.push({
+              kind: picture.kind,
+              file: picture.source.file,
+              index,
+            });
           }
         });
 
         if (picturesToUpload.length) {
           const uploadSettings = await Promise.all(
-            picturesToUpload.map(() =>
+            picturesToUpload.map(({ kind }) =>
               WebAPI.uploadSign({
-                kind: 'image',
+                kind: kind as any,
                 target: 'cover',
               }),
             ),
@@ -205,10 +220,13 @@ const CoverEditPanel = ({
             const uploadedImage = results.find(
               result => result.index === index,
             );
-            return uploadedImage?.publicId ?? (picture as string);
+            return {
+              kind: picture.kind,
+              source: uploadedImage?.publicId ?? (picture.source as string),
+            };
           });
         } else {
-          updateCoverInput.pictures = pictures as string[];
+          updateCoverInput.pictures = pictures as any;
         }
       }
     } catch (e) {
@@ -273,9 +291,12 @@ const CoverEditPanel = ({
     ];
     index = Math.min(index, pictures.length);
 
-    pictures[index] = { uri, file };
-    setImageIndex(index);
+    pictures[index] = {
+      kind: file.type.startsWith('video') ? 'video' : 'picture',
+      source: { uri, file },
+    };
     applyUpdates({ pictures });
+    setImageIndex(index);
   };
 
   const onRemovePicture = () => {
@@ -345,7 +366,7 @@ const CoverEditPanel = ({
     <>
       <View style={[styles.container, style]} onLayout={onLayout}>
         {currenTab === 'picture' && (
-          <CoverEditPanelImagePanel
+          <CoverEditPanelImageTab
             pictures={displayedCover.pictures}
             timer={displayedCover.pictureTransitionTimer}
             imageIndex={imageIndex}
@@ -449,9 +470,13 @@ const getOptimisticResponse = (
           ...coverUpdates,
           title: coverUpdates.title ?? intialData?.title ?? '',
           pictures: coverUpdates.pictures
-            ? coverUpdates.pictures?.map(picture =>
-                typeof picture === 'string' ? picture : picture.uri,
-              )
+            ? coverUpdates.pictures?.map(picture => ({
+                kind: picture.kind,
+                source:
+                  typeof picture.source === 'string'
+                    ? picture.source
+                    : picture.source.uri,
+              }))
             : intialData?.pictures ?? [],
         },
       },

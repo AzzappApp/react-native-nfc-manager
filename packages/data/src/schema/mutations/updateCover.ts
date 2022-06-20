@@ -15,6 +15,7 @@ import {
   updateUserCard,
 } from '../../domains/UserCard';
 import UserGraphQL from '../UserGraphQL';
+import { MediaInputGraphQL } from './commonsTypes';
 import type { User } from '../../domains/User';
 import type { UserCardCover, UserCard } from '../../domains/UserCard';
 import type { GraphQLContext } from '../GraphQLContext';
@@ -27,7 +28,7 @@ const updateCover = mutationWithClientMutationId({
       description: 'the background color of the card',
     },
     pictures: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      type: new GraphQLList(new GraphQLNonNull(MediaInputGraphQL)),
       description: 'the pictures of the card cover',
     },
     pictureTransitionTimer: {

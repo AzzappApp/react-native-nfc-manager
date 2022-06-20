@@ -61,7 +61,10 @@ const CoverRenderer = ({
     graphql`
       fragment CoverRenderer_cover on UserCardCover {
         backgroundColor
-        pictures
+        pictures {
+          source
+          kind
+        }
         pictureTransitionTimer
         overlayEffect
         title
@@ -196,7 +199,9 @@ const CoverRenderer = ({
     borderRadius: getScaledStyle(2, fullScreen),
   };
 
-  const displayedPictures = play ? pictures : [pictures[currentImageIndex]];
+  const displayedPictures = (play ? pictures : [pictures[currentImageIndex]])
+    // picture could be null in case of invalid image Index
+    .filter(picture => !!picture);
 
   const idPrefix = fullScreen ? 'user-screen-cover-' : 'cover-';
 
@@ -232,7 +237,7 @@ const CoverRenderer = ({
 
           return (
             <CoverRendererImage
-              key={picture}
+              key={`${picture.source}-${picture.kind}`}
               picture={picture}
               style={[
                 styles.coverImage,

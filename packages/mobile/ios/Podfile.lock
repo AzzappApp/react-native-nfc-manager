@@ -286,6 +286,8 @@ PODS:
   - React-jsinspector (0.69.0-rc.6)
   - React-logger (0.69.0-rc.6):
     - glog
+  - react-native-create-thumbnail (1.5.1):
+    - React-Core
   - react-native-encrypted-storage (4.0.2):
     - React-Core
   - react-native-image-picker (4.7.3):
@@ -296,6 +298,11 @@ PODS:
     - RCTTypeSafety
     - React
     - ReactCommon/turbomodule/core
+  - react-native-video (5.2.0):
+    - React-Core
+    - react-native-video/Video (= 5.2.0)
+  - react-native-video/Video (5.2.0):
+    - React-Core
   - React-perflogger (0.69.0-rc.6)
   - React-RCTActionSheet (0.69.0-rc.6):
     - React-Core/RCTActionSheetHeaders (= 0.69.0-rc.6)
@@ -444,9 +451,11 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
+  - react-native-create-thumbnail (from `../../../node_modules/react-native-create-thumbnail`)
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
   - react-native-image-picker (from `../../../node_modules/react-native-image-picker`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
+  - react-native-video (from `../../../node_modules/react-native-video`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -523,12 +532,16 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../../../node_modules/react-native/ReactCommon/logger"
+  react-native-create-thumbnail:
+    :path: "../../../node_modules/react-native-create-thumbnail"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
   react-native-image-picker:
     :path: "../../../node_modules/react-native-image-picker"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
+  react-native-video:
+    :path: "../../../node_modules/react-native-video"
   React-perflogger:
     :path: "../../../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -596,9 +609,11 @@ SPEC CHECKSUMS:
   React-jsiexecutor: ed108fa941c623dda1cf25b0487e506ae5cd597f
   React-jsinspector: 96a6f470b24a0918d6f207c55f9186ee6d987ab8
   React-logger: 4542bced257f3ef658671bbe354a27d76070bee9
+  react-native-create-thumbnail: dedcb7cd3d14a4b6cc2026563197242081edb52b
   react-native-encrypted-storage: e78d848ce0fb663c2ce306e37921d026809322e6
   react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
   react-native-safe-area-context: ebf8c413eb8b5f7c392a036a315eb7b46b96845f
+  react-native-video: a4c2635d0802f983594b7057e1bce8f442f0ad28
   React-perflogger: e3265731a720bfd153640721f0234e8167c49c2a
   React-RCTActionSheet: ea6a00519ba55aec249f940e388b95432478a70e
   React-RCTAnimation: 3896fcda72ab94404f77ea65710e702b0f044c3d

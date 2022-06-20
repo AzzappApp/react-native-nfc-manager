@@ -28,12 +28,12 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
     kind,
     target,
   }: {
-    kind: 'image' | 'video';
+    kind: 'picture' | 'video';
     target: 'cover' | 'post';
   } = req.body;
 
   if (
-    (kind !== 'image' && kind !== 'video') ||
+    (kind !== 'picture' && kind !== 'video') ||
     (target !== 'cover' && target !== 'post')
   ) {
     res.status(400).send({ message: ERRORS.INVALID_REQUEST });
@@ -44,8 +44,8 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
   let signature: string;
   if (target === 'cover') {
     const timestamp = Math.round(Date.now() / 1000);
-    if (kind === 'image') {
-      const publicId = `images/${cuid()}`;
+    if (kind === 'picture') {
+      const publicId = `pictures/${cuid()}`;
       uploadOptions = {
         timestamp,
         public_id: publicId,
@@ -63,6 +63,7 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
       uploadOptions = {
         timestamp,
         public_id: publicId,
+        // eager: ['format=mp4'],
       };
     }
     signature = Cloudinary.utils.api_sign_request(

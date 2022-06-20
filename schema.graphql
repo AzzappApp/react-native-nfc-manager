@@ -71,7 +71,7 @@ type UserCardCover {
   backgroundColor: String!
 
   """the pictures of the card cover"""
-  pictures: [String!]!
+  pictures: [Media!]!
 
   """
   the time, in seconds, a picture stay displayed before transition in case of multiple pictures
@@ -109,6 +109,17 @@ type UserCardCover {
   dektopImagePosition: String!
 }
 
+"""User Card media module media"""
+type Media {
+  kind: MediaKind!
+  source: String!
+}
+
+enum MediaKind {
+  video
+  picture
+}
+
 """User Card module"""
 union UserCardModule = SocialModule | MediaModule | TextModule
 
@@ -132,18 +143,7 @@ type SocialModuleData {
 
 """User Card media module"""
 type MediaModule {
-  data: [MediaModuleMedia!]!
-}
-
-"""User Card media module media"""
-type MediaModuleMedia {
-  kind: MediaModuleMediaKind!
-  src: String!
-}
-
-enum MediaModuleMediaKind {
-  video
-  picture
+  data: [Media!]!
 }
 
 """User Card text module"""
@@ -198,7 +198,7 @@ input UpdateCoverInput {
   backgroundColor: String
 
   """the pictures of the card cover"""
-  pictures: [String!]
+  pictures: [MediaInput!]
 
   """
   the time, in seconds, a picture stay displayed before transition in case of multiple pictures
@@ -235,4 +235,10 @@ input UpdateCoverInput {
   """the position of the backround image on desktop"""
   dektopImagePosition: String
   clientMutationId: String
+}
+
+"""User Card media module media"""
+input MediaInput {
+  kind: MediaKind!
+  source: String!
 }

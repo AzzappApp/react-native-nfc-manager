@@ -10,7 +10,7 @@ module.exports = {
       },
       testMatch: ['<rootDir>/packages/app/**/*.test.{js,jsx,ts,tsx}'],
       transformIgnorePatterns: [
-        'node_modules/(?!((jest-)?react-native|@react-native(-community)?|react-native-qrcode-svg)/)',
+        'node_modules/(?!((jest-)?react-native|@react-native(-community)?|react-native-qrcode-svg|react-native-video)/)',
       ],
     },
   ],

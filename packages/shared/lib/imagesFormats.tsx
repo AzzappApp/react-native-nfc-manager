@@ -19,5 +19,13 @@ export const getCoverURLForSize = (size: number, coverImageId: string) => {
   return `${baseURL}/${transformation}/${coverImageId}`;
 };
 
+export const getCoverVideoURLFor = (videoImageId: string) => {
+  if (/^(https?|file):\/\//.test(videoImageId)) {
+    return videoImageId;
+  }
+  const baseURL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+  return `${baseURL}/video/upload/${videoImageId}.mp4`;
+};
+
 export const getMostAdaptedCoverSizeForWidth = (width: number) =>
   Math.ceil(width / COVER_BASE_WIDTH);

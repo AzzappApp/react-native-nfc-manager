@@ -83,7 +83,7 @@ export const logout: APIMethod<undefined, void> = (_, init): Promise<void> =>
   });
 
 export const uploadSign: APIMethod<
-  { kind: 'image' | 'video'; target: 'cover' | 'post' },
+  { kind: 'picture' | 'video'; target: 'cover' | 'post' },
   Record<string, string>
 > = async ({ kind, target }, init) =>
   apiFetch(`${API_ENDPOINT}/uploadSign`, {

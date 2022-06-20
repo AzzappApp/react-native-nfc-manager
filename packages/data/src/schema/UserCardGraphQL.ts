@@ -3,16 +3,17 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
-  GraphQLEnumType,
   GraphQLUnionType,
   GraphQLInt,
   GraphQLFloat,
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { getUserById } from '../domains/User';
+import { MediaGraphQL } from './commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
 import type {
+  Media,
   MediaModule,
   SocialModule,
   TextModule,
@@ -49,6 +50,23 @@ const UserCardGraphQL = new GraphQLObjectType<UserCard, GraphQLContext>({
 
 export default UserCardGraphQL;
 
+export const MediaGraphql = new GraphQLObjectType<Media, GraphQLContext>({
+  name: 'UserCardCover',
+  description: 'UserCard cover display informations',
+  fields: () => ({
+    kind: {
+      type: new GraphQLNonNull(MediaGraphQL),
+      description: 'the background color of the card',
+    },
+    pictures: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      ),
+      description: 'the pictures of the card cover',
+    },
+  }),
+});
+
 export const UserCardCoverGraphQL = new GraphQLObjectType<
   UserCardCover,
   GraphQLContext
@@ -62,7 +80,7 @@ export const UserCardCoverGraphQL = new GraphQLObjectType<
     },
     pictures: {
       type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(GraphQLString)),
+        new GraphQLList(new GraphQLNonNull(MediaGraphQL)),
       ),
       description: 'the pictures of the card cover',
     },
@@ -171,34 +189,10 @@ export const MediaModuleGraphQL = new GraphQLObjectType<
   fields: () => ({
     data: {
       type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(MediaModuleMediaGraphQL)),
+        new GraphQLList(new GraphQLNonNull(MediaGraphQL)),
       ),
     },
   }),
-});
-
-export const MediaModuleMediaGraphQL = new GraphQLObjectType<
-  { kind: 'picture' | 'video'; src: string },
-  GraphQLContext
->({
-  name: 'MediaModuleMedia',
-  description: 'User Card media module media',
-  fields: () => ({
-    kind: {
-      type: new GraphQLNonNull(MediaModuleMediaKindGraphQL),
-    },
-    src: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-  }),
-});
-
-export const MediaModuleMediaKindGraphQL = new GraphQLEnumType({
-  name: 'MediaModuleMediaKind',
-  values: {
-    video: { value: 'video' },
-    picture: { value: 'picture' },
-  },
 });
 
 export const TextModuleGraphQL = new GraphQLObjectType<

@@ -14,7 +14,8 @@ const createPlatformEnvironment = (
   LinkComponent: Link,
   async launchImagePicker() {
     const { didCancel, errorCode, assets } = await launchImageLibrary({
-      quality: 0.4,
+      quality: 0.3,
+      videoQuality: Platform.select({ ios: 'medium', default: 'low' }),
       mediaType: 'mixed',
     });
     const photo = assets?.[0];
