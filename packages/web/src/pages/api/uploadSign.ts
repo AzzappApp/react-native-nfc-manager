@@ -1,13 +1,15 @@
 import ERRORS from '@azzapp/shared/lib/errors';
-import { getCoverFormat } from '@azzapp/shared/lib/imagesFormats';
 import { v2 as Cloudinary } from 'cloudinary';
 import cuid from 'cuid';
-import range from 'lodash/range';
 import {
   getRequestAuthInfos,
   withSessionAPIRoute,
 } from '../../helpers/session';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+const CLOUDINARY_API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!;
+const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
 
 const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -40,42 +42,31 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  let uploadOptions: any;
-  let signature: string;
+  const uploadURL: string =
+    kind === 'picture'
+      ? `${CLOUDINARY_BASE_URL}/image/upload`
+      : `${CLOUDINARY_BASE_URL}/video/upload`;
+  const uploadParameters: Record<string, any> = {
+    timestamp: Math.round(Date.now() / 1000),
+    public_id: cuid(),
+  };
+
   if (target === 'cover') {
-    const timestamp = Math.round(Date.now() / 1000);
-    if (kind === 'picture') {
-      const publicId = `pictures/${cuid()}`;
-      uploadOptions = {
-        timestamp,
-        public_id: publicId,
-        eager: range(1, 14)
-          .map(getCoverFormat)
-          .map(({ width, height }) => `c_fill,w_${width},h_${height}`)
-          .join('|'),
-        eager_async: true,
-        // TODO
-        // allowed_formats
-        // moderation
-      };
-    } else {
-      const publicId = `videos/${cuid()}`;
-      uploadOptions = {
-        timestamp,
-        public_id: publicId,
-        // eager: ['format=mp4'],
-      };
-    }
-    signature = Cloudinary.utils.api_sign_request(
-      uploadOptions,
-      process.env.CLOUDINARY_API_SECRET!,
-    );
+    // TODO transformations
   } else {
     res.status(400).send({ message: 'NOT_IMPLEMENTED' });
     return;
   }
 
-  res.json({ ...uploadOptions, signature });
+  Object.assign(uploadParameters, {
+    signature: Cloudinary.utils.api_sign_request(
+      uploadParameters,
+      process.env.CLOUDINARY_API_SECRET!,
+    ),
+    api_key: CLOUDINARY_API_KEY,
+  });
+
+  res.json({ uploadURL, uploadParameters });
 };
 
 export default withSessionAPIRoute(uploadSign);

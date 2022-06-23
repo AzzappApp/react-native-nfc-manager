@@ -257,7 +257,7 @@ const CoverRenderer = ({
                   nativeID={`${idPrefix}${userName}-image-${index}`}
                   testID={`${idPrefix}${userName}-image-${index}`}
                   useLargeImage={useLargeImage ?? fullScreen}
-                  hidden={!isCurrent}
+                  hidden={!isCurrent && play}
                 />
               );
             case 'video':
@@ -269,7 +269,7 @@ const CoverRenderer = ({
                   style={style}
                   nativeID={`${idPrefix}${userName}-image-${index}`}
                   testID={`${idPrefix}${userName}-image-${index}`}
-                  hidden={!isCurrent}
+                  hidden={!isCurrent && play}
                 />
               );
             default:

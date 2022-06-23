@@ -1,9 +1,6 @@
 import { fetchJSON, postFormData } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!;
-const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}/upload`;
 
 type FetchFunction = (input: RequestInfo, init: RequestInit) => Promise<any>;
 
@@ -84,7 +81,7 @@ export const logout: APIMethod<undefined, void> = (_, init): Promise<void> =>
 
 export const uploadSign: APIMethod<
   { kind: 'picture' | 'video'; target: 'cover' | 'post' },
-  Record<string, string>
+  { uploadURL: string; uploadParameters: Record<string, any> }
 > = async ({ kind, target }, init) =>
   apiFetch(`${API_ENDPOINT}/uploadSign`, {
     ...init,
@@ -94,16 +91,15 @@ export const uploadSign: APIMethod<
 
 export const uploadMedia = (
   file: File,
-  uploadSettings: Record<string, string>,
+  uploadURL: string,
+  uploadParameters: Record<string, any>,
   signal?: AbortSignal,
 ) => {
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('api_key', CLOUDINARY_API_KEY);
   // eslint-disable-next-line guard-for-in
-  for (const key in uploadSettings) {
-    formData.append(key, uploadSettings[key]);
+  for (const key in uploadParameters) {
+    formData.append(key, uploadParameters[key]);
   }
-
-  return postFormData(CLOUDINARY_URL, formData, 'json', signal);
+  return postFormData(uploadURL, formData, 'json', signal);
 };

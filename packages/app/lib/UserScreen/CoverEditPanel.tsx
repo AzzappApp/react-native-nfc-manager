@@ -77,6 +77,10 @@ const CoverEditPanel = ({
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
         }
+        coverWidth: {
+          type: "Float!"
+          provider: "../providers/CoverBaseWidth.relayprovider"
+        }
       ) {
         backgroundColor
         pictures {
@@ -84,6 +88,11 @@ const CoverEditPanel = ({
           kind
           largeURI: uri(
             width: $screenWidth
+            pixelRatio: $pixelRatio
+            ratio: $coverRatio
+          )
+          smallURI: uri(
+            width: $coverWidth
             pixelRatio: $pixelRatio
             ratio: $coverRatio
           )
@@ -191,10 +200,13 @@ const CoverEditPanel = ({
             ),
           );
 
-          const uploads = picturesToUpload.map(({ file, index }, i) => ({
-            index,
-            upload: WebAPI.uploadMedia(file, uploadSettings[i]),
-          }));
+          const uploads = picturesToUpload.map(({ file, index }, i) => {
+            const { uploadURL, uploadParameters } = uploadSettings[i];
+            return {
+              index,
+              upload: WebAPI.uploadMedia(file, uploadURL, uploadParameters),
+            };
+          });
 
           const nbObservables = uploads.length;
           if (nbObservables) {
@@ -499,6 +511,7 @@ const getOptimisticResponse = (
                   source: picture.source.uri,
                   thumbnailURI: picture.source.uri,
                   largeURI: picture.source.uri,
+                  smallURI: picture.source.uri,
                 };
               })
             : intialData?.pictures ?? [],
