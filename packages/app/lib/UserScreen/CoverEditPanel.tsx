@@ -14,7 +14,10 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import ColorPicker from '../components/ColorPicker';
-import { QR_CODE_POSITION_CHANGE_EVENT } from '../components/CoverRenderer/CoverRenderer';
+import {
+  coverRendererFragment,
+  QR_CODE_POSITION_CHANGE_EVENT,
+} from '../components/CoverRenderer/CoverRenderer';
 import TabsBar from '../components/TabsBar';
 import useFormMutation from '../hooks/useFormMutation';
 import { useImagePicker, useWebAPI } from '../PlatformEnvironment';
@@ -24,20 +27,20 @@ import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
 import ModuleEditorContext from './ModuleEditorContext';
 import UploadProgressModal from './UploadProgressModal';
 import type {
-  CoverEditPanel_cover$data,
-  CoverEditPanel_cover$key,
-} from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
-import type {
   CoverEditPanelMutation,
   MediaKind,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditPanelMutation.graphql';
+import type {
+  CoverRenderer_cover$data,
+  CoverRenderer_cover$key,
+} from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { EventEmitter } from 'events';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type CoverEditPanelProps = {
   userId: string;
-  cover?: CoverEditPanel_cover$key | null;
+  cover?: CoverRenderer_cover$key | null;
   cardId?: string;
   imageIndex: number | undefined;
   setImageIndex: (index: number | undefined) => void;
@@ -61,58 +64,7 @@ const CoverEditPanel = ({
   eventEmitter,
   style,
 }: CoverEditPanelProps) => {
-  const cover = useFragment(
-    graphql`
-      fragment CoverEditPanel_cover on UserCardCover
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        coverRatio: {
-          type: "Float!"
-          provider: "../providers/CoverRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        coverWidth: {
-          type: "Float!"
-          provider: "../providers/CoverBaseWidth.relayprovider"
-        }
-      ) {
-        backgroundColor
-        pictures {
-          source
-          kind
-          largeURI: uri(
-            width: $screenWidth
-            pixelRatio: $pixelRatio
-            ratio: $coverRatio
-          )
-          smallURI: uri(
-            width: $coverWidth
-            pixelRatio: $pixelRatio
-            ratio: $coverRatio
-          )
-          thumbnailURI: uri(width: 200, pixelRatio: $pixelRatio, ratio: 1)
-        }
-        pictureTransitionTimer
-        overlayEffect
-        title
-        titlePosition
-        titleFont
-        titleFontSize
-        titleColor
-        titleRotation
-        qrCodePosition
-        desktopLayout
-        dektopImagePosition
-      }
-    `,
-    coverKey ?? null,
-  );
+  const cover = useFragment(coverRendererFragment, coverKey ?? null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialData = useMemo(() => cover, []);
@@ -126,7 +78,7 @@ const CoverEditPanel = ({
             id
             card {
               cover {
-                ...CoverEditPanel_cover
+                ...CoverRenderer_cover @arguments(canEdit: true)
               }
             }
           }
@@ -486,7 +438,7 @@ const styles = StyleSheet.create({
 });
 
 const getOptimisticResponse = (
-  intialData: CoverEditPanel_cover$data | null,
+  intialData: CoverRenderer_cover$data | null,
   coverUpdates: CoverUpdates,
   userId: string,
   cardId?: string,

@@ -31,8 +31,11 @@ const UserScreen = ({
           id
           cover {
             ...CoverRenderer_cover
-            ...CoverEditPanel_cover
             backgroundColor
+          }
+          # TODO find a better way to refetch edit data after first rendering
+          editCover: cover {
+            ...CoverRenderer_cover @arguments(canEdit: true)
           }
         }
       }
@@ -172,7 +175,7 @@ const UserScreen = ({
         <CoverEditPanel
           userId={user.id}
           cardId={user.card?.id}
-          cover={user.card?.cover}
+          cover={user.card?.editCover}
           imageIndex={imageIndex}
           setImageIndex={setImageIndex}
         />

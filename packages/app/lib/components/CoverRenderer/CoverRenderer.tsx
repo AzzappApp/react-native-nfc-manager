@@ -44,6 +44,60 @@ type CoverRendererProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+export const coverRendererFragment = graphql`
+  fragment CoverRenderer_cover on UserCardCover
+  # For the moment relay is a bit bugy with those providers
+  # We have to provide a path relative to the artifact directory
+  @argumentDefinitions(
+    pixelRatio: {
+      type: "Float!"
+      provider: "../providers/PixelRatio.relayprovider"
+    }
+    coverRatio: {
+      type: "Float!"
+      provider: "../providers/CoverRatio.relayprovider"
+    }
+    screenWidth: {
+      type: "Float!"
+      provider: "../providers/ScreenWidth.relayprovider"
+    }
+    coverWidth: {
+      type: "Float!"
+      provider: "../providers/CoverBaseWidth.relayprovider"
+    }
+    canEdit: { type: "Boolean", defaultValue: false }
+  ) {
+    backgroundColor
+    pictures {
+      kind
+      source
+      largeURI: uri(
+        width: $screenWidth
+        pixelRatio: $pixelRatio
+        ratio: $coverRatio
+      )
+      smallURI: uri(
+        width: $coverWidth
+        pixelRatio: $pixelRatio
+        ratio: $coverRatio
+      )
+      thumbnailURI: uri(width: 200, pixelRatio: $pixelRatio, ratio: 1)
+        @include(if: $canEdit)
+    }
+    pictureTransitionTimer
+    overlayEffect
+    title
+    titlePosition
+    titleFont
+    titleFontSize
+    titleColor
+    titleRotation
+    qrCodePosition
+    desktopLayout
+    dektopImagePosition
+  }
+`;
+
 const CoverRenderer = ({
   cover: coverKey,
   userName,
@@ -57,59 +111,7 @@ const CoverRenderer = ({
   style,
   hideBorderRadius = false,
 }: CoverRendererProps) => {
-  const cover = useFragment(
-    graphql`
-      fragment CoverRenderer_cover on UserCardCover
-      # For the moment relay is a bit bugy with those providers
-      # We have to provide a path relative to the artifact directory
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        coverRatio: {
-          type: "Float!"
-          provider: "../providers/CoverRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        coverWidth: {
-          type: "Float!"
-          provider: "../providers/CoverBaseWidth.relayprovider"
-        }
-      ) {
-        backgroundColor
-        pictures {
-          kind
-          source
-          largeURI: uri(
-            width: $screenWidth
-            pixelRatio: $pixelRatio
-            ratio: $coverRatio
-          )
-          smallURI: uri(
-            width: $coverWidth
-            pixelRatio: $pixelRatio
-            ratio: $coverRatio
-          )
-        }
-        pictureTransitionTimer
-        overlayEffect
-        title
-        titlePosition
-        titleFont
-        titleFontSize
-        titleColor
-        titleRotation
-        qrCodePosition
-        desktopLayout
-        dektopImagePosition
-      }
-    `,
-    coverKey ?? null,
-  );
+  const cover = useFragment(coverRendererFragment, coverKey ?? null);
 
   /**
    * Handle image transition

@@ -8,7 +8,7 @@ import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.gra
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
-  pictures: ReadonlyArray<Readonly<{ thumbnailURI: string; kind: MediaKind }>>;
+  pictures: ReadonlyArray<Readonly<{ thumbnailURI?: string; kind: MediaKind }>>;
   timer: number;
   imageIndex: number | undefined;
   onSelectPhoto: (index: number | undefined) => void;
