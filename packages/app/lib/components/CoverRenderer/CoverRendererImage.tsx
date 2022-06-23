@@ -1,57 +1,29 @@
 import { timeout } from '@azzapp/shared/lib/asyncHelpers';
-import {
-  COVER_BASE_WIDTH,
-  getCoverURLForSize,
-  getCoverVideoURLFor,
-  getMostAdaptedCoverSizeForWidth,
-} from '@azzapp/shared/lib/imagesFormats';
 import { useEffect, useState } from 'react';
-import { Animated, Image, PixelRatio, useWindowDimensions } from 'react-native';
-import Video from 'react-native-video';
-import type { MediaKind } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
+import { Animated, Image } from 'react-native';
+import Fade from '../Fade';
 import type { ImageSourcePropType, ImageProps } from 'react-native';
-import type { VideoProperties } from 'react-native-video';
 
-type CommonPartial<A, B> = {
-  [K in keyof A & keyof B]?: A[K] extends B[K] ? A[K] : never;
-};
-
-type CoverRendererImageProps = Omit<
-  Animated.AnimatedProps<CommonPartial<ImageProps, VideoProperties>>,
-  'source'
-> & {
-  picture: Readonly<{ source: string; kind: MediaKind }>;
+type CoverRendererImageProps = Omit<ImageProps, 'source'> & {
+  source: string;
+  largeURI: string;
+  smallURI: string;
   useLargeImage?: boolean;
+  hidden?: boolean;
 };
 
 const CoverRendererImage = ({
-  picture: { source, kind },
+  largeURI,
+  smallURI,
   useLargeImage,
+  hidden,
   style,
   ...props
 }: CoverRendererImageProps) => {
   const [imageSource, setImageSource] = useState<ImageSourcePropType | null>();
 
-  const { width: windowWidth } = useWindowDimensions();
-
   useEffect(() => {
-    if (kind !== 'picture') {
-      return;
-    }
     let canceled = false;
-    const smallUri = getCoverURLForSize(
-      getMostAdaptedCoverSizeForWidth(
-        PixelRatio.getPixelSizeForLayoutSize(COVER_BASE_WIDTH),
-      ),
-      source,
-    );
-
-    const largeURI = getCoverURLForSize(
-      getMostAdaptedCoverSizeForWidth(
-        PixelRatio.getPixelSizeForLayoutSize(windowWidth),
-      ),
-      source,
-    );
 
     const loadUri = async (attempt = 0) => {
       if (canceled) {
@@ -59,7 +31,7 @@ const CoverRendererImage = ({
       }
       try {
         const loadedQueries =
-          (await Image.queryCache?.([smallUri, largeURI]).catch(() => ({}))) ??
+          (await Image.queryCache?.([largeURI, smallURI]).catch(() => ({}))) ??
           {};
 
         if (canceled) {
@@ -89,9 +61,9 @@ const CoverRendererImage = ({
         };
 
         if (useLargeImage) {
-          await setOrPrefetchImage(largeURI, smallUri);
+          await setOrPrefetchImage(largeURI, smallURI);
         } else {
-          await setOrPrefetchImage(smallUri, largeURI);
+          await setOrPrefetchImage(smallURI, largeURI);
         }
       } catch (e) {
         if (attempt < 3) {
@@ -107,37 +79,15 @@ const CoverRendererImage = ({
     return () => {
       canceled = true;
     };
-  }, [kind, source, useLargeImage, windowWidth]);
+  }, [largeURI, smallURI, useLargeImage]);
 
-  switch (kind) {
-    case 'picture':
-      return <Animated.Image {...props} source={imageSource!} style={style} />;
-    case 'video':
-      return (
-        <AnimatedVideo
-          {...props}
-          source={{ uri: getCoverVideoURLFor(source) }}
-          style={style}
-          allowsExternalPlayback={false}
-          hideShutterView
-          muted
-          playWhenInactive
-          repeat
-          resizeMode="cover"
-          // TODO check security and performance
-          useTextureView
-          // TODO
-          //poster
-          //posterResizeMode
-        />
-      );
-    default:
-      return null;
-  }
+  return (
+    <Fade hidden={hidden}>
+      <Animated.Image {...props} source={imageSource!} style={style} />
+    </Fade>
+  );
 };
 
 export default CoverRendererImage;
 
 const TIMEOUTS = [1000, 3000, 10000];
-
-const AnimatedVideo = Animated.createAnimatedComponent(Video);

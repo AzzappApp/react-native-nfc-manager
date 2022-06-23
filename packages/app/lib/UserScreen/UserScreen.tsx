@@ -1,4 +1,4 @@
-import { COVER_RATIO } from '@azzapp/shared/lib/imagesFormats';
+import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import { useMemo, useRef, useState } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import CoverRenderer from '../components/CoverRenderer';

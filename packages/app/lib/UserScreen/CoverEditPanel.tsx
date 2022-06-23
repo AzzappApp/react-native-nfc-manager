@@ -63,11 +63,31 @@ const CoverEditPanel = ({
 }: CoverEditPanelProps) => {
   const cover = useFragment(
     graphql`
-      fragment CoverEditPanel_cover on UserCardCover {
+      fragment CoverEditPanel_cover on UserCardCover
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
+        coverRatio: {
+          type: "Float!"
+          provider: "../providers/CoverRatio.relayprovider"
+        }
+        screenWidth: {
+          type: "Float!"
+          provider: "../providers/ScreenWidth.relayprovider"
+        }
+      ) {
         backgroundColor
         pictures {
           source
           kind
+          largeURI: uri(
+            width: $screenWidth
+            pixelRatio: $pixelRatio
+            ratio: $coverRatio
+          )
+          thumbnailURI: uri(width: 200, pixelRatio: $pixelRatio, ratio: 1)
         }
         pictureTransitionTimer
         overlayEffect
@@ -470,13 +490,17 @@ const getOptimisticResponse = (
           ...coverUpdates,
           title: coverUpdates.title ?? intialData?.title ?? '',
           pictures: coverUpdates.pictures
-            ? coverUpdates.pictures?.map(picture => ({
-                kind: picture.kind,
-                source:
-                  typeof picture.source === 'string'
-                    ? picture.source
-                    : picture.source.uri,
-              }))
+            ? coverUpdates.pictures?.map(picture => {
+                if (typeof picture.source === 'string') {
+                  return picture;
+                }
+                return {
+                  kind: picture.kind,
+                  source: picture.source.uri,
+                  thumbnailURI: picture.source.uri,
+                  largeURI: picture.source.uri,
+                };
+              })
             : intialData?.pictures ?? [],
         },
       },

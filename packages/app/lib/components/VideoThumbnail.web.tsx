@@ -1,14 +1,13 @@
-import { getCoverVideoURLFor } from '@azzapp/shared/lib/imagesFormats';
 import createHTMLElement from '../helpers/createHTMLElement';
 import type { ImageProps } from 'react-native';
 
 const VideoThumbnail = ({
-  uri,
+  src,
   ...props
-}: Omit<ImageProps, 'source'> & { uri: string }) => {
+}: Omit<ImageProps, 'source'> & { src: string }) => {
   return createHTMLElement('video', {
     ...props,
-    src: getCoverVideoURLFor(uri),
+    src,
     autoPlay: true,
     loop: true,
     muted: true,

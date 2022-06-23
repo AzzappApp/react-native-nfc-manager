@@ -1,10 +1,9 @@
 import {
   COVER_BASE_WIDTH,
   COVER_RATIO,
-} from '@azzapp/shared/lib/imagesFormats';
-import { useEffect, useRef, useState } from 'react';
+} from '@azzapp/shared/lib/imagesHelpers';
+import { useEffect, useState } from 'react';
 import {
-  Animated,
   Dimensions,
   Image,
   Platform,
@@ -19,6 +18,7 @@ import { withAnchorPoint } from '../../helpers/withAnchorPoints';
 import useInterval from '../../hooks/useInterval';
 import CoverOverlayEffects from './CoverOverlayEffects';
 import CoverRendererImage from './CoverRendererImage';
+import CoverRendererVideo from './CoverRendererVideo';
 import QRCodeModal from './QRCodeModal';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { EventEmitter } from 'events';
@@ -59,11 +59,41 @@ const CoverRenderer = ({
 }: CoverRendererProps) => {
   const cover = useFragment(
     graphql`
-      fragment CoverRenderer_cover on UserCardCover {
+      fragment CoverRenderer_cover on UserCardCover
+      # For the moment relay is a bit bugy with those providers
+      # We have to provide a path relative to the artifact directory
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
+        coverRatio: {
+          type: "Float!"
+          provider: "../providers/CoverRatio.relayprovider"
+        }
+        screenWidth: {
+          type: "Float!"
+          provider: "../providers/ScreenWidth.relayprovider"
+        }
+        coverWidth: {
+          type: "Float!"
+          provider: "../providers/CoverBaseWidth.relayprovider"
+        }
+      ) {
         backgroundColor
         pictures {
-          source
           kind
+          source
+          largeURI: uri(
+            width: $screenWidth
+            pixelRatio: $pixelRatio
+            ratio: $coverRatio
+          )
+          smallURI: uri(
+            width: $coverWidth
+            pixelRatio: $pixelRatio
+            ratio: $coverRatio
+          )
         }
         pictureTransitionTimer
         overlayEffect
@@ -85,14 +115,12 @@ const CoverRenderer = ({
    * Handle image transition
    */
   const [currentImageIndex, setCurrentImageIndex] = useState(imageIndex);
-  const imageFade = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (!play && currentImageIndex !== imageIndex) {
       setCurrentImageIndex(imageIndex);
-      imageFade.setValue(1);
     }
-  }, [currentImageIndex, imageFade, imageIndex, play]);
+  }, [currentImageIndex, imageIndex, play]);
 
   const playInterval = (cover?.pictureTransitionTimer ?? 0) * 1000;
   useInterval(
@@ -102,11 +130,6 @@ const CoverRenderer = ({
       }
       const nextIndex = (currentImageIndex + 1) % pictures.length;
       setCurrentImageIndex(nextIndex);
-      imageFade.setValue(0);
-      Animated.spring(imageFade, {
-        toValue: 1,
-        useNativeDriver: true,
-      }).start();
     },
     play ? playInterval : 0,
   );
@@ -213,45 +236,45 @@ const CoverRenderer = ({
       >
         {displayedPictures.map((picture, index) => {
           const isCurrent = index === currentImageIndex;
-          const isPrevious =
-            (currentImageIndex === 0 &&
-              index === displayedPictures.length - 1) ||
-            index === currentImageIndex - 1;
 
-          const imageOpacity = Platform.select({
-            default: !play
-              ? 1
-              : isCurrent
-              ? imageFade.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 1],
-                })
-              : isPrevious
-              ? imageFade.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [1, 0],
-                })
-              : 0,
-            web: isCurrent ? 1 : 0,
-          });
+          const style = [
+            styles.coverImage,
+            {
+              borderRadius,
+              backgroundColor,
+            },
+          ];
 
-          return (
-            <CoverRendererImage
-              key={`${picture.source}-${picture.kind}`}
-              picture={picture}
-              style={[
-                styles.coverImage,
-                {
-                  borderRadius,
-                  backgroundColor,
-                  opacity: play ? imageOpacity : 1,
-                },
-              ]}
-              nativeID={`${idPrefix}${userName}-image-${index}`}
-              testID={`${idPrefix}${userName}-image-${index}`}
-              useLargeImage={useLargeImage ?? fullScreen}
-            />
-          );
+          switch (picture.kind) {
+            case 'picture':
+              return (
+                <CoverRendererImage
+                  key={`${picture.source}-${picture.kind}`}
+                  source={picture.source}
+                  largeURI={picture.largeURI}
+                  smallURI={picture.smallURI}
+                  style={style}
+                  nativeID={`${idPrefix}${userName}-image-${index}`}
+                  testID={`${idPrefix}${userName}-image-${index}`}
+                  useLargeImage={useLargeImage ?? fullScreen}
+                  hidden={!isCurrent}
+                />
+              );
+            case 'video':
+              return (
+                <CoverRendererVideo
+                  key={`${picture.source}-${picture.kind}`}
+                  source={picture.source}
+                  uri={fullScreen ? picture.largeURI : picture.smallURI}
+                  style={style}
+                  nativeID={`${idPrefix}${userName}-image-${index}`}
+                  testID={`${idPrefix}${userName}-image-${index}`}
+                  hidden={!isCurrent}
+                />
+              );
+            default:
+              return null;
+          }
         })}
 
         <View

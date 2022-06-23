@@ -1,5 +1,10 @@
 import {
+  getImageURLForSize,
+  getVideoUrlForSize,
+} from '@azzapp/shared/lib/imagesHelpers';
+import {
   GraphQLEnumType,
+  GraphQLFloat,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -16,6 +21,34 @@ export const MediaGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
     },
     source: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    uri: {
+      type: new GraphQLNonNull(GraphQLString),
+      args: {
+        pixelRatio: {
+          type: GraphQLFloat,
+        },
+        ratio: {
+          type: GraphQLFloat,
+        },
+        width: {
+          type: new GraphQLNonNull(GraphQLFloat),
+        },
+      },
+      resolve(
+        { kind, source },
+        {
+          pixelRatio = 1,
+          ratio,
+          width,
+        }: { pixelRatio?: number; ratio?: number; width: number },
+      ): string {
+        if (kind === 'picture') {
+          return getImageURLForSize(source, pixelRatio, width, ratio);
+        } else {
+          return getVideoUrlForSize(source, pixelRatio, width, ratio);
+        }
+      },
     },
   }),
 });

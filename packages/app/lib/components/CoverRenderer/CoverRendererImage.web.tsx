@@ -1,68 +1,44 @@
 import {
   COVER_BASE_WIDTH,
-  getCoverURLForSize,
-  getCoverVideoURLFor,
-} from '@azzapp/shared/lib/imagesFormats';
-import range from 'lodash/range';
-import { StyleSheet } from 'react-native';
+  COVER_RATIO,
+  getImageURLForSize,
+} from '@azzapp/shared/lib/imagesHelpers';
+import omit from 'lodash/omit';
 import createHTMLElement from '../../helpers/createHTMLElement';
-import type { MediaKind } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ImageProps } from 'react-native';
 
 type CoverRendererImageProps = Omit<ImageProps, 'source'> & {
-  picture: Readonly<{ source: string; kind: MediaKind }>;
+  source: string;
   useLargeImage?: boolean;
+  hidden?: boolean;
 };
 
 const CoverRendererImage = ({
-  picture,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  source,
   useLargeImage,
+  hidden,
   style,
   ...props
 }: CoverRendererImageProps) => {
-  const coverSizes = range(1, 14);
-
-  switch (picture.kind) {
-    case 'picture':
-      return createHTMLElement('img', {
-        ...props,
-        style: [style, styles.coverImage],
-        srcSet: picture
-          ? coverSizes
-              .map(size => {
-                const url = getCoverURLForSize(size, picture.source);
-                const width = COVER_BASE_WIDTH * size;
-                return `${url} ${width}w`;
-              })
-              .join(',')
-          : undefined,
-        sizes: picture ? (useLargeImage ? '100vw' : '125px') : undefined,
-      });
-    case 'video':
-      return createHTMLElement('video', {
-        ...props,
-        style: [style, styles.coverImage],
-        src: getCoverVideoURLFor(picture.source),
-        autoPlay: true,
-        loop: true,
-        muted: true,
-        playsInline: true,
-      });
-    default:
-      return null;
-  }
+  return createHTMLElement('img', {
+    ...omit(props, 'largeURI', 'smallURI'),
+    style: [
+      style,
+      {
+        objectFit: 'cover',
+        opacity: hidden ? 0 : 1,
+        transition: 'opacity 300ms ease',
+      },
+    ],
+    srcSet: COVER_SIZES.map(size => {
+      const width = size * COVER_BASE_WIDTH;
+      const url = getImageURLForSize(source, 1, width, COVER_RATIO);
+      return `${url} ${width}w`;
+    }).join(','),
+    sizes: useLargeImage ? '100vw' : '125px',
+  });
 };
 
 export default CoverRendererImage;
 
-const styles = StyleSheet.create({
-  coverImage: {
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    transition: 'opacity 300ms ease',
-  },
-});
+const COVER_SIZES = [1, 2, 3, 5, 10, 15];

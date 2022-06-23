@@ -1,16 +1,5 @@
-import {
-  getCoverURLForSize,
-  getMostAdaptedCoverSizeForWidth,
-} from '@azzapp/shared/lib/imagesFormats';
 import range from 'lodash/range';
-import {
-  Image,
-  PixelRatio,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fontFamilies, textStyles } from '../../theme';
 import DashedSlider from '../components/DashedSlider';
 import Icon from '../components/Icon';
@@ -19,7 +8,7 @@ import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.gra
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
-  pictures: ReadonlyArray<Readonly<{ source: string; kind: MediaKind }>>;
+  pictures: ReadonlyArray<Readonly<{ thumbnailURI: string; kind: MediaKind }>>;
   timer: number;
   imageIndex: number | undefined;
   onSelectPhoto: (index: number | undefined) => void;
@@ -125,18 +114,13 @@ const CoverEditPanelImageTab = ({
                   pictures[index].kind === 'video' ? (
                     <VideoThumbnail
                       style={[styles.image, pressed && styles.imagePressed]}
-                      uri={pictures[index].source}
+                      uri={pictures[index].thumbnailURI}
                     />
                   ) : (
                     <Image
                       style={[styles.image, pressed && styles.imagePressed]}
                       source={{
-                        uri: getCoverURLForSize(
-                          getMostAdaptedCoverSizeForWidth(
-                            PixelRatio.getPixelSizeForLayoutSize(50),
-                          ),
-                          pictures[index].source,
-                        ),
+                        uri: pictures[index].thumbnailURI,
                       }}
                     />
                   )

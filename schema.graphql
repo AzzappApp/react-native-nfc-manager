@@ -113,6 +113,7 @@ type UserCardCover {
 type Media {
   kind: MediaKind!
   source: String!
+  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
 }
 
 enum MediaKind {
