@@ -4,7 +4,7 @@ import { colors, fontFamilies, textStyles } from '../../theme';
 import DashedSlider from '../components/DashedSlider';
 import Icon from '../components/Icon';
 import VideoThumbnail from '../components/VideoThumbnail';
-import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
+import type { MediaKind } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
