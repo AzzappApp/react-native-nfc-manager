@@ -2,16 +2,24 @@ import { cloneElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../theme';
 import type { ReactElement } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type HeaderProps = {
   title?: string;
   leftButton?: ReactElement | null;
   rightButton?: ReactElement | null;
   dark?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
-const Header = ({ title, leftButton, rightButton, dark }: HeaderProps) => (
-  <View style={[styles.header, dark && styles.darkHeader]}>
+const Header = ({
+  title,
+  leftButton,
+  rightButton,
+  dark,
+  style,
+}: HeaderProps) => (
+  <View style={[styles.header, dark && styles.darkHeader, style]}>
     <View style={styles.headerSegment}>
       {leftButton && cloneElement(leftButton, { dark })}
     </View>

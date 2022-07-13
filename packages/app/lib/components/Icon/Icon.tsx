@@ -5,11 +5,17 @@ const icons = {
   get azzapp() {
     return require('./assets/azzapp.png');
   },
+  get brightness() {
+    return require('./assets/brightness.png');
+  },
   get chevron() {
     return require('./assets/chevron.png');
   },
   get 'color-picker'() {
     return require('./assets/color-picker.png');
+  },
+  get contrast() {
+    return require('./assets/contrast.png');
   },
   get desktop() {
     return require('./assets/desktop.png');
@@ -29,11 +35,23 @@ const icons = {
   get plus() {
     return require('./assets/plus.png');
   },
+  get rotate() {
+    return require('./assets/rotate.png');
+  },
+  get saturation() {
+    return require('./assets/saturation.png');
+  },
+  get temperature() {
+    return require('./assets/temperature.png');
+  },
   get timer() {
     return require('./assets/timer.png');
   },
   get title() {
     return require('./assets/title.png');
+  },
+  get vigneting() {
+    return require('./assets/vigneting.png');
   },
 } as const;
 

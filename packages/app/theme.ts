@@ -7,6 +7,7 @@ export const colors = {
   lightGrey: '#ECECED',
   darkWhite: '#F5F5F5',
   orange: '#FF502E',
+  blue: '#502EFF',
 };
 
 export const fontFamilies = {
@@ -36,3 +37,13 @@ export const textStyles = StyleSheet.create({
     color: colors.dark,
   },
 });
+
+export const mixins = {
+  absoluteFill: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+  },
+} as const;

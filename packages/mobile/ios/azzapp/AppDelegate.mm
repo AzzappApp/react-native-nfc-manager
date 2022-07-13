@@ -16,6 +16,8 @@
 
 #import <react/config/ReactNativeConfig.h>
 
+#import "AzzapImageEditorManager.h"
+
 static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {

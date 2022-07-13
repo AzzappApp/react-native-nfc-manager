@@ -1,4 +1,5 @@
 import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
@@ -10,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import ColorPicker from '../components/ColorPicker';
@@ -18,9 +19,10 @@ import {
   coverRendererFragment,
   QR_CODE_POSITION_CHANGE_EVENT,
 } from '../components/CoverRenderer/CoverRenderer';
+import ImagePicker from '../components/ImagePicker';
 import TabsBar from '../components/TabsBar';
 import useFormMutation from '../hooks/useFormMutation';
-import { useImagePicker, useWebAPI } from '../PlatformEnvironment';
+import { useWebAPI } from '../PlatformEnvironment';
 import CoverEditPanelEffectTab from './CoverEditPanelEffectTab';
 import CoverEditPanelImageTab from './CoverEditPanelImageTab';
 import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
@@ -51,7 +53,7 @@ type CoverEditPanelProps = {
 export type CoverUpdates = Omit<UpdateCoverInput, 'pictures'> & {
   pictures?: Array<{
     kind: MediaKind;
-    source: string | { uri: string; file: File };
+    source: string | { uri: string; file: any };
   }>;
 };
 
@@ -257,30 +259,50 @@ const CoverEditPanel = ({
 
   useEffect(() => revert, [revert]);
 
-  const launchImagePicker = useImagePicker();
+  const [showImagePicker, setShowImagePicker] = useState(false);
+  const [editedIndex, setEditedIndex] = useState(-1);
 
-  const onSelectPhoto = async (index: number | undefined, force = false) => {
-    if (index === undefined || (cover?.pictures[index] && !force)) {
+  const onSelectPicture = (index: number | undefined) => {
+    if (index === undefined || cover?.pictures[index]) {
       setImageIndex(index);
       return;
     }
-    const { didCancel, error, uri, file } = await launchImagePicker();
+    setEditedIndex(index);
+    setShowImagePicker(true);
+  };
 
-    if (didCancel || error || !uri || !file) {
-      return;
-    }
+  const onMediaPicked = ({
+    path,
+    kind,
+  }: {
+    path: string;
+    kind: 'picture' | 'video';
+  }) => {
     const coverUpdates = coverUpdatesRef.current;
     const pictures = [
       ...(coverUpdates.pictures ?? initialData?.pictures ?? []),
     ];
-    index = Math.min(index, pictures.length);
+    const index = Math.min(editedIndex, pictures.length);
 
     pictures[index] = {
-      kind: file.type.startsWith('video') ? 'video' : 'picture',
-      source: { uri, file },
+      kind,
+      source: {
+        uri: `file://${path}`,
+        file: {
+          name: getFileName(path),
+          uri: `file://${path}`,
+          type: kind === 'picture' ? 'image/jpeg' : 'video/quicktime',
+        },
+      },
     };
     applyUpdates({ pictures });
     setImageIndex(index);
+    setShowImagePicker(false);
+  };
+
+  const onImagePickCancel = () => {
+    setEditedIndex(-1);
+    setShowImagePicker(false);
   };
 
   const onRemovePicture = () => {
@@ -297,7 +319,8 @@ const CoverEditPanel = ({
   };
 
   const onUpdatePicture = () => {
-    void onSelectPhoto(imageIndex, true);
+    setEditedIndex(imageIndex ?? 0);
+    setShowImagePicker(true);
   };
 
   const updateField = <T extends keyof CoverUpdates>(
@@ -354,7 +377,7 @@ const CoverEditPanel = ({
             pictures={displayedCover.pictures}
             timer={displayedCover.pictureTransitionTimer}
             imageIndex={imageIndex}
-            onSelectPhoto={onSelectPhoto}
+            onSelectPicture={onSelectPicture}
             onRemovePicture={onRemovePicture}
             onUpdatePicture={onUpdatePicture}
             onUpdatTimer={timer => updateField('pictureTransitionTimer', timer)}
@@ -426,6 +449,20 @@ const CoverEditPanel = ({
         visible={!!uploadProgress}
         progressIndicator={uploadProgress}
       />
+      <Modal
+        visible={showImagePicker}
+        animationType="slide"
+        onRequestClose={onImagePickCancel}
+      >
+        <ImagePicker
+          imageRatio={COVER_RATIO}
+          kind="mixed"
+          onMediaPicked={onMediaPicked}
+          onClose={onImagePickCancel}
+          maxVideoDuration={12}
+          onAuthorizationFailed={() => void 0}
+        />
+      </Modal>
     </>
   );
 };
@@ -472,3 +509,8 @@ const getOptimisticResponse = (
     },
   },
 });
+
+const getFileName = (path: string) => {
+  const arr = path.split('/');
+  return arr[arr.length - 1];
+};

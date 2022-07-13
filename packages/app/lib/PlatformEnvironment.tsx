@@ -6,13 +6,6 @@ import type { PressableProps } from 'react-native';
 export type PlatformEnvironment = {
   router: Router;
   LinkComponent: React.ComponentType<LinkProps>;
-  launchImagePicker(): Promise<{
-    file?: File;
-    uri?: string;
-    error?: Error;
-    didCancel?: boolean;
-  }>;
-
   WebAPI: typeof WebAPI;
 };
 
@@ -47,9 +40,6 @@ export const PlatformEnvironmentProvider = PlatformEnvironmentContext.Provider;
 
 export const usePlatformEnvironment = () =>
   useContext(PlatformEnvironmentContext);
-
-export const useImagePicker = () =>
-  useContext(PlatformEnvironmentContext).launchImagePicker;
 
 export const useRouter = () => useContext(PlatformEnvironmentContext).router;
 

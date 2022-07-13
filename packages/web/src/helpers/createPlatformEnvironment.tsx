@@ -62,9 +62,6 @@ const createPlatformEnvironment = (nextRoute?: {
       },
     },
     LinkComponent: Link,
-    launchImagePicker: () => {
-      throw new Error();
-    },
     WebAPI: { ...WebAPI, refreshTokens: () => Promise.resolve({} as any) },
   };
 };

@@ -11,7 +11,7 @@ type CoverEditPanelImageTabProps = {
   pictures: ReadonlyArray<Readonly<{ thumbnailURI?: string; kind: MediaKind }>>;
   timer: number;
   imageIndex: number | undefined;
-  onSelectPhoto: (index: number | undefined) => void;
+  onSelectPicture: (index: number | undefined) => void;
   onRemovePicture: () => void;
   onUpdatePicture: () => void;
   onUpdatTimer: (timer: number) => void;
@@ -22,7 +22,7 @@ const CoverEditPanelImageTab = ({
   pictures,
   imageIndex,
   timer,
-  onSelectPhoto,
+  onSelectPicture,
   onRemovePicture,
   onUpdatePicture,
   onUpdatTimer,
@@ -32,11 +32,11 @@ const CoverEditPanelImageTab = ({
     pictures && imageIndex !== undefined ? pictures[imageIndex] : undefined;
 
   const onPictureSelect = (index: number) => {
-    onSelectPhoto(index);
+    onSelectPicture(index);
   };
 
   const onSelectTimer = () => {
-    onSelectPhoto(undefined);
+    onSelectPicture(undefined);
   };
 
   return (

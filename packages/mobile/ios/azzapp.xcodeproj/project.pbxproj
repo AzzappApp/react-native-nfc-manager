@@ -14,6 +14,22 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-azzapp-azzappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-azzapp-azzappTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		FD46F44E288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
+		FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
+		FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5728882C6700D56E20 /* AZPEditableVideo.m */; };
+		FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5728882C6700D56E20 /* AZPEditableVideo.m */; };
+		FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */; };
+		FD482C5D2888360300D56E20 /* AZPEditableVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */; };
+		FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
+		FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
+		FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
+		FD9315F5286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
+		FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F728757797006E8CF7 /* AZPMTKImageView.m */; };
+		FD9315F928757797006E8CF7 /* AZPMTKImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F728757797006E8CF7 /* AZPMTKImageView.m */; };
+		FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931605287603F5006E8CF7 /* EditionFilter.m */; };
+		FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931605287603F5006E8CF7 /* EditionFilter.m */; };
+		FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931609287714D2006E8CF7 /* AZPTransformations.m */; };
+		FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931609287714D2006E8CF7 /* AZPTransformations.m */; };
 		FDFDBA72284100BE00621C0F /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FDFDBA70284100BE00621C0F /* OpenSans-Regular.ttf */; };
 		FDFDBA73284100BE00621C0F /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FDFDBA70284100BE00621C0F /* OpenSans-Regular.ttf */; };
 		FDFDBA74284100BE00621C0F /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FDFDBA71284100BE00621C0F /* OpenSans-SemiBold.ttf */; };
@@ -48,6 +64,22 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = azzapp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-azzapp-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-azzapp-azzappTests/Pods-azzapp-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FD46F44C288713B300222C11 /* AZPEditableImageSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageSource.h; path = azzapp/AZPEditableImageSource.h; sourceTree = "<group>"; };
+		FD46F44D288713B300222C11 /* AZPEditableImageSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImageSource.m; path = azzapp/AZPEditableImageSource.m; sourceTree = "<group>"; };
+		FD482C5628882C6700D56E20 /* AZPEditableVideo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableVideo.h; path = azzapp/AZPEditableVideo.h; sourceTree = "<group>"; };
+		FD482C5728882C6700D56E20 /* AZPEditableVideo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableVideo.m; path = azzapp/AZPEditableVideo.m; sourceTree = "<group>"; };
+		FD482C5A2888360300D56E20 /* AZPEditableVideoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableVideoManager.h; path = azzapp/AZPEditableVideoManager.h; sourceTree = "<group>"; };
+		FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableVideoManager.m; path = azzapp/AZPEditableVideoManager.m; sourceTree = "<group>"; };
+		FD9315E2286B555B006E8CF7 /* AZPEditableImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImage.h; path = azzapp/AZPEditableImage.h; sourceTree = "<group>"; };
+		FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImage.m; path = azzapp/AZPEditableImage.m; sourceTree = "<group>"; };
+		FD9315F2286B5D2F006E8CF7 /* AZPEditableImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageManager.h; path = azzapp/AZPEditableImageManager.h; sourceTree = "<group>"; };
+		FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImageManager.m; path = azzapp/AZPEditableImageManager.m; sourceTree = "<group>"; };
+		FD9315F628757797006E8CF7 /* AZPMTKImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMTKImageView.h; path = azzapp/AZPMTKImageView.h; sourceTree = "<group>"; };
+		FD9315F728757797006E8CF7 /* AZPMTKImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMTKImageView.m; path = azzapp/AZPMTKImageView.m; sourceTree = "<group>"; };
+		FD931604287603F5006E8CF7 /* EditionFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditionFilter.h; sourceTree = "<group>"; };
+		FD931605287603F5006E8CF7 /* EditionFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditionFilter.m; sourceTree = "<group>"; };
+		FD931608287714D2006E8CF7 /* AZPTransformations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPTransformations.h; path = azzapp/AZPTransformations.h; sourceTree = "<group>"; };
+		FD931609287714D2006E8CF7 /* AZPTransformations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPTransformations.m; path = azzapp/AZPTransformations.m; sourceTree = "<group>"; };
 		FDFDBA70284100BE00621C0F /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../../assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		FDFDBA71284100BE00621C0F /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-SemiBold.ttf"; path = "../../assets/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,12 +124,27 @@
 		13B07FAE1A68108700A75B9A /* azzapp */ = {
 			isa = PBXGroup;
 			children = (
+				FD931603287603BE006E8CF7 /* filters */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				FD9315E2286B555B006E8CF7 /* AZPEditableImage.h */,
+				FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */,
+				FD9315F2286B5D2F006E8CF7 /* AZPEditableImageManager.h */,
+				FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */,
+				FD9315F628757797006E8CF7 /* AZPMTKImageView.h */,
+				FD9315F728757797006E8CF7 /* AZPMTKImageView.m */,
+				FD931608287714D2006E8CF7 /* AZPTransformations.h */,
+				FD931609287714D2006E8CF7 /* AZPTransformations.m */,
+				FD46F44C288713B300222C11 /* AZPEditableImageSource.h */,
+				FD46F44D288713B300222C11 /* AZPEditableImageSource.m */,
+				FD482C5628882C6700D56E20 /* AZPEditableVideo.h */,
+				FD482C5728882C6700D56E20 /* AZPEditableVideo.m */,
+				FD482C5A2888360300D56E20 /* AZPEditableVideoManager.h */,
+				FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -153,6 +200,16 @@
 				89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		FD931603287603BE006E8CF7 /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				FD931604287603F5006E8CF7 /* EditionFilter.h */,
+				FD931605287603F5006E8CF7 /* EditionFilter.m */,
+			);
+			name = filters;
+			path = azzapp/filters;
 			sourceTree = "<group>";
 		};
 		FDFDBA6F2841006200621C0F /* resources */ = {
@@ -424,7 +481,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD9315F928757797006E8CF7 /* AZPMTKImageView.m in Sources */,
+				FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */,
+				FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
+				FD9315F5286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,
+				FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */,
+				FD482C5D2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
+				FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +497,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */,
+				FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
+				FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,
+				FD46F44E288713B300222C11 /* AZPEditableImageSource.m in Sources */,
+				FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
+				FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */,
+				FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

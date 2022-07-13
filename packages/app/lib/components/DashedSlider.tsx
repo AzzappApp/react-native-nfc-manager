@@ -47,6 +47,7 @@ const DashedSlider = ({
 
   const panResponder = useRef(
     PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant() {
         const { value } = propsRef.current;

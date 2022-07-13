@@ -1,5 +1,6 @@
 import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ScreenStack, Screen } from 'react-native-screens';
 import type {
   Router as PlatformRouter,
@@ -351,13 +352,15 @@ const ScreenRenderer = ({
       isNativeStack
       style={StyleSheet.absoluteFill}
     >
-      {isModal ? (
-        <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        {isModal ? (
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <Component screenId={id} route={route} params={params} />
+          </View>
+        ) : (
           <Component screenId={id} route={route} params={params} />
-        </View>
-      ) : (
-        <Component screenId={id} route={route} params={params} />
-      )}
+        )}
+      </GestureHandlerRootView>
     </Screen>
   );
 };
