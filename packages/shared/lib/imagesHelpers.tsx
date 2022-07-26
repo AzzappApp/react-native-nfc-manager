@@ -18,14 +18,21 @@ export const getImageURLForSize = (
   } else {
     transformation = `w_${width}`;
   }
-  return `${CLOUDINARY_BASE_URL}/${transformation}/${coverImageId}`;
+  return `${CLOUDINARY_BASE_URL}/image/upload/${transformation}/${coverImageId}`;
 };
 
 export const getVideoUrlForSize = (
   videoImageId: string,
-  _width?: number,
-  _pixelRatio?: number,
-  _ratio?: number,
+  pixelRatio: number,
+  width: number,
+  ratio?: number,
 ) => {
-  return `${CLOUDINARY_BASE_URL}/video/upload/${videoImageId}.mp4`;
+  width = width * pixelRatio;
+  let transformation: string;
+  if (ratio != null) {
+    transformation = `c_fill,w_${width},h_${width / ratio}`;
+  } else {
+    transformation = `w_${width}`;
+  }
+  return `${CLOUDINARY_BASE_URL}/video/upload/${transformation}/${videoImageId}.mp4`;
 };

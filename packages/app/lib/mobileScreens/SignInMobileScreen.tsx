@@ -1,7 +1,7 @@
-import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
-import SignInScreen from '@azzapp/app/lib/SignInScreen';
 import { resetEnvironment } from '../helpers/relayEnvironment';
 import { setTokens } from '../helpers/tokensStore';
+import { useRouter, useWebAPI } from '../PlatformEnvironment';
+import SignInScreen from '../SignInScreen';
 import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
 
 const SignInMobileScreen = () => {

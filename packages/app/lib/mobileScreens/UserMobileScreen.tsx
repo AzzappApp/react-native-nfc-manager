@@ -1,7 +1,7 @@
-import UserScreen from '@azzapp/app/lib/UserScreen';
 import { useEffect, useState } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '../helpers/relayScreen';
+import UserScreen from '../UserScreen';
 import type { ScreenOptions } from '../components/NativeRouter';
 import type { UserMobileScreenByIdQuery } from '@azzapp/relay/artifacts/UserMobileScreenByIdQuery.graphql';
 import type { UserMobileScreenByUserNameQuery } from '@azzapp/relay/artifacts/UserMobileScreenByUserNameQuery.graphql';

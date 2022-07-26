@@ -17,12 +17,12 @@
     "build": "yarn create-query-map-file && yarn relay",
     "dev:relay": "relay-compiler --watch",
     "dev:web": "yarn workspace @azzapp/web dev",
-    "dev:mobile": "yarn workspace @azzapp/mobile dev",
+    "dev:mobile": "yarn workspace @azzapp/app dev",
     "dev": "ttab yarn dev:relay && ttab yarn dev:web && ttab yarn dev:mobile",
-    "run:ios": "yarn workspace @azzapp/mobile run:ios",
-    "run:android": "yarn workspace @azzapp/mobile run:android",
-    "build:ios": "yarn workspace @azzapp/mobile build:ios",
-    "deploy:ios": "yarn workspace @azzapp/mobile deploy:ios",
+    "run:ios": "yarn workspace @azzapp/app run:ios",
+    "run:android": "yarn workspace @azzapp/app run:android",
+    "build:ios": "yarn workspace @azzapp/app build:ios",
+    "deploy:ios": "yarn workspace @azzapp/app deploy:ios",
     "update-graphql-schema": "ts-node ./scripts/updateGraphQLSchema.ts"
   },
   "devDependencies": {

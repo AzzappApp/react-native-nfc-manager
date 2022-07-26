@@ -1,4 +1,3 @@
-import { getVideoUrlForSize } from '@azzapp/shared/lib/imagesHelpers';
 import omit from 'lodash/omit';
 import createHTMLElement from '../../helpers/createHTMLElement';
 import type { Animated } from 'react-native';
@@ -8,12 +7,12 @@ type CoverRendererVideoProps = Omit<
   Animated.AnimatedProps<VideoProperties>,
   'source'
 > & {
-  source: string;
+  uri: string;
   hidden?: boolean;
 };
 
 const CoverRendererVideo = ({
-  source,
+  uri,
   style,
   hidden,
   ...props
@@ -28,7 +27,7 @@ const CoverRendererVideo = ({
         transition: 'opacity 300ms ease',
       },
     ],
-    src: getVideoUrlForSize(source),
+    src: uri,
     autoPlay: true,
     loop: true,
     muted: true,

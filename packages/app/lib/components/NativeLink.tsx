@@ -1,9 +1,9 @@
-import { useRouter } from '@azzapp/app/lib/PlatformEnvironment';
 import { Pressable } from 'react-native';
-import type { LinkProps } from '@azzapp/app/lib/PlatformEnvironment';
+import { useRouter } from '../PlatformEnvironment';
+import type { LinkProps } from '../PlatformEnvironment';
 import type { GestureResponderEvent } from 'react-native';
 
-const Link = ({
+const NativeLink = ({
   route,
   params,
   replace,
@@ -28,4 +28,4 @@ const Link = ({
   );
 };
 
-export default Link;
+export default NativeLink;

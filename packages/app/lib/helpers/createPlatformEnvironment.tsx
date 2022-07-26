@@ -1,15 +1,15 @@
 import * as WebAPI from '@azzapp/shared/lib/WebAPI';
-import Link from '../components/Link';
+import NativeLink from '../components/NativeLink';
 import fetchWithRefreshToken, { injectToken } from './fetchWithRefreshToken';
 import { getTokens } from './tokensStore';
 import type { NativeRouter } from '../components/NativeRouter';
-import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';
+import type { PlatformEnvironment } from '../PlatformEnvironment';
 
 const createPlatformEnvironment = (
   router: NativeRouter,
 ): PlatformEnvironment => ({
   router,
-  LinkComponent: Link,
+  LinkComponent: NativeLink,
   WebAPI: {
     logout: (_, init) =>
       WebAPI.logout(_, injectToken(getTokens()?.token, init as RequestInit)),

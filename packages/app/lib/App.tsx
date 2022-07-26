@@ -1,4 +1,3 @@
-import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
 import ROUTES from '@azzapp/shared/lib/routes';
 import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
@@ -18,10 +17,11 @@ import { getRelayEnvironment } from './helpers/relayEnvironment';
 import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
-import HomeMobileScreen from './screens/HomeMobileScreen';
-import SignInMobileScreen from './screens/SignInMobileScreen';
-import SignUpMobileScreen from './screens/SignUpMobileScreen';
-import UserMobileScreen from './screens/UserMobileScreen';
+import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
+import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
+import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
+import UserMobileScreen from './mobileScreens/UserMobileScreen';
+import { PlatformEnvironmentProvider } from './PlatformEnvironment';
 
 const screens = {
   HOME: HomeMobileScreen,

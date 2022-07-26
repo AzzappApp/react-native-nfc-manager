@@ -1,8 +1,8 @@
-import HomeScreen from '@azzapp/app/lib/HomeScreen';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { resetEnvironment } from '../helpers/relayEnvironment';
 import relayScreen from '../helpers/relayScreen';
 import { clearTokens } from '../helpers/tokensStore';
+import HomeScreen from '../HomeScreen';
 import type { HomeMobileScreenQuery } from '@azzapp/relay/artifacts/HomeMobileScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 

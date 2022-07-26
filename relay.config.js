@@ -4,7 +4,6 @@ module.exports = {
   sources: {
     'packages/app/lib': 'azzapp',
     'packages/web/src': 'azzapp',
-    'packages/mobile/src': 'azzapp',
   },
   projects: {
     azzapp: {

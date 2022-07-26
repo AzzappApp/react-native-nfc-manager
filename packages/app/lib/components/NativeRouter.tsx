@@ -5,7 +5,7 @@ import { ScreenStack, Screen } from 'react-native-screens';
 import type {
   Router as PlatformRouter,
   RouteListener,
-} from '@azzapp/app/lib/PlatformEnvironment';
+} from '../PlatformEnvironment';
 import type { Routes } from '@azzapp/shared/lib/routes';
 import type { ComponentType } from 'react';
 import type { ScreenProps } from 'react-native-screens';

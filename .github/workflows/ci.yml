@@ -24,7 +24,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          working-directory: packages/mobile
+          working-directory: packages/app
           bundler-cache: true
 
       # JavaScript build
@@ -50,24 +50,24 @@ jobs:
       - name: Cache CocoaPods
         uses: actions/cache@v3
         with:
-          path: packages/mobile/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('packages/mobile/ios/Podfile.lock') }}
+          path: packages/app/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
 
       - name: Pod install
-        run: cd packages/mobile/ios/ && bundle exec pod install
+        run: cd packages/app/ios/ && bundle exec pod install
 
       - name: Setup faslane AppStore API Key
-        run: echo $FASTLANE_APPSTORE_API_KEY | base64 --decode > ./packages/mobile/fastlane/appstore_api_key.json
+        run: echo $FASTLANE_APPSTORE_API_KEY | base64 --decode > ./packages/app/fastlane/appstore_api_key.json
         env:
           FASTLANE_APPSTORE_API_KEY: ${{ secrets.FASTLANE_APPSTORE_API_KEY }}
 
       # - name: Fix FlipperFoly
-      #   run: cd packages/mobile && sh ./scripts/fix-m1-flipper-foly.sh
+      #   run: cd packages/app && sh ./scripts/fix-m1-flipper-foly.sh
         
       - name: Setup Xcode env
         run: |
           echo "Setup node for xcode to $(command -v node)"
-          echo "export NODE_BINARY=$(command -v node)" > ./packages/mobile/ios/.xcode.env
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
         
       - name: Build ios application
         run: yarn build:ios
