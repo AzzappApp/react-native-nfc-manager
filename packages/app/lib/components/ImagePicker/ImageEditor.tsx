@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import range from 'lodash/range';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -5,12 +6,12 @@ import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   runOnJS,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { colors, mixins } from '../../../theme';
-import useIsEqualMemo from '../../hooks/useIsEqualMemo';
 import EditableImage from './EditableImage';
 import EditableVideo from './EditableVideo';
 import type {
@@ -18,13 +19,12 @@ import type {
   CropData,
   EditableImageProps,
 } from './EditableImage';
+import type { EditableVideoProps } from './EditableVideo';
 import type { FunctionComponent } from 'react';
 import type {
   ViewProps,
   LayoutChangeEvent,
   LayoutRectangle,
-  ViewStyle,
-  TransformsStyle,
 } from 'react-native';
 
 type ImageEditorProps = ViewProps & {
@@ -188,26 +188,6 @@ const ImageEditor = ({
       onCropDataChange(cropData);
     }
   }, [cropData, editionParameters?.cropData, onCropDataChange]);
-
-  const parameters = useIsEqualMemo(() => {
-    const parameters: ImageEditionParameters = {
-      ...editionParameters,
-      cropData,
-    };
-    return parameters;
-  }, [editionParameters, cropData]);
-
-  // TODO flash
-  const [imageHidden, setImageHidden] = useState(false);
-  useEffect(() => {
-    if (!cropEditionMode) {
-      setImageHidden(false);
-    }
-  }, [cropEditionMode]);
-
-  const onCropImageReady = () => {
-    setImageHidden(true);
-  };
 
   const cropOriginXSharedValue = useSharedValue(cropData.originX);
   const cropOriginYSharedValue = useSharedValue(cropData.originY);
@@ -398,7 +378,26 @@ const ImageEditor = ({
       runOnJS(onGestureEnd)();
     });
 
-  const imageCropStyle = useAnimatedStyle(() => {
+  const editionParametersSharedValue = useSharedValue(editionParameters);
+  useEffect(() => {
+    if (!isEqual(editionParameters, editionParametersSharedValue.value)) {
+      editionParametersSharedValue.value = editionParameters;
+    }
+  }, [editionParametersSharedValue, editionParameters]);
+
+  const imageAnimatedProps = useAnimatedProps(() => ({
+    editionParameters: {
+      ...editionParametersSharedValue.value,
+      cropData: {
+        originX: cropOriginXSharedValue.value,
+        originY: cropOriginYSharedValue.value,
+        width: cropOriginWidthSharedValue.value,
+        height: cropOriginHeightSharedValue.value,
+      },
+    },
+  }));
+
+  const videoStyle = useAnimatedStyle(() => {
     const originX = cropOriginXSharedValue.value;
     const originY = cropOriginYSharedValue.value;
     const width = cropOriginWidthSharedValue.value;
@@ -411,15 +410,17 @@ const ImageEditor = ({
         ? displayedHeight / height
         : displayedWidth / width;
 
-    return {
-      position: 'absolute',
-      width: mediaWidth * scale,
-      height: mediaHeight * scale,
-      transform: [
-        { translateX: -originX * scale },
-        { translateY: -originY * scale },
-      ],
-    };
+    return scale > 0
+      ? {
+          opacity: 1,
+          width: mediaWidth * scale,
+          height: mediaHeight * scale,
+          transform: [
+            { translateX: -originX * scale },
+            { translateY: -originY * scale },
+          ],
+        }
+      : { opacity: 0 };
   });
 
   const image = useMemo(() => {
@@ -427,76 +428,35 @@ const ImageEditor = ({
       return null;
     }
     if (media.kind === 'video') {
-      const { originX, originY, width, height } = parameters.cropData!;
-      const { width: mediaWidth, height: mediaHeight } = mediaSizeInfos;
-      const scale =
-        mediaWidth / mediaHeight > aspectRatio
-          ? displayedImageSize.height / height
-          : displayedImageSize.width / width;
-
-      const transforms: TransformsStyle['transform'] = [
-        { translateX: -originX * scale },
-        { translateY: -originY * scale },
-      ];
-
-      switch (editionParameters?.orientation) {
-        case 'LEFT':
-          transforms.push({ rotate: '-90deg' });
-          break;
-        case 'DOWN':
-          transforms.push({ rotate: '180deg' });
-          break;
-        case 'RIGHT':
-          transforms.push({ rotate: '90deg' });
-          break;
-        // TODO supported mirrored case ?
-        default:
-          break;
-      }
-
-      const videoStyle: ViewStyle = {
-        position: 'absolute',
-        width: mediaWidth * scale,
-        height: mediaHeight * scale,
-        transform: transforms,
-      };
       return (
-        <View
-          style={[
-            displayedImageSize,
-            { overflow: 'hidden', opacity: imageHidden ? 0 : 1 },
-          ]}
-        >
-          <EditableVideo
+        <View style={[displayedImageSize, { overflow: 'hidden' }]}>
+          <AnimatedVideo
             uri={media.uri}
-            editionParameters={parameters}
+            animatedProps={imageAnimatedProps}
             filters={filters}
             startTime={startTime}
             duration={duration}
-            style={videoStyle}
+            style={[{ position: 'absolute' }, displayedImageSize, videoStyle]}
           />
         </View>
       );
     }
     return (
-      <EditableImage
+      <AnimatedImage
         source={media}
-        editionParameters={parameters}
+        animatedProps={imageAnimatedProps}
         filters={filters}
-        style={[displayedImageSize, { opacity: imageHidden ? 0 : 1 }]}
+        style={displayedImageSize}
       />
     );
   }, [
     displayedImageSize,
     media,
-    parameters,
+    imageAnimatedProps,
     filters,
-    imageHidden,
-    mediaSizeInfos,
-    aspectRatio,
-    editionParameters?.orientation,
     startTime,
     duration,
+    videoStyle,
   ]);
 
   return (
@@ -508,28 +468,16 @@ const ImageEditor = ({
       {image}
       {cropEditionMode && componentSize && displayedImageSize && (
         <GestureDetector gesture={Gesture.Race(panGesture, pinchGesture)}>
-          <Animated.View
+          <View
             style={[
               displayedImageSize,
-              styles.panImageContainer,
+              styles.gridContainer,
               {
                 top: (componentSize.height - displayedImageSize.height) / 2,
                 left: (componentSize.width - displayedImageSize.width) / 2,
               },
             ]}
           >
-            <AnimatedImage
-              source={{ ...media, videoTime: startTime }}
-              style={imageCropStyle}
-              editionParameters={{
-                orientation: parameters.orientation,
-                roll: editionParameters?.roll,
-                yaw: editionParameters?.yaw,
-                pitch: editionParameters?.pitch,
-              }}
-              onLoad={onCropImageReady}
-            />
-
             <View style={[styles.verticalGrid, displayedImageSize]}>
               {range(0, 4).map(index => (
                 <View key={index} style={styles.verticalLine} />
@@ -540,7 +488,7 @@ const ImageEditor = ({
                 <View key={index} style={styles.horizontalLine} />
               ))}
             </View>
-          </Animated.View>
+          </View>
         </GestureDetector>
       )}
     </View>
@@ -549,13 +497,19 @@ const ImageEditor = ({
 
 export default ImageEditor;
 
+const AnimatedImage = Animated.createAnimatedComponent(
+  EditableImage as FunctionComponent<EditableImageProps>,
+);
+const AnimatedVideo = Animated.createAnimatedComponent(
+  EditableVideo as FunctionComponent<EditableVideoProps>,
+);
+
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  panImageContainer: {
-    overflow: 'hidden',
+  gridContainer: {
     position: 'absolute',
   },
   verticalGrid: {
@@ -576,10 +530,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.grey,
   },
 });
-
-const AnimatedImage = Animated.createAnimatedComponent(
-  EditableImage as FunctionComponent<EditableImageProps>,
-);
 
 // corresponds to a focal length of 28 mm full frame
 // This is an approximation from what seems to work with ios algorithm
@@ -830,7 +780,19 @@ const path = useMemo(() => {
 ]);
 ```
 
-Then render the path 
+Then render the image inside of grid container : 
+<AnimatedImage
+  source={{ ...media, videoTime: startTime }}
+  style={imageCropStyle}
+  editionParameters={{
+    orientation: parameters.orientation,
+    roll: editionParameters?.roll,
+    yaw: editionParameters?.yaw,
+    pitch: editionParameters?.pitch,
+  }}
+/>
+
+Render the path 
 ```
 
 {componentSize && (
@@ -847,4 +809,6 @@ Then render the path
   </Svg>
 )}
 ```
+
+Compare the bounds of the image and the path
 */

@@ -484,7 +484,7 @@ const editors: ParamEditor[] = [
   },
   {
     param: 'sharpness',
-    label: 'Contrast',
+    label: 'Sharpness',
     icon: 'contrast',
     kind: 'slider',
     defaultValue: 0,
