@@ -11,6 +11,9 @@ const icons = {
   get chevron() {
     return require('./assets/chevron.png');
   },
+  get comment() {
+    return require('./assets/comment.png');
+  },
   get 'color-picker'() {
     return require('./assets/color-picker.png');
   },
@@ -28,6 +31,9 @@ const icons = {
   },
   get flip() {
     return require('./assets/flip.png');
+  },
+  get heart() {
+    return require('./assets/heart.png');
   },
   get picture() {
     return require('./assets/picture.png');

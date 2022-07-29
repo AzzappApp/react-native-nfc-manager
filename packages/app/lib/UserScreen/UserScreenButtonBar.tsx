@@ -2,9 +2,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../theme';
 import FloatingButton from '../components/FloatingButton';
 import FloatingIconButton from '../components/FloatingIconButton';
+import { useRouter } from '../PlatformEnvironment';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type UserScreenButtonBarProps = {
+  userId: string;
   canEdit: boolean;
   onEdit: () => void;
   onHome: () => void;
@@ -15,29 +17,35 @@ type UserScreenButtonBarProps = {
 const UserScreenButtonBar = ({
   canEdit,
   style,
+  userId,
   onEdit,
-  onHome,
   onFollow,
-}: UserScreenButtonBarProps) => (
-  <View style={[styles.buttonBar, style]}>
-    <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
-    {canEdit ? (
-      <FloatingButton light onPress={onEdit} style={styles.mainButton}>
-        <Text style={textStyles.normal}>Edit my profile</Text>
-      </FloatingButton>
-    ) : (
-      <FloatingButton light onPress={onFollow} style={styles.mainButton}>
-        <Text style={textStyles.normal}>Follow</Text>
-      </FloatingButton>
-    )}
-    <FloatingIconButton
-      icon="flip"
-      onPress={onHome}
-      iconSize={30}
-      style={{ marginLeft: 15 }}
-    />
-  </View>
-);
+  onHome,
+}: UserScreenButtonBarProps) => {
+  const router = useRouter();
+  const onFlip = () => router.push('USER_POSTS', { userId });
+
+  return (
+    <View style={[styles.buttonBar, style]}>
+      <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
+      {canEdit ? (
+        <FloatingButton light onPress={onEdit} style={styles.mainButton}>
+          <Text style={textStyles.normal}>Edit my profile</Text>
+        </FloatingButton>
+      ) : (
+        <FloatingButton light onPress={onFollow} style={styles.mainButton}>
+          <Text style={textStyles.normal}>Follow</Text>
+        </FloatingButton>
+      )}
+      <FloatingIconButton
+        icon="flip"
+        onPress={onFlip}
+        iconSize={30}
+        style={{ marginLeft: 15 }}
+      />
+    </View>
+  );
+};
 
 export default UserScreenButtonBar;
 

@@ -1,5 +1,6 @@
 import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
 import ERRORS from '@azzapp/shared/lib/errors';
+import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import {
   GraphQLFloat,
   GraphQLInt,
@@ -88,6 +89,12 @@ const updateCover = mutationWithClientMutationId({
   ) => {
     if (!userId || isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
+    }
+
+    if (updates.pictures) {
+      updates.pictures.forEach(media => {
+        media.ratio = COVER_RATIO;
+      });
     }
 
     let user: User | null;

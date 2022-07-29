@@ -1,30 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Pressable,
   Text,
   useWindowDimensions,
+  View,
 } from 'react-native';
 import { PhotoGallery } from 'react-native-photo-gallery-api';
 import { colors, textStyles } from '../../../theme';
 import { formatVideoTime } from './helpers';
+import usePhotoGalleryPermission from './usePhotoGalleryPermission';
 import type { MediaKind } from './helpers';
 import type { ScrollViewProps } from 'react-native';
 import type { PhotoIdentifier } from 'react-native-photo-gallery-api';
 
-type ImagePickerMediaListProps = Omit<ScrollViewProps, 'children'> & {
+type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
   selectedMediaURI?: string;
   onSelectMedia: (item: PhotoIdentifier['node']) => void;
+  onPermissionRequestFailed: () => void;
   kind: MediaKind;
 };
 
-const ImagePickerMediaList = ({
+const PhotoGalleryMediaList = ({
   selectedMediaURI,
   kind,
   onSelectMedia,
+  onPermissionRequestFailed,
   ...props
-}: ImagePickerMediaListProps) => {
+}: PhotoGalleryMediaListProps) => {
+  const canUsePhotoGallery = usePhotoGalleryPermission(
+    onPermissionRequestFailed,
+  );
   const [medias, setMedias] = useState<Array<PhotoIdentifier['node']>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasNext, setHasNext] = useState(false);
@@ -54,8 +62,10 @@ const ImagePickerMediaList = ({
   );
 
   useEffect(() => {
-    void load(true);
-  }, [kind, load]);
+    if (canUsePhotoGallery) {
+      void load(true);
+    }
+  }, [canUsePhotoGallery, kind, load]);
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoading) {
@@ -64,6 +74,14 @@ const ImagePickerMediaList = ({
   }, [hasNext, isLoading, load]);
 
   const { width: windowWidth } = useWindowDimensions();
+
+  if (!canUsePhotoGallery) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ActivityIndicator style={{ alignSelf: 'center', marginTop: 100 }} />
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -113,4 +131,4 @@ const ImagePickerMediaList = ({
   );
 };
 
-export default ImagePickerMediaList;
+export default PhotoGalleryMediaList;

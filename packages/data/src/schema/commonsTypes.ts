@@ -9,7 +9,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import type { Media } from '../domains/UserCard';
+import type { Media } from '../domains/commons';
 import type { GraphQLContext } from './GraphQLContext';
 
 export const MediaGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
@@ -21,6 +21,9 @@ export const MediaGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
     },
     source: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    ratio: {
+      type: new GraphQLNonNull(GraphQLFloat),
     },
     uri: {
       type: new GraphQLNonNull(GraphQLString),

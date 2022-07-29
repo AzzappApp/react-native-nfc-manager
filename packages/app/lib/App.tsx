@@ -21,15 +21,18 @@ import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import UserMobileScreen from './mobileScreens/UserMobileScreen';
+import UserPostsMobileScreen from './mobileScreens/UserPostsMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
+import PostCreationScreen from './PostCreationScreen';
 
 const screens = {
   HOME: HomeMobileScreen,
   USER: UserMobileScreen,
+  USER_POSTS: UserPostsMobileScreen,
   SIGN_IN: SignInMobileScreen,
   SIGN_UP: SignUpMobileScreen,
   SEARCH: View,
-  NEW_POST: View,
+  NEW_POST: PostCreationScreen,
   CHAT: View,
   PROFILE: View,
   POST: View,

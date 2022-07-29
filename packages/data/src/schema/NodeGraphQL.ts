@@ -1,4 +1,5 @@
 import { GraphQLID, GraphQLInterfaceType, GraphQLNonNull } from 'graphql';
+import { isPost } from '../domains/Post';
 import { isUser } from '../domains/User';
 import { isUserCard } from '../domains/UserCard';
 
@@ -15,6 +16,8 @@ const NodeGraphQL = new GraphQLInterfaceType({
       return 'User';
     } else if (isUserCard(value)) {
       return 'UserCard';
+    } else if (isPost(value)) {
+      return 'Post';
     }
   },
 });

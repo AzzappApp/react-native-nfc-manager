@@ -27,47 +27,45 @@ type ImageEditorPanelProps = ViewProps & {
   mediaInfo: MediaInfo;
   timeRange?: TimeRange | null;
   aspectRatio: number;
-  parameters: ImageEditionParameters;
-  currentFilter: string | null;
-  currentEditedParams: keyof ImageEditionParameters | null;
+  editionParameters: ImageEditionParameters;
+  mediaFilter: string | null;
+  editedParameter: keyof ImageEditionParameters | null;
   onTimeRangeChange: (setTimeRange: TimeRange) => void;
   onFilterChange: (filter: string | null) => void;
   onStartEditing: (param: keyof ImageEditionParameters) => void;
   onSave: () => void;
   onCancel: () => void;
-  onParamChange: ParamUpdateHandler;
+  setParameterValue: ParamUpdateHandler;
 };
 
 const ImageEditorPanel = ({
   mediaInfo,
   aspectRatio,
-  currentFilter,
-  parameters,
-  currentEditedParams,
+  mediaFilter,
+  editionParameters,
+  editedParameter,
   timeRange,
   onFilterChange,
   onStartEditing,
   onSave,
   onCancel,
-  onParamChange,
+  setParameterValue,
   onTimeRangeChange,
   style,
   ...props
 }: ImageEditorPanelProps) => {
   const [currentTab, setCurrentTab] = useState<'edit' | 'filter'>('filter');
 
-  const selectedParams = editors.find(
-    ({ param }) => param === currentEditedParams,
-  );
+  const selectedParams = editors.find(({ param }) => param === editedParameter);
 
   const currentEditedParamsEditor = editors.find(
-    ({ param }) => param === currentEditedParams,
+    ({ param }) => param === editedParameter,
   );
 
   return (
     <View style={style} {...props}>
       <View style={styles.tabContainer}>
-        {currentEditedParams == null ? (
+        {editedParameter == null ? (
           tabs.map(({ label, tab }) => (
             <Pressable
               key={tab}
@@ -105,24 +103,24 @@ const ImageEditorPanel = ({
                   pressed && { opacity: 0.8 },
                 ]}
                 onPress={() =>
-                  onFilterChange(currentFilter === filter ? null : filter)
+                  onFilterChange(mediaFilter === filter ? null : filter)
                 }
               >
                 <View
                   style={[
                     styles.filterImageContainer,
-                    currentFilter === filter &&
+                    mediaFilter === filter &&
                       styles.filerImageContainerSelected,
                   ]}
                 >
                   <EditableImage
                     source={mediaInfo}
-                    editionParameters={parameters}
+                    editionParameters={editionParameters}
                     filters={[filter]}
                     style={[
                       styles.filterImage,
                       { aspectRatio },
-                      currentFilter === filter && { borderColor: colors.blue },
+                      mediaFilter === filter && { borderColor: colors.blue },
                     ]}
                   />
                 </View>
@@ -164,27 +162,29 @@ const ImageEditorPanel = ({
             ) : selectedParams.kind === 'slider' ? (
               <DashedSlider
                 value={
-                  (parameters[selectedParams?.param] ??
+                  (editionParameters[selectedParams?.param] ??
                     selectedParams?.defaultValue) as number
                 }
                 min={selectedParams.min}
                 max={selectedParams.max}
                 step={selectedParams.step}
                 interval={selectedParams.interval}
-                onChange={value => onParamChange(selectedParams.param, value)}
+                onChange={value =>
+                  setParameterValue(selectedParams.param, value)
+                }
               />
             ) : selectedParams.param === 'cropData' ? (
               mediaInfo?.kind === 'picture' ? (
                 <PerspectiveEditor
-                  parameters={parameters}
-                  onParamChange={onParamChange}
+                  parameters={editionParameters}
+                  onParamChange={setParameterValue}
                 />
               ) : (
                 <VideoCutEditor
                   mediaInfo={mediaInfo}
                   timeRange={timeRange}
                   aspectRatio={aspectRatio}
-                  parameters={parameters}
+                  parameters={editionParameters}
                   onChange={onTimeRangeChange}
                 />
               )
@@ -193,7 +193,7 @@ const ImageEditorPanel = ({
         )}
       </View>
       <View style={styles.footer}>
-        {currentEditedParams != null && (
+        {editedParameter != null && (
           <>
             <Pressable
               onPress={onCancel}

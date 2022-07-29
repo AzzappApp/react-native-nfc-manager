@@ -31,9 +31,14 @@ const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
         style={styles.recommandedUsersList}
       />
       {viewer.user ? (
-        <TouchableOpacity onPress={logout}>
-          <Text>Logout</Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity onPress={logout}>
+            <Text>Logout</Text>
+          </TouchableOpacity>
+          <Link route={ROUTES.NEW_POST}>
+            <Text>New Post</Text>
+          </Link>
+        </>
       ) : (
         <>
           <Link modal route={ROUTES.SIGN_IN}>

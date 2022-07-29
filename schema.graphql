@@ -45,6 +45,13 @@ type User implements Node {
   lastName: String
   userName: String!
   card: UserCard
+  posts(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): PostConnection
 }
 
 """An object with an ID"""
@@ -113,6 +120,7 @@ type UserCardCover {
 type Media {
   kind: MediaKind!
   source: String!
+  ratio: Float!
   uri(pixelRatio: Float, ratio: Float, width: Float!): String!
 }
 
@@ -153,12 +161,12 @@ type TextModule {
 }
 
 """A connection to a list of items."""
-type UserConnection {
+type PostConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [UserEdge]
+  edges: [PostEdge]
 }
 
 """Information about pagination in a connection."""
@@ -177,6 +185,48 @@ type PageInfo {
 }
 
 """An edge in a connection."""
+type PostEdge {
+  """The item at the end of the edge"""
+  node: Post
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Represent a Azzapp publication"""
+type Post implements Node {
+  """The ID of an object"""
+  id: ID!
+
+  """The author of the publication"""
+  author: User!
+
+  """The date of the publication"""
+  postDate: Float!
+
+  """The media of the publication"""
+  media: Media!
+
+  """The text content of the publication"""
+  content: String!
+
+  """Does this post allow comments"""
+  allowComments: Boolean!
+
+  """Does this post allow likes"""
+  allowLikes: Boolean!
+}
+
+"""A connection to a list of items."""
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]
+}
+
+"""An edge in a connection."""
 type UserEdge {
   """The item at the end of the edge"""
   node: User
@@ -187,6 +237,7 @@ type UserEdge {
 
 type Mutation {
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
 }
 
 type UpdateCoverPayload {
@@ -242,4 +293,25 @@ input UpdateCoverInput {
 input MediaInput {
   kind: MediaKind!
   source: String!
+  ratio: Float
+}
+
+type CreatePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input CreatePostInput {
+  """The media of the publication"""
+  media: MediaInput!
+
+  """The text content of the publication"""
+  content: String!
+
+  """Does this post allow comments"""
+  allowComments: Boolean!
+
+  """Does this post allow likes"""
+  allowLikes: Boolean!
+  clientMutationId: String
 }

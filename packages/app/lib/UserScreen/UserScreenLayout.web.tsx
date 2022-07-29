@@ -18,6 +18,7 @@ import UserScreenButtonBar from './UserScreenButtonBar';
 import type { ReactElement } from 'react';
 
 type UserScreenLayoutProps = {
+  userId: string;
   creatingCard: boolean;
   isEditing: boolean;
   saving: boolean;
@@ -40,6 +41,7 @@ type UserScreenLayoutProps = {
 };
 
 const UserScreenLayout = ({
+  userId,
   creatingCard,
   isEditing,
   saving,
@@ -99,6 +101,7 @@ const UserScreenLayout = ({
             style={styles.closeButton}
           />
           <UserScreenButtonBar
+            userId={userId}
             canEdit={canEdit}
             onHome={onBack}
             onEdit={onEdit}

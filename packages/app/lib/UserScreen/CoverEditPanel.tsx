@@ -19,7 +19,7 @@ import {
   coverRendererFragment,
   QR_CODE_POSITION_CHANGE_EVENT,
 } from '../components/CoverRenderer/CoverRenderer';
-import ImagePicker from '../components/ImagePicker';
+import ImagePicker from '../components/ImageEditions/ImagePicker';
 import TabsBar from '../components/TabsBar';
 import useFormMutation from '../hooks/useFormMutation';
 import { useWebAPI } from '../PlatformEnvironment';
@@ -460,7 +460,7 @@ const CoverEditPanel = ({
           onMediaPicked={onMediaPicked}
           onClose={onImagePickCancel}
           maxVideoDuration={12}
-          onAuthorizationFailed={() => void 0}
+          onPermissionRequestFailed={() => void 0}
         />
       </Modal>
     </>

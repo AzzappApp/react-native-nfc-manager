@@ -12,8 +12,8 @@ import { getUserById } from '../domains/User';
 import { MediaGraphQL } from './commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
+import type { Media } from '../domains/commons';
 import type {
-  Media,
   MediaModule,
   SocialModule,
   TextModule,

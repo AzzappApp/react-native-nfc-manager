@@ -16,13 +16,13 @@ function relayScreen<
   { fallback: Fallback, ...options }: RelayScreenOptions<U>,
 ): ComponentType<Omit<T, 'preloadedQuery'>> & typeof options {
   const RelayWrapper = (props: T) => {
-    const { componentId, route, params } = props as any;
+    const { screenId, route, params } = props as any;
     const preloadedQuery = useQueryLoaderQuery((props as any).screenId)!;
     useEffect(() => {
       if (!preloadedQuery) {
-        loadQueryFor(componentId, options, params);
+        loadQueryFor(screenId, options, params);
       }
-    }, [componentId, params, preloadedQuery, route]);
+    }, [screenId, params, preloadedQuery, route]);
     return (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
         {preloadedQuery && (

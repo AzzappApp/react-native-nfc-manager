@@ -187,6 +187,7 @@ const UserScreen = ({
   return (
     <ModuleEditorContext.Provider value={moduleEditor}>
       <UserScreenLayout
+        userId={user.id}
         creatingCard={creatingCard}
         isEditing={isEditing}
         saving={saving}

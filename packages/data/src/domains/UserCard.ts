@@ -6,6 +6,7 @@ import {
   uuidMapping,
 } from '../helpers/databaseUtils';
 import { getClient } from './db';
+import type { Media } from './commons';
 
 export type UserCard = {
   userId: string;
@@ -13,11 +14,6 @@ export type UserCard = {
   main: boolean;
   cover: UserCardCover;
   modules: UserCardModule[];
-};
-
-export type Media = {
-  kind: 'picture' | 'video';
-  source: string;
 };
 
 export type UserCardCover = {

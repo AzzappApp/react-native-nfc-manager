@@ -18,11 +18,11 @@ export const createObjectMapper = <T>(
       return null as any;
     }
     const result: any = {};
-    for (const key in object) {
+    Object.entries(object).forEach(([key, value]) => {
       const modelKey = camelCase(key) as keyof T;
       const { parse } = options[modelKey] ?? {};
-      result[modelKey] = parse ? parse(object[key]) : object[key];
-    }
+      result[modelKey] = parse ? parse(value) : value;
+    });
     result[modelSymbol] = true;
     return result;
   },

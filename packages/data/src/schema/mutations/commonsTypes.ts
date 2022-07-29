@@ -1,4 +1,9 @@
-import { GraphQLInputObjectType, GraphQLNonNull, GraphQLString } from 'graphql';
+import {
+  GraphQLFloat,
+  GraphQLInputObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import { MediaKindGraphQL } from '../commonsTypes';
 
 export const MediaInputGraphQL = new GraphQLInputObjectType({
@@ -10,6 +15,9 @@ export const MediaInputGraphQL = new GraphQLInputObjectType({
     },
     source: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    ratio: {
+      type: GraphQLFloat,
     },
   }),
 });

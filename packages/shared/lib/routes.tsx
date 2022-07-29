@@ -3,6 +3,7 @@ const ROUTES = {
   SIGN_IN: 'SIGN_IN',
   SIGN_UP: 'SIGN_UP',
   USER: 'USER',
+  USER_POSTS: 'USER_POSTS',
   SEARCH: 'SEARCH',
   NEW_POST: 'NEW_POST',
   POST: 'POST',

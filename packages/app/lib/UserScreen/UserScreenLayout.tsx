@@ -30,6 +30,7 @@ import type { ReactElement } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
 type UserScreenLayoutProps = {
+  userId: string;
   creatingCard: boolean;
   isEditing: boolean;
   saving: boolean;
@@ -52,6 +53,7 @@ type UserScreenLayoutProps = {
 };
 
 const UserScreenLayout = ({
+  userId,
   creatingCard,
   isEditing,
   saving,
@@ -144,6 +146,7 @@ const UserScreenLayout = ({
           >
             <UserScreenButtonBar
               canEdit={canEdit}
+              userId={userId}
               onHome={onBack}
               onEdit={onEdit}
               onFollow={onFollow}

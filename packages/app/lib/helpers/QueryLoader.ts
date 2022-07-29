@@ -21,21 +21,21 @@ const listeners = new Map<
 >();
 
 const addListener = (
-  componentId: string,
+  screenId: string,
   listener: (query: PreloadedQuery<any>) => void,
 ) => {
-  if (!listeners.has(componentId)) {
-    listeners.set(componentId, []);
+  if (!listeners.has(screenId)) {
+    listeners.set(screenId, []);
   }
-  listeners.get(componentId)?.push(listener);
+  listeners.get(screenId)?.push(listener);
 
   return () => {
-    const componentIdListeners = listeners.get(componentId)!;
-    const index = componentIdListeners.indexOf(listener);
+    const screenIdListeners = listeners.get(screenId)!;
+    const index = screenIdListeners.indexOf(listener);
     if (index !== -1) {
-      componentIdListeners.splice(index, 1);
-      if (componentIdListeners.length === 0) {
-        listeners.delete(componentId);
+      screenIdListeners.splice(index, 1);
+      if (screenIdListeners.length === 0) {
+        listeners.delete(screenId);
       }
     }
   };
@@ -43,27 +43,27 @@ const addListener = (
 
 export const init = () => {
   addEnvironmentListener(() => {
-    [...activeQueries.entries()].forEach(([componentId, entry]) => {
+    [...activeQueries.entries()].forEach(([screenId, entry]) => {
       const { preloadedQuery, query, variables } = entry;
       preloadedQuery.dispose();
       entry.preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
       listeners
-        .get(componentId)
+        .get(screenId)
         ?.forEach(callback => callback(entry.preloadedQuery));
     });
   });
 };
 
-export const useQueryLoaderQuery = (componentId: string) => {
+export const useQueryLoaderQuery = (screenId: string) => {
   const [queryInfos, setQueryInfos] = useState(
-    activeQueries.get(componentId)?.preloadedQuery,
+    activeQueries.get(screenId)?.preloadedQuery,
   );
   useEffect(
     () =>
-      addListener(componentId, () =>
-        setQueryInfos(activeQueries.get(componentId)?.preloadedQuery),
-      ),
-    [componentId],
+      addListener(screenId, () => {
+        setQueryInfos(activeQueries.get(screenId)?.preloadedQuery);
+      }),
+    [screenId],
   );
   return queryInfos ?? null;
 };
@@ -74,27 +74,27 @@ export type LoadQueryOptions<T> = {
 };
 
 export const loadQueryFor = <T>(
-  componentId: string,
+  screenId: string,
   options: LoadQueryOptions<T>,
   params: T = {} as T,
   refresh = false,
 ) => {
-  if (!activeQueries.has(componentId) || refresh) {
+  if (!activeQueries.has(screenId) || refresh) {
     const query =
       typeof options.query === 'function'
         ? options.query(params)
         : options.query;
     const variables = options.getVariables?.(params) ?? {};
     const preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
-    activeQueries.set(componentId, { query, preloadedQuery, variables });
-    listeners.get(componentId)?.forEach(callback => callback(preloadedQuery));
+    activeQueries.set(screenId, { query, preloadedQuery, variables });
+    listeners.get(screenId)?.forEach(callback => callback(preloadedQuery));
   }
 };
 
-export const disposeQueryFor = (componentId: string) => {
-  const query = activeQueries.get(componentId);
+export const disposeQueryFor = (screenId: string) => {
+  const query = activeQueries.get(screenId);
   if (query) {
     query.preloadedQuery.dispose();
-    activeQueries.delete(componentId);
+    activeQueries.delete(screenId);
   }
 };

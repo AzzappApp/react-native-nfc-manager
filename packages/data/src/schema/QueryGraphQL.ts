@@ -6,6 +6,7 @@ import {
   GraphQLString,
 } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
+import { getPostById } from '../domains/Post';
 import { getUserById, getUserByUserName } from '../domains/User';
 import { getUserCardById } from '../domains/UserCard';
 import NodeGraphQL from './NodeGraphQL';
@@ -78,5 +79,7 @@ const fetchNode = (gqlId: string) => {
   } else if (type === 'UserCard') {
     const [userId, cardId] = JSON.parse(id);
     return getUserCardById(userId, cardId);
+  } else if (type === 'Post') {
+    return getPostById(id);
   }
 };

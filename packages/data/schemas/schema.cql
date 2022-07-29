@@ -16,7 +16,8 @@ CREATE INDEX ON users(user_name);
 
 CREATE TYPE media (
     kind text,
-    source text
+    source text,
+    ratio float
 );
 
 CREATE TYPE card_cover (
@@ -48,3 +49,17 @@ CREATE TABLE users_cards (
     modules list<frozen<card_module>>,
     PRIMARY KEY (user_id, card_id)
 );
+
+CREATE TABLE posts (
+    author_id uuid,
+    post_id uuid,
+    post_date timestamp,
+    media frozen<media>,
+    content text,
+    allow_comments boolean,
+    allow_likes boolean,
+    PRIMARY KEY (author_id, post_date, post_id)
+)
+WITH CLUSTERING ORDER BY (post_date DESC);
+
+CREATE INDEX ON posts(post_id);

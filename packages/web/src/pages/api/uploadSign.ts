@@ -51,12 +51,7 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
     public_id: cuid(),
   };
 
-  if (target === 'cover') {
-    // TODO transformations
-  } else {
-    res.status(400).send({ message: 'NOT_IMPLEMENTED' });
-    return;
-  }
+  // TODO transformations
 
   Object.assign(uploadParameters, {
     signature: Cloudinary.utils.api_sign_request(
