@@ -70,22 +70,23 @@ RCT_EXPORT_METHOD(
     NSData* imageData;
     NSString* fileName = [[NSUUID UUID] UUIDString];
     NSString* ext;
+    CGColorSpaceRef colorSpaceRGB = CGColorSpaceCreateDeviceRGB();
     if ([format isEqualToString:@"JPEG"]) {
       NSString *qualityKey = (NSString *)kCGImageDestinationLossyCompressionQuality;
       id options = @{ qualityKey: quality };
       imageData = [ciContext JPEGRepresentationOfImage:image
-                                            colorSpace:image.colorSpace
+                                            colorSpace:colorSpaceRGB
                                                options:options];
       ext= @"jpeg";
     } else {
       imageData = [ciContext PNGRepresentationOfImage:image
                                                format:kCIFormatBGRA8
-                                           colorSpace:image.colorSpace
+                                           colorSpace:colorSpaceRGB
                                               options:@{}];
       ext = @"png";
     }
     if (imageData == nil) {
-      reject(@"export_failure", @"could not export image to data", nil);
+      reject(@"export_failure",  [NSString stringWithFormat:@"Error %d : %s", errno, strerror(errno)], nil);
       return;
     }
   
