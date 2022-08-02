@@ -7,8 +7,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../theme';
-import useSafeAreaInsets from '../hooks/useSafeAreaInsets.web';
 import type { ModalProps } from 'react-native';
 
 type BottomSheetModal = Omit<

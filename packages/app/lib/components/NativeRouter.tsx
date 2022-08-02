@@ -1,30 +1,42 @@
-import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
+// TODO add tabs
+import { EventEmitter } from 'events';
+import isEqual from 'lodash/isEqual';
+import React, {
+  useMemo,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+  useContext,
+} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ScreenStack, Screen } from 'react-native-screens';
+import { ScreenContext, ScreenStack } from 'react-native-screens';
+import { ReanimatedScreenProvider } from 'react-native-screens/reanimated';
 import type {
   Router as PlatformRouter,
   RouteListener,
 } from '../PlatformEnvironment';
-import type { Routes } from '@azzapp/shared/lib/routes';
-import type { ComponentType } from 'react';
+import type { Route, ROUTES } from '../routes';
+import type { ComponentType, ReactNode } from 'react';
+import type { NativeSyntheticEvent, TargetedEvent } from 'react-native';
 import type { ScreenProps } from 'react-native-screens';
 
-type RouteInfos = { id: string; route: Routes; params?: any };
+type RouteInstance = Route & { id: string };
 
 type PushAction = {
   type: 'PUSH';
-  payload: RouteInfos;
+  payload: RouteInstance;
 };
 
 type ReplaceAction = {
   type: 'REPLACE';
-  payload: RouteInfos;
+  payload: RouteInstance;
 };
 
 type ShowModalAction = {
   type: 'SHOW_MODAL';
-  payload: RouteInfos;
+  payload: RouteInstance;
 };
 
 type BackAction = {
@@ -37,11 +49,9 @@ type BackToTopAction = {
   payload?: undefined;
 };
 
-type SetCurrentTabAction = {
-  type: 'SET_CURRENT_TAB';
-  payload: {
-    route: Routes;
-  };
+type ScreenDismissedAction = {
+  type: 'SCREEN_DISMISSED';
+  payload: { id: string };
 };
 
 type RouterAction =
@@ -49,7 +59,7 @@ type RouterAction =
   | BackToTopAction
   | PushAction
   | ReplaceAction
-  | SetCurrentTabAction
+  | ScreenDismissedAction
   | ShowModalAction;
 
 // type TabsState = {
@@ -57,7 +67,7 @@ type RouterAction =
 //   currenIndex: number;
 // };
 
-type StackState = RouteInfos[];
+type StackState = RouteInstance[];
 
 export type RouterState = {
   stack: StackState;
@@ -75,6 +85,8 @@ const stackReducer = (
       return stack.slice(0, stack.length - 1);
     case 'REPLACE':
       return [...stack.slice(0, stack.length - 1), payload];
+    case 'SCREEN_DISMISSED':
+      return stack.filter(routeInfo => routeInfo.id !== payload.id);
     default:
       return stack;
   }
@@ -88,11 +100,16 @@ const routerReducer = (
     case 'PUSH':
     case 'BACK':
     case 'REPLACE':
-    case 'SET_CURRENT_TAB':
       if (state.modals.length) {
         return { ...state, modals: stackReducer(state.modals, action) };
       }
       return { ...state, stack: stackReducer(state.stack, action) };
+    case 'SCREEN_DISMISSED':
+      return {
+        ...state,
+        modals: stackReducer(state.modals, action),
+        stack: stackReducer(state.stack, action),
+      };
     case 'SHOW_MODAL':
       return {
         ...state,
@@ -109,23 +126,19 @@ const routerReducer = (
   }
 };
 
-type ScreenListener = (routeInfos: RouteInfos) => void;
+type ScreenListener = (routeInfos: RouteInstance) => void;
 
-export const createRouterInitialState = ({
-  route,
-  params,
-  id,
-}: {
-  route: Routes;
-  id?: string;
-  params?: any;
-}): RouterState => ({
-  stack: [{ id: id ?? generateID(), route, params }],
+export const createRouterInitialState = (
+  route: Route,
+  initialId?: string,
+): RouterState => ({
+  stack: [{ id: initialId ?? generateID(), ...route }],
   modals: [],
 });
 
 export type NativeRouter = PlatformRouter & {
   backToTop(): void;
+  screenDismissed(id: string): void;
   addScreenWillBePushedListener: (listener: ScreenListener) => {
     dispose: () => void;
   };
@@ -152,13 +165,9 @@ export const useNativeRouter = (initialState: RouterState) => {
     const state = routerStateRef.current;
     const currentRoute = getCurrentRouteFromState(state);
     const newState = routerReducer(state, action);
-    const nextRoute = getCurrentRouteFromState(routerStateRef.current);
+    const nextRoute = getCurrentRouteFromState(newState);
     if (nextRoute !== currentRoute) {
-      dispatchToListeners(
-        routeWillChangeListeners,
-        nextRoute.route,
-        nextRoute.params,
-      );
+      dispatchToListeners(routeWillChangeListeners, nextRoute);
     }
     setRouterState(newState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,11 +175,7 @@ export const useNativeRouter = (initialState: RouterState) => {
 
   const currentRoute = getCurrentRouteFromState(routerState);
   useEffect(() => {
-    dispatchToListeners(
-      routeDidChangeListeners,
-      currentRoute.route,
-      currentRoute.params,
-    );
+    dispatchToListeners(routeDidChangeListeners, currentRoute);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoute]);
 
@@ -193,16 +198,18 @@ export const useNativeRouter = (initialState: RouterState) => {
     }
     return {
       getCurrentRoute,
-      push(route: Routes, params?: any) {
-        const routeInfo = { route, params, id: generateID() };
+      push(route: Route) {
+        const id = (route as any).id ?? generateID();
+        const routeInfo = { ...route, id };
         dispatchToListeners(screenWillBePushedListeners, routeInfo);
         dispatch({
           type: 'PUSH',
           payload: routeInfo,
         });
       },
-      replace(route: Routes, params?: any) {
-        const routeInfo = { route, params, id: generateID() };
+      replace(route: Route) {
+        const id = (route as any).id ?? generateID();
+        const routeInfo = { ...route, id };
         dispatchToListeners(screenWillBeRemovedListeners, getCurrentRoute());
         dispatchToListeners(screenWillBePushedListeners, routeInfo);
         dispatch({
@@ -210,8 +217,9 @@ export const useNativeRouter = (initialState: RouterState) => {
           payload: routeInfo,
         });
       },
-      showModal(route: Routes, params?: any) {
-        const routeInfo = { route, params, id: generateID() };
+      showModal(route: Route) {
+        const id = (route as any).id ?? generateID();
+        const routeInfo = { ...route, id };
         dispatchToListeners(screenWillBePushedListeners, routeInfo);
         dispatch({
           type: 'SHOW_MODAL',
@@ -236,6 +244,12 @@ export const useNativeRouter = (initialState: RouterState) => {
           );
         dispatch({
           type: 'BACK_TO_TOP',
+        });
+      },
+      screenDismissed(id) {
+        dispatch({
+          type: 'SCREEN_DISMISSED',
+          payload: { id },
         });
       },
       addRouteWillChangeListener: listener =>
@@ -268,60 +282,153 @@ export type ScreenOptions = Omit<
   | 'onWillDisappear'
 >;
 
+export type NativeScreenProps<T extends Route> = {
+  screenId: string;
+  route: T;
+};
+
+type ScreenMap = Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
+
 type ScreensRendererProps = {
   routerState: RouterState;
-  screens: Record<Routes, ComponentType<any>>;
+  screens: ScreenMap;
   defaultScreenOptions?: ScreenOptions;
+  onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
+  onScreenDismissed?: (id: string) => void;
 };
 
 export const ScreensRenderer = ({
   routerState,
   screens,
   defaultScreenOptions,
+  onFinishTransitioning,
+  onScreenDismissed,
 }: ScreensRendererProps) => {
   const { stack, modals } = routerState;
+  const Screen = useContext(ScreenContext);
   return (
-    <ScreenStack style={{ flex: 1 }}>
-      {stack.map(routeInfo => (
+    <ReanimatedScreenProvider>
+      <StackRenderer
+        stack={stack}
+        screens={screens}
+        defaultScreenOptions={defaultScreenOptions}
+        onFinishTransitioning={onFinishTransitioning}
+        onScreenDismissed={onScreenDismissed}
+      >
+        {!!modals.length && (
+          <Screen
+            key="nativeRouterModal"
+            enabled
+            isNativeStack
+            style={StyleSheet.absoluteFill}
+            stackPresentation="modal"
+          >
+            <StackRenderer
+              stack={modals}
+              screens={screens}
+              defaultScreenOptions={defaultScreenOptions}
+              onFinishTransitioning={onFinishTransitioning}
+              onScreenDismissed={onScreenDismissed}
+              isModal
+            />
+          </Screen>
+        )}
+      </StackRenderer>
+    </ReanimatedScreenProvider>
+  );
+};
+
+const StackRenderer = ({
+  stack,
+  screens,
+  defaultScreenOptions,
+  isModal,
+  children,
+  onScreenDismissed,
+  onFinishTransitioning,
+}: {
+  stack: StackState;
+  screens: ScreenMap;
+  defaultScreenOptions?: ScreenOptions;
+  isModal?: boolean;
+  children?: ReactNode;
+  onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
+  onScreenDismissed?: (id: string) => void;
+}) => {
+  const [displayedStack, setDisplayedStack] = useState(stack);
+
+  useEffect(() => {
+    if (!isEqual(displayedStack, stack)) {
+      setDisplayedStack(stack);
+    }
+  }, [displayedStack, stack]);
+
+  return (
+    <ScreenStack
+      style={{ flex: 1 }}
+      onFinishTransitioning={onFinishTransitioning}
+    >
+      {displayedStack.map(routeInfo => (
         <ScreenRenderer
           key={routeInfo.id}
           {...routeInfo}
           defaultScreenOptions={defaultScreenOptions}
           screens={screens}
+          onDismissed={() => onScreenDismissed?.(routeInfo.id)}
+          isModal={isModal}
         />
       ))}
-      {!!modals.length && (
-        <Screen
-          key="nativeRouterModal"
-          enabled
-          isNativeStack
-          style={StyleSheet.absoluteFill}
-          stackPresentation="modal"
-        >
-          <ScreenStack style={{ flex: 1 }}>
-            {modals.map(routeInfo => (
-              <ScreenRenderer
-                key={routeInfo.id}
-                {...routeInfo}
-                defaultScreenOptions={defaultScreenOptions}
-                screens={screens}
-                isModal
-              />
-            ))}
-          </ScreenStack>
-        </Screen>
-      )}
+      {children}
     </ScreenStack>
   );
 };
 
-type ScreenRendererProps = {
+type NativeNavigationEvent =
+  | 'appear'
+  | 'disappear'
+  | 'dismissed'
+  | 'willAppear'
+  | 'willDisappear';
+
+const ScreenRendererContext = React.createContext<{
+  navigationEventEmitter: EventEmitter;
+  setOptions: (
+    value:
+      | ScreenOptions
+      | ((value: ScreenOptions | null) => ScreenOptions | null)
+      | null,
+  ) => void;
+}>({ navigationEventEmitter: new EventEmitter(), setOptions: () => void 0 });
+
+export const useNativeNavigationEvent = (
+  event: NativeNavigationEvent,
+  handler: () => void,
+) => {
+  const { navigationEventEmitter } = useContext(ScreenRendererContext);
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+  useEffect(() => {
+    const listener = () => {
+      handlerRef.current();
+    };
+    navigationEventEmitter.addListener(event, listener);
+    return () => {
+      navigationEventEmitter.removeListener(event, listener);
+    };
+  }, [event, navigationEventEmitter]);
+};
+
+export const useScreenOptionsUpdater = () => {
+  const { setOptions } = useContext(ScreenRendererContext);
+  return setOptions;
+};
+
+type ScreenRendererProps = Route & {
   id: string;
-  route: Routes;
-  params?: any;
-  screens: Record<Routes, ComponentType<any>>;
+  screens: ScreenMap;
   defaultScreenOptions?: ScreenOptions;
   isModal?: boolean;
+  onDismissed(): void;
 };
 
 const ScreenRenderer = ({
@@ -331,19 +438,52 @@ const ScreenRenderer = ({
   screens,
   defaultScreenOptions,
   isModal,
+  onDismissed: onDismissedProp,
 }: ScreenRendererProps) => {
   const Component: any = screens[route];
+
+  const navigationEventEmitter = useRef(new EventEmitter()).current;
+
+  useEffect(
+    () => () => {
+      navigationEventEmitter.removeAllListeners();
+    },
+    [navigationEventEmitter],
+  );
+
+  const [options, setOptions] = useState(() => {
+    let options: ScreenOptions | null = defaultScreenOptions ?? null;
+    if (typeof Component.options === 'object') {
+      options = { ...options, ...Component.options };
+    }
+    if (typeof Component.getScreenOptions === 'function') {
+      options = { ...options, ...Component.getScreenOptions(params) };
+    }
+    return options;
+  });
+
+  const screenContextValue = useMemo(
+    () => ({ navigationEventEmitter, setOptions }),
+    [navigationEventEmitter],
+  );
+
+  const Screen = useContext(ScreenContext);
   if (!Component) {
     console.error(`Unknown component for route ${route}`);
     return null;
   }
-  let options: ScreenOptions | null = defaultScreenOptions ?? null;
-  if (typeof Component.options === 'object') {
-    options = { ...options, ...Component.options };
-  }
-  if (typeof Component.getScreenOptions === 'function') {
-    options = { ...options, ...Component.getScreenOptions(params) };
-  }
+
+  const screenView = (
+    <ScreenRendererContext.Provider value={screenContextValue}>
+      <Component screenId={id} route={{ route, params }} />
+    </ScreenRendererContext.Provider>
+  );
+
+  const onDismissed = () => {
+    navigationEventEmitter.emit('dismissed');
+    onDismissedProp();
+  };
+
   return (
     <Screen
       {...options}
@@ -351,14 +491,19 @@ const ScreenRenderer = ({
       enabled
       isNativeStack
       style={StyleSheet.absoluteFill}
+      onAppear={() => navigationEventEmitter.emit('appear')}
+      onWillAppear={() => navigationEventEmitter.emit('willAppear')}
+      onDisappear={() => navigationEventEmitter.emit('disappear')}
+      onWillDisappear={() => navigationEventEmitter.emit('willDisappear')}
+      onDismissed={onDismissed}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
         {isModal ? (
           <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <Component screenId={id} route={route} params={params} />
+            {screenView}
           </View>
         ) : (
-          <Component screenId={id} route={route} params={params} />
+          screenView
         )}
       </GestureHandlerRootView>
     </Screen>
@@ -370,7 +515,7 @@ const generateID = () => Math.random().toString().split('.')[1];
 const getCurrentRouteFromState = ({
   modals,
   stack,
-}: RouterState): RouteInfos => {
+}: RouterState): RouteInstance => {
   if (modals.length) {
     return modals[modals.length - 1];
   }

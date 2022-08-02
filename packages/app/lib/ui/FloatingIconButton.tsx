@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
+import Icon from '../ui/Icon';
 import FloatingButton from './FloatingButton';
-import Icon from './Icon';
+import type { Icons } from '../ui/Icon';
 import type { FloatingButtonProps } from './FloatingButton';
-import type { Icons } from './Icon';
 
 export type FloatingIconButtonProps = Omit<FloatingButtonProps, 'children'> & {
   icon: Icons;

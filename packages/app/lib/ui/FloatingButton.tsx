@@ -2,7 +2,7 @@ import { Pressable, StyleSheet } from 'react-native';
 import type { ViewStyle, StyleProp, PressableProps } from 'react-native';
 
 export type FloatingButtonProps = {
-  onPress: () => void;
+  onPress?: () => void;
   size?: number;
   light?: boolean;
   style?: StyleProp<ViewStyle>;

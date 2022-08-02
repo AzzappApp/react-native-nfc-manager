@@ -1,4 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+import type { TextStyle } from 'react-native';
 
 export const colors = {
   dark: '#45444C',
@@ -11,30 +12,36 @@ export const colors = {
 };
 
 export const fontFamilies = {
-  normal: 'OpenSans-Regular',
-  semiBold: 'OpenSans-SemiBold',
+  normal: Platform.select({
+    default: { fontFamily: 'OpenSans-Regular', fontWeight: 'normal' },
+    web: { fontFamily: 'Open Sans, sans-serif', fontWeight: '400' },
+  }) as TextStyle,
+  semiBold: Platform.select({
+    default: { fontFamily: 'OpenSans-SemiBold', fontWeight: 'normal' },
+    web: { fontFamily: 'Open Sans, sans-serif', fontWeight: '600' },
+  }) as TextStyle,
 };
 
 export const textStyles = StyleSheet.create({
   small: {
     color: colors.dark,
     fontSize: 10,
-    fontFamily: fontFamilies.semiBold,
+    ...fontFamilies.semiBold,
   },
   normal: {
     color: colors.dark,
     fontSize: 16,
-    fontFamily: fontFamilies.normal,
+    ...fontFamilies.normal,
   },
   title: {
     color: colors.dark,
     fontSize: 18,
-    fontFamily: fontFamilies.semiBold,
+    ...fontFamilies.semiBold,
   },
   button: {
-    fontFamily: fontFamilies.semiBold,
     fontSize: 14,
     color: colors.dark,
+    ...fontFamilies.semiBold,
   },
 });
 

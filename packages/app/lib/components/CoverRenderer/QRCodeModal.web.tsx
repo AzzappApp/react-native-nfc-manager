@@ -23,7 +23,7 @@ const QRCodeModal = ({ onRequestClose }: QRCodeModalProps) => (
         <View style={styles.qrCodeContainer}>
           {/* <QRCode
             value={`https://www.azzapp.com/${userName}`}
-            logo={require('../assets/logo.png')}
+            logo={require('../../assets/logo.png')}
             size={240}
             logoBackgroundColor="#FFF"
             logoMargin={10}

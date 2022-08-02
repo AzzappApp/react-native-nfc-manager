@@ -1,8 +1,8 @@
-import { Image, Text, useWindowDimensions, View } from 'react-native';
-import Video from 'react-native-video';
+import { Text, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../theme';
 import Link from './Link';
+import MediaRenderer from './MediaRenderer';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
 import type { ViewProps } from 'react-native';
@@ -20,10 +20,6 @@ const PostRenderer = ({
     graphql`
       fragment PostRendererFragment_post on Post
       @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
         screenWidth: {
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
@@ -31,9 +27,7 @@ const PostRenderer = ({
       ) {
         id
         media {
-          kind
-          ratio
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          ...MediaRendererFragment_media @arguments(width: $screenWidth)
         }
         content
       }
@@ -55,32 +49,14 @@ const PostRenderer = ({
 
   return (
     <View {...props}>
-      {post.media.kind === 'picture' ? (
-        <Image
-          source={{ uri: post.media.uri }}
-          style={{
-            width: windowWidth,
-            height: windowWidth / post.media.ratio,
-            backgroundColor: colors.lightGrey,
-          }}
-        />
-      ) : (
-        <Video
-          source={{ uri: post.media.uri }}
-          allowsExternalPlayback={false}
-          hideShutterView
-          playWhenInactive
-          repeat
-          resizeMode="cover"
-          style={{
-            width: windowWidth,
-            height: windowWidth / post.media.ratio,
-            backgroundColor: colors.lightGrey,
-          }}
-        />
-      )}
+      <MediaRenderer
+        media={post.media}
+        width={windowWidth}
+        repeat
+        style={{ backgroundColor: colors.lightGrey }}
+      />
       <View style={{ padding: 20 }}>
-        <Link route="USER" params={{ userId: author.id }}>
+        <Link route="USER" params={{ userName: author.userName }}>
           <Text>{author.userName}</Text>
         </Link>
         <Text style={{ marginVertical: 10 }}>{post.content}</Text>

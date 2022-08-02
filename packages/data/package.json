@@ -2,7 +2,7 @@
   "name": "@azzapp/data",
   "version": "0.0.1",
   "private": true,
-  "main": "./src",
+  "main": "./lib",
   "devDependencies": {
     "@types/lodash": "^4.14.181",
     "@types/uuid": "^8.3.4"

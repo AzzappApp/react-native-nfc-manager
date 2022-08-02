@@ -6,7 +6,7 @@ import type { ImageProps } from 'react-native';
 const VideoThumbnail = ({
   uri,
   ...props
-}: Omit<ImageProps, 'source'> & { uri?: string }) => {
+}: Omit<ImageProps, 'source'> & { uri?: string; source?: string }) => {
   const [thumbnailSource, setThumbnailSource] = useState<string | null>(null);
   useEffect(() => {
     if (!uri) {

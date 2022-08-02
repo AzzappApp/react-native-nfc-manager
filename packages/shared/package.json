@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "react-relay": "^14.0.0"
+    "react-relay": "^14.1.0"
   },
   "devDependencies": {
     "@types/react-relay": "^13.0.2"

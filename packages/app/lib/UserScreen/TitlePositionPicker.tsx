@@ -1,6 +1,6 @@
 import { TITLE_POSITIONS } from '@azzapp/shared/lib/cardHelpers';
 import { Pressable, StyleSheet, View } from 'react-native';
-import BottomSheetModal from '../components/BottomSheetModal';
+import BottomSheetModal from '../ui/BottomSheetModal';
 
 const TitlePositionPicker = ({
   value,

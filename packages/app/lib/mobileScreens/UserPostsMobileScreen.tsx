@@ -1,12 +1,13 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '../helpers/relayScreen';
 import UserPosts from '../UserPostsScreen/UserPostsScreen';
+import type { RelayScreenProps } from '../helpers/relayScreen';
+import type { UserPostsRoute } from '../routes';
 import type { UserPostsMobileScreenQuery } from '@azzapp/relay/artifacts/UserPostsMobileScreenQuery.graphql';
-import type { PreloadedQuery } from 'react-relay';
 
 const userPostsScreenQuery = graphql`
-  query UserPostsMobileScreenQuery($userId: ID!) {
-    node(id: $userId) {
+  query UserPostsMobileScreenQuery($userName: String!) {
+    user(userName: $userName) {
       ...UserPostsScreenFragment_posts
       ...UserPostsScreenFragment_user
     }
@@ -15,17 +16,15 @@ const userPostsScreenQuery = graphql`
 
 const UserPostsMobileScreen = ({
   preloadedQuery,
-}: {
-  preloadedQuery: PreloadedQuery<UserPostsMobileScreenQuery>;
-}) => {
+}: RelayScreenProps<UserPostsRoute, UserPostsMobileScreenQuery>) => {
   const data = usePreloadedQuery(userPostsScreenQuery, preloadedQuery);
-  if (!data.node) {
+  if (!data.user) {
     return null;
   }
-  return <UserPosts user={data.node} />;
+  return <UserPosts user={data.user} />;
 };
 
 export default relayScreen(UserPostsMobileScreen, {
   query: userPostsScreenQuery,
-  getVariables: ({ userId }) => ({ userId }),
+  getVariables: ({ userName }) => ({ userName }),
 });

@@ -1,14 +1,17 @@
 import range from 'lodash/range';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fontFamilies, textStyles } from '../../theme';
-import DashedSlider from '../components/DashedSlider';
-import Icon from '../components/Icon';
-import VideoThumbnail from '../components/VideoThumbnail';
-import type { MediaKind } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
+import { MediaImageRenderer } from '../components/MediaRenderer';
+import DashedSlider from '../ui/DashedSlider';
+import Icon from '../ui/Icon';
+import VideoThumbnail from '../ui/VideoThumbnail';
+import type { MediaKind } from '@azzapp/relay/artifacts/MediaRendererFragment_media.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
-  pictures: ReadonlyArray<Readonly<{ thumbnailURI?: string; kind: MediaKind }>>;
+  pictures: ReadonlyArray<
+    Readonly<{ uri?: string; source: string; kind: MediaKind }>
+  >;
   timer: number;
   imageIndex: number | undefined;
   onSelectPicture: (index: number | undefined) => void;
@@ -47,7 +50,7 @@ const CoverEditPanelImageTab = ({
             <View style={styles.sliderContainer}>
               <Text
                 style={{
-                  fontFamily: fontFamilies.normal,
+                  ...fontFamilies.normal,
                   fontSize: 48,
                   marginBottom: 12,
                   alignSelf: 'center',
@@ -114,14 +117,14 @@ const CoverEditPanelImageTab = ({
                   pictures[index].kind === 'video' ? (
                     <VideoThumbnail
                       style={[styles.image, pressed && styles.imagePressed]}
-                      uri={pictures[index].thumbnailURI}
+                      {...pictures[index]}
                     />
                   ) : (
-                    <Image
+                    <MediaImageRenderer
                       style={[styles.image, pressed && styles.imagePressed]}
-                      source={{
-                        uri: pictures[index].thumbnailURI,
-                      }}
+                      {...pictures[index]}
+                      width={50}
+                      aspectRatio={1}
                     />
                   )
                 ) : (

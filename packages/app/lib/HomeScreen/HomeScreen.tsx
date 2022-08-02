@@ -1,8 +1,14 @@
-import ROUTES from '@azzapp/shared/lib/routes';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import Header from '../components/Header';
 import Link from '../components/Link';
+import { useCurrentRoute } from '../PlatformEnvironment';
 import RecommandedUsersList from './RecommandedUsersList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
@@ -23,11 +29,14 @@ const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
     `,
     viewerRef,
   );
+
+  const currentRoute = useCurrentRoute('willChange');
   return (
     <SafeAreaView style={styles.container}>
       <Header title="AZZAPP" />
       <RecommandedUsersList
         viewer={viewer}
+        canPlay={currentRoute.route === 'HOME'}
         style={styles.recommandedUsersList}
       />
       {viewer.user ? (
@@ -35,17 +44,23 @@ const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
           <TouchableOpacity onPress={logout}>
             <Text>Logout</Text>
           </TouchableOpacity>
-          <Link route={ROUTES.NEW_POST}>
-            <Text>New Post</Text>
+          <Link route="NEW_POST">
+            <Pressable>
+              <Text>New Post</Text>
+            </Pressable>
           </Link>
         </>
       ) : (
         <>
-          <Link modal route={ROUTES.SIGN_IN}>
-            <Text>Signin</Text>
+          <Link modal route="SIGN_IN">
+            <Pressable>
+              <Text>Signin</Text>
+            </Pressable>
           </Link>
-          <Link modal route={ROUTES.SIGN_UP}>
-            <Text>Signup</Text>
+          <Link modal route="SIGN_UP">
+            <Pressable>
+              <Text>Signup</Text>
+            </Pressable>
           </Link>
         </>
       )}

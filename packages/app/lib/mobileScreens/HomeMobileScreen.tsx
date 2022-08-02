@@ -3,8 +3,9 @@ import { resetEnvironment } from '../helpers/relayEnvironment';
 import relayScreen from '../helpers/relayScreen';
 import { clearTokens } from '../helpers/tokensStore';
 import HomeScreen from '../HomeScreen';
+import type { RelayScreenProps } from '../helpers/relayScreen';
+import type { HomeRoute } from '../routes';
 import type { HomeMobileScreenQuery } from '@azzapp/relay/artifacts/HomeMobileScreenQuery.graphql';
-import type { PreloadedQuery } from 'react-relay';
 
 const homeScreenQuery = graphql`
   query HomeMobileScreenQuery {
@@ -16,9 +17,7 @@ const homeScreenQuery = graphql`
 
 const HomeMobileScreen = ({
   preloadedQuery,
-}: {
-  preloadedQuery: PreloadedQuery<HomeMobileScreenQuery>;
-}) => {
+}: RelayScreenProps<HomeRoute, HomeMobileScreenQuery>) => {
   const data = usePreloadedQuery(homeScreenQuery, preloadedQuery);
   const logout = async () => {
     await clearTokens();

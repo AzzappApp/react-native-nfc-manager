@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, fontFamilies, textStyles } from '../../theme';
-import ColorPicker from '../components/ColorPicker';
-import DashedSlider from '../components/DashedSlider';
-import FontPicker from '../components/FontPicker';
+import ColorPicker from '../ui/ColorPicker';
+import DashedSlider from '../ui/DashedSlider';
+import FontPicker from '../ui/FontPicker';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import TitlePositionPicker from './TitlePositionPicker';
 import type { CoverUpdates } from './CoverEditPanel';
@@ -75,7 +75,7 @@ const CoverEditPanelTitleTab = ({
           >
             <Text
               style={{
-                fontFamily: fontFamilies.semiBold,
+                ...fontFamilies.semiBold,
                 fontSize: 24,
                 color: titleColor,
               }}
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: colors.darkWhite,
     borderRadius: 15,
-    fontFamily: fontFamilies.semiBold,
+    ...fontFamilies.semiBold,
   },
   buttonContainer: {
     alignSelf: 'center',

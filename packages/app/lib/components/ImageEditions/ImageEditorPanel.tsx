@@ -9,11 +9,11 @@ import {
   View,
 } from 'react-native';
 import { colors, textStyles } from '../../../theme';
-import DashedSlider from '../DashedSlider';
-import Icon from '../Icon';
-import IconButton from '../IconButton';
+import DashedSlider from '../../ui/DashedSlider';
+import Icon from '../../ui/Icon';
+import IconButton from '../../ui/IconButton';
 import EditableImage from './EditableImage';
-import type { Icons } from '../Icon';
+import type { Icons } from '../../ui/Icon';
 import type { ImageEditionParameters } from './EditableImage';
 import type { MediaInfo, TimeRange } from './helpers';
 import type { ViewProps, ListRenderItemInfo } from 'react-native';

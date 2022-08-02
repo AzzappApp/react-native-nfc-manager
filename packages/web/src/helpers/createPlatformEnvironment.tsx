@@ -15,17 +15,17 @@ const createPlatformEnvironment = (nextRoute?: {
         return {
           route: pathRoRoutes(nextRoute ? nextRoute.pathname : Router.pathname),
           params: nextRoute ? nextRoute.query : Router.query,
-        };
+        } as any;
       },
-      push(route, params) {
-        void Router.push(routesToPath(route, params));
+      push(route) {
+        void Router.push(routesToPath(route));
       },
-      replace(route, params) {
-        void Router.replace(routesToPath(route, params));
+      replace(route) {
+        void Router.replace(routesToPath(route));
       },
-      showModal(route, params) {
+      showModal(route) {
         console.error('Show modal does not work on web');
-        void Router.replace(routesToPath(route, params));
+        void Router.replace(routesToPath(route));
       },
       back() {
         Router.back();
@@ -33,8 +33,7 @@ const createPlatformEnvironment = (nextRoute?: {
       addRouteDidChangeListener(callbak) {
         const listener = () => {
           // TODO does this route is good at this moment ?
-          const { route, params } = this.getCurrentRoute();
-          callbak(route, params);
+          callbak(this.getCurrentRoute());
         };
 
         Router.events.on('routeChangeStart', listener);
@@ -48,8 +47,7 @@ const createPlatformEnvironment = (nextRoute?: {
       addRouteWillChangeListener(callbak) {
         const listener = () => {
           // TODO does this route is good at this moment ?
-          const { route, params } = this.getCurrentRoute();
-          callbak(route, params);
+          callbak(this.getCurrentRoute());
         };
 
         Router.events.on('routeChangeStart', listener);

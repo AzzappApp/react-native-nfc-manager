@@ -6,6 +6,9 @@ const config = {
   productionBrowserSourceMaps: true,
   experimental: {
     reactRoot: 'concurrent',
+    images: {
+      allowFutureImage: true,
+    },
   },
   images: {
     disableStaticImages: true,
@@ -47,8 +50,8 @@ const withTM = require('next-transpile-modules')([
   '@azzapp/data',
   '@azzapp/app',
   '@azzapp/relay',
-  // TODO I Don't understand why we have to use this
   'react-native-web-linear-gradient',
+  'react-native-safe-area-context',
 ]);
 
 module.exports = withTM(config);

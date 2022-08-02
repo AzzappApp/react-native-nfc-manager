@@ -20,6 +20,10 @@
 		FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5728882C6700D56E20 /* AZPEditableVideo.m */; };
 		FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */; };
 		FD482C5D2888360300D56E20 /* AZPEditableVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */; };
+		FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
+		FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
+		FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
+		FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
@@ -70,6 +74,10 @@
 		FD482C5728882C6700D56E20 /* AZPEditableVideo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableVideo.m; path = azzapp/AZPEditableVideo.m; sourceTree = "<group>"; };
 		FD482C5A2888360300D56E20 /* AZPEditableVideoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableVideoManager.h; path = azzapp/AZPEditableVideoManager.h; sourceTree = "<group>"; };
 		FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableVideoManager.m; path = azzapp/AZPEditableVideoManager.m; sourceTree = "<group>"; };
+		FD4EC42428A54C8F00DDC5C9 /* AZPSnapshotManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshotManager.h; path = azzapp/AZPSnapshotManager.h; sourceTree = "<group>"; };
+		FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshotManager.m; path = azzapp/AZPSnapshotManager.m; sourceTree = "<group>"; };
+		FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshot.h; path = azzapp/AZPSnapshot.h; sourceTree = "<group>"; };
+		FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshot.m; path = azzapp/AZPSnapshot.m; sourceTree = "<group>"; };
 		FD9315E2286B555B006E8CF7 /* AZPEditableImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImage.h; path = azzapp/AZPEditableImage.h; sourceTree = "<group>"; };
 		FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImage.m; path = azzapp/AZPEditableImage.m; sourceTree = "<group>"; };
 		FD9315F2286B5D2F006E8CF7 /* AZPEditableImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageManager.h; path = azzapp/AZPEditableImageManager.h; sourceTree = "<group>"; };
@@ -145,6 +153,10 @@
 				FD482C5728882C6700D56E20 /* AZPEditableVideo.m */,
 				FD482C5A2888360300D56E20 /* AZPEditableVideoManager.h */,
 				FD482C5B2888360300D56E20 /* AZPEditableVideoManager.m */,
+				FD4EC42428A54C8F00DDC5C9 /* AZPSnapshotManager.h */,
+				FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */,
+				FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */,
+				FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -484,10 +496,12 @@
 				FD9315F928757797006E8CF7 /* AZPMTKImageView.m in Sources */,
 				FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */,
 				FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
 				FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
 				FD9315F5286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,
 				FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */,
 				FD482C5D2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
+				FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
 				FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */,
 			);
@@ -504,7 +518,9 @@
 				FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
 				FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */,
 				FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */,
+				FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

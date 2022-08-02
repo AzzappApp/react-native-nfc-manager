@@ -1,14 +1,14 @@
-import { cloneElement, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
-import type { ReactElement } from 'react';
+import type { ViewProps } from 'react-native';
 
 const Fade = ({
   hidden,
-  children,
+  style,
   duration = 300,
-}: {
+  ...props
+}: ViewProps & {
   hidden?: boolean;
-  children: ReactElement;
   duration?: number;
 }) => {
   const opacity = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -22,7 +22,7 @@ const Fade = ({
     }).start();
   }, [duration, hidden, opacity]);
 
-  return cloneElement(children, { style: [children.props.style, { opacity }] });
+  return <Animated.View style={[style, { opacity }]} {...props} />;
 };
 
 export default Fade;

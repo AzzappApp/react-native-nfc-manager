@@ -14,35 +14,33 @@ import {
 import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import ColorPicker from '../components/ColorPicker';
-import {
-  coverRendererFragment,
-  QR_CODE_POSITION_CHANGE_EVENT,
-} from '../components/CoverRenderer/CoverRenderer';
+import { QR_CODE_POSITION_CHANGE_EVENT } from '../components/CoverRenderer/CoverRenderer';
 import ImagePicker from '../components/ImageEditions/ImagePicker';
-import TabsBar from '../components/TabsBar';
+import { addMediaCacheEntry } from '../components/MediaRenderer/mediaCache';
 import useFormMutation from '../hooks/useFormMutation';
 import { useWebAPI } from '../PlatformEnvironment';
+import ColorPicker from '../ui/ColorPicker';
+import TabsBar from '../ui/TabsBar';
 import CoverEditPanelEffectTab from './CoverEditPanelEffectTab';
 import CoverEditPanelImageTab from './CoverEditPanelImageTab';
 import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
 import ModuleEditorContext from './ModuleEditorContext';
 import UploadProgressModal from './UploadProgressModal';
 import type {
+  CoverEditPanel_cover$data,
+  CoverEditPanel_cover$key,
+} from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
+import type {
   CoverEditPanelMutation,
   MediaKind,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditPanelMutation.graphql';
-import type {
-  CoverRenderer_cover$data,
-  CoverRenderer_cover$key,
-} from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { EventEmitter } from 'events';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type CoverEditPanelProps = {
   userId: string;
-  cover?: CoverRenderer_cover$key | null;
+  cover?: CoverEditPanel_cover$key | null;
   cardId?: string;
   imageIndex: number | undefined;
   setImageIndex: (index: number | undefined) => void;
@@ -66,7 +64,42 @@ const CoverEditPanel = ({
   eventEmitter,
   style,
 }: CoverEditPanelProps) => {
-  const cover = useFragment(coverRendererFragment, coverKey ?? null);
+  const cover = useFragment(
+    graphql`
+      fragment CoverEditPanel_cover on UserCardCover
+      @argumentDefinitions(
+        screenWidth: {
+          type: "Float!"
+          provider: "../providers/ScreenWidth.relayprovider"
+        }
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
+      ) {
+        backgroundColor
+        pictures {
+          source
+          kind
+          ratio
+          source
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
+        }
+        pictureTransitionTimer
+        overlayEffect
+        title
+        titlePosition
+        titleFont
+        titleFontSize
+        titleColor
+        titleRotation
+        qrCodePosition
+        desktopLayout
+        dektopImagePosition
+      }
+    `,
+    coverKey ?? null,
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialData = useMemo(() => cover, []);
@@ -80,7 +113,7 @@ const CoverEditPanel = ({
             id
             card {
               cover {
-                ...CoverRenderer_cover @arguments(canEdit: true)
+                ...CoverEditPanel_cover
               }
             }
           }
@@ -132,7 +165,7 @@ const CoverEditPanel = ({
         const picturesToUpload: Array<{
           kind: MediaKind;
           index: number;
-          file: File;
+          file: any;
         }> = [];
         pictures.forEach((picture, index) => {
           if (typeof picture.source === 'object') {
@@ -159,6 +192,7 @@ const CoverEditPanel = ({
             return {
               index,
               upload: WebAPI.uploadMedia(file, uploadURL, uploadParameters),
+              localURI: file.uri,
             };
           });
 
@@ -194,13 +228,18 @@ const CoverEditPanel = ({
           }
 
           const results = await Promise.all(
-            uploads.map(({ upload, index }) =>
+            uploads.map(({ upload, localURI, index }) =>
               upload.promise.then(res => ({
                 index,
                 publicId: res.public_id as string,
+                localURI,
               })),
             ),
           );
+
+          results.forEach(({ publicId, localURI }) => {
+            addMediaCacheEntry(publicId, 0, localURI);
+          });
 
           updateCoverInput.pictures = pictures.map((picture, index) => {
             const uploadedImage = results.find(
@@ -212,7 +251,10 @@ const CoverEditPanel = ({
             };
           });
         } else {
-          updateCoverInput.pictures = pictures as any;
+          updateCoverInput.pictures = pictures.map(picture => ({
+            kind: picture.kind,
+            source: picture.source as string,
+          }));
         }
       }
     } catch (e) {
@@ -475,7 +517,7 @@ const styles = StyleSheet.create({
 });
 
 const getOptimisticResponse = (
-  intialData: CoverRenderer_cover$data | null,
+  intialData: CoverEditPanel_cover$data | null,
   coverUpdates: CoverUpdates,
   userId: string,
   cardId?: string,
@@ -498,9 +540,8 @@ const getOptimisticResponse = (
                 return {
                   kind: picture.kind,
                   source: picture.source.uri,
-                  thumbnailURI: picture.source.uri,
-                  largeURI: picture.source.uri,
-                  smallURI: picture.source.uri,
+                  uri: picture.source.uri,
+                  ratio: COVER_RATIO,
                 };
               })
             : intialData?.pictures ?? [],

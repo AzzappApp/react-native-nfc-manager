@@ -1,520 +1,217 @@
 import {
-  COVER_BASE_WIDTH,
-  COVER_RATIO,
-} from '@azzapp/shared/lib/imagesHelpers';
-import { useEffect, useState } from 'react';
-import {
-  Dimensions,
-  Image,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../../theme';
-import { withAnchorPoint } from '../../helpers/withAnchorPoints';
 import useInterval from '../../hooks/useInterval';
-import CoverOverlayEffects from './CoverOverlayEffects';
-import CoverRendererImage from './CoverRendererImage';
-import CoverRendererVideo from './CoverRendererVideo';
-import QRCodeModal from './QRCodeModal';
+import ViewTransition from '../../ui/ViewTransition';
+import MediaRenderer from '../MediaRenderer';
+import CoverLayout from './CoverLayout';
+import type { CoverLayoutProps } from './CoverLayout';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
-import type { EventEmitter } from 'events';
-import type {
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  TransformsStyle,
-  LayoutChangeEvent,
-} from 'react-native';
+import type { ForwardedRef } from 'react';
+import type { HostComponent } from 'react-native';
+import type { OnProgressData } from 'react-native-video';
 
-type CoverRendererProps = {
+export type CoverRendererProps = Omit<
+  CoverLayoutProps,
+  'children' | 'cover'
+> & {
   cover: CoverRenderer_cover$key | null | undefined;
-  userName: string;
-  play?: boolean;
+  playTransition?: boolean;
+  videoPaused?: boolean;
   imageIndex?: number;
-  fullScreen?: boolean;
-  useLargeImage?: boolean;
-  isEditing?: boolean;
-  isEditedBlock?: boolean;
-  hideBorderRadius?: boolean;
-  eventEmitter?: EventEmitter;
-  style?: StyleProp<ViewStyle>;
+  forceImageIndex?: boolean;
+  currentTime?: number;
+  onReadyForDisplay?: () => void;
 };
 
-export const coverRendererFragment = graphql`
-  fragment CoverRenderer_cover on UserCardCover
-  # For the moment relay is a bit bugy with those providers
-  # We have to provide a path relative to the artifact directory
-  @argumentDefinitions(
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
-    coverRatio: {
-      type: "Float!"
-      provider: "../providers/CoverRatio.relayprovider"
-    }
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    coverWidth: {
-      type: "Float!"
-      provider: "../providers/CoverBaseWidth.relayprovider"
-    }
-    canEdit: { type: "Boolean", defaultValue: false }
-  ) {
-    backgroundColor
-    pictures {
-      kind
-      source
-      largeURI: uri(
-        width: $screenWidth
-        pixelRatio: $pixelRatio
-        ratio: $coverRatio
-      )
-      smallURI: uri(
-        width: $coverWidth
-        pixelRatio: $pixelRatio
-        ratio: $coverRatio
-      )
-      thumbnailURI: uri(width: 200, pixelRatio: $pixelRatio, ratio: 1)
-        @include(if: $canEdit)
-    }
-    pictureTransitionTimer
-    overlayEffect
-    title
-    titlePosition
-    titleFont
-    titleFontSize
-    titleColor
-    titleRotation
-    qrCodePosition
-    desktopLayout
-    dektopImagePosition
-  }
-`;
+export type CoverHandle = {
+  getCurrentMediaRenderer(): HostComponent<any> | null;
+  getCurrentImageIndex(): number;
+  getCurrentVideoTime(): number;
+};
 
-const CoverRenderer = ({
-  cover: coverKey,
-  userName,
-  play = false,
-  imageIndex = 0,
-  fullScreen,
-  isEditing,
-  isEditedBlock,
-  useLargeImage,
-  eventEmitter,
-  style,
-  hideBorderRadius = false,
-}: CoverRendererProps) => {
-  const cover = useFragment(coverRendererFragment, coverKey ?? null);
+const CoverRenderer = (
+  {
+    cover: coverKey,
+    userName,
+    width = 125,
+    playTransition = false,
+    videoPaused = false,
+    imageIndex = 0,
+    forceImageIndex,
+    currentTime = 0,
+    onReadyForDisplay,
+    ...props
+  }: CoverRendererProps,
+  forwardRef: ForwardedRef<CoverHandle>,
+) => {
+  /**
+   * Data
+   */
+  const cover = useFragment(
+    graphql`
+      fragment CoverRenderer_cover on UserCardCover
+      @argumentDefinitions(
+        width: { type: "Float!", defaultValue: 125 }
+        screenWidth: {
+          type: "Float!"
+          provider: "../providers/ScreenWidth.relayprovider"
+        }
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
+        isNative: {
+          type: "Boolean!"
+          provider: "../providers/isNative.relayprovider"
+        }
+      ) {
+        pictures {
+          source
+          kind
+          ...MediaRendererFragment_media @arguments(width: $width)
+          # since cover are mainly used with 2 size full screen and cover size
+          # we preload those url to avoid unecessary round trip
+          _largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+            @include(if: $isNative)
+          _smallURI: uri(width: 125, pixelRatio: $pixelRatio)
+            @include(if: $isNative)
+        }
+        pictureTransitionTimer
+        ...CoverLayout_cover
+      }
+    `,
+    coverKey ?? null,
+  );
 
   /**
    * Handle image transition
    */
   const [currentImageIndex, setCurrentImageIndex] = useState(imageIndex);
+  const videoTimeRef = useRef(0);
 
   useEffect(() => {
-    if (!play && currentImageIndex !== imageIndex) {
+    setCurrentImageIndex(imageIndex);
+  }, [imageIndex]);
+
+  useEffect(() => {
+    if (forceImageIndex) {
       setCurrentImageIndex(imageIndex);
     }
-  }, [currentImageIndex, imageIndex, play]);
+  }, [imageIndex, forceImageIndex]);
+
+  const nextIndex = () => {
+    if (cover?.pictures.length) {
+      const nextIndex = (currentImageIndex + 1) % cover.pictures.length;
+      setCurrentImageIndex(nextIndex);
+      videoTimeRef.current = 0;
+    }
+  };
 
   const playInterval = (cover?.pictureTransitionTimer ?? 0) * 1000;
   useInterval(
     () => {
-      if (pictures.length === 1) {
-        return;
+      if (cover?.pictures.length) {
+        const currentPicture = cover.pictures[currentImageIndex];
+        if (currentPicture.kind === 'picture') {
+          nextIndex();
+        }
       }
-      const nextIndex = (currentImageIndex + 1) % pictures.length;
-      setCurrentImageIndex(nextIndex);
     },
-    play ? playInterval : 0,
+    playTransition ? playInterval : 0,
   );
 
-  /**
-   * Layout calculation
-   */
-  const borderRadius: number = hideBorderRadius
-    ? 0
-    : Platform.select({
-        web: '6%' as any,
-        default: getScaledStyle(0.06 * COVER_BASE_WIDTH, fullScreen),
-      });
-
-  const [textSize, setTextSize] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
-
-  const onTextLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    setTextSize({ width, height });
+  const onVideoEnd = () => {
+    nextIndex();
   };
+
+  const onVideoProgress = (data: OnProgressData) => {
+    videoTimeRef.current = data.currentTime;
+  };
+
+  /**
+   * Imperative Handle
+   */
+  const mediaRef = useRef<HostComponent<any>>(null);
+
+  useImperativeHandle(
+    forwardRef,
+    () => ({
+      getCurrentMediaRenderer() {
+        return mediaRef.current;
+      },
+      getCurrentImageIndex() {
+        return currentImageIndex;
+      },
+      getCurrentVideoTime() {
+        return videoTimeRef.current;
+      },
+    }),
+    [currentImageIndex],
+  );
 
   /**
    * Rendering
    */
-  const [qrCodeVisible, setQRCodeVisible] = useState(false);
+  const { pictures = [] } = cover ?? {};
 
-  const showQRCode = () => {
-    setQRCodeVisible(true);
-  };
-  const hideQRCode = () => {
-    setQRCodeVisible(false);
-  };
-
-  const onSelectQRCodePosition = (position: string) => {
-    eventEmitter?.emit(QR_CODE_POSITION_CHANGE_EVENT, position);
-  };
-
-  if (!cover || !cover.pictures.length) {
-    return (
-      <View
-        style={[
-          styles.container,
-          styles.coverPlaceHolder,
-          { borderRadius },
-          style,
-        ]}
-      />
-    );
-  }
-
-  const {
-    backgroundColor,
-    pictures,
-    overlayEffect,
-    title,
-    titlePosition,
-    titleFont,
-    titleFontSize,
-    titleColor,
-    titleRotation,
-    qrCodePosition,
-  } = cover;
-
-  const titleStyles = textStylesMap[titlePosition];
-
-  let titleTransform: TransformsStyle | null = null;
-  if (titleRotation && Number.isFinite(titleRotation)) {
-    const { x, y, rotateDirection } = TITLE_TRANSFORM_SETTINGS[titlePosition];
-    if (Platform.OS === 'web') {
-      titleTransform = {
-        transform: [{ rotate: `${rotateDirection * titleRotation}deg` }],
-        //@ts-expect-error transformOrigin is only supported on web
-        transformOrigin: `${x * 100}% ${y * 100}%`,
-      };
-    } else if (textSize) {
-      titleTransform = withAnchorPoint(
-        { transform: [{ rotate: `${rotateDirection * titleRotation}deg` }] },
-        { x, y },
-        textSize,
-      );
-    }
-  }
-
-  const qrCodeStyles = {
-    width: getScaledStyle(16, fullScreen),
-    height: getScaledStyle(16, fullScreen),
-    borderRadius: getScaledStyle(2, fullScreen),
-  };
-
-  const displayedPictures = (play ? pictures : [pictures[currentImageIndex]])
+  const displayedPictures = (
+    playTransition ? pictures : [pictures[currentImageIndex]]
+  )
     // picture could be null in case of invalid image Index
     .filter(picture => !!picture);
 
-  const idPrefix = fullScreen ? 'user-screen-cover-' : 'cover-';
-
   return (
-    <>
-      <View
-        style={[styles.container, { borderRadius }, style]}
-        nativeID={`${idPrefix}${userName}`}
-      >
-        {displayedPictures.map((picture, index) => {
-          const isCurrent = index === currentImageIndex;
-
-          const style = [
-            styles.coverImage,
-            {
-              borderRadius,
-              backgroundColor,
-            },
-          ];
-
-          switch (picture.kind) {
-            case 'picture':
-              return (
-                <CoverRendererImage
-                  key={`${picture.source}-${picture.kind}`}
-                  source={picture.source}
-                  largeURI={picture.largeURI}
-                  smallURI={picture.smallURI}
-                  style={style}
-                  nativeID={`${idPrefix}${userName}-image-${index}`}
-                  testID={`${idPrefix}${userName}-image-${index}`}
-                  useLargeImage={useLargeImage ?? fullScreen}
-                  hidden={!isCurrent && play}
-                />
-              );
-            case 'video':
-              return (
-                <CoverRendererVideo
-                  key={`${picture.source}-${picture.kind}`}
-                  source={picture.source}
-                  uri={fullScreen ? picture.largeURI : picture.smallURI}
-                  style={style}
-                  nativeID={`${idPrefix}${userName}-image-${index}`}
-                  testID={`${idPrefix}${userName}-image-${index}`}
-                  hidden={!isCurrent && play}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
-
-        <View
-          style={[styles.containers, styles.overlayContainer, { borderRadius }]}
-        >
-          <CoverOverlayEffects
-            overlayEffect={overlayEffect}
-            color={backgroundColor}
-            width="100%"
-            height="100%"
-            nativeID={`${idPrefix}${userName}-overlay`}
-          />
-        </View>
-        <View
-          style={[styles.containers, titleStyles.position]}
-          nativeID={`${idPrefix}${userName}-text`}
-        >
-          <Text
-            style={[
-              { zIndex: 1 },
-              titleStyles.alignment,
-              titleTransform,
-              {
-                fontSize: getScaledStyle(titleFontSize, fullScreen),
-                fontFamily: titleFont,
-                color: titleColor,
-                opacity: Platform.select({ default: textSize ? 1 : 0, web: 1 }),
-              },
-            ]}
-            onLayout={onTextLayout}
+    <CoverLayout cover={cover} width={width} userName={userName} {...props}>
+      {displayedPictures.map((picture, index) => {
+        const isDisplayed = !playTransition || index === currentImageIndex;
+        return (
+          <ViewTransition
+            key={picture.source}
+            style={[styles.coverContent, { opacity: isDisplayed ? 1 : 0 }]}
+            transitionDuration={300}
+            transitions={['opacity']}
+            easing="ease-in-out"
           >
-            {title}
-          </Text>
-        </View>
-        <View
-          style={[
-            { zIndex: 1 },
-            styles.containers,
-            QR_CODE_POSITIONS[qrCodePosition],
-            { paddingTop: '15%' },
-          ]}
-          pointerEvents="box-none"
-        >
-          <Pressable
-            onPress={showQRCode}
-            style={({ pressed }) => pressed && { opacity: 0.6 }}
-            disabled={isEditing}
-          >
-            <Image
-              nativeID={`${idPrefix}${userName}-qrCode`}
-              source={require('./assets/qr-code.png')}
-              style={qrCodeStyles}
+            <MediaRenderer
+              ref={isDisplayed ? mediaRef : null}
+              media={picture}
+              width={width}
+              muted
+              repeat
+              // TODO
+              // react native video crash if we use a currentTime that is the same
+              // that the currently used time
+              currentTime={currentTime ? currentTime : undefined}
+              paused={videoPaused || !isDisplayed}
+              onReadyForDisplay={isDisplayed ? onReadyForDisplay : undefined}
+              onEnd={onVideoEnd}
+              onProgress={onVideoProgress}
+              style={styles.coverContent}
             />
-          </Pressable>
-        </View>
-        {isEditedBlock &&
-          Object.keys(QR_CODE_POSITIONS).map(position => (
-            <View
-              key={position}
-              style={[
-                styles.containers,
-                QR_CODE_POSITIONS[position],
-                { paddingTop: '15%' },
-              ]}
-              pointerEvents="box-none"
-            >
-              <Pressable
-                onPress={() => onSelectQRCodePosition(position)}
-                style={({ pressed }) => [
-                  { zIndex: 1 },
-                  qrCodeStyles,
-                  { backgroundColor: 'rgba(255, 255, 255, 0.6)' },
-                  pressed && { opacity: 0.6 },
-                ]}
-              />
-            </View>
-          ))}
-      </View>
-      {qrCodeVisible && (
-        <QRCodeModal onRequestClose={hideQRCode} userName={userName} />
-      )}
-    </>
+          </ViewTransition>
+        );
+      })}
+    </CoverLayout>
   );
 };
 
-export default CoverRenderer;
+export default forwardRef(CoverRenderer);
 
 export const QR_CODE_POSITION_CHANGE_EVENT = 'QR_CODE_POSITION_CHANGE_EVENT';
 
 const styles = StyleSheet.create({
-  container: { aspectRatio: COVER_RATIO },
-  coverImage: {
+  coverContent: {
     position: 'absolute',
     top: 0,
     left: 0,
     width: '100%',
     height: '100%',
-  },
-  coverPlaceHolder: {
-    backgroundColor: colors.lightGrey,
-  },
-  containers: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    padding: '5%',
-    overflow: 'hidden',
-  },
-  overlayContainer: {
-    padding: 0,
-    // this fix is meant for web wich display a gap otherwise
-    height: Platform.select({
-      web: '100.5%',
-      default: '100%',
-    }),
   },
 });
-
-const textStylesMap: Record<
-  string,
-  { alignment: TextStyle; position: ViewStyle }
-> = {
-  topLeft: {
-    alignment: { textAlign: 'left' },
-    position: { justifyContent: 'flex-start' },
-  },
-  topCenter: {
-    alignment: { textAlign: 'center' },
-    position: { justifyContent: 'flex-start' },
-  },
-  topRight: {
-    alignment: { textAlign: 'right' },
-    position: { justifyContent: 'flex-start' },
-  },
-  middleLeft: {
-    alignment: { textAlign: 'left' },
-    position: { justifyContent: 'center' },
-  },
-  middleCenter: {
-    alignment: { textAlign: 'center' },
-    position: { justifyContent: 'center' },
-  },
-  middleRight: {
-    alignment: { textAlign: 'right' },
-    position: { justifyContent: 'center' },
-  },
-  bottomLeft: {
-    alignment: { textAlign: 'left' },
-    position: { justifyContent: 'flex-end' },
-  },
-  bottomCenter: {
-    alignment: { textAlign: 'center' },
-    position: { justifyContent: 'flex-end' },
-  },
-  bottomRight: {
-    alignment: { textAlign: 'right' },
-    position: { justifyContent: 'flex-end' },
-  },
-};
-
-const TITLE_TRANSFORM_SETTINGS: Record<
-  string,
-  { x: number; y: number; rotateDirection: -1 | 1 }
-> = {
-  topLeft: {
-    x: 0,
-    y: 1,
-    rotateDirection: 1,
-  },
-  topCenter: {
-    x: 0.5,
-    y: 1,
-    rotateDirection: 1,
-  },
-  topRight: {
-    x: 1,
-    y: 1,
-    rotateDirection: -1,
-  },
-  middleLeft: {
-    x: 0,
-    y: 0.5,
-    rotateDirection: 1,
-  },
-  middleCenter: {
-    x: 0.5,
-    y: 0.5,
-    rotateDirection: 1,
-  },
-  middleRight: {
-    x: 1,
-    y: 0.5,
-    rotateDirection: -1,
-  },
-  bottomLeft: {
-    x: 0,
-    y: 0,
-    rotateDirection: -1,
-  },
-  bottomCenter: {
-    x: 0.5,
-    y: 0,
-    rotateDirection: 1,
-  },
-  bottomRight: {
-    x: 1,
-    y: 0,
-    rotateDirection: 1,
-  },
-};
-
-const QR_CODE_POSITIONS: Record<string, ViewStyle> = {
-  top: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  bottomLeft: {
-    alignItems: 'flex-start',
-    justifyContent: 'flex-end',
-  },
-  bottomCenter: {
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  bottomRight: {
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-  },
-};
-
-const getScaledStyle = (value: number, fullScreen = false): any => {
-  if (!fullScreen) {
-    return value;
-  }
-  if (Platform.OS === 'web') {
-    return `calc(${value} * 100vw / ${COVER_BASE_WIDTH})`;
-  }
-  return (Dimensions.get('window').width / COVER_BASE_WIDTH) * value;
-};

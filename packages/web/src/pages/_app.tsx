@@ -3,6 +3,10 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { Suspense, useMemo } from 'react';
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { RecordSource } from 'relay-runtime';
 import createPlatformEnvironment from '../helpers/createPlatformEnvironment';
@@ -48,7 +52,9 @@ const App = ({ Component, pageProps }: AppProps) => {
               SuspenseFallback ? <SuspenseFallback {...pageProps} /> : null
             }
           >
-            <Component {...pageProps} />
+            <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+              <Component {...pageProps} />
+            </SafeAreaProvider>
           </Suspense>
         </RelayEnvironmentProvider>
       </PlatformEnvironmentProvider>

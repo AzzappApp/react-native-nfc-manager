@@ -2,7 +2,7 @@ import {
   createUser,
   getUserByEmail,
   getUserByUserName,
-} from '@azzapp/data/src/domains/User';
+} from '@azzapp/data/lib/domains/User';
 import ERRORS from '@azzapp/shared/lib/errors';
 import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';

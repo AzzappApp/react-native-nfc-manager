@@ -1,5 +1,4 @@
-import ROUTES from '@azzapp/shared/lib/routes';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import {
   initialWindowMetrics,
@@ -48,10 +47,7 @@ const initialisationPromise = init();
 
 const App = () => {
   const { router, routerState } = useNativeRouter(
-    createRouterInitialState({
-      id: 'HOME',
-      route: ROUTES.HOME,
-    }),
+    createRouterInitialState({ route: 'HOME' }, 'HOME'),
   );
 
   const platformEnvironment = useMemo(
@@ -59,6 +55,7 @@ const App = () => {
     [router],
   );
 
+  const screenIdToDispose = useRef<string[]>([]).current;
   useEffect(() => {
     router.addScreenWillBePushedListener(({ id, route, params }) => {
       const Component = screens[route];
@@ -66,16 +63,29 @@ const App = () => {
         QueryLoader.loadQueryFor(id, Component, params);
       }
     });
-    router.addScreenWillBeRemovedListener(({ id }) =>
-      QueryLoader.disposeQueryFor(id),
-    );
-  }, [router]);
+    router.addScreenWillBeRemovedListener(({ id }) => {
+      screenIdToDispose.push(id);
+    });
+  }, [router, screenIdToDispose]);
+
+  const onScreenDismissed = (id: string) => {
+    router.screenDismissed(id);
+  };
+
+  const onFinishTransitioning = () => {
+    screenIdToDispose.forEach(screen => QueryLoader.disposeQueryFor(screen));
+  };
 
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>
       <PlatformEnvironmentProvider value={platformEnvironment}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <ScreensRenderer routerState={routerState} screens={screens} />
+          <ScreensRenderer
+            routerState={routerState}
+            screens={screens}
+            onScreenDismissed={onScreenDismissed}
+            onFinishTransitioning={onFinishTransitioning}
+          />
         </SafeAreaProvider>
       </PlatformEnvironmentProvider>
     </RelayEnvironmentProvider>

@@ -2,9 +2,9 @@ import chroma from 'chroma-js';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useDebouncedCallback } from 'use-debounce';
-import BottomSheetModal from './BottomSheetModal';
-import HuePicker from './ColorPicker/HuePicker';
-import SaturationValuePicker from './ColorPicker/SaturationValuePicker';
+import BottomSheetModal from '../BottomSheetModal';
+import HuePicker from './HuePicker';
+import SaturationValuePicker from './SaturationValuePicker';
 
 type ColorPickerProps = {
   title: string;

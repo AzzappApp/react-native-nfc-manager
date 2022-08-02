@@ -6,27 +6,33 @@ const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
 
 export const getImageURLForSize = (
-  coverImageId: string,
-  pixelRatio: number,
-  width: number,
+  resourceId: string,
+  pixelRatio = 1,
+  width?: number,
   ratio?: number,
 ) => {
+  if (width == null) {
+    return `${CLOUDINARY_BASE_URL}/video/upload/${resourceId}.mp4`;
+  }
   width = width * pixelRatio;
   let transformation: string;
   if (ratio != null) {
-    transformation = `c_fill,w_${width},h_${width / ratio}`;
+    transformation = `c_fill,w_${width},h_${Math.ceil(width / ratio)}`;
   } else {
     transformation = `w_${width}`;
   }
-  return `${CLOUDINARY_BASE_URL}/image/upload/${transformation}/${coverImageId}`;
+  return `${CLOUDINARY_BASE_URL}/image/upload/${transformation}/${resourceId}`;
 };
 
 export const getVideoUrlForSize = (
-  videoImageId: string,
-  pixelRatio: number,
-  width: number,
+  resourceId: string,
+  pixelRatio = 1,
+  width?: number,
   ratio?: number,
 ) => {
+  if (width == null) {
+    return `${CLOUDINARY_BASE_URL}/video/upload/${resourceId}.mp4`;
+  }
   width = width * pixelRatio;
   let transformation: string;
   if (ratio != null) {
@@ -34,5 +40,5 @@ export const getVideoUrlForSize = (
   } else {
     transformation = `w_${width}`;
   }
-  return `${CLOUDINARY_BASE_URL}/video/upload/${transformation}/${videoImageId}.mp4`;
+  return `${CLOUDINARY_BASE_URL}/video/upload/${transformation}/${resourceId}.mp4`;
 };

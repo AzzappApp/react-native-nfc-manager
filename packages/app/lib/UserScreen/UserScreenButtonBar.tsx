@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../theme';
-import FloatingButton from '../components/FloatingButton';
-import FloatingIconButton from '../components/FloatingIconButton';
-import { useRouter } from '../PlatformEnvironment';
+import Link from '../components/Link';
+import FloatingButton from '../ui/FloatingButton';
+import FloatingIconButton from '../ui/FloatingIconButton';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type UserScreenButtonBarProps = {
-  userId: string;
+  userName: string;
   canEdit: boolean;
   onEdit: () => void;
   onHome: () => void;
@@ -15,37 +15,39 @@ type UserScreenButtonBarProps = {
 };
 
 const UserScreenButtonBar = ({
+  userName,
   canEdit,
   style,
-  userId,
   onEdit,
   onFollow,
   onHome,
-}: UserScreenButtonBarProps) => {
-  const router = useRouter();
-  const onFlip = () => router.push('USER_POSTS', { userId });
-
-  return (
-    <View style={[styles.buttonBar, style]}>
-      <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
-      {canEdit ? (
-        <FloatingButton light onPress={onEdit} style={styles.mainButton}>
-          <Text style={textStyles.normal}>Edit my profile</Text>
-        </FloatingButton>
-      ) : (
-        <FloatingButton light onPress={onFollow} style={styles.mainButton}>
-          <Text style={textStyles.normal}>Follow</Text>
-        </FloatingButton>
-      )}
+}: UserScreenButtonBarProps) => (
+  <View style={[styles.buttonBar, style]}>
+    <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
+    {canEdit ? (
+      <FloatingButton light onPress={onEdit} style={styles.mainButton}>
+        {/* @ts-expect-error suppressHydrationWarning is not typed*/}
+        <Text style={textStyles.normal} suppressHydrationWarning>
+          Edit my profile
+        </Text>
+      </FloatingButton>
+    ) : (
+      <FloatingButton light onPress={onFollow} style={styles.mainButton}>
+        {/* @ts-expect-error suppressHydrationWarning is not typed*/}
+        <Text style={textStyles.normal} suppressHydrationWarning>
+          Follow
+        </Text>
+      </FloatingButton>
+    )}
+    <Link route="USER_POSTS" params={{ userName }}>
       <FloatingIconButton
         icon="flip"
-        onPress={onFlip}
         iconSize={30}
         style={{ marginLeft: 15 }}
       />
-    </View>
-  );
-};
+    </Link>
+  </View>
+);
 
 export default UserScreenButtonBar;
 

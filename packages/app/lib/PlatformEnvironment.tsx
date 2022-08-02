@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { Routes } from '@azzapp/shared/lib/routes';
+import type { Route } from './routes';
 import type * as WebAPI from '@azzapp/shared/lib/WebAPI';
-import type { PressableProps } from 'react-native';
+import type { ReactElement } from 'react';
 
 export type PlatformEnvironment = {
   router: Router;
@@ -9,14 +9,14 @@ export type PlatformEnvironment = {
   WebAPI: typeof WebAPI;
 };
 
-export type RouteListener = (route: Routes, params: any) => void;
+export type RouteListener = (route: Route) => void;
 
 export type Router = {
-  push(route: Routes, params?: any): void;
-  replace(route: Routes, params?: any): void;
-  showModal(route: Routes, params?: any): void;
+  push<T extends Route>(route: T): void;
+  replace(route: Route): void;
+  showModal(route: Route): void;
   back(): void;
-  getCurrentRoute(): { route: Routes; params?: any };
+  getCurrentRoute(): Route;
   addRouteWillChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
@@ -25,11 +25,10 @@ export type Router = {
   };
 };
 
-export type LinkProps = PressableProps & {
-  route: Routes;
+export type LinkProps = Route & {
   replace?: boolean;
   modal?: boolean;
-  params?: any;
+  children: ReactElement;
 };
 
 const PlatformEnvironmentContext = createContext<PlatformEnvironment>(
@@ -54,12 +53,12 @@ export const useCurrentRoute = (
     let subscription: { dispose(): void };
 
     if (usedEvent === 'willChange') {
-      subscription = router.addRouteWillChangeListener((route, params) => {
-        setCurrentRoute({ route, params });
+      subscription = router.addRouteWillChangeListener(route => {
+        setCurrentRoute(route);
       });
     } else {
-      subscription = router.addRouteDidChangeListener((route, params) => {
-        setCurrentRoute({ route, params });
+      subscription = router.addRouteDidChangeListener(route => {
+        setCurrentRoute(route);
       });
     }
 

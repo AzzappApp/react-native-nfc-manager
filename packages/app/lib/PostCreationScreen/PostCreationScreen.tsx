@@ -5,15 +5,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useMutation } from 'react-relay';
 import { colors } from '../../theme';
 import Header from '../components/Header';
-import IconButton from '../components/IconButton';
 import { exportImage } from '../components/ImageEditions/EditableImage';
 import { exportVideo } from '../components/ImageEditions/EditableVideo';
 import ImageEditor from '../components/ImageEditions/ImageEditor';
 import ImageEditorPanel from '../components/ImageEditions/ImageEditorPanel';
 import PhotoGalleryMediaList from '../components/ImageEditions/PhotoGalleryMediaList';
 import useImageEditorState from '../components/ImageEditions/useImageEditorState';
-import TextHeaderButton from '../components/TextHeaderButton';
 import { useRouter, useWebAPI } from '../PlatformEnvironment';
+import IconButton from '../ui/IconButton';
+import TextHeaderButton from '../ui/TextHeaderButton';
 import UploadProgressModal from '../UserScreen/UploadProgressModal';
 import PostContentPanel from './PostContentPanel';
 import type { MediaInfo } from '../components/ImageEditions/helpers';
@@ -104,6 +104,7 @@ const PostCreationScreen = () => {
         post {
           author {
             id
+            userName
           }
         }
       }
@@ -167,8 +168,11 @@ const PostCreationScreen = () => {
       },
       onCompleted(response) {
         // TODO use fragment instead of response
-        router.replace('USER_POSTS', {
-          userId: response.createPost?.post?.author.id,
+        router.replace({
+          route: 'USER_POSTS',
+          params: {
+            userName: response.createPost?.post?.author.userName as string,
+          },
         });
       },
     });

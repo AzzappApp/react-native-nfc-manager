@@ -1,11 +1,8 @@
-import ROUTES from '@azzapp/shared/lib/routes';
-import debounce from 'lodash/debounce';
-import { useCallback, useMemo, useState } from 'react';
+import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/imagesHelpers';
+import { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
-import CoverRenderer from '../components/CoverRenderer';
-import Link from '../components/Link';
-import { useCurrentRoute } from '../PlatformEnvironment';
+import CoverLink from '../components/CoverLink';
 import type {
   RecommandedUsersList_viewer$data,
   RecommandedUsersList_viewer$key,
@@ -14,10 +11,15 @@ import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
 type RecommandedUsersListProps = {
   viewer: RecommandedUsersList_viewer$key;
+  canPlay: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
-const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
+const RecommandedUsersList = ({
+  viewer,
+  canPlay,
+  style,
+}: RecommandedUsersListProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
     graphql`
       fragment RecommandedUsersList_viewer on Viewer
@@ -72,50 +74,20 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
     [],
   );
 
-  const currentRoute = useCurrentRoute('willChange');
-  const activeUser = useMemo(() => {
-    return currentRoute.route === ROUTES.USER
-      ? (currentRoute.params?.userId as string)
-      : null;
-  }, [currentRoute]);
-
-  const [userPressed, setUserPressed] = useState<string | null>(null);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const cancelUserPressed = useCallback(
-    debounce((userId: string) => {
-      if (userPressed === userId) {
-        setUserPressed(null);
-      }
-    }, 300),
-    [userPressed],
-  );
-
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<UserNodeType>) =>
       item ? (
-        <Link
-          route={ROUTES.USER}
-          params={{
-            userId: item.id,
-            userName: item.userName,
-            useSharedAnimation: item.card?.cover != null,
-          }}
-          onPressIn={() => setUserPressed(item.id)}
-          onPressOut={() => cancelUserPressed(item.id)}
-          onPress={() => cancelUserPressed(item.id)}
-        >
-          {({ pressed }) => (
-            <CoverRenderer
-              cover={item.card?.cover}
-              userName={item.userName}
-              style={[styles.item, pressed && { opacity: 0.8 }]}
-              useLargeImage={userPressed === item.id || activeUser === item.id}
-            />
-          )}
-        </Link>
+        <CoverLink
+          cover={item.card?.cover}
+          width={COVER_BASE_WIDTH}
+          userName={item.userName}
+          userId={item.id}
+          style={styles.item}
+          playTransition={canPlay}
+          videoPaused={!canPlay}
+        />
       ) : null,
-    [activeUser, cancelUserPressed, userPressed],
+    [canPlay],
   );
 
   const onEndReached = useCallback(() => {
@@ -136,7 +108,6 @@ const RecommandedUsersList = ({ viewer, style }: RecommandedUsersListProps) => {
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
       style={style}
-      extraData={userPressed ?? activeUser}
     />
   );
 };

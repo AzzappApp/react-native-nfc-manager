@@ -3,9 +3,9 @@ import { FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import Header from '../components/Header';
-import IconButton from '../components/IconButton';
 import PostRenderer from '../components/PostRenderer';
 import { useRouter } from '../PlatformEnvironment';
+import IconButton from '../ui/IconButton';
 import type { UserPostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/UserPostsScreenFragment_posts.graphql';
 import type { UserPostsScreenFragment_user$key } from '@azzapp/relay/artifacts/UserPostsScreenFragment_user.graphql';
 
@@ -75,9 +75,8 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
     () => data.posts?.edges?.map(edge => edge?.node ?? null),
     [data.posts?.edges],
   );
-  console.log(data.posts?.edges);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
         title={`${user.userName} posts`}
         leftButton={<IconButton icon="chevron" onPress={onClose} />}

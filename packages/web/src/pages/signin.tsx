@@ -1,6 +1,5 @@
 import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
 import SignInScreen from '@azzapp/app/lib/SignInScreen';
-import ROUTES from '@azzapp/shared/lib/routes';
 import Head from 'next/head';
 import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
 
@@ -9,7 +8,7 @@ const SignInPage = () => {
   const WebAPI = useWebAPI();
   const signin = (params: SignInParams) =>
     WebAPI.signin(params).then(() => {
-      router.replace(ROUTES.HOME);
+      router.replace({ route: 'HOME' });
     });
 
   return (

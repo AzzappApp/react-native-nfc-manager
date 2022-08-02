@@ -5,7 +5,11 @@ import type { LinkProps } from '@azzapp/app/lib/PlatformEnvironment';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Link = ({ route, params, replace, modal, ...props }: LinkProps) => (
-  <NextLink replace={replace} href={routesToPath(route, params)} passHref>
+  <NextLink
+    replace={replace}
+    href={routesToPath({ route, params } as any)}
+    passHref
+  >
     <Pressable accessibilityRole="link" {...props} />
   </NextLink>
 );

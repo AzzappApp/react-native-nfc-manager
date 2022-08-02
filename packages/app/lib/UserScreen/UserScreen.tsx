@@ -2,40 +2,56 @@ import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import { useMemo, useRef, useState } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import CoverRenderer from '../components/CoverRenderer';
-import { useRouter } from '../PlatformEnvironment';
+import useViewportSize, { VW100 } from '../hooks/useViewportSize';
 import CoverEditPanel from './CoverEditPanel';
 import ModuleEditorContext from './ModuleEditorContext';
 import UserScreenLayout from './UserScreenLayout';
+import type { CoverHandle } from '../components/CoverRenderer/CoverRenderer';
 import type { ModuleEditor } from './ModuleEditorContext';
 import type { UserScreenFramgent_user$key } from '@azzapp/relay/artifacts/UserScreenFramgent_user.graphql';
 import type { UserScreenFramgent_viewer$key } from '@azzapp/relay/artifacts/UserScreenFramgent_viewer.graphql';
-import type { ReactElement } from 'react';
+import type { ReactElement, Ref } from 'react';
 
-type UserScreenProps = {
-  user: UserScreenFramgent_user$key | null;
+export type UserScreenProps = {
+  user: UserScreenFramgent_user$key;
   viewer: UserScreenFramgent_viewer$key | null;
-  canPlay?: boolean;
+  ready?: boolean;
+  hideCover?: boolean;
+  initialImageIndex?: number;
+  initialVideoTime?: number;
+  coverRef?: Ref<CoverHandle>;
+  onBack: () => void;
+  onCoverReadyForDisplay?: () => void;
 };
 
 const UserScreen = ({
   user: userKey,
-  canPlay = true,
   viewer: viewerKey,
+  ready = true,
+  hideCover,
+  initialImageIndex,
+  initialVideoTime,
+  coverRef,
+  onBack,
+  onCoverReadyForDisplay,
 }: UserScreenProps) => {
   const user = useFragment(
     graphql`
-      fragment UserScreenFramgent_user on User {
+      fragment UserScreenFramgent_user on User
+      @argumentDefinitions(
+        screenWidth: {
+          type: "Float!"
+          provider: "../providers/ScreenWidth.relayprovider"
+        }
+      ) {
         id
         userName
         card {
           id
           cover {
-            ...CoverRenderer_cover
+            ...CoverRenderer_cover @arguments(width: $screenWidth)
+            ...CoverEditPanel_cover
             backgroundColor
-          }
-          # TODO find a better way to refetch edit data after first rendering
-          editCover: cover {
-            ...CoverRenderer_cover @arguments(canEdit: true)
           }
         }
       }
@@ -53,10 +69,8 @@ const UserScreen = ({
     `,
     viewerKey,
   );
-
   const canEdit = viewer?.user?.id === user?.id;
 
-  const router = useRouter();
   const [creatingCard, setCreatingCard] = useState(
     canEdit && user?.card === null,
   );
@@ -67,6 +81,13 @@ const UserScreen = ({
   );
   const [canSave, setCanSave] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [initialRenderData, setInitialRenderData] = useState<{
+    initialImageIndex: number;
+    initialVideoTime: number;
+  } | null>({
+    initialImageIndex: initialImageIndex ?? 0,
+    initialVideoTime: initialVideoTime ?? 0,
+  });
   const [imageIndex, setImageIndex] = useState<number | undefined>(undefined);
 
   const saveListenerRef = useRef<(() => void) | null>(null);
@@ -111,10 +132,6 @@ const UserScreen = ({
     [],
   );
 
-  const onBack = () => {
-    router.back();
-  };
-
   const onSave = () => {
     if (editedBlock) {
       setSaving(true);
@@ -124,6 +141,7 @@ const UserScreen = ({
 
   const onEdit = () => {
     setIsEditing(true);
+    setInitialRenderData(null);
     setImageIndex(0);
   };
 
@@ -144,42 +162,49 @@ const UserScreen = ({
     }
   };
 
-  if (!user?.id) {
-    // TODO redirect ?
-    return null;
-  }
-
+  const vp = useViewportSize();
   const cardBackgroundColor = user?.card?.cover.backgroundColor ?? '#FFF';
 
   const blocks: Array<{
     key: number | string;
-    measure(width: number): number;
     blockContent: ReactElement;
     editPanel: ReactElement;
+    sizeStyle: { width: number | string; height: number | string };
+    measure(width: number): number;
   }> = [
     {
       key: 'cover',
       blockContent: (
         <CoverRenderer
+          ref={coverRef}
           cover={user.card?.cover}
           userName={user.userName}
-          imageIndex={imageIndex}
-          fullScreen
+          width={vp`${VW100}`}
+          imageIndex={imageIndex ?? initialRenderData?.initialImageIndex}
+          forceImageIndex={isEditing}
+          currentTime={initialRenderData?.initialVideoTime}
           isEditing={isEditing}
           isEditedBlock={editedBlock === 'cover'}
-          play={imageIndex === undefined && canPlay}
-          hideBorderRadius={!isEditing}
+          playTransition={imageIndex === undefined && ready}
+          videoPaused={!ready || imageIndex !== undefined}
+          hideBorderRadius
+          onReadyForDisplay={onCoverReadyForDisplay}
+          style={hideCover ? { opacity: 0 } : { opacity: 1 }}
         />
       ),
       editPanel: (
         <CoverEditPanel
           userId={user.id}
           cardId={user.card?.id}
-          cover={user.card?.editCover}
+          cover={user.card?.cover}
           imageIndex={imageIndex}
           setImageIndex={setImageIndex}
         />
       ),
+      sizeStyle: {
+        width: vp`${VW100}`,
+        height: vp`${VW100} / ${COVER_RATIO}`,
+      },
       measure: width => width / COVER_RATIO,
     },
   ];
@@ -187,7 +212,7 @@ const UserScreen = ({
   return (
     <ModuleEditorContext.Provider value={moduleEditor}>
       <UserScreenLayout
-        userId={user.id}
+        userName={user.userName}
         creatingCard={creatingCard}
         isEditing={isEditing}
         saving={saving}

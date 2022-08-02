@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { colors } from '../../theme';
-import Icon from '../components/Icon';
-import Switch from '../components/Switch';
+import Icon from '../ui/Icon';
+import Switch from '../ui/Switch';
 import type { ViewProps } from 'react-native';
 
 type PostContentPanelProps = ViewProps & {

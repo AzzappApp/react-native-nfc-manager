@@ -1,3 +1,4 @@
+import { useRouter } from '@azzapp/app/lib/PlatformEnvironment';
 import UserScreen from '@azzapp/app/lib/UserScreen';
 import Head from 'next/head';
 import { graphql, useLazyLoadQuery } from 'react-relay';
@@ -34,6 +35,11 @@ const UserPage = ({ userName }: { userName: string }) => {
     {},
   );
 
+  const router = useRouter();
+  const onBack = () => {
+    router.back();
+  };
+
   return (
     <div className="root">
       <Head>
@@ -41,7 +47,7 @@ const UserPage = ({ userName }: { userName: string }) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <UserScreen user={user} viewer={viewer} />
+      <UserScreen onBack={onBack} user={user!} viewer={viewer} />
     </div>
   );
 };

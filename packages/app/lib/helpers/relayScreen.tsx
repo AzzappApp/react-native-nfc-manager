@@ -1,28 +1,45 @@
 import { Suspense, useEffect } from 'react';
 import { loadQueryFor, useQueryLoaderQuery } from './QueryLoader';
+import type { NativeScreenProps } from '../components/NativeRouter';
+import type { Route } from '../routes';
 import type { LoadQueryOptions } from './QueryLoader';
 import type { ComponentType } from 'react';
 import type { PreloadedQuery } from 'react-relay';
+import type { OperationType } from 'relay-runtime';
 
-type RelayScreenOptions<U> = LoadQueryOptions<U> & {
+export type RelayScreenOptions<U> = LoadQueryOptions<U> & {
   fallback?: React.ComponentType<any> | null;
 };
 
-function relayScreen<
-  T extends { preloadedQuery: PreloadedQuery<any> },
-  U extends T extends { params: infer V } ? V : any,
->(
+export type RelayScreenProps<
+  T extends Route,
+  P extends OperationType,
+> = NativeScreenProps<T> & {
+  preloadedQuery: PreloadedQuery<P>;
+};
+
+export const isRelayScreen = (
+  Component: any,
+): Component is RelayScreenOptions<any> => {
+  const type = typeof Component?.query;
+  return type === 'string' || type === 'function';
+};
+
+function relayScreen<T extends RelayScreenProps<any, any>>(
   Component: ComponentType<T>,
-  { fallback: Fallback, ...options }: RelayScreenOptions<U>,
+  { fallback: Fallback, ...options }: RelayScreenOptions<T['route']['params']>,
 ): ComponentType<Omit<T, 'preloadedQuery'>> & typeof options {
   const RelayWrapper = (props: T) => {
-    const { screenId, route, params } = props as any;
+    const {
+      screenId,
+      route: { params },
+    } = props;
     const preloadedQuery = useQueryLoaderQuery((props as any).screenId)!;
     useEffect(() => {
       if (!preloadedQuery) {
         loadQueryFor(screenId, options, params);
       }
-    }, [screenId, params, preloadedQuery, route]);
+    }, [screenId, params, preloadedQuery]);
     return (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
         {preloadedQuery && (
@@ -40,10 +57,3 @@ function relayScreen<
 }
 
 export default relayScreen;
-
-export const isRelayScreen = (
-  Component: any,
-): Component is LoadQueryOptions<any> => {
-  const type = typeof Component?.query;
-  return type === 'string' || type === 'function';
-};
