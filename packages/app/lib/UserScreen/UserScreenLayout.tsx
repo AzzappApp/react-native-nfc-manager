@@ -40,6 +40,7 @@ type UserScreenLayoutProps = {
     sizeStyle: { width: number | string; height: number | string };
     measure(width: number): number;
   }>;
+  isFollowing: boolean;
   onBack: () => void;
   onEdit: () => void;
   onCancel: () => void;
@@ -57,6 +58,7 @@ const UserScreenLayout = ({
   canEdit,
   editedBlock,
   cardBackgroundColor,
+  isFollowing,
   blocks,
   onBack,
   onEdit,
@@ -139,6 +141,7 @@ const UserScreenLayout = ({
       >
         <UserScreenButtonBar
           userName={userName}
+          isFollowing={isFollowing}
           canEdit={canEdit}
           onHome={onBack}
           onEdit={onEdit}
@@ -235,12 +238,12 @@ const Block = ({
             width: editingWidth,
             height: editingdHeight,
             marginTop: 20,
-            borderRadius: editingWidth * 0.06,
+            borderRadius: editingWidth * 0.128,
           },
           isEditedBlock && {
             width: isEditedBlockWidth,
             height: isEditedBlockHeight,
-            borderRadius: isEditedBlockWidth * 0.06,
+            borderRadius: isEditedBlockWidth * 0.128,
           },
         ]}
         transitionDuration={TRANSITIONS_DURATION}

@@ -26,7 +26,7 @@ type Viewer {
   user: User
 
   """
-  Return a list of User that this user might possibility be interested in (followed User or promoted one)
+  Return a list of User that this user might possibility be interested in (following User or promoted one)
   """
   recommandedUsers(
     """Returns the items in the list that come after the specified cursor."""
@@ -35,6 +35,17 @@ type Viewer {
     """Returns the first n items from the list."""
     first: Int
   ): UserConnection!
+
+  """
+  Return a list of Post that this user might possibility be interested in (following User post or promoted one)
+  """
+  recommandedPosts(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): PostConnection!
 }
 
 """Represent an Azzapp User"""
@@ -52,6 +63,33 @@ type User implements Node {
     """Returns the first n items from the list."""
     first: Int
   ): PostConnection
+  isFollowing: Boolean!
+  followers(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): UserConnection
+  following(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): UserConnection
 }
 
 """An object with an ID"""
@@ -238,6 +276,7 @@ type UserEdge {
 type Mutation {
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
 }
 
 type UpdateCoverPayload {
@@ -313,5 +352,17 @@ input CreatePostInput {
 
   """Does this post allow likes"""
   allowLikes: Boolean!
+  clientMutationId: String
+}
+
+type ToggleFollowingPayload {
+  viewer: Viewer!
+  user: User!
+  clientMutationId: String
+}
+
+input ToggleFollowingInput {
+  """The id of the user we want toggle following on"""
+  userId: ID!
   clientMutationId: String
 }

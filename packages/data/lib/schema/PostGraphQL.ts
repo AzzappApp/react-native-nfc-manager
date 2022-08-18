@@ -37,6 +37,9 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
     content: {
       type: new GraphQLNonNull(GraphQLString),
       description: 'The text content of the publication',
+      resolve(post) {
+        return post.content ?? '';
+      },
     },
     allowComments: {
       type: new GraphQLNonNull(GraphQLBoolean),

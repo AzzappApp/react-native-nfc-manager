@@ -2,6 +2,12 @@ import { Platform, StyleSheet } from 'react-native';
 import type { TextStyle } from 'react-native';
 
 export const colors = {
+  // color from style guide
+  red: '#EF3962',
+  black: '#0E1216',
+  grey200: '#C8C7CA',
+
+  // other color to be replaced when styleguide is finished
   dark: '#45444C',
   darkGrey: '#8a8898',
   grey: '#c4c4c4',

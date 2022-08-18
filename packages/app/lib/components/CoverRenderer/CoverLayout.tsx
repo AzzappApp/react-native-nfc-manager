@@ -91,8 +91,8 @@ const CoverLayout = ({
   const borderRadius: number = hideBorderRadius
     ? 0
     : Platform.select({
-        web: '6%' as any,
-        default: 0.06 * (width as number),
+        web: '12.8%' as any,
+        default: 0.128 * (width as number),
       });
 
   const [textSize, setTextSize] = useState<{

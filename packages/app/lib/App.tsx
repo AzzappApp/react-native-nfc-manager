@@ -14,12 +14,12 @@ import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
+import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import UserMobileScreen from './mobileScreens/UserMobileScreen';
 import UserPostsMobileScreen from './mobileScreens/UserPostsMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
-import PostCreationScreen from './PostCreationScreen';
 
 const screens = {
   HOME: HomeMobileScreen,
@@ -30,7 +30,7 @@ const screens = {
   SIGN_UP: SignUpMobileScreen,
   USER: UserMobileScreen,
   USER_POSTS: UserPostsMobileScreen,
-  NEW_POST: PostCreationScreen,
+  NEW_POST: PostCreationMobileScreen,
 };
 
 const tabs = {

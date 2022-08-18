@@ -2,11 +2,20 @@ import { Image } from 'react-native';
 import type { ImageProps } from 'react-native';
 
 const icons = {
+  get add() {
+    return require('./assets/add.png');
+  },
+  get account() {
+    return require('./assets/account.png');
+  },
   get azzapp() {
     return require('./assets/azzapp.png');
   },
   get brightness() {
     return require('./assets/brightness.png');
+  },
+  get chat() {
+    return require('./assets/chat.png');
   },
   get chevron() {
     return require('./assets/chevron.png');
@@ -35,6 +44,9 @@ const icons = {
   get heart() {
     return require('./assets/heart.png');
   },
+  get home() {
+    return require('./assets/home.png');
+  },
   get picture() {
     return require('./assets/picture.png');
   },
@@ -46,6 +58,9 @@ const icons = {
   },
   get saturation() {
     return require('./assets/saturation.png');
+  },
+  get search() {
+    return require('./assets/search.png');
   },
   get temperature() {
     return require('./assets/temperature.png');

@@ -17,7 +17,16 @@ const MediaImageRenderer = ({
     console.error('Invalide `vw` size used on native media renderer');
     width = parseFloat(width.replace(/vw/g, ''));
   }
-  const [displayedURI, setDisplayedURI] = useState<string | null>(null);
+  const [displayedURI, setDisplayedURI] = useState<string | null>(() => {
+    if (!uri) {
+      return null;
+    }
+    const { inCache, alternateURI } = queryMediaCache(source, width as number);
+    if (inCache) {
+      return uri;
+    }
+    return alternateURI ?? null;
+  });
 
   const isReady = useRef(false);
   const onImageLoad = () => {

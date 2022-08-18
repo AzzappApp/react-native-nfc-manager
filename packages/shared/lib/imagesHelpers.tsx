@@ -17,7 +17,7 @@ export const getImageURLForSize = (
   width = width * pixelRatio;
   let transformation: string;
   if (ratio != null) {
-    transformation = `c_fill,w_${width},h_${Math.ceil(width / ratio)}`;
+    transformation = `c_fill,w_${width},h_${Math.round(width / ratio)}`;
   } else {
     transformation = `w_${width}`;
   }
@@ -36,7 +36,7 @@ export const getVideoUrlForSize = (
   width = width * pixelRatio;
   let transformation: string;
   if (ratio != null) {
-    transformation = `c_fill,w_${width},h_${width / ratio}`;
+    transformation = `c_fill,w_${width},h_${Math.round(width / ratio)}`;
   } else {
     transformation = `w_${width}`;
   }

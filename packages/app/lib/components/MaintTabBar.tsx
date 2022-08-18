@@ -1,3 +1,4 @@
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from '../PlatformEnvironment';
 import TabsBar from '../ui/TabsBar';
 
@@ -6,34 +7,37 @@ const MainTabBar = ({ currentIndex }: { currentIndex: number }) => {
   const onTabPress = (tab: string) => {
     router.push({ route: tab as any });
   };
+  const { bottom } = useSafeAreaInsets();
   return (
     <TabsBar
+      style={{ marginBottom: bottom }}
       currentTab={['HOME', 'SEARCH', 'CHAT', 'SETTINGS'][currentIndex]}
       tabs={[
         {
           key: 'HOME',
           accessibilityLabel: 'Picture Tab',
-          icon: 'azzapp',
+          icon: 'home',
         },
         {
           key: 'SEARCH',
           accessibilityLabel: 'Search',
-          icon: 'title',
+          icon: 'search',
         },
         {
           key: 'NEW_POST',
           accessibilityLabel: 'New Post',
-          icon: 'flip',
+          icon: 'add',
         },
         {
           key: 'CHAT',
           accessibilityLabel: 'Chat',
-          icon: 'effect',
+          icon: 'chat',
         },
         {
           key: 'SETTINGS',
           accessibilityLabel: 'Setting',
-          icon: 'desktop',
+          icon: 'account',
+          tint: false,
         },
       ]}
       onTabPress={onTabPress}

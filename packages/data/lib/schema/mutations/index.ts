@@ -1,5 +1,6 @@
 import { GraphQLObjectType } from 'graphql';
 import createPost from './createPost';
+import toggleFollowing from './toggleFollowing';
 import updateCover from './updateCover';
 
 const MutationGraphQL = new GraphQLObjectType({
@@ -7,6 +8,7 @@ const MutationGraphQL = new GraphQLObjectType({
   fields: {
     updateCover,
     createPost,
+    toggleFollowing,
   },
 });
 

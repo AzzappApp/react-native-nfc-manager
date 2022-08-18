@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import Header from '../components/Header';
@@ -75,6 +75,7 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
     () => data.posts?.edges?.map(edge => edge?.node ?? null),
     [data.posts?.edges],
   );
+  const { width: windowWidth } = useWindowDimensions();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
@@ -86,7 +87,9 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
         data={postLists}
         keyExtractor={(item, index) => item?.id ?? `${index}-null`}
         renderItem={({ item }) =>
-          item != null ? <PostRenderer post={item} author={user} /> : null
+          item != null ? (
+            <PostRenderer post={item} width={windowWidth} author={user} />
+          ) : null
         }
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}

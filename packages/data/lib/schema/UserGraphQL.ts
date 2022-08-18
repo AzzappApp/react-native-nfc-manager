@@ -1,10 +1,23 @@
-import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 import {
+  GraphQLBoolean,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
+import {
+  connectionArgs,
   connectionDefinitions,
+  connectionFromArray,
   forwardConnectionArgs,
   globalIdField,
 } from 'graphql-relay';
+import {
+  getUserFollowersIds,
+  getUserFollowingIds,
+  isFollowing,
+} from '../domains/Followers';
 import { getUserPosts } from '../domains/Post';
+import { getUsersByIds } from '../domains/User';
 import { getUserMainUserCard } from '../domains/UserCard';
 import {
   emptyConnection,
@@ -49,6 +62,43 @@ const UserGraphQL: GraphQLObjectType = new GraphQLObjectType<
           return forwardConnectionFromBookmarkedListResult(limit, result);
         }
         return emptyConnection;
+      },
+    },
+    isFollowing: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      resolve(user, _, { userId, isAnonymous }) {
+        if (isAnonymous || !userId) {
+          return false;
+        }
+        return isFollowing(userId, user.id);
+      },
+    },
+    followers: {
+      type: UserConnectionGraphQL,
+      args: connectionArgs,
+      async resolve(user, args: ConnectionArguments) {
+        const followersIds = await getUserFollowersIds(user.id);
+        const followers = await getUsersByIds(followersIds);
+        const map = new Map<string, User>();
+        followers?.forEach(user => map.set(user.id, user));
+        return connectionFromArray(
+          followersIds.map(id => map.get(id)),
+          args,
+        );
+      },
+    },
+    following: {
+      type: UserConnectionGraphQL,
+      args: connectionArgs,
+      async resolve(user, args: ConnectionArguments) {
+        const followingIds = await getUserFollowingIds(user.id);
+        const followings = await getUsersByIds(followingIds);
+        const map = new Map<string, User>();
+        followings?.forEach(user => map.set(user.id, user));
+        return connectionFromArray(
+          followingIds.map(id => map.get(id)),
+          args,
+        );
       },
     },
   }),

@@ -194,7 +194,7 @@ const UserMobileScreenAppearAnimationWrapper = ({
     borderRadius: interpolate(
       transitionProgress.value,
       [0, 1],
-      [fromRectangle.width * 0.06, 0],
+      [fromRectangle.width * 0.128, 0],
     ),
     top: interpolate(transitionProgress.value, [0, 1], [fromRectangle.y, 0]),
     left: interpolate(transitionProgress.value, [0, 1], [fromRectangle.x, 0]),

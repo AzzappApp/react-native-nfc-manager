@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import Video from 'react-native-video';
 import { queryMediaCache } from './mediaCache';
 import type { MediaInnerRendererProps } from './types';
@@ -8,7 +8,7 @@ const MediaVideoRenderer = ({
   source,
   width,
   muted = false,
-  playWhenInactive = true,
+  playWhenInactive = false,
   allowsExternalPlayback = false,
   repeat = false,
   style,
@@ -28,10 +28,8 @@ const MediaVideoRenderer = ({
       }
     }
   };
-  const [displayedURI, setDisplayedURI] = useState<string | undefined>(
-    undefined,
-  );
-  useEffect(() => {
+
+  const displayedURI = useMemo(() => {
     if (!uri) {
       console.error('MediaRenderer should not be rendered withour URI');
     }
@@ -40,13 +38,11 @@ const MediaVideoRenderer = ({
      * We don't use the same tricks with image since prefetching video
      * is too expensive and synchronizing play time would be error prone
      */
-    setDisplayedURI(undefined);
     const { inCache, alternateURI } = queryMediaCache(source, width as number);
     if (inCache || !alternateURI) {
-      setDisplayedURI(uri);
-      return;
+      return uri;
     }
-    setDisplayedURI(alternateURI);
+    return alternateURI;
   }, [source, uri, width]);
 
   return (

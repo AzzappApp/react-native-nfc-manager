@@ -1,23 +1,20 @@
-import {
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import Header from '../components/Header';
+import { colors } from '../../theme';
+import { HEADER_HEIGHT } from '../components/Header';
 import Link from '../components/Link';
+import useViewportSize, { insetTop, VW100 } from '../hooks/useViewportSize';
 import { useCurrentRoute } from '../PlatformEnvironment';
+import Button from '../ui/Button';
+import RecommandedPostsList from './RecommandedPostsList';
 import RecommandedUsersList from './RecommandedUsersList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
 type HomeScreenProps = {
-  logout: () => void;
   viewer: HomeScreen_viewer$key;
 };
 
-const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
+const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
@@ -25,60 +22,90 @@ const HomeScreen = ({ viewer: viewerRef, logout }: HomeScreenProps) => {
           id
         }
         ...RecommandedUsersList_viewer
+        ...RecommandedPostsList_viewer
       }
     `,
     viewerRef,
   );
-
   const currentRoute = useCurrentRoute('willChange');
+
+  const vp = useViewportSize();
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Header title="AZZAPP" />
-      <RecommandedUsersList
-        viewer={viewer}
-        canPlay={currentRoute.route === 'HOME'}
-        style={styles.recommandedUsersList}
-      />
-      {viewer.user ? (
-        <>
-          <TouchableOpacity onPress={logout}>
-            <Text>Logout</Text>
-          </TouchableOpacity>
-          <Link route="NEW_POST">
-            <Pressable>
-              <Text>New Post</Text>
-            </Pressable>
-          </Link>
-        </>
-      ) : (
-        <>
-          <Link modal route="SIGN_IN">
-            <Pressable>
-              <Text>Signin</Text>
-            </Pressable>
-          </Link>
-          <Link modal route="SIGN_UP">
-            <Pressable>
-              <Text>Signup</Text>
-            </Pressable>
-          </Link>
-        </>
-      )}
-    </SafeAreaView>
+    <RecommandedPostsList
+      viewer={viewer}
+      canPlay={currentRoute.route === 'HOME'}
+      ListHeaderComponent={
+        <View>
+          <View style={styles.header}>
+            <Image
+              source={require('../assets/logo-full.png')}
+              style={styles.logo}
+            />
+          </View>
+          <RecommandedUsersList
+            viewer={viewer}
+            canPlay={currentRoute.route === 'HOME'}
+            style={styles.recommandedUsersList}
+          />
+          {!viewer.user && (
+            <View style={styles.signupSection}>
+              <Link modal route="SIGN_UP">
+                <Button label="Sign UP" />
+              </Link>
+            </View>
+          )}
+        </View>
+      }
+      stickyHeaderIndices={[0]}
+      style={[
+        styles.recommandedPostsList,
+        {
+          borderBottomLeftRadius: vp`${VW100} * ${0.16}`,
+          borderBottomRightRadius: vp`${VW100} * ${0.16}`,
+        },
+      ]}
+      contentContainerStyle={{ marginTop: vp`${insetTop}` }}
+      postsContainerStyle={styles.recommandedPostsListPostsContainer}
+    />
   );
 };
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  recommandedPostsList: {
     flex: 1,
     backgroundColor: '#FFF',
   },
+  header: {
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: HEADER_HEIGHT,
+  },
+  logo: {
+    height: 24,
+  },
   recommandedUsersList: {
     height: 200,
-    flexGrow: 0,
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 13,
+  },
+  signupSection: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommandedPostsListPostsContainer: {
+    paddingTop: 8,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: '#FFF',
+    shadowColor: colors.dark,
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 20,
+    zIndex: 20,
   },
 });

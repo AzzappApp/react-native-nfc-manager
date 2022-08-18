@@ -12,7 +12,6 @@ import { getUserCardById } from '../domains/UserCard';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
-import type { Viewer } from '../domains/Viewer';
 import type { GraphQLContext } from './GraphQLContext';
 
 const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
@@ -21,7 +20,7 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
   fields: {
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
-      resolve: (_root, _args, context): Viewer => {
+      resolve: (_root, _args, context) => {
         // TODO We might store anonymous viewer in database later ???
         return {
           userId: context.userId,

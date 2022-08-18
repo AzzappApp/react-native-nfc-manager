@@ -63,3 +63,12 @@ CREATE TABLE posts (
 WITH CLUSTERING ORDER BY (post_date DESC);
 
 CREATE INDEX ON posts(post_id);
+
+CREATE TABLE followers (
+    follower_id uuid,
+    following_id uuid,
+    follow_date timestamp,
+    PRIMARY KEY (follower_id, following_id)
+);
+
+CREATE INDEX ON followers(following_id);

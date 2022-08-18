@@ -31,6 +31,11 @@ export const getUserById = (id: string): Promise<User | null> =>
     .execute('SELECT * FROM users where id=?', [id])
     .then(result => userMapper.parse(result.first()));
 
+export const getUsersByIds = (ids: string[]): Promise<User[]> =>
+  getClient()
+    .execute('SELECT * FROM users where id IN ?', [ids])
+    .then(result => result.rows.map(userMapper.parse));
+
 export const getUserByEmail = (email: string): Promise<User | null> =>
   getClient()
     .execute('SELECT * FROM users WHERE email=?', [email])
@@ -40,6 +45,11 @@ export const getUserByUserName = (userName: string): Promise<User | null> =>
   getClient()
     .execute('SELECT * FROM users WHERE user_name=?', [userName])
     .then(result => userMapper.parse(result.first()));
+
+export const getAllUsers = async () =>
+  getClient()
+    .execute('SELECT * FROM users', [], { prepare: true })
+    .then(result => result.rows.map(userMapper.parse));
 
 export const createUser = async (user: Omit<User, 'id'>) => {
   const id = uuid.v4();

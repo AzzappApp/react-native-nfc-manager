@@ -1,6 +1,6 @@
 import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import { useMemo, useRef, useState } from 'react';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import CoverRenderer from '../components/CoverRenderer';
 import useViewportSize, { VW100 } from '../hooks/useViewportSize';
 import CoverEditPanel from './CoverEditPanel';
@@ -10,6 +10,7 @@ import type { CoverHandle } from '../components/CoverRenderer/CoverRenderer';
 import type { ModuleEditor } from './ModuleEditorContext';
 import type { UserScreenFramgent_user$key } from '@azzapp/relay/artifacts/UserScreenFramgent_user.graphql';
 import type { UserScreenFramgent_viewer$key } from '@azzapp/relay/artifacts/UserScreenFramgent_viewer.graphql';
+import type { UserScreenToggleFollowMutation } from '@azzapp/relay/artifacts/UserScreenToggleFollowMutation.graphql';
 import type { ReactElement, Ref } from 'react';
 
 export type UserScreenProps = {
@@ -46,6 +47,9 @@ const UserScreen = ({
       ) {
         id
         userName
+        # TODO Follow is user dependant and shoudld not bet queried in
+        # A request that is staticly generated on web
+        isFollowing
         card {
           id
           cover {
@@ -69,6 +73,7 @@ const UserScreen = ({
     `,
     viewerKey,
   );
+
   const canEdit = viewer?.user?.id === user?.id;
 
   const [creatingCard, setCreatingCard] = useState(
@@ -145,8 +150,37 @@ const UserScreen = ({
     setImageIndex(0);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const onFollow = () => {};
+  const [commit, toggleFollowingActive] =
+    useMutation<UserScreenToggleFollowMutation>(graphql`
+      mutation UserScreenToggleFollowMutation($input: ToggleFollowingInput!) {
+        toggleFollowing(input: $input) {
+          user {
+            id
+            isFollowing
+          }
+        }
+      }
+    `);
+
+  const onFollow = () => {
+    if (toggleFollowingActive) {
+      return;
+    }
+    commit({
+      variables: { input: { userId: user.id } },
+      optimisticResponse: {
+        toggleFollowing: {
+          user: {
+            id: user.id,
+            isFollowing: !user.isFollowing,
+          },
+        },
+      },
+      onError(error) {
+        console.log(error);
+      },
+    });
+  };
 
   const onCancel = async () => {
     if (editedBlock) {
@@ -225,6 +259,7 @@ const UserScreen = ({
         onEdit={onEdit}
         onCancel={onCancel}
         onSave={onSave}
+        isFollowing={user.isFollowing}
         onFollow={onFollow}
         setEditedBlock={setEditedBlock}
       />

@@ -7,6 +7,9 @@ const routesMap: { [key in Route['route']]: string } = {
   USER: '/[userName]',
   USER_POSTS: '/[userName]/posts',
   NEW_POST: '/[userName]/newPost',
+  SEARCH: '/search',
+  SETTINGS: '/settings',
+  CHAT: '/chat',
 };
 
 const inverseRoutesMap: { [key: string]: Route['route'] } = Object.fromEntries(

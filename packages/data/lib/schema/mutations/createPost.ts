@@ -1,7 +1,7 @@
 import ERRORS from '@azzapp/shared/lib/errors';
 import { GraphQLBoolean, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-import { createPost } from '../../domains/Post';
+import { createPost, getPostById } from '../../domains/Post';
 import { getUserById } from '../../domains/User';
 import PostGraphQL from '../PostGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';
@@ -69,17 +69,8 @@ const createPostMutation = mutationWithClientMutationId({
       content,
     });
 
-    return {
-      // TODO find a way to use the object mapper
-      post: {
-        id: postId,
-        postDate: new Date(),
-        authorId: userId,
-        allowComments,
-        allowLikes,
-        content,
-      },
-    };
+    // TODO find a better solution
+    return { post: await getPostById(postId) };
   },
 });
 

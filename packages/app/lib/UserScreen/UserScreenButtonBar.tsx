@@ -8,6 +8,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 type UserScreenButtonBarProps = {
   userName: string;
   canEdit: boolean;
+  isFollowing: boolean;
   onEdit: () => void;
   onHome: () => void;
   onFollow: () => void;
@@ -17,6 +18,7 @@ type UserScreenButtonBarProps = {
 const UserScreenButtonBar = ({
   userName,
   canEdit,
+  isFollowing,
   style,
   onEdit,
   onFollow,
@@ -35,7 +37,7 @@ const UserScreenButtonBar = ({
       <FloatingButton light onPress={onFollow} style={styles.mainButton}>
         {/* @ts-expect-error suppressHydrationWarning is not typed*/}
         <Text style={textStyles.normal} suppressHydrationWarning>
-          Follow
+          {isFollowing ? 'Unfollow' : 'Follow'}
         </Text>
       </FloatingButton>
     )}
