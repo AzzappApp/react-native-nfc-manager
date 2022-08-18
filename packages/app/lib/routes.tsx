@@ -1,25 +1,23 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
-// const ROUTES = {
-//   HOME: 'HOME',
-//   SIGN_IN: 'SIGN_IN',
-//   SIGN_UP: 'SIGN_UP',
-//   USER: 'USER',
-//   USER_POSTS: 'USER_POSTS',
-//   SEARCH: 'SEARCH',
-//   NEW_POST: 'NEW_POST',
-//   POST: 'POST',
-//   CHAT: 'CHAT',
-//   PROFILE: 'PROFILE',
-// } as const;
-
 import type { LayoutRectangle } from 'react-native';
-
-// export default ROUTES;
-
-// export type Routes = keyof typeof ROUTES;
 
 export type HomeRoute = {
   route: 'HOME';
+  params?: never;
+};
+
+export type SearchRoute = {
+  route: 'SEARCH';
+  params?: never;
+};
+
+export type ChatRoute = {
+  route: 'CHAT';
+  params?: never;
+};
+
+export type SettingsRoute = {
+  route: 'SETTINGS';
   params?: never;
 };
 
@@ -61,6 +59,9 @@ export type NewPostRoute = {
 
 export type Route =
   | HomeRoute
+  | SearchRoute
+  | ChatRoute
+  | SettingsRoute
   | SignInRoute
   | SignUpRoute
   | UserRoute

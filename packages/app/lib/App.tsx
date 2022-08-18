@@ -5,11 +5,8 @@ import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
-import {
-  createRouterInitialState,
-  useNativeRouter,
-  ScreensRenderer,
-} from './components/NativeRouter';
+import MainTabBar from './components/MaintTabBar';
+import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import createPlatformEnvironment from './helpers/createPlatformEnvironment';
 import * as QueryLoader from './helpers/QueryLoader';
 import { getRelayEnvironment } from './helpers/relayEnvironment';
@@ -26,15 +23,18 @@ import PostCreationScreen from './PostCreationScreen';
 
 const screens = {
   HOME: HomeMobileScreen,
-  USER: UserMobileScreen,
-  USER_POSTS: UserPostsMobileScreen,
+  SEARCH: () => <View />,
+  SETTINGS: () => <View />,
+  CHAT: () => <View />,
   SIGN_IN: SignInMobileScreen,
   SIGN_UP: SignUpMobileScreen,
-  SEARCH: View,
+  USER: UserMobileScreen,
+  USER_POSTS: UserPostsMobileScreen,
   NEW_POST: PostCreationScreen,
-  CHAT: View,
-  PROFILE: View,
-  POST: View,
+};
+
+const tabs = {
+  MAIN_TAB: MainTabBar,
 };
 
 export const init = async () => {
@@ -46,9 +46,32 @@ export const init = async () => {
 const initialisationPromise = init();
 
 const App = () => {
-  const { router, routerState } = useNativeRouter(
-    createRouterInitialState({ route: 'HOME' }, 'HOME'),
-  );
+  const { router, routerState } = useNativeRouter({
+    stack: [
+      {
+        id: 'MAIN_TAB',
+        currentIndex: 0,
+        tabs: [
+          {
+            id: 'HOME',
+            route: 'HOME',
+          },
+          {
+            id: 'SEARCH',
+            route: 'SEARCH',
+          },
+          {
+            id: 'CHAT',
+            route: 'CHAT',
+          },
+          {
+            id: 'SETTINGS',
+            route: 'SETTINGS',
+          },
+        ],
+      },
+    ],
+  });
 
   const platformEnvironment = useMemo(
     () => createPlatformEnvironment(router),
@@ -57,7 +80,7 @@ const App = () => {
 
   const screenIdToDispose = useRef<string[]>([]).current;
   useEffect(() => {
-    router.addScreenWillBePushedListener(({ id, route, params }) => {
+    router.addScreenWillBePushedListener(({ id, route: { route, params } }) => {
       const Component = screens[route];
       if (isRelayScreen(Component)) {
         QueryLoader.loadQueryFor(id, Component, params);
@@ -83,6 +106,7 @@ const App = () => {
           <ScreensRenderer
             routerState={routerState}
             screens={screens}
+            tabs={tabs}
             onScreenDismissed={onScreenDismissed}
             onFinishTransitioning={onFinishTransitioning}
           />
