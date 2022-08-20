@@ -5,7 +5,6 @@ const config = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   experimental: {
-    reactRoot: 'concurrent',
     images: {
       allowFutureImage: true,
     },
