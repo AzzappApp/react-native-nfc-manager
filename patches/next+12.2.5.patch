@@ -1,0 +1,13 @@
+diff --git a/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js b/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
+index f0f462f..890f8cc 100644
+--- a/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
++++ b/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
+@@ -72,7 +72,7 @@ class TraceEntryPointsPlugin {
+         await span.traceChild("create-trace-assets").traceAsyncFn(async ()=>{
+             const entryFilesMap = new Map();
+             const chunksToTrace = new Set();
+-            const isTraceable = (file)=>!file.endsWith(".wasm");
++            const isTraceable = (file)=>(file.endsWith('.js') || file.endsWith('.jsx') || file.endsWith('.cjs') || file.endsWith('.mjs') || file.endsWith('.node') ||  file.endsWith('.ts') || file.endsWith('.tsx'));
+             for (const entrypoint of compilation.entrypoints.values()){
+                 const entryFiles = new Set();
+                 for (const chunk of entrypoint.getEntrypointChunk().getAllReferencedChunks()){
