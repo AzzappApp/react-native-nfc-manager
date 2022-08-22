@@ -201,6 +201,7 @@ const PostsGrid = ({
       style={style}
       stickyHeaderIndices={stickyHeaderIndices}
       showsVerticalScrollIndicator={false}
+      removeClippedSubviews
       refreshControl={
         <RefreshControl
           refreshing={refreshing ?? false}

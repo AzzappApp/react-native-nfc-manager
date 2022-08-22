@@ -1,7 +1,8 @@
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import PostsGrid from '../components/PostsGrid';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { RecommandedPostsList_viewer$key } from '@azzapp/relay/artifacts/RecommandedPostsList_viewer.graphql';
@@ -33,7 +34,7 @@ const RecommandedPostsList = ({
         @refetchable(queryName: "RecommandedPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 10 }
+          first: { type: Int, defaultValue: 20 }
         ) {
           recommandedPosts(after: $after, first: $first)
             @connection(key: "Viewer_recommandedPosts") {
@@ -68,9 +69,15 @@ const RecommandedPostsList = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
-      loadNext(10);
+      loadNext(20);
     }
   }, [isLoadingNext, hasNext, loadNext]);
+
+  const [sowLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const [sowLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
+  useEffect(() => {
+    setShowLoadingIndicator(!refreshing && isLoadingNext);
+  }, [isLoadingNext, refreshing]);
 
   const posts: PostsGrid_posts$key = useMemo(
     () =>
@@ -86,18 +93,17 @@ const RecommandedPostsList = ({
       canPlay={canPlay}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={
-        !refreshing &&
-        isLoadingNext && (
-          <View
-            style={{
-              height: 30,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ActivityIndicator />
-          </View>
-        )
+        <View
+          style={{
+            height: 48,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFF',
+            zIndex: 100,
+          }}
+        >
+          {sowLoadingIndicatorDebounced && <ActivityIndicator />}
+        </View>
       }
       refreshing={refreshing}
       onRefresh={onRefresh}
