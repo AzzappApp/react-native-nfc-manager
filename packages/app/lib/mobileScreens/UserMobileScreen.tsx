@@ -1,4 +1,4 @@
-import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
+import { COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useRef, useState } from 'react';
 import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {

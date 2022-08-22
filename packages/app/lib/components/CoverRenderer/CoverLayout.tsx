@@ -1,7 +1,4 @@
-import {
-  COVER_BASE_WIDTH,
-  COVER_RATIO,
-} from '@azzapp/shared/lib/imagesHelpers';
+import { COVER_BASE_WIDTH, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
 import {
   Image,

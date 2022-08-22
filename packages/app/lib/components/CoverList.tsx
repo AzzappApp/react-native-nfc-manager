@@ -1,4 +1,4 @@
-import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/imagesHelpers';
+import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
 import { useCallback } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';

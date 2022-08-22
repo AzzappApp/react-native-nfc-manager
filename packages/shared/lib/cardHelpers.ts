@@ -1,3 +1,7 @@
+export const COVER_RATIO = 0.625;
+
+export const COVER_BASE_WIDTH = 125;
+
 export const DEFAULT_CARD_COVER = {
   backgroundColor: '#FFF',
   pictureTransitionTimer: 2,

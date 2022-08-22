@@ -1,6 +1,8 @@
-import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
+import {
+  DEFAULT_CARD_COVER,
+  COVER_RATIO,
+} from '@azzapp/shared/lib/cardHelpers';
 import ERRORS from '@azzapp/shared/lib/errors';
-import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
 import {
   GraphQLFloat,
   GraphQLInt,

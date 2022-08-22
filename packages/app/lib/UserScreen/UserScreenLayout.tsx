@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
+import { COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { cloneElement, useRef } from 'react';
 import {
   ActivityIndicator,

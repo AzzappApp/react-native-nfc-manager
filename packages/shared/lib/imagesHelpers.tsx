@@ -1,7 +1,3 @@
-export const COVER_RATIO = 0.625;
-
-export const COVER_BASE_WIDTH = 125;
-
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
 

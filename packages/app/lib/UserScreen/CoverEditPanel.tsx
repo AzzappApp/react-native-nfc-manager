@@ -1,5 +1,7 @@
-import { DEFAULT_CARD_COVER } from '@azzapp/shared/lib/cardHelpers';
-import { COVER_RATIO } from '@azzapp/shared/lib/imagesHelpers';
+import {
+  DEFAULT_CARD_COVER,
+  COVER_RATIO,
+} from '@azzapp/shared/lib/cardHelpers';
 import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
