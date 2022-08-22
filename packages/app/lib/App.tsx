@@ -15,6 +15,7 @@ import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
+import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import UserMobileScreen from './mobileScreens/UserMobileScreen';
@@ -24,7 +25,7 @@ import { PlatformEnvironmentProvider } from './PlatformEnvironment';
 const screens = {
   HOME: HomeMobileScreen,
   SEARCH: () => <View />,
-  SETTINGS: () => <View />,
+  SETTINGS: SettingsMobileScreen,
   CHAT: () => <View />,
   SIGN_IN: SignInMobileScreen,
   SIGN_UP: SignUpMobileScreen,
