@@ -1,5 +1,12 @@
-import { useCallback, useMemo } from 'react';
-import { FlatList, useWindowDimensions, View } from 'react-native';
+import range from 'lodash/range';
+import { useMemo, useState } from 'react';
+import {
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostRenderer from './PostRenderer';
 import type {
@@ -7,31 +14,41 @@ import type {
   PostsGrid_posts$key,
 } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { ArraItemType } from '@azzapp/shared/lib/arrayHelpers';
-import type { ReactElement } from 'react';
-import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
+import type { ReactNode } from 'react';
+import type {
+  StyleProp,
+  ViewStyle,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  LayoutChangeEvent,
+} from 'react-native';
 
 type PostsGrid = {
   posts: PostsGrid_posts$key;
   canPlay?: boolean;
   refreshing?: boolean;
-  ListHeaderComponent?: ReactElement;
+  ListHeaderComponent?: ReactNode;
+  ListFooterComponent?: ReactNode;
   stickyHeaderIndices?: number[] | undefined;
   onRefresh?: () => void;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
-  contentContainerStyle?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
 };
+
+// This is an attemps to Use recycling for post list with custom layout
+// Since the layout can be predetermined we simply add remove element and keep same
+// key to do recycling
 
 const PostsGrid = ({
   posts: postsKey,
   refreshing,
   ListHeaderComponent,
+  ListFooterComponent,
   stickyHeaderIndices,
   onRefresh,
   onEndReached,
   style,
-  contentContainerStyle,
   postsContainerStyle,
 }: PostsGrid) => {
   const posts = useFragment(
@@ -42,87 +59,173 @@ const PostsGrid = ({
         author {
           ...PostRendererFragment_author
         }
+        media {
+          ratio
+        }
+        content
       }
     `,
     postsKey,
   );
 
-  const keyExtractor = useCallback((item: Post) => item.id, []);
-
   const { width: windowWidth } = useWindowDimensions();
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<Post>) =>
-      item ? (
-        <PostRenderer
-          post={item}
-          width={(windowWidth - 30) / 2}
-          author={item.author}
-          small
-          muted
-          style={{ marginRight: 8, marginBottom: 8 }}
-        />
-      ) : null,
-    [windowWidth],
-  );
-
-  const [even, odd] = useMemo(() => {
+  const [contentHeight, dataWithLayout] = useMemo(() => {
     const even: Post[] = [];
     const odd: Post[] = [];
 
     posts.forEach((item, index) => {
+      if (!item) {
+        console.log('no item for index ', index);
+        return;
+      }
       if (index % 2 === 0) {
         even.push(item);
       } else {
         odd.push(item);
       }
     });
-    return [even, odd];
-  }, [posts]);
 
-  // When you nest a VirtualizedList inside in other Virtualized List
-  // with same direction, the ScrollView is not rendered but actually
-  // both the 2 virtualized list share the same view.
-  // To obtain a masonery layout we render 2 flat list side by side
-  // One with odd data the other with even data
-  const lists = useMemo(() => {
-    const renderFlatList = (data: Post[], isOdd = false) => (
-      <FlatList
-        listKey={isOdd ? 'odd' : 'even'}
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
-        directionalLockEnabled
-        showsHorizontalScrollIndicator={false}
-        style={{
-          flex: 1,
-          marginLeft: isOdd ? 0 : 8,
-        }}
-      />
+    const { padding, paddingVertical, paddingTop, paddingBottom } =
+      StyleSheet.flatten(postsContainerStyle ?? {});
+
+    let offsetTop = paddingTop ?? paddingVertical ?? padding ?? 0;
+    let offsetBottom = paddingBottom ?? paddingVertical ?? padding ?? 0;
+    if (typeof offsetTop === 'string' || typeof offsetBottom === 'string') {
+      console.warn(
+        'PostGrid: percent padding are not supported in postsContainerStyle',
+      );
+      if (typeof offsetTop === 'string') {
+        offsetTop = 0;
+      }
+      if (typeof offsetBottom === 'string') {
+        offsetBottom = 0;
+      }
+    }
+
+    // window width - the 3 margin of 8px
+    const itemWidth = (windowWidth - 24) / 2;
+    let currentPosition = offsetTop;
+    const measureItem = (item: Post, isOdd: boolean) => {
+      const layout = {
+        left: isOdd ? itemWidth + 16 : 8,
+        top: currentPosition,
+        width: itemWidth,
+        // media margin between next and media, text height
+        height: itemWidth / item.media.ratio + 5 + (item.content ? 34 : 0),
+      };
+      //  margin with bottom
+      currentPosition += layout.height + 8;
+      return { item, layout };
+    };
+
+    const evenData = even.map(item => measureItem(item, false));
+    let height = currentPosition;
+    currentPosition = offsetTop;
+    const oddData = odd.map(item => measureItem(item, true));
+    height = Math.max(height, currentPosition);
+    return [height + offsetBottom, [...evenData, ...oddData]];
+  }, [posts, windowWidth, postsContainerStyle]);
+
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [headerSize, setHeaderSize] = useState(0);
+  const batchSize = scrollViewHeight;
+
+  const onHeaderLayout = (e: LayoutChangeEvent) => {
+    setHeaderSize(e.nativeEvent.layout.height);
+  };
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    setScrollViewHeight(e.nativeEvent.layout.height);
+  };
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollPosition = e.nativeEvent.contentOffset.y;
+    if (contentHeight - scrollPosition < scrollViewHeight * 2) {
+      onEndReached?.();
+    }
+
+    setCurrentBatch(
+      Math.floor(Math.max(scrollPosition - headerSize, 0) / batchSize),
     );
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        {renderFlatList(even)}
-        {renderFlatList(odd, true)}
-      </View>
-    );
-  }, [even, keyExtractor, odd, onEndReached, renderItem]);
+  };
+
+  // the batch system works by determining a list of item
+  // to display on 'page' of the scroll view and by moving the
+  // page on the bottom and on top during scroll
+  // since we always reuse the same key react-native should not
+  // recreate view
+  const items = useMemo(() => {
+    const positions = range(currentBatch - 2, currentBatch + 2);
+    const batchIndexes = [0, 0, 0, 0];
+
+    const results: Array<{
+      item: Post;
+      layout: ViewStyle;
+      key: string;
+      currentLayoutPostion: number;
+    }> = [];
+
+    dataWithLayout.forEach(({ item, layout }) => {
+      if (!item || !layout) {
+        return null;
+      }
+      positions.forEach((position, index) => {
+        if (position < 0) {
+          return;
+        }
+        const currentLayoutPostion = position * batchSize;
+        const nextLayoutPosition = (position + 1) * batchSize;
+        const prefix = BATCHES[(2 + position) % 4];
+        if (
+          layout.top >= currentLayoutPostion &&
+          layout.top < nextLayoutPosition
+        ) {
+          results.push({
+            item,
+            layout,
+            key: `${prefix}-${batchIndexes[index]++}`,
+            currentLayoutPostion,
+          });
+        }
+      });
+    });
+    return results;
+  }, [dataWithLayout, currentBatch, batchSize]);
 
   return (
-    <FlatList
-      data={emptyArray}
-      renderItem={nullRender}
-      ListHeaderComponent={ListHeaderComponent}
-      ListFooterComponent={lists}
-      showsVerticalScrollIndicator={false}
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      stickyHeaderIndices={stickyHeaderIndices}
+    <ScrollView
+      scrollEventThrottle={16}
+      onScroll={onScroll}
+      onLayout={onLayout}
       style={style}
-      contentContainerStyle={contentContainerStyle}
-      ListFooterComponentStyle={postsContainerStyle}
-    />
+      stickyHeaderIndices={stickyHeaderIndices}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing ?? false}
+          onRefresh={onRefresh}
+        />
+      }
+    >
+      {ListHeaderComponent && (
+        <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
+      )}
+      <View style={[{ height: contentHeight }, postsContainerStyle]}>
+        {items.map(({ key, item, layout }) => (
+          <PostRenderer
+            key={key}
+            post={item}
+            width={(windowWidth - 24) / 2}
+            author={item.author}
+            small
+            muted
+            style={[{ position: 'absolute' }, layout]}
+          />
+        ))}
+      </View>
+      {ListFooterComponent}
+    </ScrollView>
   );
 };
 
@@ -130,5 +233,4 @@ export default PostsGrid;
 
 type Post = ArraItemType<PostsGrid_posts$data>;
 
-const emptyArray: unknown[] = [];
-const nullRender = () => null;
+const BATCHES = ['first', 'second', 'third', 'four'];

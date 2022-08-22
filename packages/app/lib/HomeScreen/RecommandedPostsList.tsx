@@ -1,5 +1,6 @@
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import PostsGrid from '../components/PostsGrid';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
@@ -13,7 +14,6 @@ type RecommandedPostsListProps = {
   ListHeaderComponent?: ReactElement;
   stickyHeaderIndices?: number[] | undefined;
   style?: StyleProp<ViewStyle>;
-  contentContainerStyle?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
 };
 
@@ -23,7 +23,6 @@ const RecommandedPostsList = ({
   stickyHeaderIndices,
   ListHeaderComponent,
   style,
-  contentContainerStyle,
   postsContainerStyle,
 }: RecommandedPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +33,7 @@ const RecommandedPostsList = ({
         @refetchable(queryName: "RecommandedPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 20 }
+          first: { type: Int, defaultValue: 10 }
         ) {
           recommandedPosts(after: $after, first: $first)
             @connection(key: "Viewer_recommandedPosts") {
@@ -69,7 +68,7 @@ const RecommandedPostsList = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
-      loadNext(20);
+      loadNext(10);
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
@@ -86,12 +85,25 @@ const RecommandedPostsList = ({
       posts={posts}
       canPlay={canPlay}
       ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={
+        !refreshing &&
+        isLoadingNext && (
+          <View
+            style={{
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        )
+      }
       refreshing={refreshing}
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       stickyHeaderIndices={stickyHeaderIndices}
       style={style}
-      contentContainerStyle={contentContainerStyle}
       postsContainerStyle={postsContainerStyle}
     />
   );

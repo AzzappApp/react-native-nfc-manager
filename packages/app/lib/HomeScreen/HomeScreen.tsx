@@ -36,7 +36,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
       viewer={viewer}
       canPlay={currentRoute.route === 'HOME'}
       ListHeaderComponent={
-        <View>
+        <View style={{ marginTop: vp`${insetTop}` }}>
           <View style={styles.header}>
             <Image
               source={require('../assets/logo-full.png')}
@@ -65,7 +65,6 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
           borderBottomRightRadius: vp`${VW100} * ${0.16}`,
         },
       ]}
-      contentContainerStyle={{ marginTop: vp`${insetTop}` }}
       postsContainerStyle={styles.recommandedPostsListPostsContainer}
     />
   );
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   recommandedPostsListPostsContainer: {
-    paddingTop: 8,
+    paddingVertical: 8,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: '#FFF',
