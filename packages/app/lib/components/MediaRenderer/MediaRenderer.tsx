@@ -30,15 +30,23 @@ const MediaRenderer = (
           type: "Float!"
           provider: "../providers/PixelRatio.relayprovider"
         }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
         isNative: {
           type: "Boolean!"
           provider: "../providers/isNative.relayprovider"
         }
+        priority: { type: "Boolean!", defaultValue: true }
       ) {
         kind
         ratio
         source
-        uri(width: $width, pixelRatio: $pixelRatio) @include(if: $isNative)
+        ... on Media @include(if: $isNative) {
+          uri(width: $width, pixelRatio: $pixelRatio) @include(if: $priority)
+          uri(width: $width, pixelRatio: $cappedPixelRatio) @skip(if: $priority)
+        }
       }
     `,
     media,

@@ -67,20 +67,26 @@ const CoverRenderer = (
           type: "Float!"
           provider: "../providers/PixelRatio.relayprovider"
         }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
         isNative: {
           type: "Boolean!"
           provider: "../providers/isNative.relayprovider"
         }
+        priority: { type: "Boolean!", defaultValue: false }
       ) {
         pictures {
           source
           kind
-          ...MediaRendererFragment_media @arguments(width: $width)
+          ...MediaRendererFragment_media
+            @arguments(width: $width, priority: $priority)
           # since cover are mainly used with 2 size full screen and cover size
           # we preload those url to avoid unecessary round trip
           _largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
-          _smallURI: uri(width: 125, pixelRatio: $pixelRatio)
+          _smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
         }
         pictureTransitionTimer

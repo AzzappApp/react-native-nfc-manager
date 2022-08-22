@@ -53,7 +53,8 @@ const UserScreen = ({
         card {
           id
           cover {
-            ...CoverRenderer_cover @arguments(width: $screenWidth)
+            ...CoverRenderer_cover
+              @arguments(width: $screenWidth, priority: true)
             ...CoverEditPanel_cover
             backgroundColor
           }

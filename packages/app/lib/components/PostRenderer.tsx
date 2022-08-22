@@ -34,10 +34,38 @@ const PostRenderer = ({
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
         }
+        postWith: {
+          type: "Float!"
+          provider: "../providers/PostWidth.relayprovider"
+        }
+        small: { type: "Boolean!", defaultValue: false }
+        isNative: {
+          type: "Boolean!"
+          provider: "../providers/isNative.relayprovider"
+        }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/PixelRatio.relayprovider"
+        }
       ) {
         id
         media {
-          ...MediaRendererFragment_media @arguments(width: $screenWidth)
+          ...MediaRendererFragment_media
+            @arguments(width: $postWith)
+            @include(if: $small)
+          ...MediaRendererFragment_media
+            @arguments(width: $screenWidth, priority: true)
+            @skip(if: $small)
+          # since post are mainly used with 2 size full screen and cover size
+          # we preload those url to avoid unecessary round trip
+          _largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+            @include(if: $isNative)
+          _smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
+            @include(if: $isNative)
         }
         content
       }

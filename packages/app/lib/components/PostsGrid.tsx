@@ -55,7 +55,7 @@ const PostsGrid = ({
     graphql`
       fragment PostsGrid_posts on Post @relay(plural: true) {
         id
-        ...PostRendererFragment_post
+        ...PostRendererFragment_post @arguments(small: true)
         author {
           ...PostRendererFragment_author
         }
