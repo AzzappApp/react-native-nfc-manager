@@ -1,5 +1,5 @@
-import range from 'lodash/range';
-import { useMemo, useState } from 'react';
+import cuid from 'cuid';
+import { useMemo, useRef, useState } from 'react';
 import {
   RefreshControl,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '../../theme';
 import PostRenderer from './PostRenderer';
 import type {
   PostsGrid_posts$data,
@@ -37,8 +38,8 @@ type PostsGrid = {
 };
 
 // This is an attemps to Use recycling for post list with custom layout
-// Since the layout can be predetermined we simply add remove element and keep same
-// key to do recycling
+// Since the layout can be predetermined we remove and add elements depending of the scroll position
+// and maintains a pool of key to avoid recreating native view
 
 const PostsGrid = ({
   posts: postsKey,
@@ -60,6 +61,7 @@ const PostsGrid = ({
           ...PostRendererFragment_author
         }
         media {
+          kind
           ratio
         }
         content
@@ -75,7 +77,7 @@ const PostsGrid = ({
 
     posts.forEach((item, index) => {
       if (!item) {
-        console.log('no item for index ', index);
+        console.warn('no item in post grid for index ', index);
         return;
       }
       if (index % 2 === 0) {
@@ -126,10 +128,9 @@ const PostsGrid = ({
     return [height + offsetBottom, [...evenData, ...oddData]];
   }, [posts, windowWidth, postsContainerStyle]);
 
-  const [currentBatch, setCurrentBatch] = useState(0);
+  const [layoutPosition, setLayoutPosition] = useState(0);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
   const [headerSize, setHeaderSize] = useState(0);
-  const batchSize = scrollViewHeight;
 
   const onHeaderLayout = (e: LayoutChangeEvent) => {
     setHeaderSize(e.nativeEvent.layout.height);
@@ -145,85 +146,132 @@ const PostsGrid = ({
       onEndReached?.();
     }
 
-    setCurrentBatch(
-      Math.floor(Math.max(scrollPosition - headerSize, 0) / batchSize),
+    setLayoutPosition(
+      Math.floor(
+        (Math.max(scrollPosition - headerSize, 0) * BATCH_SIZE) /
+          scrollViewHeight,
+      ) / BATCH_SIZE,
     );
   };
 
-  // the batch system works by determining a list of item
-  // to display on 'page' of the scroll view and by moving the
-  // page on the bottom and on top during scroll
-  // since we always reuse the same key react-native should not
-  // recreate view
-  const items = useMemo(() => {
-    const positions = range(currentBatch - 2, currentBatch + 2);
-    const batchIndexes = [0, 0, 0, 0];
-
-    const results: Array<{
-      item: Post;
-      layout: ViewStyle;
-      key: string;
-      currentLayoutPostion: number;
-    }> = [];
-
-    dataWithLayout.forEach(({ item, layout }) => {
-      if (!item || !layout) {
-        return null;
-      }
-      positions.forEach((position, index) => {
-        if (position < 0) {
-          return;
-        }
-        const currentLayoutPostion = position * batchSize;
-        const nextLayoutPosition = (position + 1) * batchSize;
-        const prefix = BATCHES[(2 + position) % 4];
-        if (
-          layout.top >= currentLayoutPostion &&
-          layout.top < nextLayoutPosition
-        ) {
-          results.push({
-            item,
-            layout,
-            key: `${prefix}-${batchIndexes[index]++}`,
-            currentLayoutPostion,
-          });
-        }
-      });
+  const postMap = useMemo(() => {
+    const postMap = new Map<string, { item: Post; layout: ItemLayout }>();
+    dataWithLayout.forEach(data => {
+      postMap.set(data.item.id, data);
     });
-    return results;
-  }, [dataWithLayout, currentBatch, batchSize]);
+    return postMap;
+  }, [dataWithLayout]);
+
+  const keys = useRef({
+    videos: new Map<string, string>(),
+    images: new Map<string, string>(),
+  });
+
+  const items = useMemo(() => {
+    const topLimit = (layoutPosition - 0.5) * scrollViewHeight;
+    const bottomLimit = (layoutPosition + 1.25) * scrollViewHeight;
+
+    const { videos: videosKeys, images: imagesKeys } = keys.current;
+
+    const freeImageKeysMap = new Map(imagesKeys);
+    const freeVideoKeysMap = new Map(videosKeys);
+
+    const items: Array<[string, string]> = [];
+
+    for (let i = 0; i < dataWithLayout.length; i++) {
+      const { item, layout } = dataWithLayout[i];
+      if (layout.top >= topLimit && layout.top < bottomLimit) {
+        const freeKeys =
+          item.media.kind === 'video' ? freeVideoKeysMap : freeImageKeysMap;
+        const key = freeKeys.get(item.id);
+        if (key) {
+          freeKeys.delete(item.id);
+        }
+        items.push([item.id, key ?? '']);
+      }
+    }
+
+    const freeImageKeys = Array.from(freeImageKeysMap.entries());
+    const freeVideoKeys = Array.from(freeVideoKeysMap.entries());
+
+    for (let i = 0; i < items.length; i++) {
+      let key = items[i][1];
+      const item = postMap.get(items[i][0])!.item;
+      if (!key) {
+        const freeKeys =
+          item.media.kind === 'video' ? freeVideoKeys : freeImageKeys;
+        const usedKeys = item.media.kind === 'video' ? videosKeys : imagesKeys;
+        const entry = freeKeys.pop();
+        if (entry) {
+          key = entry[1];
+          usedKeys.delete(entry[0]);
+        } else {
+          key = cuid();
+        }
+        usedKeys.set(item.id, key);
+        items[i][1] = key;
+      }
+    }
+
+    freeImageKeys.forEach(([id]) => imagesKeys.delete(id));
+    freeVideoKeys.forEach(([id]) => videosKeys.delete(id));
+    keys.current = {
+      images: new Map([...imagesKeys.entries(), ...freeImageKeys]),
+      videos: new Map([...videosKeys.entries(), ...freeVideoKeys]),
+    };
+    items.push(...freeImageKeys);
+    items.push(...freeVideoKeys);
+
+    return items;
+  }, [layoutPosition, scrollViewHeight, dataWithLayout, postMap]);
+
+  const placeHolders = useMemo(
+    () =>
+      dataWithLayout.map(({ item, layout }) => (
+        <View key={item.id} style={[layout, { position: 'absolute' }]}>
+          <View
+            style={{
+              width: layout.width,
+              height: layout.width / item.media.ratio,
+              borderRadius: 16,
+              backgroundColor: colors.lightGrey,
+            }}
+          />
+        </View>
+      )),
+    [dataWithLayout],
+  );
 
   return (
     <ScrollView
-      scrollEventThrottle={16}
-      onScroll={onScroll}
-      onLayout={onLayout}
       style={style}
       stickyHeaderIndices={stickyHeaderIndices}
       showsVerticalScrollIndicator={false}
-      removeClippedSubviews
       refreshControl={
         <RefreshControl
           refreshing={refreshing ?? false}
           onRefresh={onRefresh}
         />
       }
+      scrollEventThrottle={16}
+      onScroll={onScroll}
+      onLayout={onLayout}
     >
       {ListHeaderComponent && (
         <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
       )}
       <View style={[{ height: contentHeight }, postsContainerStyle]}>
-        {items.map(({ key, item, layout }) => (
-          <PostRenderer
-            key={key}
-            post={item}
-            width={(windowWidth - 24) / 2}
-            author={item.author}
-            small
-            muted
-            style={[{ position: 'absolute' }, layout]}
-          />
-        ))}
+        {placeHolders}
+        {items.map(([id, key]) => {
+          const data = postMap.get(id);
+          if (!data) {
+            console.warn('null data for id ' + id);
+            return null;
+          }
+          return (
+            <MemoPostRenderer key={key} item={data.item} layout={data.layout} />
+          );
+        })}
       </View>
       {ListFooterComponent}
     </ScrollView>
@@ -232,6 +280,30 @@ const PostsGrid = ({
 
 export default PostsGrid;
 
-type Post = ArraItemType<PostsGrid_posts$data>;
+const MemoPostRenderer = ({
+  item,
+  layout,
+}: {
+  item: Post;
+  layout: ItemLayout;
+}) =>
+  useMemo(
+    () => (
+      <PostRenderer
+        post={item}
+        width={layout.width}
+        author={item.author}
+        small
+        muted
+        style={[layout, { position: 'absolute', backgroundColor: 'white' }]}
+      />
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [item.id],
+  );
 
-const BATCHES = ['first', 'second', 'third', 'four'];
+// fraction of the scroll height that trigger a relayout
+const BATCH_SIZE = 4;
+
+type Post = ArraItemType<PostsGrid_posts$data>;
+type ItemLayout = { top: number; left: number; width: number; height: number };
