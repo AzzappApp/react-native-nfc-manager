@@ -24,6 +24,8 @@
 		FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
+		FD55E4BB28B53F8400321128 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */; };
+		FD55E4BC28B53F8400321128 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */; };
 		FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
@@ -78,6 +80,7 @@
 		FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshotManager.m; path = azzapp/AZPSnapshotManager.m; sourceTree = "<group>"; };
 		FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshot.h; path = azzapp/AZPSnapshot.h; sourceTree = "<group>"; };
 		FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshot.m; path = azzapp/AZPSnapshot.m; sourceTree = "<group>"; };
+		FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AppCenter-Config.plist"; path = "azzapp/AppCenter-Config.plist"; sourceTree = "<group>"; };
 		FD9315E2286B555B006E8CF7 /* AZPEditableImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImage.h; path = azzapp/AZPEditableImage.h; sourceTree = "<group>"; };
 		FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImage.m; path = azzapp/AZPEditableImage.m; sourceTree = "<group>"; };
 		FD9315F2286B5D2F006E8CF7 /* AZPEditableImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageManager.h; path = azzapp/AZPEditableImageManager.h; sourceTree = "<group>"; };
@@ -157,6 +160,7 @@
 				FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */,
 				FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */,
 				FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */,
+				FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -322,6 +326,7 @@
 			files = (
 				FDFDBA75284100BE00621C0F /* OpenSans-SemiBold.ttf in Resources */,
 				FDFDBA73284100BE00621C0F /* OpenSans-Regular.ttf in Resources */,
+				FD55E4BC28B53F8400321128 /* AppCenter-Config.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FDFDBA74284100BE00621C0F /* OpenSans-SemiBold.ttf in Resources */,
+				FD55E4BB28B53F8400321128 /* AppCenter-Config.plist in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				FDFDBA72284100BE00621C0F /* OpenSans-Regular.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,

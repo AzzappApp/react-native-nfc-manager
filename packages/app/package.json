@@ -13,6 +13,9 @@
   "dependencies": {
     "@azzapp/relay": "*",
     "@azzapp/shared": "*",
+    "appcenter": "^4.4.5",
+    "appcenter-analytics": "^4.4.5",
+    "appcenter-crashes": "^4.4.5",
     "chroma-js": "^2.4.2",
     "events": "^3.3.0",
     "lodash": "^4.17.21",

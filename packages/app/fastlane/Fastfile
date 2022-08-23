@@ -50,6 +50,13 @@ platform :ios do
       profile: profile_path,
       target_filter: "azzapp"
     )
+
+    update_plist(
+      plist_path: "ios/azzapp/AppCenter-Config.plist",
+      block: proc do |plist|
+        plist[:AppSecret] = ENV['APPCENTER_IOS_APP_SECRET']
+      end
+    )
     
     gym(
       scheme: "azzapp", 
