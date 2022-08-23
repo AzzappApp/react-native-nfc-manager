@@ -5,7 +5,7 @@ import { MediaImageRenderer } from '../components/MediaRenderer';
 import DashedSlider from '../ui/DashedSlider';
 import Icon from '../ui/Icon';
 import VideoThumbnail from '../ui/VideoThumbnail';
-import type { MediaKind } from '@azzapp/relay/artifacts/MediaRendererFragment_media.graphql';
+import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {

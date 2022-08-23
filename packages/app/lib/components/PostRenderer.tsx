@@ -30,6 +30,10 @@ const PostRenderer = ({
     graphql`
       fragment PostRendererFragment_post on Post
       @argumentDefinitions(
+        isNative: {
+          type: "Boolean!"
+          provider: "../providers/isNative.relayprovider"
+        }
         screenWidth: {
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
@@ -38,14 +42,9 @@ const PostRenderer = ({
           type: "Float!"
           provider: "../providers/PostWidth.relayprovider"
         }
-        small: { type: "Boolean!", defaultValue: false }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
         cappedPixelRatio: {
           type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
+          provider: "../providers/CappedPixelRatio.relayprovider"
         }
         pixelRatio: {
           type: "Float!"
@@ -54,17 +53,12 @@ const PostRenderer = ({
       ) {
         id
         media {
-          ...MediaRendererFragment_media
-            @arguments(width: $postWith)
-            @include(if: $small)
-          ...MediaRendererFragment_media
-            @arguments(width: $screenWidth, priority: true)
-            @skip(if: $small)
-          # since post are mainly used with 2 size full screen and cover size
-          # we preload those url to avoid unecessary round trip
-          _largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          kind
+          source
+          ratio
+          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
-          _smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
+          smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
         }
         content
@@ -83,11 +77,19 @@ const PostRenderer = ({
     authorKey,
   );
 
+  const {
+    content,
+    media: { kind, ratio, source, smallURI, largeURI },
+  } = post;
+
   return (
     <View {...props}>
       <View>
         <MediaRenderer
-          media={post.media}
+          source={source}
+          uri={small ? smallURI : largeURI}
+          kind={kind}
+          aspectRatio={ratio}
           width={width}
           repeat
           muted={muted}
@@ -110,13 +112,13 @@ const PostRenderer = ({
             />
           </Link>
         )}
-        {!!post.content && (
+        {!!content && (
           <Text
             style={styles.text}
             numberOfLines={small ? 2 : undefined}
             ellipsizeMode={'tail'}
           >
-            {post.content}
+            {content}
           </Text>
         )}
       </View>

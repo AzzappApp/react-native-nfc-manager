@@ -9,9 +9,10 @@ const getTransformationsFor = (
   if (!width) {
     return `q_auto:eco`;
   }
-  width = width * pixelRatio;
+  width = Math.round(width * pixelRatio);
   if (ratio != null) {
-    return `c_fill,q_auto:eco,w_${width},h_${Math.round(width / ratio)}`;
+    const height = Math.round(width / ratio);
+    return `c_fill,q_auto:eco,w_${width},h_${height}`;
   } else {
     return `q_auto:eco,w_${width}`;
   }

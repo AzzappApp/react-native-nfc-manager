@@ -1,3 +1,4 @@
+import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
 import {
   forwardRef,
   useEffect,
@@ -58,7 +59,6 @@ const CoverRenderer = (
     graphql`
       fragment CoverRenderer_cover on UserCardCover
       @argumentDefinitions(
-        width: { type: "Float!", defaultValue: 125 }
         screenWidth: {
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
@@ -69,24 +69,22 @@ const CoverRenderer = (
         }
         cappedPixelRatio: {
           type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
+          provider: "../providers/CappedPixelRatio.relayprovider"
         }
         isNative: {
           type: "Boolean!"
           provider: "../providers/isNative.relayprovider"
         }
-        priority: { type: "Boolean!", defaultValue: false }
       ) {
         pictures {
           source
           kind
-          ...MediaRendererFragment_media
-            @arguments(width: $width, priority: $priority)
+          ratio
           # since cover are mainly used with 2 size full screen and cover size
           # we preload those url to avoid unecessary round trip
-          _largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
-          _smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
         }
         pictureTransitionTimer
@@ -187,7 +185,12 @@ const CoverRenderer = (
           >
             <MediaRenderer
               ref={isDisplayed ? mediaRef : null}
-              media={picture}
+              kind={picture.kind}
+              aspectRatio={picture.ratio}
+              source={picture.source}
+              uri={
+                width === COVER_BASE_WIDTH ? picture.smallURI : picture.largeURI
+              }
               width={width}
               muted
               repeat

@@ -38,13 +38,7 @@ const UserScreen = ({
 }: UserScreenProps) => {
   const user = useFragment(
     graphql`
-      fragment UserScreenFramgent_user on User
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-      ) {
+      fragment UserScreenFramgent_user on User {
         id
         userName
         # TODO Follow is user dependant and shoudld not bet queried in
@@ -54,7 +48,6 @@ const UserScreen = ({
           id
           cover {
             ...CoverRenderer_cover
-              @arguments(width: $screenWidth, priority: true)
             ...CoverEditPanel_cover
             backgroundColor
           }
