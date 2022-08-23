@@ -1,6 +1,6 @@
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-const AUH_INFO_KEY = 'AZZAPP_AUTH_INFOS';
+const AUH_INFO_KEY = 'AZZAPP_AUTH';
 
 let authInfos: { token: string; refreshToken: string } | null = null;
 

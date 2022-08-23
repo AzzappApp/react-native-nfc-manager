@@ -20,8 +20,8 @@ async function fetchWithRefreshToken<JSON = unknown>(
         const tokens = await refreshTokens(refreshToken);
         await setTokens(tokens);
       } catch {
-        await clearTokens();
-        throw e;
+        await clearTokens().catch(() => void 0);
+        return fetchJSON(input, init);
       }
       const token = getTokens()?.token;
       return fetchJSON<JSON>(input, injectToken(token, init));
