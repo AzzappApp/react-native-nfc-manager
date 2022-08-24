@@ -1,8 +1,10 @@
 import {
   getImageURLForSize,
+  getVideoThumbnailURL,
   getVideoUrlForSize,
 } from '@azzapp/shared/lib/imagesHelpers';
 import {
+  GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
   GraphQLNonNull,
@@ -37,6 +39,9 @@ export const MediaGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
         width: {
           type: new GraphQLNonNull(GraphQLFloat),
         },
+        thumbnail: {
+          type: GraphQLBoolean,
+        },
       },
       resolve(
         { kind, source },
@@ -44,12 +49,20 @@ export const MediaGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
           pixelRatio = 1,
           ratio,
           width,
-        }: { pixelRatio?: number; ratio?: number; width: number },
+          thumbnail,
+        }: {
+          pixelRatio?: number;
+          ratio?: number;
+          width: number;
+          thumbnail?: boolean;
+        },
       ): string {
         if (kind === 'picture') {
-          return getImageURLForSize(source, pixelRatio, width, ratio);
+          return getImageURLForSize(source, width, pixelRatio, ratio);
+        } else if (thumbnail) {
+          return getVideoThumbnailURL(source, width, pixelRatio, ratio);
         } else {
-          return getVideoUrlForSize(source, pixelRatio, width, ratio);
+          return getVideoUrlForSize(source, width, pixelRatio, ratio);
         }
       },
     },
