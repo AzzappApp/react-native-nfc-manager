@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import cuid from 'cuid';
 import React, {
   useMemo,
   useCallback,
@@ -267,7 +268,7 @@ const initToRouteInstance = <T extends RouteInit | StackInit | TabsInit>(
   : BasicRoute => {
   if ('stack' in init) {
     return {
-      id: generateID(),
+      id: cuid(),
       kind: 'stack',
       state: init.stack.map(initToRouteInstance),
     } as StackRoute as any;
@@ -383,7 +384,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         if (setTabIfExists(route)) {
           return;
         }
-        const id = (route as any).id ?? generateID();
+        const id = (route as any).id ?? cuid();
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'PUSH',
@@ -394,7 +395,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         if (setTabIfExists(route)) {
           return;
         }
-        const id = (route as any).id ?? generateID();
+        const id = (route as any).id ?? cuid();
         const currentRoute = getCurrentRoute();
         // TODO incorrect if replaced screen is a tab
         dispatchToListeners(screenWillBeRemovedListeners, {
@@ -408,7 +409,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         });
       },
       showModal(route: Route) {
-        const id = (route as any).id ?? generateID();
+        const id = (route as any).id ?? cuid();
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'SHOW_MODAL',
@@ -787,8 +788,6 @@ const ScreenRenderer = ({
     </Screen>
   );
 };
-
-const generateID = () => Math.random().toString().split('.')[1];
 
 const getCurrentRouteFromState = ({
   modals,
