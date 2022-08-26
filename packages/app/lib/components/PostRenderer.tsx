@@ -53,13 +53,23 @@ const PostRenderer = ({
       ) {
         id
         media {
-          kind
+          __typename
           source
           ratio
           largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
           smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
+          ... on MediaVideo {
+            largeThumbnail: thumbnail(
+              width: $screenWidth
+              pixelRatio: $pixelRatio
+            ) @include(if: $isNative)
+            smallThumbnail: thumbnail(
+              width: $postWith
+              pixelRatio: $cappedPixelRatio
+            ) @include(if: $isNative)
+          }
         }
         content
       }
@@ -79,15 +89,24 @@ const PostRenderer = ({
 
   const {
     content,
-    media: { kind, ratio, source, smallURI, largeURI },
+    media: {
+      __typename,
+      ratio,
+      source,
+      smallURI,
+      largeURI,
+      smallThumbnail,
+      largeThumbnail,
+    },
   } = post;
 
   return (
     <View {...props}>
       <View>
-        {kind === 'video' && (
+        {__typename === 'MediaVideo' && (
           <MediaVideoRenderer
             source={source}
+            thumbnailURI={small ? smallThumbnail : largeThumbnail}
             uri={small ? smallURI : largeURI}
             aspectRatio={ratio}
             width={width}
@@ -96,7 +115,7 @@ const PostRenderer = ({
             style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
           />
         )}
-        {kind === 'picture' && (
+        {__typename === 'MediaImage' && (
           <MediaImageRenderer
             source={source}
             uri={small ? smallURI : largeURI}

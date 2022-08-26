@@ -7,7 +7,7 @@ import {
 } from 'graphql';
 import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { getUserById } from '../domains/User';
-import { MediaGraphQL } from './commonsTypes';
+import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
 import type { Post } from '../domains/Post';

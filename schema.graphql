@@ -1,3 +1,24 @@
+"""User Card media module media"""
+type MediaVideo implements Media {
+  source: String!
+  ratio: Float!
+  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
+  thumbnail(pixelRatio: Float, ratio: Float, width: Float!, time: Float): String!
+}
+
+interface Media {
+  source: String!
+  ratio: Float!
+  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
+}
+
+"""User Card media module media"""
+type MediaImage implements Media {
+  source: String!
+  ratio: Float!
+  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
+}
+
 """GraphQL Schema Root Query object"""
 type Query {
   viewer: Viewer!
@@ -152,19 +173,6 @@ type UserCardCover {
 
   """the position of the backround image on desktop"""
   dektopImagePosition: String!
-}
-
-"""User Card media module media"""
-type Media {
-  kind: MediaKind!
-  source: String!
-  ratio: Float!
-  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
-}
-
-enum MediaKind {
-  video
-  picture
 }
 
 """User Card module"""
@@ -333,6 +341,11 @@ input MediaInput {
   kind: MediaKind!
   source: String!
   ratio: Float
+}
+
+enum MediaKind {
+  video
+  picture
 }
 
 type CreatePostPayload {

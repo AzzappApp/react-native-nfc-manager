@@ -28,10 +28,7 @@ import CoverEditPanelImageTab from './CoverEditPanelImageTab';
 import CoverEditPanelTitleTab from './CoverEditPanelTitleTab';
 import ModuleEditorContext from './ModuleEditorContext';
 import UploadProgressModal from './UploadProgressModal';
-import type {
-  CoverEditPanel_cover$data,
-  CoverEditPanel_cover$key,
-} from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
+import type { CoverEditPanel_cover$key } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type {
   CoverEditPanelMutation,
   MediaKind,
@@ -81,11 +78,13 @@ const CoverEditPanel = ({
       ) {
         backgroundColor
         pictures {
+          __typename
           source
-          kind
           ratio
-          source
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          ... on MediaVideo {
+            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+          }
         }
         pictureTransitionTimer
         overlayEffect
@@ -103,8 +102,24 @@ const CoverEditPanel = ({
     coverKey ?? null,
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialData = useMemo(() => cover, []);
+  const initialData = useMemo(
+    () => ({
+      ...cover,
+      pictures: cover?.pictures.map(
+        ({ __typename, ratio, source, uri, thumbnail }) => ({
+          kind: (__typename === 'MediaVideo'
+            ? 'video'
+            : 'picture') as MediaKind,
+          ratio,
+          source,
+          uri,
+          thumbnail,
+        }),
+      ),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   const coverUpdatesRef = useRef<CoverUpdates>({});
 
   const { commit, revert, applyOptimistic } =
@@ -519,7 +534,7 @@ const styles = StyleSheet.create({
 });
 
 const getOptimisticResponse = (
-  intialData: CoverEditPanel_cover$data | null,
+  intialData: any,
   coverUpdates: CoverUpdates,
   userId: string,
   cardId?: string,

@@ -97,8 +97,8 @@ const userScreenByIdQuery = graphql`
             backgroundColor
             ...CoverLayout_cover
             pictures {
+              __typename
               source
-              kind
             }
           }
         }
@@ -253,7 +253,7 @@ const UserMobileScreenAppearAnimationWrapper = ({
   const selectedPicture = pictures[params.imageIndex ?? 0];
 
   let imageURI: string | null = null;
-  if (selectedPicture.kind === 'picture') {
+  if (selectedPicture.__typename === 'MediaImage') {
     const { uri, alternateURI } = queryMediaCache(
       selectedPicture.source,
       windowWidth,

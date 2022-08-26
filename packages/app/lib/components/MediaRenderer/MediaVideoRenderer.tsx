@@ -1,6 +1,13 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   findNodeHandle,
+  Image,
   NativeModules,
   requireNativeComponent,
   StyleSheet,
@@ -12,12 +19,13 @@ import type { ViewProps, NativeSyntheticEvent } from 'react-native';
 
 export type MediaVideoRendererProps = ViewProps & {
   uri?: string;
+  thumbnailURI?: string;
   source: string;
   width: number | `${number}vw`;
   aspectRatio: number;
   paused?: boolean;
   muted?: boolean;
-  currentTime?: number;
+  currentTime?: number | null;
   onReadyForDisplay?: () => void;
   onEnd?: () => void;
   onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
@@ -31,12 +39,14 @@ export type MediaVideoRendererHandle = {
 const MediaVideoRenderer = (
   {
     uri,
+    thumbnailURI,
     source,
     width,
     aspectRatio,
     muted = false,
     paused = false,
     style,
+    onReadyForDisplay,
     ...props
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
@@ -44,6 +54,19 @@ const MediaVideoRenderer = (
   if (typeof width === 'string') {
     console.error('Invalide `vw` size used on native media renderer');
     width = parseFloat(width.replace(/vw/g, ''));
+  }
+
+  const [ready, setReady] = useState(false);
+  const onReady = () => {
+    setReady(true);
+    onReadyForDisplay?.();
+  };
+  const sourceRef = useRef(source);
+  // we need to clean the state as fast as possible
+  // to avoid displaying the wrong image
+  if (sourceRef.current !== source) {
+    setReady(false);
+    sourceRef.current = source;
   }
 
   const videoRef = useRef<any>();
@@ -95,9 +118,13 @@ const MediaVideoRenderer = (
         uri={displayedURI}
         muted={muted}
         paused={paused}
+        onReadyForDisplay={onReady}
         {...props}
         style={StyleSheet.absoluteFill}
       />
+      {!ready && thumbnailURI && (
+        <Image source={{ uri: thumbnailURI }} style={StyleSheet.absoluteFill} />
+      )}
     </View>
   );
 };

@@ -5,12 +5,16 @@ import { MediaImageRenderer } from '../components/MediaRenderer';
 import DashedSlider from '../ui/DashedSlider';
 import Icon from '../ui/Icon';
 import VideoThumbnail from '../ui/VideoThumbnail';
-import type { MediaKind } from '@azzapp/relay/artifacts/CoverEditPanel_cover.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {
   pictures: ReadonlyArray<
-    Readonly<{ uri?: string; source: string; kind: MediaKind }>
+    Readonly<{
+      uri?: string;
+      source: string;
+      __typename: string;
+      thumbnail?: string;
+    }>
   >;
   timer: number;
   imageIndex: number | undefined;
@@ -114,7 +118,15 @@ const CoverEditPanelImageTab = ({
             >
               {({ pressed }) =>
                 pictures?.[index] ? (
-                  pictures[index].kind === 'video' ? (
+                  pictures[index].thumbnail ? (
+                    <MediaImageRenderer
+                      style={[styles.image, pressed && styles.imagePressed]}
+                      {...pictures[index]}
+                      uri={pictures[index].thumbnail}
+                      width={50}
+                      aspectRatio={1}
+                    />
+                  ) : pictures[index].__typename === 'MediaVideo' ? (
                     <VideoThumbnail
                       style={[styles.image, pressed && styles.imagePressed]}
                       {...pictures[index]}

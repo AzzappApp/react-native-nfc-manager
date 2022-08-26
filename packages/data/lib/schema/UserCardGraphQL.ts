@@ -9,7 +9,7 @@ import {
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { getUserById } from '../domains/User';
-import { MediaGraphQL } from './commonsTypes';
+import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
 import type { Media } from '../domains/commons';

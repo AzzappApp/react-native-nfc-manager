@@ -61,7 +61,7 @@ const PostsGrid = ({
           ...PostRendererFragment_author
         }
         media {
-          kind
+          __typename
           ratio
         }
         content
@@ -182,7 +182,9 @@ const PostsGrid = ({
       const { item, layout } = dataWithLayout[i];
       if (layout.top >= topLimit && layout.top < bottomLimit) {
         const freeKeys =
-          item.media.kind === 'video' ? freeVideoKeysMap : freeImageKeysMap;
+          item.media.__typename === 'MediaVideo'
+            ? freeVideoKeysMap
+            : freeImageKeysMap;
         const key = freeKeys.get(item.id);
         if (key) {
           freeKeys.delete(item.id);
@@ -199,8 +201,11 @@ const PostsGrid = ({
       const item = postMap.get(items[i][0])!.item;
       if (!key) {
         const freeKeys =
-          item.media.kind === 'video' ? freeVideoKeys : freeImageKeys;
-        const usedKeys = item.media.kind === 'video' ? videosKeys : imagesKeys;
+          item.media.__typename === 'MediaVideo'
+            ? freeVideoKeys
+            : freeImageKeys;
+        const usedKeys =
+          item.media.__typename === 'MediaVideo' ? videosKeys : imagesKeys;
         const entry = freeKeys.pop();
         if (entry) {
           key = entry[1];

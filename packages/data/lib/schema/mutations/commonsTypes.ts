@@ -1,10 +1,10 @@
 import {
+  GraphQLEnumType,
   GraphQLFloat,
   GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLString,
 } from 'graphql';
-import { MediaKindGraphQL } from '../commonsTypes';
 
 export const MediaInputGraphQL = new GraphQLInputObjectType({
   name: 'MediaInput',
@@ -20,4 +20,12 @@ export const MediaInputGraphQL = new GraphQLInputObjectType({
       type: GraphQLFloat,
     },
   }),
+});
+
+export const MediaKindGraphQL = new GraphQLEnumType({
+  name: 'MediaKind',
+  values: {
+    video: { value: 'video' },
+    picture: { value: 'picture' },
+  },
 });

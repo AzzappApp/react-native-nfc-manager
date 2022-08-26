@@ -27,7 +27,7 @@ export type CoverRendererProps = Omit<
   videoPaused?: boolean;
   imageIndex?: number;
   forceImageIndex?: boolean;
-  currentTime?: number;
+  currentTime?: number | null;
   onReadyForDisplay?: () => void;
 };
 
@@ -77,8 +77,8 @@ const CoverRenderer = (
         }
       ) {
         pictures {
+          __typename
           source
-          kind
           ratio
           # since cover are mainly used with 2 size full screen and cover size
           # we preload those url to avoid unecessary round trip
@@ -86,6 +86,16 @@ const CoverRenderer = (
             @include(if: $isNative)
           smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
+          ... on MediaVideo {
+            largeThumbnail: thumbnail(
+              width: $screenWidth
+              pixelRatio: $pixelRatio
+            ) @include(if: $isNative)
+            smallThumbnail: thumbnail(
+              width: 125
+              pixelRatio: $cappedPixelRatio
+            ) @include(if: $isNative)
+          }
         }
         pictureTransitionTimer
         ...CoverLayout_cover
@@ -121,7 +131,7 @@ const CoverRenderer = (
     () => {
       if (cover?.pictures.length) {
         const currentPicture = cover.pictures[currentImageIndex];
-        if (currentPicture.kind === 'picture') {
+        if (currentPicture.__typename === 'MediaImage') {
           nextIndex();
         }
       }
@@ -200,16 +210,21 @@ const CoverRenderer = (
             transitions={['opacity']}
             easing="ease-in-out"
           >
-            {picture.kind === 'video' && (
+            {picture.__typename === 'MediaVideo' && (
               <MediaVideoRenderer
                 {...mediaProps}
+                thumbnailURI={
+                  width === COVER_BASE_WIDTH
+                    ? picture.smallThumbnail
+                    : picture.largeThumbnail
+                }
                 muted
                 currentTime={currentTime}
                 paused={videoPaused || !isDisplayed}
                 onEnd={onVideoEnd}
               />
             )}
-            {picture.kind === 'picture' && (
+            {picture.__typename === 'MediaImage' && (
               <MediaImageRenderer {...mediaProps} />
             )}
           </ViewTransition>
