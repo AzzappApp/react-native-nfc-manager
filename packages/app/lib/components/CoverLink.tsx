@@ -22,7 +22,7 @@ const CoverLink = ({
   const coverRef = useRef<CoverHandle | null>(null);
   const ref = useRef<View | null>(null);
   const [coverState, setCoverState] = useState<
-    { imageIndex?: number; videoTime?: number } | undefined
+    { imageIndex?: number; videoTime?: number | null } | undefined
   >();
 
   const router = useRouter();
@@ -41,7 +41,8 @@ const CoverLink = ({
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
-      const snapshotID = await snapshotView(mediaRenderer);
+      const snapshotID = await snapshotView(mediaRenderer as any);
+      const videoTime = await coverRef.current?.getCurrentVideoTime();
       router.push({
         route: 'USER',
         params: {
@@ -49,7 +50,7 @@ const CoverLink = ({
           userId,
           snapshotID,
           imageIndex: coverRef.current?.getCurrentImageIndex(),
-          videoTime: coverRef.current?.getCurrentVideoTime(),
+          videoTime,
           fromRectangle: { x, y, width, height },
           setOriginCoverState: setCoverState,
         },

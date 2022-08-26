@@ -1,33 +1,73 @@
-import { useMemo } from 'react';
-import Video from 'react-native-video';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import {
+  findNodeHandle,
+  NativeModules,
+  requireNativeComponent,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { queryMediaCache } from './mediaCache';
-import type { MediaInnerRendererProps } from './types';
+import type { ForwardedRef } from 'react';
+import type { ViewProps, NativeSyntheticEvent } from 'react-native';
 
-const MediaVideoRenderer = ({
-  uri,
-  source,
-  width,
-  muted = false,
-  playWhenInactive = false,
-  allowsExternalPlayback = false,
-  repeat = false,
-  style,
-  mediaRef,
-  ...props
-}: MediaInnerRendererProps) => {
+export type MediaVideoRendererProps = ViewProps & {
+  uri?: string;
+  source: string;
+  width: number | `${number}vw`;
+  aspectRatio: number;
+  paused?: boolean;
+  muted?: boolean;
+  currentTime?: number;
+  onReadyForDisplay?: () => void;
+  onEnd?: () => void;
+  onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
+};
+
+export type MediaVideoRendererHandle = {
+  getContainer(): View | null;
+  getPlayerCurrentTime(): Promise<number | null>;
+};
+
+const MediaVideoRenderer = (
+  {
+    uri,
+    source,
+    width,
+    aspectRatio,
+    muted = false,
+    paused = false,
+    style,
+    ...props
+  }: MediaVideoRendererProps,
+  ref: ForwardedRef<MediaVideoRendererHandle>,
+) => {
   if (typeof width === 'string') {
     console.error('Invalide `vw` size used on native media renderer');
     width = parseFloat(width.replace(/vw/g, ''));
   }
-  const videoRef = (video: any) => {
-    if (video) {
-      if (mediaRef && typeof mediaRef === 'object') {
-        (mediaRef as any).current = video._root;
-      } else if (typeof mediaRef === 'function') {
-        mediaRef(video._root);
-      }
-    }
-  };
+
+  const videoRef = useRef<any>();
+  const containerRef = useRef<View>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getContainer() {
+        return containerRef.current;
+      },
+      async getPlayerCurrentTime() {
+        if (videoRef.current) {
+          const data =
+            await NativeModules.AZPMediaVideoRendererManager.getPlayerCurrentTime(
+              findNodeHandle(videoRef.current),
+            );
+          return data?.currentTime ?? null;
+        }
+        return null;
+      },
+    }),
+    [],
+  );
 
   const displayedURI = useMemo(() => {
     if (!uri) {
@@ -46,19 +86,23 @@ const MediaVideoRenderer = ({
   }, [source, uri, width]);
 
   return (
-    <Video
-      ref={videoRef}
-      source={{ uri: displayedURI }}
-      hideShutterView
-      resizeMode="cover"
-      allowsExternalPlayback={allowsExternalPlayback}
-      muted={muted}
-      playWhenInactive={playWhenInactive}
-      repeat={repeat}
-      style={style}
-      {...props}
-    />
+    <View
+      style={[style, { width, aspectRatio, overflow: 'hidden' }]}
+      ref={containerRef}
+    >
+      <NativeMediaVideoRenderer
+        ref={videoRef}
+        uri={displayedURI}
+        muted={muted}
+        paused={paused}
+        {...props}
+        style={StyleSheet.absoluteFill}
+      />
+    </View>
   );
 };
 
-export default MediaVideoRenderer;
+export default forwardRef(MediaVideoRenderer);
+
+const NativeMediaVideoRenderer: React.ComponentType<any> =
+  requireNativeComponent('AZPMediaVideoRenderer');

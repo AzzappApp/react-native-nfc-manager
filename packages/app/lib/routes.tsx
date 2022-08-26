@@ -37,12 +37,12 @@ export type UserRoute = {
     userName: string;
     userId?: string;
     imageIndex?: number;
-    videoTime?: number;
+    videoTime?: number | null;
     fromRectangle?: LayoutRectangle;
     snapshotID?: string;
     setOriginCoverState?: (state: {
       imageIndex?: number;
-      videoTime?: number;
+      videoTime?: number | null;
     }) => void;
   };
 };

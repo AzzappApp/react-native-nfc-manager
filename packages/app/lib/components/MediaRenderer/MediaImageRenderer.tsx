@@ -1,18 +1,34 @@
-import omit from 'lodash/omit';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { Image } from 'react-native';
 import { queryMediaCache, addMediaCacheEntry } from './mediaCache';
-import type { MediaInnerRendererProps } from './types';
+import type { ForwardedRef } from 'react';
+import type {
+  ImageProps,
+  NativeSyntheticEvent,
+  ImageLoadEventData,
+} from 'react-native';
 
-const MediaImageRenderer = ({
-  uri,
-  source,
-  width,
-  onLoad,
-  onReadyForDisplay,
-  mediaRef,
-  ...props
-}: MediaInnerRendererProps) => {
+export type MediaInnerRendererProps = Omit<ImageProps, 'source'> & {
+  uri?: string;
+  source: string;
+  width: number | `${number}vw`;
+  aspectRatio: number;
+  onReadyForDisplay?: () => void;
+};
+
+const MediaImageRenderer = (
+  {
+    uri,
+    source,
+    width,
+    aspectRatio,
+    onLoad,
+    onReadyForDisplay,
+    style,
+    ...props
+  }: MediaInnerRendererProps,
+  ref: ForwardedRef<Image>,
+) => {
   if (typeof width === 'string') {
     console.error('Invalide `vw` size used on native media renderer');
     width = parseFloat(width.replace(/vw/g, ''));
@@ -29,9 +45,9 @@ const MediaImageRenderer = ({
   });
 
   const isReady = useRef(false);
-  const onImageLoad = () => {
+  const onImageLoad = (event: NativeSyntheticEvent<ImageLoadEventData>) => {
     if (displayedURI === uri) {
-      onLoad?.();
+      onLoad?.(event);
       if (!isReady.current) {
         onReadyForDisplay?.();
         isReady.current = true;
@@ -41,6 +57,7 @@ const MediaImageRenderer = ({
       isReady.current = true;
     }
   };
+
   useEffect(() => {
     if (!uri) {
       console.error('MediaRenderer should not be rendered withour URI');
@@ -68,22 +85,13 @@ const MediaImageRenderer = ({
 
   return (
     <Image
-      // @ts-expect-error bad ref type
-      ref={mediaRef}
+      ref={ref}
       source={(displayedURI ? { uri: displayedURI } : null) as any}
       onLoad={onImageLoad}
-      {...omit(props, [
-        'paused',
-        'muted',
-        'repeat',
-        'playWhenInactive',
-        'allowsExternalPlayback',
-        'currentTime',
-        'onEnd',
-        'onProgress',
-      ])}
+      style={[style, { aspectRatio, width, resizeMode: 'cover' }]}
+      {...props}
     />
   );
 };
 
-export default MediaImageRenderer;
+export default forwardRef(MediaImageRenderer);

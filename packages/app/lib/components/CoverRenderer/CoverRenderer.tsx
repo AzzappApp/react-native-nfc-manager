@@ -10,13 +10,13 @@ import { StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import useInterval from '../../hooks/useInterval';
 import ViewTransition from '../../ui/ViewTransition';
-import MediaRenderer from '../MediaRenderer';
+import { MediaImageRenderer, MediaVideoRenderer } from '../MediaRenderer';
 import CoverLayout from './CoverLayout';
+import type { MediaVideoRendererHandle } from '../MediaRenderer/MediaVideoRenderer';
 import type { CoverLayoutProps } from './CoverLayout';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ForwardedRef } from 'react';
-import type { HostComponent } from 'react-native';
-import type { OnProgressData } from 'react-native-video';
+import type { Image, View } from 'react-native';
 
 export type CoverRendererProps = Omit<
   CoverLayoutProps,
@@ -32,9 +32,9 @@ export type CoverRendererProps = Omit<
 };
 
 export type CoverHandle = {
-  getCurrentMediaRenderer(): HostComponent<any> | null;
+  getCurrentMediaRenderer(): Image | View | null;
   getCurrentImageIndex(): number;
-  getCurrentVideoTime(): number;
+  getCurrentVideoTime(): Promise<number | null>;
 };
 
 const CoverRenderer = (
@@ -98,7 +98,6 @@ const CoverRenderer = (
    * Handle image transition
    */
   const [currentImageIndex, setCurrentImageIndex] = useState(imageIndex);
-  const videoTimeRef = useRef(0);
 
   useEffect(() => {
     setCurrentImageIndex(imageIndex);
@@ -114,7 +113,6 @@ const CoverRenderer = (
     if (cover?.pictures.length) {
       const nextIndex = (currentImageIndex + 1) % cover.pictures.length;
       setCurrentImageIndex(nextIndex);
-      videoTimeRef.current = 0;
     }
   };
 
@@ -135,26 +133,35 @@ const CoverRenderer = (
     nextIndex();
   };
 
-  const onVideoProgress = (data: OnProgressData) => {
-    videoTimeRef.current = data.currentTime;
-  };
-
   /**
    * Imperative Handle
    */
-  const mediaRef = useRef<HostComponent<any>>(null);
+  const mediaRef = useRef<Image | MediaVideoRendererHandle | null>(null);
 
   useImperativeHandle(
     forwardRef,
     () => ({
       getCurrentMediaRenderer() {
-        return mediaRef.current;
+        if (!mediaRef.current) {
+          return null;
+        }
+        if ('getContainer' in mediaRef.current) {
+          return mediaRef.current.getContainer();
+        } else {
+          return mediaRef.current;
+        }
       },
       getCurrentImageIndex() {
         return currentImageIndex;
       },
-      getCurrentVideoTime() {
-        return videoTimeRef.current;
+      async getCurrentVideoTime() {
+        if (!mediaRef.current) {
+          return null;
+        }
+        if ('getPlayerCurrentTime' in mediaRef.current) {
+          return mediaRef.current.getPlayerCurrentTime();
+        }
+        return null;
       },
     }),
     [currentImageIndex],
@@ -175,6 +182,16 @@ const CoverRenderer = (
     <CoverLayout cover={cover} width={width} userName={userName} {...props}>
       {displayedPictures.map((picture, index) => {
         const isDisplayed = !playTransition || index === currentImageIndex;
+
+        const mediaProps = {
+          ref: (isDisplayed ? mediaRef : null) as any,
+          aspectRatio: picture.ratio,
+          source: picture.source,
+          uri: width === COVER_BASE_WIDTH ? picture.smallURI : picture.largeURI,
+          width,
+          onReadyForDisplay: isDisplayed ? onReadyForDisplay : undefined,
+          style: styles.coverContent,
+        };
         return (
           <ViewTransition
             key={picture.source}
@@ -183,27 +200,18 @@ const CoverRenderer = (
             transitions={['opacity']}
             easing="ease-in-out"
           >
-            <MediaRenderer
-              ref={isDisplayed ? mediaRef : null}
-              kind={picture.kind}
-              aspectRatio={picture.ratio}
-              source={picture.source}
-              uri={
-                width === COVER_BASE_WIDTH ? picture.smallURI : picture.largeURI
-              }
-              width={width}
-              muted
-              repeat
-              // TODO
-              // react native video crash if we use a currentTime that is the same
-              // that the currently used time
-              currentTime={currentTime ? currentTime : undefined}
-              paused={videoPaused || !isDisplayed}
-              onReadyForDisplay={isDisplayed ? onReadyForDisplay : undefined}
-              onEnd={onVideoEnd}
-              onProgress={onVideoProgress}
-              style={styles.coverContent}
-            />
+            {picture.kind === 'video' && (
+              <MediaVideoRenderer
+                {...mediaProps}
+                muted
+                currentTime={currentTime}
+                paused={videoPaused || !isDisplayed}
+                onEnd={onVideoEnd}
+              />
+            )}
+            {picture.kind === 'picture' && (
+              <MediaImageRenderer {...mediaProps} />
+            )}
           </ViewTransition>
         );
       })}

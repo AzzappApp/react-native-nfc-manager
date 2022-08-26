@@ -3,7 +3,7 @@ import { graphql, useFragment } from 'react-relay';
 import { colors, fontFamilies } from '../../theme';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';
-import MediaRenderer from './MediaRenderer';
+import { MediaImageRenderer, MediaVideoRenderer } from './MediaRenderer';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
 import type { ViewProps } from 'react-native';
@@ -85,17 +85,26 @@ const PostRenderer = ({
   return (
     <View {...props}>
       <View>
-        <MediaRenderer
-          source={source}
-          uri={small ? smallURI : largeURI}
-          kind={kind}
-          aspectRatio={ratio}
-          width={width}
-          repeat
-          muted={muted}
-          paused={paused}
-          style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
-        />
+        {kind === 'video' && (
+          <MediaVideoRenderer
+            source={source}
+            uri={small ? smallURI : largeURI}
+            aspectRatio={ratio}
+            width={width}
+            muted={muted}
+            paused={paused}
+            style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
+          />
+        )}
+        {kind === 'picture' && (
+          <MediaImageRenderer
+            source={source}
+            uri={small ? smallURI : largeURI}
+            aspectRatio={ratio}
+            width={width}
+            style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
+          />
+        )}
         {small && (
           <AuthorCartouche
             userName={author.userName}

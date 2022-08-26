@@ -19,7 +19,7 @@ export type UserScreenProps = {
   ready?: boolean;
   hideCover?: boolean;
   initialImageIndex?: number;
-  initialVideoTime?: number;
+  initialVideoTime?: number | null;
   coverRef?: Ref<CoverHandle>;
   onBack: () => void;
   onCoverReadyForDisplay?: () => void;

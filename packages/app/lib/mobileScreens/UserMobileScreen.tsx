@@ -154,10 +154,10 @@ const UserMobileScreenAppearAnimationWrapper = ({
   ready: boolean;
   onBack(): void;
 }) => {
-  const onBackAnimationEnd = () => {
+  const onBackAnimationEnd = async () => {
     if (coverRef.current) {
       const imageIndex = coverRef.current.getCurrentImageIndex();
-      const videoTime = coverRef.current.getCurrentVideoTime();
+      const videoTime = await coverRef.current.getCurrentVideoTime();
       params.setOriginCoverState?.({ imageIndex, videoTime });
     }
     setTimeout(onBackProp);
