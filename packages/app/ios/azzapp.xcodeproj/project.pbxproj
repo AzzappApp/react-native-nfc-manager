@@ -18,6 +18,8 @@
 		FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
 		FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
+		FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
+		FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD46F44E288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
 		FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
 		FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5728882C6700D56E20 /* AZPEditableVideo.m */; };
@@ -82,6 +84,8 @@
 		FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzappTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AZPMediaImageRendererManager.swift; path = azzapp/AZPMediaImageRendererManager.swift; sourceTree = "<group>"; };
 		FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaImageRendererManager.m; path = azzapp/AZPMediaImageRendererManager.m; sourceTree = "<group>"; };
+		FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPScrollToTopInterceptor.h; path = azzapp/AZPScrollToTopInterceptor.h; sourceTree = "<group>"; };
+		FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPScrollToTopInterceptor.m; path = azzapp/AZPScrollToTopInterceptor.m; sourceTree = "<group>"; };
 		FD46F44C288713B300222C11 /* AZPEditableImageSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageSource.h; path = azzapp/AZPEditableImageSource.h; sourceTree = "<group>"; };
 		FD46F44D288713B300222C11 /* AZPEditableImageSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImageSource.m; path = azzapp/AZPEditableImageSource.m; sourceTree = "<group>"; };
 		FD482C5628882C6700D56E20 /* AZPEditableVideo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableVideo.h; path = azzapp/AZPEditableVideo.h; sourceTree = "<group>"; };
@@ -185,6 +189,8 @@
 				FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */,
 				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
 				FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */,
+				FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */,
+				FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -529,6 +535,7 @@
 				FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
 				FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */,
 				FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */,
 				FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
 				FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
@@ -547,6 +554,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
+				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */,
 				FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
 				FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,

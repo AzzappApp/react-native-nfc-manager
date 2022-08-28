@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../theme';
+import useScrollToTopInterceptor from '../hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
 import PostRenderer from './PostRenderer';
 import type {
   PostsGrid_posts$data,
@@ -131,6 +132,7 @@ const PostsGrid = ({
   const [layoutPosition, setLayoutPosition] = useState(0);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
   const [headerSize, setHeaderSize] = useState(0);
+  const [isScrollingToTop, setIsScrollingToTop] = useState(false);
 
   const onHeaderLayout = (e: LayoutChangeEvent) => {
     setHeaderSize(e.nativeEvent.layout.height);
@@ -145,6 +147,9 @@ const PostsGrid = ({
     if (contentHeight - scrollPosition < scrollViewHeight * 2) {
       onEndReached?.();
     }
+    if (isScrollingToTop && scrollPosition === 0) {
+      setIsScrollingToTop(false);
+    }
 
     setLayoutPosition(
       Math.floor(
@@ -153,6 +158,14 @@ const PostsGrid = ({
       ) / BATCH_SIZE,
     );
   };
+
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const scrollToTopInterceptor = useScrollToTopInterceptor(() => {
+    if (scrollViewRef.current) {
+      setIsScrollingToTop(true);
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  });
 
   const postMap = useMemo(() => {
     const postMap = new Map<string, { item: Post; layout: ItemLayout }>();
@@ -167,7 +180,11 @@ const PostsGrid = ({
     images: new Map<string, string>(),
   });
 
+  const itemRefs = useRef<Array<[string, string]>>([]);
   const items = useMemo(() => {
+    if (isScrollingToTop) {
+      return itemRefs.current;
+    }
     const topLimit = (layoutPosition - 0.5) * scrollViewHeight;
     const bottomLimit = (layoutPosition + 1.25) * scrollViewHeight;
 
@@ -228,7 +245,14 @@ const PostsGrid = ({
     items.push(...freeVideoKeys);
 
     return items;
-  }, [layoutPosition, scrollViewHeight, dataWithLayout, postMap]);
+  }, [
+    isScrollingToTop,
+    layoutPosition,
+    scrollViewHeight,
+    dataWithLayout,
+    postMap,
+  ]);
+  itemRefs.current = items;
 
   const placeHolders = useMemo(
     () =>
@@ -249,6 +273,10 @@ const PostsGrid = ({
 
   return (
     <ScrollView
+      ref={scrollView => {
+        scrollToTopInterceptor(scrollView);
+        scrollViewRef.current = scrollView;
+      }}
       style={style}
       stickyHeaderIndices={stickyHeaderIndices}
       showsVerticalScrollIndicator={false}
