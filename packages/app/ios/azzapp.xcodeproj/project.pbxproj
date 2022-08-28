@@ -14,6 +14,10 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-azzapp-azzappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-azzapp-azzappTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
+		FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
+		FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
+		FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD46F44E288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
 		FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FD46F44D288713B300222C11 /* AZPEditableImageSource.m */; };
 		FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = FD482C5728882C6700D56E20 /* AZPEditableVideo.m */; };
@@ -74,6 +78,10 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = azzapp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-azzapp-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-azzapp-azzappTests/Pods-azzapp-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzapp-Bridging-Header.h"; sourceTree = "<group>"; };
+		FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzappTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AZPMediaImageRendererManager.swift; path = azzapp/AZPMediaImageRendererManager.swift; sourceTree = "<group>"; };
+		FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaImageRendererManager.m; path = azzapp/AZPMediaImageRendererManager.m; sourceTree = "<group>"; };
 		FD46F44C288713B300222C11 /* AZPEditableImageSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageSource.h; path = azzapp/AZPEditableImageSource.h; sourceTree = "<group>"; };
 		FD46F44D288713B300222C11 /* AZPEditableImageSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImageSource.m; path = azzapp/AZPEditableImageSource.m; sourceTree = "<group>"; };
 		FD482C5628882C6700D56E20 /* AZPEditableVideo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableVideo.h; path = azzapp/AZPEditableVideo.h; sourceTree = "<group>"; };
@@ -173,6 +181,10 @@
 				FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */,
 				FD55E4C128B6649E00321128 /* AZPMediaVideoRendererManager.h */,
 				FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */,
+				FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */,
+				FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */,
+				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
+				FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -305,10 +317,11 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						LastSwiftMigration = 1340;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1340;
 					};
 				};
 			};
@@ -511,7 +524,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD9315F928757797006E8CF7 /* AZPMTKImageView.m in Sources */,
+				FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
 				FD482C5928882C6700D56E20 /* AZPEditableVideo.m in Sources */,
 				FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */,
 				FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */,
@@ -531,6 +546,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
 				FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */,
 				FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
 				FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,
@@ -539,6 +555,7 @@
 				FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
 				FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */,
 				FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */,
+				FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FD482C5828882C6700D56E20 /* AZPEditableVideo.m in Sources */,
 				FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
@@ -563,7 +580,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-azzapp-azzappTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -582,6 +601,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "azzappTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/azzapp.app/azzapp";
 			};
 			name = Debug;
@@ -590,7 +612,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = azzappTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
@@ -606,6 +630,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "azzappTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/azzapp.app/azzapp";
 			};
 			name = Release;
@@ -632,6 +658,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
 				PRODUCT_NAME = azzapp;
+				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -659,6 +686,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
 				PRODUCT_NAME = azzapp;
+				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

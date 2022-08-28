@@ -1,40 +1,18 @@
-import {
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import LRUCache from 'lru-cache';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import {
   findNodeHandle,
-  Image,
   NativeModules,
   requireNativeComponent,
   StyleSheet,
   View,
 } from 'react-native';
-import { queryMediaCache } from './mediaCache';
+import MediaImageRenderer from './MediaImageRenderer';
+import type {
+  MediaVideoRendererHandle,
+  MediaVideoRendererProps,
+} from './types';
 import type { ForwardedRef } from 'react';
-import type { ViewProps, NativeSyntheticEvent } from 'react-native';
-
-export type MediaVideoRendererProps = ViewProps & {
-  uri?: string;
-  thumbnailURI?: string;
-  source: string;
-  width: number | `${number}vw`;
-  aspectRatio: number;
-  paused?: boolean;
-  muted?: boolean;
-  currentTime?: number | null;
-  onReadyForDisplay?: () => void;
-  onEnd?: () => void;
-  onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
-};
-
-export type MediaVideoRendererHandle = {
-  getContainer(): View | null;
-  getPlayerCurrentTime(): Promise<number | null>;
-};
 
 const MediaVideoRenderer = (
   {
@@ -56,21 +34,32 @@ const MediaVideoRenderer = (
     width = parseFloat(width.replace(/vw/g, ''));
   }
 
-  const [ready, setReady] = useState(false);
-  const onReady = () => {
-    setReady(true);
-    onReadyForDisplay?.();
+  const isReadyForDisplay = useRef(false);
+  const [videoReady, setVideoReady] = useState(false);
+
+  const dispatchReady = () => {
+    if (!isReadyForDisplay.current) {
+      isReadyForDisplay.current = true;
+      onReadyForDisplay?.();
+    }
   };
+
+  const onVideoReadyForDisplay = () => {
+    setVideoReady(true);
+    dispatchReady();
+  };
+
   const sourceRef = useRef(source);
-  // we need to clean the state as fast as possible
-  // to avoid displaying the wrong image
+  // we need to clean the state to start loading
+  // the placeholder
   if (sourceRef.current !== source) {
-    setReady(false);
+    setVideoReady(false);
     sourceRef.current = source;
+    isReadyForDisplay.current = false;
   }
 
   const videoRef = useRef<any>();
-  const containerRef = useRef<View>(null);
+  const containerRef = useRef<any>(null);
 
   useImperativeHandle(
     ref,
@@ -92,22 +81,6 @@ const MediaVideoRenderer = (
     [],
   );
 
-  const displayedURI = useMemo(() => {
-    if (!uri) {
-      console.error('MediaRenderer should not be rendered withour URI');
-    }
-    /**
-     * Video cache only works when we use a video that we just uploaded
-     * We don't use the same tricks with image since prefetching video
-     * is too expensive and synchronizing play time would be error prone
-     */
-    const { inCache, alternateURI } = queryMediaCache(source, width as number);
-    if (inCache || !alternateURI) {
-      return uri;
-    }
-    return alternateURI;
-  }, [source, uri, width]);
-
   return (
     <View
       style={[style, { width, aspectRatio, overflow: 'hidden' }]}
@@ -115,15 +88,23 @@ const MediaVideoRenderer = (
     >
       <NativeMediaVideoRenderer
         ref={videoRef}
-        uri={displayedURI}
+        // TODO if file is purged by system problem may arise
+        uri={localVideoFile.get(source) ?? uri}
         muted={muted}
         paused={paused}
-        onReadyForDisplay={onReady}
+        onReadyForDisplay={onVideoReadyForDisplay}
         {...props}
         style={StyleSheet.absoluteFill}
       />
-      {!ready && thumbnailURI && (
-        <Image source={{ uri: thumbnailURI }} style={StyleSheet.absoluteFill} />
+      {!videoReady && thumbnailURI && (
+        <MediaImageRenderer
+          source={source}
+          aspectRatio={aspectRatio}
+          width={width}
+          uri={thumbnailURI}
+          onReadyForDisplay={dispatchReady}
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'transparent' }]}
+        />
       )}
     </View>
   );
@@ -133,3 +114,9 @@ export default forwardRef(MediaVideoRenderer);
 
 const NativeMediaVideoRenderer: React.ComponentType<any> =
   requireNativeComponent('AZPMediaVideoRenderer');
+
+const localVideoFile = new LRUCache<string, string>({ max: 1000 });
+
+export const addLocalVideo = (mediaID: string, localURI: string) => {
+  localVideoFile.set(mediaID, localURI);
+};

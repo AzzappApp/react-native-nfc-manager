@@ -10,7 +10,7 @@ const VideoThumbnail = ({
 }: Omit<ImageProps, 'source'> & { source: string }) => {
   return createHTMLElement('video', {
     ...omit(props, 'ref'),
-    src: getVideoUrlForSize(source),
+    src: getVideoUrlForSize(source, 100),
     autoPlay: false,
     loop: false,
     muted: true,

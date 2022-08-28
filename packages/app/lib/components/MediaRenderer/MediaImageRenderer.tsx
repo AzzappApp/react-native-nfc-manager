@@ -1,20 +1,8 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
-import { Image } from 'react-native';
-import { queryMediaCache, addMediaCacheEntry } from './mediaCache';
+import { forwardRef, useRef } from 'react';
+import { NativeModules, requireNativeComponent } from 'react-native';
+import type { MediaImageRendererProps } from './types';
 import type { ForwardedRef } from 'react';
-import type {
-  ImageProps,
-  NativeSyntheticEvent,
-  ImageLoadEventData,
-} from 'react-native';
-
-export type MediaInnerRendererProps = Omit<ImageProps, 'source'> & {
-  uri?: string;
-  source: string;
-  width: number | `${number}vw`;
-  aspectRatio: number;
-  onReadyForDisplay?: () => void;
-};
+import type { HostComponent } from 'react-native';
 
 const MediaImageRenderer = (
   {
@@ -26,72 +14,59 @@ const MediaImageRenderer = (
     onReadyForDisplay,
     style,
     ...props
-  }: MediaInnerRendererProps,
-  ref: ForwardedRef<Image>,
+  }: MediaImageRendererProps,
+  ref: ForwardedRef<HostComponent<any>>,
 ) => {
   if (typeof width === 'string') {
     console.error('Invalide `vw` size used on native media renderer');
     width = parseFloat(width.replace(/vw/g, ''));
   }
-  const [displayedURI, setDisplayedURI] = useState<string | null>(() => {
-    if (!uri) {
-      return null;
-    }
-    const { inCache, alternateURI } = queryMediaCache(source, width as number);
-    if (inCache) {
-      return uri;
-    }
-    return alternateURI ?? null;
-  });
 
   const isReady = useRef(false);
-  const onImageLoad = (event: NativeSyntheticEvent<ImageLoadEventData>) => {
-    if (displayedURI === uri) {
-      onLoad?.(event);
-      if (!isReady.current) {
-        onReadyForDisplay?.();
-        isReady.current = true;
-      }
-    } else {
+
+  // we need to clean the state as fast as possible
+  // to dispatch ready if in cache
+  const uriRef = useRef(uri);
+  if (uri !== uriRef.current) {
+    uriRef.current = uri;
+    isReady.current = false;
+  }
+
+  const onImageLoad = () => {
+    if (!isReady.current) {
       onReadyForDisplay?.();
       isReady.current = true;
     }
+    onLoad?.();
   };
 
-  useEffect(() => {
-    if (!uri) {
-      console.error('MediaRenderer should not be rendered withour URI');
-      return;
-    }
-    setDisplayedURI(null);
-    const { inCache, alternateURI } = queryMediaCache(source, width as number);
-    if (inCache) {
-      setDisplayedURI(uri);
-      return;
-    }
-    if (alternateURI) {
-      setDisplayedURI(alternateURI);
-    }
-    Image.prefetch(uri).then(
-      () => {
-        setDisplayedURI(uri);
-        addMediaCacheEntry(source, width as number, uri);
-      },
-      () => {
-        // TODO handle errors, perhaps retry ?
-      },
-    );
-  }, [source, uri, width]);
+  const onPlaceHolderImageLoad = () => {
+    console.log('placeHolder load');
+    onReadyForDisplay?.();
+    isReady.current = true;
+  };
 
   return (
-    <Image
+    <NativeMediaImageRenderer
       ref={ref}
-      source={(displayedURI ? { uri: displayedURI } : null) as any}
+      source={{
+        uri,
+        mediaID: source,
+        requestedSize: typeof width == 'number' ? width : 0,
+      }}
       onLoad={onImageLoad}
-      style={[style, { aspectRatio, width, resizeMode: 'cover' }]}
+      onPlaceHolderImageLoad={onPlaceHolderImageLoad}
+      style={[style, { width, aspectRatio, overflow: 'hidden' }]}
       {...props}
     />
   );
 };
 
+export const addCacheEntry = (mediaID: string, size: number, uri: string) => {
+  NativeModules.AZPMediaImageRendererManager.addCacheEntry(mediaID, size, uri);
+};
+
 export default forwardRef(MediaImageRenderer);
+
+export const NativeMediaImageRenderer: React.ComponentType<any> =
+  requireNativeComponent('AZPMediaImageRenderer');

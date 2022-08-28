@@ -1,6 +1,12 @@
 import { COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useRef, useState } from 'react';
-import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  Dimensions,
+  PixelRatio,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
@@ -13,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReanimatedTransitionProgress } from 'react-native-screens/reanimated';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { CoverLayout } from '../components/CoverRenderer';
-import { queryMediaCache } from '../components/MediaRenderer/mediaCache';
+import { MediaImageRenderer } from '../components/MediaRenderer';
 import {
   useNativeNavigationEvent,
   useScreenOptionsUpdater,
@@ -87,7 +93,11 @@ const getQuery = (params: UserRoute['params']) =>
   params.userId ? userScreenByIdQuery : userScreenByNameQuery;
 
 const userScreenByIdQuery = graphql`
-  query UserMobileScreenByIdQuery($userId: ID!) {
+  query UserMobileScreenByIdQuery(
+    $userId: ID!
+    $screenWidth: Float!
+    $pixelRatio: Float!
+  ) {
     user: node(id: $userId) {
       ...UserScreenFramgent_user
       ... on User {
@@ -97,8 +107,11 @@ const userScreenByIdQuery = graphql`
             backgroundColor
             ...CoverLayout_cover
             pictures {
-              __typename
               source
+              ratio
+              ... on MediaImage {
+                mobileScreenURI: uri(width: $screenWidth, ratio: $pixelRatio)
+              }
             }
           }
         }
@@ -138,7 +151,14 @@ UserMobileScreen.getScreenOptions = ({
 
 export default relayScreen(UserMobileScreen, {
   query: getQuery,
-  getVariables: ({ userName, userId }) => (userId ? { userId } : { userName }),
+  getVariables: ({ userName, userId }) =>
+    userId
+      ? {
+          userId,
+          screenWidth: Dimensions.get('window').width,
+          pixelRatio: PixelRatio.get(),
+        }
+      : { userName },
 });
 
 const UserMobileScreenAppearAnimationWrapper = ({
@@ -249,17 +269,7 @@ const UserMobileScreenAppearAnimationWrapper = ({
   }
 
   const { pictures } = card.cover;
-
   const selectedPicture = pictures[params.imageIndex ?? 0];
-
-  let imageURI: string | null = null;
-  if (selectedPicture.__typename === 'MediaImage') {
-    const { uri, alternateURI } = queryMediaCache(
-      selectedPicture.source,
-      windowWidth,
-    );
-    imageURI = uri ?? alternateURI ?? null;
-  }
 
   return (
     <Animated.View
@@ -310,10 +320,13 @@ const UserMobileScreenAppearAnimationWrapper = ({
                     style={StyleSheet.absoluteFill}
                   />
                 )}
-                {imageURI && (
-                  <Image
-                    source={{ uri: imageURI }}
-                    onLoad={() => setImageReady(true)}
+                {selectedPicture.mobileScreenURI != null && (
+                  <MediaImageRenderer
+                    uri={selectedPicture.mobileScreenURI}
+                    source={selectedPicture.source}
+                    width={windowWidth}
+                    aspectRatio={selectedPicture.ratio}
+                    onReadyForDisplay={() => setImageReady(true)}
                     style={[
                       StyleSheet.absoluteFill,
                       { opacity: imageReady ? 1 : 0 },

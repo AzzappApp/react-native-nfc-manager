@@ -19,6 +19,8 @@ target 'azzapp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'Nuke', :git => 'https://github.com/kean/Nuke.git', :tag => '10.11.2'
+
   target 'azzappTests' do
     inherit! :complete
     # Pods for testing

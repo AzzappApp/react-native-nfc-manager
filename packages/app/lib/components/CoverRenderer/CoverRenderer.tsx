@@ -12,11 +12,11 @@ import useInterval from '../../hooks/useInterval';
 import ViewTransition from '../../ui/ViewTransition';
 import { MediaImageRenderer, MediaVideoRenderer } from '../MediaRenderer';
 import CoverLayout from './CoverLayout';
-import type { MediaVideoRendererHandle } from '../MediaRenderer/MediaVideoRenderer';
+import type { MediaVideoRendererHandle } from '../MediaRenderer';
 import type { CoverLayoutProps } from './CoverLayout';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ForwardedRef } from 'react';
-import type { Image, View } from 'react-native';
+import type { HostComponent } from 'react-native';
 
 export type CoverRendererProps = Omit<
   CoverLayoutProps,
@@ -32,7 +32,7 @@ export type CoverRendererProps = Omit<
 };
 
 export type CoverHandle = {
-  getCurrentMediaRenderer(): Image | View | null;
+  getCurrentMediaRenderer(): HostComponent<any> | null;
   getCurrentImageIndex(): number;
   getCurrentVideoTime(): Promise<number | null>;
 };
@@ -146,7 +146,9 @@ const CoverRenderer = (
   /**
    * Imperative Handle
    */
-  const mediaRef = useRef<Image | MediaVideoRendererHandle | null>(null);
+  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
+    null,
+  );
 
   useImperativeHandle(
     forwardRef,

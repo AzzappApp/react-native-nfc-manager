@@ -1,25 +1,36 @@
 import { getVideoUrlForSize } from '@azzapp/shared/lib/imagesHelpers';
-import omit from 'lodash/omit';
-import { useEffect, useRef } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { StyleSheet, View } from 'react-native';
 import createHTMLElement from '../../helpers/createHTMLElement';
-import type { MediaInnerRendererProps } from './types';
+import MediaImageRenderer from './MediaImageRenderer';
+import type {
+  MediaVideoRendererHandle,
+  MediaVideoRendererProps,
+} from './types';
+import type { ForwardedRef } from 'react';
 
-const MediaVideoRenderer = ({
-  source,
-  muted = false,
-  repeat = false,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  mediaRef,
-  paused,
-  currentTime,
-  width,
-  aspectRatio,
-  style,
-  onEnd,
-  onReadyForDisplay,
-  onProgress: onProgressProp,
-  ...props
-}: MediaInnerRendererProps) => {
+const MediaVideoRenderer = (
+  {
+    thumbnailURI,
+    source,
+    width,
+    aspectRatio,
+    muted = false,
+    paused = false,
+    style,
+    onReadyForDisplay,
+    currentTime,
+    onEnd,
+    onProgress: onProgressProp,
+  }: MediaVideoRendererProps,
+  ref: ForwardedRef<MediaVideoRendererHandle>,
+) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -38,7 +49,7 @@ const MediaVideoRenderer = ({
 
   const onEnded = () => {
     onEnd?.();
-    if (repeat && videoRef.current) {
+    if (videoRef.current) {
       videoRef.current.currentTime = currentTime ?? 0;
       videoRef.current.play().catch(() => null);
     }
@@ -48,11 +59,39 @@ const MediaVideoRenderer = ({
     const video = videoRef.current;
     // TODO check the validity of the conversion
     onProgressProp?.({
-      currentTime: video?.currentTime ?? 0,
-      playableDuration: video?.playbackRate ?? 0,
-      seekableDuration: video?.seekable?.length ?? 0,
-    });
+      nativeEvent: {
+        currentTime: video?.currentTime ?? 0,
+      },
+    } as any);
   };
+
+  const [ready, setReady] = useState(false);
+  const onReady = () => {
+    setReady(true);
+    onReadyForDisplay?.();
+  };
+  const sourceRef = useRef(source);
+  // we need to clean the state as fast as possible
+  // to avoid displaying the wrong image
+  if (sourceRef.current !== source) {
+    setReady(false);
+    sourceRef.current = source;
+  }
+
+  const containerRef = useRef<any>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getContainer() {
+        return containerRef.current;
+      },
+      async getPlayerCurrentTime() {
+        return videoRef.current?.currentTime ?? null;
+      },
+    }),
+    [],
+  );
 
   const height =
     typeof width === 'number'
@@ -62,21 +101,37 @@ const MediaVideoRenderer = ({
   const src =
     typeof width === 'number'
       ? getVideoUrlForSize(source, width, 2, aspectRatio)
-      : getVideoUrlForSize(source);
+      : // TODO handle max size
+        getVideoUrlForSize(source, 1280);
 
-  return createHTMLElement('video', {
-    ref: videoRef,
-    playsInline: true,
-    autoPlay: true,
-    loop: false,
-    muted,
-    src,
-    style: [style, { width, height, objectFit: 'cover' } as any],
-    onEnded,
-    onLoadedData: onReadyForDisplay,
-    onProgress,
-    ...omit(props, 'allowsExternalPlayback', 'playWhenInactive', 'uri'),
-  });
+  return (
+    <View
+      style={[style, { width, aspectRatio, overflow: 'hidden' }]}
+      ref={containerRef}
+    >
+      {createHTMLElement('video', {
+        ref: videoRef,
+        playsInline: true,
+        autoPlay: true,
+        loop: false,
+        muted,
+        src,
+        style: [style, { width, height, objectFit: 'cover' } as any],
+        onEnded,
+        onLoadedData: onReady,
+        onProgress,
+      })}
+      {!ready && thumbnailURI && (
+        <MediaImageRenderer
+          source={source}
+          aspectRatio={aspectRatio}
+          width={width}
+          uri={thumbnailURI}
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'transparent' }]}
+        />
+      )}
+    </View>
+  );
 };
 
-export default MediaVideoRenderer;
+export default forwardRef(MediaVideoRenderer);

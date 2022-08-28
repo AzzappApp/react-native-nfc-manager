@@ -18,7 +18,8 @@ import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { QR_CODE_POSITION_CHANGE_EVENT } from '../components/CoverRenderer/CoverRenderer';
 import ImagePicker from '../components/ImageEditions/ImagePicker';
-import { addMediaCacheEntry } from '../components/MediaRenderer/mediaCache';
+import { addCacheEntry } from '../components/MediaRenderer/MediaImageRenderer';
+import { addLocalVideo } from '../components/MediaRenderer/MediaVideoRenderer';
 import useFormMutation from '../hooks/useFormMutation';
 import { useWebAPI } from '../PlatformEnvironment';
 import ColorPicker from '../ui/ColorPicker';
@@ -204,11 +205,12 @@ const CoverEditPanel = ({
             ),
           );
 
-          const uploads = picturesToUpload.map(({ file, index }, i) => {
+          const uploads = picturesToUpload.map(({ file, kind, index }, i) => {
             const { uploadURL, uploadParameters } = uploadSettings[i];
             return {
               index,
               upload: WebAPI.uploadMedia(file, uploadURL, uploadParameters),
+              kind,
               localURI: file.uri,
             };
           });
@@ -245,17 +247,23 @@ const CoverEditPanel = ({
           }
 
           const results = await Promise.all(
-            uploads.map(({ upload, localURI, index }) =>
+            uploads.map(({ upload, kind, localURI, index }) =>
               upload.promise.then(res => ({
                 index,
+                kind,
                 publicId: res.public_id as string,
                 localURI,
               })),
             ),
           );
 
-          results.forEach(({ publicId, localURI }) => {
-            addMediaCacheEntry(publicId, 0, localURI);
+          results.forEach(({ publicId, kind, localURI }) => {
+            if (kind === 'picture') {
+              // TODO arbitrary size
+              addCacheEntry(publicId, 1600, localURI);
+            } else {
+              addLocalVideo(publicId, localURI);
+            }
           });
 
           updateCoverInput.pictures = pictures.map((picture, index) => {

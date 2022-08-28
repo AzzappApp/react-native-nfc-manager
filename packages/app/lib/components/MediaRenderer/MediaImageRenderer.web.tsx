@@ -1,22 +1,24 @@
 import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
-import omit from 'lodash/omit';
 import Image from 'next/future/image';
 import { StyleSheet } from 'react-native';
 import createHTMLElement from '../../helpers/createHTMLElement';
-import type { MediaInnerRendererProps } from './types';
+import type { MediaImageRendererProps } from './types';
 import type { ImageLoaderProps } from 'next/future/image';
+import type { ForwardedRef } from 'react';
+import type { HostComponent } from 'react-native';
 
-const MediaImageRenderer = ({
-  source,
-  width,
-  aspectRatio,
-  onLoad,
-  onReadyForDisplay,
+const MediaImageRenderer = (
+  {
+    source,
+    width,
+    aspectRatio,
+    onLoad,
+    onReadyForDisplay,
+    style,
+  }: MediaImageRendererProps,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  mediaRef,
-  style,
-  ...props
-}: MediaInnerRendererProps) => {
+  ref: ForwardedRef<HostComponent<any>>,
+) => {
   const handleImageLoading = () => {
     onReadyForDisplay?.();
     onLoad?.();
@@ -41,23 +43,12 @@ const MediaImageRenderer = ({
 
   return createHTMLElement(Image, {
     // TODO handle ref
-    // ref: mediaRef,
+    // ref,
     src: source,
     loader: cloudinaryLoader,
     onLoad: handleImageLoading,
     style: flatStyle,
     ...imgSizeProps,
-    ...omit(props, [
-      'uri',
-      'paused',
-      'muted',
-      'repeat',
-      'playWhenInactive',
-      'allowsExternalPlayback',
-      'currentTime',
-      'onEnd',
-      'onProgress',
-    ]),
   });
 };
 
