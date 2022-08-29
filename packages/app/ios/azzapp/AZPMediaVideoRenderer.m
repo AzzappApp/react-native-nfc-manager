@@ -37,6 +37,9 @@
     _asset = nil;
     _item = nil;
   }
+  if (_playerLayer.superlayer != nil) {
+    [_playerLayer removeFromSuperlayer];
+  }
   _isReady = NO;
   if (_uri != nil) {
     __weak NSURL *loadingURI = _uri;
@@ -109,8 +112,9 @@
       // TODO handle error
       return;
     }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{ [strongSelf setupPlayer]; });
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      [strongSelf setupPlayer];
+    });
   }];
 }
 
@@ -120,7 +124,6 @@
     _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
     _playerLayer.frame = self.bounds;
     _playerLayer.videoGravity = AVVideoScalingModeResizeAspectFill;
-    [self.layer addSublayer:_playerLayer];
   }
   [self addObservers];
   _item = [AVPlayerItem playerItemWithAsset:_asset];
@@ -199,6 +202,13 @@
     self.onReadyForDisplay(nil);
   }
   _isReady = YES;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self displayPlayer];
+  });
+}
+
+-(void)displayPlayer {
+  [self.layer addSublayer:_playerLayer];
   if (!_paused) {
     [_player play];
   } else {
@@ -238,7 +248,9 @@
   [super removeFromSuperview];
   [self removeObservers];
   if (_playerLayer != nil) {
-    [_playerLayer removeFromSuperlayer];
+    if (_playerLayer.superlayer != nil) {
+      [_playerLayer removeFromSuperlayer];
+    }
     _playerLayer = nil;
   }
   if (_player != nil) {
