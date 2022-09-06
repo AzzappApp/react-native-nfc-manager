@@ -48,7 +48,7 @@
     AVMutableVideoComposition *composition = [
       AVMutableVideoComposition videoCompositionWithAsset:_asset
                       applyingCIFiltersWithHandler:^(AVAsynchronousCIImageFilteringRequest *request){
-            CIImage *image = [request.sourceImage imageByClampingToExtent];
+            CIImage *image = request.sourceImage;
             AZPEditableVideo *strongSelf = weakSelf;
             if (strongSelf != nil) {
               NSMutableArray<NSString *> *imageTransformations = [

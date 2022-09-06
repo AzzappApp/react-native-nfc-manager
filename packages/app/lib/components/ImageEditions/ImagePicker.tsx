@@ -5,8 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconButton from '../../ui/IconButton';
 import TextHeaderButton from '../../ui/TextHeaderButton';
 import Header from '../Header';
-import { exportImage } from './EditableImage';
-import { exportVideo } from './EditableVideo';
+import exportMedia from './exportMedia';
 import ImageEditor from './ImageEditor';
 import ImageEditorPanel from './ImageEditorPanel';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
@@ -79,39 +78,29 @@ const ImagePicker = ({
   };
 
   const onSave = () => {
-    if (currentMediaInfos?.kind === 'picture') {
-      exportImage({
-        uri: currentMediaInfos.uri,
-        size: { width: 1280 * imageRatio!, height: 1280 },
-        filters: mediaFilter ? [mediaFilter] : [],
-        parameters: editionParameters,
-        format: 'JPEG',
-        quality: 0.8,
-      }).then(
-        path => {
-          onMediaPicked({ kind: 'picture', path });
-        },
-        e => {
-          console.log(e);
-        },
-      );
-    } else if (currentMediaInfos?.kind === 'video') {
-      exportVideo({
-        uri: currentMediaInfos.uri,
-        size: { width: 960 * imageRatio!, height: 960 },
-        filters: mediaFilter ? [mediaFilter] : [],
-        parameters: editionParameters,
-        removeSound: true,
-        ...timeRange,
-      }).then(
-        path => {
-          onMediaPicked({ kind: 'video', path });
-        },
-        e => {
-          console.log(e);
-        },
-      );
+    if (!currentMediaInfos) {
+      return;
     }
+    exportMedia({
+      uri: currentMediaInfos.uri,
+      kind: currentMediaInfos.kind,
+      editionParameters,
+      aspectRatio:
+        imageRatio != null
+          ? imageRatio
+          : currentMediaInfos.width / currentMediaInfos.height,
+      filter: mediaFilter,
+      removeSound: true,
+      ...timeRange,
+    }).then(
+      path => {
+        onMediaPicked({ kind: currentMediaInfos.kind, path });
+      },
+      e => {
+        // TODO handle error
+        console.log(e);
+      },
+    );
   };
 
   const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets();

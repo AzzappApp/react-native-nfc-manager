@@ -76,6 +76,7 @@ static NSURL *lastLoadedURL;
 static CIImage *lastLoadedImage;
 
 +(void) loadImage:(NSURL *)url onLoad:(void (^)(CIImage *))onLoad {
+  // TODO concurent access
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     CIImage *image = nil;
     if (url != nil) {
@@ -94,6 +95,7 @@ static CIImage *lastLoadedImage;
 }
 
 +(void) loadVideo:(NSURL *)url atTime:(CMTime)time onLoad:(void (^)(CIImage *))onLoad {
+  // TODO concurent access
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     if (url != nil) {
       if ([lastLoadedURL isEqual:url] && time.value == kCMTimeZero.value) {
@@ -109,13 +111,19 @@ static CIImage *lastLoadedImage;
             CIImage *image =  [[CIImage alloc] initWithCGImage:cgiImage options:@{
               kCIImageApplyOrientationProperty : @YES
             }];
-            // TODO very basic tricks since CIIMage doesn't get orientation properly ....
-            UIInterfaceOrientation orientation = [AZPEditableImage orientationForTrack:asset];
-            if (image.extent.size.width > image.extent.size.height && (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown)) {
-              image = [image imageByApplyingOrientation:6];
-            } else if (image.extent.size.width < image.extent.size.height && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
-              image = [image imageByApplyingOrientation:8];
+            AVAssetTrack *videoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+            if(videoTrack == nil) {
+              // TODO handle error;
+              return;
             }
+            CGAffineTransform orientationTransform =
+              [AZPEditableImage getImageTransformForVideoTrack:videoTrack];
+            
+            image = [image imageByApplyingTransform:orientationTransform];
+            image =[image imageByApplyingTransform:CGAffineTransformMakeTranslation(
+                -image.extent.origin.x,
+                -image.extent.origin.y
+            )];
             if (time.value == kCMTimeZero.value) {
               lastLoadedURL = url;
               lastLoadedImage = image;
@@ -128,20 +136,41 @@ static CIImage *lastLoadedImage;
   });
 }
 
-+ (UIInterfaceOrientation)orientationForTrack:(AVAsset *)asset
-{
-    AVAssetTrack *videoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    CGSize size = [videoTrack naturalSize];
-    CGAffineTransform txf = [videoTrack preferredTransform];
++(UIImageOrientation)orientationFor:(AVAssetTrack*)track {
+  CGAffineTransform t = track.preferredTransform;
+  if (t.a == 0 && t.b == 1.0 && t.d == 0) {
+    return UIImageOrientationUp;
+  } else if (t.a == 0 && t.b == -1.0 && t.d == 0) {
+    return UIImageOrientationDown;
+  } else if (t.a == 1.0 && t.b == 0 && t.c == 0) {
+    return UIImageOrientationRight;
+  } else if (t.a == -1.0 && t.b == 0 && t.c == 0) {
+    return UIImageOrientationLeft;
+  }
+  NSLog(@"could not determine orientation for %@", NSStringFromCGAffineTransform(t));
+  return UIImageOrientationUp;
+}
 
-    if (size.width == txf.tx && size.height == txf.ty)
-        return UIInterfaceOrientationLandscapeRight;
-    else if (txf.tx == 0 && txf.ty == 0)
-        return UIInterfaceOrientationLandscapeLeft;
-    else if (txf.tx == 0 && txf.ty == size.width)
-        return UIInterfaceOrientationPortraitUpsideDown;
-    else
-        return UIInterfaceOrientationPortrait;
++(CGAffineTransform)getImageTransformForVideoTrack:(AVAssetTrack*)track {
+   UIImageOrientation orientation = [AZPEditableImage orientationFor:track];
+   switch(orientation) {
+    case UIImageOrientationUp:
+      return CGAffineTransformMakeRotation(-M_PI_2);
+    case UIImageOrientationUpMirrored:
+      return CGAffineTransformScale(CGAffineTransformMakeRotation(-M_PI_2), -1, 1);
+    case UIImageOrientationDown:
+      return CGAffineTransformMakeRotation(M_PI_2);
+    case UIImageOrientationDownMirrored:
+      return CGAffineTransformScale(CGAffineTransformMakeRotation(M_PI_2), -1, 1);
+    case UIImageOrientationLeft:
+      return CGAffineTransformMakeRotation(M_PI);
+    case UIImageOrientationLeftMirrored:
+      return CGAffineTransformScale(CGAffineTransformMakeRotation(M_PI), 1, -1);
+    case UIImageOrientationRight:
+      return CGAffineTransformIdentity;
+    case UIImageOrientationRightMirrored:
+      return CGAffineTransformMakeScale(1, -1);
+   }
 }
 
 @end

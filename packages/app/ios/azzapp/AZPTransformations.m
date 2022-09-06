@@ -136,11 +136,11 @@ static NSMutableDictionary<NSString*, AZPTransformation> *filtersRegistry;
     
     
     CGRect cropRect = CGRectMake(
-                                 [originX floatValue],
-                                 [originY floatValue],
-                                 [width floatValue],
-                                 [height floatValue]
-                                 );
+      [originX floatValue],
+      [originY floatValue],
+      [width floatValue],
+      [height floatValue]
+    );
     
     image = [image imageByCroppingToRect:cropRect];
     image = [image imageByApplyingTransform:

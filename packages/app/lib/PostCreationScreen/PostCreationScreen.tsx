@@ -5,8 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useMutation } from 'react-relay';
 import { colors } from '../../theme';
 import Header from '../components/Header';
-import { exportImage } from '../components/ImageEditions/EditableImage';
-import { exportVideo } from '../components/ImageEditions/EditableVideo';
+import exportMedia from '../components/ImageEditions/exportMedia';
 import ImageEditor from '../components/ImageEditions/ImageEditor';
 import ImageEditorPanel from '../components/ImageEditions/ImageEditorPanel';
 import PhotoGalleryMediaList from '../components/ImageEditions/PhotoGalleryMediaList';
@@ -121,24 +120,15 @@ const PostCreationScreen = () => {
     }
     setSaving(true);
     const ratio = currentMediaInfos.width / currentMediaInfos.height;
-    const path =
-      currentMediaInfos?.kind === 'picture'
-        ? await exportImage({
-            uri: currentMediaInfos.uri,
-            size: { width: 1280 * ratio, height: 1280 },
-            filters: mediaFilter ? [mediaFilter] : [],
-            parameters: editionParameters,
-            format: 'JPEG',
-            quality: 0.8,
-          })
-        : await exportVideo({
-            uri: currentMediaInfos.uri,
-            size: { width: 960 * ratio, height: 960 },
-            filters: mediaFilter ? [mediaFilter] : [],
-            parameters: editionParameters,
-            removeSound: true,
-            ...timeRange,
-          });
+    const path = await exportMedia({
+      uri: currentMediaInfos.uri,
+      kind: currentMediaInfos.kind,
+      editionParameters,
+      aspectRatio: ratio,
+      filter: mediaFilter,
+      ...timeRange,
+    });
+
     const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
       kind: currentMediaInfos.kind,
       target: 'post',
