@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { cloneElement, useRef } from 'react';
 import {
   ActivityIndicator,
@@ -238,12 +238,12 @@ const Block = ({
             width: editingWidth,
             height: editingdHeight,
             marginTop: 20,
-            borderRadius: editingWidth * 0.128,
+            borderRadius: editingWidth * COVER_CARD_RADIUS,
           },
           isEditedBlock && {
             width: isEditedBlockWidth,
             height: isEditedBlockHeight,
-            borderRadius: isEditedBlockWidth * 0.128,
+            borderRadius: isEditedBlockWidth * COVER_CARD_RADIUS,
           },
         ]}
         transitionDuration={TRANSITIONS_DURATION}

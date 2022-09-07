@@ -1,0 +1,175 @@
+diff --git a/node_modules/react-native-screens/ios/RNSConvert.mm b/node_modules/react-native-screens/ios/RNSConvert.mm
+index 79ed0c3..5bb7d16 100644
+--- a/node_modules/react-native-screens/ios/RNSConvert.mm
++++ b/node_modules/react-native-screens/ios/RNSConvert.mm
+@@ -45,6 +45,8 @@ + (RNSScreenStackAnimation)RNSScreenStackAnimationFromCppEquivalent:
+       return RNSScreenStackAnimationSlideFromBottom;
+     case facebook::react::RNSScreenStackAnimation::Fade_from_bottom:
+       return RNSScreenStackAnimationFadeFromBottom;
++    case facebook::react::RNSScreenStackAnimation::Custom:
++      return RNSScreenStackAnimationCustom;
+   }
+ }
+ 
+diff --git a/node_modules/react-native-screens/ios/RNSEnums.h b/node_modules/react-native-screens/ios/RNSEnums.h
+index 84158c6..687c7a8 100644
+--- a/node_modules/react-native-screens/ios/RNSEnums.h
++++ b/node_modules/react-native-screens/ios/RNSEnums.h
+@@ -9,6 +9,7 @@ typedef NS_ENUM(NSInteger, RNSScreenStackPresentation) {
+ };
+ 
+ typedef NS_ENUM(NSInteger, RNSScreenStackAnimation) {
++  RNSScreenStackAnimationCustom,
+   RNSScreenStackAnimationDefault,
+   RNSScreenStackAnimationNone,
+   RNSScreenStackAnimationFade,
+diff --git a/node_modules/react-native-screens/ios/RNSScreen.h b/node_modules/react-native-screens/ios/RNSScreen.h
+index a2195b5..b6cefe2 100644
+--- a/node_modules/react-native-screens/ios/RNSScreen.h
++++ b/node_modules/react-native-screens/ios/RNSScreen.h
+@@ -55,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
+ @property (nonatomic) BOOL hasHomeIndicatorHiddenSet;
+ @property (nonatomic) BOOL hasOrientationSet;
+ @property (nonatomic) RNSScreenStackAnimation stackAnimation;
++@property (nonatomic, copy) NSDictionary* stackAnimationOptions;
+ @property (nonatomic) RNSScreenStackPresentation stackPresentation;
+ @property (nonatomic) RNSScreenSwipeDirection swipeDirection;
+ @property (nonatomic) RNSScreenReplaceAnimation replaceAnimation;
+diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
+index 5431330..91cf8e9 100644
+--- a/node_modules/react-native-screens/ios/RNSScreen.mm
++++ b/node_modules/react-native-screens/ios/RNSScreen.mm
+@@ -186,6 +186,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
+     case RNSScreenStackAnimationSimplePush:
+     case RNSScreenStackAnimationSlideFromBottom:
+     case RNSScreenStackAnimationFadeFromBottom:
++    case RNSScreenStackAnimationCustom:
+       // Default
+       break;
+   }
+@@ -1179,6 +1180,7 @@ @implementation RNSScreenManager
+ RCT_EXPORT_VIEW_PROPERTY(replaceAnimation, RNSScreenReplaceAnimation)
+ RCT_EXPORT_VIEW_PROPERTY(stackPresentation, RNSScreenStackPresentation)
+ RCT_EXPORT_VIEW_PROPERTY(stackAnimation, RNSScreenStackAnimation)
++RCT_EXPORT_VIEW_PROPERTY(stackAnimationOptions, NSDictionary);
+ RCT_EXPORT_VIEW_PROPERTY(swipeDirection, RNSScreenSwipeDirection)
+ RCT_EXPORT_VIEW_PROPERTY(transitionDuration, NSNumber)
+ 
+@@ -1225,6 +1227,7 @@ @implementation RCTConvert (RNSScreen)
+     RNSScreenStackAnimation,
+     (@{
+       @"default" : @(RNSScreenStackAnimationDefault),
++      @"custom" : @(RNSScreenStackAnimationCustom),
+       @"none" : @(RNSScreenStackAnimationNone),
+       @"fade" : @(RNSScreenStackAnimationFade),
+       @"fade_from_bottom" : @(RNSScreenStackAnimationFadeFromBottom),
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
+index f96eae7..40c8d88 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
++++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
+@@ -1,8 +1,22 @@
+ #import "RNSScreen.h"
+ 
++
++@protocol RNSScreenCustomStackAnimator <NSObject>
++
++- (void)animateCustomWithTransitionContext:(id<UIViewControllerContextTransitioning>)transitionContext
++                                    toVC:(UIViewController *)toViewController
++                                  fromVC:(UIViewController *)fromViewController
++                                  forOperation:(UINavigationControllerOperation)operation
++                                  andDuration:(NSTimeInterval)duration
++                                  withOptions:(NSDictionary *)options;
++
++@end
++
+ @interface RNSScreenStackAnimator : NSObject <UIViewControllerAnimatedTransitioning>
+ 
+ - (instancetype)initWithOperation:(UINavigationControllerOperation)operation;
+ + (BOOL)isCustomAnimation:(RNSScreenStackAnimation)animation;
+++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name;
+ 
+ @end
++
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
+index 6fc0542..35b9338 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
+@@ -312,9 +312,54 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
+   } else if (animation == RNSScreenStackAnimationFadeFromBottom) {
+     [self animateFadeFromBottomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
+     return;
++  } else if (animation == RNSScreenStackAnimationCustom) {
++    [self animateCustomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
++    return;
+   }
+   // simple_push is the default custom animation
+   [self animateSimplePushWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
+ }
+ 
++
++static NSMutableDictionary<NSString *, id<RNSScreenCustomStackAnimator>> *customAnimators;
+++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name {
++  if (customAnimators == nil) {
++    customAnimators = [[NSMutableDictionary alloc] init];
++  }
++  customAnimators[name] = animator;
++}
++
++- (void)animateCustomWithTransitionContext:(id<UIViewControllerContextTransitioning>)transitionContext
++                                    toVC:(UIViewController *)toViewController
++                                  fromVC:(UIViewController *)fromViewController
++{
++  RNSScreenView *screen;
++  if (_operation == UINavigationControllerOperationPush) {
++    screen = ((RNSScreen *)toViewController).screenView;
++  } else if (_operation == UINavigationControllerOperationPop) {
++    screen = ((RNSScreen *)fromViewController).screenView;
++  }
++  if (screen == nil || screen.stackAnimationOptions == nil) {
++    [self animateSimplePushWithTransitionContext:transitionContext
++                                            toVC:toViewController
++                                          fromVC:fromViewController];
++    return;
++  }
++  NSDictionary *options = screen.stackAnimationOptions;
++  NSString *animatorName = options[@"animator"];
++  id<RNSScreenCustomStackAnimator> animator = customAnimators[animatorName];
++  if (animator == nil) {
++    [self animateSimplePushWithTransitionContext:transitionContext
++                                            toVC:toViewController
++                                          fromVC:fromViewController];
++    return;
++  }
++  [animator animateCustomWithTransitionContext:transitionContext
++                                          toVC:toViewController
++                                        fromVC:fromViewController
++                                  forOperation:_operation
++                                  andDuration:[self transitionDuration:transitionContext]
++                                   withOptions:options];
++}
++
+ @end
+diff --git a/node_modules/react-native-screens/lib/typescript/types.d.ts b/node_modules/react-native-screens/lib/typescript/types.d.ts
+index bd82a81..6f202e1 100644
+--- a/node_modules/react-native-screens/lib/typescript/types.d.ts
++++ b/node_modules/react-native-screens/lib/typescript/types.d.ts
+@@ -1,6 +1,6 @@
+ import { Animated, NativeSyntheticEvent, ViewProps, View, TargetedEvent, TextInputFocusEventData } from 'react-native';
+ export declare type StackPresentationTypes = 'push' | 'modal' | 'transparentModal' | 'containedModal' | 'containedTransparentModal' | 'fullScreenModal' | 'formSheet';
+-export declare type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left';
++export declare type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left' | 'custom';
+ export declare type BlurEffectTypes = 'extraLight' | 'light' | 'dark' | 'regular' | 'prominent' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial' | 'systemUltraThinMaterialLight' | 'systemThinMaterialLight' | 'systemMaterialLight' | 'systemThickMaterialLight' | 'systemChromeMaterialLight' | 'systemUltraThinMaterialDark' | 'systemThinMaterialDark' | 'systemMaterialDark' | 'systemThickMaterialDark' | 'systemChromeMaterialDark';
+ export declare type ScreenReplaceTypes = 'push' | 'pop';
+ export declare type SwipeDirectionTypes = 'vertical' | 'horizontal';
+@@ -156,6 +156,11 @@ export interface ScreenProps extends ViewProps {
+      * - "none" – the screen appears/dissapears without an animation
+      */
+     stackAnimation?: StackAnimationTypes;
++
++    /**
++     * Custom animator options
++     */
++    stackAnimationOptions?: { animator: string, } & Record<string, any>
+     /**
+      * How should the screen be presented.
+      * The following values are currently supported:

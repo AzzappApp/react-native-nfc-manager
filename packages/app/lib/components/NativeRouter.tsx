@@ -10,11 +10,7 @@ import React, {
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  ScreenContainer,
-  ScreenContext,
-  ScreenStack,
-} from 'react-native-screens';
+import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
 import { ReanimatedScreenProvider } from 'react-native-screens/reanimated';
 import type {
   Router as PlatformRouter,
@@ -503,7 +499,6 @@ export const ScreensRenderer = ({
   onScreenDismissed,
 }: ScreensRendererProps) => {
   const { stack, modals } = routerState;
-  const Screen = useContext(ScreenContext);
   return (
     <ReanimatedScreenProvider>
       <StackRenderer
@@ -574,44 +569,47 @@ const StackRenderer = ({
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 }) => {
-  const Screen = useContext(ScreenContext);
+  // bug in screen stack prevent null or false children to works
+  // properly
+  const childs: any[] = stack.map(routeInfo => {
+    if (routeInfo.kind === 'tabs') {
+      return (
+        <Screen key={routeInfo.id} isNativeStack>
+          <TabsRenderer
+            id={routeInfo.id}
+            tabState={routeInfo.state}
+            screens={screens}
+            tabsRenderers={tabsRenderers}
+            defaultScreenOptions={defaultScreenOptions}
+            onFinishTransitioning={onFinishTransitioning}
+            onScreenDismissed={onScreenDismissed}
+          />
+        </Screen>
+      );
+    }
+
+    return (
+      <ScreenRenderer
+        key={routeInfo.id}
+        id={routeInfo.id}
+        {...routeInfo.state}
+        defaultScreenOptions={defaultScreenOptions}
+        screens={screens}
+        onDismissed={() => onScreenDismissed?.(routeInfo.id)}
+        isModal={isModal}
+        isNativeStack
+      />
+    );
+  });
+  if (children) {
+    childs.push(children);
+  }
   return (
     <ScreenStack
       style={{ flex: 1 }}
       onFinishTransitioning={onFinishTransitioning}
     >
-      {stack.map(routeInfo => {
-        if (routeInfo.kind === 'tabs') {
-          return (
-            <Screen key={routeInfo.id} isNativeStack>
-              <TabsRenderer
-                id={routeInfo.id}
-                tabState={routeInfo.state}
-                screens={screens}
-                tabsRenderers={tabsRenderers}
-                defaultScreenOptions={defaultScreenOptions}
-                onFinishTransitioning={onFinishTransitioning}
-                onScreenDismissed={onScreenDismissed}
-              />
-            </Screen>
-          );
-        }
-
-        return (
-          <ScreenRenderer
-            key={routeInfo.id}
-            id={routeInfo.id}
-            {...routeInfo.state}
-            defaultScreenOptions={defaultScreenOptions}
-            screens={screens}
-            onDismissed={() => onScreenDismissed?.(routeInfo.id)}
-            isModal={isModal}
-            isNativeStack
-          />
-        );
-      })}
-
-      {children}
+      {childs}
     </ScreenStack>
   );
 };
@@ -634,7 +632,6 @@ const TabsRenderer = ({
   onScreenDismissed?: (id: string) => void;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
 }) => {
-  const Screen = useContext(ScreenContext);
   const TabsRenderer = tabsRenderers[id];
   // TODO do we really want to unmount screen on tab switch ?
   return (
@@ -746,7 +743,6 @@ const ScreenRenderer = ({
     [navigationEventEmitter],
   );
 
-  const Screen = useContext(ScreenContext);
   if (!Component) {
     console.error(`Unknown component for route ${route}`);
     return null;

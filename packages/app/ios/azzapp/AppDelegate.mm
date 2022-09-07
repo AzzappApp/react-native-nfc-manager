@@ -20,8 +20,6 @@
 
 #import <react/config/ReactNativeConfig.h>
 
-#import "AzzapImageEditorManager.h"
-
 static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
@@ -32,6 +30,10 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 }
 @end
 #endif
+
+#import <RNScreens/RNSScreenStackAnimator.h>
+#import "AZPCustomReavealTransition.h"
+
 
 @implementation AppDelegate
 
@@ -67,6 +69,8 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   [AppCenterReactNative register];
   [AppCenterReactNativeAnalytics registerWithInitiallyEnabled:true];
   [AppCenterReactNativeCrashes registerWithAutomaticProcessing];
+  
+  [RNSScreenStackAnimator registerCustomAnimator:[[AZPCustomReavealTransition alloc] init] forName:@"reveal"];
   
   return YES;
 }

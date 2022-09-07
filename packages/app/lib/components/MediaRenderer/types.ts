@@ -33,4 +33,5 @@ export type MediaVideoRendererProps = {
 export type MediaVideoRendererHandle = {
   getContainer(): HostComponent<any> | null;
   getPlayerCurrentTime(): Promise<number | null>;
+  snapshot(): Promise<void>;
 };

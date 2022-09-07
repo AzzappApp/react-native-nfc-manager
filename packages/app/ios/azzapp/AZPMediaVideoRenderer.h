@@ -18,6 +18,7 @@
 @property (nonatomic, copy) RCTDirectEventBlock onReadyForDisplay;
 @property (nonatomic, copy) RCTDirectEventBlock onEnd;
 @property (nonatomic, copy) RCTDirectEventBlock onProgress;
+@property (nonatomic, copy) RCTDirectEventBlock onSeekComplete;
 
 -(CGFloat)getPlayerCurrentTime;
 

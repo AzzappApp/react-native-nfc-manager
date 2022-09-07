@@ -24,6 +24,7 @@ RCT_EXPORT_VIEW_PROPERTY(currentTime, NSNumber *)
 RCT_EXPORT_VIEW_PROPERTY(onReadyForDisplay, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onEnd, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onProgress, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onSeekComplete, RCTDirectEventBlock)
 
 
 RCT_EXPORT_METHOD(

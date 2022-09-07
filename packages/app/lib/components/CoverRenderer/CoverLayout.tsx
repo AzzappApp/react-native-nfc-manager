@@ -1,4 +1,8 @@
-import { COVER_BASE_WIDTH, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
+import {
+  COVER_BASE_WIDTH,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+} from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
 import {
   Image,
@@ -89,7 +93,7 @@ const CoverLayout = ({
     ? 0
     : Platform.select({
         web: '12.8%' as any,
-        default: 0.128 * (width as number),
+        default: COVER_CARD_RADIUS * (width as number),
       });
 
   const [textSize, setTextSize] = useState<{

@@ -82,10 +82,10 @@ const UserScreen = ({
   const [saving, setSaving] = useState(false);
   const [initialRenderData, setInitialRenderData] = useState<{
     initialImageIndex: number;
-    initialVideoTime: number;
+    initialVideoTime?: number | null;
   } | null>({
     initialImageIndex: initialImageIndex ?? 0,
-    initialVideoTime: initialVideoTime ?? 0,
+    initialVideoTime,
   });
   const [imageIndex, setImageIndex] = useState<number | undefined>(undefined);
 
@@ -210,7 +210,14 @@ const UserScreen = ({
           width={vp`${VW100}`}
           imageIndex={imageIndex ?? initialRenderData?.initialImageIndex}
           forceImageIndex={isEditing}
-          currentTime={initialRenderData?.initialVideoTime}
+          initialVideosTimes={
+            initialRenderData
+              ? {
+                  [initialRenderData.initialImageIndex]:
+                    initialRenderData.initialVideoTime,
+                }
+              : null
+          }
           isEditing={isEditing}
           isEditedBlock={editedBlock === 'cover'}
           playTransition={imageIndex === undefined && ready}

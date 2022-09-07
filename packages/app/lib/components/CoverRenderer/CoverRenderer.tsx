@@ -27,7 +27,7 @@ export type CoverRendererProps = Omit<
   videoPaused?: boolean;
   imageIndex?: number;
   forceImageIndex?: boolean;
-  currentTime?: number | null;
+  initialVideosTimes?: { [index: number]: number | null | undefined } | null;
   onReadyForDisplay?: () => void;
 };
 
@@ -35,6 +35,7 @@ export type CoverHandle = {
   getCurrentMediaRenderer(): HostComponent<any> | null;
   getCurrentImageIndex(): number;
   getCurrentVideoTime(): Promise<number | null>;
+  snapshot(): Promise<void>;
 };
 
 const CoverRenderer = (
@@ -46,7 +47,7 @@ const CoverRenderer = (
     videoPaused = false,
     imageIndex = 0,
     forceImageIndex,
-    currentTime = 0,
+    initialVideosTimes,
     onReadyForDisplay,
     ...props
   }: CoverRendererProps,
@@ -108,7 +109,6 @@ const CoverRenderer = (
    * Handle image transition
    */
   const [currentImageIndex, setCurrentImageIndex] = useState(imageIndex);
-
   useEffect(() => {
     setCurrentImageIndex(imageIndex);
   }, [imageIndex]);
@@ -167,13 +167,15 @@ const CoverRenderer = (
         return currentImageIndex;
       },
       async getCurrentVideoTime() {
-        if (!mediaRef.current) {
-          return null;
-        }
-        if ('getPlayerCurrentTime' in mediaRef.current) {
+        if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
           return mediaRef.current.getPlayerCurrentTime();
         }
         return null;
+      },
+      async snapshot() {
+        if (mediaRef.current && 'snapshot' in mediaRef.current) {
+          await mediaRef.current.snapshot();
+        }
       },
     }),
     [currentImageIndex],
@@ -184,15 +186,15 @@ const CoverRenderer = (
    */
   const { pictures = [] } = cover ?? {};
 
-  const displayedPictures = (
-    playTransition ? pictures : [pictures[currentImageIndex]]
-  )
-    // picture could be null in case of invalid image Index
-    .filter(picture => !!picture);
+  const displayedPictures = playTransition
+    ? pictures.map((picture, index) => ({ picture, index }))
+    : pictures[currentImageIndex]
+    ? [{ index: currentImageIndex, picture: pictures[currentImageIndex] }]
+    : [];
 
   return (
     <CoverLayout cover={cover} width={width} userName={userName} {...props}>
-      {displayedPictures.map((picture, index) => {
+      {displayedPictures.map(({ picture, index }) => {
         const isDisplayed = !playTransition || index === currentImageIndex;
 
         const mediaProps = {
@@ -221,7 +223,7 @@ const CoverRenderer = (
                     : picture.largeThumbnail
                 }
                 muted
-                currentTime={currentTime}
+                currentTime={initialVideosTimes?.[index]}
                 paused={videoPaused || !isDisplayed}
                 onEnd={onVideoEnd}
               />

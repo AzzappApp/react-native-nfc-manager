@@ -1,4 +1,5 @@
 export const COVER_RATIO = 0.625;
+export const COVER_CARD_RADIUS = 0.128;
 
 export const COVER_BASE_WIDTH = 125;
 

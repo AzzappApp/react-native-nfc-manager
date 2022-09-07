@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { useRouter } from '../PlatformEnvironment';
 import CoverRenderer from './CoverRenderer';
-import { snapshotView } from './SnapshotView';
 import type {
   CoverHandle,
   CoverRendererProps,
@@ -22,7 +21,7 @@ const CoverLink = ({
   const coverRef = useRef<CoverHandle | null>(null);
   const ref = useRef<View | null>(null);
   const [coverState, setCoverState] = useState<
-    { imageIndex?: number; videoTime?: number | null } | undefined
+    { imageIndex: number; videoTime?: number | null } | undefined
   >();
 
   const router = useRouter();
@@ -41,14 +40,13 @@ const CoverLink = ({
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
-      const snapshotID = await snapshotView(mediaRenderer as any);
+      await coverRef.current?.snapshot();
       const videoTime = await coverRef.current?.getCurrentVideoTime();
       router.push({
         route: 'USER',
         params: {
           userName,
           userId,
-          snapshotID,
           imageIndex: coverRef.current?.getCurrentImageIndex(),
           videoTime,
           fromRectangle: { x, y, width, height },
@@ -74,7 +72,11 @@ const CoverLink = ({
           videoPaused={pressed ? true : props.videoPaused}
           playTransition={pressed ? false : props.playTransition}
           imageIndex={coverState?.imageIndex}
-          currentTime={coverState?.videoTime}
+          initialVideosTimes={
+            coverState
+              ? { [coverState.imageIndex]: coverState.videoTime }
+              : null
+          }
         />
       )}
     </Pressable>

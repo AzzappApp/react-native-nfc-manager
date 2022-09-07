@@ -39,9 +39,8 @@ export type UserRoute = {
     imageIndex?: number;
     videoTime?: number | null;
     fromRectangle?: LayoutRectangle;
-    snapshotID?: string;
     setOriginCoverState?: (state: {
-      imageIndex?: number;
+      imageIndex: number;
       videoTime?: number | null;
     }) => void;
   };

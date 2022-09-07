@@ -89,6 +89,8 @@ const MediaVideoRenderer = (
       async getPlayerCurrentTime() {
         return videoRef.current?.currentTime ?? null;
       },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      async snapshot() {},
     }),
     [],
   );

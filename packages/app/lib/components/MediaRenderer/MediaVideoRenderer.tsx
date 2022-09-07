@@ -1,5 +1,11 @@
 import LRUCache from 'lru-cache';
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   findNodeHandle,
   NativeModules,
@@ -7,6 +13,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import SnapshotView, { snapshotView } from '../SnapshotView';
 import MediaImageRenderer from './MediaImageRenderer';
 import type {
   MediaVideoRendererHandle,
@@ -24,8 +31,10 @@ const MediaVideoRenderer = (
     muted = false,
     paused = false,
     style,
+    currentTime,
+    onProgress,
+    onEnd,
     onReadyForDisplay,
-    ...props
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
 ) => {
@@ -36,6 +45,13 @@ const MediaVideoRenderer = (
 
   const isReadyForDisplay = useRef(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [seeking, setSeeking] = useState(false);
+
+  useEffect(() => {
+    if (videoReady && currentTime != null) {
+      setSeeking(true);
+    }
+  }, [currentTime, videoReady]);
 
   const dispatchReady = () => {
     if (!isReadyForDisplay.current) {
@@ -44,9 +60,19 @@ const MediaVideoRenderer = (
     }
   };
 
+  const cleanSnapshots = () => {
+    _videoSnapshots.delete(source);
+  };
+
   const onVideoReadyForDisplay = () => {
+    cleanSnapshots();
     setVideoReady(true);
     dispatchReady();
+  };
+
+  const onSeekComplete = () => {
+    cleanSnapshots();
+    setSeeking(false);
   };
 
   const sourceRef = useRef(source);
@@ -77,9 +103,19 @@ const MediaVideoRenderer = (
         }
         return null;
       },
+      async snapshot() {
+        if (containerRef.current) {
+          _videoSnapshots.set(
+            sourceRef.current,
+            await snapshotView(containerRef.current),
+          );
+        }
+      },
     }),
     [],
   );
+
+  const snapshotID = _videoSnapshots.get(source);
 
   return (
     <View
@@ -92,11 +128,14 @@ const MediaVideoRenderer = (
         uri={localVideoFile.get(source) ?? uri}
         muted={muted}
         paused={paused}
-        onReadyForDisplay={onVideoReadyForDisplay}
-        {...props}
+        currentTime={currentTime}
         style={StyleSheet.absoluteFill}
+        onReadyForDisplay={onVideoReadyForDisplay}
+        onSeekComplete={onSeekComplete}
+        onProgress={onProgress}
+        onEnd={onEnd}
       />
-      {!videoReady && thumbnailURI && (
+      {!videoReady && thumbnailURI && !currentTime && (
         <MediaImageRenderer
           source={source}
           aspectRatio={aspectRatio}
@@ -104,6 +143,13 @@ const MediaVideoRenderer = (
           uri={thumbnailURI}
           onReadyForDisplay={dispatchReady}
           style={[StyleSheet.absoluteFill, { backgroundColor: 'transparent' }]}
+        />
+      )}
+      {(!videoReady || seeking) && snapshotID && (
+        <SnapshotView
+          clearOnUnmount
+          snapshotID={snapshotID}
+          style={StyleSheet.absoluteFill}
         />
       )}
     </View>
@@ -120,3 +166,5 @@ const localVideoFile = new LRUCache<string, string>({ max: 1000 });
 export const addLocalVideo = (mediaID: string, localURI: string) => {
   localVideoFile.set(mediaID, localURI);
 };
+
+const _videoSnapshots = new Map<string, string>();

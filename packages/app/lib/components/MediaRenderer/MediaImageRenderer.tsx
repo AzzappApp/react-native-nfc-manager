@@ -41,7 +41,6 @@ const MediaImageRenderer = (
   };
 
   const onPlaceHolderImageLoad = () => {
-    console.log('placeHolder load');
     onReadyForDisplay?.();
     isReady.current = true;
   };

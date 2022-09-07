@@ -36,6 +36,8 @@
 		FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */; };
 		FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
+		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
+		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
 		FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315E5286B555B006E8CF7 /* AZPEditableImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */; };
 		FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
@@ -101,6 +103,8 @@
 		FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaVideoRenderer.m; path = azzapp/AZPMediaVideoRenderer.m; sourceTree = "<group>"; };
 		FD55E4C128B6649E00321128 /* AZPMediaVideoRendererManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMediaVideoRendererManager.h; path = azzapp/AZPMediaVideoRendererManager.h; sourceTree = "<group>"; };
 		FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaVideoRendererManager.m; path = azzapp/AZPMediaVideoRendererManager.m; sourceTree = "<group>"; };
+		FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPCustomReavealTransition.h; path = azzapp/AZPCustomReavealTransition.h; sourceTree = "<group>"; };
+		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPCustomReavealTransition.m; path = azzapp/AZPCustomReavealTransition.m; sourceTree = "<group>"; };
 		FD9315E2286B555B006E8CF7 /* AZPEditableImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImage.h; path = azzapp/AZPEditableImage.h; sourceTree = "<group>"; };
 		FD9315E3286B555B006E8CF7 /* AZPEditableImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImage.m; path = azzapp/AZPEditableImage.m; sourceTree = "<group>"; };
 		FD9315F2286B5D2F006E8CF7 /* AZPEditableImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPEditableImageManager.h; path = azzapp/AZPEditableImageManager.h; sourceTree = "<group>"; };
@@ -191,6 +195,8 @@
 				FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */,
 				FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */,
 				FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */,
+				FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */,
+				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -543,6 +549,7 @@
 				FD46F44F288713B300222C11 /* AZPEditableImageSource.m in Sources */,
 				FD482C5D2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
 				FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
+				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
 				FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
 				FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */,
@@ -555,6 +562,7 @@
 			files = (
 				FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
 				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
+				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
 				FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */,
 				FD482C5C2888360300D56E20 /* AZPEditableVideoManager.m in Sources */,
 				FD9315F4286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */,

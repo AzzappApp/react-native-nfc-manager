@@ -78,7 +78,11 @@
   }
   _currentTime = currentTime;
   if (_isReady && _currentTime != nil) {
-    [self seekToCurrentTime:nil];
+    [self seekToCurrentTime:^(BOOL success){
+      if(self.onSeekComplete) {
+        self.onSeekComplete(nil);
+      }
+    }];
   }
 }
 
@@ -235,13 +239,11 @@
 }
 
 -(void) seekToCurrentTime:(void (^)(BOOL finished))completionHandler {
-  CGFloat currentTimeFloat = [_currentTime floatValue];
-  CGFloat playerTime = CMTimeGetSeconds(_player.currentTime);
-  if (ABS(playerTime - currentTimeFloat) < 0.1) {
-    return;
-  }
   CMTime seekedTime = CMTimeMakeWithSeconds([_currentTime floatValue], NSEC_PER_SEC);
-  [_player seekToTime:seekedTime completionHandler:completionHandler];
+  [_player seekToTime:seekedTime
+      toleranceBefore:CMTimeMakeWithSeconds(0.05, NSEC_PER_SEC)
+       toleranceAfter:CMTimeMakeWithSeconds(0.05, NSEC_PER_SEC)
+    completionHandler:completionHandler];
 }
 
 - (void)removeFromSuperview {
