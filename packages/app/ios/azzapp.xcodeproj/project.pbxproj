@@ -44,8 +44,6 @@
 		FD9315F5286B5D2F006E8CF7 /* AZPEditableImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */; };
 		FD9315F828757797006E8CF7 /* AZPMTKImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F728757797006E8CF7 /* AZPMTKImageView.m */; };
 		FD9315F928757797006E8CF7 /* AZPMTKImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD9315F728757797006E8CF7 /* AZPMTKImageView.m */; };
-		FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931605287603F5006E8CF7 /* EditionFilter.m */; };
-		FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931605287603F5006E8CF7 /* EditionFilter.m */; };
 		FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931609287714D2006E8CF7 /* AZPTransformations.m */; };
 		FD93160B287714D2006E8CF7 /* AZPTransformations.m in Sources */ = {isa = PBXBuildFile; fileRef = FD931609287714D2006E8CF7 /* AZPTransformations.m */; };
 		FDFDBA72284100BE00621C0F /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FDFDBA70284100BE00621C0F /* OpenSans-Regular.ttf */; };
@@ -111,8 +109,6 @@
 		FD9315F3286B5D2F006E8CF7 /* AZPEditableImageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPEditableImageManager.m; path = azzapp/AZPEditableImageManager.m; sourceTree = "<group>"; };
 		FD9315F628757797006E8CF7 /* AZPMTKImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMTKImageView.h; path = azzapp/AZPMTKImageView.h; sourceTree = "<group>"; };
 		FD9315F728757797006E8CF7 /* AZPMTKImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMTKImageView.m; path = azzapp/AZPMTKImageView.m; sourceTree = "<group>"; };
-		FD931604287603F5006E8CF7 /* EditionFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditionFilter.h; sourceTree = "<group>"; };
-		FD931605287603F5006E8CF7 /* EditionFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditionFilter.m; sourceTree = "<group>"; };
 		FD931608287714D2006E8CF7 /* AZPTransformations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPTransformations.h; path = azzapp/AZPTransformations.h; sourceTree = "<group>"; };
 		FD931609287714D2006E8CF7 /* AZPTransformations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPTransformations.m; path = azzapp/AZPTransformations.m; sourceTree = "<group>"; };
 		FDFDBA70284100BE00621C0F /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../../assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
@@ -159,7 +155,6 @@
 		13B07FAE1A68108700A75B9A /* azzapp */ = {
 			isa = PBXGroup;
 			children = (
-				FD931603287603BE006E8CF7 /* filters */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -252,16 +247,6 @@
 				89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		FD931603287603BE006E8CF7 /* filters */ = {
-			isa = PBXGroup;
-			children = (
-				FD931604287603F5006E8CF7 /* EditionFilter.h */,
-				FD931605287603F5006E8CF7 /* EditionFilter.m */,
-			);
-			name = filters;
-			path = azzapp/filters;
 			sourceTree = "<group>";
 		};
 		FDFDBA6F2841006200621C0F /* resources */ = {
@@ -552,7 +537,6 @@
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
 				FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
-				FD931607287603F5006E8CF7 /* EditionFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,7 +553,6 @@
 				FD46F44E288713B300222C11 /* AZPEditableImageSource.m in Sources */,
 				FD9315E4286B555B006E8CF7 /* AZPEditableImage.m in Sources */,
 				FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
-				FD931606287603F5006E8CF7 /* EditionFilter.m in Sources */,
 				FD93160A287714D2006E8CF7 /* AZPTransformations.m in Sources */,
 				FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
