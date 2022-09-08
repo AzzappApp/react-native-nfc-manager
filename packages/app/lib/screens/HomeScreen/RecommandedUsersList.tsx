@@ -1,7 +1,7 @@
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useMemo } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
-import CoverList from '../components/CoverList';
+import CoverList from '../../components/CoverList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 import type { RecommandedUsersList_viewer$key } from '@azzapp/relay/artifacts/RecommandedUsersList_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';

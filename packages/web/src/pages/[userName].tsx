@@ -1,5 +1,5 @@
 import { useRouter } from '@azzapp/app/lib/PlatformEnvironment';
-import UserScreen from '@azzapp/app/lib/UserScreen';
+import UserScreen from '@azzapp/app/lib/screens/UserScreen';
 import Head from 'next/head';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { preloadServerQuery } from '../helpers/relayServer';

@@ -10,16 +10,16 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Transition } from 'react-transition-group';
-import { colors } from '../../theme';
-import Header, { HEADER_HEIGHT } from '../components/Header';
+import { colors } from '../../../theme';
+import Header, { HEADER_HEIGHT } from '../../components/Header';
 import useViewportSize, {
   insetBottom,
   insetTop,
   VW100,
-} from '../hooks/useViewportSize';
-import FloatingIconButton from '../ui/FloatingIconButton';
-import TextHeaderButton from '../ui/TextHeaderButton';
-import ViewTransition from '../ui/ViewTransition';
+} from '../../hooks/useViewportSize';
+import FloatingIconButton from '../../ui/FloatingIconButton';
+import TextHeaderButton from '../../ui/TextHeaderButton';
+import ViewTransition from '../../ui/ViewTransition';
 import UserScreenButtonBar from './UserScreenButtonBar';
 import type { ReactElement } from 'react';
 import type { ViewStyle } from 'react-native';

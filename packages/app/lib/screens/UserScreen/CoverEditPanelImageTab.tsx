@@ -1,10 +1,10 @@
 import range from 'lodash/range';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies, textStyles } from '../../theme';
-import { MediaImageRenderer } from '../components/MediaRenderer';
-import DashedSlider from '../ui/DashedSlider';
-import Icon from '../ui/Icon';
-import VideoThumbnail from '../ui/VideoThumbnail';
+import { colors, fontFamilies, textStyles } from '../../../theme';
+import { MediaImageRenderer } from '../../components/MediaRenderer';
+import DashedSlider from '../../ui/DashedSlider';
+import Icon from '../../ui/Icon';
+import VideoThumbnail from '../../ui/VideoThumbnail';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverEditPanelImageTabProps = {

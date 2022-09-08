@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '../../theme';
-import Link from '../components/Link';
-import FloatingButton from '../ui/FloatingButton';
-import FloatingIconButton from '../ui/FloatingIconButton';
+import { textStyles } from '../../../theme';
+import Link from '../../components/Link';
+import FloatingButton from '../../ui/FloatingButton';
+import FloatingIconButton from '../../ui/FloatingIconButton';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type UserScreenButtonBarProps = {

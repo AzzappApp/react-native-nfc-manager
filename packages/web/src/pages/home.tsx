@@ -1,4 +1,4 @@
-import HomeScreen from '@azzapp/app/lib/HomeScreen';
+import HomeScreen from '@azzapp/app/lib/screens/HomeScreen';
 import Head from 'next/head';
 import { graphql } from 'react-relay';
 import ClientOnlySuspense from '../components/ClientSuspence';

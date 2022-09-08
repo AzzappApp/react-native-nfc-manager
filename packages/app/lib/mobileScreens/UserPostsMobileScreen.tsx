@@ -1,6 +1,6 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '../helpers/relayScreen';
-import UserPosts from '../UserPostsScreen/UserPostsScreen';
+import UserPosts from '../screens/UserPostsScreen';
 import type { RelayScreenProps } from '../helpers/relayScreen';
 import type { UserPostsRoute } from '../routes';
 import type { UserPostsMobileScreenQuery } from '@azzapp/relay/artifacts/UserPostsMobileScreenQuery.graphql';

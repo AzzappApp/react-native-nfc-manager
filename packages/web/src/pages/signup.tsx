@@ -1,5 +1,5 @@
 import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
-import SignUpScreen from '@azzapp/app/lib/SignUpScreen';
+import SignUpScreen from '@azzapp/app/lib/screens/SignUpScreen';
 import Head from 'next/head';
 import type { SignUpParams } from '@azzapp/shared/lib/WebAPI';
 

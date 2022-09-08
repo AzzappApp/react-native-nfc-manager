@@ -1,11 +1,11 @@
 import { StyleSheet, View, Image } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../theme';
-import { HEADER_HEIGHT } from '../components/Header';
-import Link from '../components/Link';
-import useViewportSize, { insetTop, VW100 } from '../hooks/useViewportSize';
-import { useCurrentRoute } from '../PlatformEnvironment';
-import Button from '../ui/Button';
+import { colors } from '../../../theme';
+import { HEADER_HEIGHT } from '../../components/Header';
+import Link from '../../components/Link';
+import useViewportSize, { insetTop, VW100 } from '../../hooks/useViewportSize';
+import { useCurrentRoute } from '../../PlatformEnvironment';
+import Button from '../../ui/Button';
 import RecommandedPostsList from './RecommandedPostsList';
 import RecommandedUsersList from './RecommandedUsersList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
@@ -39,7 +39,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
         <View style={{ marginTop: vp`${insetTop}` }}>
           <View style={styles.header}>
             <Image
-              source={require('../assets/logo-full.png')}
+              source={require('../../assets/logo-full.png')}
               style={styles.logo}
             />
           </View>

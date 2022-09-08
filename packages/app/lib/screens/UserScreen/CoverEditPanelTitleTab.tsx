@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, fontFamilies, textStyles } from '../../theme';
-import ColorPicker from '../ui/ColorPicker';
-import DashedSlider from '../ui/DashedSlider';
-import FontPicker from '../ui/FontPicker';
+import { colors, fontFamilies, textStyles } from '../../../theme';
+import ColorPicker from '../../ui/ColorPicker';
+import DashedSlider from '../../ui/DashedSlider';
+import FontPicker from '../../ui/FontPicker';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import TitlePositionPicker from './TitlePositionPicker';
 import type { CoverUpdates } from './CoverEditPanel';

@@ -1,5 +1,5 @@
 import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
-import SignInScreen from '@azzapp/app/lib/SignInScreen';
+import SignInScreen from '@azzapp/app/lib/screens/SignInScreen';
 import Head from 'next/head';
 import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
 

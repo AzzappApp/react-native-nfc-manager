@@ -1,4 +1,4 @@
-import PostCreationScreen from '../PostCreationScreen';
+import PostCreationScreen from '../screens/PostCreationScreen';
 
 const PostCreationMobileScreen = () => <PostCreationScreen />;
 

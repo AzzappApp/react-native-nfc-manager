@@ -1,9 +1,9 @@
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import Header from '../components/Header';
-import PostRenderer from '../components/PostRenderer';
+import PostList from '../components/PostList';
 import { useRouter } from '../PlatformEnvironment';
 import IconButton from '../ui/IconButton';
 import type { UserPostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/UserPostsScreenFragment_posts.graphql';
@@ -38,7 +38,7 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
             edges {
               node {
                 id
-                ...PostRendererFragment_post
+                ...PostList_posts @arguments(includeAuthor: false)
               }
             }
           }
@@ -71,30 +71,28 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
     router.back();
   };
 
-  const postLists = useMemo(
-    () => data.posts?.edges?.map(edge => edge?.node ?? null),
+  const posts = useMemo(
+    () =>
+      data.posts?.edges
+        ? convertToNonNullArray(
+            data.posts.edges.map(edge => edge?.node ?? null),
+          )
+        : [],
     [data.posts?.edges],
   );
-  const { width: windowWidth } = useWindowDimensions();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
         title={`${user.userName} posts`}
         leftButton={<IconButton icon="chevron" onPress={onClose} />}
       />
-      <FlatList
+      <PostList
         style={{ flex: 1 }}
-        data={postLists}
-        keyExtractor={(item, index) => item?.id ?? `${index}-null`}
-        renderItem={({ item }) =>
-          item != null ? (
-            <PostRenderer post={item} width={windowWidth} author={user} />
-          ) : null
-        }
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
-        onRefresh={onRefresh}
+        posts={posts}
+        author={user}
         refreshing={refreshing}
+        onEndReached={onEndReached}
+        onRefresh={onRefresh}
       />
     </SafeAreaView>
   );

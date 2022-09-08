@@ -1,6 +1,6 @@
 import chunk from 'lodash/chunk';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../../../theme';
 import type { CoverUpdates } from './CoverEditPanel';
 import type { StyleProp, ViewStyle } from 'react-native';
 

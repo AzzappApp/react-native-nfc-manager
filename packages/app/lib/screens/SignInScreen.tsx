@@ -14,6 +14,7 @@ import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
 type SignInScreenProps = {
   signin: (params: SignInParams) => Promise<void>;
 };
+
 const SignInScreen = ({ signin }: SignInScreenProps) => {
   const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');

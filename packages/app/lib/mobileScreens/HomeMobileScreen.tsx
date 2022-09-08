@@ -1,6 +1,6 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '../helpers/relayScreen';
-import HomeScreen from '../HomeScreen';
+import HomeScreen from '../screens/HomeScreen';
 import type { RelayScreenProps } from '../helpers/relayScreen';
 import type { HomeRoute } from '../routes';
 import type { HomeMobileScreenQuery } from '@azzapp/relay/artifacts/HomeMobileScreenQuery.graphql';

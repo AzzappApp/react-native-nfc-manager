@@ -12,14 +12,14 @@ import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
 type CoverListProps = {
   users: CoverList_users$key;
-  canPlay: boolean;
+  canPlay?: boolean;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
 const CoverList = ({
   users: usersKey,
-  canPlay,
+  canPlay = false,
   onEndReached,
   style,
 }: CoverListProps) => {

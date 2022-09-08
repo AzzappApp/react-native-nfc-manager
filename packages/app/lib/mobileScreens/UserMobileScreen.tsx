@@ -5,7 +5,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { useNativeNavigationEvent } from '../components/NativeRouter';
 import relayScreen from '../helpers/relayScreen';
 import { useRouter } from '../PlatformEnvironment';
-import UserScreen from '../UserScreen';
+import UserScreen from '../screens/UserScreen';
 import type { CoverHandle } from '../components/CoverRenderer/CoverRenderer';
 import type { ScreenOptions } from '../components/NativeRouter';
 import type { RelayScreenProps } from '../helpers/relayScreen';
