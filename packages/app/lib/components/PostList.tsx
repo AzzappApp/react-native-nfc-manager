@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { FlatList, useWindowDimensions } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostRenderer from '../components/PostRenderer';
@@ -14,6 +14,8 @@ import type {
   ViewStyle,
   ListRenderItemInfo,
   LayoutRectangle,
+  ViewToken,
+  LayoutChangeEvent,
 } from 'react-native';
 
 type PostListProps = {
@@ -70,12 +72,29 @@ const PostList = ({
     [],
   );
 
+  const viewableItems = useRef<ViewToken[]>([]);
+  const [snapedPostId, setSnapedPostId] = useState<string | undefined>(
+    posts[0]?.id,
+  );
+
+  const onViewableItemsChanged = useCallback(
+    (info: { viewableItems: ViewToken[] }) => {
+      viewableItems.current = info.viewableItems;
+    },
+    [],
+  );
+
+  const onMomentumScrollEnd = useCallback(() => {
+    const viewableItem = viewableItems.current[0];
+    setSnapedPostId(viewableItem?.item.id);
+  }, []);
+
   const { width: windowWidth } = useWindowDimensions();
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<Post>) => (
       <PostRenderer
         post={item}
-        paused={!canPlay}
+        paused={!canPlay || snapedPostId !== item.id}
         width={windowWidth}
         author={item.author ?? author!}
         style={index !== 0 && { marginTop: 10 }}
@@ -83,7 +102,14 @@ const PostList = ({
         initialTime={initialVideoTimes?.[item.id]}
       />
     ),
-    [author, canPlay, initialVideoTimes, onPostLayout, windowWidth],
+    [
+      author,
+      canPlay,
+      initialVideoTimes,
+      onPostLayout,
+      windowWidth,
+      snapedPostId,
+    ],
   );
 
   const snapToOffsets = useMemo(() => {
@@ -101,8 +127,23 @@ const PostList = ({
     return results;
   }, [postLayouts, posts]);
 
+  const [listHeight, setListHeight] = useState<number | null>(null);
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    setListHeight(e.nativeEvent.layout.height);
+  }, []);
+
+  const offsetBottom = useMemo(() => {
+    const lastPost = posts[posts.length - 1];
+    const lastPostLayout = postLayouts[lastPost?.id];
+    if (!lastPostLayout || !listHeight) {
+      return 0;
+    }
+    return listHeight - lastPostLayout.height;
+  }, [listHeight, postLayouts, posts]);
+
   return (
     <FlatList
+      onLayout={onLayout}
       data={posts}
       keyExtractor={(item, index) => item?.id ?? `${index}-null`}
       snapToOffsets={snapToOffsets}
@@ -114,6 +155,10 @@ const PostList = ({
       style={style}
       decelerationRate="fast"
       ListFooterComponent={<ListLoadingFooter loading={loading} />}
+      onViewableItemsChanged={onViewableItemsChanged}
+      onMomentumScrollEnd={onMomentumScrollEnd}
+      viewabilityConfig={{ itemVisiblePercentThreshold: 0.5 }}
+      contentContainerStyle={{ paddingBottom: offsetBottom }}
     />
   );
 };
