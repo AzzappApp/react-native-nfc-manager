@@ -12,7 +12,7 @@ export type MediaImageRendererProps = {
   aspectRatio: number;
   onLoad?: () => void;
   onReadyForDisplay?: () => void;
-  style: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
 export type MediaVideoRendererProps = {
@@ -27,7 +27,7 @@ export type MediaVideoRendererProps = {
   onReadyForDisplay?: () => void;
   onEnd?: () => void;
   onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
-  style: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
 export type MediaVideoRendererHandle = {

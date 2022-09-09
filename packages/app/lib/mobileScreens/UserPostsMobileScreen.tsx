@@ -1,6 +1,6 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '../helpers/relayScreen';
-import UserPosts from '../screens/UserPostsScreen';
+import UserPostsScreen from '../screens/UserPostsScreen';
 import type { RelayScreenProps } from '../helpers/relayScreen';
 import type { UserPostsRoute } from '../routes';
 import type { UserPostsMobileScreenQuery } from '@azzapp/relay/artifacts/UserPostsMobileScreenQuery.graphql';
@@ -21,7 +21,7 @@ const UserPostsMobileScreen = ({
   if (!data.user) {
     return null;
   }
-  return <UserPosts user={data.user} />;
+  return <UserPostsScreen user={data.user} />;
 };
 
 export default relayScreen(UserPostsMobileScreen, {

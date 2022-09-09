@@ -9,11 +9,11 @@ import IconButton from '../ui/IconButton';
 import type { UserPostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/UserPostsScreenFragment_posts.graphql';
 import type { UserPostsScreenFragment_user$key } from '@azzapp/relay/artifacts/UserPostsScreenFragment_user.graphql';
 
-type UserPostsProps = {
+type UserPostsScreenProps = {
   user: UserPostsScreenFragment_posts$key & UserPostsScreenFragment_user$key;
 };
 
-const UserPosts = ({ user: userKey }: UserPostsProps) => {
+const UserPostsScreen = ({ user: userKey }: UserPostsScreenProps) => {
   const user = useFragment(
     graphql`
       fragment UserPostsScreenFragment_user on User {
@@ -98,4 +98,4 @@ const UserPosts = ({ user: userKey }: UserPostsProps) => {
   );
 };
 
-export default UserPosts;
+export default UserPostsScreen;

@@ -6,6 +6,7 @@ const routesMap: { [key in Route['route']]: string } = {
   SIGN_UP: '/signup',
   USER: '/[userName]',
   USER_POSTS: '/[userName]/posts',
+  POST: '/posts/[postId]',
   NEW_POST: '/[userName]/newPost',
   SEARCH: '/search',
   SETTINGS: '/settings',

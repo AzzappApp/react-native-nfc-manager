@@ -1,9 +1,9 @@
 import { useRouter } from '@azzapp/app/lib/PlatformEnvironment';
 import UserScreen from '@azzapp/app/lib/screens/UserScreen';
+import useClientLazyLoadQuery from '@azzapp/shared/lib/useClientLazyLoadQuery';
 import Head from 'next/head';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { preloadServerQuery } from '../helpers/relayServer';
-import useClientLazyLoadQuery from '../helpers/useClientLazyLoadQuery';
 import type { UserNamePageUserQuery } from '@azzapp/relay/artifacts/UserNamePageUserQuery.graphql';
 import type { UserNamePageViewerQuery } from '@azzapp/relay/artifacts/UserNamePageViewerQuery.graphql';
 import type { GetStaticPaths, GetStaticProps } from 'next';

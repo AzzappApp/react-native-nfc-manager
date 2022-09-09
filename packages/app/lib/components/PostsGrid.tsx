@@ -10,7 +10,7 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../theme';
 import useScrollToTopInterceptor from '../hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
-import PostRenderer from './PostRenderer';
+import PostLink from './PostLink';
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
@@ -113,8 +113,7 @@ const PostsGrid = ({
         left: isOdd ? itemWidth + 16 : 8,
         top: currentPosition,
         width: itemWidth,
-        // media margin between next and media, text height
-        height: itemWidth / item.media.ratio + 5 + (item.content ? 34 : 0),
+        height: itemWidth / item.media.ratio,
       };
       //  margin with bottom
       currentPosition += layout.height + 8;
@@ -322,7 +321,8 @@ const MemoPostRenderer = ({
 }) =>
   useMemo(
     () => (
-      <PostRenderer
+      <PostLink
+        postId={item.id}
         post={item}
         width={layout.width}
         author={item.author}

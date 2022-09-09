@@ -261,6 +261,13 @@ type Post implements Node {
 
   """Does this post allow likes"""
   allowLikes: Boolean!
+  relatedPosts(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): PostConnection!
 }
 
 """A connection to a list of items."""

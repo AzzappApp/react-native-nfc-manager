@@ -1,6 +1,6 @@
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useRef, useState } from 'react';
-import { Dimensions, PixelRatio } from 'react-native';
+import { Dimensions } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useNativeNavigationEvent } from '../components/NativeRouter';
 import relayScreen from '../helpers/relayScreen';
@@ -111,12 +111,5 @@ UserMobileScreen.getScreenOptions = ({
 
 export default relayScreen(UserMobileScreen, {
   query: getQuery,
-  getVariables: ({ userName, userId }) =>
-    userId
-      ? {
-          userId,
-          screenWidth: Dimensions.get('window').width,
-          pixelRatio: PixelRatio.get(),
-        }
-      : { userName },
+  getVariables: ({ userName, userId }) => (userId ? { userId } : { userName }),
 });

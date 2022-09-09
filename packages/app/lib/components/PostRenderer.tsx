@@ -1,31 +1,45 @@
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors, fontFamilies } from '../../theme';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';
 import { MediaImageRenderer, MediaVideoRenderer } from './MediaRenderer';
+import type { MediaVideoRendererHandle } from './MediaRenderer';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
-import type { ViewProps } from 'react-native';
+import type { ForwardedRef } from 'react';
+import type { ViewProps, HostComponent } from 'react-native';
 
-type PostScreenProps = ViewProps & {
+export type PostRendererProps = ViewProps & {
   post: PostRendererFragment_post$key;
   author: PostRendererFragment_author$key;
   small?: boolean;
   width: number;
   muted?: boolean;
   paused?: boolean;
+  initialTime?: number | null;
 };
 
-const PostRenderer = ({
-  post: postKey,
-  author: authorKey,
-  width,
-  small,
-  muted = false,
-  paused = false,
-  ...props
-}: PostScreenProps) => {
+export type PostRendererHandle = {
+  getCurrentMediaRenderer(): HostComponent<any> | null;
+  getCurrentVideoTime(): Promise<number | null>;
+  snapshot(): Promise<void>;
+};
+
+const PostRenderer = (
+  {
+    post: postKey,
+    author: authorKey,
+    width,
+    small,
+    muted = false,
+    paused = false,
+    initialTime,
+    ...props
+  }: PostRendererProps,
+  forwardedRef: ForwardedRef<PostRendererHandle>,
+) => {
   const post = useFragment(
     graphql`
       fragment PostRendererFragment_post on Post
@@ -87,6 +101,38 @@ const PostRenderer = ({
     authorKey,
   );
 
+  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
+    null,
+  );
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      getCurrentMediaRenderer() {
+        if (!mediaRef.current) {
+          return null;
+        }
+        if ('getContainer' in mediaRef.current) {
+          return mediaRef.current.getContainer();
+        } else {
+          return mediaRef.current;
+        }
+      },
+      async getCurrentVideoTime() {
+        if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
+          return mediaRef.current.getPlayerCurrentTime();
+        }
+        return null;
+      },
+      async snapshot() {
+        if (mediaRef.current && 'snapshot' in mediaRef.current) {
+          await mediaRef.current.snapshot();
+        }
+      },
+    }),
+    [],
+  );
+
   const {
     content,
     media: {
@@ -102,9 +148,12 @@ const PostRenderer = ({
 
   return (
     <View {...props}>
-      <View>
+      <View
+        style={[styles.mediaContainer, small && styles.mediaContainerSmall]}
+      >
         {__typename === 'MediaVideo' && (
           <MediaVideoRenderer
+            ref={mediaRef as any}
             source={source}
             thumbnailURI={small ? smallThumbnail : largeThumbnail}
             uri={small ? smallURI : largeURI}
@@ -112,16 +161,16 @@ const PostRenderer = ({
             width={width}
             muted={muted}
             paused={paused}
-            style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
+            currentTime={initialTime}
           />
         )}
         {__typename === 'MediaImage' && (
           <MediaImageRenderer
+            ref={mediaRef as any}
             source={source}
             uri={small ? smallURI : largeURI}
             aspectRatio={ratio}
             width={width}
-            style={[styles.mediaRenderer, small && styles.mediaRendererSmall]}
           />
         )}
         {small && (
@@ -131,43 +180,33 @@ const PostRenderer = ({
           />
         )}
       </View>
-      <View style={[styles.content, small && styles.smallContent]}>
-        {!small && (
+      {!small && (
+        <View style={[styles.content]}>
           <Link route="USER" params={{ userName: author.userName }}>
             <AuthorCartouche
               userName={author.userName}
               style={styles.largeAuthorCartouche}
             />
           </Link>
-        )}
-        {!!content && (
-          <Text
-            style={styles.text}
-            numberOfLines={small ? 2 : undefined}
-            ellipsizeMode={'tail'}
-          >
-            {content}
-          </Text>
-        )}
-      </View>
+          {!!content && <Text style={styles.text}>{content}</Text>}
+        </View>
+      )}
     </View>
   );
 };
 
-export default PostRenderer;
+export default forwardRef(PostRenderer);
 
 const styles = StyleSheet.create({
-  mediaRenderer: {
+  mediaContainer: {
     backgroundColor: colors.lightGrey,
+    overflow: 'hidden',
   },
-  mediaRendererSmall: {
+  mediaContainerSmall: {
     borderRadius: 16,
   },
   content: {
     paddingHorizontal: 20,
-  },
-  smallContent: {
-    paddingHorizontal: 5,
   },
   smallAuthorCartouche: {
     position: 'absolute',

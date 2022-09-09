@@ -32,8 +32,9 @@
   );
   
   CGPoint fromCenter = CGPointMake(
-    fromRect.origin.x + fromRect.size.width / 2,
+    fromRect.origin.x + fromRect.size.width / 2 - toRect.origin.x / 2,
     fromRect.origin.y + fromRect.size.width * (targetFrame.size.height / targetFrame.size.width) / 2
+       - toRect.origin.y / 2
   );
   
   CGPoint targetCenter = CGPointMake(
@@ -41,15 +42,23 @@
     targetFrame.origin.y + targetFrame.size.height / 2
   );
   
-  CGRect fromRevealedSize = CGRectMake(0, 0, toRect.size.width, toRect.size.height);
-  CGRect targetRevealedSize = CGRectMake(0, 0, targetFrame.size.width, targetFrame.size.height);
-  
-  
   UIView *mask = [[UIView alloc] initWithFrame:targetFrame];
   mask.backgroundColor = [UIColor clearColor];
   UIView *areaToReveal = [[UIView alloc] init];
   areaToReveal.backgroundColor = [UIColor whiteColor];
   [mask addSubview:areaToReveal];
+  
+  CGRect fromRevealBounds = CGRectMake(0, 0, toRect.size.width, toRect.size.height);
+  CGPoint fromRevealCenter =  CGPointMake(
+    CGRectGetMidX(toRect),
+    CGRectGetMidY(toRect)
+  );
+  
+  CGRect targetRevealBounds = CGRectMake(0, 0, targetFrame.size.width, targetFrame.size.height);
+  CGPoint targetRevealCenter = CGPointMake(
+    CGRectGetMidX(targetFrame),
+    CGRectGetMidY(targetFrame)
+  );
   
   toViewController.view.frame = targetFrame;
   
@@ -58,7 +67,8 @@
     
     toViewController.view.transform = fromTransform;
     toViewController.view.center = fromCenter;
-    areaToReveal.frame = fromRevealedSize;
+    areaToReveal.bounds = fromRevealBounds;
+    areaToReveal.center = fromRevealCenter;
     areaToReveal.layer.cornerRadius = fromRadius;
     
     toViewController.view.maskView = mask;
@@ -67,7 +77,8 @@
         animations:^{
           toViewController.view.transform = CGAffineTransformIdentity;
           toViewController.view.center = targetCenter;
-          areaToReveal.frame = targetRevealedSize;
+          areaToReveal.bounds = targetRevealBounds;
+          areaToReveal.center = targetRevealCenter;
           areaToReveal.layer.cornerRadius = toRadius;
         }
         completion:^(BOOL finished) {
@@ -81,7 +92,8 @@
     
     fromViewController.view.transform = CGAffineTransformIdentity;
     fromViewController.view.center = targetCenter;
-    areaToReveal.frame = targetRevealedSize;
+    areaToReveal.bounds = targetRevealBounds;
+    areaToReveal.center = targetRevealCenter;
     areaToReveal.layer.cornerRadius = toRadius;
   
     fromViewController.view.maskView = mask;
@@ -90,7 +102,8 @@
         animations:^{
           fromViewController.view.transform = fromTransform;
           fromViewController.view.center = fromCenter;
-          areaToReveal.frame = fromRevealedSize;
+          areaToReveal.bounds = fromRevealBounds;
+          areaToReveal.center = fromRevealCenter;
           areaToReveal.layer.cornerRadius = fromRadius;
         }
         completion:^(BOOL finished) {

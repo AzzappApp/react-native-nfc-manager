@@ -1,8 +1,8 @@
 import HomeScreen from '@azzapp/app/lib/screens/HomeScreen';
+import useClientLazyLoadQuery from '@azzapp/shared/lib/useClientLazyLoadQuery';
 import Head from 'next/head';
 import { graphql } from 'react-relay';
 import ClientOnlySuspense from '../components/ClientSuspence';
-import useClientLazyLoadQuery from '../helpers/useClientLazyLoadQuery';
 import type { homePageQuery } from '@azzapp/relay/artifacts/homePageQuery.graphql';
 
 const HomePage = () => {

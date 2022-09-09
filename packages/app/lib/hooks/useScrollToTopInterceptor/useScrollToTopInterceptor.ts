@@ -14,8 +14,6 @@ const useScrollToTopInterceptor = (onScrollToTop: () => void): any => {
 
   useEffect(() => {
     const subscription = eventEmitter.addListener('onScrollToTop', data => {
-      console.log(data);
-      console.log(interceptorIDRef.current);
       if (data?.interceptorID === interceptorIDRef.current) {
         onScrollToTopRef.current?.();
       }

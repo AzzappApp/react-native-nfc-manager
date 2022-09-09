@@ -15,6 +15,7 @@ import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
+import PostMobileScreen from './mobileScreens/PostMobileScreen';
 import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
@@ -30,6 +31,7 @@ const screens = {
   SIGN_IN: SignInMobileScreen,
   SIGN_UP: SignUpMobileScreen,
   USER: UserMobileScreen,
+  POST: PostMobileScreen,
   USER_POSTS: UserPostsMobileScreen,
   NEW_POST: PostCreationMobileScreen,
 };

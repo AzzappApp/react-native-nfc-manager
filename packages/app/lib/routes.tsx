@@ -51,6 +51,15 @@ export type UserPostsRoute = {
   params: { userName: string };
 };
 
+export type PostRoute = {
+  route: 'POST';
+  params: {
+    postId: string;
+    videoTime?: number | null;
+    fromRectangle?: LayoutRectangle;
+  };
+};
+
 export type NewPostRoute = {
   route: 'NEW_POST';
   params?: never;
@@ -64,6 +73,7 @@ export type Route =
   | SignInRoute
   | SignUpRoute
   | UserRoute
+  | PostRoute
   | UserPostsRoute
   | NewPostRoute;
 

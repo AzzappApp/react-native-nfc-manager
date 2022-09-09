@@ -28,8 +28,7 @@ const CoverLink = ({
   const onPress = () => {
     const container = ref.current;
     const cover = coverRef.current;
-    const mediaRenderer = cover?.getCurrentMediaRenderer();
-    if (!container || !cover || !mediaRenderer) {
+    if (!container || !cover) {
       router.push({
         route: 'USER',
         params: {

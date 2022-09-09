@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
 import { ReanimatedScreenProvider } from 'react-native-screens/reanimated';
 import type {
@@ -719,6 +720,7 @@ const ScreenRenderer = ({
   const Component: any = screens[route];
 
   const navigationEventEmitter = useRef(new EventEmitter()).current;
+  const safeArea = useSafeAreaInsets();
 
   useEffect(
     () => () => {
@@ -733,7 +735,7 @@ const ScreenRenderer = ({
       options = { ...options, ...Component.options };
     }
     if (typeof Component.getScreenOptions === 'function') {
-      options = { ...options, ...Component.getScreenOptions(params) };
+      options = { ...options, ...Component.getScreenOptions(params, safeArea) };
     }
     return options;
   });
