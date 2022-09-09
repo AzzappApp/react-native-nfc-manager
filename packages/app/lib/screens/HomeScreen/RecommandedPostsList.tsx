@@ -1,9 +1,9 @@
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import PostsGrid from '../../components/PostsGrid';
+import ListLoadingFooter from '../../ui/ListLoadingFooter';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { RecommandedPostsList_viewer$key } from '@azzapp/relay/artifacts/RecommandedPostsList_viewer.graphql';
 import type { ReactElement } from 'react';
@@ -74,7 +74,7 @@ const RecommandedPostsList = ({
   }, [isLoadingNext, hasNext, loadNext]);
 
   const [sowLoadingIndicator, setShowLoadingIndicator] = useState(false);
-  const [sowLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
+  const [showLoadingIndicatorDebounced] = useDebounce(sowLoadingIndicator, 150);
   useEffect(() => {
     setShowLoadingIndicator(!refreshing && isLoadingNext);
   }, [isLoadingNext, refreshing]);
@@ -93,17 +93,7 @@ const RecommandedPostsList = ({
       canPlay={canPlay}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={
-        <View
-          style={{
-            height: 48,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#FFF',
-            zIndex: 100,
-          }}
-        >
-          {sowLoadingIndicatorDebounced && <ActivityIndicator />}
-        </View>
+        <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
       }
       refreshing={refreshing}
       onRefresh={onRefresh}

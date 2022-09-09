@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { AUTHOR_CARTOUCHE_HEIGHT } from '../components/AuthorCartouche';
 import { HEADER_HEIGHT } from '../components/Header';
 import { useNativeNavigationEvent } from '../components/NativeRouter';
 import relayScreen from '../helpers/relayScreen';
@@ -15,9 +16,7 @@ const postMobileScreenQuery = graphql`
   query PostMobileScreenQuery($postId: ID!) {
     node(id: $postId) {
       ...PostScreenFragment_post
-      ... on Post {
-        ...PostScreenFragment_relatedPost
-      }
+      ...PostScreenFragment_relatedPosts
     }
   }
 `;
@@ -59,7 +58,7 @@ PostMobileScreen.getScreenOptions = (
       fromRectangle,
       toRectangle: {
         x: 0,
-        y: safeArea.top + HEADER_HEIGHT,
+        y: safeArea.top + HEADER_HEIGHT + AUTHOR_CARTOUCHE_HEIGHT,
         width: windowWidth,
         height: (windowWidth * fromRectangle.height) / fromRectangle.width,
       },

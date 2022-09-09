@@ -15,7 +15,7 @@ import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
 } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { ArraItemType } from '@azzapp/shared/lib/arrayHelpers';
+import type { ArrayItemType } from '@azzapp/shared/lib/arrayHelpers';
 import type { ReactNode } from 'react';
 import type {
   StyleProp,
@@ -338,5 +338,5 @@ const MemoPostRenderer = ({
 // fraction of the scroll height that trigger a relayout
 const BATCH_SIZE = 4;
 
-type Post = ArraItemType<PostsGrid_posts$data>;
+type Post = ArrayItemType<PostsGrid_posts$data>;
 type ItemLayout = { top: number; left: number; width: number; height: number };

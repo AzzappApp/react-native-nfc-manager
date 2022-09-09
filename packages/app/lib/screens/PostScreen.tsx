@@ -1,23 +1,29 @@
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
-import { Suspense, useCallback, useMemo } from 'react';
 import {
-  ActivityIndicator,
-  useWindowDimensions,
-  View,
-  FlatList,
-  SafeAreaView,
-} from 'react-native';
+  forwardRef,
+  Suspense,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { SafeAreaView } from 'react-native';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import Header from '../components/Header';
 import PostList from '../components/PostList';
-import PostRenderer from '../components/PostRenderer';
 import { useRouter } from '../PlatformEnvironment';
 import IconButton from '../ui/IconButton';
 import type { PostScreenFragment_post$key } from '@azzapp/relay/artifacts/PostScreenFragment_post.graphql';
-import type { PostScreenFragment_relatedPost$key } from '@azzapp/relay/artifacts/PostScreenFragment_relatedPost.graphql';
+import type {
+  PostScreenFragment_relatedPosts$data,
+  PostScreenFragment_relatedPosts$key,
+} from '@azzapp/relay/artifacts/PostScreenFragment_relatedPosts.graphql';
+import type { ForwardedRef } from 'react';
 
 type PostScreenProps = {
-  post: PostScreenFragment_post$key & PostScreenFragment_relatedPost$key;
+  post: PostScreenFragment_post$key & PostScreenFragment_relatedPosts$key;
   ready?: boolean;
   initialVideoTime?: number | null;
 };
@@ -36,21 +42,51 @@ const PostScreen = ({
     graphql`
       fragment PostScreenFragment_post on Post {
         id
-        ...PostRendererFragment_post
-        author {
-          ...PostRendererFragment_author
-        }
+        ...PostList_posts @arguments(includeAuthor: true)
       }
     `,
     postKey as PostScreenFragment_post$key,
   );
 
-  /*
-    Instead of this trick it could be insteresting to use the
-    graphql @defer directive
-  */
+  const [relatedPosts, setRelatedPosts] = useState<
+    PostScreenFragment_relatedPosts$data['relatedPosts'] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+  const relatedPostLoaderRef = useRef<RelatedPostLoaderHandle>(null);
 
-  const { width: windowWidth } = useWindowDimensions();
+  const onRelatedPostLoaded = useCallback(
+    (
+      relatedPosts: PostScreenFragment_relatedPosts$data['relatedPosts'],
+      isLoadingNext: boolean,
+    ) => {
+      setRelatedPosts(relatedPosts);
+      setLoading(isLoadingNext);
+    },
+    [],
+  );
+
+  const onEndReached = () => {
+    relatedPostLoaderRef.current?.onEndReached();
+  };
+
+  const posts = useMemo(
+    () =>
+      relatedPosts?.edges
+        ? [
+            post,
+            ...convertToNonNullArray(
+              relatedPosts?.edges.map(edge => edge?.node ?? null),
+            ),
+          ]
+        : [post],
+    [post, relatedPosts],
+  );
+
+  const initialVideoTimes = useMemo(
+    () => ({ [post.id]: initialVideoTime }),
+    [initialVideoTime, post.id],
+  );
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: '#fff', overflow: 'hidden' }}
@@ -59,45 +95,42 @@ const PostScreen = ({
         title={'Discover'}
         leftButton={<IconButton icon="chevron" onPress={onClose} />}
       />
-      <FlatList
-        data={emptyArray}
-        renderItem={nullRender}
-        ListHeaderComponent={
-          <PostRenderer
-            post={post}
-            author={post.author}
-            width={windowWidth}
-            initialTime={initialVideoTime}
-          />
-        }
-        ListFooterComponent={
-          <Suspense
-            fallback={
-              <View style={{ flex: 1 }}>
-                <ActivityIndicator style={{ marginTop: 50 }} />
-              </View>
-            }
-          >
-            <PostScreenList canPlay={ready} post={postKey} />
-          </Suspense>
-        }
+      <PostList
+        style={{ flex: 1 }}
+        canPlay={ready}
+        posts={posts}
+        onEndReached={onEndReached}
+        initialVideoTimes={initialVideoTimes}
+        loading={loading}
       />
+      <Suspense>
+        <RelatedPostLoader
+          ref={relatedPostLoaderRef}
+          post={postKey}
+          onRelatedPostChange={onRelatedPostLoaded}
+        />
+      </Suspense>
     </SafeAreaView>
   );
 };
 
-const emptyArray: never[] = [];
-const nullRender = () => null;
-
 export default PostScreen;
 
-const PostScreenList = ({
-  post,
-  canPlay,
-}: {
-  post: PostScreenFragment_relatedPost$key;
-  canPlay: boolean;
-}) => {
+type RelatedPostLoaderHandle = { onEndReached(): void };
+
+const RelatedPostLoaderInner = (
+  {
+    post,
+    onRelatedPostChange: onRelatedLoadedStateChange,
+  }: {
+    post: PostScreenFragment_relatedPosts$key;
+    onRelatedPostChange: (
+      posts: PostScreenFragment_relatedPosts$data['relatedPosts'],
+      isLoadingNext: boolean,
+    ) => void;
+  },
+  forwardedRef: ForwardedRef<RelatedPostLoaderHandle>,
+) => {
   const {
     data: { relatedPosts },
     loadNext,
@@ -105,7 +138,7 @@ const PostScreenList = ({
     isLoadingNext,
   } = usePaginationFragment(
     graphql`
-      fragment PostScreenFragment_relatedPost on Post
+      fragment PostScreenFragment_relatedPosts on Post
       @refetchable(queryName: "PostScreenQuery")
       @argumentDefinitions(
         after: { type: String }
@@ -115,7 +148,6 @@ const PostScreenList = ({
           @connection(key: "Post_relatedPosts") {
           edges {
             node {
-              id
               ...PostList_posts @arguments(includeAuthor: true)
             }
           }
@@ -125,27 +157,23 @@ const PostScreenList = ({
     post,
   );
 
-  const onEndReached = useCallback(() => {
-    if (!isLoadingNext && hasNext) {
-      loadNext(10);
-    }
-  }, [isLoadingNext, hasNext, loadNext]);
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      onEndReached() {
+        if (!isLoadingNext && hasNext) {
+          loadNext(10);
+        }
+      },
+    }),
+    [isLoadingNext, hasNext, loadNext],
+  );
 
-  const posts = useMemo(
-    () =>
-      relatedPosts?.edges
-        ? convertToNonNullArray(
-            relatedPosts.edges.map(edge => edge?.node ?? null),
-          )
-        : [],
-    [relatedPosts?.edges],
-  );
-  return (
-    <PostList
-      style={{ flex: 1 }}
-      canPlay={canPlay}
-      posts={posts}
-      onEndReached={onEndReached}
-    />
-  );
+  useEffect(() => {
+    onRelatedLoadedStateChange(relatedPosts, isLoadingNext);
+  }, [isLoadingNext, onRelatedLoadedStateChange, relatedPosts]);
+
+  return null;
 };
+
+const RelatedPostLoader = forwardRef(RelatedPostLoaderInner);

@@ -95,6 +95,7 @@ const PostRenderer = (
     graphql`
       fragment PostRendererFragment_author on User {
         id
+        ...AuthorCartoucheFragment_user
         userName
       }
     `,
@@ -148,6 +149,11 @@ const PostRenderer = (
 
   return (
     <View {...props}>
+      {!small && (
+        <Link route="USER" params={{ userName: author.userName }}>
+          <AuthorCartouche author={author} />
+        </Link>
+      )}
       <View
         style={[styles.mediaContainer, small && styles.mediaContainerSmall]}
       >
@@ -175,22 +181,13 @@ const PostRenderer = (
         )}
         {small && (
           <AuthorCartouche
-            userName={author.userName}
+            author={author}
             style={styles.smallAuthorCartouche}
+            small
           />
         )}
       </View>
-      {!small && (
-        <View style={[styles.content]}>
-          <Link route="USER" params={{ userName: author.userName }}>
-            <AuthorCartouche
-              userName={author.userName}
-              style={styles.largeAuthorCartouche}
-            />
-          </Link>
-          {!!content && <Text style={styles.text}>{content}</Text>}
-        </View>
-      )}
+      {!small && !!content && <Text style={styles.text}>{content}</Text>}
     </View>
   );
 };
@@ -205,20 +202,15 @@ const styles = StyleSheet.create({
   mediaContainerSmall: {
     borderRadius: 16,
   },
-  content: {
-    paddingHorizontal: 20,
-  },
   smallAuthorCartouche: {
     position: 'absolute',
     bottom: 5,
     left: 5,
   },
-  largeAuthorCartouche: {
-    marginTop: 10,
-  },
   text: {
     ...fontFamilies.semiBold,
-    marginTop: 5,
+    marginTop: 10,
     fontSize: 12,
+    paddingHorizontal: 10,
   },
 });

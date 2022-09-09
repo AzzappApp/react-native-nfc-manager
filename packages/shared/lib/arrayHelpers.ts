@@ -1,4 +1,4 @@
-export type ArraItemType<T> = T extends ReadonlyArray<infer U> ? U : never;
+export type ArrayItemType<T> = T extends ReadonlyArray<infer U> ? U : never;
 
 export const convertToNonNullArray = <T>(
   val: T[],

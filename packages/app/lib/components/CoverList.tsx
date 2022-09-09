@@ -7,7 +7,7 @@ import type {
   CoverList_users$data,
   CoverList_users$key,
 } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { ArraItemType } from '@azzapp/shared/lib/arrayHelpers';
+import type { ArrayItemType } from '@azzapp/shared/lib/arrayHelpers';
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
 type CoverListProps = {
@@ -39,12 +39,12 @@ const CoverList = ({
   );
 
   const keyExtractor = useCallback(
-    (item: ArraItemType<CoverList_users$data>) => item.id,
+    (item: ArrayItemType<CoverList_users$data>) => item.id,
     [],
   );
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ArraItemType<CoverList_users$data>>) =>
+    ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) =>
       item ? (
         <CoverLink
           cover={item.card?.cover}
