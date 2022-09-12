@@ -44,6 +44,7 @@ type PostsGrid = {
 
 const PostsGrid = ({
   posts: postsKey,
+  canPlay,
   refreshing,
   ListHeaderComponent,
   ListFooterComponent,
@@ -301,7 +302,12 @@ const PostsGrid = ({
             return null;
           }
           return (
-            <MemoPostRenderer key={key} item={data.item} layout={data.layout} />
+            <MemoPostRenderer
+              key={key}
+              item={data.item}
+              layout={data.layout}
+              paused={!canPlay}
+            />
           );
         })}
       </View>
@@ -315,14 +321,17 @@ export default PostsGrid;
 const MemoPostRenderer = ({
   item,
   layout,
+  paused,
 }: {
   item: Post;
+  paused?: boolean;
   layout: ItemLayout;
 }) =>
   useMemo(
     () => (
       <PostLink
         postId={item.id}
+        paused={paused}
         post={item}
         width={layout.width}
         author={item.author}
@@ -332,7 +341,7 @@ const MemoPostRenderer = ({
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [item.id],
+    [item.id, paused],
   );
 
 // fraction of the scroll height that trigger a relayout
