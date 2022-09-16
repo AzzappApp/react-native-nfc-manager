@@ -17,6 +17,7 @@ const QRCodeModal = ({ onRequestClose, userName }: QRCodeModalProps) => (
     animationType="fade"
     transparent
     onRequestClose={onRequestClose}
+    testID="qr-code-modal"
   >
     <TouchableWithoutFeedback onPress={onRequestClose}>
       <View style={styles.overlay}>

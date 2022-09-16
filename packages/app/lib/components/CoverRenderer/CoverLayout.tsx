@@ -170,6 +170,7 @@ const CoverLayout = ({
             color={backgroundColor}
             width="100%"
             height="100%"
+            testID="cover-overlay"
           />
         </View>
         <View style={[styles.containers, titleStyles.position]}>
@@ -203,6 +204,7 @@ const CoverLayout = ({
             onPress={showQRCode}
             style={({ pressed }) => pressed && { opacity: 0.6 }}
             disabled={isEditing}
+            testID="qr-code-button"
           >
             <Image
               source={require('./assets/qr-code.png')}
@@ -229,6 +231,7 @@ const CoverLayout = ({
                   { backgroundColor: 'rgba(255, 255, 255, 0.6)' },
                   pressed && { opacity: 0.6 },
                 ]}
+                testID={`qr-code-button-${position}`}
               />
             </View>
           ))}

@@ -6,7 +6,7 @@ import useViewportSize, { VW100 } from '../../hooks/useViewportSize';
 import CoverEditPanel from './CoverEditPanel';
 import ModuleEditorContext from './ModuleEditorContext';
 import UserScreenLayout from './UserScreenLayout';
-import type { CoverHandle } from '../../components/CoverRenderer/CoverRenderer';
+import type { CoverHandle } from '../../components/CoverRenderer';
 import type { ModuleEditor } from './ModuleEditorContext';
 import type { UserScreenFramgent_user$key } from '@azzapp/relay/artifacts/UserScreenFramgent_user.graphql';
 import type { UserScreenFramgent_viewer$key } from '@azzapp/relay/artifacts/UserScreenFramgent_viewer.graphql';

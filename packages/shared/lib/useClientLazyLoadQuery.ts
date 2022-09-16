@@ -9,6 +9,16 @@ import type {
   RenderPolicy,
 } from 'relay-runtime';
 
+/**
+ * A hook with the same api thant relay [useLazyLoadQuery](https://relay.dev/docs/api-reference/use-lazy-load-query/)
+ * but that will only perform a network request on client, on server it will execute the request with
+ * a 'store-only' fetch policy
+ *
+ * @param gqlQuery
+ * @param variables
+ * @param options
+ * @returns
+ */
 function useClientLazyLoadQuery<TQuery extends OperationType>(
   gqlQuery: GraphQLTaggedNode,
   variables: VariablesOf<TQuery>,

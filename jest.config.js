@@ -1,3 +1,10 @@
+const esModules = [
+  'react-native',
+  '@react-native(-community)?',
+  'react-native-qrcode-svg',
+  'react-native-reanimated',
+];
+
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   clearMocks: true,
@@ -8,10 +15,9 @@ module.exports = {
       transform: {
         '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
       },
-      testMatch: ['<rootDir>/packages/app/**/*.test.{js,jsx,ts,tsx}'],
-      transformIgnorePatterns: [
-        'node_modules/(?!((jest-)?react-native|@react-native(-community)?|react-native-qrcode-svg|react-native-video)/)',
-      ],
+      setupFilesAfterEnv: ['./scripts/jestSetup.js'],
+      testMatch: ['<rootDir>/packages/**/*.test.{js,jsx,ts,tsx}'],
+      transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
     },
   ],
 };

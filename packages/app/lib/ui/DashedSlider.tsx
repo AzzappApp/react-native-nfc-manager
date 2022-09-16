@@ -18,8 +18,6 @@ type DashedSliderProps = {
 
 const DEFAULT_INTERVAL = 6;
 
-// TODO accessibility
-
 const DashedSlider = ({
   value,
   min,
@@ -87,7 +85,12 @@ const DashedSlider = ({
   const size = steps.length * interval;
 
   return (
-    <View {...panResponder.panHandlers} style={[style, styles.container]}>
+    <View
+      {...panResponder.panHandlers}
+      style={[style, styles.container]}
+      accessibilityRole="adjustable"
+      accessibilityValue={{ min, max, now: value }}
+    >
       <Animated.View
         style={[
           styles.dashContainer,

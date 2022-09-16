@@ -5,19 +5,48 @@ import type { Icons } from './Icon';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type TabsBarProps = {
-  currentTab: string;
-  onTabPress: (tab: string) => void;
+  /**
+   * the list of tabs to display
+   */
   tabs: ReadonlyArray<{
+    /** unique tab key */
     key: string;
+
+    /** the icon displayed on the tab */
     icon: Icons;
+
+    /** the accessibility lable of the tab */
     accessibilityLabel: string;
+
+    /**
+     * by default tabs icons are tinted if this property is set to `'unactive'`
+     * the icon will only be tinted when the tab is not selected
+     * if this property is set to `false` the icon won't be tinted
+     */
     tint?: 'unactive' | false | true;
   }>;
+
+  /**
+   * the currently selected tab
+   */
+  currentTab?: string;
+
+  /**
+   * An event fired when the user press one of the tab
+   */
+  onTabPress: (tab: string) => void;
+
   style?: StyleProp<ViewStyle>;
 };
 
 export const TAB_BAR_HEIGHT = 70;
 
+/**
+ * A simple tabs bar component, this component is controlled
+ * and does not hold any state.
+ *
+ * @param props
+ */
 const TabsBar = ({ currentTab, tabs, onTabPress, style }: TabsBarProps) => (
   <View style={[styles.container, style]} accessibilityRole="tablist">
     {tabs.map(({ key, icon, tint, accessibilityLabel }) => (
@@ -26,6 +55,7 @@ const TabsBar = ({ currentTab, tabs, onTabPress, style }: TabsBarProps) => (
         style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
         accessibilityRole="tab"
         accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ selected: currentTab === key }}
         onPress={() => onTabPress(key)}
       >
         {({ pressed }) => {

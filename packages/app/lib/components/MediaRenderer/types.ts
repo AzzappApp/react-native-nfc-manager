@@ -13,6 +13,7 @@ export type MediaImageRendererProps = {
   onLoad?: () => void;
   onReadyForDisplay?: () => void;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 export type MediaVideoRendererProps = {
@@ -28,6 +29,7 @@ export type MediaVideoRendererProps = {
   onEnd?: () => void;
   onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 export type MediaVideoRendererHandle = {

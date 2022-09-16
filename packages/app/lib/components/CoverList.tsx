@@ -44,18 +44,17 @@ const CoverList = ({
   );
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) =>
-      item ? (
-        <CoverLink
-          cover={item.card?.cover}
-          width={COVER_BASE_WIDTH}
-          userName={item.userName}
-          userId={item.id}
-          style={styles.item}
-          playTransition={canPlay}
-          videoPaused={!canPlay}
-        />
-      ) : null,
+    ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
+      <CoverLink
+        cover={item.card?.cover}
+        width={COVER_BASE_WIDTH}
+        userName={item.userName}
+        userId={item.id}
+        style={styles.item}
+        playTransition={canPlay}
+        videoPaused={!canPlay}
+      />
+    ),
     [canPlay],
   );
 

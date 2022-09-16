@@ -15,7 +15,7 @@ const MainTabBar = ({ currentIndex }: { currentIndex: number }) => {
       tabs={[
         {
           key: 'HOME',
-          accessibilityLabel: 'Picture Tab',
+          accessibilityLabel: 'Home',
           icon: 'home',
         },
         {
@@ -35,7 +35,7 @@ const MainTabBar = ({ currentIndex }: { currentIndex: number }) => {
         },
         {
           key: 'SETTINGS',
-          accessibilityLabel: 'Setting',
+          accessibilityLabel: 'Settings',
           icon: 'account',
           tint: false,
         },

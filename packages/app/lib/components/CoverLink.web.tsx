@@ -1,7 +1,7 @@
 import { Pressable } from 'react-native';
 import CoverRenderer from './CoverRenderer';
 import Link from './Link';
-import type { CoverRendererProps } from './CoverRenderer/CoverRenderer';
+import type { CoverRendererProps } from './CoverRenderer';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 const CoverLink = ({

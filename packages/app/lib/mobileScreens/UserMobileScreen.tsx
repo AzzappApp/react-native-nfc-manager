@@ -6,7 +6,7 @@ import { useNativeNavigationEvent } from '../components/NativeRouter';
 import relayScreen from '../helpers/relayScreen';
 import { useRouter } from '../PlatformEnvironment';
 import UserScreen from '../screens/UserScreen';
-import type { CoverHandle } from '../components/CoverRenderer/CoverRenderer';
+import type { CoverHandle } from '../components/CoverRenderer';
 import type { ScreenOptions } from '../components/NativeRouter';
 import type { RelayScreenProps } from '../helpers/relayScreen';
 import type { UserRoute } from '../routes';

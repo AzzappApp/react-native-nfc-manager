@@ -124,7 +124,12 @@ const applyActionToDeepestStack = (
   if (lastScreen.kind === 'tabs') {
     const { tabs, currentIndex } = lastScreen.state;
     const tabScreen = tabs[currentIndex];
-    if (tabScreen.kind === 'stack') {
+    const isBackAction =
+      action.type === 'BACK' || action.type === 'SCREEN_DISMISSED';
+    if (
+      tabScreen.kind === 'stack' &&
+      (!isBackAction || tabScreen.state.length >= 2)
+    ) {
       return [
         ...stack.slice(0, stack.length - 1),
         {
@@ -346,6 +351,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
       };
     }
 
+    // TODO doesn't works with stack in tabs
     const setTabIfExists = (route: Route) => {
       const tabState = getActiveTabs(routerState);
       if (!tabState) {
@@ -370,8 +376,8 @@ export const useNativeRouter = (init: NativeRouterInit) => {
       return true;
     };
 
-    // TODO we could ass the possibilities to PUSH/REPLACE with tabs
-    // If we feel the needs, but there is complex case to think about
+    // TODO we could add the possibilities to PUSH/REPLACE stack in tabs
+    // if we feel the needs, but there is complex case to think about
     // so until we needs it we won't implement that
     return {
       getCurrentRoute() {

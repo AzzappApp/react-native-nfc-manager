@@ -30,8 +30,9 @@ const MediaVideoRenderer = (
     aspectRatio,
     muted = false,
     paused = false,
-    style,
+    testID,
     currentTime,
+    style,
     onProgress,
     onEnd,
     onReadyForDisplay,
@@ -121,6 +122,7 @@ const MediaVideoRenderer = (
     <View
       style={[style, { width, aspectRatio, overflow: 'hidden' }]}
       ref={containerRef}
+      testID={testID}
     >
       <NativeMediaVideoRenderer
         ref={videoRef}

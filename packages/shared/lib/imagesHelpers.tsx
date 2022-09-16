@@ -15,6 +15,15 @@ const getTransformationsFor = (
   }
 };
 
+/**
+ * Helpers used to create cloudinary URL for image given size parameters
+ *
+ * @param resourceId the id of the cloudinary resource
+ * @param width the desired image width
+ * @param pixelRatio the desired pixeld density - default 1
+ * @param aspectRatio the desired aspect ratio
+ * @returns the url of a transformed imate
+ */
 export const getImageURLForSize = (
   resourceId: string,
   width: number,
@@ -25,6 +34,15 @@ export const getImageURLForSize = (
   return `${CLOUDINARY_BASE_URL}/image/upload/${transforms}/${resourceId}`;
 };
 
+/**
+ * Helpers used to create cloudinary url for video given size parameters
+ *
+ * @param resourceId the id of the cloudinary resource
+ * @param width the desired image width
+ * @param pixelRatio the desired pixeld density - default 1
+ * @param aspectRatio the desired aspect ratio
+ * @returns the url of a transformed imate
+ */
 export const getVideoUrlForSize = (
   resourceId: string,
   width: number,
@@ -35,6 +53,15 @@ export const getVideoUrlForSize = (
   return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${resourceId}.mp4`;
 };
 
+/**
+ * Helpers used to create cloudinary thumbnail url for video given size parameters
+ *
+ * @param resourceId the id of the cloudinary resource
+ * @param width the desired image width
+ * @param pixelRatio the desired pixeld density - default 1
+ * @param aspectRatio the desired aspect ratio
+ * @returns the url of a transformed imate
+ */
 export const getVideoThumbnailURL = (
   resourceId: string,
   width: number,

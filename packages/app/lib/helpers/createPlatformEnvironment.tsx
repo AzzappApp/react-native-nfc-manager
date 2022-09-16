@@ -11,8 +11,8 @@ const createPlatformEnvironment = (
   router,
   LinkComponent: NativeLink,
   WebAPI: {
-    logout: (_, init) =>
-      WebAPI.logout(_, injectToken(getTokens()?.token, init as RequestInit)),
+    logout: init =>
+      WebAPI.logout(injectToken(getTokens()?.token, init as RequestInit)),
     signin: (params: WebAPI.SignInParams) =>
       WebAPI.signin({ ...params, authMethod: 'token' }),
     signup: (params: WebAPI.SignUpParams) =>

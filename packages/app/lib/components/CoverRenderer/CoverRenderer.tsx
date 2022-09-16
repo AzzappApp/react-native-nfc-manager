@@ -43,7 +43,7 @@ const CoverRenderer = (
     cover: coverKey,
     userName,
     width = 125,
-    playTransition = false,
+    playTransition = true,
     videoPaused = false,
     imageIndex = 0,
     forceImageIndex,
@@ -213,6 +213,7 @@ const CoverRenderer = (
             transitionDuration={300}
             transitions={['opacity']}
             easing="ease-in-out"
+            testID={`cover-media-container-${picture.source}`}
           >
             {picture.__typename === 'MediaVideo' && (
               <MediaVideoRenderer
@@ -226,10 +227,14 @@ const CoverRenderer = (
                 currentTime={initialVideosTimes?.[index]}
                 paused={videoPaused || !isDisplayed}
                 onEnd={onVideoEnd}
+                testID={`cover-video-${picture.source}`}
               />
             )}
             {picture.__typename === 'MediaImage' && (
-              <MediaImageRenderer {...mediaProps} />
+              <MediaImageRenderer
+                {...mediaProps}
+                testID={`cover-image-${picture.source}`}
+              />
             )}
           </ViewTransition>
         );

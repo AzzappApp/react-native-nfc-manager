@@ -7,7 +7,7 @@ export type CoverOverlayEffectProps = {
   color: string;
   width: number | string;
   height: number | string;
-  nativeID?: string;
+  testID?: string;
 };
 
 const SVGMAP: Record<string, React.ComponentType<SvgProps>> = {
@@ -111,14 +111,12 @@ const CoverOverlayEffect = ({
   color,
   width,
   height,
-  nativeID,
+  testID,
 }: CoverOverlayEffectProps) => {
   const Comp = SVGMAP[overlayEffect];
 
   if (Comp) {
-    return (
-      <Comp color={color} width={width} height={height} nativeID={nativeID} />
-    );
+    return <Comp color={color} width={width} height={height} testID={testID} />;
   }
   return null;
 };

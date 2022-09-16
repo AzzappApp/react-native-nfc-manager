@@ -1,24 +1,20 @@
+/**
+ * API methods used by all clients
+ */
 import { fetchJSON, postFormData } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
 
 type FetchFunction = (input: RequestInfo, init: RequestInit) => Promise<any>;
 
-type APIMethod<Params, ReturnType> = Params extends undefined
-  ? <
-      FetchFunc extends FetchFunction = typeof fetchJSON,
-      ReqInit = Parameters<FetchFunc>[1],
-    >(
-      params?: undefined,
-      init?: ReqInit & { fetchFunction?: FetchFunc },
-    ) => Promise<ReturnType>
-  : <
-      FetchFunc extends FetchFunction = typeof fetchJSON,
-      ReqInit = Parameters<FetchFunc>[1],
-    >(
-      params: Params,
-      init?: ReqInit & { fetchFunction?: FetchFunc },
-    ) => Promise<ReturnType>;
+type APIMethod<Params, ReturnType> = (
+  params: Params,
+  init?: RequestInit & { fetchFunction?: typeof fetchJSON },
+) => Promise<ReturnType>;
+
+type APIMethodWithoutParams<ReturnType> = (
+  init?: RequestInit & { fetchFunction?: typeof fetchJSON },
+) => Promise<ReturnType>;
 
 const apiFetch = (
   input: RequestInfo,
@@ -73,7 +69,7 @@ export const refreshTokens: APIMethod<string, TokensResponse> = (
     body: JSON.stringify({ refreshToken }),
   });
 
-export const logout: APIMethod<undefined, void> = (_, init): Promise<void> =>
+export const logout: APIMethodWithoutParams<void> = (init): Promise<void> =>
   apiFetch(`${API_ENDPOINT}/logout`, {
     ...init,
     method: 'POST',
@@ -97,9 +93,8 @@ export const uploadMedia = (
 ) => {
   const formData = new FormData();
   formData.append('file', file);
-  // eslint-disable-next-line guard-for-in
-  for (const key in uploadParameters) {
+  Object.keys(uploadParameters).forEach(key => {
     formData.append(key, uploadParameters[key]);
-  }
+  });
   return postFormData(uploadURL, formData, 'json', signal);
 };

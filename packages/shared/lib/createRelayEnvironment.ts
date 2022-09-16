@@ -18,6 +18,12 @@ type CreateRelayEnvironmentParams = {
   cacheConfig?: { size?: number; ttl?: number };
 };
 
+/**
+ * Factory used by both web and mobile applications used to create the Relay Environement
+ *
+ * @param options
+ * @returns a Relay environment
+ */
 const createRelayEnvironment = ({
   fetchFunction = fetchJSON,
   cacheConfig,

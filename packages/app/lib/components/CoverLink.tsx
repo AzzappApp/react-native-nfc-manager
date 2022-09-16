@@ -2,10 +2,7 @@ import { useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { useRouter } from '../PlatformEnvironment';
 import CoverRenderer from './CoverRenderer';
-import type {
-  CoverHandle,
-  CoverRendererProps,
-} from './CoverRenderer/CoverRenderer';
+import type { CoverHandle, CoverRendererProps } from './CoverRenderer';
 import type { StyleProp, ViewStyle, View } from 'react-native';
 
 const CoverLink = ({
@@ -33,7 +30,6 @@ const CoverLink = ({
         route: 'USER',
         params: {
           userName,
-          userId,
         },
       });
       return;
