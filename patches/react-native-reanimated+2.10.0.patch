@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-reanimated/lib/reanimated2/jestUtils.js b/node_modules/react-native-reanimated/lib/reanimated2/jestUtils.js
+index d8befd8..b6faeea 100644
+--- a/node_modules/react-native-reanimated/lib/reanimated2/jestUtils.js
++++ b/node_modules/react-native-reanimated/lib/reanimated2/jestUtils.js
+@@ -154,6 +154,9 @@ export const setUpTests = (userConfig = {}) => {
+         const { expect: expectModule } = require('@jest/globals');
+         expect = expectModule;
+     }
++    if (typeof expect === 'object') {
++        expect = expect.expect;
++    }
+     require('setimmediate');
+     frameTime = Math.round(1000 / config.fps);
+     config = Object.assign(Object.assign({}, config), userConfig);
