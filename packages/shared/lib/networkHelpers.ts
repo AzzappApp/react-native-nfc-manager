@@ -1,8 +1,10 @@
 import { Observable } from 'relay-runtime';
+import { executeWithRetries } from './asyncHelpers';
 import ERRORS from './errors';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_RETRIES = [1000, 3000];
 
 /**
  * A function used to handle JSON request with parametrable timeout
@@ -14,11 +16,58 @@ const DEFAULT_TIMEOUT = 15000;
  * added to the request - default true
  * @returns
  */
-export async function fetchJSON<JSON = unknown>(
+export const fetchJSON = async <JSON = unknown>(
+  input: RequestInfo,
+  init?: RequestInit & { timeout?: number; retries?: number[] },
+): Promise<JSON> => {
+  init = {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...init?.headers,
+    },
+  };
+  const response: Response = await fetchWithRetries(input, init);
+
+  let data: JSON;
+  try {
+    data = await response.json();
+  } catch {
+    throw new FetchError({
+      message: ERRORS.JSON_DECODING_ERROR,
+      response,
+      data: { error: ERRORS.JSON_DECODING_ERROR },
+    });
+  }
+  if (response.ok) {
+    return data;
+  }
+
+  throw new FetchError({
+    message: response.statusText,
+    response,
+    data,
+  });
+};
+
+export const fetchWithRetries = async (
+  input: RequestInfo,
+  init?: RequestInit & { timeout?: number; retries?: number[] },
+): Promise<Response> => {
+  const retries = init?.retries ?? DEFAULT_RETRIES;
+  return executeWithRetries(
+    () => fetchWithTimeout(input, init),
+    retries,
+    error =>
+      error instanceof TypeError && error.message === TIMEOUT_ERROR_MESSAGE,
+  );
+};
+
+export const fetchWithTimeout = async (
   input: RequestInfo,
   init?: RequestInit & { timeout?: number },
-  addHeaders = true,
-): Promise<JSON> {
+): Promise<Response> => {
   const timeout = init?.timeout ?? DEFAULT_TIMEOUT;
   const signal = init?.signal;
 
@@ -41,40 +90,20 @@ export async function fetchJSON<JSON = unknown>(
       ...init,
       signal: abortController.signal,
     };
-    if (addHeaders) {
-      init.headers = { 'Content-Type': 'application/json', ...init.headers };
-    }
     response = await fetch(input, init);
   } catch (error) {
     if (isTimeout && isAbortError(error)) {
-      throw new TypeError('Timeout');
+      throw new TypeError(TIMEOUT_ERROR_MESSAGE);
     }
     throw error;
   } finally {
     signal?.removeEventListener('abort', onAbort);
     clearTimeout(timeoutHandle);
   }
+  return response;
+};
 
-  let data: JSON;
-  try {
-    data = await response.json();
-  } catch {
-    throw new FetchError({
-      message: ERRORS.JSON_DECODING_ERROR,
-      response,
-      data: { error: ERRORS.JSON_DECODING_ERROR },
-    });
-  }
-  if (response.ok) {
-    return data;
-  }
-
-  throw new FetchError({
-    message: response.statusText,
-    response,
-    data,
-  });
-}
+export const TIMEOUT_ERROR_MESSAGE = 'TIMEOUT';
 
 /**
  * A special error thrown by `fetchJSON`

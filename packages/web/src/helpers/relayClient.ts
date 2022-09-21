@@ -18,9 +18,7 @@ export const getRelayEnvironment = () => {
     return createFakeServerEnvironment();
   }
   if (!relayEnvironment) {
-    relayEnvironment = createRelayEnvironment({
-      cacheConfig: { size: 10, ttl: 2000 },
-    });
+    relayEnvironment = createRelayEnvironment({});
   }
   return relayEnvironment;
 };

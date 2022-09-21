@@ -1,5 +1,10 @@
 import ERRORS from '../errors';
-import { createAbortError, FetchError, fetchJSON } from '../networkHelpers';
+import {
+  createAbortError,
+  FetchError,
+  fetchJSON,
+  TIMEOUT_ERROR_MESSAGE,
+} from '../networkHelpers';
 
 const fetchMock = jest.fn();
 global.fetch = fetchMock;
@@ -27,7 +32,7 @@ describe('networkHelpers', () => {
       expect(await fetchJSON('fake')).toEqual({ foo: 'bar' });
     });
 
-    test('should add `Content-Type` header if `addHeaders` params is not false', async () => {
+    test('should add `Content-Type` and `Accept` headers', async () => {
       fetchMock.mockReturnValue({
         ok: true,
         async json() {
@@ -47,18 +52,7 @@ describe('networkHelpers', () => {
           headers: {
             fakeHeader: 'foo',
             'Content-Type': 'application/json',
-          },
-        }),
-      );
-      fetchMock.mockClear();
-      await fetchJSON('fake', { headers: { fakeHeader: 'foo' } }, false);
-      expect(fetchMock).toHaveBeenCalled();
-      expect(fetchMock).not.toHaveBeenCalledWith(
-        'fake',
-        expect.objectContaining({
-          headers: {
-            fakeHeader: 'foo',
-            'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
         }),
       );
@@ -100,7 +94,7 @@ describe('networkHelpers', () => {
       );
       let error: any = null;
 
-      fetchJSON('fake', { timeout: 1000 }).catch(e => {
+      fetchJSON('fake', { timeout: 1000, retries: [] }).catch(e => {
         error = e;
       });
       jest.advanceTimersByTime(999);
@@ -111,10 +105,40 @@ describe('networkHelpers', () => {
       jest.runAllTicks();
       expect(abortMock).toHaveBeenCalled();
       expect(error).toBeInstanceOf(TypeError);
-      expect(error.message).toBe('Timeout');
+      expect(error.message).toBe(TIMEOUT_ERROR_MESSAGE);
     });
 
-    test('should throw a timeout error if request is aborted', () => {
+    test.only('should retries before timeout', () => {
+      jest.useFakeTimers();
+
+      fetchMock.mockImplementation(
+        () =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => reject(createAbortError()), 1000);
+          }),
+      );
+      let error: any = null;
+
+      fetchJSON('fake', { timeout: 1000, retries: [1000, 3000] }).catch(e => {
+        error = e;
+      });
+      jest.advanceTimersByTime(1000);
+      expect(error).toBe(null);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      jest.advanceTimersByTime(1000);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(error).toBe(null);
+      jest.advanceTimersByTime(4000);
+      expect(error).toBe(null);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      jest.advanceTimersByTime(1000);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(abortMock).toHaveBeenCalled();
+      expect(error).toBeInstanceOf(TypeError);
+      expect(error.message).toBe(TIMEOUT_ERROR_MESSAGE);
+    });
+
+    test('should not throw a timeout error if request is aborted', () => {
       jest.useFakeTimers();
       fetchMock.mockImplementation(
         () =>

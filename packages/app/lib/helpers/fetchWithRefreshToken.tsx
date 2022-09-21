@@ -5,7 +5,7 @@ import { clearTokens, getTokens, setTokens } from './tokensStore';
 
 async function fetchWithRefreshToken<JSON = unknown>(
   input: RequestInfo,
-  init?: RequestInit & { timeout?: number },
+  init?: RequestInit & { timeout?: number; retries?: number[] },
 ): Promise<JSON> {
   const tokens = getTokens();
   if (!tokens) {
