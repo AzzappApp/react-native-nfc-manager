@@ -1,7 +1,9 @@
 import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
 import SignUpScreen from '@azzapp/app/lib/screens/SignUpScreen';
 import Head from 'next/head';
+import { getMessages } from '../helpers/i18nmessages';
 import type { SignUpParams } from '@azzapp/shared/lib/WebAPI';
+import type { GetStaticProps } from 'next';
 
 const SingupPage = () => {
   const WebAPI = useWebAPI();
@@ -21,6 +23,14 @@ const SingupPage = () => {
       <SignUpScreen signup={signup} />
     </div>
   );
+};
+
+export const getStaticProps: GetStaticProps = context => {
+  return {
+    props: {
+      i18nMessages: getMessages('signup', context.locale),
+    },
+  };
 };
 
 export default SingupPage;

@@ -1,3 +1,4 @@
+import { FormattedMessage } from 'react-intl';
 import { Pressable, SafeAreaView, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { graphql, usePreloadedQuery } from 'react-relay';
@@ -34,19 +35,34 @@ const SettingsMobileScreen = ({
       {viewer.user ? (
         <>
           <TouchableOpacity onPress={logout}>
-            <Text>Logout</Text>
+            <Text>
+              <FormattedMessage
+                defaultMessage="logout"
+                description="logout link"
+              />
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
         <>
           <Link modal route="SIGN_IN">
             <Pressable>
-              <Text>Sig in</Text>
+              <Text>
+                <FormattedMessage
+                  defaultMessage="Sign In"
+                  description="sign in link"
+                />
+              </Text>
             </Pressable>
           </Link>
           <Link modal route="SIGN_UP">
             <Pressable>
-              <Text>Sig up</Text>
+              <Text>
+                <FormattedMessage
+                  defaultMessage="Sign Up"
+                  description="sign up link"
+                />
+              </Text>
             </Pressable>
           </Link>
         </>

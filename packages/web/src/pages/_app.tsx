@@ -1,8 +1,11 @@
 import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { IntlErrorCode } from '@formatjs/intl';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { Suspense, useMemo } from 'react';
+import { IntlProvider } from 'react-intl';
 import {
   SafeAreaProvider,
   initialWindowMetrics,
@@ -37,6 +40,17 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   const SuspenseFallback = (Component as any).fallback;
 
+  const { defaultLocale, locale } = nextRouter;
+
+  const onIntlError = (err: any) => {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      err.code === IntlErrorCode.MISSING_TRANSLATION
+    ) {
+      return;
+    }
+    console.error(err);
+  };
   return (
     <>
       <Head>
@@ -47,15 +61,22 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <PlatformEnvironmentProvider value={platformEnvironment}>
         <RelayEnvironmentProvider environment={environment}>
-          <Suspense
-            fallback={
-              SuspenseFallback ? <SuspenseFallback {...pageProps} /> : null
-            }
+          <IntlProvider
+            locale={locale ?? DEFAULT_LOCALE}
+            defaultLocale={defaultLocale ?? DEFAULT_LOCALE}
+            messages={pageProps.i18nMessages}
+            onError={onIntlError}
           >
-            <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-              <Component {...pageProps} />
-            </SafeAreaProvider>
-          </Suspense>
+            <Suspense
+              fallback={
+                SuspenseFallback ? <SuspenseFallback {...pageProps} /> : null
+              }
+            >
+              <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                <Component {...pageProps} />
+              </SafeAreaProvider>
+            </Suspense>
+          </IntlProvider>
         </RelayEnvironmentProvider>
       </PlatformEnvironmentProvider>
 

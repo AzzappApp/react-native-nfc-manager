@@ -3,7 +3,9 @@ import useClientLazyLoadQuery from '@azzapp/shared/lib/useClientLazyLoadQuery';
 import Head from 'next/head';
 import { graphql } from 'react-relay';
 import ClientOnlySuspense from '../components/ClientSuspence';
+import { getMessages } from '../helpers/i18nmessages';
 import type { homePageQuery } from '@azzapp/relay/artifacts/homePageQuery.graphql';
+import type { GetStaticProps } from 'next';
 
 const HomePage = () => {
   const data = useClientLazyLoadQuery<homePageQuery>(
@@ -29,6 +31,14 @@ const HomePage = () => {
       </ClientOnlySuspense>
     </div>
   );
+};
+
+export const getStaticProps: GetStaticProps = context => {
+  return {
+    props: {
+      i18nMessages: getMessages('home', context.locale),
+    },
+  };
 };
 
 export default HomePage;

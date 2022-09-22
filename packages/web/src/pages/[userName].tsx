@@ -3,6 +3,7 @@ import UserScreen from '@azzapp/app/lib/screens/UserScreen';
 import useClientLazyLoadQuery from '@azzapp/shared/lib/useClientLazyLoadQuery';
 import Head from 'next/head';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import { getMessages } from '../helpers/i18nmessages';
 import { preloadServerQuery } from '../helpers/relayServer';
 import type { UserNamePageUserQuery } from '@azzapp/relay/artifacts/UserNamePageUserQuery.graphql';
 import type { UserNamePageViewerQuery } from '@azzapp/relay/artifacts/UserNamePageViewerQuery.graphql';
@@ -75,6 +76,7 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       userName,
       initialRecords,
+      i18nMessages: getMessages('[userName]', context.locale),
     },
     revalidate: 10,
   };

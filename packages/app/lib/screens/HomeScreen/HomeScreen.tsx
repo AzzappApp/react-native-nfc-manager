@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { StyleSheet, View, Image } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
@@ -31,6 +32,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
 
   const vp = useViewportSize();
 
+  const intl = useIntl();
   return (
     <RecommandedPostsList
       viewer={viewer}
@@ -51,7 +53,12 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
           {!viewer.user && (
             <View style={styles.signupSection}>
               <Link modal route="SIGN_UP">
-                <Button label="Sign UP" />
+                <Button
+                  label={intl.formatMessage({
+                    defaultMessage: 'Sign Up',
+                    description: 'Home screen sign up button label',
+                  })}
+                />
               </Link>
             </View>
           )}

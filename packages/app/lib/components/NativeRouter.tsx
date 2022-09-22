@@ -256,7 +256,7 @@ type TabsInit = {
 
 type StackInit = { stack: Array<RouteInit | TabsInit> };
 
-type NativeRouterInit = {
+export type NativeRouterInit = {
   stack: Array<RouteInit | TabsInit>;
   modals?: Array<RouteInit | TabsInit>;
 };

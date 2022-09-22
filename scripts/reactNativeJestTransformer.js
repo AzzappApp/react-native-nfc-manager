@@ -14,5 +14,6 @@ module.exports = createTransformer({
       'relay',
       { eagerEsModules: false, artifactDirectory: relayArtifactDirectory },
     ],
+    ['formatjs', { idInterpolationPattern: '[sha1:contenthash:base64:6]' }],
   ],
 });

@@ -1,0 +1,15 @@
+{
+  "name": "@azzapp/i18n",
+  "version": "0.0.1",
+  "private": true,
+  "types": "index.d.ts",
+  "main": "index.js",
+  "scripts": {
+    "build:app": "formatjs compile-folder --ast src/app compiled/app",
+    "build:web": "formatjs compile-folder --ast src/web compiled/web",
+    "build": "yarn build:app && yarn build:web"
+  },
+  "dependencies": {
+    "@formatjs/cli": "^5.1.0"
+  }
+}

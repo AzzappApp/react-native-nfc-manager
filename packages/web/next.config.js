@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const i18nConfig = require('@azzapp/i18n');
+
 const config = {
   swcMinify: true,
   reactStrictMode: true,
@@ -11,6 +13,10 @@ const config = {
   },
   images: {
     disableStaticImages: true,
+  },
+  i18n: {
+    locales: i18nConfig.SUPPORTED_LOCALES,
+    defaultLocale: i18nConfig.DEFAULT_LOCALE,
   },
   webpack: config => {
     config.resolve.alias = {

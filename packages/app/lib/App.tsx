@@ -1,4 +1,7 @@
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { IntlErrorCode } from '@formatjs/intl';
 import { useEffect, useMemo, useRef } from 'react';
+import { IntlProvider } from 'react-intl';
 import { View } from 'react-native';
 import {
   initialWindowMetrics,
@@ -8,6 +11,11 @@ import { RelayEnvironmentProvider } from 'react-relay';
 import MainTabBar from './components/MaintTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import createPlatformEnvironment from './helpers/createPlatformEnvironment';
+import {
+  init as initLocaleHelpers,
+  messages,
+  useCurrentLocale,
+} from './helpers/localeHelpers';
 import * as QueryLoader from './helpers/QueryLoader';
 import { getRelayEnvironment } from './helpers/relayEnvironment';
 import { isRelayScreen } from './helpers/relayScreen';
@@ -22,6 +30,7 @@ import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import UserMobileScreen from './mobileScreens/UserMobileScreen';
 import UserPostsMobileScreen from './mobileScreens/UserPostsMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
+import type { NativeRouterInit } from './components/NativeRouter';
 
 const screens = {
   HOME: HomeMobileScreen,
@@ -40,8 +49,36 @@ const tabs = {
   MAIN_TAB: MainTabBar,
 };
 
+const initialRoutes: NativeRouterInit = {
+  stack: [
+    {
+      id: 'MAIN_TAB',
+      currentIndex: 0,
+      tabs: [
+        {
+          id: 'HOME',
+          route: 'HOME',
+        },
+        {
+          id: 'SEARCH',
+          route: 'SEARCH',
+        },
+        {
+          id: 'CHAT',
+          route: 'CHAT',
+        },
+        {
+          id: 'SETTINGS',
+          route: 'SETTINGS',
+        },
+      ],
+    },
+  ],
+};
+
 export const init = async () => {
   await initTokensStore();
+  initLocaleHelpers();
   QueryLoader.init();
   QueryLoader.loadQueryFor('HOME', HomeMobileScreen);
 };
@@ -49,32 +86,7 @@ export const init = async () => {
 const initialisationPromise = init();
 
 const App = () => {
-  const { router, routerState } = useNativeRouter({
-    stack: [
-      {
-        id: 'MAIN_TAB',
-        currentIndex: 0,
-        tabs: [
-          {
-            id: 'HOME',
-            route: 'HOME',
-          },
-          {
-            id: 'SEARCH',
-            route: 'SEARCH',
-          },
-          {
-            id: 'CHAT',
-            route: 'CHAT',
-          },
-          {
-            id: 'SETTINGS',
-            route: 'SETTINGS',
-          },
-        ],
-      },
-    ],
-  });
+  const { router, routerState } = useNativeRouter(initialRoutes);
 
   const platformEnvironment = useMemo(
     () => createPlatformEnvironment(router),
@@ -102,17 +114,33 @@ const App = () => {
     screenIdToDispose.forEach(screen => QueryLoader.disposeQueryFor(screen));
   };
 
+  const locale = useCurrentLocale();
+
+  const onIntlError = (err: any) => {
+    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
+      return;
+    }
+    console.error(err);
+  };
+
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>
       <PlatformEnvironmentProvider value={platformEnvironment}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <ScreensRenderer
-            routerState={routerState}
-            screens={screens}
-            tabs={tabs}
-            onScreenDismissed={onScreenDismissed}
-            onFinishTransitioning={onFinishTransitioning}
-          />
+          <IntlProvider
+            locale={locale}
+            defaultLocale={DEFAULT_LOCALE}
+            messages={messages[locale]}
+            onError={onIntlError}
+          >
+            <ScreensRenderer
+              routerState={routerState}
+              screens={screens}
+              tabs={tabs}
+              onScreenDismissed={onScreenDismissed}
+              onFinishTransitioning={onFinishTransitioning}
+            />
+          </IntlProvider>
         </SafeAreaProvider>
       </PlatformEnvironmentProvider>
     </RelayEnvironmentProvider>

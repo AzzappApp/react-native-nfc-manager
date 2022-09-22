@@ -6,7 +6,8 @@
     "node": true
   },
   "parserOptions": {
-    "project": ["./tsconfig.json"]
+    "project": ["./tsconfig.json"],
+    "ecmaVersion": 2022
   },
   "settings": {
     "react": {
@@ -22,6 +23,7 @@
     "plugin:react-hooks/recommended",
     "plugin:prettier/recommended"
   ],
+  "plugins": ["formatjs"],
   "ignorePatterns": ["**/__generated__/*", "packages/relay/artifacts/"],
   "rules": {
     "array-callback-return": "error",
@@ -90,7 +92,12 @@
     "react/react-in-jsx-scope": "off",
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
-    "eslint-comments/disable-enable-pair": "off"
+    "eslint-comments/disable-enable-pair": "off",
+    "formatjs/enforce-description": "error",
+    "formatjs/enforce-default-message": "error",
+    "formatjs/enforce-placeholders": "error",
+    "formatjs/no-multiple-whitespaces": "error",
+    "formatjs/no-id": "error"
   },
   "overrides": [
     {

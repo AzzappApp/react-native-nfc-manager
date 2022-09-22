@@ -20,5 +20,12 @@ module.exports = {
     ['module:react-native-dotenv', { moduleName: 'process.env' }],
     ['relay', { artifactDirectory: relayArtifactDirectory }],
     'react-native-reanimated/plugin',
+    [
+      'formatjs',
+      {
+        removeDefaultMessage: process.env.NODE_ENV === 'production',
+        idInterpolationPattern: '[sha1:contenthash:base64:6]',
+      },
+    ],
   ],
 };

@@ -10,5 +10,12 @@ module.exports = {
   plugins: [
     ['react-native-web', { commonjs: true }],
     ['relay', { artifactDirectory: relayArtifactDirectory }],
+    [
+      'formatjs',
+      {
+        removeDefaultMessage: process.env.NODE_ENV === 'production',
+        idInterpolationPattern: '[sha1:contenthash:base64:6]',
+      },
+    ],
   ],
 };
