@@ -93,6 +93,8 @@
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
     "eslint-comments/disable-enable-pair": "off",
+    "react/self-closing-comp": 2,
+    "react-hooks/rules-of-hooks": "error",
     "formatjs/enforce-description": "error",
     "formatjs/enforce-default-message": "error",
     "formatjs/enforce-placeholders": "error",

@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderRadius: 12,
-    backgroundColor: colors.darkWhite,
+    backgroundColor: colors.grey50,
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 20,

@@ -3,6 +3,7 @@ const esModules = [
   '@react-native(-community)?',
   'react-native-qrcode-svg',
   'react-native-reanimated',
+  'validator',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */

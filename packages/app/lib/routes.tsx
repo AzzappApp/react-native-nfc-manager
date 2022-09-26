@@ -31,6 +31,11 @@ export type SignUpRoute = {
   params?: never;
 };
 
+export type ForgotPasswordRoute = {
+  route: 'FORGOT_PASSWORD';
+  params?: never;
+};
+
 export type UserRoute = {
   route: 'USER';
   params: {
@@ -72,6 +77,7 @@ export type Route =
   | SettingsRoute
   | SignInRoute
   | SignUpRoute
+  | ForgotPasswordRoute
   | UserRoute
   | PostRoute
   | UserPostsRoute

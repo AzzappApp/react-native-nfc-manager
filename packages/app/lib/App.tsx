@@ -21,6 +21,7 @@ import { getRelayEnvironment } from './helpers/relayEnvironment';
 import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
+import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScreen';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
 import PostMobileScreen from './mobileScreens/PostMobileScreen';
@@ -39,6 +40,7 @@ const screens = {
   CHAT: () => <View />,
   SIGN_IN: SignInMobileScreen,
   SIGN_UP: SignUpMobileScreen,
+  FORGOT_PASSWORD: ForgotPasswordMobileScreen,
   USER: UserMobileScreen,
   POST: PostMobileScreen,
   USER_POSTS: UserPostsMobileScreen,

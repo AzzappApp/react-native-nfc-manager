@@ -59,6 +59,22 @@ export const signin: APIMethod<SignInParams, TokensResponse> = (
     body: JSON.stringify(data),
   });
 
+export type ForgotPasswordParams = {
+  email: string;
+  authMethod?: 'cookie' | 'token';
+};
+
+//TODO: check if  forgotPassword method exist on server
+export const forgotPassword: APIMethod<ForgotPasswordParams, TokensResponse> = (
+  data,
+  init,
+): Promise<TokensResponse> =>
+  apiFetch(`${API_ENDPOINT}/forgotPassword`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
 export const refreshTokens: APIMethod<string, TokensResponse> = (
   refreshToken,
   init,

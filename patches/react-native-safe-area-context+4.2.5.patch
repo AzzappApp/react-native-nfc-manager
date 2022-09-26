@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-safe-area-context/jest/mock.js b/node_modules/react-native-safe-area-context/jest/mock.js
+index 0d2ffc7..63d834e 100644
+--- a/node_modules/react-native-safe-area-context/jest/mock.js
++++ b/node_modules/react-native-safe-area-context/jest/mock.js
+@@ -23,6 +23,12 @@ export default {
+   ...RNSafeAreaContext,
+   initialWindowMetrics: MOCK_INITIAL_METRICS,
+   // Provide a simpler implementation with default values.
++    useSafeAreaInsets: () => {
++     return MOCK_INITIAL_METRICS.insets;
++   },
++   useSafeAreaFrame: () => {
++     return MOCK_INITIAL_METRICS.frame;
++   },
+   SafeAreaProvider: ({ children, initialMetrics }) => {
+     return (
+       <RNSafeAreaContext.SafeAreaFrameContext.Provider

@@ -30,7 +30,6 @@ const SVGMAP: Record<string, React.ComponentType<SvgProps>> = {
     <Svg {...props} viewBox="0 0 125 200">
       <Path d="M0 0h125v200H0V0Z" fill="url(#a)" />
       <Defs>
-        {/*@ts-expect-error type seems incorrect */}
         <LinearGradient
           id="a"
           x1="62.5"
@@ -51,7 +50,6 @@ const SVGMAP: Record<string, React.ComponentType<SvgProps>> = {
     <Svg {...props} viewBox="0 0 125 200">
       <Path d="M0 0h125v200H0V0Z" fill="url(#a)" />
       <Defs>
-        {/*@ts-expect-error type seems incorrect */}
         <LinearGradient
           id="a"
           x1="62.5"

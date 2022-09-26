@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   titleInput: {
     paddingHorizontal: 15,
     paddingVertical: 8,
-    backgroundColor: colors.darkWhite,
+    backgroundColor: colors.grey50,
     borderRadius: 15,
     ...fontFamilies.semiBold,
   },

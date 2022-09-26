@@ -54,6 +54,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
             <View style={styles.signupSection}>
               <Link modal route="SIGN_UP">
                 <Button
+                  style={styles.signupButton}
                   label={intl.formatMessage({
                     defaultMessage: 'Sign Up',
                     description: 'Home screen sign up button label',
@@ -80,6 +81,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  signupButton: { paddingLeft: 100, paddingRight: 100 },
   recommandedPostsList: {
     flex: 1,
     backgroundColor: '#FFF',

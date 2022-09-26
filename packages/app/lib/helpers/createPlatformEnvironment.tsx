@@ -17,6 +17,8 @@ const createPlatformEnvironment = (
       WebAPI.signin({ ...params, authMethod: 'token' }),
     signup: (params: WebAPI.SignUpParams) =>
       WebAPI.signup({ ...params, authMethod: 'token' }),
+    forgotPassword: (params: WebAPI.ForgotPasswordParams) =>
+      WebAPI.forgotPassword({ ...params, authMethod: 'token' }),
     refreshTokens: WebAPI.refreshTokens,
     uploadMedia: WebAPI.uploadMedia,
     uploadSign: (params, init) =>

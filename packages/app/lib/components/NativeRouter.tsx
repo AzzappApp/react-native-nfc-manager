@@ -517,7 +517,7 @@ export const ScreensRenderer = ({
         onScreenDismissed={onScreenDismissed}
       >
         {!!modals.length && (
-          <Screen isNativeStack stackPresentation="modal">
+          <Screen isNativeStack stackPresentation="fullScreenModal">
             <StackRenderer
               stack={modals}
               screens={screens}

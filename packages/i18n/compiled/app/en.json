@@ -1,8 +1,140 @@
 {
+  "+2LHYI": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email"
+    }
+  ],
+  "+TJPaq": [
+    {
+      "type": 0,
+      "value": "Email Address"
+    }
+  ],
+  "0avf3W": [
+    {
+      "type": 0,
+      "value": "You need to accept the Terms of services & privacy policy"
+    }
+  ],
+  "1UGgMw": [
+    {
+      "type": 0,
+      "value": "Sign Up"
+    }
+  ],
+  "1cQrMk": [
+    {
+      "type": 0,
+      "value": "Forgot your password?"
+    }
+  ],
+  "4RJ0I8": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "4so7Pr": [
+    {
+      "type": 0,
+      "value": "Check your emails !"
+    }
+  ],
+  "69Fl8v": [
+    {
+      "type": 0,
+      "value": "At least 8 caracters, 1upper, 1 lower 1 digit"
+    }
+  ],
+  "8mCCVu": [
+    {
+      "type": 0,
+      "value": "Email Address"
+    }
+  ],
+  "96x4pb": [
+    {
+      "type": 0,
+      "value": "Back to Log In"
+    }
+  ],
+  "Bm4p42": [
+    {
+      "type": 0,
+      "value": "We just send you a link to create a new password"
+    }
+  ],
+  "DWnvYf": [
+    {
+      "type": 0,
+      "value": "Reset password"
+    }
+  ],
+  "DgczNZ": [
+    {
+      "type": 0,
+      "value": "Log In"
+    }
+  ],
+  "FPsHDW": [
+    {
+      "type": 0,
+      "value": "Sign Up"
+    }
+  ],
+  "G3pknE": [
+    {
+      "type": 0,
+      "value": "I agree to the"
+    }
+  ],
+  "GvowiA": [
+    {
+      "type": 0,
+      "value": "Forgot your password ?"
+    }
+  ],
+  "PDfRjc": [
+    {
+      "type": 0,
+      "value": "privacy policy"
+    }
+  ],
+  "PEHtPw": [
+    {
+      "type": 0,
+      "value": "Enter your email address and we'll send you a link to create a new password"
+    }
+  ],
+  "QuRr//": [
+    {
+      "type": 0,
+      "value": "Don't have an account"
+    }
+  ],
+  "V2RVO7": [
+    {
+      "type": 0,
+      "value": "Terms of services"
+    }
+  ],
+  "Y+Ob8P": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
   "Y7sr+4": [
     {
       "type": 0,
       "value": "Sign Up"
+    }
+  ],
+  "h0jHxq": [
+    {
+      "type": 0,
+      "value": "Password"
     }
   ],
   "izbcMX": [
@@ -11,16 +143,52 @@
       "value": "Sign In"
     }
   ],
+  "l29LyJ": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email"
+    }
+  ],
+  "lsO83S": [
+    {
+      "type": 0,
+      "value": "Please enter a password"
+    }
+  ],
+  "nufnAH": [
+    {
+      "type": 0,
+      "value": "Email Address"
+    }
+  ],
   "ny70pU": [
     {
       "type": 0,
       "value": "logout"
     }
   ],
+  "pBqrA+": [
+    {
+      "type": 0,
+      "value": "Already have an account?"
+    }
+  ],
   "sSVrVw": [
     {
       "type": 0,
       "value": "Sign Up"
+    }
+  ],
+  "wvXg6E": [
+    {
+      "type": 0,
+      "value": "I accept with"
+    }
+  ],
+  "xl/PxL": [
+    {
+      "type": 0,
+      "value": "Log In"
     }
   ]
 }

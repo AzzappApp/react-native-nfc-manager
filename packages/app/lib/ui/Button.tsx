@@ -1,21 +1,22 @@
 import { forwardRef } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors, fontFamilies } from '../../theme';
+import { colors, textStyles } from '../../theme';
 import type { ForwardedRef } from 'react';
-import type { StyleProp, ViewProps, View } from 'react-native';
+import type { PressableProps, StyleProp, ViewStyle, View } from 'react-native';
 
-type ButtonProps = {
+export type ButtonProps = PressableProps & {
   label: string;
-  onPress?: () => void;
-  style?: StyleProp<ViewProps>;
+  style?: StyleProp<ViewStyle>;
 };
 
 const Button = (
-  { onPress, label, style }: ButtonProps,
+  { label, style, ...props }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
 ) => (
   <Pressable
-    onPress={onPress}
+    testID="azzapp_Button_pressable-wrapper"
+    accessibilityRole="button"
+    {...props}
     style={({ pressed }) => [
       styles.button,
       pressed && styles.buttonPressed,
@@ -31,17 +32,17 @@ export default forwardRef(Button);
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.dark,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    height: 45,
+    backgroundColor: colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 12,
   },
   buttonPressed: {
-    backgroundColor: colors.grey200,
+    backgroundColor: colors.grey900,
   },
   label: {
-    ...fontFamilies.semiBold,
-    fontSize: 14,
+    ...textStyles.button,
     color: '#fff',
   },
 });
