@@ -4,13 +4,7 @@ const i18nConfig = require('@azzapp/i18n');
 
 const config = {
   swcMinify: true,
-  reactStrictMode: true,
   productionBrowserSourceMaps: true,
-  experimental: {
-    images: {
-      allowFutureImage: true,
-    },
-  },
   images: {
     disableStaticImages: true,
   },

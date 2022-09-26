@@ -7,6 +7,7 @@ import type { HostComponent } from 'react-native';
 const MediaImageRenderer = (
   {
     uri,
+    alt,
     source,
     width,
     aspectRatio,
@@ -53,6 +54,7 @@ const MediaImageRenderer = (
         mediaID: source,
         requestedSize: typeof width == 'number' ? width : 0,
       }}
+      accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
       style={[style, { width, aspectRatio, overflow: 'hidden' }]}

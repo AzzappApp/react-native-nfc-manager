@@ -7,6 +7,7 @@ import type {
 
 export type MediaImageRendererProps = {
   uri?: string;
+  alt: string;
   source: string;
   width: number | `${number}vw`;
   aspectRatio: number;
@@ -18,6 +19,7 @@ export type MediaImageRendererProps = {
 
 export type MediaVideoRendererProps = {
   uri?: string;
+  alt: string;
   thumbnailURI?: string;
   source: string;
   width: number | `${number}vw`;

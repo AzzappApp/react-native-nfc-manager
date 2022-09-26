@@ -1,29 +1,15 @@
 import cuid from 'cuid';
-import { useMemo, useRef, useState } from 'react';
-import {
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../theme';
-import useScrollToTopInterceptor from '../hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
-import PostLink from './PostLink';
-import type {
-  PostsGrid_posts$data,
-  PostsGrid_posts$key,
-} from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { ArrayItemType } from '@azzapp/shared/lib/arrayHelpers';
+import { colors } from '../../../theme';
+import PostLink from '../PostLink';
+import PostGridContainer from './PostGridContainer';
+import PostGridWindowScrollContainer from './PostGridWindowScrollContainer';
+import type { ItemLayout, Post } from './types';
+import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { ReactNode } from 'react';
-import type {
-  StyleProp,
-  ViewStyle,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  LayoutChangeEvent,
-} from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type PostsGrid = {
   posts: PostsGrid_posts$key;
@@ -36,6 +22,7 @@ type PostsGrid = {
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
+  useWindowScroll?: boolean;
 };
 
 // This is an attemps to Use recycling for post list with custom layout
@@ -53,6 +40,7 @@ const PostsGrid = ({
   onEndReached,
   style,
   postsContainerStyle,
+  useWindowScroll,
 }: PostsGrid) => {
   const posts = useFragment(
     graphql`
@@ -134,16 +122,11 @@ const PostsGrid = ({
   const [headerSize, setHeaderSize] = useState(0);
   const [isScrollingToTop, setIsScrollingToTop] = useState(false);
 
-  const onHeaderLayout = (e: LayoutChangeEvent) => {
-    setHeaderSize(e.nativeEvent.layout.height);
+  const onWillScrollToTop = () => {
+    setIsScrollingToTop(true);
   };
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    setScrollViewHeight(e.nativeEvent.layout.height);
-  };
-
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollPosition = e.nativeEvent.contentOffset.y;
+  const onScroll = (scrollPosition: number) => {
     if (contentHeight - scrollPosition < scrollViewHeight * 2) {
       onEndReached?.();
     }
@@ -158,14 +141,6 @@ const PostsGrid = ({
       ) / BATCH_SIZE,
     );
   };
-
-  const scrollViewRef = useRef<ScrollView | null>(null);
-  const scrollToTopInterceptor = useScrollToTopInterceptor(() => {
-    if (scrollViewRef.current) {
-      setIsScrollingToTop(true);
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  });
 
   const postMap = useMemo(() => {
     const postMap = new Map<string, { item: Post; layout: ItemLayout }>();
@@ -263,7 +238,7 @@ const PostsGrid = ({
               width: layout.width,
               height: layout.width / item.media.ratio,
               borderRadius: 16,
-              backgroundColor: colors.lightGrey,
+              backgroundColor: colors.grey200,
             }}
           />
         </View>
@@ -271,48 +246,44 @@ const PostsGrid = ({
     [dataWithLayout],
   );
 
+  const GridContainer = Platform.select({
+    default: PostGridContainer,
+    web: useWindowScroll ? PostGridWindowScrollContainer : PostGridContainer,
+  });
+
   return (
-    <ScrollView
-      ref={scrollView => {
-        scrollToTopInterceptor(scrollView);
-        scrollViewRef.current = scrollView;
-      }}
-      style={style}
+    <GridContainer
+      contentHeight={contentHeight}
       stickyHeaderIndices={stickyHeaderIndices}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing ?? false}
-          onRefresh={onRefresh}
-        />
-      }
-      scrollEventThrottle={16}
+      refreshing={refreshing}
+      ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
+      style={style}
+      postsContainerStyle={postsContainerStyle}
+      onRefresh={onRefresh}
       onScroll={onScroll}
-      onLayout={onLayout}
+      onScrollViewHeightChange={setScrollViewHeight}
+      onHeaderHeightChange={setHeaderSize}
+      onWillScrollToTop={onWillScrollToTop}
     >
-      {ListHeaderComponent && (
-        <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
-      )}
-      <View style={[{ height: contentHeight }, postsContainerStyle]}>
-        {placeHolders}
-        {items.map(([id, key]) => {
-          const data = postMap.get(id);
-          if (!data) {
-            console.warn('null data for id ' + id);
-            return null;
-          }
-          return (
-            <MemoPostRenderer
-              key={key}
-              item={data.item}
-              layout={data.layout}
-              paused={!canPlay}
-            />
-          );
-        })}
-      </View>
-      {ListFooterComponent}
-    </ScrollView>
+      {placeHolders}
+      {items.map(([id, key]) => {
+        const data = postMap.get(id);
+        if (!data) {
+          console.warn('null data for id ' + id);
+          return null;
+        }
+        return (
+          <MemoPostRenderer
+            key={key}
+            item={data.item}
+            windowWidth={windowWidth}
+            layout={data.layout}
+            paused={!canPlay}
+          />
+        );
+      })}
+    </GridContainer>
   );
 };
 
@@ -321,10 +292,12 @@ export default PostsGrid;
 const MemoPostRenderer = ({
   item,
   layout,
+  windowWidth,
   paused,
 }: {
   item: Post;
   paused?: boolean;
+  windowWidth: number;
   layout: ItemLayout;
 }) =>
   useMemo(
@@ -341,11 +314,8 @@ const MemoPostRenderer = ({
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [item.id, paused],
+    [item.id, paused, windowWidth],
   );
 
 // fraction of the scroll height that trigger a relayout
 const BATCH_SIZE = 4;
-
-type Post = ArrayItemType<PostsGrid_posts$data>;
-type ItemLayout = { top: number; left: number; width: number; height: number };

@@ -161,6 +161,8 @@ const PostRenderer = (
           <MediaVideoRenderer
             ref={mediaRef as any}
             source={source}
+            // TODO alt generation by cloudinary AI ? include text in small format ?
+            alt={`This is a video posted by ${author.userName}`}
             thumbnailURI={small ? smallThumbnail : largeThumbnail}
             uri={small ? smallURI : largeURI}
             aspectRatio={ratio}
@@ -174,6 +176,8 @@ const PostRenderer = (
           <MediaImageRenderer
             ref={mediaRef as any}
             source={source}
+            // TODO alt generation by cloudinary AI ? include text in small format ?
+            alt={`This is an image posted by ${author.userName}`}
             uri={small ? smallURI : largeURI}
             aspectRatio={ratio}
             width={width}

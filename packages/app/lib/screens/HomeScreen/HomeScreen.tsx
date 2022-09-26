@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, Platform } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import { HEADER_HEIGHT } from '../../components/Header';
@@ -67,7 +67,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
       stickyHeaderIndices={[0]}
       style={[
         styles.recommandedPostsList,
-        {
+        Platform.OS !== 'web' && {
           borderBottomLeftRadius: vp`${VW100} * ${0.16}`,
           borderBottomRightRadius: vp`${VW100} * ${0.16}`,
         },

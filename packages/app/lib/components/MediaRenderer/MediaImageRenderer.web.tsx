@@ -1,5 +1,6 @@
 import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
 import Image from 'next/future/image';
+import { forwardRef } from 'react';
 import { StyleSheet } from 'react-native';
 import createHTMLElement from '../../helpers/createHTMLElement';
 import type { MediaImageRendererProps } from './types';
@@ -10,6 +11,7 @@ import type { HostComponent } from 'react-native';
 const MediaImageRenderer = (
   {
     source,
+    alt,
     width,
     aspectRatio,
     onLoad,
@@ -26,7 +28,7 @@ const MediaImageRenderer = (
 
   const height =
     typeof width === 'number'
-      ? width / aspectRatio
+      ? Math.round(width / aspectRatio)
       : `calc(${width} / ${aspectRatio})`;
   const imgSizeProps =
     typeof width === 'number'
@@ -45,6 +47,7 @@ const MediaImageRenderer = (
     // TODO handle ref
     // ref,
     src: source,
+    alt,
     loader: cloudinaryLoader,
     onLoad: handleImageLoading,
     style: flatStyle,
@@ -52,7 +55,7 @@ const MediaImageRenderer = (
   });
 };
 
-export default MediaImageRenderer;
+export default forwardRef(MediaImageRenderer);
 
 // TODO use quality ?
 const cloudinaryLoader = ({ src, width }: ImageLoaderProps): string =>

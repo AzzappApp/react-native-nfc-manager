@@ -18,6 +18,7 @@ import type { ForwardedRef } from 'react';
 const MediaVideoRenderer = (
   {
     thumbnailURI,
+    alt,
     source,
     width,
     aspectRatio,
@@ -122,9 +123,13 @@ const MediaVideoRenderer = (
         onEnded,
         onLoadedData: onReady,
         onProgress,
+        // TODO is it the right choice for alt ?
+        children: <p>{alt}</p>,
       })}
       {!ready && thumbnailURI && (
+        // TODO should we use poster ?
         <MediaImageRenderer
+          alt={alt}
           source={source}
           aspectRatio={aspectRatio}
           width={width}

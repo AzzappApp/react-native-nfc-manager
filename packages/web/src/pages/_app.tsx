@@ -16,9 +16,19 @@ import createPlatformEnvironment from '../helpers/createPlatformEnvironment';
 import { getRelayEnvironment } from '../helpers/relayClient';
 import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';
 import type { AppProps } from 'next/app';
+import type { MessageFormatElement } from 'react-intl';
 import './styles.css';
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App = ({
+  Component,
+  pageProps,
+}: AppProps<{
+  initialRecords?: any;
+  i18nMessages:
+    | Record<string, MessageFormatElement[]>
+    | Record<string, string>
+    | undefined;
+}>) => {
   const environment = getRelayEnvironment();
 
   if (pageProps.initialRecords) {

@@ -28,13 +28,13 @@ const useViewportSize = () => {
             strValue = 'env(safe-area-inset-left, 0px)';
             break;
           case insetRight:
-            strValue = 'env(safe-area-inset-left, 0px)';
+            strValue = 'env(safe-area-inset-right, 0px)';
             break;
           case insetBottom:
-            strValue = 'env(safe-area-inset-left, 0px)';
+            strValue = 'env(safe-area-inset-bottom, 0px)';
             break;
           case insetTop:
-            strValue = 'env(safe-area-inset-left, 0px)';
+            strValue = 'env(safe-area-inset-top, 0px)';
             break;
           default:
             if (value != null) {

@@ -121,6 +121,7 @@ const CoverEditPanelImageTab = ({
                   pictures[index].thumbnail ? (
                     <MediaImageRenderer
                       style={[styles.image, pressed && styles.imagePressed]}
+                      alt={`media ${index + 1}`}
                       {...pictures[index]}
                       uri={pictures[index].thumbnail}
                       width={50}
@@ -135,6 +136,7 @@ const CoverEditPanelImageTab = ({
                     <MediaImageRenderer
                       style={[styles.image, pressed && styles.imagePressed]}
                       {...pictures[index]}
+                      alt={`media ${index + 1}`}
                       width={50}
                       aspectRatio={1}
                     />

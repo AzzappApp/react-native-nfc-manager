@@ -101,6 +101,7 @@ const RecommandedPostsList = ({
       stickyHeaderIndices={stickyHeaderIndices}
       style={style}
       postsContainerStyle={postsContainerStyle}
+      useWindowScroll
     />
   );
 };

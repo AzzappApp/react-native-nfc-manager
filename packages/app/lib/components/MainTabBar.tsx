@@ -1,16 +1,23 @@
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useViewportSize, { insetBottom } from '../hooks/useViewportSize';
 import { useRouter } from '../PlatformEnvironment';
 import TabsBar from '../ui/TabsBar';
+import type { StyleProp, ViewStyle } from 'react-native';
 
-const MainTabBar = ({ currentIndex }: { currentIndex: number }) => {
+const MainTabBar = ({
+  currentIndex,
+  style,
+}: {
+  currentIndex: number;
+  style?: StyleProp<ViewStyle>;
+}) => {
   const router = useRouter();
   const onTabPress = (tab: string) => {
     router.push({ route: tab as any });
   };
-  const { bottom } = useSafeAreaInsets();
+  const vp = useViewportSize();
   return (
     <TabsBar
-      style={{ marginBottom: bottom }}
+      style={[{ marginBottom: vp`${insetBottom}` }, style]}
       currentTab={['HOME', 'SEARCH', 'CHAT', 'SETTINGS'][currentIndex]}
       tabs={[
         {

@@ -218,6 +218,8 @@ const CoverRenderer = (
             {picture.__typename === 'MediaVideo' && (
               <MediaVideoRenderer
                 {...mediaProps}
+                // TODO alt generation by cloudinary AI ? include text in small format ?
+                alt={`This is a video posted by ${userName}`}
                 thumbnailURI={
                   width === COVER_BASE_WIDTH
                     ? picture.smallThumbnail
@@ -233,6 +235,8 @@ const CoverRenderer = (
             {picture.__typename === 'MediaImage' && (
               <MediaImageRenderer
                 {...mediaProps}
+                // TODO alt generation by cloudinary AI ? include text in small format ?
+                alt={`This is an image posted by ${userName}`}
                 testID={`cover-image-${picture.source}`}
               />
             )}

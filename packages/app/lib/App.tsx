@@ -8,7 +8,7 @@ import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
-import MainTabBar from './components/MaintTabBar';
+import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import createPlatformEnvironment from './helpers/createPlatformEnvironment';
 import {

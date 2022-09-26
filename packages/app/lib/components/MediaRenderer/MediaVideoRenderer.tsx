@@ -24,6 +24,7 @@ import type { ForwardedRef } from 'react';
 const MediaVideoRenderer = (
   {
     uri,
+    alt,
     thumbnailURI,
     source,
     width,
@@ -131,6 +132,7 @@ const MediaVideoRenderer = (
         muted={muted}
         paused={paused}
         currentTime={currentTime}
+        accessibilityLabel={alt}
         style={StyleSheet.absoluteFill}
         onReadyForDisplay={onVideoReadyForDisplay}
         onSeekComplete={onSeekComplete}
@@ -140,6 +142,7 @@ const MediaVideoRenderer = (
       {!videoReady && thumbnailURI && !currentTime && (
         <MediaImageRenderer
           source={source}
+          alt={alt}
           aspectRatio={aspectRatio}
           width={width}
           uri={thumbnailURI}
