@@ -4,6 +4,7 @@ import type { TextStyle } from 'react-native';
 export const colors = {
   // color from style guide
   primary400: '#FF502E',
+  red: '#EF3962',
   red400: '#FF2E54',
   black: '#0E1216',
   grey50: '#F5F5F6',
@@ -13,7 +14,6 @@ export const colors = {
   grey900: '#45444C',
 
   // other color to be replaced when styleguide is finished
-  red: '#EF3962',
   dark: '#45444C',
   darkGrey: '#8a8898',
   grey: '#c4c4c4',
@@ -51,6 +51,11 @@ export const textStyles = StyleSheet.create({
   title: {
     color: colors.dark,
     fontSize: 18,
+    ...fontFamilies.semiBold,
+  },
+  sectionTitle: {
+    color: colors.black,
+    fontSize: 16,
     ...fontFamilies.semiBold,
   },
   button: {

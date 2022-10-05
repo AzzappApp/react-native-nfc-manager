@@ -46,10 +46,8 @@ type Query {
 type Viewer {
   user: User
 
-  """
-  Return a list of User that this user might possibility be interested in (following User or promoted one)
-  """
-  recommandedUsers(
+  """Return a list of Profiles that the current user is following"""
+  followedProfiles(
     """Returns the items in the list that come after the specified cursor."""
     after: String
 
@@ -57,16 +55,67 @@ type Viewer {
     first: Int
   ): UserConnection!
 
-  """
-  Return a list of Post that this user might possibility be interested in (following User post or promoted one)
-  """
-  recommandedPosts(
+  """Return a list of Post that the current user is following author"""
+  followedProfilesPosts(
     """Returns the items in the list that come after the specified cursor."""
     after: String
 
     """Returns the first n items from the list."""
     first: Int
   ): PostConnection!
+
+  """
+  Return a list of User that this user might possibility be interested in (following User or promoted one)
+  """
+  trendingProfiles(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): UserConnection!
+
+  """Return a list of tranding posts (public ?) at the time of the request"""
+  trendingPosts(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): PostConnection!
+
+  """Return a list of profiles the current user can be interested in"""
+  recommendedProfiles(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): UserConnection!
+
+  """Return a list of posts that match the search query"""
+  searchPosts(
+    search: String!
+    useLocation: Boolean!
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): PostConnection!
+
+  """Return a list of profiles that match the search query"""
+  searchProfiles(
+    search: String!
+    useLocation: Boolean!
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): UserConnection!
 }
 
 """Represent an Azzapp User"""

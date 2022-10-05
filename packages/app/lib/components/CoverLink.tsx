@@ -3,7 +3,7 @@ import { Pressable } from 'react-native';
 import { useRouter } from '../PlatformEnvironment';
 import CoverRenderer from './CoverRenderer';
 import type { CoverHandle, CoverRendererProps } from './CoverRenderer';
-import type { StyleProp, ViewStyle, View } from 'react-native';
+import type { View } from 'react-native';
 
 const CoverLink = ({
   userId,
@@ -13,7 +13,6 @@ const CoverLink = ({
   ...props
 }: CoverRendererProps & {
   userId: string;
-  coverStyle?: StyleProp<ViewStyle>;
 }) => {
   const coverRef = useRef<CoverHandle | null>(null);
   const ref = useRef<View | null>(null);

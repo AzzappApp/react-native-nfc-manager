@@ -16,7 +16,7 @@ import type { MediaVideoRendererHandle } from '../MediaRenderer';
 import type { CoverLayoutProps } from './CoverLayout';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ForwardedRef } from 'react';
-import type { HostComponent } from 'react-native';
+import type { HostComponent, StyleProp, ViewStyle } from 'react-native';
 
 export type CoverRendererProps = Omit<
   CoverLayoutProps,
@@ -27,6 +27,7 @@ export type CoverRendererProps = Omit<
   videoPaused?: boolean;
   imageIndex?: number;
   forceImageIndex?: boolean;
+  coverStyle?: StyleProp<ViewStyle>;
   initialVideosTimes?: { [index: number]: number | null | undefined } | null;
   onReadyForDisplay?: () => void;
 };

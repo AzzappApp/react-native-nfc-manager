@@ -16,7 +16,6 @@ const config = {
     config.resolve.alias = {
       ...config.resolve.alias,
       'react-native$': 'react-native-web',
-
       'react-native-linear-gradient': 'react-native-web-linear-gradient',
     };
     config.resolve.extensions = [
@@ -52,6 +51,7 @@ const withTM = require('next-transpile-modules')([
   '@azzapp/relay',
   'react-native-web-linear-gradient',
   'react-native-safe-area-context',
+  'react-native-tab-view',
   'react-native-svg',
   'validator',
 ]);

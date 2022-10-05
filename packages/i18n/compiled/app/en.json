@@ -11,6 +11,12 @@
       "value": "Email Address"
     }
   ],
+  "0C3U4p": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
   "0avf3W": [
     {
       "type": 0,
@@ -41,10 +47,22 @@
       "value": "Check your emails !"
     }
   ],
+  "5/HOhV": [
+    {
+      "type": 0,
+      "value": "Profiles"
+    }
+  ],
   "69Fl8v": [
     {
       "type": 0,
       "value": "At least 8 caracters, 1upper, 1 lower 1 digit"
+    }
+  ],
+  "8PT+FO": [
+    {
+      "type": 0,
+      "value": "Posts"
     }
   ],
   "8mCCVu": [
@@ -59,10 +77,22 @@
       "value": "Back to Log In"
     }
   ],
+  "ABAFDF": [
+    {
+      "type": 0,
+      "value": "Recent searchs"
+    }
+  ],
   "Bm4p42": [
     {
       "type": 0,
       "value": "We just send you a link to create a new password"
+    }
+  ],
+  "CCbp9S": [
+    {
+      "type": 0,
+      "value": "Trending profiles"
     }
   ],
   "DWnvYf": [
@@ -95,6 +125,12 @@
       "value": "Forgot your password ?"
     }
   ],
+  "KOjOOw": [
+    {
+      "type": 0,
+      "value": "Search for profiles, posts..."
+    }
+  ],
   "PDfRjc": [
     {
       "type": 0,
@@ -111,6 +147,12 @@
     {
       "type": 0,
       "value": "Don't have an account"
+    }
+  ],
+  "SmWLhs": [
+    {
+      "type": 0,
+      "value": "Trending posts"
     }
   ],
   "V2RVO7": [
@@ -155,6 +197,12 @@
       "value": "Please enter a password"
     }
   ],
+  "n8Bdhz": [
+    {
+      "type": 0,
+      "value": "See all"
+    }
+  ],
   "nufnAH": [
     {
       "type": 0,
@@ -167,6 +215,12 @@
       "value": "logout"
     }
   ],
+  "p042gg": [
+    {
+      "type": 0,
+      "value": "Profiles you may like"
+    }
+  ],
   "pBqrA+": [
     {
       "type": 0,
@@ -177,6 +231,16 @@
     {
       "type": 0,
       "value": "Sign Up"
+    }
+  ],
+  "uvBCJV": [
+    {
+      "type": 0,
+      "value": "No recent search for "
+    },
+    {
+      "type": 1,
+      "value": "word"
     }
   ],
   "wvXg6E": [

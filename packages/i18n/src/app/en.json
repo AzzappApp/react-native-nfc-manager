@@ -7,6 +7,10 @@
     "defaultMessage": "Email Address",
     "description": "Signin Screen email address input placeholder"
   },
+  "0C3U4p": {
+    "defaultMessage": "Cancel",
+    "description": "SearchBar - Cancel button"
+  },
   "0avf3W": {
     "defaultMessage": "You need to accept the Terms of services & privacy policy",
     "description": "Signup Screen - error message when TOS or PP are not checked"
@@ -27,9 +31,17 @@
     "defaultMessage": "Check your emails !",
     "description": "ForgotPasswordScreen - Check your emails !"
   },
+  "5/HOhV": {
+    "defaultMessage": "Profiles",
+    "description": "SearchPage - Result - Global search profiles title"
+  },
   "69Fl8v": {
     "defaultMessage": "At least 8 caracters, 1upper, 1 lower 1 digit",
     "description": "SignupScreen - error message when password is not valid"
+  },
+  "8PT+FO": {
+    "defaultMessage": "Posts",
+    "description": "SearchPage - Result - Global search posts title"
   },
   "8mCCVu": {
     "defaultMessage": "Email Address",
@@ -39,9 +51,17 @@
     "defaultMessage": "Back to Log In",
     "description": "ForgotPasswordScreen - Back to Log In bottom screen link"
   },
+  "ABAFDF": {
+    "defaultMessage": "Recent searchs",
+    "description": "ResetSearch - title "
+  },
   "Bm4p42": {
     "defaultMessage": "We just send you a link to create a new password",
     "description": "ForgotPasswordScreen - email send indication"
+  },
+  "CCbp9S": {
+    "defaultMessage": "Trending profiles",
+    "description": "SearchPage - Trending profile title"
   },
   "DWnvYf": {
     "defaultMessage": "Reset password",
@@ -63,6 +83,10 @@
     "defaultMessage": "Forgot your password ?",
     "description": "ForgotPasswordScreen - Forgot your password  title"
   },
+  "KOjOOw": {
+    "defaultMessage": "Search for profiles, posts...",
+    "description": "SearchScreen - search bar placeholder"
+  },
   "PDfRjc": {
     "defaultMessage": "privacy policy",
     "description": "Signup Screen - privacy policy link"
@@ -74,6 +98,10 @@
   "QuRr//": {
     "defaultMessage": "Don't have an account",
     "description": "SigninScreen - Don't have an account"
+  },
+  "SmWLhs": {
+    "defaultMessage": "Trending posts",
+    "description": "SearchPage - Trending posts title"
   },
   "V2RVO7": {
     "defaultMessage": "Terms of services",
@@ -103,6 +131,10 @@
     "defaultMessage": "Please enter a password",
     "description": "SigninScreen - error message when input password is empty"
   },
+  "n8Bdhz": {
+    "defaultMessage": "See all",
+    "description": "CoverList - See all button"
+  },
   "nufnAH": {
     "defaultMessage": "Email Address",
     "description": "Signup Screen - email address input placeholder"
@@ -111,6 +143,10 @@
     "defaultMessage": "logout",
     "description": "logout link"
   },
+  "p042gg": {
+    "defaultMessage": "Profiles you may like",
+    "description": "SearchPage - Profile recommendation title"
+  },
   "pBqrA+": {
     "defaultMessage": "Already have an account?",
     "description": "Signup Screen - Already have an account?"
@@ -118,6 +154,10 @@
   "sSVrVw": {
     "defaultMessage": "Sign Up",
     "description": "Home screen sign up button label"
+  },
+  "uvBCJV": {
+    "defaultMessage": "No recent search for {word}",
+    "description": "ResetSearch - message when no history search found"
   },
   "wvXg6E": {
     "defaultMessage": "I accept with",

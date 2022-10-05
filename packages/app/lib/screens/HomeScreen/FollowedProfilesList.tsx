@@ -3,30 +3,30 @@ import { useCallback, useMemo } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import CoverList from '../../components/CoverList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { RecommandedUsersList_viewer$key } from '@azzapp/relay/artifacts/RecommandedUsersList_viewer.graphql';
+import type { FollowedProfilesList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesList_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type RecommandedUsersListProps = {
-  viewer: RecommandedUsersList_viewer$key;
+type FollowedProfilesListProps = {
+  viewer: FollowedProfilesList_viewer$key;
   canPlay: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
-const RecommandedUsersList = ({
+const FollowedProfilesList = ({
   viewer,
   canPlay,
   style,
-}: RecommandedUsersListProps) => {
+}: FollowedProfilesListProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
     graphql`
-      fragment RecommandedUsersList_viewer on Viewer
-      @refetchable(queryName: "RecommandedUsersListQuery")
+      fragment FollowedProfilesList_viewer on Viewer
+      @refetchable(queryName: "FollowedProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 10 }
       ) {
-        recommandedUsers(after: $after, first: $first)
-          @connection(key: "Viewer_recommandedUsers") {
+        followedProfiles(after: $after, first: $first)
+          @connection(key: "Viewer_followedProfiles") {
           edges {
             node {
               ...CoverList_users
@@ -42,15 +42,15 @@ const RecommandedUsersList = ({
   );
 
   const users: CoverList_users$key = useMemo(() => {
-    const recommandedUrsers = data.recommandedUsers.edges
+    const recommendedUrsers = data.followedProfiles.edges
       ?.map(edge => edge?.node)
       .filter(item => !!item);
     return convertToNonNullArray(
       data.user
-        ? [data.user, ...(recommandedUrsers ?? [])]
-        : recommandedUrsers ?? [],
+        ? [data.user, ...(recommendedUrsers ?? [])]
+        : recommendedUrsers ?? [],
     );
-  }, [data.recommandedUsers.edges, data.user]);
+  }, [data.followedProfiles.edges, data.user]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
@@ -68,4 +68,4 @@ const RecommandedUsersList = ({
   );
 };
 
-export default RecommandedUsersList;
+export default FollowedProfilesList;

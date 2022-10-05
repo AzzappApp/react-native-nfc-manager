@@ -1,5 +1,5 @@
 import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import CoverLink from './CoverLink';
@@ -15,6 +15,10 @@ type CoverListProps = {
   canPlay?: boolean;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  coverStyle?: StyleProp<ViewStyle>;
+  horizontal?: boolean;
+  numColums?: number;
 };
 
 const CoverList = ({
@@ -22,7 +26,20 @@ const CoverList = ({
   canPlay = false,
   onEndReached,
   style,
+  coverStyle = {},
+  containerStyle,
+  horizontal = true,
+  numColums = 1,
 }: CoverListProps) => {
+  const coverWidth = useMemo(() => {
+    //TODO: refactoring aka do it better :). number is required. flatten will give a string.
+    // not elegant but works
+    const flattenStyle = StyleSheet.flatten(coverStyle);
+    if (typeof flattenStyle?.width === 'number') {
+      return flattenStyle.width;
+    }
+    return COVER_BASE_WIDTH;
+  }, [coverStyle]);
   const users = useFragment(
     graphql`
       fragment CoverList_users on User @relay(plural: true) {
@@ -47,15 +64,19 @@ const CoverList = ({
     ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
       <CoverLink
         cover={item.card?.cover}
-        width={COVER_BASE_WIDTH}
+        width={coverWidth}
         userName={item.userName}
         userId={item.id}
-        style={styles.item}
+        style={[
+          styles.item,
+          { height: horizontal ? '100%' : 'auto' },
+          coverStyle,
+        ]}
         playTransition={canPlay}
         videoPaused={!canPlay}
       />
     ),
-    [canPlay],
+    [canPlay, coverStyle, coverWidth, horizontal],
   );
 
   return (
@@ -65,10 +86,11 @@ const CoverList = ({
       renderItem={renderItem}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
-      horizontal
+      horizontal={horizontal}
+      numColumns={horizontal ? 1 : numColums}
       directionalLockEnabled
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[styles.container, containerStyle]}
       style={style}
     />
   );
@@ -78,8 +100,6 @@ export default CoverList;
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    paddingLeft: 10,
     flexGrow: 0,
   },
   item: {

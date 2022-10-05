@@ -4,13 +4,13 @@ import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import PostsGrid from '../../components/PostsGrid';
 import ListLoadingFooter from '../../ui/ListLoadingFooter';
+import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { RecommandedPostsList_viewer$key } from '@azzapp/relay/artifacts/RecommandedPostsList_viewer.graphql';
 import type { ReactElement } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type RecommandedPostsListProps = {
-  viewer: RecommandedPostsList_viewer$key;
+type FollowedProfilesPostsListProps = {
+  viewer: FollowedProfilesPostsList_viewer$key;
   canPlay?: boolean;
   ListHeaderComponent?: ReactElement;
   stickyHeaderIndices?: number[] | undefined;
@@ -18,26 +18,26 @@ type RecommandedPostsListProps = {
   postsContainerStyle?: StyleProp<ViewStyle>;
 };
 
-const RecommandedPostsList = ({
+const FollowedProfilesPostsList = ({
   viewer,
   canPlay,
   stickyHeaderIndices,
   ListHeaderComponent,
   style,
   postsContainerStyle,
-}: RecommandedPostsListProps) => {
+}: FollowedProfilesPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment RecommandedPostsList_viewer on Viewer
-        @refetchable(queryName: "RecommandedPostsListQuery")
+        fragment FollowedProfilesPostsList_viewer on Viewer
+        @refetchable(queryName: "FollowedProfilesPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 20 }
         ) {
-          recommandedPosts(after: $after, first: $first)
-            @connection(key: "Viewer_recommandedPosts") {
+          followedProfilesPosts(after: $after, first: $first)
+            @connection(key: "Viewer_followedProfilesPosts") {
             edges {
               node {
                 ...PostsGrid_posts
@@ -82,9 +82,9 @@ const RecommandedPostsList = ({
   const posts: PostsGrid_posts$key = useMemo(
     () =>
       convertToNonNullArray(
-        data.recommandedPosts.edges?.map(edge => edge?.node) ?? [],
+        data.followedProfilesPosts.edges?.map(edge => edge?.node) ?? [],
       ),
-    [data.recommandedPosts.edges],
+    [data.followedProfilesPosts.edges],
   );
 
   return (
@@ -106,4 +106,4 @@ const RecommandedPostsList = ({
   );
 };
 
-export default RecommandedPostsList;
+export default FollowedProfilesPostsList;

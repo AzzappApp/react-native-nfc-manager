@@ -309,6 +309,8 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.2):
     - React-Core
+  - react-native-pager-view (6.0.0):
+    - React-Core
   - react-native-photo-gallery-api (1.1.0):
     - React
     - React-Core
@@ -384,6 +386,8 @@ PODS:
     - React-jsi (= 0.69.0)
     - React-logger (= 0.69.0)
     - React-perflogger (= 0.69.0)
+  - RNCAsyncStorage (1.17.10):
+    - React-Core
   - RNGestureHandler (2.5.0):
     - React-Core
   - RNLocalize (2.2.3):
@@ -476,6 +480,7 @@ DEPENDENCIES:
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - react-native-create-thumbnail (from `../../../node_modules/react-native-create-thumbnail`)
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
+  - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - react-native-photo-gallery-api (from `../../../node_modules/react-native-photo-gallery-api`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -490,6 +495,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
@@ -571,6 +577,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-create-thumbnail"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
+  react-native-pager-view:
+    :path: "../../../node_modules/react-native-pager-view"
   react-native-photo-gallery-api:
     :path: "../../../node_modules/react-native-photo-gallery-api"
   react-native-safe-area-context:
@@ -599,6 +607,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../../../node_modules/@react-native-async-storage/async-storage"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNLocalize:
@@ -659,6 +669,7 @@ SPEC CHECKSUMS:
   React-logger: bcf33ce10afa135158c72635e621ddb94126c610
   react-native-create-thumbnail: dedcb7cd3d14a4b6cc2026563197242081edb52b
   react-native-encrypted-storage: e78d848ce0fb663c2ce306e37921d026809322e6
+  react-native-pager-view: e76d64a5114a152e942caa09136e4e250709378c
   react-native-photo-gallery-api: 239ca8bef015aef1ee9c5ec4052fce6a4137279d
   react-native-safe-area-context: ebf8c413eb8b5f7c392a036a315eb7b46b96845f
   React-perflogger: aa48956d87bae67fc847acc196fae97928b96cd3
@@ -673,6 +684,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 7549ef7b07aad1cc629f4c6d88c325366f26423c
   React-runtimeexecutor: 7ad268dee53d001697e13264c6bc8e95a902352e
   ReactCommon: 74a3b8ee497c6d50ce86ef57e15c4c5bf654b83d
+  RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
   RNGestureHandler: bad495418bcbd3ab47017a38d93d290ebd406f50
   RNLocalize: a64514b46a01375fdfae9349036b4dc7130333b5
   RNReanimated: 7faa787e8d4493fbc95fab2ad331fa7625828cfa

@@ -20,6 +20,7 @@ export type PostGridContainerProps = {
   ListFooterComponent?: ReactNode;
   style: StyleProp<ViewStyle>;
   postsContainerStyle: StyleProp<ViewStyle>;
+  nestedScrollEnabled?: boolean;
   onRefresh?: () => void;
   onWillScrollToTop?: () => void;
   onScroll?: (scrollPosition: number) => void;

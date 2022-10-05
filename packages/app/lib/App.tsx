@@ -25,6 +25,7 @@ import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScre
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
 import PostMobileScreen from './mobileScreens/PostMobileScreen';
+import SearchMobileScreen from './mobileScreens/SearchMobileScreen';
 import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
@@ -35,7 +36,7 @@ import type { NativeRouterInit } from './components/NativeRouter';
 
 const screens = {
   HOME: HomeMobileScreen,
-  SEARCH: () => <View />,
+  SEARCH: SearchMobileScreen,
   SETTINGS: SettingsMobileScreen,
   CHAT: () => <View />,
   SIGN_IN: SignInMobileScreen,

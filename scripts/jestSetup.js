@@ -7,8 +7,11 @@ global.ReanimatedDataMock = {
 
 require('react-native-gesture-handler/jestSetup');
 
+import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
+
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 
 process.env.NEXT_PUBLIC_URL = 'https://fake-azzapp.com';
 process.env.NEXT_PUBLIC_API_ENDPOINT = 'https://api.fake-azzapp.com';

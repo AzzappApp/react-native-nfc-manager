@@ -23,6 +23,7 @@ type PostsGrid = {
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
   useWindowScroll?: boolean;
+  nestedScrollEnabled?: boolean;
 };
 
 // This is an attemps to Use recycling for post list with custom layout
@@ -41,6 +42,7 @@ const PostsGrid = ({
   style,
   postsContainerStyle,
   useWindowScroll,
+  nestedScrollEnabled = false,
 }: PostsGrid) => {
   const posts = useFragment(
     graphql`
@@ -260,6 +262,7 @@ const PostsGrid = ({
       ListFooterComponent={ListFooterComponent}
       style={style}
       postsContainerStyle={postsContainerStyle}
+      nestedScrollEnabled={nestedScrollEnabled}
       onRefresh={onRefresh}
       onScroll={onScroll}
       onScrollViewHeightChange={setScrollViewHeight}

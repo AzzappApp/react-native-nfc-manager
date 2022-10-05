@@ -7,6 +7,7 @@ import type { LayoutChangeEvent } from 'react-native';
 const PostGridContainer = ({
   children,
   contentHeight,
+  nestedScrollEnabled = false,
   stickyHeaderIndices,
   refreshing,
   ListHeaderComponent,
@@ -37,6 +38,7 @@ const PostGridContainer = ({
 
   return (
     <ScrollView
+      nestedScrollEnabled={nestedScrollEnabled}
       ref={ref => {
         scrollToTopInterceptor(ref);
         scrollViewRef.current = ref;

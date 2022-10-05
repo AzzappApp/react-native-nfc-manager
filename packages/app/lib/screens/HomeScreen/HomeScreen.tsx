@@ -7,8 +7,8 @@ import Link from '../../components/Link';
 import useViewportSize, { insetTop, VW100 } from '../../hooks/useViewportSize';
 import { useCurrentRoute } from '../../PlatformEnvironment';
 import Button from '../../ui/Button';
-import RecommandedPostsList from './RecommandedPostsList';
-import RecommandedUsersList from './RecommandedUsersList';
+import FollowedProfilesList from './FollowedProfilesList';
+import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
 type HomeScreenProps = {
@@ -22,19 +22,20 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
         user {
           id
         }
-        ...RecommandedUsersList_viewer
-        ...RecommandedPostsList_viewer
+        ...FollowedProfilesList_viewer
+        ...FollowedProfilesPostsList_viewer
       }
     `,
     viewerRef,
   );
+
   const currentRoute = useCurrentRoute('willChange');
 
   const vp = useViewportSize();
 
   const intl = useIntl();
   return (
-    <RecommandedPostsList
+    <FollowedProfilesPostsList
       viewer={viewer}
       canPlay={currentRoute.route === 'HOME'}
       ListHeaderComponent={
@@ -45,10 +46,10 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
               style={styles.logo}
             />
           </View>
-          <RecommandedUsersList
+          <FollowedProfilesList
             viewer={viewer}
             canPlay={currentRoute.route === 'HOME'}
-            style={styles.recommandedUsersList}
+            style={styles.followedProfilesList}
           />
           {!viewer.user && (
             <View style={styles.signupSection}>
@@ -67,13 +68,13 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
       }
       stickyHeaderIndices={[0]}
       style={[
-        styles.recommandedPostsList,
+        styles.followedProfilesPosts,
         Platform.OS !== 'web' && {
           borderBottomLeftRadius: vp`${VW100} * ${0.16}`,
           borderBottomRightRadius: vp`${VW100} * ${0.16}`,
         },
       ]}
-      postsContainerStyle={styles.recommandedPostsListPostsContainer}
+      postsContainerStyle={styles.followedProfilesPostsListPostsContainer}
     />
   );
 };
@@ -82,7 +83,7 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   signupButton: { paddingLeft: 100, paddingRight: 100 },
-  recommandedPostsList: {
+  followedProfilesPosts: {
     flex: 1,
     backgroundColor: '#FFF',
   },
@@ -95,17 +96,18 @@ const styles = StyleSheet.create({
   logo: {
     height: 24,
   },
-  recommandedUsersList: {
+  followedProfilesList: {
     height: 200,
     marginTop: 10,
     marginBottom: 13,
+    marginLeft: 10,
   },
   signupSection: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  recommandedPostsListPostsContainer: {
+  followedProfilesPostsListPostsContainer: {
     paddingVertical: 8,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

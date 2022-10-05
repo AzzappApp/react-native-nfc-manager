@@ -14,6 +14,12 @@ const icons = {
   get brightness() {
     return require('./assets/brightness.png');
   },
+  get cancel() {
+    return require('./assets/cancel.png');
+  },
+  get cross() {
+    return require('./assets/cross.png');
+  },
   get chat() {
     return require('./assets/chat.png');
   },
@@ -41,11 +47,23 @@ const icons = {
   get flip() {
     return require('./assets/flip.png');
   },
+  get foursquare() {
+    return require('./assets/foursquare.png');
+  },
+  get hashtag() {
+    return require('./assets/hashtag.png');
+  },
   get heart() {
     return require('./assets/heart.png');
   },
   get home() {
     return require('./assets/home.png');
+  },
+  get lens() {
+    return require('./assets/lens.png');
+  },
+  get location() {
+    return require('./assets/location.png');
   },
   get picture() {
     return require('./assets/picture.png');
@@ -61,6 +79,9 @@ const icons = {
   },
   get search() {
     return require('./assets/search.png');
+  },
+  get searchprofile() {
+    return require('./assets/searchprofile.png');
   },
   get temperature() {
     return require('./assets/temperature.png');
