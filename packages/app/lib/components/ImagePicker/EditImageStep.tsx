@@ -248,7 +248,7 @@ const EditImageStep = () => {
         )
       }
       toolbarProps={
-        isEditing
+        !isEditing
           ? {
               currentTab,
               onTabPress: setCurrentTab as any,
