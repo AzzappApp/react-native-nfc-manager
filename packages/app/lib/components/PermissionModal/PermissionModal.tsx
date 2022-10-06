@@ -1,14 +1,6 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  Modal,
-  SafeAreaView,
-  Linking,
-} from 'react-native';
-import { Camera } from 'react-native-vision-camera';
+import { StyleSheet, View, Modal, SafeAreaView, Linking } from 'react-native';
 import useCameraPermissions, {
   requestCameraPermission,
   requestMicrophonePermission,
@@ -30,7 +22,7 @@ const PermissionModal = ({
   onRequestClose,
 }: CameraModalProps) => {
   const { cameraPermission } = useCameraPermissions();
-  const [currentPermission, setCurrentPermission] = useState(() => {
+  const currentPermission = useMemo(() => {
     switch (permissionsFor) {
       case 'gallery':
         return 'gallery';
@@ -43,18 +35,16 @@ const PermissionModal = ({
         ) {
           return 'camera';
         }
-        return 'microphobe';
+        return 'microphone';
     }
-  });
+  }, [cameraPermission, permissionsFor]);
 
   const onAllowsCamera = async () => {
-    await requestCameraPermission();
-    const permission = await Camera.requestMicrophonePermission();
+    const permission = await requestCameraPermission();
     if (permission === 'denied') {
       return;
     }
     if (permissionsFor === 'video') {
-      setCurrentPermission('microphonePermission');
       void requestMicrophonePermission();
     }
   };
@@ -81,11 +71,6 @@ const PermissionModal = ({
           leftButton={<IconButton icon="chevron" onPress={onRequestClose} />}
         />
         <FadeSwitch currentKey={currentPermission} transitionDuration={220}>
-          {currentPermission === 'waiting' && (
-            <View style={styles.content}>
-              <ActivityIndicator />
-            </View>
-          )}
           {currentPermission === 'camera' && (
             <View style={styles.content}>
               <PermissionScreen
