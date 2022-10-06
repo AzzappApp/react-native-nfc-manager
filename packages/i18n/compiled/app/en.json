@@ -11,6 +11,12 @@
       "value": "Email Address"
     }
   ],
+  "07iiib": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
   "0C3U4p": [
     {
       "type": 0,
@@ -59,6 +65,30 @@
       "value": "At least 8 caracters, 1upper, 1 lower 1 digit"
     }
   ],
+  "6EyA+S": [
+    {
+      "type": 0,
+      "value": "Access to the microphone allows you to record videos."
+    }
+  ],
+  "6V9XJr": [
+    {
+      "type": 0,
+      "value": "Allow Azzapp to access your photos"
+    }
+  ],
+  "74j5Wg": [
+    {
+      "type": 0,
+      "value": "Access to the photos allows you to create publications."
+    }
+  ],
+  "7HPaV3": [
+    {
+      "type": 0,
+      "value": "Tint"
+    }
+  ],
   "8PT+FO": [
     {
       "type": 0,
@@ -81,6 +111,12 @@
     {
       "type": 0,
       "value": "Recent searchs"
+    }
+  ],
+  "AsCp0n": [
+    {
+      "type": 0,
+      "value": "Validate"
     }
   ],
   "Bm4p42": [
@@ -125,10 +161,28 @@
       "value": "Forgot your password ?"
     }
   ],
+  "J7Z2GR": [
+    {
+      "type": 0,
+      "value": "Cut Video"
+    }
+  ],
+  "JcQ1BH": [
+    {
+      "type": 0,
+      "value": "Photo"
+    }
+  ],
   "KOjOOw": [
     {
       "type": 0,
       "value": "Search for profiles, posts..."
+    }
+  ],
+  "M32J+R": [
+    {
+      "type": 0,
+      "value": "Next"
     }
   ],
   "PDfRjc": [
@@ -141,6 +195,12 @@
     {
       "type": 0,
       "value": "Enter your email address and we'll send you a link to create a new password"
+    }
+  ],
+  "PjYjnk": [
+    {
+      "type": 0,
+      "value": "Ok"
     }
   ],
   "QuRr//": [
@@ -161,10 +221,28 @@
       "value": "Terms of services"
     }
   ],
+  "Vh3DQb": [
+    {
+      "type": 0,
+      "value": "Saturation"
+    }
+  ],
+  "WBD9Bx": [
+    {
+      "type": 0,
+      "value": "Next"
+    }
+  ],
   "Y+Ob8P": [
     {
       "type": 0,
       "value": "Please enter a valid email address"
+    }
+  ],
+  "Y+UQRB": [
+    {
+      "type": 0,
+      "value": "Media Filter"
     }
   ],
   "Y7sr+4": [
@@ -173,10 +251,70 @@
       "value": "Sign Up"
     }
   ],
+  "a17Y8A": [
+    {
+      "type": 0,
+      "value": "Temperature"
+    }
+  ],
+  "b4fFwm": [
+    {
+      "type": 0,
+      "value": "Brightness"
+    }
+  ],
+  "dF52vj": [
+    {
+      "type": 0,
+      "value": "Highlights"
+    }
+  ],
+  "dqGjrZ": [
+    {
+      "type": 0,
+      "value": "Structure"
+    }
+  ],
+  "ebisVt": [
+    {
+      "type": 0,
+      "value": "Adjust"
+    }
+  ],
+  "g67Jzi": [
+    {
+      "type": 0,
+      "value": "Vibrance"
+    }
+  ],
+  "g7w55v": [
+    {
+      "type": 0,
+      "value": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos."
+    }
+  ],
+  "gRy2ak": [
+    {
+      "type": 0,
+      "value": "Vigneting"
+    }
+  ],
+  "gXvULC": [
+    {
+      "type": 0,
+      "value": "Latest"
+    }
+  ],
   "h0jHxq": [
     {
       "type": 0,
       "value": "Password"
+    }
+  ],
+  "hc+1uI": [
+    {
+      "type": 0,
+      "value": "Allow Azzapp to access your microphone"
     }
   ],
   "izbcMX": [
@@ -191,6 +329,12 @@
       "value": "Please enter a valid email"
     }
   ],
+  "lXovx3": [
+    {
+      "type": 0,
+      "value": "New Post"
+    }
+  ],
   "lsO83S": [
     {
       "type": 0,
@@ -201,6 +345,12 @@
     {
       "type": 0,
       "value": "See all"
+    }
+  ],
+  "nMtsXg": [
+    {
+      "type": 0,
+      "value": "Shadow"
     }
   ],
   "nufnAH": [
@@ -215,6 +365,12 @@
       "value": "logout"
     }
   ],
+  "oAzffi": [
+    {
+      "type": 0,
+      "value": "Adjust"
+    }
+  ],
   "p042gg": [
     {
       "type": 0,
@@ -227,10 +383,40 @@
       "value": "Already have an account?"
     }
   ],
+  "pqxK1C": [
+    {
+      "type": 0,
+      "value": "Contrast"
+    }
+  ],
+  "qyCo80": [
+    {
+      "type": 0,
+      "value": "Describe your publication"
+    }
+  ],
+  "rKml3z": [
+    {
+      "type": 0,
+      "value": "Allow Azzapp to access your camera and your microphone"
+    }
+  ],
+  "rzJ3iZ": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
   "sSVrVw": [
     {
       "type": 0,
       "value": "Sign Up"
+    }
+  ],
+  "ukFVmp": [
+    {
+      "type": 0,
+      "value": "Normal"
     }
   ],
   "uvBCJV": [
@@ -243,6 +429,42 @@
       "value": "word"
     }
   ],
+  "vDm98w": [
+    {
+      "type": 0,
+      "value": "Sharpness"
+    }
+  ],
+  "w3ybid": [
+    {
+      "type": 0,
+      "value": "Finish"
+    }
+  ],
+  "wMsxl3": [
+    {
+      "type": 0,
+      "value": "Take a picture"
+    }
+  ],
+  "wfjPDR": [
+    {
+      "type": 0,
+      "value": "Photos gallery"
+    }
+  ],
+  "wjUxdq": [
+    {
+      "type": 0,
+      "value": "Filter"
+    }
+  ],
+  "wkQ0bm": [
+    {
+      "type": 0,
+      "value": "video"
+    }
+  ],
   "wvXg6E": [
     {
       "type": 0,
@@ -253,6 +475,18 @@
     {
       "type": 0,
       "value": "Log In"
+    }
+  ],
+  "y37Ei7": [
+    {
+      "type": 0,
+      "value": "Select an album"
+    }
+  ],
+  "zMaylR": [
+    {
+      "type": 0,
+      "value": "Take a video"
     }
   ]
 }

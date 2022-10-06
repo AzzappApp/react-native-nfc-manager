@@ -27,14 +27,22 @@ const UserScreenButtonBar = ({
   <View style={[styles.buttonBar, style]}>
     <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
     {canEdit ? (
-      <FloatingButton light onPress={onEdit} style={styles.mainButton}>
+      <FloatingButton
+        variant="light"
+        onPress={onEdit}
+        style={styles.mainButton}
+      >
         {/* @ts-expect-error suppressHydrationWarning is not typed*/}
         <Text style={textStyles.normal} suppressHydrationWarning>
           Edit my profile
         </Text>
       </FloatingButton>
     ) : (
-      <FloatingButton light onPress={onFollow} style={styles.mainButton}>
+      <FloatingButton
+        variant="light"
+        onPress={onFollow}
+        style={styles.mainButton}
+      >
         {/* @ts-expect-error suppressHydrationWarning is not typed*/}
         <Text style={textStyles.normal} suppressHydrationWarning>
           {isFollowing ? 'Unfollow' : 'Follow'}

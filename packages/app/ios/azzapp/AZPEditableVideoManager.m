@@ -27,7 +27,6 @@ RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(startTime, NSNumber *)
 RCT_EXPORT_VIEW_PROPERTY(duration, NSNumber *)
 
-
 RCT_EXPORT_METHOD(
         exportVideo:(NSURL *)uri
      withParameters:(NSDictionary *)parameters

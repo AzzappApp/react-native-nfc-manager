@@ -8,6 +8,11 @@
 export const COVER_RATIO = 0.625;
 
 /**
+ * Cover video maxium duration in seconds
+ */
+export const COVER_MAX_VIDEO_DURATTION = 12;
+
+/**
  * The border radius that should be used when a cover is not displayed full screen
  */
 export const COVER_CARD_RADIUS = 0.128;

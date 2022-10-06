@@ -1,6 +1,18 @@
-import { StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import { colors } from '../../../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, textStyles } from '../../../theme';
+import Header from '../../components/Header';
+import Button from '../../ui/Button';
 import Icon from '../../ui/Icon';
 import Switch from '../../ui/Switch';
 import type { ViewProps } from 'react-native';
@@ -23,29 +35,103 @@ const PostContentPanel = ({
   onContentChange,
   style,
   ...props
-}: PostContentPanelProps) => (
-  <View style={[styles.container, style]} {...props}>
-    <View style={styles.settingsContainer}>
-      <View style={styles.switchContainer}>
-        <Icon icon="heart" style={styles.switchIcon} />
-        <Switch value={allowLikes} onValueChange={onAllowLikesChange} />
+}: PostContentPanelProps) => {
+  const [showContentModal, setShowContentModal] = useState(false);
+  const onFocus = () => {
+    setShowContentModal(true);
+  };
+  const onModalClose = () => {
+    setShowContentModal(false);
+  };
+  const intl = useIntl();
+  const textAraPlaceHolder = intl.formatMessage({
+    defaultMessage: 'Describe your publication',
+    description: 'Post creation screen textarea placeholder',
+  });
+
+  const { top: safeAreaTop } = useSafeAreaInsets();
+
+  return (
+    <>
+      <View style={[styles.container, style]} {...props}>
+        <View style={styles.settingsContainer}>
+          <View style={styles.switchContainer}>
+            <Icon icon="heart" style={styles.switchIcon} />
+            <Switch value={allowLikes} onValueChange={onAllowLikesChange} />
+          </View>
+          <View style={styles.switchContainer}>
+            <Icon icon="comment" style={styles.switchIcon} />
+            <Switch
+              value={allowComments}
+              onValueChange={onAllowCommentsChange}
+            />
+          </View>
+        </View>
+        <Pressable
+          style={pressed => [styles.textArea, pressed && { opacity: 0.8 }]}
+          onPress={onFocus}
+        >
+          {content ? (
+            <Text style={textStyles.normal}>{content}</Text>
+          ) : (
+            <Text style={[textStyles.normal, styles.placeHolder]}>
+              {textAraPlaceHolder}
+            </Text>
+          )}
+        </Pressable>
       </View>
-      <View style={styles.switchContainer}>
-        <Icon icon="comment" style={styles.switchIcon} />
-        <Switch value={allowComments} onValueChange={onAllowCommentsChange} />
-      </View>
-    </View>
-    <TextInput
-      multiline
-      style={styles.textArea}
-      placeholder="Describe your publication"
-      value={content}
-      onChangeText={onContentChange}
-    />
-  </View>
-);
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showContentModal}
+        onRequestClose={onModalClose}
+      >
+        <View style={styles.modal}>
+          <Header
+            style={{
+              backgroundColor: 'white',
+              height: 70 + safeAreaTop,
+              paddingTop: safeAreaTop,
+            }}
+            rightButton={
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Ok',
+                  description:
+                    'Ok button label in post creation text edition modal',
+                })}
+                onPress={onModalClose}
+                variant="secondary"
+                style={styles.headerButtons}
+              />
+            }
+          />
+          <KeyboardAvoidingView behavior="height" style={styles.contentModal}>
+            <View style={styles.textArea}>
+              <TextInput
+                multiline
+                placeholder={textAraPlaceHolder}
+                style={textStyles.normal}
+                value={content}
+                onChangeText={onContentChange}
+                autoFocus
+                maxLength={MAX_CONTENT_LENGHT}
+                onBlur={onModalClose}
+              />
+            </View>
+            <Text style={[textStyles.small, styles.counter]}>
+              {content?.length ?? 0} / {MAX_CONTENT_LENGHT}
+            </Text>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+    </>
+  );
+};
 
 export default PostContentPanel;
+
+const MAX_CONTENT_LENGHT = 3000;
 
 const styles = StyleSheet.create({
   container: {
@@ -72,5 +158,28 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 20,
+  },
+  placeHolder: {
+    color: colors.grey400,
+  },
+  modal: {
+    flex: 1,
+  },
+  headerButtons: {
+    width: 70,
+    height: 46,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  contentModal: {
+    flex: 1,
+    backgroundColor: `${colors.black}AA`,
+    height: 1,
+    padding: 10,
+  },
+  counter: {
+    marginTop: 5,
+    marginLeft: 12,
+    color: 'white',
   },
 });

@@ -1,14 +1,7 @@
 import { requireNativeComponent, NativeModules } from 'react-native';
-import type { ImageEditionParameters } from './EditableImage';
+import type { ImageEditionParameters } from './helpers';
 import type React from 'react';
 import type { ViewProps } from 'react-native';
-
-export type CropData = {
-  originX: number;
-  originY: number;
-  width: number;
-  height: number;
-};
 
 export type EditableVideoProps = Omit<ViewProps, 'children'> & {
   uri?: string | null;

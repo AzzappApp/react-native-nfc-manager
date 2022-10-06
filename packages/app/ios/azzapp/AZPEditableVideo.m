@@ -73,7 +73,6 @@
                 ];
                 if (transformation != nil) {
                   image = transformation(image, parameters);
-                  //image = transformation(image, strongSelf.editionParameters);
                 }
               }
               [request finishWithImage:image context:nil];

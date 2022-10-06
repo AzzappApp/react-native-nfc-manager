@@ -1,6 +1,8 @@
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import {
   DEFAULT_CARD_COVER,
   COVER_RATIO,
+  COVER_MAX_VIDEO_DURATTION,
 } from '@azzapp/shared/lib/cardHelpers';
 import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
@@ -17,7 +19,7 @@ import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { QR_CODE_POSITION_CHANGE_EVENT } from '../../components/CoverRenderer/CoverRenderer';
-import ImagePicker from '../../components/ImageEditions/ImagePicker';
+import ImagePicker from '../../components/ImagePicker';
 import { addCacheEntry } from '../../components/MediaRenderer/MediaImageRenderer';
 import { addLocalVideo } from '../../components/MediaRenderer/MediaVideoRenderer';
 import useFormMutation from '../../hooks/useFormMutation';
@@ -49,10 +51,19 @@ type CoverEditPanelProps = {
 };
 
 export type CoverUpdates = Omit<UpdateCoverInput, 'pictures'> & {
-  pictures?: Array<{
-    kind: MediaKind;
-    source: string | { uri: string; file: any };
-  }>;
+  pictures?: Array<
+    | {
+        kind: MediaKind;
+        source: { uri: string; file: any };
+      }
+    | {
+        readonly __typename: string;
+        readonly ratio: number;
+        readonly source: string;
+        readonly thumbnail?: string;
+        readonly uri: string;
+      }
+  >;
 };
 
 const CoverEditPanel = ({
@@ -104,20 +115,7 @@ const CoverEditPanel = ({
   );
 
   const initialData = useMemo(
-    () => ({
-      ...cover,
-      pictures: cover?.pictures.map(
-        ({ __typename, ratio, source, uri, thumbnail }) => ({
-          kind: (__typename === 'MediaVideo'
-            ? 'video'
-            : 'picture') as MediaKind,
-          ratio,
-          source,
-          uri,
-          thumbnail,
-        }),
-      ),
-    }),
+    () => cover,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -186,7 +184,7 @@ const CoverEditPanel = ({
           file: any;
         }> = [];
         pictures.forEach((picture, index) => {
-          if (typeof picture.source === 'object') {
+          if ('kind' in picture) {
             picturesToUpload.push({
               kind: picture.kind,
               file: picture.source.file,
@@ -270,16 +268,31 @@ const CoverEditPanel = ({
             const uploadedImage = results.find(
               result => result.index === index,
             );
-            return {
-              kind: picture.kind,
-              source: uploadedImage?.publicId ?? (picture.source as string),
-            };
+            if ('kind' in picture) {
+              return {
+                kind: picture.kind,
+                source: uploadedImage!.publicId,
+              };
+            } else {
+              return {
+                kind: picture.__typename === 'MediaImage' ? 'picture' : 'video',
+                source: picture.source,
+              };
+            }
           });
         } else {
-          updateCoverInput.pictures = pictures.map(picture => ({
-            kind: picture.kind,
-            source: picture.source as string,
-          }));
+          updateCoverInput.pictures = convertToNonNullArray(
+            pictures.map(picture => {
+              if ('kind' in picture) {
+                console.error('Illogical case in mutation');
+                return null;
+              }
+              return {
+                kind: picture.__typename === 'MediaImage' ? 'picture' : 'video',
+                source: picture.source,
+              };
+            }),
+          );
         }
       }
     } catch (e) {
@@ -343,7 +356,7 @@ const CoverEditPanel = ({
     kind,
   }: {
     path: string;
-    kind: 'picture' | 'video';
+    kind: 'image' | 'video';
   }) => {
     const coverUpdates = coverUpdatesRef.current;
     const pictures = [
@@ -352,13 +365,13 @@ const CoverEditPanel = ({
     const index = Math.min(editedIndex, pictures.length);
 
     pictures[index] = {
-      kind,
+      kind: kind === 'video' ? 'video' : 'picture',
       source: {
         uri: `file://${path}`,
         file: {
           name: getFileName(path),
           uri: `file://${path}`,
-          type: kind === 'picture' ? 'image/jpeg' : 'video/quicktime',
+          type: kind === 'image' ? 'image/jpeg' : 'video/quicktime',
         },
       },
     };
@@ -522,12 +535,10 @@ const CoverEditPanel = ({
         onRequestClose={onImagePickCancel}
       >
         <ImagePicker
-          imageRatio={COVER_RATIO}
-          kind="mixed"
-          onMediaPicked={onMediaPicked}
-          onClose={onImagePickCancel}
-          maxVideoDuration={12}
-          onPermissionRequestFailed={() => void 0}
+          forceAspectRatio={COVER_RATIO}
+          onFinished={onMediaPicked}
+          onCancel={onImagePickCancel}
+          maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
         />
       </Modal>
     </>
@@ -559,15 +570,25 @@ const getOptimisticResponse = (
           title: coverUpdates.title ?? intialData?.title ?? '',
           pictures: coverUpdates.pictures
             ? coverUpdates.pictures?.map(picture => {
-                if (typeof picture.source === 'string') {
+                if ('__typename' in picture) {
                   return picture;
                 }
-                return {
-                  kind: picture.kind,
-                  source: picture.source.uri,
-                  uri: picture.source.uri,
-                  ratio: COVER_RATIO,
-                };
+                if (picture.kind === 'video') {
+                  return {
+                    __typename: 'MediaVideo',
+                    source: picture.source.uri,
+                    uri: picture.source.uri,
+                    thumbnail: '',
+                    ratio: COVER_RATIO,
+                  };
+                } else {
+                  return {
+                    __typename: 'MediaImage',
+                    source: picture.source.uri,
+                    uri: picture.source.uri,
+                    ratio: COVER_RATIO,
+                  };
+                }
               })
             : intialData?.pictures ?? [],
         },

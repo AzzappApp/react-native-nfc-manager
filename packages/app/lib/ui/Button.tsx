@@ -6,43 +6,72 @@ import type { PressableProps, StyleProp, ViewStyle, View } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
+  variant?: 'primary' | 'secondary';
   style?: StyleProp<ViewStyle>;
 };
 
 const Button = (
-  { label, style, ...props }: ButtonProps,
+  { label, variant = 'primary', style, ...props }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
-) => (
-  <Pressable
-    testID="azzapp_Button_pressable-wrapper"
-    accessibilityRole="button"
-    {...props}
-    style={({ pressed }) => [
-      styles.button,
-      pressed && styles.buttonPressed,
-      style,
-    ]}
-    ref={forwardedRef}
-  >
-    <Text style={styles.label}>{label}</Text>
-  </Pressable>
-);
+) => {
+  const variantStyles = stylesVariant[variant];
+  return (
+    <Pressable
+      testID="azzapp_Button_pressable-wrapper"
+      accessibilityRole="button"
+      {...props}
+      style={({ pressed }) => [
+        styles.root,
+        variantStyles.root,
+        pressed && variantStyles.pressed,
+        style,
+      ]}
+      ref={forwardedRef}
+    >
+      <Text style={[styles.label, variantStyles.label]}>{label}</Text>
+    </Pressable>
+  );
+};
 
 export default forwardRef(Button);
 
 const styles = StyleSheet.create({
-  button: {
-    height: 45,
-    backgroundColor: colors.black,
+  root: {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
   },
-  buttonPressed: {
-    backgroundColor: colors.grey900,
-  },
   label: {
     ...textStyles.button,
-    color: '#fff',
   },
 });
+
+const stylesVariant = {
+  primary: StyleSheet.create({
+    root: {
+      backgroundColor: colors.black,
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+    },
+    pressed: {
+      backgroundColor: colors.grey900,
+    },
+    label: {
+      color: '#fff',
+    },
+  }),
+  secondary: StyleSheet.create({
+    root: {
+      borderWidth: 1,
+      borderColor: colors.black,
+      paddingHorizontal: 18,
+      paddingVertical: 12,
+    },
+    pressed: {
+      opacity: 0.4,
+    },
+    label: {
+      color: colors.black,
+    },
+  }),
+} as const;

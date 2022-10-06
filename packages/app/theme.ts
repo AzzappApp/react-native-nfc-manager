@@ -11,6 +11,7 @@ export const colors = {
   grey100: '#E2E1E3',
   grey200: '#C8C7CA',
   grey400: '#A1A1A5',
+  grey500: '#87878E',
   grey900: '#45444C',
 
   // other color to be replaced when styleguide is finished

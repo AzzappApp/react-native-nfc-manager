@@ -2,14 +2,23 @@ import { Image } from 'react-native';
 import type { ImageProps } from 'react-native';
 
 const icons = {
-  get add() {
-    return require('./assets/add.png');
-  },
   get account() {
     return require('./assets/account.png');
   },
+  get add() {
+    return require('./assets/add.png');
+  },
+  get adjust() {
+    return require('./assets/adjust.png');
+  },
+  get 'arrow-down'() {
+    return require('./assets/arrow-down.png');
+  },
   get azzapp() {
     return require('./assets/azzapp.png');
+  },
+  get back() {
+    return require('./assets/back.png');
   },
   get brightness() {
     return require('./assets/brightness.png');
@@ -25,6 +34,9 @@ const icons = {
   },
   get chevron() {
     return require('./assets/chevron.png');
+  },
+  get clock() {
+    return require('./assets/clock.png');
   },
   get comment() {
     return require('./assets/comment.png');
@@ -44,6 +56,15 @@ const icons = {
   get effect() {
     return require('./assets/effect.png');
   },
+  get flash() {
+    return require('./assets/flash.png');
+  },
+  get 'flash-auto'() {
+    return require('./assets/flash-auto.png');
+  },
+  get 'flash-disabled'() {
+    return require('./assets/flash-disabled.png');
+  },
   get flip() {
     return require('./assets/flip.png');
   },
@@ -52,6 +73,9 @@ const icons = {
   },
   get hashtag() {
     return require('./assets/hashtag.png');
+  },
+  get grid() {
+    return require('./assets/grid.png');
   },
   get heart() {
     return require('./assets/heart.png');
@@ -64,6 +88,15 @@ const icons = {
   },
   get location() {
     return require('./assets/location.png');
+  },
+  get invert() {
+    return require('./assets/invert.png');
+  },
+  get magic() {
+    return require('./assets/magic.png');
+  },
+  get parameters() {
+    return require('./assets/parameters.png');
   },
   get picture() {
     return require('./assets/picture.png');
@@ -91,6 +124,9 @@ const icons = {
   },
   get title() {
     return require('./assets/title.png');
+  },
+  get video() {
+    return require('./assets/video.png');
   },
   get vigneting() {
     return require('./assets/vigneting.png');

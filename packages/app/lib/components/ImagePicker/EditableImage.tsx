@@ -1,47 +1,12 @@
 import { requireNativeComponent, NativeModules } from 'react-native';
+import type { ImageEditionParameters } from './helpers';
 import type React from 'react';
 import type { ViewProps } from 'react-native';
-
-export type CropData = {
-  originX: number;
-  originY: number;
-  width: number;
-  height: number;
-};
-
-export type ImageOrientation =
-  | 'DOWN_MIRRORED'
-  | 'DOWN'
-  | 'LEFT_MIRRORED'
-  | 'LEFT'
-  | 'RIGHT_MIRRORED'
-  | 'RIGHT'
-  | 'UP_MIRRORED'
-  | 'UP';
-
-export type ImageEditionParameters = {
-  brightness?: number | null;
-  contrast?: number | null;
-  highlights?: number | null;
-  saturation?: number | null;
-  shadow?: number | null;
-  sharpness?: number | null;
-  structure?: number | null;
-  temperature?: number | null;
-  tint?: number | null;
-  vibrance?: number | null;
-  vigneting?: number | null;
-  pitch?: number | null;
-  roll?: number | null;
-  yaw?: number | null;
-  cropData?: CropData | null;
-  orientation?: ImageOrientation;
-};
 
 export type EditableImageProps = Omit<ViewProps, 'children'> & {
   source?: {
     uri?: string | null;
-    kind?: 'picture' | 'video' | null;
+    kind?: 'image' | 'video' | null;
     videoTime?: number;
   } | null;
   editionParameters?: ImageEditionParameters;

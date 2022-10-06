@@ -14,12 +14,9 @@ import Animated, {
 import { colors, mixins } from '../../../theme';
 import EditableImage from './EditableImage';
 import EditableVideo from './EditableVideo';
-import type {
-  ImageEditionParameters,
-  CropData,
-  EditableImageProps,
-} from './EditableImage';
+import type { EditableImageProps } from './EditableImage';
 import type { EditableVideoProps } from './EditableVideo';
+import type { CropData, ImageEditionParameters } from './helpers';
 import type { FunctionComponent } from 'react';
 import type {
   ViewProps,
@@ -33,7 +30,7 @@ type ImageEditorProps = ViewProps & {
     width: number;
     height: number;
     videoTime?: number;
-    kind?: 'picture' | 'video';
+    kind?: 'image' | 'video';
   };
   aspectRatio: number;
   editionParameters?: ImageEditionParameters;
@@ -558,7 +555,9 @@ const getValidCropdata = (
   if (
     !cropData ||
     cropData.width > mediaWidth ||
-    cropData.height > mediaHeight
+    cropData.height > mediaHeight ||
+    // might have slight error due to javascrpt floating number
+    Math.abs(cropData.width / cropData.height - aspectRatio) > 0.00001
   ) {
     if (mediaWidth / mediaHeight > aspectRatio) {
       cropData = {

@@ -28,3 +28,18 @@ export const waitTime = (time: number) =>
   new Promise(resolve => {
     setTimeout(resolve, time);
   });
+
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve(value: T): void;
+  reject(error: Error): void;
+};
+
+export const createDeffered = <T>(): Deferred<T> => {
+  const deffered = {} as Deferred<T>;
+  deffered.promise = new Promise<T>((resolve, reject) => {
+    deffered.resolve = resolve;
+    deffered.reject = reject;
+  });
+  return deffered;
+};

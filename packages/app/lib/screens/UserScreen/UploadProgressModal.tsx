@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../../theme';
+import ProgressBar from '../../ui/ProgressBar';
 import type { Subscription, Observable } from 'relay-runtime';
 
 type UploadProgressModalProps = {
@@ -42,11 +43,7 @@ const UploadProgressModal = ({
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>Uploading...</Text>
-          <View style={styles.progressBar}>
-            <View
-              style={[styles.progressBarInner, { width: `${progess * 100}%` }]}
-            />
-          </View>
+          <ProgressBar style={styles.progressBar} progress={progess} />
           <Text style={styles.title}>{Math.round(progess * 100)}%</Text>
         </View>
       </View>
@@ -80,15 +77,6 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     width: 200,
-    backgroundColor: colors.lightGrey,
-    height: 8,
     marginBottom: 10,
-  },
-  progressBarInner: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    height: 8,
-    backgroundColor: colors.dark,
   },
 });

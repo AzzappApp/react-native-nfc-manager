@@ -7,6 +7,10 @@
     "defaultMessage": "Email Address",
     "description": "Signin Screen email address input placeholder"
   },
+  "07iiib": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button in Image edition screen"
+  },
   "0C3U4p": {
     "defaultMessage": "Cancel",
     "description": "SearchBar - Cancel button"
@@ -39,6 +43,22 @@
     "defaultMessage": "At least 8 caracters, 1upper, 1 lower 1 digit",
     "description": "SignupScreen - error message when password is not valid"
   },
+  "6EyA+S": {
+    "defaultMessage": "Access to the microphone allows you to record videos.",
+    "description": "Camera authorization screen content for microphone permission"
+  },
+  "6V9XJr": {
+    "defaultMessage": "Allow Azzapp to access your photos",
+    "description": "Camera authorization screen title for photos permission"
+  },
+  "74j5Wg": {
+    "defaultMessage": "Access to the photos allows you to create publications.",
+    "description": "Camera authorization screen content for photos permission"
+  },
+  "7HPaV3": {
+    "defaultMessage": "Tint",
+    "description": "Tint image edition parameters name"
+  },
   "8PT+FO": {
     "defaultMessage": "Posts",
     "description": "SearchPage - Result - Global search posts title"
@@ -54,6 +74,10 @@
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
+  },
+  "AsCp0n": {
+    "defaultMessage": "Validate",
+    "description": "Validate button in Image edition screen"
   },
   "Bm4p42": {
     "defaultMessage": "We just send you a link to create a new password",
@@ -83,9 +107,21 @@
     "defaultMessage": "Forgot your password ?",
     "description": "ForgotPasswordScreen - Forgot your password  title"
   },
+  "J7Z2GR": {
+    "defaultMessage": "Cut Video",
+    "description": "Title of the cut video section in Image edition wizzard"
+  },
+  "JcQ1BH": {
+    "defaultMessage": "Photo",
+    "description": "Title of the photo view in image picker wizzard"
+  },
   "KOjOOw": {
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
+  },
+  "M32J+R": {
+    "defaultMessage": "Next",
+    "description": "Next button label in image picker wizzard"
   },
   "PDfRjc": {
     "defaultMessage": "privacy policy",
@@ -94,6 +130,10 @@
   "PEHtPw": {
     "defaultMessage": "Enter your email address and we'll send you a link to create a new password",
     "description": "ForgotPasswordScreen - Forgot your password description"
+  },
+  "PjYjnk": {
+    "defaultMessage": "Ok",
+    "description": "Ok button label in post creation text edition modal"
   },
   "QuRr//": {
     "defaultMessage": "Don't have an account",
@@ -107,17 +147,69 @@
     "defaultMessage": "Terms of services",
     "description": "Signup Screen - Terms of Service link"
   },
+  "Vh3DQb": {
+    "defaultMessage": "Saturation",
+    "description": "Saturation image edition parameters name"
+  },
+  "WBD9Bx": {
+    "defaultMessage": "Next",
+    "description": "Button label of screens asking for camera/micro permissions"
+  },
   "Y+Ob8P": {
     "defaultMessage": "Please enter a valid email address",
     "description": "SignupScreen - error message when input doest not validate as an email"
+  },
+  "Y+UQRB": {
+    "defaultMessage": "Media Filter",
+    "description": "Accessibility label of the Media filter tabs in image editing view"
   },
   "Y7sr+4": {
     "defaultMessage": "Sign Up",
     "description": "sign up link"
   },
+  "a17Y8A": {
+    "defaultMessage": "Temperature",
+    "description": "Temperature image edition parameters name"
+  },
+  "b4fFwm": {
+    "defaultMessage": "Brightness",
+    "description": "Brightness image edition parameters name"
+  },
+  "dF52vj": {
+    "defaultMessage": "Highlights",
+    "description": "Highlights image edition parameters name"
+  },
+  "dqGjrZ": {
+    "defaultMessage": "Structure",
+    "description": "Structure image edition parameters name"
+  },
+  "ebisVt": {
+    "defaultMessage": "Adjust",
+    "description": "Adjust image edition parameters name"
+  },
+  "g67Jzi": {
+    "defaultMessage": "Vibrance",
+    "description": "Vibrance image edition parameters name"
+  },
+  "g7w55v": {
+    "defaultMessage": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.",
+    "description": "Camera authorization screen content for camera permission"
+  },
+  "gRy2ak": {
+    "defaultMessage": "Vigneting",
+    "description": "Vigneting image edition parameters name"
+  },
+  "gXvULC": {
+    "defaultMessage": "Latest",
+    "description": "Latest photos album title in image wizzard album selection "
+  },
   "h0jHxq": {
     "defaultMessage": "Password",
     "description": "Signup Screen - password"
+  },
+  "hc+1uI": {
+    "defaultMessage": "Allow Azzapp to access your microphone",
+    "description": "Camera authorization screen title for microphobe permission"
   },
   "izbcMX": {
     "defaultMessage": "Sign In",
@@ -127,6 +219,10 @@
     "defaultMessage": "Please enter a valid email",
     "description": "ForgotpasswordScreen - error message when input doest not validate as an email"
   },
+  "lXovx3": {
+    "defaultMessage": "New Post",
+    "description": "New post screen title"
+  },
   "lsO83S": {
     "defaultMessage": "Please enter a password",
     "description": "SigninScreen - error message when input password is empty"
@@ -134,6 +230,10 @@
   "n8Bdhz": {
     "defaultMessage": "See all",
     "description": "CoverList - See all button"
+  },
+  "nMtsXg": {
+    "defaultMessage": "Shadow",
+    "description": "Shadow image edition parameters name"
   },
   "nufnAH": {
     "defaultMessage": "Email Address",
@@ -143,6 +243,10 @@
     "defaultMessage": "logout",
     "description": "logout link"
   },
+  "oAzffi": {
+    "defaultMessage": "Adjust",
+    "description": "Title of the adjust section in Image edition wizzard"
+  },
   "p042gg": {
     "defaultMessage": "Profiles you may like",
     "description": "SearchPage - Profile recommendation title"
@@ -151,13 +255,57 @@
     "defaultMessage": "Already have an account?",
     "description": "Signup Screen - Already have an account?"
   },
+  "pqxK1C": {
+    "defaultMessage": "Contrast",
+    "description": "Contrast image edition parameters name"
+  },
+  "qyCo80": {
+    "defaultMessage": "Describe your publication",
+    "description": "Post creation screen textarea placeholder"
+  },
+  "rKml3z": {
+    "defaultMessage": "Allow Azzapp to access your camera and your microphone",
+    "description": "Camera authorization screen title for camera permission"
+  },
+  "rzJ3iZ": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in image picker wizzard"
+  },
   "sSVrVw": {
     "defaultMessage": "Sign Up",
     "description": "Home screen sign up button label"
   },
+  "ukFVmp": {
+    "defaultMessage": "Normal",
+    "description": "Name of the default filter (no filter applied) in image edition"
+  },
   "uvBCJV": {
     "defaultMessage": "No recent search for {word}",
     "description": "ResetSearch - message when no history search found"
+  },
+  "vDm98w": {
+    "defaultMessage": "Sharpness",
+    "description": "Sharpness image edition parameters name"
+  },
+  "w3ybid": {
+    "defaultMessage": "Finish",
+    "description": "Finish button label in image picker wizzard"
+  },
+  "wMsxl3": {
+    "defaultMessage": "Take a picture",
+    "description": "Accessibility label of the camera tabs in post in image picking wizzard"
+  },
+  "wfjPDR": {
+    "defaultMessage": "Photos gallery",
+    "description": "Accessibility label of the Photos gallery tabs in image picking wizzard"
+  },
+  "wjUxdq": {
+    "defaultMessage": "Filter",
+    "description": "Title of the filter section in Image edition wizzard"
+  },
+  "wkQ0bm": {
+    "defaultMessage": "video",
+    "description": "Title of the photo view in image picker wizzard"
   },
   "wvXg6E": {
     "defaultMessage": "I accept with",
@@ -166,5 +314,13 @@
   "xl/PxL": {
     "defaultMessage": "Log In",
     "description": "Password input placeholder"
+  },
+  "y37Ei7": {
+    "defaultMessage": "Select an album",
+    "description": "Title of the album selection modal"
+  },
+  "zMaylR": {
+    "defaultMessage": "Take a video",
+    "description": "Accessibility label of the video tabs in post  in image picking wizzard"
   }
 }

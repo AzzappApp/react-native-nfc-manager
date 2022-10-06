@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet } from 'react-native';
+import { colors } from '../../theme';
 import type { ViewStyle, StyleProp, PressableProps } from 'react-native';
 
 export type FloatingButtonProps = {
   onPress?: () => void;
   size?: number;
-  light?: boolean;
+  variant?: 'default' | 'light' | 'white';
   style?: StyleProp<ViewStyle>;
   nativeID?: string;
   children: PressableProps['children'];
@@ -15,40 +16,59 @@ const FloatingButton = ({
   size = 50,
   style,
   children,
-  light,
+  variant = 'default',
   nativeID,
-}: FloatingButtonProps) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => [
-      { minWidth: size, height: size, borderRadius: size / 2 },
-      styles.button,
-      light && styles.buttonLight,
-      pressed && styles.buttonPressed,
-      pressed && light && styles.buttonLightPressed,
-      style,
-    ]}
-    nativeID={nativeID}
-  >
-    {children}
-  </Pressable>
-);
+}: FloatingButtonProps) => {
+  const variantStyles = stylesVariant[variant];
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        { minWidth: size, height: size, borderRadius: size / 2 },
+        styles.root,
+        variantStyles.root,
+        pressed && variantStyles.pressed,
+        style,
+      ]}
+      nativeID={nativeID}
+    >
+      {children}
+    </Pressable>
+  );
+};
 
 export default FloatingButton;
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+  root: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonLight: {
-    backgroundColor: 'rgba(255,255,255,0.8)',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonLightPressed: {
-    backgroundColor: 'rgba(255,255,255,0.6)',
-  },
 });
+
+const stylesVariant = {
+  default: StyleSheet.create({
+    root: {
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    pressed: {
+      opacity: 0.8,
+    },
+  }),
+  light: StyleSheet.create({
+    root: {
+      backgroundColor: 'rgba(255,255,255,0.8)',
+    },
+    pressed: {
+      backgroundColor: 'rgba(255,255,255,0.6)',
+    },
+  }),
+  white: StyleSheet.create({
+    root: {
+      backgroundColor: '#FFF',
+    },
+    pressed: {
+      backgroundColor: colors.grey50,
+    },
+  }),
+} as const;
