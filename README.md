@@ -32,7 +32,7 @@ The path to yout node binary can be obtained with the command :
 which node
 ```
 
-To use relay, one should first generate the query map file (required only the first time) :
+The relay-compiler in the project needs the query map file to be created, one should first generate this file through this query (required only the first time) :
 
 ```sh
 yarn create-query-map-file
