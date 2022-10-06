@@ -24,13 +24,12 @@ The sources of this project should be edited through [Visual Studio Code](https:
 To build with xcode, one should first create a .xcode.env.local file under `packages/app/ios` with a path to node :
 
 ```
-export NODE_BINARY=/Users/yourusername/.nvm/versions/node/v16.13.0/bin/node
+export NODE_BINARY=<PATH_TO_YOUR_NODE_BIN>
 ```
+The path to yout node binary can be obtained with the command : 
 
-or
-
-```
-export NODE_BINARY=/opt/homebrew/bin/node
+```sh
+which node
 ```
 
 To use relay, one should first generate the query map file (required only the first time) :
