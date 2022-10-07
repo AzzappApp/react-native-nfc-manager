@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { colors } from '../../theme';
 import Icon from './Icon';
+import PressableNative from './PressableNative';
 import type { Icons } from './Icon';
 import type { StyleProp, ViewStyle, ImageStyle } from 'react-native';
 
@@ -23,12 +24,11 @@ const IconButton = ({
   iconStyle,
   nativeID,
 }: IconButtonProps) => (
-  <Pressable
+  <PressableNative
     onPress={onPress}
-    style={({ pressed }) => [
+    style={[
       { minWidth: size, height: size, borderRadius: size / 2 },
       styles.button,
-      pressed && styles.buttonPressed,
       style,
     ]}
     nativeID={nativeID}
@@ -44,7 +44,7 @@ const IconButton = ({
         },
       ]}
     />
-  </Pressable>
+  </PressableNative>
 );
 
 export default IconButton;
@@ -53,9 +53,6 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonPressed: {
-    backgroundColor: colors.lightGrey,
   },
   image: {
     tintColor: colors.dark,

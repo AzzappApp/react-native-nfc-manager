@@ -1,14 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Animated, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../theme';
+import PressableNative from './PressableNative';
 import type { ModalProps } from 'react-native';
 
 type BottomSheetModal = Omit<
@@ -83,13 +77,13 @@ const BottomSheetModal = ({
             <Text style={[textStyles.title, styles.accessoryViewLabel]}>
               {title}
             </Text>
-            <Pressable
+            <PressableNative
               style={styles.okButton}
               hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
               onPress={onRequestClose}
             >
               <Text style={[textStyles.button, styles.okButtonLabel]}>OK</Text>
-            </Pressable>
+            </PressableNative>
           </View>
           {children}
         </Animated.View>

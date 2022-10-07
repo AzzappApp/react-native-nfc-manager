@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { colors, textStyles } from '../../theme';
+import PressableBackground from './PressableBackground';
+import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef } from 'react';
 import type { PressableProps, StyleProp, ViewStyle, View } from 'react-native';
 
@@ -15,22 +17,23 @@ const Button = (
   forwardedRef: ForwardedRef<View>,
 ) => {
   const variantStyles = stylesVariant[variant];
-  return (
-    <Pressable
-      testID="azzapp_Button_pressable-wrapper"
-      accessibilityRole="button"
-      {...props}
-      style={({ pressed }) => [
-        styles.root,
-        variantStyles.root,
-        pressed && variantStyles.pressed,
-        style,
-      ]}
-      ref={forwardedRef}
-    >
-      <Text style={[styles.label, variantStyles.label]}>{label}</Text>
-    </Pressable>
-  );
+  const buttonProps = {
+    testID: 'azzapp_Button_pressable-wrapper',
+    accessibilityRole: 'button',
+    style: [styles.root, variantStyles.root, style] as StyleProp<ViewStyle>,
+    children: <Text style={[styles.label, variantStyles.label]}>{label}</Text>,
+    ref: forwardedRef,
+    ...props,
+  } as const;
+
+  switch (variant) {
+    case 'secondary':
+      return <PressableOpacity {...buttonProps} />;
+    default:
+      return (
+        <PressableBackground highlightColor={colors.grey900} {...buttonProps} />
+      );
+  }
 };
 
 export default forwardRef(Button);
@@ -53,9 +56,6 @@ const stylesVariant = {
       paddingHorizontal: 20,
       paddingVertical: 14,
     },
-    pressed: {
-      backgroundColor: colors.grey900,
-    },
     label: {
       color: '#fff',
     },
@@ -66,9 +66,6 @@ const stylesVariant = {
       borderColor: colors.black,
       paddingHorizontal: 18,
       paddingVertical: 12,
-    },
-    pressed: {
-      opacity: 0.4,
     },
     label: {
       color: colors.black,

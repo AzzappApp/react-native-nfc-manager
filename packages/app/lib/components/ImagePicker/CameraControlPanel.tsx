@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, textStyles } from '../../../theme';
 import useInterval from '../../hooks/useInterval';
+import PressableBackground from '../../ui/PressableBackground';
 import ProgressBar from '../../ui/ProgressBar';
 import ViewTransition from '../../ui/ViewTransition';
 import { formatVideoTime } from './helpers';
@@ -81,14 +82,11 @@ const CameraControlPanel = ({
         </Text>
       )}
       {captureMode === 'photo' ? (
-        <Pressable
-          style={({ pressed }) => [
-            styles.photoButton,
-            pressed && styles.photoButtonPressed,
-            !ready && styles.photoButtonDisabled,
-          ]}
+        <PressableBackground
+          style={[styles.photoButton, !ready && styles.photoButtonDisabled]}
           onPress={onTakePhoto}
           disabled={!ready}
+          highlightColor={colors.grey50}
         />
       ) : (
         <Pressable
@@ -145,9 +143,7 @@ const styles = StyleSheet.create({
     borderColor: colors.grey100,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  photoButtonPressed: {
-    backgroundColor: colors.grey50,
+    backgroundColor: '#FFF',
   },
   photoButtonDisabled: {
     opacity: 0.5,

@@ -1,19 +1,13 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  FlatList,
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { FlatList, Image, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../../theme';
 import Icon from '../../ui/Icon';
 import IconButton from '../../ui/IconButton';
+import PressableBackground from '../../ui/PressableBackground';
+import PressableNative from '../../ui/PressableNative';
 import Header from '../Header';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { IntlShape } from 'react-intl';
@@ -47,20 +41,16 @@ const AlbumPicker = ({
   const intl = useIntl();
   return (
     <>
-      <Pressable
-        style={({ pressed }) => [
-          style,
-          styles.root,
-          pressed && { opacity: 0.4 },
-        ]}
-        {...props}
+      <PressableNative
+        style={[styles.root, style]}
         onPress={onModalOpen}
+        {...props}
       >
         <Text style={[textStyles.title, styles.title]}>
           {value ?? latestAlbumTitme(intl)}
         </Text>
         <Icon icon="arrow-down" style={styles.arrowIcon} />
-      </Pressable>
+      </PressableNative>
       <Modal
         animationType="slide"
         visible={showModal}
@@ -166,13 +156,7 @@ const AlbumRenderer = ({
     );
   }, [album]);
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.albumRow,
-        pressed && styles.albumRowPressed,
-      ]}
-    >
+    <PressableBackground onPress={onPress} style={styles.albumRow}>
       <Image
         source={(imageUri ? { uri: imageUri } : null) as any}
         style={{
@@ -188,7 +172,7 @@ const AlbumRenderer = ({
         </Text>
         <Text style={textStyles.small}>{album ? album.count : 'all'}</Text>
       </View>
-    </Pressable>
+    </PressableBackground>
   );
 };
 
@@ -210,8 +194,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  albumRowPressed: {
-    backgroundColor: colors.grey100,
+    backgroundColor: '#FFF',
   },
 });

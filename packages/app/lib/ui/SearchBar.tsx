@@ -1,10 +1,11 @@
 import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet, TextInput, View, Text, Pressable } from 'react-native';
+import { StyleSheet, TextInput, View, Text } from 'react-native';
 import { fontFamilies, colors } from '../../theme';
 
 import Icon from './Icon';
+import PressableNative from './PressableNative';
 import ViewTransition from './ViewTransition';
 import type {
   StyleProp,
@@ -135,17 +136,17 @@ const SearchBar = ({
                   onSubmitEditing={onSubmitEditingLocal}
                 />
                 {isNotFalsyString(searchValue) && (
-                  <Pressable
+                  <PressableNative
                     onPress={onPressClear}
                     testID="azzapp__SearchBar__clear-button"
                     style={styles.cancelPressable}
                   >
                     <Icon icon="cancel" style={styles.lensIcon} />
-                  </Pressable>
+                  </PressableNative>
                 )}
               </ViewTransition>
 
-              <Pressable
+              <PressableNative
                 testID="azzapp__SearchBar__cancel-button"
                 style={[styles.cancelButton]}
                 onLayout={onButtonLayout}
@@ -157,7 +158,7 @@ const SearchBar = ({
                     description="SearchBar - Cancel button"
                   />
                 </Text>
-              </Pressable>
+              </PressableNative>
             </>
           )}
         </View>

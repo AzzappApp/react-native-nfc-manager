@@ -1,7 +1,8 @@
 import { FormattedMessage } from 'react-intl';
-import { PixelRatio, Pressable, StyleSheet, View, Text } from 'react-native';
+import { PixelRatio, StyleSheet, View, Text } from 'react-native';
 import { colors, fontFamilies, textStyles } from '../../../theme';
 import { useCurrentRoute } from '../../PlatformEnvironment';
+import PressableBackground from '../../ui/PressableBackground';
 import RecommendedProfilesList from './RecommendedProfilesList';
 import TrendingPostsList from './TrendingPostsList';
 import TrendingProfilesList from './TrendingProfilesList';
@@ -63,7 +64,7 @@ const IMAGE_SIZE = PixelRatio.roundToNearestPixel(24);
 const SeeAll = () => {
   return (
     <View style={styles.viewSeeAll} pointerEvents="box-none">
-      <Pressable
+      <PressableBackground
         style={styles.pressableSeeAll}
         // eslint-disable-next-line no-alert
         onPress={() => alert('todo')}
@@ -74,7 +75,7 @@ const SeeAll = () => {
             description="CoverList - See all button"
           />
         </Text>
-      </Pressable>
+      </PressableBackground>
     </View>
   );
 };

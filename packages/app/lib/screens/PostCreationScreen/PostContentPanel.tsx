@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import {
   KeyboardAvoidingView,
   Modal,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -14,6 +13,7 @@ import { colors, textStyles } from '../../../theme';
 import Header from '../../components/Header';
 import Button from '../../ui/Button';
 import Icon from '../../ui/Icon';
+import PressableNative from '../../ui/PressableNative';
 import Switch from '../../ui/Switch';
 import type { ViewProps } from 'react-native';
 
@@ -67,9 +67,10 @@ const PostContentPanel = ({
             />
           </View>
         </View>
-        <Pressable
-          style={pressed => [styles.textArea, pressed && { opacity: 0.8 }]}
+        <PressableNative
+          style={styles.textArea}
           onPress={onFocus}
+          activeOpacity={0.8}
         >
           {content ? (
             <Text style={textStyles.normal}>{content}</Text>
@@ -78,7 +79,7 @@ const PostContentPanel = ({
               {textAraPlaceHolder}
             </Text>
           )}
-        </Pressable>
+        </PressableNative>
       </View>
       <Modal
         transparent

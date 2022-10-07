@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '../../theme';
 import Icon from './Icon';
+import PressableBackground from './PressableBackground';
 import type { Icons } from './Icon';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -65,18 +66,18 @@ const TabsBar = ({
   return (
     <View style={[styles.container, style]} accessibilityRole="tablist">
       {tabs.map(({ key, icon, tint, accessibilityLabel }, index) => (
-        <Pressable
+        <PressableBackground
           key={key}
-          style={({ pressed }) => [
-            styles.tab,
-            index === tabs.length - 1 && styles.lastTab,
-            currentTab === key && styles.selectedTab,
-            pressed && styles.tabPressed,
-          ]}
           accessibilityRole="tab"
           accessibilityLabel={accessibilityLabel}
           accessibilityState={{ selected: currentTab === key }}
           onPress={() => onTabPress(key)}
+          style={[
+            styles.tab,
+            index === tabs.length - 1 && styles.lastTab,
+            currentTab === key && styles.selectedTab,
+          ]}
+          highlightColor={variant === 'default' ? colors.grey100 : colors.black}
         >
           {({ pressed }) => {
             const active = pressed || currentTab === key;
@@ -107,7 +108,7 @@ const TabsBar = ({
               </>
             );
           }}
-        </Pressable>
+        </PressableBackground>
       ))}
     </View>
   );
@@ -126,12 +127,10 @@ const variantStyles = {
       alignItems: 'center',
       justifyContent: 'center',
       width: TAB_BAR_HEIGHT,
+      backgroundColor: 'white',
     },
     lastTab: {},
     selectedTab: {},
-    tabPressed: {
-      backgroundColor: colors.lightGrey,
-    },
     image: {
       width: 28,
       height: 28,
@@ -161,12 +160,10 @@ const variantStyles = {
       height: 50,
       borderRadius: 25,
       marginRight: 25,
+      backgroundColor: 'white',
     },
     lastTab: { marginRight: 0 },
     selectedTab: {
-      backgroundColor: colors.black,
-    },
-    tabPressed: {
       backgroundColor: colors.black,
     },
     image: {

@@ -200,7 +200,7 @@ export default forwardRef(PostRenderer);
 
 const styles = StyleSheet.create({
   mediaContainer: {
-    backgroundColor: colors.lightGrey,
+    backgroundColor: colors.grey100,
     overflow: 'hidden',
   },
   mediaContainerSmall: {

@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
-import { Pressable, ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import { colors, textStyles } from '../../../theme';
+import PressableNative from '../../ui/PressableNative';
 import EditableImage from './EditableImage';
 import type { ImageEditionParameters, Media } from './helpers';
 import type { ScrollViewProps } from 'react-native';
@@ -74,10 +75,7 @@ const FilterButton = ({
   filter,
   onPress,
 }: FilterButtonProps) => (
-  <Pressable
-    style={({ pressed }) => [styles.filterButton, pressed && { opacity: 0.8 }]}
-    onPress={onPress}
-  >
+  <PressableNative onPress={onPress} style={styles.filterButton}>
     <View style={styles.filterImageContainer}>
       <Text
         style={[
@@ -95,7 +93,7 @@ const FilterButton = ({
         style={[styles.filterImage, { aspectRatio }]}
       />
     </View>
-  </Pressable>
+  </PressableNative>
 );
 
 const styles = StyleSheet.create({

@@ -1,6 +1,7 @@
+import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
 import { useRef, useState } from 'react';
-import { Pressable } from 'react-native';
 import { useRouter } from '../PlatformEnvironment';
+import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import CoverRenderer from './CoverRenderer';
 import type { CoverHandle, CoverRendererProps } from './CoverRenderer';
 import type { View } from 'react-native';
@@ -51,10 +52,16 @@ const CoverLink = ({
   };
 
   return (
-    <Pressable
+    <PressableScaleHighlight
       onPress={onPress}
       ref={ref}
-      style={style}
+      style={[
+        style,
+        {
+          overflow: 'hidden',
+          borderRadius: COVER_CARD_RADIUS * (props.width as number),
+        },
+      ]}
       accessibilityRole="link"
     >
       {({ pressed }) => (
@@ -62,7 +69,7 @@ const CoverLink = ({
           {...props}
           userName={userName}
           ref={coverRef}
-          style={[coverStyle, pressed && { opacity: 0.8 }]}
+          style={coverStyle}
           videoPaused={pressed ? true : props.videoPaused}
           playTransition={pressed ? false : props.playTransition}
           imageIndex={coverState?.imageIndex}
@@ -73,7 +80,7 @@ const CoverLink = ({
           }
         />
       )}
-    </Pressable>
+    </PressableScaleHighlight>
   );
 };
 

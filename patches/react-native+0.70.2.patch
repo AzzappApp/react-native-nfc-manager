@@ -1,0 +1,25 @@
+diff --git a/node_modules/react-native/Libraries/Components/Pressable/Pressable.js b/node_modules/react-native/Libraries/Components/Pressable/Pressable.js
+index aab4f21..6742074 100644
+--- a/node_modules/react-native/Libraries/Components/Pressable/Pressable.js
++++ b/node_modules/react-native/Libraries/Components/Pressable/Pressable.js
+@@ -276,8 +276,10 @@ function Pressable(props: Props, forwardedRef): React.Node {
+   );
+   const eventHandlers = usePressability(config);
+ 
++  const ViewComponent = props.ViewComponent ?? View;
++
+   return (
+-    <View
++    <ViewComponent
+       {...restPropsWithDefaults}
+       {...eventHandlers}
+       ref={viewRef}
+@@ -285,7 +287,7 @@ function Pressable(props: Props, forwardedRef): React.Node {
+       collapsable={false}>
+       {typeof children === 'function' ? children({pressed}) : children}
+       {__DEV__ ? <PressabilityDebugView color="red" hitSlop={hitSlop} /> : null}
+-    </View>
++    </ViewComponent>
+   );
+ }
+ 

@@ -1,10 +1,11 @@
 import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { FlatList, Text, View, Pressable, StyleSheet } from 'react-native';
-
-import { textStyles } from '../../../theme';
+import { FlatList, Text, StyleSheet } from 'react-native';
+import { colors, textStyles } from '../../../theme';
 import Icon from '../../ui/Icon';
+import PressableBackground from '../../ui/PressableBackground';
+import PressableNative from '../../ui/PressableNative';
 
 type Props = {
   searchValue: string | null | undefined;
@@ -47,7 +48,7 @@ const RecentSearch = ({
   return (
     <FlatList<string>
       ListHeaderComponent={
-        <Text style={styles.textStyleRecent}>
+        <Text style={[textStyles.title, styles.textStyleRecent]}>
           <FormattedMessage
             defaultMessage="Recent searchs"
             description="ResetSearch - title "
@@ -56,17 +57,15 @@ const RecentSearch = ({
       }
       data={data}
       renderItem={renderRecentSearchItem}
-      style={styles.flexOne}
+      style={styles.root}
       ListEmptyComponent={
-        <View>
-          <Text>
-            <FormattedMessage
-              defaultMessage="No recent search for {word}"
-              description="ResetSearch - message when no history search found"
-              values={{ word: searchValue }}
-            />
-          </Text>
-        </View>
+        <Text style={[textStyles.button, styles.noRecentSearch]}>
+          <FormattedMessage
+            defaultMessage="No recent search for {word}"
+            description="ResetSearch - message when no history search found"
+            values={{ word: searchValue }}
+          />
+        </Text>
       }
     />
   );
@@ -91,31 +90,19 @@ const SearchRecentItem = ({
   };
 
   return (
-    <Pressable
-      style={{
-        height: 39,
-        marginLeft: 5,
-        marginRight: 5,
-        paddingLeft: 9,
-        paddingRight: 9,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}
-      onPress={onSearch}
-    >
+    <PressableBackground style={styles.pressableRecentRow} onPress={onSearch}>
       <Text style={{ ...textStyles.sectionTitle }}>{item}</Text>
-      <Pressable onPress={onRemove}>
+      <PressableNative onPress={onRemove}>
         <Icon icon="cross" style={{ height: 15, width: 15, marginRight: 25 }} />
-      </Pressable>
-    </Pressable>
+      </PressableNative>
+    </PressableBackground>
   );
 };
 
 export default RecentSearch;
 
 const styles = StyleSheet.create({
-  flexOne: { flex: 1 },
+  root: { flex: 1 },
   textStyleRecent: {
     paddingTop: 5,
     paddingBottom: 5,
@@ -123,5 +110,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 14,
     marginRight: 15,
+  },
+  noRecentSearch: {
+    margin: 15,
+    color: colors.grey400,
+  },
+  pressableRecentRow: {
+    height: 39,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
 });

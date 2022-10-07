@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import CheckBox from '../CheckBox';
 
@@ -15,10 +16,12 @@ describe('Checkbox component', () => {
       />,
     );
     const wrapper = screen.getByTestId('azzapp__CheckBox__view-wrapper');
-    expect(wrapper.props.style).toMatchObject([
-      { alignItems: 'center', flexDirection: 'row' },
-      containerStyle,
-    ]);
+    expect(StyleSheet.flatten(wrapper.props.style)).toMatchObject(
+      StyleSheet.flatten([
+        { alignItems: 'center', flexDirection: 'row' },
+        containerStyle,
+      ]),
+    );
   });
   test('callback `onChange` should not be call when disabled', () => {
     render(<CheckBox checked={false} onValueChange={onChange} disabled />);

@@ -1,8 +1,9 @@
-import { StyleSheet, Text, Pressable } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { Svg, Path, Rect } from 'react-native-svg';
 import { colors, fontFamilies } from '../../theme';
 
+import PressableNative from './PressableNative';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 //TODO: can be improve by selecting position of the label
 //TODO: Dark Mode
@@ -47,7 +48,7 @@ const CheckBox = ({
     }
   };
   return (
-    <Pressable
+    <PressableNative
       accessibilityRole="checkbox"
       testID="azzapp__CheckBox__view-wrapper"
       style={[styles.container, containerStyle]}
@@ -88,7 +89,7 @@ const CheckBox = ({
           label
         )}
       </>
-    </Pressable>
+    </PressableNative>
   );
 };
 

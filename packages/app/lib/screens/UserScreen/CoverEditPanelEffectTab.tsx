@@ -1,6 +1,7 @@
 import chunk from 'lodash/chunk';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { colors } from '../../../theme';
+import PressableNative from '../../ui/PressableNative';
 import type { CoverUpdates } from './CoverEditPanel';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -29,15 +30,12 @@ const CoverEditPanelEffectTab = ({
               overlayEffect === effect && styles.buttonContainerSelected,
             ]}
           >
-            <Pressable
+            <PressableNative
               onPress={() => updateField('overlayEffect', effect)}
-              style={({ pressed }) => [
-                styles.button,
-                pressed && styles.buttonPressed,
-              ]}
+              style={styles.button}
             >
               {icon && <Image source={icon} style={styles.buttonIcon} />}
-            </Pressable>
+            </PressableNative>
           </View>
         ))}
       </View>
@@ -74,9 +72,6 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     backgroundColor: colors.lightGrey,
     justifyContent: 'flex-end',
-  },
-  buttonPressed: {
-    backgroundColor: colors.grey,
   },
   buttonIcon: {
     resizeMode: 'stretch',

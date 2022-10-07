@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import CoverRenderer from './CoverRenderer';
 import Link from './Link';
 import type { CoverRendererProps } from './CoverRenderer';
@@ -18,16 +18,24 @@ const CoverLink = ({
       userName: props.userName,
     }}
   >
-    <Pressable style={style}>
+    <PressableScaleHighlight
+      style={[
+        style,
+        {
+          overflow: 'hidden',
+          borderRadius: '12.8%' as any,
+        },
+      ]}
+    >
       {({ pressed }) => (
         <CoverRenderer
           {...props}
-          style={[coverStyle, pressed && { opacity: 0.8 }]}
+          style={coverStyle}
           videoPaused={pressed}
           playTransition={!pressed}
         />
       )}
-    </Pressable>
+    </PressableScaleHighlight>
   </Link>
 );
 

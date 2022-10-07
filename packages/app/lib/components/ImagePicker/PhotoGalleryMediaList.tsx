@@ -4,12 +4,12 @@ import {
   FlatList,
   Image,
   Platform,
-  Pressable,
   Text,
   useWindowDimensions,
 } from 'react-native';
 import { textStyles } from '../../../theme';
 import { getFilePathFromURI, getPHAssetPath } from '../../helpers/mediaHelpers';
+import PressableNative from '../../ui/PressableNative';
 import { formatVideoTime } from './helpers';
 import type { Media } from './helpers';
 import type {
@@ -131,8 +131,8 @@ const PhotoGalleryMediaList = ({
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<PhotoIdentifier['node']>) => (
-      <Pressable
-        style={({ pressed }) => [
+      <PressableNative
+        style={[
           {
             width: windowWidth / 3,
             height: windowWidth / 3,
@@ -143,9 +143,9 @@ const PhotoGalleryMediaList = ({
           selectedMediaURI === item.image.uri && {
             opacity: 0.5,
           },
-          pressed && { opacity: 0.8 },
         ]}
         onPress={() => dispatchSelectMedia(item)}
+        activeOpacity={0.7}
       >
         <Image
           style={{
@@ -164,7 +164,7 @@ const PhotoGalleryMediaList = ({
             {formatVideoTime(item.image.playableDuration)}
           </Text>
         )}
-      </Pressable>
+      </PressableNative>
     ),
     [dispatchSelectMedia, selectedMediaURI, windowWidth],
   );

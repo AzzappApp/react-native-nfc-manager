@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { colors } from '../../theme';
+import PressableBackground from './PressableBackground';
 import type { StyleProp, ViewStyle, ListRenderItemInfo } from 'react-native';
 
 type SelectListProps<T> = {
@@ -24,16 +25,12 @@ function SelectList<T>({
     ({ item }: ListRenderItemInfo<T>) => {
       const isSelected = selectedItem === item;
       return (
-        <Pressable
-          style={({ pressed }) => [
-            styles.item,
-            pressed && styles.itemPressed,
-            isSelected && styles.itemSelected,
-          ]}
+        <PressableBackground
+          style={[styles.item, isSelected && styles.itemSelected]}
           onPress={() => onChange(item)}
         >
           {renderItem(item, isSelected)}
-        </Pressable>
+        </PressableBackground>
       );
     },
     [onChange, renderItem, selectedItem],
@@ -57,9 +54,6 @@ const styles = StyleSheet.create({
     height: 32,
     backgroundColor: 'white',
     justifyContent: 'center',
-  },
-  itemPressed: {
-    backgroundColor: colors.grey,
   },
   itemSelected: {
     backgroundColor: colors.orange,

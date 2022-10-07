@@ -22,7 +22,7 @@ export type TransitionValues = { [K in TransitionableStyle]?: ViewStyle[K] };
 export type Easing = 'ease-in-out' | 'ease-in' | 'ease-out' | 'ease' | 'linear';
 
 export type ViewTransitionProps = ViewProps & {
-  transitions: TransitionableStyle[];
+  transitions: readonly TransitionableStyle[];
   transitionDuration: number;
   easing?: Easing;
 };

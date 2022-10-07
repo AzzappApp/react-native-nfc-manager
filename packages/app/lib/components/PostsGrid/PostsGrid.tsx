@@ -240,7 +240,7 @@ const PostsGrid = ({
               width: layout.width,
               height: layout.width / item.media.ratio,
               borderRadius: 16,
-              backgroundColor: colors.grey200,
+              backgroundColor: colors.grey100,
             }}
           />
         </View>
@@ -269,7 +269,7 @@ const PostsGrid = ({
       onHeaderHeightChange={setHeaderSize}
       onWillScrollToTop={onWillScrollToTop}
     >
-      {placeHolders}
+      {isScrollingToTop && placeHolders}
       {items.map(([id, key]) => {
         const data = postMap.get(id);
         if (!data) {

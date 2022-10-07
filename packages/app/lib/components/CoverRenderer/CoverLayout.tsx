@@ -4,17 +4,11 @@ import {
   COVER_RATIO,
 } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
-import {
-  Image,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import { withAnchorPoint } from '../../helpers/withAnchorPoints';
+import PressableNative from '../../ui/PressableNative';
 import CoverOverlayEffects from './CoverOverlayEffects';
 import QRCodeModal from './QRCodeModal';
 import type { CoverLayout_cover$key } from '@azzapp/relay/artifacts/CoverLayout_cover.graphql';
@@ -200,7 +194,7 @@ const CoverLayout = ({
           ]}
           pointerEvents="box-none"
         >
-          <Pressable
+          <PressableNative
             onPress={showQRCode}
             style={({ pressed }) => pressed && { opacity: 0.6 }}
             disabled={isEditing}
@@ -210,7 +204,7 @@ const CoverLayout = ({
               source={require('./assets/qr-code.png')}
               style={qrCodeStyles}
             />
-          </Pressable>
+          </PressableNative>
         </View>
         {isEditedBlock &&
           Object.keys(QR_CODE_POSITIONS).map(position => (
@@ -223,13 +217,12 @@ const CoverLayout = ({
               ]}
               pointerEvents="box-none"
             >
-              <Pressable
+              <PressableNative
                 onPress={() => onSelectQRCodePosition(position)}
-                style={({ pressed }) => [
+                style={[
                   { zIndex: 1 },
                   qrCodeStyles,
                   { backgroundColor: 'rgba(255, 255, 255, 0.6)' },
-                  pressed && { opacity: 0.6 },
                 ]}
                 testID={`qr-code-button-${position}`}
               />

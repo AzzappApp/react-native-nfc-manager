@@ -6,7 +6,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -22,6 +21,7 @@ import { useRouter } from '../PlatformEnvironment';
 import Button from '../ui/Button';
 import FloatingIconButton from '../ui/FloatingIconButton';
 import Form, { Submit } from '../ui/Form/Form';
+import PressableNative from '../ui/PressableNative';
 import TextInput from '../ui/TextInput';
 import ViewTransition from '../ui/ViewTransition';
 import type { ForgotPasswordParams } from '@azzapp/shared/lib/WebAPI';
@@ -167,14 +167,14 @@ const ForgotPasswordScreen = ({
           alignItems: 'center',
         }}
       >
-        <Pressable onPress={onBack}>
+        <PressableNative onPress={onBack}>
           <Text style={styles.back}>
             <FormattedMessage
               defaultMessage="Back to Log In"
               description="ForgotPasswordScreen - Back to Log In bottom screen link"
             />
           </Text>
-        </Pressable>
+        </PressableNative>
       </View>
     </View>
   );

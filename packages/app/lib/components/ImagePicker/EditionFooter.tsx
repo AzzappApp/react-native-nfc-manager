@@ -1,6 +1,7 @@
 import { FormattedMessage } from 'react-intl';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../../theme';
+import PressableNative from '../../ui/PressableNative';
 import type { ViewProps } from 'react-native';
 
 type EditionFooterProps = ViewProps & {
@@ -14,28 +15,22 @@ const EditionFooter = ({
   ...props
 }: EditionFooterProps) => (
   <View style={[styles.footer, style]} {...props}>
-    <Pressable
-      onPress={onCancel}
-      style={({ pressed }) => pressed && { opacity: 0.8 }}
-    >
+    <PressableNative onPress={onCancel}>
       <Text style={textStyles.button}>
         <FormattedMessage
           defaultMessage="Cancel"
           description="Cancel button in Image edition screen"
         />
       </Text>
-    </Pressable>
-    <Pressable
-      onPress={onSave}
-      style={({ pressed }) => pressed && { opacity: 0.8 }}
-    >
+    </PressableNative>
+    <PressableNative onPress={onSave}>
       <Text style={textStyles.button}>
         <FormattedMessage
           defaultMessage="Validate"
           description="Validate button in Image edition screen"
         />
       </Text>
-    </Pressable>
+    </PressableNative>
   </View>
 );
 

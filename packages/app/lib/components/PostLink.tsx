@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import { Pressable } from 'react-native';
 import { useRouter } from '../PlatformEnvironment';
+import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import PostRenderer from './PostRenderer';
 import type { PostRendererHandle, PostRendererProps } from './PostRenderer';
 import type { StyleProp, ViewStyle, View, NativeMethods } from 'react-native';
@@ -45,21 +45,21 @@ const PostLink = ({
   };
 
   return (
-    <Pressable
+    <PressableScaleHighlight
       onPress={onPress}
       ref={ref}
-      style={style}
       accessibilityRole="link"
+      style={[style, { borderRadius: 16, overflow: 'hidden' }]}
     >
       {({ pressed }) => (
         <PostRenderer
           {...props}
           ref={postRef}
-          style={[postRendererStyle, pressed && { opacity: 0.8 }]}
+          style={postRendererStyle}
           paused={pressed ? true : props.paused}
         />
       )}
-    </Pressable>
+    </PressableScaleHighlight>
   );
 };
 

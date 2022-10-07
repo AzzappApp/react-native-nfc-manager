@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { colors, textStyles } from '../../../theme';
 import Icon from '../../ui/Icon';
+import PressableNative from '../../ui/PressableNative';
 import { useEditionParametersDisplayInfos } from './helpers';
 import type { ImageEditionParameters } from './helpers';
 import type { ScrollViewProps } from 'react-native';
@@ -19,18 +20,15 @@ const ParametersList = ({
         const { label, icon } = paramsInfos[param]!;
         return (
           <View key={param} style={styles.paramsButtonContainer}>
-            <Pressable
+            <PressableNative
               onPress={() => onSelectParam(param)}
-              style={({ pressed }) => [
-                styles.paramsButton,
-                pressed && { opacity: 0.8 },
-              ]}
+              style={styles.paramsButton}
             >
               <View style={styles.paramIconContainer}>
                 <Icon icon={icon} style={styles.paramIcon} />
               </View>
               <Text style={textStyles.button}>{label}</Text>
-            </Pressable>
+            </PressableNative>
           </View>
         );
       })}

@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import Link from './Link';
 import PostRenderer from './PostRenderer';
 import type { PostRendererProps } from './PostRenderer';
@@ -15,15 +15,17 @@ const PostLink = ({
 }) => {
   return (
     <Link route="POST" params={{ postId }}>
-      <Pressable style={style}>
+      <PressableScaleHighlight
+        style={[style, { borderRadius: 16, overflow: 'hidden' }]}
+      >
         {({ pressed }) => (
           <PostRenderer
             {...props}
-            style={[postRendererStyle, pressed && { opacity: 0.8 }]}
+            style={postRendererStyle}
             paused={pressed ? true : props.paused}
           />
         )}
-      </Pressable>
+      </PressableScaleHighlight>
     </Link>
   );
 };
