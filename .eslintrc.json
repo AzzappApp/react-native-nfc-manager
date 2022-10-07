@@ -95,6 +95,12 @@
     "eslint-comments/disable-enable-pair": "off",
     "react/self-closing-comp": 2,
     "react-hooks/rules-of-hooks": "error",
+    "react/no-unknown-property": [
+      2,
+      {
+        "ignore": ["jsx"]
+      }
+    ],
     "formatjs/enforce-description": "error",
     "formatjs/enforce-default-message": "error",
     "formatjs/enforce-placeholders": "error",

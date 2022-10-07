@@ -36,7 +36,7 @@ index a2195b5..b6cefe2 100644
  @property (nonatomic) RNSScreenSwipeDirection swipeDirection;
  @property (nonatomic) RNSScreenReplaceAnimation replaceAnimation;
 diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
-index 5431330..91cf8e9 100644
+index 337b325..ec57576 100644
 --- a/node_modules/react-native-screens/ios/RNSScreen.mm
 +++ b/node_modules/react-native-screens/ios/RNSScreen.mm
 @@ -186,6 +186,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
@@ -150,7 +150,7 @@ index 6fc0542..35b9338 100644
 +
  @end
 diff --git a/node_modules/react-native-screens/lib/typescript/types.d.ts b/node_modules/react-native-screens/lib/typescript/types.d.ts
-index bd82a81..6f202e1 100644
+index 35369eb..fd2a6ee 100644
 --- a/node_modules/react-native-screens/lib/typescript/types.d.ts
 +++ b/node_modules/react-native-screens/lib/typescript/types.d.ts
 @@ -1,6 +1,6 @@
@@ -161,7 +161,7 @@ index bd82a81..6f202e1 100644
  export declare type BlurEffectTypes = 'extraLight' | 'light' | 'dark' | 'regular' | 'prominent' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial' | 'systemUltraThinMaterialLight' | 'systemThinMaterialLight' | 'systemMaterialLight' | 'systemThickMaterialLight' | 'systemChromeMaterialLight' | 'systemUltraThinMaterialDark' | 'systemThinMaterialDark' | 'systemMaterialDark' | 'systemThickMaterialDark' | 'systemChromeMaterialDark';
  export declare type ScreenReplaceTypes = 'push' | 'pop';
  export declare type SwipeDirectionTypes = 'vertical' | 'horizontal';
-@@ -156,6 +156,11 @@ export interface ScreenProps extends ViewProps {
+@@ -176,6 +176,11 @@ export interface ScreenProps extends ViewProps {
       * - "none" – the screen appears/dissapears without an animation
       */
      stackAnimation?: StackAnimationTypes;
@@ -173,3 +173,17 @@ index bd82a81..6f202e1 100644
      /**
       * How should the screen be presented.
       * The following values are currently supported:
+diff --git a/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js b/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
+index 762c349..37a9242 100644
+--- a/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
++++ b/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
+@@ -50,7 +50,8 @@ type StackAnimation =
+   | 'slide_from_right'
+   | 'slide_from_left'
+   | 'slide_from_bottom'
+-  | 'fade_from_bottom';
++  | 'fade_from_bottom'
++  | 'custom'
+ 
+ type SwipeDirection = 'vertical' | 'horizontal';
+ 

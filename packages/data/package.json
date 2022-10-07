@@ -4,7 +4,7 @@
   "private": true,
   "main": "./lib",
   "devDependencies": {
-    "@types/lodash": "^4.14.181",
+    "@types/lodash": "^4.14.186",
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {

@@ -10,6 +10,6 @@
     "build": "yarn build:app && yarn build:web"
   },
   "dependencies": {
-    "@formatjs/cli": "^5.1.0"
+    "@formatjs/cli": "^5.1.1"
   }
 }

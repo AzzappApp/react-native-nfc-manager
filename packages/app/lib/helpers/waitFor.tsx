@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 
-function waitFor<U>(
-  Component: ComponentType<U>,
+function waitFor(
+  Component: ComponentType,
   promise: Promise<any>,
   Fallback?: ComponentType<any>,
 ) {
-  const WrapperComponent = (props: U) => {
+  const WrapperComponent = (props: any) => {
     const [ready, setReady] = useState(false);
     useEffect(() => {
       promise.finally(() => setReady(true));
