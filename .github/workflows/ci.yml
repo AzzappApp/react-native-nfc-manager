@@ -77,8 +77,9 @@ jobs:
         
       - name: Setup Xcode env
         run: |
-          echo "Setup node for xcode to $(command -v node)"
+          echo "Setup node for xcode to $(command -v node) and USE_HERMES flag"
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
+          echo "export USE_HERMES=true" >> ./packages/app/ios/.xcode.env
         
       - name: Build ios application
         run: yarn build:ios
