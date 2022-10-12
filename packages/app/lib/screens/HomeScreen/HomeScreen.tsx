@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import { HEADER_HEIGHT } from '../../components/Header';

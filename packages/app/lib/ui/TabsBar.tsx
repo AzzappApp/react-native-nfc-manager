@@ -1,5 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '../../theme';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '../helpers/createStyles';
 import Icon from './Icon';
 import PressableBackground from './PressableBackground';
 import type { Icons } from './Icon';
@@ -37,7 +41,7 @@ export type TabsBarProps = {
   /**
    * Style variants
    */
-  variant?: 'default' | 'tool';
+  variant?: 'tabbar' | 'toolbar';
 
   /**
    * An event fired when the user press one of the tab
@@ -59,10 +63,11 @@ const TabsBar = ({
   currentTab,
   tabs,
   onTabPress,
-  variant = 'default',
+  variant = 'tabbar',
   style,
 }: TabsBarProps) => {
-  const styles = variantStyles[variant];
+  const styles = useVariantStyleSheet(computedStyles, variant);
+
   return (
     <View style={[styles.container, style]} accessibilityRole="tablist">
       {tabs.map(({ key, icon, tint, accessibilityLabel }, index) => (
@@ -77,7 +82,7 @@ const TabsBar = ({
             index === tabs.length - 1 && styles.lastTab,
             currentTab === key && styles.selectedTab,
           ]}
-          highlightColor={variant === 'default' ? colors.grey100 : colors.black}
+          highlightColor={styles.highlight.backgroundColor}
         >
           {({ pressed }) => {
             const active = pressed || currentTab === key;
@@ -93,7 +98,7 @@ const TabsBar = ({
                     shouldNotTint && { tintColor: undefined },
                   ]}
                 />
-                {variant === 'default' && (
+                {variant === 'tabbar' && (
                   <View
                     style={{
                       width: 14,
@@ -114,56 +119,59 @@ const TabsBar = ({
   );
 };
 
-export default TabsBar;
-
-const variantStyles = {
-  default: StyleSheet.create({
+const computedStyles = createVariantsStyleSheet(appearance => ({
+  default: {
     container: {
       flexDirection: 'row',
       height: TAB_BAR_HEIGHT,
       justifyContent: 'space-around',
+      backgroundColor: appearance === 'light' ? '#FFF' : '#111',
     },
     tab: {
       alignItems: 'center',
       justifyContent: 'center',
-      width: TAB_BAR_HEIGHT,
-      backgroundColor: 'white',
+      backgroundColor: appearance === 'light' ? '#FFF' : '#111',
     },
-    lastTab: {},
-    selectedTab: {},
+    image: {
+      tintColor: appearance === 'light' ? colors.grey : colors.darkGrey,
+    },
+    imageActive: {
+      tintColor: appearance === 'light' ? colors.dark : '#FFF',
+    },
+  },
+  tabbar: {
+    highlight: {
+      backgroundColor: appearance === 'light' ? colors.grey100 : 'blue',
+    },
     image: {
       width: 28,
       height: 28,
       tintColor: colors.grey,
     },
     imageActive: {
-      tintColor: colors.dark,
+      tintColor: appearance === 'light' ? colors.dark : '#FFF',
     },
-  }),
-  tool: StyleSheet.create({
+  },
+  toolbar: {
     container: {
-      flexDirection: 'row',
-      height: TAB_BAR_HEIGHT,
-      justifyContent: 'space-around',
       padding: 10,
       borderRadius: TAB_BAR_HEIGHT / 2,
-      backgroundColor: 'white',
       shadowColor: colors.black,
       shadowOpacity: 0.35,
       shadowOffset: { width: 0, height: 10 },
       shadowRadius: 20,
     },
     tab: {
-      alignItems: 'center',
-      justifyContent: 'center',
       width: 50,
       height: 50,
       borderRadius: 25,
       marginRight: 25,
-      backgroundColor: 'white',
     },
     lastTab: { marginRight: 0 },
     selectedTab: {
+      backgroundColor: colors.black,
+    },
+    highlight: {
       backgroundColor: colors.black,
     },
     image: {
@@ -173,5 +181,6 @@ const variantStyles = {
     imageActive: {
       tintColor: '#fff',
     },
-  }),
-};
+  },
+}));
+export default TabsBar;

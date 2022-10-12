@@ -169,7 +169,7 @@ const ImagePickerWizardRenderer = ({
             ]}
             pointerEvents="box-none"
           >
-            <TabsBar variant="tool" {...toolbarProps} />
+            <TabsBar variant="toolbar" {...toolbarProps} />
           </View>
         )}
       </View>

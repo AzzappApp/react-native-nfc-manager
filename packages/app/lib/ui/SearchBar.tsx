@@ -81,7 +81,6 @@ const SearchBar = ({
 
   const focus = (event: GestureResponderEvent) => {
     event.preventDefault();
-    console.log('callin focus');
     textInputRef.current?.focus();
   };
 
