@@ -67,5 +67,8 @@ fastlane/test_output
 /ios/Pods/
 /vendor/bundle/
 
+# when using the yarn bundle command
+/ios/assets
+
 
 
