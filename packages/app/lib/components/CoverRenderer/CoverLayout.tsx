@@ -4,6 +4,7 @@ import {
   COVER_RATIO,
 } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
@@ -48,6 +49,7 @@ const CoverLayout = ({
   /**
    * Data
    */
+  const intl = useIntl();
   const cover = useFragment(
     graphql`
       fragment CoverLayout_cover on UserCardCover {
@@ -198,9 +200,16 @@ const CoverLayout = ({
             onPress={showQRCode}
             style={({ pressed }) => pressed && { opacity: 0.6 }}
             disabled={isEditing}
+            accessibilityState={{ disabled: isEditing }}
             testID="qr-code-button"
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap me to show the QR Code fullscreen',
+              description: 'CoverLayout - Accessibility Qr code button',
+            })}
           >
             <Image
+              accessibilityRole="image"
               source={require('./assets/qr-code.png')}
               style={qrCodeStyles}
             />
@@ -225,6 +234,11 @@ const CoverLayout = ({
                   { backgroundColor: 'rgba(255, 255, 255, 0.6)' },
                 ]}
                 testID={`qr-code-button-${position}`}
+                accessibilityRole="button"
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap me to show the QR Code fullscreen',
+                  description: 'CoverLayout - Accessibility Qr code button',
+                })}
               />
             </View>
           ))}

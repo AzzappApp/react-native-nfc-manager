@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { Animated, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../theme';
@@ -52,7 +53,7 @@ const BottomSheetModal = ({
   }, [animation, visible]);
 
   const { bottom } = useSafeAreaInsets();
-
+  const intl = useIntl();
   return (
     <Modal animationType="none" visible={isVisible} {...props} transparent>
       <View style={styles.modalContainer}>
@@ -81,6 +82,11 @@ const BottomSheetModal = ({
               style={styles.okButton}
               hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
               onPress={onRequestClose}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to close',
+                description: 'BottomSheet - close button',
+              })}
+              accessibilityRole="button"
             >
               <Text style={[textStyles.button, styles.okButtonLabel]}>OK</Text>
             </PressableNative>

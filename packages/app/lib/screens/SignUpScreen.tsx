@@ -166,6 +166,11 @@ const SignUpScreen = ({ signup }: SignUpScreenProps) => {
                   defaultMessage: 'Sign Up',
                   description: 'Signup Screen - Sign Up button',
                 })}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to sign up',
+                  description:
+                    'Signup Screen - AccessibilityLabel Sign Up button',
+                })}
                 style={styles.button}
               />
             </Submit>

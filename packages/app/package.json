@@ -26,13 +26,13 @@
     "lodash": "^4.17.21",
     "lru-cache": "^7.14.0",
     "react": "^18.2.0",
-    "react-intl": "^6.1.2",
+    "react-intl": "^6.2.1",
     "react-native": "0.70.3",
     "react-native-create-thumbnail": "^1.6.3",
     "react-native-encrypted-storage": "^4.0.2",
-    "react-native-gesture-handler": "2.7.0",
+    "react-native-gesture-handler": "2.7.1",
     "react-native-linear-gradient": "2.6.2",
-    "react-native-localize": "^2.2.3",
+    "react-native-localize": "^2.2.4",
     "react-native-pager-view": "6.0.1",
     "react-native-qrcode-svg": "^6.1.2",
     "react-native-reanimated": "2.10.0",
@@ -47,7 +47,7 @@
     "use-debounce": "8.0.4"
   },
   "devDependencies": {
-    "@testing-library/react-native": "^11.0.0",
+    "@testing-library/react-native": "^11.2.0",
     "@types/chroma-js": "^2.1.3",
     "@types/react": "^18.0.3",
     "@types/react-native": "^0.69.13",
@@ -57,7 +57,7 @@
     "graphql": "^16.6.0",
     "react-native-dotenv": "^3.3.1",
     "react-native-monorepo-tools": "^1.1.4",
-    "react-test-renderer": "^18.0.0",
+    "react-test-renderer": "^18.2.0",
     "relay-test-utils": "^14.1.0"
   },
   "jest": {

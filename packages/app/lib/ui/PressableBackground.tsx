@@ -60,6 +60,8 @@ const PressableBackground = (
       transitions={backgroundTransitions}
       transitionDuration={animationDuration}
       easing={easing}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: disabled ?? false }}
       {...props}
     />
   );

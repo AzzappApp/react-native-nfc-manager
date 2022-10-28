@@ -44,6 +44,11 @@ const AlbumPicker = ({
       <PressableNative
         style={[styles.root, style]}
         onPress={onModalOpen}
+        accessibilityRole="link"
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Select and display the album',
+          description: 'Album Picker - Accessibliity label button select album',
+        })}
         {...props}
       >
         <Text style={[textStyles.title, styles.title]}>
@@ -158,6 +163,8 @@ const AlbumRenderer = ({
   return (
     <PressableBackground onPress={onPress} style={styles.albumRow}>
       <Image
+        accessibilityRole="image"
+        accessibilityIgnoresInvertColors={true}
         source={(imageUri ? { uri: imageUri } : null) as any}
         style={{
           height: 80,

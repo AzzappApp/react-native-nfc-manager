@@ -1,6 +1,6 @@
 import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, TextInput, View, Text } from 'react-native';
 import { fontFamilies, colors } from '../../theme';
 
@@ -99,6 +99,8 @@ const SearchBar = ({
     }
   };
 
+  const intl = useIntl();
+
   return (
     <View style={containerStyle}>
       <View
@@ -123,6 +125,10 @@ const SearchBar = ({
                 <Icon icon="lens" style={styles.lensIcon} />
                 <TextInput
                   testID="azzapp__searchbar__textInput"
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Enter your search word',
+                    description: 'Seach bar - accessibility label',
+                  })}
                   placeholder={placeholder}
                   ref={textInputRef}
                   onFocus={onInputFocus}
@@ -136,6 +142,11 @@ const SearchBar = ({
                 />
                 {isNotFalsyString(searchValue) && (
                   <PressableNative
+                    accessibilityRole="button"
+                    accessibilityLabel={intl.formatMessage({
+                      defaultMessage: 'Tap to clear your search',
+                      description: 'SearchBar accessibilityLabel Clear Button',
+                    })}
                     onPress={onPressClear}
                     testID="azzapp__SearchBar__clear-button"
                     style={styles.cancelPressable}
@@ -146,6 +157,11 @@ const SearchBar = ({
               </ViewTransition>
 
               <PressableNative
+                accessibilityRole="button"
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to cancel your search',
+                  description: 'SearchBar accessibilityLabel Cancel Button',
+                })}
                 testID="azzapp__SearchBar__cancel-button"
                 style={[styles.cancelButton]}
                 onLayout={onButtonLayout}

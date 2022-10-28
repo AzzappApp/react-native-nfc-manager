@@ -19,6 +19,14 @@
     "defaultMessage": "You need to accept the Terms of services & privacy policy",
     "description": "Signup Screen - error message when TOS or PP are not checked"
   },
+  "19LN22": {
+    "defaultMessage": "Tap to cancel your search",
+    "description": "SearchBar accessibilityLabel Cancel Button"
+  },
+  "1ETO0L": {
+    "defaultMessage": "Tap to sign up",
+    "description": "Signup Screen - AccessibilityLabel Sign Up button"
+  },
   "1UGgMw": {
     "defaultMessage": "Sign Up",
     "description": "SigninScreen - Sign Up"
@@ -75,9 +83,17 @@
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
   },
+  "AEQg5t": {
+    "defaultMessage": "Tap me to show the QR Code fullscreen",
+    "description": "CoverLayout - Accessibility Qr code button"
+  },
   "AsCp0n": {
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
+  },
+  "BJRz8L": {
+    "defaultMessage": "Tap to close",
+    "description": "BottomSheet - close button"
   },
   "Bm4p42": {
     "defaultMessage": "We just send you a link to create a new password",
@@ -131,6 +147,10 @@
     "defaultMessage": "Enter your email address and we'll send you a link to create a new password",
     "description": "ForgotPasswordScreen - Forgot your password description"
   },
+  "ParXIq": {
+    "defaultMessage": "Select and display the album",
+    "description": "Album Picker - Accessibliity label button select album"
+  },
   "PjYjnk": {
     "defaultMessage": "Ok",
     "description": "Ok button label in post creation text edition modal"
@@ -142,6 +162,10 @@
   "SmWLhs": {
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"
+  },
+  "UIZoTQ": {
+    "defaultMessage": "Enter your search word",
+    "description": "Seach bar - accessibility label"
   },
   "V2RVO7": {
     "defaultMessage": "Terms of services",
@@ -183,6 +207,10 @@
     "defaultMessage": "Structure",
     "description": "Structure image edition parameters name"
   },
+  "eNyb4j": {
+    "defaultMessage": "Tap to sign in",
+    "description": "Signin Screen - AccessibilityLabel Sign In button"
+  },
   "ebisVt": {
     "defaultMessage": "Adjust",
     "description": "Adjust image edition parameters name"
@@ -195,6 +223,10 @@
     "defaultMessage": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.",
     "description": "Camera authorization screen content for camera permission"
   },
+  "gL9Uhd": {
+    "defaultMessage": "Tap to edit your profile",
+    "description": "UserScreenButtonBar edit button accessibility label"
+  },
   "gRy2ak": {
     "defaultMessage": "Vigneting",
     "description": "Vigneting image edition parameters name"
@@ -202,6 +234,10 @@
   "gXvULC": {
     "defaultMessage": "Latest",
     "description": "Latest photos album title in image wizzard album selection "
+  },
+  "gpYU75": {
+    "defaultMessage": "Tap to reset your passward",
+    "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
   },
   "h0jHxq": {
     "defaultMessage": "Password",
@@ -227,9 +263,17 @@
     "defaultMessage": "Please enter a password",
     "description": "SigninScreen - error message when input password is empty"
   },
+  "mfzT2i": {
+    "defaultMessage": "Tap to follow the profile",
+    "description": "UserScreenButtonBar follow profile accessibility label"
+  },
   "n8Bdhz": {
     "defaultMessage": "See all",
     "description": "CoverList - See all button"
+  },
+  "nJgiur": {
+    "defaultMessage": "Tap to clear your search",
+    "description": "SearchBar accessibilityLabel Clear Button"
   },
   "nMtsXg": {
     "defaultMessage": "Shadow",
@@ -254,6 +298,10 @@
   "pBqrA+": {
     "defaultMessage": "Already have an account?",
     "description": "Signup Screen - Already have an account?"
+  },
+  "pGovG7": {
+    "defaultMessage": "Top to remove {word} from history",
+    "description": "Recent Search - Accessibiltity Label remove element from history"
   },
   "pqxK1C": {
     "defaultMessage": "Contrast",
@@ -282,6 +330,10 @@
   "uvBCJV": {
     "defaultMessage": "No recent search for {word}",
     "description": "ResetSearch - message when no history search found"
+  },
+  "v3DENk": {
+    "defaultMessage": "Tap to sign up",
+    "description": "Home Screen - AccessibilityLabel Sign Up button"
   },
   "vDm98w": {
     "defaultMessage": "Sharpness",
@@ -318,6 +370,10 @@
   "y37Ei7": {
     "defaultMessage": "Select an album",
     "description": "Title of the album selection modal"
+  },
+  "ymtf7H": {
+    "defaultMessage": "Tap to search for {word}",
+    "description": "Recent Search - Accessibiltity Label remove element from history"
   },
   "zMaylR": {
     "defaultMessage": "Take a video",

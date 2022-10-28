@@ -29,6 +29,18 @@
       "value": "You need to accept the Terms of services & privacy policy"
     }
   ],
+  "19LN22": [
+    {
+      "type": 0,
+      "value": "Tap to cancel your search"
+    }
+  ],
+  "1ETO0L": [
+    {
+      "type": 0,
+      "value": "Tap to sign up"
+    }
+  ],
   "1UGgMw": [
     {
       "type": 0,
@@ -113,10 +125,22 @@
       "value": "Recent searchs"
     }
   ],
+  "AEQg5t": [
+    {
+      "type": 0,
+      "value": "Tap me to show the QR Code fullscreen"
+    }
+  ],
   "AsCp0n": [
     {
       "type": 0,
       "value": "Validate"
+    }
+  ],
+  "BJRz8L": [
+    {
+      "type": 0,
+      "value": "Tap to close"
     }
   ],
   "Bm4p42": [
@@ -197,6 +221,12 @@
       "value": "Enter your email address and we'll send you a link to create a new password"
     }
   ],
+  "ParXIq": [
+    {
+      "type": 0,
+      "value": "Select and display the album"
+    }
+  ],
   "PjYjnk": [
     {
       "type": 0,
@@ -213,6 +243,12 @@
     {
       "type": 0,
       "value": "Trending posts"
+    }
+  ],
+  "UIZoTQ": [
+    {
+      "type": 0,
+      "value": "Enter your search word"
     }
   ],
   "V2RVO7": [
@@ -275,6 +311,12 @@
       "value": "Structure"
     }
   ],
+  "eNyb4j": [
+    {
+      "type": 0,
+      "value": "Tap to sign in"
+    }
+  ],
   "ebisVt": [
     {
       "type": 0,
@@ -293,6 +335,12 @@
       "value": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos."
     }
   ],
+  "gL9Uhd": [
+    {
+      "type": 0,
+      "value": "Tap to edit your profile"
+    }
+  ],
   "gRy2ak": [
     {
       "type": 0,
@@ -303,6 +351,12 @@
     {
       "type": 0,
       "value": "Latest"
+    }
+  ],
+  "gpYU75": [
+    {
+      "type": 0,
+      "value": "Tap to reset your passward"
     }
   ],
   "h0jHxq": [
@@ -341,10 +395,22 @@
       "value": "Please enter a password"
     }
   ],
+  "mfzT2i": [
+    {
+      "type": 0,
+      "value": "Tap to follow the profile"
+    }
+  ],
   "n8Bdhz": [
     {
       "type": 0,
       "value": "See all"
+    }
+  ],
+  "nJgiur": [
+    {
+      "type": 0,
+      "value": "Tap to clear your search"
     }
   ],
   "nMtsXg": [
@@ -381,6 +447,20 @@
     {
       "type": 0,
       "value": "Already have an account?"
+    }
+  ],
+  "pGovG7": [
+    {
+      "type": 0,
+      "value": "Top to remove "
+    },
+    {
+      "type": 1,
+      "value": "word"
+    },
+    {
+      "type": 0,
+      "value": " from history"
     }
   ],
   "pqxK1C": [
@@ -427,6 +507,12 @@
     {
       "type": 1,
       "value": "word"
+    }
+  ],
+  "v3DENk": [
+    {
+      "type": 0,
+      "value": "Tap to sign up"
     }
   ],
   "vDm98w": [
@@ -481,6 +567,16 @@
     {
       "type": 0,
       "value": "Select an album"
+    }
+  ],
+  "ymtf7H": [
+    {
+      "type": 0,
+      "value": "Tap to search for "
+    },
+    {
+      "type": 1,
+      "value": "word"
     }
   ],
   "zMaylR": [

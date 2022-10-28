@@ -117,6 +117,7 @@ const SearchScreen = ({ viewer: viewerRef }: SearchScreenProps) => {
             { opacity: searchBarHasFocus ? 1 : 0 },
           ]}
           pointerEvents={searchBarHasFocus ? 'auto' : 'none'}
+          testID="azzaap_searchScreeb-RecentSearch_viewTransition"
         >
           <RecentSearch
             searchValue={searchValue}

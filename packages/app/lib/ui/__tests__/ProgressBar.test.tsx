@@ -1,0 +1,30 @@
+import { render, screen } from '@testing-library/react-native';
+import '@testing-library/jest-native/extend-expect';
+
+import ProgressBar from '../ProgressBar';
+
+describe('ProgressBar component', () => {
+  test('should apply `style` props correctly', () => {
+    render(
+      <ProgressBar
+        style={{ backgroundColor: 'red', width: 345 }}
+        progress={0}
+      />,
+    );
+
+    expect(screen.container).toHaveStyle({
+      backgroundColor: 'red',
+      width: 345,
+    });
+  });
+
+  test('should `progress` props size the bar correctly', () => {
+    render(
+      <ProgressBar
+        style={{ backgroundColor: 'red', width: 345 }}
+        progress={0.49}
+      />,
+    );
+    expect(screen.getByRole('progressbar')).toHaveStyle({ width: '49%' });
+  });
+});

@@ -1,6 +1,6 @@
 import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, Text, StyleSheet } from 'react-native';
 import { colors, textStyles } from '../../../theme';
 import Icon from '../../ui/Icon';
@@ -47,6 +47,7 @@ const RecentSearch = ({
 
   return (
     <FlatList<string>
+      accessibilityRole="list"
       ListHeaderComponent={
         <Text style={[textStyles.title, styles.textStyleRecent]}>
           <FormattedMessage
@@ -59,13 +60,15 @@ const RecentSearch = ({
       renderItem={renderRecentSearchItem}
       style={styles.root}
       ListEmptyComponent={
-        <Text style={[textStyles.button, styles.noRecentSearch]}>
-          <FormattedMessage
-            defaultMessage="No recent search for {word}"
-            description="ResetSearch - message when no history search found"
-            values={{ word: searchValue }}
-          />
-        </Text>
+        searchValue ? (
+          <Text style={[textStyles.button, styles.noRecentSearch]}>
+            <FormattedMessage
+              defaultMessage="No recent search for {word}"
+              description="ResetSearch - message when no history search found"
+              values={{ word: searchValue }}
+            />
+          </Text>
+        ) : undefined
       }
     />
   );
@@ -81,6 +84,7 @@ const SearchRecentItem = ({
   removeItem,
   search,
 }: SearchRecentItemProps) => {
+  const intl = useIntl();
   const onRemove = async () => {
     await removeItem(item);
   };
@@ -90,9 +94,33 @@ const SearchRecentItem = ({
   };
 
   return (
-    <PressableBackground style={styles.pressableRecentRow} onPress={onSearch}>
+    <PressableBackground
+      style={styles.pressableRecentRow}
+      onPress={onSearch}
+      accessibilityRole="link"
+      accessibilityLabel={intl.formatMessage(
+        {
+          defaultMessage: 'Tap to search for {word}',
+
+          description:
+            'Recent Search - Accessibiltity Label remove element from history',
+        },
+        { word: item },
+      )}
+    >
       <Text style={{ ...textStyles.sectionTitle }}>{item}</Text>
-      <PressableNative onPress={onRemove}>
+      <PressableNative
+        onPress={onRemove}
+        accessibilityRole="button"
+        accessibilityLabel={intl.formatMessage(
+          {
+            defaultMessage: 'Top to remove {word} from history',
+            description:
+              'Recent Search - Accessibiltity Label remove element from history',
+          },
+          { word: item },
+        )}
+      >
         <Icon icon="cross" style={{ height: 15, width: 15, marginRight: 25 }} />
       </PressableNative>
     </PressableBackground>

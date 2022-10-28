@@ -130,6 +130,11 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
                   defaultMessage: 'Log In',
                   description: 'Password input placeholder',
                 })}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to sign in',
+                  description:
+                    'Signin Screen - AccessibilityLabel Sign In button',
+                })}
                 style={styles.button}
               />
             </Submit>

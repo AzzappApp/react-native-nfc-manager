@@ -37,6 +37,7 @@ function SelectList<T>({
   );
   return (
     <FlatList
+      accessibilityRole="list"
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderListItem}

@@ -19,16 +19,16 @@ const PostLink = ({
 
   const router = useRouter();
   const onPress = () => {
-    const cover = postRef.current;
-    const mediaRenderer = cover?.getCurrentMediaRenderer();
-    if (!cover || !mediaRenderer) {
+    const container = ref.current;
+    const post = postRef.current;
+    if (!post || !container) {
       router.push({
         route: 'POST',
         params: { postId },
       });
       return;
     }
-    (mediaRenderer as any as NativeMethods).measureInWindow(
+    (container as any as NativeMethods).measureInWindow(
       async (x, y, width, height) => {
         await postRef.current?.snapshot();
         const videoTime = await postRef.current?.getCurrentVideoTime();

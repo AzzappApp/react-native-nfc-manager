@@ -79,8 +79,19 @@ const CoverList = ({
     [canPlay, coverStyle, coverWidth, horizontal],
   );
 
+  //TODO: handle vertical layout with height instead of width
+  const getItemLayout = useCallback(
+    (_data: any, index: number) => ({
+      length: coverWidth,
+      offset: coverWidth * index,
+      index,
+    }),
+    [coverWidth],
+  );
+
   return (
     <FlatList
+      accessibilityRole="list"
       data={users}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
@@ -92,6 +103,7 @@ const CoverList = ({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={[styles.container, containerStyle]}
       style={style}
+      getItemLayout={getItemLayout}
     />
   );
 };

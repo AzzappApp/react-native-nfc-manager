@@ -2,6 +2,7 @@ import { render } from '@testing-library/react-native';
 import React, { useMemo } from 'react';
 import { IntlProvider } from 'react-intl';
 
+import { Text } from 'react-native';
 import { useNativeRouter } from '../lib/components/NativeRouter';
 import createPlatformEnvironment from '../lib/helpers/createPlatformEnvironment';
 import { PlatformEnvironmentProvider } from '../lib/PlatformEnvironment';
@@ -30,7 +31,12 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   );
   return (
     <PlatformEnvironmentProvider value={platformEnvironment}>
-      <IntlProvider locale={'en'} defaultLocale={'en'} messages={{}}>
+      <IntlProvider
+        textComponent={Text}
+        locale={'fr'}
+        defaultLocale={'fr'}
+        messages={{}}
+      >
         {children}
       </IntlProvider>
     </PlatformEnvironmentProvider>

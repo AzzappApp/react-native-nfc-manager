@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+
 import '@testing-library/jest-native/extend-expect';
 import {
   graphql,
@@ -7,6 +7,8 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+
+import { render, screen, act, fireEvent } from '../../../utils/test-util';
 import { QR_CODE_POSITION_CHANGE_EVENT } from '../CoverRenderer/CoverLayout';
 import CoverRenderer from '../CoverRenderer/CoverRenderer';
 import type { CoverRendererProps, CoverHandle } from '../CoverRenderer';

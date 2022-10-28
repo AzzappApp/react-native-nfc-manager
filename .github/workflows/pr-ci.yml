@@ -3,7 +3,7 @@ on: pull_request
 jobs:
   continuous-integration :
     name: Validate and test and Build
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 

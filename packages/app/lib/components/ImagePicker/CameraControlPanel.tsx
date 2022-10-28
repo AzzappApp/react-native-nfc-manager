@@ -86,6 +86,7 @@ const CameraControlPanel = ({
           style={[styles.photoButton, !ready && styles.photoButtonDisabled]}
           onPress={onTakePhoto}
           disabled={!ready}
+          accessibilityState={{ disabled: !ready }}
           highlightColor={colors.grey50}
         />
       ) : (
@@ -93,6 +94,7 @@ const CameraControlPanel = ({
           style={[styles.photoButton, !ready && styles.photoButtonDisabled]}
           onPress={onVideoButtonPress}
           disabled={!ready}
+          accessibilityState={{ disabled: !ready }}
         >
           {({ pressed }) => (
             <ViewTransition

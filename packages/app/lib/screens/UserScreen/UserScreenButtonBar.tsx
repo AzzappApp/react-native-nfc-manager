@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../../theme';
 import Link from '../../components/Link';
@@ -23,41 +24,53 @@ const UserScreenButtonBar = ({
   onEdit,
   onFollow,
   onHome,
-}: UserScreenButtonBarProps) => (
-  <View style={[styles.buttonBar, style]}>
-    <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
-    {canEdit ? (
-      <FloatingButton
-        variant="light"
-        onPress={onEdit}
-        style={styles.mainButton}
-      >
-        {/* @ts-expect-error suppressHydrationWarning is not typed*/}
-        <Text style={textStyles.normal} suppressHydrationWarning>
-          Edit my profile
-        </Text>
-      </FloatingButton>
-    ) : (
-      <FloatingButton
-        variant="light"
-        onPress={onFollow}
-        style={styles.mainButton}
-      >
-        {/* @ts-expect-error suppressHydrationWarning is not typed*/}
-        <Text style={textStyles.normal} suppressHydrationWarning>
-          {isFollowing ? 'Unfollow' : 'Follow'}
-        </Text>
-      </FloatingButton>
-    )}
-    <Link route="USER_POSTS" params={{ userName }}>
-      <FloatingIconButton
-        icon="flip"
-        iconSize={30}
-        style={{ marginLeft: 15 }}
-      />
-    </Link>
-  </View>
-);
+}: UserScreenButtonBarProps) => {
+  const intl = useIntl();
+  return (
+    <View style={[styles.buttonBar, style]}>
+      <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
+      {canEdit ? (
+        <FloatingButton
+          variant="light"
+          onPress={onEdit}
+          style={styles.mainButton}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Tap to edit your profile',
+            description: 'UserScreenButtonBar edit button accessibility label',
+          })}
+        >
+          {/* @ts-expect-error suppressHydrationWarning is not typed*/}
+          <Text style={textStyles.normal} suppressHydrationWarning>
+            Edit my profile
+          </Text>
+        </FloatingButton>
+      ) : (
+        <FloatingButton
+          variant="light"
+          onPress={onFollow}
+          style={styles.mainButton}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Tap to follow the profile',
+            description:
+              'UserScreenButtonBar follow profile accessibility label',
+          })}
+        >
+          {/* @ts-expect-error suppressHydrationWarning is not typed*/}
+          <Text style={textStyles.normal} suppressHydrationWarning>
+            {isFollowing ? 'Unfollow' : 'Follow'}
+          </Text>
+        </FloatingButton>
+      )}
+      <Link route="USER_POSTS" params={{ userName }}>
+        <FloatingIconButton
+          icon="flip"
+          iconSize={30}
+          style={{ marginLeft: 15 }}
+        />
+      </Link>
+    </View>
+  );
+};
 
 export default UserScreenButtonBar;
 

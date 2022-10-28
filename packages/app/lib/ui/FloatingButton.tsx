@@ -9,6 +9,7 @@ export type FloatingButtonProps = {
   style?: StyleProp<ViewStyle>;
   nativeID?: string;
   children: PressableProps['children'];
+  accessibilityLabel?: string;
 };
 
 const FloatingButton = ({
@@ -18,6 +19,7 @@ const FloatingButton = ({
   children,
   variant = 'default',
   nativeID,
+  accessibilityLabel,
 }: FloatingButtonProps) => {
   const variantStyles = stylesVariant[variant];
   return (
@@ -31,6 +33,8 @@ const FloatingButton = ({
         style,
       ]}
       nativeID={nativeID}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
     >
       {children}
     </Pressable>

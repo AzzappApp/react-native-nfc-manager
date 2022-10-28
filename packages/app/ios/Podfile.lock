@@ -329,8 +329,6 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.2):
     - React-Core
-  - react-native-flipper (0.164.0):
-    - React-Core
   - react-native-pager-view (6.0.1):
     - React-Core
   - react-native-safe-area-context (4.4.1):
@@ -407,9 +405,9 @@ PODS:
     - React-perflogger (= 0.70.3)
   - RNCAsyncStorage (1.17.10):
     - React-Core
-  - RNGestureHandler (2.7.0):
+  - RNGestureHandler (2.7.1):
     - React-Core
-  - RNLocalize (2.2.3):
+  - RNLocalize (2.2.4):
     - React-Core
   - RNReanimated (2.10.0):
     - DoubleConversion
@@ -507,7 +505,6 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-create-thumbnail (from `../../../node_modules/react-native-create-thumbnail`)
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
-  - react-native-flipper (from `../../../node_modules/react-native-flipper`)
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -611,8 +608,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-create-thumbnail"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
-  react-native-flipper:
-    :path: "../../../node_modules/react-native-flipper"
   react-native-pager-view:
     :path: "../../../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -708,7 +703,6 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 38b40d9033e4077b6c603f92f95c6d05fa7907df
   react-native-create-thumbnail: 94e68f6cc050a870f830352d1a924c1e8d38b52f
   react-native-encrypted-storage: e78d848ce0fb663c2ce306e37921d026809322e6
-  react-native-flipper: c33a4995958ef12a2b2f8290d63bed7adeed7634
   react-native-pager-view: 3051346698a0ba0c4e13e40097cc11b00ee03cca
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
   React-perflogger: 082b4293f0b3914ff41da35a6c06ac4490fcbcc8
@@ -724,8 +718,8 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: e9b1f9310158a1e265bcdfdfd8c62d6174b947a2
   ReactCommon: 01064177e66d652192c661de899b1076da962fd9
   RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
-  RNGestureHandler: 7673697e7c0e9391adefae4faa087442bc04af33
-  RNLocalize: a64514b46a01375fdfae9349036b4dc7130333b5
+  RNGestureHandler: b7a872907ee289ada902127f2554fa1d2c076122
+  RNLocalize: 0df7970cfc60389f00eb62fd7c097dc75af3fb4f
   RNReanimated: 60e291d42c77752a0f6d6f358387bdf225a87c6e
   RNScreens: f3230dd008a7d0ce5c0a8bc78ff12cf2315bda24
   RNSVG: 1869ad9534459f24caaa0416a4764548c2aeedad

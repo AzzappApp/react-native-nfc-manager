@@ -60,6 +60,11 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
                     defaultMessage: 'Sign Up',
                     description: 'Home screen sign up button label',
                   })}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Tap to sign up',
+                    description:
+                      'Home Screen - AccessibilityLabel Sign Up button',
+                  })}
                 />
               </Link>
             </View>

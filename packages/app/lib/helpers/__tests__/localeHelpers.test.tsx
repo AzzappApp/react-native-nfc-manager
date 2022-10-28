@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
-import { act, renderHook } from '@testing-library/react-native';
-import RNLocalize from 'react-native-localize';
+
+import * as RNLocalize from 'react-native-localize';
+import { act, renderHook } from '../../../utils/test-util';
 import * as localHelpersModule from '../localeHelpers';
 import type { AppStateStatus } from 'react-native';
-
 let mockListener: ((status: AppStateStatus) => null) | null = null;
 jest.mock('react-native/Libraries/AppState/AppState', () => ({
   currentState: 'active',
@@ -12,7 +12,6 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
     mockListener = listener;
   },
 }));
-jest.mock('react-native-localize', () => require('react-native-localize/mock'));
 
 describe('localeHelpers', () => {
   let localHelpers: typeof localHelpersModule;

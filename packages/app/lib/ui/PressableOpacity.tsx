@@ -53,6 +53,7 @@ const PressableOpacity = (
       ref={ref}
       style={styleFunc}
       disabled={disabled}
+      accessibilityState={{ disabled: disabled ?? false }}
       transitions={opacityTransitions}
       transitionDuration={animationDuration}
       easing={easing}

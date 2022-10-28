@@ -4,9 +4,18 @@ import type { ViewProps } from 'react-native';
 
 type ProgressBarProps = ViewProps & { progress: number };
 
-const ProgressBar = ({ style, progress }: ProgressBarProps) => (
+const ProgressBar = ({
+  style,
+  progress,
+  accessibilityLabel,
+}: ProgressBarProps) => (
   <View style={[styles.progressBar, style]}>
-    <View style={[styles.progressBarInner, { width: `${progress * 100}%` }]} />
+    <View
+      style={[styles.progressBarInner, { width: `${progress * 100}%` }]}
+      accessibilityRole="progressbar"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }}
+    />
   </View>
 );
 export default ProgressBar;

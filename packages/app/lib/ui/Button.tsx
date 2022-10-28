@@ -28,10 +28,21 @@ const Button = (
 
   switch (variant) {
     case 'secondary':
-      return <PressableOpacity {...buttonProps} />;
+      return (
+        <PressableOpacity
+          {...buttonProps}
+          accessibilityState={{ disabled: props.disabled ?? false }}
+          accessibilityRole="button"
+        />
+      );
     default:
       return (
-        <PressableBackground highlightColor={colors.grey900} {...buttonProps} />
+        <PressableBackground
+          highlightColor={colors.grey900}
+          {...buttonProps}
+          accessibilityState={{ disabled: props.disabled ?? false }}
+          accessibilityRole="button"
+        />
       );
   }
 };

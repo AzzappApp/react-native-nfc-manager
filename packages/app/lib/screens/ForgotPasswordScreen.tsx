@@ -148,6 +148,11 @@ const ForgotPasswordScreen = ({
                     defaultMessage: 'Reset password',
                     description: 'ForgotpasswordScreen - Reset password',
                   })}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Tap to reset your passward',
+                    description:
+                      'ForgotPassword Screen - AccessibilityLabel Reset password button',
+                  })}
                   style={styles.button}
                   onPress={onSubmit}
                 />

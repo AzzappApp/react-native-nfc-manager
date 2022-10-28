@@ -53,6 +53,7 @@ const CheckBox = ({
       testID="azzapp__CheckBox__view-wrapper"
       style={[styles.container, containerStyle]}
       onPress={onPress}
+      accessibilityState={{ checked }}
     >
       <>
         <Svg

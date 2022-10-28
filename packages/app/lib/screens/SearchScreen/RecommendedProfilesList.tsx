@@ -34,9 +34,6 @@ const RecommendedProfilesList = ({
             }
           }
         }
-        user {
-          ...CoverList_users
-        }
       }
     `,
     viewer,

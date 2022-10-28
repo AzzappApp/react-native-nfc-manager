@@ -148,6 +148,8 @@ const PhotoGalleryMediaList = ({
         activeOpacity={0.7}
       >
         <Image
+          accessibilityRole="image"
+          accessibilityIgnoresInvertColors={true}
           style={{
             flex: 1,
             resizeMode: 'cover',
