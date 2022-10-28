@@ -65,7 +65,7 @@ const stylesVariant = {
     root: {
       backgroundColor: colors.black,
       paddingHorizontal: 20,
-      paddingVertical: 14,
+      height: 46,
     },
     label: {
       color: '#fff',
@@ -76,7 +76,7 @@ const stylesVariant = {
       borderWidth: 1,
       borderColor: colors.black,
       paddingHorizontal: 18,
-      paddingVertical: 12,
+      height: 46,
     },
     label: {
       color: colors.black,
