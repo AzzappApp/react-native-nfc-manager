@@ -21,9 +21,12 @@ export type PostGridContainerProps = {
   style: StyleProp<ViewStyle>;
   postsContainerStyle: StyleProp<ViewStyle>;
   nestedScrollEnabled?: boolean;
+  maxVideo?: number;
   onRefresh?: () => void;
   onWillScrollToTop?: () => void;
   onScroll?: (scrollPosition: number) => void;
+  onScrollStart?: () => void;
+  onScrollEnd?: () => void;
   onScrollViewHeightChange?: (scrollViewHeight: number) => void;
   onHeaderHeightChange?: (headerHeight: number) => void;
 };

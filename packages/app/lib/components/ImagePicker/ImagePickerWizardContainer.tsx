@@ -49,6 +49,7 @@ type ImagePickerWizardContainerProps = Exclude<ViewProps, 'children'> & {
   isLastStep: boolean;
   isFirstStep: boolean;
   busy?: boolean;
+  exporting?: boolean;
   onBack(): void;
   onNext(): void;
 };

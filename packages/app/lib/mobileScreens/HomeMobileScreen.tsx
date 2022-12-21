@@ -15,9 +15,10 @@ const homeScreenQuery = graphql`
 
 const HomeMobileScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<HomeRoute, HomeMobileScreenQuery>) => {
   const data = usePreloadedQuery(homeScreenQuery, preloadedQuery);
-  return <HomeScreen viewer={data.viewer} />;
+  return <HomeScreen viewer={data.viewer} hasFocus={hasFocus} />;
 };
 
 export default relayScreen(HomeMobileScreen, {

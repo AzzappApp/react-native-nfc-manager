@@ -91,19 +91,11 @@ static NSMutableDictionary<NSString*, AZPTransformation> *filtersRegistry;
     if ([orientation isEqualToString:@"UP"]) {
       exifOrientation = 1;
     } else if ([orientation isEqualToString:@"RIGHT"]) {
-      exifOrientation = 6;
+      exifOrientation = 8;
     } else if ([orientation isEqualToString:@"DOWN"]) {
       exifOrientation = 3;
     } else if ([orientation isEqualToString:@"LEFT"]) {
-      exifOrientation = 8;
-    } else if ([orientation isEqualToString:@"UP_MIRRORED"]) {
-      exifOrientation = 2;
-    } else if ([orientation isEqualToString:@"RIGHT_MIRRORED"]) {
-      exifOrientation = 7;
-    } else if ([orientation isEqualToString:@"DOWN_MIRRORED"]) {
-      exifOrientation = 4;
-    } else if ([orientation isEqualToString:@"LEFT_MIRRORED"]) {
-      exifOrientation = 5;
+      exifOrientation = 6;
     }
     image = [image imageByApplyingOrientation:exifOrientation];
   }

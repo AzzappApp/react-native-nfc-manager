@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import useScrollToTopInterceptor from '../../hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
 import type { PostGridContainerProps } from './types';
 import type { LayoutChangeEvent } from 'react-native';
@@ -16,6 +16,8 @@ const PostGridContainer = ({
   postsContainerStyle,
   onRefresh,
   onScroll,
+  onScrollStart,
+  onScrollEnd,
   onScrollViewHeightChange,
   onHeaderHeightChange,
   onWillScrollToTop,
@@ -55,12 +57,17 @@ const PostGridContainer = ({
       }
       scrollEventThrottle={16}
       onScroll={e => onScroll?.(e.nativeEvent.contentOffset.y)}
+      onScrollBeginDrag={onScrollStart}
+      onMomentumScrollEnd={onScrollEnd}
       onLayout={onLayout}
     >
       {ListHeaderComponent && (
         <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
       )}
-      <View style={[{ height: contentHeight }, postsContainerStyle]}>
+      <View
+        style={[{ height: contentHeight, width: '100%' }, postsContainerStyle]}
+      >
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#FFF' }]} />
         {children}
       </View>
       {ListFooterComponent}

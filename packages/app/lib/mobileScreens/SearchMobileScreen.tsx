@@ -15,9 +15,10 @@ const searchScreenQuery = graphql`
 
 const SearchMobileScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<SearchRoute, SearchMobileScreenQuery>) => {
   const data = usePreloadedQuery(searchScreenQuery, preloadedQuery);
-  return <SearchScreen viewer={data.viewer} />;
+  return <SearchScreen viewer={data.viewer} hasFocus={hasFocus} />;
 };
 
 export default relayScreen(SearchMobileScreen, {

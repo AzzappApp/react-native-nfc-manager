@@ -1,10 +1,10 @@
 import { forwardRef } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, textStyles } from '../../theme';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef } from 'react';
-import type { PressableProps, StyleProp, ViewStyle, View } from 'react-native';
+import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
@@ -20,31 +20,41 @@ const Button = (
   const buttonProps = {
     testID: 'azzapp_Button_pressable-wrapper',
     accessibilityRole: 'button',
-    style: [styles.root, variantStyles.root, style] as StyleProp<ViewStyle>,
     children: <Text style={[styles.label, variantStyles.label]}>{label}</Text>,
+    accessibilityState: { disabled: props.disabled ?? false },
     ref: forwardedRef,
     ...props,
   } as const;
 
-  switch (variant) {
-    case 'secondary':
-      return (
-        <PressableOpacity
+  if (Platform.OS === 'android') {
+    return (
+      <View style={[styles.androidContainer, style]}>
+        <Pressable
           {...buttonProps}
-          accessibilityState={{ disabled: props.disabled ?? false }}
-          accessibilityRole="button"
+          style={[styles.root, variantStyles.root]}
+          android_ripple={{
+            borderless: false,
+            foreground: true,
+            color: colors.grey400,
+          }}
         />
-      );
-    default:
-      return (
-        <PressableBackground
-          highlightColor={colors.grey900}
-          {...buttonProps}
-          accessibilityState={{ disabled: props.disabled ?? false }}
-          accessibilityRole="button"
-        />
-      );
+      </View>
+    );
+  } else if (variant === 'primary') {
+    return (
+      <PressableBackground
+        highlightColor={colors.grey900}
+        style={[styles.root, variantStyles.root, style]}
+        {...buttonProps}
+      />
+    );
   }
+  return (
+    <PressableOpacity
+      style={[styles.root, variantStyles.root, style]}
+      {...buttonProps}
+    />
+  );
 };
 
 export default forwardRef(Button);
@@ -57,6 +67,10 @@ const styles = StyleSheet.create({
   },
   label: {
     ...textStyles.button,
+  },
+  androidContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
   },
 });
 

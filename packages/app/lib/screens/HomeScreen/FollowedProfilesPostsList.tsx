@@ -16,6 +16,7 @@ type FollowedProfilesPostsListProps = {
   stickyHeaderIndices?: number[] | undefined;
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
+  onScroll?: (scrollPosition: number) => void;
 };
 
 const FollowedProfilesPostsList = ({
@@ -25,6 +26,7 @@ const FollowedProfilesPostsList = ({
   ListHeaderComponent,
   style,
   postsContainerStyle,
+  onScroll,
 }: FollowedProfilesPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -101,6 +103,7 @@ const FollowedProfilesPostsList = ({
       stickyHeaderIndices={stickyHeaderIndices}
       style={style}
       postsContainerStyle={postsContainerStyle}
+      onScroll={onScroll}
       useWindowScroll
     />
   );

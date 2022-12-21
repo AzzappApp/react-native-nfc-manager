@@ -24,6 +24,7 @@ export type CoverRendererProps = Omit<
 > & {
   cover: CoverRenderer_cover$key | null | undefined;
   playTransition?: boolean;
+  videoDisabled?: boolean;
   videoPaused?: boolean;
   imageIndex?: number;
   forceImageIndex?: boolean;
@@ -45,6 +46,7 @@ const CoverRenderer = (
     userName,
     width = 125,
     playTransition = true,
+    videoDisabled = false,
     videoPaused = false,
     imageIndex = 0,
     forceImageIndex,
@@ -132,7 +134,7 @@ const CoverRenderer = (
     () => {
       if (cover?.pictures.length) {
         const currentPicture = cover.pictures[currentImageIndex];
-        if (currentPicture.__typename === 'MediaImage') {
+        if (currentPicture.__typename === 'MediaImage' || videoDisabled) {
           nextIndex();
         }
       }
@@ -216,23 +218,36 @@ const CoverRenderer = (
             easing="ease-in-out"
             testID={`cover-media-container-${picture.source}`}
           >
-            {picture.__typename === 'MediaVideo' && (
-              <MediaVideoRenderer
-                {...mediaProps}
-                // TODO alt generation by cloudinary AI ? include text in small format ?
-                alt={`This is a video posted by ${userName}`}
-                thumbnailURI={
-                  width === COVER_BASE_WIDTH
-                    ? picture.smallThumbnail
-                    : picture.largeThumbnail
-                }
-                muted
-                currentTime={initialVideosTimes?.[index]}
-                paused={videoPaused || !isDisplayed}
-                onEnd={onVideoEnd}
-                testID={`cover-video-${picture.source}`}
-              />
-            )}
+            {picture.__typename === 'MediaVideo' &&
+              (videoDisabled ? (
+                <MediaImageRenderer
+                  {...mediaProps}
+                  // TODO alt generation by cloudinary AI ? include text in small format ?
+                  alt={`This is an image posted by ${userName}`}
+                  testID={`cover-image-${picture.source}`}
+                  uri={
+                    width === COVER_BASE_WIDTH
+                      ? picture.smallThumbnail
+                      : picture.largeThumbnail
+                  }
+                />
+              ) : (
+                <MediaVideoRenderer
+                  {...mediaProps}
+                  // TODO alt generation by cloudinary AI ? include text in small format ?
+                  alt={`This is a video posted by ${userName}`}
+                  thumbnailURI={
+                    width === COVER_BASE_WIDTH
+                      ? picture.smallThumbnail
+                      : picture.largeThumbnail
+                  }
+                  muted
+                  currentTime={initialVideosTimes?.[index]}
+                  paused={videoPaused || !isDisplayed}
+                  onEnd={onVideoEnd}
+                  testID={`cover-video-${picture.source}`}
+                />
+              ))}
             {picture.__typename === 'MediaImage' && (
               <MediaImageRenderer
                 {...mediaProps}

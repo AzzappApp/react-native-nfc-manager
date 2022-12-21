@@ -25,12 +25,14 @@ import type { ForwardedRef } from 'react';
 type PostScreenProps = {
   post: PostScreenFragment_post$key & PostScreenFragment_relatedPosts$key;
   ready?: boolean;
+  hasFocus?: boolean;
   initialVideoTime?: number | null;
 };
 
 const PostScreen = ({
   post: postKey,
   ready = true,
+  hasFocus = true,
   initialVideoTime,
 }: PostScreenProps) => {
   const router = useRouter();
@@ -97,7 +99,7 @@ const PostScreen = ({
       />
       <PostList
         style={{ flex: 1 }}
-        canPlay={ready}
+        canPlay={ready && hasFocus}
         posts={posts}
         onEndReached={onEndReached}
         initialVideoTimes={initialVideoTimes}

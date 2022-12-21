@@ -10,7 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '../../../theme';
 import EditableImage from './EditableImage';
-import type { ImageEditionParameters, TimeRange, Video } from './helpers';
+import type { TimeRange, Video } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ViewProps } from 'react-native';
 
 type VideoEditorProps = ViewProps & {

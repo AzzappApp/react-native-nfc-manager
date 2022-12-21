@@ -8,6 +8,7 @@
   AVQueuePlayer *_player;
   AVPlayerLayer *_playerLayer;
   AVPlayerLooper *_playerLooper;
+  AVMutableVideoComposition *_videoComposition;
   AVAsset *_asset;
   AVPlayerItem *_item;
 }
@@ -45,8 +46,8 @@
 -(void)setupComposition {
   if (_asset != nil) {
     __weak AZPEditableVideo *weakSelf = self;
-    AVMutableVideoComposition *composition = [
-      AVMutableVideoComposition videoCompositionWithAsset:_asset
+    _videoComposition = [
+        AVMutableVideoComposition videoCompositionWithAsset:_asset
                       applyingCIFiltersWithHandler:^(AVAsynchronousCIImageFilteringRequest *request){
             CIImage *image = request.sourceImage;
             AZPEditableVideo *strongSelf = weakSelf;
@@ -58,13 +59,14 @@
                 [imageTransformations addObjectsFromArray:strongSelf.filters];
               }
               
-              NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithDictionary:strongSelf.editionParameters];
-              /* Thoses edition parameters are not supported */
-              [parameters removeObjectForKey:@"cropData"];
-              [parameters removeObjectForKey:@"orientation"];
-              [parameters removeObjectForKey:@"pitch"];
-              [parameters removeObjectForKey:@"roll"];
-              [parameters removeObjectForKey:@"yaw"];
+              
+              image = [
+                image
+                imageByApplyingTransform: CGAffineTransformScale(
+                 CGAffineTransformMakeTranslation(0, image.extent.size.height),
+                  1, -1
+                )
+              ];
               
               for (NSString *transformationName in imageTransformations) {
                 AZPTransformation transformation = [
@@ -72,13 +74,35 @@
                   imageTransformationForName:transformationName
                 ];
                 if (transformation != nil) {
-                  image = transformation(image, parameters);
+                  image = transformation(image, strongSelf.editionParameters);
                 }
               }
+              
+          
+              CGFloat scale = request.renderSize.height / image.extent.size.height;
+              if (scale != 1) {
+                image = [
+                  image
+                  imageByApplyingTransform: CGAffineTransformMakeScale(scale, scale)
+                ];
+              }
+              
+              image = [
+                image
+                imageByApplyingTransform: CGAffineTransformScale(
+                 CGAffineTransformMakeTranslation(0, image.extent.size.height),
+                  1, -1
+                )
+              ];
+              
+              CIImage *blackImage = [CIImage imageWithColor:[CIColor blackColor]];
+              image = [image imageByCompositingOverImage: blackImage];
+              
               [request finishWithImage:image context:nil];
             }
         }];
-    _item.videoComposition = composition;
+    
+    _item.videoComposition = _videoComposition;
     [self resetLoop];
   }
 }

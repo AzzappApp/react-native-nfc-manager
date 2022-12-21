@@ -49,6 +49,9 @@ jobs:
           echo "app_center_ios_app_name=${{ secrets.APPCENTER_STAGING_IOS_APP_NAME }}" >> $GITHUB_ENV
           echo "app_center_ios_api_token=${{ secrets.APPCENTER_STAGING_IOS_API_TOKEN }}" >> $GITHUB_ENV
           echo "app_center_ios_secret=${{ secrets.APPCENTER_STAGING_IOS_APP_SECRET }}" >> $GITHUB_ENV
+          echo "app_center_android_app_name=${{ secrets.APPCENTER_STAGING_ANDROID_APP_NAME }}" >> $GITHUB_ENV
+          echo "app_center_android_api_token=${{ secrets.APPCENTER_STAGING_ANDROID_API_TOKEN }}" >> $GITHUB_ENV
+          echo "app_center_android_secret=${{ secrets.APPCENTER_STAGING_ANDROID_APP_SECRET }}" >> $GITHUB_ENV
           
       - name: Set App Center env for dev
         if: github.ref != 'refs/heads/main'
@@ -56,6 +59,30 @@ jobs:
           echo "app_center_ios_app_name=${{ secrets.APPCENTER_DEV_IOS_APP_NAME }}" >> $GITHUB_ENV
           echo "app_center_ios_api_token=${{ secrets.APPCENTER_DEV_IOS_API_TOKEN }}" >> $GITHUB_ENV
           echo "app_center_ios_secret=${{ secrets.APPCENTER_DEV_IOS_APP_SECRET }}" >> $GITHUB_ENV
+          echo "app_center_android_app_name=${{ secrets.APPCENTER_DEV_ANDROID_APP_NAME }}" >> $GITHUB_ENV
+          echo "app_center_android_api_token=${{ secrets.APPCENTER_DEV_ANDROID_API_TOKEN }}" >> $GITHUB_ENV
+          echo "app_center_android_secret=${{ secrets.APPCENTER_DEV_ANDROID_APP_SECRET }}" >> $GITHUB_ENV
+ 
+      # Android Build
+      - name: Generate release.keystore
+        env:
+          ANDROID_KEY_STORE: ${{ secrets.ANDROID_KEY_STORE }}
+        run: echo $ANDROID_KEY_STORE | openssl base64 -A -d > ./packages/app/android/app/release.keystore
+
+      - name: Android build apk
+        run: yarn build:android
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      # Android Upload
+      - name: Android Appcenter upload
+        run: yarn deploy:android
+        env:
+          APPCENTER_OWNER_NAME: azzapp
+          APPCENTER_ANDROID_APP_NAME: ${{ env.app_center_android_app_name }}
+          APPCENTER_ANDROID_API_TOKEN: ${{ env.app_center_android_api_token }
 
       # IOS App build
       - name: Cache CocoaPods
@@ -98,7 +125,6 @@ jobs:
 
       - name: Deploy on App Center
         run: yarn deploy:ios
-        id: appcenter_deploy_ios
         env:
           APPCENTER_OWNER_NAME: azzapp
           APPCENTER_IOS_APP_NAME: ${{ env.app_center_ios_app_name }}
@@ -111,4 +137,5 @@ jobs:
           message: |
             Application deployed to Microsoft App Center
             sha: ${{ github.event.pull_request.head.sha }}
-            url: ${{ env.IOS_INSTALL_URL }}
+            IOS install url: ${{ env.IOS_INSTALL_URL }}
+            Android install url: ${{ env.ANDROID_INSTALL_URL }}

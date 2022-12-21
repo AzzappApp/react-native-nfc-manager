@@ -23,8 +23,8 @@ const PressableBackground = (
     highlightColor = colors.grey100,
     animationDuration = 150,
     easing = 'ease-in-out',
-    disabled,
     style,
+    disabled,
     ...props
   }: PressableBackgroundProps,
   ref: ForwardedRef<View>,
@@ -56,12 +56,17 @@ const PressableBackground = (
     <PressableTransition
       ref={ref}
       style={styleFunc}
-      disabled={disabled}
       transitions={backgroundTransitions}
       transitionDuration={animationDuration}
       easing={easing}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityState={{ disabled: disabled ?? false }}
+      android_ripple={{
+        borderless: false,
+        color: highlightColor,
+        foreground: true,
+      }}
       {...props}
     />
   );

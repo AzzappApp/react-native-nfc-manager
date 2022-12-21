@@ -31,7 +31,7 @@ jest.mock('../../../components/CoverLink', () => {
     return createElement('CoverLink', {
       userId: props.userId,
       playTransition: props.playTransition,
-      videoPaused: props.videoPaused,
+      videoDisabled: props.videoDisabled,
       style: props.style,
       testID: 'CoverLink',
     });
@@ -190,7 +190,7 @@ describe('Trending Profiles list Component', () => {
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks).toHaveLength(10);
     expect(coverLinks[0]).toHaveProp('playTransition', false);
-    expect(coverLinks[0]).toHaveProp('videoPaused', true);
+    expect(coverLinks[0]).toHaveProp('videoDisabled', true);
     expect(coverLinks[0]).toHaveStyle({ width: 80 });
 
     act(() => {
@@ -202,10 +202,10 @@ describe('Trending Profiles list Component', () => {
     });
   });
 
-  test('should render with `videoPaused`props false when `canPlay`is true', async () => {
+  test('should render with `videoDisabled`props false when `canPlay`is true', async () => {
     renderScreen(true);
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks[0]).toHaveProp('playTransition', true);
-    expect(coverLinks[0]).toHaveProp('videoPaused', false);
+    expect(coverLinks[0]).toHaveProp('videoDisabled', false);
   });
 });

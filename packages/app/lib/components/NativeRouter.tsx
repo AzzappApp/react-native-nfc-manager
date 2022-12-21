@@ -12,7 +12,6 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
-import { ReanimatedScreenProvider } from 'react-native-screens/reanimated';
 import type {
   Router as PlatformRouter,
   RouteListener,
@@ -480,6 +479,7 @@ export type ScreenOptions = Omit<
 
 export type NativeScreenProps<T extends Route> = {
   screenId: string;
+  hasFocus: boolean;
   route: T;
 };
 
@@ -507,30 +507,30 @@ export const ScreensRenderer = ({
 }: ScreensRendererProps) => {
   const { stack, modals } = routerState;
   return (
-    <ReanimatedScreenProvider>
-      <StackRenderer
-        stack={stack}
-        screens={screens}
-        tabsRenderers={tabs}
-        defaultScreenOptions={defaultScreenOptions}
-        onFinishTransitioning={onFinishTransitioning}
-        onScreenDismissed={onScreenDismissed}
-      >
-        {!!modals.length && (
-          <Screen isNativeStack stackPresentation="fullScreenModal">
-            <StackRenderer
-              stack={modals}
-              screens={screens}
-              tabsRenderers={tabs}
-              defaultScreenOptions={defaultScreenOptions}
-              onFinishTransitioning={onFinishTransitioning}
-              onScreenDismissed={onScreenDismissed}
-              isModal
-            />
-          </Screen>
-        )}
-      </StackRenderer>
-    </ReanimatedScreenProvider>
+    <StackRenderer
+      stack={stack}
+      screens={screens}
+      tabsRenderers={tabs}
+      defaultScreenOptions={defaultScreenOptions}
+      onFinishTransitioning={onFinishTransitioning}
+      onScreenDismissed={onScreenDismissed}
+      hasFocus
+    >
+      {!!modals.length && (
+        <Screen isNativeStack stackPresentation="fullScreenModal">
+          <StackRenderer
+            stack={modals}
+            screens={screens}
+            tabsRenderers={tabs}
+            defaultScreenOptions={defaultScreenOptions}
+            onFinishTransitioning={onFinishTransitioning}
+            onScreenDismissed={onScreenDismissed}
+            hasFocus
+            isModal
+          />
+        </Screen>
+      )}
+    </StackRenderer>
   );
 };
 
@@ -563,6 +563,7 @@ const StackRenderer = ({
   tabsRenderers,
   defaultScreenOptions,
   isModal,
+  hasFocus,
   children,
   onScreenDismissed,
   onFinishTransitioning,
@@ -572,13 +573,17 @@ const StackRenderer = ({
   tabsRenderers: TabsMap;
   defaultScreenOptions?: ScreenOptions;
   isModal?: boolean;
+  hasFocus?: boolean;
   children?: ReactNode;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 }) => {
   // bug in screen stack prevent null or false children to works
   // properly
-  const childs: any[] = stack.map(routeInfo => {
+  const childrenArray = React.Children.toArray(children);
+  const childs: any[] = stack.map((routeInfo, index) => {
+    const screenHasFocus =
+      hasFocus && childrenArray.length === 0 && index === stack.length - 1;
     if (routeInfo.kind === 'tabs') {
       return (
         <Screen key={routeInfo.id} isNativeStack>
@@ -590,6 +595,7 @@ const StackRenderer = ({
             defaultScreenOptions={defaultScreenOptions}
             onFinishTransitioning={onFinishTransitioning}
             onScreenDismissed={onScreenDismissed}
+            hasFocus={screenHasFocus}
           />
         </Screen>
       );
@@ -604,6 +610,7 @@ const StackRenderer = ({
         screens={screens}
         onDismissed={() => onScreenDismissed?.(routeInfo.id)}
         isModal={isModal}
+        hasFocus={screenHasFocus}
         isNativeStack
       />
     );
@@ -627,6 +634,7 @@ const TabsRenderer = ({
   tabsRenderers,
   screens,
   defaultScreenOptions,
+  hasFocus,
   onScreenDismissed,
   onFinishTransitioning,
 }: {
@@ -635,16 +643,23 @@ const TabsRenderer = ({
   tabsRenderers: TabsMap;
   screens: ScreenMap;
   defaultScreenOptions?: ScreenOptions;
-  isModal?: boolean;
+  hasFocus?: boolean;
   onScreenDismissed?: (id: string) => void;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
 }) => {
-  const TabsRenderer = tabsRenderers[id];
-  // TODO do we really want to unmount screen on tab switch ?
+  const TabsListRenderer = tabsRenderers[id];
+  const visitedTabs = useRef(new Set<string>()).current;
+  visitedTabs.add(tabs[currentIndex].id);
+
   return (
     <>
       <ScreenContainer style={{ flex: 1 }} hasTwoStates>
         {tabs.map((routeInfo, index) => {
+          const screenHasFocus = hasFocus && index === currentIndex;
+          if (!visitedTabs.has(routeInfo.id)) {
+            return null;
+          }
+
           if (routeInfo.kind === 'stack') {
             return (
               <Screen
@@ -659,6 +674,7 @@ const TabsRenderer = ({
                   onFinishTransitioning={onFinishTransitioning}
                   onScreenDismissed={onScreenDismissed}
                   isModal
+                  hasFocus={screenHasFocus}
                 />
               </Screen>
             );
@@ -674,12 +690,13 @@ const TabsRenderer = ({
               screens={screens}
               onDismissed={() => onScreenDismissed?.(routeInfo.id)}
               isNativeStack={false}
+              hasFocus={screenHasFocus}
             />
           );
         })}
       </ScreenContainer>
-      {TabsRenderer && (
-        <TabsRenderer id={id} tabs={tabs} currentIndex={currentIndex} />
+      {TabsListRenderer && (
+        <TabsListRenderer id={id} tabs={tabs} currentIndex={currentIndex} />
       )}
     </>
   );
@@ -700,7 +717,10 @@ const ScreenRendererContext = React.createContext<{
       | ((value: ScreenOptions | null) => ScreenOptions | null)
       | null,
   ) => void;
-}>({ navigationEventEmitter: new EventEmitter(), setOptions: () => void 0 });
+}>({
+  navigationEventEmitter: new EventEmitter(),
+  setOptions: () => void 0,
+});
 
 type ScreenRendererProps = Route & {
   id: string;
@@ -709,6 +729,7 @@ type ScreenRendererProps = Route & {
   isNativeStack?: boolean;
   defaultScreenOptions?: ScreenOptions;
   isModal?: boolean;
+  hasFocus?: boolean;
   onDismissed(): void;
 };
 
@@ -720,6 +741,7 @@ const ScreenRenderer = ({
   activityState,
   defaultScreenOptions,
   isModal,
+  hasFocus,
   isNativeStack,
   onDismissed: onDismissedProp,
 }: ScreenRendererProps) => {
@@ -747,8 +769,8 @@ const ScreenRenderer = ({
   });
 
   const screenContextValue = useMemo(
-    () => ({ navigationEventEmitter, setOptions }),
-    [navigationEventEmitter],
+    () => ({ navigationEventEmitter, hasFocus, setOptions }),
+    [navigationEventEmitter, hasFocus],
   );
 
   if (!Component) {
@@ -758,7 +780,7 @@ const ScreenRenderer = ({
 
   const screenView = (
     <ScreenRendererContext.Provider value={screenContextValue}>
-      <Component screenId={id} route={{ route, params }} />
+      <Component screenId={id} hasFocus={hasFocus} route={{ route, params }} />
     </ScreenRendererContext.Provider>
   );
 

@@ -3,14 +3,20 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import {
   FlatList,
   Image,
+  PermissionsAndroid,
   Platform,
   Text,
   useWindowDimensions,
 } from 'react-native';
 import { textStyles } from '../../../theme';
-import { getFilePathFromURI, getPHAssetPath } from '../../helpers/mediaHelpers';
 import PressableNative from '../../ui/PressableNative';
 import { formatVideoTime } from './helpers';
+import {
+  getFilePathFromURI,
+  getImageSize,
+  getPHAssetPath,
+  getVideoSize,
+} from './mediaHelpers';
 import type { Media } from './helpers';
 import type {
   PhotoIdentifier,
@@ -46,19 +52,36 @@ const PhotoGalleryMediaList = ({
     async (refreshing = false) => {
       setIsLoading(true);
       let result: PhotoIdentifiersPage;
+
+      if (Platform.OS === 'android') {
+        const result = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: 'Permission Explanation',
+            message: 'Azzapp would like to access your pictures.',
+            buttonPositive: 'OK',
+          },
+        );
+        if (result !== 'granted') {
+          onGalleryPermissionFailRef.current?.();
+          return;
+        }
+      }
+
       try {
         const params: GetPhotosParams = {
           first: 30,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'video' ? 'Videos' : 'Photos',
           after: endCursor.current,
+          include: ['imageSize', 'playableDuration'],
         };
         if (album) {
           params.groupTypes = 'Album';
           params.groupName = album;
         }
         result = await CameraRoll.getPhotos(params);
-      } catch {
+      } catch (e) {
         onGalleryPermissionFailRef.current?.();
         return;
       }
@@ -97,7 +120,10 @@ const PhotoGalleryMediaList = ({
         return;
       }
       const uri = `file://${path}`;
-      if (type === 'video') {
+      if (type.startsWith('video')) {
+        if (width == null || height == null) {
+          ({ width, height } = await getVideoSize(`file://${path}`));
+        }
         onSelectMedia({
           kind: 'video',
           mediaId: assetUri,
@@ -108,6 +134,9 @@ const PhotoGalleryMediaList = ({
           duration: playableDuration,
         });
       } else {
+        if (width == null || height == null) {
+          ({ width, height } = await getImageSize(`file://${path}`));
+        }
         onSelectMedia({
           kind: 'image',
           mediaId: assetUri,
@@ -156,7 +185,7 @@ const PhotoGalleryMediaList = ({
           }}
           source={{ uri: item.image.uri }}
         />
-        {item.type === 'video' && (
+        {item.type.startsWith('video') && (
           <Text
             style={[
               textStyles.button,

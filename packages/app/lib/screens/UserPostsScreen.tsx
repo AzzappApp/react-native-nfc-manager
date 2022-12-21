@@ -11,9 +11,13 @@ import type { UserPostsScreenFragment_user$key } from '@azzapp/relay/artifacts/U
 
 type UserPostsScreenProps = {
   user: UserPostsScreenFragment_posts$key & UserPostsScreenFragment_user$key;
+  hasFocus?: boolean;
 };
 
-const UserPostsScreen = ({ user: userKey }: UserPostsScreenProps) => {
+const UserPostsScreen = ({
+  user: userKey,
+  hasFocus = true,
+}: UserPostsScreenProps) => {
   const user = useFragment(
     graphql`
       fragment UserPostsScreenFragment_user on User {
@@ -90,6 +94,7 @@ const UserPostsScreen = ({ user: userKey }: UserPostsScreenProps) => {
         style={{ flex: 1 }}
         posts={posts}
         author={user}
+        canPlay={hasFocus}
         refreshing={refreshing}
         onEndReached={onEndReached}
         onRefresh={onRefresh}

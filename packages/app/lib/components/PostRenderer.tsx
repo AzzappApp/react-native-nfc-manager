@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors, fontFamilies } from '../../theme';
+import Icon from '../ui/Icon';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';
 import { MediaImageRenderer, MediaVideoRenderer } from './MediaRenderer';
@@ -17,6 +18,7 @@ export type PostRendererProps = ViewProps & {
   small?: boolean;
   width: number;
   muted?: boolean;
+  videoDisabled?: boolean;
   paused?: boolean;
   initialTime?: number | null;
 };
@@ -34,6 +36,7 @@ const PostRenderer = (
     width,
     small,
     muted = false,
+    videoDisabled = false,
     paused = false,
     initialTime,
     ...props
@@ -157,21 +160,35 @@ const PostRenderer = (
       <View
         style={[styles.mediaContainer, small && styles.mediaContainerSmall]}
       >
-        {__typename === 'MediaVideo' && (
-          <MediaVideoRenderer
-            ref={mediaRef as any}
-            source={source}
-            // TODO alt generation by cloudinary AI ? include text in small format ?
-            alt={`This is a video posted by ${author.userName}`}
-            thumbnailURI={small ? smallThumbnail : largeThumbnail}
-            uri={small ? smallURI : largeURI}
-            aspectRatio={ratio}
-            width={width}
-            muted={muted}
-            paused={paused}
-            currentTime={initialTime}
-          />
-        )}
+        {__typename === 'MediaVideo' &&
+          (videoDisabled ? (
+            <>
+              <MediaImageRenderer
+                ref={mediaRef as any}
+                source={source}
+                // TODO alt generation by cloudinary AI ? include text in small format ?
+                alt={`This is an image posted by ${author.userName}`}
+                uri={small ? smallThumbnail : largeThumbnail}
+                aspectRatio={ratio}
+                width={width}
+              />
+              <Icon icon="play" style={styles.playIcon} />
+            </>
+          ) : (
+            <MediaVideoRenderer
+              ref={mediaRef as any}
+              source={source}
+              // TODO alt generation by cloudinary AI ? include text in small format ?
+              alt={`This is a video posted by ${author.userName}`}
+              thumbnailURI={small ? smallThumbnail : largeThumbnail}
+              uri={small ? smallURI : largeURI}
+              aspectRatio={ratio}
+              width={width}
+              muted={muted}
+              paused={paused}
+              currentTime={initialTime}
+            />
+          ))}
         {__typename === 'MediaImage' && (
           <MediaImageRenderer
             ref={mediaRef as any}
@@ -202,6 +219,14 @@ const styles = StyleSheet.create({
   mediaContainer: {
     backgroundColor: colors.grey100,
     overflow: 'hidden',
+  },
+  playIcon: {
+    position: 'absolute',
+    top: 10,
+    end: 10,
+    height: 24,
+    width: 24,
+    tintColor: '#FFF',
   },
   mediaContainerSmall: {
     borderRadius: 16,

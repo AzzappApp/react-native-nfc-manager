@@ -3,6 +3,7 @@ import {
   requireNativeComponent,
   NativeModules,
   findNodeHandle,
+  Platform,
 } from 'react-native';
 import type { ViewProps, HostComponent } from 'react-native';
 
@@ -12,7 +13,10 @@ export type SnapshotViewProps = Omit<ViewProps, 'children'> & {
 };
 
 const NativeSnapshotView: React.ComponentType<SnapshotViewProps> =
-  requireNativeComponent('AZPSnapshot');
+  Platform.select({
+    ios: requireNativeComponent('AZPSnapshot'),
+    default: null as any,
+  });
 
 const SnapshotView = ({
   style,
@@ -20,6 +24,9 @@ const SnapshotView = ({
   snapshotID,
   ...props
 }: SnapshotViewProps) => {
+  if (Platform.OS !== 'ios') {
+    throw new Error('Not Supported');
+  }
   const clearOnUnmountRef = useRef(clearOnUnmount);
   clearOnUnmountRef.current = clearOnUnmount;
   useEffect(
@@ -45,6 +52,9 @@ const FAKE_SNAPSHOT_ID = 'FAKE_SNAPSHOT_ID';
 export const snapshotView = async (
   viewHandle: HostComponent<any> | number,
 ): Promise<string> => {
+  if (Platform.OS !== 'ios') {
+    throw new Error('Not supported');
+  }
   if (typeof viewHandle === 'object') {
     const nodeHandle = findNodeHandle(viewHandle);
     if (nodeHandle == null) {

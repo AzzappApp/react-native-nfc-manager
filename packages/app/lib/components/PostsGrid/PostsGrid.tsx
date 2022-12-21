@@ -1,6 +1,12 @@
 import cuid from 'cuid';
 import React, { useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  unstable_batchedUpdates,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import PostLink from '../PostLink';
@@ -15,11 +21,13 @@ type PostsGrid = {
   posts: PostsGrid_posts$key;
   canPlay?: boolean;
   refreshing?: boolean;
+  maxVideos?: number;
   ListHeaderComponent?: ReactNode;
   ListFooterComponent?: ReactNode;
   stickyHeaderIndices?: number[] | undefined;
   onRefresh?: () => void;
   onEndReached?: () => void;
+  onScroll?: (scrollPosition: number) => void;
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
   useWindowScroll?: boolean;
@@ -34,11 +42,13 @@ const PostsGrid = ({
   posts: postsKey,
   canPlay,
   refreshing,
+  maxVideos = Platform.select({ android: 2, default: 3 }),
   ListHeaderComponent,
   ListFooterComponent,
   stickyHeaderIndices,
   onRefresh,
   onEndReached,
+  onScroll: onScrollCallback,
   style,
   postsContainerStyle,
   useWindowScroll,
@@ -62,23 +72,20 @@ const PostsGrid = ({
     postsKey,
   );
 
+  const [layoutPosition, setLayoutPosition] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [headerSize, setHeaderSize] = useState(0);
+  const [isScrollingToTop, setIsScrollingToTop] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+
   const { width: windowWidth } = useWindowDimensions();
-  const [contentHeight, dataWithLayout] = useMemo(() => {
-    const even: Post[] = [];
-    const odd: Post[] = [];
-
-    posts.forEach((item, index) => {
-      if (!item) {
-        console.warn('no item in post grid for index ', index);
-        return;
-      }
-      if (index % 2 === 0) {
-        even.push(item);
-      } else {
-        odd.push(item);
-      }
-    });
-
+  const [contentHeight, postsMap] = useMemo(() => {
+    if (!scrollViewHeight) {
+      return [
+        0,
+        new Map<string, { item: Post; layout: ItemLayout; isVideo: boolean }>(),
+      ];
+    }
     const { padding, paddingVertical, paddingTop, paddingBottom } =
       StyleSheet.flatten(postsContainerStyle ?? {});
 
@@ -98,42 +105,95 @@ const PostsGrid = ({
 
     // window width - the 3 margin of 8px
     const itemWidth = (windowWidth - 24) / 2;
-    let currentPosition = offsetTop;
-    const measureItem = (item: Post, isOdd: boolean) => {
-      const layout = {
-        left: isOdd ? itemWidth + 16 : 8,
-        top: currentPosition,
-        width: itemWidth,
-        height: itemWidth / item.media.ratio,
-      };
-      //  margin with bottom
-      currentPosition += layout.height + 8;
-      return { item, layout };
-    };
+    const postsMap = new Map<
+      string,
+      { item: Post; layout: ItemLayout; isVideo: boolean }
+    >();
 
-    const evenData = even.map(item => measureItem(item, false));
-    let height = currentPosition;
-    currentPosition = offsetTop;
-    const oddData = odd.map(item => measureItem(item, true));
-    height = Math.max(height, currentPosition);
-    return [height + offsetBottom, [...evenData, ...oddData]];
-  }, [posts, windowWidth, postsContainerStyle]);
+    let currentPositionLeft = offsetTop;
+    let currentPositionRight = offsetTop;
 
-  const [layoutPosition, setLayoutPosition] = useState(0);
-  const [scrollViewHeight, setScrollViewHeight] = useState(0);
-  const [headerSize, setHeaderSize] = useState(0);
-  const [isScrollingToTop, setIsScrollingToTop] = useState(false);
+    const pageSize = 1.75 * scrollViewHeight;
+    const videosDistance = pageSize / maxVideos;
+    let canUseVideo = true;
+    let lastVideoPosition = 0;
+    for (const post of posts) {
+      const isOnLeft = currentPositionLeft <= currentPositionRight;
+      const height = itemWidth / post.media.ratio;
+
+      let isVideo = post.media.__typename === 'MediaVideo';
+      if (
+        !canUseVideo &&
+        currentPositionLeft - lastVideoPosition > videosDistance &&
+        currentPositionRight - lastVideoPosition > videosDistance
+      ) {
+        canUseVideo = true;
+      }
+
+      if (isVideo && canUseVideo) {
+        canUseVideo = false;
+        lastVideoPosition =
+          (isOnLeft ? currentPositionLeft : currentPositionRight) + height;
+      } else {
+        isVideo = false;
+      }
+
+      postsMap.set(post.id, {
+        item: post,
+        layout: {
+          left: isOnLeft ? 8 : itemWidth + 16,
+          top: isOnLeft ? currentPositionLeft : currentPositionRight,
+          width: itemWidth,
+          height,
+        },
+        isVideo,
+      });
+
+      if (isOnLeft) {
+        currentPositionLeft += height + 8;
+      } else {
+        currentPositionRight += height + 8;
+      }
+    }
+
+    const contentHeight =
+      Math.max(currentPositionLeft, currentPositionRight) + offsetBottom;
+
+    return [contentHeight, postsMap];
+  }, [scrollViewHeight, postsContainerStyle, windowWidth, posts, maxVideos]);
+
+  const onScrollStart = () => {
+    clearTimeout(scrollEndTimeout.current);
+    scrollEndTimeout.current = null;
+    setIsScrolling(true);
+  };
+
+  const scrollEndTimeout = useRef<any>(null);
+
+  const onScrollEnd = () => {
+    if (scrollEndTimeout.current != null) {
+      return;
+    }
+    scrollEndTimeout.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 500);
+  };
 
   const onWillScrollToTop = () => {
-    setIsScrollingToTop(true);
+    unstable_batchedUpdates(() => {
+      setIsScrollingToTop(true);
+      onScrollStart();
+    });
   };
 
   const onScroll = (scrollPosition: number) => {
+    onScrollCallback?.(scrollPosition);
     if (contentHeight - scrollPosition < scrollViewHeight * 2) {
       onEndReached?.();
     }
     if (isScrollingToTop && scrollPosition === 0) {
       setIsScrollingToTop(false);
+      onScrollEnd();
     }
 
     setLayoutPosition(
@@ -143,14 +203,6 @@ const PostsGrid = ({
       ) / BATCH_SIZE,
     );
   };
-
-  const postMap = useMemo(() => {
-    const postMap = new Map<string, { item: Post; layout: ItemLayout }>();
-    dataWithLayout.forEach(data => {
-      postMap.set(data.item.id, data);
-    });
-    return postMap;
-  }, [dataWithLayout]);
 
   const keys = useRef({
     videos: new Map<string, string>(),
@@ -172,13 +224,14 @@ const PostsGrid = ({
 
     const items: Array<[string, string]> = [];
 
-    for (let i = 0; i < dataWithLayout.length; i++) {
-      const { item, layout } = dataWithLayout[i];
+    for (const post of posts) {
+      const data = postsMap.get(post.id);
+      if (!data) {
+        break;
+      }
+      const { item, layout, isVideo } = data;
       if (layout.top >= topLimit && layout.top < bottomLimit) {
-        const freeKeys =
-          item.media.__typename === 'MediaVideo'
-            ? freeVideoKeysMap
-            : freeImageKeysMap;
+        const freeKeys = isVideo ? freeVideoKeysMap : freeImageKeysMap;
         const key = freeKeys.get(item.id);
         if (key) {
           freeKeys.delete(item.id);
@@ -191,15 +244,16 @@ const PostsGrid = ({
     const freeVideoKeys = Array.from(freeVideoKeysMap.entries());
 
     for (let i = 0; i < items.length; i++) {
-      let key = items[i][1];
-      const item = postMap.get(items[i][0])!.item;
+      // eslint-disable-next-line prefer-const
+      let [id, key] = items[i];
+      const data = postsMap.get(id);
+      if (!data) {
+        break;
+      }
+      const { item, isVideo } = data;
       if (!key) {
-        const freeKeys =
-          item.media.__typename === 'MediaVideo'
-            ? freeVideoKeys
-            : freeImageKeys;
-        const usedKeys =
-          item.media.__typename === 'MediaVideo' ? videosKeys : imagesKeys;
+        const freeKeys = isVideo ? freeVideoKeys : freeImageKeys;
+        const usedKeys = isVideo ? videosKeys : imagesKeys;
         const entry = freeKeys.pop();
         if (entry) {
           key = entry[1];
@@ -222,30 +276,30 @@ const PostsGrid = ({
     items.push(...freeVideoKeys);
 
     return items;
-  }, [
-    isScrollingToTop,
-    layoutPosition,
-    scrollViewHeight,
-    dataWithLayout,
-    postMap,
-  ]);
+  }, [isScrollingToTop, layoutPosition, posts, postsMap, scrollViewHeight]);
   itemRefs.current = items;
 
   const placeHolders = useMemo(
     () =>
-      dataWithLayout.map(({ item, layout }) => (
-        <View key={item.id} style={[layout, { position: 'absolute' }]}>
-          <View
-            style={{
-              width: layout.width,
-              height: layout.width / item.media.ratio,
-              borderRadius: 16,
-              backgroundColor: colors.grey100,
-            }}
-          />
-        </View>
-      )),
-    [dataWithLayout],
+      posts.map(({ id }) => {
+        if (!postsMap.has(id)) {
+          return null;
+        }
+        const { item, layout } = postsMap.get(id)!;
+        return (
+          <View key={item.id} style={[layout, { position: 'absolute' }]}>
+            <View
+              style={{
+                width: layout.width,
+                height: layout.width / item.media.ratio,
+                borderRadius: 16,
+                backgroundColor: colors.grey100,
+              }}
+            />
+          </View>
+        );
+      }),
+    [posts, postsMap],
   );
 
   const GridContainer = Platform.select({
@@ -265,13 +319,26 @@ const PostsGrid = ({
       nestedScrollEnabled={nestedScrollEnabled}
       onRefresh={onRefresh}
       onScroll={onScroll}
+      onScrollStart={onScrollStart}
+      onScrollEnd={onScrollEnd}
       onScrollViewHeightChange={setScrollViewHeight}
       onHeaderHeightChange={setHeaderSize}
       onWillScrollToTop={onWillScrollToTop}
     >
-      {isScrollingToTop && placeHolders}
+      <View
+        style={[
+          {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            opacity: isScrolling ? 1 : 0,
+          },
+        ]}
+      >
+        {placeHolders}
+      </View>
       {items.map(([id, key]) => {
-        const data = postMap.get(id);
+        const data = postsMap.get(id);
         if (!data) {
           console.warn('null data for id ' + id);
           return null;
@@ -280,6 +347,7 @@ const PostsGrid = ({
           <MemoPostRenderer
             key={key}
             item={data.item}
+            videoDisabled={!data.isVideo || !canPlay}
             windowWidth={windowWidth}
             layout={data.layout}
             paused={!canPlay}
@@ -297,9 +365,11 @@ const MemoPostRenderer = ({
   layout,
   windowWidth,
   paused,
+  videoDisabled,
 }: {
   item: Post;
   paused?: boolean;
+  videoDisabled?: boolean;
   windowWidth: number;
   layout: ItemLayout;
 }) =>
@@ -311,13 +381,14 @@ const MemoPostRenderer = ({
         post={item}
         width={layout.width}
         author={item.author}
+        videoDisabled={videoDisabled}
         small
         muted
         style={[layout, { position: 'absolute', backgroundColor: 'white' }]}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [item.id, paused, windowWidth],
+    [item.id, paused, videoDisabled, windowWidth],
   );
 
 // fraction of the scroll height that trigger a relayout

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { AUTHOR_CARTOUCHE_HEIGHT } from '../components/AuthorCartouche';
 import { HEADER_HEIGHT } from '../components/Header';
@@ -23,6 +23,7 @@ const postMobileScreenQuery = graphql`
 
 const PostMobileScreen = ({
   preloadedQuery,
+  hasFocus,
   route: { params },
 }: RelayScreenProps<PostRoute, PostMobileScreenQuery>) => {
   const data = usePreloadedQuery(postMobileScreenQuery, preloadedQuery);
@@ -37,6 +38,7 @@ const PostMobileScreen = ({
   return (
     <PostScreen
       ready={ready}
+      hasFocus={hasFocus}
       post={data.node}
       initialVideoTime={params.videoTime}
     />
@@ -47,6 +49,10 @@ PostMobileScreen.getScreenOptions = (
   { fromRectangle }: PostRoute['params'],
   safeArea: EdgeInsets,
 ): ScreenOptions | null => {
+  if (Platform.OS !== 'ios') {
+    // TODO make it works on android
+    return { stackAnimation: 'default' };
+  }
   if (!fromRectangle) {
     return null;
   }

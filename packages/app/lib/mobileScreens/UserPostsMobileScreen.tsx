@@ -16,12 +16,13 @@ const userPostsScreenQuery = graphql`
 
 const UserPostsMobileScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<UserPostsRoute, UserPostsMobileScreenQuery>) => {
   const data = usePreloadedQuery(userPostsScreenQuery, preloadedQuery);
   if (!data.user) {
     return null;
   }
-  return <UserPostsScreen user={data.user} />;
+  return <UserPostsScreen hasFocus={hasFocus} user={data.user} />;
 };
 
 export default relayScreen(UserPostsMobileScreen, {

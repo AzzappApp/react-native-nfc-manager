@@ -78,9 +78,15 @@ import org.apache.tools.ant.taskdefs.condition.Os
  * ]
  */
 
+
+def reactNativePath = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath()
+
 project.ext.react = [
+    root: "../..",
     enableHermes: true,  // clean and rebuild if changing
-     cliPath: new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/cli.js",
+    cliPath: reactNativePath + "/cli.js",
+    hermesCommand: reactNativePath + "/sdks/hermesc/%OS-BIN%/hermesc",
+    composeSourceMapsPath: reactNativePath + "/scripts/compose-source-maps.js"
 ]
 
 apply from: "../../../../node_modules/react-native/react.gradle"
@@ -121,6 +127,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
+
 
 /**
  * Architectures to build native code for.
@@ -218,6 +225,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file("release.keystore")
+            keyAlias "$System.env.ANDROID_KEY_ALIAS"
+            storePassword "$System.env.ANDROID_STORE_PASSWORD"
+            keyPassword "$System.env.ANDROID_KEY_PASSWORD"
+        }
     }
     buildTypes {
         debug {
@@ -249,6 +262,8 @@ android {
     }
 }
 
+apply plugin: "kotlin-android"
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
@@ -278,6 +293,21 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // kotlin dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
+    // TODO https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
+    // glide dependencies
+    implementation "com.github.bumptech.glide:glide:4.14.2"
+    implementation "com.github.bumptech.glide:okhttp3-integration:4.14.2"
+    annotationProcessor "com.github.bumptech.glide:compiler:4.14.2"
+
+    // exoplayer dependencies
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-transformer:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-effect:2.18.2'
 }
 
 if (isNewArchitectureEnabled()) {

@@ -30,9 +30,10 @@ export const searchResultGlobalQuery = graphql`
 
 type Props = {
   queryReference: PreloadedQuery<SearchResultGlobalQuery>;
+  hasFocus: boolean;
 };
 
-const SearchResultGlobal = ({ queryReference }: Props) => {
+const SearchResultGlobal = ({ queryReference, hasFocus }: Props) => {
   const preloadedQuery = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
     queryReference,
@@ -110,9 +111,12 @@ const SearchResultGlobal = ({ queryReference }: Props) => {
   return (
     <PostsGrid
       posts={posts}
-      canPlay={false}
+      canPlay={hasFocus}
       ListHeaderComponent={
-        <SearchResultGlobalListHeader viewer={preloadedQuery.viewer} />
+        <SearchResultGlobalListHeader
+          hasFocus={hasFocus}
+          viewer={preloadedQuery.viewer}
+        />
       }
       ListFooterComponent={
         <ListLoadingFooter loading={showLoadingIndicatorDebounced} />

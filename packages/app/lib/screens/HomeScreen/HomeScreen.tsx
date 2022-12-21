@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -5,17 +6,21 @@ import { colors } from '../../../theme';
 import { HEADER_HEIGHT } from '../../components/Header';
 import Link from '../../components/Link';
 import useViewportSize, { insetTop, VW100 } from '../../hooks/useViewportSize';
-import { useCurrentRoute } from '../../PlatformEnvironment';
 import Button from '../../ui/Button';
 import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
+import type { LayoutChangeEvent } from 'react-native';
 
 type HomeScreenProps = {
   viewer: HomeScreen_viewer$key;
+  hasFocus?: boolean;
 };
 
-const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
+const HomeScreen = ({
+  viewer: viewerRef,
+  hasFocus = true,
+}: HomeScreenProps) => {
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
@@ -29,17 +34,29 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
     viewerRef,
   );
 
-  const currentRoute = useCurrentRoute('willChange');
-
   const vp = useViewportSize();
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(Infinity);
+
+  const onHeaderLayout = (e: LayoutChangeEvent) => {
+    setHeaderHeight(e.nativeEvent.layout.height);
+  };
+
+  const onScroll = useCallback(
+    (scrollPosition: number) => {
+      setHeaderHidden(scrollPosition > headerHeight * 1.2);
+    },
+    [headerHeight],
+  );
 
   const intl = useIntl();
   return (
     <FollowedProfilesPostsList
       viewer={viewer}
-      canPlay={currentRoute.route === 'HOME'}
+      canPlay={hasFocus}
+      onScroll={onScroll}
       ListHeaderComponent={
-        <View style={{ marginTop: vp`${insetTop}` }}>
+        <View onLayout={onHeaderLayout} style={{ marginTop: vp`${insetTop}` }}>
           <View style={styles.header}>
             <Image
               source={require('../../assets/logo-full.png')}
@@ -48,7 +65,7 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
           </View>
           <FollowedProfilesList
             viewer={viewer}
-            canPlay={currentRoute.route === 'HOME'}
+            canPlay={hasFocus && !headerHidden}
             style={styles.followedProfilesList}
           />
           {!viewer.user && (
@@ -79,7 +96,10 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
           borderBottomRightRadius: vp`${VW100} * ${0.16}`,
         },
       ]}
-      postsContainerStyle={styles.followedProfilesPostsListPostsContainer}
+      postsContainerStyle={[
+        styles.followedProfilesPostsListPostsContainer,
+        styles.followedProfilesPostsListPostsContainerShadow,
+      ]}
     />
   );
 };
@@ -87,10 +107,9 @@ const HomeScreen = ({ viewer: viewerRef }: HomeScreenProps) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  signupButton: { paddingLeft: 100, paddingRight: 100 },
+  signupButton: { width: 150 },
   followedProfilesPosts: {
     flex: 1,
-    backgroundColor: '#FFF',
   },
   header: {
     backgroundColor: '#FFF',
@@ -117,10 +136,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: '#FFF',
-    shadowColor: colors.dark,
-    shadowOpacity: 0.4,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 20,
     zIndex: 20,
   },
+  followedProfilesPostsListPostsContainerShadow: Platform.select({
+    default: {
+      shadowColor: colors.dark,
+      shadowOpacity: 0.4,
+      shadowOffset: { width: 0, height: 10 },
+      shadowRadius: 20,
+    },
+    android: { elevation: 10 },
+  }),
 });

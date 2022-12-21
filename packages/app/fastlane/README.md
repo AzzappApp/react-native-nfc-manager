@@ -37,7 +37,28 @@ Build IOS application
 [bundle exec] fastlane ios deploy
 ```
 
+Upload the IOS application to App Center.
 
+----
+
+
+## Android
+
+### android build
+
+```sh
+[bundle exec] fastlane android build
+```
+
+Build the Android application.
+
+### android deploy
+
+```sh
+[bundle exec] fastlane android deploy
+```
+
+Upload the Android application to App Center.
 
 ----
 

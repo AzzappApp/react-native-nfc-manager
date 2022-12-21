@@ -28,9 +28,10 @@ import type { PreloadedQuery } from 'react-relay';
 
 type Props = {
   searchValue: string | undefined;
+  hasFocus: boolean;
 };
 
-const SearchTabContainer = ({ searchValue }: Props) => {
+const SearchTabContainer = ({ searchValue, hasFocus }: Props) => {
   const [tabQueryReference, setTabPreloadedQuery] = useState<TabQueries>({
     searchGlobal: undefined,
     searchProfiles: undefined,
@@ -78,6 +79,7 @@ const SearchTabContainer = ({ searchValue }: Props) => {
         key: string;
       };
     }) => {
+      // TODO hasFocus should be true only on the current tab
       switch (route.key) {
         case 'searchGlobal':
           return (
@@ -85,6 +87,7 @@ const SearchTabContainer = ({ searchValue }: Props) => {
               {tabQueryReference['searchGlobal'] && (
                 <SearchResultGlobal
                   queryReference={tabQueryReference['searchGlobal']}
+                  hasFocus={hasFocus}
                 />
               )}
             </Suspense>
@@ -95,6 +98,7 @@ const SearchTabContainer = ({ searchValue }: Props) => {
               {tabQueryReference['searchProfiles'] && (
                 <SearchResultProfiles
                   queryReference={tabQueryReference['searchProfiles']}
+                  hasFocus={hasFocus}
                 />
               )}
             </Suspense>
@@ -105,6 +109,7 @@ const SearchTabContainer = ({ searchValue }: Props) => {
               {tabQueryReference['searchPosts'] && (
                 <SearchResultPosts
                   queryReference={tabQueryReference['searchPosts']}
+                  hasFocus={hasFocus}
                 />
               )}
             </Suspense>
@@ -117,13 +122,14 @@ const SearchTabContainer = ({ searchValue }: Props) => {
                   queryReference={
                     tabQueryReference['searchGlobalhWithLocation']
                   }
+                  hasFocus={hasFocus}
                 />
               )}
             </Suspense>
           );
       }
     },
-    [tabQueryReference],
+    [hasFocus, tabQueryReference],
   );
   return (
     <TabView

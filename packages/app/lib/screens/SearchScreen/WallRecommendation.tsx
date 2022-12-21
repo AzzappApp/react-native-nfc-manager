@@ -1,7 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { PixelRatio, StyleSheet, View, Text } from 'react-native';
 import { colors, fontFamilies, textStyles } from '../../../theme';
-import { useCurrentRoute } from '../../PlatformEnvironment';
 import PressableBackground from '../../ui/PressableBackground';
 import RecommendedProfilesList from './RecommendedProfilesList';
 import TrendingPostsList from './TrendingPostsList';
@@ -10,9 +9,9 @@ import type { SearchScreen_viewer$data } from '@azzapp/relay/artifacts/SearchScr
 
 type Props = {
   viewer: SearchScreen_viewer$data;
+  hasFocus: boolean;
 };
-const WallRecommendation = ({ viewer }: Props) => {
-  const currentRoute = useCurrentRoute('willChange');
+const WallRecommendation = ({ viewer, hasFocus }: Props) => {
   return (
     <TrendingPostsList
       viewer={viewer}
@@ -25,10 +24,7 @@ const WallRecommendation = ({ viewer }: Props) => {
             />
           </Text>
           <View>
-            <TrendingProfilesList
-              viewer={viewer}
-              canPlay={currentRoute.route === 'SEARCH'}
-            />
+            <TrendingProfilesList viewer={viewer} canPlay={hasFocus} />
             <SeeAll />
           </View>
           <Text style={styles.titleSection}>
@@ -38,10 +34,7 @@ const WallRecommendation = ({ viewer }: Props) => {
             />
           </Text>
           <View>
-            <RecommendedProfilesList
-              viewer={viewer}
-              canPlay={currentRoute.route === 'SEARCH'}
-            />
+            <RecommendedProfilesList viewer={viewer} canPlay={hasFocus} />
             <SeeAll />
           </View>
           <Text style={styles.titleSection}>
@@ -52,7 +45,7 @@ const WallRecommendation = ({ viewer }: Props) => {
           </Text>
         </>
       }
-      canPlay={currentRoute.route === 'SEARCH'}
+      canPlay={hasFocus}
     />
   );
 };

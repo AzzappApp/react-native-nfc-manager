@@ -1,9 +1,11 @@
 import { useIntl } from 'react-intl';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, Platform } from 'react-native';
 import { colors, textStyles } from '../../../theme';
 import PressableNative from '../../ui/PressableNative';
 import EditableImage from './EditableImage';
-import type { ImageEditionParameters, Media } from './helpers';
+import { useFilterList } from './helpers';
+import type { Media } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ScrollViewProps } from 'react-native';
 
 type FilterSelectionListProps = ScrollViewProps & {
@@ -23,6 +25,10 @@ const FilterSelectionList = ({
   ...props
 }: FilterSelectionListProps) => {
   const intl = useIntl();
+  const filters = useFilterList().filter(
+    ({ ios, android }) =>
+      (Platform.OS === 'ios' && ios) || (Platform.OS === 'android' && android),
+  );
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
       <FilterButton
@@ -117,16 +123,3 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
 });
-
-const filters = [
-  { filter: 'chrome', label: 'Chrome' },
-  { filter: 'fade', label: 'Fade' },
-  { filter: 'instant', label: 'Instant' },
-  { filter: 'noir', label: 'Noir' },
-  { filter: 'process', label: 'Process' },
-  { filter: 'tonal', label: 'Tonal' },
-  { filter: 'transfer', label: 'Transfer' },
-  { filter: 'sepia', label: 'Sepia' },
-  { filter: 'thermal', label: 'Thermal' },
-  { filter: 'xray', label: 'X-ray' },
-];

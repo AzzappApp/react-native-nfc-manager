@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { Platform } from 'react-native';
 import { colors } from '../../theme';
 import { getPressableStyle } from '../helpers/gestureHelpers';
 import PressableTransition from './PressableTransition';
@@ -33,6 +34,7 @@ const PressableScaleHighlight = (
     disabledOpacity = 0.5,
     animationDuration = 150,
     easing = 'ease-in-out',
+    disabled,
     children,
     style,
     ...props
@@ -45,16 +47,17 @@ const PressableScaleHighlight = (
       { transform: [{ scale: state.pressed ? activeScale : scale }] },
     ]}
     ref={ref}
-    disabled={props.disabled}
+    disabled={disabled}
     transitionDuration={animationDuration}
     transitions={['transform']}
+    easing={easing}
     {...props}
   >
     {(state: PressableStateCallbackType) => {
       return (
         <>
           <ViewTransition
-            transitionDuration={animationDuration}
+            transitionDuration={animationDuration / 2}
             transitions={['backgroundColor']}
             easing={easing}
             style={{
@@ -73,9 +76,9 @@ const PressableScaleHighlight = (
             easing={easing}
             style={{
               flex: 1,
-              opacity: props.disabled
+              opacity: disabled
                 ? disabledOpacity
-                : state.pressed
+                : state.pressed && Platform.OS !== 'android'
                 ? activeOpacity
                 : opacity,
             }}

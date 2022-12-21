@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import type { Icons } from '../../ui/Icon';
+import type { ImageEditionParameters } from './mediaHelpers';
 
 export type TimeRange = {
   startTime: number;
@@ -20,13 +21,6 @@ export type Image = MediaBase & { kind: 'image' };
 export type Video = MediaBase & { kind: 'video'; duration: number };
 export type Media = Image | Video;
 
-export type CropData = {
-  originX: number;
-  originY: number;
-  width: number;
-  height: number;
-};
-
 export type ImageOrientation =
   | 'DOWN_MIRRORED'
   | 'DOWN'
@@ -36,25 +30,6 @@ export type ImageOrientation =
   | 'RIGHT'
   | 'UP_MIRRORED'
   | 'UP';
-
-export type ImageEditionParameters = {
-  brightness?: number | null;
-  contrast?: number | null;
-  highlights?: number | null;
-  saturation?: number | null;
-  shadow?: number | null;
-  sharpness?: number | null;
-  structure?: number | null;
-  temperature?: number | null;
-  tint?: number | null;
-  vibrance?: number | null;
-  vigneting?: number | null;
-  pitch?: number | null;
-  roll?: number | null;
-  yaw?: number | null;
-  cropData?: CropData | null;
-  orientation?: ImageOrientation;
-};
 
 export const formatVideoTime = (timeInSeconds = 0) => {
   const seconds = Math.floor(timeInSeconds);
@@ -213,3 +188,124 @@ export const editionParametersSettings: ParametersInfo<{
 };
 
 export const TOOL_BAR_BOTTOM_MARGIN = 20;
+
+export const useFilterList = (): Array<{
+  filter: string;
+  label: string;
+  ios?: boolean;
+  android?: boolean;
+}> => {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        filter: 'chrome',
+        label: intl.formatMessage({
+          defaultMessage: 'Chrome',
+          description: 'Chrome photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'fade',
+        label: intl.formatMessage({
+          defaultMessage: 'Fade',
+          description: 'Fade photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'instant',
+        label: intl.formatMessage({
+          defaultMessage: 'Instant',
+          description: 'Instant photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'noir',
+        label: intl.formatMessage({
+          defaultMessage: 'Noir',
+          description: 'Noir photo filter name',
+        }),
+        ios: true,
+        android: true,
+      },
+      {
+        filter: 'process',
+        label: intl.formatMessage({
+          defaultMessage: 'Process',
+          description: 'Process photo filter name',
+        }),
+        ios: true,
+        android: true,
+      },
+      {
+        filter: 'tonal',
+        label: intl.formatMessage({
+          defaultMessage: 'Tonal',
+          description: 'Tonal photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'transfer',
+        label: intl.formatMessage({
+          defaultMessage: 'Transfer',
+          description: 'Transfer photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'sepia',
+        label: intl.formatMessage({
+          defaultMessage: 'Sepia',
+          description: 'Sepia photo filter name',
+        }),
+        ios: true,
+        android: true,
+      },
+      {
+        filter: 'thermal',
+        label: intl.formatMessage({
+          defaultMessage: 'Thermal',
+          description: 'Thermal photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'xray',
+        label: intl.formatMessage({
+          defaultMessage: 'X-ray',
+          description: 'X-ray photo filter name',
+        }),
+        ios: true,
+      },
+      {
+        filter: 'documentary',
+        label: intl.formatMessage({
+          defaultMessage: 'Documentary',
+          description: 'Documentary photo filter name',
+        }),
+        android: true,
+      },
+      {
+        filter: 'negative',
+        label: intl.formatMessage({
+          defaultMessage: 'Negative',
+          description: 'Negative photo filter name',
+        }),
+        android: true,
+      },
+      {
+        filter: 'posterize',
+        label: intl.formatMessage({
+          defaultMessage: 'Posterize',
+          description: 'Posterize photo filter name',
+        }),
+        android: true,
+      },
+    ],
+    [intl],
+  );
+};

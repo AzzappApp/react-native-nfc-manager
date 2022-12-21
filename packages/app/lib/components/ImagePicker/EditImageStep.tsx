@@ -18,11 +18,8 @@ import ParametersList from './ParametersList';
 import VideoEditor from './VideoEditor';
 import WizardImageEditor from './WizardImagEditor';
 import type { Tab } from '../../ui/TabsBar';
-import type {
-  Video,
-  ImageEditionParameters,
-  ImageOrientation,
-} from './helpers';
+import type { Video, ImageOrientation } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 
 const EditImageStep = () => {
   const {
@@ -78,18 +75,18 @@ const EditImageStep = () => {
   const onNextOrientation = useCallback(() => {
     let nextOrientation: ImageOrientation;
     switch (editionParameters.orientation) {
-      case 'RIGHT':
+      case 'LEFT':
         nextOrientation = 'DOWN';
         break;
       case 'DOWN':
-        nextOrientation = 'LEFT';
+        nextOrientation = 'RIGHT';
         break;
-      case 'LEFT':
+      case 'RIGHT':
         nextOrientation = 'UP';
         break;
       case 'UP':
       default:
-        nextOrientation = 'RIGHT';
+        nextOrientation = 'LEFT';
         break;
     }
     onParameterValueChange('orientation', nextOrientation);
@@ -142,7 +139,7 @@ const EditImageStep = () => {
       stepId={EditImageStep.STEP_ID}
       headerTitle={editedParameter ? paramsInfos[editedParameter]?.label : null}
       headerRightButton={
-        editedParameter === 'cropData' && media?.kind === 'image' ? (
+        editedParameter === 'cropData' ? (
           <IconButton icon="rotate" onPress={onNextOrientation} />
         ) : null
       }
@@ -225,16 +222,12 @@ const EditImageStep = () => {
             }}
           >
             {editedParameter === 'cropData' ? (
-              media?.kind === 'image' ? (
-                <ParamEditor
-                  value={editionParameters.roll}
-                  parameter="roll"
-                  onChange={value => onParameterValueChange('roll', value)}
-                  style={{ flex: 1 }}
-                />
-              ) : (
-                <View style={{ flex: 1 }} />
-              )
+              <ParamEditor
+                value={editionParameters.roll}
+                parameter="roll"
+                onChange={value => onParameterValueChange('roll', value)}
+                style={{ flex: 1 }}
+              />
             ) : (
               <ParamEditor
                 value={editionParameters[editedParameter] as any}

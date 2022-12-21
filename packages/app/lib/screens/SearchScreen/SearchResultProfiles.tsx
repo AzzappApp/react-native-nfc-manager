@@ -20,9 +20,10 @@ export const searchResultProfilesQuery = graphql`
 
 type Props = {
   queryReference: PreloadedQuery<SearchResultProfilesQuery>;
+  hasFocus: boolean;
 };
 
-const SearchResultProfiles = ({ queryReference }: Props) => {
+const SearchResultProfiles = ({ queryReference, hasFocus }: Props) => {
   const preloadedQuery = usePreloadedQuery<SearchResultProfilesQuery>(
     searchResultProfilesQuery,
     queryReference,
@@ -73,7 +74,7 @@ const SearchResultProfiles = ({ queryReference }: Props) => {
     <CoverList
       users={users}
       onEndReached={onEndReached}
-      canPlay={false}
+      canPlay={hasFocus}
       containerStyle={styles.containerStyle}
       coverStyle={styles.coverStyle}
       horizontal={false}

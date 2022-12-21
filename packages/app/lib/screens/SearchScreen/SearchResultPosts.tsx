@@ -23,9 +23,10 @@ export const searchResultPostsQuery = graphql`
 
 type Props = {
   queryReference: PreloadedQuery<any>;
+  hasFocus: boolean;
 };
 
-const SearchResultPosts = ({ queryReference }: Props) => {
+const SearchResultPosts = ({ queryReference, hasFocus }: Props) => {
   const preloadedQuery = usePreloadedQuery<SearchResultPostsQuery>(
     searchResultPostsQuery,
     queryReference,
@@ -97,7 +98,7 @@ const SearchResultPosts = ({ queryReference }: Props) => {
   return (
     <PostsGrid
       posts={posts}
-      canPlay={false}
+      canPlay={hasFocus}
       ListFooterComponent={
         <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
       }

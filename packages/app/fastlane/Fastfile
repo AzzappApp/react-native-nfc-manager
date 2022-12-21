@@ -76,6 +76,7 @@ platform :ios do
     restore_file(path: pbxprojPath)
   end
 
+  desc 'Upload the IOS application to App Center.'
   lane :deploy do
     ownerName = ENV['APPCENTER_OWNER_NAME']
     appName = ENV['APPCENTER_IOS_APP_NAME']
@@ -93,5 +94,31 @@ platform :ios do
     installUrl = "https://install.appcenter.ms/orgs/#{ownerName}/apps/#{appName}/releases/#{release["id"]}"
     sh("echo IOS_INSTALL_URL=#{installUrl} >> $GITHUB_ENV")
   end 
+end
+
+platform :android do
+
+  desc 'Build the Android application.'
+  lane :build do
+    gradle(task: 'clean', project_dir: 'android/')
+    gradle(task: 'app:assemble', build_type: 'release', project_dir: 'android/')
+  end
+
+  desc 'Upload the Android application to App Center.'
+  lane :deploy do
+    ownerName = ENV['APPCENTER_OWNER_NAME']
+    appName = ENV['APPCENTER_ANDROID_APP_NAME']
+    appcenter_upload(
+      api_token: ENV["APPCENTER_ANDROID_API_TOKEN"],
+      owner_name: ownerName,
+      app_name: appName,
+      file: 'android/app/build/outputs/apk/release/app-release.apk'
+    )
+
+    release = Actions.lane_context[SharedValues::APPCENTER_BUILD_INFORMATION]
+    installUrl = "https://install.appcenter.ms/orgs/#{ownerName}/apps/#{appName}/releases/#{release["id"]}"
+    sh("echo ANDROID_INSTALL_URL=#{installUrl} >> $GITHUB_ENV")
+  end
+
 end
 

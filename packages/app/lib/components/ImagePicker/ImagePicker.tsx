@@ -1,12 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { exportImage } from './EditableImage';
-import { exportVideo } from './EditableVideo';
 import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
+import { exportImage, exportVideo } from './mediaHelpers';
 import SelectImageStep from './SelectImageStep';
-import type { ImageEditionParameters } from './helpers';
 import type { ImagePickerState } from './ImagePickerContext';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ComponentType } from 'react';
 
 type ImagePickerProps = {
@@ -55,15 +54,21 @@ const ImagePicker = ({
         return;
       }
       setExporting(true);
-      const path = await exportMedia({
-        uri: media.uri,
-        kind: media.kind,
-        editionParameters,
-        aspectRatio,
-        filter: mediaFilter,
-        ...timeRange,
-      });
-      setExporting(false);
+      let path: string;
+      try {
+        path = await exportMedia({
+          uri: media.uri,
+          kind: media.kind,
+          editionParameters,
+          aspectRatio,
+          filter: mediaFilter,
+          ...timeRange,
+        });
+      } catch (e) {
+        setExporting(false);
+        return;
+      }
+
       onFinished?.({
         kind: media.kind,
         path,
@@ -89,6 +94,7 @@ const ImagePicker = ({
       ref={pickerStateRef}
       forceAspectRatio={forceAspectRatio}
       maxVideoDuration={maxVideoDuration}
+      exporting={exporting}
     >
       <ImagePickerWizardContainer
         onBack={onBack}

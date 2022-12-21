@@ -17,6 +17,12 @@
       "value": "Cancel"
     }
   ],
+  "0AvByP": [
+    {
+      "type": 0,
+      "value": "Noir"
+    }
+  ],
   "0C3U4p": [
     {
       "type": 0,
@@ -89,6 +95,12 @@
       "value": "Allow Azzapp to access your photos"
     }
   ],
+  "6j49Wn": [
+    {
+      "type": 0,
+      "value": "Negative"
+    }
+  ],
   "74j5Wg": [
     {
       "type": 0,
@@ -137,6 +149,12 @@
       "value": "Validate"
     }
   ],
+  "BFnUrJ": [
+    {
+      "type": 0,
+      "value": "Process"
+    }
+  ],
   "BJRz8L": [
     {
       "type": 0,
@@ -147,6 +165,12 @@
     {
       "type": 0,
       "value": "We just send you a link to create a new password"
+    }
+  ],
+  "C1R1bc": [
+    {
+      "type": 0,
+      "value": "Fade"
     }
   ],
   "CCbp9S": [
@@ -209,6 +233,12 @@
       "value": "Next"
     }
   ],
+  "P2PER8": [
+    {
+      "type": 0,
+      "value": "Sepia"
+    }
+  ],
   "PDfRjc": [
     {
       "type": 0,
@@ -231,6 +261,12 @@
     {
       "type": 0,
       "value": "Ok"
+    }
+  ],
+  "PmtfGE": [
+    {
+      "type": 0,
+      "value": "Documentary"
     }
   ],
   "QuRr//": [
@@ -305,10 +341,22 @@
       "value": "Highlights"
     }
   ],
+  "dl8CRm": [
+    {
+      "type": 0,
+      "value": "Posterize"
+    }
+  ],
   "dqGjrZ": [
     {
       "type": 0,
       "value": "Structure"
+    }
+  ],
+  "dzmRcf": [
+    {
+      "type": 0,
+      "value": "Transfer"
     }
   ],
   "eNyb4j": [
@@ -469,6 +517,12 @@
       "value": "Contrast"
     }
   ],
+  "q/ZByJ": [
+    {
+      "type": 0,
+      "value": "Thermal"
+    }
+  ],
   "qyCo80": [
     {
       "type": 0,
@@ -493,6 +547,12 @@
       "value": "Sign Up"
     }
   ],
+  "uNR58P": [
+    {
+      "type": 0,
+      "value": "Chrome"
+    }
+  ],
   "ukFVmp": [
     {
       "type": 0,
@@ -513,6 +573,18 @@
     {
       "type": 0,
       "value": "Tap to sign up"
+    }
+  ],
+  "v4LP9H": [
+    {
+      "type": 0,
+      "value": "Instant"
+    }
+  ],
+  "vC6hy9": [
+    {
+      "type": 0,
+      "value": "X-ray"
     }
   ],
   "vDm98w": [
@@ -577,6 +649,12 @@
     {
       "type": 1,
       "value": "word"
+    }
+  ],
+  "z7TgL0": [
+    {
+      "type": 0,
+      "value": "Tonal"
     }
   ],
   "zMaylR": [

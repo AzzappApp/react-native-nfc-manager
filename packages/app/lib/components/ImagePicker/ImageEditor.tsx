@@ -1,13 +1,12 @@
 import isEqual from 'lodash/isEqual';
 import range from 'lodash/range';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedProps,
-  useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -16,7 +15,7 @@ import EditableImage from './EditableImage';
 import EditableVideo from './EditableVideo';
 import type { EditableImageProps } from './EditableImage';
 import type { EditableVideoProps } from './EditableVideo';
-import type { CropData, ImageEditionParameters } from './helpers';
+import type { CropData, ImageEditionParameters } from './mediaHelpers';
 import type { FunctionComponent } from 'react';
 import type {
   ViewProps,
@@ -181,7 +180,7 @@ const ImageEditor = ({
   );
 
   useEffect(() => {
-    if (!editionParameters?.cropData) {
+    if (!isEqual(cropData, editionParameters?.cropData)) {
       onCropDataChange(cropData);
     }
   }, [cropData, editionParameters?.cropData, onCropDataChange]);
@@ -326,6 +325,7 @@ const ImageEditor = ({
   ]);
 
   const panGesture = Gesture.Pan()
+    .maxPointers(1)
     .onStart(onGestureStart)
     .onChange(e => {
       'worklet';
@@ -356,15 +356,31 @@ const ImageEditor = ({
       runOnJS(onGestureEnd)();
     });
 
+  const isAndroid = Platform.OS === 'android';
   const pinchGesture = Gesture.Pinch()
     .onStart(onGestureStart)
     .onChange(e => {
       'worklet';
+
+      const { mediaHeight, mediaWidth } = sizeInfosSharedValue.value;
+
       const { offsetX, offsetY, offsetHeight, offsetWidth } =
         gestureContext.value;
 
       cropOriginWidthSharedValue.value = offsetWidth / e.scale;
       cropOriginHeightSharedValue.value = offsetHeight / e.scale;
+      if (isAndroid) {
+        // android effect doesn't support this kind of downscaling
+        cropOriginWidthSharedValue.value = Math.min(
+          cropOriginWidthSharedValue.value,
+          mediaWidth,
+        );
+        cropOriginHeightSharedValue.value = Math.min(
+          cropOriginHeightSharedValue.value,
+          mediaHeight,
+        );
+      }
+
       cropOriginXSharedValue.value =
         offsetX - (cropOriginWidthSharedValue.value - offsetWidth) / 2;
       cropOriginYSharedValue.value =
@@ -394,51 +410,20 @@ const ImageEditor = ({
     },
   }));
 
-  const videoStyle = useAnimatedStyle(() => {
-    const originX = cropOriginXSharedValue.value;
-    const originY = cropOriginYSharedValue.value;
-    const width = cropOriginWidthSharedValue.value;
-    const height = cropOriginHeightSharedValue.value;
-    const { mediaHeight, mediaWidth, displayedHeight, displayedWidth } =
-      sizeInfosSharedValue.value;
-
-    const scale =
-      mediaWidth / mediaHeight > aspectRatio
-        ? displayedHeight / height
-        : displayedWidth / width;
-
-    return scale > 0
-      ? {
-          opacity: 1,
-          width: mediaWidth * scale,
-          height: mediaHeight * scale,
-          transform: [
-            { translateX: -originX * scale },
-            { translateY: -originY * scale },
-          ],
-        }
-      : { opacity: 0 };
-  });
-
   const image = useMemo(() => {
     if (!displayedImageSize) {
       return null;
     }
-    if (media.kind === 'video') {
-      return (
-        <View style={[displayedImageSize, { overflow: 'hidden' }]}>
-          <AnimatedVideo
-            uri={media.uri}
-            animatedProps={imageAnimatedProps}
-            filters={filters}
-            startTime={startTime}
-            duration={duration}
-            style={[{ position: 'absolute' }, displayedImageSize, videoStyle]}
-          />
-        </View>
-      );
-    }
-    return (
+    return media.kind === 'video' ? (
+      <AnimatedVideo
+        uri={media.uri}
+        animatedProps={imageAnimatedProps}
+        filters={filters}
+        startTime={startTime}
+        duration={duration}
+        style={displayedImageSize}
+      />
+    ) : (
       <AnimatedImage
         source={media}
         animatedProps={imageAnimatedProps}
@@ -453,7 +438,6 @@ const ImageEditor = ({
     filters,
     startTime,
     duration,
-    videoStyle,
   ]);
 
   return (
@@ -464,7 +448,7 @@ const ImageEditor = ({
     >
       {image}
       {cropEditionMode && componentSize && displayedImageSize && (
-        <GestureDetector gesture={Gesture.Race(panGesture, pinchGesture)}>
+        <GestureDetector gesture={Gesture.Race(pinchGesture, panGesture)}>
           <View
             style={[
               displayedImageSize,

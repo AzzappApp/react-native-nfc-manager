@@ -11,6 +11,10 @@
     "defaultMessage": "Cancel",
     "description": "Cancel button in Image edition screen"
   },
+  "0AvByP": {
+    "defaultMessage": "Noir",
+    "description": "Noir photo filter name"
+  },
   "0C3U4p": {
     "defaultMessage": "Cancel",
     "description": "SearchBar - Cancel button"
@@ -59,6 +63,10 @@
     "defaultMessage": "Allow Azzapp to access your photos",
     "description": "Camera authorization screen title for photos permission"
   },
+  "6j49Wn": {
+    "defaultMessage": "Negative",
+    "description": "Negative photo filter name"
+  },
   "74j5Wg": {
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
@@ -91,6 +99,10 @@
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
   },
+  "BFnUrJ": {
+    "defaultMessage": "Process",
+    "description": "Process photo filter name"
+  },
   "BJRz8L": {
     "defaultMessage": "Tap to close",
     "description": "BottomSheet - close button"
@@ -98,6 +110,10 @@
   "Bm4p42": {
     "defaultMessage": "We just send you a link to create a new password",
     "description": "ForgotPasswordScreen - email send indication"
+  },
+  "C1R1bc": {
+    "defaultMessage": "Fade",
+    "description": "Fade photo filter name"
   },
   "CCbp9S": {
     "defaultMessage": "Trending profiles",
@@ -139,6 +155,10 @@
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
   },
+  "P2PER8": {
+    "defaultMessage": "Sepia",
+    "description": "Sepia photo filter name"
+  },
   "PDfRjc": {
     "defaultMessage": "privacy policy",
     "description": "Signup Screen - privacy policy link"
@@ -154,6 +174,10 @@
   "PjYjnk": {
     "defaultMessage": "Ok",
     "description": "Ok button label in post creation text edition modal"
+  },
+  "PmtfGE": {
+    "defaultMessage": "Documentary",
+    "description": "Documentary photo filter name"
   },
   "QuRr//": {
     "defaultMessage": "Don't have an account",
@@ -203,9 +227,17 @@
     "defaultMessage": "Highlights",
     "description": "Highlights image edition parameters name"
   },
+  "dl8CRm": {
+    "defaultMessage": "Posterize",
+    "description": "Posterize photo filter name"
+  },
   "dqGjrZ": {
     "defaultMessage": "Structure",
     "description": "Structure image edition parameters name"
+  },
+  "dzmRcf": {
+    "defaultMessage": "Transfer",
+    "description": "Transfer photo filter name"
   },
   "eNyb4j": {
     "defaultMessage": "Tap to sign in",
@@ -307,6 +339,10 @@
     "defaultMessage": "Contrast",
     "description": "Contrast image edition parameters name"
   },
+  "q/ZByJ": {
+    "defaultMessage": "Thermal",
+    "description": "Thermal photo filter name"
+  },
   "qyCo80": {
     "defaultMessage": "Describe your publication",
     "description": "Post creation screen textarea placeholder"
@@ -323,6 +359,10 @@
     "defaultMessage": "Sign Up",
     "description": "Home screen sign up button label"
   },
+  "uNR58P": {
+    "defaultMessage": "Chrome",
+    "description": "Chrome photo filter name"
+  },
   "ukFVmp": {
     "defaultMessage": "Normal",
     "description": "Name of the default filter (no filter applied) in image edition"
@@ -334,6 +374,14 @@
   "v3DENk": {
     "defaultMessage": "Tap to sign up",
     "description": "Home Screen - AccessibilityLabel Sign Up button"
+  },
+  "v4LP9H": {
+    "defaultMessage": "Instant",
+    "description": "Instant photo filter name"
+  },
+  "vC6hy9": {
+    "defaultMessage": "X-ray",
+    "description": "X-ray photo filter name"
   },
   "vDm98w": {
     "defaultMessage": "Sharpness",
@@ -374,6 +422,10 @@
   "ymtf7H": {
     "defaultMessage": "Tap to search for {word}",
     "description": "Recent Search - Accessibiltity Label remove element from history"
+  },
+  "z7TgL0": {
+    "defaultMessage": "Tonal",
+    "description": "Tonal photo filter name"
   },
   "zMaylR": {
     "defaultMessage": "Take a video",

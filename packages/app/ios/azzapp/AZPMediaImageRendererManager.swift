@@ -177,7 +177,7 @@ class MediaImageURICache {
   private let cache = NSCache<NSString, NSMutableDictionary>()
   
   init() {
-    cache.countLimit = 100;
+    cache.countLimit = 1000;
   }
   
   func queryCache(mediaID: NSString, size: NSNumber) -> (NSString, NSNumber)? {

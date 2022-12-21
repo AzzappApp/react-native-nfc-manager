@@ -22,6 +22,7 @@ import { QR_CODE_POSITION_CHANGE_EVENT } from '../../components/CoverRenderer/Co
 import ImagePicker from '../../components/ImagePicker';
 import { addCacheEntry } from '../../components/MediaRenderer/MediaImageRenderer';
 import { addLocalVideo } from '../../components/MediaRenderer/MediaVideoRenderer';
+import { getFileName } from '../../helpers/fileHelpers';
 import useFormMutation from '../../hooks/useFormMutation';
 import { useWebAPI } from '../../PlatformEnvironment';
 import ColorPicker from '../../ui/ColorPicker';
@@ -596,8 +597,3 @@ const getOptimisticResponse = (
     },
   },
 });
-
-const getFileName = (path: string) => {
-  const arr = path.split('/');
-  return arr[arr.length - 1];
-};

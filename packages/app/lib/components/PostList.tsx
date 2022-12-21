@@ -94,7 +94,7 @@ const PostList = ({
     ({ item, index }: ListRenderItemInfo<Post>) => (
       <PostRenderer
         post={item}
-        paused={!canPlay || snapedPostId !== item.id}
+        videoDisabled={!canPlay || snapedPostId !== item.id}
         width={windowWidth}
         author={item.author ?? author!}
         style={index !== 0 && { marginTop: 10 }}

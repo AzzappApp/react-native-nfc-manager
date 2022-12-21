@@ -13,9 +13,13 @@ import type { SearchScreen_viewer$key } from '@azzapp/relay/artifacts/SearchScre
 
 type SearchScreenProps = {
   viewer: SearchScreen_viewer$key;
+  hasFocus?: boolean;
 };
 
-const SearchScreen = ({ viewer: viewerRef }: SearchScreenProps) => {
+const SearchScreen = ({
+  viewer: viewerRef,
+  hasFocus = true,
+}: SearchScreenProps) => {
   const viewer = useFragment(
     graphql`
       fragment SearchScreen_viewer on Viewer {
@@ -106,7 +110,7 @@ const SearchScreen = ({ viewer: viewerRef }: SearchScreenProps) => {
               },
             ]}
           >
-            <WallRecommendation viewer={viewer} />
+            <WallRecommendation viewer={viewer} hasFocus={hasFocus} />
           </ViewTransition>
         )}
         <ViewTransition
@@ -127,7 +131,10 @@ const SearchScreen = ({ viewer: viewerRef }: SearchScreenProps) => {
           />
         </ViewTransition>
         {showTabView && (
-          <SearchTabContainer searchValue={searchValueSubmitted} />
+          <SearchTabContainer
+            searchValue={searchValueSubmitted}
+            hasFocus={hasFocus}
+          />
         )}
       </View>
     </View>

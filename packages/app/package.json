@@ -3,14 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "dev": "react-native start",
+    "clean": "watchman watch-del-all && rm -rf node_modules && rm -Rf ios/build && rm -Rf ios/Pods",
+    "bundle": "react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios",
+    "pod-install": "cd ios && bundle exec pod install",
     "run:android": "react-native run-android --no-packager",
     "run:ios": "react-native run-ios --no-packager",
-    "dev": "react-native start",
     "build:ios": "bundle exec fastlane ios build",
+    "build:android": "bundle exec fastlane android build",
     "deploy:ios": "bundle exec fastlane ios deploy",
-    "pod-install": "cd ios && bundle exec pod install",
-    "clean": "watchman watch-del-all && rm -rf node_modules && rm -Rf ios/build && rm -Rf ios/Pods",
-    "bundle": "react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios"
+    "deploy:android": "bundle exec fastlane android deploy"
   },
   "dependencies": {
     "@azzapp/i18n": "*",
@@ -30,7 +32,8 @@
     "react-native": "0.70.3",
     "react-native-create-thumbnail": "^1.6.3",
     "react-native-encrypted-storage": "^4.0.2",
-    "react-native-gesture-handler": "2.7.1",
+    "react-native-flipper": "^0.164.0",
+    "react-native-gesture-handler": "2.8.0",
     "react-native-linear-gradient": "2.6.2",
     "react-native-localize": "^2.2.4",
     "react-native-pager-view": "6.0.1",

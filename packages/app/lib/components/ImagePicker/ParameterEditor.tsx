@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '../../../theme';
 import DashedSlider from '../../ui/DashedSlider';
 import { editionParametersSettings } from './helpers';
-import type { ImageEditionParameters } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ViewProps } from 'react-native';
 
 type ParamEditorProps = ViewProps & {

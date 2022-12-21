@@ -4,7 +4,7 @@ import { colors, textStyles } from '../../../theme';
 import Icon from '../../ui/Icon';
 import PressableNative from '../../ui/PressableNative';
 import { useEditionParametersDisplayInfos } from './helpers';
-import type { ImageEditionParameters } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ScrollViewProps } from 'react-native';
 
 const ParametersList = ({

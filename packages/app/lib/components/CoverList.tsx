@@ -73,7 +73,7 @@ const CoverList = ({
           coverStyle,
         ]}
         playTransition={canPlay}
-        videoPaused={!canPlay}
+        videoDisabled={!canPlay}
       />
     ),
     [canPlay, coverStyle, coverWidth, horizontal],

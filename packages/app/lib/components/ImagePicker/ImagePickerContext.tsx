@@ -7,7 +7,8 @@ import {
   useMemo,
   useState,
 } from 'react';
-import type { ImageEditionParameters, Media, TimeRange } from './helpers';
+import type { Media, TimeRange } from './helpers';
+import type { ImageEditionParameters } from './mediaHelpers';
 import type { ReactNode, ForwardedRef } from 'react';
 
 export type ImagePickerState = {
@@ -18,6 +19,7 @@ export type ImagePickerState = {
   editionParameters: ImageEditionParameters;
   mediaFilter: string | null;
   timeRange: TimeRange | null;
+  exporting?: boolean;
   onMediaChange(media: Media): void;
   onAspectRatioChange(value: number): void;
   onTimeRangeChange(timeRange: TimeRange | null): void;
@@ -42,6 +44,7 @@ export const useImagePickerState = () => {
 
 type ImagePickerContextProviderProps = {
   maxVideoDuration: number;
+  exporting?: boolean;
   forceAspectRatio?: number;
   children: ReactNode;
 };
@@ -50,6 +53,7 @@ const _ImagePickerContextProvider = (
   {
     maxVideoDuration,
     forceAspectRatio,
+    exporting,
     children,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
@@ -141,6 +145,7 @@ const _ImagePickerContextProvider = (
       editionParameters,
       mediaFilter,
       timeRange,
+      exporting,
       onMediaChange,
       onAspectRatioChange,
       onEditionParametersChange: setEditionParameters,
@@ -157,6 +162,7 @@ const _ImagePickerContextProvider = (
       editionParameters,
       mediaFilter,
       timeRange,
+      exporting,
       onMediaChange,
       onAspectRatioChange,
       onParameterValueChange,

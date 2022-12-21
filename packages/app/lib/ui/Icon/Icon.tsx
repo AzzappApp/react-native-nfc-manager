@@ -101,6 +101,9 @@ const icons = {
   get picture() {
     return require('./assets/picture.png');
   },
+  get play() {
+    return require('./assets/play.png');
+  },
   get plus() {
     return require('./assets/plus.png');
   },

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { graphql, useMutation } from 'react-relay';
 import ImagePicker from '../../components/ImagePicker';
-import { getFileName } from '../../helpers/mediaHelpers';
+import { getFileName } from '../../helpers/fileHelpers';
 import { useRouter, useWebAPI } from '../../PlatformEnvironment';
 import UploadProgressModal from '../UserScreen/UploadProgressModal';
 import PostContentStep from './PostContentStep';
