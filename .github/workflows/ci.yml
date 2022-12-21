@@ -82,7 +82,7 @@ jobs:
         env:
           APPCENTER_OWNER_NAME: azzapp
           APPCENTER_ANDROID_APP_NAME: ${{ env.app_center_android_app_name }}
-          APPCENTER_ANDROID_API_TOKEN: ${{ env.app_center_android_api_token }
+          APPCENTER_ANDROID_API_TOKEN: ${{ env.app_center_android_api_token }}
 
       # IOS App build
       - name: Cache CocoaPods
