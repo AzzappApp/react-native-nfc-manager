@@ -64,6 +64,13 @@ jobs:
           echo "app_center_android_secret=${{ secrets.APPCENTER_DEV_ANDROID_APP_SECRET }}" >> $GITHUB_ENV
  
       # Android Build
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
       - name: Generate release.keystore
         env:
           ANDROID_KEY_STORE: ${{ secrets.ANDROID_KEY_STORE }}
@@ -77,12 +84,6 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       # Android Upload
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
       
       - name: Android Appcenter upload
         run: yarn deploy:android
