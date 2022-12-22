@@ -15,21 +15,17 @@ const IndexPage = () => (
     <Link href="/home">Home</Link>
     <br />
     <Link href="/signin">
-      <a>
-        <FormattedMessage
-          defaultMessage="Sign In"
-          description="Sign In link in web home page"
-        />
-      </a>
+      <FormattedMessage
+        defaultMessage="Sign In"
+        description="Sign In link in web home page"
+      />
     </Link>
     <br />
     <Link href="/signup">
-      <a>
-        <FormattedMessage
-          defaultMessage="Sign Up"
-          description="Sign Up link in web home page"
-        />
-      </a>
+      <FormattedMessage
+        defaultMessage="Sign Up"
+        description="Sign Up link in web home page"
+      />
     </Link>
     <br />
   </div>

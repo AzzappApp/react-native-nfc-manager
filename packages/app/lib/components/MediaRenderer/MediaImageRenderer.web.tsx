@@ -1,10 +1,10 @@
 import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
-import Image from 'next/future/image';
+import Image from 'next/image';
 import { forwardRef } from 'react';
 import { StyleSheet } from 'react-native';
 import createHTMLElement from '../../helpers/createHTMLElement';
 import type { MediaImageRendererProps } from './types';
-import type { ImageLoaderProps } from 'next/future/image';
+import type { ImageLoaderProps } from 'next/image';
 import type { ForwardedRef } from 'react';
 import type { HostComponent } from 'react-native';
 
@@ -31,9 +31,9 @@ const MediaImageRenderer = (
       ? Math.round(width / aspectRatio)
       : `calc(${width} / ${aspectRatio})`;
   const imgSizeProps =
-    typeof width === 'number'
+    typeof width === 'number' && typeof height === 'number'
       ? { width, height }
-      : { sizes: width, fill: true };
+      : { sizes: width as string, fill: true };
 
   const flatStyle = StyleSheet.flatten(style);
 

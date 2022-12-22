@@ -7,7 +7,7 @@
     "validator": "13.7.0"
   },
   "devDependencies": {
-    "@types/react-relay": "^13.0.2",
-    "@types/validator": "^13.7.6"
+    "@types/react-relay": "^14.1.2",
+    "@types/validator": "^13.7.10"
   }
 }

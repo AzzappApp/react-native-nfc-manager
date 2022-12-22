@@ -8,6 +8,7 @@ const Link = ({ route, params, replace, children }: LinkProps) => (
     replace={replace}
     href={routesToPath({ route, params } as any)}
     passHref
+    legacyBehavior
   >
     {cloneElement(children, { accessibilityRole: 'link' })}
   </NextLink>
