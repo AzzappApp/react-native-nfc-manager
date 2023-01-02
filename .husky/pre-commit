@@ -5,4 +5,3 @@ yarn i18n:extract
 yarn i18n:compile
 git add ./packages/i18n/src
 git add ./packages/i18n/compiled
-git add ./packages/i18n/pagesMessagesDependencies.json

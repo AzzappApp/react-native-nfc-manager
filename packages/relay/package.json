@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "relay-runtime": "^14.1.0"
+    "relay-runtime": "^14.1.0",
+    "@azzapp/shared": "*"
   }
 }

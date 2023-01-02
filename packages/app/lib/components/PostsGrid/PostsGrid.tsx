@@ -1,12 +1,6 @@
 import cuid from 'cuid';
 import React, { useMemo, useRef, useState } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  unstable_batchedUpdates,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import PostLink from '../PostLink';
@@ -180,10 +174,9 @@ const PostsGrid = ({
   };
 
   const onWillScrollToTop = () => {
-    unstable_batchedUpdates(() => {
-      setIsScrollingToTop(true);
-      onScrollStart();
-    });
+    // TODO we would like to use batched updates, but it doesn't work on web
+    setIsScrollingToTop(true);
+    onScrollStart();
   };
 
   const onScroll = (scrollPosition: number) => {

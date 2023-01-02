@@ -1,5 +1,5 @@
 export type GraphQLContextData = {
-  userId: string | null;
+  userId?: string | null;
   isAnonymous: boolean;
   locale?: string | null;
   location?: { lat: number; lng: number };

@@ -1,12 +1,12 @@
 import NextLink from 'next/link';
 import { cloneElement } from 'react';
-import { routesToPath } from '../helpers/routesMap';
+import { routeToPath } from '../helpers/routesHelpers';
 import type { LinkProps } from '@azzapp/app/lib/PlatformEnvironment';
 
 const Link = ({ route, params, replace, children }: LinkProps) => (
   <NextLink
     replace={replace}
-    href={routesToPath({ route, params } as any)}
+    href={routeToPath({ route, params } as any)}
     passHref
     legacyBehavior
   >

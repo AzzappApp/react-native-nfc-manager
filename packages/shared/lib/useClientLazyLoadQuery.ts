@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
-import { useLazyLoadQuery } from 'react-relay';
+import { useEffect, useState } from 'react';
+import { useLazyLoadQuery, useRelayEnvironment } from 'react-relay';
+import { fetchQuery } from 'relay-runtime';
 import type { GraphQLTaggedNode } from 'react-relay';
 import type {
   OperationType,
@@ -28,13 +28,31 @@ function useClientLazyLoadQuery<TQuery extends OperationType>(
     UNSTABLE_renderPolicy?: RenderPolicy | undefined;
   },
 ) {
+  const environment = useRelayEnvironment();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(true);
+  useEffect(() => {
+    const observable = fetchQuery(environment, gqlQuery, variables).subscribe({
+      error: (error: any) => {
+        setError(error);
+        setLoading(false);
+      },
+      complete() {
+        setLoading(false);
+      },
+    });
+    return () => {
+      observable.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gqlQuery, JSON.stringify(variables)]);
+
   const data = useLazyLoadQuery<TQuery>(gqlQuery, variables, {
-    fetchPolicy:
-      getRuntimeEnvironment() === 'node' ? 'store-only' : 'store-or-network',
+    fetchPolicy: 'store-only',
     ...options,
   });
 
-  return data;
+  return { error, data, loading };
 }
 
 export default useClientLazyLoadQuery;

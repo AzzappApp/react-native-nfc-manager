@@ -1,10 +1,13 @@
 import ERRORS from '@azzapp/shared/lib/errors';
 import cuid from 'cuid';
-import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
+import { unsealData } from 'iron-session';
+import { withIronSessionApiRoute } from 'iron-session/next';
+import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { verifyToken } from './tokensHelpers';
 import type { IncomingMessage } from 'http';
 import type { IronSessionOptions } from 'iron-session';
-import type { GetServerSideProps, NextApiHandler } from 'next';
+import type { NextApiHandler } from 'next';
 
 export const sessionOptions: IronSessionOptions = {
   password: process.env.SECRET_COOKIE_PASSWORD as string,
@@ -29,8 +32,32 @@ export const withSessionAPIRoute = (handler: NextApiHandler) => {
   return withIronSessionApiRoute(handler, sessionOptions);
 };
 
-export const withSessionSsr = (handler: GetServerSideProps) => {
-  return withIronSessionSsr(handler, sessionOptions);
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type IronSessionData = import('iron-session').IronSessionData;
+
+export const getSessionData = cache(
+  async (): Promise<IronSessionData | null> => {
+    const found = cookies().get(sessionOptions.cookieName);
+
+    if (!found) {
+      return null;
+    }
+
+    const data = await unsealData(found.value, sessionOptions);
+
+    return data;
+  },
+);
+
+export const getAuthInfos = async () => {
+  const sessionData = await getSessionData();
+  if (!sessionData?.userId) {
+    return {
+      userId: cuid(),
+      isAnonymous: true,
+    };
+  }
+  return { userId: sessionData.userId, isAnonymous: false };
 };
 
 export type AuthInfos = {

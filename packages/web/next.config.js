@@ -1,17 +1,24 @@
 /** @type {import('next').NextConfig} */
-
-const i18nConfig = require('@azzapp/i18n');
-
-const config = {
-  swcMinify: true,
+module.exports = {
   productionBrowserSourceMaps: true,
   images: {
     disableStaticImages: true,
   },
-  i18n: {
-    locales: i18nConfig.SUPPORTED_LOCALES,
-    defaultLocale: i18nConfig.DEFAULT_LOCALE,
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ['cassandra-driver'],
   },
+  transpilePackages: [
+    '@azzapp/shared',
+    '@azzapp/data',
+    '@azzapp/app',
+    '@azzapp/relay',
+    'react-native-web-linear-gradient',
+    'react-native-safe-area-context',
+    'react-native-tab-view',
+    'react-native-svg',
+    'validator',
+  ],
   webpack: config => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -43,17 +50,3 @@ const config = {
     return config;
   },
 };
-
-const withTM = require('next-transpile-modules')([
-  '@azzapp/shared',
-  '@azzapp/data',
-  '@azzapp/app',
-  '@azzapp/relay',
-  'react-native-web-linear-gradient',
-  'react-native-safe-area-context',
-  'react-native-tab-view',
-  'react-native-svg',
-  'validator',
-]);
-
-module.exports = withTM(config);

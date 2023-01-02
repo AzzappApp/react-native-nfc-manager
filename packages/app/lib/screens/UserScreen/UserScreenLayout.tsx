@@ -3,6 +3,7 @@ import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { cloneElement, useRef } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -72,7 +73,10 @@ const UserScreenLayout = ({
 
   const vp = useViewportSize();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const insets =
+    // TODO: remove this eslint-disable when the conditional hook usage is fixed
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    Platform.OS === 'web' ? { top: 0, bottom: 0 } : useSafeAreaInsets();
   const contentHeight =
     windowHeight - HEADER_HEIGHT - insets.top - insets.bottom;
   // We want the cover to take half of the available space when editing

@@ -1,8 +1,5 @@
-import { Platform } from 'react-native';
+import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 
 export const get = () => {
-  return Platform.select({
-    web: false,
-    default: true,
-  });
+  return getRuntimeEnvironment() === 'react-native';
 };

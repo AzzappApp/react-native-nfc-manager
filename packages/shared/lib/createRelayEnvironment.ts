@@ -16,6 +16,7 @@ import type {
 
 type CreateRelayEnvironmentParams = {
   fetchFunction?: typeof fetchJSON;
+  isServer?: boolean;
   retries?: number[];
 };
 
@@ -27,11 +28,12 @@ type CreateRelayEnvironmentParams = {
  */
 const createRelayEnvironment = ({
   fetchFunction = fetchJSON,
+  isServer = false,
 }: CreateRelayEnvironmentParams = {}) => {
   const environment = new Environment({
     network: createNetwork(fetchFunction),
     store: new Store(new RecordSource()),
-    isServer: false,
+    isServer,
     missingFieldHandlers,
   });
   return environment;

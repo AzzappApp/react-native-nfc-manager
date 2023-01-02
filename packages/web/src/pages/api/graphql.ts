@@ -3,7 +3,7 @@ import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/lib/errors';
 import Cors from 'cors';
 import { graphql } from 'graphql';
-import initMiddleware from '../../helpers/initMiddleware';
+import applyConnectMiddleware from '../../helpers/applyConnectMiddleware';
 import {
   getRequestAuthInfos,
   withSessionAPIRoute,
@@ -11,13 +11,11 @@ import {
 import type { AuthInfos } from '../../helpers/session';
 import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 
-const cors = initMiddleware(
-  // todo production security settings
-  Cors(),
-);
+// TODO production security settings
+const cors = Cors();
 
 async function graphqlHandler(req: NextApiRequest, res: NextApiResponse) {
-  await cors(req, res);
+  await applyConnectMiddleware(req, res, cors);
 
   if (req.method === 'OPTIONS') {
     res.end();

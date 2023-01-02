@@ -60,3 +60,5 @@ export default forwardRef(MediaImageRenderer);
 // TODO use quality ?
 const cloudinaryLoader = ({ src, width }: ImageLoaderProps): string =>
   getImageURLForSize(src, 1, width);
+
+export const addCacheEntry = () => void 0;

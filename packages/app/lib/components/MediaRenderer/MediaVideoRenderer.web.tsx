@@ -142,3 +142,5 @@ const MediaVideoRenderer = (
 };
 
 export default forwardRef(MediaVideoRenderer);
+
+export const addLocalVideo = () => void 0;
