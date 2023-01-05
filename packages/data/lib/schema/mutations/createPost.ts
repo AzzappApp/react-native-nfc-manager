@@ -1,12 +1,10 @@
 import ERRORS from '@azzapp/shared/lib/errors';
 import { GraphQLBoolean, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-import { createPost, getPostById } from '../../domains/Post';
-import { getUserById } from '../../domains/User';
+import { createMedia, createPost, db } from '../../domains';
 import PostGraphQL from '../PostGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';
-import type { Post } from '../../domains/Post';
-import type { User } from '../../domains/User';
+import type { Media, User } from '../../domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const createPostMutation = mutationWithClientMutationId({
@@ -40,8 +38,13 @@ const createPostMutation = mutationWithClientMutationId({
       content,
       allowComments,
       allowLikes,
-    }: Omit<Post, 'authorId' | 'id' | 'postDate'>,
-    { userId, isAnonymous }: GraphQLContext,
+    }: {
+      media: Omit<Media, 'id' | 'ownerId'>;
+      content: string;
+      allowComments: boolean;
+      allowLikes: boolean;
+    },
+    { userInfos: { userId, isAnonymous }, userLoader }: GraphQLContext,
   ) => {
     if (!userId || isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -49,7 +52,7 @@ const createPostMutation = mutationWithClientMutationId({
 
     let user: User | null;
     try {
-      user = await getUserById(userId);
+      user = await userLoader.load(userId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -61,16 +64,31 @@ const createPostMutation = mutationWithClientMutationId({
       throw new Error(ERRORS.INVALID_REQUEST);
     }
 
-    const postId = await createPost({
-      media,
-      authorId: userId,
-      allowComments,
-      allowLikes,
-      content,
-    });
+    try {
+      const post = await db.transaction().execute(async trx => {
+        const post = await createPost(
+          {
+            authorId: userId,
+            content,
+            allowComments,
+            allowLikes,
+          },
+          trx,
+        );
 
-    // TODO find a better solution
-    return { post: await getPostById(postId) };
+        await createMedia(
+          {
+            ownerId: post.id,
+            ...media,
+          },
+          trx,
+        );
+        return post;
+      });
+      return { post };
+    } catch {
+      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    }
   },
 });
 

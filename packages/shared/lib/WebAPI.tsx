@@ -92,7 +92,7 @@ export const logout: APIMethodWithoutParams<void> = (init): Promise<void> =>
   });
 
 export const uploadSign: APIMethod<
-  { kind: 'picture' | 'video'; target: 'cover' | 'post' },
+  { kind: 'image' | 'video'; target: 'cover' | 'post' },
   { uploadURL: string; uploadParameters: Record<string, any> }
 > = async ({ kind, target }, init) =>
   apiFetch(`${API_ENDPOINT}/uploadSign`, {

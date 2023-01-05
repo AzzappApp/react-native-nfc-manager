@@ -30,12 +30,12 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
     kind,
     target,
   }: {
-    kind: 'picture' | 'video';
+    kind: 'image' | 'video';
     target: 'cover' | 'post';
   } = req.body;
 
   if (
-    (kind !== 'picture' && kind !== 'video') ||
+    (kind !== 'image' && kind !== 'video') ||
     (target !== 'cover' && target !== 'post')
   ) {
     res.status(400).send({ message: ERRORS.INVALID_REQUEST });
@@ -43,7 +43,7 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const uploadURL: string =
-    kind === 'picture'
+    kind === 'image'
       ? `${CLOUDINARY_BASE_URL}/image/upload`
       : `${CLOUDINARY_BASE_URL}/video/upload`;
   const uploadParameters: Record<string, any> = {

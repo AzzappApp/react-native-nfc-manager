@@ -166,6 +166,7 @@ const PostRenderer = (
               <MediaImageRenderer
                 ref={mediaRef as any}
                 source={source}
+                isVideo
                 // TODO alt generation by cloudinary AI ? include text in small format ?
                 alt={`This is an image posted by ${author.userName}`}
                 uri={small ? smallThumbnail : largeThumbnail}

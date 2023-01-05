@@ -7,6 +7,7 @@ import type {
 
 export type MediaImageRendererProps = {
   uri?: string;
+  isVideo?: boolean;
   alt: string;
   source: string;
   width: number | `${number}vw`;

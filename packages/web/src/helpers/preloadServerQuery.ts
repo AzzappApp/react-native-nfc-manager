@@ -1,8 +1,9 @@
 import { createGraphQLContext, graphQLSchema } from '@azzapp/data/lib';
 import queryMap from '@azzapp/relay/query-map.json';
+import ERRORS from '@azzapp/shared/lib/errors';
 import { graphql } from 'graphql';
 import { cache } from 'react';
-import type { GraphQLContextData } from '@azzapp/data/lib/schema/GraphQLContext';
+import type { UserInfos } from '@azzapp/data/lib/schema/GraphQLContext';
 import type { VariablesOf, GraphQLTaggedNode } from 'react-relay';
 import type { ConcreteRequest, OperationType } from 'relay-runtime';
 
@@ -15,7 +16,7 @@ export type ServerQuery<TQuery extends OperationType> = {
 const preloadServerQuery = async <TQuery extends OperationType>(
   gqlQuery: GraphQLTaggedNode,
   variables: VariablesOf<TQuery>,
-  contextData?: GraphQLContextData,
+  userInfos?: UserInfos,
 ): Promise<ServerQuery<TQuery>> => {
   if (typeof gqlQuery === 'function') {
     gqlQuery = gqlQuery();
@@ -41,9 +42,14 @@ const preloadServerQuery = async <TQuery extends OperationType>(
     source: params.text ? params.text : (queryMap as any)[params.id!],
     variableValues: queryVariables,
     contextValue: createCachedGraphQLContext(
-      contextData ?? { isAnonymous: true },
+      userInfos ?? { isAnonymous: true },
     ),
   });
+
+  if (response.errors) {
+    console.log(response.errors);
+    throw new Error(ERRORS.GRAPHQL_ERROR, { cause: response.errors });
+  }
 
   return {
     id: params.id ?? params.cacheID!,
@@ -55,7 +61,7 @@ const preloadServerQuery = async <TQuery extends OperationType>(
 
 export default preloadServerQuery;
 
-const createCachedGraphQLContext = cache((contextData: GraphQLContextData) =>
+const createCachedGraphQLContext = cache((contextData: UserInfos) =>
   createGraphQLContext(contextData),
 );
 

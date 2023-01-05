@@ -8,67 +8,43 @@ import {
   GraphQLFloat,
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
-import { getUserById } from '../domains/User';
+import { getCardModules } from '../domains';
 import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
-import type { Media } from '../domains/commons';
-import type {
-  MediaModule,
-  SocialModule,
-  TextModule,
-  UserCard,
-  UserCardCover,
-  UserCardModule,
-} from '../domains/UserCard';
+import type { Card, CardCover, Media, CardModule } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 
-const UserCardGraphQL = new GraphQLObjectType<UserCard, GraphQLContext>({
+const UserCardGraphQL = new GraphQLObjectType<Card, GraphQLContext>({
   name: 'UserCard',
   description: 'An azzapp User card',
   interfaces: [NodeGraphQL],
   fields: () => ({
-    id: globalIdField('UserCard', (card: UserCard) =>
-      JSON.stringify([card.userId, card.cardId]),
-    ),
+    id: globalIdField('UserCard'),
     user: {
       type: new GraphQLNonNull(UserGraphQL),
-      resolve: card => getUserById(card.userId),
+      // TODO handle null case ?
+      resolve: (card, _, { userLoader }) => userLoader.load(card.userId),
     },
     cover: {
       type: new GraphQLNonNull(UserCardCoverGraphQL),
       description: 'Card cover display informations',
+      resolve: (card, _, { coverLoader }) => coverLoader.load(card.coverId),
     },
     modules: {
       type: new GraphQLNonNull(
         new GraphQLList(new GraphQLNonNull(UserCardModuleGraphQL)),
       ),
       description: 'Definitions of the cards modules',
+      resolve: ({ id }): Promise<CardModule[]> => getCardModules(id),
     },
   }),
 });
 
 export default UserCardGraphQL;
 
-export const MediaGraphql = new GraphQLObjectType<Media, GraphQLContext>({
-  name: 'UserCardCover',
-  description: 'UserCard cover display informations',
-  fields: () => ({
-    kind: {
-      type: new GraphQLNonNull(MediaGraphQL),
-      description: 'the background color of the card',
-    },
-    pictures: {
-      type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(GraphQLString)),
-      ),
-      description: 'the pictures of the card cover',
-    },
-  }),
-});
-
 export const UserCardCoverGraphQL = new GraphQLObjectType<
-  UserCardCover,
+  CardCover,
   GraphQLContext
 >({
   name: 'UserCardCover',
@@ -83,6 +59,8 @@ export const UserCardCoverGraphQL = new GraphQLObjectType<
         new GraphQLList(new GraphQLNonNull(MediaGraphQL)),
       ),
       description: 'the pictures of the card cover',
+      resolve: async (cardCover, _, { mediasLoader }): Promise<Media[]> =>
+        (await mediasLoader.load(cardCover.id)) ?? [],
     },
     pictureTransitionTimer: {
       type: new GraphQLNonNull(GraphQLFloat),
@@ -136,7 +114,7 @@ export const UserCardModuleGraphQL = new GraphQLUnionType({
   name: 'UserCardModule',
   description: 'User Card module',
   types: () => [SocialModuleGraphQL, MediaModuleGraphQL, TextModuleGraphQL],
-  resolveType: (module: UserCardModule) => {
+  resolveType: (module: CardModule) => {
     switch (module.kind) {
       case 'media':
         return 'MediaModule';
@@ -149,7 +127,7 @@ export const UserCardModuleGraphQL = new GraphQLUnionType({
 });
 
 export const SocialModuleGraphQL = new GraphQLObjectType<
-  SocialModule,
+  CardModule,
   GraphQLContext
 >({
   name: 'SocialModule',
@@ -162,7 +140,7 @@ export const SocialModuleGraphQL = new GraphQLObjectType<
 });
 
 export const SocialModuleDataGraphQL = new GraphQLObjectType<
-  SocialModule,
+  CardModule['data'],
   GraphQLContext
 >({
   name: 'SocialModuleData',
@@ -181,7 +159,7 @@ export const SocialModuleDataGraphQL = new GraphQLObjectType<
 });
 
 export const MediaModuleGraphQL = new GraphQLObjectType<
-  MediaModule,
+  CardModule,
   GraphQLContext
 >({
   name: 'MediaModule',
@@ -196,7 +174,7 @@ export const MediaModuleGraphQL = new GraphQLObjectType<
 });
 
 export const TextModuleGraphQL = new GraphQLObjectType<
-  TextModule,
+  CardModule,
   GraphQLContext
 >({
   name: 'TextModule',

@@ -11,27 +11,25 @@ import {
   forwardConnectionArgs,
   globalIdField,
 } from 'graphql-relay';
-import { getUserPosts } from '../domains/Post';
-import { getUserById } from '../domains/User';
-import { emptyConnection } from '../helpers/graphqlHelpers';
+import { db } from '../domains';
 import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
-import type { Post } from '../domains/Post';
+import type { Post } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
-import type { ConnectionArguments } from 'graphql-relay';
+import type { ConnectionArguments, Connection } from 'graphql-relay';
 
 const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
   name: 'Post',
   description: 'Represent a Azzapp publication',
   interfaces: [NodeGraphQL],
   fields: () => ({
-    id: globalIdField('Post', post => post.postId),
+    id: globalIdField('Post'),
     author: {
       type: new GraphQLNonNull(UserGraphQL),
       description: 'The author of the publication',
-      resolve(post) {
-        return getUserById(post.authorId);
+      resolve(post, _, { userLoader }) {
+        return userLoader.load(post.authorId);
       },
     },
     postDate: {
@@ -41,6 +39,10 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
     media: {
       type: new GraphQLNonNull(MediaGraphQL),
       description: 'The media of the publication',
+      resolve(post, _, { mediasLoader }) {
+        // TODO handle null case ?
+        return mediasLoader.load(post.id).then(medias => medias?.[0]);
+      },
     },
     content: {
       type: new GraphQLNonNull(GraphQLString),
@@ -60,17 +62,15 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
     relatedPosts: {
       type: new GraphQLNonNull(PostConnectionGraphQL),
       args: forwardConnectionArgs,
-      async resolve(post, args: ConnectionArguments) {
-        const result = await getUserPosts(post.authorId, 1000);
-        if (result) {
-          return connectionFromArray(
-            result.rows
-              .map(({ doc }) => doc)
-              .filter(({ postId }) => postId !== post.postId),
-            args,
-          );
-        }
-        return emptyConnection;
+      async resolve(
+        post,
+        args: ConnectionArguments,
+      ): Promise<Connection<Post>> {
+        // TODO dummy implementation just to test frontend
+        return connectionFromArray(
+          await db.selectFrom('Post').selectAll().execute(),
+          args,
+        );
       },
     },
   }),

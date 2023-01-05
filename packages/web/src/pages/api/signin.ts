@@ -1,7 +1,4 @@
-import {
-  getUserByEmail,
-  getUserByUserName,
-} from '@azzapp/data/lib/domains/User';
+import { getUserByEmail, getUserByUserName } from '@azzapp/data/lib/domains';
 import ERRORS from '@azzapp/shared/lib/errors';
 import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';

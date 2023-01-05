@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
-    "incremental": true
+    "incremental": false
   },
   "exclude": ["node_modules", "**/packages/**/node_modules"]
 }

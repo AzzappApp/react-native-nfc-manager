@@ -4,28 +4,47 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import { connectionFromArray, forwardConnectionArgs } from 'graphql-relay';
-import { uniqWith } from 'lodash';
-import { getUserFollowingIds } from '../domains/Followers';
-import { getAllPosts, getUsersPosts } from '../domains/Post';
-import { getAllUsers, getUserById, getUsersByIds } from '../domains/User';
+import {
+  connectionFromArray,
+  connectionFromArraySlice,
+  cursorToOffset,
+  forwardConnectionArgs,
+} from 'graphql-relay';
+import {
+  db,
+  getAllPosts,
+  getAllUsersWithCard,
+  getAllUsersWithCardCount,
+  getFollowedUsers,
+  getFollowedUsersPosts,
+  getFollowedUsersPostsCount,
+} from '../domains';
+import {
+  connectionFromDateSortedItems,
+  cursorToDate,
+} from '../helpers/connectionsHelpers';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import UserGraphQL, { UserConnectionGraphQL } from './UserGraphQL';
-import type { Post } from '../domains/Post';
-import type { User } from '../domains/User';
+import type { User, Viewer, Post } from '../domains';
+import type { GraphQLContext } from './GraphQLContext';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
-const ViewerGraphQL = new GraphQLObjectType<{
-  userId?: string | null;
-  isAnonymous: boolean;
-}>({
+const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
   name: 'Viewer',
   description: 'Represent an Application Viewer',
   fields: () => ({
     user: {
       type: UserGraphQL,
-      resolve: viewer =>
-        viewer.isAnonymous ? null : getUserById(viewer.userId!),
+      resolve: async (
+        { isAnonymous, userId },
+        _,
+        { userLoader },
+      ): Promise<User | null> => {
+        if (isAnonymous || !userId) {
+          return null;
+        }
+        return userLoader.load(userId);
+      },
     },
     followedProfiles: {
       description:
@@ -36,23 +55,26 @@ const ViewerGraphQL = new GraphQLObjectType<{
         viewer,
         args: ConnectionArguments,
       ): Promise<Connection<User>> => {
-        // TODO dummy implementation just to test frontend
-        const result: User[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const followings = await getUsersByIds(followingIds);
-            const map = new Map<string, User>();
-            followings.forEach(user => map.set(user.id, user));
-            result.push(...followingIds.map(id => map.get(id)!));
-          }
+        if (viewer.isAnonymous || !viewer.userId) {
+          return connectionFromArray([], args);
         }
-        result.push(...(await getAllUsers()));
-        return connectionFromArray(
-          uniqWith(result, (a, b) => a.id === b.id).filter(
-            ({ id }) => id !== viewer.userId,
-          ),
+        // TODO should we use pagination in database query?
+        const followedUsers = await getFollowedUsers(viewer.userId);
+        if (followedUsers.length > 0) {
+          return connectionFromArray(followedUsers, args);
+        }
+
+        // TODO if we don't have any followed users, returns a list of recommanded users ?
+        const { after, first } = args;
+        const limit = first ?? 100;
+        const offset = after ? cursorToOffset(after) : 0;
+        return connectionFromArraySlice(
+          await getAllUsersWithCard(limit, offset),
           args,
+          {
+            sliceStart: offset,
+            arrayLength: await getAllUsersWithCardCount(),
+          },
         );
       },
     },
@@ -65,24 +87,25 @@ const ViewerGraphQL = new GraphQLObjectType<{
         viewer,
         args: ConnectionArguments,
       ): Promise<Connection<Post>> => {
-        // TODO dummy implementation just to test frontend
-        const result: Post[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const { rows } = await getUsersPosts(
-              followingIds,
-              10000,
-              args.after,
-            );
-            result.push(...rows.map(({ doc }) => doc));
-          }
+        if (viewer.isAnonymous || !viewer.userId) {
+          return connectionFromArray([], args);
         }
-        result.push(...(await getAllPosts()));
-        return connectionFromArray(
-          uniqWith(result, (a, b) => a.postId === b.postId),
-          args,
-        );
+        const nbPosts = await getFollowedUsersPostsCount(viewer.userId);
+
+        const first = args.first ?? 100;
+        const offset = args.after ? cursorToDate(args.after) : null;
+
+        const posts = nbPosts
+          ? await getFollowedUsersPosts(viewer.userId, first, offset)
+          : // TODO instead of returning all posts, we should return a list of recommanded posts
+            await getAllPosts(first, offset);
+
+        return connectionFromDateSortedItems(posts, {
+          getDate: post => post.postDate,
+          // approximations that should be good enough, and avoid a query
+          hasNextPage: posts.length > 0,
+          hasPreviousPage: offset !== null,
+        });
       },
     },
     trendingProfiles: {
@@ -91,25 +114,12 @@ const ViewerGraphQL = new GraphQLObjectType<{
       type: new GraphQLNonNull(UserConnectionGraphQL),
       args: forwardConnectionArgs,
       resolve: async (
-        viewer,
+        _,
         args: ConnectionArguments,
       ): Promise<Connection<User>> => {
         // TODO dummy implementation just to test frontend
-        const result: User[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const followings = await getUsersByIds(followingIds);
-            const map = new Map<string, User>();
-            followings.forEach(user => map.set(user.id, user));
-            result.push(...followingIds.map(id => map.get(id)!));
-          }
-        }
-        result.push(...(await getAllUsers()));
         return connectionFromArray(
-          uniqWith(result, (a, b) => a.id === b.id).filter(
-            ({ id }) => id !== viewer.userId,
-          ),
+          await db.selectFrom('User').selectAll().execute(),
           args,
         );
       },
@@ -124,21 +134,8 @@ const ViewerGraphQL = new GraphQLObjectType<{
         args: ConnectionArguments,
       ): Promise<Connection<Post>> => {
         // TODO dummy implementation just to test frontend
-        const result: Post[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const { rows } = await getUsersPosts(
-              followingIds,
-              10000,
-              args.after,
-            );
-            result.push(...rows.map(({ doc }) => doc));
-          }
-        }
-        result.push(...(await getAllPosts()));
         return connectionFromArray(
-          uniqWith(result, (a, b) => a.postId === b.postId),
+          await db.selectFrom('Post').selectAll().execute(),
           args,
         );
       },
@@ -153,26 +150,12 @@ const ViewerGraphQL = new GraphQLObjectType<{
         args: ConnectionArguments,
       ): Promise<Connection<User>> => {
         // TODO dummy implementation just to test frontend
-        const result: User[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const followings = await getUsersByIds(followingIds);
-            const map = new Map<string, User>();
-            followings.forEach(user => map.set(user.id, user));
-            result.push(...followingIds.map(id => map.get(id)!));
-          }
-        }
-        result.push(...(await getAllUsers()));
         return connectionFromArray(
-          uniqWith(result, (a, b) => a.id === b.id).filter(
-            ({ id }) => id !== viewer.userId,
-          ),
+          await db.selectFrom('User').selectAll().execute(),
           args,
         );
       },
     },
-
     searchPosts: {
       description: 'Return a list of posts that match the search query',
       type: new GraphQLNonNull(PostConnectionGraphQL),
@@ -182,30 +165,16 @@ const ViewerGraphQL = new GraphQLObjectType<{
         ...forwardConnectionArgs,
       },
       resolve: async (
-        viewer,
+        _,
         args: ConnectionArguments & { search: string; useLocation: boolean },
       ): Promise<Connection<Post>> => {
         // TODO dummy implementation just to test frontend
-        const result: Post[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const { rows } = await getUsersPosts(
-              followingIds,
-              10000,
-              args.after,
-            );
-            result.push(
-              ...rows.map(({ doc }) => {
-                console.log(doc);
-                return doc;
-              }),
-            );
-          }
-        }
-        result.push(...(await getAllPosts()));
         return connectionFromArray(
-          uniqWith(result, (a, b) => a.postId === b.postId),
+          await db
+            .selectFrom('Post')
+            .selectAll()
+            .where('content', 'like', `%${args.search}%`)
+            .execute(),
           args,
         );
       },
@@ -223,27 +192,16 @@ const ViewerGraphQL = new GraphQLObjectType<{
         args: ConnectionArguments & { search: string; useLocation: boolean },
       ): Promise<Connection<User>> => {
         // TODO dummy implementation just to test frontend
-        const result: User[] = [];
-        if (!viewer.isAnonymous && viewer.userId) {
-          const followingIds = await getUserFollowingIds(viewer.userId);
-          if (followingIds.length) {
-            const followings = await getUsersByIds(followingIds);
-            const map = new Map<string, User>();
-            followings.forEach(user => map.set(user.id, user));
-            result.push(...followingIds.map(id => map.get(id)!));
-          }
-        }
-        result.push(...(await getAllUsers()));
         return connectionFromArray(
-          uniqWith(result, (a, b) => a.id === b.id).filter(
-            ({ id }) => id !== viewer.userId,
-          ),
+          await db
+            .selectFrom('User')
+            .selectAll()
+            .where('userName', 'like', `%${args.search}%`)
+            .execute(),
           args,
         );
       },
     },
-    //     searchPosts(first: Float!, after: String, search: String , useLocation: Boolean):PostConnection
-    //  searchProfiles(first: Float!, after: String, search: String , useLocation: Boolean):ProfileConnection
   }),
 });
 

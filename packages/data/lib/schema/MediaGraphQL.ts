@@ -10,7 +10,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import type { Media } from '../domains/commons';
+import type { Media } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 
 const MediaGraphQL = new GraphQLInterfaceType({
@@ -43,11 +43,9 @@ export default MediaGraphQL;
 
 export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
   name: 'MediaVideo',
-  description: 'User Card media module media',
+  description: 'A video media',
   interfaces: [MediaGraphQL],
-  isTypeOf(media) {
-    return media.kind === 'video';
-  },
+  isTypeOf: media => media.kind === 'video',
   fields: () => ({
     source: {
       type: new GraphQLNonNull(GraphQLString),
@@ -69,7 +67,7 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
         },
       },
       resolve(
-        { kind, source },
+        { source },
         {
           pixelRatio = 1,
           ratio,
@@ -82,9 +80,7 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
           thumbnail?: boolean;
         },
       ): string {
-        if (kind === 'picture') {
-          return getImageURLForSize(source, width, pixelRatio, ratio);
-        } else if (thumbnail) {
+        if (thumbnail) {
           return getVideoThumbnailURL(source, width, pixelRatio, ratio);
         } else {
           return getVideoUrlForSize(source, width, pixelRatio, ratio);
@@ -127,11 +123,9 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
 
 export const MediaImageGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
   name: 'MediaImage',
-  description: 'User Card media module media',
+  description: 'An image media',
   interfaces: [MediaGraphQL],
-  isTypeOf(media) {
-    return media.kind === 'picture';
-  },
+  isTypeOf: media => media.kind === 'image',
   fields: () => ({
     source: {
       type: new GraphQLNonNull(GraphQLString),

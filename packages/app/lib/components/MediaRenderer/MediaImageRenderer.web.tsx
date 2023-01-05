@@ -1,4 +1,7 @@
-import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
+import {
+  getImageURLForSize,
+  getVideoThumbnailURL,
+} from '@azzapp/shared/lib/imagesHelpers';
 import Image from 'next/image';
 import { forwardRef } from 'react';
 import { StyleSheet } from 'react-native';
@@ -11,6 +14,7 @@ import type { HostComponent } from 'react-native';
 const MediaImageRenderer = (
   {
     source,
+    isVideo,
     alt,
     width,
     aspectRatio,
@@ -48,7 +52,7 @@ const MediaImageRenderer = (
     // ref,
     src: source,
     alt,
-    loader: cloudinaryLoader,
+    loader: isVideo ? cloudinaryThumbnailLoader : cloudinaryImageLoader,
     onLoad: handleImageLoading,
     style: flatStyle,
     ...imgSizeProps,
@@ -58,7 +62,10 @@ const MediaImageRenderer = (
 export default forwardRef(MediaImageRenderer);
 
 // TODO use quality ?
-const cloudinaryLoader = ({ src, width }: ImageLoaderProps): string =>
+const cloudinaryImageLoader = ({ src, width }: ImageLoaderProps): string =>
   getImageURLForSize(src, 1, width);
+
+const cloudinaryThumbnailLoader = ({ src, width }: ImageLoaderProps): string =>
+  getVideoThumbnailURL(src, 1, width);
 
 export const addCacheEntry = () => void 0;

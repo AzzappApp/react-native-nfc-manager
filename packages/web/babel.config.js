@@ -17,5 +17,6 @@ module.exports = {
         idInterpolationPattern: '[sha1:contenthash:base64:6]',
       },
     ],
+    '@babel/plugin-proposal-private-methods',
   ],
 };

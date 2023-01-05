@@ -222,6 +222,7 @@ const CoverRenderer = (
               (videoDisabled ? (
                 <MediaImageRenderer
                   {...mediaProps}
+                  isVideo
                   // TODO alt generation by cloudinary AI ? include text in small format ?
                   alt={`This is an image posted by ${userName}`}
                   testID={`cover-image-${picture.source}`}

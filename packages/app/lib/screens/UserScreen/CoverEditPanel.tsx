@@ -198,7 +198,7 @@ const CoverEditPanel = ({
           const uploadSettings = await Promise.all(
             picturesToUpload.map(({ kind }) =>
               WebAPI.uploadSign({
-                kind: kind as any,
+                kind: kind === 'video' ? 'video' : 'image',
                 target: 'cover',
               }),
             ),
@@ -257,7 +257,7 @@ const CoverEditPanel = ({
           );
 
           results.forEach(({ publicId, kind, localURI }) => {
-            if (kind === 'picture') {
+            if (kind === 'image') {
               // TODO arbitrary size
               addCacheEntry(publicId, 1600, localURI);
             } else {
@@ -276,7 +276,7 @@ const CoverEditPanel = ({
               };
             } else {
               return {
-                kind: picture.__typename === 'MediaImage' ? 'picture' : 'video',
+                kind: picture.__typename === 'MediaImage' ? 'image' : 'video',
                 source: picture.source,
               };
             }
@@ -289,7 +289,7 @@ const CoverEditPanel = ({
                 return null;
               }
               return {
-                kind: picture.__typename === 'MediaImage' ? 'picture' : 'video',
+                kind: picture.__typename === 'MediaImage' ? 'image' : 'video',
                 source: picture.source,
               };
             }),
@@ -366,7 +366,7 @@ const CoverEditPanel = ({
     const index = Math.min(editedIndex, pictures.length);
 
     pictures[index] = {
-      kind: kind === 'video' ? 'video' : 'picture',
+      kind: kind === 'video' ? 'video' : 'image',
       source: {
         uri: `file://${path}`,
         file: {

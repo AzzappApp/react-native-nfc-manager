@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id        String @id
+  email     String @unique
+  userName  String @unique
+  password  String
+  firstName String
+  lastName  String
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  followDate  DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@index([followerId])
+}
+
+model Media {
+  id      String    @id
+  kind    MediaKind
+  source  String
+  ratio   Float
+  ownerId String
+}
+
+enum MediaKind {
+  image
+  video
+}
+
+model CardCover {
+  id                     String @id
+  backgroundColor        String
+  pictureTransitionTimer Int
+  overlayEffect          String
+  title                  String
+  titlePosition          String
+  titleFont              String
+  titleFontSize          Int
+  titleColor             String
+  titleRotation          Int
+  qrCodePosition         String
+  desktopLayout          String
+  dektopImagePosition    String
+}
+
+model CardModule {
+  id     String @id
+  kind   String
+  cardId String
+  data   Json
+
+  @@index([cardId])
+}
+
+model Card {
+  id      String  @id
+  userId  String
+  isMain  Boolean
+  coverId String  @unique
+
+  @@index([userId])
+  @@index([coverId])
+}
+
+model Post {
+  id            String   @id
+  postDate      DateTime
+  authorId      String
+  content       String   @db.Text
+  allowComments Boolean
+  allowLikes    Boolean
+
+  @@index([authorId])
+}

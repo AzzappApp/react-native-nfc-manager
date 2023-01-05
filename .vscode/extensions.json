@@ -1,8 +1,8 @@
 {
   "recommendations": [
-    "lawrencegrant.cql",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "meta.relay"
+    "meta.relay",
+    "Prisma.prisma"
   ]
 }

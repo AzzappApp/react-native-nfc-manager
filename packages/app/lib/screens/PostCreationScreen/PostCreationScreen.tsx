@@ -49,7 +49,7 @@ const PostCreationScreen = () => {
   }) => {
     setSaving(true);
     const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
-      kind: kind === 'video' ? 'video' : 'picture',
+      kind: kind === 'video' ? 'video' : 'image',
       target: 'post',
     });
     const file: any = {
@@ -65,7 +65,7 @@ const PostCreationScreen = () => {
       variables: {
         input: {
           media: {
-            kind: kind === 'video' ? 'video' : 'picture',
+            kind: kind === 'video' ? 'video' : 'image',
             source: public_id,
             ratio: aspectRatio,
           },

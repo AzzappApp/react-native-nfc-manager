@@ -11,16 +11,11 @@ import {
   GraphQLString,
 } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-import { getUserById } from '../../domains/User';
-import {
-  getUserMainUserCard,
-  createUserCard,
-  updateUserCard,
-} from '../../domains/UserCard';
+import { v4 as uuid } from 'uuid';
+import { db } from '../../domains';
 import UserGraphQL from '../UserGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';
-import type { User } from '../../domains/User';
-import type { UserCardCover, UserCard } from '../../domains/UserCard';
+import type { Card, Media, CardCover, User } from '../../domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const updateCover = mutationWithClientMutationId({
@@ -86,8 +81,15 @@ const updateCover = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (
-    updates: Partial<UserCardCover>,
-    { userId, isAnonymous }: GraphQLContext,
+    updates: Partial<Omit<CardCover, 'id'>> & {
+      pictures?: Array<Omit<Media, 'id' | 'ownerId'>>;
+    },
+    {
+      userInfos: { userId, isAnonymous },
+      userLoader,
+      cardByUserLoader,
+      coverLoader,
+    }: GraphQLContext,
   ) => {
     if (!userId || isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -101,7 +103,7 @@ const updateCover = mutationWithClientMutationId({
 
     let user: User | null;
     try {
-      user = await getUserById(userId);
+      user = await userLoader.load(userId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -109,34 +111,66 @@ const updateCover = mutationWithClientMutationId({
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
-    let card: UserCard | null;
+    let card: Card | null;
     try {
-      card = await getUserMainUserCard(userId);
+      card = await cardByUserLoader.load(userId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    let cover: UserCardCover | null = card?.cover ?? null;
-    if (!cover) {
-      const { pictures, title } = updates;
-      if (!pictures || !title) {
-        throw new Error(ERRORS.INVALID_REQUEST);
-      }
-      cover = { ...DEFAULT_CARD_COVER, pictures, title };
+    if (!card && (!updates.title || !updates.pictures?.length)) {
+      throw new Error(ERRORS.INVALID_REQUEST);
     }
 
-    Object.entries(updates).forEach(([key, val]) => {
-      if (val != null) {
-        (cover as any)[key] = val;
-      }
-    });
+    const cover: CardCover = card
+      ? ((await coverLoader.load(card.coverId)) as CardCover)
+      : {
+          id: uuid(),
+          ...DEFAULT_CARD_COVER,
+          title: updates.title!,
+        };
+
     try {
-      if (!card) {
-        await createUserCard({ userId, main: true, cover, modules: [] });
-      } else {
-        await updateUserCard(userId, card.cardId, { cover });
-      }
-    } catch (e) {
+      await db.transaction().execute(async trx => {
+        const coverExists = !!card;
+        if (!coverExists) {
+          await trx
+            .insertInto('Card')
+            .values({
+              id: uuid(),
+              userId,
+              isMain: true,
+              coverId: cover.id,
+            })
+            .execute();
+          await trx.insertInto('CardCover').values(cover).execute();
+        } else {
+          await trx
+            .updateTable('CardCover')
+            .set(updates)
+            .where('id', '=', cover.id)
+            .execute();
+        }
+        if (updates.pictures) {
+          if (coverExists) {
+            await trx
+              .deleteFrom('Media')
+              .where('ownerId', '=', cover.id)
+              .execute();
+          }
+          await trx
+            .insertInto('Media')
+            .values(
+              updates.pictures.map(media => ({
+                id: uuid(),
+                ownerId: cover.id,
+                ...media,
+              })),
+            )
+            .execute();
+        }
+      });
+    } catch {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 

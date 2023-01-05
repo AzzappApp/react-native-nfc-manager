@@ -121,7 +121,7 @@ The sources code of the application is mainly written using [TypeScript](https:/
 
 ### Database
 
-The main database used by this project is [Scylladb](https://www.scylladb.com/) with an [Apache Cassandra](https://cassandra.apache.org/_/index.html) compatible API. The database infrastructure is based on [Scylla cloud](https://www.scylladb.com/product/scylla-cloud/).
+The main database used by this project is [PlanetScale](https://planetscale.com/) a MySQL-compatible serverless database platform. 
 
 In the future the application should use [ElasticSearch](https://www.elastic.co/fr/elasticsearch/) for search request in the application, and might use [JanusGraph](https://janusgraph.org/) or [Neo4j](https://neo4j.com/) for recommandations.
 

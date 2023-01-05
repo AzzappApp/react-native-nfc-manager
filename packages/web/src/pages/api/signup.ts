@@ -2,7 +2,7 @@ import {
   createUser,
   getUserByEmail,
   getUserByUserName,
-} from '@azzapp/data/lib/domains/User';
+} from '@azzapp/data/lib/domains';
 import ERRORS from '@azzapp/shared/lib/errors';
 import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';
@@ -20,7 +20,7 @@ type SignupBody = {
 };
 
 const signup = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { email, userName, password, locale, firstName, lastName, authMethod } =
+  const { email, userName, password, firstName, lastName, authMethod } =
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     <SignupBody>req.body || {};
 
@@ -38,22 +38,20 @@ const signup = async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    const user = {
+    const user = await createUser({
       userName,
       email,
       password: await bcrypt.hash(password, 12),
-      locale,
-      firstName,
-      lastName,
-    };
+      firstName: firstName ?? '',
+      lastName: lastName ?? '',
+    });
 
-    const userId = await createUser(user);
     if (authMethod === 'token') {
       req.session.destroy();
-      const { token, refreshToken } = generateTokens(userId);
+      const { token, refreshToken } = generateTokens(user.id);
       res.json({ token, refreshToken });
     } else {
-      req.session.userId = userId;
+      req.session.userId = user.id;
       req.session.isAnonymous = false;
       await req.session.save();
       res.json({});

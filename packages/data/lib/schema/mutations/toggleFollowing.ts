@@ -1,11 +1,10 @@
 import ERRORS from '@azzapp/shared/lib/errors';
 import { GraphQLID, GraphQLNonNull } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
-import { follow, isFollowing, unFollow } from '../../domains/Followers';
-import { getUserById } from '../../domains/User';
+import { follows, isUserFollowings, unFollows } from '../../domains';
 import UserGraphQL from '../UserGraphQL';
 import ViewerGraphQL from '../ViewerGraphQL';
-import type { User } from '../../domains/User';
+import type { User } from '../../domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const toggleFollowingMutation = mutationWithClientMutationId({
@@ -29,14 +28,11 @@ const toggleFollowingMutation = mutationWithClientMutationId({
     },
     user: {
       type: new GraphQLNonNull(UserGraphQL),
-      resolve({ userId }) {
-        return getUserById(userId);
-      },
     },
   },
   mutateAndGetPayload: async (
     args: { userId: string },
-    { userId, isAnonymous }: GraphQLContext,
+    { userInfos: { userId, isAnonymous }, userLoader }: GraphQLContext,
   ) => {
     if (!userId || isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -44,7 +40,7 @@ const toggleFollowingMutation = mutationWithClientMutationId({
 
     let user: User | null;
     try {
-      user = await getUserById(userId);
+      user = await userLoader.load(userId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -59,7 +55,7 @@ const toggleFollowingMutation = mutationWithClientMutationId({
 
     let targetUser: User | null;
     try {
-      targetUser = await getUserById(targetId);
+      targetUser = await userLoader.load(targetId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -68,16 +64,16 @@ const toggleFollowingMutation = mutationWithClientMutationId({
     }
 
     try {
-      if (await isFollowing(user.id, targetUser.id)) {
-        await unFollow(user.id, targetUser.id);
+      if (await isUserFollowings(userId, targetId)) {
+        await unFollows(userId, targetId);
       } else {
-        await follow(user.id, targetUser.id);
+        await follows(userId, targetId);
       }
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    return { userId };
+    return { user };
   },
 });
 

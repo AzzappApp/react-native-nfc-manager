@@ -26,6 +26,6 @@ export const MediaKindGraphQL = new GraphQLEnumType({
   name: 'MediaKind',
   values: {
     video: { value: 'video' },
-    picture: { value: 'picture' },
+    image: { value: 'image' },
   },
 });

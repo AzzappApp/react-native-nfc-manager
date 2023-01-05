@@ -1,17 +1,9 @@
-import {
-  GraphQLID,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLString,
-} from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
-import { getPostById } from '../domains/Post';
-import { getUserById, getUserByUserName } from '../domains/User';
-import { getUserCardById } from '../domains/UserCard';
-import NodeGraphQL from './NodeGraphQL';
+import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
+import { getUserByUserName } from '../domains';
+import { nodeField, nodesField } from './NodeGraphQL';
 import UserGraphQL from './UserGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
+import type { User, Viewer } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 
 const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
@@ -20,40 +12,10 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
   fields: {
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
-      resolve: (_root, _args, context) => {
-        // TODO We might store anonymous viewer in database later ???
-        return {
-          userId: context.userId,
-          isAnonymous: context.isAnonymous,
-        };
-      },
+      resolve: (_root, _args, { userInfos }): Viewer => userInfos,
     },
-    node: {
-      description: 'Fetches an object given its ID',
-      type: NodeGraphQL,
-      args: {
-        id: {
-          type: new GraphQLNonNull(GraphQLID),
-          description: 'The ID of an object',
-        },
-      },
-      resolve: (_, { id: gqlId }) => fetchNode(gqlId),
-    },
-    nodes: {
-      description: 'Fetches objects given their IDs',
-      type: new GraphQLNonNull(new GraphQLList(NodeGraphQL)),
-      args: {
-        ids: {
-          type: new GraphQLNonNull(
-            new GraphQLList(new GraphQLNonNull(GraphQLID)),
-          ),
-          description: 'The IDs of objects',
-        },
-      },
-      // TODO implement with batch ?
-      resolve: (_, { ids: gqlIds }: { ids: string[] }) =>
-        Promise.all(gqlIds.map(fetchNode)),
-    },
+    node: nodeField,
+    nodes: nodesField,
     user: {
       description: 'Fetches an user given its user name',
       type: UserGraphQL,
@@ -63,22 +25,12 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
           description: 'The user name of the user',
         },
       },
-      resolve: (_, { userName }: { userName: string }) =>
-        getUserByUserName(userName),
+      resolve: async (
+        _,
+        { userName }: { userName: string },
+      ): Promise<User | null> => getUserByUserName(userName),
     },
   },
 });
 
 export default QueryGraphQL;
-
-const fetchNode = (gqlId: string) => {
-  const { id, type } = fromGlobalId(gqlId);
-  if (type === 'User') {
-    return getUserById(id);
-  } else if (type === 'UserCard') {
-    const [userId, cardId] = JSON.parse(id);
-    return getUserCardById(userId, cardId);
-  } else if (type === 'Post') {
-    return getPostById(id);
-  }
-};
