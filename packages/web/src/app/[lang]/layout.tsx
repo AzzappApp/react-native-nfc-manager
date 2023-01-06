@@ -1,7 +1,7 @@
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import Script from 'next/script';
 import getTranslationMessages from '../../helpers/getTranslationMessages';
-import ContextsProviders from './ContextsProviders';
+import ClientWrapper from './ClientWrapper';
 import './styles.css';
 
 const RootLayout = ({
@@ -45,16 +45,17 @@ const RootLayout = ({
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        {/** Todo use next/font once we are able to use swc instead of babel */}
-        <link
+        {/** TODO use next/font once we are able to use swc instead of babel */}
+        {/** TODO causes hydratation error */}
+        {/* <link
           href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
           rel="stylesheet"
-        />
+        /> */}
       </head>
       <body>
-        <ContextsProviders locale={lang} messages={messages}>
+        <ClientWrapper locale={lang} messages={messages}>
           {children}
-        </ContextsProviders>
+        </ClientWrapper>
         <Script id="vh-fix">
           {`
             function applyVH() {

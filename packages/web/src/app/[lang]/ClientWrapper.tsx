@@ -5,22 +5,21 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import createRelayEnvironment from '@azzapp/shared/lib/createRelayEnvironment';
 import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import { IntlErrorCode } from '@formatjs/intl';
+import { useServerInsertedHTML } from 'next/navigation';
 import React, { useCallback, useMemo } from 'react';
 import { IntlProvider } from 'react-intl';
+// @ts-expect-error there is no types definition for react-native-web
+import { StyleSheet } from 'react-native-web';
 import { RelayEnvironmentProvider } from 'react-relay';
 import useWebPlatformEnvironment from '../../hooks/useWebPlatformEnvironment';
 
-type ContextsProvidersProps = {
+type ClientWrapperProps = {
   children: React.ReactNode;
   locale?: string | null;
   messages: Record<string, string>;
 };
 
-const ContextsProviders = ({
-  children,
-  locale,
-  messages,
-}: ContextsProvidersProps) => {
+const ClientWrapper = ({ children, locale, messages }: ClientWrapperProps) => {
   const platformEnvironment = useWebPlatformEnvironment();
 
   const environment = useMemo(
@@ -39,6 +38,18 @@ const ContextsProviders = ({
     console.error(err);
   }, []);
 
+  useServerInsertedHTML(() => {
+    const sheet = StyleSheet.getSheet();
+    return (
+      <>
+        <style
+          dangerouslySetInnerHTML={{ __html: sheet.textContent }}
+          id={sheet.id}
+        />
+      </>
+    );
+  });
+
   return (
     <PlatformEnvironmentProvider value={platformEnvironment}>
       <RelayEnvironmentProvider environment={environment}>
@@ -54,4 +65,4 @@ const ContextsProviders = ({
     </PlatformEnvironmentProvider>
   );
 };
-export default ContextsProviders;
+export default ClientWrapper;
