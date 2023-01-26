@@ -328,8 +328,6 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
-  - react-native-flipper (0.176.1):
-    - React-Core
   - react-native-pager-view (6.1.2):
     - React-Core
   - react-native-safe-area-context (4.4.1):
@@ -506,7 +504,6 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-create-thumbnail (from `../../../node_modules/react-native-create-thumbnail`)
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
-  - react-native-flipper (from `../../../node_modules/react-native-flipper`)
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -610,8 +607,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-create-thumbnail"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
-  react-native-flipper:
-    :path: "../../../node_modules/react-native-flipper"
   react-native-pager-view:
     :path: "../../../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -707,7 +702,6 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 0ff04cc4e0ff5f19a94ff4313e5c8bc4503cd86d
   react-native-create-thumbnail: 94e68f6cc050a870f830352d1a924c1e8d38b52f
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
-  react-native-flipper: 7e4b1c3fe1a2eecbe7304e5ff6b89231b3ec61dc
   react-native-pager-view: 54bed894cecebe28cede54c01038d9d1e122de43
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
   React-perflogger: 8c79399b0500a30ee8152d0f9f11beae7fc36595
