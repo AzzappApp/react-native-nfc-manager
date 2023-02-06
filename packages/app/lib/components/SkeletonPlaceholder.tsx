@@ -11,7 +11,7 @@ import Animated, {
 import { colors } from '../../theme';
 import type { StyleProp, ViewStyle, LayoutRectangle } from 'react-native';
 
-type Props = {
+type SkeletonProps = {
   style: StyleProp<ViewStyle>;
   highLightColor?: string;
   duration?: number;
@@ -20,7 +20,7 @@ const Skeleton = ({
   style,
   highLightColor = colors.grey200,
   duration = 1100,
-}: Props) => {
+}: SkeletonProps) => {
   const shared = useSharedValue(0);
   const [layout, setLayout] = useState<LayoutRectangle>({
     width: 0,

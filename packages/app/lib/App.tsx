@@ -21,8 +21,11 @@ import { getRelayEnvironment } from './helpers/relayEnvironment';
 import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
+import useAuth from './hooks/useAuth';
+import ChangePasswordMobileScreen from './mobileScreens/ChangePasswordMobileScreen';
 import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScreen';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
+import OnBoardingMobileScreen from './mobileScreens/OnBoardingMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
 import PostMobileScreen from './mobileScreens/PostMobileScreen';
 import SearchMobileScreen from './mobileScreens/SearchMobileScreen';
@@ -32,27 +35,40 @@ import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import UserMobileScreen from './mobileScreens/UserMobileScreen';
 import UserPostsMobileScreen from './mobileScreens/UserPostsMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
-import type { NativeRouterInit } from './components/NativeRouter';
+
+import type { NativeRouterInit, TabsMap } from './components/NativeRouter';
 
 const screens = {
+  SIGN_IN: SignInMobileScreen,
+  SIGN_UP: SignUpMobileScreen,
+  FORGOT_PASSWORD: ForgotPasswordMobileScreen,
+  CHANGE_PASSWORD: ChangePasswordMobileScreen,
   HOME: HomeMobileScreen,
   SEARCH: SearchMobileScreen,
   SETTINGS: SettingsMobileScreen,
   CHAT: () => <View />,
-  SIGN_IN: SignInMobileScreen,
-  SIGN_UP: SignUpMobileScreen,
-  FORGOT_PASSWORD: ForgotPasswordMobileScreen,
   USER: UserMobileScreen,
   POST: PostMobileScreen,
   USER_POSTS: UserPostsMobileScreen,
   NEW_POST: PostCreationMobileScreen,
+  ONBOARDING: OnBoardingMobileScreen,
 };
 
 const tabs = {
   MAIN_TAB: MainTabBar,
 };
 
-const initialRoutes: NativeRouterInit = {
+const unauthenticatedRoutes: NativeRouterInit = {
+  id: 'UNAUTHENTICATED',
+  stack: [
+    { id: 'SIGN_IN', route: 'SIGN_IN' },
+    { id: 'FORGOT_PASSWORD', route: 'FORGOT_PASSWORD' },
+    { id: 'SIGN_UP', route: 'SIGN_UP' },
+  ],
+};
+
+const authenticatedRoutes: NativeRouterInit = {
+  id: 'AUTHENTICATED',
   stack: [
     {
       id: 'MAIN_TAB',
@@ -83,20 +99,56 @@ export const init = async () => {
   await initTokensStore();
   initLocaleHelpers();
   QueryLoader.init();
-  QueryLoader.loadQueryFor('HOME', HomeMobileScreen);
 };
 
 const initialisationPromise = init();
 
 const App = () => {
-  const { router, routerState } = useNativeRouter(initialRoutes);
+  //we need to decide which route tu use
+  const authenticated = useAuth();
 
-  const platformEnvironment = useMemo(
-    () => createPlatformEnvironment(router),
-    [router],
+  const locale = useCurrentLocale();
+
+  const onIntlError = (err: any) => {
+    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
+      return;
+    }
+    console.error(err);
+  };
+
+  return (
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <IntlProvider
+        locale={locale}
+        defaultLocale={DEFAULT_LOCALE}
+        messages={messages[locale]}
+        onError={onIntlError}
+      >
+        {authenticated ? (
+          <AppRouter routes={authenticatedRoutes} tabs={tabs} />
+        ) : (
+          <AppRouter routes={unauthenticatedRoutes} />
+        )}
+      </IntlProvider>
+    </SafeAreaProvider>
   );
+};
+
+const AppRouter = ({
+  routes,
+  tabs = {},
+}: {
+  routes: NativeRouterInit;
+  tabs?: TabsMap;
+}) => {
+  const { router, routerState } = useNativeRouter(routes);
+
+  const platformEnvironment = useMemo(() => {
+    return createPlatformEnvironment(router);
+  }, [router]);
 
   const screenIdToDispose = useRef<string[]>([]).current;
+
   useEffect(() => {
     router.addScreenWillBePushedListener(({ id, route: { route, params } }) => {
       const Component = screens[route];
@@ -117,37 +169,25 @@ const App = () => {
     screenIdToDispose.forEach(screen => QueryLoader.disposeQueryFor(screen));
   };
 
-  const locale = useCurrentLocale();
+  return (
+    <PlatformEnvironmentProvider value={platformEnvironment}>
+      <ScreensRenderer
+        routerState={routerState}
+        screens={screens}
+        tabs={tabs}
+        onScreenDismissed={onScreenDismissed}
+        onFinishTransitioning={onFinishTransitioning}
+      />
+    </PlatformEnvironmentProvider>
+  );
+};
 
-  const onIntlError = (err: any) => {
-    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
-      return;
-    }
-    console.error(err);
-  };
-
+const RelayEnvironnementProvider = () => {
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>
-      <PlatformEnvironmentProvider value={platformEnvironment}>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <IntlProvider
-            locale={locale}
-            defaultLocale={DEFAULT_LOCALE}
-            messages={messages[locale]}
-            onError={onIntlError}
-          >
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onScreenDismissed={onScreenDismissed}
-              onFinishTransitioning={onFinishTransitioning}
-            />
-          </IntlProvider>
-        </SafeAreaProvider>
-      </PlatformEnvironmentProvider>
+      <App />
     </RelayEnvironmentProvider>
   );
 };
 
-export default waitFor(App, initialisationPromise);
+export default waitFor(RelayEnvironnementProvider, initialisationPromise);

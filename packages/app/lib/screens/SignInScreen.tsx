@@ -1,86 +1,88 @@
-import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
-import { useState } from 'react';
-import { useIntl, FormattedMessage } from 'react-intl';
+import {
+  isNotFalsyString,
+  isPhoneNumber,
+  isValidEmail,
+} from '@azzapp/shared/lib/stringHelpers';
+import { useCallback, useMemo, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
 } from 'react-native';
-import { colors, fontFamilies } from '../../theme';
+import { getLocales } from 'react-native-localize';
+import { fontFamilies, colors } from '../../theme';
 import Link from '../components/Link';
+import useViewportSize, { insetBottom } from '../hooks/useViewportSize';
 
-import useViewportSize, {
-  insetBottom,
-  insetTop,
-} from '../hooks/useViewportSize';
-import { useRouter } from '../PlatformEnvironment';
 import Button from '../ui/Button';
-import FloatingIconButton from '../ui/FloatingIconButton';
 import Form, { Submit } from '../ui/Form/Form';
 import TextInput from '../ui/TextInput';
 import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
+import type { CountryCode } from 'libphonenumber-js';
 
-type SignInScreenProps = {
+type SignInMobileScreenProps = {
   signin: (params: SignInParams) => Promise<void>;
 };
 
-const SignInScreen = ({ signin }: SignInScreenProps) => {
+const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
   const vp = useViewportSize();
-  const router = useRouter();
+
+  const [signinError, setSigninError] = useState(false);
   const intl = useIntl();
-  const [userNameOrEmail, setUserNameOrEmail] = useState('');
-  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [phoneOrEmail, setPhoneOrEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState<string | undefined>(
-    undefined,
-  );
 
-  const onSubmit = async () => {
-    let canSignin = true;
-    if (!isNotFalsyString(userNameOrEmail)) {
-      setEmailError(
-        intl.formatMessage({
-          defaultMessage: 'Please enter a valid email',
-          description:
-            'SigninScreen - error message when input usernameOrEmail is empty',
-        }),
-      );
-      canSignin = false;
-    } else {
-      setEmailError(undefined);
+  const isValidMailOrPhone = useMemo(() => {
+    if (isValidEmail(phoneOrEmail)) {
+      return true;
     }
-    if (!isNotFalsyString(password)) {
-      setPasswordError(
-        intl.formatMessage({
-          defaultMessage: 'Please enter a password',
-          description:
-            'SigninScreen - error message when input password is empty',
-        }),
-      );
-      return;
-    }
-    setPasswordError(undefined);
-    if (canSignin) {
-      await signin({ userNameOrEmail, password });
-    }
-  };
+    const locales = getLocales();
 
-  const onBack = () => {
-    router.back();
-  };
+    for (let i = 0; i < locales.length; i++) {
+      if (isPhoneNumber(phoneOrEmail, locales[i].countryCode as CountryCode)) {
+        return true;
+      }
+    }
+    return false;
+  }, [phoneOrEmail]);
+
+  const onSubmit = useCallback(async () => {
+    try {
+      if (isValidMailOrPhone) {
+        await signin({ credential: phoneOrEmail, password });
+      }
+      setSigninError(false);
+    } catch (error) {
+      //TODO handle more error cases ?
+      setSigninError(true);
+    }
+  }, [isValidMailOrPhone, signin, phoneOrEmail, password]);
 
   return (
-    <View style={styles.flex}>
+    <View style={styles.mainContainer}>
+      <View
+        onTouchStart={Keyboard.dismiss}
+        style={styles.containerImagebackground}
+      >
+        <Image
+          source={require('../assets/sign/sign_background.png')}
+          resizeMode="cover"
+        />
+      </View>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={-vp`${insetBottom}`}
       >
         <View onTouchStart={Keyboard.dismiss} style={styles.container}>
-          <Form style={styles.inner} onSubmit={onSubmit}>
+          <Form
+            style={[styles.inner, { marginBottom: vp`${insetBottom}` }]}
+            onSubmit={onSubmit}
+          >
             <View style={styles.logoContainer}>
               <Image
                 source={require('../assets/logo-full.png')}
@@ -90,21 +92,25 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
             </View>
 
             <TextInput
-              testID="azzapp_SignIn_textInput-usernameOrEmail"
               placeholder={intl.formatMessage({
-                defaultMessage: 'Email Address',
-                description: 'Signin Screen email address input placeholder',
+                defaultMessage: 'Phone number or email address',
+                description:
+                  'SignIn Screen Phone number or email address input placeholder',
               })}
-              value={userNameOrEmail}
-              onChangeText={setUserNameOrEmail}
+              value={phoneOrEmail}
+              onChangeText={setPhoneOrEmail}
               autoCapitalize="none"
               autoComplete="email"
               keyboardType="email-address"
               autoCorrect={false}
-              errorLabel={emailError}
+              containerStyle={styles.textinputContainer}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Enter your phone number or email address',
+                description:
+                  'SignIn Screen - Accessibility TextInput phone number or email address',
+              })}
             />
             <TextInput
-              testID="azzapp_SignIn_textInput-password"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',
@@ -112,11 +118,16 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              errorLabel={passwordError}
+              containerStyle={styles.textinputContainer}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Enter your password',
+                description:
+                  'SignIn Screen - Accessibility TextInput email address ',
+              })}
             />
-            <View style={{ alignItems: 'flex-end', paddingRight: 10 }}>
+            <View style={styles.viewForgetPassword}>
               <Link modal route="FORGOT_PASSWORD">
-                <Text style={styles.linkTextForgot}>
+                <Text style={styles.greyText}>
                   <FormattedMessage
                     defaultMessage="Forgot your password?"
                     description="SigninScreen - Forgot your password?"
@@ -128,58 +139,81 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
               <Button
                 label={intl.formatMessage({
                   defaultMessage: 'Log In',
-                  description: 'Password input placeholder',
+                  description: 'SigninScreen - Login Button Placeholder',
                 })}
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Tap to sign in',
                   description:
-                    'Signin Screen - AccessibilityLabel Sign In button',
+                    'SignIn Screen - AccessibilityLabel Sign In button',
                 })}
                 style={styles.button}
+                disabled={!isValidMailOrPhone || !isNotFalsyString(password)}
               />
             </Submit>
+            {signinError && (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 20,
+                }}
+              >
+                <Text style={styles.errorTextStyle}>
+                  <FormattedMessage
+                    defaultMessage="Invalid credentials"
+                    description="SigninScreen - Invalid Credentials"
+                  />
+                </Text>
+              </View>
+            )}
+            <View style={[styles.viewSignup]}>
+              <Text style={styles.greyText}>
+                <FormattedMessage
+                  defaultMessage="Don't have an account?"
+                  description="SigninScreen - Don't have an account"
+                />
+              </Text>
+              <Link modal route="SIGN_UP" replace>
+                <Text style={styles.linkLogin}>
+                  <FormattedMessage
+                    defaultMessage="Sign Up"
+                    description="SigninScreen - Sign Up"
+                  />
+                </Text>
+              </Link>
+            </View>
           </Form>
         </View>
       </KeyboardAvoidingView>
-      <View style={[styles.closeButton, { top: vp`${insetTop} + ${16}` }]}>
-        <FloatingIconButton icon="chevron" onPress={onBack} />
-      </View>
-      <View
-        style={{
-          bottom: vp`${insetBottom} + ${35}`,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={styles.alrSignText}>
-          <FormattedMessage
-            defaultMessage="Don't have an account"
-            description="SigninScreen - Don't have an account"
-          />
-        </Text>
-        <Link modal route="SIGN_UP" replace>
-          <Text style={styles.linkLogin}>
-            <FormattedMessage
-              defaultMessage="Sign Up"
-              description="SigninScreen - Sign Up"
-            />
-          </Text>
-        </Link>
-      </View>
     </View>
   );
 };
 
-export default SignInScreen;
+export default SignInMobileScreen;
 
 const styles = StyleSheet.create({
-  linkTextForgot: { ...fontFamilies.fontMedium, color: colors.grey200 },
+  containerImagebackground: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    backgroundColor: 'black',
+  },
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  viewForgetPassword: { alignItems: 'flex-end', paddingRight: 10 },
+  viewSignup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  greyText: { ...fontFamilies.fontMedium, color: colors.grey200 },
   flex: { flex: 1 },
   button: {
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 41,
+    marginTop: 20,
     height: 45,
     backgroundColor: colors.black,
     justifyContent: 'center',
@@ -187,32 +221,32 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   container: {
-    marginBottom: 34,
-    flex: 1,
     justifyContent: 'center',
     alignItem: 'center',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   inner: {
-    padding: 15,
+    padding: 20,
+  },
+  textinputContainer: {
+    padding: 0,
+    margin: 0,
+    marginBottom: 5,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 61,
+    marginBottom: 20,
   },
-  logo: { width: 242, height: 50 },
-  alrSignText: { color: colors.grey200 },
-  linkLogin: { ...fontFamilies.fontMedium, paddingLeft: 8 },
+  logo: { height: 34, width: 165 },
+  linkLogin: { ...fontFamilies.fontMedium, paddingLeft: 5 },
   errorTextStyle: {
     ...fontFamilies.fontMedium,
     color: colors.red400,
     paddingLeft: 10,
     paddingRight: 10,
     fontSize: 14,
-  },
-  closeButton: {
-    position: 'absolute',
-    start: 15,
-    zIndex: 1,
   },
 });

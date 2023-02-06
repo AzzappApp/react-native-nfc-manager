@@ -125,6 +125,10 @@ type User implements Node {
   firstName: String
   lastName: String
   userName: String!
+  companyName: String
+  companyActivityId: String
+  isReady: Boolean!
+  userType: UserType
   card: UserCard
   posts(
     """Returns the items in the list that come after the specified cursor."""
@@ -140,6 +144,12 @@ type User implements Node {
 interface Node {
   """The id of the object."""
   id: ID!
+}
+
+enum UserType {
+  BUSINESS
+  PERSONAL
+  PRODUCT
 }
 
 """An azzapp User card"""
@@ -313,9 +323,25 @@ type UserEdge {
 }
 
 type Mutation {
+  updateUser(input: UpdateUserInput!): UpdateUserPayload
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
+}
+
+type UpdateUserPayload {
+  user: User
+  clientMutationId: String
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  userType: UserType
+  companyName: String
+  companyActivityId: String
+  isReady: Boolean
+  clientMutationId: String
 }
 
 type UpdateCoverPayload {

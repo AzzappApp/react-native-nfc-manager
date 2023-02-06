@@ -21,12 +21,15 @@ export const searchResultPostsQuery = graphql`
   }
 `;
 
-type Props = {
+type SearchResultPostsProps = {
   queryReference: PreloadedQuery<any>;
   hasFocus: boolean;
 };
 
-const SearchResultPosts = ({ queryReference, hasFocus }: Props) => {
+const SearchResultPosts = ({
+  queryReference,
+  hasFocus,
+}: SearchResultPostsProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultPostsQuery>(
     searchResultPostsQuery,
     queryReference,

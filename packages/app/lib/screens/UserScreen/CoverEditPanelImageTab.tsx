@@ -61,7 +61,7 @@ const CoverEditPanelImageTab = ({
                 }}
               >
                 {' '}
-                {timer}’
+                {timer}'
               </Text>
               <DashedSlider
                 value={timer}

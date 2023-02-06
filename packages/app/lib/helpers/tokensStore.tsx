@@ -24,9 +24,36 @@ export const setTokens = async ({
 }) => {
   authInfos = { token, refreshToken };
   await EncryptedStorage.setItem(AUH_INFO_KEY, JSON.stringify(authInfos));
+  callListener();
 };
 
 export const clearTokens = async () => {
   authInfos = null;
   await EncryptedStorage.removeItem(AUH_INFO_KEY);
+  callListener();
+};
+
+/*  Create a typed listener to listen when value changed in store */
+
+type Subscription = {
+  dispose: () => void;
+};
+
+type TokenListener = () => void;
+const listeners: TokenListener[] = [];
+
+const callListener = () => listeners.forEach(listener => listener());
+
+export const addOnTokenChangedListener = (
+  onTokenChanged: () => void,
+): Subscription => {
+  listeners.push(onTokenChanged);
+  return {
+    dispose: () => {
+      const index = listeners.indexOf(onTokenChanged);
+      if (index !== -1) {
+        listeners.splice(index, 1);
+      }
+    },
+  };
 };

@@ -34,9 +34,9 @@ const CoverList = ({
   const coverWidth = useMemo(() => {
     //TODO: refactoring aka do it better :). number is required. flatten will give a string.
     // not elegant but works
-    const flattenStyle = StyleSheet.flatten(coverStyle);
-    if (typeof flattenStyle?.width === 'number') {
-      return flattenStyle.width;
+    const flatStyles = StyleSheet.flatten(coverStyle);
+    if (typeof flatStyles?.width === 'number') {
+      return flatStyles.width;
     }
     return COVER_BASE_WIDTH;
   }, [coverStyle]);

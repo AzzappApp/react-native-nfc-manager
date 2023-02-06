@@ -7,7 +7,7 @@ import Icon from '../../ui/Icon';
 import PressableBackground from '../../ui/PressableBackground';
 import PressableNative from '../../ui/PressableNative';
 
-type Props = {
+type RecentSearchProps = {
   searchValue: string | null | undefined;
   recentSearch: string[];
   removeSearch: (item: string) => Promise<void>;
@@ -18,7 +18,7 @@ const RecentSearch = ({
   removeSearch,
   recentSearch,
   search,
-}: Props) => {
+}: RecentSearchProps) => {
   const [data, setData] = useState<string[]>([]);
 
   useEffect(() => {

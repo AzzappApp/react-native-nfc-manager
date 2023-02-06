@@ -28,12 +28,15 @@ export const searchResultGlobalQuery = graphql`
   }
 `;
 
-type Props = {
+type SearchResultGlobalProps = {
   queryReference: PreloadedQuery<SearchResultGlobalQuery>;
   hasFocus: boolean;
 };
 
-const SearchResultGlobal = ({ queryReference, hasFocus }: Props) => {
+const SearchResultGlobal = ({
+  queryReference,
+  hasFocus,
+}: SearchResultGlobalProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
     queryReference,

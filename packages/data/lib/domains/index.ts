@@ -8,6 +8,7 @@ import type {
   MediaKind,
   Post,
   User,
+  UserType,
 } from '@prisma/client';
 
 type Viewer = {
@@ -24,6 +25,7 @@ export type {
   MediaKind,
   Post,
   User,
+  UserType,
   Viewer,
 };
 

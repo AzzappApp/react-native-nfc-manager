@@ -22,6 +22,11 @@ DATABASE_URL= 'mysql://root@127.0.0.1:3309/azzapp'
 
 To update the schema of your dev branch use the following command : 
 
+You need to set the branch url in .env file
+```
+mysql://usnermae:passwordj@eu-central.connect.psdb.cloud:3306/azzapp?sslaccept=strict
+```
+
 ```
 yarn prisma db push 
 ```

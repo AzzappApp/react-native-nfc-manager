@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import { TextInput as NativeTextInput } from 'react-native';
 import { colors } from '../../../theme';
+import { render, screen } from '../../../utils/test-util';
 import TextInput from '../TextInput';
 
 describe('TextInput component', () => {
@@ -33,7 +33,7 @@ describe('TextInput component', () => {
     let wrapper = queryByTestId('azzapp__Input__view-wrapper');
     let inputTree = wrapper?.findByType(NativeTextInput);
     expect(inputTree?.props.placeholderTextColor).toBe(colors.grey400);
-    rerender(<TextInput placeholderTextColor={'pink'} />);
+    rerender(<TextInput placeholderTextColor="pink" />);
     wrapper = queryByTestId('azzapp__Input__view-wrapper');
     inputTree = wrapper?.findByType(NativeTextInput);
     expect(inputTree?.props.placeholderTextColor).toBe('pink');

@@ -94,7 +94,7 @@ const PostScreen = ({
       style={{ flex: 1, backgroundColor: '#fff', overflow: 'hidden' }}
     >
       <Header
-        title={'Discover'}
+        title="Discover"
         leftButton={<IconButton icon="chevron" onPress={onClose} />}
       />
       <PostList

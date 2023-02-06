@@ -256,6 +256,7 @@ type TabsInit = {
 type StackInit = { stack: Array<RouteInit | TabsInit> };
 
 export type NativeRouterInit = {
+  id: string;
   stack: Array<RouteInit | TabsInit>;
   modals?: Array<RouteInit | TabsInit>;
 };
@@ -289,25 +290,37 @@ const initToRouteInstance = <T extends RouteInit | StackInit | TabsInit>(
   }
 };
 
+export const initRouterState = (init: NativeRouterInit): RouterState => {
+  const stack = initToRouteInstance({ stack: init.stack }).state;
+  const modals = init.modals
+    ? initToRouteInstance({ stack: init.modals }).state
+    : [];
+  //not propaging id to the routerState (not needed for now)
+  return {
+    stack,
+    modals,
+  };
+};
+
 export const useNativeRouter = (init: NativeRouterInit) => {
   // We can't use useReducer since we need to dispatch event before
   // the state change takes effect
-  const [routerState, setRouterState] = useState<RouterState>(() => {
-    const stack = initToRouteInstance({ stack: init.stack }).state;
-    const modals = init.modals
-      ? initToRouteInstance({ stack: init.modals }).state
-      : [];
+  const [routerState, setRouterState] = useState<RouterState>(
+    initRouterState(init),
+  );
 
-    return {
-      stack,
-      modals,
-    };
-  });
+  useEffect(() => {
+    setRouterState(initRouterState(init));
+    // comparison was not working fine, also in jest causing javascript out of memory error
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [init.id]);
 
   const routerStateRef = useRef(routerState);
+  // this is clearly not working properly when changing routerState. Other solution would be using immutable state for example
   if (routerStateRef.current !== routerState) {
     routerStateRef.current = routerState;
   }
+
   const routeWillChangeListeners = useRef<RouteListener[]>([]).current;
   const routeDidChangeListeners = useRef<RouteListener[]>([]).current;
   const screenWillBePushedListeners = useRef<ScreenListener[]>([]).current;
@@ -483,8 +496,8 @@ export type NativeScreenProps<T extends Route> = {
   route: T;
 };
 
-type ScreenMap = Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
-type TabsMap = Partial<
+export type ScreenMap = Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
+export type TabsMap = Partial<
   Record<string, ComponentType<TabsState & { id: string }>>
 >;
 

@@ -24,6 +24,7 @@ const routesMap: { [key in Route['route']]: string } = {
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
   FORGOT_PASSWORD: '/forgotPassword',
+  CHANGE_PASSWORD: '/changePassword',
   USER: '/[userName]',
   USER_POSTS: '/[userName]/posts',
   POST: '/posts/[postId]',
@@ -31,6 +32,7 @@ const routesMap: { [key in Route['route']]: string } = {
   SEARCH: '/search',
   SETTINGS: '/settings',
   CHAT: '/chat',
+  ONBOARDING: '/onboarding',
 };
 
 type PathToken = {

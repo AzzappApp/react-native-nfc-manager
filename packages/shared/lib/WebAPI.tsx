@@ -23,9 +23,9 @@ const apiFetch = (
 
 export type SignUpParams = {
   userName: string;
-  email: string;
+  email?: string;
+  phoneNumber?: string;
   password: string;
-  // locale?: string;
   firstName?: string;
   lastName?: string;
   authMethod?: 'cookie' | 'token';
@@ -44,7 +44,7 @@ export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
   });
 
 export type SignInParams = {
-  userNameOrEmail: string;
+  credential: string;
   password: string;
   authMethod?: 'cookie' | 'token';
 };
@@ -60,8 +60,7 @@ export const signin: APIMethod<SignInParams, TokensResponse> = (
   });
 
 export type ForgotPasswordParams = {
-  email: string;
-  authMethod?: 'cookie' | 'token';
+  credential: string;
 };
 
 //TODO: check if  forgotPassword method exist on server
@@ -70,6 +69,22 @@ export const forgotPassword: APIMethod<ForgotPasswordParams, TokensResponse> = (
   init,
 ): Promise<TokensResponse> =>
   apiFetch(`${API_ENDPOINT}/forgotPassword`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export type ChangePasswordParams = {
+  password: string;
+  credential: string;
+  token: string;
+};
+
+export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
+  data,
+  init,
+): Promise<TokensResponse> =>
+  apiFetch(`${API_ENDPOINT}/changePassword`, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),

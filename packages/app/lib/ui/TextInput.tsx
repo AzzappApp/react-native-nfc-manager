@@ -9,7 +9,7 @@ import {
 
 import { colors, fontFamilies, textStyles } from '../../theme';
 import type {
-  TextInputProps,
+  TextInputProps as NativeTextInputProps,
   StyleProp,
   ViewStyle,
   NativeSyntheticEvent,
@@ -17,7 +17,7 @@ import type {
   TextStyle,
 } from 'react-native';
 
-type Props = TextInputProps & {
+export type TextInputProps = NativeTextInputProps & {
   containerStyle?: StyleProp<ViewStyle>;
   label?: string;
   errorLabel?: string;
@@ -41,8 +41,9 @@ const TextInput = ({
   errorLabel,
   errorLabelStyle,
   testID,
+  accessibilityLabel,
   ...props
-}: Props) => {
+}: TextInputProps) => {
   const textInputRef = useRef<NativeTextInput>(null);
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
 
@@ -87,18 +88,22 @@ const TextInput = ({
           {label}
         </Text>
       )}
-      <NativeTextInput
-        testID="azzap_native_text_input"
-        selectionColor={colors.primary400}
-        placeholderTextColor={placeholderTextColor}
-        {...props}
-        ref={textInputRef}
-        onFocus={onInputFocus}
-        onBlur={onInputBlur}
-        style={[styles.input, focusedStyle, style, errorStyle]}
-      />
+      <View pointerEvents="box-none">
+        <NativeTextInput
+          testID="azzap_native_text_input"
+          selectionColor={colors.primary400}
+          placeholderTextColor={placeholderTextColor}
+          accessibilityLabel={accessibilityLabel}
+          {...props}
+          ref={textInputRef}
+          onFocus={onInputFocus}
+          onBlur={onInputBlur}
+          style={[styles.input, focusedStyle, style, errorStyle]}
+        />
+        {props.children}
+      </View>
       <View style={{ minHeight: 15 }}>
-        {errorLabel && (
+        {isNotFalsyString(errorLabel) && (
           <Text
             testID="azzapp__Input__error-label"
             style={[styles.errorTextStyle, errorLabelStyle]}

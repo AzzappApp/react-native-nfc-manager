@@ -35,6 +35,9 @@ const icons = {
   get chevron() {
     return require('./assets/chevron.png');
   },
+  get 'chevron-down-full'() {
+    return require('./assets/chevron-down-full.png');
+  },
   get clock() {
     return require('./assets/clock.png');
   },
@@ -55,6 +58,9 @@ const icons = {
   },
   get effect() {
     return require('./assets/effect.png');
+  },
+  get eye() {
+    return require('./assets/eye.png');
   },
   get flash() {
     return require('./assets/flash.png');
@@ -130,6 +136,9 @@ const icons = {
   },
   get video() {
     return require('./assets/video.png');
+  },
+  get viewpassword() {
+    return require('./assets/viewpassword.png');
   },
   get vigneting() {
     return require('./assets/vigneting.png');

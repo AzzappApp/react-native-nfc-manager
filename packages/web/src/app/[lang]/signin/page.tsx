@@ -1,16 +1,14 @@
 'use client';
 
-import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
+import { useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
 import SignInScreen from '@azzapp/app/lib/screens/SignInScreen';
 import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
 
 const SignInPage = () => {
-  const router = useRouter();
   const WebAPI = useWebAPI();
-  const signin = (params: SignInParams) =>
-    WebAPI.signin(params).then(() => {
-      router.replace({ route: 'HOME' });
-    });
+  const signin = async (params: SignInParams) => {
+    await WebAPI.signin(params);
+  };
 
   return <SignInScreen signin={signin} />;
 };

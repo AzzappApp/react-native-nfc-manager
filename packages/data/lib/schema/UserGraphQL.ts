@@ -16,6 +16,7 @@ import {
   getUsersPostsCount,
   isUserFollowings,
 } from '../domains';
+import { UserTypeGraphQL } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import UserCardGraphQL from './UserCardGraphQL';
@@ -40,6 +41,18 @@ const UserGraphQL: GraphQLObjectType = new GraphQLObjectType<
     },
     userName: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    companyName: {
+      type: GraphQLString,
+    },
+    companyActivityId: {
+      type: GraphQLString,
+    },
+    isReady: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+    },
+    userType: {
+      type: UserTypeGraphQL,
     },
     card: {
       type: UserCardGraphQL,

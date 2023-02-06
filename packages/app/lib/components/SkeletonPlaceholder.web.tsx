@@ -2,12 +2,12 @@ import { View, StyleSheet } from 'react-native';
 
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type Props = {
+type SkeletonProps = {
   style: StyleProp<ViewStyle>;
   highLightColor?: string;
   duration?: number;
 };
-const Skeleton = ({ style }: Props) => {
+const Skeleton = ({ style }: SkeletonProps) => {
   return <View style={[style, styles.container]} />;
 };
 export default Skeleton;

@@ -9,6 +9,7 @@ import { PlatformEnvironmentProvider } from '../lib/PlatformEnvironment';
 import type { NativeRouterInit } from '../lib/components/NativeRouter';
 import type { ReactElement } from 'react';
 const initialRoutes: NativeRouterInit = {
+  id: 'test',
   stack: [
     {
       id: 'JEST_TAB',
@@ -29,12 +30,13 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     () => createPlatformEnvironment(router),
     [router],
   );
+
   return (
     <PlatformEnvironmentProvider value={platformEnvironment}>
       <IntlProvider
         textComponent={Text}
-        locale={'fr'}
-        defaultLocale={'fr'}
+        locale="fr"
+        defaultLocale="fr"
         messages={{}}
       >
         {children}

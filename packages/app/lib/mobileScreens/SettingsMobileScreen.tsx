@@ -32,7 +32,7 @@ const SettingsMobileScreen = ({
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >
-      {viewer.user ? (
+      {viewer?.user ? (
         <>
           <TouchableOpacity onPress={logout}>
             <Text>
@@ -42,27 +42,22 @@ const SettingsMobileScreen = ({
               />
             </Text>
           </TouchableOpacity>
+          <Link modal route="ONBOARDING">
+            <Pressable>
+              <Text>ONBOARDING- Temporary access for test</Text>
+            </Pressable>
+          </Link>
         </>
       ) : (
         <>
-          <Link modal route="SIGN_IN">
+          <Link modal route="ONBOARDING">
             <Pressable>
-              <Text>
-                <FormattedMessage
-                  defaultMessage="Sign In"
-                  description="sign in link"
-                />
-              </Text>
+              <Text>ONBOARDING- Temporary access for test</Text>
             </Pressable>
           </Link>
-          <Link modal route="SIGN_UP">
+          <Link modal route="ONBOARDING">
             <Pressable>
-              <Text>
-                <FormattedMessage
-                  defaultMessage="Sign Up"
-                  description="sign up link"
-                />
-              </Text>
+              <Text>ONBOARDING- Temporary access for test</Text>
             </Pressable>
           </Link>
         </>

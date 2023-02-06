@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, textStyles } from '../../theme';
 import PressableBackground from './PressableBackground';
@@ -26,12 +26,23 @@ const Button = (
     ...props,
   } as const;
 
+  const backgroundColor = useMemo(() => {
+    if (props.disabled) {
+      return colors.grey200;
+    }
+    const flatStyles = StyleSheet.flatten(style);
+    if ((flatStyles as ViewStyle)?.backgroundColor) {
+      return (flatStyles as ViewStyle).backgroundColor;
+    }
+    return colors.black;
+  }, [props.disabled, style]);
+
   if (Platform.OS === 'android') {
     return (
-      <View style={[styles.androidContainer, style]}>
+      <View style={[styles.androidContainer, style, { backgroundColor }]}>
         <Pressable
           {...buttonProps}
-          style={[styles.root, variantStyles.root]}
+          style={[styles.root, variantStyles.root, { backgroundColor }]}
           android_ripple={{
             borderless: false,
             foreground: true,
@@ -44,14 +55,14 @@ const Button = (
     return (
       <PressableBackground
         highlightColor={colors.grey900}
-        style={[styles.root, variantStyles.root, style]}
+        style={[styles.root, variantStyles.root, style, { backgroundColor }]}
         {...buttonProps}
       />
     );
   }
   return (
     <PressableOpacity
-      style={[styles.root, variantStyles.root, style]}
+      style={[styles.root, variantStyles.root, style, { backgroundColor }]}
       {...buttonProps}
     />
   );
@@ -77,7 +88,6 @@ const styles = StyleSheet.create({
 const stylesVariant = {
   primary: StyleSheet.create({
     root: {
-      backgroundColor: colors.black,
       paddingHorizontal: 20,
       height: 46,
     },

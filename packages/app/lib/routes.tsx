@@ -36,6 +36,16 @@ export type ForgotPasswordRoute = {
   params?: never;
 };
 
+export type ChangePasswordRoute = {
+  route: 'CHANGE_PASSWORD';
+  params?: never; //TODO this should coutain a reset token ?
+};
+
+export type OnBoardingRoute = {
+  route: 'ONBOARDING';
+  params?: never; //TODO this should coutain a reset token ?
+};
+
 export type UserRoute = {
   route: 'USER';
   params: {
@@ -75,12 +85,15 @@ export type Route =
   | SearchRoute
   | ChatRoute
   | SettingsRoute
-  | SignInRoute
-  | SignUpRoute
-  | ForgotPasswordRoute
   | UserRoute
   | PostRoute
   | UserPostsRoute
-  | NewPostRoute;
+  | NewPostRoute
+  | OnBoardingRoute
+  | SignInRoute
+  | SignUpRoute
+  | ForgotPasswordRoute
+  | ChangePasswordRoute
+  | OnBoardingRoute;
 
 export type ROUTES = Route['route'];

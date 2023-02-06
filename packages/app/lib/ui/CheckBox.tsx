@@ -7,7 +7,7 @@ import PressableNative from './PressableNative';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 //TODO: can be improve by selecting position of the label
 //TODO: Dark Mode
-type Props = {
+type CheckBoxProps = {
   checked: boolean;
   disabled?: boolean;
   onValueChange: (checked: boolean) => void;
@@ -21,6 +21,7 @@ type Props = {
   label?: React.ReactNode | string;
   labelStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
+  accessibilityLabel?: string;
 };
 
 const checkMarkPath =
@@ -40,7 +41,8 @@ const CheckBox = ({
   borderRadius = 3,
   labelStyle,
   label,
-}: Props) => {
+  accessibilityLabel,
+}: CheckBoxProps) => {
   const ratio = size / DEFAULT_SIZE;
   const onPress = () => {
     if (!disabled) {
@@ -54,6 +56,8 @@ const CheckBox = ({
       style={[styles.container, containerStyle]}
       onPress={onPress}
       accessibilityState={{ checked }}
+      activeOpacity={1}
+      accessibilityLabel={accessibilityLabel}
     >
       <>
         <Svg

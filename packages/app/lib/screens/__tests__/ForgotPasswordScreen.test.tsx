@@ -32,15 +32,15 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('should call the `forgotPassword` callback when the form is submitted', () => {
-    const { queryByTestId, queryByPlaceholderText } = render(
+    const { queryByRole, queryByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone number or email address');
     act(() => {
       fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
     });
 
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryByRole('button');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -49,15 +49,15 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('should not call the `forgotPassword` callback when the provided email is invalid', () => {
-    const { queryByTestId, queryByPlaceholderText } = render(
+    const { queryByRole, queryByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone number or email address');
     act(() => {
       fireEvent(inputLogin, 'onChangeText', 'test@com');
     });
 
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryByRole('button');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -65,29 +65,28 @@ describe('ForgotPassword Screen', () => {
     cleanup();
   });
 
-  test('should display an error message when the provided email is invalid', () => {
-    const { queryByTestId, queryByPlaceholderText } = render(
+  test('Change password button should be `disabled` when the provided email is invalid', () => {
+    const { queryByRole, queryByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
-    fireEvent(inputLogin, 'onChangeText', 'test@com');
-    act(() => {
-      fireEvent(queryByTestId('azzapp_Button_pressable-wrapper'), 'onPress');
-    });
-    expect(screen.queryByText('Please enter a valid email')).not.toBeNull();
+    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
+    const ubutton = queryByRole('button');
+    expect(ubutton).toBeDisabled();
+
     cleanup();
   });
 
   test('should display the confirmation message when a valid form is submitted', () => {
     jest.useFakeTimers();
-    const { queryByPlaceholderText, queryByTestId } = render(
+    const { queryByPlaceholderText, queryByRole } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
 
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone number or email address');
     fireEvent(inputLogin, 'onChangeText', 'test@test.com');
     act(() => {
-      fireEvent(queryByTestId('azzapp_Button_pressable-wrapper'), 'onPress');
+      fireEvent(queryByRole('button'), 'onPress');
     });
     act(() => {
       jest.advanceTimersByTime(600);

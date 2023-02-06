@@ -17,7 +17,7 @@ import type {
   LayoutChangeEvent,
 } from 'react-native';
 
-type Props = {
+type SearchBarProps = {
   containerStyle?: StyleProp<ViewStyle>;
   onCancel?: () => void;
   onChangeText: (text?: string) => void;
@@ -39,7 +39,7 @@ const SearchBar = ({
   placeholder,
   value,
   animationDuration = 300,
-}: Props) => {
+}: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});

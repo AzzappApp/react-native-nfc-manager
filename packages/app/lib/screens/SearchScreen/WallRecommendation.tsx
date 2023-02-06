@@ -7,11 +7,11 @@ import TrendingPostsList from './TrendingPostsList';
 import TrendingProfilesList from './TrendingProfilesList';
 import type { SearchScreen_viewer$data } from '@azzapp/relay/artifacts/SearchScreen_viewer.graphql';
 
-type Props = {
+type WallRecommendationProps = {
   viewer: SearchScreen_viewer$data;
   hasFocus: boolean;
 };
-const WallRecommendation = ({ viewer, hasFocus }: Props) => {
+const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
   return (
     <TrendingPostsList
       viewer={viewer}

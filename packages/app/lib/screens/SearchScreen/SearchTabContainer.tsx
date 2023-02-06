@@ -26,12 +26,15 @@ import type {
 } from 'react-native-tab-view';
 import type { PreloadedQuery } from 'react-relay';
 
-type Props = {
+type SearchTabContainerProps = {
   searchValue: string | undefined;
   hasFocus: boolean;
 };
 
-const SearchTabContainer = ({ searchValue, hasFocus }: Props) => {
+const SearchTabContainer = ({
+  searchValue,
+  hasFocus,
+}: SearchTabContainerProps) => {
   const [tabQueryReference, setTabPreloadedQuery] = useState<TabQueries>({
     searchGlobal: undefined,
     searchProfiles: undefined,

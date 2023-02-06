@@ -49,7 +49,7 @@ describe('Recent Search component', () => {
   test('should display a message when search value is not found in `recentSearch`', async () => {
     render(
       <RecentSearch
-        searchValue={'azzapp'}
+        searchValue="azzapp"
         recentSearch={[]}
         removeSearch={removeSearch}
         search={search}
@@ -78,7 +78,7 @@ describe('Recent Search component', () => {
   test('should filter history `recentSearch` list based on `searchValue`', async () => {
     render(
       <RecentSearch
-        searchValue={'azz'}
+        searchValue="azz"
         recentSearch={['azzapp', 'testing', 'android is bad']}
         removeSearch={removeSearch}
         search={search}
@@ -94,7 +94,7 @@ describe('Recent Search component', () => {
   test('should display message when `searchValue` is not in `recentSearch`', async () => {
     render(
       <RecentSearch
-        searchValue={'azz2themoon'}
+        searchValue="azz2themoon"
         recentSearch={['azzapp', 'testing', 'android is bad']}
         removeSearch={removeSearch}
         search={search}
@@ -113,7 +113,7 @@ describe('Recent Search component', () => {
   test('should dispatch onSearch event when a list item is pressed', async () => {
     render(
       <RecentSearch
-        searchValue={'azzapp'}
+        searchValue="azzapp"
         recentSearch={['azzapp', 'azzapp2', 'azzapp3']}
         removeSearch={removeSearch}
         search={search}

@@ -1,29 +1,49 @@
-import { getUserByEmail, getUserByUserName } from '@azzapp/data/lib/domains';
+import {
+  getUserByEmail,
+  getUserByPhoneNumber,
+  getUserByUserName,
+} from '@azzapp/data/lib/domains';
 import ERRORS from '@azzapp/shared/lib/errors';
+import {
+  isInternationalPhoneNumber,
+  isValidEmail,
+} from '@azzapp/shared/lib/stringHelpers';
 import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';
 import { generateTokens } from '../../helpers/tokensHelpers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type SignInBody = {
-  userNameOrEmail?: string;
+  credential?: string; //email or username or phone number
   password?: string;
   authMethod?: 'cookie' | 'token';
 };
 
 const signin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { userNameOrEmail, password, authMethod } =
+  const { credential, password, authMethod } =
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     <SignInBody>req.body || {};
 
-  if (!userNameOrEmail || !password) {
+  if (!credential || !password) {
     res.status(400).json({ message: ERRORS.INVALID_REQUEST });
     return;
   }
   try {
-    const user =
-      (await getUserByEmail(userNameOrEmail)) ??
-      (await getUserByUserName(userNameOrEmail));
+    let user;
+    if (isValidEmail(credential)) {
+      // looking for email only if the credential is a valid email
+      user = await getUserByEmail(credential);
+    }
+    if (!user && isInternationalPhoneNumber(credential)) {
+      // looking for phonenumber only if the credential is a valid phonenumber
+      user = await getUserByPhoneNumber(credential);
+    }
+    //TODO: specification does not specifiy to loginwiht username but lets do it anyway
+    if (!user) {
+      // in all other case, look for username
+      user = await getUserByUserName(credential);
+    }
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({ message: ERRORS.INVALID_CREDENTIALS });
       return;

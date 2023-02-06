@@ -12,12 +12,15 @@ import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_user
 
 import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalListHeader_viewer.graphql';
 
-type Props = {
+type SearchResultGlobalListHeaderProps = {
   viewer: SearchResultGlobalListHeader_viewer$key;
   hasFocus: boolean;
 };
 
-const SearchResultGlobalListHeader = ({ viewer, hasFocus }: Props) => {
+const SearchResultGlobalListHeader = ({
+  viewer,
+  hasFocus,
+}: SearchResultGlobalListHeaderProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     graphql`
       fragment SearchResultGlobalListHeader_viewer on Viewer

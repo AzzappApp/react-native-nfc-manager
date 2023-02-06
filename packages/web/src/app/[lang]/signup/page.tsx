@@ -4,17 +4,17 @@ import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
 import SignUpScreen from '@azzapp/app/lib/screens/SignUpScreen';
 import type { SignUpParams } from '@azzapp/shared/lib/WebAPI';
 
-const SingUpPage = () => {
+const SignUpPage = () => {
   const WebAPI = useWebAPI();
   const router = useRouter();
-  const signup = (params: SignUpParams) =>
-    WebAPI.signup(params).then(() => {
-      router.replace({ route: 'HOME' });
-    });
+  const signup = async (params: SignUpParams) => {
+    await WebAPI.signup(params);
+    router.showModal({ route: 'ONBOARDING' });
+  };
 
   return <SignUpScreen signup={signup} />;
 };
 
-export default SingUpPage;
+export default SignUpPage;
 
 export const dynamic = 'force-static';

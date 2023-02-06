@@ -8,6 +8,7 @@ describe('NativeRouter', () => {
     test('should return initial state from config', () => {
       const { result } = renderHook(() => {
         return useNativeRouter({
+          id: 'test',
           stack: [
             {
               id: 'MAIN_TABS',
@@ -99,6 +100,7 @@ describe('NativeRouter', () => {
       test('should return the modal route if any', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TABS',
@@ -131,6 +133,7 @@ describe('NativeRouter', () => {
       test('should return the current tab if any', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               { id: 'NEW_POST', route: 'NEW_POST' },
               {
@@ -162,6 +165,7 @@ describe('NativeRouter', () => {
       test('should return the top level stack route if any', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               { id: 'NEW_POST', route: 'NEW_POST' },
               {
@@ -196,6 +200,7 @@ describe('NativeRouter', () => {
       test('should add route to the current stack', () => {
         let { result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -276,6 +281,7 @@ describe('NativeRouter', () => {
         unmount();
         ({ result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -357,6 +363,7 @@ describe('NativeRouter', () => {
       test('should set current tab if tabs exist', () => {
         let { result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -435,6 +442,7 @@ describe('NativeRouter', () => {
         unmount();
         ({ result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -511,6 +519,7 @@ describe('NativeRouter', () => {
       test('should push to modal if there is a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -572,6 +581,7 @@ describe('NativeRouter', () => {
       test('should pop route from the current stack', () => {
         let { result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -698,6 +708,7 @@ describe('NativeRouter', () => {
         unmount();
         ({ result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'user-0',
@@ -751,6 +762,7 @@ describe('NativeRouter', () => {
       test('should pop the if there is a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -840,6 +852,7 @@ describe('NativeRouter', () => {
       test('should replace route from the current stack', () => {
         let { result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -891,6 +904,7 @@ describe('NativeRouter', () => {
         unmount();
         ({ result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -965,6 +979,7 @@ describe('NativeRouter', () => {
       test('should set current tab if tabs exist', () => {
         let { result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -1043,6 +1058,7 @@ describe('NativeRouter', () => {
         unmount();
         ({ result, unmount } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -1112,6 +1128,7 @@ describe('NativeRouter', () => {
       test('should replace the modal if there is a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -1166,6 +1183,7 @@ describe('NativeRouter', () => {
       test('should push a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -1206,6 +1224,7 @@ describe('NativeRouter', () => {
       test('should push to the modal stack if there is already a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -1260,6 +1279,7 @@ describe('NativeRouter', () => {
       test('should remove the screen from the current stack', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TAB',
@@ -1493,6 +1513,7 @@ describe('NativeRouter', () => {
       test('should pop the if there is a modal', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'HOME',
@@ -1585,6 +1606,7 @@ describe('NativeRouter', () => {
       test('should reset state', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'MAIN_TABS',
@@ -1619,6 +1641,7 @@ describe('NativeRouter', () => {
       test('router should dispatch a screenWillBePushed and route change events when a screen is pushed', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [{ id: 'HOME', route: 'HOME' }],
             modals: [],
           });
@@ -1657,6 +1680,7 @@ describe('NativeRouter', () => {
       test('router should dispatch a screenWillBeRemoved and route change events when a screen is poped', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               { id: 'HOME', route: 'HOME' },
               { id: 'SETTINGS', route: 'SETTINGS' },
@@ -1696,6 +1720,7 @@ describe('NativeRouter', () => {
       test('router should dispatch a screenWillBePushed, screenWillBeRemoved and route change events when a screen is replaced', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [{ id: 'HOME', route: 'HOME' }],
             modals: [],
           });
@@ -1742,6 +1767,7 @@ describe('NativeRouter', () => {
       test('router should dispatch a screenWillBePushed and route change events when a modal is shown', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [{ id: 'HOME', route: 'HOME' }],
             modals: [],
           });
@@ -1780,6 +1806,7 @@ describe('NativeRouter', () => {
       test('router should dispatch a screenWillBePushed  nd route change events when a tab is set', () => {
         const { result } = renderHook(() => {
           return useNativeRouter({
+            id: 'test',
             stack: [
               {
                 id: 'main-tabs',

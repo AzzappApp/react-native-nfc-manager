@@ -136,7 +136,7 @@ const renderScreen = () => {
         viewer={data.viewer}
         canPlay={false}
         ListHeaderComponent={
-          <View testID={'listheadertestId'} style={{ height: 30 }} />
+          <View testID="listheadertestId" style={{ height: 30 }} />
         }
       />
     );

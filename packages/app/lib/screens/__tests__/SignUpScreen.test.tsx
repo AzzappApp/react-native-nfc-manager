@@ -1,53 +1,61 @@
-import { fireEvent, render, within, screen } from '../../../utils/test-util';
-
+import { RelayEnvironmentProvider } from 'react-relay';
+import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+import { act, fireEvent, render, waitFor } from '../../../utils/test-util';
+import '@testing-library/jest-native/extend-expect';
 import SignUpScreen from '../SignUpScreen';
+
+const environement = createMockEnvironment();
+environement.mock.queueOperationResolver(operation =>
+  MockPayloadGenerator.generate(operation, {
+    User: (_, generateId) => {
+      if (operation.fragment.variables.userName !== 'sebastien') {
+        return { id: String(generateId()) };
+      }
+      return {
+        id: String(generateId()),
+        userName: 'sebastien',
+      };
+    },
+  }),
+);
 
 describe('Signup Screen', () => {
   const signup = jest.fn();
   beforeEach(() => {
     signup.mockReset();
   });
-  test('should render without error', () => {
-    const { container } = render(<SignUpScreen signup={signup} />);
-    expect(container).not.toBeNull();
-  });
-
-  test('should call the `signup` callback if form is valid', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+  test('should call the `signup` callback if form is valid', async () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
     const input = queryByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
+    const inputUsername = queryByPlaceholderText('Choose a username');
+
+    fireEvent(inputUsername, 'onChangeText', 'sebastienValid');
+
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
     fireEvent(checkboxes[0], 'onPress');
     fireEvent(checkboxes[1], 'onPress');
 
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
-    fireEvent(buttonComponent, 'onPress');
-    expect(signup).toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(screen.queryByTestId('azzapp_SignUp_textInput-errorTos')).toBeNull();
+    const buttonComponent = queryAllByRole('button')[1];
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    await waitFor(() => expect(signup).toHaveBeenCalled());
   });
 
   test('should not call the `signup` callback if email is not valid', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@com');
 
     const input = queryByPlaceholderText('Password');
@@ -56,28 +64,18 @@ describe('Signup Screen', () => {
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
     fireEvent(checkboxes[0], 'onPress');
     fireEvent(checkboxes[1], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryAllByRole('button')[1];
     fireEvent(buttonComponent, 'onPress');
     expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).not.toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(screen.queryByTestId('azzapp_SignUp_textInput-errorTos')).toBeNull();
   });
 
   test('should not call the `signup` callback if password is not valid', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
     const input = queryByPlaceholderText('Password');
@@ -87,28 +85,115 @@ describe('Signup Screen', () => {
 
     fireEvent(checkboxes[0], 'onPress');
     fireEvent(checkboxes[1], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryAllByRole('button')[1];
+
     fireEvent(buttonComponent, 'onPress');
     expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).not.toBeNull();
-    expect(screen.queryByTestId('azzapp_SignUp_textInput-errorTos')).toBeNull();
   });
 
-  test('should not call the `signup` callback if TOS is not checked', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+  test('should not call the `signup` callback if username is not valid', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
+
+    const input = queryByPlaceholderText('Password');
+    fireEvent(input, 'onChangeText', 'AZEqsd81');
+
+    const inputUsername = queryByPlaceholderText('Choose a username');
+    fireEvent(inputUsername, 'onChangeText', '123');
+
+    const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
+
+    fireEvent(checkboxes[0], 'onPress');
+    fireEvent(checkboxes[1], 'onPress');
+    const buttonComponent = queryAllByRole('button')[1];
+
+    fireEvent(buttonComponent, 'onPress');
+    expect(signup).not.toHaveBeenCalled();
+  });
+
+  test('should not call the `signup` callback if username is not valid', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
+    );
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
+
+    const input = queryByPlaceholderText('Password');
+    fireEvent(input, 'onChangeText', 'AZEqsd81');
+
+    const inputUsername = queryByPlaceholderText('Choose a username');
+    fireEvent(inputUsername, 'onChangeText', '123');
+
+    const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
+
+    fireEvent(checkboxes[0], 'onPress');
+    fireEvent(checkboxes[1], 'onPress');
+    const buttonComponent = queryAllByRole('button')[1];
+
+    fireEvent(buttonComponent, 'onPress');
+    expect(signup).not.toHaveBeenCalled();
+  });
+
+  test('should not call the `signup` callback and show error message if username already exists', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
+    );
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
+
+    const input = queryByPlaceholderText('Password');
+    fireEvent(input, 'onChangeText', 'AZEqsd81');
+
+    const inputUsername = queryByPlaceholderText('Choose a username');
+    fireEvent(inputUsername, 'onChangeText', 'sebastien');
+    act(() => fireEvent(inputUsername, 'onBlur'));
+
+    const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
+
+    fireEvent(checkboxes[0], 'onPress');
+    fireEvent(checkboxes[1], 'onPress');
+    const buttonComponent = queryAllByRole('button')[1];
+
+    fireEvent(buttonComponent, 'onPress');
+    expect(signup).not.toHaveBeenCalled();
+  });
+
+  test('Sign Up button should be disabled if phone number is not valid', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
+    );
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    fireEvent(inputLogin, 'onChangeText', '+3368876');
+
+    const input = queryByPlaceholderText('Password');
+    fireEvent(input, 'onChangeText', 'wonrpsdfsdfass');
+
+    const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
+
+    fireEvent(checkboxes[0], 'onPress');
+    fireEvent(checkboxes[1], 'onPress');
+    const buttonComponent = queryAllByRole('button')[1];
+    expect(buttonComponent).toBeDisabled();
+  });
+
+  test('should not call the `signup` callback if the terms of service checkbox is not checked', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
+    );
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
     const input = queryByPlaceholderText('Password');
@@ -116,30 +201,18 @@ describe('Signup Screen', () => {
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
     fireEvent(checkboxes[1], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryAllByRole('button')[1];
     fireEvent(buttonComponent, 'onPress');
     expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      screen.queryByTestId('azzapp_SignUp_textInput-errorTos'),
-    ).not.toBeNull();
   });
 
-  test('should not call the `signup` callback if PP is not checked', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+  test('should not call the `signup` callback if privacy policy checkbox is not checked', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Email Address');
+    const inputLogin = queryByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
     const input = queryByPlaceholderText('Password');
@@ -148,28 +221,16 @@ describe('Signup Screen', () => {
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
 
     fireEvent(checkboxes[0], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryAllByRole('button')[1];
     fireEvent(buttonComponent, 'onPress');
     expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      screen.queryByTestId('azzapp_SignUp_textInput-errorTos'),
-    ).not.toBeNull();
   });
 
-  test('should not call the `signup` callback if email empty', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+  test('Sign Up Button should be disabled if Phone Number or Email address has not been filled', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
 
     const input = queryByPlaceholderText('Password');
@@ -179,49 +240,26 @@ describe('Signup Screen', () => {
 
     fireEvent(checkboxes[0], 'onPress');
     fireEvent(checkboxes[1], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
-    fireEvent(buttonComponent, 'onPress');
-    expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).not.toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(screen.queryByTestId('azzapp_SignUp_textInput-errorTos')).toBeNull();
+    const buttonComponent = queryAllByRole('button')[1];
+    expect(buttonComponent).toBeDisabled();
   });
 
-  test('should not call the `signup` callback if password empty', () => {
-    const { queryByTestId, queryAllByTestId, queryByPlaceholderText } = render(
-      <SignUpScreen signup={signup} />,
+  test('should display an error message and not call the `signup`callback if password is not filled when pressing `Sign Up`button', () => {
+    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+      <RelayEnvironmentProvider environment={environement}>
+        <SignUpScreen signup={signup} />
+      </RelayEnvironmentProvider>,
     );
 
-    const input = queryByPlaceholderText('Email Address');
+    const input = queryByPlaceholderText('Phone Number of email address');
     fireEvent(input, 'onChangeText', 'test@azzaap.coms');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
 
     fireEvent(checkboxes[0], 'onPress');
     fireEvent(checkboxes[1], 'onPress');
-    const buttonComponent = queryByTestId('azzapp_Button_pressable-wrapper');
+    const buttonComponent = queryAllByRole('button')[1];
     fireEvent(buttonComponent, 'onPress');
     expect(signup).not.toHaveBeenCalled();
-
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-email'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).toBeNull();
-    expect(
-      within(
-        screen.queryByTestId('azzapp_SignUp_textInput-password'),
-      ).queryByTestId('azzapp__Input__error-label'),
-    ).not.toBeNull();
-    expect(screen.queryByTestId('azzapp_SignUp_textInput-errorTos')).toBeNull();
   });
 });

@@ -1,12 +1,10 @@
-import { useCallback, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
 import { HEADER_HEIGHT } from '../../components/Header';
-import Link from '../../components/Link';
 import useViewportSize, { insetTop, VW100 } from '../../hooks/useViewportSize';
-import Button from '../../ui/Button';
+import { useRouter } from '../../PlatformEnvironment';
 import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
@@ -26,6 +24,7 @@ const HomeScreen = ({
       fragment HomeScreen_viewer on Viewer {
         user {
           id
+          isReady
         }
         ...FollowedProfilesList_viewer
         ...FollowedProfilesPostsList_viewer
@@ -33,6 +32,11 @@ const HomeScreen = ({
     `,
     viewerRef,
   );
+
+  const router = useRouter();
+  useEffect(() => {
+    if (!viewer.user?.isReady) router.showModal({ route: 'ONBOARDING' });
+  }, [router, viewer.user?.isReady]);
 
   const vp = useViewportSize();
   const [headerHidden, setHeaderHidden] = useState(false);
@@ -49,7 +53,6 @@ const HomeScreen = ({
     [headerHeight],
   );
 
-  const intl = useIntl();
   return (
     <FollowedProfilesPostsList
       viewer={viewer}
@@ -68,24 +71,6 @@ const HomeScreen = ({
             canPlay={hasFocus && !headerHidden}
             style={styles.followedProfilesList}
           />
-          {!viewer.user && (
-            <View style={styles.signupSection}>
-              <Link modal route="SIGN_UP">
-                <Button
-                  style={styles.signupButton}
-                  label={intl.formatMessage({
-                    defaultMessage: 'Sign Up',
-                    description: 'Home screen sign up button label',
-                  })}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Tap to sign up',
-                    description:
-                      'Home Screen - AccessibilityLabel Sign Up button',
-                  })}
-                />
-              </Link>
-            </View>
-          )}
         </View>
       }
       stickyHeaderIndices={[0]}

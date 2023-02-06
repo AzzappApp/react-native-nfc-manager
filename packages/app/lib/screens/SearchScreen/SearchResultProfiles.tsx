@@ -18,12 +18,15 @@ export const searchResultProfilesQuery = graphql`
   }
 `;
 
-type Props = {
+type SearchResultProfilesProps = {
   queryReference: PreloadedQuery<SearchResultProfilesQuery>;
   hasFocus: boolean;
 };
 
-const SearchResultProfiles = ({ queryReference, hasFocus }: Props) => {
+const SearchResultProfiles = ({
+  queryReference,
+  hasFocus,
+}: SearchResultProfilesProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultProfilesQuery>(
     searchResultProfilesQuery,
     queryReference,

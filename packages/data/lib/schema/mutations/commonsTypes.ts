@@ -29,3 +29,12 @@ export const MediaKindGraphQL = new GraphQLEnumType({
     image: { value: 'image' },
   },
 });
+
+export const UserTypeGraphQL = new GraphQLEnumType({
+  name: 'UserType',
+  values: {
+    BUSINESS: { value: 'BUSINESS' },
+    PERSONAL: { value: 'PERSONAL' },
+    PRODUCT: { value: 'PRODUCT' },
+  },
+});

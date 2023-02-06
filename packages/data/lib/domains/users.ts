@@ -45,6 +45,22 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 };
 
 /**
+ * Retrieve a user by their phoneNumber
+ * @param phoneNumber - The phoneNumber of the user to retrieve
+ * @returns The user if found, otherwise null
+ */
+export const getUserByPhoneNumber = async (
+  phoneNumber: string,
+): Promise<User | null> => {
+  const user = await db
+    .selectFrom('User')
+    .selectAll()
+    .where('phoneNumber', '=', phoneNumber)
+    .executeTakeFirst();
+  return user ?? null;
+};
+
+/**
  * Retrieve all users with a card
  * @param limit - The maximum number of users to retrieve
  * @param offset - The number of users to skip

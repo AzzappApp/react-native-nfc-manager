@@ -1,5 +1,5 @@
-import { isValidEmail } from '@azzapp/shared/lib/stringHelpers';
-import { useState } from 'react';
+import { isPhoneNumber, isValidEmail } from '@azzapp/shared/lib/stringHelpers';
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Image,
@@ -10,25 +10,23 @@ import {
   Text,
   View,
 } from 'react-native';
+import { getLocales } from 'react-native-localize';
 import { colors, fontFamilies } from '../../theme';
 
-import useViewportSize, {
-  insetBottom,
-  insetTop,
-  VW100,
-} from '../hooks/useViewportSize';
+import useViewportSize, { insetBottom, VW100 } from '../hooks/useViewportSize';
 import { useRouter } from '../PlatformEnvironment';
 import Button from '../ui/Button';
-import FloatingIconButton from '../ui/FloatingIconButton';
 import Form, { Submit } from '../ui/Form/Form';
 import PressableNative from '../ui/PressableNative';
 import TextInput from '../ui/TextInput';
 import ViewTransition from '../ui/ViewTransition';
 import type { ForgotPasswordParams } from '@azzapp/shared/lib/WebAPI';
+import type { CountryCode } from 'libphonenumber-js';
 
 type ForgotPasswordScreenProps = {
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
 };
+const locales = getLocales();
 
 const ForgotPasswordScreen = ({
   forgotPassword,
@@ -37,22 +35,29 @@ const ForgotPasswordScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [emailOrPhone, setEmailOrPhone] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const onSubmit = async () => {
-    if (!isValidEmail(email)) {
-      setEmailError(
-        intl.formatMessage({
-          defaultMessage: 'Please enter a valid email',
-          description:
-            'ForgotpasswordScreen - error message when input doest not validate as an email',
-        }),
-      );
-      return;
+
+  const isValidMailOrPhone = useMemo(() => {
+    if (isValidEmail(emailOrPhone)) {
+      return true;
     }
-    await forgotPassword({ email });
-    setIsSubmitted(true);
+
+    for (let i = 0; i < locales.length; i++) {
+      if (isPhoneNumber(emailOrPhone, locales[i].countryCode as CountryCode)) {
+        return true;
+      }
+    }
+    return false;
+  }, [emailOrPhone]);
+
+  const onSubmit = async () => {
+    if (isValidMailOrPhone) {
+      if (!isSubmitted) {
+        await forgotPassword({ credential: emailOrPhone });
+      }
+      setIsSubmitted(true);
+    }
   };
 
   const onBack = () => {
@@ -62,7 +67,7 @@ const ForgotPasswordScreen = ({
   return (
     <View style={styles.flex}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
       >
         <View onTouchStart={Keyboard.dismiss} style={[styles.container]}>
@@ -87,14 +92,14 @@ const ForgotPasswordScreen = ({
               <View style={styles.viewText}>
                 <Text style={styles.textForgot}>
                   <FormattedMessage
-                    defaultMessage="Check your emails !"
-                    description="ForgotPasswordScreen - Check your emails !"
+                    defaultMessage="Check your emails or messages!"
+                    description="ForgotPasswordScreen - Check your emails or messages!"
                   />
                 </Text>
                 <Text style={styles.textForgotExplain}>
                   <FormattedMessage
                     defaultMessage="We just send you a link to create a new password"
-                    description="ForgotPasswordScreen - email send indication"
+                    description="ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
                   />
                 </Text>
               </View>
@@ -118,29 +123,29 @@ const ForgotPasswordScreen = ({
               <View style={styles.viewText}>
                 <Text style={styles.textForgot}>
                   <FormattedMessage
-                    defaultMessage="Forgot your password ?"
-                    description="ForgotPasswordScreen - Forgot your password  title"
+                    defaultMessage="Forgot your password?"
+                    description="ForgotPasswordScreen - Forgot your password title"
                   />
                 </Text>
                 <Text style={styles.textForgotExplain}>
                   <FormattedMessage
-                    defaultMessage="Enter your email address and we'll send you a link to create a new password"
+                    defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
                     description="ForgotPasswordScreen - Forgot your password description"
                   />
                 </Text>
               </View>
               <TextInput
                 placeholder={intl.formatMessage({
-                  defaultMessage: 'Email Address',
-                  description: 'ForgotpasswordScreen - Email Address',
+                  defaultMessage: 'Phone number or email address',
+                  description:
+                    'ForgotpasswordScreen - Phone number or email address placeholder',
                 })}
-                value={email}
-                onChangeText={setEmail}
+                value={emailOrPhone}
+                onChangeText={setEmailOrPhone}
                 autoCapitalize="none"
                 autoComplete="email"
                 keyboardType="email-address"
                 autoCorrect={false}
-                errorLabel={emailError}
               />
               <Submit>
                 <Button
@@ -155,15 +160,13 @@ const ForgotPasswordScreen = ({
                   })}
                   style={styles.button}
                   onPress={onSubmit}
+                  disabled={!isValidMailOrPhone}
                 />
               </Submit>
             </ViewTransition>
           </Form>
         </View>
       </KeyboardAvoidingView>
-      <View style={[styles.closeButton, { top: vp`${insetTop} + ${16}` }]}>
-        <FloatingIconButton icon="chevron" onPress={onBack} />
-      </View>
       <View
         style={{
           bottom: vp`${insetBottom} + ${35}`,
@@ -231,9 +234,4 @@ const styles = StyleSheet.create({
   },
   logo: { width: 38, height: 54 },
   back: { color: colors.grey200 },
-  closeButton: {
-    position: 'absolute',
-    start: 15,
-    zIndex: 1,
-  },
 });
