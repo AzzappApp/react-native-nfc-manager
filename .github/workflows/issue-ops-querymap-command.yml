@@ -1,0 +1,42 @@
+name: Query-map pull request comment
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+  issue_comment:
+    types: [created, edited]
+
+
+jobs:
+  querymap-depends:
+    name: "On query map Pull request created"
+    if: startsWith(github.rest.event.comment.body, '/querymap-depends')
+    env:
+      ImageOS: macos12
+    runs-on: self-hosted
+    steps:
+      - name: Get the current branch name lowercase without dashes
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo $GITHUB_HEAD_REF | tr "[:upper:]" "[:lower:]" | sed -e 's/-//g')" >> $GITHUB_OUTPUT
+        id: branch_name
+
+      - name: Find Pull Request
+        uses: juliangruber/find-pull-request-action@v1.8.0
+        with: 
+          github-token: ${{ secrets.QUERY_MAP_PAT }}
+          repo: 'AzzappApp/azzapp-precompiled-queries'
+          branch: '${{ github.head_ref }}_on_${{ github.base_ref }}-precompiled-queries'
+          base: 'main'
+      
+      - name: Check if pull request is closed
+        run: |
+          if [ ${{ steps.fpr.outputs.state }} == 'closed' ]; then
+            echo "Pull request is closed"
+            exit 0
+          fi
+          if [ ${{ steps.fpr.outputs.state }} == 'open' ]; then
+            echo "Pull request is open"
+            exit 1
+          fi
