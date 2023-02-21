@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '../../../theme';
@@ -8,7 +8,6 @@ import { useRouter } from '../../PlatformEnvironment';
 import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
-import type { LayoutChangeEvent } from 'react-native';
 
 type HomeScreenProps = {
   viewer: HomeScreen_viewer$key;
@@ -22,7 +21,7 @@ const HomeScreen = ({
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
-        user {
+        profile {
           id
           isReady
         }
@@ -35,31 +34,17 @@ const HomeScreen = ({
 
   const router = useRouter();
   useEffect(() => {
-    if (!viewer.user?.isReady) router.showModal({ route: 'ONBOARDING' });
-  }, [router, viewer.user?.isReady]);
+    if (!viewer.profile?.isReady) router.showModal({ route: 'ONBOARDING' });
+  }, [router, viewer.profile?.isReady]);
 
   const vp = useViewportSize();
-  const [headerHidden, setHeaderHidden] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(Infinity);
-
-  const onHeaderLayout = (e: LayoutChangeEvent) => {
-    setHeaderHeight(e.nativeEvent.layout.height);
-  };
-
-  const onScroll = useCallback(
-    (scrollPosition: number) => {
-      setHeaderHidden(scrollPosition > headerHeight * 1.2);
-    },
-    [headerHeight],
-  );
 
   return (
     <FollowedProfilesPostsList
       viewer={viewer}
       canPlay={hasFocus}
-      onScroll={onScroll}
       ListHeaderComponent={
-        <View onLayout={onHeaderLayout} style={{ marginTop: vp`${insetTop}` }}>
+        <View style={{ marginTop: vp`${insetTop}` }}>
           <View style={styles.header}>
             <Image
               source={require('../../assets/logo-full.png')}
@@ -68,7 +53,6 @@ const HomeScreen = ({
           </View>
           <FollowedProfilesList
             viewer={viewer}
-            canPlay={hasFocus && !headerHidden}
             style={styles.followedProfilesList}
           />
         </View>

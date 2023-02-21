@@ -1,33 +1,29 @@
 import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useRouter } from '../PlatformEnvironment';
 import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import CoverRenderer from './CoverRenderer';
-import type { CoverHandle, CoverRendererProps } from './CoverRenderer';
-import type { View } from 'react-native';
+import type { CoverRendererProps } from './CoverRenderer';
+import type { StyleProp, View, ViewStyle } from 'react-native';
 
 const CoverLink = ({
-  userId,
+  profileID,
   userName,
   style,
   coverStyle,
   ...props
 }: CoverRendererProps & {
-  userId: string;
+  profileID: string;
+  coverStyle: StyleProp<ViewStyle>;
 }) => {
-  const coverRef = useRef<CoverHandle | null>(null);
   const ref = useRef<View | null>(null);
-  const [coverState, setCoverState] = useState<
-    { imageIndex: number; videoTime?: number | null } | undefined
-  >();
 
   const router = useRouter();
   const onPress = () => {
     const container = ref.current;
-    const cover = coverRef.current;
-    if (!container || !cover) {
+    if (!container) {
       router.push({
-        route: 'USER',
+        route: 'PROFILE',
         params: {
           userName,
         },
@@ -35,17 +31,12 @@ const CoverLink = ({
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
-      await coverRef.current?.snapshot();
-      const videoTime = await coverRef.current?.getCurrentVideoTime();
       router.push({
-        route: 'USER',
+        route: 'PROFILE',
         params: {
           userName,
-          userId,
-          imageIndex: coverRef.current?.getCurrentImageIndex(),
-          videoTime,
+          profileID,
           fromRectangle: { x, y, width, height },
-          setOriginCoverState: setCoverState,
         },
       });
     });
@@ -64,22 +55,7 @@ const CoverLink = ({
       ]}
       accessibilityRole="link"
     >
-      {({ pressed }) => (
-        <CoverRenderer
-          {...props}
-          userName={userName}
-          ref={coverRef}
-          style={coverStyle}
-          videoPaused={pressed ? true : props.videoPaused}
-          playTransition={pressed ? false : props.playTransition}
-          imageIndex={coverState?.imageIndex}
-          initialVideosTimes={
-            coverState
-              ? { [coverState.imageIndex]: coverState.videoTime }
-              : null
-          }
-        />
-      )}
+      <CoverRenderer {...props} userName={userName} style={coverStyle} />
     </PressableScaleHighlight>
   );
 };

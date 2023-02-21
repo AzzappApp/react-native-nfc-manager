@@ -16,10 +16,16 @@ import type { GraphQLContext } from './GraphQLContext';
 const MediaGraphQL = new GraphQLInterfaceType({
   name: 'Media',
   fields: () => ({
-    source: {
+    id: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    ratio: {
+    aspectRatio: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    width: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    height: {
       type: new GraphQLNonNull(GraphQLFloat),
     },
     uri: {
@@ -28,11 +34,11 @@ const MediaGraphQL = new GraphQLInterfaceType({
         pixelRatio: {
           type: GraphQLFloat,
         },
-        ratio: {
+        height: {
           type: GraphQLFloat,
         },
         width: {
-          type: new GraphQLNonNull(GraphQLFloat),
+          type: GraphQLFloat,
         },
       },
     },
@@ -47,10 +53,19 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
   interfaces: [MediaGraphQL],
   isTypeOf: media => media.kind === 'video',
   fields: () => ({
-    source: {
+    id: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    ratio: {
+    aspectRatio: {
+      type: new GraphQLNonNull(GraphQLFloat),
+      resolve({ width, height }) {
+        return width / height;
+      },
+    },
+    width: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    height: {
       type: new GraphQLNonNull(GraphQLFloat),
     },
     uri: {
@@ -59,31 +74,31 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
         pixelRatio: {
           type: GraphQLFloat,
         },
-        ratio: {
+        height: {
           type: GraphQLFloat,
         },
         width: {
-          type: new GraphQLNonNull(GraphQLFloat),
+          type: GraphQLFloat,
         },
       },
       resolve(
-        { source },
+        { id },
         {
           pixelRatio = 1,
-          ratio,
+          height,
           width,
           thumbnail,
         }: {
           pixelRatio?: number;
-          ratio?: number;
-          width: number;
+          height?: number;
+          width?: number;
           thumbnail?: boolean;
         },
       ): string {
         if (thumbnail) {
-          return getVideoThumbnailURL(source, width, pixelRatio, ratio);
+          return getVideoThumbnailURL(id, width, pixelRatio, height);
         } else {
-          return getVideoUrlForSize(source, width, pixelRatio, ratio);
+          return getVideoUrlForSize(id, width, pixelRatio, height);
         }
       },
     },
@@ -93,29 +108,29 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
         pixelRatio: {
           type: GraphQLFloat,
         },
-        ratio: {
+        height: {
           type: GraphQLFloat,
         },
         width: {
-          type: new GraphQLNonNull(GraphQLFloat),
+          type: GraphQLFloat,
         },
         time: {
           type: GraphQLFloat,
         },
       },
       resolve(
-        { source },
+        { id },
         {
           pixelRatio = 1,
-          ratio,
+          height,
           width,
         }: {
           pixelRatio?: number;
-          ratio?: number;
+          height?: number;
           width: number;
         },
       ): string {
-        return getVideoThumbnailURL(source, width, pixelRatio, ratio);
+        return getVideoThumbnailURL(id, width, pixelRatio, height);
       },
     },
   }),
@@ -127,10 +142,19 @@ export const MediaImageGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
   interfaces: [MediaGraphQL],
   isTypeOf: media => media.kind === 'image',
   fields: () => ({
-    source: {
+    id: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    ratio: {
+    aspectRatio: {
+      type: new GraphQLNonNull(GraphQLFloat),
+      resolve({ width, height }) {
+        return width / height;
+      },
+    },
+    width: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    height: {
       type: new GraphQLNonNull(GraphQLFloat),
     },
     uri: {
@@ -139,27 +163,27 @@ export const MediaImageGraphQL = new GraphQLObjectType<Media, GraphQLContext>({
         pixelRatio: {
           type: GraphQLFloat,
         },
-        ratio: {
+        height: {
           type: GraphQLFloat,
         },
         width: {
-          type: new GraphQLNonNull(GraphQLFloat),
+          type: GraphQLFloat,
         },
       },
       resolve(
-        { source },
+        { id },
         {
           pixelRatio = 1,
-          ratio,
+          height,
           width,
         }: {
           pixelRatio?: number;
-          ratio?: number;
-          width: number;
+          height?: number;
+          width?: number;
           thumbnail?: boolean;
         },
       ): string {
-        return getImageURLForSize(source, width, pixelRatio, ratio);
+        return getImageURLForSize(id, width, height, pixelRatio);
       },
     },
   }),

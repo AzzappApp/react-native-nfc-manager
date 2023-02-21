@@ -1,9 +1,9 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
-import { getUserByUserName } from '../domains';
+import { getProfileByUserName } from '../domains';
 import { nodeField, nodesField } from './NodeGraphQL';
-import UserGraphQL from './UserGraphQL';
+import ProfileGraphQL from './ProfileGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
-import type { User, Viewer } from '../domains';
+import type { Profile, Viewer } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 
 const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
@@ -12,23 +12,23 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
   fields: {
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
-      resolve: (_root, _args, { userInfos }): Viewer => userInfos,
+      resolve: (_root, _args, { auth: userInfos }): Viewer => userInfos,
     },
     node: nodeField,
     nodes: nodesField,
-    user: {
-      description: 'Fetches an user given its user name',
-      type: UserGraphQL,
+    profile: {
+      description: 'Fetches a profile given its user name',
+      type: ProfileGraphQL,
       args: {
         userName: {
           type: new GraphQLNonNull(GraphQLString),
-          description: 'The user name of the user',
+          description: 'The user name of the profile',
         },
       },
       resolve: async (
         _,
         { userName }: { userName: string },
-      ): Promise<User | null> => getUserByUserName(userName),
+      ): Promise<Profile | null> => getProfileByUserName(userName),
     },
   },
 });

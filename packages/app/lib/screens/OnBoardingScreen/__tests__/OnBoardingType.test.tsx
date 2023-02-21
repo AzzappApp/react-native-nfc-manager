@@ -5,12 +5,12 @@ import { act, fireEvent, render, screen } from '../../../../utils/test-util';
 import OnBoardingType from '../OnBoardingType';
 
 describe('OnBoardingType component', () => {
-  test('Button Continue should be disabled if userType is not selected', () => {
+  test('Button Continue should be disabled if profileKind is not selected', () => {
     render(
       <OnBoardingType
         next={jest.fn}
-        userType={undefined}
-        setUserType={jest.fn}
+        profileKind={undefined}
+        setProfileKind={jest.fn}
       />,
     );
 
@@ -19,13 +19,13 @@ describe('OnBoardingType component', () => {
     ).toBeDisabled();
   });
 
-  test('Button Continue should be enabled if userType is defined from props', () => {
+  test('Button Continue should be enabled if profileKind is defined from props', () => {
     const mockSetContet = jest.fn();
     render(
       <OnBoardingType
         next={jest.fn}
-        userType={'PERSONAL'}
-        setUserType={mockSetContet}
+        profileKind={'personal'}
+        setProfileKind={mockSetContet}
       />,
     );
 
@@ -34,13 +34,13 @@ describe('OnBoardingType component', () => {
     ).toBeEnabled();
   });
 
-  test('Button Continue should be enabled if userType is selected from form', () => {
+  test('Button Continue should be enabled if profileKind is selected from form', () => {
     const mockSetContet = jest.fn();
     render(
       <OnBoardingType
         next={jest.fn}
-        userType={'PERSONAL'}
-        setUserType={mockSetContet}
+        profileKind={'personal'}
+        setProfileKind={mockSetContet}
       />,
     );
 
@@ -53,16 +53,16 @@ describe('OnBoardingType component', () => {
     expect(
       screen.queryByTestId('azzapp_Button_pressable-wrapper'),
     ).toBeEnabled();
-    expect(mockSetContet).toHaveBeenCalledWith('PERSONAL');
+    expect(mockSetContet).toHaveBeenCalledWith('personal');
   });
 
-  test('should call `setUserType` callback when selecting userType ', () => {
+  test('should call `setProfileKind` callback when selecting profileKind ', () => {
     const mockSetContet = jest.fn();
     render(
       <OnBoardingType
         next={jest.fn}
-        userType={'PERSONAL'}
-        setUserType={mockSetContet}
+        profileKind={'personal'}
+        setProfileKind={mockSetContet}
       />,
     );
 
@@ -75,7 +75,7 @@ describe('OnBoardingType component', () => {
     expect(
       screen.queryByTestId('azzapp_Button_pressable-wrapper'),
     ).toBeEnabled();
-    expect(mockSetContet).toHaveBeenCalledWith('PERSONAL');
+    expect(mockSetContet).toHaveBeenCalledWith('personal');
   });
 
   test('Button Continue should call `next` callback', () => {
@@ -83,8 +83,8 @@ describe('OnBoardingType component', () => {
     render(
       <OnBoardingType
         next={mockNext}
-        userType={'PERSONAL'}
-        setUserType={jest.fn}
+        profileKind={'personal'}
+        setProfileKind={jest.fn}
       />,
     );
 

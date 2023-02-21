@@ -8,7 +8,7 @@ import {
   getRequestAuthInfos,
   withSessionAPIRoute,
 } from '../../helpers/session';
-import type { AuthInfos } from '../../helpers/session';
+import type { ViewerInfos } from '@azzapp/data/lib/schema/GraphQLContext';
 import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 
 // TODO production security settings
@@ -23,9 +23,9 @@ async function graphqlHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'POST') {
-    let authInfos: AuthInfos;
+    let viewerInfos: ViewerInfos;
     try {
-      authInfos = await getRequestAuthInfos(req);
+      viewerInfos = await getRequestAuthInfos(req);
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
         res.status(401).send({ message: ERRORS.INVALID_TOKEN });
@@ -50,7 +50,7 @@ async function graphqlHandler(req: NextApiRequest, res: NextApiResponse) {
             ? (queryMap as any)[requestParams.id]
             : requestParams.query,
           variableValues: requestParams.variables,
-          contextValue: createGraphQLContext(authInfos),
+          contextValue: createGraphQLContext(viewerInfos),
         }),
       );
     } catch (e) {

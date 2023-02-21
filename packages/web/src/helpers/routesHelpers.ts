@@ -25,14 +25,15 @@ const routesMap: { [key in Route['route']]: string } = {
   SIGN_UP: '/signup',
   FORGOT_PASSWORD: '/forgotPassword',
   CHANGE_PASSWORD: '/changePassword',
-  USER: '/[userName]',
-  USER_POSTS: '/[userName]/posts',
+  PROFILE: '/[userName]',
+  PROFILE_POSTS: '/[userName]/posts',
   POST: '/posts/[postId]',
   NEW_POST: '/[userName]/newPost',
   SEARCH: '/search',
   SETTINGS: '/settings',
   CHAT: '/chat',
   ONBOARDING: '/onboarding',
+  CARD_MODULE_EDITION: '/my-card/edit/[module]',
 };
 
 type PathToken = {

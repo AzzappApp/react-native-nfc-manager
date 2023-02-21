@@ -1,41 +1,44 @@
 import DataLoader from 'dataloader';
 import {
-  getUsersByIds,
   getCardsByIds,
   getCardCoversByIds,
   getPostsByIds,
   getUsersCards,
-  getMedias,
+  getProfilesByIds,
+  getMediasByIds,
 } from '../domains';
-import type { Card, CardCover, Post, User, Media } from '../domains';
+import type { Card, CardCover, Post, Media, Profile } from '../domains';
 
-export type UserInfos = {
-  userId?: string | null;
-  isAnonymous: boolean;
-  locale?: string | null;
-  location?: { lat: number; lng: number };
-};
+export type ViewerInfos =
+  | {
+      isAnonymous: false;
+      userId: string;
+      profileId: string;
+    }
+  | { isAnonymous: true };
 
 export type GraphQLContext = {
-  userInfos: UserInfos;
-  userLoader: DataLoader<string, User | null>;
+  auth: ViewerInfos;
+  profileLoader: DataLoader<string, Profile | null>;
   cardLoader: DataLoader<string, Card | null>;
-  cardByUserLoader: DataLoader<string, Card | null>;
+  cardByProfileLoader: DataLoader<string, Card | null>;
   coverLoader: DataLoader<string, CardCover | null>;
   postLoader: DataLoader<string, Post | null>;
-  mediasLoader: DataLoader<string, Media[] | null>;
+  mediaLoader: DataLoader<string, Media | null>;
 };
 
-export const createGraphQLContext = (userInfos?: UserInfos): GraphQLContext => {
-  userInfos = userInfos ?? { userId: null, isAnonymous: true };
+export const createGraphQLContext = (
+  userInfos?: ViewerInfos,
+): GraphQLContext => {
+  userInfos = userInfos ?? { isAnonymous: true };
 
   return {
-    userInfos,
-    userLoader: new DataLoader(getUsersByIds),
-    cardByUserLoader: new DataLoader(getUsersCards),
+    auth: userInfos,
+    profileLoader: new DataLoader(getProfilesByIds),
+    cardByProfileLoader: new DataLoader(getUsersCards),
     cardLoader: new DataLoader(getCardsByIds),
     coverLoader: new DataLoader(getCardCoversByIds),
     postLoader: new DataLoader(getPostsByIds),
-    mediasLoader: new DataLoader(getMedias),
+    mediaLoader: new DataLoader(getMediasByIds),
   };
 };

@@ -1,4 +1,5 @@
 import { Text } from 'react-native';
+import { useAvailableFonts } from '../helpers/mediaHelpers';
 import BottomSheetModal from './BottomSheetModal';
 import SelectList from './SelectList';
 
@@ -16,43 +17,36 @@ const FontPicker = ({
   visible: boolean;
   height: number;
   onRequestClose: () => void;
-}) => (
-  <BottomSheetModal
-    visible={visible}
-    onRequestClose={onRequestClose}
-    title={title}
-    height={height}
-  >
-    <SelectList
-      selectedItem={value}
-      onChange={onChange}
-      items={fonts}
-      renderItem={item => (
-        <Text
-          style={{
-            fontSize: 18,
-            fontFamily: item,
-            textAlign: 'center',
-            alignSelf: 'center',
-          }}
-        >
-          {item}
-        </Text>
-      )}
-      keyExtractor={item => item}
-    />
-  </BottomSheetModal>
-);
+}) => {
+  const fonts = useAvailableFonts();
+
+  return (
+    <BottomSheetModal
+      visible={visible}
+      onRequestClose={onRequestClose}
+      title={title}
+      height={height}
+    >
+      <SelectList
+        selectedItem={value}
+        onChange={onChange}
+        items={fonts}
+        renderItem={item => (
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: item,
+              textAlign: 'center',
+              alignSelf: 'center',
+            }}
+          >
+            {item}
+          </Text>
+        )}
+        keyExtractor={item => item}
+      />
+    </BottomSheetModal>
+  );
+};
 
 export default FontPicker;
-
-const fonts = [
-  'Arial',
-  'Verdana',
-  'Trebuchet MS',
-  'Times New Roman',
-  'Georgia',
-  'American Typewriter',
-  'Courier',
-  'Bradley Hand',
-];

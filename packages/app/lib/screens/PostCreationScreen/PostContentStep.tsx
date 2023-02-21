@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ImagePickerStep,
-  WizardImageEditor,
+  ImagePickerMediaRenderer,
 } from '../../components/ImagePicker';
 import PostContentPanel from './PostContentPanel';
 import PostCreationScreenContext from './PostCreationScreenContext';
@@ -26,7 +26,7 @@ const PostContentStep = () => {
         defaultMessage: 'New Post',
         description: 'New post screen title',
       })}
-      topPanel={<WizardImageEditor />}
+      topPanel={<ImagePickerMediaRenderer />}
       bottomPanel={
         <PostContentPanel
           allowLikes={allowLikes}

@@ -8,15 +8,10 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 type FollowedProfilesListProps = {
   viewer: FollowedProfilesList_viewer$key;
-  canPlay: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
-const FollowedProfilesList = ({
-  viewer,
-  canPlay,
-  style,
-}: FollowedProfilesListProps) => {
+const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
     graphql`
       fragment FollowedProfilesList_viewer on Viewer
@@ -33,7 +28,7 @@ const FollowedProfilesList = ({
             }
           }
         }
-        user {
+        profile {
           ...CoverList_users
         }
       }
@@ -46,11 +41,11 @@ const FollowedProfilesList = ({
       ?.map(edge => edge?.node)
       .filter(item => !!item);
     return convertToNonNullArray(
-      data.user
-        ? [data.user, ...(recommendedUrsers ?? [])]
+      data.profile
+        ? [data.profile, ...(recommendedUrsers ?? [])]
         : recommendedUrsers ?? [],
     );
-  }, [data.followedProfiles.edges, data.user]);
+  }, [data.followedProfiles.edges, data.profile]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
@@ -58,14 +53,7 @@ const FollowedProfilesList = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
-  return (
-    <CoverList
-      users={users}
-      onEndReached={onEndReached}
-      canPlay={canPlay}
-      style={style}
-    />
-  );
+  return <CoverList users={users} onEndReached={onEndReached} style={style} />;
 };
 
 export default FollowedProfilesList;

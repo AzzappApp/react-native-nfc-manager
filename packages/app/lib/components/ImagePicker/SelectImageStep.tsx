@@ -1,22 +1,23 @@
 import clamp from 'lodash/clamp';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getImageSize, getVideoSize } from '../../helpers/mediaHelpers';
 import useCameraPermissions from '../../hooks/useCameraPermissions';
 import FloatingIconButton from '../../ui/FloatingIconButton';
 import { TAB_BAR_HEIGHT } from '../../ui/TabsBar';
+import CameraControlPanel from '../CameraControlPanel';
+import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
 import AlbumPicker from './AlbumPicker';
-import CameraControlPanel from './CameraControlPanel';
-import CameraView from './CameraView';
-import { TOOL_BAR_BOTTOM_MARGIN } from './helpers';
+import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import { useImagePickerState } from './ImagePickerContext';
+import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import { getImageSize, getVideoSize } from './mediaHelpers';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
-import WizardImageEditor from './WizardImagEditor';
-import type { CameraViewHandle, RecordSession } from './CameraView';
+import type { Tab } from '../../ui/TabsBar';
+import type { CameraViewHandle, RecordSession } from '../CameraView';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
 type SelectImageStepProps = {
@@ -26,6 +27,7 @@ type SelectImageStepProps = {
 
 const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
   const {
+    kind,
     forceAspectRatio,
     maxVideoDuration,
     media,
@@ -93,11 +95,9 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
     const { width, height } = await getImageSize(uri);
     onMediaChange({
       kind: 'image',
-      path,
       uri,
       height,
       width,
-      aspectRatio: 1,
     });
     onNext();
   }, [onMediaChange, onNext]);
@@ -125,12 +125,10 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
     const { width, height } = await getVideoSize(uri);
     onMediaChange({
       kind: 'video',
-      path,
       uri,
       height,
       width,
       duration,
-      aspectRatio: 1,
     });
     onNext();
   }, [onMediaChange, onNext]);
@@ -146,6 +144,43 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
   };
   const intl = useIntl();
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
+
+  const tabs = useMemo(() => {
+    const tabs: Tab[] = [
+      {
+        icon: 'grid',
+        key: 'gallery',
+        label: intl.formatMessage({
+          defaultMessage: 'Photos gallery',
+          description:
+            'Accessibility label of the Photos gallery tabs in image picking wizzard',
+        }),
+      },
+    ];
+    if (kind !== 'video') {
+      tabs.push({
+        icon: 'picture',
+        key: 'photo',
+        label: intl.formatMessage({
+          defaultMessage: 'Take a picture',
+          description:
+            'Accessibility label of the camera tabs in image picking wizzard',
+        }),
+      });
+    }
+    if (kind !== 'image') {
+      tabs.push({
+        icon: 'video',
+        key: 'video',
+        label: intl.formatMessage({
+          defaultMessage: 'Take a video',
+          description:
+            'Accessibility label of the video tabs in post  in image picking wizzard',
+        }),
+      });
+    }
+    return tabs;
+  }, [intl, kind]);
 
   return (
     <>
@@ -171,8 +206,8 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
           pickerMode === 'gallery' ? (
             media != null ? (
               <>
-                <WizardImageEditor />
-                {forceAspectRatio == null && media.aspectRatio == null && (
+                <ImagePickerMediaRenderer />
+                {forceAspectRatio == null && (
                   <FloatingIconButton
                     icon="adjust"
                     style={styles.adjustButton}
@@ -196,11 +231,11 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
         bottomPanel={
           pickerMode === 'gallery' ? (
             <PhotoGalleryMediaList
-              selectedMediaURI={media?.mediaId}
+              selectedMediaID={media?.galleryUri}
               album={album}
-              onSelectMedia={onMediaChange}
+              onMediaSelected={onMediaChange}
               onGalleryPermissionFail={onGalleryPermissionFail}
-              kind="mixed"
+              kind={kind}
               style={{ flex: 1 }}
               contentContainerStyle={{
                 paddingBottom:
@@ -226,35 +261,7 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
         toolbarProps={{
           currentTab: pickerMode,
           onTabPress: setPickerMode as any,
-          tabs: [
-            {
-              icon: 'grid',
-              key: 'gallery',
-              accessibilityLabel: intl.formatMessage({
-                defaultMessage: 'Photos gallery',
-                description:
-                  'Accessibility label of the Photos gallery tabs in image picking wizzard',
-              }),
-            },
-            {
-              icon: 'picture',
-              key: 'photo',
-              accessibilityLabel: intl.formatMessage({
-                defaultMessage: 'Take a picture',
-                description:
-                  'Accessibility label of the camera tabs in post in image picking wizzard',
-              }),
-            },
-            {
-              icon: 'video',
-              key: 'video',
-              accessibilityLabel: intl.formatMessage({
-                defaultMessage: 'Take a video',
-                description:
-                  'Accessibility label of the video tabs in post  in image picking wizzard',
-              }),
-            },
-          ],
+          tabs,
         }}
       />
       <PermissionModal

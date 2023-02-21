@@ -1,8 +1,21 @@
+import EditImageStep from './EditImageStep';
 import ImagePicker from './ImagePicker';
 import { useImagePickerState } from './ImagePickerContext';
+import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import WizardImageEditor from './WizardImagEditor';
+import SelectImageStep from './SelectImageStep';
+import type { ImagePickerResult } from './ImagePicker';
 
 export default ImagePicker;
 
-export { ImagePickerStep, useImagePickerState, WizardImageEditor };
+export {
+  EditImageStep,
+  ImagePickerStep,
+  SelectImageStep,
+  ImagePickerMediaRenderer,
+  useImagePickerState,
+};
+
+export * from './imagePickerConstants';
+
+export type { ImagePickerResult };

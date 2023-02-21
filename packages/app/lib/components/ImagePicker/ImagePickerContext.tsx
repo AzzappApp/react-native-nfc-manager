@@ -7,13 +7,18 @@ import {
   useMemo,
   useState,
 } from 'react';
-import type { Media, TimeRange } from './helpers';
-import type { ImageEditionParameters } from './mediaHelpers';
+import type {
+  ImageEditionParameters,
+  Media,
+  TimeRange,
+  ImageOrientation,
+} from '../../types';
 import type { ReactNode, ForwardedRef } from 'react';
 
 export type ImagePickerState = {
   forceAspectRatio: number | undefined;
   maxVideoDuration: number;
+  kind: 'image' | 'mixed' | 'video';
   media: Media | null;
   aspectRatio: number;
   editionParameters: ImageEditionParameters;
@@ -44,6 +49,7 @@ export const useImagePickerState = () => {
 
 type ImagePickerContextProviderProps = {
   maxVideoDuration: number;
+  kind: 'image' | 'mixed' | 'video';
   exporting?: boolean;
   forceAspectRatio?: number;
   children: ReactNode;
@@ -51,6 +57,7 @@ type ImagePickerContextProviderProps = {
 
 const _ImagePickerContextProvider = (
   {
+    kind,
     maxVideoDuration,
     forceAspectRatio,
     exporting,
@@ -60,7 +67,7 @@ const _ImagePickerContextProvider = (
 ) => {
   const [media, setMedia] = useState<Media | null>(null);
   const [aspectRatio, setAspectRatio] = useState(
-    typeof forceAspectRatio === 'number' ? forceAspectRatio : 1,
+    typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
   const [editionParameters, setEditionParameters] =
     useState<ImageEditionParameters>({});
@@ -83,20 +90,18 @@ const _ImagePickerContextProvider = (
   const onMediaChange = useCallback(
     (media: Media) => {
       setMedia(media);
-      setAspectRatio(
-        forceAspectRatio ?? media.aspectRatio ?? media.width / media.height,
-      );
+      setAspectRatio(forceAspectRatio ?? null);
       reset();
     },
     [forceAspectRatio, reset],
   );
 
   const onAspectRatioChange = useCallback(
-    (aspectRatio: number) => {
+    (aspectRatio: number | undefined) => {
       if (!media) {
         return;
       }
-      setAspectRatio(aspectRatio);
+      setAspectRatio(aspectRatio ?? null);
       reset();
     },
     [media, reset],
@@ -138,10 +143,15 @@ const _ImagePickerContextProvider = (
 
   const pickerState = useMemo<ImagePickerState>(
     () => ({
+      kind,
       forceAspectRatio,
       maxVideoDuration,
       media,
-      aspectRatio,
+      aspectRatio:
+        aspectRatio ??
+        (media != null
+          ? getMediaAspectRatio(media, editionParameters.orientation)
+          : 1),
       editionParameters,
       mediaFilter,
       timeRange,
@@ -155,6 +165,7 @@ const _ImagePickerContextProvider = (
       reset,
     }),
     [
+      kind,
       forceAspectRatio,
       maxVideoDuration,
       media,
@@ -183,3 +194,10 @@ const _ImagePickerContextProvider = (
 export const ImagePickerContextProvider = forwardRef(
   _ImagePickerContextProvider,
 );
+
+const getMediaAspectRatio = (media: Media, orientation?: ImageOrientation) => {
+  const aspectRatio = media.width / media.height;
+  return orientation === 'LEFT' || orientation === 'RIGHT'
+    ? 1 / aspectRatio
+    : aspectRatio;
+};

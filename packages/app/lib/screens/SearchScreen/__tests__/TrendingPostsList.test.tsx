@@ -61,10 +61,10 @@ const FAKE_POST = {
   media: {
     //  id: String(generateId()),
     __typename: 'MediaVideo',
-    source: 'fakeSource-0',
-    ratio: 1,
-    uri: () => 'fakeUri',
-    thumbnail: () => 'fakeThumbnail',
+    id: 'fakeSource-0',
+    aspectRatio: 1,
+    uri: 'fakeUri',
+    thumbnail: 'fakeThumbnail',
   },
 };
 
@@ -175,7 +175,7 @@ const eventData = {
   },
 };
 
-describe('Tending Posts List Component', () => {
+describe('TendingPostsList', () => {
   test('should render initial list and loadMore after scrolling', async () => {
     renderScreen();
 

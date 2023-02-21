@@ -1,10 +1,10 @@
 import ERRORS from '@azzapp/shared/lib/errors';
-import cuid from 'cuid';
 import { unsealData } from 'iron-session';
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { verifyToken } from './tokensHelpers';
+import type { ViewerInfos } from '@azzapp/data/lib/schema/GraphQLContext';
 import type { IncomingMessage } from 'http';
 import type { IronSessionOptions } from 'iron-session';
 import type { NextApiHandler } from 'next';
@@ -22,6 +22,7 @@ declare module 'iron-session' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface IronSessionData {
     userId?: string;
+    profileId?: string;
     isAnonymous?: boolean;
     locale?: string;
     location?: { lat: number; lng: number };
@@ -49,49 +50,40 @@ export const getSessionData = cache(
   },
 );
 
-export const getAuthInfos = async () => {
+export const getAuthInfos = async (): Promise<ViewerInfos> => {
   const sessionData = await getSessionData();
-  if (!sessionData?.userId) {
+  if (sessionData?.userId && sessionData?.profileId) {
     return {
-      userId: cuid(),
-      isAnonymous: true,
+      userId: sessionData.userId,
+      profileId: sessionData.profileId,
+      isAnonymous: false,
     };
   }
-  return { userId: sessionData.userId, isAnonymous: false };
-};
 
-export type AuthInfos = {
-  userId: string;
-  isAnonymous: boolean;
+  return { isAnonymous: true };
 };
 
 export const getRequestAuthInfos = async (
   req: IncomingMessage,
-): Promise<AuthInfos> => {
-  let userId: string;
-  let isAnonymous = false;
+): Promise<ViewerInfos> => {
   const token = getTokensFromRequest(req);
   if (token) {
     try {
       const data = verifyToken(token);
-      userId = data.userId;
+      return { ...data, isAnonymous: false };
     } catch (e) {
       throw new Error(ERRORS.INVALID_TOKEN);
     }
-  } else if (req.session.userId) {
-    userId = req.session.userId;
-    isAnonymous = req.session.isAnonymous ?? true;
-  } else {
-    userId = cuid();
-    isAnonymous = true;
-    req.session.userId = userId;
-    req.session.isAnonymous = true;
-    await req.session.save();
   }
-  return {
-    userId,
-    isAnonymous,
-  };
+  if (req.session.userId && req.session.profileId) {
+    return {
+      userId: req.session.userId,
+      profileId: req.session.profileId,
+      isAnonymous: false,
+    };
+  }
+
+  return { isAnonymous: true };
 };
 
 const getTokensFromRequest = (req: IncomingMessage) =>

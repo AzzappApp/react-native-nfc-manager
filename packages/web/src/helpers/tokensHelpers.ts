@@ -5,8 +5,14 @@ const REFREH_TOKEN_EXP_TIME = '7d';
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-export const generateTokens = (userId: string) => {
-  const data = { userId };
+export const generateTokens = ({
+  userId,
+  profileId,
+}: {
+  userId: string;
+  profileId: string;
+}) => {
+  const data = { userId, profileId };
   const token = sign(data, TOKEN_SECRET, {
     expiresIn: TOKEN_EXP_TIME,
   });
@@ -17,13 +23,15 @@ export const generateTokens = (userId: string) => {
   return { token, refreshToken };
 };
 
-export const verifyToken = (token: string): { userId: string } =>
-  verify(token, TOKEN_SECRET) as any;
+export const verifyToken = (
+  token: string,
+): { userId: string; profileId: string } => verify(token, TOKEN_SECRET) as any;
 
 export const refreshTokens = (refreshToken: string) => {
-  const { userId } = verify(refreshToken, REFRESH_TOKEN_SECRET) as {
+  const data = verify(refreshToken, REFRESH_TOKEN_SECRET) as {
     userId: string;
+    profileId: string;
   };
 
-  return generateTokens(userId);
+  return generateTokens(data);
 };

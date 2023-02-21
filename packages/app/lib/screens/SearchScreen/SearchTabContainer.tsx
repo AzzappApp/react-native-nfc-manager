@@ -101,7 +101,6 @@ const SearchTabContainer = ({
               {tabQueryReference['searchProfiles'] && (
                 <SearchResultProfiles
                   queryReference={tabQueryReference['searchProfiles']}
-                  hasFocus={hasFocus}
                 />
               )}
             </Suspense>

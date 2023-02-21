@@ -23,6 +23,7 @@ const ViewTransition = (
   {
     transitions,
     transitionDuration,
+    disableAnimation,
     easing = 'linear',
     style,
     ...props
@@ -78,6 +79,9 @@ const ViewTransition = (
   ]);
 
   const animatedStyles = useAnimatedStyle(() => {
+    if (disableAnimation) {
+      return transitionTo.value;
+    }
     const style: AnimatedStyleProp<ViewStyle> = {};
     const keySet: Set<TransitionableStyle> = new Set();
     Object.keys(transitionFrom.value).forEach((key: any) => {
@@ -107,7 +111,12 @@ const ViewTransition = (
     });
 
     return style;
-  }, [transitionStateSharedValue, transitionFrom, transitionTo]);
+  }, [
+    transitionStateSharedValue,
+    disableAnimation,
+    transitionFrom,
+    transitionTo,
+  ]);
 
   return (
     <Animated.View

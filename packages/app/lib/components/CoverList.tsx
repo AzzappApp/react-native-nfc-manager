@@ -12,7 +12,6 @@ import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
 type CoverListProps = {
   users: CoverList_users$key;
-  canPlay?: boolean;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
@@ -23,7 +22,6 @@ type CoverListProps = {
 
 const CoverList = ({
   users: usersKey,
-  canPlay = false,
   onEndReached,
   style,
   coverStyle = {},
@@ -42,7 +40,7 @@ const CoverList = ({
   }, [coverStyle]);
   const users = useFragment(
     graphql`
-      fragment CoverList_users on User @relay(plural: true) {
+      fragment CoverList_users on Profile @relay(plural: true) {
         id
         userName
         card {
@@ -66,17 +64,15 @@ const CoverList = ({
         cover={item.card?.cover}
         width={coverWidth}
         userName={item.userName}
-        userId={item.id}
+        profileID={item.id}
         style={[
           styles.item,
           { height: horizontal ? '100%' : 'auto' },
           coverStyle,
         ]}
-        playTransition={canPlay}
-        videoDisabled={!canPlay}
       />
     ),
-    [canPlay, coverStyle, coverWidth, horizontal],
+    [coverStyle, coverWidth, horizontal],
   );
 
   //TODO: handle vertical layout with height instead of width

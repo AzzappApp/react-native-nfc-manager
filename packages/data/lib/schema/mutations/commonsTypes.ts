@@ -13,11 +13,14 @@ export const MediaInputGraphQL = new GraphQLInputObjectType({
     kind: {
       type: new GraphQLNonNull(MediaKindGraphQL),
     },
-    source: {
+    id: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    ratio: {
-      type: GraphQLFloat,
+    width: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    height: {
+      type: new GraphQLNonNull(GraphQLFloat),
     },
   }),
 });
@@ -30,11 +33,11 @@ export const MediaKindGraphQL = new GraphQLEnumType({
   },
 });
 
-export const UserTypeGraphQL = new GraphQLEnumType({
-  name: 'UserType',
+export const ProfileKind = new GraphQLEnumType({
+  name: 'ProfileKind',
   values: {
-    BUSINESS: { value: 'BUSINESS' },
-    PERSONAL: { value: 'PERSONAL' },
-    PRODUCT: { value: 'PRODUCT' },
+    business: { value: 'business' },
+    personal: { value: 'personal' },
+    product: { value: 'product' },
   },
 });

@@ -1,49 +1,45 @@
-import { v4 as uuid } from 'uuid';
 import db from './db';
+import { getEntitiesByIds } from './generic';
 import type { Database } from './db';
 import type { Media } from '@prisma/client';
 import type { QueryCreator } from 'kysely';
 
 /**
- * Retrieve medias by their owner ids
- * @param ownerIds - The owner ids
- * @returns The medias grouped by their owner ids in the same order as the owner ids
+ * Retrieve a list of medias by their ids.
+ * @param ids - The ids of the medias to retrieve
+ * @returns A list of medias, where the order of the medias matches the order of the ids
  */
-export const getMedias = async (ownerIds: readonly string[]) => {
-  const medias = await db
-    .selectFrom('Media')
-    .selectAll()
-    .where('ownerId', 'in', ownerIds)
-    .execute();
-
-  const mediasMap = new Map<string, Media[]>();
-  medias.forEach(media => {
-    if (!mediasMap.has(media.ownerId)) {
-      mediasMap.set(media.ownerId, [media]);
-    } else {
-      mediasMap.get(media.ownerId)?.push(media);
-    }
-  });
-
-  return ownerIds.map(id => mediasMap.get(id) ?? null);
+export const getMediasByIds = (
+  ids: readonly string[],
+): Promise<Array<Media | null>> => {
+  return getEntitiesByIds('Media', ids, 'id');
 };
 
 /**
  * Create a media.
  *
- * @param values - the media fields, excluding the id
+ * @param media - the media fields, excluding the id
  * @param qc - The query creator to use (user for transactions)
  * @returns The created media
  */
 export const createMedia = async (
-  values: Omit<Media, 'id'>,
+  media: Media,
   qc: QueryCreator<Database> = db,
 ): Promise<Media> => {
-  const media = {
-    id: uuid(),
-    postDate: new Date(),
-    ...values,
-  };
   await qc.insertInto('Media').values(media).execute();
   return media;
+};
+
+/**
+ * Delete a media.
+ *
+ * @param id - the id of the media to delete
+ * @param qc - The query creator to use (user for transactions)
+ * @returns The created media
+ */
+export const removeMedia = async (
+  id: string,
+  qc: QueryCreator<Database> = db,
+): Promise<void> => {
+  await qc.deleteFrom('Media').where('id', '=', id).execute();
 };

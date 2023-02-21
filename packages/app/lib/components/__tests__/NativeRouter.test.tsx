@@ -18,7 +18,7 @@ describe('NativeRouter', () => {
                     { id: 'HOME', route: 'HOME' },
                     {
                       id: 'USER_2',
-                      route: 'USER',
+                      route: 'PROFILE',
                       params: { userName: 'user-2' },
                     },
                   ],
@@ -69,7 +69,7 @@ describe('NativeRouter', () => {
                           "params": {
                             "userName": "user-2",
                           },
-                          "route": "USER",
+                          "route": "PROFILE",
                         },
                       },
                     ],
@@ -110,7 +110,7 @@ describe('NativeRouter', () => {
                       { id: 'HOME', route: 'HOME' },
                       {
                         id: 'USER_2',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user-2' },
                       },
                     ],
@@ -144,7 +144,7 @@ describe('NativeRouter', () => {
                       { id: 'HOME', route: 'HOME' },
                       {
                         id: 'USER_2',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user-2' },
                       },
                     ],
@@ -176,7 +176,7 @@ describe('NativeRouter', () => {
                       { id: 'HOME', route: 'HOME' },
                       {
                         id: 'USER_2',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user-2' },
                       },
                     ],
@@ -190,7 +190,7 @@ describe('NativeRouter', () => {
         });
 
         expect(result.current.router.getCurrentRoute()).toEqual({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-2' },
         });
       });
@@ -226,7 +226,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.push({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -271,7 +271,7 @@ describe('NativeRouter', () => {
                   "params": {
                     "userName": "user-0",
                   },
-                  "route": "USER",
+                  "route": "PROFILE",
                 },
               },
             ],
@@ -307,7 +307,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.push({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -347,7 +347,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user-0",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                       ],
@@ -537,7 +537,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.push({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -559,7 +559,7 @@ describe('NativeRouter', () => {
                   "params": {
                     "userName": "user-0",
                   },
-                  "route": "USER",
+                  "route": "PROFILE",
                 },
               },
             ],
@@ -599,7 +599,7 @@ describe('NativeRouter', () => {
                       },
                       {
                         id: 'user-1',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user1' },
                       },
                     ],
@@ -608,7 +608,7 @@ describe('NativeRouter', () => {
               },
               {
                 id: 'user-0',
-                route: 'USER',
+                route: 'PROFILE',
                 params: { userName: 'user-0' },
               },
             ],
@@ -653,7 +653,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user1",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                       ],
@@ -712,7 +712,7 @@ describe('NativeRouter', () => {
             stack: [
               {
                 id: 'user-0',
-                route: 'USER',
+                route: 'PROFILE',
                 params: { userName: 'user-0' },
               },
               {
@@ -751,7 +751,7 @@ describe('NativeRouter', () => {
                   "params": {
                     "userName": "user-0",
                   },
-                  "route": "USER",
+                  "route": "PROFILE",
                 },
               },
             ],
@@ -878,7 +878,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.replace({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -894,7 +894,7 @@ describe('NativeRouter', () => {
                   "params": {
                     "userName": "user-0",
                   },
-                  "route": "USER",
+                  "route": "PROFILE",
                 },
               },
             ],
@@ -930,7 +930,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.replace({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -963,7 +963,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user-0",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                       ],
@@ -1146,7 +1146,7 @@ describe('NativeRouter', () => {
 
         act(() => {
           result.current.router.replace({
-            route: 'USER',
+            route: 'PROFILE',
             params: { userName: 'user-0' },
           });
         });
@@ -1161,7 +1161,7 @@ describe('NativeRouter', () => {
                   "params": {
                     "userName": "user-0",
                   },
-                  "route": "USER",
+                  "route": "PROFILE",
                 },
               },
             ],
@@ -1297,12 +1297,12 @@ describe('NativeRouter', () => {
                       },
                       {
                         id: 'user-1',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user1' },
                       },
                       {
                         id: 'user-2',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user2' },
                       },
                     ],
@@ -1311,7 +1311,7 @@ describe('NativeRouter', () => {
               },
               {
                 id: 'user-0',
-                route: 'USER',
+                route: 'PROFILE',
                 params: { userName: 'user-0' },
               },
             ],
@@ -1357,7 +1357,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user1",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                         {
@@ -1367,7 +1367,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user2",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                       ],
@@ -1417,7 +1417,7 @@ describe('NativeRouter', () => {
                             "params": {
                               "userName": "user2",
                             },
-                            "route": "USER",
+                            "route": "PROFILE",
                           },
                         },
                       ],
@@ -1616,7 +1616,7 @@ describe('NativeRouter', () => {
                       { id: 'HOME', route: 'HOME' },
                       {
                         id: 'USER_2',
-                        route: 'USER',
+                        route: 'PROFILE',
                         params: { userName: 'user-2' },
                       },
                     ],
@@ -1658,21 +1658,21 @@ describe('NativeRouter', () => {
         router.addRouteWillChangeListener(routeDidChangeListenerSpy);
 
         act(() => {
-          router.push({ route: 'USER', params: { userName: 'user-1' } });
+          router.push({ route: 'PROFILE', params: { userName: 'user-1' } });
         });
 
         expect(screenWillBePushedListenerSpy).toHaveBeenCalledWith({
           id: expect.any(String),
-          route: { route: 'USER', params: { userName: 'user-1' } },
+          route: { route: 'PROFILE', params: { userName: 'user-1' } },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
 
         expect(routeDidChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
       });
@@ -1740,12 +1740,12 @@ describe('NativeRouter', () => {
         router.addRouteWillChangeListener(routeDidChangeListenerSpy);
 
         act(() => {
-          router.replace({ route: 'USER', params: { userName: 'user-1' } });
+          router.replace({ route: 'PROFILE', params: { userName: 'user-1' } });
         });
 
         expect(screenWillBePushedListenerSpy).toHaveBeenCalledWith({
           id: expect.any(String),
-          route: { route: 'USER', params: { userName: 'user-1' } },
+          route: { route: 'PROFILE', params: { userName: 'user-1' } },
         });
 
         expect(screenWillBeRemovedListenerSpy).toHaveBeenCalledWith({
@@ -1754,12 +1754,12 @@ describe('NativeRouter', () => {
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
 
         expect(routeDidChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
       });
@@ -1784,21 +1784,24 @@ describe('NativeRouter', () => {
         router.addRouteWillChangeListener(routeDidChangeListenerSpy);
 
         act(() => {
-          router.showModal({ route: 'USER', params: { userName: 'user-1' } });
+          router.showModal({
+            route: 'PROFILE',
+            params: { userName: 'user-1' },
+          });
         });
 
         expect(screenWillBePushedListenerSpy).toHaveBeenCalledWith({
           id: expect.any(String),
-          route: { route: 'USER', params: { userName: 'user-1' } },
+          route: { route: 'PROFILE', params: { userName: 'user-1' } },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
 
         expect(routeDidChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'USER',
+          route: 'PROFILE',
           params: { userName: 'user-1' },
         });
       });

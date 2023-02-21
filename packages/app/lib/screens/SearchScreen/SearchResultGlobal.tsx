@@ -116,10 +116,7 @@ const SearchResultGlobal = ({
       posts={posts}
       canPlay={hasFocus}
       ListHeaderComponent={
-        <SearchResultGlobalListHeader
-          hasFocus={hasFocus}
-          viewer={preloadedQuery.viewer}
-        />
+        <SearchResultGlobalListHeader viewer={preloadedQuery.viewer} />
       }
       ListFooterComponent={
         <ListLoadingFooter loading={showLoadingIndicatorDebounced} />

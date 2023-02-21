@@ -1,43 +1,27 @@
-import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
 import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
-import { StyleSheet } from 'react-native';
+  COVER_BASE_WIDTH,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+} from '@azzapp/shared/lib/cardHelpers';
+import { forwardRef, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import useInterval from '../../hooks/useInterval';
-import ViewTransition from '../../ui/ViewTransition';
-import { MediaImageRenderer, MediaVideoRenderer } from '../MediaRenderer';
-import CoverLayout from './CoverLayout';
-import type { MediaVideoRendererHandle } from '../MediaRenderer';
-import type { CoverLayoutProps } from './CoverLayout';
+import { colors } from '../../../theme';
+import PressableNative from '../../ui/PressableNative';
+import { MediaImageRenderer } from '../medias';
+import QRCodeModal from './QRCodeModal';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ForwardedRef } from 'react';
-import type { HostComponent, StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
-export type CoverRendererProps = Omit<
-  CoverLayoutProps,
-  'children' | 'cover'
-> & {
+export type CoverRendererProps = {
   cover: CoverRenderer_cover$key | null | undefined;
-  playTransition?: boolean;
-  videoDisabled?: boolean;
-  videoPaused?: boolean;
-  imageIndex?: number;
-  forceImageIndex?: boolean;
-  coverStyle?: StyleProp<ViewStyle>;
-  initialVideosTimes?: { [index: number]: number | null | undefined } | null;
+  userName: string;
+  width?: number | `${number}vw`;
+  hideBorderRadius?: boolean;
+  style?: StyleProp<ViewStyle>;
   onReadyForDisplay?: () => void;
-};
-
-export type CoverHandle = {
-  getCurrentMediaRenderer(): HostComponent<any> | null;
-  getCurrentImageIndex(): number;
-  getCurrentVideoTime(): Promise<number | null>;
-  snapshot(): Promise<void>;
 };
 
 const CoverRenderer = (
@@ -45,23 +29,16 @@ const CoverRenderer = (
     cover: coverKey,
     userName,
     width = 125,
-    playTransition = true,
-    videoDisabled = false,
-    videoPaused = false,
-    imageIndex = 0,
-    forceImageIndex,
-    initialVideosTimes,
+    hideBorderRadius,
+    style,
     onReadyForDisplay,
-    ...props
   }: CoverRendererProps,
-  forwardRef: ForwardedRef<CoverHandle>,
+  forwardRef: ForwardedRef<View>,
 ) => {
-  /**
-   * Data
-   */
+  //#region Data
   const cover = useFragment(
     graphql`
-      fragment CoverRenderer_cover on UserCardCover
+      fragment CoverRenderer_cover on CardCover
       @argumentDefinitions(
         screenWidth: {
           type: "Float!"
@@ -80,200 +57,173 @@ const CoverRenderer = (
           provider: "../providers/isNative.relayprovider"
         }
       ) {
-        pictures {
-          __typename
-          source
-          ratio
-          # since cover are mainly used with 2 size full screen and cover size
-          # we preload those url to avoid unecessary round trip
+        # On the cover medias, we fetch both the large and small version
+        # of the image to avoid a flickering effect when the profile screen is opened
+        media {
+          id
           largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
           smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             @include(if: $isNative)
-          ... on MediaVideo {
-            largeThumbnail: thumbnail(
-              width: $screenWidth
-              pixelRatio: $pixelRatio
-            ) @include(if: $isNative)
-            smallThumbnail: thumbnail(
-              width: 125
-              pixelRatio: $cappedPixelRatio
-            ) @include(if: $isNative)
-          }
         }
-        pictureTransitionTimer
-        ...CoverLayout_cover
+        textPreviewMedia {
+          id
+          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+            @include(if: $isNative)
+          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            @include(if: $isNative)
+        }
+        title
+        subTitle
       }
     `,
     coverKey ?? null,
   );
+  //#endregion
 
-  /**
-   * Handle image transition
-   */
-  const [currentImageIndex, setCurrentImageIndex] = useState(imageIndex);
-  useEffect(() => {
-    setCurrentImageIndex(imageIndex);
-  }, [imageIndex]);
+  //#region Ready states
+  const readyStates = useRef({ text: false, media: false });
 
-  useEffect(() => {
-    if (forceImageIndex) {
-      setCurrentImageIndex(imageIndex);
-    }
-  }, [imageIndex, forceImageIndex]);
+  const sources = useRef({
+    media: cover?.media?.id,
+    text: cover?.textPreviewMedia?.id,
+  });
 
-  const nextIndex = () => {
-    if (cover?.pictures.length) {
-      const nextIndex = (currentImageIndex + 1) % cover.pictures.length;
-      setCurrentImageIndex(nextIndex);
+  if (sources.current.media !== cover?.media?.id) {
+    readyStates.current.media = false;
+    sources.current.media = cover?.media?.id;
+  }
+
+  if (sources.current.text !== cover?.textPreviewMedia?.id) {
+    readyStates.current.text = false;
+    sources.current.text = cover?.textPreviewMedia?.id;
+  }
+
+  const onMediaReadyForDisplay = () => {
+    readyStates.current.media = true;
+    if (readyStates.current.text) {
+      onReadyForDisplay?.();
     }
   };
 
-  const playInterval = (cover?.pictureTransitionTimer ?? 0) * 1000;
-  useInterval(
-    () => {
-      if (cover?.pictures.length) {
-        const currentPicture = cover.pictures[currentImageIndex];
-        if (currentPicture.__typename === 'MediaImage' || videoDisabled) {
-          nextIndex();
-        }
-      }
-    },
-    playTransition ? playInterval : 0,
-  );
-
-  const onVideoEnd = () => {
-    nextIndex();
+  const onTextReadyForDisplay = () => {
+    readyStates.current.text = true;
+    if (readyStates.current.media) {
+      onReadyForDisplay?.();
+    }
   };
+  //#endregion
 
-  /**
-   * Imperative Handle
-   */
-  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
-    null,
-  );
+  //#region QR Code
+  const [qrCodeVisible, setQRCodeVisible] = useState(false);
+  const showQRCode = () => {
+    setQRCodeVisible(true);
+  };
+  const hideQRCode = () => {
+    setQRCodeVisible(false);
+  };
+  //#endregion
 
-  useImperativeHandle(
-    forwardRef,
-    () => ({
-      getCurrentMediaRenderer() {
-        if (!mediaRef.current) {
-          return null;
-        }
-        if ('getContainer' in mediaRef.current) {
-          return mediaRef.current.getContainer();
-        } else {
-          return mediaRef.current;
-        }
-      },
-      getCurrentImageIndex() {
-        return currentImageIndex;
-      },
-      async getCurrentVideoTime() {
-        if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
-          return mediaRef.current.getPlayerCurrentTime();
-        }
-        return null;
-      },
-      async snapshot() {
-        if (mediaRef.current && 'snapshot' in mediaRef.current) {
-          await mediaRef.current.snapshot();
-        }
-      },
-    }),
-    [currentImageIndex],
-  );
+  //#region Styles
+  const borderRadius: number = hideBorderRadius
+    ? 0
+    : Platform.select({
+        web: '12.8%' as any,
+        default: COVER_CARD_RADIUS * (width as number),
+      });
 
-  /**
-   * Rendering
-   */
-  const { pictures = [] } = cover ?? {};
+  const { media, textPreviewMedia, title, subTitle } = cover ?? {};
 
-  const displayedPictures = playTransition
-    ? pictures.map((picture, index) => ({ picture, index }))
-    : pictures[currentImageIndex]
-    ? [{ index: currentImageIndex, picture: pictures[currentImageIndex] }]
-    : [];
+  const intl = useIntl();
+  //#endregion
 
   return (
-    <CoverLayout cover={cover} width={width} userName={userName} {...props}>
-      {displayedPictures.map(({ picture, index }) => {
-        const isDisplayed = !playTransition || index === currentImageIndex;
-
-        const mediaProps = {
-          ref: (isDisplayed ? mediaRef : null) as any,
-          aspectRatio: picture.ratio,
-          source: picture.source,
-          uri: width === COVER_BASE_WIDTH ? picture.smallURI : picture.largeURI,
-          width,
-          onReadyForDisplay: isDisplayed ? onReadyForDisplay : undefined,
-          style: styles.coverContent,
-        };
-        return (
-          <ViewTransition
-            key={picture.source}
-            style={[styles.coverContent, { opacity: isDisplayed ? 1 : 0 }]}
-            transitionDuration={300}
-            transitions={['opacity']}
-            easing="ease-in-out"
-            testID={`cover-media-container-${picture.source}`}
-          >
-            {picture.__typename === 'MediaVideo' &&
-              (videoDisabled ? (
-                <MediaImageRenderer
-                  {...mediaProps}
-                  isVideo
-                  // TODO alt generation by cloudinary AI ? include text in small format ?
-                  alt={`This is an image posted by ${userName}`}
-                  testID={`cover-image-${picture.source}`}
-                  uri={
-                    width === COVER_BASE_WIDTH
-                      ? picture.smallThumbnail
-                      : picture.largeThumbnail
-                  }
-                />
-              ) : (
-                <MediaVideoRenderer
-                  {...mediaProps}
-                  // TODO alt generation by cloudinary AI ? include text in small format ?
-                  alt={`This is a video posted by ${userName}`}
-                  thumbnailURI={
-                    width === COVER_BASE_WIDTH
-                      ? picture.smallThumbnail
-                      : picture.largeThumbnail
-                  }
-                  muted
-                  currentTime={initialVideosTimes?.[index]}
-                  paused={videoPaused || !isDisplayed}
-                  onEnd={onVideoEnd}
-                  testID={`cover-video-${picture.source}`}
-                />
-              ))}
-            {picture.__typename === 'MediaImage' && (
-              <MediaImageRenderer
-                {...mediaProps}
-                // TODO alt generation by cloudinary AI ? include text in small format ?
-                alt={`This is an image posted by ${userName}`}
-                testID={`cover-image-${picture.source}`}
-              />
+    <View
+      ref={forwardRef}
+      style={[styles.root, { borderRadius, width }, style]}
+      testID="cover-renderer"
+    >
+      {media ? (
+        <>
+          <MediaImageRenderer
+            width={width}
+            aspectRatio={COVER_RATIO}
+            alt={intl.formatMessage(
+              {
+                defaultMessage: '{title} - background image',
+                description: 'CoverRenderer - Accessibility cover image',
+              },
+              { title: `${title} - ${subTitle}` },
             )}
-          </ViewTransition>
-        );
-      })}
-    </CoverLayout>
+            source={media.id}
+            uri={width === COVER_BASE_WIDTH ? media.smallURI : media.largeURI}
+            onReadyForDisplay={onMediaReadyForDisplay}
+            style={styles.layer}
+          />
+          {textPreviewMedia && (
+            <MediaImageRenderer
+              width={width}
+              aspectRatio={COVER_RATIO}
+              alt={`${title} - ${subTitle}`}
+              source={textPreviewMedia.id}
+              uri={
+                width === COVER_BASE_WIDTH
+                  ? textPreviewMedia.smallURI
+                  : textPreviewMedia.largeURI
+              }
+              onReadyForDisplay={onTextReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
+        </>
+      ) : (
+        <View style={styles.coverPlaceHolder} />
+      )}
+      <PressableNative
+        onPress={showQRCode}
+        accessibilityRole="button"
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap me to show the QR Code fullscreen',
+          description: 'CoverRenderer - Accessibility Qr code button',
+        })}
+        style={styles.qrCode}
+      >
+        <Image
+          accessibilityRole="image"
+          source={require('./assets/qr-code.png')}
+          style={styles.layer}
+        />
+      </PressableNative>
+      {qrCodeVisible && (
+        <QRCodeModal onRequestClose={hideQRCode} userName={userName} />
+      )}
+    </View>
   );
 };
 
 export default forwardRef(CoverRenderer);
 
-export const QR_CODE_POSITION_CHANGE_EVENT = 'QR_CODE_POSITION_CHANGE_EVENT';
-
 const styles = StyleSheet.create({
-  coverContent: {
+  root: {
+    aspectRatio: COVER_RATIO,
+    overflow: 'hidden',
+  },
+  layer: {
     position: 'absolute',
     top: 0,
     left: 0,
     width: '100%',
     height: '100%',
+  },
+  coverPlaceHolder: {
+    backgroundColor: colors.grey100,
+    aspectRatio: COVER_RATIO,
+  },
+  qrCode: {
+    position: 'absolute',
+    top: '10%',
+    left: '45%',
+    width: '10%',
+    aspectRatio: 1,
   },
 });

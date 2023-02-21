@@ -23,21 +23,14 @@ export const COVER_CARD_RADIUS = 0.128;
 export const COVER_BASE_WIDTH = 125;
 
 /**
- * Card cover default styles
+ * The max width
  */
-export const DEFAULT_CARD_COVER = {
-  backgroundColor: '#FFF',
-  pictureTransitionTimer: 2,
-  overlayEffect: 'none',
-  titlePosition: 'bottomLeft',
-  titleFont: 'Arial',
-  titleFontSize: 16,
-  titleColor: '#000',
-  titleRotation: 0,
-  desktopLayout: 'card',
-  dektopImagePosition: 'center',
-  qrCodePosition: 'top',
-};
+export const COVER_MAX_WIDTH = 2048 * COVER_RATIO;
+
+/**
+ * The max width
+ */
+export const COVER_MAX_HEIGHT = 2048 * COVER_RATIO;
 
 /**
  * list of possible covertitle position
@@ -53,3 +46,13 @@ export const TITLE_POSITIONS = [
   'bottomCenter',
   'bottomRight',
 ];
+
+export const DEFAULT_COVER_FONT_FAMILY = 'Arial';
+
+export const DEFAULT_COVER_FONT_SIZE = 14;
+
+export const DEFAULT_COVER_TEXT_COLOR = '#000000';
+
+export const DEFAULT_COVER_CONTENT_ORTIENTATION = 'horizontal';
+
+export const DEFAULT_COVER_CONTENT_PLACEMENT = 'bottomLeft';

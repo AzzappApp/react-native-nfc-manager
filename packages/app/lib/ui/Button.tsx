@@ -34,8 +34,8 @@ const Button = (
     if ((flatStyles as ViewStyle)?.backgroundColor) {
       return (flatStyles as ViewStyle).backgroundColor;
     }
-    return colors.black;
-  }, [props.disabled, style]);
+    return variant === 'primary' ? colors.black : 'transparent';
+  }, [props.disabled, style, variant]);
 
   if (Platform.OS === 'android') {
     return (

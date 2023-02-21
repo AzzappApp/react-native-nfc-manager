@@ -2,7 +2,8 @@ import {
   createUser,
   getUserByEmail,
   getUserByPhoneNumber,
-  getUserByUserName,
+  getProfileByUserName,
+  createProfile,
 } from '@azzapp/data/lib/domains';
 import ERRORS from '@azzapp/shared/lib/errors';
 import {
@@ -26,22 +27,16 @@ type SignupBody = {
 };
 
 const signup = async (req: NextApiRequest, res: NextApiResponse) => {
-  const {
-    email,
-    userName,
-    phoneNumber,
-    password,
-    firstName,
-    lastName,
-    authMethod,
-  } =
+  const { email, userName, phoneNumber, password, authMethod } =
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     <SignupBody>req.body || {};
+
   //we need at least one email or one phone number
   if (!(email || phoneNumber) || !userName || !password) {
     res.status(400).json({ message: ERRORS.INVALID_REQUEST });
     return;
   }
+
   try {
     if (email != null) {
       if (!isValidEmail(email)) {
@@ -53,36 +48,45 @@ const signup = async (req: NextApiRequest, res: NextApiResponse) => {
         return;
       }
     }
+
     if (isInternationalPhoneNumber(phoneNumber)) {
       if (await getUserByPhoneNumber(phoneNumber!)) {
         res.status(400).json({ message: ERRORS.PHONENUMBER_ALREADY_EXISTS });
         return;
       }
     }
-    if (await getUserByUserName(userName)) {
-      res.status(400).json({ message: ERRORS.USERNAME_ALREADY_EXIST });
+    if (await getProfileByUserName(userName)) {
+      res.status(400).json({ message: ERRORS.USERNAME_ALREADY_EXISTS });
       return;
     }
 
     const user = await createUser({
-      userName,
       email,
       phoneNumber,
       password: await bcrypt.hash(password, 12),
-      firstName: firstName ?? '',
-      lastName: lastName ?? '',
+    });
+
+    const profile = await createProfile({
+      userId: user.id,
+      userName,
+      firstName: null,
+      lastName: null,
       companyActivityId: null,
       companyName: null,
-      userType: null,
+      profileKind: null,
       isReady: false,
     });
 
     if (authMethod === 'token') {
       req.session.destroy();
-      const { token, refreshToken } = generateTokens(user.id);
+      const { token, refreshToken } = generateTokens({
+        userId: user.id,
+        profileId: profile.id,
+      });
       res.json({ token, refreshToken });
     } else {
       req.session.userId = user.id;
+      req.session.profileId = profile.id;
       req.session.isAnonymous = false;
       await req.session.save();
       res.json({});

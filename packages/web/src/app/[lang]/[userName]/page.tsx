@@ -1,27 +1,27 @@
-import UserWebScreenUserQueryNode from '@azzapp/relay/artifacts/UserWebScreenUserQuery.graphql';
+import ProfileWebSCreenQueryNode from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
 import { notFound } from 'next/navigation';
 import preloadServerQuery from '../../../helpers/preloadServerQuery';
-import UserWebScreen from './UserWebScreen';
-import type { UserWebScreenUserQuery } from '@azzapp/relay/artifacts/UserWebScreenUserQuery.graphql';
+import UserWebScreen from './ProfileWebScreen';
+import type { ProfileWebScreenQuery } from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
 
 export type UserPageProps = {
   params: { userName: string };
 };
 
-const UserPage = async ({ params: { userName } }: UserPageProps) => {
-  const serverQuery = await preloadServerQuery<UserWebScreenUserQuery>(
-    UserWebScreenUserQueryNode,
+const ProfilePage = async ({ params: { userName } }: UserPageProps) => {
+  const serverQuery = await preloadServerQuery<ProfileWebScreenQuery>(
+    ProfileWebSCreenQueryNode,
     { userName },
   );
 
-  if (!serverQuery.response.user) {
+  if (!serverQuery.response.profile) {
     return notFound();
   }
 
   return <UserWebScreen serverQuery={serverQuery} />;
 };
 
-export default UserPage;
+export default ProfilePage;
 
 export const dynamic = 'force-static';
 

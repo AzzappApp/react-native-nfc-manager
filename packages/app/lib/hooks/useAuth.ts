@@ -13,10 +13,10 @@ export const storage = new MMKV();
 
 const MMKVS_KEY_AUTH = '@azzap/auth';
 /**
- * Listening on token changed to determine if user is still login or not
- * We keep the userId stored for easy use in the app and now if it was already logged(not the token)
- * We also listen on app state change(active) to check if the user is still login
- * We also listen on storage change to update the userId
+ * Listening on token changed to determine if profile is still login or not
+ * We keep the profileId stored for easy use in the app and now if it was already logged(not the token)
+ * We also listen on app state change(active) to check if the profile is still login
+ * We also listen on storage change to update the profileId
  *
  *
  * Warning : We need to handle the network error with caution
@@ -26,7 +26,7 @@ const MMKVS_KEY_AUTH = '@azzap/auth';
  */
 export default function useAuth() {
   const appState = useAppState();
-  const [userId, setUserId] = useState<string | undefined>(
+  const [profileID, setProfileID] = useState<string | undefined>(
     storage.getString(MMKVS_KEY_AUTH),
   );
 
@@ -38,7 +38,7 @@ export default function useAuth() {
       graphql`
         query useAuthViewerQuery {
           viewer {
-            user {
+            profile {
               id
               isReady
             }
@@ -49,8 +49,8 @@ export default function useAuth() {
     )
       .toPromise()
       .then(data => {
-        if (data?.viewer?.user?.id) {
-          storage.set(MMKVS_KEY_AUTH, data.viewer.user.id);
+        if (data?.viewer?.profile?.id) {
+          storage.set(MMKVS_KEY_AUTH, data.viewer.profile.id);
         } else {
           storage.delete(MMKVS_KEY_AUTH);
         }
@@ -63,7 +63,7 @@ export default function useAuth() {
 
   useEffect(() => {
     if (appState === 'active') {
-      setUserId(storage.getString(MMKVS_KEY_AUTH));
+      setProfileID(storage.getString(MMKVS_KEY_AUTH));
       isViewerValid();
     }
   }, [appState, isViewerValid]);
@@ -81,7 +81,7 @@ export default function useAuth() {
   useEffect(() => {
     const listener = storage.addOnValueChangedListener(changedKey => {
       if (MMKVS_KEY_AUTH === changedKey) {
-        setUserId(storage.getString(MMKVS_KEY_AUTH));
+        setProfileID(storage.getString(MMKVS_KEY_AUTH));
       }
     });
     return () => {
@@ -89,5 +89,5 @@ export default function useAuth() {
     };
   }, []);
 
-  return userId != null;
+  return profileID != null;
 }

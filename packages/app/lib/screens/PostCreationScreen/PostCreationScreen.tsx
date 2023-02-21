@@ -1,11 +1,16 @@
 import { useMemo, useState } from 'react';
 import { graphql, useMutation } from 'react-relay';
-import ImagePicker from '../../components/ImagePicker';
+import ImagePicker, {
+  SelectImageStep,
+  EditImageStep,
+} from '../../components/ImagePicker';
 import { getFileName } from '../../helpers/fileHelpers';
 import { useRouter, useWebAPI } from '../../PlatformEnvironment';
-import UploadProgressModal from '../UserScreen/UploadProgressModal';
+import UploadProgressModal from '../../ui/UploadProgressModal';
+import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
+import type { ImagePickerResult } from '../../components/ImagePicker';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
 import type { Observable } from 'relay-runtime';
 
@@ -39,15 +44,25 @@ const PostCreationScreen = () => {
     useState<Observable<number> | null>(null);
   const [saving, setSaving] = useState(false);
   const onFinished = async ({
-    path,
     kind,
+    uri,
     aspectRatio,
-  }: {
-    path: string;
-    kind: 'image' | 'video';
-    aspectRatio: number;
-  }) => {
+    width,
+    height,
+    editionParameters,
+    filter,
+    timeRange,
+  }: ImagePickerResult) => {
     setSaving(true);
+    const path = await exportMedia({
+      uri,
+      kind,
+      editionParameters,
+      aspectRatio,
+      filter,
+      ...timeRange,
+    });
+
     const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
       kind: kind === 'video' ? 'video' : 'image',
       target: 'post',
@@ -66,8 +81,9 @@ const PostCreationScreen = () => {
         input: {
           media: {
             kind: kind === 'video' ? 'video' : 'image',
-            source: public_id,
-            ratio: aspectRatio,
+            id: public_id,
+            width,
+            height,
           },
           allowComments,
           allowLikes,
@@ -77,7 +93,7 @@ const PostCreationScreen = () => {
       onCompleted(response) {
         // TODO use fragment instead of response
         router.replace({
-          route: 'USER_POSTS',
+          route: 'PROFILE_POSTS',
           params: {
             userName: response.createPost?.post?.author.userName as string,
           },
@@ -105,7 +121,8 @@ const PostCreationScreen = () => {
         onCancel={onCancel}
         onFinished={onFinished}
         busy={saving}
-        additionalSteps={ADDITIONAL_STEPS}
+        steps={[SelectImageStep, EditImageStep, PostContentStep]}
+        exporting={saving}
       />
       <UploadProgressModal
         visible={!!uploadProgress}
@@ -114,7 +131,5 @@ const PostCreationScreen = () => {
     </PostCreationScreenContext.Provider>
   );
 };
-
-const ADDITIONAL_STEPS = [PostContentStep];
 
 export default PostCreationScreen;

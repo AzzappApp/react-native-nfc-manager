@@ -1,7 +1,6 @@
-import CoverLayout from './CoverLayout';
 import CoverRenderer from './CoverRenderer';
-import type { CoverRendererProps, CoverHandle } from './CoverRenderer';
+import type { CoverRendererProps } from './CoverRenderer';
 
-export { CoverLayout, CoverRenderer as default };
+export default CoverRenderer;
 
-export type { CoverRendererProps, CoverHandle };
+export type { CoverRendererProps };

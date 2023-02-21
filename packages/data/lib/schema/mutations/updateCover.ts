@@ -1,181 +1,302 @@
-import {
-  DEFAULT_CARD_COVER,
-  COVER_RATIO,
-} from '@azzapp/shared/lib/cardHelpers';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import ERRORS from '@azzapp/shared/lib/errors';
+import { typedEntries } from '@azzapp/shared/lib/objectHelpers';
 import {
-  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLInputObjectType,
   GraphQLInt,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLString,
 } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-import { v4 as uuid } from 'uuid';
-import { db } from '../../domains';
-import UserGraphQL from '../UserGraphQL';
+import { GraphQLJSON } from 'graphql-scalars';
+import {
+  createCard,
+  createCardCover,
+  createMedia,
+  db,
+  removeMedia,
+  updateCardCover,
+} from '../../domains';
+import { CardCoverTitleOrientationGraphQL } from '../CardGraphQL';
+import ProfileGraphQL from '../ProfileGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';
-import type { Card, Media, CardCover, User } from '../../domains';
+import type { Card, CoverUpdates, Media } from '../../domains';
+import type { Database } from '../../domains/db';
 import type { GraphQLContext } from '../GraphQLContext';
+import type { Transaction } from 'kysely';
+
+type UpdateCoverInput = Partial<{
+  media: Media;
+  mediaStyle: unknown;
+  sourceMedia: Media;
+  textPreviewMedia: Media;
+  maskMedia: Media;
+  backgroundId: string;
+  backgroundStyle: {
+    backgroundColor: string;
+    patternColor: string;
+  };
+  foregroundId: string;
+  foregroundStyle: {
+    color: string;
+  };
+  segmented: boolean;
+  merged: boolean;
+  title: string;
+  contentStyle: {
+    orientation: 'bottomToTop' | 'horizontal' | 'topToBottom';
+  };
+  titleStyle: {
+    color: string;
+    fontSize: number;
+    fontFamily: string;
+  };
+  subTitle: string;
+  subTitleStyle: {
+    color: string;
+    fontSize: number;
+    fontFamily: string;
+  };
+}>;
 
 const updateCover = mutationWithClientMutationId({
   name: 'UpdateCover',
-  inputFields: {
-    backgroundColor: {
-      type: GraphQLString,
-      description: 'the background color of the card',
-    },
-    pictures: {
-      type: new GraphQLList(new GraphQLNonNull(MediaInputGraphQL)),
-      description: 'the pictures of the card cover',
-    },
-    pictureTransitionTimer: {
-      type: GraphQLFloat,
-      description:
-        'the time, in seconds, a picture stay displayed before transition in case of multiple pictures',
-    },
-    overlayEffect: {
-      type: GraphQLString,
-      description: 'the overlay effect applied to the card cover',
-    },
-    title: {
-      type: GraphQLString,
-      description: 'the title of the card cover',
-    },
-    titlePosition: {
-      type: GraphQLString,
-      description: 'the title position in the card cover',
-    },
-    titleFont: {
-      type: GraphQLString,
-      description: 'the font family used to display the title',
-    },
-    titleFontSize: {
-      type: GraphQLInt,
-      description: 'the font size of used to display the title',
-    },
-    titleColor: {
-      type: GraphQLString,
-      description: 'the color used to display the title',
-    },
-    titleRotation: {
-      type: GraphQLInt,
-      description: 'the rotation of the title',
-    },
-    qrCodePosition: {
-      type: GraphQLString,
-      description: 'the position of the qr code in the card',
-    },
-    desktopLayout: {
-      type: GraphQLString,
-      description: 'the layout used to display the cover on desktop',
-    },
-    dektopImagePosition: {
-      type: GraphQLString,
-      description: 'the position of the backround image on desktop',
-    },
-  },
+  inputFields: () => ({
+    media: { type: MediaInputGraphQL },
+    mediaStyle: { type: GraphQLJSON },
+    sourceMedia: { type: MediaInputGraphQL },
+    textPreviewMedia: { type: MediaInputGraphQL },
+    maskMedia: { type: MediaInputGraphQL },
+    backgroundId: { type: GraphQLString },
+    backgroundStyle: { type: CardCoverBackgroundStyleInputGraphQL },
+    foregroundId: { type: GraphQLString },
+    foregroundStyle: { type: CardCoverForegroundStyleInputGraphQL },
+    segmented: { type: GraphQLBoolean },
+    merged: { type: GraphQLBoolean },
+    title: { type: GraphQLString },
+    contentStyle: { type: CardCoverContentStyleInputGraphQL },
+    titleStyle: { type: CardCoverTextStyleInputGraphQL },
+    subTitle: { type: GraphQLString },
+    subTitleStyle: { type: CardCoverTextStyleInputGraphQL },
+  }),
   outputFields: {
-    user: {
-      type: UserGraphQL,
+    profile: {
+      type: ProfileGraphQL,
     },
   },
   mutateAndGetPayload: async (
-    updates: Partial<Omit<CardCover, 'id'>> & {
-      pictures?: Array<Omit<Media, 'id' | 'ownerId'>>;
-    },
-    {
-      userInfos: { userId, isAnonymous },
-      userLoader,
-      cardByUserLoader,
-      coverLoader,
-    }: GraphQLContext,
+    input: UpdateCoverInput,
+    { auth, cardByProfileLoader, profileLoader, coverLoader }: GraphQLContext,
   ) => {
-    if (!userId || isAnonymous) {
-      throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    if (updates.pictures) {
-      updates.pictures.forEach(media => {
-        media.ratio = COVER_RATIO;
-      });
-    }
-
-    let user: User | null;
-    try {
-      user = await userLoader.load(userId);
-    } catch (e) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-    if (!user) {
+    if (auth.isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
     let card: Card | null;
     try {
-      card = await cardByUserLoader.load(userId);
+      card = await cardByProfileLoader.load(auth.profileId);
     } catch (e) {
+      console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    if (!card && (!updates.title || !updates.pictures?.length)) {
+    const cover =
+      card?.coverId != null ? await coverLoader.load(card.coverId) : null;
+
+    if (
+      !cover &&
+      (!input.media ||
+        !input.sourceMedia ||
+        !input.textPreviewMedia ||
+        !input.title ||
+        !input.titleStyle ||
+        !input.contentStyle)
+    ) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
-
-    const cover: CardCover = card
-      ? ((await coverLoader.load(card.coverId)) as CardCover)
-      : {
-          id: uuid(),
-          ...DEFAULT_CARD_COVER,
-          title: updates.title!,
-        };
-
     try {
       await db.transaction().execute(async trx => {
-        const coverExists = !!card;
-        if (!coverExists) {
-          await trx
-            .insertInto('Card')
-            .values({
-              id: uuid(),
-              userId,
-              isMain: true,
-              coverId: cover.id,
-            })
-            .execute();
-          await trx.insertInto('CardCover').values(cover).execute();
+        let coverId = cover?.id;
+        if (!cover) {
+          await Promise.all([
+            await createMedia(input.media!, trx),
+            await createMedia(input.sourceMedia!, trx),
+            await createMedia(input.textPreviewMedia!, trx),
+            input.maskMedia && (await createMedia(input.maskMedia, trx)),
+          ]);
+
+          const cover = await createCardCover(
+            {
+              mediaId: input.media!.id,
+              mediaStyle: input.mediaStyle as any,
+              sourceMediaId: input.sourceMedia!.id,
+              textPreviewMediaId: input.textPreviewMedia!.id,
+              maskMediaId: input.maskMedia?.id ?? null,
+              backgroundId: input.backgroundId ?? null,
+              backgroundStyle: input.backgroundStyle ?? null,
+              foregroundId: input.foregroundId ?? null,
+              foregroundStyle: input.foregroundStyle ?? null,
+              segmented: input.segmented ?? false,
+              merged: input.merged ?? false,
+              title: input.title!,
+              titleStyle: input.titleStyle as any,
+              subTitle: input.subTitle ?? null,
+              subTitleStyle: input.subTitleStyle ?? null,
+              contentStyle: input.contentStyle as any,
+            },
+            trx,
+          );
+          coverId = cover.id;
         } else {
-          await trx
-            .updateTable('CardCover')
-            .set(updates)
-            .where('id', '=', cover.id)
-            .execute();
+          const mediaOperations: Array<Promise<any> | null> = [];
+          const updates: CoverUpdates = {};
+
+          const entries = typedEntries(input);
+          entries.forEach(([key, value]) => {
+            switch (key) {
+              case 'media':
+                updates.mediaId = value.id;
+                mediaOperations.push(
+                  ...replaceMedia(cover.mediaId, input.media, trx),
+                );
+                break;
+              case 'sourceMedia':
+                updates.sourceMediaId = value.id;
+                mediaOperations.push(
+                  ...replaceMedia(cover.sourceMediaId, input.sourceMedia, trx),
+                );
+                break;
+              case 'maskMedia':
+                updates.maskMediaId = value.id;
+                mediaOperations.push(
+                  ...replaceMedia(cover.maskMediaId, input.maskMedia, trx),
+                );
+                break;
+              case 'textPreviewMedia':
+                updates.textPreviewMediaId = value.id;
+                mediaOperations.push(
+                  ...replaceMedia(
+                    cover.textPreviewMediaId,
+                    input.textPreviewMedia,
+                    trx,
+                  ),
+                );
+                break;
+              case 'mediaStyle':
+                updates.mediaStyle = value as any;
+                break;
+              case 'backgroundId':
+                updates.backgroundId = value;
+                break;
+              case 'backgroundStyle':
+                updates.backgroundStyle = value;
+                break;
+              case 'foregroundId':
+                updates.foregroundId = value;
+                break;
+              case 'foregroundStyle':
+                updates.foregroundStyle = value;
+                break;
+              case 'segmented':
+                updates.segmented = value;
+                break;
+              case 'merged':
+                updates.merged = value;
+                break;
+              case 'title':
+                updates.title = value;
+                break;
+              case 'contentStyle':
+                updates.contentStyle = value;
+                break;
+              case 'titleStyle':
+                updates.titleStyle = value;
+                break;
+              case 'subTitle':
+                updates.subTitle = value;
+                break;
+              case 'subTitleStyle':
+                updates.subTitleStyle = value;
+                break;
+            }
+          });
+
+          await Promise.all(mediaOperations);
+
+          await updateCardCover(coverId!, updates, trx);
+
+          coverLoader.clear(coverId!);
         }
-        if (updates.pictures) {
-          if (coverExists) {
-            await trx
-              .deleteFrom('Media')
-              .where('ownerId', '=', cover.id)
-              .execute();
-          }
-          await trx
-            .insertInto('Media')
-            .values(
-              updates.pictures.map(media => ({
-                id: uuid(),
-                ownerId: cover.id,
-                ...media,
-              })),
-            )
-            .execute();
+        if (!card) {
+          await createCard(
+            {
+              profileId: auth.profileId,
+              isMain: true,
+              coverId: coverId!,
+            },
+            trx,
+          );
         }
       });
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    return { user };
+    const profile = await profileLoader.load(auth.profileId);
+    return { profile };
   },
 });
 
 export default updateCover;
+
+export const CardCoverBackgroundStyleInputGraphQL = new GraphQLInputObjectType({
+  name: 'CardCoverBackgroundStyleInput',
+  description: 'Style of the background of a card cover',
+  fields: () => ({
+    backgroundColor: { type: GraphQLString },
+    patternColor: { type: GraphQLString },
+  }),
+});
+
+export const CardCoverForegroundStyleInputGraphQL = new GraphQLInputObjectType({
+  name: 'CardCoverForegroundStyleInput',
+  description: 'Style of the foreground of a card cover',
+  fields: () => ({
+    color: { type: GraphQLString },
+  }),
+});
+
+export const CardCoverContentStyleInputGraphQL = new GraphQLInputObjectType({
+  name: 'CardCoverContentStyleInput',
+  description: 'Style of the content of a card cover',
+  fields: () => ({
+    orientation: { type: CardCoverTitleOrientationGraphQL },
+    placement: { type: GraphQLString }, // TODO enum
+  }),
+});
+
+export const CardCoverTextStyleInputGraphQL = new GraphQLInputObjectType({
+  name: 'CardCoverTextStyleInput',
+  description: 'Style of the text in a  a card cover',
+  fields: () => ({
+    color: { type: GraphQLString },
+    fontSize: { type: GraphQLInt },
+    fontFamily: { type: GraphQLString },
+  }),
+});
+
+const replaceMedia = (
+  oldMediaId: string | null | undefined,
+  newMedia: Media | null | undefined,
+  trx: Transaction<Database>,
+) => {
+  if (oldMediaId === newMedia?.id) {
+    return [];
+  }
+  return [
+    // TODO remove media from cloudinary
+    oldMediaId ? removeMedia(oldMediaId, trx) : null,
+    newMedia ? createMedia(newMedia, trx) : null,
+  ];
+};

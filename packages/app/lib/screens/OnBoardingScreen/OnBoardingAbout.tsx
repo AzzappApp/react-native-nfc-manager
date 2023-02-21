@@ -14,7 +14,6 @@ import TagCategory from '../../ui/TagCategory';
 
 import OnBoardingPager from './OnBoardingPager';
 import type { TagCatoryItem } from '../../ui/TagCategory';
-import type { UserType } from '@azzapp/relay/artifacts/OnBoardingScreenUpdateUserMutation.graphql';
 
 //TODO : get a list of interest from the server
 const FAKE_INTEREST1: TagCatoryItem[] = [...Array(10).keys()].map(item => {
@@ -33,14 +32,14 @@ type OnBoardingAboutProps = {
   next: () => void;
   prev: () => void;
   skip: () => void;
-  userType: UserType;
+  profileKind: 'business' | 'personal' | 'product';
 };
 
 const OnBoardingAboutUser = ({
   next,
   prev,
   skip,
-  userType,
+  profileKind,
 }: OnBoardingAboutProps) => {
   const vp = useViewportSize();
   const intl = useIntl();
@@ -87,7 +86,7 @@ const OnBoardingAboutUser = ({
       <View style={styles.containerIcon}>
         <IconButton icon="back" onPress={prev} style={styles.backIcon} />
         <Text style={styles.titleText}>
-          {userType === 'PERSONAL' ? (
+          {profileKind === 'personal' ? (
             <FormattedMessage
               defaultMessage="Tell us more about you?"
               description="OnBoarding About Screen - Title Tell us more about you"
@@ -103,7 +102,7 @@ const OnBoardingAboutUser = ({
       <OnBoardingPager activeIndex={2} />
 
       <Text style={styles.subtitleText}>
-        {userType === 'PERSONAL' ? (
+        {profileKind === 'business' ? (
           <FormattedMessage
             defaultMessage="Pick some topics you like."
             description="OnBoarding About User Screen - SubTitle Pick some topics you like."

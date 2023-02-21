@@ -24,7 +24,7 @@ const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
             />
           </Text>
           <View>
-            <TrendingProfilesList viewer={viewer} canPlay={hasFocus} />
+            <TrendingProfilesList viewer={viewer} />
             <SeeAll />
           </View>
           <Text style={styles.titleSection}>
@@ -34,7 +34,7 @@ const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
             />
           </Text>
           <View>
-            <RecommendedProfilesList viewer={viewer} canPlay={hasFocus} />
+            <RecommendedProfilesList viewer={viewer} />
             <SeeAll />
           </View>
           <Text style={styles.titleSection}>

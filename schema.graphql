@@ -1,22 +1,28 @@
 """A video media"""
 type MediaVideo implements Media {
-  source: String!
-  ratio: Float!
-  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
-  thumbnail(pixelRatio: Float, ratio: Float, width: Float!, time: Float): String!
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+  thumbnail(pixelRatio: Float, height: Float, width: Float, time: Float): String!
 }
 
 interface Media {
-  source: String!
-  ratio: Float!
-  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
 }
 
 """An image media"""
 type MediaImage implements Media {
-  source: String!
-  ratio: Float!
-  uri(pixelRatio: Float, ratio: Float, width: Float!): String!
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
 }
 
 """GraphQL Schema Root Query object"""
@@ -35,16 +41,16 @@ type Query {
     ids: [ID!]!
   ): [Node]!
 
-  """Fetches an user given its user name"""
-  user(
-    """The user name of the user"""
+  """Fetches a profile given its user name"""
+  profile(
+    """The user name of the profile"""
     userName: String!
-  ): User
+  ): Profile
 }
 
 """Represent an Application Viewer"""
 type Viewer {
-  user: User
+  profile: Profile
 
   """Return a list of Profiles that the current user is following"""
   followedProfiles(
@@ -53,7 +59,7 @@ type Viewer {
 
     """Returns the first n items from the list."""
     first: Int
-  ): UserConnection!
+  ): ProfileConnection!
 
   """Return a list of Post that the current user is following author"""
   followedProfilesPosts(
@@ -65,7 +71,7 @@ type Viewer {
   ): PostConnection!
 
   """
-  Return a list of User that this user might possibility be interested in (following User or promoted one)
+  Return a list of Profile that this user might possibility be interested in (following Profile or promoted one)
   """
   trendingProfiles(
     """Returns the items in the list that come after the specified cursor."""
@@ -73,7 +79,7 @@ type Viewer {
 
     """Returns the first n items from the list."""
     first: Int
-  ): UserConnection!
+  ): ProfileConnection!
 
   """Return a list of tranding posts (public ?) at the time of the request"""
   trendingPosts(
@@ -91,7 +97,7 @@ type Viewer {
 
     """Returns the first n items from the list."""
     first: Int
-  ): UserConnection!
+  ): ProfileConnection!
 
   """Return a list of posts that match the search query"""
   searchPosts(
@@ -115,21 +121,27 @@ type Viewer {
 
     """Returns the first n items from the list."""
     first: Int
-  ): UserConnection!
+  ): ProfileConnection!
+
+  """Return a list of cover backgrounds"""
+  coverBackgrounds: [CoverLayer!]!
+
+  """Return a list of cover foregrounds"""
+  coverForegrounds: [CoverLayer!]!
 }
 
-"""Represent an Azzapp User"""
-type User implements Node {
+"""Represent an Azzapp Profile"""
+type Profile implements Node {
   """The ID of an object"""
   id: ID!
+  userName: String!
   firstName: String
   lastName: String
-  userName: String!
   companyName: String
   companyActivityId: String
   isReady: Boolean!
-  userType: UserType
-  card: UserCard
+  profileKind: ProfileKind
+  card: Card
   posts(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -146,71 +158,106 @@ interface Node {
   id: ID!
 }
 
-enum UserType {
-  BUSINESS
-  PERSONAL
-  PRODUCT
+enum ProfileKind {
+  business
+  personal
+  product
 }
 
 """An azzapp User card"""
-type UserCard implements Node {
+type Card implements Node {
   """The ID of an object"""
   id: ID!
-  user: User!
+  user: Profile!
 
   """Card cover display informations"""
-  cover: UserCardCover!
+  cover: CardCover!
 
   """Definitions of the cards modules"""
-  modules: [UserCardModule!]!
+  modules: [CardModule!]!
 }
 
-"""UserCard cover display informations"""
-type UserCardCover {
-  """the background color of the card"""
-  backgroundColor: String!
+"""Card cover display informations"""
+type CardCover {
+  """The main media of the cover"""
+  media: MediaImage!
+  mediaStyle: JSON
 
-  """the pictures of the card cover"""
-  pictures: [Media!]!
+  """The source of the media used by the cover"""
+  sourceMedia: MediaImage!
+
+  """The mask media of the cover"""
+  maskMedia: MediaImage!
 
   """
-  the time, in seconds, a picture stay displayed before transition in case of multiple pictures
+  The text of the cover renderered as an image to avoid font loading issues
   """
-  pictureTransitionTimer: Float!
-
-  """the overlay effect applied to the card cover"""
-  overlayEffect: String!
-
-  """the title of the card cover"""
+  textPreviewMedia: MediaImage!
+  background: CoverLayer
+  backgroundStyle: CardCoverBackgroundStyle
+  foreground: CoverLayer
+  foregroundStyle: CardCoverForegroundStyle
+  segmented: Boolean!
+  merged: Boolean!
   title: String!
+  titleStyle: CardCoverTextStyle
+  subTitle: String
+  subTitleStyle: CardCoverTextStyle
+  contentStyle: CardCoverContentStyle
+}
 
-  """the title position in the card cover"""
-  titlePosition: String!
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
-  """the font family used to display the title"""
-  titleFont: String!
+"""Style of the background of a card cover"""
+type CoverLayer {
+  id: ID!
+  uri(width: Int, pixelRatio: Int): String!
+  name: String
+  kind: CoverLayerKind!
+  tags: [String!]!
+}
 
-  """the font size of used to display the title"""
-  titleFontSize: Int!
+enum CoverLayerKind {
+  background
+  foreground
+}
 
-  """the color used to display the title"""
-  titleColor: String!
+"""Style of the background of a card cover"""
+type CardCoverBackgroundStyle {
+  backgroundColor: String
+  patternColor: String
+}
 
-  """the rotation of the title"""
-  titleRotation: Int!
+"""Style of the foreground of a card cover"""
+type CardCoverForegroundStyle {
+  color: String
+}
 
-  """the position of the qr code in the card"""
-  qrCodePosition: String!
+"""Style of the text in a  a card cover"""
+type CardCoverTextStyle {
+  color: String
+  fontSize: Int
+  fontFamily: String
+}
 
-  """the layout used to display the cover on desktop"""
-  desktopLayout: String!
+"""Style of the content of a card cover"""
+type CardCoverContentStyle {
+  orientation: CardCoverTitleOrientation
+  placement: String
+}
 
-  """the position of the backround image on desktop"""
-  dektopImagePosition: String!
+"""Orientation of the title of a card cover"""
+enum CardCoverTitleOrientation {
+  horizontal
+  topToBottom
+  bottomToTop
 }
 
 """User Card module"""
-union UserCardModule = SocialModule | MediaModule | TextModule
+union CardModule = SocialModule | MediaModule | TextModule
 
 """User Card social module"""
 type SocialModule {
@@ -279,7 +326,7 @@ type Post implements Node {
   id: ID!
 
   """The author of the publication"""
-  author: User!
+  author: Profile!
 
   """The date of the publication"""
   postDate: Float!
@@ -305,39 +352,39 @@ type Post implements Node {
 }
 
 """A connection to a list of items."""
-type UserConnection {
+type ProfileConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [UserEdge]
+  edges: [ProfileEdge]
 }
 
 """An edge in a connection."""
-type UserEdge {
+type ProfileEdge {
   """The item at the end of the edge"""
-  node: User
+  node: Profile
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
 type Mutation {
-  updateUser(input: UpdateUserInput!): UpdateUserPayload
+  updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
 }
 
-type UpdateUserPayload {
-  user: User
+type UpdateProfilePayload {
+  profile: Profile
   clientMutationId: String
 }
 
-input UpdateUserInput {
+input UpdateProfileInput {
   firstName: String
   lastName: String
-  userType: UserType
+  profileKind: ProfileKind
   companyName: String
   companyActivityId: String
   isReady: Boolean
@@ -345,64 +392,65 @@ input UpdateUserInput {
 }
 
 type UpdateCoverPayload {
-  user: User
+  profile: Profile
   clientMutationId: String
 }
 
 input UpdateCoverInput {
-  """the background color of the card"""
-  backgroundColor: String
-
-  """the pictures of the card cover"""
-  pictures: [MediaInput!]
-
-  """
-  the time, in seconds, a picture stay displayed before transition in case of multiple pictures
-  """
-  pictureTransitionTimer: Float
-
-  """the overlay effect applied to the card cover"""
-  overlayEffect: String
-
-  """the title of the card cover"""
+  media: MediaInput
+  mediaStyle: JSON
+  sourceMedia: MediaInput
+  textPreviewMedia: MediaInput
+  maskMedia: MediaInput
+  backgroundId: String
+  backgroundStyle: CardCoverBackgroundStyleInput
+  foregroundId: String
+  foregroundStyle: CardCoverForegroundStyleInput
+  segmented: Boolean
+  merged: Boolean
   title: String
-
-  """the title position in the card cover"""
-  titlePosition: String
-
-  """the font family used to display the title"""
-  titleFont: String
-
-  """the font size of used to display the title"""
-  titleFontSize: Int
-
-  """the color used to display the title"""
-  titleColor: String
-
-  """the rotation of the title"""
-  titleRotation: Int
-
-  """the position of the qr code in the card"""
-  qrCodePosition: String
-
-  """the layout used to display the cover on desktop"""
-  desktopLayout: String
-
-  """the position of the backround image on desktop"""
-  dektopImagePosition: String
+  contentStyle: CardCoverContentStyleInput
+  titleStyle: CardCoverTextStyleInput
+  subTitle: String
+  subTitleStyle: CardCoverTextStyleInput
   clientMutationId: String
 }
 
 """User Card media module media"""
 input MediaInput {
   kind: MediaKind!
-  source: String!
-  ratio: Float
+  id: String!
+  width: Float!
+  height: Float!
 }
 
 enum MediaKind {
   video
   image
+}
+
+"""Style of the background of a card cover"""
+input CardCoverBackgroundStyleInput {
+  backgroundColor: String
+  patternColor: String
+}
+
+"""Style of the foreground of a card cover"""
+input CardCoverForegroundStyleInput {
+  color: String
+}
+
+"""Style of the content of a card cover"""
+input CardCoverContentStyleInput {
+  orientation: CardCoverTitleOrientation
+  placement: String
+}
+
+"""Style of the text in a  a card cover"""
+input CardCoverTextStyleInput {
+  color: String
+  fontSize: Int
+  fontFamily: String
 }
 
 type CreatePostPayload {
@@ -427,12 +475,15 @@ input CreatePostInput {
 
 type ToggleFollowingPayload {
   viewer: Viewer!
-  user: User!
+  profile: Profile!
   clientMutationId: String
 }
 
 input ToggleFollowingInput {
   """The id of the user we want toggle following on"""
-  userId: ID!
+  profileId: ID!
+
+  """Should we follow or unfollow the user"""
+  follow: Boolean!
   clientMutationId: String
 }

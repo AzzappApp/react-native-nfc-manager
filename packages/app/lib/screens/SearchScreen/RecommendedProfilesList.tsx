@@ -8,13 +8,9 @@ import type { RecommendedProfilesList_viewer$key } from '@azzapp/relay/artifacts
 import type { RecommendedProfilesListQuery } from '@azzapp/relay/artifacts/RecommendedProfilesListQuery.graphql';
 type RecommendedProfilesListProps = {
   viewer: RecommendedProfilesList_viewer$key;
-  canPlay: boolean;
 };
 
-const RecommendedProfilesList = ({
-  viewer,
-  canPlay,
-}: RecommendedProfilesListProps) => {
+const RecommendedProfilesList = ({ viewer }: RecommendedProfilesListProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     RecommendedProfilesListQuery,
     RecommendedProfilesList_viewer$key
@@ -55,7 +51,6 @@ const RecommendedProfilesList = ({
     <CoverList
       users={users}
       onEndReached={onEndReached}
-      canPlay={canPlay}
       coverStyle={styles.coverStyle}
       containerStyle={styles.containerStyle}
     />

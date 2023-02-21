@@ -14,7 +14,7 @@ import FadeSwitch from '../../ui/FadeSwitch';
 import IconButton from '../../ui/IconButton';
 import TabsBar from '../../ui/TabsBar';
 import Header from '../Header';
-import { TOOL_BAR_BOTTOM_MARGIN } from './helpers';
+import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import type { TabsBarProps } from '../../ui/TabsBar';
 import type { ReactElement, ReactNode } from 'react';
 import type { ViewProps } from 'react-native';
@@ -48,6 +48,7 @@ type ImagePickerWizardContainerProps = Exclude<ViewProps, 'children'> & {
   children: ReactElement;
   isLastStep: boolean;
   isFirstStep: boolean;
+  canCancel: boolean;
   busy?: boolean;
   exporting?: boolean;
   onBack(): void;
@@ -78,6 +79,7 @@ type ImagePickerWizardRendererProps = ImagePickerStepDefinition &
   ViewProps & {
     isLastStep: boolean;
     isFirstStep: boolean;
+    canCancel: boolean;
     busy?: boolean;
     onBack(): void;
     onNext(): void;
@@ -95,6 +97,7 @@ const ImagePickerWizardRenderer = ({
   topPanel,
   bottomPanel,
   toolbarProps,
+  canCancel,
   onBack,
   onNext,
   style,
@@ -106,7 +109,7 @@ const ImagePickerWizardRenderer = ({
 
   let leftButton = headerLeftButton;
   if (!leftButton) {
-    if (isFirstStep) {
+    if (isFirstStep && canCancel) {
       leftButton = (
         <Button
           label={intl.formatMessage({

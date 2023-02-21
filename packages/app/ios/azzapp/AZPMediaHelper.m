@@ -9,7 +9,10 @@
 #import <React/RCTConvert.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
+#import <Vision/Vision.h>
+
 #import "AZPTransformations.h"
+#import "azzapp-Swift.h"
 
 @implementation AZPMediaHelper
 
@@ -91,73 +94,59 @@ RCT_EXPORT_METHOD(
 
 RCT_EXPORT_METHOD(
         exportImage:(NSURL *)uri
-     withParameters:(NSDictionary *)parameters
-         andFilters:(NSArray<NSString *> *)filters
-             format:(NSString *) format
-            quality:(nonnull NSNumber *) quality
+         parameters:(NSDictionary *)parameters
+            filters:(NSArray<NSString *> *)filters
+             format:(NSString *)format
+            quality:(nonnull NSNumber *)quality
             forSize:(CGSize)size
+            mask:(NSURL *)maskUri
+            backgroundColor:(UIColor *)backgroundColor
+            backgroundImageUri:(NSURL *)backgroundImageUri
+   backgroundImageTintColor:(UIColor *)backgroundImageTintColor
+         backgroundMultiply:(BOOL)backgroundMultiply
+            foregroundImageUri:(NSURL *)foregroundImageUri
+            foregroundImageTintColor:(UIColor *)foregroundImageTintColor
            resolver:(RCTPromiseResolveBlock)resolve
            rejecter:(RCTPromiseRejectBlock)reject
  ) {
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    CIImage *image = [[CIImage alloc] initWithContentsOfURL:uri options:@{
-      kCIImageApplyOrientationProperty : @YES
-    }];
-    
-    NSMutableArray<NSString *> *imageTransformations = [
-      [NSMutableArray alloc] initWithArray:@[azzappImageEditorTransformationKey]
-    ];
-    if (filters != nil) {
-      [imageTransformations addObjectsFromArray:filters];
-    }
-    
-    NSMutableDictionary *transormationsParameters = [
-      [NSMutableDictionary alloc] initWithDictionary: parameters
-    ];
-    transormationsParameters[@"outputSize"] = [NSValue valueWithCGSize:size];
-    
-    for (NSString * transformationName in imageTransformations) {
-      AZPTransformation transformation = [AZPTransformations imageTransformationForName:transformationName];
-      if (transformation != nil) {
-        image = transformation(image, transormationsParameters);
+    [AZPEditableImageManager
+        exportImageWithUri:uri
+                parameters:parameters
+                   filters:filters
+                    format:format
+                   quality:quality
+                      size:size
+                   maskUri:maskUri
+           backgroundColor:backgroundColor
+        backgroundImageUri:backgroundImageUri
+  backgroundImageTintColor:backgroundImageTintColor
+        backgroundMultiply:backgroundMultiply
+             foregroundUri:foregroundImageUri
+  foregroundImageTintColor:foregroundImageTintColor
+         completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
+      if(error != nil) {
+        reject(@"export_failure", @"Could not export", error);
+        return;
       }
-    }
-    
-    CIContext * ciContext = [CIContext contextWithOptions:nil];
-    
-    NSData* imageData;
-    NSString* ext;
-    CGColorSpaceRef colorSpaceRGB = CGColorSpaceCreateDeviceRGB();
-    if ([format isEqualToString:@"JPEG"]) {
-      NSString *qualityKey = (NSString *)kCGImageDestinationLossyCompressionQuality;
-      id options = @{ qualityKey: quality };
-      imageData = [ciContext JPEGRepresentationOfImage:image
-                                            colorSpace:colorSpaceRGB
-                                               options:options];
-      ext= @"jpeg";
-    } else {
-      imageData = [ciContext PNGRepresentationOfImage:image
-                                               format:kCIFormatBGRA8
-                                           colorSpace:colorSpaceRGB
-                                              options:@{}];
-      ext = @"png";
-    }
-    if (imageData == nil) {
-      reject(@"export_failure",  [NSString stringWithFormat:@"Error %d : %s", errno, strerror(errno)], nil);
-      return;
-    }
-  
-  
-    NSString *filePath =  [AZPMediaHelper getRandomTempFilePath:ext];
-    BOOL success = [[NSFileManager defaultManager]
-                    createFileAtPath:filePath
-                    contents:imageData
-                    attributes:nil];
-    if (success) {
-      resolve(filePath);
-    } else {
-      reject(@"export_failure", [NSString stringWithFormat:@"Error %d : %s", errno, strerror(errno)], nil);
-    }
+      
+      
+      NSString* ext = [format isEqualToString:@"JPEG"]
+        ? @"jpeg"
+        : @"png";
+     
+      NSString *filePath =  [AZPMediaHelper getRandomTempFilePath:ext];
+      BOOL success = [[NSFileManager defaultManager]
+                      createFileAtPath:filePath
+                      contents:data
+                      attributes:nil];
+      if (success) {
+        resolve(filePath);
+      } else {
+        reject(@"export_failure", [NSString stringWithFormat:@"Error %d : %s", errno, strerror(errno)], nil);
+      }
+    }];
+
   });
 }
 
@@ -419,8 +408,76 @@ RCT_EXPORT_METHOD(
   });
 }
 
+
+RCT_EXPORT_METHOD(
+  segmentImage:(NSURL *)uri
+  resolver:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    if (@available(iOS 15.0, *)) {
+      CIContext * ciContext = [CIContext contextWithOptions:nil];
+      VNGeneratePersonSegmentationRequest *segmentationRequest = [VNGeneratePersonSegmentationRequest new];
+      segmentationRequest.qualityLevel = VNGeneratePersonSegmentationRequestQualityLevelAccurate;
+      
+      #if TARGET_OS_SIMULATOR
+      segmentationRequest.usesCPUOnly = true;
+      #endif
+      
+      VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc] initWithURL:uri options:@{
+        VNImageOptionCIContext: ciContext
+      }];
+      
+      
+      NSError * error;
+      [requestHandler performRequests:@[segmentationRequest] error:&error];
+      if (error) {
+        reject(@"failure", @"Error during segmentation", error);
+        return;
+      }
+      if (segmentationRequest.results == nil || segmentationRequest.results.firstObject == nil || segmentationRequest.results.firstObject.pixelBuffer == nil) {
+        reject(@"failure", @"No result from segmentation", error);
+        return;
+      }
+      CVPixelBufferRef pixelBuffer = segmentationRequest.results.firstObject.pixelBuffer;
+      CIImage *maskImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+      
+      CGColorSpaceRef colorSpaceRGB = CGColorSpaceCreateDeviceRGB();
+      NSData* imageData =
+        [ciContext
+          PNGRepresentationOfImage:maskImage
+                            format:kCIFormatBGRA8
+                        colorSpace:colorSpaceRGB
+                           options:@{}];
+      
+      NSString *filePath =  [AZPMediaHelper getRandomTempFilePath:@".png"];
+      BOOL success = [[NSFileManager defaultManager]
+                      createFileAtPath:filePath
+                      contents:imageData
+                      attributes:nil];
+      if (success) {
+        resolve(filePath);
+      } else {
+        reject(@"failure", [NSString stringWithFormat:@"Error %d : %s", errno, strerror(errno)], nil);
+      }
+    } else {
+      reject(@"failure", @"Unsuported OS version", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(getAvailableFonts:(RCTResponseSenderBlock)callback) {
+    NSMutableArray *fontFamilyNames = [[NSMutableArray alloc]init];
+
+    for (NSString *familyName in [UIFont familyNames]){
+        [fontFamilyNames addObject:familyName];
+    }
+ 
+    callback(@[fontFamilyNames]);
+}
+
 +(NSString *)getRandomTempFilePath:(NSString *)ext {
-  NSString* fileName = [[NSUUID UUID] UUIDString];
+  NSString *fileName = [[NSUUID UUID] UUIDString];
   NSString *filePath =  [[[NSTemporaryDirectory() stringByStandardizingPath] stringByAppendingPathComponent:fileName] stringByAppendingPathExtension:ext];
   return filePath;
 }

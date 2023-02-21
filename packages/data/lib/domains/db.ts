@@ -1,23 +1,39 @@
 import { Kysely } from 'kysely';
 import { PlanetScaleDialect } from 'kysely-planetscale';
 import type {
+  WithCreatedAt,
+  WithoutJSONFields,
+  WithTimeStamps,
+} from './generic';
+import type {
   Card,
   CardCover,
+  CoverLayer,
   CardModule,
   Follow,
   Media,
+  Profile,
   Post,
   User,
 } from '@prisma/client';
 
 export type Database = {
-  Card: Card;
-  CardCover: CardCover;
+  Card: WithTimeStamps<Card>;
+  CardCover: WithoutJSONFields<
+    WithTimeStamps<CardCover>,
+    | 'backgroundStyle'
+    | 'foregroundStyle'
+    | 'mediaStyle'
+    | 'subTitleStyle'
+    | 'titleStyle'
+  >;
   CardModule: CardModule;
-  Follow: Follow;
+  CoverLayer: WithCreatedAt<CoverLayer>;
+  Follow: WithCreatedAt<Follow>;
   Media: Media;
-  Post: Post;
-  User: User;
+  Profile: WithTimeStamps<Profile>;
+  Post: WithoutJSONFields<WithCreatedAt<Post>, 'medias'>;
+  User: WithTimeStamps<User>;
 };
 
 const db = new Kysely<Database>({

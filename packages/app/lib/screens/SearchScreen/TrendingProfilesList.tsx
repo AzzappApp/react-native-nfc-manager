@@ -6,15 +6,12 @@ import CoverList from '../../components/CoverList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 import type { TrendingProfilesList_viewer$key } from '@azzapp/relay/artifacts/TrendingProfilesList_viewer.graphql';
 import type { TrendingProfilesListQuery } from '@azzapp/relay/artifacts/TrendingProfilesListQuery.graphql';
+
 type TrendingProfilesListProps = {
   viewer: TrendingProfilesList_viewer$key;
-  canPlay: boolean;
 };
 
-const TrendingProfilesList = ({
-  viewer,
-  canPlay,
-}: TrendingProfilesListProps) => {
+const TrendingProfilesList = ({ viewer }: TrendingProfilesListProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     TrendingProfilesListQuery,
     TrendingProfilesList_viewer$key
@@ -55,7 +52,6 @@ const TrendingProfilesList = ({
     <CoverList
       users={users}
       onEndReached={onEndReached}
-      canPlay={canPlay}
       containerStyle={styles.containerStyle}
       coverStyle={styles.coverStyle}
     />

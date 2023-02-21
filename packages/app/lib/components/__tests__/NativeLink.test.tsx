@@ -35,20 +35,20 @@ describe('NativeLink', () => {
 
   test('should push route when pressed', () => {
     render(
-      <NativeLink route="USER" params={{ userName: 'hello' }}>
+      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </NativeLink>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
-      route: 'USER',
+      route: 'PROFILE',
       params: { userName: 'hello' },
     });
   });
 
   test('should not push route if event is default prevented', () => {
     render(
-      <NativeLink route="USER" params={{ userName: 'hello' }}>
+      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </NativeLink>,
     );
@@ -62,13 +62,13 @@ describe('NativeLink', () => {
 
   test('should show modal  when pressed and modal is true', () => {
     render(
-      <NativeLink route="USER" modal params={{ userName: 'hello' }}>
+      <NativeLink route="PROFILE" modal params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </NativeLink>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.showModal).toHaveBeenCalledWith({
-      route: 'USER',
+      route: 'PROFILE',
       params: { userName: 'hello' },
     });
     expect(mockRouter.push).not.toHaveBeenCalled();
@@ -76,13 +76,13 @@ describe('NativeLink', () => {
 
   test('should replace router  when pressed and replace is true', () => {
     render(
-      <NativeLink route="USER" replace params={{ userName: 'hello' }}>
+      <NativeLink route="PROFILE" replace params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </NativeLink>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.replace).toHaveBeenCalledWith({
-      route: 'USER',
+      route: 'PROFILE',
       params: { userName: 'hello' },
     });
     expect(mockRouter.push).not.toHaveBeenCalled();

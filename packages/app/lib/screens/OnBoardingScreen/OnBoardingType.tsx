@@ -14,18 +14,17 @@ import TagCategory from '../../ui/TagCategory';
 
 import OnBoardingPager from './OnBoardingPager';
 import type { TagCatoryItem } from '../../ui/TagCategory';
-import type { UserType } from '@prisma/client';
 
 type OnBoardingTypeProps = {
   next: () => void;
-  userType?: UserType;
-  setUserType: (userType: UserType) => void;
+  profileKind?: 'business' | 'personal' | 'product';
+  setProfileKind: (profileKind: 'business' | 'personal' | 'product') => void;
 };
 
 const OnBoardingType = ({
   next,
-  setUserType,
-  userType,
+  setProfileKind,
+  profileKind,
 }: OnBoardingTypeProps) => {
   const vp = useViewportSize();
   const intl = useIntl();
@@ -33,8 +32,8 @@ const OnBoardingType = ({
     next();
   }, [next]);
 
-  const setUserTypeFromgTag = (userType: TagCatoryItem) => {
-    setUserType(userType.id as UserType);
+  const setProfileKindFromgTag = (profileKind: TagCatoryItem) => {
+    setProfileKind(profileKind.id as 'business' | 'personal' | 'product');
   };
 
   return (
@@ -60,25 +59,25 @@ const OnBoardingType = ({
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <TagCategory
           item={{
-            id: 'PERSONAL',
+            id: 'personal',
             label: intl.formatMessage({
               defaultMessage: 'Person',
-              description: 'UserType: PERSONAL',
+              description: 'UserType: personal',
             }),
           }}
-          onPress={setUserTypeFromgTag}
-          selected={userType === 'PERSONAL'}
+          onPress={setProfileKindFromgTag}
+          selected={profileKind === 'personal'}
         />
         <TagCategory
           item={{
-            id: 'BUSINESS',
+            id: 'business',
             label: intl.formatMessage({
               defaultMessage: 'Business/company',
-              description: 'UserType: BUSINESS/company',
+              description: 'UserType: business/company',
             }),
           }}
-          onPress={setUserTypeFromgTag}
-          selected={userType === 'BUSINESS'}
+          onPress={setProfileKindFromgTag}
+          selected={profileKind === 'business'}
         />
       </View>
       <Submit>
@@ -93,7 +92,7 @@ const OnBoardingType = ({
               'OnBoardingType User Type Screen - AccessibilityLabel Continue Button',
           })}
           style={styles.button}
-          disabled={!isNotFalsyString(userType)}
+          disabled={!isNotFalsyString(profileKind)}
         />
       </Submit>
     </Form>

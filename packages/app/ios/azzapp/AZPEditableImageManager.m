@@ -1,33 +1,21 @@
-#import "AZPEditableImageManager.h"
-#import "AZPEditableImage.h"
-#import "AZPEditableImageSource.h"
-@implementation AZPEditableImageManager
+#import <React/RCTBridgeModule.h>
+#import <React/RCTConvert.h>
+#import <React/RCTViewManager.h>
 
 
-RCT_EXPORT_MODULE()
+@interface RCT_EXTERN_MODULE(AZPEditableImageManager, RCTViewManager)
 
-- (UIView *) view {
-  return [AZPEditableImage new];
-}
-
-RCT_CUSTOM_VIEW_PROPERTY(source, AzzappEditableImageSource *, AZPEditableImage)
-{
-  if (json == nil) {
-    [view setSource:nil];
-  }
-  AZPEditableImageSource * source= [[AZPEditableImageSource alloc] init];
-  
-  source.uri = [RCTConvert NSURL:json[@"uri"]];
-  if ([json[@"kind"] isEqualToString:@"video"]) {
-    source.kind = AZPMediaKindVideo;
-  } else {
-    source.kind = AZPMediaKindImage;
-  }
-  source.videoTime = [RCTConvert NSNumber:json[@"videoTime"]];
-  [view setSource:source];
-}
+RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary *)
 RCT_EXPORT_VIEW_PROPERTY(editionParameters, NSDictionary *)
-RCT_EXPORT_VIEW_PROPERTY(filters, NSArray<NSString> *)
+RCT_EXPORT_VIEW_PROPERTY(backgroundImageColor, UIColor)
+RCT_EXPORT_VIEW_PROPERTY(backgroundImageTintColor, UIColor)
+RCT_EXPORT_VIEW_PROPERTY(backgroundMultiply, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(foregroundImageTintColor, UIColor)
+RCT_EXPORT_VIEW_PROPERTY(filters, NSArray *)
+RCT_EXPORT_VIEW_PROPERTY(onLoadStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
+
+
 
 @end

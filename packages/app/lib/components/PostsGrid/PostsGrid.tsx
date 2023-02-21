@@ -58,7 +58,7 @@ const PostsGrid = ({
         }
         media {
           __typename
-          ratio
+          aspectRatio
         }
         content
       }
@@ -113,7 +113,7 @@ const PostsGrid = ({
     let lastVideoPosition = 0;
     for (const post of posts) {
       const isOnLeft = currentPositionLeft <= currentPositionRight;
-      const height = itemWidth / post.media.ratio;
+      const height = itemWidth / post.media.aspectRatio;
 
       let isVideo = post.media.__typename === 'MediaVideo';
       if (
@@ -284,7 +284,7 @@ const PostsGrid = ({
             <View
               style={{
                 width: layout.width,
-                height: layout.width / item.media.ratio,
+                height: layout.width / item.media.aspectRatio,
                 borderRadius: 16,
                 backgroundColor: colors.grey100,
               }}

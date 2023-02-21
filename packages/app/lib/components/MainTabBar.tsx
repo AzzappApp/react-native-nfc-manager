@@ -22,27 +22,27 @@ const MainTabBar = ({
       tabs={[
         {
           key: 'HOME',
-          accessibilityLabel: 'Home',
+          label: 'Home',
           icon: 'home',
         },
         {
           key: 'SEARCH',
-          accessibilityLabel: 'Search',
+          label: 'Search',
           icon: 'search',
         },
         {
           key: 'NEW_POST',
-          accessibilityLabel: 'New Post',
+          label: 'New Post',
           icon: 'add',
         },
         {
           key: 'CHAT',
-          accessibilityLabel: 'Chat',
+          label: 'Chat',
           icon: 'chat',
         },
         {
           key: 'SETTINGS',
-          accessibilityLabel: 'Settings',
+          label: 'Settings',
           icon: 'account',
           tint: false,
         },

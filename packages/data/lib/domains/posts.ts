@@ -1,6 +1,10 @@
 import * as uuid from 'uuid';
 import db from './db';
-import { getEntitiesByIds, sqlCountToNumber } from './generic';
+import {
+  getEntitiesByIds,
+  jsonFieldSerializer,
+  sqlCountToNumber,
+} from './generic';
 import type { Database } from './db';
 import type { Post } from '@prisma/client';
 import type { QueryCreator } from 'kysely';
@@ -15,37 +19,37 @@ export const getPostsByIds = (
 ): Promise<Array<Post | null>> => getEntitiesByIds('Post', ids);
 
 /**
- * Retrieve a user's posts, ordered by date, with pagination.
+ * Retrieve a profile's posts, ordered by date, with pagination.
  *
- * @param userId  The id of the user
+ * @param profileId  The id of the profile
  * @param limit The maximum number of posts to retrieve
  * @param offset The offset of the first post to retrieve
  * @returns A list of posts
  */
-export const getUsersPosts = (
-  userId: string,
+export const getProfilesPosts = (
+  profileId: string,
   limit: number,
   offset: number,
 ): Promise<Post[]> =>
   db
     .selectFrom('Post')
     .selectAll()
-    .where('authorId', '=', userId)
-    .orderBy('postDate', 'desc')
+    .where('authorId', '=', profileId)
+    .orderBy('createdAt', 'desc')
     .limit(limit)
     .offset(offset)
     .execute();
 
 /**
- * Retrieve the number of posts a user has.
- * @param userId - The id of the user
- * @returns he number of posts the user has
+ * Retrieve the number of posts a profile has.
+ * @param profileId - The id of the profile
+ * @returns he number of posts the profile has
  */
-export const getUsersPostsCount = (userId: string): Promise<number> =>
+export const getProfilesPostsCount = (profileId: string): Promise<number> =>
   db
     .selectFrom('Post')
     .select(db.fn.count('id').as('nbPosts'))
-    .where('authorId', '=', userId)
+    .where('authorId', '=', profileId)
     .executeTakeFirstOrThrow()
     .then(({ nbPosts }) => sqlCountToNumber(nbPosts));
 
@@ -63,26 +67,26 @@ export const getAllPosts = async (
   let query = db
     .selectFrom('Post')
     .selectAll()
-    .orderBy('Post.postDate', 'desc');
+    .orderBy('Post.createdAt', 'desc');
 
   if (after) {
-    query = query.where('Post.postDate', '<', after);
+    query = query.where('Post.createdAt', '<', after);
   }
 
   return query.limit(limit).execute();
 };
 
 /**
- * Retrieve a list of posts from the users a user is following, ordered by date,
+ * Retrieve a list of posts from the profiles a profile is following, ordered by date,
  * with pagination based on postDate.
  *
- * @param userId - The id of the user
+ * @param profileId - The id of the profile
  * @param limit - The maximum number of posts to retrieve
  * @param offset - the offset of the first post to retrieve (based on postDate)
  * @returns A list of posts
  */
-export const getFollowedUsersPosts = async (
-  userId: string,
+export const getFollowedProfilesPosts = async (
+  profileId: string,
   limit: number,
   after: Date | null = null,
 ): Promise<Post[]> => {
@@ -90,30 +94,30 @@ export const getFollowedUsersPosts = async (
     .selectFrom('Post')
     .selectAll()
     .innerJoin('Follow', 'Post.authorId', 'Follow.followingId')
-    .where('Follow.followerId', '=', userId)
-    .orderBy('Post.postDate', 'desc');
+    .where('Follow.followerId', '=', profileId)
+    .orderBy('Post.createdAt', 'desc');
 
   if (after) {
-    query = query.where('Post.postDate', '<', after);
+    query = query.where('Post.createdAt', '<', after);
   }
 
   return query.limit(limit).execute();
 };
 
 /**
- * Retrieve the number of posts from the users a user is following.
+ * Retrieve the number of posts from the profiles a profile is following.
  *
- * @param userId - The id of the user
- * @returns The number of posts from the users a user is following
+ * @param profileId - The id of the profile
+ * @returns The number of posts from the profiles a profile is following
  */
-export const getFollowedUsersPostsCount = async (
-  userId: string,
+export const getFollowedProfilesPostsCount = async (
+  profileId: string,
 ): Promise<number> =>
   db
     .selectFrom('Post')
     .select(db.fn.count('id').as('nbPosts'))
     .innerJoin('Follow', 'Post.authorId', 'Follow.followingId')
-    .where('Follow.followerId', '=', userId)
+    .where('Follow.followerId', '=', profileId)
     .executeTakeFirstOrThrow()
     .then(({ nbPosts }) => sqlCountToNumber(nbPosts));
 
@@ -121,18 +125,22 @@ export const getFollowedUsersPostsCount = async (
  * Create a post.
  *
  * @param values - the post fields, excluding the id and the postDate
- * @param qc - The query creator to use (user for transactions)
+ * @param qc - The query creator to use (profile for transactions)
  * @returns The created post
  */
 export const createPost = async (
-  values: Omit<Post, 'id' | 'postDate'>,
+  values: Omit<Post, 'createdAt' | 'id'>,
   qc: QueryCreator<Database> = db,
 ): Promise<Post> => {
   const post = {
     id: uuid.v4(),
-    postDate: new Date(),
     ...values,
   };
-  await qc.insertInto('Post').values(post).execute();
-  return post;
+  await qc.insertInto('Post').values(postSerializer(post)).execute();
+  // TODO should we return the post from the database instead? createdAt might be different
+  return { ...post, createdAt: new Date() };
 };
+
+const jsonFields = ['medias'] as const;
+
+const postSerializer = jsonFieldSerializer(jsonFields);

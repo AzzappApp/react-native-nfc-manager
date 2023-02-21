@@ -82,7 +82,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         environment,
         graphql`
           query SignUpScreenQuery($userName: String!) {
-            user(userName: $userName) {
+            profile(userName: $userName) {
               id
               userName
             }
@@ -90,7 +90,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         `,
         { userName: username },
       ).toPromise();
-      if (result?.user?.userName === username) {
+      if (result?.profile?.userName === username) {
         return true;
       }
     }

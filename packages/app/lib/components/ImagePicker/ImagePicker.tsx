@@ -1,47 +1,52 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
-import { exportImage, exportVideo } from './mediaHelpers';
 import SelectImageStep from './SelectImageStep';
+import type { ImageEditionParameters, TimeRange } from '../../types';
 import type { ImagePickerState } from './ImagePickerContext';
-import type { ImageEditionParameters } from './mediaHelpers';
 import type { ComponentType } from 'react';
 
+export type ImagePickerResult = {
+  kind: 'image' | 'video';
+  uri: string;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  editionParameters: ImageEditionParameters;
+  filter: string | null;
+  timeRange: TimeRange | null;
+};
+
 type ImagePickerProps = {
-  maxVideoDuration: number;
+  maxVideoDuration?: number;
   forceAspectRatio?: number;
-  additionalSteps?: Array<ComponentType<any>>;
+  steps?: Array<ComponentType<any>>;
+  kind?: 'image' | 'mixed' | 'video';
   busy?: boolean;
-  onFinished(params: {
-    kind: 'image' | 'video';
-    path: string;
-    aspectRatio: number;
-    duration?: number;
-  }): void;
+  canCancel?: boolean;
+  exporting?: boolean;
+  onFinished(params: ImagePickerResult): void;
   onCancel(): void;
 };
 
 const ImagePicker = ({
-  maxVideoDuration,
+  maxVideoDuration = 10,
   forceAspectRatio,
-  additionalSteps,
+  steps = DEFAULT_STEPS,
+  kind = 'mixed',
   busy,
+  canCancel = true,
+  exporting = false,
   onFinished,
   onCancel,
 }: ImagePickerProps) => {
-  const steps = useMemo(
-    () => (additionalSteps ? [...STEPS, ...additionalSteps] : STEPS),
-    [additionalSteps],
-  );
   const [stepIndex, setStepIndex] = useState(0);
 
   const pickerStateRef = useRef<ImagePickerState | null>(null);
 
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === steps.length - 1;
-
-  const [exporting, setExporting] = useState(false);
 
   const onNext = useCallback(async () => {
     if (isLastStep) {
@@ -53,27 +58,12 @@ const ImagePicker = ({
       if (!media) {
         return;
       }
-      setExporting(true);
-      let path: string;
-      try {
-        path = await exportMedia({
-          uri: media.uri,
-          kind: media.kind,
-          editionParameters,
-          aspectRatio,
-          filter: mediaFilter,
-          ...timeRange,
-        });
-      } catch (e) {
-        setExporting(false);
-        return;
-      }
-
       onFinished?.({
-        kind: media.kind,
-        path,
+        ...media,
         aspectRatio,
-        duration: media.kind === 'video' ? media.duration : undefined,
+        editionParameters,
+        filter: mediaFilter,
+        timeRange,
       });
     } else {
       setStepIndex(stepIndex => stepIndex + 1);
@@ -81,20 +71,22 @@ const ImagePicker = ({
   }, [isLastStep, onFinished]);
 
   const onBack = useCallback(() => {
-    if (isFirstStep) {
+    if (isFirstStep && canCancel) {
       onCancel();
     } else {
       setStepIndex(stepIndex => stepIndex - 1);
     }
-  }, [isFirstStep, onCancel]);
+  }, [isFirstStep, onCancel, canCancel]);
 
   const Component = steps[stepIndex];
+
   return (
     <ImagePickerContextProvider
       ref={pickerStateRef}
       forceAspectRatio={forceAspectRatio}
       maxVideoDuration={maxVideoDuration}
       exporting={exporting}
+      kind={kind}
     >
       <ImagePickerWizardContainer
         onBack={onBack}
@@ -102,6 +94,7 @@ const ImagePicker = ({
         isLastStep={isLastStep}
         isFirstStep={isFirstStep}
         busy={exporting || busy}
+        canCancel={canCancel}
       >
         <Component onNext={onNext} onBack={onBack} />
       </ImagePickerWizardContainer>
@@ -109,57 +102,6 @@ const ImagePicker = ({
   );
 };
 
-const STEPS = [SelectImageStep, EditImageStep];
+export const DEFAULT_STEPS = [SelectImageStep, EditImageStep];
 
 export default ImagePicker;
-
-const VIDEO_MAX_SIZE = 1280;
-const IMAGE_MAX_SIZE = 2048;
-const VIDEO_BIT_RATE = 3000000;
-
-const exportMedia = ({
-  uri,
-  kind,
-  aspectRatio,
-  filter,
-  editionParameters,
-  removeSound = false,
-  startTime,
-  duration,
-}: {
-  uri: string;
-  kind: 'image' | 'video';
-  aspectRatio: number;
-  filter?: string | null;
-  editionParameters?: ImageEditionParameters | null;
-  removeSound?: boolean;
-  startTime?: number;
-  duration?: number;
-}): Promise<string> => {
-  const maxSize = kind === 'image' ? IMAGE_MAX_SIZE : VIDEO_MAX_SIZE;
-  const size = {
-    width: aspectRatio >= 1 ? maxSize : maxSize * aspectRatio,
-    height: aspectRatio < 1 ? maxSize : maxSize / aspectRatio,
-  };
-  if (kind === 'image') {
-    return exportImage({
-      uri,
-      size,
-      filters: filter ? [filter] : [],
-      parameters: editionParameters ?? {},
-      format: 'JPEG',
-      quality: 0.8,
-    });
-  } else {
-    return exportVideo({
-      uri,
-      size,
-      bitRate: VIDEO_BIT_RATE,
-      filters: filter ? [filter] : [],
-      parameters: editionParameters ?? {},
-      removeSound,
-      startTime,
-      duration,
-    });
-  }
-};

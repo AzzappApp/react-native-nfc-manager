@@ -46,23 +46,17 @@ export type OnBoardingRoute = {
   params?: never; //TODO this should coutain a reset token ?
 };
 
-export type UserRoute = {
-  route: 'USER';
+export type ProfileRoute = {
+  route: 'PROFILE';
   params: {
     userName: string;
-    userId?: string;
-    imageIndex?: number;
-    videoTime?: number | null;
+    profileID?: string;
     fromRectangle?: LayoutRectangle;
-    setOriginCoverState?: (state: {
-      imageIndex: number;
-      videoTime?: number | null;
-    }) => void;
   };
 };
 
-export type UserPostsRoute = {
-  route: 'USER_POSTS';
+export type ProfilePostsRoute = {
+  route: 'PROFILE_POSTS';
   params: { userName: string };
 };
 
@@ -80,20 +74,26 @@ export type NewPostRoute = {
   params?: never;
 };
 
+export type CardModuleEditionRoute = {
+  route: 'CARD_MODULE_EDITION';
+  params: { module: string };
+};
+
 export type Route =
   | HomeRoute
   | SearchRoute
   | ChatRoute
   | SettingsRoute
-  | UserRoute
+  | ProfileRoute
+  | ProfilePostsRoute
   | PostRoute
-  | UserPostsRoute
   | NewPostRoute
+  | OnBoardingRoute
+  | ChangePasswordRoute
   | OnBoardingRoute
   | SignInRoute
   | SignUpRoute
   | ForgotPasswordRoute
-  | ChangePasswordRoute
-  | OnBoardingRoute;
+  | CardModuleEditionRoute;
 
 export type ROUTES = Route['route'];

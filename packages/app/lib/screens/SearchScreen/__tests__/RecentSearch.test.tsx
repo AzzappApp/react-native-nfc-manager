@@ -23,8 +23,6 @@ jest.mock('../../../components/CoverLink', () => {
   ) {
     return createElement('CoverLink', {
       userId: props.userId,
-      playTransition: props.playTransition,
-      videoPaused: props.videoPaused,
       style: props.style,
       testID: 'CoverLink',
     });

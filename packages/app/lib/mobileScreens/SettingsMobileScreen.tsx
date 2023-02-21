@@ -13,7 +13,7 @@ import type { SettingsMobileScreenQuery } from '@azzapp/relay/artifacts/Settings
 const settingsScreenQuery = graphql`
   query SettingsMobileScreenQuery {
     viewer {
-      user {
+      profile {
         id
       }
     }
@@ -32,7 +32,7 @@ const SettingsMobileScreen = ({
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >
-      {viewer?.user ? (
+      {viewer.profile ? (
         <>
           <TouchableOpacity onPress={logout}>
             <Text>

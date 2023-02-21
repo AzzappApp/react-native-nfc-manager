@@ -30,8 +30,6 @@ jest.mock('../../../components/CoverLink', () => {
   ) {
     return createElement('CoverLink', {
       userId: props.userId,
-      playTransition: props.playTransition,
-      videoDisabled: props.videoDisabled,
       style: props.style,
       testID: 'CoverLink',
     });
@@ -54,15 +52,15 @@ const CARD = {
     pictures: [
       {
         __typename: 'MediaImage',
-        source: 'fakeSource0',
+        id: 'fakeSource0',
       },
       {
         __typename: 'MediaVideo',
-        source: 'fakeSource1',
+        id: 'fakeSource1',
       },
       {
         __typename: 'MediaImage',
-        source: 'fakeSource2',
+        id: 'fakeSource2',
       },
     ],
     pictureTransitionTimer: 5,
@@ -152,7 +150,7 @@ const renderScreen = () => {
       {},
     );
 
-    return <RecommendedProfilesList viewer={data.viewer} canPlay={false} />;
+    return <RecommendedProfilesList viewer={data.viewer} />;
   };
 
   const component = render(
@@ -181,6 +179,7 @@ const eventData = {
     zoomScale: 1,
   },
 };
+
 describe('Recommended Profiles list Component', () => {
   test('should render initial list and loadMore after scrolling', async () => {
     renderScreen();
@@ -188,8 +187,6 @@ describe('Recommended Profiles list Component', () => {
 
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks).toHaveLength(10);
-    expect(coverLinks[0]).toHaveProp('playTransition', false);
-    expect(coverLinks[0]).toHaveProp('videoDisabled', true);
     expect(coverLinks[0]).toHaveStyle({ width: 80 });
 
     act(() => {

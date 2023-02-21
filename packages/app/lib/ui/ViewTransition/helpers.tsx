@@ -24,5 +24,6 @@ export type Easing = 'ease-in-out' | 'ease-in' | 'ease-out' | 'ease' | 'linear';
 export type ViewTransitionProps = ViewProps & {
   transitions: readonly TransitionableStyle[];
   transitionDuration: number;
+  disableAnimation?: boolean;
   easing?: Easing;
 };

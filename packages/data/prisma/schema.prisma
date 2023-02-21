@@ -11,30 +11,41 @@ datasource db {
   relationMode = "prisma"
 }
 
-enum UserType {
-  PERSONAL
-  BUSINESS
-  PRODUCT
+model User {
+  id          String   @id
+  email       String?  @unique
+  phoneNumber String?  @unique
+  password    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 }
 
-model User {
-  id                String    @id
-  email             String?   @unique
-  userName          String    @unique
-  phoneNumber       String?   @unique
-  password          String
-  firstName         String
-  lastName          String
-  userType          UserType?
+model Profile {
+  id                String       @id
+  userId            String
+  userName          String       @unique
+  firstName         String?
+  lastName          String?
+  profileKind       ProfileKind?
   companyName       String?
   companyActivityId String?
-  isReady           Boolean   @default(false)
+  isReady           Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @default(now())
+
+  @@index([userId])
+}
+
+enum ProfileKind {
+  personal
+  business
+  product
 }
 
 model Follow {
   followerId  String
   followingId String
-  followDate  DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
   @@index([followingId])
@@ -42,11 +53,10 @@ model Follow {
 }
 
 model Media {
-  id      String    @id
-  kind    MediaKind
-  source  String
-  ratio   Float
-  ownerId String
+  id     String    @id
+  kind   MediaKind
+  width  Float
+  height Float
 }
 
 enum MediaKind {
@@ -54,20 +64,50 @@ enum MediaKind {
   video
 }
 
+model CoverLayer {
+  id        String    @id
+  kind      LayerKind
+  name      String?
+  tags      String?
+  createdAt DateTime  @default(now())
+}
+
+enum LayerKind {
+  foreground
+  background
+}
+
+model Card {
+  id        String   @id
+  profileId String
+  isMain    Boolean
+  coverId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([profileId])
+}
+
 model CardCover {
-  id                     String @id
-  backgroundColor        String
-  pictureTransitionTimer Int
-  overlayEffect          String
-  title                  String
-  titlePosition          String
-  titleFont              String
-  titleFontSize          Int
-  titleColor             String
-  titleRotation          Int
-  qrCodePosition         String
-  desktopLayout          String
-  dektopImagePosition    String
+  id                 String   @id
+  mediaId            String
+  mediaStyle         Json
+  textPreviewMediaId String
+  sourceMediaId      String
+  maskMediaId        String?
+  backgroundId       String?
+  backgroundStyle    Json?
+  foregroundId       String?
+  foregroundStyle    Json?
+  segmented          Boolean
+  merged             Boolean
+  title              String
+  titleStyle         Json
+  subTitle           String?
+  subTitleStyle      Json?
+  contentStyle       Json
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
 }
 
 model CardModule {
@@ -79,23 +119,14 @@ model CardModule {
   @@index([cardId])
 }
 
-model Card {
-  id      String  @id
-  userId  String
-  isMain  Boolean
-  coverId String  @unique
-
-  @@index([userId])
-  @@index([coverId])
-}
-
 model Post {
   id            String   @id
-  postDate      DateTime
   authorId      String
+  medias        Json
   content       String   @db.Text
   allowComments Boolean
   allowLikes    Boolean
+  createdAt     DateTime @default(now())
 
   @@index([authorId])
 }

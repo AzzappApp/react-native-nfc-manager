@@ -1,13 +1,13 @@
 import db from './db';
 
 /**
- * Checks if an user is following another one.
+ * Checks if a profile is following another one.
  *
  * @param userId - The id of the potential follower
  * @param targetId - The id of the potential followed user
  * @returns true if the user is following the target, false otherwise
  */
-export const isUserFollowings = async (
+export const isFollowing = async (
   userId: string,
   targetId: string,
 ): Promise<boolean> =>
@@ -20,21 +20,7 @@ export const isUserFollowings = async (
     .then(follow => !!follow);
 
 /**
- * Add a follow relation between two users.
- *
- * @param userId - The id of the follower
- * @param targetId - The id of the followed user
- */
-export const unFollows = (userId: string, targetId: string): Promise<void> =>
-  db
-    .deleteFrom('Follow')
-    .where('followerId', '=', userId)
-    .where('followingId', '=', targetId)
-    .execute()
-    .then(() => void 0);
-
-/**
- * Remove a follow relation between two users.
+ * Adds a follow relation between two users.
  *
  * @param userId - The id of the follower
  * @param targetId - The id of the followed user
@@ -48,7 +34,20 @@ export const follows = async (
     .values({
       followerId: userId,
       followingId: targetId,
-      followDate: new Date(),
     })
+    .execute()
+    .then(() => void 0);
+
+/**
+ * Removes a follow relation between two users.
+ *
+ * @param userId - The id of the follower
+ * @param targetId - The id of the followed user
+ */
+export const unfollows = (userId: string, targetId: string): Promise<void> =>
+  db
+    .deleteFrom('Follow')
+    .where('followerId', '=', userId)
+    .where('followingId', '=', targetId)
     .execute()
     .then(() => void 0);

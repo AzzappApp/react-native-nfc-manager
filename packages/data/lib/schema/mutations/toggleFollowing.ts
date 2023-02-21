@@ -1,79 +1,71 @@
 import ERRORS from '@azzapp/shared/lib/errors';
-import { GraphQLID, GraphQLNonNull } from 'graphql';
+import { GraphQLBoolean, GraphQLID, GraphQLNonNull } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
-import { follows, isUserFollowings, unFollows } from '../../domains';
-import UserGraphQL from '../UserGraphQL';
+import { follows, unfollows } from '../../domains';
+import ProfileGraphQL from '../ProfileGraphQL';
 import ViewerGraphQL from '../ViewerGraphQL';
-import type { User } from '../../domains';
+import type { Profile, Viewer } from '../../domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const toggleFollowingMutation = mutationWithClientMutationId({
   name: 'ToggleFollowing',
   inputFields: {
-    userId: {
+    profileId: {
       type: new GraphQLNonNull(GraphQLID),
       description: 'The id of the user we want toggle following on',
+    },
+    follow: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Should we follow or unfollow the user',
     },
   },
   outputFields: {
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
-      resolve(_root, _args, context) {
+      resolve(_root, _args, context: GraphQLContext): Viewer {
         // TODO factorization
-        return {
-          userId: context.userId,
-          isAnonymous: context.isAnonymous,
-        };
+        return context.auth;
       },
     },
-    user: {
-      type: new GraphQLNonNull(UserGraphQL),
+    profile: {
+      type: new GraphQLNonNull(ProfileGraphQL),
     },
   },
   mutateAndGetPayload: async (
-    args: { userId: string },
-    { userInfos: { userId, isAnonymous }, userLoader }: GraphQLContext,
+    args: { profileId: string; follow: boolean },
+    { auth, profileLoader }: GraphQLContext,
   ) => {
-    if (!userId || isAnonymous) {
+    if (auth.isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
-    let user: User | null;
-    try {
-      user = await userLoader.load(userId);
-    } catch (e) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-    if (!user) {
-      throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    const { id: targetId, type } = fromGlobalId(args.userId);
-    if (type !== 'User') {
+    const { id: targetId, type } = fromGlobalId(args.profileId);
+    if (type !== 'Profile') {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
 
-    let targetUser: User | null;
+    let target: Profile | null;
     try {
-      targetUser = await userLoader.load(targetId);
+      target = await profileLoader.load(targetId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-    if (!targetUser) {
+    if (!target) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
 
+    const { profileId } = auth;
     try {
-      if (await isUserFollowings(userId, targetId)) {
-        await unFollows(userId, targetId);
+      if (args.follow) {
+        await follows(profileId, targetId);
       } else {
-        await follows(userId, targetId);
+        await unfollows(profileId, targetId);
       }
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    return { user };
+    return { profile: target };
   },
 });
 

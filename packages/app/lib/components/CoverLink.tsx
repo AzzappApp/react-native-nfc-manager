@@ -10,11 +10,11 @@ const CoverLink = ({
   coverStyle,
   ...props
 }: CoverRendererProps & {
-  userId: string;
+  profileID: string;
   coverStyle?: StyleProp<ViewStyle>;
 }) => (
   <Link
-    route="USER"
+    route="PROFILE"
     params={{
       userName: props.userName,
     }}
@@ -28,14 +28,7 @@ const CoverLink = ({
         },
       ]}
     >
-      {({ pressed }) => (
-        <CoverRenderer
-          {...props}
-          style={coverStyle}
-          videoPaused={pressed}
-          playTransition={!pressed}
-        />
-      )}
+      <CoverRenderer {...props} style={coverStyle} />
     </PressableScaleHighlight>
   </Link>
 );

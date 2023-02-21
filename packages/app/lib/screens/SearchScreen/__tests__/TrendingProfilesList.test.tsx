@@ -25,13 +25,11 @@ jest.mock('../../../components/CoverLink', () => {
   const { createElement } = require('react');
   function CoverLink(
     props: CoverRendererProps & {
-      userId: string;
+      profileID: string;
     },
   ) {
     return createElement('CoverLink', {
-      userId: props.userId,
-      playTransition: props.playTransition,
-      videoDisabled: props.videoDisabled,
+      profileID: props.profileID,
       style: props.style,
       testID: 'CoverLink',
     });
@@ -41,35 +39,25 @@ jest.mock('../../../components/CoverLink', () => {
 });
 
 const CARD = {
+  id: 'fakeCardId',
+  __typename: 'Card',
   cover: {
-    backgroundColor: '#FA3',
-    overlayEffect: 'wave',
-    title: 'fake title',
-    titlePosition: 'bottomRight',
-    titleFont: 'verdana',
-    titleFontSize: 13,
-    titleColor: '#FG3',
-    titleRotation: 30,
-    qrCodePosition: 'bottomLeft',
-    pictures: [
-      {
-        __typename: 'MediaImage',
-        source: 'fakeSource0',
-      },
-      {
-        __typename: 'MediaVideo',
-        source: 'fakeSource1',
-      },
-      {
-        __typename: 'MediaImage',
-        source: 'fakeSource2',
-      },
-    ],
-    pictureTransitionTimer: 5,
+    media: {
+      id: 'media_id',
+      largeURI: 'media_large_uri',
+      smallURI: 'media_small_uri',
+    },
+    textPreviewMedia: {
+      id: 'text_preview_media_id',
+      largeURI: 'text_preview_large_uri',
+      smallURI: 'text_preview_small_uri',
+    },
+    title: 'User card title',
+    subTitle: 'User card subtitle',
   },
 };
 
-const renderScreen = (canPlay: boolean) => {
+const renderScreen = () => {
   const environment = createMockEnvironment();
 
   environment.mock.queueOperationResolver(operation => {
@@ -141,7 +129,7 @@ const renderScreen = (canPlay: boolean) => {
     });
   });
 
-  const TestRenderer = ({ canPlay }: { canPlay: boolean }) => {
+  const TestRenderer = () => {
     const data = useLazyLoadQuery<TrendingProfilesListTestQuery>(
       graphql`
         query TrendingProfilesListTestQuery @relay_test_operation {
@@ -153,12 +141,12 @@ const renderScreen = (canPlay: boolean) => {
       {},
     );
 
-    return <TrendingProfilesList viewer={data.viewer} canPlay={canPlay} />;
+    return <TrendingProfilesList viewer={data.viewer} />;
   };
 
   const component = render(
     <RelayEnvironmentProvider environment={environment}>
-      <TestRenderer canPlay={canPlay} />
+      <TestRenderer />
     </RelayEnvironmentProvider>,
   );
 
@@ -166,7 +154,7 @@ const renderScreen = (canPlay: boolean) => {
     rerender() {
       component.rerender(
         <RelayEnvironmentProvider environment={environment}>
-          <TestRenderer canPlay={canPlay} />
+          <TestRenderer />
         </RelayEnvironmentProvider>,
       );
     },
@@ -183,14 +171,12 @@ const eventData = {
   },
 };
 
-describe('Trending Profiles list Component', () => {
+describe('TrendingProfilesList', () => {
   test('should render initial list and loadMore after scrolling', async () => {
-    renderScreen(false);
+    renderScreen();
     const list = screen.getByRole('list');
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks).toHaveLength(10);
-    expect(coverLinks[0]).toHaveProp('playTransition', false);
-    expect(coverLinks[0]).toHaveProp('videoDisabled', true);
     expect(coverLinks[0]).toHaveStyle({ width: 80 });
 
     act(() => {
@@ -200,12 +186,5 @@ describe('Trending Profiles list Component', () => {
     await waitFor(() => {
       expect(screen.getAllByTestId('CoverLink')).toHaveLength(13);
     });
-  });
-
-  test('should render with `videoDisabled`props false when `canPlay`is true', async () => {
-    renderScreen(true);
-    const coverLinks = screen.getAllByTestId('CoverLink');
-    expect(coverLinks[0]).toHaveProp('playTransition', true);
-    expect(coverLinks[0]).toHaveProp('videoDisabled', false);
   });
 });

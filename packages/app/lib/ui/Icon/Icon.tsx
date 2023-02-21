@@ -20,6 +20,9 @@ const icons = {
   get back() {
     return require('./assets/back.png');
   },
+  get background() {
+    return require('./assets/background.png');
+  },
   get brightness() {
     return require('./assets/brightness.png');
   },
@@ -73,6 +76,9 @@ const icons = {
   },
   get flip() {
     return require('./assets/flip.png');
+  },
+  get foreground() {
+    return require('./assets/foreground.png');
   },
   get foursquare() {
     return require('./assets/foursquare.png');

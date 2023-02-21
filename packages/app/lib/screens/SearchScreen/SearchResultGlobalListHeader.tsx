@@ -14,12 +14,10 @@ import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/arti
 
 type SearchResultGlobalListHeaderProps = {
   viewer: SearchResultGlobalListHeader_viewer$key;
-  hasFocus: boolean;
 };
 
 const SearchResultGlobalListHeader = ({
   viewer,
-  hasFocus,
 }: SearchResultGlobalListHeaderProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     graphql`
@@ -72,7 +70,6 @@ const SearchResultGlobalListHeader = ({
       <CoverList
         users={users}
         onEndReached={onEndReachedCover}
-        canPlay={hasFocus}
         containerStyle={styles.containerStyle}
         coverStyle={styles.coverStyle}
       />

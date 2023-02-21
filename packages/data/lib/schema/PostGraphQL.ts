@@ -14,8 +14,8 @@ import {
 import { db } from '../domains';
 import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
-import UserGraphQL from './UserGraphQL';
-import type { Post } from '../domains';
+import ProfileGraphQL from './ProfileGraphQL';
+import type { Post, Media } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
@@ -26,10 +26,10 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
   fields: () => ({
     id: globalIdField('Post'),
     author: {
-      type: new GraphQLNonNull(UserGraphQL),
+      type: new GraphQLNonNull(ProfileGraphQL),
       description: 'The author of the publication',
-      resolve(post, _, { userLoader }) {
-        return userLoader.load(post.authorId);
+      resolve(post, _, { profileLoader }) {
+        return profileLoader.load(post.authorId);
       },
     },
     postDate: {
@@ -39,10 +39,12 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
     media: {
       type: new GraphQLNonNull(MediaGraphQL),
       description: 'The media of the publication',
-      resolve(post, _, { mediasLoader }) {
-        // TODO handle null case ?
-        return mediasLoader.load(post.id).then(medias => medias?.[0]);
-      },
+      resolve: (post, _, { mediaLoader }): Promise<Media[]> =>
+        mediaLoader
+          .loadMany(post.medias as string[])
+          .then(medias =>
+            medias.filter(media => media && !(media instanceof Error)),
+          ) as any,
     },
     content: {
       type: new GraphQLNonNull(GraphQLString),

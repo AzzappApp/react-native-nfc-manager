@@ -9,15 +9,14 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { textStyles } from '../../../theme';
-import PressableNative from '../../ui/PressableNative';
-import { formatVideoTime } from './helpers';
 import {
-  getFilePathFromURI,
+  formatVideoTime,
   getImageSize,
   getPHAssetPath,
   getVideoSize,
-} from './mediaHelpers';
-import type { Media } from './helpers';
+} from '../../helpers/mediaHelpers';
+import PressableNative from '../../ui/PressableNative';
+import type { Media } from '../../types';
 import type {
   PhotoIdentifier,
   PhotoIdentifiersPage,
@@ -26,18 +25,18 @@ import type {
 import type { ScrollViewProps, ListRenderItemInfo } from 'react-native';
 
 type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
-  selectedMediaURI?: string;
+  selectedMediaID?: string;
   album?: string | null;
-  onSelectMedia: (media: Media) => void;
+  onMediaSelected: (media: Media) => void;
   onGalleryPermissionFail: () => void;
   kind: 'image' | 'mixed' | 'video';
 };
 
 const PhotoGalleryMediaList = ({
-  selectedMediaURI,
+  selectedMediaID,
   album,
   kind,
-  onSelectMedia,
+  onMediaSelected,
   onGalleryPermissionFail,
   ...props
 }: PhotoGalleryMediaListProps) => {
@@ -106,48 +105,43 @@ const PhotoGalleryMediaList = ({
 
   const dispatchSelectMedia = useCallback(
     async ({
-      image: { uri: assetUri, height, width, playableDuration },
+      image: { uri: galleryUri, height, width, playableDuration },
       type,
     }: PhotoIdentifier['node']) => {
-      let path: string | null;
+      let uri: string | null = galleryUri;
       if (Platform.OS === 'ios') {
-        path = await getPHAssetPath(assetUri);
-      } else {
-        path = getFilePathFromURI(assetUri);
+        uri = await getPHAssetPath(galleryUri);
       }
-      if (path == null) {
+      if (uri == null) {
         // TODO
         return;
       }
-      const uri = `file://${path}`;
       if (type.startsWith('video')) {
         if (width == null || height == null) {
-          ({ width, height } = await getVideoSize(`file://${path}`));
+          ({ width, height } = await getVideoSize(uri));
         }
-        onSelectMedia({
+        onMediaSelected({
+          galleryUri,
           kind: 'video',
-          mediaId: assetUri,
           uri,
-          path,
           width,
           height,
           duration: playableDuration,
         });
       } else {
         if (width == null || height == null) {
-          ({ width, height } = await getImageSize(`file://${path}`));
+          ({ width, height } = await getImageSize(uri));
         }
-        onSelectMedia({
+        onMediaSelected({
+          galleryUri,
           kind: 'image',
-          mediaId: assetUri,
           uri,
-          path,
           width,
           height,
         });
       }
     },
-    [onSelectMedia],
+    [onMediaSelected],
   );
 
   const onEndReached = useCallback(() => {
@@ -169,7 +163,7 @@ const PhotoGalleryMediaList = ({
             borderBottomWidth: 1,
             borderColor: 'transparent',
           },
-          selectedMediaURI === item.image.uri && {
+          selectedMediaID === item.image.uri && {
             opacity: 0.5,
           },
         ]}
@@ -197,7 +191,7 @@ const PhotoGalleryMediaList = ({
         )}
       </PressableNative>
     ),
-    [dispatchSelectMedia, selectedMediaURI, windowWidth],
+    [dispatchSelectMedia, selectedMediaID, windowWidth],
   );
 
   return (

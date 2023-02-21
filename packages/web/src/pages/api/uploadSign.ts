@@ -5,6 +5,7 @@ import {
   getRequestAuthInfos,
   withSessionAPIRoute,
 } from '../../helpers/session';
+import type { Viewer } from '@azzapp/data/lib/domains';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
@@ -12,8 +13,9 @@ const CLOUDINARY_API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!;
 const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
 
 const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
+  let authInfos: Viewer;
   try {
-    const authInfos = await getRequestAuthInfos(req);
+    authInfos = await getRequestAuthInfos(req);
     if (authInfos.isAnonymous) {
       res.status(401).send({ message: ERRORS.UNAUTORIZED });
       return;
@@ -49,6 +51,7 @@ const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {
   const uploadParameters: Record<string, any> = {
     timestamp: Math.round(Date.now() / 1000),
     public_id: cuid(),
+    context: `author=${authInfos.profileId}|target=${target}`,
   };
 
   // TODO transformations

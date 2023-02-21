@@ -5,21 +5,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '../../../theme';
 import IconButton from '../../ui/IconButton';
 import { TAB_BAR_HEIGHT } from '../../ui/TabsBar';
-import EditionFooter from './EditionFooter';
-import FilterSelectionList from './FilterSelectionList';
-import {
-  TOOL_BAR_BOTTOM_MARGIN,
-  useEditionParametersDisplayInfos,
-} from './helpers';
+import FilterSelectionList from '../FilterSelectionList';
+import ImageEditionFooter from '../ImageEditionFooter';
+import ImageEditionParameterControl from '../ImageEditionParameterControl';
+import ImageEditionParametersList from '../ImageEditionParametersList';
+import { useEditionParametersDisplayInfos } from '../medias';
+import VideoTimelineEditor from '../VideoTimelineEditor';
+import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import { useImagePickerState } from './ImagePickerContext';
+import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import ParamEditor from './ParameterEditor';
-import ParametersList from './ParametersList';
-import VideoEditor from './VideoEditor';
-import WizardImageEditor from './WizardImagEditor';
+import type {
+  ImageEditionParameters,
+  ImageOrientation,
+  MediaVideo,
+} from '../../types';
 import type { Tab } from '../../ui/TabsBar';
-import type { Video, ImageOrientation } from './helpers';
-import type { ImageEditionParameters } from './mediaHelpers';
 
 const EditImageStep = () => {
   const {
@@ -104,7 +105,7 @@ const EditImageStep = () => {
       {
         icon: 'magic',
         key: 'filter',
-        accessibilityLabel: intl.formatMessage({
+        label: intl.formatMessage({
           defaultMessage: 'Media Filter',
           description:
             'Accessibility label of the Media filter tabs in image editing view',
@@ -113,7 +114,7 @@ const EditImageStep = () => {
       {
         icon: 'parameters',
         key: 'edit',
-        accessibilityLabel: intl.formatMessage({
+        label: intl.formatMessage({
           defaultMessage: 'Media Filter',
           description:
             'Accessibility label of the Media filter tabs in image editing view',
@@ -124,7 +125,7 @@ const EditImageStep = () => {
       tabs.push({
         icon: 'clock',
         key: 'timeRange',
-        accessibilityLabel: intl.formatMessage({
+        label: intl.formatMessage({
           defaultMessage: 'Take a video',
           description:
             'Accessibility label of the video tabs in post  in image picking wizzard',
@@ -145,7 +146,9 @@ const EditImageStep = () => {
       }
       preventNavigation={isEditing}
       topPanel={
-        <WizardImageEditor cropEditionMode={editedParameter === 'cropData'} />
+        <ImagePickerMediaRenderer
+          cropEditionMode={editedParameter === 'cropData'}
+        />
       }
       bottomPanel={
         editedParameter === null ? (
@@ -194,14 +197,14 @@ const EditImageStep = () => {
                 />
               )}
               {currentTab === 'edit' && (
-                <ParametersList
+                <ImageEditionParametersList
                   style={{ flexGrow: 0 }}
                   onSelectParam={onEditionStart}
                 />
               )}
               {currentTab === 'timeRange' && (
-                <VideoEditor
-                  media={media as Video}
+                <VideoTimelineEditor
+                  video={media as MediaVideo}
                   editionParameters={editionParameters}
                   aspectRatio={aspectRatio}
                   maxDuration={maxVideoDuration}
@@ -222,21 +225,24 @@ const EditImageStep = () => {
             }}
           >
             {editedParameter === 'cropData' ? (
-              <ParamEditor
+              <ImageEditionParameterControl
                 value={editionParameters.roll}
                 parameter="roll"
                 onChange={value => onParameterValueChange('roll', value)}
                 style={{ flex: 1 }}
               />
             ) : (
-              <ParamEditor
+              <ImageEditionParameterControl
                 value={editionParameters[editedParameter] as any}
                 parameter={editedParameter}
                 onChange={onCurrentParamChange}
                 style={{ flex: 1 }}
               />
             )}
-            <EditionFooter onSave={onEditionSave} onCancel={onEditionCancel} />
+            <ImageEditionFooter
+              onSave={onEditionSave}
+              onCancel={onEditionCancel}
+            />
           </View>
         )
       }
@@ -282,18 +288,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export const parametersList: Array<keyof ImageEditionParameters> = [
-  'cropData',
-  'brightness',
-  'contrast',
-  'highlights',
-  'saturation',
-  'shadow',
-  'sharpness',
-  'structure',
-  'temperature',
-  'tint',
-  'vibrance',
-  'vigneting',
-];

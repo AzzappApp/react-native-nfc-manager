@@ -1,5 +1,6 @@
-import { View } from 'react-native';
-import { colors } from '../../theme';
+import { Fragment } from 'react';
+import { Text, View } from 'react-native';
+import { colors, fontFamilies } from '../../theme';
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
@@ -7,17 +8,20 @@ import {
 import Icon from './Icon';
 import PressableBackground from './PressableBackground';
 import type { Icons } from './Icon';
+import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 export type Tab = {
   /** unique tab key */
   key: string;
 
-  /** the icon displayed on the tab */
-  icon: Icons;
+  /** the icon displayed on the tab, required if not topbar */
+  icon?: Icons;
 
   /** the accessibility lable of the tab */
-  accessibilityLabel: string;
+  label: string;
+
+  rightElement?: ReactNode;
 
   /**
    * by default tabs icons are tinted if this property is set to `'unactive'`
@@ -40,8 +44,12 @@ export type TabsBarProps = {
 
   /**
    * Style variants
+   *  - tabbar: the tabbar is displayed at the bottom of the screen
+   *  - toolbar: the tabbar is displayed at the bottom of the screen
+   *  - topbar: the tabbar is displayed at the top of the screen,
+   *    in this variant the label is displayed instead of the icon
    */
-  variant?: 'tabbar' | 'toolbar';
+  variant?: 'tabbar' | 'toolbar' | 'topbar';
 
   /**
    * An event fired when the user press one of the tab
@@ -70,51 +78,61 @@ const TabsBar = ({
 
   return (
     <View style={[styles.container, style]} accessibilityRole="tablist">
-      {tabs.map(({ key, icon, tint, accessibilityLabel }, index) => (
-        <PressableBackground
-          key={key}
-          accessibilityRole="tab"
-          accessibilityLabel={accessibilityLabel}
-          accessibilityState={{ selected: currentTab === key }}
-          onPress={() => onTabPress(key)}
-          style={[
-            styles.tab,
-            index === tabs.length - 1 && styles.lastTab,
-            currentTab === key && styles.selectedTab,
-          ]}
-          highlightColor={styles.highlight.backgroundColor}
-        >
-          {({ pressed }) => {
-            const active = pressed || currentTab === key;
-            const shouldNotTint =
-              tint === false || (tint === 'unactive' && active);
-            return (
-              <>
-                <Icon
-                  icon={icon}
-                  style={[
-                    styles.image,
-                    active && styles.imageActive,
-                    shouldNotTint && { tintColor: undefined },
-                  ]}
-                />
-                {variant === 'tabbar' && (
-                  <View
-                    style={{
-                      width: 14,
-                      height: 4,
-                      borderRadius: 4,
-                      marginTop: 10,
-                      backgroundColor:
-                        currentTab === key ? colors.red : 'transparent',
-                    }}
-                  />
-                )}
-              </>
-            );
-          }}
-        </PressableBackground>
+      {tabs.map(({ key, icon, tint, rightElement, label }, index) => (
+        <Fragment key={key}>
+          {variant === 'topbar' && <View style={styles.backgroundLine} />}
+          <PressableBackground
+            key={key}
+            accessibilityRole="tab"
+            accessibilityLabel={label}
+            accessibilityState={{ selected: currentTab === key }}
+            onPress={() => onTabPress(key)}
+            style={[
+              styles.tab,
+              index === tabs.length - 1 && styles.lastTab,
+              currentTab === key && styles.selectedTab,
+            ]}
+            highlightColor={colors.grey100}
+          >
+            {({ pressed }) => {
+              const active = pressed || currentTab === key;
+              const shouldNotTint =
+                tint === false || (tint === 'unactive' && active);
+              return (
+                <>
+                  {variant === 'topbar' ? (
+                    <View style={styles.labelContainer}>
+                      <Text style={styles.label}>{label}</Text>
+                      {rightElement}
+                    </View>
+                  ) : (
+                    <Icon
+                      icon={icon!}
+                      style={[
+                        styles.image,
+                        active && styles.imageActive,
+                        shouldNotTint && { tintColor: undefined },
+                      ]}
+                    />
+                  )}
+                  {(variant === 'tabbar' || variant === 'topbar') && (
+                    <View
+                      style={[
+                        styles.highlightUnderline,
+                        {
+                          backgroundColor:
+                            currentTab === key ? colors.red : 'transparent',
+                        },
+                      ]}
+                    />
+                  )}
+                </>
+              );
+            }}
+          </PressableBackground>
+        </Fragment>
       ))}
+      {variant === 'topbar' && <View style={styles.backgroundLine} />}
     </View>
   );
 };
@@ -165,7 +183,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       width: 50,
       height: 50,
       borderRadius: 25,
-      marginRight: 25,
+      marginRight: 10,
     },
     lastTab: { marginRight: 0 },
     selectedTab: {
@@ -180,6 +198,47 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     },
     imageActive: {
       tintColor: '#fff',
+    },
+    highlightUnderline: {
+      width: 14,
+      height: 4,
+      borderRadius: 4,
+      marginTop: 10,
+      backgroundColor: 'transparent',
+    },
+  },
+  topbar: {
+    container: {
+      height: 26,
+      backgroundColor: 'transparent',
+    },
+    backgroundLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.grey50,
+      alignSelf: 'center',
+    },
+    tab: {
+      backgroundColor: 'transparent',
+      marginHorizontal: 10,
+    },
+    labelContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 15,
+    },
+    label: {
+      ...fontFamilies.semiBold,
+      color: colors.black,
+      fontSize: 12,
+    },
+    highlightUnderline: {
+      position: 'absolute',
+      top: 24,
+      left: 0,
+      width: '100%',
+      height: 2,
+      backgroundColor: 'transparent',
     },
   },
 }));

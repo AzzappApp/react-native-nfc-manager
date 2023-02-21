@@ -5,8 +5,8 @@ import { colors, fontFamilies } from '../../theme';
 import Icon from '../ui/Icon';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';
-import { MediaImageRenderer, MediaVideoRenderer } from './MediaRenderer';
-import type { MediaVideoRendererHandle } from './MediaRenderer';
+import { MediaImageRenderer, MediaVideoRenderer } from './medias';
+import type { MediaVideoRendererHandle } from './medias';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
 import type { ForwardedRef } from 'react';
@@ -71,8 +71,8 @@ const PostRenderer = (
         id
         media {
           __typename
-          source
-          ratio
+          id
+          aspectRatio
           largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
           smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
@@ -96,9 +96,9 @@ const PostRenderer = (
 
   const author = useFragment(
     graphql`
-      fragment PostRendererFragment_author on User {
+      fragment PostRendererFragment_author on Profile {
         id
-        ...AuthorCartoucheFragment_user
+        ...AuthorCartoucheFragment_profile
         userName
       }
     `,
@@ -141,8 +141,8 @@ const PostRenderer = (
     content,
     media: {
       __typename,
-      ratio,
-      source,
+      id,
+      aspectRatio,
       smallURI,
       largeURI,
       smallThumbnail,
@@ -153,7 +153,7 @@ const PostRenderer = (
   return (
     <View {...props}>
       {!small && (
-        <Link route="USER" params={{ userName: author.userName }}>
+        <Link route="PROFILE" params={{ userName: author.userName }}>
           <AuthorCartouche author={author} />
         </Link>
       )}
@@ -165,12 +165,12 @@ const PostRenderer = (
             <>
               <MediaImageRenderer
                 ref={mediaRef as any}
-                source={source}
+                source={id}
                 isVideo
                 // TODO alt generation by cloudinary AI ? include text in small format ?
                 alt={`This is an image posted by ${author.userName}`}
                 uri={small ? smallThumbnail : largeThumbnail}
-                aspectRatio={ratio}
+                aspectRatio={aspectRatio}
                 width={width}
               />
               <Icon icon="play" style={styles.playIcon} />
@@ -178,12 +178,12 @@ const PostRenderer = (
           ) : (
             <MediaVideoRenderer
               ref={mediaRef as any}
-              source={source}
+              source={id}
               // TODO alt generation by cloudinary AI ? include text in small format ?
               alt={`This is a video posted by ${author.userName}`}
               thumbnailURI={small ? smallThumbnail : largeThumbnail}
               uri={small ? smallURI : largeURI}
-              aspectRatio={ratio}
+              aspectRatio={aspectRatio}
               width={width}
               muted={muted}
               paused={paused}
@@ -193,11 +193,11 @@ const PostRenderer = (
         {__typename === 'MediaImage' && (
           <MediaImageRenderer
             ref={mediaRef as any}
-            source={source}
+            source={id}
             // TODO alt generation by cloudinary AI ? include text in small format ?
             alt={`This is an image posted by ${author.userName}`}
             uri={small ? smallURI : largeURI}
-            aspectRatio={ratio}
+            aspectRatio={aspectRatio}
             width={width}
           />
         )}

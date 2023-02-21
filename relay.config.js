@@ -15,6 +15,9 @@ module.exports = {
       persist: {
         file: 'packages/relay/query-map.json',
       },
+      customScalarTypes: {
+        JSON: 'Record<string, unknown>',
+      },
     },
   },
 };

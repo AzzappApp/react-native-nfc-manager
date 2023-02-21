@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors, fontFamilies } from '../../theme';
-import type { AuthorCartoucheFragment_user$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_user.graphql';
+import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 const AuthorCartouche = ({
@@ -10,12 +10,12 @@ const AuthorCartouche = ({
   author: authorKey,
   ...props
 }: ViewProps & {
-  author: AuthorCartoucheFragment_user$key;
+  author: AuthorCartoucheFragment_profile$key;
   small?: boolean;
 }) => {
   const author = useFragment(
     graphql`
-      fragment AuthorCartoucheFragment_user on User {
+      fragment AuthorCartoucheFragment_profile on Profile {
         userName
       }
     `,

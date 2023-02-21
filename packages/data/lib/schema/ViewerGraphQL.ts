@@ -1,5 +1,6 @@
 import {
   GraphQLBoolean,
+  GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -13,19 +14,21 @@ import {
 import {
   db,
   getAllPosts,
-  getAllUsersWithCard,
-  getAllUsersWithCardCount,
-  getFollowedUsers,
-  getFollowedUsersPosts,
-  getFollowedUsersPostsCount,
+  getAllProfilesWithCard,
+  getAllProfilesWithCardCount,
+  getCoverLayers,
+  getFollowedProfiles,
+  getFollowedProfilesPosts,
+  getFollowedProfilesPostsCount,
 } from '../domains';
 import {
   connectionFromDateSortedItems,
   cursorToDate,
 } from '../helpers/connectionsHelpers';
+import { CoverLayerGraphQL } from './CardGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
-import UserGraphQL, { UserConnectionGraphQL } from './UserGraphQL';
-import type { User, Viewer, Post } from '../domains';
+import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
+import type { Viewer, Post, Profile } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
@@ -33,35 +36,35 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
   name: 'Viewer',
   description: 'Represent an Application Viewer',
   fields: () => ({
-    user: {
-      type: UserGraphQL,
+    profile: {
+      type: ProfileGraphQL,
       resolve: async (
-        { isAnonymous, userId },
+        viewer,
         _,
-        { userLoader },
-      ): Promise<User | null> => {
-        if (isAnonymous || !userId) {
+        { profileLoader },
+      ): Promise<Profile | null> => {
+        if (viewer.isAnonymous) {
           return null;
         }
-        return userLoader.load(userId);
+        return profileLoader.load(viewer.profileId);
       },
     },
     followedProfiles: {
       description:
         'Return a list of Profiles that the current user is following',
-      type: new GraphQLNonNull(UserConnectionGraphQL),
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
       args: forwardConnectionArgs,
       resolve: async (
         viewer,
         args: ConnectionArguments,
-      ): Promise<Connection<User>> => {
-        if (viewer.isAnonymous || !viewer.userId) {
+      ): Promise<Connection<Profile>> => {
+        if (viewer.isAnonymous) {
           return connectionFromArray([], args);
         }
         // TODO should we use pagination in database query?
-        const followedUsers = await getFollowedUsers(viewer.userId);
-        if (followedUsers.length > 0) {
-          return connectionFromArray(followedUsers, args);
+        const followedProfiles = await getFollowedProfiles(viewer.profileId);
+        if (followedProfiles.length > 0) {
+          return connectionFromArray(followedProfiles, args);
         }
 
         // TODO if we don't have any followed users, returns a list of recommanded users ?
@@ -69,11 +72,11 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         const limit = first ?? 100;
         const offset = after ? cursorToOffset(after) : 0;
         return connectionFromArraySlice(
-          await getAllUsersWithCard(limit, offset),
+          await getAllProfilesWithCard(limit, offset, [viewer.profileId]),
           args,
           {
             sliceStart: offset,
-            arrayLength: await getAllUsersWithCardCount(),
+            arrayLength: await getAllProfilesWithCardCount(),
           },
         );
       },
@@ -87,21 +90,21 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         viewer,
         args: ConnectionArguments,
       ): Promise<Connection<Post>> => {
-        if (viewer.isAnonymous || !viewer.userId) {
+        if (viewer.isAnonymous) {
           return connectionFromArray([], args);
         }
-        const nbPosts = await getFollowedUsersPostsCount(viewer.userId);
+        const nbPosts = await getFollowedProfilesPostsCount(viewer.profileId);
 
         const first = args.first ?? 100;
         const offset = args.after ? cursorToDate(args.after) : null;
 
         const posts = nbPosts
-          ? await getFollowedUsersPosts(viewer.userId, first, offset)
+          ? await getFollowedProfilesPosts(viewer.profileId, first, offset)
           : // TODO instead of returning all posts, we should return a list of recommanded posts
             await getAllPosts(first, offset);
 
         return connectionFromDateSortedItems(posts, {
-          getDate: post => post.postDate,
+          getDate: post => post.createdAt,
           // approximations that should be good enough, and avoid a query
           hasNextPage: posts.length > 0,
           hasPreviousPage: offset !== null,
@@ -110,16 +113,16 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
     },
     trendingProfiles: {
       description:
-        'Return a list of User that this user might possibility be interested in (following User or promoted one)',
-      type: new GraphQLNonNull(UserConnectionGraphQL),
+        'Return a list of Profile that this user might possibility be interested in (following Profile or promoted one)',
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
       args: forwardConnectionArgs,
       resolve: async (
         _,
         args: ConnectionArguments,
-      ): Promise<Connection<User>> => {
+      ): Promise<Connection<Profile>> => {
         // TODO dummy implementation just to test frontend
         return connectionFromArray(
-          await db.selectFrom('User').selectAll().execute(),
+          await db.selectFrom('Profile').selectAll().execute(),
           args,
         );
       },
@@ -143,15 +146,15 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
     recommendedProfiles: {
       description:
         'Return a list of profiles the current user can be interested in',
-      type: new GraphQLNonNull(UserConnectionGraphQL),
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
       args: forwardConnectionArgs,
       resolve: async (
         viewer,
         args: ConnectionArguments,
-      ): Promise<Connection<User>> => {
+      ): Promise<Connection<Profile>> => {
         // TODO dummy implementation just to test frontend
         return connectionFromArray(
-          await db.selectFrom('User').selectAll().execute(),
+          await db.selectFrom('Profile').selectAll().execute(),
           args,
         );
       },
@@ -181,7 +184,7 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
     },
     searchProfiles: {
       description: 'Return a list of profiles that match the search query',
-      type: new GraphQLNonNull(UserConnectionGraphQL),
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
       args: {
         search: { type: new GraphQLNonNull(GraphQLString) },
         useLocation: { type: new GraphQLNonNull(GraphQLBoolean) },
@@ -190,17 +193,31 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
       resolve: async (
         viewer,
         args: ConnectionArguments & { search: string; useLocation: boolean },
-      ): Promise<Connection<User>> => {
+      ): Promise<Connection<Profile>> => {
         // TODO dummy implementation just to test frontend
         return connectionFromArray(
           await db
-            .selectFrom('User')
+            .selectFrom('Profile')
             .selectAll()
             .where('userName', 'like', `%${args.search}%`)
             .execute(),
           args,
         );
       },
+    },
+    coverBackgrounds: {
+      description: 'Return a list of cover backgrounds',
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CoverLayerGraphQL)),
+      ),
+      resolve: async () => getCoverLayers('background'),
+    },
+    coverForegrounds: {
+      description: 'Return a list of cover foregrounds',
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CoverLayerGraphQL)),
+      ),
+      resolve: async () => getCoverLayers('foreground'),
     },
   }),
 });

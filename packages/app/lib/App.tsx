@@ -22,18 +22,19 @@ import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
 import useAuth from './hooks/useAuth';
+import CardModuleEditionMobileScreen from './mobileScreens/CardModuleEditionMobileScreen';
 import ChangePasswordMobileScreen from './mobileScreens/ChangePasswordMobileScreen';
 import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScreen';
 import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
 import OnBoardingMobileScreen from './mobileScreens/OnBoardingMobileScreen';
 import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
 import PostMobileScreen from './mobileScreens/PostMobileScreen';
+import ProfileMobileScreen from './mobileScreens/ProfileMobileScreen';
+import ProfilePostsMobileScreen from './mobileScreens/ProfilePostsMobileScreen';
 import SearchMobileScreen from './mobileScreens/SearchMobileScreen';
 import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
-import UserMobileScreen from './mobileScreens/UserMobileScreen';
-import UserPostsMobileScreen from './mobileScreens/UserPostsMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
 
 import type { NativeRouterInit, TabsMap } from './components/NativeRouter';
@@ -47,11 +48,12 @@ const screens = {
   SEARCH: SearchMobileScreen,
   SETTINGS: SettingsMobileScreen,
   CHAT: () => <View />,
-  USER: UserMobileScreen,
   POST: PostMobileScreen,
-  USER_POSTS: UserPostsMobileScreen,
+  PROFILE_POSTS: ProfilePostsMobileScreen,
   NEW_POST: PostCreationMobileScreen,
   ONBOARDING: OnBoardingMobileScreen,
+  CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
+  PROFILE: ProfileMobileScreen,
 };
 
 const tabs = {

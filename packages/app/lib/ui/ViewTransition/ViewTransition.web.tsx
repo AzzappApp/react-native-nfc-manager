@@ -8,6 +8,7 @@ const ViewTransition = (
     transitions,
     transitionDuration,
     easing = 'linear',
+    disableAnimation,
     style,
     ...props
   }: ViewTransitionProps,
@@ -19,7 +20,7 @@ const ViewTransition = (
         `${jsToCSS(transitionKey)} ${transitionDuration}ms ${easing}`,
     )
     .join(',');
-  const transitionStyle: any = { transition };
+  const transitionStyle: any = disableAnimation ? 'none' : { transition };
   return <View ref={ref} style={[style, transitionStyle]} {...props} />;
 };
 export default forwardRef(ViewTransition);

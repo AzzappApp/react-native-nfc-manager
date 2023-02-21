@@ -7,16 +7,7 @@ import OnBoardingAbout from './OnBoardingAbout';
 import OnBoardingName from './OnBoardingName';
 import OnBoardingNameCompany from './OnBoardingNameCompany';
 import OnBoardingType from './OnBoardingType';
-import type { OnBoardingScreenUpdateUserMutation } from '@azzapp/relay/artifacts/OnBoardingScreenUpdateUserMutation.graphql';
-import type { UserType } from '@prisma/client';
-
-export type OnboardingContext = {
-  firstName: string;
-  lastName: string;
-  userType?: UserType;
-  companyName?: string;
-  companyActivityId?: string;
-};
+import type { OnBoardingScreenUpdateProfileMutation } from '@azzapp/relay/artifacts/OnBoardingScreenUpdateProfileMutation.graphql';
 
 type OnBoardingScreenProps = {
   skip(): void;
@@ -40,14 +31,18 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [userType, setUserType] = useState<UserType>();
+  const [profileKind, setProfileKind] = useState<
+    'business' | 'personal' | 'product'
+  >();
   const [companyName, setCompanyName] = useState('');
   const [companyActivityId, setCompanyActivityId] = useState('');
 
-  const [commit] = useMutation<OnBoardingScreenUpdateUserMutation>(graphql`
-    mutation OnBoardingScreenUpdateUserMutation($input: UpdateUserInput!) {
-      updateUser(input: $input) {
-        user {
+  const [commit] = useMutation<OnBoardingScreenUpdateProfileMutation>(graphql`
+    mutation OnBoardingScreenUpdateProfileMutation(
+      $input: UpdateProfileInput!
+    ) {
+      updateProfile(input: $input) {
+        profile {
           id
           isReady
         }
@@ -78,7 +73,7 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
       commit({
         variables: {
           input: {
-            userType,
+            profileKind,
           },
         },
       });
@@ -87,7 +82,7 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
       //TODO: specify how to handle error
       console.error(error);
     }
-  }, [commit, next, userType]);
+  }, [commit, next, profileKind]);
 
   const saveAboutCompany = useCallback(() => {
     try {
@@ -130,12 +125,12 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
         <View key="0" style={styles.containerPage} collapsable={false}>
           <OnBoardingType
             next={saveUserType}
-            userType={userType}
-            setUserType={setUserType}
+            profileKind={profileKind}
+            setProfileKind={setProfileKind}
           />
         </View>
         <View key="1" style={styles.containerPage} collapsable={false}>
-          {userType === 'PERSONAL' && (
+          {profileKind === 'personal' && (
             <OnBoardingName
               next={saveName}
               prev={prev}
@@ -145,7 +140,7 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
               setLastName={setLastName}
             />
           )}
-          {userType === 'BUSINESS' && (
+          {profileKind === 'business' && (
             <OnBoardingNameCompany
               next={saveAboutCompany}
               prev={prev}
@@ -160,7 +155,7 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
           <OnBoardingAbout
             next={saveAboutUser}
             prev={prev}
-            userType={userType!}
+            profileKind={profileKind!}
             skip={skip}
           />
         </View>

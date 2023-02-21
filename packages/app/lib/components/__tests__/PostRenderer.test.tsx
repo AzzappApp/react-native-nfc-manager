@@ -12,14 +12,14 @@ import type {
   MediaImageRendererProps,
   MediaVideoRendererHandle,
   MediaVideoRendererProps,
-} from '../MediaRenderer/types';
+} from '../medias';
 import type { PostRendererProps } from '../PostRenderer';
 import type { PostRendererTestQuery } from '@azzapp/relay/artifacts/PostRendererTestQuery.graphql';
 import type { ForwardedRef } from 'react';
 
 jest.useFakeTimers();
 let mockMediaHandles: Record<string, any> = {};
-jest.mock('../MediaRenderer', () => {
+jest.mock('../medias', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function MediaVideoRenderer(
@@ -65,7 +65,7 @@ const renderPost = (props?: Partial<PostRendererProps>) => {
           postDate: 123123123,
           media: {
             __typename: 'MediaVideo',
-            source: 'fakeSource0',
+            id: 'fakeSource0',
           },
           content: 'post content',
           allowComments: true,

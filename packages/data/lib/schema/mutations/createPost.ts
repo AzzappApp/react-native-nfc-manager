@@ -4,7 +4,7 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 import { createMedia, createPost, db } from '../../domains';
 import PostGraphQL from '../PostGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';
-import type { Media, User } from '../../domains';
+import type { Media } from '../../domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const createPostMutation = mutationWithClientMutationId({
@@ -39,50 +39,31 @@ const createPostMutation = mutationWithClientMutationId({
       allowComments,
       allowLikes,
     }: {
-      media: Omit<Media, 'id' | 'ownerId'>;
+      media: Media;
       content: string;
       allowComments: boolean;
       allowLikes: boolean;
     },
-    { userInfos: { userId, isAnonymous }, userLoader }: GraphQLContext,
+    { auth }: GraphQLContext,
   ) => {
-    if (!userId || isAnonymous) {
+    if (auth.isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    let user: User | null;
-    try {
-      user = await userLoader.load(userId);
-    } catch (e) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-    if (!user) {
-      throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    if (media.ratio == null) {
-      throw new Error(ERRORS.INVALID_REQUEST);
     }
 
     try {
       const post = await db.transaction().execute(async trx => {
+        await createMedia(media, trx);
         const post = await createPost(
           {
-            authorId: userId,
+            authorId: auth.profileId,
             content,
             allowComments,
             allowLikes,
+            medias: [media.id],
           },
           trx,
         );
 
-        await createMedia(
-          {
-            ownerId: post.id,
-            ...media,
-          },
-          trx,
-        );
         return post;
       });
       return { post };

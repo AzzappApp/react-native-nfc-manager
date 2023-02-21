@@ -1,7 +1,9 @@
 import {
   getUserByEmail,
   getUserByPhoneNumber,
-  getUserByUserName,
+  getProfileByUserName,
+  getUsersByIds,
+  getUserProfiles,
 } from '@azzapp/data/lib/domains';
 import ERRORS from '@azzapp/shared/lib/errors';
 import {
@@ -11,6 +13,7 @@ import {
 import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';
 import { generateTokens } from '../../helpers/tokensHelpers';
+import type { Profile, User } from '@azzapp/data/lib/domains';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type SignInBody = {
@@ -29,7 +32,8 @@ const signin = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
   try {
-    let user;
+    let user: User | null = null;
+    let profile: Profile | null = null;
     if (isValidEmail(credential)) {
       // looking for email only if the credential is a valid email
       user = await getUserByEmail(credential);
@@ -38,22 +42,35 @@ const signin = async (req: NextApiRequest, res: NextApiResponse) => {
       // looking for phonenumber only if the credential is a valid phonenumber
       user = await getUserByPhoneNumber(credential);
     }
-    //TODO: specification does not specifiy to loginwiht username but lets do it anyway
-    if (!user) {
+    if (user) {
+      // if we found a user by email or phonenumber, we look for the profile
+      [profile] = await getUserProfiles(user.id);
+    } else {
       // in all other case, look for username
-      user = await getUserByUserName(credential);
+      profile = await getProfileByUserName(credential);
+      [user] = profile ? await getUsersByIds([profile.userId]) : [];
     }
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !profile || !user.password) {
       res.status(401).json({ message: ERRORS.INVALID_CREDENTIALS });
       return;
     }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      res.status(401).json({ message: ERRORS.INVALID_CREDENTIALS });
+      return;
+    }
+
     if (authMethod === 'token') {
       req.session.destroy();
-      const { token, refreshToken } = generateTokens(user.id);
+      const { token, refreshToken } = generateTokens({
+        userId: user.id,
+        profileId: profile.id,
+      });
       res.json({ ok: true, token, refreshToken });
     } else {
       req.session.userId = user.id;
+      req.session.profileId = profile.id;
       req.session.isAnonymous = false;
       await req.session.save();
       res.json({ ok: true });
