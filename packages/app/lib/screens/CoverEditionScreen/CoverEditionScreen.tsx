@@ -1,3 +1,9 @@
+import isEqual from 'lodash/isEqual';
+import zip from 'lodash/zip';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { Modal, StyleSheet, View } from 'react-native';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import {
   COVER_MAX_HEIGHT,
@@ -6,13 +12,6 @@ import {
 } from '@azzapp/shared/lib/cardHelpers';
 import { typedEntries } from '@azzapp/shared/lib/objectHelpers';
 import { combineLatest } from '@azzapp/shared/lib/observableHelpers';
-import isEqual from 'lodash/isEqual';
-import zip from 'lodash/zip';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View } from 'react-native';
-import { graphql, useFragment, useMutation } from 'react-relay';
-import { colors } from '../../../theme';
 import Header from '../../components/Header';
 import ImageEditionFooter from '../../components/ImageEditionFooter';
 import ImageEditionParameterControl from '../../components/ImageEditionParameterControl';
@@ -24,6 +23,7 @@ import useViewportSize, {
   insetTop,
 } from '../../hooks/useViewportSize';
 import { useRouter, useWebAPI } from '../../PlatformEnvironment';
+import { colors } from '../../theme';
 import Button from '../../ui/Button';
 import FloatingIconButton from '../../ui/FloatingIconButton';
 import Icon from '../../ui/Icon';

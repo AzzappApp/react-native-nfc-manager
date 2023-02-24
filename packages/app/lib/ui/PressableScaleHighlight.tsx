@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Platform } from 'react-native';
-import { colors } from '../../theme';
 import { getPressableStyle } from '../helpers/gestureHelpers';
+import { colors } from '../theme';
 import PressableTransition from './PressableTransition';
 import ViewTransition from './ViewTransition';
 import type { Easing } from './ViewTransition';

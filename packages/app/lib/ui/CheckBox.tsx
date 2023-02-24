@@ -1,7 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import { Svg, Path, Rect } from 'react-native-svg';
-import { colors, fontFamilies } from '../../theme';
+import { colors, fontFamilies } from '../theme';
 
 import PressableNative from './PressableNative';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';

@@ -1,13 +1,13 @@
+import { forwardRef, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { Image, Platform, StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/lib/cardHelpers';
-import { forwardRef, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { Image, Platform, StyleSheet, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 import PressableNative from '../../ui/PressableNative';
 import { MediaImageRenderer } from '../medias';
 import QRCodeModal from './QRCodeModal';

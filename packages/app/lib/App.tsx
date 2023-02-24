@@ -1,4 +1,3 @@
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { IntlErrorCode } from '@formatjs/intl';
 import { useEffect, useMemo, useRef } from 'react';
 import { IntlProvider } from 'react-intl';
@@ -8,6 +7,7 @@ import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import createPlatformEnvironment from './helpers/createPlatformEnvironment';

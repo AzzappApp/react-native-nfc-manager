@@ -1,8 +1,8 @@
-import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, TextInput, View, Text } from 'react-native';
-import { fontFamilies, colors } from '../../theme';
+import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
+import { fontFamilies, colors } from '../theme';
 
 import Icon from './Icon';
 import PressableNative from './PressableNative';

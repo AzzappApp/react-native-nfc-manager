@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import Icon from '../ui/Icon';
 import PressableNative from '../ui/PressableNative';
 import { useEditionParametersDisplayInfos } from './medias';

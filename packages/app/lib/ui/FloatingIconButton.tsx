@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import Icon from '../ui/Icon';
 import FloatingButton from './FloatingButton';
 import type { Icons } from '../ui/Icon';

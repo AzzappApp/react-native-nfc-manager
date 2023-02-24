@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import type { ForwardedRef } from 'react';
 import type { ViewStyle, StyleProp, PressableProps, View } from 'react-native';
 

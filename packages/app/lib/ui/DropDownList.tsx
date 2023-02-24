@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import { colors, fontFamilies, textStyles } from '../../theme';
+import { colors, fontFamilies, textStyles } from '../theme';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import ViewTransition from './ViewTransition';

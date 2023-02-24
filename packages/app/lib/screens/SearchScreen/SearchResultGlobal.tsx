@@ -1,12 +1,12 @@
-import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { usePaginationFragment, graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { colors } from '../../../theme';
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import PostsGrid from '../../components/PostsGrid';
 import SkeletonPlaceholder from '../../components/SkeletonPlaceholder';
+import { colors } from '../../theme';
 import ListLoadingFooter from '../../ui/ListLoadingFooter';
 import SearchResultGlobalListHeader, {
   SearchResultGlobalListHeaderPlaceholder,

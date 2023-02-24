@@ -1,9 +1,9 @@
-import { getPrecision } from '@azzapp/shared/lib/numberHelpers';
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, View } from 'react-native';
-import { colors } from '../../theme';
+import { getPrecision } from '@azzapp/shared/lib/numberHelpers';
+import { colors } from '../theme';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type DashedSliderProps = {

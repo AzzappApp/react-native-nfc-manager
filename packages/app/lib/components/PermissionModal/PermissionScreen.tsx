@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet, Text } from 'react-native';
-import { textStyles } from '../../../theme';
+import { textStyles } from '../../theme';
 import Button from '../../ui/Button';
 
 const PermissionScreen = ({

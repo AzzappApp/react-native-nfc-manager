@@ -1,6 +1,6 @@
 import { cloneElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '../../theme';
+import { textStyles } from '../theme';
 import type { ReactElement, ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 

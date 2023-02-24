@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, textStyles } from '../../theme';
 import { formatVideoTime } from '../helpers/mediaHelpers';
 import useInterval from '../hooks/useInterval';
+import { colors, textStyles } from '../theme';
 import PressableBackground from '../ui/PressableBackground';
 import ProgressBar from '../ui/ProgressBar';
 import ViewTransition from '../ui/ViewTransition';

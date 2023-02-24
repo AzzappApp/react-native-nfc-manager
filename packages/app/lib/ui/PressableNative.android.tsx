@@ -1,6 +1,6 @@
 import { forwardRef, useState } from 'react';
 import { Pressable } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import type { Easing } from './ViewTransition';
 import type { ForwardedRef } from 'react';
 import type {

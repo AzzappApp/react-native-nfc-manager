@@ -1,13 +1,12 @@
-import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
-
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, Text } from 'react-native';
-import { colors, fontFamilies } from '../../../theme';
+import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import useViewportSize, {
   insetBottom,
   insetTop,
 } from '../../hooks/useViewportSize';
+import { colors, fontFamilies } from '../../theme';
 import Button from '../../ui/Button';
 import Form, { Submit } from '../../ui/Form/Form';
 import TagCategory from '../../ui/TagCategory';

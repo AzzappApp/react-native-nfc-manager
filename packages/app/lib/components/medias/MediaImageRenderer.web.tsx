@@ -1,10 +1,10 @@
+import Image from 'next/image';
+import { forwardRef } from 'react';
+import { StyleSheet } from 'react-native';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
 } from '@azzapp/shared/lib/imagesHelpers';
-import Image from 'next/image';
-import { forwardRef } from 'react';
-import { StyleSheet } from 'react-native';
 import createHTMLElement from '../../helpers/createHTMLElement';
 import type { MediaImageRendererProps } from './mediasTypes';
 import type { ImageLoaderProps } from 'next/image';

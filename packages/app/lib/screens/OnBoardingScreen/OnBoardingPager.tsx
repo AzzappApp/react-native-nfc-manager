@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 
 type OnBoardingPagerProps = {
   activeIndex: number;

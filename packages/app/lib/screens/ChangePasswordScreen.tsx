@@ -1,8 +1,3 @@
-import {
-  isNotFalsyString,
-  isValidPassword,
-} from '@azzapp/shared/lib/stringHelpers';
-
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -14,10 +9,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import { colors, fontFamilies, textStyles } from '../../theme';
+import {
+  isNotFalsyString,
+  isValidPassword,
+} from '@azzapp/shared/lib/stringHelpers';
 
 import useViewportSize, { insetBottom } from '../hooks/useViewportSize';
 import { useRouter } from '../PlatformEnvironment';
+import { colors, fontFamilies, textStyles } from '../theme';
 import Button from '../ui/Button';
 import Form, { Submit } from '../ui/Form/Form';
 import PressableNative from '../ui/PressableNative';

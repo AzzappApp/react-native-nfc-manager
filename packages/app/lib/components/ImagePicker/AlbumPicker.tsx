@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, Image, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '../../../theme';
+import { colors, textStyles } from '../../theme';
 import Icon from '../../ui/Icon';
 import IconButton from '../../ui/IconButton';
 import PressableBackground from '../../ui/PressableBackground';

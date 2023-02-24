@@ -1,5 +1,5 @@
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import { NextResponse } from 'next/server';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import type { NextRequest } from 'next/server';
 
 const PUBLIC_FILE = /\.(.*)$/;

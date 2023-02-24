@@ -1,4 +1,3 @@
-import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import {
@@ -7,6 +6,7 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+import { COVER_BASE_WIDTH } from '@azzapp/shared/lib/cardHelpers';
 import { render } from '../../../utils/test-util';
 import CoverRenderer from '../CoverRenderer';
 import type { CoverRendererProps } from '../CoverRenderer';

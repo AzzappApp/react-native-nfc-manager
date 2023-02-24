@@ -1,4 +1,3 @@
-import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
@@ -6,8 +5,9 @@ import {
   TextInput as NativeTextInput,
   View,
 } from 'react-native';
+import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 
-import { colors, fontFamilies, textStyles } from '../../theme';
+import { colors, fontFamilies, textStyles } from '../theme';
 import type {
   TextInputProps as NativeTextInputProps,
   StyleProp,

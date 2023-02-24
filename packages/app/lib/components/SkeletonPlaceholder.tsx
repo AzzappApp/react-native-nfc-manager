@@ -8,7 +8,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import type { StyleProp, ViewStyle, LayoutRectangle } from 'react-native';
 
 type SkeletonProps = {

@@ -2,7 +2,7 @@ import cuid from 'cuid';
 import React, { useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 import PostLink from '../PostLink';
 import PostGridContainer from './PostGridContainer';
 import PostGridWindowScrollContainer from './PostGridWindowScrollContainer';

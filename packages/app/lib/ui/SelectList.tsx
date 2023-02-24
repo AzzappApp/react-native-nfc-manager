@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import PressableBackground from './PressableBackground';
 import type { StyleProp, ViewStyle, ListRenderItemInfo } from 'react-native';
 

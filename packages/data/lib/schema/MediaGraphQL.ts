@@ -1,15 +1,15 @@
 import {
-  getImageURLForSize,
-  getVideoThumbnailURL,
-  getVideoUrlForSize,
-} from '@azzapp/shared/lib/imagesHelpers';
-import {
   GraphQLFloat,
   GraphQLInterfaceType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
+import {
+  getImageURLForSize,
+  getVideoThumbnailURL,
+  getVideoUrlForSize,
+} from '@azzapp/shared/lib/imagesHelpers';
 import type { Media } from '../domains';
 import type { GraphQLContext } from './GraphQLContext';
 

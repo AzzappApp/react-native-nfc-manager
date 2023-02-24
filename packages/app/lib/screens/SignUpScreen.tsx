@@ -1,11 +1,3 @@
-import {
-  isNotFalsyString,
-  isPhoneNumber,
-  isValidEmail,
-  isValidPassword,
-  isValidUsername,
-  REGEX_CHAR_USERNAME,
-} from '@azzapp/shared/lib/stringHelpers';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -20,9 +12,17 @@ import {
 } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { fetchQuery, graphql, useRelayEnvironment } from 'react-relay';
-import { textStyles, fontFamilies, colors } from '../../theme';
+import {
+  isNotFalsyString,
+  isPhoneNumber,
+  isValidEmail,
+  isValidPassword,
+  isValidUsername,
+  REGEX_CHAR_USERNAME,
+} from '@azzapp/shared/lib/stringHelpers';
 import Link from '../components/Link';
 import useViewportSize, { insetBottom } from '../hooks/useViewportSize';
+import { textStyles, fontFamilies, colors } from '../theme';
 import Button from '../ui/Button';
 import CheckBox from '../ui/CheckBox';
 import Form, { Submit } from '../ui/Form/Form';

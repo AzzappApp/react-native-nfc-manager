@@ -1,8 +1,8 @@
+import Cors from 'cors';
+import { graphql } from 'graphql';
 import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/lib/errors';
-import Cors from 'cors';
-import { graphql } from 'graphql';
 import applyConnectMiddleware from '../../helpers/applyConnectMiddleware';
 import {
   getRequestAuthInfos,

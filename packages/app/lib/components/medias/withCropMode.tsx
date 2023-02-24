@@ -11,7 +11,7 @@ import {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, mixins } from '../../../theme';
+import { colors, mixins } from '../../theme';
 import type { CropData, ImageEditionParameters } from '../../types';
 import type { ComponentType } from 'react';
 import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';

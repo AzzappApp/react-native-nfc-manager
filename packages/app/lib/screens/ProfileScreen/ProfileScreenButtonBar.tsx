@@ -1,8 +1,8 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, Text, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { textStyles } from '../../../theme';
 import Link from '../../components/Link';
+import { textStyles } from '../../theme';
 import ClientOnlySuspense from '../../ui/ClientOnlySuspense';
 import FloatingButton from '../../ui/FloatingButton';
 import FloatingIconButton from '../../ui/FloatingIconButton';

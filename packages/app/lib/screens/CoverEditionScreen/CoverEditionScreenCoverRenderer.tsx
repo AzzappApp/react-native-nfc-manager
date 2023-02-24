@@ -1,13 +1,3 @@
-import {
-  COVER_BASE_WIDTH,
-  COVER_CARD_RADIUS,
-  COVER_RATIO,
-  DEFAULT_COVER_CONTENT_ORTIENTATION,
-  DEFAULT_COVER_CONTENT_PLACEMENT,
-  DEFAULT_COVER_FONT_FAMILY,
-  DEFAULT_COVER_FONT_SIZE,
-  DEFAULT_COVER_TEXT_COLOR,
-} from '@azzapp/shared/lib/cardHelpers';
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -18,9 +8,19 @@ import {
   View,
 } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
-import { colors, textStyles } from '../../../theme';
+import {
+  COVER_BASE_WIDTH,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+  DEFAULT_COVER_CONTENT_ORTIENTATION,
+  DEFAULT_COVER_CONTENT_PLACEMENT,
+  DEFAULT_COVER_FONT_FAMILY,
+  DEFAULT_COVER_FONT_SIZE,
+  DEFAULT_COVER_TEXT_COLOR,
+} from '@azzapp/shared/lib/cardHelpers';
 import Delay from '../../components/Delay';
 import { EditableImageWithCropMode } from '../../components/medias';
+import { colors, textStyles } from '../../theme';
 import Button from '../../ui/Button';
 import type { EditableImageSource } from '../../components/medias';
 import type { CropData, ImageEditionParameters } from '../../types';

@@ -2,7 +2,7 @@ import { useState, useEffect, Suspense, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 import Icon from '../../ui/Icon';
 import SearchResultGlobal, {
   SearchResultGlobalPlaceHolder,

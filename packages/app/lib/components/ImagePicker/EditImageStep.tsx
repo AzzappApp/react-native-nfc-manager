@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '../../../theme';
+import { colors, textStyles } from '../../theme';
 import IconButton from '../../ui/IconButton';
 import { TAB_BAR_HEIGHT } from '../../ui/TabsBar';
 import FilterSelectionList from '../FilterSelectionList';

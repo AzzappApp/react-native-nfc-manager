@@ -1,8 +1,3 @@
-import {
-  isNotFalsyString,
-  isPhoneNumber,
-  isValidEmail,
-} from '@azzapp/shared/lib/stringHelpers';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -15,9 +10,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import { getLocales } from 'react-native-localize';
-import { fontFamilies, colors } from '../../theme';
+import {
+  isNotFalsyString,
+  isPhoneNumber,
+  isValidEmail,
+} from '@azzapp/shared/lib/stringHelpers';
 import Link from '../components/Link';
 import useViewportSize, { insetBottom } from '../hooks/useViewportSize';
+import { fontFamilies, colors } from '../theme';
 
 import Button from '../ui/Button';
 import Form, { Submit } from '../ui/Form/Form';

@@ -8,7 +8,7 @@ import {
 import { useIntl } from 'react-intl';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 import Button from '../../ui/Button';
 import FadeSwitch from '../../ui/FadeSwitch';
 import IconButton from '../../ui/IconButton';

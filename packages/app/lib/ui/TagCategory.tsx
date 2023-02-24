@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import PressableBackground from '../ui/PressableBackground';
 import type { StyleProp, ViewStyle } from 'react-native';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, StyleSheet, View, Text, Platform } from 'react-native';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import PressableNative from '../ui/PressableNative';
 import { EditableImage, useFilterList } from './medias';
 import type { ImageEditionParameters } from '../types';

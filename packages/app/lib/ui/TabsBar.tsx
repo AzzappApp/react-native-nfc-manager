@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
 import { Text, View } from 'react-native';
-import { colors, fontFamilies } from '../../theme';
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '../helpers/createStyles';
+import { colors, fontFamilies } from '../theme';
 import Icon from './Icon';
 import PressableBackground from './PressableBackground';
 import type { Icons } from './Icon';

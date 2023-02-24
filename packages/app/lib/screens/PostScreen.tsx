@@ -1,4 +1,3 @@
-import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import {
   forwardRef,
   Suspense,
@@ -11,6 +10,7 @@ import {
 } from 'react';
 import { SafeAreaView } from 'react-native';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import Header from '../components/Header';
 import PostList from '../components/PostList';
 import { useRouter } from '../PlatformEnvironment';

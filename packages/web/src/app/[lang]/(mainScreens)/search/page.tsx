@@ -1,5 +1,5 @@
-import SearchWebScreenQueryNode from '@azzapp/relay/artifacts/SearchWebScreenQuery.graphql';
 import { redirect } from 'next/navigation';
+import SearchWebScreenQueryNode from '@azzapp/relay/artifacts/SearchWebScreenQuery.graphql';
 import preloadServerQuery from '../../../../helpers/preloadServerQuery';
 import { getAuthInfos } from '../../../../helpers/session';
 import SearchWebScreen from './SearchWebScreen';

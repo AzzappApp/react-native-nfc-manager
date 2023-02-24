@@ -1,7 +1,7 @@
-import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import PostsGrid from '../../components/PostsGrid';
 import ListLoadingFooter from '../../ui/ListLoadingFooter';
 import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';

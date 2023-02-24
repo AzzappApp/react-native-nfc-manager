@@ -1,7 +1,7 @@
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import FilterSelectionList from '../../components/FilterSelectionList';
 import ImageEditionParametersList from '../../components/ImageEditionParametersList';
 import TabsBar from '../../ui/TabsBar';

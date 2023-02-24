@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import ERRORS from '@azzapp/shared/lib/errors';
-import { typedEntries } from '@azzapp/shared/lib/objectHelpers';
 import {
   GraphQLBoolean,
   GraphQLInputObjectType,
@@ -9,6 +7,8 @@ import {
 } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLJSON } from 'graphql-scalars';
+import ERRORS from '@azzapp/shared/lib/errors';
+import { typedEntries } from '@azzapp/shared/lib/objectHelpers';
 import {
   createCard,
   createCardCover,

@@ -1,4 +1,3 @@
-import { isPhoneNumber, isValidEmail } from '@azzapp/shared/lib/stringHelpers';
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -11,10 +10,11 @@ import {
   View,
 } from 'react-native';
 import { getLocales } from 'react-native-localize';
-import { colors, fontFamilies } from '../../theme';
+import { isPhoneNumber, isValidEmail } from '@azzapp/shared/lib/stringHelpers';
 
 import useViewportSize, { insetBottom, VW100 } from '../hooks/useViewportSize';
 import { useRouter } from '../PlatformEnvironment';
+import { colors, fontFamilies } from '../theme';
 import Button from '../ui/Button';
 import Form, { Submit } from '../ui/Form/Form';
 import PressableNative from '../ui/PressableNative';

@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '../../theme';
+import { textStyles } from '../theme';
 import PressableNative from '../ui/PressableNative';
 import type { ViewProps } from 'react-native';
 

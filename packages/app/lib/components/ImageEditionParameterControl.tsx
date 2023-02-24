@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '../../theme';
+import { textStyles } from '../theme';
 import DashedSlider from '../ui/DashedSlider';
 import { editionParametersSettings } from './medias';
 import type { ImageEditionParameters } from '../types';

@@ -8,7 +8,7 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import { EditableImage } from './medias';
 import type { ImageEditionParameters, TimeRange } from '../types';
 import type { ViewProps } from 'react-native';

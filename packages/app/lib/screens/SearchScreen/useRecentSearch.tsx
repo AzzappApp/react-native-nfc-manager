@@ -1,6 +1,6 @@
-import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
+import { isNotFalsyString } from '@azzapp/shared/lib/stringHelpers';
 
 const RECENT_SEARCH_KEY = 'recentSearch';
 const MAX_ITEM_COUNT = 20;

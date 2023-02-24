@@ -1,9 +1,9 @@
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useCallback, useState } from 'react';
 import { Image, Platform, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../../theme';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
+import { colors } from '../../theme';
 import PressableNative from '../../ui/PressableNative';
 import ViewTransition from '../../ui/ViewTransition';
 import type {

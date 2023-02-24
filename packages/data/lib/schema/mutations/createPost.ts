@@ -1,6 +1,6 @@
-import ERRORS from '@azzapp/shared/lib/errors';
 import { GraphQLBoolean, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
+import ERRORS from '@azzapp/shared/lib/errors';
 import { createMedia, createPost, db } from '../../domains';
 import PostGraphQL from '../PostGraphQL';
 import { MediaInputGraphQL } from './commonsTypes';

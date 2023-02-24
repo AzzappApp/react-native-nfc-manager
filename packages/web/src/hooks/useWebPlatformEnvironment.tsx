@@ -1,6 +1,6 @@
-import * as WebAPI from '@azzapp/shared/lib/WebAPI';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
+import * as WebAPI from '@azzapp/shared/lib/WebAPI';
 import Link from '../components/Link';
 import { pathToRoute, routeToPath } from '../helpers/routesHelpers';
 import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';

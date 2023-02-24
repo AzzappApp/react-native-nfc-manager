@@ -1,9 +1,5 @@
 'use client';
 
-import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import createRelayEnvironment from '@azzapp/shared/lib/createRelayEnvironment';
-import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import { IntlErrorCode } from '@formatjs/intl';
 import { useServerInsertedHTML } from 'next/navigation';
 import React, { useCallback, useMemo } from 'react';
@@ -11,6 +7,10 @@ import { IntlProvider } from 'react-intl';
 // @ts-expect-error there is no types definition for react-native-web
 import { StyleSheet } from 'react-native-web';
 import { RelayEnvironmentProvider } from 'react-relay';
+import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import createRelayEnvironment from '@azzapp/shared/lib/createRelayEnvironment';
+import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import useWebPlatformEnvironment from '../../hooks/useWebPlatformEnvironment';
 
 type ClientWrapperProps = {

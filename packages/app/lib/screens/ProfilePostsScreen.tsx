@@ -1,7 +1,7 @@
-import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import { useCallback, useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import Header from '../components/Header';
 import PostList from '../components/PostList';
 import { useRouter } from '../PlatformEnvironment';

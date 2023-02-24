@@ -1,5 +1,5 @@
 import { StyleSheet, Switch as RNSwitch, Text, View } from 'react-native';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import type { SwitchProps as RNSwitchProps } from 'react-native';
 
 type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {

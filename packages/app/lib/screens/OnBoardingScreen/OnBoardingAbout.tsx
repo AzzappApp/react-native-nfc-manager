@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
-import { colors, fontFamilies } from '../../../theme';
 import useViewportSize, {
   insetBottom,
   insetTop,
 } from '../../hooks/useViewportSize';
+import { colors, fontFamilies } from '../../theme';
 import Button from '../../ui/Button';
 import Form, { Submit } from '../../ui/Form/Form';
 import IconButton from '../../ui/IconButton';

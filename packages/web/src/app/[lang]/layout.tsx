@@ -1,5 +1,5 @@
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import Script from 'next/script';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import getTranslationMessages from '../../helpers/getTranslationMessages';
 import ClientWrapper from './ClientWrapper';
 import './styles.css';

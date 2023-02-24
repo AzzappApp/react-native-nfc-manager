@@ -1,5 +1,5 @@
-import ProfileWebSCreenQueryNode from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
 import { notFound } from 'next/navigation';
+import ProfileWebSCreenQueryNode from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
 import preloadServerQuery from '../../../helpers/preloadServerQuery';
 import UserWebScreen from './ProfileWebScreen';
 import type { ProfileWebScreenQuery } from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';

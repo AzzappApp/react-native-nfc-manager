@@ -1,4 +1,3 @@
-import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -12,6 +11,7 @@ import {
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { GraphQLJSON } from 'graphql-scalars';
+import { getImageURLForSize } from '@azzapp/shared/lib/imagesHelpers';
 import { getCardModules, getCoverLayerById } from '../domains';
 import MediaGraphQL, { MediaImageGraphQL } from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';

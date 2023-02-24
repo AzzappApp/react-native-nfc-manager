@@ -1,4 +1,3 @@
-import { createDeffered } from '@azzapp/shared/lib/asyncHelpers';
 import {
   useRef,
   useState,
@@ -17,6 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useCameraDevices, Camera } from 'react-native-vision-camera';
+import { createDeffered } from '@azzapp/shared/lib/asyncHelpers';
 import useIsForeground from '../hooks/useIsForeground';
 import FloatingIconButton from '../ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';

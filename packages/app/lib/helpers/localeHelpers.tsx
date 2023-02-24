@@ -1,7 +1,7 @@
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@azzapp/i18n';
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { findBestAvailableLanguage } from 'react-native-localize';
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@azzapp/i18n';
 
 let currentLocale: string | null = null;
 const localeChangeListeners: Array<() => void> = [];

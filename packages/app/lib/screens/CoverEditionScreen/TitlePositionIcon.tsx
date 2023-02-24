@@ -1,6 +1,6 @@
-import { TITLE_POSITIONS } from '@azzapp/shared/lib/cardHelpers';
 import { StyleSheet, View } from 'react-native';
-import { colors } from '../../../theme';
+import { TITLE_POSITIONS } from '@azzapp/shared/lib/cardHelpers';
+import { colors } from '../../theme';
 
 export const TitlePositionIcon = ({ value }: { value: string }) => (
   <View style={styles.iconContainer}>

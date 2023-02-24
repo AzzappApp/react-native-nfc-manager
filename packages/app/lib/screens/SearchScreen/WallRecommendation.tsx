@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { PixelRatio, StyleSheet, View, Text } from 'react-native';
-import { colors, fontFamilies, textStyles } from '../../../theme';
+import { colors, fontFamilies, textStyles } from '../../theme';
 import PressableBackground from '../../ui/PressableBackground';
 import RecommendedProfilesList from './RecommendedProfilesList';
 import TrendingPostsList from './TrendingPostsList';

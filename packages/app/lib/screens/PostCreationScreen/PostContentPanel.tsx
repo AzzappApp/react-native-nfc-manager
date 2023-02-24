@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '../../../theme';
 import Header from '../../components/Header';
+import { colors, textStyles } from '../../theme';
 import Button from '../../ui/Button';
 import Icon from '../../ui/Icon';
 import PressableNative from '../../ui/PressableNative';

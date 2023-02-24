@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '../../../theme';
 import { HEADER_HEIGHT } from '../../components/Header';
 import useViewportSize, { insetTop, VW100 } from '../../hooks/useViewportSize';
 import { useRouter } from '../../PlatformEnvironment';
+import { colors } from '../../theme';
 import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';

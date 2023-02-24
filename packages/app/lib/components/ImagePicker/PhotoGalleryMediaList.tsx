@@ -8,13 +8,13 @@ import {
   Text,
   useWindowDimensions,
 } from 'react-native';
-import { textStyles } from '../../../theme';
 import {
   formatVideoTime,
   getImageSize,
   getPHAssetPath,
   getVideoSize,
 } from '../../helpers/mediaHelpers';
+import { textStyles } from '../../theme';
 import PressableNative from '../../ui/PressableNative';
 import type { Media } from '../../types';
 import type {

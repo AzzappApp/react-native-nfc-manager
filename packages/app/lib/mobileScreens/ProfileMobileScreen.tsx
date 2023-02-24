@@ -1,7 +1,7 @@
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useNativeNavigationEvent } from '../components/NativeRouter';
 import relayScreen from '../helpers/relayScreen';
 import ProfileScreen from '../screens/ProfileScreen';

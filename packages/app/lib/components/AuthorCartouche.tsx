@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors, fontFamilies } from '../../theme';
+import { colors, fontFamilies } from '../theme';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { ViewProps } from 'react-native';
 

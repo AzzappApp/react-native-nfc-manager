@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { colors } from '../../../theme';
+import { colors } from '../../theme';
 import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 
 const ColorPreview = ({

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import type { Icons } from './Icon';

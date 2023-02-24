@@ -1,6 +1,6 @@
 import { forwardRef, useMemo } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef } from 'react';

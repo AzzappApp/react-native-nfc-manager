@@ -1,5 +1,5 @@
-import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import { Dimensions } from 'react-native';
+import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 
 export const get = () => {
   if (getRuntimeEnvironment() !== 'react-native') {

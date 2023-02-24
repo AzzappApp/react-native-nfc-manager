@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import ProgressBar from './ProgressBar';
 import type { Subscription, Observable } from 'relay-runtime';
 

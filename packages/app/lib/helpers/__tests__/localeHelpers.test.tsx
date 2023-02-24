@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import * as RNLocalize from 'react-native-localize';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 
-import * as RNLocalize from 'react-native-localize';
 import { act, renderHook } from '../../../utils/test-util';
 import * as localHelpersModule from '../localeHelpers';
 import type { AppStateStatus } from 'react-native';

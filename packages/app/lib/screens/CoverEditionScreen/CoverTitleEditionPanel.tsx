@@ -1,11 +1,3 @@
-import {
-  DEFAULT_COVER_CONTENT_ORTIENTATION,
-  DEFAULT_COVER_CONTENT_PLACEMENT,
-  DEFAULT_COVER_FONT_FAMILY,
-  DEFAULT_COVER_FONT_SIZE,
-  DEFAULT_COVER_TEXT_COLOR,
-  TITLE_POSITIONS,
-} from '@azzapp/shared/lib/cardHelpers';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
@@ -16,7 +8,15 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, fontFamilies, textStyles } from '../../../theme';
+import {
+  DEFAULT_COVER_CONTENT_ORTIENTATION,
+  DEFAULT_COVER_CONTENT_PLACEMENT,
+  DEFAULT_COVER_FONT_FAMILY,
+  DEFAULT_COVER_FONT_SIZE,
+  DEFAULT_COVER_TEXT_COLOR,
+  TITLE_POSITIONS,
+} from '@azzapp/shared/lib/cardHelpers';
+import { colors, fontFamilies, textStyles } from '../../theme';
 import ColorPicker from '../../ui/ColorPicker';
 import DashedSlider from '../../ui/DashedSlider';
 import FontPicker from '../../ui/FontPicker';

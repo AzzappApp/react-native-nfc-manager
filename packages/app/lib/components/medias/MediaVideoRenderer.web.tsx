@@ -1,4 +1,3 @@
-import { getVideoUrlForSize } from '@azzapp/shared/lib/imagesHelpers';
 import {
   forwardRef,
   useEffect,
@@ -7,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { getVideoUrlForSize } from '@azzapp/shared/lib/imagesHelpers';
 import createHTMLElement from '../../helpers/createHTMLElement';
 import MediaImageRenderer from './MediaImageRenderer';
 import type {

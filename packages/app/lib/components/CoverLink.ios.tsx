@@ -1,5 +1,5 @@
-import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
 import { useRef } from 'react';
+import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
 import { useRouter } from '../PlatformEnvironment';
 import PressableScaleHighlight from '../ui/PressableScaleHighlight';
 import CoverRenderer from './CoverRenderer';

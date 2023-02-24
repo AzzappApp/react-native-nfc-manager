@@ -1,5 +1,5 @@
-import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import React, { Suspense } from 'react';
+import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
 import type { SuspenseProps } from 'react';
 
 /**

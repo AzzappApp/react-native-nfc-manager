@@ -1,7 +1,6 @@
-import ERRORS from '@azzapp/shared/lib/errors';
-
 import { GraphQLBoolean, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
+import ERRORS from '@azzapp/shared/lib/errors';
 
 import { db } from '../../domains';
 import ProfileGraphQL from '../ProfileGraphQL';

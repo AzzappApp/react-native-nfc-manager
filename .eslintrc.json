@@ -75,6 +75,12 @@
     "import/order": [
       "error",
       {
+        "pathGroups": [
+          {
+            "pattern": "@azzapp/**",
+            "group": "internal"
+          }
+        ],
         "groups": [
           "builtin",
           "external",
@@ -84,7 +90,8 @@
           "index",
           "type"
         ],
-        "alphabetize": { "order": "asc", "caseInsensitive": true }
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "pathGroupsExcludedImportTypes": ["type"]
       }
     ],
     "import/namespace": "off",

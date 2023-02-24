@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Animated, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '../../theme';
+import { colors, textStyles } from '../theme';
 import PressableNative from './PressableNative';
 import type { ModalProps } from 'react-native';
 

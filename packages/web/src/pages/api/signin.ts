@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import {
   getUserByEmail,
   getUserByPhoneNumber,
@@ -10,7 +11,6 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/lib/stringHelpers';
-import bcrypt from 'bcrypt';
 import { withSessionAPIRoute } from '../../helpers/session';
 import { generateTokens } from '../../helpers/tokensHelpers';
 import type { Profile, User } from '@azzapp/data/lib/domains';

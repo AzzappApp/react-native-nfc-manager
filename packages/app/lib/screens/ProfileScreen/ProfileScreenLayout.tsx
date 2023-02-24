@@ -1,14 +1,14 @@
-import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { Transition } from 'react-transition-group';
-import { colors } from '../../../theme';
+import { COVER_CARD_RADIUS } from '@azzapp/shared/lib/cardHelpers';
 import Header, { HEADER_HEIGHT } from '../../components/Header';
 import useViewportSize, {
   insetBottom,
   insetTop,
 } from '../../hooks/useViewportSize';
+import { colors } from '../../theme';
 import FloatingIconButton from '../../ui/FloatingIconButton';
 import PressableNative from '../../ui/PressableNative';
 import TextHeaderButton from '../../ui/TextHeaderButton';

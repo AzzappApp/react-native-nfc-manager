@@ -1,13 +1,13 @@
-import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 import { useMemo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Text, StyleSheet, View } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/lib/cardHelpers';
 
-import { colors, textStyles } from '../../../theme';
 import CoverList from '../../components/CoverList';
 import SkeletonPlaceholder from '../../components/SkeletonPlaceholder';
+import { colors, textStyles } from '../../theme';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 
 import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalListHeader_viewer.graphql';

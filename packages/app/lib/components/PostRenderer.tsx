@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors, fontFamilies } from '../../theme';
+import { colors, fontFamilies } from '../theme';
 import Icon from '../ui/Icon';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';

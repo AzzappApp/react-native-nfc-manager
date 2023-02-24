@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '../theme';
 import type { ViewProps } from 'react-native';
 
 type ProgressBarProps = ViewProps & { progress: number };

@@ -1,7 +1,7 @@
 import '@testing-library/jest-native/extend-expect';
 import { TextInput as NativeTextInput } from 'react-native';
-import { colors } from '../../../theme';
 import { render, screen } from '../../../utils/test-util';
+import { colors } from '../../theme';
 import TextInput from '../TextInput';
 
 describe('TextInput component', () => {
