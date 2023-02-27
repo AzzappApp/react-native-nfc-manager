@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - stable
+      - staging
 jobs:
   continuous-integration :
     name: Validate and test and Build
