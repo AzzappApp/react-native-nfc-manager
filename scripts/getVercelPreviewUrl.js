@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const [, , GITHUB_REF, GITHUB_SHA, VERCEL_TOKEN] = process.argv;
 
+const DEV = 'azzap-dev.vercel.app';
 const STAGING = 'azzap-staging.vercel.app';
 const PRODUCTION = 'azzap.vercel.app';
 const TIMEOUT = 300;
@@ -14,6 +15,10 @@ console.log(
 const setOutPut = value =>
   console.log(`::set-output name=vercel_url::${value}`);
 
+if (GITHUB_REF === 'refs/heads/dev') {
+  setOutPut(DEV);
+  process.exit(0);
+}
 if (GITHUB_REF === 'refs/heads/main') {
   setOutPut(STAGING);
   process.exit(0);

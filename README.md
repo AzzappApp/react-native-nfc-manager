@@ -172,11 +172,9 @@ List of environement variables during the build process:
 
 List of environement variables used at runtime by the application server:
 
-- `DB_CONTACT_POINT`: comma separated list of contact point for scylladb connection
-- `DB_DATACENTER`: scylladb datacenter name
-- `DB_USERNAME`: scylladb user name
-- `DB_PASSWORD`: scylladb password
-- `DB_KEYSPACE`: scylladb keyspace
+- `DATABASE_HOST`: Host of the planetscale database
+- `DATABASE_USERNAME`: Username of the planetscale database
+- `DATABASE_PASSWORD`: Password of the planetscale database 
 - `CLOUDINARY_API_SECRET`: cloudinary api secret
 - `SECRET_COOKIE_PASSWORD`: password used to encrypt web cookie
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
