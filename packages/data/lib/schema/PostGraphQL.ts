@@ -42,8 +42,9 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
       resolve: (post, _, { mediaLoader }): Promise<Media[]> =>
         mediaLoader
           .loadMany(post.medias as string[])
-          .then(medias =>
-            medias.filter(media => media && !(media instanceof Error)),
+          .then(
+            medias =>
+              medias.filter(media => media && !(media instanceof Error))[0],
           ) as any,
     },
     content: {
