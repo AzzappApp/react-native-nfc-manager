@@ -102,10 +102,10 @@ model CardCover {
   segmented          Boolean
   merged             Boolean
   title              String
-  titleStyle         Json
+  titleStyle         Json?
   subTitle           String?
   subTitleStyle      Json?
-  contentStyle       Json
+  contentStyle       Json?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
 }
