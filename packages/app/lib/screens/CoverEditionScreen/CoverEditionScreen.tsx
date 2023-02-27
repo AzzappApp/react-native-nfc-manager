@@ -574,7 +574,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   const [maskComputing, setMaskComputing] = useState(false);
   useEffect(() => {
     let canceled = false;
-    if (!maskMedia && sourceMedia && isFileURL(sourceMedia.uri)) {
+    if (sourceMedia && isFileURL(sourceMedia.uri)) {
       setMaskComputing(true);
       segmentImage(sourceMedia.uri)
         .then(path => {
