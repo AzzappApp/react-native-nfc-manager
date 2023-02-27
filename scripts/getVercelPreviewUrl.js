@@ -1,9 +1,10 @@
 const fetch = require('node-fetch');
 const [, , GITHUB_REF, GITHUB_SHA, VERCEL_TOKEN] = process.argv;
 
-const DEV = 'azzap-dev.vercel.app';
-const STAGING = 'azzap-staging.vercel.app';
-const PRODUCTION = 'azzap.vercel.app';
+const DEV = 'azzapp-dev.vercel.app';
+const STAGING = 'azzapp-staging.vercel.app';
+const PRODUCTION = 'azzapp.vercel.app';
+
 const TIMEOUT = 300;
 const VERCEL_TEAM_ID = 'azzapp';
 const VERCEL_PROJECT_NAME = 'azzapp';
