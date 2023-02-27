@@ -121,7 +121,7 @@ jobs:
           echo "app_center_android_secret=${{ secrets.APPCENTER_STAGING_ANDROID_APP_SECRET }}" >> $GITHUB_ENV
           
       - name: Set App Center env for dev
-        if: github.ref != 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: |
           echo "app_center_ios_app_name=${{ secrets.APPCENTER_DEV_IOS_APP_NAME }}" >> $GITHUB_ENV
           echo "app_center_ios_api_token=${{ secrets.APPCENTER_DEV_IOS_API_TOKEN }}" >> $GITHUB_ENV
