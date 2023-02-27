@@ -15,11 +15,11 @@ console.log(
 const setOutPut = value =>
   console.log(`::set-output name=vercel_url::${value}`);
 
-if (GITHUB_REF === 'refs/heads/dev') {
+if (GITHUB_REF === 'refs/heads/main') {
   setOutPut(DEV);
   process.exit(0);
 }
-if (GITHUB_REF === 'refs/heads/main') {
+if (GITHUB_REF === 'refs/heads/staging') {
   setOutPut(STAGING);
   process.exit(0);
 }
