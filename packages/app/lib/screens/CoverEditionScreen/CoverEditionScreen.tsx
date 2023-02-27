@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual';
 import zip from 'lodash/zip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/lib/arrayHelpers';
 import {
@@ -801,11 +801,13 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   return (
     <>
-      <View
-        style={[
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
           styles.root,
           { paddingTop: vp`${insetTop}`, paddingBottom: vp`${insetBottom}` },
         ]}
+        behavior="position"
       >
         <Header
           title={
@@ -1002,7 +1004,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             </>
           )}
         </View>
-      </View>
+      </KeyboardAvoidingView>
+
       <Modal
         visible={showImagePicker}
         animationType={sourceMedia ? 'slide' : 'none'}
@@ -1029,8 +1032,10 @@ export default CoverEditionScreen;
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
     backgroundColor: '#fff',
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
   topPanel: {
     flex: 1,

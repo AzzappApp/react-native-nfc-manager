@@ -1,14 +1,14 @@
 {
-  "+2LHYI": [
+  "+miIiv": [
     {
       "type": 0,
-      "value": "Please enter a valid email"
+      "value": "Invalid credentials"
     }
   ],
-  "+TJPaq": [
+  "/u5+bX": [
     {
       "type": 0,
-      "value": "Email Address"
+      "value": "Press to edit this section of your profile"
     }
   ],
   "07iiib": [
@@ -29,22 +29,16 @@
       "value": "Cancel"
     }
   ],
-  "0avf3W": [
-    {
-      "type": 0,
-      "value": "You need to accept the Terms of services & privacy policy"
-    }
-  ],
   "19LN22": [
     {
       "type": 0,
       "value": "Tap to cancel your search"
     }
   ],
-  "1ETO0L": [
+  "1ENz6W": [
     {
       "type": 0,
-      "value": "Tap to sign up"
+      "value": "Tap to show the list of options"
     }
   ],
   "1UGgMw": [
@@ -59,16 +53,16 @@
       "value": "Forgot your password?"
     }
   ],
+  "4I6fyv": [
+    {
+      "type": 0,
+      "value": "Phone number or email address"
+    }
+  ],
   "4RJ0I8": [
     {
       "type": 0,
       "value": "Password"
-    }
-  ],
-  "4so7Pr": [
-    {
-      "type": 0,
-      "value": "Check your emails !"
     }
   ],
   "5/HOhV": [
@@ -77,10 +71,28 @@
       "value": "Profiles"
     }
   ],
-  "69Fl8v": [
+  "5VwKcb": [
     {
       "type": 0,
-      "value": "At least 8 caracters, 1upper, 1 lower 1 digit"
+      "value": "Log In"
+    }
+  ],
+  "5iui5g": [
+    {
+      "type": 0,
+      "value": "First name"
+    }
+  ],
+  "6+FKio": [
+    {
+      "type": 0,
+      "value": "Tap to show secured text in clear"
+    }
+  ],
+  "65Pcwu": [
+    {
+      "type": 0,
+      "value": "Continue"
     }
   ],
   "6EyA+S": [
@@ -101,6 +113,28 @@
       "value": "Negative"
     }
   ],
+  "6k4Jyd": [
+    {
+      "type": 0,
+      "value": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter"
+    }
+  ],
+  "6o2WcD": [
+    {
+      "type": 1,
+      "value": "title"
+    },
+    {
+      "type": 0,
+      "value": " - background image"
+    }
+  ],
+  "6sBD1M": [
+    {
+      "type": 0,
+      "value": "Get started"
+    }
+  ],
   "74j5Wg": [
     {
       "type": 0,
@@ -113,16 +147,28 @@
       "value": "Tint"
     }
   ],
+  "7XIZlu": [
+    {
+      "type": 0,
+      "value": "Tap me to show the QR Code fullscreen"
+    }
+  ],
+  "87390w": [
+    {
+      "type": 0,
+      "value": "Let's get started with Azzapp!"
+    }
+  ],
   "8PT+FO": [
     {
       "type": 0,
       "value": "Posts"
     }
   ],
-  "8mCCVu": [
+  "9/DfwF": [
     {
       "type": 0,
-      "value": "Email Address"
+      "value": "Forgot your password?"
     }
   ],
   "96x4pb": [
@@ -137,10 +183,10 @@
       "value": "Recent searchs"
     }
   ],
-  "AEQg5t": [
+  "AfkzY0": [
     {
       "type": 0,
-      "value": "Tap me to show the QR Code fullscreen"
+      "value": "Welcome"
     }
   ],
   "AsCp0n": [
@@ -161,16 +207,28 @@
       "value": "Tap to close"
     }
   ],
-  "Bm4p42": [
+  "BRodym": [
     {
       "type": 0,
-      "value": "We just send you a link to create a new password"
+      "value": "Terms of Service"
+    }
+  ],
+  "Bq3ew9": [
+    {
+      "type": 0,
+      "value": "Skip"
     }
   ],
   "C1R1bc": [
     {
       "type": 0,
       "value": "Fade"
+    }
+  ],
+  "CCNK+L": [
+    {
+      "type": 0,
+      "value": "Confirm password"
     }
   ],
   "CCbp9S": [
@@ -191,22 +249,76 @@
       "value": "Log In"
     }
   ],
+  "DwePHC": [
+    {
+      "type": 0,
+      "value": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter"
+    }
+  ],
+  "E5po/y": [
+    {
+      "type": 0,
+      "value": "Enter your email address or phone number and we'll send you a link to create a new password"
+    }
+  ],
+  "EG60mr": [
+    {
+      "type": 0,
+      "value": "Adjust"
+    }
+  ],
+  "EPprBn": [
+    {
+      "type": 0,
+      "value": "Usernames can only use Roman latines letters(a-z, A-Z), numbers, underscores and full stops. Should contains at least 4 characters"
+    }
+  ],
+  "Ee6pSd": [
+    {
+      "type": 0,
+      "value": "This username is not available"
+    }
+  ],
   "FPsHDW": [
     {
       "type": 0,
       "value": "Sign Up"
     }
   ],
-  "G3pknE": [
+  "FnmYrQ": [
+    {
+      "type": 0,
+      "value": "Merge"
+    }
+  ],
+  "GY7j0U": [
     {
       "type": 0,
       "value": "I agree to the"
     }
   ],
-  "GvowiA": [
+  "HLKVM1": [
     {
       "type": 0,
-      "value": "Forgot your password ?"
+      "value": "New password"
+    }
+  ],
+  "IBgr9f": [
+    {
+      "type": 0,
+      "value": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case"
+    }
+  ],
+  "IG0zHo": [
+    {
+      "type": 0,
+      "value": "We need your full name so that we know how to call you"
+    }
+  ],
+  "IflgW1": [
+    {
+      "type": 0,
+      "value": "Enter your last name"
     }
   ],
   "J7Z2GR": [
@@ -215,10 +327,28 @@
       "value": "Cut Video"
     }
   ],
+  "JQIn3j": [
+    {
+      "type": 0,
+      "value": "Enter your email address or phone number"
+    }
+  ],
+  "JQwUqv": [
+    {
+      "type": 0,
+      "value": "Pick some topics about your company"
+    }
+  ],
   "JcQ1BH": [
     {
       "type": 0,
       "value": "Photo"
+    }
+  ],
+  "K4JPQO": [
+    {
+      "type": 0,
+      "value": "Continue"
     }
   ],
   "KOjOOw": [
@@ -227,10 +357,22 @@
       "value": "Search for profiles, posts..."
     }
   ],
+  "LGAptw": [
+    {
+      "type": 0,
+      "value": "Phone number or email address"
+    }
+  ],
   "M32J+R": [
     {
       "type": 0,
       "value": "Next"
+    }
+  ],
+  "ONJ+uo": [
+    {
+      "type": 0,
+      "value": "Last name"
     }
   ],
   "P2PER8": [
@@ -239,16 +381,16 @@
       "value": "Sepia"
     }
   ],
-  "PDfRjc": [
+  "PL6vuK": [
     {
       "type": 0,
-      "value": "privacy policy"
+      "value": "Title"
     }
   ],
-  "PEHtPw": [
+  "PVzsRd": [
     {
       "type": 0,
-      "value": "Enter your email address and we'll send you a link to create a new password"
+      "value": "Foreground"
     }
   ],
   "ParXIq": [
@@ -269,10 +411,22 @@
       "value": "Documentary"
     }
   ],
-  "QuRr//": [
+  "RTqCXo": [
     {
       "type": 0,
-      "value": "Don't have an account"
+      "value": "Tap to accept the terms of service"
+    }
+  ],
+  "SGt9OO": [
+    {
+      "type": 0,
+      "value": "Edit my profile"
+    }
+  ],
+  "SWwxhL": [
+    {
+      "type": 0,
+      "value": "Pick some topics you like."
     }
   ],
   "SmWLhs": [
@@ -281,16 +435,52 @@
       "value": "Trending posts"
     }
   ],
+  "Tmtm4h": [
+    {
+      "type": 0,
+      "value": "Choose a company activity"
+    }
+  ],
+  "TtcQs5": [
+    {
+      "type": 0,
+      "value": "Clipping"
+    }
+  ],
   "UIZoTQ": [
     {
       "type": 0,
       "value": "Enter your search word"
     }
   ],
-  "V2RVO7": [
+  "UPw9Sj": [
     {
       "type": 0,
-      "value": "Terms of services"
+      "value": "Create new password"
+    }
+  ],
+  "UTSFOW": [
+    {
+      "type": 0,
+      "value": "Business/company"
+    }
+  ],
+  "UWbqab": [
+    {
+      "type": 0,
+      "value": "Unfollow"
+    }
+  ],
+  "V1zxkj": [
+    {
+      "type": 0,
+      "value": "Please enter a valid phone number or email address"
+    }
+  ],
+  "VAgiN9": [
+    {
+      "type": 0,
+      "value": "This phone number is already registered"
     }
   ],
   "Vh3DQb": [
@@ -305,10 +495,22 @@
       "value": "Next"
     }
   ],
-  "Y+Ob8P": [
+  "WO7pDf": [
     {
       "type": 0,
-      "value": "Please enter a valid email address"
+      "value": "Enter your password"
+    }
+  ],
+  "X3tHsa": [
+    {
+      "type": 0,
+      "value": "Tap to sign in"
+    }
+  ],
+  "XfBKWm": [
+    {
+      "type": 0,
+      "value": "Activity"
     }
   ],
   "Y+UQRB": [
@@ -317,10 +519,28 @@
       "value": "Media Filter"
     }
   ],
-  "Y7sr+4": [
+  "YgcSzd": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Create a new password"
+    }
+  ],
+  "ZP2YVW": [
+    {
+      "type": 0,
+      "value": "What best describe you?"
+    }
+  ],
+  "ZgjKM3": [
+    {
+      "type": 0,
+      "value": "Get started"
+    }
+  ],
+  "ZnPyUn": [
+    {
+      "type": 0,
+      "value": "Enter your phone number or email address"
     }
   ],
   "a17Y8A": [
@@ -329,10 +549,34 @@
       "value": "Temperature"
     }
   ],
+  "aGgFjV": [
+    {
+      "type": 0,
+      "value": "Tap to reset your passward"
+    }
+  ],
+  "aOpC4m": [
+    {
+      "type": 0,
+      "value": "I agree to the"
+    }
+  ],
   "b4fFwm": [
     {
       "type": 0,
       "value": "Brightness"
+    }
+  ],
+  "bO/TfG": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "bxkdJ/": [
+    {
+      "type": 0,
+      "value": "Don't have an account?"
     }
   ],
   "dF52vj": [
@@ -359,16 +603,34 @@
       "value": "Transfer"
     }
   ],
-  "eNyb4j": [
+  "e9NfAF": [
     {
       "type": 0,
-      "value": "Tap to sign in"
+      "value": "Check your emails or messages!"
     }
   ],
   "ebisVt": [
     {
       "type": 0,
       "value": "Adjust"
+    }
+  ],
+  "f2KYUh": [
+    {
+      "type": 0,
+      "value": "Subtitle"
+    }
+  ],
+  "fCYBEv": [
+    {
+      "type": 0,
+      "value": "We just send you a link to create a new password"
+    }
+  ],
+  "fWSCbG": [
+    {
+      "type": 0,
+      "value": "Tap to sign in"
     }
   ],
   "g67Jzi": [
@@ -407,10 +669,22 @@
       "value": "Tap to reset your passward"
     }
   ],
-  "h0jHxq": [
+  "h7lmdC": [
     {
       "type": 0,
-      "value": "Password"
+      "value": "This email address is already registered"
+    }
+  ],
+  "h98t/F": [
+    {
+      "type": 0,
+      "value": "Failed to load the informations of your cover"
+    }
+  ],
+  "hFNpbJ": [
+    {
+      "type": 0,
+      "value": "Tap to accept the privacy policy"
     }
   ],
   "hc+1uI": [
@@ -419,16 +693,58 @@
       "value": "Allow Azzapp to access your microphone"
     }
   ],
-  "izbcMX": [
+  "hwL8A0": [
     {
       "type": 0,
-      "value": "Sign In"
+      "value": "Follow"
     }
   ],
-  "l29LyJ": [
+  "iERvZO": [
     {
       "type": 0,
-      "value": "Please enter a valid email"
+      "value": "Pick some topics that describes your company."
+    }
+  ],
+  "jWEWL/": [
+    {
+      "type": 0,
+      "value": "Enter your first name"
+    }
+  ],
+  "k2OnxJ": [
+    {
+      "type": 0,
+      "value": "Tell us more about you?"
+    }
+  ],
+  "kjYrL+": [
+    {
+      "type": 0,
+      "value": "Color #1"
+    }
+  ],
+  "ksoDJ1": [
+    {
+      "type": 0,
+      "value": "Continue"
+    }
+  ],
+  "l9gQB2": [
+    {
+      "type": 0,
+      "value": "Continue"
+    }
+  ],
+  "lC1DXs": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "lXXDGw": [
+    {
+      "type": 0,
+      "value": "Create your cover"
     }
   ],
   "lXovx3": [
@@ -437,16 +753,40 @@
       "value": "New Post"
     }
   ],
-  "lsO83S": [
+  "m3tMdT": [
     {
       "type": 0,
-      "value": "Please enter a password"
+      "value": "Tap to sign up"
+    }
+  ],
+  "mRqzw5": [
+    {
+      "type": 0,
+      "value": "Color"
+    }
+  ],
+  "maTkuw": [
+    {
+      "type": 0,
+      "value": "Enter your last name"
     }
   ],
   "mfzT2i": [
     {
       "type": 0,
       "value": "Tap to follow the profile"
+    }
+  ],
+  "mj17hv": [
+    {
+      "type": 0,
+      "value": "Background"
+    }
+  ],
+  "n+R1xX": [
+    {
+      "type": 0,
+      "value": "Choose a username"
     }
   ],
   "n8Bdhz": [
@@ -467,10 +807,10 @@
       "value": "Shadow"
     }
   ],
-  "nufnAH": [
+  "nxN9u/": [
     {
       "type": 0,
-      "value": "Email Address"
+      "value": "Tell us more about your company"
     }
   ],
   "ny70pU": [
@@ -511,6 +851,12 @@
       "value": " from history"
     }
   ],
+  "pfOnsu": [
+    {
+      "type": 0,
+      "value": "Effect"
+    }
+  ],
   "pqxK1C": [
     {
       "type": 0,
@@ -523,10 +869,28 @@
       "value": "Thermal"
     }
   ],
+  "qEenwJ": [
+    {
+      "type": 0,
+      "value": "You need to accept the Terms of Service and the Privacy Policy"
+    }
+  ],
   "qyCo80": [
     {
       "type": 0,
       "value": "Describe your publication"
+    }
+  ],
+  "r2oElc": [
+    {
+      "type": 0,
+      "value": "Enter your company name"
+    }
+  ],
+  "rHj8v4": [
+    {
+      "type": 0,
+      "value": "Password"
     }
   ],
   "rKml3z": [
@@ -535,22 +899,58 @@
       "value": "Allow Azzapp to access your camera and your microphone"
     }
   ],
+  "ryq1Nd": [
+    {
+      "type": 0,
+      "value": "What's your name?"
+    }
+  ],
   "rzJ3iZ": [
     {
       "type": 0,
       "value": "Cancel"
     }
   ],
-  "sSVrVw": [
+  "s/244i": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Update your cover"
+    }
+  ],
+  "sRESK6": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
+  "sqy+v3": [
+    {
+      "type": 0,
+      "value": "Log In"
+    }
+  ],
+  "u1bNBj": [
+    {
+      "type": 0,
+      "value": "Color #2"
+    }
+  ],
+  "uM3ONA": [
+    {
+      "type": 0,
+      "value": "Enter your first name"
     }
   ],
   "uNR58P": [
     {
       "type": 0,
       "value": "Chrome"
+    }
+  ],
+  "uYooK1": [
+    {
+      "type": 0,
+      "value": "Enter your company name"
     }
   ],
   "ukFVmp": [
@@ -569,10 +969,10 @@
       "value": "word"
     }
   ],
-  "v3DENk": [
+  "uzUgQ0": [
     {
       "type": 0,
-      "value": "Tap to sign up"
+      "value": "Tell us more about your company?"
     }
   ],
   "v4LP9H": [
@@ -593,16 +993,28 @@
       "value": "Sharpness"
     }
   ],
+  "vgbI3l": [
+    {
+      "type": 0,
+      "value": "This username is already taken"
+    }
+  ],
   "w3ybid": [
     {
       "type": 0,
       "value": "Finish"
     }
   ],
-  "wMsxl3": [
+  "w96WJ0": [
     {
       "type": 0,
-      "value": "Take a picture"
+      "value": "Password doesn't match"
+    }
+  ],
+  "wMRD7a": [
+    {
+      "type": 0,
+      "value": "Person"
     }
   ],
   "wfjPDR": [
@@ -623,16 +1035,28 @@
       "value": "video"
     }
   ],
-  "wvXg6E": [
+  "x/HwUu": [
     {
       "type": 0,
-      "value": "I accept with"
+      "value": "Take a picture"
     }
   ],
-  "xl/PxL": [
+  "x288ev": [
     {
       "type": 0,
-      "value": "Log In"
+      "value": "Unknown error - Please retry"
+    }
+  ],
+  "x2jOn0": [
+    {
+      "type": 0,
+      "value": "Phone Number of email address"
+    }
+  ],
+  "xaWatU": [
+    {
+      "type": 0,
+      "value": "Cancel"
     }
   ],
   "y37Ei7": [
@@ -661,6 +1085,12 @@
     {
       "type": 0,
       "value": "Take a video"
+    }
+  ],
+  "zSfUYY": [
+    {
+      "type": 0,
+      "value": "Company name"
     }
   ]
 }
