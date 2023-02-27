@@ -108,9 +108,7 @@ const updateCover = mutationWithClientMutationId({
       (!input.media ||
         !input.sourceMedia ||
         !input.textPreviewMedia ||
-        !input.title ||
-        !input.titleStyle ||
-        !input.contentStyle)
+        !input.title)
     ) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
@@ -139,10 +137,10 @@ const updateCover = mutationWithClientMutationId({
               segmented: input.segmented ?? false,
               merged: input.merged ?? false,
               title: input.title!,
-              titleStyle: input.titleStyle as any,
+              titleStyle: input.titleStyle ?? null,
               subTitle: input.subTitle ?? null,
               subTitleStyle: input.subTitleStyle ?? null,
-              contentStyle: input.contentStyle as any,
+              contentStyle: input.contentStyle ?? null,
             },
             trx,
           );
