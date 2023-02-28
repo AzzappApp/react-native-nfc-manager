@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   productionBrowserSourceMaps: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    tsconfigPath: './tsconfig.next.json',
+    ignoreBuildErrors: true,
+  },
   images: {
     disableStaticImages: true,
   },
@@ -9,7 +16,7 @@ module.exports = {
     serverComponentsExternalPackages: ['cassandra-driver'],
   },
   transpilePackages: [
-    '@azzapp/shared',
+    '@azzapp/shared/',
     '@azzapp/data',
     '@azzapp/app',
     '@azzapp/relay',

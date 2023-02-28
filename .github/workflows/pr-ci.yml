@@ -24,6 +24,9 @@ jobs:
         run: yarn build
       
       # Testing
+      - name: JavaScript build
+        run: yarn build
+
       - name: Lint
         run: yarn lint
 

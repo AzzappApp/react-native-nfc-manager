@@ -1,19 +1,31 @@
 {
   "name": "@azzapp/app",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
-    "dev": "react-native start",
-    "clean": "watchman watch-del-all && rm -rf node_modules && rm -Rf ios/build && rm -Rf ios/Pods",
-    "bundle": "react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios",
-    "pod-install": "cd ios && bundle exec pod install",
+    "build:lib": "yarn lib:clean && yarn lib:compile && yarn lib:definition && yarn assets:copy",
+    "build:ios": "bundle exec fastlane ios build",
+    "typecheck": "tsc --noEmit",
+    "build:android": "bundle exec fastlane android build",
+    "rn:watch": "react-native start",
     "run:android": "react-native run-android --no-packager",
     "run:ios": "react-native run-ios --no-packager",
-    "build:ios": "bundle exec fastlane ios build",
-    "build:android": "bundle exec fastlane android build",
     "deploy:ios": "bundle exec fastlane ios deploy",
-    "deploy:android": "bundle exec fastlane android deploy"
+    "deploy:android": "bundle exec fastlane android deploy",
+    "lib:clean": "rimraf lib",
+    "lib:definition": "tsc -p tsconfig.lib.json",
+    "lib:definition:watch": "yarn lib:definition --watch",
+    "lib:compile": "babel src --config-file ./babel.config.lib.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
+    "lib:compile:watch": "yarn lib:compile --watch",
+    "assets:copy": "node scripts/copy-assets",
+    "assets:watch": "yarn assets:copy && node scripts/watch-assets",
+    "pod-install": "cd ios && bundle exec pod install"
   },
+  "devScripts": [
+    "lib:compile:watch",
+    "lib:definition:watch",
+    "assets:watch",
+    "rn:watch"
+  ],
   "dependencies": {
     "@azzapp/i18n": "*",
     "@azzapp/relay": "*",
@@ -59,10 +71,13 @@
     "@types/react-relay": "^14.1.2",
     "@types/react-transition-group": "^4.4.5",
     "@types/relay-test-utils": "^14.1.0",
+    "copyfiles": "^2.4.1",
+    "fb-watchman": "^2.0.2",
     "react-native-dotenv": "^3.4.6",
     "react-native-monorepo-tools": "^1.2.1",
     "react-test-renderer": "^18.2.0",
-    "relay-test-utils": "^14.1.0"
+    "relay-test-utils": "^14.1.0",
+    "rimraf": "^4.1.2"
   },
   "jest": {
     "preset": "react-native"

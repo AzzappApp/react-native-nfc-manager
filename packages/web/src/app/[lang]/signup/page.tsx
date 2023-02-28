@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter, useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
-import SignUpScreen from '@azzapp/app/lib/screens/SignUpScreen';
-import type { SignUpParams } from '@azzapp/shared/lib/WebAPI';
+import { useRouter, useWebAPI } from '@azzapp/app/PlatformEnvironment';
+import SignUpScreen from '@azzapp/app/screens/SignUpScreen';
+import type { SignUpParams } from '@azzapp/shared/WebAPI';
 
 const SignUpPage = () => {
   const WebAPI = useWebAPI();

@@ -1,11 +1,8 @@
 import { v2 as Cloudinary } from 'cloudinary';
 import cuid from 'cuid';
-import ERRORS from '@azzapp/shared/lib/errors';
-import {
-  getRequestAuthInfos,
-  withSessionAPIRoute,
-} from '../../helpers/session';
-import type { Viewer } from '@azzapp/data/lib/domains';
+import ERRORS from '@azzapp/shared/errors';
+import { getRequestAuthInfos, withSessionAPIRoute } from '#helpers/session';
+import type { Viewer } from '@azzapp/data/domains';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;

@@ -1,8 +1,8 @@
 'use client';
 
-import { useWebAPI } from '@azzapp/app/lib/PlatformEnvironment';
-import SignInScreen from '@azzapp/app/lib/screens/SignInScreen';
-import type { SignInParams } from '@azzapp/shared/lib/WebAPI';
+import { useWebAPI } from '@azzapp/app/PlatformEnvironment';
+import SignInScreen from '@azzapp/app/screens/SignInScreen';
+import type { SignInParams } from '@azzapp/shared/WebAPI';
 
 const SignInPage = () => {
   const WebAPI = useWebAPI();

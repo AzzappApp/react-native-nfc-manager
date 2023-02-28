@@ -5,7 +5,7 @@ import useLazyLoadQueryNode from 'react-relay/lib/relay-hooks/useLazyLoadQueryNo
 // @ts-expect-error no types
 import useMemoOperationDescriptor from 'react-relay/lib/relay-hooks/useMemoOperationDescriptor';
 import { __internal } from 'relay-runtime';
-import type { ServerQuery } from '../helpers/preloadServerQuery';
+import type { ServerQuery } from '#helpers/preloadServerQuery';
 import type { OperationType, GraphQLTaggedNode } from 'relay-runtime';
 
 const { fetchQuery } = __internal;

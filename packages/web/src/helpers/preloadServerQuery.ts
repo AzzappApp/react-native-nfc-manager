@@ -1,9 +1,9 @@
 import { graphql } from 'graphql';
 import { cache } from 'react';
-import { createGraphQLContext, graphQLSchema } from '@azzapp/data/lib';
+import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
-import ERRORS from '@azzapp/shared/lib/errors';
-import type { ViewerInfos } from '@azzapp/data/lib/schema/GraphQLContext';
+import ERRORS from '@azzapp/shared/errors';
+import type { ViewerInfos } from '@azzapp/data/schema/GraphQLContext';
 import type { VariablesOf, GraphQLTaggedNode } from 'react-relay';
 import type { ConcreteRequest, OperationType } from 'relay-runtime';
 

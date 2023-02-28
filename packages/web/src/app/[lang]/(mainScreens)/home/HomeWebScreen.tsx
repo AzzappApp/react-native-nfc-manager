@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { graphql } from 'react-relay';
-import HomeScreen from '@azzapp/app/lib/screens/HomeScreen';
-import useServerQuery from '../../../../hooks/useServerQuery';
-import type { ServerQuery } from '../../../../helpers/preloadServerQuery';
+import HomeScreen from '@azzapp/app/screens/HomeScreen';
+import useServerQuery from '#hooks/useServerQuery';
+import type { ServerQuery } from '#helpers/preloadServerQuery';
 import type { HomeWebScreenQuery } from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 
 type HomePageProps = {

@@ -1,4 +1,4 @@
-import type { Route } from '@azzapp/app/lib/routes';
+import type { Route } from '@azzapp/app/routes';
 
 export const routeToPath = ({ route, params }: Route) => {
   const tokens = routesPathTokens[route];

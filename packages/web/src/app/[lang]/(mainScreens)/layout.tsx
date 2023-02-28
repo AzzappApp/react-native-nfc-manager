@@ -1,7 +1,7 @@
 'use client';
 
-import MainTabBar from '@azzapp/app/lib/components/MainTabBar';
-import { TAB_BAR_HEIGHT } from '@azzapp/app/lib/ui/TabsBar';
+import MainTabBar from '@azzapp/app/components/MainTabBar';
+import { TAB_BAR_HEIGHT } from '@azzapp/app/ui/TabsBar';
 
 const ScreensLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="root" style={{ paddingBottom: TAB_BAR_HEIGHT }}>

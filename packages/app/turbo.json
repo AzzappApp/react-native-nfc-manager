@@ -1,0 +1,24 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "pipeline": {
+    "build:lib": {
+      "dependsOn": ["//#relay:build", "^build"],
+      "outputs": ["lib/**/*"],
+      "inputs": ["src/**/*"]
+    },
+    "build:ios": {
+      "dependsOn": ["//#relay:build", "^build"],
+      "cache": false
+    },
+    "build:android": {
+      "dependsOn": ["//#relay:build", "^build", "pod-install"],
+      "cache": false
+    },
+    "pod-install": {},
+    "typecheck": {
+      "dependsOn": ["//#relay:build", "^build"],
+      "inputs": ["src/**/*"]
+    }
+  }
+}

@@ -1,9 +1,9 @@
 'use client';
 
 import { graphql } from 'react-relay';
-import SearchScreen from '@azzapp/app/lib/screens/SearchScreen';
-import useServerQuery from '../../../../hooks/useServerQuery';
-import type { ServerQuery } from '../../../../helpers/preloadServerQuery';
+import SearchScreen from '@azzapp/app/screens/SearchScreen';
+import useServerQuery from '#hooks/useServerQuery';
+import type { ServerQuery } from '#helpers/preloadServerQuery';
 import type { SearchWebScreenQuery } from '@azzapp/relay/artifacts/SearchWebScreenQuery.graphql';
 
 type SearchWebScreenProps = {

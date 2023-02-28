@@ -1,10 +1,10 @@
-import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/lib/domains';
-import ERRORS from '@azzapp/shared/lib/errors';
+import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
+import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
-} from '@azzapp/shared/lib/stringHelpers';
-import { withSessionAPIRoute } from '../../helpers/session';
+} from '@azzapp/shared/stringHelpers';
+import { withSessionAPIRoute } from '#helpers/session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type ChangePasswordBody = {

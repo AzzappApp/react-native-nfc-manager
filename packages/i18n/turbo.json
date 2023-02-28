@@ -1,0 +1,17 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["build:app", "build:web"]
+    },
+    "build:app": {
+      "inputs": ["src/app/**/*.json"],
+      "outputs": ["compiled/app/**"]
+    },
+    "build:web": {
+      "inputs": ["src/web/**/*.json"],
+      "outputs": ["compiled/web/**"]
+    }
+  }
+}

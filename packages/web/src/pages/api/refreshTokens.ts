@@ -1,5 +1,5 @@
-import ERRORS from '@azzapp/shared/lib/errors';
-import { refreshTokens } from '../../helpers/tokensHelpers';
+import ERRORS from '@azzapp/shared/errors';
+import { refreshTokens } from '#helpers/tokensHelpers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const refreshTokensApi = async (req: NextApiRequest, res: NextApiResponse) => {

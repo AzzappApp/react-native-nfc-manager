@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from '@azzapp/app/lib/PlatformEnvironment';
-import OnBoardingScreen from '@azzapp/app/lib/screens/OnBoardingScreen';
+import { useRouter } from '@azzapp/app/PlatformEnvironment';
+import OnBoardingScreen from '@azzapp/app/screens/OnBoardingScreen';
 
 const OnBoardingPage = () => {
   const router = useRouter();

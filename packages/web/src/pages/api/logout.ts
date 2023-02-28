@@ -1,4 +1,4 @@
-import { withSessionAPIRoute } from '../../helpers/session';
+import { withSessionAPIRoute } from '#helpers/session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const logout = async (req: NextApiRequest, res: NextApiResponse) => {

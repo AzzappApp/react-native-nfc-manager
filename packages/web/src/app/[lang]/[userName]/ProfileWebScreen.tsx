@@ -1,9 +1,9 @@
 'use client';
 
 import { graphql } from 'react-relay';
-import ProfileScreen from '@azzapp/app/lib/screens/ProfileScreen';
-import useServerQuery from '../../../hooks/useServerQuery';
-import type { ServerQuery } from '../../../helpers/preloadServerQuery';
+import ProfileScreen from '@azzapp/app/screens/ProfileScreen';
+import useServerQuery from '#hooks/useServerQuery';
+import type { ServerQuery } from '#helpers/preloadServerQuery';
 import type { ProfileWebScreenQuery } from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
 
 type UserWebScreenProps = {

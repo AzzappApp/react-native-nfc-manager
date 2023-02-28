@@ -2,13 +2,10 @@ import Cors from 'cors';
 import { graphql } from 'graphql';
 import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
-import ERRORS from '@azzapp/shared/lib/errors';
-import applyConnectMiddleware from '../../helpers/applyConnectMiddleware';
-import {
-  getRequestAuthInfos,
-  withSessionAPIRoute,
-} from '../../helpers/session';
-import type { ViewerInfos } from '@azzapp/data/lib/schema/GraphQLContext';
+import ERRORS from '@azzapp/shared/errors';
+import applyConnectMiddleware from '#helpers/applyConnectMiddleware';
+import { getRequestAuthInfos, withSessionAPIRoute } from '#helpers/session';
+import type { ViewerInfos } from '@azzapp/data/schema/GraphQLContext';
 import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 
 // TODO production security settings

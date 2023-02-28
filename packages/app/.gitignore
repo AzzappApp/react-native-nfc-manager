@@ -70,5 +70,7 @@ fastlane/test_output
 # when using the yarn bundle command
 /ios/assets
 
-
+# TS compilation
+dist/
+lib/
 

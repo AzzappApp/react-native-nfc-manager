@@ -7,11 +7,11 @@ import { IntlProvider } from 'react-intl';
 // @ts-expect-error there is no types definition for react-native-web
 import { StyleSheet } from 'react-native-web';
 import { RelayEnvironmentProvider } from 'react-relay';
-import { PlatformEnvironmentProvider } from '@azzapp/app/lib/PlatformEnvironment';
+import { PlatformEnvironmentProvider } from '@azzapp/app/PlatformEnvironment';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import createRelayEnvironment from '@azzapp/shared/lib/createRelayEnvironment';
-import getRuntimeEnvironment from '@azzapp/shared/lib/getRuntimeEnvironment';
-import useWebPlatformEnvironment from '../../hooks/useWebPlatformEnvironment';
+import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
+import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
+import useWebPlatformEnvironment from '#hooks/useWebPlatformEnvironment';
 
 type ClientWrapperProps = {
   children: React.ReactNode;

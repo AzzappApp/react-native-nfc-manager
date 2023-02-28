@@ -30,6 +30,9 @@ jobs:
           CI: true    
       
       # Testing
+      - name: JavaScript build
+        run: yarn build
+
       - name: Lint
         run: yarn lint
 
@@ -52,7 +55,7 @@ jobs:
 
        # use manual command instead of build command for passing --repersist option to relay
       - name: Force rebuild the query-map.json
-        run: yarn relay --repersist
+        run: yarn relay:build --repersist
         env:
           CI: true  
 
@@ -166,9 +169,6 @@ jobs:
         with:
           path: packages/app/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
-
-      - name: Pod install
-        run: cd packages/app/ios/ && bundle exec pod install
 
       - name: Setup faslane AppStore API Key
         run: echo $FASTLANE_APPSTORE_API_KEY | base64 --decode > ./packages/app/fastlane/appstore_api_key.json

@@ -5,14 +5,14 @@ import {
   getUserByPhoneNumber,
   getProfileByUserName,
   createProfile,
-} from '@azzapp/data/lib/domains';
-import ERRORS from '@azzapp/shared/lib/errors';
+} from '@azzapp/data/domains';
+import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
-} from '@azzapp/shared/lib/stringHelpers';
-import { withSessionAPIRoute } from '../../helpers/session';
-import { generateTokens } from '../../helpers/tokensHelpers';
+} from '@azzapp/shared/stringHelpers';
+import { withSessionAPIRoute } from '#helpers/session';
+import { generateTokens } from '#helpers/tokensHelpers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type SignupBody = {

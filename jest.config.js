@@ -17,7 +17,23 @@ module.exports = {
         '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
       },
       setupFilesAfterEnv: ['./scripts/jestSetup.js'],
-      testMatch: ['<rootDir>/packages/**/*.test.{js,jsx,ts,tsx}'],
+      testMatch: ['<rootDir>/packages/app/src/**/*.test.{js,jsx,ts,tsx}'],
+      transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
+      moduleNameMapper: {
+        '#(.*)': '<rootDir>/packages/app/src/$1',
+        '@azzapp/shared/(.*)': '<rootDir>/packages/shared/src/$1',
+      },
+    },
+    {
+      displayName: 'shared',
+      // TODO use a more appropriate preset
+      preset: 'react-native',
+      transform: {
+        // TODO use a more appropriate transformer
+        '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
+      },
+      setupFilesAfterEnv: ['./scripts/jestSetup.js'],
+      testMatch: ['<rootDir>/packages/shared/src/**/*.test.{js,jsx,ts,tsx}'],
       transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
     },
   ],

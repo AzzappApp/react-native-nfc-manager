@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import HomeWebScreenQueryNode from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
-import preloadServerQuery from '../../../../helpers/preloadServerQuery';
-import { getAuthInfos } from '../../../../helpers/session';
+import preloadServerQuery from '#helpers/preloadServerQuery';
+import { getAuthInfos } from '#helpers/session';
 import HomeWebScreen from './HomeWebScreen';
 import type { HomeWebScreenQuery } from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 

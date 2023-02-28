@@ -1,22 +1,11 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "jsx": "preserve",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ]
+    "paths": {
+      "@azzapp/shared/*": ["../shared/src/*"],
+      "@azzapp/data/*": ["../data/src/*"],
+      "@azzapp/app/*": ["../app/src/*"],
+      "#*": ["./src/*"]
+    }
+  }
 }

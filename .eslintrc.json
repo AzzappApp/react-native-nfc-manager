@@ -6,7 +6,7 @@
     "node": true
   },
   "parserOptions": {
-    "project": ["./tsconfig.json"],
+    "project": ["./packages/*/tsconfig.json", "tsconfig.json"],
     "ecmaVersion": 2022
   },
   "settings": {
@@ -24,7 +24,19 @@
     "plugin:prettier/recommended"
   ],
   "plugins": ["formatjs"],
-  "ignorePatterns": ["**/__generated__/*", "packages/relay/artifacts/"],
+  "ignorePatterns": [
+    "**/__generated__/*",
+    "packages/relay/artifacts/",
+    "packages/app/lib",
+    "packages/app/ios",
+    "packages/app/android",
+    "packages/app/fastlane",
+    "packages/app/vendor",
+    "packages/data/lib",
+    "packages/shared/lib",
+    "packages/web/.next",
+    "trash"
+  ],
   "rules": {
     "array-callback-return": "error",
     "no-promise-executor-return": "error",
@@ -79,6 +91,16 @@
           {
             "pattern": "@azzapp/**",
             "group": "internal"
+          },
+          {
+            "pattern": "#**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "#**/**",
+            "group": "internal",
+            "position": "after"
           }
         ],
         "groups": [

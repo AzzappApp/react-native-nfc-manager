@@ -5,15 +5,15 @@ import {
   getProfileByUserName,
   getUsersByIds,
   getUserProfiles,
-} from '@azzapp/data/lib/domains';
-import ERRORS from '@azzapp/shared/lib/errors';
+} from '@azzapp/data/domains';
+import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
-} from '@azzapp/shared/lib/stringHelpers';
-import { withSessionAPIRoute } from '../../helpers/session';
-import { generateTokens } from '../../helpers/tokensHelpers';
-import type { Profile, User } from '@azzapp/data/lib/domains';
+} from '@azzapp/shared/stringHelpers';
+import { withSessionAPIRoute } from '#helpers/session';
+import { generateTokens } from '#helpers/tokensHelpers';
+import type { Profile, User } from '@azzapp/data/domains';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type SignInBody = {

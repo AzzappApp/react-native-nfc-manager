@@ -1,0 +1,18 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build", "generate-db-type"],
+      "outputs": ["lib/**/*"],
+      "inputs": ["src/**/*"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "generate-db-type"],
+      "inputs": ["src/**/*"]
+    },
+    "generate-db-type": {
+      "inputs": ["prisma/schema.prisma"]
+    }
+  }
+}

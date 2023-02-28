@@ -4,7 +4,7 @@ const glob = require('fast-glob');
 
 (async () => {
   const appMessages = JSON.parse(
-    await extract(glob.sync('packages/app/lib/**/*.ts*'), {
+    await extract(glob.sync('packages/app/src/**/*.ts*', {}), {
       idInterpolationPattern: '[sha1:contenthash:base64:6]',
     }),
   );

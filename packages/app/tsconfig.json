@@ -1,7 +1,22 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "baseUrl": "./lib"
-  }
+    "paths": {
+      "@azzapp/shared/*": ["../shared/src/*"],
+      "#*": ["./src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+  "exclude": [
+    ".bundle",
+    "android",
+    "assets",
+    "dist",
+    "lib",
+    "fastlane",
+    "ios",
+    "node_modules",
+    "vendor"
+  ]
 }

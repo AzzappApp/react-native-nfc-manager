@@ -2,7 +2,7 @@ module.exports = {
   name: 'azzapp',
   root: '.',
   sources: {
-    'packages/app/lib': 'azzapp',
+    'packages/app/src': 'azzapp',
     'packages/web/src': 'azzapp',
   },
   projects: {

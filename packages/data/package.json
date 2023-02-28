@@ -2,7 +2,34 @@
   "name": "@azzapp/data",
   "version": "0.0.1",
   "private": true,
-  "main": "./lib",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    },
+    "./domains": {
+      "types": "./lib/domains/index.d.ts",
+      "default": "./lib/domains/index.js"
+    }
+  },
+  "scripts": {
+    "build": "yarn compile && yarn definition",
+    "dev": "yarn compile:watch & yarn definition:watch",
+    "typecheck": "yarn definition",
+    "generate-db-type": "prisma generate",
+    "definition": "tsc -p tsconfig.build.json",
+    "definition:watch": "yarn definition --watch",
+    "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
+    "compile:watch": "yarn compile --watch"
+  },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
   "dependencies": {
     "@azzapp/relay": "*",
     "@azzapp/shared": "*",
@@ -19,7 +46,6 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@prisma/client": "^4.8.0",
     "@types/lodash": "^4.14.186",
     "@types/uuid": "^8.3.4",
     "prisma": "^4.8.0"

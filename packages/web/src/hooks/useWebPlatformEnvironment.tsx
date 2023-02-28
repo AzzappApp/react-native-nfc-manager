@@ -1,10 +1,10 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
-import * as WebAPI from '@azzapp/shared/lib/WebAPI';
-import Link from '../components/Link';
-import { pathToRoute, routeToPath } from '../helpers/routesHelpers';
-import type { PlatformEnvironment } from '@azzapp/app/lib/PlatformEnvironment';
-import type { Route } from '@azzapp/app/lib/routes';
+import * as WebAPI from '@azzapp/shared/WebAPI';
+import Link from '#components/Link';
+import { pathToRoute, routeToPath } from '#helpers/routesHelpers';
+import type { PlatformEnvironment } from '@azzapp/app/PlatformEnvironment';
+import type { Route } from '@azzapp/app/routes';
 
 const useWebPlatformEnvironment = (): PlatformEnvironment => {
   const router = useRouter();
