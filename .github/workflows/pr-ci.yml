@@ -1,5 +1,10 @@
-name: Test
-on: pull_request
+name: CI process on pull request on release branch
+on: 
+  pull_request:
+    branches:
+      - main
+      - staging
+      - production
 jobs:
   continuous-integration :
     name: Validate and test and Build
