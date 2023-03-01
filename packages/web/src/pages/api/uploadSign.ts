@@ -6,7 +6,7 @@ import type { Viewer } from '@azzapp/data/domains';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!;
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
 const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
 
 const uploadSign = async (req: NextApiRequest, res: NextApiResponse) => {

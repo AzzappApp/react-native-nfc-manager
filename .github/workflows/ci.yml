@@ -188,7 +188,6 @@ jobs:
           EXPORT_METHOD: "development"
           MATCH_TYPE: "development"
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "azzapp"
-          NEXT_PUBLIC_CLOUDINARY_API_KEY: "281326962786824"
           NEXT_PUBLIC_API_ENDPOINT: "https://${{ steps.vercel_preview_url.outputs.vercel_url }}/api"
           APPCENTER_IOS_APP_SECRET: ${{ env.app_center_ios_secret }}
   

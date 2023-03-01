@@ -32,12 +32,6 @@ The path to yout node binary can be obtained with the command :
 which node
 ```
 
-The relay-compiler in the project needs the query map file to be created, one should first generate this file through this query (required only the first time) :
-
-```sh
-yarn create-query-map-file
-```
-
 ### Dependencies
 
 JavaScript dependencies of the project are installed using `yarn`.
@@ -64,6 +58,12 @@ yarn pod-install
 ### Development Scripts
 
 > All the development / build related scripts should be launched using `yarn`.
+
+Before you can start developping, you should build the whole workspace once : 
+
+```
+yarn build
+```
 
 To launch the application server and react native bundler in dev mode use the `dev` script at the top level sources directory.
 
@@ -154,37 +154,39 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ## CI/CD
 
-The application is build using [Github Actions](https://github.com/features/actions) and [FastLane](https://fastlane.tools/).
-A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the application certificate.
+- The workspace build system is based on [Turbo Repo](https://turbo.build/)
+- The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
+- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate.
 
-List of environement variables during the build process:
+### List of environement variables during the build process:
 
 - `FASTLANE_APPSTORE_API_KEY`: a base 64 encoded of a [Faslane JSON API Key](https://docs.fastlane.tools/app-store-connect-api/)
 - `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
 - `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
-- `APPCENTER_DEV_IOS_API_TOKEN`: the api token of the ios dev appcenter app
-- `APPCENTER_DEV_IOS_APP_NAME`: the name the ios dev appcenter app
-- `APPCENTER_DEV_IOS_APP_SECRET`: the app secret the ios dev appcenter app
-- `APPCENTER_STAGING_IOS_API_TOKEN`: the api token of the ios staging appcenter app
-- `APPCENTER_STAGING_IOS_APP_NAME`: the name of the ios staging appcenter app
-- `APPCENTER_STAGING_IOS_APP_SECRET`: the app secret of the ios staging appcenter app
+- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_API_TOKEN`: the api token of the appcenter app
+- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_NAME`: the name the appcenter app
+- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_SECRET`: the app secret the appcenter app
 
-List of environement variables used at runtime by the application server:
+Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
+Valid platforms are  `IOS` and `ANDROID`. 
+
+### List of environement variables used at runtime by the application server:
 
 - `DATABASE_HOST`: Host of the planetscale database
 - `DATABASE_USERNAME`: Username of the planetscale database
 - `DATABASE_PASSWORD`: Password of the planetscale database 
 - `CLOUDINARY_API_SECRET`: cloudinary api secret
+- `CLOUDINARY_API_KEY`: the cloudinary api key 
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`:  the cloudinary cloud name (also used by web application client)
 - `SECRET_COOKIE_PASSWORD`: password used to encrypt web cookie
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
 - `REFRESH_TOKEN_SECRET`: password used to encrypt jwt refresh tokens
 
-List of environement variables used at runtime by the application clients:
+### List of environement variables used at runtime by the application clients:
 
 - `NEXT_PUBLIC_API_ENDPOINT`: the endpoint of api (generated at build time for mobile clients, set to `/api` for web client)
-- `NEXT_PUBLIC_CLOUDINARY_API_KEY`: the cloudinary api key
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name (only used on WEB)
 
 ## Resources
 
