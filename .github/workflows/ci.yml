@@ -204,13 +204,3 @@ jobs:
           APPCENTER_OWNER_NAME: azzapp
           APPCENTER_IOS_APP_NAME: ${{ env.app_center_ios_app_name }}
           APPCENTER_IOS_API_TOKEN: ${{ env.app_center_ios_api_token }}
-
-      - name: Pull Request deploy command
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
-        with:
-          message: |
-            Application deployed to Microsoft App Center
-            sha: ${{ github.event.pull_request.head.sha }}
-            IOS install url: ${{ env.IOS_INSTALL_URL }}
-            Android install url: ${{ env.ANDROID_INSTALL_URL }}

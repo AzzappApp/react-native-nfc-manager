@@ -4,8 +4,8 @@
   "pipeline": {
     "build:lib": {
       "dependsOn": ["//#relay:build", "^build"],
-      "outputs": ["lib/**/*"],
-      "inputs": ["src/**/*"]
+      "outputs": ["lib/**"],
+      "inputs": ["src/**"]
     },
     "build:ios": {
       "dependsOn": ["build:ios:native", "build:ios:bundle"],
@@ -17,14 +17,14 @@
     },
     "build:ios:native": {
       "inputs": [
-        "ios/azzapp/**/*",
+        "ios/azzapp/**",
         "ios/azzapp.xcodeproj/project.pbxproj",
         "ios/azzapp.xcworkspace/content.xcworkspacedata",
         "ios/Podfile",
         "ios/Podfile.lock",
         "ios/azzapp-Bridging-Header.h"
       ],
-      "outputs": ["ios/fastlane/builds/azzapp.xcarchive/**/*"],
+      "outputs": ["fastlane/builds/azzapp.xcarchive/**"],
       "dependsOn": ["pod-install"]
     },
     "pod-install": {
@@ -36,7 +36,7 @@
     },
     "typecheck": {
       "dependsOn": ["//#relay:build", "^build"],
-      "inputs": ["src/**/*"]
+      "inputs": ["src/**"]
     }
   }
 }

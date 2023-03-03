@@ -3,11 +3,11 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "inputs": ["src/**/*"],
-      "outputs": ["lib/**/*"]
+      "inputs": ["src/**"],
+      "outputs": ["lib/**"]
     },
     "typecheck": {
-      "inputs": ["src/**/*"]
+      "inputs": ["src/**"]
     }
   }
 }

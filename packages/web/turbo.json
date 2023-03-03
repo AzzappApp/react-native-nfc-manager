@@ -4,7 +4,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["//#relay:build", "^build", "@azzapp/app#build:lib"],
-      "inputs": ["src/**/*", "src/public/**/*"],
+      "inputs": ["src/**", "src/public/**"],
       "outputs": [".next/**"]
     },
     "dev": {
