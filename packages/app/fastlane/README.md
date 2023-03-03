@@ -31,6 +31,14 @@ Generate provisioning profile and register test devices
 
 Build IOS application
 
+### ios sign
+
+```sh
+[bundle exec] fastlane ios sign
+```
+
+Sign the IOS application
+
 ### ios deploy
 
 ```sh

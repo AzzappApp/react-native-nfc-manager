@@ -3,9 +3,11 @@
   "version": "0.0.1",
   "scripts": {
     "build:lib": "yarn lib:clean && yarn lib:compile && yarn lib:definition && yarn assets:copy",
-    "build:ios": "bundle exec fastlane ios build",
-    "typecheck": "tsc --noEmit",
+    "build:ios": "bundle exec fastlane ios sign",
+    "build:ios:native": "SKIP_BUNDLING=true bundle exec fastlane ios build",
+    "build:ios:bundle": "./scripts/bundle-ios.sh",
     "build:android": "bundle exec fastlane android build",
+    "typecheck": "tsc --noEmit",
     "rn:watch": "react-native start",
     "run:android": "react-native run-android --no-packager",
     "run:ios": "react-native run-ios --no-packager",

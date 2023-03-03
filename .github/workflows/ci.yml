@@ -9,6 +9,9 @@ jobs:
   continuous-integration :
     name: Validate and test and Build
     runs-on: macos-12
+    env:
+      TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
+      TURBO_TEAM: azzapp
     steps:
       - uses: actions/checkout@v3
 
@@ -142,12 +145,16 @@ jobs:
           ANDROID_KEY_STORE: ${{ secrets.ANDROID_KEY_STORE }}
         run: echo $ANDROID_KEY_STORE | openssl base64 -A -d > ./packages/app/android/app/release.keystore
 
-      - name: Android build apk
-        run: yarn build:android
+      - name: Build Android application bundle
+        uses: burrunan/gradle-cache-action@v1
         env:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        with:
+          job-id : 'azzapp-android-build'
+          arguments: 'bundleRelease'
+          build-root-directory: 'packages/app/android'
 
       # Android Upload
       
@@ -170,9 +177,6 @@ jobs:
         env:
           FASTLANE_APPSTORE_API_KEY: ${{ secrets.FASTLANE_APPSTORE_API_KEY }}
 
-      # - name: Fix FlipperFoly
-      #   run: cd packages/app && sh ./scripts/fix-m1-flipper-foly.sh
-        
       - name: Setup Xcode env
         run: |
           echo "Setup node for xcode to $(command -v node) and USE_HERMES flag"
@@ -187,6 +191,7 @@ jobs:
           GIT_BASIC_AUTH: ${{ secrets.FASTLANE_GIT_BASIC_AUTH }}
           EXPORT_METHOD: "development"
           MATCH_TYPE: "development"
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "azzapp"
           NEXT_PUBLIC_API_ENDPOINT: "https://${{ steps.vercel_preview_url.outputs.vercel_url }}/api"
           APPCENTER_IOS_APP_SECRET: ${{ env.app_center_ios_secret }}

@@ -18,11 +18,28 @@ platform :ios do
 
   desc "Build IOS application"
   lane :build do
-    app_identifier = "com.fadioit.azzapp"
-    pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
+    update_plist(
+      plist_path: "ios/azzapp/AppCenter-Config.plist",
+      block: proc do |plist|
+        plist[:AppSecret] = ENV['APPCENTER_IOS_APP_SECRET']
+      end
+    )
+    
+    gym(
+      scheme: "azzapp", 
+      workspace: "ios/azzapp.xcworkspace", 
+      configuration: "Release",
+      output_directory: "./fastlane/builds",
+      archive_path: "./fastlane/builds/azzapp.xcarchive",
+      skip_package_ipa: true,
+      skip_codesigning: true
+    )
+  end
 
+  desc "Sign the IOS application"
+  lane :sign do
+    app_identifier = "com.fadioit.azzapp"
     setup_ci if ENV['CI']
-    backup_file(path: pbxprojPath)
 
     match(
       type: MATCH_TYPE, 
@@ -50,20 +67,16 @@ platform :ios do
       profile: profile_path,
       target_filter: "azzapp"
     )
-
-    update_plist(
-      plist_path: "ios/azzapp/AppCenter-Config.plist",
-      block: proc do |plist|
-        plist[:AppSecret] = ENV['APPCENTER_IOS_APP_SECRET']
-      end
-    )
     
     gym(
       scheme: "azzapp", 
       workspace: "ios/azzapp.xcworkspace", 
       configuration: "Release",
       output_directory: "./fastlane/builds",
+      skip_build_archive: true,
+      archive_path: "./fastlane/builds/azzapp.xcarchive",
       export_method: EXPORT_METHOD,
+      export_team_id: ENV['TEAM_ID'],
       export_options: {
         method: EXPORT_METHOD,
         signingStyle: "manual",
@@ -72,8 +85,6 @@ platform :ios do
         }
       }
     )
-
-    restore_file(path: pbxprojPath)
   end
 
   desc 'Upload the IOS application to App Center.'
@@ -100,8 +111,7 @@ platform :android do
 
   desc 'Build the Android application.'
   lane :build do
-    gradle(task: 'clean', project_dir: 'android/')
-    gradle(task: 'app:assemble', build_type: 'release', project_dir: 'android/')
+    gradle(task: 'bundle', build_type: 'release', project_dir: 'android/')
   end
 
   desc 'Upload the Android application to App Center.'
@@ -112,7 +122,7 @@ platform :android do
       api_token: ENV["APPCENTER_ANDROID_API_TOKEN"],
       owner_name: ownerName,
       app_name: appName,
-      file: 'android/app/build/outputs/apk/release/app-release.apk'
+      file: 'android/app/build/outputs/bundle/release/app-release.aab',
     )
 
     release = Actions.lane_context[SharedValues::APPCENTER_BUILD_INFORMATION]

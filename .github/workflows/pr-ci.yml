@@ -9,6 +9,9 @@ jobs:
   continuous-integration :
     name: Validate and test and Build
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
+      TURBO_TEAM: azzapp
     steps:
       - uses: actions/checkout@v3
 
@@ -24,10 +27,6 @@ jobs:
           working-directory: packages/app
           bundler-cache: true
 
-      # JavaScript build
-      - name: Relay Compiler 
-        run: yarn build
-      
       # Testing
       - name: JavaScript build
         run: yarn build
