@@ -1,7 +1,15 @@
 {
+  "YLIHQy": {
+    "defaultMessage": "Azzapp - Welcome",
+    "description": "Azzapp welcome page title"
+  },
   "acL7Jg": {
     "defaultMessage": "Sign Up",
     "description": "Sign Up link in web home page"
+  },
+  "cquUKU": {
+    "defaultMessage": "Welcome to Azzapp",
+    "description": "Azzapp welcome page description"
   },
   "jNRxDl": {
     "defaultMessage": "Sign In",

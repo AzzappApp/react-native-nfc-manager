@@ -1,8 +1,7 @@
 'use client';
 
-import { IntlErrorCode } from '@formatjs/intl';
 import { useServerInsertedHTML } from 'next/navigation';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { IntlProvider } from 'react-intl';
 // @ts-expect-error there is no types definition for react-native-web
 import { StyleSheet } from 'react-native-web';
@@ -11,6 +10,7 @@ import { PlatformEnvironmentProvider } from '@azzapp/app/PlatformEnvironment';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
 import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
+import { intlErrorHandler } from '#helpers/i18nHelpers';
 import useWebPlatformEnvironment from '#hooks/useWebPlatformEnvironment';
 
 type ClientWrapperProps = {
@@ -27,16 +27,6 @@ const ClientWrapper = ({ children, locale, messages }: ClientWrapperProps) => {
       createRelayEnvironment({ isServer: getRuntimeEnvironment() === 'node' }),
     [],
   );
-
-  const onIntlError = useCallback((err: any) => {
-    if (
-      process.env.NODE_ENV !== 'production' &&
-      err.code === IntlErrorCode.MISSING_TRANSLATION
-    ) {
-      return;
-    }
-    console.error(err);
-  }, []);
 
   useServerInsertedHTML(() => {
     const sheet = StyleSheet.getSheet();
@@ -57,7 +47,7 @@ const ClientWrapper = ({ children, locale, messages }: ClientWrapperProps) => {
           locale={locale ?? DEFAULT_LOCALE}
           defaultLocale={DEFAULT_LOCALE}
           messages={messages}
-          onError={onIntlError}
+          onError={intlErrorHandler}
         >
           {children}
         </IntlProvider>
