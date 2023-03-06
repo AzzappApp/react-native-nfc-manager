@@ -71,8 +71,8 @@ export const POST = async (req: Request) => {
   return NextResponse.json({ uploadURL, uploadParameters });
 };
 
-// TODO blocked by https://github.com/vercel/next.js/issues/46755
-//export const runtime = 'experimental-edge';
+// TODO blocked by https://github.com/vercel/next.js/issues/46755 and by https://github.com/vercel/next.js/issues/46337
+//export const runtime = 'edge';
 
 // extracted from Cloudinary SDK to avoid importing the whole SDK
 // which has edge runtime issues
