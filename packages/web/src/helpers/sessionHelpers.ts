@@ -45,12 +45,13 @@ export const getSession = (): Promise<SessionData | null> | null => {
 
 export const setSession = async (res: NextResponse, data: SessionData) => {
   const seal = await sealData(data);
-  return res.cookies.set({
+  res.cookies.set({
     name: COOKIE_NAME,
     value: seal,
     maxAge: TTL,
     ...COOKIE_OPTIONS,
   });
+  return res;
 };
 
 export const destroySession = (res: NextResponse) => {

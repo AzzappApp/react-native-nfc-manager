@@ -9,7 +9,6 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { getLocales } from 'react-native-localize';
 import {
   isNotFalsyString,
   isPhoneNumber,
@@ -17,6 +16,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { fontFamilies, colors } from '#theme';
 import Link from '#components/Link';
+import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 
 import Button from '#ui/Button';
@@ -41,8 +41,8 @@ const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
     if (isValidEmail(phoneOrEmail)) {
       return true;
     }
-    const locales = getLocales();
 
+    const locales = getLocales();
     for (let i = 0; i < locales.length; i++) {
       if (isPhoneNumber(phoneOrEmail, locales[i].countryCode as CountryCode)) {
         return true;

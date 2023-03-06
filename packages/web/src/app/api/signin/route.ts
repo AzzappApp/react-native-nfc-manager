@@ -82,6 +82,8 @@ export const POST = async (req: Request) => {
       });
     }
   } catch (error) {
+    console.error('Singin error');
+    console.error(typeof error);
     console.error(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
@@ -90,4 +92,4 @@ export const POST = async (req: Request) => {
   }
 };
 
-export const runtime = 'experimental-edge';
+export const runtime = 'edge';

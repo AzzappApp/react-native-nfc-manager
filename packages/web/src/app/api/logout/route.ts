@@ -10,4 +10,4 @@ export const POST = async () => {
   return res;
 };
 
-export const runtime = 'experimental-edge';
+export const runtime = 'edge';

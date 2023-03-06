@@ -45,4 +45,4 @@ export const POST = async (req: Request) => {
   }
 };
 
-export const runtime = 'experimental-edge';
+export const runtime = 'edge';

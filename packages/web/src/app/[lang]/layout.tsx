@@ -1,5 +1,5 @@
 import Script from 'next/script';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import {
   LocalServerContext,
   getTranslationMessages,
@@ -76,3 +76,6 @@ const RootLayout = ({
 };
 
 export default RootLayout;
+
+export const generateStaticParams = () =>
+  SUPPORTED_LOCALES.map(lang => ({ lang }));

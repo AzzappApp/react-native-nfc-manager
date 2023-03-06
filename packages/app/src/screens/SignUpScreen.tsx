@@ -10,7 +10,6 @@ import {
   Text,
   Image,
 } from 'react-native';
-import { getLocales } from 'react-native-localize';
 import { fetchQuery, graphql, useRelayEnvironment } from 'react-relay';
 import {
   isNotFalsyString,
@@ -22,6 +21,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { textStyles, fontFamilies, colors } from '#theme';
 import Link from '#components/Link';
+import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
@@ -29,7 +29,6 @@ import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import TextInput from '#ui/TextInput';
-
 import type { SignUpScreenQuery } from '@azzapp/relay/artifacts/SignUpScreenQuery.graphql';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
@@ -37,7 +36,7 @@ import type { CountryCode } from 'libphonenumber-js';
 type SignupScreenProps = {
   signup: (params: SignUpParams) => Promise<void>;
 };
-const locales = getLocales();
+
 const SignupScreen = ({ signup }: SignupScreenProps) => {
   const vp = useViewportSize();
   const intl = useIntl();
@@ -127,6 +126,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
       return true;
     }
 
+    const locales = getLocales();
     for (let i = 0; i < locales.length; i++) {
       if (isPhoneNumber(phoneOrEmail, locales[i].countryCode as CountryCode)) {
         return true;
@@ -169,6 +169,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
       if (canSignup && canCreateUsername) {
         let phoneEmail = phoneOrEmail;
 
+        const locales = getLocales();
         if (!isValidEmail(phoneOrEmail)) {
           for (let i = 0; i < locales.length; i++) {
             if (

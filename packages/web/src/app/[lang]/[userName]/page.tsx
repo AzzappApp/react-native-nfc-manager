@@ -23,10 +23,13 @@ const ProfilePage = async ({ params: { userName } }: UserPageProps) => {
 
 export default ProfilePage;
 
-export const dynamic = 'force-static';
-
-export const revalidate = 10;
-
 export const generateMetadata = ({ params: { userName } }: UserPageProps) => ({
   title: `${userName}`,
 });
+
+// TODO there seems to be a bug with static params and regeneration, for the moment we force dynamic
+export const dynamic = 'force-dynamic';
+
+export const generateStaticParams = () => [];
+
+export const dynamicParams = true;

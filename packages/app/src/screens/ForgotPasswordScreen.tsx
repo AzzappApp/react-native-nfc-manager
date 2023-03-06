@@ -9,11 +9,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { getLocales } from 'react-native-localize';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 
 import { useRouter } from '#PlatformEnvironment';
 import { colors, fontFamilies } from '#theme';
+import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom, VW100 } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import Form, { Submit } from '#ui/Form/Form';
@@ -26,8 +26,6 @@ import type { CountryCode } from 'libphonenumber-js';
 type ForgotPasswordScreenProps = {
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
 };
-const locales = getLocales();
-
 const ForgotPasswordScreen = ({
   forgotPassword,
 }: ForgotPasswordScreenProps) => {
@@ -43,6 +41,7 @@ const ForgotPasswordScreen = ({
       return true;
     }
 
+    const locales = getLocales();
     for (let i = 0; i < locales.length; i++) {
       if (isPhoneNumber(emailOrPhone, locales[i].countryCode as CountryCode)) {
         return true;
