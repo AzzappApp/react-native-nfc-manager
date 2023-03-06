@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useNativeRouter } from '../NativeRouter';
 
-jest.mock('cuid', () => () => `cuid-id`);
+jest.mock('../../helpers/idHelpers', () => ({ createId: () => `created-id` }));
 
 describe('NativeRouter', () => {
   describe('useNativeRouter', () => {
@@ -52,7 +52,7 @@ describe('NativeRouter', () => {
                 "currentIndex": 1,
                 "tabs": [
                   {
-                    "id": "cuid-id",
+                    "id": "created-id",
                     "kind": "stack",
                     "state": [
                       {
@@ -249,7 +249,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -265,7 +265,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -330,7 +330,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -341,7 +341,7 @@ describe('NativeRouter', () => {
                           },
                         },
                         {
-                          "id": "cuid-id",
+                          "id": "created-id",
                           "kind": "route",
                           "state": {
                             "params": {
@@ -413,7 +413,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -505,7 +505,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "route": "SETTINGS",
@@ -553,7 +553,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -636,7 +636,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -686,7 +686,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -888,7 +888,7 @@ describe('NativeRouter', () => {
             "modals": [],
             "stack": [
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -953,11 +953,11 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
-                          "id": "cuid-id",
+                          "id": "created-id",
                           "kind": "route",
                           "state": {
                             "params": {
@@ -1029,7 +1029,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -1114,7 +1114,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "route": "SETTINGS",
@@ -1155,7 +1155,7 @@ describe('NativeRouter', () => {
           {
             "modals": [
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -1201,7 +1201,7 @@ describe('NativeRouter', () => {
           {
             "modals": [
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "route": "SETTINGS",
@@ -1254,7 +1254,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "cuid-id",
+                "id": "created-id",
                 "kind": "route",
                 "state": {
                   "route": "SETTINGS",
@@ -1340,7 +1340,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -1400,7 +1400,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -1450,7 +1450,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {
@@ -1490,7 +1490,7 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "cuid-id",
+                      "id": "created-id",
                       "kind": "stack",
                       "state": [
                         {

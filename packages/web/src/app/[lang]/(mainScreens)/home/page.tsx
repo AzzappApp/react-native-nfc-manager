@@ -1,21 +1,21 @@
 import { redirect } from 'next/navigation';
 import HomeWebScreenQueryNode from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 import preloadServerQuery from '#helpers/preloadServerQuery';
-import { getAuthInfos } from '#helpers/session';
+import { getViewerInfos } from '#helpers/sessionHelpers';
 import HomeWebScreen from './HomeWebScreen';
 import type { HomeWebScreenQuery } from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 
 const HomePage = async () => {
-  const authInfos = await getAuthInfos();
+  const viewer = await getViewerInfos();
 
-  if (authInfos.isAnonymous) {
+  if (viewer.isAnonymous) {
     return redirect('/signin');
   }
 
   const serverQuery = await preloadServerQuery<HomeWebScreenQuery>(
     HomeWebScreenQueryNode,
     {},
-    authInfos,
+    viewer,
   );
 
   return <HomeWebScreen serverQuery={serverQuery} />;
@@ -24,3 +24,7 @@ const HomePage = async () => {
 export default HomePage;
 
 export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Azzapp - Home',
+};

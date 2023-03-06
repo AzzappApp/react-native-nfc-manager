@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import db from './db';
 import { getEntitiesByIds, jsonFieldSerializer } from './generic';
 import type { Database } from './db';
@@ -26,7 +26,7 @@ export const createCardCover = async (
   qc: QueryCreator<Database> = db,
 ): Promise<CardCover> => {
   const cardCover = cardSerializer({
-    id: uuid.v4(),
+    id: createId(),
     ...values,
   });
   await qc.insertInto('CardCover').values(cardCover).execute();

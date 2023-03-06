@@ -26,3 +26,7 @@ export default ProfilePage;
 export const dynamic = 'force-static';
 
 export const revalidate = 10;
+
+export const generateMetadata = ({ params: { userName } }: UserPageProps) => ({
+  title: `${userName}`,
+});

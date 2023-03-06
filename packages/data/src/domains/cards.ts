@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import db from './db';
 import { getEntitiesByIds } from './generic';
 import type { Database } from './db';
@@ -44,7 +44,7 @@ export const createCard = async (
   qc: QueryCreator<Database> = db,
 ): Promise<Card> => {
   const card = {
-    id: uuid.v4(),
+    id: createId(),
     ...values,
   };
   await qc.insertInto('Card').values(card).execute();

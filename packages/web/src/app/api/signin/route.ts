@@ -1,20 +1,20 @@
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt-ts';
+import { NextResponse } from 'next/server';
 import {
+  getProfileByUserName,
   getUserByEmail,
   getUserByPhoneNumber,
-  getProfileByUserName,
-  getUsersByIds,
   getUserProfiles,
+  getUsersByIds,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { withSessionAPIRoute } from '#helpers/session';
+import { destroySession, setSession } from '#helpers/sessionHelpers';
 import { generateTokens } from '#helpers/tokensHelpers';
 import type { Profile, User } from '@azzapp/data/domains';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 type SignInBody = {
   credential?: string; //email or username or phone number
@@ -22,14 +22,15 @@ type SignInBody = {
   authMethod?: 'cookie' | 'token';
 };
 
-const signin = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { credential, password, authMethod } =
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    <SignInBody>req.body || {};
+export const POST = async (req: Request) => {
+  const bod = await req.json();
+  const { credential, password, authMethod } = <SignInBody>bod || {};
 
   if (!credential || !password) {
-    res.status(400).json({ message: ERRORS.INVALID_REQUEST });
-    return;
+    return NextResponse.json(
+      { message: ERRORS.INVALID_REQUEST },
+      { status: 400 },
+    );
   }
   try {
     let user: User | null = null;
@@ -52,32 +53,41 @@ const signin = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (!user || !profile || !user.password) {
-      res.status(401).json({ message: ERRORS.INVALID_CREDENTIALS });
-      return;
+      return NextResponse.json(
+        { message: ERRORS.INVALID_CREDENTIALS },
+        { status: 401 },
+      );
     }
 
-    if (!(await bcrypt.compare(password, user.password))) {
-      res.status(401).json({ message: ERRORS.INVALID_CREDENTIALS });
-      return;
+    if (!bcrypt.compareSync(password, user.password)) {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_CREDENTIALS },
+        { status: 401 },
+      );
     }
 
     if (authMethod === 'token') {
-      req.session.destroy();
-      const { token, refreshToken } = generateTokens({
+      const { token, refreshToken } = await generateTokens({
         userId: user.id,
         profileId: profile.id,
       });
-      res.json({ ok: true, token, refreshToken });
+      return destroySession(
+        NextResponse.json({ ok: true, token, refreshToken }),
+      );
     } else {
-      req.session.userId = user.id;
-      req.session.profileId = profile.id;
-      req.session.isAnonymous = false;
-      await req.session.save();
-      res.json({ ok: true });
+      return setSession(NextResponse.json({ ok: true }), {
+        userId: user.id,
+        profileId: profile.id,
+        isAnonymous: false,
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    console.error(error);
+    return NextResponse.json(
+      { message: ERRORS.INTERNAL_SERVER_ERROR },
+      { status: 500 },
+    );
   }
 };
 
-export default withSessionAPIRoute(signin);
+export const runtime = 'experimental-edge';

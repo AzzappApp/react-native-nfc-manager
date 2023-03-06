@@ -1,16 +1,13 @@
-'use client';
-
-import { useRouter } from '@azzapp/app/PlatformEnvironment';
-import OnBoardingScreen from '@azzapp/app/screens/OnBoardingScreen';
+import OnBoardingWebScreen from './OnBoardingWebScreen';
 
 const OnBoardingPage = () => {
-  const router = useRouter();
-  const skip = async () => {
-    router.push({ route: 'HOME' });
-  };
-  return <OnBoardingScreen skip={skip} />;
+  return <OnBoardingWebScreen />;
 };
 
 export default OnBoardingPage;
 
 export const dynamic = 'force-static';
+
+export const metadata = {
+  title: 'Azzapp - OnBoarding',
+};

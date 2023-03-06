@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import db from './db';
 import {
   getEntitiesByIds,
@@ -133,7 +133,7 @@ export const createPost = async (
   qc: QueryCreator<Database> = db,
 ): Promise<Post> => {
   const post = {
-    id: uuid.v4(),
+    id: createId(),
     ...values,
   };
   await qc.insertInto('Post').values(postSerializer(post)).execute();

@@ -71,3 +71,8 @@ const RootLayout = ({
 };
 
 export default RootLayout;
+
+export const metadata = {
+  title: 'Azzapp',
+  description: 'Azzapp',
+};

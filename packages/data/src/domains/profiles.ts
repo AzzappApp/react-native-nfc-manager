@@ -1,5 +1,5 @@
+import { createId } from '@paralleldrive/cuid2';
 import { sql } from 'kysely';
-import * as uuid from 'uuid';
 import db from './db';
 import { getEntitiesByIds, sqlCountToNumber } from './generic';
 import type { Profile } from '@prisma/client';
@@ -105,7 +105,7 @@ export const createProfile = async (
   data: Omit<Profile, 'createdAt' | 'id' | 'updatedAt'>,
 ): Promise<Profile> => {
   const profile = {
-    id: uuid.v4(),
+    id: createId(),
     updatedAt: new Date(),
     ...data,
   };

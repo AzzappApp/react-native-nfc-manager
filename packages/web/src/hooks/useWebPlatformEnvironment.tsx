@@ -19,7 +19,7 @@ const useWebPlatformEnvironment = (): PlatformEnvironment => {
   const willChangeListeners = useRef<Array<(route: Route) => void>>([]);
   const didChangeListeners = useRef<Array<(route: Route) => void>>([]);
   if (pathnameRef.current !== pathname) {
-    const route = pathToRoute(pathname!);
+    const route = pathToRoute(pathname);
     willChangeListeners.current.forEach(listener => listener(route));
   }
 
@@ -30,7 +30,7 @@ const useWebPlatformEnvironment = (): PlatformEnvironment => {
       return;
     }
     didChangeListeners.current.forEach(listener =>
-      listener(pathToRoute(pathname!)),
+      listener(pathToRoute(pathname)),
     );
   }, [pathname]);
 
@@ -38,7 +38,7 @@ const useWebPlatformEnvironment = (): PlatformEnvironment => {
     () => ({
       router: {
         getCurrentRoute() {
-          return pathToRoute(pathnameRef.current!);
+          return pathToRoute(pathnameRef.current);
         },
         push(route) {
           routerRef.current.push(routeToPath(route));

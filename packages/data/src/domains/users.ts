@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import db from './db';
 import { getEntitiesByIds } from './generic';
 import type { User } from '@prisma/client';
@@ -51,7 +51,7 @@ export const createUser = async (
   data: Omit<User, 'createdAt' | 'id' | 'updatedAt'>,
 ): Promise<User> => {
   const user = {
-    id: uuid.v4(),
+    id: createId(),
     updatedAt: new Date(),
     ...data,
   };

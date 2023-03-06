@@ -1,11 +1,11 @@
-import { sign, verify } from 'jsonwebtoken';
+import { seal, unseal } from './cryptoHelpers';
 
-const TOKEN_EXP_TIME = '1h';
-const REFREH_TOKEN_EXP_TIME = '7d';
+const TOKEN_EXP_TIME = 3600 * 1000;
+const REFREH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-export const generateTokens = ({
+export const generateTokens = async ({
   userId,
   profileId,
 }: {
@@ -13,11 +13,12 @@ export const generateTokens = ({
   profileId: string;
 }) => {
   const data = { userId, profileId };
-  const token = sign(data, TOKEN_SECRET, {
-    expiresIn: TOKEN_EXP_TIME,
+  const token = await seal(data, TOKEN_SECRET, {
+    ttl: TOKEN_EXP_TIME,
   });
-  const refreshToken = sign(data, REFRESH_TOKEN_SECRET, {
-    expiresIn: REFREH_TOKEN_EXP_TIME,
+
+  const refreshToken = await seal(data, REFRESH_TOKEN_SECRET, {
+    ttl: REFREH_TOKEN_EXP_TIME,
   });
 
   return { token, refreshToken };
@@ -25,13 +26,20 @@ export const generateTokens = ({
 
 export const verifyToken = (
   token: string,
-): { userId: string; profileId: string } => verify(token, TOKEN_SECRET) as any;
+): Promise<{ userId: string; profileId: string }> =>
+  unseal(token, TOKEN_SECRET, { ttl: TOKEN_EXP_TIME }) as Promise<any>;
 
-export const refreshTokens = (refreshToken: string) => {
-  const data = verify(refreshToken, REFRESH_TOKEN_SECRET) as {
-    userId: string;
-    profileId: string;
-  };
+export const refreshTokens = async (refreshToken: string) => {
+  const data = unseal(refreshToken, REFRESH_TOKEN_SECRET, {
+    ttl: TOKEN_EXP_TIME,
+  }) as any;
 
+  if (
+    typeof data !== 'object' ||
+    typeof data?.userId !== 'string' ||
+    typeof !data?.profileId !== 'string'
+  ) {
+    throw new Error('Invalid token');
+  }
   return generateTokens(data);
 };

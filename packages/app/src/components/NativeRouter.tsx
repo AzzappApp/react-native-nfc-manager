@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import cuid from 'cuid';
 import React, {
   useMemo,
   useCallback,
@@ -12,6 +11,7 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
+import { createId } from '#helpers/idHelpers';
 import type {
   Router as PlatformRouter,
   RouteListener,
@@ -270,7 +270,7 @@ const initToRouteInstance = <T extends RouteInit | StackInit | TabsInit>(
   : BasicRoute => {
   if ('stack' in init) {
     return {
-      id: cuid(),
+      id: createId(),
       kind: 'stack',
       state: init.stack.map(initToRouteInstance),
     } as StackRoute as any;
@@ -399,7 +399,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         if (setTabIfExists(route)) {
           return;
         }
-        const id = (route as any).id ?? cuid();
+        const id = (route as any).id ?? createId();
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'PUSH',
@@ -410,7 +410,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         if (setTabIfExists(route)) {
           return;
         }
-        const id = (route as any).id ?? cuid();
+        const id = (route as any).id ?? createId();
         const currentRoute = getCurrentRoute();
         // TODO incorrect if replaced screen is a tab
         dispatchToListeners(screenWillBeRemovedListeners, {
@@ -424,7 +424,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         });
       },
       showModal(route: Route) {
-        const id = (route as any).id ?? cuid();
+        const id = (route as any).id ?? createId();
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'SHOW_MODAL',

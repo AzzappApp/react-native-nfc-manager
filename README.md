@@ -148,7 +148,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 ### Miscellaneous
 
 - The authentification process of the mobile applications is based on [JWT](https://jwt.io/) tokens
-- The authentification process of the web application is based on [Iron session](https://github.com/vvo/iron-session)
 - [Microsoft App Center](https://appcenter.ms/) is used of Code Push, crash reporting and distribution of staging and development version of the application
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 

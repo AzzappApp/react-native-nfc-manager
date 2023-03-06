@@ -1,8 +1,8 @@
-import cuid from 'cuid';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import { createId } from '#helpers/idHelpers';
 import PostLink from '../PostLink';
 import PostGridContainer from './PostGridContainer';
 import PostGridWindowScrollContainer from './PostGridWindowScrollContainer';
@@ -252,7 +252,7 @@ const PostsGrid = ({
           key = entry[1];
           usedKeys.delete(entry[0]);
         } else {
-          key = cuid();
+          key = createId();
         }
         usedKeys.set(item.id, key);
         items[i][1] = key;
