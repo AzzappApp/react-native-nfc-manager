@@ -22,10 +22,17 @@ const webMessages: { readonly [lang: string]: Record<string, string> } = {
   },
 };
 
-export const getTranslationMessages = (locale = DEFAULT_LOCALE) => ({
-  ...appMessages[locale],
-  ...webMessages[locale],
-});
+export const getTranslationMessages = (locale = DEFAULT_LOCALE) => {
+  const messages = Object.assign(
+    {},
+    appMessages[DEFAULT_LOCALE],
+    webMessages[DEFAULT_LOCALE],
+  );
+  if (locale !== DEFAULT_LOCALE) {
+    Object.assign(messages, appMessages[locale], webMessages[locale]);
+  }
+  return messages;
+};
 
 export const intlErrorHandler = (err: any) => {
   if (

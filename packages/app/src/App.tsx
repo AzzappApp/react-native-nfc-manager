@@ -118,12 +118,20 @@ const App = () => {
     console.error(err);
   };
 
+  const langMessages = useMemo(() => {
+    let langMessages = messages[DEFAULT_LOCALE];
+    if (locale !== DEFAULT_LOCALE) {
+      langMessages = Object.assign({}, langMessages, messages[locale]);
+    }
+    return langMessages;
+  }, [locale]);
+
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <IntlProvider
         locale={locale}
         defaultLocale={DEFAULT_LOCALE}
-        messages={messages[locale]}
+        messages={langMessages}
         onError={onIntlError}
       >
         {authenticated ? (
