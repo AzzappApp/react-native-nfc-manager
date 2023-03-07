@@ -19,7 +19,12 @@ import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
-import { exportImage, segmentImage } from '#helpers/mediaHelpers';
+import {
+  calculImageSize,
+  exportImage,
+  isPNG,
+  segmentImage,
+} from '#helpers/mediaHelpers';
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -458,6 +463,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     if (sourceMediaInput) {
       input.sourceMedia = sourceMediaInput;
     }
+
     if (maskMediaInput) {
       input.maskMedia = maskMediaInput;
     }
@@ -549,19 +555,49 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     setShowImagePicker(true);
   };
 
-  const onMediaSelected = ({
+  const onMediaSelected = async ({
     uri,
     width,
     height,
     editionParameters,
   }: ImagePickerResult) => {
+    //we will use the export image directly, no compression
+    const imagePickerBoxed = { width, height, uri };
+    const editionParametersBoxed = { ...editionParameters };
+    if (
+      width > COVER_MAX_IMAGE_DIMENSION ||
+      height > COVER_MAX_IMAGE_DIMENSION
+    ) {
+      const resize = calculImageSize(width, height, COVER_MAX_IMAGE_DIMENSION);
+      const resizePath = await exportImage({
+        uri,
+        size: { width: resize.width, height: resize.height },
+        format: isPNG(uri) ? 'PNG' : 'JPEG',
+      });
+      imagePickerBoxed.width = resize.width;
+      imagePickerBoxed.height = resize.height;
+      imagePickerBoxed.uri = `file://${resizePath}`;
+
+      //don't forget to update the crop data
+      if (editionParametersBoxed.cropData) {
+        editionParametersBoxed.cropData.width = Math.min(
+          resize.width,
+          editionParametersBoxed.cropData.width,
+        );
+        editionParametersBoxed.cropData.height = Math.min(
+          resize.height,
+          editionParametersBoxed.cropData.height,
+        );
+      }
+    }
+
     updateFields(
-      ['sourceMedia', { uri, width, height }],
+      ['sourceMedia', imagePickerBoxed],
       [
         'mediaStyle',
         {
           ...mediaStyle,
-          parameters: editionParameters,
+          parameters: editionParametersBoxed,
         },
       ],
     );
@@ -1135,3 +1171,5 @@ const firstNotUndefined = <T extends any[]>(...values: T) => {
 
 const makeTranslucent = (color: string | null | undefined) =>
   (color ?? '#000000') + 'CC';
+
+const COVER_MAX_IMAGE_DIMENSION = 4096;

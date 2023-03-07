@@ -138,3 +138,23 @@ export const formatVideoTime = (timeInSeconds = 0) => {
   }
   return `${display2digit(minutes)}:${display2digit(seconds)}`;
 };
+
+/**
+ * It takes a width and height, and returns a new width and height that are scaled down to fit within a
+ * maximum dimension
+ * @param {number} width - The width of the image
+ * @param {number} height - The height of the image
+ * @param {number} maxDimension - The maximum width or height of the image.
+ * @returns An object with two properties, width and height.
+ */
+export const calculImageSize = (
+  width: number,
+  height: number,
+  maxDimension: number,
+) => {
+  const maxSize = Math.min(Math.max(height, width), maxDimension);
+  const ratio = Math.min(maxSize / width, maxSize / height);
+  return { width: Math.ceil(width * ratio), height: Math.ceil(height * ratio) };
+};
+
+export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
