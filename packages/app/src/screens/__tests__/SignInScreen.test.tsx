@@ -1,10 +1,22 @@
+import { getLocales } from '#helpers/localeHelpers';
 import { act, fireEvent, render, screen, waitFor } from '#utils/test-util';
 import '@testing-library/jest-native/extend-expect';
 import SignInScreen from '../SignInScreen';
 
+jest.mock('./#helpers/localeHelpers', () => ({ getLocales: jest.fn() }));
+
 describe('Signin Screen', () => {
   const signin = jest.fn();
   beforeEach(() => {
+    // @ts-expect-error mock implementation
+    getLocales.mockImplementation(() => [
+      {
+        languageCode: 'fr',
+        countryCode: 'fr',
+        languageTag: 'fr',
+        isRTL: true,
+      },
+    ]);
     signin.mockReset();
   });
   test('Login button should be `disabled` if both credential (phone number or email) and password are empty', () => {
