@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
+import { getViewer } from '@azzapp/auth/viewer';
 import SearchWebScreenQueryNode from '@azzapp/relay/artifacts/SearchWebScreenQuery.graphql';
 import preloadServerQuery from '#helpers/preloadServerQuery';
-import { getViewerInfos } from '#helpers/sessionHelpers';
 import SearchWebScreen from './SearchWebScreen';
 import type { SearchWebScreenQuery } from '@azzapp/relay/artifacts/SearchWebScreenQuery.graphql';
 
 const SearchPage = async () => {
-  const viewer = await getViewerInfos();
+  const viewer = await getViewer();
   if (viewer.isAnonymous) {
     redirect('/signin?next=/');
   }

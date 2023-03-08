@@ -1,10 +1,10 @@
 /* eslint-disable no-bitwise */
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
+import { getCrypto } from '@azzapp/auth/crypto';
+import { getViewer } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { getCrypto } from '#helpers/cryptoHelpers';
-import { getViewerInfos } from '#helpers/sessionHelpers';
-import type { Viewer } from '@azzapp/data/domains';
+import type { Viewer } from '@azzapp/auth/viewer';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
@@ -13,7 +13,7 @@ const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDN
 export const POST = async (req: Request) => {
   let viewer: Viewer;
   try {
-    viewer = await getViewerInfos();
+    viewer = await getViewer();
     if (viewer.isAnonymous) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },

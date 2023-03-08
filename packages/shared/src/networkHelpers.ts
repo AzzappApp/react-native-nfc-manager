@@ -30,22 +30,21 @@ export const fetchJSON = async <JSON = unknown>(
   };
   const response: Response = await fetchWithRetries(input, init);
 
-  let data: JSON;
-  try {
-    data = await response.json();
-  } catch (error) {
-    throw new FetchError({
-      message: ERRORS.JSON_DECODING_ERROR,
-      response,
-      data: { error: ERRORS.JSON_DECODING_ERROR },
-    });
-  }
   if (response.ok) {
-    return data;
+    try {
+      return await response.json();
+    } catch {
+      throw new FetchError({
+        message: ERRORS.JSON_DECODING_ERROR,
+        response,
+        data: { error: ERRORS.JSON_DECODING_ERROR },
+      });
+    }
   }
+  const data = await response.json().catch(() => ({}));
 
   throw new FetchError({
-    message: response.statusText,
+    message: data.message ?? response.statusText,
     response,
     data,
   });

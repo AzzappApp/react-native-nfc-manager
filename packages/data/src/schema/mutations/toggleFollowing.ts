@@ -4,8 +4,9 @@ import ERRORS from '@azzapp/shared/errors';
 import { follows, unfollows } from '#domains';
 import ProfileGraphQL from '../ProfileGraphQL';
 import ViewerGraphQL from '../ViewerGraphQL';
-import type { Profile, Viewer } from '#domains';
+import type { Profile } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
+import type { Viewer } from '@azzapp/auth/viewer';
 
 const toggleFollowingMutation = mutationWithClientMutationId({
   name: 'ToggleFollowing',

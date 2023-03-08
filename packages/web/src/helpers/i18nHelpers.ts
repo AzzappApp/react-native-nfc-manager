@@ -1,8 +1,6 @@
 import { createIntl, IntlErrorCode } from '@formatjs/intl';
-// @ts-expect-error createServerContext is not typed
-import { cache, createServerContext, useContext } from 'react';
+import { cache } from 'react';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import type { createContext } from 'react';
 
 const appMessages: { readonly [lang: string]: Record<string, string> } = {
   get en() {
@@ -45,15 +43,7 @@ export const intlErrorHandler = (err: any) => {
 };
 
 export const getServerIntl = cache((locale = DEFAULT_LOCALE) => {
+  console.log(locale);
   const messages = getTranslationMessages(locale);
   return createIntl({ locale, messages, onError: intlErrorHandler });
 });
-
-export const LocalServerContext = (
-  createServerContext as typeof createContext
-)<string>(DEFAULT_LOCALE);
-
-export const useServerIntl = () => {
-  const locale = useContext(LocalServerContext);
-  return getServerIntl(locale);
-};

@@ -13,14 +13,6 @@ import type {
   Profile,
 } from '@prisma/client';
 
-type Viewer =
-  | {
-      isAnonymous: false;
-      userId: string;
-      profileId: string;
-    }
-  | { isAnonymous: true };
-
 export type {
   Card,
   CardCover,
@@ -33,7 +25,6 @@ export type {
   User,
   ProfileKind,
   Profile,
-  Viewer,
 };
 
 export { db };

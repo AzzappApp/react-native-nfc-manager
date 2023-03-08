@@ -1,5 +1,7 @@
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import { destroySession, setSession } from '@azzapp/auth/session';
+import { generateTokens } from '@azzapp/auth/tokens';
 import {
   getProfileByUserName,
   getUserByEmail,
@@ -12,8 +14,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { destroySession, setSession } from '#helpers/sessionHelpers';
-import { generateTokens } from '#helpers/tokensHelpers';
+import cors from '#helpers/cors';
 import type { Profile, User } from '@azzapp/data/domains';
 
 type SignInBody = {
@@ -22,7 +23,7 @@ type SignInBody = {
   authMethod?: 'cookie' | 'token';
 };
 
-export const POST = async (req: Request) => {
+const signin = async (req: Request) => {
   const bod = await req.json();
   const { credential, password, authMethod } = <SignInBody>bod || {};
 
@@ -91,6 +92,8 @@ export const POST = async (req: Request) => {
     );
   }
 };
+
+export const { POST, OPTIONS } = cors({ POST: signin });
 
 // TODO blocked by https://github.com/vercel/next.js/issues/46337
 // export const runtime = 'edge';

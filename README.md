@@ -108,6 +108,7 @@ The sources of the project are organized as a monorepo. Dependencies are managed
 The differents packages of the application are located under the `packages` directory :
 
 - [app](./packages/app/): contains the source code of the client React Native application.
+- [app](./packages/auth/): authentification related logic.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the GraphQL API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.

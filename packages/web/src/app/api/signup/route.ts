@@ -1,5 +1,7 @@
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import { destroySession, setSession } from '@azzapp/auth/session';
+import { generateTokens } from '@azzapp/auth/tokens';
 import {
   createProfile,
   createUser,
@@ -12,8 +14,6 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { destroySession, setSession } from '#helpers/sessionHelpers';
-import { generateTokens } from '#helpers/tokensHelpers';
 
 type SignupBody = {
   userName?: string;
@@ -73,6 +73,7 @@ export const POST = async (req: Request) => {
       email: email ?? null,
       phoneNumber: phoneNumber ?? null,
       password: bcrypt.hashSync(password, 12),
+      roles: null,
     });
 
     const profile = await createProfile({

@@ -1,4 +1,4 @@
-import { seal, unseal } from './cryptoHelpers';
+import { seal, unseal } from './crypto';
 
 const TOKEN_EXP_TIME = 3600 * 1000;
 const REFREH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;

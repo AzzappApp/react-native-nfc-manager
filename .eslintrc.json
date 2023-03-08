@@ -32,6 +32,7 @@
     "packages/app/android",
     "packages/app/fastlane",
     "packages/app/vendor",
+    "packages/auth/lib",
     "packages/data/lib",
     "packages/shared/lib",
     "packages/web/.next",

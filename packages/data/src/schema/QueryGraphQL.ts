@@ -3,8 +3,9 @@ import { getProfileByUserName } from '#domains';
 import { nodeField, nodesField } from './NodeGraphQL';
 import ProfileGraphQL from './ProfileGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
-import type { Profile, Viewer } from '#domains';
+import type { Profile } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
+import type { Viewer } from '@azzapp/auth/viewer';
 
 const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
   name: 'Query',

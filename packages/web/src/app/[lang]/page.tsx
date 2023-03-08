@@ -1,8 +1,12 @@
 import Link from 'next/link';
-import { getServerIntl, useServerIntl } from '#helpers/i18nHelpers';
+import { getServerIntl } from '#helpers/i18nHelpers';
 
-const IndexPage = () => {
-  const intl = useServerIntl();
+type IndexPageProps = {
+  params: { lang: string };
+};
+
+const IndexPage = ({ params: { lang } }: IndexPageProps) => {
+  const intl = getServerIntl(lang);
   return (
     <>
       <h1>Welcome to AZZAPP</h1>

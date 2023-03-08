@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
+import { refreshTokens } from '@azzapp/auth/tokens';
 import ERRORS from '@azzapp/shared/errors';
-import { refreshTokens } from '#helpers/tokensHelpers';
+import cors from '#helpers/cors';
 
-export const POST = async (req: Request) => {
+const refreshTokensApi = async (req: Request) => {
   const { refreshToken: oldToken } = await req.json();
   if (!oldToken) {
     return NextResponse.json(
@@ -20,5 +21,7 @@ export const POST = async (req: Request) => {
     );
   }
 };
+
+export const { POST, OPTIONS } = cors({ POST: refreshTokensApi });
 
 export const runtime = 'edge';

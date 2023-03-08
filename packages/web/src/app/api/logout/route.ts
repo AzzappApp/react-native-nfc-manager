@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { destroySession, getSession } from '#helpers/sessionHelpers';
+import { destroySession, getSession } from '@azzapp/auth/session';
 
 export const POST = async () => {
   const session = await getSession();

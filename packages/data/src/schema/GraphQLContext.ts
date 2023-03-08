@@ -8,17 +8,10 @@ import {
   getMediasByIds,
 } from '#domains';
 import type { Card, CardCover, Post, Media, Profile } from '#domains';
-
-export type ViewerInfos =
-  | {
-      isAnonymous: false;
-      userId: string;
-      profileId: string;
-    }
-  | { isAnonymous: true };
+import type { Viewer } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
-  auth: ViewerInfos;
+  auth: Viewer;
   profileLoader: DataLoader<string, Profile | null>;
   cardLoader: DataLoader<string, Card | null>;
   cardByProfileLoader: DataLoader<string, Card | null>;
@@ -27,9 +20,7 @@ export type GraphQLContext = {
   mediaLoader: DataLoader<string, Media | null>;
 };
 
-export const createGraphQLContext = (
-  userInfos?: ViewerInfos,
-): GraphQLContext => {
+export const createGraphQLContext = (userInfos?: Viewer): GraphQLContext => {
   userInfos = userInfos ?? { isAnonymous: true };
 
   return {

@@ -1,9 +1,6 @@
 import Script from 'next/script';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
-import {
-  LocalServerContext,
-  getTranslationMessages,
-} from '#helpers/i18nHelpers';
+import { getTranslationMessages } from '#helpers/i18nHelpers';
 import ClientWrapper from './ClientWrapper';
 import './styles.css';
 
@@ -56,11 +53,9 @@ const RootLayout = ({
         /> */}
       </head>
       <body>
-        <LocalServerContext.Provider value={lang}>
-          <ClientWrapper locale={lang} messages={messages}>
-            {children}
-          </ClientWrapper>
-        </LocalServerContext.Provider>
+        <ClientWrapper locale={lang} messages={messages}>
+          {children}
+        </ClientWrapper>
         <Script id="vh-fix">
           {`
             function applyVH() {

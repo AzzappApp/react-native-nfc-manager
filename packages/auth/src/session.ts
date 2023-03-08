@@ -1,9 +1,7 @@
-import { cookies, headers } from 'next/headers';
-import ERRORS from '@azzapp/shared/errors';
-import { seal, unseal } from './cryptoHelpers';
-import { verifyToken } from './tokensHelpers';
-import type { ViewerInfos } from '@azzapp/data/schema/GraphQLContext';
+import { cookies } from 'next/headers';
+import { seal, unseal } from './crypto';
 import type { NextResponse } from 'next/server';
+import type { Viewer } from 'viewer';
 
 const TTL = 15 * 24 * 3600;
 const PASSWORD = process.env.SECRET_COOKIE_PASSWORD as string;
@@ -16,24 +14,7 @@ const COOKIE_OPTIONS = {
 const COOKIE_NAME = 'azzapp-session';
 
 // TODO we might want to add a session id system to be able to track sessions
-type SessionData = ViewerInfos;
-
-export const getViewerInfos = async (): Promise<ViewerInfos> => {
-  const token = headers().get('authorization')?.split(' ')?.[1] ?? null;
-  if (token) {
-    try {
-      const data = await verifyToken(token);
-      return { ...data, isAnonymous: false };
-    } catch (e) {
-      throw new Error(ERRORS.INVALID_TOKEN);
-    }
-  }
-  const session = await getSession();
-  if (!session) {
-    return { isAnonymous: true };
-  }
-  return session;
-};
+type SessionData = Viewer;
 
 export const getSession = (): Promise<SessionData | null> | null => {
   const seal = cookies().get(COOKIE_NAME)?.value;

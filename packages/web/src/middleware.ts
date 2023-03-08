@@ -16,7 +16,10 @@ export function middleware(request: NextRequest) {
     locale = DEFAULT_LOCALE;
   }
 
-  if (PUBLIC_FILE.test(nextUrl.pathname) || nextUrl.pathname.includes('/api')) {
+  if (
+    PUBLIC_FILE.test(nextUrl.pathname) ||
+    nextUrl.pathname.startsWith('/api')
+  ) {
     return undefined;
   }
 

@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  productionBrowserSourceMaps: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -13,7 +12,6 @@ module.exports = {
   },
   experimental: {
     appDir: true,
-    serverComponentsExternalPackages: ['cassandra-driver'],
   },
   transpilePackages: [
     '@azzapp/shared/',

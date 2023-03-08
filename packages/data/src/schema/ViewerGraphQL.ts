@@ -28,8 +28,9 @@ import {
 import { CoverLayerGraphQL } from './CardGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
-import type { Viewer, Post, Profile } from '#domains';
+import type { Post, Profile } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
+import type { Viewer } from '@azzapp/auth/viewer';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
 const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
