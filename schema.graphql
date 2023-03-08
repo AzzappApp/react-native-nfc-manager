@@ -142,6 +142,7 @@ type Profile implements Node {
   isReady: Boolean!
   profileKind: ProfileKind
   card: Card
+  colorPalette: [String!]
   posts(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -388,6 +389,7 @@ input UpdateProfileInput {
   companyName: String
   companyActivityId: String
   isReady: Boolean
+  colorPalette: String
   clientMutationId: String
 }
 

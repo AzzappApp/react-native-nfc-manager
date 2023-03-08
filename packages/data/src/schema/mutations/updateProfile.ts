@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLBoolean, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
+
 import ERRORS from '@azzapp/shared/errors';
 
-import { db } from '#domains';
+import { updateProfile } from '#domains/profiles';
 import ProfileGraphQL from '../ProfileGraphQL';
 import { ProfileKind } from './commonsTypes';
 import type { Profile } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
-const updateProfile = mutationWithClientMutationId({
+const updateProfileMutation = mutationWithClientMutationId({
   name: 'UpdateProfile',
   inputFields: {
     firstName: {
@@ -28,6 +30,9 @@ const updateProfile = mutationWithClientMutationId({
     },
     isReady: {
       type: GraphQLBoolean,
+    },
+    colorPalette: {
+      type: GraphQLString,
     },
   },
   outputFields: {
@@ -54,20 +59,12 @@ const updateProfile = mutationWithClientMutationId({
     }
 
     try {
-      const result = await db
-        .updateTable('Profile')
-        .where('id', '=', profile.id)
-        .set(updates)
-        .execute();
-      if (result.length > 0) {
-        return true;
-      } else {
-        throw new Error(ERRORS.USER_NOT_FOUND);
-      }
-    } catch {
+      const resultProfile = await updateProfile(profile.id, updates);
+      return { profile: { ...profile, ...resultProfile } };
+    } catch (error) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
   },
 });
 
-export default updateProfile;
+export default updateProfileMutation;

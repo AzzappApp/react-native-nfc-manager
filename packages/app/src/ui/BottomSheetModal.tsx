@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Animated, Modal, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Modal,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, textStyles } from '#theme';
-import PressableNative from './PressableNative';
+import Button from './Button';
 import type { ModalProps } from 'react-native';
 
 type BottomSheetModal = Omit<
@@ -12,15 +19,24 @@ type BottomSheetModal = Omit<
 > & {
   title: string;
   height?: number;
-  onRequestClose(): void;
+  onValidate(): void;
+  onCancel?(): void;
+  cancelable?: boolean;
+  cancelLabel?: string;
+  validationButtonLabel: string;
+  validationButtonDisabled?: boolean;
 };
 
 const BottomSheetModal = ({
   children,
   height = 200,
   visible,
-  onRequestClose,
+  onValidate,
+  onCancel,
   title,
+  cancelable = true,
+  validationButtonLabel,
+  validationButtonDisabled = false,
   ...props
 }: BottomSheetModal) => {
   const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
@@ -56,7 +72,16 @@ const BottomSheetModal = ({
   const intl = useIntl();
   return (
     <Modal animationType="none" visible={isVisible} {...props} transparent>
-      <View style={styles.modalContainer}>
+      <KeyboardAvoidingView
+        style={styles.modalContainer}
+        behavior="position"
+        contentContainerStyle={{
+          backgroundColor: '#transparent',
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+        }}
+      >
         <Animated.View
           style={[
             styles.bottomSheetContainer,
@@ -74,26 +99,40 @@ const BottomSheetModal = ({
           ]}
         >
           <View style={styles.accessoryView}>
-            <View style={styles.spacer} />
+            {cancelable && onCancel ? (
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Cancel',
+                  description: 'BottomSheetModal - default Cancel button label',
+                })}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to cancel and close',
+                  description:
+                    'BottomSheetModal accessibility label - Close button',
+                })}
+                variant="secondary"
+                onPress={onCancel}
+              />
+            ) : (
+              <View style={styles.spacer} />
+            )}
             <Text style={[textStyles.title, styles.accessoryViewLabel]}>
               {title}
             </Text>
-            <PressableNative
-              style={styles.okButton}
-              hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
-              onPress={onRequestClose}
+            <Button
+              label={validationButtonLabel}
+              onPress={onValidate}
+              disabled={validationButtonDisabled}
               accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to close',
-                description: 'BottomSheet - close button',
+                defaultMessage: 'Tap to validate and close',
+                description:
+                  'BottomSheetModal accessibility label - Validate button',
               })}
-              accessibilityRole="button"
-            >
-              <Text style={[textStyles.button, styles.okButtonLabel]}>OK</Text>
-            </PressableNative>
+            />
           </View>
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -114,6 +153,15 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     paddingTop: 16,
     paddingHorizontal: 20,
+    shadowColor: colors.grey900,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 29,
+
+    elevation: 7,
   },
   accessoryView: {
     flexDirection: 'row',

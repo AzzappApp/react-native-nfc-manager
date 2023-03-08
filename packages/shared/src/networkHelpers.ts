@@ -33,7 +33,7 @@ export const fetchJSON = async <JSON = unknown>(
   let data: JSON;
   try {
     data = await response.json();
-  } catch {
+  } catch (error) {
     throw new FetchError({
       message: ERRORS.JSON_DECODING_ERROR,
       response,

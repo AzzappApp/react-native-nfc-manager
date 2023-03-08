@@ -17,7 +17,7 @@ import {
   TITLE_POSITIONS,
 } from '@azzapp/shared/cardHelpers';
 import { colors, fontFamilies, textStyles } from '#theme';
-import ColorPicker from '#ui/ColorPicker';
+import { ProfileColorPaletteModal } from '#components/ProfileColorPalette';
 import DashedSlider from '#ui/DashedSlider';
 import FontPicker from '#ui/FontPicker';
 import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
@@ -276,13 +276,22 @@ const CoverTitleEditionPanel = ({
         onChange={onFontFamilyChange}
         height={bottomSheetHeights}
       />
-      <ColorPicker
-        title="Font color"
-        value={color}
+      <ProfileColorPaletteModal
+        title={intl.formatMessage({
+          defaultMessage: 'Font color',
+          description:
+            'Title of the color picker modal in cover edition for font color',
+        })}
+        selectedColor={color}
         visible={colorPickerOpen}
         onRequestClose={() => setColorPickerOpen(false)}
-        onChange={onColorChange}
+        onChangeColor={onColorChange}
         height={bottomSheetHeights}
+        validationButtonLabel={intl.formatMessage({
+          defaultMessage: 'Save',
+          description:
+            'CoverTitleEditionPanel - Label of the save button in font color picker modal',
+        })}
       />
     </View>
   );

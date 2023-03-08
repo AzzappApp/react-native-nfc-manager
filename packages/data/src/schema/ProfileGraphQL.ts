@@ -3,6 +3,7 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
+  GraphQLList,
 } from 'graphql';
 import {
   connectionDefinitions,
@@ -54,6 +55,12 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
       type: CardGraphQL,
       resolve: (profile, _, { cardByProfileLoader }) =>
         cardByProfileLoader.load(profile.id),
+    },
+    colorPalette: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      resolve({ colorPalette }) {
+        return colorPalette ? colorPalette.split(',') : null;
+      },
     },
     posts: {
       type: PostConnectionGraphQL,

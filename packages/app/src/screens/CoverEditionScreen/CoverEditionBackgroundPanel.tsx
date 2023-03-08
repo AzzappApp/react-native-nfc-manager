@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { ColorChooser } from '#ui/ColorPicker';
+import ProfileColorPalette from '#components/ProfileColorPalette';
 import TabsBar from '#ui/TabsBar';
 import ColorPreview from './ColorPreview';
 import CoverLayerList from './CoverLayerlist';
@@ -98,11 +98,11 @@ const CoverEditionBackgroundPanel = ({
           style={styles.content}
         />
       ) : (
-        <ColorChooser
-          value={
+        <ProfileColorPalette
+          selectedColor={
             currentTab === 'backgroundColor' ? backgroundColor : patternColor
           }
-          onChange={onColorChange}
+          onChangeColor={onColorChange}
           style={styles.content}
         />
       )}

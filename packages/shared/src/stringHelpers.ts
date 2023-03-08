@@ -84,3 +84,21 @@ export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_.]$/;
 export const isValidUsername = (username: string) => {
   return REGEX_USERNAME.test(username) && encodeURI(username) === username;
 };
+
+const matcher = /^#?([0-9A-F]{3,8})$/i;
+
+/**
+ * It returns true if the value is a valid hexadecimal color code, and false otherwise
+ * @param {string} value - string - The value to check
+ * @param {boolean} [shortFormat] - boolean - Whether or not to allow format with 3 caracters
+ * @returns A boolean value.
+ */
+export const isValidHex = (value: string, shortFormat?: boolean): boolean => {
+  const match = matcher.exec(value);
+  const length = match ? match[1].length : 0;
+
+  return (
+    (!!shortFormat && length === 3) || // '#rgb' format
+    length === 6 // '#rrggbb' format
+  );
+};

@@ -3,6 +3,7 @@ import {
   isValidPassword,
   isNotFalsyString,
   isValidUsername,
+  isValidHex,
 } from '../stringHelpers';
 
 describe('stringHelper', () => {
@@ -55,6 +56,26 @@ describe('stringHelper', () => {
       expect(isValidUsername('se._test')).toBe(true);
       expect(isValidUsername('zer23sdf')).toBe(true);
       expect(isValidUsername('superTester23_______')).toBe(true);
+    });
+  });
+  describe('isValidHex', () => {
+    test('should be a valid hex', () => {
+      // valid strings
+      expect(isValidHex('#8c0dba')).toBe(true);
+      expect(isValidHex('aabbcc')).toBe(true);
+      expect(isValidHex('#ABC', true)).toBe(true);
+      expect(isValidHex('123', true)).toBe(true);
+    });
+    test('should not be a valid hex', () => {
+      expect(isValidHex('#123', false)).toBe(false);
+      // out of [0-F] range
+      expect(isValidHex('#eeffhh')).toBe(false);
+      // wrong length
+      expect(isValidHex('#12')).toBe(false);
+      expect(isValidHex('#12345')).toBe(false);
+      // empty
+      expect(isValidHex('')).toBe(false);
+      expect(isValidHex('#12345', true)).toBe(false);
     });
   });
 });

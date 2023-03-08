@@ -29,6 +29,7 @@ model Profile {
   profileKind       ProfileKind?
   companyName       String?
   companyActivityId String?
+  colorPalette      String?
   isReady           Boolean      @default(false)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @default(now())

@@ -140,3 +140,6 @@ dist
 trash
 packages/app/ios/.xcode.env.local
 packages/web/.vscode/settings.json
+
+
+.pscale/env

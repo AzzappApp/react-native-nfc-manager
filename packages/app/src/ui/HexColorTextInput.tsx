@@ -1,29 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import {
   StyleSheet,
   Text,
   TextInput as NativeTextInput,
   View,
 } from 'react-native';
-import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-
-import { colors, fontFamilies, textStyles } from '#theme';
+import { isValidHex } from '@azzapp/shared/stringHelpers';
+import { colors, fontFamilies } from '#theme';
 import type {
   TextInputProps as NativeTextInputProps,
   StyleProp,
-  ViewStyle,
   NativeSyntheticEvent,
   TextInputFocusEventData,
   TextStyle,
 } from 'react-native';
 
-export type TextInputProps = NativeTextInputProps & {
-  containerStyle?: StyleProp<ViewStyle>;
-  label?: string;
-  errorLabel?: string;
-  errorLabelStyle?: StyleProp<ViewStyle>;
-  errorContainerStyle?: StyleProp<ViewStyle>;
+type HexColorTextInputProps = Omit<
+  Omit<NativeTextInputProps, 'onChangeText'>,
+  'onChange'
+> & {
+  onChangeColor: (hexColor: string) => void;
+  value: string;
 };
+
 /**
  * A wrapper around TextInput that adds Azzapp's default styling.
  *
@@ -31,22 +31,20 @@ export type TextInputProps = NativeTextInputProps & {
  * @param {TextInputProps} props
  * @return {React.Component<TextInputProps>}
  */
-//TODO: darkmode;
-const TextInput = ({
-  label,
-  containerStyle,
+const HexColorTextInput = ({
   style = {},
-  placeholderTextColor = colors.grey400,
   onFocus,
   onBlur,
-  errorLabel,
-  errorLabelStyle,
-  testID,
+  value,
   accessibilityLabel,
-  errorContainerStyle = { minHeight: 15 },
   ...props
-}: TextInputProps) => {
+}: HexColorTextInputProps) => {
+  const [colorValue, setColorValue] = useState<string>(value);
   const textInputRef = useRef<NativeTextInput>(null);
+  useEffect(() => {
+    setColorValue(value);
+  }, [value]);
+
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
 
   const focus = () => {
@@ -70,82 +68,86 @@ const TextInput = ({
     }
   };
 
-  const [errorStyle, setErrorStyle] = useState({});
-  useEffect(() => {
-    if (isNotFalsyString(errorLabel)) {
-      setErrorStyle({ borderColor: colors.red400 });
-    } else {
-      setErrorStyle({});
-    }
-  }, [errorLabel]);
+  const onChangeText = (text: string) => {
+    const newColor = '#' + text.replace(/([^0-9A-F]+)/gi, '').substring(0, 6);
+    setColorValue(newColor);
+    //only accept 6 digit format
+    if (isValidHex(newColor)) props.onChangeColor(newColor);
+  };
 
   return (
-    <View
-      testID={testID ?? 'azzapp__Input__view-wrapper'}
-      onTouchStart={focus}
-      style={[styles.container, containerStyle]}
-    >
-      {label && (
-        <Text testID="native_text_input_label" style={styles.text}>
-          {label}
-        </Text>
-      )}
-      <View pointerEvents="box-none">
+    <View onTouchStart={focus} style={[styles.container]}>
+      <Text style={styles.text}>
+        <FormattedMessage
+          defaultMessage="Hex"
+          description="HexColorTextInput Component Hex Title"
+        />
+      </Text>
+
+      <View
+        pointerEvents="box-none"
+        style={[styles.inputViewStyle, focusedStyle]}
+      >
+        <View
+          style={[styles.colorPreview, { backgroundColor: value }]}
+          testID="azzap_native_hexcolor_previewcolor"
+        />
         <NativeTextInput
           testID="azzap_native_text_input"
           selectionColor={colors.primary400}
-          placeholderTextColor={placeholderTextColor}
           accessibilityLabel={accessibilityLabel}
+          autoComplete="off"
+          keyboardType="name-phone-pad"
+          autoCorrect={false}
+          onChangeText={onChangeText}
           {...props}
+          value={colorValue}
           ref={textInputRef}
           onFocus={onInputFocus}
           onBlur={onInputBlur}
-          style={[styles.input, focusedStyle, style, errorStyle]}
+          style={[styles.input, style]}
         />
-        {props.children}
-      </View>
-      <View style={errorContainerStyle}>
-        {isNotFalsyString(errorLabel) && (
-          <Text
-            testID="azzapp__Input__error-label"
-            style={[styles.errorTextStyle, errorLabelStyle]}
-            numberOfLines={2}
-            allowFontScaling
-          >
-            {errorLabel}
-          </Text>
-        )}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  colorPreview: {
+    width: 26,
+    height: 26,
+
+    marginRight: 5,
+    marginLeft: 5,
+  },
   text: {
     ...fontFamilies.semiBold,
     paddingBottom: 5,
     size: 14,
   },
   container: {
-    padding: 10,
-    paddingBottom: 0, //will be replace by the error line specified on figma
+    marginRight: 10,
+    width: 124,
+  },
+  inputViewStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.grey50,
+    borderColor: colors.grey50,
+    height: 43,
+    borderWidth: 1,
+    borderRadius: 12,
   },
   input: {
     ...fontFamilies.normal,
     flexDirection: 'row',
     alignItems: 'center',
+    textAlign: 'center',
     height: 43,
-    backgroundColor: colors.grey50,
-    borderColor: colors.grey50,
-    borderRadius: 12,
-    paddingLeft: 20,
-    paddingRight: 20,
+    width: 74,
     fontSize: 16,
     fontColor: colors.black,
-    borderWidth: 1,
-  },
-  errorTextStyle: {
-    ...textStyles.error,
+    textTransform: 'uppercase',
   },
 });
 
@@ -153,4 +155,4 @@ const styles = StyleSheet.create({
 // passing object like style will cause rerender. Still have to test it again with
 // the last version using why did you render
 //memo(TextInputAzz, isEqual);
-export default TextInput;
+export default HexColorTextInput;
