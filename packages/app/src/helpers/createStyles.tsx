@@ -27,6 +27,13 @@ export const createStyleSheet = <T extends ComposableNamedStyles<T>>(
   };
 };
 
+/**
+ * Use a style sheet object that has a light and dark version of the style object
+ * and select the correct one based on the current color scheme
+ *
+ * @param styleSheet - A style sheet object that has a light and dark version of the style object
+ * @returns a react native style object
+ */
 export const useStyleSheet = <T,>(styleSheet: ColorSchemeStyleSheet<T>) => {
   const colorScheme = useColorScheme() ?? 'light';
 
@@ -103,6 +110,14 @@ const composeStyles = <T extends ComposableNamedStyles<T>>(
   return result as any;
 };
 
+/**
+ * Use a style sheet object that has multiple variants and a light and dark version of the style object
+ * and select the correct one based on the current color scheme and the given variant
+ *
+ * @param styleSheet - A style sheet object that has multiple variants and a light and dark version of the style object
+ * @param variant - The variant to use
+ * @returns a react native style object
+ */
 export const useVariantStyleSheet = <Variants extends string, T>(
   styleSheet: VariantsStyleSheet<Variants, T>,
   variant: Variants,

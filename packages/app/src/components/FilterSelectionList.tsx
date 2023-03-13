@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View, Text, Platform } from 'react-native';
 import { colors, textStyles } from '#theme';
 import PressableNative from '#ui/PressableNative';
 import { EditableImage, useFilterList } from './medias';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { EditableImageSource } from './medias';
 import type { ScrollViewProps, LayoutChangeEvent } from 'react-native';
 
@@ -21,6 +21,7 @@ type FilterSelectionListProps = ScrollViewProps & {
   onChange(value: string | null): void;
 };
 
+// TODO docs and tests once this component is production ready
 const FilterSelectionList = ({
   media,
   editionParameters,

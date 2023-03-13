@@ -1,6 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
 
-import { act, fireEvent, render, screen } from '#utils/test-util';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 
 import OnBoardingName from '../OnBoardingName';
 
@@ -30,7 +30,7 @@ describe('OnBoardingName component', () => {
         prev={jest.fn}
       />,
     );
-    const inputName = screen.queryByPlaceholderText('Enter your last name');
+    const inputName = screen.getByPlaceholderText('Enter your last name');
     act(() => fireEvent(inputName, 'onChangeText', 'myTestUserName'));
     expect(screen.queryAllByRole('button')[1]).toBeDisabled();
   });
@@ -46,7 +46,7 @@ describe('OnBoardingName component', () => {
         prev={jest.fn}
       />,
     );
-    const lastName = screen.queryByPlaceholderText('Enter your first name');
+    const lastName = screen.getByPlaceholderText('Enter your first name');
     act(() => fireEvent(lastName, 'onChangeText', 'myTestUserName'));
     expect(screen.queryAllByRole('button')[1]).toBeDisabled();
   });
@@ -93,7 +93,7 @@ describe('OnBoardingName component', () => {
         prev={jest.fn}
       />,
     );
-    const lastName = screen.queryByPlaceholderText('Enter your first name');
+    const lastName = screen.getByPlaceholderText('Enter your first name');
     act(() => fireEvent(lastName, 'onChangeText', 'myTestUserName'));
 
     expect(mockContext).toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe('OnBoardingName component', () => {
         prev={jest.fn}
       />,
     );
-    const lastName = screen.queryByPlaceholderText('Enter your last name');
+    const lastName = screen.getByPlaceholderText('Enter your last name');
     act(() => fireEvent(lastName, 'onChangeText', 'myTestUserName'));
 
     expect(mockContext).toHaveBeenCalled();

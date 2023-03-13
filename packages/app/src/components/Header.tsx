@@ -5,13 +5,32 @@ import type { ReactElement, ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type HeaderProps = {
-  title?: ReactNode | string;
+  /**
+   * The title to display in the header.
+   */
+  title?: ReactNode;
+  /**
+   * The left button to display in the header.
+   */
   leftButton?: ReactElement | null;
+  /**
+   * The right button to display in the header.
+   */
   rightButton?: ReactElement | null;
+  /**
+   * Whether the header should be displayed in dark mode.
+   */
   dark?: boolean;
+  /**
+   * The style to apply to the header.
+   * @see https://reactnative.dev/docs/view-style-props
+   */
   style?: StyleProp<ViewStyle>;
 };
 
+/**
+ * A mobile header with a title and two buttons.
+ */
 const Header = ({
   title,
   leftButton,
@@ -37,6 +56,9 @@ const Header = ({
 
 export default Header;
 
+/**
+ * The height of the header.
+ */
 export const HEADER_HEIGHT = 44;
 
 const styles = StyleSheet.create({

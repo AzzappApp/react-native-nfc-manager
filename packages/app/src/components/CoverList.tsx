@@ -19,7 +19,7 @@ type CoverListProps = {
   horizontal?: boolean;
   numColums?: number;
 };
-
+// TODO docs and tests once this component is production ready
 const CoverList = ({
   users: usersKey,
   onEndReached,

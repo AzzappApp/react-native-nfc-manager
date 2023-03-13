@@ -1,5 +1,12 @@
 import { useEffect, useRef } from 'react';
 
+/**
+ * A hook to run a function at a specified interval.
+ *
+ * @param func The function to run.
+ * @param time The interval in milliseconds.
+ * @param leading Whether to run the function immediately.
+ */
 const useInterval = (func: () => void, time: number, leading = false) => {
   const funcRef = useRef(func);
   funcRef.current = func;

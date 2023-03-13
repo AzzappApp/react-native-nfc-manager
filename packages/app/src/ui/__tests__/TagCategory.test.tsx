@@ -1,5 +1,5 @@
 import '@testing-library/jest-native/extend-expect';
-import { fireEvent, render, screen } from '#utils/test-util';
+import { fireEvent, render, screen } from '#helpers/testHelpers';
 
 import TagCategory from '../TagCategory';
 

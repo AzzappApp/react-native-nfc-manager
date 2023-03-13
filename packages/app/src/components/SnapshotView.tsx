@@ -8,20 +8,26 @@ import {
 import type { ViewProps, HostComponent } from 'react-native';
 
 export type SnapshotViewProps = Omit<ViewProps, 'children'> & {
+  /**
+   * The ID of the snapshot to render.
+   * This ID is returned by the `snapshotView` function.
+   */
   snapshotID: string;
+  /**
+   * Whether to clear the snapshot on unmount.
+   * Defaults to true.
+   */
   clearOnUnmount?: boolean;
 };
 
-const NativeSnapshotView: React.ComponentType<SnapshotViewProps> =
-  Platform.select({
-    ios: requireNativeComponent('AZPSnapshot'),
-    default: null as any,
-  });
-
+/**
+ * A view that renders a snapshot of a view.
+ * iOS only for now.
+ */
 const SnapshotView = ({
-  style,
-  clearOnUnmount = true,
   snapshotID,
+  clearOnUnmount = true,
+  style,
   ...props
 }: SnapshotViewProps) => {
   if (Platform.OS !== 'ios') {
@@ -49,6 +55,14 @@ export default SnapshotView;
 
 const FAKE_SNAPSHOT_ID = 'FAKE_SNAPSHOT_ID';
 
+/**
+ * Snapshots a view and returns a promise that resolves to the snapshot ID.
+ * This ID can be used to render the snapshot using the `SnapshotView` component.
+ * iOS only for now.
+ *
+ * @param viewHandle The view to snapshot
+ * @returns a promise that resolves to the snapshot ID
+ */
 export const snapshotView = async (
   viewHandle: HostComponent<any> | number,
 ): Promise<string> => {
@@ -66,9 +80,20 @@ export const snapshotView = async (
   return NativeModules.AZPSnapshotManager.snapshotView(viewHandle);
 };
 
+/**
+ * Clears a snapshot. (releases it from memory)
+ *
+ * @param id
+ */
 export const clearShapshot = async (id: string): Promise<void> => {
   if (id === FAKE_SNAPSHOT_ID) {
     return;
   }
   return NativeModules.AZPSnapshotManager.clearSnapshot(id);
 };
+
+const NativeSnapshotView: React.ComponentType<SnapshotViewProps> =
+  Platform.select({
+    ios: requireNativeComponent('AZPSnapshot'),
+    default: null as any,
+  });

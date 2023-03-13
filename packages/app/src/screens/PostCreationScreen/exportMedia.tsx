@@ -1,5 +1,5 @@
 import { exportImage, exportVideo } from '#helpers/mediaHelpers';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 
 const VIDEO_MAX_SIZE = 1280;
 const IMAGE_MAX_SIZE = 2048;

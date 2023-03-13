@@ -1,6 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
 
-import { act, fireEvent, render, screen } from '#utils/test-util';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 
 import OnBoardingType from '../OnBoardingType';
 
@@ -90,7 +90,7 @@ describe('OnBoardingType component', () => {
 
     act(() =>
       fireEvent(
-        screen.queryByTestId('azzapp_Button_pressable-wrapper'),
+        screen.getByTestId('azzapp_Button_pressable-wrapper'),
         'onPress',
       ),
     );

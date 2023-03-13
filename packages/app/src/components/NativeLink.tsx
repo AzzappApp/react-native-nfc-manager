@@ -4,6 +4,9 @@ import type { LinkProps } from '#PlatformEnvironment';
 import type { Route } from '#routes';
 import type { GestureResponderEvent } from 'react-native';
 
+/**
+ * Native implementation of the Link component.
+ */
 const NativeLink = ({ route, params, replace, modal, children }: LinkProps) => {
   const router = useRouter();
   const onLinkPress = (event?: GestureResponderEvent) => {

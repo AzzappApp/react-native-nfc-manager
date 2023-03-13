@@ -1,6 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
+import { render, act, fireEvent } from '#helpers/testHelpers';
 import RGBHexColorPicker from '#ui/ColorPicker/RGBHexColorPicker';
-import { render, act, fireEvent } from '#utils/test-util';
 
 describe('RGBHexColorPicker component', () => {
   test('should call `onChange` with correct hex when changing red value', async () => {

@@ -16,6 +16,8 @@ type SkeletonProps = {
   highLightColor?: string;
   duration?: number;
 };
+
+// TODO docs and tests once this component is production ready
 const Skeleton = ({
   style,
   highLightColor = colors.grey200,

@@ -1,6 +1,6 @@
 import { RelayEnvironmentProvider } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import { act, fireEvent, render, waitFor } from '#utils/test-util';
+import { act, fireEvent, render, waitFor } from '#helpers/testHelpers';
 import '@testing-library/jest-native/extend-expect';
 import SignUpScreen from '../SignUpScreen';
 
@@ -25,18 +25,18 @@ describe('Signup Screen', () => {
     signup.mockReset();
   });
   test('should call the `signup` callback if form is valid', async () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
-    const inputUsername = queryByPlaceholderText('Choose a username');
+    const inputUsername = getByPlaceholderText('Choose a username');
 
     fireEvent(inputUsername, 'onChangeText', 'sebastienValid');
 
@@ -50,15 +50,15 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if email is not valid', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -70,15 +70,15 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if password is not valid', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'wonrpsdfsdfass');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -92,18 +92,18 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if username is not valid', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
-    const inputUsername = queryByPlaceholderText('Choose a username');
+    const inputUsername = getByPlaceholderText('Choose a username');
     fireEvent(inputUsername, 'onChangeText', '123');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -117,18 +117,18 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if username is not valid', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
-    const inputUsername = queryByPlaceholderText('Choose a username');
+    const inputUsername = getByPlaceholderText('Choose a username');
     fireEvent(inputUsername, 'onChangeText', '123');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -142,18 +142,18 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback and show error message if username already exists', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
-    const inputUsername = queryByPlaceholderText('Choose a username');
+    const inputUsername = getByPlaceholderText('Choose a username');
     fireEvent(inputUsername, 'onChangeText', 'sebastien');
     act(() => fireEvent(inputUsername, 'onBlur'));
 
@@ -168,15 +168,15 @@ describe('Signup Screen', () => {
   });
 
   test('Sign Up button should be disabled if phone number is not valid', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', '+3368876');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'wonrpsdfsdfass');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -188,15 +188,15 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if the terms of service checkbox is not checked', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -207,15 +207,15 @@ describe('Signup Screen', () => {
   });
 
   test('should not call the `signup` callback if privacy policy checkbox is not checked', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
-    const inputLogin = queryByPlaceholderText('Phone Number of email address');
+    const inputLogin = getByPlaceholderText('Phone Number of email address');
     fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -227,13 +227,13 @@ describe('Signup Screen', () => {
   });
 
   test('Sign Up Button should be disabled if Phone Number or Email address has not been filled', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     fireEvent(input, 'onChangeText', 'AZEqsd81');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');
@@ -245,13 +245,13 @@ describe('Signup Screen', () => {
   });
 
   test('should display an error message and not call the `signup`callback if password is not filled when pressing `Sign Up`button', () => {
-    const { queryAllByRole, queryAllByTestId, queryByPlaceholderText } = render(
+    const { queryAllByRole, queryAllByTestId, getByPlaceholderText } = render(
       <RelayEnvironmentProvider environment={environement}>
         <SignUpScreen signup={signup} />
       </RelayEnvironmentProvider>,
     );
 
-    const input = queryByPlaceholderText('Phone Number of email address');
+    const input = getByPlaceholderText('Phone Number of email address');
     fireEvent(input, 'onChangeText', 'test@azzaap.coms');
 
     const checkboxes = queryAllByTestId('azzapp__CheckBox__view-wrapper');

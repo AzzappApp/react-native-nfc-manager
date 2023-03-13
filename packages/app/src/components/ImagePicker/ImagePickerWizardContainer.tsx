@@ -20,22 +20,47 @@ import type { ReactElement, ReactNode } from 'react';
 import type { ViewProps } from 'react-native';
 
 export type ImagePickerStepDefinition = {
+  /**
+   * the id of the step
+   */
   stepId: string;
+  /**
+   * the left button of the header
+   * if null, and if the state allows it, the back button is displayed
+   */
   headerLeftButton?: ReactElement | null;
+  /**
+   * the right button of the header
+   * if null, and if the state allows it, the next button is displayed
+   */
   headerRightButton?: ReactElement | null;
+  /**
+   * prevent the navigation to the next step
+   */
   preventNavigation?: boolean;
+  /**
+   * the title of the header
+   */
   headerTitle?: ReactNode;
+  /**
+   * the content to display in the top panel of the image picker
+   */
   topPanel: ReactNode;
+  /**
+   * the content to display in the bottom panel of the image picker
+   */
   bottomPanel: ReactNode;
+  /**
+   * the props of the toolbar to display, if null, no toolbar is displayed
+   */
   toolbarProps?: Exclude<TabsBarProps, 'style' | 'variant'> | null;
 };
 
-const ImagePickerWizardContainerContext = createContext<{
-  setCurrentStep(step: ImagePickerStepDefinition): void;
-}>({
-  setCurrentStep: () => void 0,
-});
-
+/**
+ * Allows to define a step of the image picker wizard, every step must return
+ * and ImagePickerStep element to be able to display content
+ * in the image picker wizard
+ */
 export const ImagePickerStep = (props: ImagePickerStepDefinition) => {
   const { setCurrentStep } = useContext(ImagePickerWizardContainerContext);
   useLayoutEffect(() => {
@@ -43,6 +68,12 @@ export const ImagePickerStep = (props: ImagePickerStepDefinition) => {
   }, [setCurrentStep, props]);
   return null;
 };
+
+const ImagePickerWizardContainerContext = createContext<{
+  setCurrentStep(step: ImagePickerStepDefinition): void;
+}>({
+  setCurrentStep: () => void 0,
+});
 
 type ImagePickerWizardContainerProps = Exclude<ViewProps, 'children'> & {
   children: ReactElement;
@@ -55,6 +86,12 @@ type ImagePickerWizardContainerProps = Exclude<ViewProps, 'children'> & {
   onNext(): void;
 };
 
+/**
+ * Manage the display of the image picker wizard Internally use a portal
+ * like mechanism through Context to display the current step without
+ * mounting/unmounting the panels of the wizard every time the step changes
+ * if those panels are identical between steps
+ */
 export const ImagePickerWizardContainer = ({
   children,
   ...props

@@ -47,6 +47,11 @@ const getCameraPermissions = async () => {
   dispatchChanges();
 };
 
+/**
+ * requests the camera permission, if the permission is denied, it opens the settings.
+ *
+ * @returns a promise that resolves to the camera permission status.
+ */
 export const requestCameraPermission = async () => {
   if (permissions.cameraPermission === 'denied') {
     await Linking.openSettings();
@@ -60,6 +65,11 @@ export const requestCameraPermission = async () => {
   return permissions.cameraPermission;
 };
 
+/**
+ * requests the microphone permission, if the permission is denied, it opens the settings.
+ *
+ * @returns a promise that resolves to the microphone permission status.
+ */
 export const requestMicrophonePermission = async () => {
   if (permissions.microphonePermission === 'denied') {
     await Linking.openSettings();
@@ -73,6 +83,11 @@ export const requestMicrophonePermission = async () => {
   return permissions.microphonePermission;
 };
 
+/**
+ * A hook that returns the camera permissions.
+ *
+ * @returns The camera permissions.
+ */
 const useCameraPermissions = () => {
   useEffect(() => {
     if (!initialized) {

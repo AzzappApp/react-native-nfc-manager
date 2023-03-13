@@ -16,8 +16,8 @@ import {
   messages,
   useCurrentLocale,
 } from './helpers/localeHelpers';
-import * as QueryLoader from './helpers/QueryLoader';
 import { getRelayEnvironment } from './helpers/relayEnvironment';
+import * as RelayQueryManager from './helpers/RelayQueryManager';
 import { isRelayScreen } from './helpers/relayScreen';
 import { init as initTokensStore } from './helpers/tokensStore';
 import waitFor from './helpers/waitFor';
@@ -100,7 +100,7 @@ const authenticatedRoutes: NativeRouterInit = {
 export const init = async () => {
   await initTokensStore();
   initLocaleHelpers();
-  QueryLoader.init();
+  RelayQueryManager.init();
 };
 
 const initialisationPromise = init();
@@ -163,7 +163,7 @@ const AppRouter = ({
     router.addScreenWillBePushedListener(({ id, route: { route, params } }) => {
       const Component = screens[route];
       if (isRelayScreen(Component)) {
-        QueryLoader.loadQueryFor(id, Component, params);
+        RelayQueryManager.loadQueryFor(id, Component, params);
       }
     });
     router.addScreenWillBeRemovedListener(({ id }) => {
@@ -176,7 +176,9 @@ const AppRouter = ({
   };
 
   const onFinishTransitioning = () => {
-    screenIdToDispose.forEach(screen => QueryLoader.disposeQueryFor(screen));
+    screenIdToDispose.forEach(screen =>
+      RelayQueryManager.disposeQueryFor(screen),
+    );
   };
 
   return (

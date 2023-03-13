@@ -6,6 +6,14 @@ import {
 } from './relayEnvironment';
 import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
 
+/**
+ * This module is used to load and dispose queries for a given screen.
+ * It is used to manage the lifecycle of the relay queries, during the navigation.
+ */
+
+/**
+ * A map of active queries, indexed by screenId
+ */
 const activeQueries = new Map<
   string,
   {
@@ -15,11 +23,22 @@ const activeQueries = new Map<
   }
 >();
 
+/**
+ * A map of listeners, indexed by screenId
+ */
 const listeners = new Map<
   string,
   Array<(query: PreloadedQuery<any>) => void>
 >();
 
+/**
+ * Add a listener for a query status change
+ * The listener will be called when the query changes (create/refresh)
+ *
+ * @param screenId
+ * @param listener
+ * @returns
+ */
 const addListener = (
   screenId: string,
   listener: (query: PreloadedQuery<any>) => void,
@@ -41,6 +60,9 @@ const addListener = (
   };
 };
 
+/**
+ * Initialize the query manager
+ */
 export const init = () => {
   addEnvironmentListener(() => {
     [...activeQueries.entries()].forEach(([screenId, entry]) => {
@@ -54,7 +76,12 @@ export const init = () => {
   });
 };
 
-export const useQueryLoaderQuery = (screenId: string) => {
+/**
+ * Return the relay preloaded query associated with a given screen
+ * @param screenId the screen id
+ * @returns a preloaded query or null if the query is not in the cache
+ */
+export const useManagedQuery = (screenId: string) => {
   const [queryInfos, setQueryInfos] = useState(
     activeQueries.get(screenId)?.preloadedQuery,
   );
@@ -68,11 +95,30 @@ export const useQueryLoaderQuery = (screenId: string) => {
   return queryInfos ?? null;
 };
 
+/**
+ * Query options
+ */
 export type LoadQueryOptions<T> = {
+  /**
+   * The query to load, can be a static query or a function that returns a query
+   * based on the params of the screen route
+   */
   query: GraphQLTaggedNode | ((params: T) => GraphQLTaggedNode);
+  /**
+   * A function that returns the variables of the query based on the params of the screen route
+   * @param params
+   * @returns the query variables
+   */
   getVariables?: (params: T) => Variables;
 };
 
+/**
+ * Preloload a query for a given screen
+ * @param screenId screen id
+ * @param options query options
+ * @param params the route params
+ * @param refresh if true, the query will be refreshed even if it is already loaded
+ */
 export const loadQueryFor = <T>(
   screenId: string,
   options: LoadQueryOptions<T>,
@@ -91,6 +137,10 @@ export const loadQueryFor = <T>(
   }
 };
 
+/**
+ * Dispose the query for a given screen
+ * @param screenId
+ */
 export const disposeQueryFor = (screenId: string) => {
   const query = activeQueries.get(screenId);
   if (query) {

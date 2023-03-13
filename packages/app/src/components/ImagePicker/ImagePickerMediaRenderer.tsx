@@ -6,9 +6,15 @@ import {
 } from '../medias';
 import { useImagePickerState } from './ImagePickerContext';
 
+/**
+ * Render the selected media of the ImagePicker
+ */
 const ImagePickerMediaRenderer = ({
   cropEditionMode,
 }: {
+  /**
+   * if true, the crop edition mode is enabled
+   */
   cropEditionMode?: boolean;
 }) => {
   const {

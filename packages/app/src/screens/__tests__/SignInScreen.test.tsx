@@ -1,5 +1,5 @@
 import { getLocales } from '#helpers/localeHelpers';
-import { act, fireEvent, render, screen, waitFor } from '#utils/test-util';
+import { act, fireEvent, render, screen, waitFor } from '#helpers/testHelpers';
 import '@testing-library/jest-native/extend-expect';
 import SignInScreen from '../SignInScreen';
 
@@ -27,7 +27,7 @@ describe('Signin Screen', () => {
 
   test('should not call the `signin` callback if (phone number or email) and password are empty', () => {
     render(<SignInScreen signin={signin} />);
-    const buttonComponent = screen.queryByTestId(
+    const buttonComponent = screen.getByTestId(
       'azzapp_Button_pressable-wrapper',
     );
     act(() => fireEvent(buttonComponent, 'onPress'));
@@ -35,10 +35,10 @@ describe('Signin Screen', () => {
   });
 
   test('Login button should be `disabled` and should not call the `signin` callback if credential (phone number or email) is empty and password filled', () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { queryByRole, getByPlaceholderText } = render(
       <SignInScreen signin={signin} />,
     );
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'myPassword'));
     expect(input.props.value).toBe('myPassword');
     const buttonComponent = queryByRole('button');
@@ -47,67 +47,67 @@ describe('Signin Screen', () => {
   });
 
   test('should call `signin` callback if an email for credential and password are filled', async () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { getByRole, getByPlaceholderText } = render(
       <SignInScreen signin={signin} />,
     );
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
 
-    const buttonComponent = queryByRole('button');
+    const buttonComponent = getByRole('button');
     act(() => fireEvent(buttonComponent, 'onPress'));
     await waitFor(() => expect(signin).toHaveBeenCalled());
   });
 
   test('should call `signin` callback if a phone number for credential and password are filled', async () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { getByRole, getByPlaceholderText } = render(
       <SignInScreen signin={signin} />,
     );
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', '+33669696969'));
 
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
 
-    const buttonComponent = queryByRole('button');
+    const buttonComponent = getByRole('button');
     act(() => fireEvent(buttonComponent, 'onPress'));
     await waitFor(() => expect(signin).toHaveBeenCalled());
   });
 
   test('Login button should be `disabled` if email is not well formatted ', () => {
-    const { queryByPlaceholderText, queryByRole } = render(
+    const { getByPlaceholderText, queryByRole } = render(
       <SignInScreen signin={signin} />,
     );
     const buttonComponent = queryByRole('button');
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'seb@com'));
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
     expect(buttonComponent).toBeDisabled();
   });
 
   test('Login button should be `disabled` if phone number is not well formatted ', () => {
-    const { queryByPlaceholderText, queryByRole } = render(
+    const { getByPlaceholderText, queryByRole } = render(
       <SignInScreen signin={signin} />,
     );
     const buttonComponent = queryByRole('button');
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', '+336234234'));
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
     expect(buttonComponent).toBeDisabled();
   });
 
   test('Login button should be `enable` if password contaians at least one character', () => {
-    const { queryByPlaceholderText, queryByRole } = render(
+    const { getByPlaceholderText, queryByRole } = render(
       <SignInScreen signin={signin} />,
     );
     const buttonComponent = queryByRole('button');
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'azeqsd'));
     expect(buttonComponent).toBeEnabled();
   });
@@ -116,13 +116,13 @@ describe('Signin Screen', () => {
     const errorFunction = jest.fn(() => {
       throw new Error('INVALID_CRENDENTIALS');
     });
-    const { queryByPlaceholderText, queryByRole } = render(
+    const { getByPlaceholderText, getByRole } = render(
       <SignInScreen signin={errorFunction} />,
     );
-    const buttonComponent = queryByRole('button');
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const buttonComponent = getByRole('button');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
-    const input = queryByPlaceholderText('Password');
+    const input = getByPlaceholderText('Password');
     act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
     act(() => fireEvent.press(buttonComponent));
     expect(errorFunction).toThrowError();

@@ -12,33 +12,98 @@ import type {
   Media,
   TimeRange,
   ImageOrientation,
-} from '#types';
+} from '#helpers/mediaHelpers';
 import type { ReactNode, ForwardedRef } from 'react';
 
+/**
+ * the state of the image picker injected in the step components
+ */
 export type ImagePickerState = {
+  /**
+   * the aspect ratio of the image to pick
+   * if null, the aspect ratio is the one of the media
+   */
   forceAspectRatio: number | undefined;
+  /**
+   * the maximum duration of a video to pick
+   */
   maxVideoDuration: number;
+  /**
+   * the kind of media to pick
+   */
   kind: 'image' | 'mixed' | 'video';
+  /**
+   * the selected media
+   */
   media: Media | null;
+  /**
+   * the aspect ratio of the media
+   */
   aspectRatio: number;
+  /**
+   * the edition parameters applied to the media
+   */
   editionParameters: ImageEditionParameters;
+  /**
+   * the filter applied to the media
+   */
   mediaFilter: string | null;
+  /**
+   * the time range of the video selected
+   */
   timeRange: TimeRange | null;
+  /**
+   * true during the export process
+   */
   exporting?: boolean;
+  /**
+   * an event dispatched by picker step when the media is changed
+   *
+   * @param media the selected media
+   */
   onMediaChange(media: Media): void;
+  /**
+   * an event dispatched by picker step when the desired aspect ratio is changed
+   * @param value the new aspect ratio
+   */
   onAspectRatioChange(value: number): void;
+  /**
+   * an event dispatched by picker step to select a new time range in the video
+   * @param timeRange the new time range
+   */
   onTimeRangeChange(timeRange: TimeRange | null): void;
+  /**
+   * an event dispatched by picker step to change the filter applied to the media
+   * @param filter the new filter
+   */
   onMediaFilterChange(filter: string | null): void;
+  /**
+   * an event dispatched by picker step to change the edition parameters applied to the media
+   * @param editionParameters the new edition parameters
+   */
   onEditionParametersChange(editionParameters: ImageEditionParameters): void;
+  /**
+   * an event dispatched by picker step to change an edition parameter value
+   * @param param the parameter to change
+   * @param value the new value
+   */
   onParameterValueChange<T extends keyof ImageEditionParameters>(
     param: T,
     value: ImageEditionParameters[T],
   ): void;
+  /**
+   * an event dispatched by picker step to reset the state of the picker
+   * @param duration the duration of the selected video
+   */
   reset(duration?: number | null): void;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
 
+/**
+ * a hook used in picker steps to access the picker state
+ * @returns the picker state
+ */
 export const useImagePickerState = () => {
   const state = useContext(ImagePickerContext);
   if (state === null) {
@@ -48,10 +113,25 @@ export const useImagePickerState = () => {
 };
 
 type ImagePickerContextProviderProps = {
+  /**
+   * the maximum duration of a video
+   */
   maxVideoDuration: number;
+  /**
+   * the kind of media to pick
+   */
   kind: 'image' | 'mixed' | 'video';
+  /**
+   * true during the export process
+   */
   exporting?: boolean;
+  /**
+   * the aspect ratio of the image to pick
+   */
   forceAspectRatio?: number;
+  /**
+   * the children of the provider
+   */
   children: ReactNode;
 };
 
@@ -191,6 +271,11 @@ const _ImagePickerContextProvider = (
   );
 };
 
+/**
+ * The root component of the picker.
+ * It provides the picker state to all its children.
+ * it also manages the display of the picker steps.
+ */
 export const ImagePickerContextProvider = forwardRef(
   _ImagePickerContextProvider,
 );

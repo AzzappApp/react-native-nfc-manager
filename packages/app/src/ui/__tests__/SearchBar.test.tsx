@@ -1,5 +1,5 @@
 import '@testing-library/jest-native/extend-expect';
-import { act, fireEvent, render, screen } from '#utils/test-util';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SearchBar from '../SearchBar';
 
 const placeholder = 'placeholder';
@@ -61,7 +61,7 @@ describe('SearchBar component', () => {
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         searchText,
       );
@@ -93,7 +93,7 @@ describe('SearchBar component', () => {
       );
     });
 
-    fireEvent(screen.queryByTestId('azzapp__searchbar__textInput'), 'focus');
+    fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'focus');
     expect(onFocus).toHaveBeenCalled();
   });
 
@@ -117,16 +117,13 @@ describe('SearchBar component', () => {
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         searchText,
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__SearchBar__clear-button'),
-        'press',
-      );
+      fireEvent(screen.getByTestId('azzapp__SearchBar__clear-button'), 'press');
     });
     expect(onCancel).not.toHaveBeenCalled();
     expect(onChangeText).toHaveBeenCalledTimes(2);
@@ -152,10 +149,7 @@ describe('SearchBar component', () => {
       );
     });
 
-    fireEvent(
-      screen.queryByTestId('azzapp__SearchBar__cancel-button'),
-      'press',
-    );
+    fireEvent(screen.getByTestId('azzapp__SearchBar__cancel-button'), 'press');
     expect(onCancel).toHaveBeenCalled();
     expect(onClear).not.toHaveBeenCalled();
     expect(onChangeText).not.toHaveBeenCalled();
@@ -178,7 +172,7 @@ describe('SearchBar component', () => {
       screen.getByTestId('azzapp__SearchBar__view-inputcontainer'),
     ).toHaveStyle({ width: 450 });
 
-    fireEvent(screen.queryByTestId('azzapp__searchbar__textInput'), 'focus');
+    fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'focus');
     act(() => {
       jest.advanceTimersByTime(1000);
     });

@@ -1,5 +1,6 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import {
   FlatList,
   Image,
@@ -16,7 +17,7 @@ import {
   getVideoSize,
 } from '#helpers/mediaHelpers';
 import PressableNative from '#ui/PressableNative';
-import type { Media } from '#types';
+import type { Media } from '#helpers/mediaHelpers';
 import type {
   PhotoIdentifier,
   PhotoIdentifiersPage,
@@ -25,13 +26,34 @@ import type {
 import type { ScrollViewProps, ListRenderItemInfo } from 'react-native';
 
 type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
+  /**
+   * The ID of the media that is currently selected.
+   * this id is the uri of the media as in camera roll (phassets on ios).
+   */
   selectedMediaID?: string;
-  album?: string | null;
-  onMediaSelected: (media: Media) => void;
-  onGalleryPermissionFail: () => void;
+  /**
+   * The kind of media to display.
+   */
   kind: 'image' | 'mixed' | 'video';
+  /**
+   * Allows the list to be filtered by album.
+   */
+  album?: string | null;
+  /**
+   * Called when the user selects a media.
+   * @param media The media that was selected.
+   */
+  onMediaSelected: (media: Media) => void;
+  /**
+   * Called when the user denies the gallery permission.
+   */
+  onGalleryPermissionFail: () => void;
 };
 
+/**
+ * A component that displays a list of media from the camera roll
+ * and allows the user to select one of them.
+ */
 const PhotoGalleryMediaList = ({
   selectedMediaID,
   album,
@@ -103,7 +125,7 @@ const PhotoGalleryMediaList = ({
     void load(true);
   }, [load]);
 
-  const dispatchSelectMedia = useCallback(
+  const onMediaPress = useCallback(
     async ({
       image: { uri: galleryUri, height, width, playableDuration },
       type,
@@ -152,6 +174,8 @@ const PhotoGalleryMediaList = ({
 
   const { width: windowWidth } = useWindowDimensions();
 
+  const intl = useIntl();
+
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<PhotoIdentifier['node']>) => (
       <PressableNative
@@ -167,7 +191,13 @@ const PhotoGalleryMediaList = ({
             opacity: 0.5,
           },
         ]}
-        onPress={() => dispatchSelectMedia(item)}
+        accessibilityRole="button"
+        accessibilityHint={intl.formatMessage({
+          defaultMessage: 'tap to select this media',
+          description:
+            'accessibility hint for media selection buttons in photo gallery',
+        })}
+        onPress={() => onMediaPress(item)}
         activeOpacity={0.7}
       >
         <Image
@@ -191,7 +221,7 @@ const PhotoGalleryMediaList = ({
         )}
       </PressableNative>
     ),
-    [dispatchSelectMedia, selectedMediaID, windowWidth],
+    [onMediaPress, intl, selectedMediaID, windowWidth],
   );
 
   return (
@@ -202,6 +232,7 @@ const PhotoGalleryMediaList = ({
       renderItem={renderItem}
       onEndReached={onEndReached}
       style={{ flex: 1 }}
+      accessibilityRole="list"
       {...props}
     />
   );

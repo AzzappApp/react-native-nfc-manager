@@ -4,6 +4,13 @@ const AUH_INFO_KEY = 'AZZAPP_AUTH';
 
 let authInfos: { token: string; refreshToken: string } | null = null;
 
+/**
+ * this module is used to store auth tokens and retrive tokens in encrypted storage
+ */
+
+/**
+ * Init the store
+ */
 export const init = () =>
   EncryptedStorage.getItem(AUH_INFO_KEY)
     .then(value => {
@@ -13,8 +20,15 @@ export const init = () =>
       authInfos = null;
     });
 
+/**
+ * Retrieve the auth tokens
+ * @returns the tokens if exist
+ */
 export const getTokens = () => authInfos;
 
+/**
+ * Set the auth tokens
+ */
 export const setTokens = async ({
   token,
   refreshToken,
@@ -27,6 +41,9 @@ export const setTokens = async ({
   callListener();
 };
 
+/**
+ * Clear the auth tokens
+ */
 export const clearTokens = async () => {
   authInfos = null;
   await EncryptedStorage.removeItem(AUH_INFO_KEY);
@@ -44,6 +61,9 @@ const listeners: TokenListener[] = [];
 
 const callListener = () => listeners.forEach(listener => listener());
 
+/**
+ * Add a listener to listen when value changed in store
+ */
 export const addOnTokenChangedListener = (
   onTokenChanged: () => void,
 ): Subscription => {

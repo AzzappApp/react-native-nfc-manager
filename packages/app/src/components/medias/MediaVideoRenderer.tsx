@@ -1,4 +1,3 @@
-import LRUCache from 'lru-cache';
 import {
   forwardRef,
   useEffect,
@@ -16,6 +15,10 @@ import type {
 } from './mediasTypes';
 import type { ForwardedRef } from 'react';
 
+/**
+ * A native component that allows to display a video.
+ * It also allows to take a snapshot of the video, which is useful in case of transition.
+ */
 const MediaVideoRenderer = (
   {
     uri,
@@ -122,8 +125,7 @@ const MediaVideoRenderer = (
     >
       <NativeMediaVideoRenderer
         ref={videoRef}
-        // TODO if file is purged by system problem may arise
-        uri={localVideoFile.get(source) ?? uri}
+        uri={uri}
         muted={muted}
         paused={paused}
         currentTime={currentTime}
@@ -158,11 +160,5 @@ const MediaVideoRenderer = (
 };
 
 export default forwardRef(MediaVideoRenderer);
-
-const localVideoFile = new LRUCache<string, string>({ max: 1000 });
-
-export const addLocalVideo = (mediaID: string, localURI: string) => {
-  localVideoFile.set(mediaID, localURI);
-};
 
 const _videoSnapshots = new Map<string, string>();

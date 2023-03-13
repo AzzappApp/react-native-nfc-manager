@@ -19,11 +19,11 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/cardHelpers';
 import { colors, textStyles } from '#theme';
-import Delay from '#components/Delay';
 import { EditableImageWithCropMode } from '#components/medias';
 import Button from '#ui/Button';
+import Delay from '#ui/Delay';
 import type { EditableImageSource } from '#components/medias';
-import type { CropData, ImageEditionParameters } from '#types';
+import type { CropData, ImageEditionParameters } from '#helpers/mediaHelpers';
 import type {
   CardCoverContentStyleInput,
   CardCoverTextStyleInput,

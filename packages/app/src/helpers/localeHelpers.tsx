@@ -10,6 +10,12 @@ import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
 let currentLocale: string | null = null;
 const localeChangeListeners: Array<() => void> = [];
 
+/**
+ * Returns the user preferred locales, in order.
+ * On server, returns an empty array.
+ *
+ * @see https://github.com/zoontek/react-native-localize#getlocales
+ */
 export const getLocales = () => {
   if (getRuntimeEnvironment() === 'node') {
     return [];
@@ -17,6 +23,9 @@ export const getLocales = () => {
   return getLocalesRNLocalize();
 };
 
+/**
+ * Returns the current locale used by the application.
+ */
 export const getCurrentLocale = () => {
   if (!currentLocale) {
     console.warn('trying to access `getCurrentLocale` before initialization');
@@ -42,7 +51,11 @@ export const useCurrentLocale = () => {
   return locale;
 };
 
-const setCurrentLocale = () => {
+/**
+ * Sets the current locale based on the user preferred locales.
+ * If the user preferred locales are not supported, the default locale is used.
+ */
+const guessCurrentLocale = () => {
   const locale = findBestAvailableLanguage(SUPPORTED_LOCALES);
   const lang = locale?.languageTag ?? DEFAULT_LOCALE;
   if (currentLocale !== lang) {
@@ -51,17 +64,23 @@ const setCurrentLocale = () => {
   }
 };
 
+/**
+ * Initializes the locale helpers.
+ */
 export const init = () => {
-  setCurrentLocale();
+  guessCurrentLocale();
   let appState = AppState.currentState;
   AppState.addEventListener('change', nextAppState => {
     if (appState.match(/inactive|background/) && nextAppState === 'active') {
-      setCurrentLocale();
+      guessCurrentLocale();
     }
     appState = nextAppState;
   });
 };
 
+/**
+ * Returns the current locale used by the application.
+ */
 export const messages: { readonly [lang: string]: Record<string, string> } = {
   get en() {
     return require('@azzapp/i18n/compiled/app/en.json');

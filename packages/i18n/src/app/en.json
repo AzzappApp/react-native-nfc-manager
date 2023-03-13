@@ -55,17 +55,33 @@
     "defaultMessage": "First name",
     "description": "OnBoarding Name Screen - Enter your first name label textinput"
   },
+  "5jGwoy": {
+    "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
+    "description": "Accessibility hint of the rotate button in in the cover edition screen"
+  },
   "6+FKio": {
     "defaultMessage": "Tap to show secured text in clear",
     "description": "TextInput - AccessibilityLabel button to show password in clear"
+  },
+  "6+YHde": {
+    "defaultMessage": "Flip camera",
+    "description": "camera flip button accessibility label"
   },
   "65Pcwu": {
     "defaultMessage": "Continue",
     "description": "OnBoarding Name Company Screen - AccessibilityLabel Continue"
   },
+  "6EPGoU": {
+    "defaultMessage": "Off",
+    "description": "flash off accessibility value"
+  },
   "6EyA+S": {
     "defaultMessage": "Access to the microphone allows you to record videos.",
     "description": "Camera authorization screen content for microphone permission"
+  },
+  "6SitNY": {
+    "defaultMessage": "Tap to switch between front and back camera",
+    "description": "camera flip button accessibility hint"
   },
   "6V9XJr": {
     "defaultMessage": "Allow Azzapp to access your photos",
@@ -115,9 +131,17 @@
     "defaultMessage": "Back to Log In",
     "description": "ForgotPasswordScreen - Back to Log In bottom screen link"
   },
+  "9djJN/": {
+    "defaultMessage": "Torch",
+    "description": "camera torch button accessibility label"
+  },
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
+  },
+  "AV7xEU": {
+    "defaultMessage": "Font size",
+    "description": "Label of the font size slider in cover edition"
   },
   "AfkzY0": {
     "defaultMessage": "Welcome",
@@ -126,6 +150,14 @@
   "AsCp0n": {
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
+  },
+  "BCtKX4": {
+    "defaultMessage": "Tap to change the orientation of the content",
+    "description": "Hint of the orientation button in cover edition"
+  },
+  "BD8knG": {
+    "defaultMessage": "Top center",
+    "description": "Label of the top center position in cover edition"
   },
   "BFnUrJ": {
     "defaultMessage": "Process",
@@ -155,6 +187,10 @@
     "defaultMessage": "Reset password",
     "description": "ForgotpasswordScreen - Reset password"
   },
+  "DXYRN3": {
+    "defaultMessage": "Middle center",
+    "description": "Label of the middle center position in cover edition"
+  },
   "DgczNZ": {
     "defaultMessage": "Log In",
     "description": "Signup Screen - Login link bottom screen"
@@ -162,6 +198,10 @@
   "DwePHC": {
     "defaultMessage": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter",
     "description": "SignupScreen - error message when password is not compliant with our rules"
+  },
+  "E2sLo4": {
+    "defaultMessage": "Tap to take a photo",
+    "description": "Accessibility hint for the camera shutter button"
   },
   "E5po/y": {
     "defaultMessage": "Enter your email address or phone number and we'll send you a link to create a new password",
@@ -179,6 +219,10 @@
     "defaultMessage": "This username is not available",
     "description": "Signup Screen - Error This username is not available"
   },
+  "F1nOOr": {
+    "defaultMessage": "Color",
+    "description": "Label of the color button in cover edition"
+  },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
@@ -195,9 +239,17 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Terms of service "
   },
+  "H5dcbM": {
+    "defaultMessage": "Tap to start recording",
+    "description": "Accessibility label for the camera shutter button"
+  },
   "HLKVM1": {
     "defaultMessage": "New password",
     "description": "ChangePassword Screen - New password"
+  },
+  "HQ/owO": {
+    "defaultMessage": "Slide to change the font size",
+    "description": "Hint of the font size slider in cover edition"
   },
   "IBgr9f": {
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
@@ -230,6 +282,10 @@
   "K4JPQO": {
     "defaultMessage": "Continue",
     "description": "OnboardingScreen - Continue Button"
+  },
+  "KKW5Ea": {
+    "defaultMessage": "Horizontal",
+    "description": "Label of the horizontal orientation in cover edition"
   },
   "KOjOOw": {
     "defaultMessage": "Search for profiles, posts...",
@@ -275,6 +331,10 @@
     "defaultMessage": "Tap to accept the terms of service",
     "description": "Signup Screen - Accessibility checkbox terms of service"
   },
+  "RiA6pa": {
+    "defaultMessage": "Font family",
+    "description": "Title of the font picker modal in cover edition"
+  },
   "SGt9OO": {
     "defaultMessage": "Edit my profile",
     "description": "Edit my profile button label in Profile Screen Button Bar"
@@ -291,6 +351,10 @@
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"
   },
+  "T3U4SY": {
+    "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
+    "description": "Accessibility hint of the rotate button in image edition wizzard"
+  },
   "Tmtm4h": {
     "defaultMessage": "Choose a company activity",
     "description": "OnBoarding Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
@@ -298,6 +362,10 @@
   "TtcQs5": {
     "defaultMessage": "Clipping",
     "description": "Label of the clipping switch in cover edition"
+  },
+  "UAcWni": {
+    "defaultMessage": "Bottom left",
+    "description": "Label of the bottom left position in cover edition"
   },
   "UIZoTQ": {
     "defaultMessage": "Enter your search word",
@@ -314,6 +382,14 @@
   "UWbqab": {
     "defaultMessage": "Unfollow",
     "description": "Unfollow button label in Profile Screen Button Bar"
+  },
+  "UjPdhp": {
+    "defaultMessage": "Press this button to select an image from your library",
+    "description": "Accessibility hint of the image selection button"
+  },
+  "UtDANq": {
+    "defaultMessage": "Shutter",
+    "description": "Accessibility label for the camera shutter button"
   },
   "V1zxkj": {
     "defaultMessage": "Please enter a valid phone number or email address",
@@ -347,13 +423,21 @@
     "defaultMessage": "Font color",
     "description": "Title of the color picker modal in cover edition for font color"
   },
+  "X6lxBz": {
+    "defaultMessage": "Position",
+    "description": "Label of the position button in cover edition"
+  },
+  "Xaq6Uu": {
+    "defaultMessage": "FONT SIZE {size}",
+    "description": "Font size message in cover edition"
+  },
   "XfBKWm": {
     "defaultMessage": "Activity",
     "description": "OnBoarding Name Company Screen - Label Activity textinput"
   },
-  "Y+UQRB": {
-    "defaultMessage": "Media Filter",
-    "description": "Accessibility label of the Media filter tabs in image editing view"
+  "YJRxy5": {
+    "defaultMessage": "Subtitle",
+    "description": "Label of the subtitle input in cover edition"
   },
   "YgcSzd": {
     "defaultMessage": "Create a new password",
@@ -407,6 +491,10 @@
     "defaultMessage": "Highlights",
     "description": "Highlights image edition parameters name"
   },
+  "dNmlSS": {
+    "defaultMessage": "Tap to select a color",
+    "description": "Hint of the color button in cover edition"
+  },
   "dl8CRm": {
     "defaultMessage": "Posterize",
     "description": "Posterize photo filter name"
@@ -418,6 +506,10 @@
   "dzmRcf": {
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
+  },
+  "e5zpd5": {
+    "defaultMessage": "Tap to stop recording",
+    "description": "Accessibility label for the camera shutter button"
   },
   "e9NfAF": {
     "defaultMessage": "Check your emails or messages!",
@@ -435,6 +527,10 @@
     "defaultMessage": "We just send you a link to create a new password",
     "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
   },
+  "fF/vRd": {
+    "defaultMessage": "Press this button to adjust the boundary of the selected image",
+    "description": "Accessibility hint of the crop button"
+  },
   "fWSCbG": {
     "defaultMessage": "Tap to sign in",
     "description": "SignIn Screen - AccessibilityLabel Sign In button"
@@ -447,9 +543,17 @@
     "defaultMessage": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.",
     "description": "Camera authorization screen content for camera permission"
   },
+  "gKqCS0": {
+    "defaultMessage": "On",
+    "description": "flash on accessibility value"
+  },
   "gL9Uhd": {
     "defaultMessage": "Tap to edit your profile",
     "description": "UserScreenButtonBar edit button accessibility label"
+  },
+  "gLBaC+": {
+    "defaultMessage": "Tap to select a font",
+    "description": "Hint of the font button in cover edition"
   },
   "gRy2ak": {
     "defaultMessage": "Vigneting",
@@ -491,13 +595,33 @@
     "defaultMessage": "Pick some topics that describes your company.",
     "description": "OnBoarding About Screen - SubTitle Pick some topics that describes your company."
   },
+  "ieyDkr": {
+    "defaultMessage": "Bottom right",
+    "description": "Label of the bottom right position in cover edition"
+  },
+  "ivmD1N": {
+    "defaultMessage": "Crop",
+    "description": "Accessibility label of the crop button"
+  },
   "jWEWL/": {
     "defaultMessage": "Enter your first name",
     "description": "OnBoarding Name Screen - Enter your first name placeholder"
   },
+  "jbyp1F": {
+    "defaultMessage": "Select an image",
+    "description": "Accessibility label of the image selection button"
+  },
+  "jjn0/J": {
+    "defaultMessage": "Top right",
+    "description": "Label of the top right position in cover edition"
+  },
   "k2OnxJ": {
     "defaultMessage": "Tell us more about you?",
     "description": "OnBoarding About Screen - Title Tell us more about you"
+  },
+  "k2pUu2": {
+    "defaultMessage": "Bottom to top",
+    "description": "Label of the bottom to top orientation in cover edition"
   },
   "kjYrL+": {
     "defaultMessage": "Color #1",
@@ -506,6 +630,10 @@
   "ksoDJ1": {
     "defaultMessage": "Continue",
     "description": "OnBoarding Name Screen - AccessibilityLabel Button Continue"
+  },
+  "kuaFQc": {
+    "defaultMessage": "Orientation",
+    "description": "Label of the orientation button in cover edition"
   },
   "l8fBNE": {
     "defaultMessage": "Edit Palette",
@@ -519,6 +647,10 @@
     "defaultMessage": "Retry",
     "description": "label of the button allowing  to retry loading cover image"
   },
+  "lUOLXQ": {
+    "defaultMessage": "Top left",
+    "description": "Label of the top left position in cover edition"
+  },
   "lXXDGw": {
     "defaultMessage": "Create your cover",
     "description": "Cover creation screen title"
@@ -526,6 +658,10 @@
   "lXovx3": {
     "defaultMessage": "New Post",
     "description": "New post screen title"
+  },
+  "m/3KOp": {
+    "defaultMessage": "Bottom center",
+    "description": "Label of the bottom center position in cover edition"
   },
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
@@ -538,6 +674,10 @@
   "maTkuw": {
     "defaultMessage": "Enter your last name",
     "description": "OnBoarding Name Screen - Enter your last name placeholder"
+  },
+  "me0reI": {
+    "defaultMessage": "Tap to change the position",
+    "description": "Hint of the position button in cover edition"
   },
   "mfzT2i": {
     "defaultMessage": "Tap to follow the profile",
@@ -555,6 +695,10 @@
     "defaultMessage": "See all",
     "description": "CoverList - See all button"
   },
+  "nHSXvS": {
+    "defaultMessage": "Tap to activate torch",
+    "description": "camera torch button accessibility hint"
+  },
   "nJgiur": {
     "defaultMessage": "Tap to clear your search",
     "description": "SearchBar accessibilityLabel Clear Button"
@@ -562,6 +706,10 @@
   "nMtsXg": {
     "defaultMessage": "Shadow",
     "description": "Shadow image edition parameters name"
+  },
+  "noNWRA": {
+    "defaultMessage": "Cut Video",
+    "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
   "nxN9u/": {
     "defaultMessage": "Tell us more about your company",
@@ -574,6 +722,10 @@
   "oAzffi": {
     "defaultMessage": "Adjust",
     "description": "Title of the adjust section in Image edition wizzard"
+  },
+  "p0+sji": {
+    "defaultMessage": "tap to select this media",
+    "description": "accessibility hint for media selection buttons in photo gallery"
   },
   "p042gg": {
     "defaultMessage": "Profiles you may like",
@@ -603,17 +755,37 @@
     "defaultMessage": "You need to accept the Terms of Service and the Privacy Policy",
     "description": "Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
   },
+  "qbB3xv": {
+    "defaultMessage": "Top to bottom",
+    "description": "Label of the top to bottom orientation in cover edition"
+  },
   "qgSTeL": {
     "defaultMessage": "Add a color",
     "description": "ColorPicker component - Bottom sheet title Add a color"
+  },
+  "qkbfOu": {
+    "defaultMessage": "Middle left",
+    "description": "Label of the middle left position in cover edition"
   },
   "qyCo80": {
     "defaultMessage": "Describe your publication",
     "description": "Post creation screen textarea placeholder"
   },
+  "r/zo6r": {
+    "defaultMessage": "Font",
+    "description": "Label of the font button in cover edition"
+  },
+  "r2XHrR": {
+    "defaultMessage": "Middle right",
+    "description": "Label of the middle right position in cover edition"
+  },
   "r2oElc": {
     "defaultMessage": "Enter your company name",
     "description": "OnBoarding Name Company Screen - Accessibility TextInput Enter your company name"
+  },
+  "r3LnPL": {
+    "defaultMessage": "Filter",
+    "description": "Accessibility label of the Filter tab in image editing view"
   },
   "rHj8v4": {
     "defaultMessage": "Password",
@@ -635,6 +807,10 @@
     "defaultMessage": "Update your cover",
     "description": "Cover edition screen title"
   },
+  "sIONS1": {
+    "defaultMessage": "Adjust",
+    "description": "Accessibility label of the Adjust tab in image editing view"
+  },
   "sRESK6": {
     "defaultMessage": "Save",
     "description": "Save button label in cover edition screen"
@@ -646,6 +822,10 @@
   "u1bNBj": {
     "defaultMessage": "Color #2",
     "description": "Label of the background color tab in cover edition"
+  },
+  "uHQfNw": {
+    "defaultMessage": "Video Shutter",
+    "description": "Accessibility label for the video shutter button"
   },
   "uM3ONA": {
     "defaultMessage": "Enter your first name",
@@ -666,6 +846,10 @@
   "uvBCJV": {
     "defaultMessage": "No recent search for {word}",
     "description": "ResetSearch - message when no history search found"
+  },
+  "uyQGcW": {
+    "defaultMessage": "Rotate",
+    "description": "Accessibility label of the rotate button in the cover edition screen"
   },
   "uzUgQ0": {
     "defaultMessage": "Tell us more about your company?",
@@ -739,6 +923,14 @@
     "defaultMessage": "Select an album",
     "description": "Title of the album selection modal"
   },
+  "y3qZwL": {
+    "defaultMessage": "Title",
+    "description": "Label of the title input in cover edition"
+  },
+  "ydBmYF": {
+    "defaultMessage": "Auto",
+    "description": "flash auto accessibility value"
+  },
   "ymtf7H": {
     "defaultMessage": "Tap to search for {word}",
     "description": "Recent Search - Accessibiltity Label remove element from history"
@@ -746,6 +938,10 @@
   "z7TgL0": {
     "defaultMessage": "Tonal",
     "description": "Tonal photo filter name"
+  },
+  "zDelVQ": {
+    "defaultMessage": "Rotate",
+    "description": "Accessibility label of the rotate button in image edition wizzard"
   },
   "zMaylR": {
     "defaultMessage": "Take a video",

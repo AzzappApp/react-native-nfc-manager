@@ -29,6 +29,7 @@ export type PostRendererHandle = {
   snapshot(): Promise<void>;
 };
 
+// TODO docs and tests once this component is production ready
 const PostRenderer = (
   {
     post: postKey,

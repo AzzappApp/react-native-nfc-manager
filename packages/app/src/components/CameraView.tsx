@@ -7,6 +7,7 @@ import {
   forwardRef,
   useImperativeHandle,
 } from 'react';
+import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -23,44 +24,90 @@ import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
-type CameraViewProps = ViewProps & {
+export type CameraViewProps = ViewProps & {
+  /**
+   * A callback that is called when the camera is ready to take photos/videos
+   */
   onInitialized(): void;
+  /**
+   * A callback that is called when the camera encounters an error
+   */
   onError(error: CameraRuntimeError): void;
 };
 
+/**
+ * An object that represents a recording session
+ */
 export type RecordSession = {
-  end(): Promise<{ path: string; duration: number }>;
-  cancel(): void;
+  /**
+   * Stops recording and returns the recorded video
+   */
+  end(): Promise<{
+    /**
+     * The path to the recorded video
+     */
+    path: string;
+    /**
+     * The duration of the recorded video in seconds
+     */
+    duration: number;
+  }>;
 };
 
+/**
+ * The type of the reference to the CameraView component
+ */
 export type CameraViewHandle = {
+  /**
+   * Takes a photo and returns the path to the photo
+   */
   takePhoto(): Promise<string | null>;
+  /**
+   * Starts recording a video and returns a RecordSession
+   */
   startRecording(): RecordSession | null;
 };
 
+/**
+ * Camera view component, allows to take photos and record videos
+ */
 const CameraView = (
   { onInitialized, onError, ...props }: CameraViewProps,
   ref: ForwardedRef<CameraViewHandle>,
 ) => {
+  // #region camera state
   const camera = useRef<Camera>(null);
-  const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
-
-  const isActive = useIsForeground();
 
   const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
     'back',
   );
-  const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
+  const devices = useCameraDevices();
+  const device = devices[cameraPosition];
+  const supportsCameraFlipping = devices.back != null && devices.front != null;
 
+  const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
+  const supportsFlash = device?.hasFlash ?? false;
+
+  const isActive = useIsForeground();
+  const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
+  useEffect(() => {
+    Camera.getMicrophonePermissionStatus().then(
+      status => setHasMicrophonePermission(status === 'authorized'),
+      () => setHasMicrophonePermission(false),
+    );
+  }, []);
+  // #endregion
+
+  // #region Camera ref
   useImperativeHandle(
     ref,
     () => ({
       async takePhoto() {
-        if (!camera.current) {
+        if (!camera.current || !isActive) {
           return null;
         }
         const photo = await camera.current.takePhoto({
-          flash,
+          flash: supportsFlash ? flash : 'off',
           // TODO investigate those parameters
           // enableAutoDistortionCorrection: true,
           // enableAutoRedEyeReduction: true,
@@ -71,53 +118,45 @@ const CameraView = (
       },
 
       startRecording() {
-        if (!camera.current) {
+        if (!camera.current || !isActive) {
           return null;
         }
         const resultDeffered = createDeffered<{
           path: string;
           duration: number;
         }>();
-        let isActive = true;
+        let recording = true;
         camera.current.startRecording({
           flash,
           onRecordingError(error) {
+            recording = false;
             resultDeffered.reject(error);
           },
           onRecordingFinished(video) {
+            recording = false;
             resultDeffered.resolve(video);
           },
         });
         return {
           end() {
-            if (!isActive || !camera.current) {
+            if (!camera.current) {
               throw new Error('Invalid record session');
             }
-            isActive = false;
+            if (!recording) {
+              throw new Error('Recording already ended');
+            }
             return camera.current
               .stopRecording()
               .then(() => resultDeffered.promise);
           },
-          cancel() {
-            if (isActive) {
-              void camera.current?.stopRecording();
-            }
-          },
         };
       },
     }),
-    [flash],
+    [flash, isActive, supportsFlash],
   );
+  // #endregion
 
-  const devices = useCameraDevices();
-  const device = devices[cameraPosition];
-
-  const supportsCameraFlipping = useMemo(
-    () => devices.back != null && devices.front != null,
-    [devices.back, devices.front],
-  );
-  const supportsFlash = device?.hasFlash ?? false;
-
+  // #region camera controls
   const onFlipCameraPressed = useCallback(() => {
     setCameraPosition(p => (p === 'back' ? 'front' : 'back'));
   }, []);
@@ -125,7 +164,9 @@ const CameraView = (
   const onFlashPressed = useCallback(() => {
     setFlash(f => (f === 'off' ? 'on' : f === 'on' ? 'auto' : 'off'));
   }, []);
+  // #endregion
 
+  // #region focus
   const focusRingVisible = useSharedValue(0);
   const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(
     null,
@@ -172,13 +213,9 @@ const CameraView = (
       transform: [{ scale }],
     };
   });
+  // #endregion
 
-  useEffect(() => {
-    Camera.getMicrophonePermissionStatus().then(
-      status => setHasMicrophonePermission(status === 'authorized'),
-      () => setHasMicrophonePermission(false),
-    );
-  }, []);
+  const intl = useIntl();
 
   return (
     <View {...props}>
@@ -224,6 +261,32 @@ const CameraView = (
           variant="white"
           size={40}
           onPress={onFlashPressed}
+          accessibilityRole="togglebutton"
+          accessibilityValue={{
+            text:
+              flash === 'off'
+                ? intl.formatMessage({
+                    defaultMessage: 'Off',
+                    description: 'flash off accessibility value',
+                  })
+                : flash === 'auto'
+                ? intl.formatMessage({
+                    defaultMessage: 'Auto',
+                    description: 'flash auto accessibility value',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'On',
+                    description: 'flash on accessibility value',
+                  }),
+          }}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Torch',
+            description: 'camera torch button accessibility label',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Tap to activate torch',
+            description: 'camera torch button accessibility hint',
+          })}
         />
       )}
       {supportsCameraFlipping && (
@@ -233,6 +296,14 @@ const CameraView = (
           variant="white"
           size={40}
           onPress={onFlipCameraPressed}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Flip camera',
+            description: 'camera flip button accessibility label',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Tap to switch between front and back camera',
+            description: 'camera flip button accessibility hint',
+          })}
         />
       )}
     </View>

@@ -45,7 +45,7 @@ import type {
   CropData,
   ImageEditionParameters,
   ImageOrientation,
-} from '#types';
+} from '#helpers/mediaHelpers';
 import type { CoverEditionScreenCoverRendererHandle } from './CoverEditionScreenCoverRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
@@ -61,9 +61,15 @@ import type {
 import type { Observable } from 'relay-runtime';
 
 export type CoverEditionScreenProps = {
+  /**
+   * The relay viewer reference
+   */
   viewer: CoverEditionScreen_viewer$key | null;
 };
 
+/**
+ * Allows un user to edit his Cover, the cover changes, can be previsualized
+ */
 const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   //#region Data dependencies
   const viewer = useFragment(
@@ -299,7 +305,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   const isCreation = !cover;
   const isDirty = Object.keys(updates).length > 0;
   const isValid =
-    !isCreation || (updates.sourceMedia != null && updates.title != null);
+    !isCreation || (updates.sourceMedia != null && !!updates.title);
   const canSave = !saving && isDirty && isValid;
   const canCancel = !isCreation && !saving;
 
@@ -855,7 +861,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                 })
           }
           leftButton={
-            !cropEditionMode ? (
+            !cropEditionMode && !isCreation ? (
               <Button
                 disabled={!canCancel}
                 variant="secondary"
@@ -869,7 +875,21 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           }
           rightButton={
             cropEditionMode ? (
-              <IconButton icon="rotate" onPress={onNextOrientation} />
+              <IconButton
+                icon="rotate"
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Rotate',
+                  description:
+                    'Accessibility label of the rotate button in the cover edition screen',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage:
+                    'Rotate the image by 90° clockwise. This will change the crop area.',
+                  description:
+                    'Accessibility hint of the rotate button in in the cover edition screen',
+                })}
+                onPress={onNextOrientation}
+              />
             ) : (
               <Button
                 disabled={!canSave}
@@ -912,12 +932,32 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               variant="white"
               onPress={onActivateCropMode}
               style={styles.cropButton}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Crop',
+                description: 'Accessibility label of the crop button',
+              })}
+              accessibilityHint={intl.formatMessage({
+                defaultMessage:
+                  'Press this button to adjust the boundary of the selected image',
+                description: 'Accessibility hint of the crop button',
+              })}
             />
           )}
           <View style={styles.toolbar}>
             <PressableNative
               onPress={onPickImage}
               style={[styles.imageButton, styles.toolbarElement]}
+              accessibilityRole="button"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Select an image',
+                description:
+                  'Accessibility label of the image selection button',
+              })}
+              accessibilityHint={intl.formatMessage({
+                defaultMessage:
+                  'Press this button to select an image from your library',
+                description: 'Accessibility hint of the image selection button',
+              })}
             >
               <Icon icon="picture" style={styles.iconPicture} />
             </PressableNative>
@@ -1014,22 +1054,22 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   {
                     key: 'image',
                     icon: 'picture',
-                    label: 'Image edition tab',
+                    label: 'Image edition',
                   },
                   {
                     key: 'title',
                     icon: 'title',
-                    label: 'Title edition tab',
+                    label: 'Title edition',
                   },
                   {
                     key: 'foreground',
                     icon: 'foreground',
-                    label: 'Effect edition tab',
+                    label: 'Foreground selection',
                   },
                   {
                     key: 'background',
                     icon: 'background',
-                    label: 'Effect edition tab',
+                    label: 'Background selection',
                   },
                 ]}
                 style={styles.tabsBar}

@@ -1,6 +1,11 @@
 import '@testing-library/jest-native/extend-expect';
-
-import { fireEvent, render, screen, waitFor, within } from '#utils/test-util';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '#helpers/testHelpers';
 import RecentSearch from '../RecentSearch';
 import type { CoverRendererProps } from '#components/CoverRenderer';
 

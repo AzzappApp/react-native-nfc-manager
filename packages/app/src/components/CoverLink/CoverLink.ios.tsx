@@ -1,21 +1,22 @@
 import { useRef } from 'react';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
 import { useRouter } from '#PlatformEnvironment';
+import CoverRenderer from '#components/CoverRenderer';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import CoverRenderer from './CoverRenderer';
-import type { CoverRendererProps } from './CoverRenderer';
-import type { StyleProp, View, ViewStyle } from 'react-native';
+import type { CoverLinkProps } from './coverLinkTypes';
+import type { View } from 'react-native';
 
+/**
+ * iOS version of the cover link, it dispatches a push to the profile screen with
+ * the native reveal animation
+ */
 const CoverLink = ({
   profileID,
   userName,
   style,
   coverStyle,
   ...props
-}: CoverRendererProps & {
-  profileID: string;
-  coverStyle: StyleProp<ViewStyle>;
-}) => {
+}: CoverLinkProps) => {
   const ref = useRef<View | null>(null);
 
   const router = useRouter();

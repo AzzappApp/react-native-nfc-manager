@@ -1,6 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
 
-import { render, screen, act, fireEvent } from '#utils/test-util';
+import { render, screen, act, fireEvent } from '#helpers/testHelpers';
 import HexColorTextInput from '../HexColorTextInput';
 
 describe('HexColorTextInput component', () => {
@@ -10,7 +10,7 @@ describe('HexColorTextInput component', () => {
       'azzap_native_hexcolor_previewcolor',
     );
     expect(previewColor).toHaveStyle({ backgroundColor: '#2C73FA' });
-    const inputV = screen.queryByTestId('azzap_native_text_input');
+    const inputV = screen.getByTestId('azzap_native_text_input');
 
     expect(inputV.props.value).toBe('#2C73FA');
   });
@@ -21,7 +21,7 @@ describe('HexColorTextInput component', () => {
       'azzap_native_hexcolor_previewcolor',
     );
 
-    const inputV = screen.queryByTestId('azzap_native_text_input');
+    const inputV = screen.getByTestId('azzap_native_text_input');
     act(() => {
       fireEvent.changeText(inputV, '12');
     });

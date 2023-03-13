@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { act, fireEvent, render } from '#utils/test-util';
+import { act, fireEvent, render } from '#helpers/testHelpers';
 import '@testing-library/jest-native/extend-expect';
 
 import DropDownList from '../DropDownList';

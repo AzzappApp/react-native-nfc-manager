@@ -5,6 +5,13 @@ import type { MediaImageRendererProps } from './mediasTypes';
 import type { ForwardedRef } from 'react';
 import type { HostComponent } from 'react-native';
 
+/**
+ * A native component that allows to display an image, it also implements
+ * an aggressive cache system to allow to display images as fast as possible.
+ * Uses the [nuke](https://github.com/kean/Nuke) on iOS and [Glide](https://github.com/bumptech/glide)
+ * On Android.
+ * If a version of the image in a different size is already in cache it will be used as a placeholder.
+ */
 const MediaImageRenderer = (
   {
     uri,
@@ -43,8 +50,10 @@ const MediaImageRenderer = (
   };
 
   const onPlaceHolderImageLoad = () => {
-    onReadyForDisplay?.();
-    isReady.current = true;
+    if (!isReady.current) {
+      onReadyForDisplay?.();
+      isReady.current = true;
+    }
   };
 
   return (
@@ -65,6 +74,13 @@ const MediaImageRenderer = (
   );
 };
 
+/**
+ * Add an entry to the image cache, usefull to add local images to the cache
+ *
+ * @param mediaID  the mediaID of the image
+ * @param size the width of the image
+ * @param uri the uri of the image
+ */
 export const addCacheEntry = (mediaID: string, size: number, uri: string) => {
   NativeModules.AZPMediaImageRendererManager.addCacheEntry(mediaID, size, uri);
 };

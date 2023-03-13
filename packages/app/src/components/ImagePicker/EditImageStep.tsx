@@ -19,9 +19,13 @@ import type {
   ImageEditionParameters,
   ImageOrientation,
   MediaVideo,
-} from '#types';
+} from '#helpers/mediaHelpers';
 import type { Tab } from '#ui/TabsBar';
 
+/**
+ * A step of the Image Picker that allows the user to edit the selected image
+ * (crop, filter, brightness, contrast etc.)
+ */
 const EditImageStep = () => {
   const {
     maxVideoDuration,
@@ -106,18 +110,18 @@ const EditImageStep = () => {
         icon: 'magic',
         key: 'filter',
         label: intl.formatMessage({
-          defaultMessage: 'Media Filter',
+          defaultMessage: 'Filter',
           description:
-            'Accessibility label of the Media filter tabs in image editing view',
+            'Accessibility label of the Filter tab in image editing view',
         }),
       },
       {
         icon: 'parameters',
         key: 'edit',
         label: intl.formatMessage({
-          defaultMessage: 'Media Filter',
+          defaultMessage: 'Adjust',
           description:
-            'Accessibility label of the Media filter tabs in image editing view',
+            'Accessibility label of the Adjust tab in image editing view',
         }),
       },
     ];
@@ -126,9 +130,9 @@ const EditImageStep = () => {
         icon: 'clock',
         key: 'timeRange',
         label: intl.formatMessage({
-          defaultMessage: 'Take a video',
+          defaultMessage: 'Cut Video',
           description:
-            'Accessibility label of the video tabs in post  in image picking wizzard',
+            'Accessibility label of the Cut Video tab in image picking wizzard',
         }),
       });
     }
@@ -141,7 +145,21 @@ const EditImageStep = () => {
       headerTitle={editedParameter ? paramsInfos[editedParameter]?.label : null}
       headerRightButton={
         editedParameter === 'cropData' ? (
-          <IconButton icon="rotate" onPress={onNextOrientation} />
+          <IconButton
+            icon="rotate"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Rotate',
+              description:
+                'Accessibility label of the rotate button in image edition wizzard',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage:
+                'Rotate the image by 90° clockwise. This will change the crop area.',
+              description:
+                'Accessibility hint of the rotate button in image edition wizzard',
+            })}
+            onPress={onNextOrientation}
+          />
         ) : null
       }
       preventNavigation={isEditing}

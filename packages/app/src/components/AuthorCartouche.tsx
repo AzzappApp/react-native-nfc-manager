@@ -4,6 +4,11 @@ import { colors, fontFamilies } from '#theme';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { ViewProps } from 'react-native';
 
+/**
+ * Author cartouche
+ * Display a small cartouche with the author picture and username
+ */
+// TODO components is dummy, replace with real component
 const AuthorCartouche = ({
   style,
   small = false,

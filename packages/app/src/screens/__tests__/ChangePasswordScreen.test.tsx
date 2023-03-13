@@ -1,4 +1,4 @@
-import { fireEvent, render, act, cleanup } from '#utils/test-util';
+import { fireEvent, render, act, cleanup } from '#helpers/testHelpers';
 import ChangePasswordScreen from '../ChangePasswordScreen';
 import '@testing-library/jest-native/extend-expect';
 
@@ -18,11 +18,11 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('should not call the `changePassword` callback and show error message when password does not match the requirement', () => {
-    const { queryAllByRole, queryByPlaceholderText, getByText } = render(
+    const { queryAllByRole, getByPlaceholderText, getByText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
-    const inputPwd = queryByPlaceholderText('New password');
-    const inputConfig = queryByPlaceholderText('Confirm password');
+    const inputPwd = getByPlaceholderText('New password');
+    const inputConfig = getByPlaceholderText('Confirm password');
     act(() => {
       fireEvent(inputPwd, 'onChangeText', 'unsufficient password');
     });
@@ -43,11 +43,11 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('should not call the `changePassword` callback and shows error message when password does not match the confirm password', () => {
-    const { queryAllByRole, queryByPlaceholderText, getByText } = render(
+    const { queryAllByRole, getByPlaceholderText, getByText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
-    const inputPwd = queryByPlaceholderText('New password');
-    const inputConfig = queryByPlaceholderText('Confirm password');
+    const inputPwd = getByPlaceholderText('New password');
+    const inputConfig = getByPlaceholderText('Confirm password');
     act(() => {
       fireEvent(inputPwd, 'onChangeText', 'AZErty123&');
     });
@@ -67,11 +67,11 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('should call the `changePassword` callback when form is valid', () => {
-    const { queryAllByRole, queryByPlaceholderText } = render(
+    const { queryAllByRole, getByPlaceholderText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
-    const inputPwd = queryByPlaceholderText('New password');
-    const inputConfig = queryByPlaceholderText('Confirm password');
+    const inputPwd = getByPlaceholderText('New password');
+    const inputConfig = getByPlaceholderText('Confirm password');
     act(() => {
       fireEvent(inputPwd, 'onChangeText', 'AZErty123&');
     });

@@ -6,7 +6,7 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import { act, fireEvent, render, screen, waitFor } from '#utils/test-util';
+import { act, fireEvent, render, screen, waitFor } from '#helpers/testHelpers';
 
 import RecommendedProfilesList from '../RecommendedProfilesList';
 import type { CoverRendererProps } from '#components/CoverRenderer';

@@ -1,18 +1,13 @@
 import { COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import CoverRenderer from './CoverRenderer';
-import Link from './Link';
-import type { CoverRendererProps } from './CoverRenderer';
-import type { StyleProp, ViewStyle } from 'react-native';
+import CoverRenderer from '../CoverRenderer';
+import Link from '../Link';
+import type { CoverLinkProps } from './coverLinkTypes';
 
-const CoverLink = ({
-  style,
-  coverStyle,
-  ...props
-}: CoverRendererProps & {
-  profileID: string;
-  coverStyle?: StyleProp<ViewStyle>;
-}) => (
+/**
+ * A cover link is a cover renderer wrapped in a link to the profile page
+ */
+const CoverLink = ({ style, coverStyle, ...props }: CoverLinkProps) => (
   <Link
     route="PROFILE"
     params={{

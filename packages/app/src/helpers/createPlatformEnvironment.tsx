@@ -1,10 +1,16 @@
 import * as WebAPI from '@azzapp/shared/WebAPI';
 import NativeLink from '#components/NativeLink';
-import fetchWithRefreshToken, { injectToken } from './fetchWithRefreshToken';
+import fetchWithAuthTokens, { injectToken } from './fetchWithAuthTokens';
 import { getTokens } from './tokensStore';
 import type { NativeRouter } from '#components/NativeRouter';
 import type { PlatformEnvironment } from '#PlatformEnvironment';
 
+/**
+ * Creates a platform environment for the native app.
+ *
+ * @param router The router to use
+ * @returns The platform environment
+ */
 const createPlatformEnvironment = (
   router: NativeRouter,
 ): PlatformEnvironment => ({
@@ -26,7 +32,7 @@ const createPlatformEnvironment = (
     uploadSign: (params, init) =>
       WebAPI.uploadSign(params, {
         ...init,
-        fetchFunction: fetchWithRefreshToken,
+        fetchFunction: fetchWithAuthTokens,
       }),
   },
 });

@@ -2,15 +2,28 @@ import { StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '#theme';
 import DashedSlider from '#ui/DashedSlider';
 import { editionParametersSettings } from './medias';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { ViewProps } from 'react-native';
 
 type ImageEditionParameterControlProps = ViewProps & {
+  /**
+   * The parameter to control.
+   */
   parameter: keyof ImageEditionParameters;
+  /**
+   * The value of the parameter.
+   */
   value: number | null | undefined;
+  /**
+   * Callback called when the value of the parameter changes.x
+   */
   onChange(value: number): void;
 };
 
+/**
+ * Controls the values of a single parameter of the ImageEditionParameters using a slider.
+ * the limits of the parameter and the step are defined in the editionParametersSettings.
+ */
 const ImageEditionParameterControl = ({
   parameter,
   value: propsValue,

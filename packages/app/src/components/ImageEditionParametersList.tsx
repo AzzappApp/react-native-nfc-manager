@@ -4,14 +4,24 @@ import { colors, textStyles } from '#theme';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import { useEditionParametersDisplayInfos } from './medias';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { ScrollViewProps } from 'react-native';
 
 type ImageEditionParametersListProps = ScrollViewProps & {
+  /**
+   * A callback called when the user selects a parameter.
+   * @param param Theselected parameter .
+   */
   onSelectParam(param: keyof ImageEditionParameters): void;
+  /**
+   * A list of parameters to exclude from the list.
+   */
   excludedParams?: Array<keyof ImageEditionParameters>;
 };
 
+/**
+ * A list of buttons to select a parameter to edit.
+ */
 const ImageEditionParametersList = ({
   onSelectParam,
   excludedParams,
@@ -29,6 +39,7 @@ const ImageEditionParametersList = ({
               <PressableNative
                 onPress={() => onSelectParam(param)}
                 style={styles.paramsButton}
+                accessibilityRole="button"
               >
                 <View style={styles.paramIconContainer}>
                   <Icon icon={icon} style={styles.paramIcon} />
@@ -69,7 +80,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const parametersList: Array<keyof ImageEditionParameters> = [
+const parametersList: Array<keyof ImageEditionParameters> = [
   'cropData',
   'brightness',
   'contrast',

@@ -16,14 +16,40 @@ import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 export type CoverRendererProps = {
+  /**
+   * The relay reference to the cover
+   */
   cover: CoverRenderer_cover$key | null | undefined;
+  /**
+   * The user name of the card owner
+   * Used to generate the QR code
+   */
   userName: string;
+  /**
+   * The width of the displayed cover
+   * Must be a number on native, vw unit are supported on web
+   */
   width?: number | `${number}vw`;
+  /**
+   * if true, the cover will not have rounded corners
+   * @default false
+   */
   hideBorderRadius?: boolean;
-  style?: StyleProp<ViewStyle>;
+  /**
+   * Called when the cover is ready for display,
+   * which means both the media and the text are ready for display,
+   * even if the size of the downloaded image is different from the size of the cover
+   */
   onReadyForDisplay?: () => void;
+  /**
+   * The style of the cover container
+   */
+  style?: StyleProp<ViewStyle>;
 };
 
+/**
+ * Renders a card cover
+ */
 const CoverRenderer = (
   {
     cover: coverKey,
@@ -82,6 +108,9 @@ const CoverRenderer = (
   //#endregion
 
   //#region Ready states
+  // We need to wait for both the media and the text to be ready for display
+  // before calling the onReadyForDisplay callback, however, we need to
+  // redispatch it when the cover changes
   const readyStates = useRef({ text: false, media: false });
 
   const sources = useRef({

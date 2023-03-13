@@ -4,7 +4,14 @@ import type { Attributes, ComponentType } from 'react';
 import type { ImageStyle, StyleProp, ViewStyle } from 'react-native';
 
 const unstable_createElement = require('react-native-web/dist/cjs/exports/createElement/');
-
+/**
+ * Create an HTML element with the given tag and props.
+ * @see https://necolas.github.io/react-native-web/docs/unstable-apis/#use-with-existing-react-dom-components
+ *
+ * @param tag the tag name or component type to create, e.g. 'div' or React web component
+ * @param props the props to pass to the element
+ * @returns the created element
+ */
 function createHTMLElement<
   T extends ComponentType<any> | keyof JSX.IntrinsicElements,
   P extends T extends ComponentType<infer U>

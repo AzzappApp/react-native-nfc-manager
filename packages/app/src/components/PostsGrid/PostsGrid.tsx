@@ -32,6 +32,7 @@ type PostsGrid = {
 // Since the layout can be predetermined we remove and add elements depending of the scroll position
 // and maintains a pool of key to avoid recreating native view
 
+// TODO docs and tests once this component is production ready
 const PostsGrid = ({
   posts: postsKey,
   canPlay,

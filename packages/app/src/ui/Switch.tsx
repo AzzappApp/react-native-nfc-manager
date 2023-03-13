@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Switch as RNSwitch, Text, View } from 'react-native';
 import { colors, textStyles } from '#theme';
+import { createId } from '#helpers/idHelpers';
 import type { SwitchProps as RNSwitchProps } from 'react-native';
 
 type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {
@@ -19,10 +21,13 @@ const Switch = ({
     trackColor: trackColor ?? { false: colors.grey, true: colors.orange },
     ...props,
   };
+  const id = useMemo(() => createId(), []);
   return label ? (
     <View style={[styles.root, style]}>
-      <RNSwitch {...switchProps} />
-      <Text style={[textStyles.small, styles.text]}>{label}</Text>
+      <RNSwitch {...switchProps} accessibilityLabelledBy={id} />
+      <Text style={[textStyles.small, styles.text]} nativeID={id}>
+        {label}
+      </Text>
     </View>
   ) : (
     <RNSwitch {...switchProps} style={style} />

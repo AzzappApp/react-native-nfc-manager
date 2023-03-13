@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Image,
   Pressable,
@@ -25,6 +25,7 @@ import { TitlePositionIcon } from './TitlePositionIcon';
 import type {
   CardCoverContentStyleInput,
   CardCoverTextStyleInput,
+  CardCoverTitleOrientation,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 
@@ -148,6 +149,9 @@ const CoverTitleEditionPanel = ({
 
   const intl = useIntl();
 
+  const placementsLabels = usePlacementsLabels();
+  const orientationsLabel = useOrientationsLabels();
+
   return (
     <View style={[styles.root, style]} onLayout={onLayout}>
       <TabsBar
@@ -178,6 +182,17 @@ const CoverTitleEditionPanel = ({
             currentTab === 'subtitle' ? onSubTitleChange : onTitleChange
           }
           style={styles.titleInput}
+          placeholder={
+            currentTab === 'title'
+              ? intl.formatMessage({
+                  defaultMessage: 'Title',
+                  description: 'Label of the title input in cover edition',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Subtitle',
+                  description: 'Label of the subtitle input in cover edition',
+                })
+          }
         />
         <View style={styles.buttonContainer}>
           <Pressable
@@ -187,6 +202,15 @@ const CoverTitleEditionPanel = ({
               pressed && styles.buttonPressed,
             ]}
             onPress={() => setFontPickerOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Font',
+              description: 'Label of the font button in cover edition',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to select a font',
+              description: 'Hint of the font button in cover edition',
+            })}
           >
             <Text
               style={{
@@ -204,6 +228,15 @@ const CoverTitleEditionPanel = ({
               pressed && styles.buttonPressed,
             ]}
             onPress={() => setColorPickerOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Color',
+              description: 'Label of the color button in cover edition',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to select a color',
+              description: 'Hint of the color button in cover edition',
+            })}
           >
             <Text
               style={{
@@ -230,6 +263,18 @@ const CoverTitleEditionPanel = ({
               pressed && styles.buttonPressed,
             ]}
             onPress={onNextPlacement}
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Position',
+              description: 'Label of the position button in cover edition',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to change the position',
+              description: 'Hint of the position button in cover edition',
+            })}
+            accessibilityValue={{
+              text: placementsLabels[placement],
+            }}
           >
             <TitlePositionIcon value={placement} />
           </Pressable>
@@ -239,6 +284,18 @@ const CoverTitleEditionPanel = ({
               pressed && styles.buttonPressed,
             ]}
             onPress={onNextOrientation}
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Orientation',
+              description: 'Label of the orientation button in cover edition',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to change the orientation of the content',
+              description: 'Hint of the orientation button in cover edition',
+            })}
+            accessibilityValue={{
+              text: orientationsLabel[orientation] ?? '',
+            }}
           >
             <Image
               source={
@@ -261,15 +318,32 @@ const CoverTitleEditionPanel = ({
               step={1}
               interval={10}
               onChange={onFontSizeChange}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Font size',
+                description: 'Label of the font size slider in cover edition',
+              })}
+              accessibilityHint={intl.formatMessage({
+                defaultMessage: 'Slide to change the font size',
+                description: 'Hint of the font size slider in cover edition',
+              })}
             />
             <Text style={[textStyles.small, styles.sliderTitle]}>
-              FONT SIZE : {fontSize}
+              <FormattedMessage
+                defaultMessage="FONT SIZE {size}"
+                description="Font size message in cover edition"
+                values={{
+                  size: fontSize,
+                }}
+              />
             </Text>
           </View>
         </View>
       </View>
       <FontPicker
-        title="Font style"
+        title={intl.formatMessage({
+          defaultMessage: 'Font family',
+          description: 'Title of the font picker modal in cover edition',
+        })}
         value={fontFamily as any}
         visible={fontPickerOpen}
         onRequestClose={() => setFontPickerOpen(false)}
@@ -354,3 +428,64 @@ const styles = StyleSheet.create({
     height: 30,
   },
 });
+
+const usePlacementsLabels = (): Record<string, string> => {
+  const intl = useIntl();
+  return {
+    topLeft: intl.formatMessage({
+      defaultMessage: 'Top left',
+      description: 'Label of the top left position in cover edition',
+    }),
+    topCenter: intl.formatMessage({
+      defaultMessage: 'Top center',
+      description: 'Label of the top center position in cover edition',
+    }),
+    topRight: intl.formatMessage({
+      defaultMessage: 'Top right',
+      description: 'Label of the top right position in cover edition',
+    }),
+    middleLeft: intl.formatMessage({
+      defaultMessage: 'Middle left',
+      description: 'Label of the middle left position in cover edition',
+    }),
+    middleCenter: intl.formatMessage({
+      defaultMessage: 'Middle center',
+      description: 'Label of the middle center position in cover edition',
+    }),
+    middleRight: intl.formatMessage({
+      defaultMessage: 'Middle right',
+      description: 'Label of the middle right position in cover edition',
+    }),
+    bottomLeft: intl.formatMessage({
+      defaultMessage: 'Bottom left',
+      description: 'Label of the bottom left position in cover edition',
+    }),
+    bottomCenter: intl.formatMessage({
+      defaultMessage: 'Bottom center',
+      description: 'Label of the bottom center position in cover edition',
+    }),
+    bottomRight: intl.formatMessage({
+      defaultMessage: 'Bottom right',
+      description: 'Label of the bottom right position in cover edition',
+    }),
+  };
+};
+
+const useOrientationsLabels = (): Record<CardCoverTitleOrientation, string> => {
+  const intl = useIntl();
+  return {
+    bottomToTop: intl.formatMessage({
+      defaultMessage: 'Bottom to top',
+      description: 'Label of the bottom to top orientation in cover edition',
+    }),
+    topToBottom: intl.formatMessage({
+      defaultMessage: 'Top to bottom',
+      description: 'Label of the top to bottom orientation in cover edition',
+    }),
+    horizontal: intl.formatMessage({
+      defaultMessage: 'Horizontal',
+      description: 'Label of the horizontal orientation in cover edition',
+    }),
+    '%future added value': '',
+  };
+};

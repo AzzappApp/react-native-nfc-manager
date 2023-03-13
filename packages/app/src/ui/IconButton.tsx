@@ -14,6 +14,7 @@ export type IconButtonProps = {
   iconStyle?: StyleProp<ImageStyle>;
   nativeID?: string;
   accessibilityLabel?: string;
+  accessibilityHint?: string;
 };
 
 const IconButton = ({
@@ -25,6 +26,7 @@ const IconButton = ({
   iconStyle,
   nativeID,
   accessibilityLabel,
+  accessibilityHint,
 }: IconButtonProps) => (
   <PressableNative
     accessibilityRole="button"
@@ -36,6 +38,7 @@ const IconButton = ({
     ]}
     nativeID={nativeID}
     accessibilityLabel={accessibilityLabel}
+    accessibilityHint={accessibilityHint}
   >
     <Icon
       icon={icon}

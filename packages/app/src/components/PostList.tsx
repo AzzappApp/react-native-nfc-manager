@@ -30,6 +30,7 @@ type PostListProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+// TODO docs and tests once this component is production ready
 const PostList = ({
   posts: postKey,
   author,

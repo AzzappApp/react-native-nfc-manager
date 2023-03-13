@@ -6,7 +6,7 @@ import FilterSelectionList from '#components/FilterSelectionList';
 import ImageEditionParametersList from '#components/ImageEditionParametersList';
 import TabsBar from '#ui/TabsBar';
 import type { EditableImageSource } from '#components/medias';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverImageEditionPanelProps = {

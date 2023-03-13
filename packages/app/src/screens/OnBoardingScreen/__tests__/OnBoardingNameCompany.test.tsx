@@ -1,6 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
 
-import { act, fireEvent, render, screen } from '#utils/test-util';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 
 import OnBoardingNameCompany from '../OnBoardingNameCompany';
 
@@ -111,7 +111,7 @@ describe('OnBoardingNameCompany component', () => {
         companyName="companyName"
       />,
     );
-    const inputName = screen.queryByPlaceholderText('Enter your company name');
+    const inputName = screen.getByPlaceholderText('Enter your company name');
 
     act(() => fireEvent(inputName, 'onChangeText', 'Compan name'));
     expect(mockFn).toHaveBeenCalled();

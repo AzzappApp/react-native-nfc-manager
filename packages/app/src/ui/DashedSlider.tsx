@@ -4,16 +4,15 @@ import { useEffect, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, View } from 'react-native';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native';
 
-type DashedSliderProps = {
+type DashedSliderProps = ViewProps & {
   value: number;
   min: number;
   max: number;
   step: number;
   interval?: number;
   onChange: (value: number) => void;
-  style?: StyleProp<ViewStyle>;
 };
 
 const DEFAULT_INTERVAL = 6;
@@ -24,8 +23,9 @@ const DashedSlider = ({
   max,
   step,
   onChange,
-  style,
   interval = DEFAULT_INTERVAL,
+  style,
+  ...props
 }: DashedSliderProps) => {
   const pan = useRef(new Animated.Value(value)).current;
 
@@ -86,6 +86,7 @@ const DashedSlider = ({
 
   return (
     <View
+      {...props}
       {...panResponder.panHandlers}
       style={[style, styles.container]}
       accessibilityRole="adjustable"

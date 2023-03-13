@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { EditableImage } from './medias';
-import type { ImageEditionParameters, TimeRange } from '#types';
+import type { ImageEditionParameters, TimeRange } from '#helpers/mediaHelpers';
 import type { ViewProps } from 'react-native';
 
 type VideoTimelineEditorProps = ViewProps & {
@@ -24,6 +24,7 @@ type VideoTimelineEditorProps = ViewProps & {
   onChange: (timeRange: TimeRange) => void;
 };
 
+// TODO docs and tests once this component is production ready
 const VideoTimelineEditor = ({
   video,
   aspectRatio,

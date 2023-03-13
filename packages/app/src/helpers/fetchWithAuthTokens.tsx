@@ -3,7 +3,15 @@ import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens } from '@azzapp/shared/WebAPI';
 import { clearTokens, getTokens, setTokens } from './tokensStore';
 
-async function fetchWithRefreshToken<JSON = unknown>(
+/**
+ * Fetches JSON data from the server, injecting the token in the header
+ * if the token is invalid, it will try to refresh it
+ *
+ * @param input - The resource that you wish to fetch.
+ * @param init - An options object containing any custom settings that you want to apply to the request.
+ * @returns A promise that resolves to the JSON response data.
+ */
+async function fetchWithAuthTokens<JSON = unknown>(
   input: RequestInfo,
   init?: RequestInit & { timeout?: number; retries?: number[] },
 ): Promise<JSON> {
@@ -30,6 +38,12 @@ async function fetchWithRefreshToken<JSON = unknown>(
   }
 }
 
+/**
+ * Injects the token in the header of the request
+ * @param token the token to inject
+ * @param init the request init to inject the token in
+ * @returns the request init with the token injected
+ */
 export const injectToken = (token?: string, init?: RequestInit) => ({
   ...init,
   headers: token
@@ -37,4 +51,4 @@ export const injectToken = (token?: string, init?: RequestInit) => ({
     : init?.headers,
 });
 
-export default fetchWithRefreshToken;
+export default fetchWithAuthTokens;

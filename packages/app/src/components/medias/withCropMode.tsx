@@ -12,21 +12,43 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { colors, mixins } from '#theme';
-import type { CropData, ImageEditionParameters } from '#types';
+import type { CropData, ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { ComponentType } from 'react';
 import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 import type { AnimateProps } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 export type CropperProps = {
+  /**
+   * the size of the media to crop
+   */
   mediaSize: { width: number; height: number };
+  /**
+   * the desired aspect ratio of the cropped media
+   */
   aspectRatio: number;
+  /**
+   * the edition parameters applied to the media
+   */
   editionParameters?: ImageEditionParameters;
+  /**
+   * if true, the component will be in crop mode
+   */
   cropEditionMode?: boolean | null;
+  /**
+   * A callback that will be called when the crop data change
+   * @param cropData the new crop data
+   */
   onCropDataChange: (cropData: CropData) => void;
+  /**
+   * A callback that will be called when the displayed image layout change
+   */
   onDisplayedImageLayout?: (displayedLayout: LayoutRectangle) => void;
 };
 
+/**
+ * an higher order component that adds crop mode to a component
+ */
 const withCropMode = <
   P extends Omit<ViewProps, 'children'> & {
     editionParameters?: ImageEditionParameters;

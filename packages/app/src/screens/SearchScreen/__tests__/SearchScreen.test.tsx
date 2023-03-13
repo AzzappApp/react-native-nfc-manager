@@ -5,7 +5,7 @@ import {
   RelayEnvironmentProvider,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import { act, fireEvent, render, screen } from '#utils/test-util';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SearchScreen from '../SearchScreen';
 import type { SearchScreenTestQuery } from '@azzapp/relay/artifacts/SearchScreenTestQuery.graphql';
 
@@ -161,10 +161,7 @@ xdescribe('SearchScreen component', () => {
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
-        'onFocus',
-      );
+      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
     });
     expect(screen.queryByTestId('WallRecommendation')).not.toBeNull();
     expect(
@@ -185,14 +182,11 @@ xdescribe('SearchScreen component', () => {
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
-        'onFocus',
-      );
+      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         'search',
       );
@@ -215,21 +209,18 @@ xdescribe('SearchScreen component', () => {
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
-        'onFocus',
-      );
+      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         'search',
       );
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onSubmitEditing',
       );
     });
@@ -248,21 +239,18 @@ xdescribe('SearchScreen component', () => {
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
-        'onFocus',
-      );
+      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         'search',
       );
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onSubmitEditing',
       );
     });
@@ -272,7 +260,7 @@ xdescribe('SearchScreen component', () => {
     ).toHaveStyle({ opacity: 1 });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         null,
       );
@@ -293,21 +281,18 @@ xdescribe('SearchScreen component', () => {
       );
     });
     act(() => {
-      fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
-        'onFocus',
-      );
+      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onChangeText',
         'search',
       );
     });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__searchbar__textInput'),
+        screen.getByTestId('azzapp__searchbar__textInput'),
         'onSubmitEditing',
       );
     });
@@ -317,7 +302,7 @@ xdescribe('SearchScreen component', () => {
     ).toHaveStyle({ opacity: 1 });
     act(() => {
       fireEvent(
-        screen.queryByTestId('azzapp__SearchBar__cancel-button'),
+        screen.getByTestId('azzapp__SearchBar__cancel-button'),
         'onPress',
       );
     });

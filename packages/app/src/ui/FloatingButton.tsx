@@ -2,7 +2,14 @@ import { forwardRef } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import type { ForwardedRef } from 'react';
-import type { ViewStyle, StyleProp, PressableProps, View } from 'react-native';
+import type {
+  ViewStyle,
+  StyleProp,
+  PressableProps,
+  View,
+  AccessibilityRole,
+  AccessibilityValue,
+} from 'react-native';
 
 export type FloatingButtonProps = {
   onPress?: () => void;
@@ -11,7 +18,10 @@ export type FloatingButtonProps = {
   style?: StyleProp<ViewStyle>;
   nativeID?: string;
   children: PressableProps['children'];
+  accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityValue?: AccessibilityValue;
 };
 
 const FloatingButton = (
@@ -22,7 +32,10 @@ const FloatingButton = (
     children,
     variant = 'default',
     nativeID,
+    accessibilityRole = 'button',
     accessibilityLabel,
+    accessibilityHint,
+    accessibilityValue,
   }: FloatingButtonProps,
   ref: ForwardedRef<View>,
 ) => {
@@ -38,8 +51,10 @@ const FloatingButton = (
         style,
       ]}
       nativeID={nativeID}
-      accessibilityRole="button"
+      accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityValue={accessibilityValue}
       ref={ref}
     >
       {children}

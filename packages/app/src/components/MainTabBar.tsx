@@ -3,6 +3,9 @@ import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import TabsBar from '#ui/TabsBar';
 import type { StyleProp, ViewStyle } from 'react-native';
 
+/**
+ * The main tab bar of the app.
+ */
 const MainTabBar = ({
   currentIndex,
   style,

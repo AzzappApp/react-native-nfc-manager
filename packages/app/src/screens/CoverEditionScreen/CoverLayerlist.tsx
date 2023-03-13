@@ -75,6 +75,7 @@ const CoverLayerList = ({
           <PressableNative
             style={[styles.button, { borderRadius }]}
             onPress={() => onSelectLayer(item?.id ?? null)}
+            accessibilityRole="button"
           >
             {item?.smallURI ? (
               <Image
@@ -113,6 +114,7 @@ const CoverLayerList = ({
       style={style}
       contentContainerStyle={styles.container}
       renderItem={renderItem}
+      accessibilityRole="list"
     />
   );
 };

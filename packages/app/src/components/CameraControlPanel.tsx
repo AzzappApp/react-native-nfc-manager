@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, textStyles } from '#theme';
 import { formatVideoTime } from '#helpers/mediaHelpers';
@@ -9,14 +10,37 @@ import ViewTransition from '#ui/ViewTransition';
 import type { ViewProps } from 'react-native';
 
 type CameraControlPanelProps = ViewProps & {
+  /**
+   * Should be true, when the camera is ready to take photos/videos
+   */
   ready: boolean;
+  /**
+   * The current capture mode
+   */
   captureMode: 'photo' | 'video';
+  /**
+   * The maximum duration of a video in seconds
+   */
   maxVideoDuration: number;
+  /**
+   * A callback that is called when the user press the shutter button
+   */
   onTakePhoto(): void;
+  /**
+   * A callback that is called when the user starts recording a video
+   */
   onStartRecording(): void;
+  /**
+   * A callback that is called when the user stops recording a video
+   */
   onStopRecording(): void;
 };
 
+/**
+ * A component that renders the controls for the camera.
+ * It includes a shutter button in photo mode
+ * And controls for recording a video in video mode.
+ */
 const CameraControlPanel = ({
   ready,
   captureMode,
@@ -70,6 +94,8 @@ const CameraControlPanel = ({
 
   const progress = timer != null ? timer / (maxVideoDuration * 1000) : 0;
 
+  const intl = useIntl();
+
   return (
     <View style={[styles.root, style]} {...props}>
       <ProgressBar
@@ -88,6 +114,15 @@ const CameraControlPanel = ({
           disabled={!ready}
           accessibilityState={{ disabled: !ready }}
           highlightColor={colors.grey50}
+          accessibilityRole="button"
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Shutter',
+            description: 'Accessibility label for the camera shutter button',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Tap to take a photo',
+            description: 'Accessibility hint for the camera shutter button',
+          })}
         />
       ) : (
         <Pressable
@@ -95,6 +130,24 @@ const CameraControlPanel = ({
           onPress={onVideoButtonPress}
           disabled={!ready}
           accessibilityState={{ disabled: !ready }}
+          accessibilityRole="button"
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Video Shutter',
+            description: 'Accessibility label for the video shutter button',
+          })}
+          accessibilityHint={
+            !isRecording
+              ? intl.formatMessage({
+                  defaultMessage: 'Tap to start recording',
+                  description:
+                    'Accessibility label for the camera shutter button',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Tap to stop recording',
+                  description:
+                    'Accessibility label for the camera shutter button',
+                })
+          }
         >
           {({ pressed }) => (
             <ViewTransition

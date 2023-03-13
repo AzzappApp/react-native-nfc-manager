@@ -25,7 +25,12 @@ type SelectImageStepProps = {
   onBack(): void;
 };
 
+/**
+ * A step of the image picker wizard that allows the user to select an image
+ * from the gallery or take a photo/video with the camera.
+ */
 const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
+  // #region State management
   const {
     kind,
     forceAspectRatio,
@@ -40,8 +45,21 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
     'gallery',
   );
 
-  const { cameraPermission, microphonePermission } = useCameraPermissions();
+  const onAspectRatioToggle = () => {
+    if (!media) {
+      return;
+    }
+    const { width, height } = media;
+    onAspectRatioChange(
+      aspectRatio === 1 ? clampAspectRatio(width / height) : 1,
+    );
+  };
+
   const [album, setAlbum] = useState<string | null>(null);
+  // #endregion
+
+  // #region permissions logic
+  const { cameraPermission, microphonePermission } = useCameraPermissions();
   const [hasGalleryPermission, setHasGalleryPermision] = useState(true);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const hasCameraPermission =
@@ -68,7 +86,9 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
       onBack();
     }
   }, [permissionDenied, onBack]);
+  // #endregion
 
+  // #region camera logic
   const cameraRef = useRef<CameraViewHandle | null>(null);
   const [cameraInitialized, setCameraInitialized] = useState(false);
 
@@ -132,16 +152,9 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
     });
     onNext();
   }, [onMediaChange, onNext]);
+  // #endregion
 
-  const onAspectRatioToggle = () => {
-    if (!media) {
-      return;
-    }
-    const { width, height } = media;
-    onAspectRatioChange(
-      aspectRatio === 1 ? clampAspectRatio(width / height) : 1,
-    );
-  };
+  // #region display logic
   const intl = useIntl();
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
 
@@ -181,6 +194,7 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
     }
     return tabs;
   }, [intl, kind]);
+  // #endregion
 
   return (
     <>

@@ -7,9 +7,9 @@ import {
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import { COVER_BASE_WIDTH } from '@azzapp/shared/cardHelpers';
-import { render } from '#utils/test-util';
-import CoverRenderer from '../CoverRenderer';
-import type { CoverRendererProps } from '../CoverRenderer';
+import { render } from '#helpers/testHelpers';
+import CoverRenderer from '..';
+import type { CoverRendererProps } from '..';
 import type { CoverRendererTestQuery } from '@azzapp/relay/artifacts/CoverRendererTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 

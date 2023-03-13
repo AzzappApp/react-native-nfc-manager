@@ -3,33 +3,96 @@ import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
 import SelectImageStep from './SelectImageStep';
-import type { ImageEditionParameters, TimeRange } from '#types';
+import type { ImageEditionParameters, TimeRange } from '#helpers/mediaHelpers';
 import type { ImagePickerState } from './ImagePickerContext';
 import type { ComponentType } from 'react';
 
 export type ImagePickerResult = {
+  /**
+   * The kind of media selected
+   */
   kind: 'image' | 'video';
+  /**
+   * The uri of the media selected
+   */
   uri: string;
+  /**
+   * The width of the media selected
+   */
   width: number;
+  /**
+   * The height of the media selected
+   */
   height: number;
+  /**
+   * The aspect ratio of the media selected
+   */
   aspectRatio: number;
+  /**
+   * The edition parameters to be applied to the media
+   */
   editionParameters: ImageEditionParameters;
+  /**
+   * The filter to be applied to the media
+   */
   filter: string | null;
+  /**
+   * The time range to be applied to the media
+   * Only available for videos
+   */
   timeRange: TimeRange | null;
 };
 
-type ImagePickerProps = {
+export type ImagePickerProps = {
+  /**
+   * The maximum allowed duration for a video
+   */
   maxVideoDuration?: number;
+  /**
+   * The aspect ratio to force on the media
+   * If not provided, the aspect ratio will be the one of the media
+   */
   forceAspectRatio?: number;
+  /**
+   * The steps to display in the wizard
+   * By default, it will display the SelectImageStep and the EditImageStep
+   * You can add or remove steps, but you must make sure that the first step is a SelectImageStep
+   */
   steps?: Array<ComponentType<any>>;
+  /**
+   * The kind of media to select
+   * By default, it will allow to select both images and videos
+   */
   kind?: 'image' | 'mixed' | 'video';
+  /**
+   * Whether the component is busy
+   */
   busy?: boolean;
-  canCancel?: boolean;
+  /**
+   * Whether the component is exporting
+   * If true, the next button will be replaced by a loading indicator
+   * It will also display a loading indicator in place of the media preview on Android
+   * for performance reasons
+   */
   exporting?: boolean;
+  /**
+   * Whether the media selection process can be cancelled
+   */
+  canCancel?: boolean;
+  /**
+   * A callback called when the media selection process is finished
+   */
   onFinished(params: ImagePickerResult): void;
-  onCancel(): void;
+  /**
+   * A callback called when the media selection process is cancelled
+   */
+  onCancel?: () => void;
 };
-
+/**
+ * A component used to select an image or a video and edit it
+ * It has a wizard like interface, and can be customized to add or remove steps.
+ *
+ */
 const ImagePicker = ({
   maxVideoDuration = 10,
   forceAspectRatio,
@@ -71,8 +134,10 @@ const ImagePicker = ({
   }, [isLastStep, onFinished]);
 
   const onBack = useCallback(() => {
-    if (isFirstStep && canCancel) {
-      onCancel();
+    if (isFirstStep) {
+      if (canCancel) {
+        onCancel?.();
+      }
     } else {
       setStepIndex(stepIndex => stepIndex - 1);
     }

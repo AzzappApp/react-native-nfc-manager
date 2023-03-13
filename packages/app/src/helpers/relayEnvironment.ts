@@ -1,5 +1,5 @@
 import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
-import fetchWithRefreshToken from './fetchWithRefreshToken';
+import fetchWithAuthTokens from './fetchWithAuthTokens';
 import type { Environment } from 'relay-runtime';
 
 let environment: Environment | null;
@@ -8,7 +8,7 @@ const listeners: Array<() => void> = [];
 export const getRelayEnvironment = () => {
   if (!environment) {
     environment = createRelayEnvironment({
-      fetchFunction: fetchWithRefreshToken,
+      fetchFunction: fetchWithAuthTokens,
     });
   }
   return environment;

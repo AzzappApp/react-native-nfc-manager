@@ -10,7 +10,7 @@ import EditableVideo, {
 } from './EditableVideo';
 import MediaImageRenderer from './MediaImageRenderer';
 import MediaVideoRenderer from './MediaVideoRenderer';
-import type { ImageEditionParameters } from '#types';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { Icons } from '#ui/Icon';
 import type {
   EditableImageProps,

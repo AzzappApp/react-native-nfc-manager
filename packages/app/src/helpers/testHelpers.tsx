@@ -7,6 +7,7 @@ import { PlatformEnvironmentProvider } from '#PlatformEnvironment';
 import { useNativeRouter } from '#components/NativeRouter';
 import createPlatformEnvironment from '#helpers/createPlatformEnvironment';
 import type { NativeRouterInit } from '#components/NativeRouter';
+import type { RenderResult } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 const initialRoutes: NativeRouterInit = {
   id: 'test',
@@ -45,7 +46,15 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const customRender = (ui: ReactElement, options?: any): any =>
+/**
+ * A custom render function to wrap all the providers
+ * @see https://testing-library.com/docs/react-testing-library/setup#custom-render
+ *
+ * @param ui
+ * @param options
+ * @returns
+ */
+const customRender = (ui: ReactElement, options?: any): RenderResult =>
   render(ui, { wrapper: AllTheProviders, ...options });
 
 export * from '@testing-library/react-native';

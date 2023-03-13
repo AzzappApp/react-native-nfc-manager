@@ -1,19 +1,21 @@
 import { useRef } from 'react';
 import { useRouter } from '#PlatformEnvironment';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import PostRenderer from './PostRenderer';
-import type { PostRendererHandle, PostRendererProps } from './PostRenderer';
-import type { StyleProp, ViewStyle, View, NativeMethods } from 'react-native';
+import PostRenderer from '../PostRenderer';
+import type { PostRendererHandle } from '../PostRenderer';
+import type { PostLinkProps } from './postLinkTypes';
+import type { View, NativeMethods } from 'react-native';
 
+/**
+ * iOS version of the post link, it dispatches a push to the posts screen with
+ * the native reveal animation
+ */
 const PostLink = ({
   postId,
   style,
   postRendererStyle,
   ...props
-}: PostRendererProps & {
-  postId: string;
-  postRendererStyle?: StyleProp<ViewStyle>;
-}) => {
+}: PostLinkProps) => {
   const postRef = useRef<PostRendererHandle | null>(null);
   const ref = useRef<View | null>(null);
 

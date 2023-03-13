@@ -5,10 +5,19 @@ import PressableNative from '#ui/PressableNative';
 import type { ViewProps } from 'react-native';
 
 type EditionFooterProps = ViewProps & {
+  /**
+   * Callback called when the user clicks on the save button.
+   */
   onSave(): void;
+  /**
+   * Callback called when the user clicks on the cancel button.
+   */
   onCancel(): void;
 };
 
+/**
+ * A footer containing two buttons to cancel or save, used in the Image edition screens.
+ */
 const ImageEditionFooter = ({
   onCancel,
   onSave,

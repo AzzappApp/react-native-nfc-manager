@@ -1,18 +1,18 @@
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import Link from './Link';
-import PostRenderer from './PostRenderer';
-import type { PostRendererProps } from './PostRenderer';
-import type { StyleProp, ViewStyle } from 'react-native';
+import Link from '../Link';
+import PostRenderer from '../PostRenderer';
+import type { PostLinkProps } from './postLinkTypes';
 
+/**
+ * A PostRenderer wrapped in a link to the post screen on ios,
+ * triggers a reaveal animation when pressed
+ */
 const PostLink = ({
   postId,
   style,
   postRendererStyle,
   ...props
-}: PostRendererProps & {
-  postId: string;
-  postRendererStyle?: StyleProp<ViewStyle>;
-}) => {
+}: PostLinkProps) => {
   return (
     <Link route="POST" params={{ postId }}>
       <PressableScaleHighlight

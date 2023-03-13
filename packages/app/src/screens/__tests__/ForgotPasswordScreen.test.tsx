@@ -1,4 +1,4 @@
-import { fireEvent, render, act, cleanup, screen } from '#utils/test-util';
+import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
 import '@testing-library/jest-native/extend-expect';
 
@@ -26,15 +26,15 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('should call the `forgotPassword` callback when the form is submitted', () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { getByRole, getByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => {
       fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
     });
 
-    const buttonComponent = queryByRole('button');
+    const buttonComponent = getByRole('button');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -43,15 +43,15 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('should not call the `forgotPassword` callback when the provided email is invalid', () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { getByRole, getByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => {
       fireEvent(inputLogin, 'onChangeText', 'test@com');
     });
 
-    const buttonComponent = queryByRole('button');
+    const buttonComponent = getByRole('button');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -60,10 +60,10 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('Change password button should be `disabled` when the provided email is invalid', () => {
-    const { queryByRole, queryByPlaceholderText } = render(
+    const { queryByRole, getByPlaceholderText } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
     const ubutton = queryByRole('button');
     expect(ubutton).toBeDisabled();
@@ -73,14 +73,14 @@ describe('ForgotPassword Screen', () => {
 
   test('should display the confirmation message when a valid form is submitted', () => {
     jest.useFakeTimers();
-    const { queryByPlaceholderText, queryByRole } = render(
+    const { getByPlaceholderText, getByRole } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
 
-    const inputLogin = queryByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Phone number or email address');
     fireEvent(inputLogin, 'onChangeText', 'test@test.com');
     act(() => {
-      fireEvent(queryByRole('button'), 'onPress');
+      fireEvent(getByRole('button'), 'onPress');
     });
     act(() => {
       jest.advanceTimersByTime(600);

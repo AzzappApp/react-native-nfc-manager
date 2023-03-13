@@ -11,11 +11,23 @@ import Header from '../Header';
 import PermissionScreen from './PermissionScreen';
 
 type CameraModalProps = {
+  /**
+   * The permission to request.
+   */
   permissionsFor: 'gallery' | 'photo' | 'video';
+  /**
+   * @see https://reactnative.dev/docs/modal#visible
+   */
   visible?: boolean;
+  /**
+   * @see https://reactnative.dev/docs/modal#onrequestclose
+   */
   onRequestClose(): void;
 };
 
+/**
+ * A modal that allows to request permissions from the user.
+ */
 const PermissionModal = ({
   permissionsFor,
   visible,

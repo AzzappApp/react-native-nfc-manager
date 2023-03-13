@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 
+/**
+ * An HOC to wait for a promise to resolve before rendering a component.
+ * @param Component The component to render.
+ * @param promise The promise to wait for.
+ * @param Fallback The fallback component to render while waiting.
+ */
 function waitFor(
   Component: ComponentType,
   promise: Promise<any>,
