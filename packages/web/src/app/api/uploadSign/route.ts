@@ -4,16 +4,18 @@ import { NextResponse } from 'next/server';
 import { getCrypto } from '@azzapp/auth/crypto';
 import { getViewer } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
+import cors from '#helpers/cors';
 import type { Viewer } from '@azzapp/auth/viewer';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
 const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
 
-export const POST = async (req: Request) => {
+const uploadSignApi = async (req: Request) => {
   let viewer: Viewer;
   try {
     viewer = await getViewer();
+
     if (viewer.isAnonymous) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },
@@ -70,6 +72,8 @@ export const POST = async (req: Request) => {
 
   return NextResponse.json({ uploadURL, uploadParameters });
 };
+
+export const { POST, OPTIONS } = cors({ POST: uploadSignApi });
 
 // TODO blocked by https://github.com/vercel/next.js/issues/46755 and by https://github.com/vercel/next.js/issues/46337
 //export const runtime = 'edge';

@@ -9,6 +9,7 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
 } from '@azzapp/data/domains';
+import { DEFAULT_PALETTE_COLOR } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
@@ -85,15 +86,7 @@ export const POST = async (req: Request) => {
       companyName: null,
       profileKind: null,
       isReady: false,
-      colorPalette: [
-        '#FFFFFF',
-        '#000000',
-        '#68C4C9',
-        '#EBCC60',
-        '#F3A1B0',
-        '#B0C0F8',
-        '#C8F491',
-      ].join(','),
+      colorPalette: DEFAULT_PALETTE_COLOR.join(','),
       //TODO: define the default color palette or import the one from the template when card is created from a template
     });
 

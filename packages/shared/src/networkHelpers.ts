@@ -28,6 +28,7 @@ export const fetchJSON = async <JSON = unknown>(
       ...init?.headers,
     },
   };
+
   const response: Response = await fetchWithRetries(input, init);
 
   if (response.ok) {
@@ -209,6 +210,7 @@ export const postFormData = (
     };
 
     xhr.open('POST', url);
+
     xhr.send(formData);
   });
 

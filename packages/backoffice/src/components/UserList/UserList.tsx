@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { useCallback } from 'react';
 import {
   Datagrid,
@@ -5,6 +6,7 @@ import {
   EmailField,
   FunctionField,
   List,
+  SearchInput,
   TextField,
 } from 'react-admin';
 
@@ -14,8 +16,8 @@ const UserList = () => {
     return isAdmin ? <span style={{ color: 'red' }}>Admin</span> : 'User';
   }, []);
   return (
-    <List exporter={false}>
-      <Datagrid>
+    <List exporter={false} filters={orderFilters}>
+      <Datagrid rowClick="edit" bulkActionButtons={false}>
         <TextField label="Id" source="id" />
         <EmailField label="Email" source="email" />
         <TextField label="Phone number" source="phoneNumber" />
@@ -27,3 +29,5 @@ const UserList = () => {
 };
 
 export default UserList;
+
+const orderFilters = [<SearchInput source="email" alwaysOn />];

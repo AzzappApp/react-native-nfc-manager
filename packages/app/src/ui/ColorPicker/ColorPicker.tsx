@@ -25,15 +25,6 @@ export type ColorPickerProps = {
 };
 
 const ITEM_PER_ROW = 5;
-export const DEFAULT_PALETTE_COLOR = [
-  '#FFFFFF',
-  '#000000',
-  '#68C4C9',
-  '#EBCC60',
-  '#F3A1B0',
-  '#B0C0F8',
-  '#C8F491',
-];
 
 const ColorPicker = ({
   colorList = [],

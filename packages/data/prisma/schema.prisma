@@ -71,6 +71,7 @@ model CoverLayer {
   kind      LayerKind
   name      String?
   tags      String?
+  available Boolean   @default(true)
   createdAt DateTime  @default(now())
 }
 
@@ -119,6 +120,21 @@ model CardModule {
   data   Json
 
   @@index([cardId])
+}
+
+model CoverTemplate {
+  id           String      @id
+  name         String
+  colorPalette String?
+  tags         String?
+  data         Json
+  segmented    Boolean
+  merged       Boolean
+  category     Json?
+  kind         ProfileKind
+  enabled      Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
 }
 
 model Post {

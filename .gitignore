@@ -142,5 +142,7 @@ packages/app/ios/.xcode.env.local
 packages/web/.vscode/settings.json
 
 
-.pscale/env
 packages/backoffice/.vscode/settings.json
+
+# vscode extension that is not needed in the repo
+.vscode/restore-terminals.json

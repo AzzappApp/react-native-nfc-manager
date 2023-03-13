@@ -3,7 +3,9 @@ import { Admin, Resource, ListGuesser } from 'react-admin';
 import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens, signin } from '@azzapp/shared/WebAPI';
-import UserList from '#components/UserList';
+import coverLayerList from '#components/CoverLayer';
+import coverTemplateList from '#components/CoverTemplate';
+import userList from '#components/UserList';
 import { getTokens, removeTokens, setTokens } from '#helpers/tokenStore';
 import type { AuthProvider } from 'react-admin';
 
@@ -105,12 +107,13 @@ const App = () => {
 
   return (
     <Admin dataProvider={dataProvider} authProvider={authProvider} requireAuth>
-      <Resource name="User" list={UserList} />
+      <Resource {...userList} />
+      <Resource {...coverLayerList} />
+      <Resource {...coverTemplateList} />
       <Resource name="Profile" list={ListGuesser} />
       <Resource name="CardCover" list={ListGuesser} />
       <Resource name="Post" list={ListGuesser} />
       <Resource name="Media" list={ListGuesser} />
-      <Resource name="CoverLayer" list={ListGuesser} />
     </Admin>
   );
 };

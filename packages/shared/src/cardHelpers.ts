@@ -56,3 +56,17 @@ export const DEFAULT_COVER_TEXT_COLOR = '#000000';
 export const DEFAULT_COVER_CONTENT_ORTIENTATION = 'horizontal';
 
 export const DEFAULT_COVER_CONTENT_PLACEMENT = 'bottomLeft';
+
+export const DEFAULT_PALETTE_COLOR = [
+  '#FFFFFF',
+  '#000000',
+  '#68C4C9',
+  '#EBCC60',
+  '#F3A1B0',
+  '#B0C0F8',
+  '#C8F491',
+];
+
+export const DEFAULT_COVER_MIN_FONT_SIZE = 10;
+
+export const DEFAULT_COVER_MAX_FONT_SIZE = 24;

@@ -127,5 +127,6 @@ export const uploadMedia = (
   Object.keys(uploadParameters).forEach(key => {
     formData.append(key, uploadParameters[key]);
   });
+
   return postFormData(uploadURL, formData, 'json', signal);
 };

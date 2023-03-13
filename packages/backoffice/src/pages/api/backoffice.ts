@@ -3,6 +3,7 @@ import { verifyToken } from '@azzapp/auth/tokens';
 import { db, getUsersByIds } from '@azzapp/data/domains';
 import { sqlCountToNumber } from '@azzapp/data/domains/generic';
 import ERRORS from '@azzapp/shared/errors';
+
 import type { NextApiHandler } from 'next';
 import type {
   DataProvider,
@@ -66,6 +67,7 @@ type ResourceType =
   | 'CardCover'
   | 'CardModule'
   | 'CoverLayer'
+  | 'CoverTemplate'
   | 'Follow'
   | 'Media'
   | 'Post'
@@ -95,7 +97,6 @@ const dataProvider: DataProvider<ResourceType> = {
     const count = await countQuery
       .executeTakeFirstOrThrow()
       .then(({ count }) => sqlCountToNumber(count));
-
     return {
       data,
       total: count,
@@ -124,9 +125,13 @@ const dataProvider: DataProvider<ResourceType> = {
     throw new Error('Not supported yet');
   },
   async update(resource, params) {
+    //remove createdAt and updatedAt(datetime isssue when automatically handled)
+    delete params.data.createdAt;
+    delete params.data.updatedAt;
+
     await db
       .updateTable(resource)
-      .set(params.data)
+      .set({ ...params.data })
       .where('id', '=', params.id as any)
       .execute();
 
@@ -142,14 +147,19 @@ const dataProvider: DataProvider<ResourceType> = {
     return { data: params.ids };
   },
   async create(resource, params) {
-    const id = createId();
-    const data = await db
-      .insertInto(resource)
-      .values({ id, ...params.data })
-      .returning('id')
-      .executeTakeFirstOrThrow();
+    //TOD: should we limite the creation of element
+    if (resource === 'CoverLayer' || resource === 'CoverTemplate') {
+      const id = params.data.id ?? createId();
+      await db
+        .insertInto(resource)
+        .values({ id, ...params.data })
+        .executeTakeFirstOrThrow();
 
-    return this.getOne(resource, { id: data.id });
+      return this.getOne(resource, { id });
+    }
+    throw new Error(
+      `Create ${resource} is currently not supported on backoffice`,
+    );
   },
   async delete(_resource, _params) {
     //TODO not suported yet

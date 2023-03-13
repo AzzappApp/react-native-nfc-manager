@@ -9,6 +9,7 @@ import type {
   Card,
   CardCover,
   CoverLayer,
+  CoverTemplate,
   CardModule,
   Follow,
   Media,
@@ -27,6 +28,7 @@ export type Database = {
     | 'subTitleStyle'
     | 'titleStyle'
   >;
+  CoverTemplate: CoverTemplate;
   CardModule: CardModule;
   CoverLayer: WithCreatedAt<CoverLayer>;
   Follow: WithCreatedAt<Follow>;

@@ -12,9 +12,8 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/app": "*",
-    "@azzapp/shared": "*",
     "@azzapp/data": "*",
+    "@azzapp/shared": "*",
     "lodash": "^4.17.21",
     "next": "^13.2.3",
     "react": "^18.2.0",

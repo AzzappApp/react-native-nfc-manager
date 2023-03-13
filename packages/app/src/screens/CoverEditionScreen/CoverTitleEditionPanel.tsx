@@ -13,6 +13,8 @@ import {
   DEFAULT_COVER_CONTENT_PLACEMENT,
   DEFAULT_COVER_FONT_FAMILY,
   DEFAULT_COVER_FONT_SIZE,
+  DEFAULT_COVER_MAX_FONT_SIZE,
+  DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
   TITLE_POSITIONS,
 } from '@azzapp/shared/cardHelpers';
@@ -313,8 +315,8 @@ const CoverTitleEditionPanel = ({
           <View style={styles.sliderContainer}>
             <DashedSlider
               value={fontSize}
-              min={10}
-              max={24}
+              min={DEFAULT_COVER_MIN_FONT_SIZE}
+              max={DEFAULT_COVER_MAX_FONT_SIZE}
               step={1}
               interval={10}
               onChange={onFontSizeChange}
