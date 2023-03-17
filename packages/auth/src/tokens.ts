@@ -30,14 +30,14 @@ export const verifyToken = (
   unseal(token, TOKEN_SECRET, { ttl: TOKEN_EXP_TIME }) as Promise<any>;
 
 export const refreshTokens = async (refreshToken: string) => {
-  const data = unseal(refreshToken, REFRESH_TOKEN_SECRET, {
+  const data: any = await unseal(refreshToken, REFRESH_TOKEN_SECRET, {
     ttl: TOKEN_EXP_TIME,
-  }) as any;
+  });
 
   if (
     typeof data !== 'object' ||
     typeof data?.userId !== 'string' ||
-    typeof !data?.profileId !== 'string'
+    typeof data?.profileId !== 'string'
   ) {
     throw new Error('Invalid token');
   }
