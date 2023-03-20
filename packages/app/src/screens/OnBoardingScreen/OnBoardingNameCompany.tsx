@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, Text } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
@@ -11,7 +11,7 @@ import IconButton from '#ui/IconButton';
 
 import TextInput from '#ui/TextInput';
 import OnBoardingPager from './OnBoardingPager';
-import type { DropDownListData } from '#ui/DropDownList';
+import type { DropDownListData, DropDownListHandle } from '#ui/DropDownList';
 
 type OnBoardingNameCompanyProps = {
   next: () => void;
@@ -32,7 +32,7 @@ const OnBoardingNameCompany = ({
 }: OnBoardingNameCompanyProps) => {
   const vp = useViewportSize();
   const intl = useIntl();
-
+  const dropDownRef = useRef<DropDownListHandle>(null);
   const setCompanyActivityIdFromList = useCallback(
     (item: DropDownListData) => {
       setCompanyActivityId(item.id);
@@ -81,6 +81,9 @@ const OnBoardingNameCompany = ({
         autoCapitalize="none"
         autoComplete="name"
         autoCorrect={false}
+        onFocus={() => {
+          dropDownRef.current?.closeDropDown();
+        }}
         containerStyle={styles.textinputContainer}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Enter your company name',
@@ -94,6 +97,7 @@ const OnBoardingNameCompany = ({
         })}
       />
       <DropDownList
+        ref={dropDownRef}
         selectedId={companyActivityId}
         setSelected={setCompanyActivityIdFromList}
         data={[

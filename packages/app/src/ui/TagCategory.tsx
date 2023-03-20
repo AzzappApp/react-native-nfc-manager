@@ -57,8 +57,6 @@ const styles = StyleSheet.create({
   container: {
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 9,
-    paddingBottom: 9,
     height: 35,
     borderRadius: 100,
     borderWidth: 1,
@@ -67,5 +65,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 9,
     marginBottom: 9,
+    overflow: 'hidden',
   },
 });

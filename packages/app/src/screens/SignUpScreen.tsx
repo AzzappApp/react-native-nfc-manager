@@ -1,5 +1,5 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Keyboard,
@@ -33,6 +33,8 @@ import type { SignUpScreenQuery } from '@azzapp/relay/artifacts/SignUpScreenQuer
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
+import type { TextInput as NativeTextInput } from 'react-native';
+
 type SignupScreenProps = {
   signup: (params: SignUpParams) => Promise<void>;
 };
@@ -49,7 +51,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
   const [errorTos, setErrorTos] = useState<boolean>(false);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState<string | undefined>();
-
+  const userNameRef = useRef<NativeTextInput>(null);
+  const passwordRef = useRef<NativeTextInput>(null);
   const environment = useRelayEnvironment();
 
   const onChangeUsername = useCallback(
@@ -243,12 +246,17 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
     usernameExist,
   ]);
 
+  const focusUserName = () => {
+    userNameRef?.current?.focus();
+  };
+
+  const focusPassword = () => {
+    passwordRef?.current?.focus();
+  };
+
   return (
     <View style={styles.mainContainer}>
-      <View
-        onTouchStart={Keyboard.dismiss}
-        style={styles.containerImagebackground}
-      >
+      <View style={styles.containerImagebackground}>
         <Image
           source={require('#assets/sign/darkensign_background.png')}
           resizeMode="cover"
@@ -259,14 +267,17 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         keyboardVerticalOffset={-vp`${insetBottom}`}
         style={styles.flexible}
       >
-        <View style={styles.logoContainer}>
+        <View
+          style={styles.logoContainer}
+          onTouchStart={() => Keyboard.dismiss()}
+        >
           <Image
             source={require('#assets/logo-full_white.png')}
             resizeMode="contain"
             style={styles.logo}
           />
         </View>
-        <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+        <View style={styles.container}>
           <Form
             style={[styles.inner, { marginBottom: vp`${insetBottom}` }]}
             onSubmit={onSubmit}
@@ -313,10 +324,13 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   'Signup Screen - Accessibility TextInput email address or phone number',
               })}
               errorLabel={phoneEmailError}
+              onSubmitEditing={focusUserName}
+              returnKeyType="next"
             />
 
             <TextInput
               key="username"
+              ref={userNameRef}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Choose a username',
                 description:
@@ -330,9 +344,12 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               errorLabel={usernameError}
               onBlur={validateUsername}
               containerStyle={styles.textinputContainer}
+              onSubmitEditing={focusPassword}
+              returnKeyType="next"
             />
             <SecuredTextInput
               key="password"
+              ref={passwordRef}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
                 description: 'Signup Screen - password textinput placeholder',
@@ -356,6 +373,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                 description:
                   'Signup Screen - Accessibility Label TextInput Password',
               })}
+              returnKeyType="done"
             />
             <CheckBox
               label={

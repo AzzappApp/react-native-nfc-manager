@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Image,
@@ -24,7 +24,7 @@ import Form, { Submit } from '#ui/Form/Form';
 import TextInput from '#ui/TextInput';
 import type { SignInParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
-
+import type { TextInput as NativeTextInput } from 'react-native';
 type SignInMobileScreenProps = {
   signin: (params: SignInParams) => Promise<void>;
 };
@@ -62,7 +62,10 @@ const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
       setSigninError(true);
     }
   }, [isValidMailOrPhone, signin, phoneOrEmail, password]);
-
+  const passwordRef = useRef<NativeTextInput>(null);
+  const focusPassword = () => {
+    passwordRef?.current?.focus();
+  };
   return (
     <View style={styles.mainContainer}>
       <View
@@ -78,7 +81,7 @@ const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
       >
-        <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+        <View style={styles.container}>
           <Form
             style={[styles.inner, { marginBottom: vp`${insetBottom}` }]}
             onSubmit={onSubmit}
@@ -109,8 +112,11 @@ const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
                 description:
                   'SignIn Screen - Accessibility TextInput phone number or email address',
               })}
+              onSubmitEditing={focusPassword}
+              returnKeyType="next"
             />
             <TextInput
+              ref={passwordRef}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',
@@ -124,6 +130,7 @@ const SignInMobileScreen = ({ signin }: SignInMobileScreenProps) => {
                 description:
                   'SignIn Screen - Accessibility TextInput email address ',
               })}
+              returnKeyType="done"
             />
             <View style={styles.viewForgetPassword}>
               <Link modal route="FORGOT_PASSWORD">

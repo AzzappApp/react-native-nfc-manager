@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 
 import { colors, fontFamilies, textStyles } from '#theme';
+import type { ForwardedRef } from 'react';
 import type {
   TextInputProps as NativeTextInputProps,
   StyleProp,
@@ -32,27 +33,24 @@ export type TextInputProps = NativeTextInputProps & {
  * @return {React.Component<TextInputProps>}
  */
 //TODO: darkmode;
-const TextInput = ({
-  label,
-  containerStyle,
-  style = {},
-  placeholderTextColor = colors.grey400,
-  onFocus,
-  onBlur,
-  errorLabel,
-  errorLabelStyle,
-  testID,
-  accessibilityLabel,
-  errorContainerStyle = { minHeight: 15 },
-  ...props
-}: TextInputProps) => {
-  const textInputRef = useRef<NativeTextInput>(null);
+const TextInput = (
+  {
+    label,
+    containerStyle,
+    style = {},
+    placeholderTextColor = colors.grey400,
+    onFocus,
+    onBlur,
+    errorLabel,
+    errorLabelStyle,
+    testID,
+    accessibilityLabel,
+    errorContainerStyle = { minHeight: 15 },
+    ...props
+  }: TextInputProps,
+  ref: ForwardedRef<NativeTextInput>,
+) => {
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
-
-  const focus = () => {
-    //setting setTimeout fix a know bug where input will blur just after calling focus
-    setTimeout(() => textInputRef.current?.focus(), 100);
-  };
 
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
@@ -82,7 +80,6 @@ const TextInput = ({
   return (
     <View
       testID={testID ?? 'azzapp__Input__view-wrapper'}
-      onTouchStart={focus}
       style={[styles.container, containerStyle]}
     >
       {label && (
@@ -92,12 +89,12 @@ const TextInput = ({
       )}
       <View pointerEvents="box-none">
         <NativeTextInput
+          ref={ref}
           testID="azzap_native_text_input"
           selectionColor={colors.primary400}
           placeholderTextColor={placeholderTextColor}
           accessibilityLabel={accessibilityLabel}
           {...props}
-          ref={textInputRef}
           onFocus={onInputFocus}
           onBlur={onInputBlur}
           style={[styles.input, focusedStyle, style, errorStyle]}
@@ -153,4 +150,4 @@ const styles = StyleSheet.create({
 // passing object like style will cause rerender. Still have to test it again with
 // the last version using why did you render
 //memo(TextInputAzz, isEqual);
-export default TextInput;
+export default forwardRef(TextInput);

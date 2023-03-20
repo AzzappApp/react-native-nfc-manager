@@ -1,7 +1,16 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import {
   Dimensions,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +22,7 @@ import { colors, fontFamilies, textStyles } from '#theme';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import ViewTransition from './ViewTransition';
+import type { ForwardedRef } from 'react';
 import type {
   TextInputProps as NativeTextInputProps,
   StyleProp,
@@ -71,23 +81,38 @@ type DropDownListProps = {
    */
   itemStyle?: StyleProp<ViewStyle>;
 };
-const DropDownList = ({
-  data,
-  label,
-  containerStyle,
-  searchable = false,
-  textInputProps,
-  maxHeight = 200,
-  setSelected,
-  selectedId,
-  itemStyle = { paddingLeft: 20, height: 24 },
-}: DropDownListProps) => {
+export type DropDownListHandle = { closeDropDown(): void };
+
+const DropDownList = (
+  {
+    data,
+    label,
+    containerStyle,
+    searchable = false,
+    textInputProps,
+    maxHeight = 200,
+    setSelected,
+    selectedId,
+    itemStyle = { paddingLeft: 20, height: 24 },
+  }: DropDownListProps,
+  forwardedRef: ForwardedRef<DropDownListHandle>,
+) => {
   const intl = useIntl();
   const textInputRef = useRef<NativeTextInput>(null);
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
   const [showDropDown, setShowDropDown] = useState(false);
   const [selectedItem, setSelectedItem] = useState<DropDownListData | null>(
     null,
+  );
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      closeDropDown() {
+        setShowDropDown(false);
+      },
+    }),
+    [],
   );
 
   useEffect(() => {
@@ -117,8 +142,12 @@ const DropDownList = ({
   }, [data.length, itemStyle, maxHeight]);
 
   const toggleDropDownList = useCallback(() => {
+    //close keyboard if not searchable and displaying the dropdownlist
+    if (!searchable) {
+      Keyboard.dismiss();
+    }
     setShowDropDown(prev => !prev);
-  }, []);
+  }, [searchable]);
 
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
@@ -183,38 +212,37 @@ const DropDownList = ({
           />
         </PressableNative>
       </View>
-      {showDropDown && (
-        <ViewTransition
-          transitionDuration={300}
-          transitions={['height']}
-          testID="azzapp__dropdownlist__animated-view"
-          style={[
-            styles.dropdownStyles,
-            {
-              height: showDropDown ? dropdownHeight : 0,
-              top: inputHeight + 10,
-              zIndex: 100,
-            },
-          ]}
-          pointerEvents="box-none"
+      <ViewTransition
+        transitionDuration={280}
+        transitions={['height', 'opacity']}
+        testID="azzapp__dropdownlist__animated-view"
+        style={[
+          styles.dropdownStyles,
+          {
+            height: showDropDown ? dropdownHeight : 0,
+            opacity: showDropDown ? 1 : 0,
+            top: inputHeight + 10,
+            zIndex: 100,
+          },
+        ]}
+        pointerEvents="box-none"
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContainerStyle}
+          style={{ zIndex: 200 }}
+          nestedScrollEnabled={true}
+          accessibilityRole="list"
         >
-          <ScrollView
-            contentContainerStyle={styles.scrollViewContainerStyle}
-            style={{ zIndex: 200 }}
-            nestedScrollEnabled={true}
-            accessibilityRole="list"
-          >
-            {data.map(item => (
-              <DropDownListItem
-                key={`dropdownlist-item_${item.id}`}
-                item={item}
-                selectItem={selectItem}
-                itemStyle={itemStyle}
-              />
-            ))}
-          </ScrollView>
-        </ViewTransition>
-      )}
+          {data.map(item => (
+            <DropDownListItem
+              key={`dropdownlist-item_${item.id}`}
+              item={item}
+              selectItem={selectItem}
+              itemStyle={itemStyle}
+            />
+          ))}
+        </ScrollView>
+      </ViewTransition>
     </View>
   );
 };
@@ -257,7 +285,7 @@ const DropDownListItem = memo(
   (prev, next) => prev.item.id === next.item.id,
 );
 
-export default DropDownList;
+export default forwardRef(DropDownList);
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   scrollViewContainerStyle: {

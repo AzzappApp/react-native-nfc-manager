@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 
@@ -6,7 +6,11 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import TextInput from './TextInput';
 import type { TextInputProps } from './TextInput';
-import type { GestureResponderEvent } from 'react-native';
+import type { ForwardedRef } from 'react';
+import type {
+  GestureResponderEvent,
+  TextInput as NativeTextInput,
+} from 'react-native';
 /**
  * A SecruedTextInput the can show secured text clearly
  *
@@ -15,7 +19,10 @@ import type { GestureResponderEvent } from 'react-native';
  * @return {React.Component<TextInputProps>}
  */
 
-const SecuredTextInput = (props: TextInputProps) => {
+const SecuredTextInput = (
+  props: TextInputProps,
+  ref: ForwardedRef<NativeTextInput>,
+) => {
   const intl = useIntl();
   const [showPassword, setShowPassword] = useState(false);
   const onPressShowPassword = useCallback(
@@ -28,7 +35,7 @@ const SecuredTextInput = (props: TextInputProps) => {
 
   return (
     <View>
-      <TextInput {...props} secureTextEntry={!showPassword} />
+      <TextInput {...props} ref={ref} secureTextEntry={!showPassword} />
       <PressableNative
         testID="azzapp__Input__secure-icon"
         style={styles.buttonSecure}
@@ -62,4 +69,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SecuredTextInput;
+export default forwardRef(SecuredTextInput);

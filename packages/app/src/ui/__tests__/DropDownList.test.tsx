@@ -39,7 +39,7 @@ describe('DropDownList ui component', () => {
   });
 
   test('should show the list on touching the view container', () => {
-    const { queryByRole, getByRole, getByTestId } = render(
+    const { getByRole, getByTestId } = render(
       <DropDownList
         textInputProps={{
           placeholder: 'placeholdertest',
@@ -51,7 +51,10 @@ describe('DropDownList ui component', () => {
         data={FAKE_DATA(10)}
       />,
     );
-    expect(queryByRole('list')).toBeFalsy();
+
+    expect(getByTestId('azzapp__dropdownlist__animated-view')).toHaveStyle({
+      opacity: 0,
+    });
     act(() => {
       fireEvent(
         getByTestId('azzapp__dropdownlist__touchable-container'),
