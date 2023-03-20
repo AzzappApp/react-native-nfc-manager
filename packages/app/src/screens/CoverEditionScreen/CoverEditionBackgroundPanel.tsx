@@ -16,6 +16,7 @@ type CoverEditionBackgroundPanelProps = {
   backgroundStyle: CardCoverBackgroundStyleInput | null | undefined;
   onBackgroundChange: (background: string | null) => void;
   onBackgroundStyleChange: (style: CardCoverBackgroundStyleInput) => void;
+  bottomSheetHeights: number;
   style: StyleProp<ViewStyle>;
 };
 
@@ -25,13 +26,17 @@ const CoverEditionBackgroundPanel = ({
   backgroundStyle,
   onBackgroundChange,
   onBackgroundStyleChange,
+  bottomSheetHeights,
   style,
 }: CoverEditionBackgroundPanelProps) => {
-  const { coverBackgrounds } = useFragment(
+  const { coverBackgrounds, profile } = useFragment(
     graphql`
       fragment CoverEditionBackgroundPanel_viewer on Viewer {
         coverBackgrounds {
           ...CoverLayerlist_layers
+        }
+        profile {
+          ...ProfileColorPalette_profile
         }
       }
     `,
@@ -51,6 +56,14 @@ const CoverEditionBackgroundPanel = ({
   };
 
   const intl = useIntl();
+  const patternColorLabel = intl.formatMessage({
+    defaultMessage: 'Color #1',
+    description: 'Label of the background pattern color tab in cover edition',
+  });
+  const backgroundColorLabel = intl.formatMessage({
+    defaultMessage: 'Color #2',
+    description: 'Label of the background color tab in cover edition',
+  });
   return (
     <View style={[styles.root, style]}>
       <TabsBar
@@ -67,43 +80,43 @@ const CoverEditionBackgroundPanel = ({
           },
           {
             key: 'patternColor',
-            label: intl.formatMessage({
-              defaultMessage: 'Color #1',
-              description:
-                'Label of the background pattern color tab in cover edition',
-            }),
+            label: patternColorLabel,
             rightElement: (
               <ColorPreview color={patternColor} style={{ marginLeft: 5 }} />
             ),
           },
           {
             key: 'backgroundColor',
-            label: intl.formatMessage({
-              defaultMessage: 'Color #2',
-              description: 'Label of the background color tab in cover edition',
-            }),
+            label: backgroundColorLabel,
             rightElement: (
               <ColorPreview color={backgroundColor} style={{ marginLeft: 5 }} />
             ),
           },
         ]}
       />
-      {currentTab === 'background' ? (
-        <CoverLayerList
-          layers={coverBackgrounds}
-          selectedLayer={background}
-          backgroundColor={backgroundColor}
-          tintColor={patternColor}
-          onSelectLayer={onBackgroundChange}
-          style={styles.content}
-        />
-      ) : (
+      <CoverLayerList
+        layers={coverBackgrounds}
+        selectedLayer={background}
+        backgroundColor={backgroundColor}
+        tintColor={patternColor}
+        onSelectLayer={onBackgroundChange}
+        style={styles.content}
+      />
+      {profile && (
         <ProfileColorPalette
+          visible={currentTab !== 'background'}
+          height={bottomSheetHeights}
+          profile={profile}
+          title={
+            currentTab === 'backgroundColor'
+              ? backgroundColorLabel
+              : patternColorLabel
+          }
           selectedColor={
             currentTab === 'backgroundColor' ? backgroundColor : patternColor
           }
           onChangeColor={onColorChange}
-          style={styles.content}
+          onRequestClose={() => setCurrentTab('background')}
         />
       )}
     </View>

@@ -5,40 +5,54 @@ import {
   KeyboardAvoidingView,
   Modal,
   StyleSheet,
-  Text,
-  View,
 } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
+import Header from '#components/Header';
 import Button from './Button';
+import type { HeaderProps } from '#components/Header';
 import type { ModalProps } from 'react-native';
 
-type BottomSheetModal = Omit<
+export type BottomSheetModalProps = Omit<
   ModalProps,
   'animated' | 'animationType' | 'onRequestClose' | 'transparent'
 > & {
-  title: string;
+  /**
+   * The height of the bottomsheet @default 200
+   */
   height?: number;
-  onValidate(): void;
-  onCancel?(): void;
-  cancelable?: boolean;
-  cancelLabel?: string;
-  validationButtonLabel: string;
-  validationButtonDisabled?: boolean;
+  /**
+   * @see HeaderProps#title
+   */
+  headerTitle?: HeaderProps['title'];
+  /**
+   * @see HeaderProps#rightButton
+   */
+  headerLeftButton?: HeaderProps['leftButton'];
+  /**
+   * @see HeaderProps#rightButton
+   */
+  headerRightButton?: HeaderProps['rightButton'];
+  /**
+   * @see ModalProps#onRequestClose
+   */
+  onRequestClose: () => void;
 };
 
+/**
+ * A simple bottom sheet component
+ */
 const BottomSheetModal = ({
-  children,
   height = 200,
   visible,
-  onValidate,
-  onCancel,
-  title,
-  cancelable = true,
-  validationButtonLabel,
-  validationButtonDisabled = false,
+  headerTitle,
+  headerLeftButton,
+  headerRightButton,
+  children,
+  onRequestClose,
   ...props
-}: BottomSheetModal) => {
+}: BottomSheetModalProps) => {
   const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
 
   const [isVisible, setIsVisible] = useState(false);
@@ -71,16 +85,21 @@ const BottomSheetModal = ({
   const { bottom } = useSafeAreaInsets();
   const intl = useIntl();
   return (
-    <Modal animationType="none" visible={isVisible} {...props} transparent>
+    <Modal
+      animationType="none"
+      visible={isVisible}
+      onRequestClose={onRequestClose}
+      {...props}
+      transparent
+    >
+      <TouchableWithoutFeedback
+        style={styles.absoluteFill}
+        onPress={onRequestClose}
+      />
       <KeyboardAvoidingView
         style={styles.modalContainer}
         behavior="position"
-        contentContainerStyle={{
-          backgroundColor: '#transparent',
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-        }}
+        contentContainerStyle={styles.absoluteFill}
       >
         <Animated.View
           style={[
@@ -98,38 +117,24 @@ const BottomSheetModal = ({
             },
           ]}
         >
-          <View style={styles.accessoryView}>
-            {cancelable && onCancel ? (
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'BottomSheetModal - default Cancel button label',
-                })}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Tap to cancel and close',
-                  description:
-                    'BottomSheetModal accessibility label - Close button',
-                })}
-                variant="secondary"
-                onPress={onCancel}
-              />
-            ) : (
-              <View style={styles.spacer} />
-            )}
-            <Text style={[textStyles.title, styles.accessoryViewLabel]}>
-              {title}
-            </Text>
-            <Button
-              label={validationButtonLabel}
-              onPress={onValidate}
-              disabled={validationButtonDisabled}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to validate and close',
-                description:
-                  'BottomSheetModal accessibility label - Validate button',
-              })}
-            />
-          </View>
+          <Header
+            style={styles.accessoryView}
+            title={headerTitle}
+            leftButton={headerLeftButton}
+            rightButton={
+              headerRightButton !== undefined ? (
+                headerRightButton
+              ) : (
+                <Button
+                  label={intl.formatMessage({
+                    defaultMessage: 'Close',
+                    description: 'Bottom sheet close button',
+                  })}
+                  onPress={onRequestClose}
+                />
+              )
+            }
+          />
           {children}
         </Animated.View>
       </KeyboardAvoidingView>
@@ -142,6 +147,13 @@ export default BottomSheetModal;
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
+  },
+  absoluteFill: {
+    backgroundColor: 'transparent',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
   },
   bottomSheetContainer: {
     position: 'absolute',
@@ -164,27 +176,7 @@ const styles = StyleSheet.create({
     elevation: 7,
   },
   accessoryView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 10,
-  },
-  spacer: {
-    width: 40,
-  },
-  accessoryViewLabel: {
-    textAlign: 'center',
-    flex: 1,
-    marginHorizontal: 10,
-  },
-  okButton: {
-    backgroundColor: colors.orange,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  okButtonLabel: {
-    color: '#FFF',
+    marginBottom: 10,
+    paddingHorizontal: 0,
   },
 });

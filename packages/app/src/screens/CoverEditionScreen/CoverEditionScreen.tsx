@@ -58,6 +58,7 @@ import type {
   MediaInput,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
+import type { LayoutChangeEvent } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
 export type CoverEditionScreenProps = {
@@ -77,13 +78,16 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       fragment CoverEditionScreen_viewer on Viewer {
         ...CoverEditionBackgroundPanel_viewer
         ...CoverEditionForegroundPanel_viewer
+        ...CoverTitleEditionPanel_viewer
         profile {
+          id
           userName
           firstName
           lastName
           companyName
           profileKind
           card {
+            id
             cover {
               ...CoverEditionScreen_cover
             }
@@ -838,6 +842,11 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   const cropEditionMode = editedParameter === 'roll';
 
+  const [bottomSheetHeights, setBottomSheetHeights] = useState(0);
+  const onBottomPanelLayout = (event: LayoutChangeEvent) => {
+    setBottomSheetHeights(event.nativeEvent.layout.height);
+  };
+
   return (
     <>
       <KeyboardAvoidingView
@@ -981,7 +990,10 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             />
           </View>
         </View>
-        <View style={styles.bottomPanelContainer}>
+        <View
+          style={styles.bottomPanelContainer}
+          onLayout={onBottomPanelLayout}
+        >
           {editedParameter != null ? (
             <>
               <ImageEditionParameterControl
@@ -1013,6 +1025,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               )}
               {currentTab === 'title' && (
                 <CoverTitleEditionPanel
+                  viewer={viewer!}
                   title={title}
                   subTitle={subTitle}
                   titleStyle={titleStyle}
@@ -1023,6 +1036,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onTitleStyleChange={onTitleStyleChange}
                   onSubTitleStyleChange={onSubTitleStyleChange}
                   onContentStyleChange={onContentStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
                   style={styles.bottomPanel}
                 />
               )}
@@ -1033,6 +1047,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
                   style={styles.bottomPanel}
                 />
               )}
@@ -1043,6 +1058,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   foregroundStyle={foregroundStyle}
                   onForegroundChange={onForegroundChange}
                   onForegroundStyleChange={onForegroundStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
                   style={styles.bottomPanel}
                 />
               )}

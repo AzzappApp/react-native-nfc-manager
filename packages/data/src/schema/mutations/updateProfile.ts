@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { GraphQLBoolean, GraphQLString } from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
 import ERRORS from '@azzapp/shared/errors';
@@ -7,8 +12,18 @@ import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains/profiles';
 import ProfileGraphQL from '../ProfileGraphQL';
 import { ProfileKind } from './commonsTypes';
-import type { Profile } from '#domains';
+import type { Profile, ProfileKind as ProfileKindType } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
+
+type UpdateProfileInput = {
+  firstName?: string;
+  lastName?: string;
+  profileKind?: ProfileKindType;
+  companyName?: string;
+  companyActivityId?: string;
+  isReady?: boolean;
+  colorPalette?: string[];
+};
 
 const updateProfileMutation = mutationWithClientMutationId({
   name: 'UpdateProfile',
@@ -32,7 +47,7 @@ const updateProfileMutation = mutationWithClientMutationId({
       type: GraphQLBoolean,
     },
     colorPalette: {
-      type: GraphQLString,
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
     },
   },
   outputFields: {
@@ -41,7 +56,7 @@ const updateProfileMutation = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (
-    updates: Omit<Partial<Profile>, 'id'>,
+    updates: UpdateProfileInput,
     { auth, profileLoader }: GraphQLContext,
   ) => {
     if (auth.isAnonymous) {
@@ -58,8 +73,18 @@ const updateProfileMutation = mutationWithClientMutationId({
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
+    const { colorPalette, ...profileUpdates } = updates;
+
     try {
-      const resultProfile = await updateProfile(profile.id, updates);
+      const resultProfile = await updateProfile(
+        profile.id,
+        colorPalette
+          ? {
+              ...profileUpdates,
+              colorPalette: colorPalette.join(','),
+            }
+          : profileUpdates,
+      );
       return { profile: { ...profile, ...resultProfile } };
     } catch (error) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

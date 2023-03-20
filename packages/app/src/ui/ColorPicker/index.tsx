@@ -1,6 +1,5 @@
-import ColorChooser from './ColorChooser';
 import ColorPicker from './ColorPicker';
+import type { ColorPickerProps } from './ColorPicker';
 
-export { ColorChooser };
-
+export type { ColorPickerProps };
 export default ColorPicker;

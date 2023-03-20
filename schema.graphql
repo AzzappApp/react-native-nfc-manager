@@ -389,7 +389,7 @@ input UpdateProfileInput {
   companyName: String
   companyActivityId: String
   isReady: Boolean
-  colorPalette: String
+  colorPalette: [String!]
   clientMutationId: String
 }
 

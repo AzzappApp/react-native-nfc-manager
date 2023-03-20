@@ -35,6 +35,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
   },
+  "428m8h": {
+    "defaultMessage": "Add a color",
+    "description": "ColorPicker component title when adding a color"
+  },
   "4I6fyv": {
     "defaultMessage": "Phone number or email address",
     "description": "SignIn Screen Phone number or email address input placeholder"
@@ -182,6 +186,10 @@
   "CCbp9S": {
     "defaultMessage": "Trending profiles",
     "description": "SearchPage - Trending profile title"
+  },
+  "CfCNOX": {
+    "defaultMessage": "Foreground color",
+    "description": "Title of the foreground color picker"
   },
   "DWnvYf": {
     "defaultMessage": "Reset password",
@@ -367,6 +375,10 @@
     "defaultMessage": "Bottom left",
     "description": "Label of the bottom left position in cover edition"
   },
+  "UEFYKC": {
+    "defaultMessage": "Edit",
+    "description": "ColorPicker component Edit button label"
+  },
   "UIZoTQ": {
     "defaultMessage": "Enter your search word",
     "description": "Seach bar - accessibility label"
@@ -403,10 +415,6 @@
     "defaultMessage": "Saturation",
     "description": "Saturation image edition parameters name"
   },
-  "VsI5yY": {
-    "defaultMessage": "Tap to validate and close",
-    "description": "BottomSheetModal accessibility label - Validate button"
-  },
   "WBD9Bx": {
     "defaultMessage": "Next",
     "description": "Button label of screens asking for camera/micro permissions"
@@ -439,6 +447,10 @@
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
   },
+  "YM0Ycc": {
+    "defaultMessage": "Close",
+    "description": "Bottom sheet close button"
+  },
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
@@ -455,10 +467,6 @@
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
   },
-  "Zu7uzJ": {
-    "defaultMessage": "Save",
-    "description": "CoverTitleEditionPanel - Label of the save button in font color picker modal"
-  },
   "a17Y8A": {
     "defaultMessage": "Temperature",
     "description": "Temperature image edition parameters name"
@@ -470,10 +478,6 @@
   "aOpC4m": {
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
-  },
-  "b0rHlc": {
-    "defaultMessage": "Tap to cancel and close",
-    "description": "BottomSheetModal accessibility label - Close button"
   },
   "b4fFwm": {
     "defaultMessage": "Brightness",
@@ -583,10 +587,6 @@
     "defaultMessage": "Allow Azzapp to access your microphone",
     "description": "Camera authorization screen title for microphobe permission"
   },
-  "hcA1Cq": {
-    "defaultMessage": "Add",
-    "description": "FontPicker - BottomSheetModal - Validation button label"
-  },
   "hwL8A0": {
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
@@ -666,6 +666,10 @@
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
     "description": "Signup Screen - Accessibility Sign Up button"
+  },
+  "mPVwE6": {
+    "defaultMessage": "Cancel",
+    "description": "ColorPicker component Cancel button label"
   },
   "mRqzw5": {
     "defaultMessage": "Color",
@@ -759,10 +763,6 @@
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
   },
-  "qgSTeL": {
-    "defaultMessage": "Add a color",
-    "description": "ColorPicker component - Bottom sheet title Add a color"
-  },
   "qkbfOu": {
     "defaultMessage": "Middle left",
     "description": "Label of the middle left position in cover edition"
@@ -786,6 +786,10 @@
   "r3LnPL": {
     "defaultMessage": "Filter",
     "description": "Accessibility label of the Filter tab in image editing view"
+  },
+  "rAaYKi": {
+    "defaultMessage": "Save",
+    "description": "ColorPicker component Save button label"
   },
   "rHj8v4": {
     "defaultMessage": "Password",
@@ -883,10 +887,6 @@
     "defaultMessage": "Person",
     "description": "UserType: personal"
   },
-  "wVwWK7": {
-    "defaultMessage": "Cancel",
-    "description": "BottomSheetModal - default Cancel button label"
-  },
   "wfjPDR": {
     "defaultMessage": "Photos gallery",
     "description": "Accessibility label of the Photos gallery tabs in image picking wizzard"
@@ -898,10 +898,6 @@
   "wkQ0bm": {
     "defaultMessage": "video",
     "description": "Title of the photo view in image picker wizzard"
-  },
-  "wq7Uyv": {
-    "defaultMessage": "Add",
-    "description": "ColorPicker component - Bottom sheet label button validate action"
   },
   "x/HwUu": {
     "defaultMessage": "Take a picture",

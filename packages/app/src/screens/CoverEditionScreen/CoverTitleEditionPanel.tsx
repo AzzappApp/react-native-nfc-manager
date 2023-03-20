@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_PLACEMENT,
@@ -19,19 +20,21 @@ import {
   TITLE_POSITIONS,
 } from '@azzapp/shared/cardHelpers';
 import { colors, fontFamilies, textStyles } from '#theme';
-import { ProfileColorPaletteModal } from '#components/ProfileColorPalette';
+import ProfileColorPalette from '#components/ProfileColorPalette';
 import DashedSlider from '#ui/DashedSlider';
 import FontPicker from '#ui/FontPicker';
-import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import TabsBar from '#ui/TabsBar';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import type {
   CardCoverContentStyleInput,
   CardCoverTextStyleInput,
   CardCoverTitleOrientation,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import type { CoverTitleEditionPanel_viewer$key } from '@azzapp/relay/artifacts/CoverTitleEditionPanel_viewer.graphql';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverTitleEditionPanelProps = {
+  viewer: CoverTitleEditionPanel_viewer$key;
   title: string | null | undefined;
   titleStyle: CardCoverTextStyleInput | null | undefined;
   subTitle: string | null | undefined;
@@ -42,10 +45,12 @@ type CoverTitleEditionPanelProps = {
   onSubTitleChange: (subTitle: string) => void;
   onSubTitleStyleChange: (subTitleStyle: CardCoverTextStyleInput) => void;
   onContentStyleChange: (contentStyle: CardCoverContentStyleInput) => void;
+  bottomSheetHeights: number;
   style?: StyleProp<ViewStyle>;
 };
 
 const CoverTitleEditionPanel = ({
+  viewer,
   title,
   titleStyle,
   subTitle,
@@ -56,8 +61,20 @@ const CoverTitleEditionPanel = ({
   onSubTitleChange,
   onSubTitleStyleChange,
   onContentStyleChange,
+  bottomSheetHeights,
   style,
 }: CoverTitleEditionPanelProps) => {
+  const { profile } = useFragment(
+    graphql`
+      fragment CoverTitleEditionPanel_viewer on Viewer {
+        profile {
+          ...ProfileColorPalette_profile
+        }
+      }
+    `,
+    viewer,
+  );
+
   const [currentTab, setCurrentTab] = useState<'subtitle' | 'title'>('title');
 
   const onTabPress = (tab: string) => {
@@ -84,14 +101,6 @@ const CoverTitleEditionPanel = ({
 
   const [fontPickerOpen, setFontPickerOpen] = useState(false);
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
-  // const [titlePositonPickerOpen, setTitlePositonPickerOpen] = useState(false);
-  const [bottomSheetHeights, setBottomSheetHeights] = useState(0);
-
-  const onLayout = (event: LayoutChangeEvent) => {
-    setBottomSheetHeights(
-      event.nativeEvent.layout.height + TAB_BAR_HEIGHT + 20,
-    );
-  };
 
   const onFontFamilyChange = (fontFamily: string) => {
     if (currentTab === 'title') {
@@ -155,7 +164,7 @@ const CoverTitleEditionPanel = ({
   const orientationsLabel = useOrientationsLabels();
 
   return (
-    <View style={[styles.root, style]} onLayout={onLayout}>
+    <View style={[styles.root, style]}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
@@ -352,23 +361,21 @@ const CoverTitleEditionPanel = ({
         onChange={onFontFamilyChange}
         height={bottomSheetHeights}
       />
-      <ProfileColorPaletteModal
-        title={intl.formatMessage({
-          defaultMessage: 'Font color',
-          description:
-            'Title of the color picker modal in cover edition for font color',
-        })}
-        selectedColor={color}
-        visible={colorPickerOpen}
-        onRequestClose={() => setColorPickerOpen(false)}
-        onChangeColor={onColorChange}
-        height={bottomSheetHeights}
-        validationButtonLabel={intl.formatMessage({
-          defaultMessage: 'Save',
-          description:
-            'CoverTitleEditionPanel - Label of the save button in font color picker modal',
-        })}
-      />
+      {profile && (
+        <ProfileColorPalette
+          profile={profile}
+          title={intl.formatMessage({
+            defaultMessage: 'Font color',
+            description:
+              'Title of the color picker modal in cover edition for font color',
+          })}
+          selectedColor={color}
+          visible={colorPickerOpen}
+          onRequestClose={() => setColorPickerOpen(false)}
+          onChangeColor={onColorChange}
+          height={bottomSheetHeights}
+        />
+      )}
     </View>
   );
 };

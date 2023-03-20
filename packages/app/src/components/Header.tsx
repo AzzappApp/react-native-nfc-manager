@@ -4,7 +4,7 @@ import { textStyles } from '#theme';
 import type { ReactElement, ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type HeaderProps = {
+export type HeaderProps = {
   /**
    * The title to display in the header.
    */

@@ -1,275 +1,173 @@
-import chroma from 'chroma-js';
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, Pressable, StyleSheet } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-import { colors } from '#theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
-import Icon from '#ui/Icon/Icon';
-import PressableNative from '#ui/PressableNative';
-import ViewTransition from '#ui/ViewTransition/ViewTransition';
 import ColorChooser from './ColorChooser';
-
-import type { LayoutChangeEvent, ViewProps } from 'react-native';
+import ColorPalette from './ColorPalette';
 
 export type ColorPickerProps = {
+  /**
+   * whether the bottomsheet is visible or not
+   */
+  visible: boolean;
+  /**
+   * The height of the bottomsheet @default 200
+   */
+  title: string;
   height?: number;
   selectedColor: string;
   colorList: readonly string[] | null;
   onChangeColor: (color: string) => void;
-  addColor: (color: string) => void;
-  deleteColor: (color: string) => void;
-  style?: ViewProps['style'] | undefined;
-  setEditMode?: (editMode: boolean) => void;
+  onUpdateColorList: (color: string[]) => void;
+  onRequestClose: () => void;
 };
-
-const ITEM_PER_ROW = 5;
 
 const ColorPicker = ({
-  colorList = [],
+  visible,
+  height,
+  title,
   selectedColor,
-  height = 330,
+  colorList,
+  onRequestClose,
   onChangeColor,
-  addColor,
-  deleteColor,
-  style,
-  setEditMode,
+  onUpdateColorList,
 }: ColorPickerProps) => {
-  const intl = useIntl();
-  const [localColor, setLocalColor] = useState(selectedColor);
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
-  const onSelectColor = useCallback(
-    (color: string) => {
-      setLocalColor(color);
-      onChangeColor(color);
-    },
-    [onChangeColor],
-  );
+  const [state, setState] = useState<
+    'addingColor' | 'colorChooser' | 'editingPalette'
+  >('colorChooser');
 
-  const [itemWidth, setItemWidth] = useState(0);
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    // calculate the average width of the items for perfect fitting
-    const { width } = event.nativeEvent.layout;
-    setItemWidth(Math.floor(width / ITEM_PER_ROW));
+  const onClose = () => {
+    if (state === 'colorChooser') {
+      onRequestClose();
+      return;
+    }
+    // TODO blink edition button to show that the user can't close the modal
+  };
+
+  // #region Adding a color
+  const previouslySelectedColor = useRef<string | null>(null);
+  const onRequestNewColor = () => {
+    previouslySelectedColor.current = selectedColor;
+    setState('addingColor');
+  };
+
+  const onCancelNewColor = useCallback(() => {
+    const previousColor = previouslySelectedColor.current ?? selectedColor;
+    onChangeColor(previousColor);
+    previouslySelectedColor.current = null;
+    setState('colorChooser');
+  }, [onChangeColor, selectedColor]);
+
+  const onSaveNewColor = useCallback(() => {
+    previouslySelectedColor.current = null;
+    onUpdateColorList(
+      colorList ? [...colorList, selectedColor] : [selectedColor],
+    );
+    setState('colorChooser');
+  }, [colorList, onUpdateColorList, selectedColor]);
+  // #endregion
+
+  // #region Editing palette
+  const [colorsToRemove, setColorsToRemove] = useState(new Set<string>());
+
+  const onEditPalette = useCallback(() => {
+    setState('editingPalette');
   }, []);
 
-  const [editPalette, setEditPalette] = useState(false);
+  const onCancelEditPalette = useCallback(() => {
+    setColorsToRemove(new Set());
+    setState('colorChooser');
+  }, []);
 
-  const toggleEditPalette = useCallback(() => {
-    if (setEditMode) {
-      setEditMode(!editPalette);
-    }
-    setEditPalette(!editPalette);
-  }, [editPalette, setEditMode]);
+  const onRemoveColor = useCallback((color: string) => {
+    setColorsToRemove(colorsToRemove => {
+      const newColorsToRemove = new Set(colorsToRemove);
+      newColorsToRemove.add(color);
+      return newColorsToRemove;
+    });
+  }, []);
 
-  const renderItem = useCallback(
-    ({ item }: { item: string }) => {
-      if (item === 'add') {
-        return (
-          <PressableNative
-            onPress={() => {
-              setColorPickerOpen(true);
-            }}
-            style={[
-              styles.itemContainer,
-              {
-                width: itemWidth - ITEM_MARGIN,
-                height: itemWidth - ITEM_MARGIN,
-                borderRadius: itemWidth / 2,
-                borderColor: `rgba(0,0,0,0)`,
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.centerAlign,
-                {
-                  borderWidth: 1,
-                  borderStyle: 'dashed',
-                  borderColor: colors.grey200,
-                  width: itemWidth - ITEM_MARGIN - 10,
-                  height: itemWidth - ITEM_MARGIN - 10,
-                  borderRadius: (itemWidth - ITEM_MARGIN - 10) / 2,
-                },
-              ]}
-            >
-              <Icon icon="plus" style={styles.iconPlus} />
-            </View>
-          </PressableNative>
-        );
+  const onSavePaletteEdition = useCallback(() => {
+    onUpdateColorList((colorList ?? []).filter(c => !colorsToRemove.has(c)));
+    setColorsToRemove(new Set());
+    setState('colorChooser');
+  }, [colorList, colorsToRemove, onUpdateColorList]);
+  // #endregion
+
+  const intl = useIntl();
+  const { bottom } = useSafeAreaInsets();
+  return (
+    <BottomSheetModal
+      height={height}
+      visible={visible}
+      headerTitle={
+        state === 'colorChooser'
+          ? title
+          : state === 'editingPalette'
+          ? intl.formatMessage({
+              defaultMessage: 'Edit Palette',
+              description: 'ColorPicker component button Edit Palette',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Add a color',
+              description: 'ColorPicker component title when adding a color',
+            })
       }
-      return (
-        <ColorPickerItemMemo
-          color={item}
-          selected={localColor === item}
-          selectColor={onSelectColor}
-          deleteColor={deleteColor}
-          editMode={editPalette}
-          itemWidth={itemWidth}
-        />
-      );
-    },
-    [localColor, onSelectColor, deleteColor, editPalette, itemWidth],
-  );
-
-  return (
-    <View style={[styles.container, style]} onLayout={onLayout}>
-      <FlatList
-        numColumns={ITEM_PER_ROW}
-        data={['add', ...(colorList ?? [])]}
-        renderItem={renderItem}
-        bounces={false}
-        style={{ marginBottom: 4 }}
-      />
-
-      <View
-        style={[
-          styles.centerAlign,
-          {
-            flexDirection: 'row',
-          },
-        ]}
-      >
+      headerLeftButton={
         <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Edit Palette',
-            description: 'ColorPicker component button Edit Palette',
-          })}
-          onPress={toggleEditPalette}
-          variant={editPalette ? 'primary' : 'secondary'}
-          style={styles.removeColorButton}
+          label={
+            state === 'colorChooser'
+              ? intl.formatMessage({
+                  defaultMessage: 'Edit',
+                  description: 'ColorPicker component Edit button label',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Cancel',
+                  description: 'ColorPicker component Cancel button label',
+                })
+          }
+          onPress={
+            state === 'colorChooser'
+              ? onEditPalette
+              : state === 'addingColor'
+              ? onCancelNewColor
+              : onCancelEditPalette
+          }
+          variant="secondary"
         />
-      </View>
-      <BottomSheetModal
-        visible={colorPickerOpen}
-        onValidate={() => {
-          addColor(localColor);
-          setColorPickerOpen(false);
-        }}
-        onCancel={() => setColorPickerOpen(false)}
-        title={intl.formatMessage({
-          defaultMessage: 'Add a color',
-          description: 'ColorPicker component - Bottom sheet title Add a color',
-        })}
-        height={height}
-        cancelLabel={'add'}
-        validationButtonLabel={intl.formatMessage({
-          defaultMessage: 'Add',
-          description:
-            'ColorPicker component - Bottom sheet label button validate action',
-        })}
-      >
-        <ColorChooser value={localColor} onChangeColor={onSelectColor} />
-      </BottomSheetModal>
-    </View>
-  );
-};
-
-//We can improve later with rowgap and column gap
-type ColorPickerItemProps = {
-  color: string;
-  selected: boolean;
-  selectColor: (color: string) => void;
-  deleteColor: (color: string) => void;
-  editMode: boolean;
-  itemWidth: number;
-};
-const ColorPickerItem = ({
-  color,
-  selected,
-  selectColor,
-  deleteColor,
-  editMode,
-  itemWidth,
-}: ColorPickerItemProps) => {
-  const onPressColor = useCallback(() => {
-    if (editMode) {
-      deleteColor(color);
-    } else {
-      selectColor(color);
-    }
-  }, [editMode, deleteColor, color, selectColor]);
-
-  const ITEM_CALCUL = itemWidth - ITEM_MARGIN;
-
-  const closeColor = chroma(color).darken(0.8).hex();
-  return (
-    <ViewTransition
-      pointerEvents="box-none"
-      style={[
-        styles.itemContainer,
-        {
-          width: ITEM_CALCUL,
-          height: ITEM_CALCUL,
-          borderRadius: itemWidth / 2,
-          borderColor: `rgba(0,0,0,${selected ? 1 : 0})`,
-        },
-      ]}
-      transitions={['borderColor']}
-      transitionDuration={280}
-    >
-      <Pressable
-        onPress={onPressColor}
-        style={{
-          width: ITEM_CALCUL - ITEM_MARGIN,
-          height: ITEM_CALCUL - ITEM_MARGIN,
-          backgroundColor: color,
-          borderColor: closeColor,
-          borderRadius: (itemWidth - 2 * BORDER_WIDTH - ITEM_MARGIN) / 2,
-          borderWidth: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <ViewTransition
-          style={{
-            width: ITEM_CALCUL - 19,
-            height: ITEM_CALCUL - 19,
-            borderRadius: (ITEM_CALCUL - 9) / 2,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: editMode ? 'rgba(255, 255, 255, 0.5)' : color, //don't use transparent, it will cause a small blinking
-            opacity: editMode ? 1 : 0,
-          }}
-          transitions={['backgroundColor', 'opacity']}
-          transitionDuration={300}
-        >
-          <Icon
-            icon="cross"
-            style={{
-              height: 14,
-              width: 14,
-              tintColor: colors.black,
-            }}
+      }
+      headerRightButton={
+        state === 'colorChooser' ? undefined : (
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'ColorPicker component Save button label',
+            })}
+            onPress={
+              state === 'addingColor' ? onSaveNewColor : onSavePaletteEdition
+            }
+            variant="primary"
           />
-        </ViewTransition>
-      </Pressable>
-    </ViewTransition>
+        )
+      }
+      onRequestClose={onClose}
+    >
+      {state !== 'addingColor' ? (
+        <ColorPalette
+          selectedColor={selectedColor}
+          colorList={colorList?.filter(c => !colorsToRemove.has(c)) ?? []}
+          onSelectColor={onChangeColor}
+          onRequestNewColor={onRequestNewColor}
+          onRemoveColor={onRemoveColor}
+          editMode={state === 'editingPalette'}
+          style={{ marginBottom: bottom }}
+        />
+      ) : (
+        <ColorChooser value={selectedColor} onChangeColor={onChangeColor} />
+      )}
+    </BottomSheetModal>
   );
 };
-
-// recommended to memo/pure component flastlist item
-const ColorPickerItemMemo = memo(ColorPickerItem);
-const ITEM_MARGIN = 10;
-
-const BORDER_WIDTH = 2;
 
 export default ColorPicker;
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'flex-start' },
-  centerAlign: { justifyContent: 'center', alignItems: 'center' },
-  iconPlus: { height: 17, width: 17, tintColor: colors.grey200 },
-  itemContainer: {
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: ITEM_MARGIN / 2,
-    marginRight: ITEM_MARGIN / 2,
-    marginTop: 5,
-  },
-  removeColorButton: {
-    flex: 1,
-  },
-});

@@ -1,4 +1,3 @@
-import { useIntl } from 'react-intl';
 import { Text } from 'react-native';
 import { useAvailableFonts } from '#helpers/mediaHelpers';
 import BottomSheetModal from './BottomSheetModal';
@@ -20,17 +19,12 @@ const FontPicker = ({
   onRequestClose: () => void;
 }) => {
   const fonts = useAvailableFonts();
-  const intl = useIntl();
   return (
     <BottomSheetModal
       visible={visible}
-      onValidate={onRequestClose}
-      title={title}
+      onRequestClose={onRequestClose}
       height={height}
-      validationButtonLabel={intl.formatMessage({
-        defaultMessage: 'Add',
-        description: 'FontPicker - BottomSheetModal - Validation button label',
-      })}
+      headerTitle={title}
     >
       <SelectList
         selectedItem={value}

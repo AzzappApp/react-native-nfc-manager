@@ -16,6 +16,7 @@ type CoverEditionForegroundPanelProps = {
   foregroundStyle: CardCoverForegroundStyleInput | null | undefined;
   onForegroundChange: (foregroundId: string | null) => void;
   onForegroundStyleChange: (style: CardCoverForegroundStyleInput) => void;
+  bottomSheetHeights: number;
   style: StyleProp<ViewStyle>;
 };
 
@@ -25,22 +26,26 @@ const CoverEditionForegroundPanel = ({
   foregroundStyle,
   onForegroundChange,
   onForegroundStyleChange,
+  bottomSheetHeights,
   style,
 }: CoverEditionForegroundPanelProps) => {
-  const { coverForegrounds } = useFragment(
+  const { coverForegrounds, profile } = useFragment(
     graphql`
       fragment CoverEditionForegroundPanel_viewer on Viewer {
         coverForegrounds {
           ...CoverLayerlist_layers
+        }
+        profile {
+          ...ProfileColorPalette_profile
         }
       }
     `,
     viewer,
   );
 
-  const color = foregroundStyle?.color ?? '#000000';
   const [currentTab, setCurrentTab] = useState('foreground');
 
+  const color = foregroundStyle?.color ?? '#000000';
   const onColorChange = (color: string) => {
     onForegroundStyleChange({ color });
   };
@@ -49,7 +54,7 @@ const CoverEditionForegroundPanel = ({
   return (
     <View style={[styles.root, style]}>
       <TabsBar
-        currentTab={currentTab}
+        currentTab="foreground"
         onTabPress={setCurrentTab}
         variant="topbar"
         tabs={[
@@ -72,19 +77,25 @@ const CoverEditionForegroundPanel = ({
           },
         ]}
       />
-      {currentTab === 'foreground' ? (
-        <CoverLayerList
-          layers={coverForegrounds}
-          selectedLayer={foreground}
-          tintColor={color}
-          onSelectLayer={onForegroundChange}
-          style={styles.content}
-        />
-      ) : (
+      <CoverLayerList
+        layers={coverForegrounds}
+        selectedLayer={foreground}
+        tintColor={color}
+        onSelectLayer={onForegroundChange}
+        style={styles.content}
+      />
+      {profile && (
         <ProfileColorPalette
+          profile={profile}
+          visible={currentTab === 'color'}
           selectedColor={color}
           onChangeColor={onColorChange}
-          style={styles.content}
+          onRequestClose={() => setCurrentTab('foreground')}
+          height={bottomSheetHeights}
+          title={intl.formatMessage({
+            defaultMessage: 'Foreground color',
+            description: 'Title of the foreground color picker',
+          })}
         />
       )}
     </View>
