@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "build:app": "formatjs compile-folder --ast src/app compiled/app",
-    "build:web": "formatjs compile-folder --ast src/web compiled/web"
+    "build:web": "formatjs compile-folder --ast src/web compiled/web",
+    "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {
     "@formatjs/cli": "^5.1.12"

@@ -6,7 +6,8 @@
     "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc -p tsconfig.next.json --noEmit"
+    "typecheck": "tsc -p tsconfig.next.json --noEmit",
+    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
   "devScripts": [
     "dev"
