@@ -1,3 +1,5 @@
+import getRuntimeEnvironment from './getRuntimeEnvironment';
+
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
 
@@ -16,6 +18,12 @@ export const getImageURLForSize = (
   height?: number,
   pixelRatio = 1,
 ) => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    getRuntimeEnvironment() === 'react-native'
+  ) {
+    throw new Error('getImageURLForSize is not supported on react-native');
+  }
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
   }
@@ -38,6 +46,12 @@ export const getVideoUrlForSize = (
   height?: number,
   pixelRatio = 1,
 ) => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    getRuntimeEnvironment() === 'react-native'
+  ) {
+    throw new Error('getVideoUrlForSize is not supported on react-native');
+  }
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.mp4`;
   }
@@ -60,6 +74,12 @@ export const getVideoThumbnailURL = (
   height?: number,
   pixelRatio = 1,
 ) => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    getRuntimeEnvironment() === 'react-native'
+  ) {
+    throw new Error('getVideoThumbnailURL is not supported on react-native');
+  }
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.jpg`;
   }
