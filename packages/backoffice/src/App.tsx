@@ -111,9 +111,6 @@ const App = () => {
       <Resource {...coverLayerList} />
       <Resource {...coverTemplateList} />
       <Resource name="Profile" list={ListGuesser} />
-      <Resource name="CardCover" list={ListGuesser} />
-      <Resource name="Post" list={ListGuesser} />
-      <Resource name="Media" list={ListGuesser} />
     </Admin>
   );
 };

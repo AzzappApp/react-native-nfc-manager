@@ -1,11 +1,29 @@
+import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { isValidHex } from '@azzapp/shared/stringHelpers';
 
-export const validateFormCover = (values: any) => {
+export const validateFormCover = async (
+  values: any,
+  imageDimension: { width: number; height: number } | undefined,
+) => {
   let errors = { data: {} } as any;
   //this will be a quick n dirty validation form
-  if (values.data.sourceMediaId == null) {
-    errors.sourceMediaId = 'Image is required';
+
+  if (values.data.sourceMedia == null) {
+    errors.data.sourceMedia = { id: 'Image is required' };
   }
+  if (imageDimension && imageDimension.width !== 0) {
+    //check the ratio
+    const ratio = imageDimension.width / imageDimension.height;
+    if (ratio !== COVER_RATIO) {
+      errors.data.sourceMedia = {
+        id: `Image ratio is not respected, should be ${COVER_RATIO}`,
+      };
+    }
+  }
+  if (values.category?.en == null) {
+    errors.category = { en: 'Category is required' };
+  }
+
   if (values.data.backgroundId != null) {
     let bgErrors = {} as any;
     if (values.data.backgroundStyle == null) {

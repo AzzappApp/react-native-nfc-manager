@@ -24,6 +24,7 @@ const CoverTempalteList = () => {
           }}
         />
         <TextField label="Name" source="name" />
+        <TextField label="Category" source="category.en" />
         <DateField label="Creation Date" source="createdAt" />
       </Datagrid>
     </List>

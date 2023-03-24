@@ -33,8 +33,8 @@ const CoverTemplatePreview: React.FC<CoverTemplatePreview> = ({
     () => containerWidth / COVER_BASE_WIDTH,
     [containerWidth],
   );
+
   const {
-    sourceMediaId,
     foregroundId,
     backgroundId,
     foregroundStyle,
@@ -45,15 +45,19 @@ const CoverTemplatePreview: React.FC<CoverTemplatePreview> = ({
     subTitleStyle,
     contentStyle,
   } = values;
-
-  const sourceMedia = useMemo(() => {
-    if (sourceMediaId) {
-      if (typeof sourceMediaId === 'string') {
-        return getImageURLForSize(sourceMediaId, undefined, containerHeight, 1);
+  const sourceMediaValidated = useMemo(() => {
+    if (values.sourceMedia) {
+      if (typeof values.sourceMedia.id === 'string') {
+        return getImageURLForSize(
+          values.sourceMedia.id,
+          undefined,
+          containerHeight,
+          1,
+        );
       }
-      return sourceMediaId.src;
+      return values.sourceMedia?.id?.src;
     }
-  }, [containerHeight, sourceMediaId]);
+  }, [containerHeight, values]);
 
   const orientation = contentStyle?.orientation;
   const placement = contentStyle?.placement;
@@ -252,7 +256,7 @@ const CoverTemplatePreview: React.FC<CoverTemplatePreview> = ({
           />
         )}
         <img
-          src={sourceMedia}
+          src={sourceMediaValidated}
           height={containerHeight}
           style={{
             zIndex: 2,

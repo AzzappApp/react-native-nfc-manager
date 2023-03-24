@@ -10,6 +10,7 @@ import {
   SaveButton,
   Toolbar,
 } from 'react-admin';
+import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { uploadMedia, uploadSign } from '@azzapp/shared/WebAPI';
 import { injectToken } from '#App';
 import { getTokens } from '#helpers/tokenStore';
@@ -79,8 +80,8 @@ const CoverLayerCreate = () => {
               source="uri"
               label=""
               accept="image/png"
-              helperText="No control is done on the width, height, ratio and format of the
-          image. Please test the image before uploading it."
+              helperText={`IMAGE SHOULD BE USING THE COVER RATIO ${COVER_RATIO} No control is done on t format of the
+          image. Please test the image before uploading it.`}
             >
               <ImageField
                 source="src"

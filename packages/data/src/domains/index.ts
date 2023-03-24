@@ -11,12 +11,14 @@ import type {
   User,
   ProfileKind,
   Profile,
+  CoverTemplate,
 } from '@prisma/client';
 
 export type {
   Card,
   CardCover,
   CardModule,
+  CoverTemplate,
   CoverLayer,
   Follow,
   Media,
@@ -38,3 +40,4 @@ export * from './users';
 export * from './medias';
 export * from './follows';
 export * from './profiles';
+export * from './coverTemplates';

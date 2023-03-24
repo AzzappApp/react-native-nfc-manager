@@ -39,7 +39,7 @@ export type CropperProps = {
    * A callback that will be called when the crop data change
    * @param cropData the new crop data
    */
-  onCropDataChange: (cropData: CropData) => void;
+  onCropDataChange?: (cropData: CropData) => void;
   /**
    * A callback that will be called when the displayed image layout change
    */
@@ -193,7 +193,7 @@ const withCropMode = <
     );
 
     useEffect(() => {
-      if (!isEqual(cropData, editionParameters?.cropData)) {
+      if (!isEqual(cropData, editionParameters?.cropData) && onCropDataChange) {
         onCropDataChange(cropData);
       }
     }, [cropData, editionParameters?.cropData, onCropDataChange]);
@@ -272,7 +272,7 @@ const withCropMode = <
       let animationDones = 0;
       const onAnimationEnd = () => {
         animationDones += 1;
-        if (animationDones >= animationsNb) {
+        if (animationDones >= animationsNb && onCropDataChange) {
           onCropDataChange(cropData);
         }
       };

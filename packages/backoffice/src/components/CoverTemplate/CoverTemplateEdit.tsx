@@ -11,11 +11,14 @@ import { validateFormCover } from './CoverValidator';
 
 const CoverTemplateEdit = () => {
   const [changeValue, setChangeValue] = useState<any>({});
+  const [imageDimension, setImageDimension] = useState<{
+    width: number;
+    height: number;
+  }>();
   const transform = async (dataForm: Record<string, any>) => {
     const { data, category, colorPalette, ...rest } = dataForm;
     try {
-      let mediaId = data.sourceMediaId;
-      if (data.sourceMediaId.rawFile) {
+      if (data.sourceMedia.id?.rawFile != null) {
         const { uploadURL, uploadParameters } = await uploadSign(
           {
             kind: 'image',
@@ -25,12 +28,12 @@ const CoverTemplateEdit = () => {
         );
 
         const { promise: uploadPromise } = uploadMedia(
-          data.sourceMediaId.rawFile,
+          data.sourceMedia.id.rawFile,
           uploadURL,
           uploadParameters,
         );
         const { public_id } = await uploadPromise;
-        mediaId = public_id;
+        data.sourceMedia = { ...imageDimension, id: public_id, kind: 'image' };
       }
 
       if (colorPalette && colorPalette.length > 0) {
@@ -38,10 +41,11 @@ const CoverTemplateEdit = () => {
       } else {
         delete rest.colorPalette;
       }
-
-      data.sourceMediaId = mediaId;
+      data.merged = dataForm.merged;
+      data.segmented = dataForm.segmented;
       rest.category = JSON.stringify(category);
-      rest.data = JSON.stringify(data);
+
+      rest.data = data;
 
       return rest;
     } catch (error) {
@@ -61,7 +65,7 @@ const CoverTemplateEdit = () => {
         },
       ),
     );
-    return validateFormCover(values);
+    return validateFormCover(values, imageDimension);
   };
 
   return (
@@ -69,7 +73,10 @@ const CoverTemplateEdit = () => {
       transform={transform}
       aside={<CoverTemplatePreview values={changeValue} />}
     >
-      <CoverTemplate validate={validateForm} />
+      <CoverTemplate
+        validate={validateForm}
+        setImageDimension={setImageDimension}
+      />
     </Edit>
   );
 };

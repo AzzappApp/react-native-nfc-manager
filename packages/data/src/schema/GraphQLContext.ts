@@ -6,8 +6,16 @@ import {
   getUsersCards,
   getProfilesByIds,
   getMediasByIds,
+  getCoverTemplatesByIds,
 } from '#domains';
-import type { Card, CardCover, Post, Media, Profile } from '#domains';
+import type {
+  Card,
+  CardCover,
+  Post,
+  Media,
+  Profile,
+  CoverTemplate,
+} from '#domains';
 import type { Viewer } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
@@ -18,6 +26,7 @@ export type GraphQLContext = {
   coverLoader: DataLoader<string, CardCover | null>;
   postLoader: DataLoader<string, Post | null>;
   mediaLoader: DataLoader<string, Media | null>;
+  coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
 };
 
 export const createGraphQLContext = (userInfos?: Viewer): GraphQLContext => {
@@ -31,5 +40,6 @@ export const createGraphQLContext = (userInfos?: Viewer): GraphQLContext => {
     coverLoader: new DataLoader(getCardCoversByIds),
     postLoader: new DataLoader(getPostsByIds),
     mediaLoader: new DataLoader(getMediasByIds),
+    coverTemplateLoader: new DataLoader(getCoverTemplatesByIds),
   };
 };

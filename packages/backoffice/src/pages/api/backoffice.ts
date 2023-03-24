@@ -129,6 +129,40 @@ const dataProvider: DataProvider<ResourceType> = {
     delete params.data.createdAt;
     delete params.data.updatedAt;
 
+    if (resource === 'CoverTemplate') {
+      //create a media for the cover template
+
+      await db.transaction().execute(async trx => {
+        const dataTemplate = params.data.data;
+        //dataTempalte is a stringified json, so I need to have ALL the informations.
+        // issue with the media, get the actual media to check is already in Media ressrouce
+        if (dataTemplate.sourceMedia?.id) {
+          const existingData = await trx
+            .selectFrom('Media')
+            .selectAll()
+            .where('id', '=', dataTemplate.sourceMedia.id)
+            .execute();
+          if (existingData && existingData.length === 0) {
+            const media = params.data.data.sourceMedia;
+            await trx.insertInto('Media').values(media).execute();
+            dataTemplate.sourceMediaId = media.id;
+          }
+        }
+        const templateWithMedia = {
+          ...params.data,
+          data: JSON.stringify(dataTemplate),
+        };
+
+        await trx
+          .updateTable(resource)
+          .set({ ...templateWithMedia })
+          .where('id', '=', params.id as any)
+          .executeTakeFirstOrThrow();
+      });
+
+      return this.getOne(resource, params);
+    }
+
     await db
       .updateTable(resource)
       .set({ ...params.data })
@@ -147,8 +181,30 @@ const dataProvider: DataProvider<ResourceType> = {
     return { data: params.ids };
   },
   async create(resource, params) {
-    //TOD: should we limite the creation of element
-    if (resource === 'CoverLayer' || resource === 'CoverTemplate') {
+    if (resource === 'CoverTemplate') {
+      //create a media for the cover template
+      const media = params.data.data.sourceMedia;
+      const id = params.data.id ?? createId();
+      await db.transaction().execute(async trx => {
+        await trx.insertInto('Media').values(media).execute();
+        const templateWithMedia = {
+          ...params.data,
+          data: JSON.stringify({
+            ...params.data.data,
+            sourceMediaId: media.id,
+          }),
+        };
+
+        await trx
+          .insertInto(resource)
+          .values({ id, ...templateWithMedia })
+          .executeTakeFirstOrThrow();
+      });
+
+      return this.getOne(resource, { id });
+    }
+
+    if (resource === 'CoverLayer') {
       const id = params.data.id ?? createId();
       await db
         .insertInto(resource)

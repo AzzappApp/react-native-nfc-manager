@@ -17,6 +17,7 @@ import {
   getAllProfilesWithCard,
   getAllProfilesWithCardCount,
   getCoverLayers,
+  getCoverTemplatesByKind,
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
@@ -26,9 +27,10 @@ import {
   cursorToDate,
 } from '#helpers/connectionsHelpers';
 import { CoverLayerGraphQL } from './CardGraphQL';
+import CoverTemplateGraphQL from './CoverTemplateGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
-import type { Post, Profile } from '#domains';
+import type { Post, Profile, CoverTemplate } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { Viewer } from '@azzapp/auth/viewer';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
@@ -219,6 +221,21 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         new GraphQLList(new GraphQLNonNull(CoverLayerGraphQL)),
       ),
       resolve: async () => getCoverLayers('foreground'),
+    },
+    coverTemplates: {
+      type: new GraphQLNonNull(new GraphQLList(CoverTemplateGraphQL)),
+      description: 'Fetches all cover templates for a given kind',
+      resolve: async (
+        viewer,
+        _,
+        { profileLoader },
+      ): Promise<Array<CoverTemplate | null>> => {
+        if (viewer.isAnonymous) {
+          return [];
+        }
+        const profile = await profileLoader.load(viewer.profileId);
+        return getCoverTemplatesByKind(profile?.profileKind ?? 'personal');
+      },
     },
   }),
 });

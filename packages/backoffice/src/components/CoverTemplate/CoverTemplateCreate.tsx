@@ -10,8 +10,13 @@ import { validateFormCover } from './CoverValidator';
 
 const CoverTemplateCreate = () => {
   const [changeValue, setChangeValue] = useState<any>({});
+  const [imageDimension, setImageDimension] = useState<{
+    width: number;
+    height: number;
+  }>();
   const transform = async (dataForm: Record<string, any>) => {
     const { data, category, colorPalette, ...rest } = dataForm;
+
     try {
       const { uploadURL, uploadParameters } = await uploadSign(
         {
@@ -22,13 +27,13 @@ const CoverTemplateCreate = () => {
       );
 
       const { promise: uploadPromise } = uploadMedia(
-        data.sourceMediaId.rawFile,
+        data.sourceMedia.id.rawFile,
         uploadURL,
         uploadParameters,
       );
 
       const { public_id } = await uploadPromise;
-      data.sourceMediaId = public_id;
+      data.sourceMedia = { ...imageDimension, id: public_id, kind: 'image' };
 
       if (colorPalette && colorPalette.length > 0) {
         rest.colorPalette = colorPalette;
@@ -36,8 +41,11 @@ const CoverTemplateCreate = () => {
         delete rest.colorPalette;
       }
 
-      rest.category = JSON.stringify(category);
-      rest.data = JSON.stringify(data);
+      rest.category = JSON.stringify({ en: category });
+      //add mergeed and segmented also in data for simplification in frontend
+      data.merged = dataForm.merged;
+      data.segmented = dataForm.segmented;
+      rest.data = data;
 
       return rest;
     } catch (error) {
@@ -56,7 +64,7 @@ const CoverTemplateCreate = () => {
         },
       ),
     );
-    return validateFormCover(values);
+    return validateFormCover(values, imageDimension);
   };
 
   return (
@@ -64,7 +72,10 @@ const CoverTemplateCreate = () => {
       transform={transform}
       aside={<CoverTemplatePreview values={changeValue} />}
     >
-      <CoverTemplate validate={validateForm} />
+      <CoverTemplate
+        validate={validateForm}
+        setImageDimension={setImageDimension}
+      />
     </Create>
   );
 };

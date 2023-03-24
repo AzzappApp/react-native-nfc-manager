@@ -48,6 +48,7 @@ import type {
 } from '#helpers/mediaHelpers';
 import type { CoverEditionScreenCoverRendererHandle } from './CoverEditionScreenCoverRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
+import type { CoverEditionScreen_template$key } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
 import type {
   CardCoverBackgroundStyleInput,
@@ -66,14 +67,19 @@ export type CoverEditionScreenProps = {
    * The relay viewer reference
    */
   viewer: CoverEditionScreen_viewer$key | null;
+
+  coverTemplate?: CoverEditionScreen_template$key | null;
 };
 
 /**
  * Allows un user to edit his Cover, the cover changes, can be previsualized
  */
-const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
+const CoverEditionScreen = ({
+  viewer: viewerKey,
+  coverTemplate: coverTemplateKey,
+}: CoverEditionScreenProps) => {
   //#region Data dependencies
-  const viewer = useFragment(
+  const viewer = useFragment<CoverEditionScreen_viewer$key>(
     graphql`
       fragment CoverEditionScreen_viewer on Viewer {
         ...CoverEditionBackgroundPanel_viewer
@@ -108,9 +114,60 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     viewerKey,
   );
 
+  const coverTemplate = useFragment<CoverEditionScreen_template$key>(
+    graphql`
+      fragment CoverEditionScreen_template on CoverTemplate {
+        id
+        colorPalette
+        tags
+        data {
+          mediaStyle
+          sourceMedia {
+            uri
+            id
+            width
+            height
+          }
+          backgroundStyle {
+            backgroundColor
+            patternColor
+          }
+          background {
+            id
+          }
+          foreground {
+            id
+          }
+          foregroundStyle {
+            color
+          }
+          segmented
+          merged
+          title
+          contentStyle {
+            orientation
+            placement
+          }
+          titleStyle {
+            fontFamily
+            fontSize
+            color
+          }
+          subTitle
+          subTitleStyle {
+            fontFamily
+            fontSize
+            color
+          }
+        }
+      }
+    `,
+    coverTemplateKey ?? null,
+  );
+
   // we separate the cover fragment from the viewer fragment
   // for refetching in mutation response
-  const cover = useFragment(
+  const cover = useFragment<CoverEditionScreen_cover$key>(
     graphql`
       fragment CoverEditionScreen_cover on CardCover {
         mediaStyle
@@ -159,8 +216,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         }
       }
     `,
-    (viewer?.profile?.card?.cover as CoverEditionScreen_cover$key | null) ??
-      null,
+    viewer?.profile?.card?.cover ?? null,
   );
 
   //#endregion
@@ -168,16 +224,28 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   //#region Updates management
   const { firstName, lastName, companyName, profileKind } =
     viewer?.profile ?? {};
-  const [updates, setUpdates] = useState<CoverEditionValue>(
-    cover
-      ? {}
-      : {
+  const [updates, setUpdates] = useState<CoverEditionValue>(() => {
+    if (cover) return {};
+    if (coverTemplate) {
+      const { background, foreground, ...rest } = coverTemplate.data;
+      if (coverTemplate?.data) {
+        return {
+          ...rest,
+          backgroundId: background?.id,
+          foregroundId: foreground?.id,
           title:
             profileKind === 'personal'
               ? `${firstName} ${lastName}`
               : companyName,
-        },
-  );
+        };
+      }
+    }
+    return {
+      title:
+        profileKind === 'personal' ? `${firstName} ${lastName}` : companyName,
+    };
+  });
+
   const updateFields = useCallback(
     <Key extends keyof CoverEditionValue>(
       ...entries: Array<[Key, CoverEditionValue[Key]]>
@@ -187,24 +255,11 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         entries.forEach(([key, value]) => {
           switch (key) {
             case 'sourceMedia': {
-              const media = value as {
-                uri: string;
-                width: number;
-                height: number;
-              };
-              if (media?.uri === cover?.sourceMedia.id) {
-                delete updates.sourceMedia;
-              } else {
-                updates.sourceMedia = value as any;
-              }
+              updates.sourceMedia = value as any;
               break;
             }
             case 'maskMedia':
-              if (value === cover?.maskMedia.id) {
-                delete updates.maskMedia;
-              } else {
-                updates.maskMedia = value as any;
-              }
+              updates.maskMedia = value as any;
               break;
             case 'backgroundId':
               if (value === cover?.background?.id) {
@@ -356,7 +411,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             ? ([mediaStyle.filter] as string[])
             : undefined,
           quality: 0.8,
-          maskUri: segmented ? updates.maskMedia ?? cover?.maskMedia.uri : null,
+          maskUri: segmented
+            ? updates.maskMedia ?? cover?.maskMedia?.uri
+            : null,
           backgroundColor: backgroundStyle?.backgroundColor,
           backgroundImageUri: backgroundUri,
           backgroundImageTintColor: backgroundStyle?.patternColor,
@@ -373,14 +430,17 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       updates.subTitle != null ||
       updates.subTitleStyle != null;
 
-    const textPreviewMediaPath =
-      (shouldRecreateTextPreview && (await rendererRef.current?.capture())) ??
-      null;
+    const textPreviewMediaPath = ((shouldRecreateTextPreview &&
+      (await rendererRef.current?.capture())) ??
+      null) as string | null; // could have a 'false' type
+
+    const sourceMediaId = sourceMedia?.id;
+    const shouldRecreateSourceMedia = updates.sourceMedia && !sourceMediaId;
 
     const mediaToUploads = [
       mediaPath,
       textPreviewMediaPath,
-      updates.sourceMedia?.uri, // TODO limit the size of the source media
+      shouldRecreateSourceMedia && updates.sourceMedia?.uri, // TODO limit the size of the source media
       updates.maskMedia, // TODO limit the size of the mask media
     ];
 
@@ -435,7 +495,6 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         ),
       );
     }
-
     let mediaInput: MediaInput | undefined;
     let textPreviewMediaInput: MediaInput | undefined;
     let sourceMediaInput: MediaInput | undefined;
@@ -464,13 +523,24 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     }
 
     const input: UpdateCoverInput = {};
-    if (mediaInput) {
+
+    if (shouldRecreateMedia && mediaInput) {
       input.media = mediaInput;
     }
-    if (textPreviewMediaInput) {
+
+    if (shouldRecreateTextPreview && textPreviewMediaInput) {
       input.textPreviewMedia = textPreviewMediaInput;
     }
-    if (sourceMediaInput) {
+
+    if (!cover && sourceMediaId) {
+      // Business case using the default image
+      input.sourceMedia = {
+        id: sourceMediaId,
+        height: sourceMedia.height,
+        width: sourceMedia.width,
+        kind: 'image',
+      };
+    } else if (sourceMediaInput) {
       input.sourceMedia = sourceMediaInput;
     }
 
@@ -559,7 +629,15 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   //#endregion
 
   //#region Image Picker state
-  const [showImagePicker, setShowImagePicker] = useState(!cover);
+  const [showImagePicker, setShowImagePicker] = useState(() => {
+    if (cover) {
+      return false;
+    }
+    if (coverTemplate?.data && viewer?.profile?.profileKind !== 'personal') {
+      return false;
+    }
+    return true;
+  });
 
   const onPickImage = () => {
     setShowImagePicker(true);
@@ -847,6 +925,10 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     setBottomSheetHeights(event.nativeEvent.layout.height);
   };
 
+  if (!viewer) {
+    return null;
+  }
+
   return (
     <>
       <KeyboardAvoidingView
@@ -1025,7 +1107,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               )}
               {currentTab === 'title' && (
                 <CoverTitleEditionPanel
-                  viewer={viewer!}
+                  viewer={viewer}
                   title={title}
                   subTitle={subTitle}
                   titleStyle={titleStyle}
@@ -1042,7 +1124,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               )}
               {currentTab === 'background' && (
                 <CoverEditionBackgroundPanel
-                  viewer={viewer!}
+                  viewer={viewer}
                   background={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}
@@ -1053,7 +1135,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               )}
               {currentTab === 'foreground' && (
                 <CoverEditionForegroundPanel
-                  viewer={viewer!}
+                  viewer={viewer}
                   foreground={foregroundId}
                   foregroundStyle={foregroundStyle}
                   onForegroundChange={onForegroundChange}
@@ -1200,7 +1282,12 @@ const styles = StyleSheet.create({
 });
 
 type CoverEditionValue = {
-  sourceMedia?: { uri: string; width: number; height: number } | null;
+  sourceMedia?: {
+    id?: string;
+    uri: string;
+    width: number;
+    height: number;
+  } | null;
   maskMedia?: string | null;
   backgroundId?: string | null;
   backgroundStyle?: CardCoverBackgroundStyleInput | null;

@@ -76,7 +76,10 @@ export type NewPostRoute = {
 
 export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
-  params: { module: string };
+  params: {
+    module: string;
+    templateId?: string;
+  };
 };
 
 export type Route =

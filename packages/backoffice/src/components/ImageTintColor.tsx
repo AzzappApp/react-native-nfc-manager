@@ -27,7 +27,6 @@ const IconTint: React.FunctionComponent<IconTintProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    console.log(color);
     const { current: canvas } = canvasRef;
     const pic = new Image();
     if (color && canvas) {

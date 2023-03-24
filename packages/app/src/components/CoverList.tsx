@@ -18,6 +18,11 @@ type CoverListProps = {
   coverStyle?: StyleProp<ViewStyle>;
   horizontal?: boolean;
   numColums?: number;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
 };
 // TODO docs and tests once this component is production ready
 const CoverList = ({
@@ -28,6 +33,7 @@ const CoverList = ({
   containerStyle,
   horizontal = true,
   numColums = 1,
+  ListHeaderComponent,
 }: CoverListProps) => {
   const coverWidth = useMemo(() => {
     //TODO: refactoring aka do it better :). number is required. flatten will give a string.
@@ -38,6 +44,7 @@ const CoverList = ({
     }
     return COVER_BASE_WIDTH;
   }, [coverStyle]);
+
   const users = useFragment(
     graphql`
       fragment CoverList_users on Profile @relay(plural: true) {
@@ -100,6 +107,7 @@ const CoverList = ({
       contentContainerStyle={[styles.container, containerStyle]}
       style={style}
       getItemLayout={getItemLayout}
+      ListHeaderComponent={ListHeaderComponent}
     />
   );
 };

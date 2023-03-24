@@ -13,6 +13,7 @@
     "dev"
   ],
   "dependencies": {
+    "@azzapp/auth": "*",
     "@azzapp/data": "*",
     "@azzapp/shared": "*",
     "lodash": "^4.17.21",

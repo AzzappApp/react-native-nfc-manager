@@ -51,7 +51,7 @@ type CoverEditionScreenCoverRendererProps = {
   filter?: string | null;
   computing?: boolean | null;
   cropEditionMode?: boolean | null;
-  onCropDataChange: (cropData: CropData) => void;
+  onCropDataChange?: (cropData: CropData) => void;
 };
 
 export type CoverEditionScreenCoverRendererHandle = {

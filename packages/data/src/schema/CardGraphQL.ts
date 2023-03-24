@@ -72,7 +72,7 @@ export const CardCoverGraphQL = new GraphQLObjectType<
         mediaLoader.load(cardCover.sourceMediaId) as Promise<Media>,
     },
     maskMedia: {
-      type: new GraphQLNonNull(MediaImageGraphQL),
+      type: MediaImageGraphQL,
       description: 'The mask media of the cover',
       resolve: (cardCover, _, { mediaLoader }): Promise<Media | null> | null =>
         // TODO prevent others to access to the source media

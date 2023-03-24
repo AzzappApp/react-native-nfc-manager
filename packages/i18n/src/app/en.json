@@ -1,4 +1,8 @@
 {
+  "+eDqFA": {
+    "defaultMessage": "Cancel",
+    "description": "OnBoarding Cover Component - Link Cancel"
+  },
   "+miIiv": {
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
@@ -46,6 +50,10 @@
   "4RJ0I8": {
     "defaultMessage": "Password",
     "description": "Password input placeholder"
+  },
+  "4lSCO+": {
+    "defaultMessage": "Create your cover from scratch",
+    "description": "TemplateSelector - AccessibilityLabel Button Create your cover from scratch"
   },
   "5/HOhV": {
     "defaultMessage": "Profiles",
@@ -119,6 +127,10 @@
     "defaultMessage": "Tap me to show the QR Code fullscreen",
     "description": "CoverRenderer - Accessibility Qr code button"
   },
+  "7j6ah2": {
+    "defaultMessage": "Select this cover template template for your profile",
+    "description": "TemplateSelectorTemplateItem accessibilityHint template item"
+  },
   "87390w": {
     "defaultMessage": "Let's get started with Azzapp!",
     "description": "Signup Screen - Let's get started with Azzapp! subtitle"
@@ -178,6 +190,10 @@
   "C1R1bc": {
     "defaultMessage": "Fade",
     "description": "Fade photo filter name"
+  },
+  "C3M81B": {
+    "defaultMessage": "Cancel and go back",
+    "description": "TemplateSelector - AccessibilityLabel Link Cancel"
   },
   "CCNK+L": {
     "defaultMessage": "Confirm password",
@@ -623,6 +639,10 @@
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
   },
+  "kAtJlh": {
+    "defaultMessage": "Create your cover from scratch",
+    "description": "TemplateSelector - Create your cover from scratch Button"
+  },
   "kjYrL+": {
     "defaultMessage": "Color #1",
     "description": "Label of the background pattern color tab in cover edition"
@@ -662,6 +682,10 @@
   "m/3KOp": {
     "defaultMessage": "Bottom center",
     "description": "Label of the bottom center position in cover edition"
+  },
+  "m/dw+k": {
+    "defaultMessage": "Horizontal list of Cover Templates",
+    "description": "TemplateSelector - AccessibilityLabel List Templates"
   },
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
@@ -710,6 +734,10 @@
   "nMtsXg": {
     "defaultMessage": "Shadow",
     "description": "Shadow image edition parameters name"
+  },
+  "nQzYNz": {
+    "defaultMessage": "Choose a visual for your cover",
+    "description": "OnBoarding Cover Component - Title"
   },
   "noNWRA": {
     "defaultMessage": "Cut Video",
@@ -839,6 +867,10 @@
     "defaultMessage": "Chrome",
     "description": "Chrome photo filter name"
   },
+  "uWN1s2": {
+    "defaultMessage": "Tap to cancel the creation fo your cover",
+    "description": "TemplateSelector - AccessibilityHint Link Cancel"
+  },
   "uYooK1": {
     "defaultMessage": "Enter your company name",
     "description": "OnBoarding Name Company Screen - Enter your company name placeholder"
@@ -931,6 +963,10 @@
     "defaultMessage": "Tap to search for {word}",
     "description": "Recent Search - Accessibiltity Label remove element from history"
   },
+  "z0uhsM": {
+    "defaultMessage": "You’ll be able to modify it later",
+    "description": "OnBoarding Cover Component - Subtitle"
+  },
   "z7TgL0": {
     "defaultMessage": "Tonal",
     "description": "Tonal photo filter name"
@@ -946,5 +982,9 @@
   "zSfUYY": {
     "defaultMessage": "Company name",
     "description": "OnBoarding Name Company Screen - Company name label textinput"
+  },
+  "zXfzb7": {
+    "defaultMessage": "or",
+    "description": "OnBoarding Cover Component - Or text"
   }
 }

@@ -144,5 +144,3 @@ packages/web/.vscode/settings.json
 
 packages/backoffice/.vscode/settings.json
 
-# vscode extension that is not needed in the repo
-.vscode/restore-terminals.json

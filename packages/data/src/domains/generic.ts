@@ -3,6 +3,7 @@ import db from './db';
 import type {
   Card,
   CardCover,
+  CoverTemplate,
   Media,
   Post,
   Prisma,
@@ -11,7 +12,14 @@ import type {
 } from '@prisma/client';
 import type { ColumnType } from 'kysely';
 
-type EntityKind = 'Card' | 'CardCover' | 'Media' | 'Post' | 'Profile' | 'User';
+type EntityKind =
+  | 'Card'
+  | 'CardCover'
+  | 'CoverTemplate'
+  | 'Media'
+  | 'Post'
+  | 'Profile'
+  | 'User';
 
 type EntityKindToEntity<T extends EntityKind> = T extends 'Card'
   ? Card
@@ -23,6 +31,8 @@ type EntityKindToEntity<T extends EntityKind> = T extends 'Card'
   ? Post
   : T extends 'Profile'
   ? Profile
+  : T extends 'CoverTemplate'
+  ? CoverTemplate
   : User;
 
 /**

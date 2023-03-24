@@ -107,7 +107,7 @@ const initialisationPromise = init();
 
 const App = () => {
   //we need to decide which route tu use
-  const authenticated = useAuth();
+  const { authenticated } = useAuth();
 
   const locale = useCurrentLocale();
 

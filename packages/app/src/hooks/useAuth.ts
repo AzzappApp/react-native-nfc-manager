@@ -89,5 +89,5 @@ export default function useAuth() {
     };
   }, []);
 
-  return profileID != null;
+  return { authenticated: profileID != null, profileID };
 }

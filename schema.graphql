@@ -128,6 +128,9 @@ type Viewer {
 
   """Return a list of cover foregrounds"""
   coverForegrounds: [CoverLayer!]!
+
+  """Fetches all cover templates for a given kind"""
+  coverTemplates: [CoverTemplate]!
 }
 
 """Represent an Azzapp Profile"""
@@ -188,7 +191,7 @@ type CardCover {
   sourceMedia: MediaImage!
 
   """The mask media of the cover"""
-  maskMedia: MediaImage!
+  maskMedia: MediaImage
 
   """
   The text of the cover renderered as an image to avoid font loading issues
@@ -368,6 +371,47 @@ type ProfileEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""Template for a cover"""
+type CoverTemplate implements Node {
+  """The ID of an object"""
+  id: ID!
+  name: String
+  kind: ProfileKind
+  data: CardCoverTemplate!
+  enabled: Boolean!
+  category: [CoverTemplateCategorGraphQL]
+  colorPalette: [String!]
+  tags: [String!]!
+}
+
+"""Card cover display informations"""
+type CardCoverTemplate {
+  mediaStyle: JSON
+
+  """The source of the media used by the cover"""
+  sourceMedia: MediaImage!
+
+  """The background of the cover"""
+  background: CoverLayer
+  backgroundStyle: CardCoverBackgroundStyle
+  foreground: CoverLayer
+  foregroundStyle: CardCoverForegroundStyle
+  segmented: Boolean!
+  merged: Boolean!
+  title: String
+  titleStyle: CardCoverTextStyle
+  subTitle: String
+  subTitleStyle: CardCoverTextStyle
+  contentStyle: CardCoverContentStyle
+}
+
+"""Category of a cover template"""
+type CoverTemplateCategorGraphQL {
+  """Should be a country code"""
+  id: String
+  cateogry: String
 }
 
 type Mutation {

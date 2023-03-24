@@ -11,12 +11,11 @@ import {
   NumberInput,
   SelectInput,
   RadioButtonGroupInput,
-  ArrayInput,
-  SimpleFormIterator,
   SaveButton,
   Toolbar,
 } from 'react-admin';
 import {
+  COVER_RATIO,
   DEFAULT_PALETTE_COLOR,
   DEFAULT_COVER_CONTENT_PLACEMENT,
   DEFAULT_COVER_CONTENT_ORTIENTATION,
@@ -31,8 +30,10 @@ import type { ValidateForm } from 'react-admin';
 
 const CoverTemplate = ({
   validate,
+  setImageDimension,
 }: {
   validate: ValidateForm | undefined;
+  setImageDimension: (dimension: { width: number; height: number }) => void;
 }) => {
   return (
     <TabbedForm
@@ -107,7 +108,6 @@ const CoverTemplate = ({
           choices={[
             { id: 'personal', name: 'Personal' },
             { id: 'business', name: 'Business' },
-            { id: 'product', name: 'Product' },
           ]}
         />
         <TextInput
@@ -117,35 +117,34 @@ const CoverTemplate = ({
           helperText="Hex Color code separated by  comma. #123453,#87FAEE,#23CA23"
         />
         <SectionTitle label="Category" />
-        <ArrayInput source="category" label="">
-          <SimpleFormIterator inline disableReordering sx={{ marginLeft: 2 }}>
-            <TextInput
-              source="id"
-              label="Country Code"
-              helperText={'For category translation'}
-            />
-            <TextInput
-              source="category"
-              label="Category"
-              helperText={false}
-              sx={{ minWidth: 300 }}
-            />
-          </SimpleFormIterator>
-        </ArrayInput>
+
+        <TextInput
+          source="category.en"
+          label="Country Code - EN language code"
+          fullWidth
+        />
+
         <TextInput source="tags" fullWidth />
       </FormTab>
       <FormTab label="Cover">
         <ImageInput
-          source="data.sourceMediaId"
+          source="data.sourceMedia.id"
           label=""
           accept="image/*"
-          helperText="No control is done on the width, height, ratio and format of the
-          image. Please test the image before uploading it."
+          helperText={`IMAGE SHOULD BE USING THE COVER RATIO ${COVER_RATIO} No control is done on t format of the
+          image. Please test the image before uploading it.`}
         >
           <ImageField
             source="src"
             title=""
             sx={{ backgroundColor: 'rgba(233,233,233,0.2)' }}
+            //@ts-expect-error  onLoad type is not propagated from ra-material-ui
+            onLoad={({ nativeEvent }: any) => {
+              setImageDimension({
+                width: nativeEvent.srcElement.naturalWidth,
+                height: nativeEvent.srcElement.naturalHeight,
+              });
+            }}
           />
         </ImageInput>
         <div style={{ display: 'flex' }}>

@@ -43,7 +43,6 @@ export const intlErrorHandler = (err: any) => {
 };
 
 export const getServerIntl = cache((locale = DEFAULT_LOCALE) => {
-  console.log(locale);
   const messages = getTranslationMessages(locale);
   return createIntl({ locale, messages, onError: intlErrorHandler });
 });

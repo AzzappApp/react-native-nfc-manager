@@ -91,6 +91,7 @@ const OnBoardingScreen = ({ skip }: OnBoardingScreenProps) => {
           input: {
             companyName,
             companyActivityId,
+            isReady: true,
           },
         },
       });

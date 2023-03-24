@@ -86,7 +86,13 @@ const updateCover = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async (
     input: UpdateCoverInput,
-    { auth, cardByProfileLoader, profileLoader, coverLoader }: GraphQLContext,
+    {
+      auth,
+      cardByProfileLoader,
+      profileLoader,
+      coverLoader,
+      mediaLoader,
+    }: GraphQLContext,
   ) => {
     if (auth.isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -106,21 +112,26 @@ const updateCover = mutationWithClientMutationId({
     if (
       !cover &&
       (!input.media ||
-        !input.sourceMedia ||
         !input.textPreviewMedia ||
-        !input.title)
+        !input.title ||
+        !input.sourceMedia)
     ) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
+
     try {
       await db.transaction().execute(async trx => {
         let coverId = cover?.id;
         if (!cover) {
+          // souceMedia can exist in `Media` table (business template + using business image)
+          const mediaExist =
+            (await mediaLoader.load(input.sourceMedia!.id)) != null;
+
           await Promise.all([
-            await createMedia(input.media!, trx),
-            await createMedia(input.sourceMedia!, trx),
-            await createMedia(input.textPreviewMedia!, trx),
-            input.maskMedia && (await createMedia(input.maskMedia, trx)),
+            createMedia(input.media!, trx),
+            !mediaExist && createMedia(input.sourceMedia!, trx),
+            createMedia(input.textPreviewMedia!, trx),
+            input.maskMedia && createMedia(input.maskMedia, trx),
           ]);
 
           const cover = await createCardCover(

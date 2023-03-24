@@ -12,6 +12,7 @@ import CoverEditionScreen from '../CoverEditionScreen';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 import type { CoverEditionScreenProps } from '../CoverEditionScreen';
 import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
+import type { CoverEditionScreen_template$data } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreenTestQuery } from '@azzapp/relay/artifacts/CoverEditionScreenTestQuery.graphql';
 import type { ReactTestInstance } from 'react-test-renderer';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
@@ -137,13 +138,47 @@ describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 
   type CoverData = Omit<CoverEditionScreen_cover$data, ' $fragmentType'>;
+  type CoverTemplateData = Omit<
+    CoverEditionScreen_template$data,
+    ' $fragmentType'
+  >;
+
+  const TEMPLATE_COVER_DATA: CoverTemplateData = {
+    id: 'coverTemplateId',
+    colorPalette: ['#233423'],
+    tags: ['tags'],
+    data: {
+      segmented: false,
+      merged: false,
+      background: null,
+      backgroundStyle: null,
+      foreground: null,
+      foregroundStyle: null,
+      title: 'Template title',
+      contentStyle: null,
+      titleStyle: null,
+      subTitleStyle: null,
+      subTitle: 'Template subTitle',
+      mediaStyle: null,
+      sourceMedia: {
+        id: 'sourceMediaId',
+        uri: 'https://example.com/sourceMedia.png',
+        width: 100,
+        height: 100,
+      },
+    },
+  };
 
   const renderCoverEditionScreen = ({
     coverData = null,
+    coverTemplateData = null,
+    profileKind = 'personal',
     ...props
   }: Partial<
     CoverEditionScreenProps & {
       coverData: CoverData | null;
+      coverTemplateData: CoverTemplateData | null;
+      profileKind: 'business' | 'personal';
     }
   > = {}) => {
     environement = createMockEnvironment();
@@ -160,6 +195,8 @@ describe('CoverEditionScreen', () => {
             firstName: '',
             lastName: '',
             companyName: '',
+            profileKind,
+            colorPalette: ['#233423'],
           },
           coverBackgrounds: range(10).map(i => ({
             id: `coverBackgroundId${i}`,
@@ -170,6 +207,12 @@ describe('CoverEditionScreen', () => {
             uri: `https://example.com/coverForeground${i}.png`,
           })),
         }),
+        CoverTemplate: () => {
+          if (coverTemplateData) {
+            return coverTemplateData;
+          }
+          return null;
+        },
       }),
     );
 
@@ -180,11 +223,20 @@ describe('CoverEditionScreen', () => {
             viewer {
               ...CoverEditionScreen_viewer
             }
+            node(id: "test-cover-template-id") {
+              ...CoverEditionScreen_template
+            }
           }
         `,
         {},
       );
-      return <CoverEditionScreen viewer={data.viewer} {...props} />;
+      return (
+        <CoverEditionScreen
+          viewer={data.viewer}
+          coverTemplate={data.node}
+          {...props}
+        />
+      );
     };
 
     return render(
@@ -254,6 +306,22 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'cancel');
     });
+    expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
+  });
+
+  test('Should render ImagePicker if there is a personal cover template', () => {
+    renderCoverEditionScreen({
+      coverTemplateData: TEMPLATE_COVER_DATA,
+    });
+    expect(screen.queryByTestId('image-picker')).toBeTruthy();
+  });
+
+  test('Should not render ImagePicker if there a business cover template', () => {
+    renderCoverEditionScreen({
+      profileKind: 'business',
+      coverTemplateData: TEMPLATE_COVER_DATA,
+    });
+
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
   });
 
@@ -612,14 +680,14 @@ describe('CoverEditionScreen', () => {
       expect(screen.queryByTestId('font-picker')).toHaveProp('visible', false);
 
       // Color change tests
-      expect(screen.queryByTestId('profile-color-palette-modal')).toHaveProp(
+      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
         'visible',
         false,
       );
       act(() => {
         fireEvent.press(screen.getByLabelText('Color'));
       });
-      expect(screen.queryByTestId('profile-color-palette-modal')).toHaveProp(
+      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
         'visible',
         true,
       );
@@ -628,7 +696,7 @@ describe('CoverEditionScreen', () => {
       });
       act(() => {
         fireEvent(
-          screen.getByTestId('profile-color-palette-modal'),
+          screen.getByTestId('profile-color-palette'),
           'changeColor',
           '#FF3322',
         );
@@ -636,17 +704,14 @@ describe('CoverEditionScreen', () => {
       expect(text).toHaveStyle({
         color: '#FF3322',
       });
-      expect(screen.queryByTestId('profile-color-palette-modal')).toHaveProp(
+      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
         'visible',
         true,
       );
       act(() => {
-        fireEvent(
-          screen.getByTestId('profile-color-palette-modal'),
-          'requestClose',
-        );
+        fireEvent(screen.getByTestId('profile-color-palette'), 'requestClose');
       });
-      expect(screen.queryByTestId('profile-color-palette-modal')).toHaveProp(
+      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
         'visible',
         false,
       );
@@ -812,7 +877,7 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByText('Cancel')).toBeTruthy();
   });
 
-  test.only('Should allow to save if the title is not empty, and if the sourceMedia is not empty', () => {
+  test('Should allow to save if the title is not empty, and if the sourceMedia is not empty', () => {
     renderCoverEditionScreen();
     let saveButton = screen.getByText('Save');
     while (saveButton.props.accessibilityRole !== 'button') {
@@ -835,7 +900,7 @@ describe('CoverEditionScreen', () => {
     act(() => {
       jest.runAllTicks();
     });
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: true });
+    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
     act(() => {
       fireEvent.press(screen.getByLabelText('Title edition'));
     });
