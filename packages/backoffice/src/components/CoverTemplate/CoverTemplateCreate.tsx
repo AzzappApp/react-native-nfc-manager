@@ -41,7 +41,7 @@ const CoverTemplateCreate = () => {
         delete rest.colorPalette;
       }
 
-      rest.category = JSON.stringify({ en: category });
+      rest.category = JSON.stringify(category);
       //add mergeed and segmented also in data for simplification in frontend
       data.merged = dataForm.merged;
       data.segmented = dataForm.segmented;
