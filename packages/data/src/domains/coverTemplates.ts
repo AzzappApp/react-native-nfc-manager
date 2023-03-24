@@ -12,7 +12,7 @@ import type { CoverTemplate, ProfileKind } from '@prisma/client';
 export const getCoverTemplatesByIds = (
   ids: readonly string[],
 ): Promise<Array<CoverTemplate | null>> => {
-  return getEntitiesByIds('Media', ids, 'id');
+  return getEntitiesByIds('CoverTemplate', ids, 'id');
 };
 
 /**

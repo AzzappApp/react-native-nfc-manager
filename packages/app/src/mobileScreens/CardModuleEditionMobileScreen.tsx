@@ -4,7 +4,7 @@ import relayScreen from '#helpers/relayScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
-import type { CardModuleEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CardModuleEditionMobileScreenQuery.graphql';
+import type { CardModuleEditionMobileScreenTemplateQuery } from '@azzapp/relay/artifacts/CardModuleEditionMobileScreenTemplateQuery.graphql';
 import type { TemplateSelector_viewer$key } from '@azzapp/relay/artifacts/TemplateSelector_viewer.graphql';
 
 const CardModuleEditionMobileScreen = ({
@@ -12,7 +12,7 @@ const CardModuleEditionMobileScreen = ({
   route: { params },
 }: RelayScreenProps<
   CardModuleEditionRoute,
-  CardModuleEditionMobileScreenQuery
+  CardModuleEditionMobileScreenTemplateQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
   if (!data.viewer) {
@@ -44,13 +44,22 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
         }
       `;
     default:
+      if (params.templateId) {
+        return graphql`
+          query CardModuleEditionMobileScreenTemplateQuery($templateId: ID!) {
+            viewer {
+              ...CoverEditionScreen_viewer
+            }
+            node(id: $templateId) {
+              ...CoverEditionScreen_template
+            }
+          }
+        `;
+      }
       return graphql`
-        query CardModuleEditionMobileScreenQuery($templateId: ID!) {
+        query CardModuleEditionMobileScreenQuery {
           viewer {
             ...CoverEditionScreen_viewer
-          }
-          node(id: $templateId) {
-            ...CoverEditionScreen_template
           }
         }
       `;
