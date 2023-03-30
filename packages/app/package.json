@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "build:lib": "yarn lib:clean && yarn lib:compile && yarn lib:definition && yarn assets:copy",
     "build:ios": "bundle exec fastlane ios sign",

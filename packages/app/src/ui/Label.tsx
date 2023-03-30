@@ -20,6 +20,14 @@ export type LabelProps = ViewProps & {
    * The style of the error message.
    */
   errorStyle?: StyleProp<TextStyle>;
+
+  /**
+   * Whether to show the error message or not.(and reserve the error view height)
+   * Default: true
+   * have the bottom height reserved can cause issue in horizontal alignment but can cause blink if height is not reserved
+   * Best way is to let the developer allows it or not(minHeight to zero is not working)
+   */
+  showError?: boolean;
 };
 
 /**
@@ -31,6 +39,7 @@ const Label = ({
   errorStyle,
   labelID,
   children,
+  showError = true,
   ...props
 }: LabelProps) => {
   return (
@@ -39,14 +48,15 @@ const Label = ({
         {label}
       </Text>
       {children}
-
-      <Text
-        style={[styles.error, errorStyle]}
-        numberOfLines={2}
-        allowFontScaling
-      >
-        {isNotFalsyString(error) ? error : ' '}
-      </Text>
+      {showError && (
+        <Text
+          style={[styles.error, errorStyle]}
+          numberOfLines={2}
+          allowFontScaling
+        >
+          {isNotFalsyString(error) ? error : ' '}
+        </Text>
+      )}
     </View>
   );
 };

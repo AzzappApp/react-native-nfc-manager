@@ -165,6 +165,8 @@ const RGBHexColorPicker = ({
           defaultMessage: 'RGB',
           description: 'ColorPicker Component - TextInput Label : RGB Title',
         })}
+        showError={false}
+        style={styles.flex}
       >
         <TextInput
           testID="red"
@@ -179,30 +181,32 @@ const RGBHexColorPicker = ({
           style={styles.textInputStyle}
         />
       </Label>
-      <TextInput
-        testID="green"
-        accessibilityLabelledBy="RGB"
-        value={localColor.green}
-        onChangeText={onChangeGreen}
-        onEndEditing={onEndSubmittingGreen}
-        autoCapitalize="none"
-        autoComplete="off"
-        keyboardType="number-pad"
-        autoCorrect={false}
-        style={styles.textInputStyle}
-      />
-      <TextInput
-        testID="blue"
-        accessibilityLabelledBy="RGB"
-        value={localColor.blue}
-        onChangeText={onChangeBlue}
-        onEndEditing={onEndSubmittingBlue}
-        autoCapitalize="none"
-        autoComplete="off"
-        keyboardType="number-pad"
-        autoCorrect={false}
-        style={styles.textInputStyle}
-      />
+      <View style={styles.viewgb}>
+        <TextInput
+          testID="green"
+          accessibilityLabelledBy="RGB"
+          value={localColor.green}
+          onChangeText={onChangeGreen}
+          onEndEditing={onEndSubmittingGreen}
+          autoCapitalize="none"
+          autoComplete="off"
+          keyboardType="number-pad"
+          autoCorrect={false}
+          style={styles.textInputStyle}
+        />
+        <TextInput
+          testID="blue"
+          accessibilityLabelledBy="RGB"
+          value={localColor.blue}
+          onChangeText={onChangeBlue}
+          onEndEditing={onEndSubmittingBlue}
+          autoCapitalize="none"
+          autoComplete="off"
+          keyboardType="number-pad"
+          autoCorrect={false}
+          style={styles.textInputStyle}
+        />
+      </View>
     </View>
   );
 };
@@ -210,9 +214,17 @@ const RGBHexColorPicker = ({
 export default RGBHexColorPicker;
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  viewgb: {
+    flex: 2,
+    flexDirection: 'row',
+  },
   textInputStyle: {
+    flex: 1,
     marginRight: 10,
     textAlign: 'center',
     textAlignVertical: 'center',
+    paddingHorizontal: 10,
+    maxHeight: 43,
   },
 });
