@@ -44,7 +44,7 @@ const ImageEditionParametersList = ({
                 <View style={styles.paramIconContainer}>
                   <Icon icon={icon} style={styles.paramIcon} />
                 </View>
-                <Text style={textStyles.button}>{label}</Text>
+                <Text style={styles.label}>{label}</Text>
               </PressableNative>
             </View>
           );
@@ -57,7 +57,7 @@ export default ImageEditionParametersList;
 
 const styles = StyleSheet.create({
   paramsButtonContainer: {
-    width: 100,
+    width: 80,
     alignItems: 'center',
   },
   paramsButton: {
@@ -77,6 +77,10 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     tintColor: colors.black,
+  },
+  label: {
+    ...textStyles.button,
+    fontSize: 12,
   },
 });
 

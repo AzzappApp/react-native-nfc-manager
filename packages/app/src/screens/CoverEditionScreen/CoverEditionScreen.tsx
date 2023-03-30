@@ -23,7 +23,7 @@ import { colors } from '#theme';
 import Header from '#components/Header';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
-import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
+import ImagePicker from '#components/ImagePicker';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import {
   calculImageSize,
@@ -40,6 +40,7 @@ import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
+import CoverEditionImagePickerSelectImageStep from './CoverEditionImagePickerSelectImageStep';
 import CoverImageEditionPanel from './CoverImageEditionPanel';
 import CoverModelsEditionPanel from './CoverModelsEditionPanel';
 import CoverPreviewRenderer from './CoverPreviewRenderer';
@@ -370,7 +371,8 @@ const CoverEditionScreen = ({
   const isDirty = Object.keys(updates).length > 0;
   const isValid =
     !isCreation || (updates.sourceMedia != null && !!updates.title);
-  const canSave = !saving && isDirty && isValid;
+  const [maskComputing, setMaskComputing] = useState(false);
+  const canSave = !saving && isDirty && isValid && !maskComputing;
   const canCancel = !isCreation && !saving;
 
   const router = useRouter();
@@ -697,7 +699,6 @@ const CoverEditionScreen = ({
     setShowImagePicker(false);
   };
 
-  const [maskComputing, setMaskComputing] = useState(false);
   useEffect(() => {
     let canceled = false;
     if (sourceMedia && isFileURL(sourceMedia.uri)) {
@@ -728,6 +729,9 @@ const CoverEditionScreen = ({
   const onImagePickerCancel = () => {
     if (sourceMedia) {
       setShowImagePicker(false);
+    } else {
+      //the user should always be able to cancel, even cancelling the process
+      router.back();
     }
   };
   //#endregion
@@ -926,7 +930,10 @@ const CoverEditionScreen = ({
     (templateId: string, data: TemplateData) => {
       setTemplateId(templateId);
       updateFields(
-        ['mediaStyle', data.mediaStyle],
+        [
+          'mediaStyle',
+          { ...data.mediaStyle, filter: data.mediaStyle?.filter ?? null },
+        ],
         ['backgroundId', data.background?.id ?? null],
         ['foregroundId', data.foreground?.id ?? null],
         ['contentStyle', data.contentStyle],
@@ -1252,8 +1259,7 @@ const CoverEditionScreen = ({
           forceAspectRatio={COVER_RATIO}
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
-          canCancel={!!sourceMedia}
-          steps={[SelectImageStep]}
+          steps={[CoverEditionImagePickerSelectImageStep]}
         />
       </Modal>
       <UploadProgressModal
@@ -1313,7 +1319,8 @@ const styles = StyleSheet.create({
     aspectRatio: COVER_RATIO,
   },
   bottomPanelContainer: {
-    flex: 1,
+    width: '100%',
+    height: 324,
   },
   bottomPanel: {
     flex: 1,

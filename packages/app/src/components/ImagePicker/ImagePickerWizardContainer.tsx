@@ -8,10 +8,8 @@ import {
 import { useIntl } from 'react-intl';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '#theme';
 import Button from '#ui/Button';
 import FadeSwitch from '#ui/FadeSwitch';
-import IconButton from '#ui/IconButton';
 import TabsBar from '#ui/TabsBar';
 import Header from '../Header';
 import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
@@ -143,10 +141,9 @@ const ImagePickerWizardRenderer = ({
   const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets();
 
   const intl = useIntl();
-
   let leftButton = headerLeftButton;
   if (!leftButton) {
-    if (isFirstStep && canCancel) {
+    if ((isFirstStep && canCancel) || !preventNavigation) {
       leftButton = (
         <Button
           label={intl.formatMessage({
@@ -158,8 +155,6 @@ const ImagePickerWizardRenderer = ({
           style={styles.headerButtons}
         />
       );
-    } else if (!preventNavigation) {
-      leftButton = <IconButton icon="back" onPress={onBack} />;
     }
   }
   if (busy) {
@@ -237,7 +232,7 @@ const styles = StyleSheet.create({
   },
   topPanel: {
     aspectRatio: 1,
-    backgroundColor: colors.grey500,
+    // backgroundColor: colors.grey500,
   },
   bottomPanel: { flex: 1, marginTop: 1 },
   tabBarContainer: {

@@ -67,7 +67,7 @@ export const textStyles = StyleSheet.create({
   button: {
     fontSize: 14,
     color: colors.dark,
-    ...fontFamilies.semiBold,
+    ...fontFamilies.normal,
   },
   error: {
     ...fontFamilies.normal,

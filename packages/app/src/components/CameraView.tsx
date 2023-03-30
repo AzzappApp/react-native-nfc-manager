@@ -33,6 +33,9 @@ export type CameraViewProps = ViewProps & {
    * A callback that is called when the camera encounters an error
    */
   onError(error: CameraRuntimeError): void;
+
+  /* define the initial camera position. */
+  initialCameraPosition?: 'back' | 'front';
 };
 
 /**
@@ -72,19 +75,23 @@ export type CameraViewHandle = {
  * Camera view component, allows to take photos and record videos
  */
 const CameraView = (
-  { onInitialized, onError, ...props }: CameraViewProps,
+  {
+    onInitialized,
+    onError,
+    initialCameraPosition = 'back',
+    ...props
+  }: CameraViewProps,
   ref: ForwardedRef<CameraViewHandle>,
 ) => {
   // #region camera state
   const camera = useRef<Camera>(null);
-
-  const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
-    'back',
-  );
   const devices = useCameraDevices();
-  const device = devices[cameraPosition];
   const supportsCameraFlipping = devices.back != null && devices.front != null;
+  const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
+    supportsCameraFlipping ? initialCameraPosition : 'back',
+  );
 
+  const device = devices[cameraPosition];
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
   const supportsFlash = device?.hasFlash ?? false;
 

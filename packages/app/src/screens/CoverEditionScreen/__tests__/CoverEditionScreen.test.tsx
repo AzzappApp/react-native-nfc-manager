@@ -44,6 +44,38 @@ jest.mock('#helpers/mediaHelpers', () => ({
     ]),
 }));
 
+const mockRouter = {
+  push: jest.fn(),
+  replace: jest.fn(),
+  back: jest.fn(),
+};
+
+const mockWebAPI = {
+  uploadSign: jest.fn(),
+  uploadMedia: jest.fn(),
+};
+
+jest.mock('#PlatformEnvironment', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react');
+  return {
+    useRouter() {
+      return mockRouter;
+    },
+    useWebAPI() {
+      return mockWebAPI;
+    },
+
+    PlatformEnvironmentProvider: ({
+      children,
+    }: {
+      children: React.ReactNode;
+    }) => {
+      return <>{children}</>;
+    },
+  };
+});
+
 const segmentImageMock = segmentImage as jest.MockedFunction<
   typeof segmentImage
 >;
@@ -293,13 +325,8 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
   });
 
-  test('Should hide ImagePicker when user cancel, only if an image is selected', () => {
+  test('Should hide ImagePicker when user cancel if a sourceMedia exist', () => {
     renderCoverEditionScreen();
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
-    expect(screen.getByTestId('image-picker')).toHaveProp('canCancel', false);
-    act(() => {
-      fireEvent(screen.getByTestId('image-picker'), 'cancel');
-    });
     expect(screen.queryByTestId('image-picker')).toBeTruthy();
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
@@ -313,12 +340,22 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent.press(screen.getByLabelText('Select an image'));
     });
-    expect(screen.getByTestId('image-picker')).toHaveProp('canCancel', true);
     expect(screen.queryByTestId('image-picker')).toBeTruthy();
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'cancel');
     });
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
+  });
+
+  test('Should router back method be called when ImagePicker is shown, sourceMedia does not exist and user cancel', () => {
+    renderCoverEditionScreen();
+    expect(screen.queryByTestId('image-picker')).toBeTruthy();
+
+    act(() => {
+      fireEvent(screen.getByTestId('image-picker'), 'cancel');
+    });
+
+    expect(mockRouter.back).toHaveBeenCalled();
   });
 
   test('Should render ImagePicker if there is a personal cover template', () => {

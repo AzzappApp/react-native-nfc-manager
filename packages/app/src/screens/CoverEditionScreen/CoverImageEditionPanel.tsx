@@ -91,6 +91,7 @@ const CoverImageEditionPanel = ({
             style={{ flexGrow: 0 }}
             onSelectParam={onStartParameterEdition}
             excludedParams={['cropData']}
+            showsHorizontalScrollIndicator={false}
           />
         )}
       </View>
@@ -109,5 +110,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   filterSelectionListContentContainer: { paddingHorizontal: 20 },
-  filterSelectionList: { flex: 1, maxHeight: 120 },
+  filterSelectionList: {
+    flex: 1,
+    maxHeight: 200,
+    marginTop: 20,
+    marginBottom: 10,
+  },
 });

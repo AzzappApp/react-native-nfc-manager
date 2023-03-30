@@ -40,6 +40,7 @@ const FilterSelectionList = ({
     ({ ios, android }) =>
       (Platform.OS === 'ios' && ios) || (Platform.OS === 'android' && android),
   );
+
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
       <FilterButton
@@ -121,12 +122,35 @@ const FilterButton = ({
     web: cardRadius ? (`${cardRadius}%` as any) : null,
     default: width != null && cardRadius != null ? cardRadius * width : null,
   });
+
   return (
     <PressableNative
       onPress={onPress}
-      style={styles.filterButton}
+      style={[styles.filterButton]}
       onLayout={onLayout}
     >
+      <View
+        style={[
+          styles.filterImageContainer,
+          {
+            borderColor: selected ? colors.black : 'transparent',
+            borderRadius: borderRadius + BORDER_SELECTED_WIDTH,
+          },
+        ]}
+      >
+        <View style={[styles.wrapperEditableImage, { borderRadius }]}>
+          <EditableImage
+            source={media}
+            backgroundImageColor={backgroundImageColor}
+            backgroundImageTintColor={backgroundImageTintColor}
+            foregroundImageTintColor={foregroundImageTintColor}
+            backgroundMultiply={backgroundMultiply}
+            editionParameters={editionParameters}
+            filters={filter ? [filter] : null}
+            style={[styles.filterImage, { aspectRatio, borderRadius }]}
+          />
+        </View>
+      </View>
       <Text
         style={[
           textStyles.button,
@@ -136,30 +160,24 @@ const FilterButton = ({
       >
         {label}
       </Text>
-      <View style={[styles.filterImageContainer, { borderRadius }]}>
-        <EditableImage
-          source={media}
-          backgroundImageColor={backgroundImageColor}
-          backgroundImageTintColor={backgroundImageTintColor}
-          foregroundImageTintColor={foregroundImageTintColor}
-          backgroundMultiply={backgroundMultiply}
-          editionParameters={editionParameters}
-          filters={filter ? [filter] : null}
-          style={[styles.filterImage, { aspectRatio, borderRadius }]}
-        />
-      </View>
     </PressableNative>
   );
 };
 
+const BORDER_SELECTED_WIDTH = 3.75;
+
 const styles = StyleSheet.create({
+  wrapperEditableImage: {
+    flex: 1,
+    backgroundColor: colors.grey200,
+  },
   filterButton: {
-    marginEnd: 10,
+    marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
     height: '100%',
   },
   filterImageContainer: {
     flex: 1,
-    backgroundColor: colors.grey200,
+    borderWidth: BORDER_SELECTED_WIDTH,
     shadowColor: colors.black,
     shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 4 },

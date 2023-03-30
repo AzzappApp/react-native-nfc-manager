@@ -6,17 +6,19 @@ import {
 } from '../medias';
 import { useImagePickerState } from './ImagePickerContext';
 
+type ImagePickerMediaRendererProps = {
+  /**
+   * if true, the crop edition mode is enabled
+   */
+  cropEditionMode?: boolean;
+};
+
 /**
  * Render the selected media of the ImagePicker
  */
 const ImagePickerMediaRenderer = ({
   cropEditionMode,
-}: {
-  /**
-   * if true, the crop edition mode is enabled
-   */
-  cropEditionMode?: boolean;
-}) => {
+}: ImagePickerMediaRendererProps) => {
   const {
     media,
     aspectRatio,

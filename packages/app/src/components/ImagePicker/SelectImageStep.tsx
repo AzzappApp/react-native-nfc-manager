@@ -1,5 +1,12 @@
 import clamp from 'lodash/clamp';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,16 +27,23 @@ import type { Tab } from '#ui/TabsBar';
 import type { CameraViewHandle, RecordSession } from '../CameraView';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
-type SelectImageStepProps = {
+export type SelectImageStepProps = {
   onNext(): void;
   onBack(): void;
+  MediaContainerComponent?: React.ElementType;
+  initialCameraPosition?: 'back' | 'front';
 };
 
 /**
  * A step of the image picker wizard that allows the user to select an image
  * from the gallery or take a photo/video with the camera.
  */
-const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
+const SelectImageStep = ({
+  onBack,
+  onNext,
+  MediaContainerComponent = Fragment,
+  initialCameraPosition,
+}: SelectImageStepProps) => {
   // #region State management
   const {
     kind,
@@ -219,18 +233,20 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
         topPanel={
           pickerMode === 'gallery' ? (
             media != null ? (
-              <>
-                <ImagePickerMediaRenderer />
-                {forceAspectRatio == null && (
-                  <FloatingIconButton
-                    icon="adjust"
-                    style={styles.adjustButton}
-                    variant="white"
-                    size={40}
-                    onPress={onAspectRatioToggle}
-                  />
-                )}
-              </>
+              <MediaContainerComponent>
+                <>
+                  <ImagePickerMediaRenderer />
+                  {forceAspectRatio == null && (
+                    <FloatingIconButton
+                      icon="adjust"
+                      style={styles.adjustButton}
+                      variant="white"
+                      size={40}
+                      onPress={onAspectRatioToggle}
+                    />
+                  )}
+                </>
+              </MediaContainerComponent>
             ) : null
           ) : hasCameraPermission &&
             (pickerMode === 'photo' || hasMicrophonePermission) ? (
@@ -239,6 +255,7 @@ const SelectImageStep = ({ onBack, onNext }: SelectImageStepProps) => {
               onError={onCameraError}
               onInitialized={onCameraInitialized}
               style={{ width: '100%', height: '100%' }}
+              initialCameraPosition={initialCameraPosition}
             />
           ) : null
         }

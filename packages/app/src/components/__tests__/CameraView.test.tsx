@@ -249,5 +249,17 @@ describe('CameraView', () => {
     }).toThrowError('Recording already ended');
   });
 
+  it('renders the CameraView correctly with `initialCameraPosition` props to front', () => {
+    render(
+      <CameraView
+        initialCameraPosition={'front'}
+        onInitialized={() => void 0}
+        onError={() => void 0}
+      />,
+    );
+
+    const camera = screen.getByTestId('camera');
+    expect(camera).toHaveProp('device', { id: 'front', hasFlash: true });
+  });
   // TODO test focus behavior
 });
