@@ -3,39 +3,37 @@ import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Text, View, StyleSheet, FlatList } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import { colors, fontFamilies } from '#theme';
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
-import TemplateSelectorItem from './TemplateSelectorItem';
-import type {
-  TemplateSelector_viewer$data,
-  TemplateSelector_viewer$key,
-} from '@azzapp/relay/artifacts/TemplateSelector_viewer.graphql';
-import type { TemplateSelectorProfileMutation } from '@azzapp/relay/artifacts/TemplateSelectorProfileMutation.graphql';
+import TemplateSelectorItem, {
+  TEMPLATE_SELECTOR_ITEM_WIDTH,
+} from './CoverTemplateRenderer';
+import type { TemplateSelectorScreen_viewer$key } from '@azzapp/relay/artifacts/TemplateSelectorScreen_viewer.graphql';
+import type { TemplateSelectorScreenProfileMutation } from '@azzapp/relay/artifacts/TemplateSelectorScreenProfileMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 import type { ListRenderItemInfo } from 'react-native';
 
-export type TemplateSelectorProps = {
+export type TemplateSelectorScreenProps = {
   /**
    * The relay viewer reference
    */
-  viewer: TemplateSelector_viewer$key;
+  viewer: TemplateSelectorScreen_viewer$key;
 };
 
-const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
-  const vp = useViewportSize();
-  const intl = useIntl();
-  const router = useRouter();
-  const skip = useCallback(() => {
-    router.back();
-  }, [router]);
-
+/**
+ * Allows the user to select a template for the cover
+ */
+const TemplateSelectorScreen = ({
+  viewer: viewerKey,
+}: TemplateSelectorScreenProps) => {
   const { profile, coverTemplates } = useFragment(
     graphql`
-      fragment TemplateSelector_viewer on Viewer {
+      fragment TemplateSelectorScreen_viewer on Viewer {
         profile {
           id
           colorPalette
@@ -43,15 +41,19 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
         coverTemplates {
           id
           colorPalette
-          ...TemplateSelectorItem_templateData
+          ...CoverTemplateRenderer_template
         }
       }
     `,
     viewerKey,
   );
 
-  const [commit] = useMutation<TemplateSelectorProfileMutation>(graphql`
-    mutation TemplateSelectorProfileMutation($input: UpdateProfileInput!) {
+  const router = useRouter();
+
+  const [commit] = useMutation<TemplateSelectorScreenProfileMutation>(graphql`
+    mutation TemplateSelectorScreenProfileMutation(
+      $input: UpdateProfileInput!
+    ) {
       updateProfile(input: $input) {
         profile {
           id
@@ -61,69 +63,77 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
     }
   `);
 
-  const selectTemplate = useCallback(
-    (templateId: string) => {
-      if (coverTemplates && profile) {
-        const template = coverTemplates.find(t => t?.id === templateId);
+  type Template = ArrayItemType<typeof coverTemplates>;
 
-        if (template) {
-          if (template.colorPalette) {
-            const newColorArray = uniq([
-              ...(profile.colorPalette ?? []),
-              ...template.colorPalette,
-            ]);
-            commit({
-              variables: {
-                input: {
-                  colorPalette: newColorArray,
-                },
-              },
-              optimisticResponse: {
-                updateProfile: {
-                  profile: {
-                    id: profile.id,
-                    colorPalette: newColorArray,
-                  },
-                },
-              },
-            });
-          }
-
-          router.replace({
-            route: 'CARD_MODULE_EDITION',
-            params: {
-              module: module as any,
-              templateId: template.id,
+  const onSelectTemplate = useCallback(
+    (template: Template) => {
+      if (template.colorPalette) {
+        const newColorArray = uniq([
+          ...(profile!.colorPalette ?? []),
+          ...template.colorPalette,
+        ]);
+        commit({
+          variables: {
+            input: {
+              colorPalette: newColorArray,
             },
-          });
-        }
+          },
+          optimisticResponse: {
+            updateProfile: {
+              profile: {
+                id: profile!.id,
+                colorPalette: newColorArray,
+              },
+            },
+          },
+          onError(e: any) {
+            // TODO
+            console.error(e);
+          },
+        });
       }
+      // TODO do we really want to not wait for the mutation to finish ? if so we need to handle the case where the mutation fails
+      router.replace({
+        route: 'CARD_MODULE_EDITION',
+        params: {
+          module: 'cover',
+          templateId: template.id,
+        },
+      });
     },
-    [commit, coverTemplates, profile, router],
+    [commit, profile, router],
   );
 
+  const onSkip = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const renderItem = useCallback(
-    ({
-      item,
-      index,
-    }: ListRenderItemInfo<ArrayItemType<TemplateSelector_viewer$data>>) => {
+    ({ item, index }: ListRenderItemInfo<Template>) => {
       return (
         <TemplateSelectorItem
           template={item}
-          index={index}
-          selectTemplate={selectTemplate}
+          onPress={() => onSelectTemplate(item)}
+          style={{
+            width: TEMPLATE_SELECTOR_ITEM_WIDTH,
+            height: TEMPLATE_SELECTOR_ITEM_WIDTH / COVER_RATIO,
+            marginLeft: index === 0 ? 13.5 : 0,
+          }}
         />
       );
     },
-    [selectTemplate],
+    [onSelectTemplate],
   );
 
-  const createCover = useCallback(() => {
+  const onCreateCoverFromScratch = useCallback(() => {
     router.replace({
       route: 'CARD_MODULE_EDITION',
-      params: { module: module as any },
+      params: { module: 'cover' },
     });
   }, [router]);
+
+  const intl = useIntl();
+  const vp = useViewportSize();
 
   return (
     <View
@@ -150,12 +160,12 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
       </Text>
 
       <FlatList
-        data={coverTemplates as ArrayItemType<TemplateSelector_viewer$data>} // couldn't find a way to make it work with the fragment without hard casting
+        data={coverTemplates}
         renderItem={renderItem}
         style={{ flex: 1 }}
         contentContainerStyle={{ alignItems: 'center' }}
         horizontal
-        ItemSeparatorComponent={() => <View style={{ width: 13 }} />}
+        ItemSeparatorComponent={ItemSeparatorComponent}
         showsHorizontalScrollIndicator={false}
         accessibilityRole="list"
         accessibilityLabel={intl.formatMessage({
@@ -171,6 +181,7 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
         />
       </Text>
       <Button
+        testID="create-from-scratch-button"
         label={intl.formatMessage({
           defaultMessage: 'Create your cover from scratch',
           description:
@@ -182,7 +193,7 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
             'TemplateSelector - AccessibilityLabel Button Create your cover from scratch',
         })}
         style={[styles.inner, styles.button]}
-        onPress={createCover}
+        onPress={onCreateCoverFromScratch}
       />
 
       <View
@@ -197,7 +208,7 @@ const TemplateSelector = ({ viewer: viewerKey }: TemplateSelectorProps) => {
         ]}
       >
         <PressableNative
-          onPress={skip}
+          onPress={onSkip}
           accessibilityRole="link"
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Cancel and go back',
@@ -253,4 +264,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TemplateSelector;
+export default TemplateSelectorScreen;
+
+const ItemSeparatorComponent = () => (
+  <View style={{ width: 13, backgroundColor: 'transparent' }} />
+);

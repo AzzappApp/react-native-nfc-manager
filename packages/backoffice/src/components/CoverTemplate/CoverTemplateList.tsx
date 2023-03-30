@@ -5,11 +5,11 @@ import {
   List,
   TextField,
 } from 'react-admin';
+import CoverTemplateListAside from './CoverTemplateListAside';
 import CoverTemplatePreview from './CoverTemplatePreview';
-
 const CoverTempalteList = () => {
   return (
-    <List exporter={false} hasCreate hasEdit>
+    <List exporter={false} hasCreate hasEdit aside={<CoverTemplateListAside />}>
       <Datagrid rowClick="edit" bulkActionButtons={false}>
         <FunctionField
           label="Image"

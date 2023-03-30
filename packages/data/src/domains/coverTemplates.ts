@@ -23,9 +23,13 @@ export const getCoverTemplatesByKind = (
   kind: ProfileKind,
   segmented?: boolean,
 ): Promise<CoverTemplate[]> => {
-  const request = db.selectFrom('CoverTemplate').where('enabled', '=', true);
-  if (segmented) {
-    request.where('segmented', '=', segmented);
+  let request = db
+    .selectFrom('CoverTemplate')
+    .selectAll()
+    .where('enabled', '=', true)
+    .where('kind', '=', kind);
+  if (segmented != null) {
+    request = request.where('segmented', '=', segmented);
   }
-  return request.where('kind', '=', kind).selectAll().execute();
+  return request.execute();
 };

@@ -130,7 +130,10 @@ type Viewer {
   coverForegrounds: [CoverLayer!]!
 
   """Fetches all cover templates for a given kind"""
-  coverTemplates: [CoverTemplate]!
+  coverTemplates: [CoverTemplate!]!
+
+  """Fetches all cover templates for a given kind ordered by Category"""
+  coverTemplatesByCategory(segmented: Boolean): [CoverTemplateCategory!]!
 }
 
 """Represent an Azzapp Profile"""
@@ -412,6 +415,15 @@ type CoverTemplateCategorGraphQL {
   """Should be a country code"""
   id: String
   cateogry: String
+}
+
+"""A cover template by category"""
+type CoverTemplateCategory {
+  """The category name"""
+  category: String!
+
+  """The category templates"""
+  templates: [CoverTemplate!]!
 }
 
 type Mutation {

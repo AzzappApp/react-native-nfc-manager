@@ -112,6 +112,18 @@ jest.mock('#ui/FontPicker', () => {
   return FontPicker;
 });
 
+jest.mock('#screens/CoverEditionScreen/CoverModelsEditionPanel', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react');
+
+  const CoverModelsEditionPanel = (props: any) =>
+    React.createElement('CoverModelsEditionPanel', {
+      ...props,
+      testID: 'cover-models-edition-panel',
+    });
+  return CoverModelsEditionPanel;
+});
+
 jest.mock('#components/ProfileColorPalette', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
@@ -553,6 +565,10 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
 
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Title edition'));
+    });
+
     const image = screen.getByTestId('editable-image');
     expect(image).toHaveProp('backgroundMultiply', false);
     act(() => {
@@ -566,6 +582,10 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
 
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Image edition'));
+    });
+
     const image = screen.getByTestId('editable-image');
     expect(image).toHaveProp('filters', ['corail']);
     act(() => {
@@ -577,6 +597,10 @@ describe('CoverEditionScreen', () => {
   test('Should enter in parameter edition mode when user select a parameter', () => {
     renderCoverEditionScreen({
       coverData: fakeCover,
+    });
+
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Image edition'));
     });
 
     const image = screen.getByTestId('editable-image');

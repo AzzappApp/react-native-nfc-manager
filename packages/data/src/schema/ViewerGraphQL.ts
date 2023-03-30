@@ -33,6 +33,7 @@ import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
 import type { Post, Profile, CoverTemplate } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { Viewer } from '@azzapp/auth/viewer';
+import type { Prisma } from '@prisma/client';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
 const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
@@ -223,13 +224,15 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
       resolve: async () => getCoverLayers('foreground'),
     },
     coverTemplates: {
-      type: new GraphQLNonNull(new GraphQLList(CoverTemplateGraphQL)),
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CoverTemplateGraphQL)),
+      ),
       description: 'Fetches all cover templates for a given kind',
       resolve: async (
         viewer,
         _,
         { profileLoader },
-      ): Promise<Array<CoverTemplate | null>> => {
+      ): Promise<CoverTemplate[]> => {
         if (viewer.isAnonymous) {
           return [];
         }
@@ -237,7 +240,81 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         return getCoverTemplatesByKind(profile?.profileKind ?? 'personal');
       },
     },
+    coverTemplatesByCategory: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CoverTemplateCategoryGraphQL)),
+      ),
+      args: {
+        segmented: { type: GraphQLBoolean },
+      },
+      description:
+        'Fetches all cover templates for a given kind ordered by Category',
+      resolve: async (
+        viewer,
+        { segmented }: { segmented: boolean },
+        { profileLoader },
+      ): Promise<CoverTemplateCategory[]> => {
+        if (viewer.isAnonymous) {
+          return [];
+        }
+        const profile = await profileLoader.load(viewer.profileId);
+
+        const templates = await getCoverTemplatesByKind(
+          profile?.profileKind ?? 'personal',
+          segmented,
+        );
+
+        const categories: CoverTemplateCategory[] = [];
+        // TODO refactor this, this is a mess, we should not use the en label as a group by ...
+        templates.forEach(template => {
+          const category = (template.category as Prisma.JsonObject)
+            ?.en as string; //strong typing cames from the prisma documentation
+
+          if (category) {
+            // find object in categories array with category name === category
+            const existingCategory = categories.find(
+              categoryItem => categoryItem.category === category,
+            );
+
+            if (existingCategory) {
+              existingCategory.templates.push(template);
+            } else {
+              categories.push({
+                category,
+                templates: [template],
+              });
+            }
+          }
+        });
+        console.log(categories);
+        return categories;
+      },
+    },
   }),
 });
 
 export default ViewerGraphQL;
+
+type CoverTemplateCategory = {
+  category: string;
+  templates: CoverTemplate[];
+};
+/* create the GraphQLObjectType for CoverTempalteByCategory});*/
+
+const CoverTemplateCategoryGraphQL = new GraphQLObjectType({
+  name: 'CoverTemplateCategory',
+  description: 'A cover template by category',
+  fields: () => ({
+    category: {
+      description: 'The category name',
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    templates: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CoverTemplateGraphQL)),
+      ),
+      description: 'The category templates',
+    },
+  }),
+});
+//create a grpahqlscalar type for {[lang:string]: CoverTemplate[]}

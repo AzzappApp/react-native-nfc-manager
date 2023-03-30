@@ -56,7 +56,14 @@ export type TabsBarProps = {
    */
   onTabPress: (tab: string) => void;
 
+  /**
+   * the Style of the container
+   */
   style?: StyleProp<ViewStyle>;
+  /**
+   * The size of icon used in the tabbar item
+   */
+  iconSize?: number;
 };
 
 export const TAB_BAR_HEIGHT = 70;
@@ -73,6 +80,7 @@ const TabsBar = ({
   onTabPress,
   variant = 'tabbar',
   style,
+  iconSize = 28,
 }: TabsBarProps) => {
   const styles = useVariantStyleSheet(computedStyles, variant);
 
@@ -112,6 +120,7 @@ const TabsBar = ({
                         styles.image,
                         active && styles.imageActive,
                         shouldNotTint && { tintColor: undefined },
+                        { height: iconSize },
                       ]}
                     />
                   )}
@@ -121,7 +130,7 @@ const TabsBar = ({
                         styles.highlightUnderline,
                         {
                           backgroundColor:
-                            currentTab === key ? colors.red : 'transparent',
+                            currentTab === key ? colors.black : 'transparent',
                         },
                       ]}
                     />
@@ -193,7 +202,6 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       backgroundColor: colors.black,
     },
     image: {
-      height: 18,
       tintColor: colors.grey200,
     },
     imageActive: {

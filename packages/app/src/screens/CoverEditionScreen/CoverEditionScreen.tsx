@@ -2,7 +2,13 @@ import isEqual from 'lodash/isEqual';
 import zip from 'lodash/zip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -28,16 +34,15 @@ import {
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
-import TabsBar from '#ui/TabsBar';
+import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
-import CoverEditionScreenCoverRenderer from './CoverEditionScreenCoverRenderer';
 import CoverImageEditionPanel from './CoverImageEditionPanel';
+import CoverModelsEditionPanel from './CoverModelsEditionPanel';
+import CoverPreviewRenderer from './CoverPreviewRenderer';
 import CoverTitleEditionPanel from './CoverTitleEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { EditableImageSource } from '#components/medias';
@@ -46,7 +51,8 @@ import type {
   ImageEditionParameters,
   ImageOrientation,
 } from '#helpers/mediaHelpers';
-import type { CoverEditionScreenCoverRendererHandle } from './CoverEditionScreenCoverRenderer';
+import type { TemplateData } from './CoverModelsEditionPanel';
+import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
 import type { CoverEditionScreen_template$key } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
@@ -79,12 +85,13 @@ const CoverEditionScreen = ({
   coverTemplate: coverTemplateKey,
 }: CoverEditionScreenProps) => {
   //#region Data dependencies
-  const viewer = useFragment<CoverEditionScreen_viewer$key>(
+  const viewer = useFragment(
     graphql`
       fragment CoverEditionScreen_viewer on Viewer {
         ...CoverEditionBackgroundPanel_viewer
         ...CoverEditionForegroundPanel_viewer
         ...CoverTitleEditionPanel_viewer
+        ...CoverModelsEditionPanel_viewer
         profile {
           id
           userName
@@ -291,7 +298,7 @@ const CoverEditionScreen = ({
   );
   //#endregion
 
-  //#region Displayed values computation
+  //#region Displayed values computation;
   const {
     mediaStyle,
     sourceMedia,
@@ -354,9 +361,7 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Mutation, Cancel and navigation
-  const rendererRef = useRef<CoverEditionScreenCoverRendererHandle | null>(
-    null,
-  );
+  const rendererRef = useRef<CoverPreviewHandler | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
@@ -601,10 +606,10 @@ const CoverEditionScreen = ({
       onCompleted() {
         setSaving(false);
         setUploadProgress(null);
-        if (isCreation) {
+        if (isCreation && viewer) {
           router.replace({
             route: 'PROFILE',
-            params: { userName: viewer!.profile!.userName },
+            params: { userName: viewer.profile!.userName },
           });
         } else {
           router.back();
@@ -913,7 +918,31 @@ const CoverEditionScreen = ({
   };
   //#endregion
 
-  const [currentTab, setCurrentTab] = useState<string>('image');
+  //#region Template selection
+
+  const [templateId, setTemplateId] = useState<string | null>(null);
+
+  const onSelectTemplate = useCallback(
+    (templateId: string, data: TemplateData) => {
+      setTemplateId(templateId);
+      updateFields(
+        ['mediaStyle', data.mediaStyle],
+        ['backgroundId', data.background?.id ?? null],
+        ['foregroundId', data.foreground?.id ?? null],
+        ['contentStyle', data.contentStyle],
+        ['backgroundStyle', data.backgroundStyle ?? null],
+        ['foregroundStyle', data.foregroundStyle ?? null],
+        ['merged', data.merged],
+        ['segmented', data.segmented],
+        ['subTitleStyle', data.subTitleStyle ?? null],
+        ['titleStyle', data.titleStyle],
+      );
+    },
+    [updateFields],
+  );
+  //#endregion
+
+  const [currentTab, setCurrentTab] = useState<string>('models');
 
   const vp = useViewportSize();
   const intl = useIntl();
@@ -923,6 +952,13 @@ const CoverEditionScreen = ({
   const [bottomSheetHeights, setBottomSheetHeights] = useState(0);
   const onBottomPanelLayout = (event: LayoutChangeEvent) => {
     setBottomSheetHeights(event.nativeEvent.layout.height);
+  };
+
+  const [heighCover, setHeightCover] = useState(0);
+  const onContainerLayout = ({
+    nativeEvent: { layout },
+  }: LayoutChangeEvent) => {
+    setHeightCover(layout.height);
   };
 
   if (!viewer) {
@@ -994,7 +1030,7 @@ const CoverEditionScreen = ({
           }
         />
         <View style={styles.topPanel}>
-          <CoverEditionScreenCoverRenderer
+          <CoverPreviewRenderer
             ref={rendererRef}
             source={imageSource}
             mediaSize={sourceMediaSize}
@@ -1016,13 +1052,18 @@ const CoverEditionScreen = ({
             computing={segmented && maskComputing}
             cropEditionMode={cropEditionMode}
             onCropDataChange={onCropDataChange}
+            onLayout={onContainerLayout}
           />
           {sourceMedia && !cropEditionMode && (
             <FloatingIconButton
-              icon="contrast"
+              icon="crop"
               variant="white"
+              iconSize={24}
               onPress={onActivateCropMode}
-              style={styles.cropButton}
+              style={[
+                styles.cropButton,
+                { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
+              ]}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Crop',
                 description: 'Accessibility label of the crop button',
@@ -1034,24 +1075,26 @@ const CoverEditionScreen = ({
               })}
             />
           )}
+          <FloatingIconButton
+            icon="picture"
+            variant="white"
+            iconSize={24}
+            onPress={onPickImage}
+            style={[
+              styles.takePictureButton,
+              { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
+            ]}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Select an image',
+              description: 'Accessibility label of the image selection button',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage:
+                'Press this button to select an image from your library',
+              description: 'Accessibility hint of the image selection button',
+            })}
+          />
           <View style={styles.toolbar}>
-            <PressableNative
-              onPress={onPickImage}
-              style={[styles.imageButton, styles.toolbarElement]}
-              accessibilityRole="button"
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Select an image',
-                description:
-                  'Accessibility label of the image selection button',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage:
-                  'Press this button to select an image from your library',
-                description: 'Accessibility hint of the image selection button',
-              })}
-            >
-              <Icon icon="picture" style={styles.iconPicture} />
-            </PressableNative>
             <Switch
               value={segmented ?? false}
               onValueChange={onToggleSegmentation}
@@ -1060,16 +1103,20 @@ const CoverEditionScreen = ({
                 description: 'Label of the clipping switch in cover edition',
               })}
               style={styles.toolbarElement}
+              switchStyle={styles.switchStyle}
             />
-            <Switch
-              value={merged ?? false}
-              onValueChange={onToggleMerge}
-              label={intl.formatMessage({
-                defaultMessage: 'Merge',
-                description: 'Label of the merge switch in cover edition',
-              })}
-              style={styles.toolbarElement}
-            />
+            {currentTab !== 'models' && (
+              <Switch
+                value={merged ?? false}
+                onValueChange={onToggleMerge}
+                label={intl.formatMessage({
+                  defaultMessage: 'Merge',
+                  description: 'Label of the merge switch in cover edition',
+                })}
+                style={[styles.toolbarElement]}
+                switchStyle={styles.switchStyle}
+              />
+            )}
           </View>
         </View>
         <View
@@ -1091,6 +1138,18 @@ const CoverEditionScreen = ({
             </>
           ) : (
             <>
+              {currentTab === 'models' && (
+                <CoverModelsEditionPanel
+                  viewer={viewer}
+                  segmented={segmented ?? false}
+                  sourceUri={imageSource?.uri}
+                  mediaSize={sourceMediaSize}
+                  title={title}
+                  subTitle={subTitle}
+                  selectedTemplateId={templateId}
+                  onSelectTemplate={onSelectTemplate}
+                />
+              )}
               {currentTab === 'image' && (
                 <CoverImageEditionPanel
                   media={imageSource}
@@ -1148,10 +1207,16 @@ const CoverEditionScreen = ({
                 variant="toolbar"
                 currentTab={currentTab}
                 onTabPress={setCurrentTab}
+                iconSize={24}
                 tabs={[
                   {
+                    key: 'models',
+                    icon: 'modelsCoverTemplate',
+                    label: 'Models',
+                  },
+                  {
                     key: 'image',
-                    icon: 'picture',
+                    icon: 'image',
                     label: 'Image edition',
                   },
                   {
@@ -1200,8 +1265,11 @@ const CoverEditionScreen = ({
 };
 
 export default CoverEditionScreen;
-
+const { width } = Dimensions.get('window');
+const PADDING_TOP_TOPPANEL = 20;
+const ICON_SIZE = 50;
 const styles = StyleSheet.create({
+  switchStyle: { transform: [{ scaleX: 0.67 }, { scaleY: 0.71 }] },
   root: {
     backgroundColor: '#fff',
     position: 'absolute',
@@ -1211,7 +1279,7 @@ const styles = StyleSheet.create({
   topPanel: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: PADDING_TOP_TOPPANEL,
   },
   topPanelContent: {
     flex: 1,
@@ -1219,8 +1287,15 @@ const styles = StyleSheet.create({
   },
   cropButton: {
     position: 'absolute',
-    top: 40,
     end: 20,
+    shadowColor: colors.black,
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 2, height: 2 },
+    shadowRadius: 4,
+  },
+  takePictureButton: {
+    position: 'absolute',
+    start: 20,
     shadowColor: colors.black,
     shadowOpacity: 0.35,
     shadowOffset: { width: 2, height: 2 },
@@ -1239,19 +1314,23 @@ const styles = StyleSheet.create({
   },
   bottomPanelContainer: {
     flex: 1,
-    marginBottom: 10,
   },
   bottomPanel: {
     flex: 1,
     marginVertical: 10,
+    marginBottom: TAB_BAR_HEIGHT,
   },
   tabsBar: {
-    marginHorizontal: 10,
+    position: 'absolute',
+    bottom: 0,
+    left: 10,
+    width: width - 20,
+    right: 10,
   },
   toolbar: {
     flexDirection: 'row',
-    height: 40,
-    borderRadius: 20,
+    height: 46,
+    borderRadius: 100,
     backgroundColor: '#fff',
     shadowColor: colors.black,
     shadowOpacity: 0.35,
@@ -1262,9 +1341,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 10,
     marginTop: 10,
+    paddingLeft: 15,
+    paddingRight: 5,
   },
   toolbarElement: {
     marginRight: 10,
+    height: 22,
   },
   imageButton: {
     backgroundColor: colors.grey50,

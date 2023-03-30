@@ -117,13 +117,11 @@ const CoverTemplate = ({
           helperText="Hex Color code separated by  comma. #123453,#87FAEE,#23CA23"
         />
         <SectionTitle label="Category" />
-
         <TextInput
           source="category.en"
           label="Country Code - EN language code"
           fullWidth
         />
-
         <TextInput source="tags" fullWidth />
       </FormTab>
       <FormTab label="Cover">

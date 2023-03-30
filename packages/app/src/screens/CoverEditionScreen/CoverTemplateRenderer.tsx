@@ -1,42 +1,75 @@
-import { useMemo, useCallback, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { useIntl } from 'react-intl';
-import { Dimensions, PixelRatio } from 'react-native';
+import { Dimensions, PixelRatio, StyleSheet } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
-import CoverEditionScreenCoverRenderer from '#screens/CoverEditionScreen/CoverEditionScreenCoverRenderer';
+import { colors } from '#theme';
+import CoverPreviewRenderer from '#screens/CoverEditionScreen/CoverPreviewRenderer';
 import PressableNative from '#ui/PressableNative';
 import type { EditableImageSource } from '#components/medias';
 import type { ImageEditionParameters } from '#helpers/mediaHelpers';
-import type { TemplateSelectorItem_templateData$key } from '@azzapp/relay/artifacts/TemplateSelectorItem_templateData.graphql';
+import type { CoverTemplateRenderer_template$key } from '@azzapp/relay/artifacts/CoverTemplateRenderer_template.graphql';
+import type { StyleProp, ViewStyle } from 'react-native';
 
-type TemplateSelectorTemplateItemProps = {
+type CoverTemplateRendererProps = {
   /**
-   * the selected CoverTEmplate
+   * the cover template to render
    *
-   * @type {TemplateCover}
    */
-  template: TemplateSelectorItem_templateData$key;
+  template: CoverTemplateRenderer_template$key;
   /**
-   * the index of the flatlist item (for styling purpose)
+   * A callback called when the user select this template
+   */
+  onPress(): void;
+  /**
+   * the width of the cover
    *
    * @type {number}
    */
-  index: number;
+  coverWidth?: number;
   /**
-   * the function to call when the user select a template
+   * Title to Override the title of the template
    *
+   * @type {string}
    */
-  selectTemplate: (templateId: string) => void;
+  title?: string | null;
+  /**
+   * SubTitle to Override the SubTitle of the template
+   *
+   * @type {string}
+   */
+  subTitle?: string | null;
+
+  /**
+   * Source Media to Override the Source Media of the template
+   */
+  sourceMedia?: { uri: string; width: number; height: number };
+  /**
+   * add shadow on cover
+   *
+   * @type {(boolean | null)}
+   */
+  withShadow?: boolean | null;
+
+  /**
+   * Additional style to apply to the container of the CoverTemplateRenderer
+   */
+  style?: StyleProp<ViewStyle>;
 };
 
-const TemplateSelectorTemplateItem = ({
+const CoveTemplateRenderer = ({
   template,
-  index,
-  selectTemplate,
-}: TemplateSelectorTemplateItemProps) => {
+  onPress,
+  coverWidth = TEMPLATE_SELECTOR_ITEM_WIDTH,
+  title,
+  subTitle,
+  sourceMedia,
+  withShadow = true,
+  style,
+}: CoverTemplateRendererProps) => {
   const cover = useFragment(
     graphql`
-      fragment TemplateSelectorItem_templateData on CoverTemplate
+      fragment CoverTemplateRenderer_template on CoverTemplate
       @argumentDefinitions(
         pixelRatio: {
           type: "Float!"
@@ -49,6 +82,7 @@ const TemplateSelectorTemplateItem = ({
         }
       ) {
         id
+        colorPalette
         data {
           mediaStyle
           sourceMedia {
@@ -99,7 +133,7 @@ const TemplateSelectorTemplateItem = ({
 
   const editableImageSource: EditableImageSource = useMemo(() => {
     return {
-      uri: cover.data.sourceMedia.templateURI,
+      uri: sourceMedia?.uri ?? cover.data.sourceMedia.templateURI,
       backgroundUri: cover.data.background?.uri,
       foregroundUri: cover.data.foreground?.uri,
       kind: 'image',
@@ -108,11 +142,8 @@ const TemplateSelectorTemplateItem = ({
     cover.data.background?.uri,
     cover.data.foreground?.uri,
     cover.data.sourceMedia.templateURI,
+    sourceMedia,
   ]);
-
-  const onPress = useCallback(() => {
-    selectTemplate(cover.id);
-  }, [selectTemplate, cover.id]);
 
   //doing this to avoid typescript error in render ...
   const editionParameters: ImageEditionParameters =
@@ -127,45 +158,60 @@ const TemplateSelectorTemplateItem = ({
   return (
     <PressableNative
       onPress={onPress}
-      style={{
-        width: TEMPLATE_SELECTOR_ITEM_WIDTH,
-        height: TEMPLATE_SELECTOR_ITEM_WIDTH / COVER_RATIO,
-        marginLeft: index === 0 ? 13.5 : 0,
-      }}
-      accessibilityRole="link"
+      accessibilityRole="button"
       accessibilityHint={intl.formatMessage({
         defaultMessage: 'Select this cover template template for your profile',
         description:
           'TemplateSelectorTemplateItem accessibilityHint template item',
       })}
+      style={style}
     >
-      <CoverEditionScreenCoverRenderer
+      <CoverPreviewRenderer
         source={editableImageSource}
-        mediaSize={{
-          width: TEMPLATE_SELECTOR_ITEM_WIDTH * PIXEL_RATIO,
-          height: (TEMPLATE_SELECTOR_ITEM_WIDTH * PIXEL_RATIO) / COVER_RATIO,
-        }}
+        mediaSize={
+          sourceMedia
+            ? {
+                width: sourceMedia.width,
+                height: sourceMedia.height,
+              }
+            : {
+                width: coverWidth * PIXEL_RATIO,
+                height: (coverWidth * PIXEL_RATIO) / COVER_RATIO,
+              }
+        }
         foregroundImageTintColor={cover.data.foregroundStyle?.color}
         backgroundImageColor={cover.data.backgroundStyle?.backgroundColor}
         backgroundMultiply={cover.data.merged}
         backgroundImageTintColor={cover.data.backgroundStyle?.patternColor}
         editionParameters={editionParameters}
         filter={filter}
-        title={cover.data.title}
-        subTitle={cover.data.subTitle}
+        title={title ?? cover.data.title}
+        subTitle={subTitle ?? cover.data.subTitle}
         titleStyle={cover.data.titleStyle}
         subTitleStyle={cover.data.subTitleStyle}
         contentStyle={cover.data.contentStyle}
-        computing={cover.data.segmented}
+        computing={false}
         cropEditionMode={false}
+        style={withShadow ? styles.coverShadow : undefined}
       />
     </PressableNative>
   );
 };
 
-export default memo(TemplateSelectorTemplateItem);
+export default memo(CoveTemplateRenderer);
 
+// TODO refactor this static PixelRatio.get() is deprecated
 const PIXEL_RATIO = PixelRatio.get();
 const RATIO_TEMPLATE = 7 / 15;
 const { width } = Dimensions.get('window');
 export const TEMPLATE_SELECTOR_ITEM_WIDTH = width * RATIO_TEMPLATE;
+
+const styles = StyleSheet.create({
+  coverShadow: {
+    shadowColor: colors.black,
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 17,
+    elevation: 6,
+  },
+});

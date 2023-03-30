@@ -18,7 +18,7 @@ import {
   DEFAULT_COVER_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/cardHelpers';
-import { colors, textStyles } from '#theme';
+import { textStyles } from '#theme';
 import { EditableImageWithCropMode } from '#components/medias';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
@@ -33,32 +33,95 @@ import type {
   LayoutChangeEvent,
   ViewStyle,
   LayoutRectangle,
+  ViewProps,
 } from 'react-native';
 
-type CoverEditionScreenCoverRendererProps = {
+type CoverPreviewRendererProps = ViewProps & {
+  /**
+   * The source media of the cover
+   */
   source?: EditableImageSource | null;
+  /**
+   * The size of the source media
+   */
   mediaSize?: { width: number; height: number } | null;
+  /**
+   * The background color of the cover
+   */
   backgroundImageColor?: string | null;
+  /**
+   * The tint color of the background image
+   */
   backgroundImageTintColor?: string | null;
+  /**
+   * The tint color of the foreground image
+   */
   foregroundImageTintColor?: string | null;
+  /**
+   * Should the main image be multiplied by the background image
+   */
   backgroundMultiply?: boolean | null;
+  /**
+   * The title of the cover
+   */
   title: string | null | undefined;
+  /**
+   * The style of the title
+   */
   titleStyle: CardCoverTextStyleInput | null | undefined;
+  /**
+   * The sub title of the cover
+   */
   subTitle: string | null | undefined;
+  /**
+   * The style of the sub title
+   */
   subTitleStyle: CardCoverTextStyleInput | null | undefined;
+  /**
+   * The style of the content
+   */
   contentStyle: CardCoverContentStyleInput | null | undefined;
+  /**
+   * Edition parameters to apply on the sourceMedia image
+   */
   editionParameters?: ImageEditionParameters | null;
+  /**
+   * Image filter to apply on the sourceMedia image
+   * @type {(string | null)}
+   */
   filter?: string | null;
+  /**
+   * if true, a loading indicator will be displayed after a delay
+   */
   computing?: boolean | null;
+  /**
+   * Enable the crop edition mode on the sourceMedia image
+   *
+   * @type {(boolean | null)}
+   */
   cropEditionMode?: boolean | null;
+  /**
+   * Callback called when the crop data of the sourceMedia image change
+   */
   onCropDataChange?: (cropData: CropData) => void;
+  /**
+   * use the default shadow effect arond the card
+   *
+   * @type {(boolean | null)}
+   */
+  withShadow?: boolean | null;
 };
 
-export type CoverEditionScreenCoverRendererHandle = {
+export type CoverPreviewHandler = {
   capture: () => Promise<string | null>;
 };
 
-const CoverEditionScreenCoverRenderer = (
+/**
+ * Render a cover in preview mode, which means that the cover will be rendered from the sourceMedia
+ * and the different text styles that will be applied on it instead of the generated cover media
+ * used in CoverEditionScreen and in CoverTemplateRenderer
+ */
+const CoverPreviewRenderer = (
   {
     source,
     mediaSize,
@@ -76,13 +139,19 @@ const CoverEditionScreenCoverRenderer = (
     computing,
     cropEditionMode,
     onCropDataChange,
-  }: CoverEditionScreenCoverRendererProps,
-  forwardedRef: ForwardedRef<CoverEditionScreenCoverRendererHandle>,
+    onLayout,
+    style,
+    ...props
+  }: CoverPreviewRendererProps,
+  forwardedRef: ForwardedRef<CoverPreviewHandler>,
 ) => {
   const [containerLayout, setContainerLayout] =
     useState<LayoutRectangle | null>(null);
-  const onLayout = (event: LayoutChangeEvent) => {
+  const onLayoutInner = (event: LayoutChangeEvent) => {
     setContainerLayout(event.nativeEvent.layout);
+    if (onLayout) {
+      onLayout(event);
+    }
   };
 
   const borderRadius = Platform.select({
@@ -251,7 +320,11 @@ const CoverEditionScreenCoverRenderer = (
   } as const;
 
   return (
-    <View style={[styles.root, { borderRadius }]} onLayout={onLayout}>
+    <View
+      style={[styles.root, { borderRadius }, style]}
+      {...props}
+      onLayout={onLayoutInner}
+    >
       <View style={[styles.topPanelContent, { borderRadius }]}>
         {loadingFailed ? (
           <View style={styles.errorContainer}>
@@ -322,16 +395,12 @@ const CoverEditionScreenCoverRenderer = (
   );
 };
 
-export default forwardRef(CoverEditionScreenCoverRenderer);
+export default forwardRef(CoverPreviewRenderer);
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     aspectRatio: COVER_RATIO,
-    shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 17,
   },
   topPanelContent: {
     flex: 1,

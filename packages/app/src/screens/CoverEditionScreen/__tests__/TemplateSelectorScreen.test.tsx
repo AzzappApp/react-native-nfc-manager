@@ -9,18 +9,18 @@ import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 import { act, render, screen, fireEvent } from '#helpers/testHelpers';
 
-import TemplateSelector from '..';
-import type { TemplateSelectorProps } from '../TemplateSelector';
-import type { TemplateSelectorTestQuery } from '@azzapp/relay/artifacts/TemplateSelectorTestQuery.graphql';
+import TemplateSelectorScreen from '../TemplateSelectorScreen';
+import type { TemplateSelectorScreenProps } from '../TemplateSelectorScreen';
+import type { TemplateSelectorScreenTestQuery } from '@azzapp/relay/artifacts/TemplateSelectorScreenTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-jest.mock('#screens/CoverEditionScreen/CoverEditionScreenCoverRenderer', () => {
+jest.mock('#screens/CoverEditionScreen/CoverPreviewRenderer', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
   const CoverEditionScreenCoverRenderer = (props: any) =>
-    React.createElement('CoverEditionScreenCoverRenderer', {
+    React.createElement('CoverPreviewRenderer', {
       ...props,
-      testID: 'cover-edition-screen-cover-renderer',
+      testID: 'cover-preview',
     });
   return {
     __esModule: true,
@@ -35,7 +35,9 @@ jest.mock('react-native-view-shot', () => ({
 const mockRouter = {
   push: jest.fn(),
   replace: jest.fn(),
+  back: jest.fn(),
 };
+
 jest.mock('#PlatformEnvironment', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
@@ -79,7 +81,7 @@ const TEMPLATE_COVER_DATA = {
   },
 };
 
-describe('TemplateSelector component', () => {
+describe('TemplateSelectorScreen component', () => {
   let environement: RelayMockEnvironment;
 
   const renderTemplateSelector = () => {
@@ -96,18 +98,18 @@ describe('TemplateSelector component', () => {
       }),
     );
 
-    const TestRenderer = (props?: Partial<TemplateSelectorProps>) => {
-      const data = useLazyLoadQuery<TemplateSelectorTestQuery>(
+    const TestRenderer = (props?: Partial<TemplateSelectorScreenProps>) => {
+      const data = useLazyLoadQuery<TemplateSelectorScreenTestQuery>(
         graphql`
-          query TemplateSelectorTestQuery @relay_test_operation {
+          query TemplateSelectorScreenTestQuery @relay_test_operation {
             viewer {
-              ...TemplateSelector_viewer
+              ...TemplateSelectorScreen_viewer
             }
           }
         `,
         {},
       );
-      return <TemplateSelector viewer={data.viewer} {...props} />;
+      return <TemplateSelectorScreen viewer={data.viewer} {...props} />;
     };
 
     return render(
@@ -120,14 +122,12 @@ describe('TemplateSelector component', () => {
   test('Should render the flatlist correctly with one cover template', () => {
     renderTemplateSelector();
     expect(screen.getByRole('list')).toBeTruthy();
-    expect(
-      screen.getAllByTestId('cover-edition-screen-cover-renderer'),
-    ).toHaveLength(1);
+    expect(screen.getAllByTestId('cover-preview')).toHaveLength(1);
   });
 
   test('Should call the router with `templateId`  navigation params when selecting a template', () => {
     renderTemplateSelector();
-    const allLink = screen.getAllByRole('link');
+    const allLink = screen.getAllByRole('button');
 
     act(() => {
       fireEvent.press(allLink[0]);
@@ -143,7 +143,7 @@ describe('TemplateSelector component', () => {
 
   test('Should call the router without `temaplteId` navigation params when "create from scratch button" is clicked', () => {
     renderTemplateSelector();
-    const button = screen.getByRole('button');
+    const button = screen.getByTestId('create-from-scratch-button');
 
     act(() => {
       fireEvent.press(button);

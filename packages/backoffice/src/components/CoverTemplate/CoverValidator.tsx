@@ -24,6 +24,13 @@ export const validateFormCover = async (
     errors.category = { en: 'Category is required' };
   }
 
+  if (values.category?.length > 0) {
+    const enCategory = values.category.find((c: any) => c.lang === 'en');
+    if (enCategory == null) {
+      errors.category = 'English Category is Required - code en';
+    }
+  }
+
   if (values.data.backgroundId != null) {
     let bgErrors = {} as any;
     if (values.data.backgroundStyle == null) {

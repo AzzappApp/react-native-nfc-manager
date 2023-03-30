@@ -29,6 +29,9 @@ const icons = {
   get cancel() {
     return require('./assets/cancel.png');
   },
+  get crop() {
+    return require('./assets/crop.png');
+  },
   get cross() {
     return require('./assets/cross.png');
   },
@@ -101,11 +104,17 @@ const icons = {
   get location() {
     return require('./assets/location.png');
   },
+  get image() {
+    return require('./assets/image.png');
+  },
   get invert() {
     return require('./assets/invert.png');
   },
   get magic() {
     return require('./assets/magic.png');
+  },
+  get modelsCoverTemplate() {
+    return require('./assets/modelsCoverTemplate.png');
   },
   get parameters() {
     return require('./assets/parameters.png');

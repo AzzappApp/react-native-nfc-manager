@@ -17,6 +17,7 @@ const CoverTemplateEdit = () => {
   }>();
   const transform = async (dataForm: Record<string, any>) => {
     const { data, category, colorPalette, ...rest } = dataForm;
+
     try {
       if (data.sourceMedia.id?.rawFile != null) {
         const { uploadURL, uploadParameters } = await uploadSign(
@@ -43,12 +44,15 @@ const CoverTemplateEdit = () => {
       }
       data.merged = dataForm.merged;
       data.segmented = dataForm.segmented;
+
       rest.category = JSON.stringify(category);
+      //boolean need to be converted in number apparantrly
 
       rest.data = data;
 
       return rest;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     }
   };

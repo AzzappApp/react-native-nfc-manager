@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemSelected: {
-    backgroundColor: colors.orange,
+    backgroundColor: colors.black,
   },
 });

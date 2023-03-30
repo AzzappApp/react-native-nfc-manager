@@ -7,6 +7,7 @@ import type { SwitchProps as RNSwitchProps } from 'react-native';
 type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {
   label?: string;
   onValueChange?: (value: boolean) => void;
+  switchStyle?: RNSwitchProps['style'];
 };
 
 const Switch = ({
@@ -14,18 +15,23 @@ const Switch = ({
   thumbColor,
   trackColor,
   style,
+  switchStyle,
   ...props
 }: SwitchProps) => {
   const switchProps = {
     thumbColor: thumbColor ?? '#fff',
-    trackColor: trackColor ?? { false: colors.grey, true: colors.orange },
+    trackColor: trackColor ?? { false: colors.grey, true: colors.black },
     ...props,
   };
   const id = useMemo(() => createId(), []);
   return label ? (
     <View style={[styles.root, style]}>
-      <RNSwitch {...switchProps} accessibilityLabelledBy={id} />
-      <Text style={[textStyles.small, styles.text]} nativeID={id}>
+      <RNSwitch
+        {...switchProps}
+        accessibilityLabelledBy={id}
+        style={switchStyle}
+      />
+      <Text style={styles.text} nativeID={id}>
         {label}
       </Text>
     </View>
@@ -42,6 +48,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
+    ...textStyles.small,
     marginLeft: 10,
     fontSize: 12,
   },
