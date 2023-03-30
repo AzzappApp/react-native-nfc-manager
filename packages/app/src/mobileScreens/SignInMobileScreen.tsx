@@ -1,18 +1,31 @@
-import { useWebAPI } from '#PlatformEnvironment';
-import { resetEnvironment } from '#helpers/relayEnvironment';
-import { setTokens } from '#helpers/tokensStore';
-import SignInMobileScreen from '#screens/SignInScreen';
+import { mainRoutes, newProfileRoute } from '#mobileRoutes';
+import { useRouter, useWebAPI } from '#PlatformEnvironment';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import SignInScreen from '#screens/SignInScreen';
+import type { NativeRouter } from '#components/NativeRouter';
 import type { SignInParams } from '@azzapp/shared/WebAPI';
 
-const SignUpMobileScreen = () => {
+const SignInMobileScreen = () => {
   const WebAPI = useWebAPI();
+  const nativeRouter = useRouter() as NativeRouter;
   const signin = async (params: SignInParams) => {
-    const tokens = await WebAPI.signin(params);
-    await setTokens(tokens);
-    resetEnvironment();
-  };
+    const { token, refreshToken, profileId } = await WebAPI.signin(params);
+    dispatchGlobalEvent({
+      type: 'SIGN_IN',
+      payload: { authTokens: { token, refreshToken }, profileId },
+    });
 
-  return <SignInMobileScreen signin={signin} />;
+    if (profileId) {
+      nativeRouter.replaceAll(mainRoutes);
+    } else {
+      nativeRouter.replaceAll(newProfileRoute);
+    }
+  };
+  return <SignInScreen signin={signin} />;
 };
 
-export default SignUpMobileScreen;
+export default SignInMobileScreen;
+
+SignInMobileScreen.options = {
+  replaceAnimation: 'push',
+};

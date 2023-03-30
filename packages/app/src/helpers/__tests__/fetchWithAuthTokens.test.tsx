@@ -1,13 +1,16 @@
 import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens } from '@azzapp/shared/WebAPI';
+import { getTokens } from '#helpers/authStore';
 import fetchWithAuthTokens from '#helpers/fetchWithAuthTokens';
-import { clearTokens, getTokens, setTokens } from '#helpers/tokensStore';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 
-jest.mock('#helpers/tokensStore', () => ({
+jest.mock('#helpers/authStore', () => ({
   getTokens: jest.fn(),
-  setTokens: jest.fn(),
-  clearTokens: jest.fn(),
+}));
+
+jest.mock('#helpers/globalEvents', () => ({
+  dispatchGlobalEvent: jest.fn(),
 }));
 
 jest.mock('@azzapp/shared/networkHelpers', () => ({
@@ -19,8 +22,6 @@ jest.mock('@azzapp/shared/WebAPI', () => ({
 }));
 
 const getTokensMock = getTokens as jest.MockedFunction<typeof getTokens>;
-const setTokensMock = setTokens as jest.MockedFunction<typeof setTokens>;
-const clearTokensMock = clearTokens as jest.MockedFunction<typeof clearTokens>;
 const fetchJSONMock = fetchJSON as jest.MockedFunction<typeof fetchJSON>;
 const refreshTokensMock = refreshTokens as jest.MockedFunction<
   typeof refreshTokens
@@ -29,7 +30,7 @@ const refreshTokensMock = refreshTokens as jest.MockedFunction<
 jest.useFakeTimers();
 describe('fetchWithAuthTokens', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
   test('should not amend the request if there is no tokens in the store', () => {
     getTokensMock.mockReturnValueOnce(null);
@@ -67,7 +68,6 @@ describe('fetchWithAuthTokens', () => {
       token: 'fakeToken2',
       refreshToken: 'fakeRefreshToken2',
     });
-    setTokensMock.mockResolvedValueOnce(undefined);
 
     void fetchWithAuthTokens('https://example.com', { method: 'POST' });
     jest.runAllTicks();
@@ -84,34 +84,38 @@ describe('fetchWithAuthTokens', () => {
         Authorization: 'Bearer fakeToken2',
       },
     });
-    expect(setTokensMock).toHaveBeenCalledWith({
-      token: 'fakeToken2',
-      refreshToken: 'fakeRefreshToken2',
+    expect(dispatchGlobalEvent).toHaveBeenCalledWith({
+      type: 'TOKENS_REFRESHED',
+      payload: {
+        authTokens: {
+          token: 'fakeToken2',
+          refreshToken: 'fakeRefreshToken2',
+        },
+      },
     });
   });
 
-  test('should clear the tokens if the refresh token is invalid', () => {
+  test('should throw an error if the refresh token is invalid', () => {
+    expect.assertions(3);
     getTokensMock.mockReturnValueOnce({
       token: 'fakeToken',
       refreshToken: 'fakeRefreshToken',
     });
     fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
     refreshTokensMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
-    clearTokensMock.mockResolvedValueOnce(undefined);
 
-    void fetchWithAuthTokens('https://example.com', { method: 'POST' });
+    fetchWithAuthTokens('https://example.com', { method: 'POST' }).catch(e => {
+      expect(e.message).toBe(ERRORS.INVALID_TOKEN);
+    });
     jest.runAllTicks();
 
-    expect(fetchJSONMock).toHaveBeenNthCalledWith(1, 'https://example.com', {
+    expect(fetchJSONMock).toHaveBeenCalledWith('https://example.com', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer fakeToken',
       },
     });
-    expect(fetchJSONMock).toHaveBeenNthCalledWith(2, 'https://example.com', {
-      method: 'POST',
-    });
-    expect(clearTokensMock).toHaveBeenCalled();
+    expect(fetchJSONMock).toHaveBeenCalledTimes(1);
   });
 
   test('should throw an error if the error is not invalid token', () => {

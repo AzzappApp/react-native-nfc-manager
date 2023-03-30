@@ -3,13 +3,10 @@ import { NextResponse } from 'next/server';
 import { destroySession, setSession } from '@azzapp/auth/session';
 import { generateTokens } from '@azzapp/auth/tokens';
 import {
-  createProfile,
   createUser,
-  getProfileByUserName,
   getUserByEmail,
   getUserByPhoneNumber,
 } from '@azzapp/data/domains';
-import { DEFAULT_PALETTE_COLOR } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
@@ -17,22 +14,18 @@ import {
 } from '@azzapp/shared/stringHelpers';
 
 type SignupBody = {
-  userName?: string;
   email?: string | null;
   phoneNumber?: string | null;
   password?: string;
-  locale?: string;
-  firstName?: string;
-  lastName?: string;
   authMethod?: 'cookie' | 'token';
 };
 
 export const POST = async (req: Request) => {
-  const { email, userName, phoneNumber, password, authMethod } =
+  const { email, phoneNumber, password, authMethod } =
     ((await req.json()) as SignupBody) || {};
 
   //we need at least one email or one phone number
-  if ((!email && !phoneNumber) || !userName || !password) {
+  if ((!email && !phoneNumber) || !password) {
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
@@ -63,37 +56,18 @@ export const POST = async (req: Request) => {
         );
       }
     }
-    if (await getProfileByUserName(userName)) {
-      return NextResponse.json(
-        { message: ERRORS.USERNAME_ALREADY_EXISTS },
-        { status: 400 },
-      );
-    }
 
     const user = await createUser({
       email: email ?? null,
-      phoneNumber: phoneNumber ?? null,
+      phoneNumber: phoneNumber?.replace(/\s/g, '') ?? null,
       password: bcrypt.hashSync(password, 12),
       roles: null,
-    });
-
-    const profile = await createProfile({
-      userId: user.id,
-      userName,
-      firstName: null,
-      lastName: null,
-      companyActivityId: null,
-      companyName: null,
-      profileKind: null,
-      isReady: false,
-      colorPalette: DEFAULT_PALETTE_COLOR.join(','),
-      //TODO: define the default color palette or import the one from the template when card is created from a template
     });
 
     if (authMethod === 'token') {
       const { token, refreshToken } = await generateTokens({
         userId: user.id,
-        profileId: profile.id,
+        profileId: null,
       });
       return destroySession(
         NextResponse.json({ ok: true, token, refreshToken }),
@@ -101,7 +75,7 @@ export const POST = async (req: Request) => {
     } else {
       return setSession(NextResponse.json({ ok: true }), {
         userId: user.id,
-        profileId: profile.id,
+        profileId: null,
         isAnonymous: false,
       });
     }

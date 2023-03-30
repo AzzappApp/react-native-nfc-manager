@@ -4,15 +4,17 @@ import {
   Animated,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   StyleSheet,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import Header from '#components/Header';
+import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from './Button';
 import type { HeaderProps } from '#components/Header';
-import type { ModalProps } from 'react-native';
+import type { ModalProps, StyleProp, ViewStyle } from 'react-native';
 
 export type BottomSheetModalProps = Omit<
   ModalProps,
@@ -35,6 +37,19 @@ export type BottomSheetModalProps = Omit<
    */
   headerRightButton?: HeaderProps['rightButton'];
   /**
+   * The variant of the bottomsheet @default 'default'
+   */
+  variant?: 'default' | 'modal';
+  /**
+   * The style of the bottomsheet content container, since the bottomsheet has a default padding
+   * and margin, you can use this to override the default style
+   */
+  contentContainerStyle?: StyleProp<ViewStyle>;
+  /**
+   * disableGestureInteraction
+   */
+  disableGestureInteraction?: boolean;
+  /**
    * @see ModalProps#onRequestClose
    */
   onRequestClose: () => void;
@@ -50,6 +65,9 @@ const BottomSheetModal = ({
   headerLeftButton,
   headerRightButton,
   children,
+  variant,
+  disableGestureInteraction,
+  contentContainerStyle,
   onRequestClose,
   ...props
 }: BottomSheetModalProps) => {
@@ -82,8 +100,55 @@ const BottomSheetModal = ({
     };
   }, [animation, visible]);
 
-  const { bottom } = useSafeAreaInsets();
+  const vp = useViewportSize();
   const intl = useIntl();
+
+  if (variant === 'default' && headerRightButton === undefined) {
+    headerRightButton = (
+      <Button
+        label={intl.formatMessage({
+          defaultMessage: 'Close',
+          description: 'Bottom sheet close button',
+        })}
+        onPress={onRequestClose}
+      />
+    );
+  }
+
+  const hasHeader =
+    headerTitle != null ||
+    headerLeftButton != null ||
+    headerRightButton != null;
+
+  const disableGestureInteractionRef = useRef(disableGestureInteraction);
+  useEffect(() => {
+    disableGestureInteractionRef.current = disableGestureInteraction;
+  }, [disableGestureInteraction]);
+  const pan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () =>
+        disableGestureInteractionRef.current !== true,
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          animation.setValue(1 - gestureState.dy / height);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          if (gestureState.dy > height / 2) {
+            onRequestClose();
+          } else {
+            Animated.spring(animation, {
+              toValue: 1,
+              useNativeDriver: true,
+              bounciness: 0,
+            }).start();
+          }
+        }
+      },
+    }),
+  ).current;
+
   return (
     <Modal
       animationType="none"
@@ -95,46 +160,58 @@ const BottomSheetModal = ({
       <TouchableWithoutFeedback
         style={styles.absoluteFill}
         onPress={onRequestClose}
-      />
+      >
+        <View style={styles.absoluteFill}>
+          {variant === 'modal' && (
+            <Animated.View
+              style={[
+                styles.absoluteFill,
+                {
+                  backgroundColor: colors.dark,
+                  opacity: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 0.8],
+                  }),
+                },
+              ]}
+            />
+          )}
+        </View>
+      </TouchableWithoutFeedback>
       <KeyboardAvoidingView
         style={styles.modalContainer}
         behavior="position"
         contentContainerStyle={styles.absoluteFill}
       >
         <Animated.View
+          {...pan.panHandlers}
           style={[
             styles.bottomSheetContainer,
-            { height: height + bottom, paddingBottom: bottom },
+            contentContainerStyle,
+            {
+              height: vp`${height} + ${insetBottom}`,
+              paddingBottom: vp`${insetBottom}`,
+            },
             {
               transform: [
                 {
                   translateY: animation.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, -(height + bottom)],
+                    outputRange: [0, -(height + vp`${insetBottom}`)],
                   }),
                 },
               ],
             },
           ]}
         >
-          <Header
-            style={styles.accessoryView}
-            title={headerTitle}
-            leftButton={headerLeftButton}
-            rightButton={
-              headerRightButton !== undefined ? (
-                headerRightButton
-              ) : (
-                <Button
-                  label={intl.formatMessage({
-                    defaultMessage: 'Close',
-                    description: 'Bottom sheet close button',
-                  })}
-                  onPress={onRequestClose}
-                />
-              )
-            }
-          />
+          {hasHeader && (
+            <Header
+              style={styles.accessoryView}
+              title={headerTitle}
+              leftButton={headerLeftButton}
+              rightButton={headerRightButton}
+            />
+          )}
           {children}
         </Animated.View>
       </KeyboardAvoidingView>

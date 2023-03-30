@@ -1,7 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { sql } from 'kysely';
 import ERRORS from '@azzapp/shared/errors';
-
 import db from './db';
 import { getEntitiesByIds, sqlCountToNumber } from './generic';
 import type { Profile } from '@prisma/client';

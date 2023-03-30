@@ -1,5 +1,5 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useMemo, useState, useRef } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Keyboard,
@@ -10,26 +10,23 @@ import {
   Text,
   Image,
 } from 'react-native';
-import { fetchQuery, graphql, useRelayEnvironment } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import {
-  isNotFalsyString,
   isPhoneNumber,
   isValidEmail,
   isValidPassword,
-  isValidUsername,
-  REGEX_CHAR_USERNAME,
 } from '@azzapp/shared/stringHelpers';
 import { textStyles, fontFamilies, colors } from '#theme';
 import Link from '#components/Link';
-import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
+import EmailOrCountryCodeSelector from '#ui/EmailOrCountryCodeSelector';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import TextInput from '#ui/TextInput';
-import type { SignUpScreenQuery } from '@azzapp/relay/artifacts/SignUpScreenQuery.graphql';
+import PhoneInput from '../components/PhoneInput';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
@@ -40,223 +37,115 @@ type SignupScreenProps = {
 };
 
 const SignupScreen = ({ signup }: SignupScreenProps) => {
-  const vp = useViewportSize();
-  const intl = useIntl();
-  const [phoneOrEmail, setPhoneOrEmail] = useState('');
-  const [phoneEmailError, setPhoneEmailError] = useState('');
+  const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
+    CountryCode | 'email'
+  >('email');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneOrEmailError, setPhoneOrEmailError] = useState('');
+
   const [password, setPassword] = useState('');
-  const [pwdError, setPwdError] = useState(false);
+  const [showPasswordError, setShowPasswordError] = useState(false);
+
   const [checkedTos, setCheckedTos] = useState(false);
   const [checkedPrivacy, setCheckedPrivacy] = useState(false);
-  const [errorTos, setErrorTos] = useState<boolean>(false);
-  const [username, setUsername] = useState('');
-  const [usernameError, setUsernameError] = useState<string | undefined>();
-  const userNameRef = useRef<NativeTextInput>(null);
-  const passwordRef = useRef<NativeTextInput>(null);
-  const environment = useRelayEnvironment();
+  const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
-  const onChangeUsername = useCallback(
-    (text: string) => {
-      if (isNotFalsyString(text)) {
-        if (REGEX_CHAR_USERNAME.test(text.slice(-1))) {
-          setUsernameError(undefined);
-          setUsername(text);
+  const passwordRef = useRef<NativeTextInput>(null);
+
+  const intl = useIntl();
+
+  const onSubmit = useCallback(async () => {
+    setPhoneOrEmailError('');
+    let canSignup = true;
+    if (countryCodeOrEmail === 'email') {
+      if (!isValidEmail(email)) {
+        setPhoneOrEmailError(
+          intl.formatMessage({
+            defaultMessage: 'Please enter a valid email address',
+            description:
+              'Signup Screen - Error message for invalid email address',
+          }),
+        );
+        canSignup = false;
+      }
+    } else if (!isPhoneNumber(phoneNumber, countryCodeOrEmail)) {
+      setPhoneOrEmailError(
+        intl.formatMessage({
+          defaultMessage: 'Please enter a valid phone number',
+          description: 'Signup Screen - Error message for invalid phone number',
+        }),
+      );
+      canSignup = false;
+    }
+
+    const passWordValid = isValidPassword(password);
+    setShowPasswordError(!passWordValid);
+    canSignup &&= passWordValid;
+
+    const tosValid = checkedTos && checkedPrivacy;
+    setShowTOSError(!tosValid);
+    canSignup &&= tosValid;
+
+    if (canSignup) {
+      try {
+        if (countryCodeOrEmail === 'email') {
+          await signup({ email, password });
         } else {
-          setUsernameError(
+          await signup({
+            phoneNumber: parsePhoneNumber(
+              phoneNumber,
+              countryCodeOrEmail,
+            ).formatInternational(),
+            password,
+          });
+        }
+      } catch (error: any) {
+        if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
+          setPhoneOrEmailError(
             intl.formatMessage({
-              defaultMessage:
-                'Usernames can only use Roman latines letters(a-z, A-Z), numbers, underscores and full stops. Should contains at least 4 characters',
+              defaultMessage: 'This email address is already registered',
               description:
-                'Signup Screen - Error message for invalid username on textInput',
+                'Signup Screen - Error This email address is already registered ',
+            }),
+          );
+        } else if (error.message === ERRORS.PHONENUMBER_ALREADY_EXISTS) {
+          setPhoneOrEmailError(
+            intl.formatMessage({
+              defaultMessage: 'This phone number is already registered',
+              description:
+                'Signup Screen - Error This phone number is already registered ',
+            }),
+          );
+        } else {
+          setPhoneOrEmailError(
+            intl.formatMessage({
+              defaultMessage: 'Unknown error - Please retry',
+              description: 'Signup Screen - Error unkown',
             }),
           );
         }
-      } else {
-        setUsername('');
-      }
-    },
-    [intl],
-  );
-
-  const usernameExist = useCallback(async () => {
-    if (isValidUsername(username)) {
-      const result = await fetchQuery<SignUpScreenQuery>(
-        environment,
-        graphql`
-          query SignUpScreenQuery($userName: String!) {
-            profile(userName: $userName) {
-              id
-              userName
-            }
-          }
-        `,
-        { userName: username },
-      ).toPromise();
-      if (result?.profile?.userName === username) {
-        return true;
-      }
-    }
-    return false;
-  }, [environment, username]);
-
-  const validateUsername = useCallback(async () => {
-    if (!isValidUsername(username)) {
-      setUsernameError(
-        intl.formatMessage({
-          defaultMessage:
-            'Usernames can only use Roman latines letters(a-z, A-Z), numbers, underscores and full stops. Should contains at least 4 characters',
-          description:
-            'Signup Screen - Error message for invalid username on textInput',
-        }),
-      );
-      return;
-    }
-    if (await usernameExist()) {
-      setUsernameError(
-        intl.formatMessage({
-          defaultMessage: 'This username is already taken',
-          description:
-            'Signup Screen - Error message for  username is already taken',
-        }),
-      );
-      return;
-    }
-    setUsernameError(undefined);
-  }, [intl, username, usernameExist]);
-
-  const isValidMailOrPhone = useMemo(() => {
-    if (isValidEmail(phoneOrEmail)) {
-      return true;
-    }
-
-    const locales = getLocales();
-    for (let i = 0; i < locales.length; i++) {
-      if (isPhoneNumber(phoneOrEmail, locales[i].countryCode as CountryCode)) {
-        return true;
-      }
-    }
-    return false;
-  }, [phoneOrEmail]);
-
-  const onSubmit = useCallback(async () => {
-    try {
-      setPhoneEmailError('');
-      let canSignup = true;
-      if (!isValidPassword(password)) {
-        setPwdError(true);
-        canSignup = false;
-      } else {
-        setPwdError(false);
-      }
-      if (!(checkedTos && checkedPrivacy)) {
-        setErrorTos(true);
-        canSignup = false;
-        return;
-      }
-      setErrorTos(false);
-      if (!isValidMailOrPhone) {
-        setPhoneEmailError(
-          intl.formatMessage({
-            defaultMessage:
-              'Please enter a valid phone number or email address',
-            description:
-              'Signup Screen - Error message for invalid phone or email address on textInput ',
-          }),
-        );
-
-        canSignup = false;
-        return;
-      }
-      // test is not working if doing  if (canSignup && !(await usernameExist())
-      const canCreateUsername = !(await usernameExist());
-      if (canSignup && canCreateUsername) {
-        let phoneEmail = phoneOrEmail;
-
-        const locales = getLocales();
-        if (!isValidEmail(phoneOrEmail)) {
-          for (let i = 0; i < locales.length; i++) {
-            if (
-              isPhoneNumber(phoneOrEmail, locales[i].countryCode as CountryCode)
-            ) {
-              const res = parsePhoneNumber(
-                phoneOrEmail,
-                locales[i].countryCode as CountryCode,
-              );
-              //this will format
-              phoneEmail = res.formatInternational();
-              break;
-            }
-          }
-
-          await signup({
-            userName: username,
-            phoneNumber: phoneEmail,
-            password,
-          });
-        } else {
-          await signup({
-            userName: username,
-            email: phoneEmail,
-            password,
-          });
-        }
-      }
-    } catch (error: any) {
-      if (error.message === 'EMAIL_ALREADY_EXISTS') {
-        setPhoneEmailError(
-          intl.formatMessage({
-            defaultMessage: 'This email address is already registered',
-            description:
-              'Signup Screen - Error This email address is already registered ',
-          }),
-        );
-      } else if (error.message === 'PHONENUMBER_ALREADY_EXISTS') {
-        setPhoneEmailError(
-          intl.formatMessage({
-            defaultMessage: 'This phone number is already registered',
-            description:
-              'Signup Screen - Error This phone number is already registered ',
-          }),
-        );
-      } else if (error.message === 'USERNAME_ALREADY_EXIST') {
-        setUsernameError(
-          intl.formatMessage({
-            defaultMessage: 'This username is not available',
-            description: 'Signup Screen - Error This username is not available',
-          }),
-        );
-      } else {
-        setPhoneEmailError(
-          intl.formatMessage({
-            defaultMessage: 'Unknown error - Please retry',
-            description: 'Signup Screen - Error unkown',
-          }),
-        );
       }
     }
   }, [
     checkedPrivacy,
     checkedTos,
+    countryCodeOrEmail,
+    email,
     intl,
-    isValidMailOrPhone,
     password,
-    phoneOrEmail,
+    phoneNumber,
     signup,
-    username,
-    usernameExist,
   ]);
-
-  const focusUserName = () => {
-    userNameRef?.current?.focus();
-  };
 
   const focusPassword = () => {
     passwordRef?.current?.focus();
   };
 
+  const vp = useViewportSize();
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.containerImagebackground}>
+    <View style={styles.root}>
+      <View style={styles.background}>
         <Image
           source={require('#assets/sign/darkensign_background.png')}
           resizeMode="cover"
@@ -265,7 +154,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
-        style={styles.flexible}
+        style={styles.content}
       >
         <View
           style={styles.logoContainer}
@@ -277,26 +166,20 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
             style={styles.logo}
           />
         </View>
-        <View style={styles.container}>
+        <View style={styles.body}>
           <Form
-            style={[styles.inner, { marginBottom: vp`${insetBottom}` }]}
+            style={[styles.form, { marginBottom: vp`${insetBottom}` }]}
             onSubmit={onSubmit}
           >
-            <View style={{ alignItems: 'center', marginBottom: 10 }}>
-              <Text
-                style={{
-                  ...fontFamilies.semiBold,
-                  fontSize: 26,
-                  marginBottom: 10,
-                }}
-              >
+            <View style={styles.header}>
+              <Text style={styles.title}>
                 <FormattedMessage
                   defaultMessage="Welcome"
                   description="Signup Screen - Welcome title"
                 />
               </Text>
 
-              <Text>
+              <Text style={styles.subTitle}>
                 <FormattedMessage
                   defaultMessage="Let's get started with Azzapp!"
                   description="Signup Screen - Let's get started with Azzapp! subtitle"
@@ -304,51 +187,76 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               </Text>
             </View>
 
-            <TextInput
-              key="email"
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Phone Number of email address',
-                description:
-                  'Signup Screen - email address or phone number input placeholder',
-              })}
-              value={phoneOrEmail}
-              onChangeText={setPhoneOrEmail}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              autoCorrect={false}
-              containerStyle={styles.textinputContainer}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Enter your email address or phone number',
-                description:
-                  'Signup Screen - Accessibility TextInput email address or phone number',
-              })}
-              errorLabel={phoneEmailError}
-              onSubmitEditing={focusUserName}
-              returnKeyType="next"
-            />
+            <View style={styles.phoneOrEmailContainer}>
+              <EmailOrCountryCodeSelector
+                emailSectionTitle={intl.formatMessage({
+                  defaultMessage: 'Connect with email address',
+                  description:
+                    'Signup Form Connect with email address section title in country selection list',
+                })}
+                phoneSectionTitle={intl.formatMessage({
+                  defaultMessage: 'Connect with phone number',
+                  description:
+                    'Signup Form Connect with phone number section title in country selection list',
+                })}
+                value={countryCodeOrEmail}
+                onChange={setCountryCodeOrEmail}
+                style={styles.countryCodeOrEmailButton}
+              />
+              {countryCodeOrEmail === 'email' ? (
+                <TextInput
+                  nativeID="email"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Email address',
+                    description:
+                      'Signup Screen - email address input placeholder',
+                  })}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  keyboardType="email-address"
+                  autoCorrect={false}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Enter your email address',
+                    description:
+                      'Signup Screen - Accessibility TextInput email address',
+                  })}
+                  isErrored={!!phoneOrEmailError}
+                  onSubmitEditing={focusPassword}
+                  returnKeyType="next"
+                  style={{ flex: 1 }}
+                />
+              ) : (
+                <PhoneInput
+                  nativeID="phoneNumber"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Phone number',
+                    description:
+                      'Signup Screen - phone number input placeholder',
+                  })}
+                  value={phoneNumber}
+                  onChange={value => setPhoneNumber(value ?? '')}
+                  defaultCountry={countryCodeOrEmail}
+                  autoCapitalize="none"
+                  keyboardType="phone-pad"
+                  autoCorrect={false}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Enter your phone number',
+                    description:
+                      'Signup Screen - Accessibility TextInput phone number',
+                  })}
+                  isErrored={!!phoneOrEmailError}
+                  onSubmitEditing={focusPassword}
+                  returnKeyType="next"
+                  style={{ flex: 1 }}
+                />
+              )}
+            </View>
+            <Text style={styles.error}>{phoneOrEmailError}</Text>
 
-            <TextInput
-              key="username"
-              ref={userNameRef}
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Choose a username',
-                description:
-                  'Signup Screen - choose a username input placeholder',
-              })}
-              value={username}
-              onChangeText={onChangeUsername}
-              autoCapitalize="none"
-              autoComplete="username"
-              autoCorrect={false}
-              errorLabel={usernameError}
-              onBlur={validateUsername}
-              containerStyle={styles.textinputContainer}
-              onSubmitEditing={focusPassword}
-              returnKeyType="next"
-            />
             <SecuredTextInput
-              key="password"
+              nativeID="password"
               ref={passwordRef}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
@@ -356,25 +264,25 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               })}
               value={password}
               onChangeText={setPassword}
-              errorLabel={
-                pwdError
-                  ? intl.formatMessage({
-                      defaultMessage:
-                        'Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter',
-                      description:
-                        'SignupScreen - error message when password is not compliant with our rules',
-                    })
-                  : undefined
-              }
-              containerStyle={styles.textinputContainer}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage:
                   'Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case',
                 description:
                   'Signup Screen - Accessibility Label TextInput Password',
               })}
-              returnKeyType="done"
+              returnKeyType="send"
+              onSubmitEditing={onSubmit}
+              isErrored={showPasswordError}
             />
+            <Text style={styles.error}>
+              {showPasswordError && (
+                <FormattedMessage
+                  defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                  description="Signup Screen - error message when password is not compliant with our rules"
+                />
+              )}
+            </Text>
+
             <CheckBox
               label={
                 <Text style={styles.checkLabel}>
@@ -419,7 +327,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               }
               checked={checkedPrivacy}
               onValueChange={setCheckedPrivacy}
-              containerStyle={styles.ppContainer}
+              containerStyle={styles.checkboxContainer}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Tap to accept the privacy policy',
                 description:
@@ -429,6 +337,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 
             <Submit>
               <Button
+                testID="submit"
                 label={intl.formatMessage({
                   defaultMessage: 'Sign Up',
                   description: 'Signup Screen - Sign Up button',
@@ -438,31 +347,25 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   description: 'Signup Screen - Accessibility Sign Up button',
                 })}
                 style={styles.button}
-                disabled={!isValidMailOrPhone && !isNotFalsyString(username)}
+                disabled={(!phoneNumber && !email) || !password}
               />
             </Submit>
-            {errorTos && (
-              <Text
-                style={{
-                  ...textStyles.error,
-                  paddingLeft: 10,
-                  marginTop: 10,
-                }}
-              >
+            {showTOSError && (
+              <Text style={styles.formError}>
                 <FormattedMessage
                   defaultMessage="You need to accept the Terms of Service and the Privacy Policy"
                   description="Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
                 />
               </Text>
             )}
-            <View style={styles.viewAlreadyAccount}>
+            <View style={styles.footer}>
               <Text style={styles.alrSignText}>
                 <FormattedMessage
                   defaultMessage="Already have an account?"
                   description="Signup Screen - Already have an account?"
                 />
               </Text>
-              <Link modal route="SIGN_IN" replace>
+              <Link route="SIGN_IN" replace>
                 <Text style={styles.linkLogin}>
                   <FormattedMessage
                     defaultMessage="Log In"
@@ -481,14 +384,11 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 export default SignupScreen;
 
 const styles = StyleSheet.create({
-  flexible: { flex: 1 },
-  viewAlreadyAccount: {
-    marginTop: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  root: {
+    flex: 1,
+    justifyContent: 'flex-end',
   },
-  containerImagebackground: {
+  background: {
     width: '100%',
     position: 'absolute',
     top: 0,
@@ -496,21 +396,64 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mainContainer: {
+  content: {
     flex: 1,
-    justifyContent: 'flex-end',
   },
-  container: {
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    height: 34,
+    width: 165,
+  },
+  body: {
     justifyContent: 'center',
     alignItem: 'center',
     backgroundColor: 'white',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
-  textinputContainer: {
-    padding: 0,
-    margin: 0,
+  form: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  title: {
+    ...fontFamilies.semiBold,
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  subTitle: {
+    ...textStyles.normal,
+    color: colors.grey400,
+  },
+  phoneOrEmailContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryCodeOrEmailButton: {
+    marginRight: 5,
+  },
+  error: {
+    ...textStyles.error,
+    minHeight: 15,
     marginBottom: 5,
+  },
+  checkLabel: {
+    ...fontFamilies.fontMedium,
+    fontSize: 14,
+    color: colors.black,
+    paddingLeft: 11,
+  },
+  checkboxContainer: {
+    paddingTop: 20,
   },
   button: {
     marginTop: 20,
@@ -520,25 +463,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
   },
-  checkLabel: {
-    ...fontFamilies.fontMedium,
-    fontSize: 14,
-    color: colors.black,
-    paddingLeft: 11,
+  formError: {
+    ...textStyles.error,
+    paddingLeft: 10,
+    marginTop: 10,
   },
-  ppContainer: { paddingTop: 20 },
-  inner: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  logoContainer: {
-    flex: 1,
-    alignItems: 'center',
+  footer: {
+    marginTop: 10,
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  logo: { height: 34, width: 165 },
-  alrSignText: { color: colors.grey200 },
-  linkLogin: { ...fontFamilies.fontMedium, paddingLeft: 5 },
+  alrSignText: {
+    color: colors.grey200,
+  },
+  linkLogin: {
+    ...fontFamilies.fontMedium,
+    paddingLeft: 5,
+  },
 });

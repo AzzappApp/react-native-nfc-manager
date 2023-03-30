@@ -26,6 +26,7 @@ export const isNotFalsyString = (value: string | null | undefined) => {
   return true;
 };
 
+// TODO improve regex
 // At least one digit [0-9]
 // At least one lowercase character [a-z]
 // At least one uppercase character [A-Z]
@@ -72,7 +73,7 @@ export const isInternationalPhoneNumber = (phoneNumber?: string | null) => {
   }
   return false;
 };
-export const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_.]{4,30}$/;
+export const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_.]{1,30}$/;
 export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_.]$/;
 /**
  * Validate username using simple regex (does not start with specific charaters, does not container special characters and only one _ allowed at the end)
@@ -81,7 +82,7 @@ export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_.]$/;
  * @param {string} username
  * @return {*}
  */
-export const isValidUsername = (username: string) => {
+export const isValidUserName = (username: string) => {
   return REGEX_USERNAME.test(username) && encodeURI(username) === username;
 };
 

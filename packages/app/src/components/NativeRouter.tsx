@@ -64,11 +64,17 @@ type SetTabAction = {
   payload: { tabIndex: number };
 };
 
+type ReplaceAllAction = {
+  type: 'REPLACE_ALL';
+  payload: RouterState;
+};
+
 type RouterAction =
   | BackAction
   | BackToTopAction
   | PushAction
   | ReplaceAction
+  | ReplaceAllAction
   | ScreenDismissedAction
   | SetTabAction
   | ShowModalAction;
@@ -226,6 +232,8 @@ const routerReducer = (
         stack: [state.stack[0]],
         modals: [],
       };
+    case 'REPLACE_ALL':
+      return action.payload;
     default:
       console.error(`Unknonw route action of type '${(action as any).type}'`);
       return state;
@@ -235,6 +243,7 @@ const routerReducer = (
 type ScreenListener = (args: { id: string; route: Route }) => void;
 
 export type NativeRouter = PlatformRouter & {
+  replaceAll(routes: NativeRouterInit): void;
   backToTop(): void;
   screenDismissed(id: string): void;
   addScreenWillBePushedListener: (listener: ScreenListener) => {
@@ -309,12 +318,6 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     initRouterState(init),
   );
 
-  useEffect(() => {
-    setRouterState(initRouterState(init));
-    // comparison was not working fine, also in jest causing javascript out of memory error
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [init.id]);
-
   const routerStateRef = useRef(routerState);
   // this is clearly not working properly when changing routerState. Other solution would be using immutable state for example
   if (routerStateRef.current !== routerState) {
@@ -339,11 +342,38 @@ export const useNativeRouter = (init: NativeRouterInit) => {
   }, []);
 
   const currentRoute = getCurrentRouteFromState(routerState);
+
   useEffect(() => {
     // TODO should we dispatch after transition end ?
     dispatchToListeners(routeDidChangeListeners, currentRoute.state);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoute]);
+
+  const replaceAll = (init: NativeRouterInit) => {
+    const { stack, modals } = routerStateRef.current;
+    const screenRemoved = [
+      ...getAllRoutesFromStack(modals),
+      ...getAllRoutesFromStack(stack),
+    ];
+    screenRemoved.forEach(({ id, state: route }) =>
+      dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
+    );
+    const nextState = initRouterState(init);
+    const screenPusheds = [
+      ...getAllRoutesFromStack(nextState.modals, [], true),
+      ...getAllRoutesFromStack(nextState.stack, [], true),
+    ];
+    screenPusheds.forEach(({ id, state: route }) =>
+      dispatchToListeners(screenWillBePushedListeners, { id, route }),
+    );
+
+    dispatch({ type: 'REPLACE_ALL', payload: nextState });
+  };
+
+  useEffect(() => {
+    replaceAll(init);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [init.id]);
 
   const router = useMemo<NativeRouter>(() => {
     const getCurrentRoute = () =>
@@ -442,11 +472,14 @@ export const useNativeRouter = (init: NativeRouterInit) => {
           type: 'BACK',
         });
       },
+      // Native Router specific methods
+      replaceAll,
       backToTop() {
         const { stack, modals } = routerStateRef.current;
-        const screenRemoved = getAllRoutesFromStack(modals).concat(
-          getAllRoutesFromStack(stack.slice(1)),
-        );
+        const screenRemoved = [
+          ...getAllRoutesFromStack(modals),
+          ...getAllRoutesFromStack(stack),
+        ];
         screenRemoved.forEach(({ id, state: route }) =>
           dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
         );
@@ -852,13 +885,17 @@ const getCurrentRouteFromState = ({
 const getAllRoutesFromStack = (
   state: StackState,
   routes: BasicRoute[] = [],
+  excludeNonActiveTabs = false,
 ) => {
   for (let i = state.length - 1; i >= 0; i--) {
     const screen = state[i];
     if (screen.kind === 'route') {
       routes.push(screen);
     } else if (screen.kind === 'tabs') {
-      screen.state.tabs.forEach(screen => {
+      const tabs = excludeNonActiveTabs
+        ? [screen.state.tabs[screen.state.currentIndex]]
+        : screen.state.tabs;
+      tabs.forEach(screen => {
         if (screen.kind === 'route') {
           routes.push(screen);
         } else {

@@ -11,6 +11,7 @@ import {
   cursorToOffset,
   forwardConnectionArgs,
 } from 'graphql-relay';
+import { getProfileId } from '@azzapp/auth/viewer';
 import {
   db,
   getAllPosts,
@@ -21,6 +22,8 @@ import {
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
+  getInterests,
+  getProfileCategories,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -28,8 +31,12 @@ import {
 } from '#helpers/connectionsHelpers';
 import { CoverLayerGraphQL } from './CardGraphQL';
 import CoverTemplateGraphQL from './CoverTemplateGraphQL';
+import { InterestGraphQL } from './mutations/commonsTypes';
 import { PostConnectionGraphQL } from './PostGraphQL';
-import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
+import ProfileGraphQL, {
+  ProfileCategoryGraphQL,
+  ProfileConnectionGraphQL,
+} from './ProfileGraphQL';
 import type { Post, Profile, CoverTemplate } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { Viewer } from '@azzapp/auth/viewer';
@@ -47,10 +54,11 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         _,
         { profileLoader },
       ): Promise<Profile | null> => {
-        if (viewer.isAnonymous) {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
           return null;
         }
-        return profileLoader.load(viewer.profileId);
+        return profileLoader.load(profileId);
       },
     },
     followedProfiles: {
@@ -62,11 +70,12 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         viewer,
         args: ConnectionArguments,
       ): Promise<Connection<Profile>> => {
-        if (viewer.isAnonymous) {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
           return connectionFromArray([], args);
         }
         // TODO should we use pagination in database query?
-        const followedProfiles = await getFollowedProfiles(viewer.profileId);
+        const followedProfiles = await getFollowedProfiles(profileId);
         if (followedProfiles.length > 0) {
           return connectionFromArray(followedProfiles, args);
         }
@@ -76,7 +85,7 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         const limit = first ?? 100;
         const offset = after ? cursorToOffset(after) : 0;
         return connectionFromArraySlice(
-          await getAllProfilesWithCard(limit, offset, [viewer.profileId]),
+          await getAllProfilesWithCard(limit, offset, [profileId]),
           args,
           {
             sliceStart: offset,
@@ -94,16 +103,17 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         viewer,
         args: ConnectionArguments,
       ): Promise<Connection<Post>> => {
-        if (viewer.isAnonymous) {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
           return connectionFromArray([], args);
         }
-        const nbPosts = await getFollowedProfilesPostsCount(viewer.profileId);
+        const nbPosts = await getFollowedProfilesPostsCount(profileId);
 
         const first = args.first ?? 100;
         const offset = args.after ? cursorToDate(args.after) : null;
 
         const posts = nbPosts
-          ? await getFollowedProfilesPosts(viewer.profileId, first, offset)
+          ? await getFollowedProfilesPosts(profileId, first, offset)
           : // TODO instead of returning all posts, we should return a list of recommanded posts
             await getAllPosts(first, offset);
 
@@ -233,10 +243,11 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         _,
         { profileLoader },
       ): Promise<CoverTemplate[]> => {
-        if (viewer.isAnonymous) {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
           return [];
         }
-        const profile = await profileLoader.load(viewer.profileId);
+        const profile = await profileLoader.load(profileId);
         return getCoverTemplatesByKind(profile?.profileKind ?? 'personal');
       },
     },
@@ -254,10 +265,11 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         { segmented }: { segmented: boolean },
         { profileLoader },
       ): Promise<CoverTemplateCategory[]> => {
-        if (viewer.isAnonymous) {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
           return [];
         }
-        const profile = await profileLoader.load(viewer.profileId);
+        const profile = await profileLoader.load(profileId);
 
         const templates = await getCoverTemplatesByKind(
           profile?.profileKind ?? 'personal',
@@ -289,6 +301,20 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         console.log(categories);
         return categories;
       },
+    },
+    profileCategories: {
+      description: 'Return a list of profile categories',
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(ProfileCategoryGraphQL)),
+      ),
+      resolve: async () => getProfileCategories(),
+    },
+    interests: {
+      description: 'Return a list of interests',
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(InterestGraphQL)),
+      ),
+      resolve: async () => getInterests(),
     },
   }),
 });

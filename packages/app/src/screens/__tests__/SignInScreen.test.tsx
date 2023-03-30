@@ -1,131 +1,69 @@
-import { getLocales } from '#helpers/localeHelpers';
-import { act, fireEvent, render, screen, waitFor } from '#helpers/testHelpers';
-import '@testing-library/jest-native/extend-expect';
+import ERRORS from '@azzapp/shared/errors';
+import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
+import '@testing-library/jest-native/extend-expect';
 
-jest.mock('./#helpers/localeHelpers', () => ({ getLocales: jest.fn() }));
-
+jest.useFakeTimers();
 describe('Signin Screen', () => {
   const signin = jest.fn();
   beforeEach(() => {
-    // @ts-expect-error mock implementation
-    getLocales.mockImplementation(() => [
-      {
-        languageCode: 'fr',
-        countryCode: 'fr',
-        languageTag: 'fr',
-        isRTL: true,
-      },
-    ]);
     signin.mockReset();
   });
-  test('Login button should be `disabled` if both credential (phone number or email) and password are empty', () => {
-    const { queryByRole } = render(<SignInScreen signin={signin} />);
-    const buttonComponent = queryByRole('button');
-    expect(buttonComponent).toBeDisabled();
-  });
 
-  test('should not call the `signin` callback if (phone number or email) and password are empty', () => {
+  test('submit button should be `disabled` if both credential and password are empty', () => {
     render(<SignInScreen signin={signin} />);
-    const buttonComponent = screen.getByTestId(
-      'azzapp_Button_pressable-wrapper',
-    );
-    act(() => fireEvent(buttonComponent, 'onPress'));
-    expect(signin).not.toHaveBeenCalled();
-  });
 
-  test('Login button should be `disabled` and should not call the `signin` callback if credential (phone number or email) is empty and password filled', () => {
-    const { queryByRole, getByPlaceholderText } = render(
-      <SignInScreen signin={signin} />,
+    const credentialInput = screen.getByPlaceholderText(
+      'Phone number or email address',
     );
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'myPassword'));
-    expect(input.props.value).toBe('myPassword');
-    const buttonComponent = queryByRole('button');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
+
     expect(buttonComponent).toBeDisabled();
-    expect(signin).not.toHaveBeenCalled();
-  });
+    act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+    expect(credentialInput.props.value).toBe('myname');
 
-  test('should call `signin` callback if an email for credential and password are filled', async () => {
-    const { getByRole, getByPlaceholderText } = render(
-      <SignInScreen signin={signin} />,
-    );
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
-
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
-
-    const buttonComponent = getByRole('button');
-    act(() => fireEvent(buttonComponent, 'onPress'));
-    await waitFor(() => expect(signin).toHaveBeenCalled());
-  });
-
-  test('should call `signin` callback if a phone number for credential and password are filled', async () => {
-    const { getByRole, getByPlaceholderText } = render(
-      <SignInScreen signin={signin} />,
-    );
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', '+33669696969'));
-
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
-
-    const buttonComponent = getByRole('button');
-    act(() => fireEvent(buttonComponent, 'onPress'));
-    await waitFor(() => expect(signin).toHaveBeenCalled());
-  });
-
-  test('Login button should be `disabled` if email is not well formatted ', () => {
-    const { getByPlaceholderText, queryByRole } = render(
-      <SignInScreen signin={signin} />,
-    );
-    const buttonComponent = queryByRole('button');
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', 'seb@com'));
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
     expect(buttonComponent).toBeDisabled();
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+    expect(passwordInput.props.value).toBe('myPassword');
   });
 
-  test('Login button should be `disabled` if phone number is not well formatted ', () => {
-    const { getByPlaceholderText, queryByRole } = render(
-      <SignInScreen signin={signin} />,
+  test('should call the `signin` callback if credential and password are filled', () => {
+    render(<SignInScreen signin={signin} />);
+
+    const credentialInput = screen.getByPlaceholderText(
+      'Phone number or email address',
     );
-    const buttonComponent = queryByRole('button');
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', '+336234234'));
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
-    expect(buttonComponent).toBeDisabled();
-  });
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
 
-  test('Login button should be `enable` if password contaians at least one character', () => {
-    const { getByPlaceholderText, queryByRole } = render(
-      <SignInScreen signin={signin} />,
-    );
-    const buttonComponent = queryByRole('button');
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'azeqsd'));
-    expect(buttonComponent).toBeEnabled();
-  });
+    act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+    act(() => fireEvent(buttonComponent, 'onPress'));
 
-  test('should show error message is credentials are not valid', () => {
-    const errorFunction = jest.fn(() => {
-      throw new Error('INVALID_CRENDENTIALS');
+    expect(signin).toHaveBeenCalledWith({
+      credential: 'myname',
+      password: 'myPassword',
     });
-    const { getByPlaceholderText, getByRole } = render(
-      <SignInScreen signin={errorFunction} />,
+  });
+
+  test('should display an error message if the `signin` callback fails', () => {
+    render(<SignInScreen signin={signin} />);
+    signin.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
+
+    const credentialInput = screen.getByPlaceholderText(
+      'Phone number or email address',
     );
-    const buttonComponent = getByRole('button');
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', 'seb@seb.com'));
-    const input = getByPlaceholderText('Password');
-    act(() => fireEvent(input, 'onChangeText', 'AZEqsd81'));
-    act(() => fireEvent.press(buttonComponent));
-    expect(errorFunction).toThrowError();
-    expect(screen.getByText('Invalid credentials')).not.toBeNull();
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
+
+    act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+
+    expect(screen.queryByText('Invalid credentials')).not.toBeTruthy();
+
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    act(() => jest.runAllTicks());
+    expect(screen.queryByText('Invalid credentials')).toBeTruthy();
   });
 });

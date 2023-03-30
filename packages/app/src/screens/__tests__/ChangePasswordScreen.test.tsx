@@ -1,4 +1,4 @@
-import { fireEvent, render, act, cleanup } from '#helpers/testHelpers';
+import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ChangePasswordScreen from '../ChangePasswordScreen';
 import '@testing-library/jest-native/extend-expect';
 
@@ -9,16 +9,14 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('button `Create new password` should be disabled if new password and old password are not enter', () => {
-    const { queryAllByRole } = render(
-      <ChangePasswordScreen changePassword={changePassword} />,
-    );
-    const buttonComponent = queryAllByRole('button')[1];
+    render(<ChangePasswordScreen changePassword={changePassword} />);
+    const buttonComponent = screen.getByTestId('submitButton');
     expect(buttonComponent).toBeDisabled();
     cleanup();
   });
 
   test('should not call the `changePassword` callback and show error message when password does not match the requirement', () => {
-    const { queryAllByRole, getByPlaceholderText, getByText } = render(
+    const { getByPlaceholderText, getByText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
     const inputPwd = getByPlaceholderText('New password');
@@ -29,7 +27,7 @@ describe('ChangePasswordScreen Screen', () => {
     act(() => {
       fireEvent(inputConfig, 'onChangeText', 'unsufficient password');
     });
-    const buttonComponent = queryAllByRole('button')[1];
+    const buttonComponent = screen.getByTestId('submitButton');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -43,7 +41,7 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('should not call the `changePassword` callback and shows error message when password does not match the confirm password', () => {
-    const { queryAllByRole, getByPlaceholderText, getByText } = render(
+    const { getByPlaceholderText, getByText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
     const inputPwd = getByPlaceholderText('New password');
@@ -55,7 +53,7 @@ describe('ChangePasswordScreen Screen', () => {
       fireEvent(inputConfig, 'onChangeText', 'doest not match');
     });
 
-    const buttonComponent = queryAllByRole('button')[1];
+    const buttonComponent = screen.getByTestId('submitButton');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });
@@ -67,7 +65,7 @@ describe('ChangePasswordScreen Screen', () => {
   });
 
   test('should call the `changePassword` callback when form is valid', () => {
-    const { queryAllByRole, getByPlaceholderText } = render(
+    const { getByPlaceholderText } = render(
       <ChangePasswordScreen changePassword={changePassword} />,
     );
     const inputPwd = getByPlaceholderText('New password');
@@ -79,7 +77,7 @@ describe('ChangePasswordScreen Screen', () => {
       fireEvent(inputConfig, 'onChangeText', 'AZErty123&');
     });
 
-    const buttonComponent = queryAllByRole('button')[1];
+    const buttonComponent = screen.getByTestId('submitButton');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });

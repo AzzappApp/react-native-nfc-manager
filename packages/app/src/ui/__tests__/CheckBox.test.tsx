@@ -15,7 +15,7 @@ describe('Checkbox component', () => {
         containerStyle={containerStyle}
       />,
     );
-    const wrapper = screen.getByTestId('azzapp__CheckBox__view-wrapper');
+    const wrapper = screen.getByRole('checkbox');
     expect(StyleSheet.flatten(wrapper.props.style)).toMatchObject(
       StyleSheet.flatten([
         { alignItems: 'center', flexDirection: 'row' },
@@ -25,7 +25,7 @@ describe('Checkbox component', () => {
   });
   test('callback `onChange` should not be call when disabled', () => {
     render(<CheckBox checked={false} onValueChange={onChange} disabled />);
-    const wrapper = screen.getByTestId('azzapp__CheckBox__view-wrapper');
+    const wrapper = screen.getByRole('checkbox');
     fireEvent(wrapper, 'onPress');
     expect(onChange).not.toBeCalled();
   });
@@ -33,7 +33,7 @@ describe('Checkbox component', () => {
 
 test('should call `onChange` callback when triggering `onPress` event', () => {
   render(<CheckBox checked={false} onValueChange={onChange} />);
-  const wrapper = screen.getByTestId('azzapp__CheckBox__view-wrapper');
+  const wrapper = screen.getByRole('checkbox');
   fireEvent(wrapper, 'onPress');
   expect(onChange).toBeCalled();
 });

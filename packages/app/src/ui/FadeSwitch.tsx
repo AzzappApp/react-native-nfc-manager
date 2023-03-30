@@ -6,12 +6,14 @@ import type { ReactNode } from 'react';
 type FadeSwitchProps = {
   currentKey: string;
   transitionDuration: number;
+  easing?: 'ease-in-out' | 'ease-in' | 'ease-out' | 'ease' | 'linear' | null;
   children: ReactNode;
 };
 
 const FadeSwitch = ({
   currentKey,
   transitionDuration,
+  easing,
   children,
 }: FadeSwitchProps) => {
   const containerRef = useRef<any>();
@@ -33,9 +35,10 @@ const FadeSwitch = ({
                 left: 0,
                 width: '100%',
                 height: '100%',
-                opacity: state === 'entering' || state === 'entered' ? 1 : 0,
+                opacity: state === 'entered' || state === 'entering' ? 1 : 0,
               },
             ]}
+            easing={easing ?? 'linear'}
           >
             {children}
           </ViewTransition>

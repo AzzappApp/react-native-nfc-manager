@@ -32,7 +32,7 @@ const routesMap: { [key in Route['route']]: string } = {
   SEARCH: '/search',
   SETTINGS: '/settings',
   CHAT: '/chat',
-  ONBOARDING: '/onboarding',
+  NEW_PROFILE: '/profile/new',
   CARD_MODULE_EDITION: '/my-card/edit/[module]',
 };
 

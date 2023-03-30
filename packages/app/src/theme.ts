@@ -4,8 +4,10 @@ import type { TextStyle } from 'react-native';
 export const colors = {
   // color from style guide
   primary400: '#FF502E',
+
   red: '#EF3962',
   red400: '#FF2E54',
+
   black: '#0E1216',
   grey50: '#F5F5F6',
   grey100: '#E2E1E3',
@@ -14,6 +16,8 @@ export const colors = {
   grey500: '#87878E',
   grey600: '#727179',
   grey900: '#45444C',
+
+  green: '#0FD59E',
 
   // other color to be replaced when styleguide is finished
   dark: '#45444C',

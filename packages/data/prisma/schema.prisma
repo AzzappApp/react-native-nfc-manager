@@ -22,18 +22,19 @@ model User {
 }
 
 model Profile {
-  id                String       @id
+  id                String      @id
   userId            String
-  userName          String       @unique
+  userName          String      @unique
+  profileKind       ProfileKind
+  profileCategoryId String?
   firstName         String?
   lastName          String?
-  profileKind       ProfileKind?
   companyName       String?
   companyActivityId String?
   colorPalette      String?
-  isReady           Boolean      @default(false)
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @default(now())
+  interests         String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
 
   @@index([userId])
 }
@@ -41,7 +42,28 @@ model Profile {
 enum ProfileKind {
   personal
   business
-  product
+}
+
+model ProfileCategory {
+  id          String      @id
+  profileKind ProfileKind
+  labels      Json
+  medias      Json
+  available   Boolean     @default(true)
+  order       Int
+}
+
+model CompanyActivity {
+  id                String @id
+  profileCategoryId String
+  labels            Json
+  order             Int
+}
+
+model Interest {
+  id     String @id
+  tag    String
+  labels Json
 }
 
 model Follow {

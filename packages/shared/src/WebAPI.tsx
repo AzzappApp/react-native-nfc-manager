@@ -22,14 +22,9 @@ const apiFetch = (
 ) => (init.fetchFunction ?? fetchJSON)(input, init);
 
 export type SignUpParams = {
-  userName: string;
-  email?: string;
-  phoneNumber?: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
   authMethod?: 'cookie' | 'token';
-};
+} & ({ email: string } | { phoneNumber: string });
 
 export type TokensResponse = {
   token: string;
@@ -49,11 +44,32 @@ export type SignInParams = {
   authMethod?: 'cookie' | 'token';
 };
 
-export const signin: APIMethod<SignInParams, TokensResponse> = (
-  data,
-  init,
-): Promise<TokensResponse> =>
+export const signin: APIMethod<
+  SignInParams,
+  TokensResponse & { profileId?: string }
+> = (data, init): Promise<TokensResponse> =>
   apiFetch(`${API_ENDPOINT}/signin`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export type CreateProfileParams = {
+  userName: string;
+  profileKind: string;
+  profileCategoryId?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  companyName?: string | null;
+  companyActivityId?: string | null;
+  authMethod?: 'cookie' | 'token';
+};
+
+export const createProfile: APIMethod<
+  CreateProfileParams,
+  TokensResponse & { profileId: string }
+> = (data, init) =>
+  apiFetch(`${API_ENDPOINT}/new-profile`, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -67,7 +83,7 @@ export type ForgotPasswordParams = {
 export const forgotPassword: APIMethod<ForgotPasswordParams, TokensResponse> = (
   data,
   init,
-): Promise<TokensResponse> =>
+) =>
   apiFetch(`${API_ENDPOINT}/forgotPassword`, {
     ...init,
     method: 'POST',
@@ -83,7 +99,7 @@ export type ChangePasswordParams = {
 export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
   data,
   init,
-): Promise<TokensResponse> =>
+) =>
   apiFetch(`${API_ENDPOINT}/changePassword`, {
     ...init,
     method: 'POST',
@@ -93,14 +109,14 @@ export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
 export const refreshTokens: APIMethod<string, TokensResponse> = (
   refreshToken,
   init,
-): Promise<TokensResponse> =>
+) =>
   apiFetch(`${API_ENDPOINT}/refreshTokens`, {
     ...init,
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
 
-export const logout: APIMethodWithoutParams<void> = (init): Promise<void> =>
+export const logout: APIMethodWithoutParams<void> = init =>
   apiFetch(`${API_ENDPOINT}/logout`, {
     ...init,
     method: 'POST',

@@ -9,7 +9,7 @@ const SignUpWebScreen = () => {
   const router = useRouter();
   const signup = async (params: SignUpParams) => {
     await WebAPI.signup(params);
-    router.showModal({ route: 'ONBOARDING' });
+    router.showModal({ route: 'NEW_PROFILE' });
   };
 
   return <SignUpScreen signup={signup} />;

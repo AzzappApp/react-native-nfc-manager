@@ -151,6 +151,7 @@ const ColorPicker = ({
           />
         )
       }
+      disableGestureInteraction={state !== 'colorChooser'}
       onRequestClose={onClose}
     >
       {state !== 'addingColor' ? (

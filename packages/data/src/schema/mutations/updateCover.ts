@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLJSON } from 'graphql-scalars';
+import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import {
@@ -94,13 +95,14 @@ const updateCover = mutationWithClientMutationId({
       mediaLoader,
     }: GraphQLContext,
   ) => {
-    if (auth.isAnonymous) {
+    const profileId = getProfileId(auth);
+    if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
     let card: Card | null;
     try {
-      card = await cardByProfileLoader.load(auth.profileId);
+      card = await cardByProfileLoader.load(profileId);
     } catch (e) {
       console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
@@ -239,7 +241,7 @@ const updateCover = mutationWithClientMutationId({
         if (!card) {
           await createCard(
             {
-              profileId: auth.profileId,
+              profileId,
               isMain: true,
               coverId: coverId!,
             },
@@ -252,7 +254,7 @@ const updateCover = mutationWithClientMutationId({
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const profile = await profileLoader.load(auth.profileId);
+    const profile = await profileLoader.load(profileId);
     return { profile };
   },
 });

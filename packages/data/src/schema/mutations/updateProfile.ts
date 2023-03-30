@@ -6,9 +6,8 @@ import {
   GraphQLString,
 } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-
+import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-
 import { updateProfile } from '#domains/profiles';
 import ProfileGraphQL from '../ProfileGraphQL';
 import { ProfileKind } from './commonsTypes';
@@ -23,6 +22,7 @@ type UpdateProfileInput = {
   companyActivityId?: string;
   isReady?: boolean;
   colorPalette?: string[];
+  interests?: string[];
 };
 
 const updateProfileMutation = mutationWithClientMutationId({
@@ -49,6 +49,9 @@ const updateProfileMutation = mutationWithClientMutationId({
     colorPalette: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
     },
+    interests: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+    },
   },
   outputFields: {
     profile: {
@@ -59,13 +62,14 @@ const updateProfileMutation = mutationWithClientMutationId({
     updates: UpdateProfileInput,
     { auth, profileLoader }: GraphQLContext,
   ) => {
-    if (auth.isAnonymous) {
+    const profileId = getProfileId(auth);
+    if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
     let profile: Profile | null;
     try {
-      profile = await profileLoader.load(auth.profileId);
+      profile = await profileLoader.load(profileId);
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -73,18 +77,22 @@ const updateProfileMutation = mutationWithClientMutationId({
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
-    const { colorPalette, ...profileUpdates } = updates;
+    const { colorPalette, interests, ...profileUpdates } = updates;
+
+    const partialProfile: Partial<
+      Omit<Profile, 'createdAt' | 'id' | 'updatedAt'>
+    > = {
+      ...profileUpdates,
+    };
+    if (colorPalette) {
+      partialProfile.colorPalette = colorPalette.join(',');
+    }
+    if (interests) {
+      partialProfile.interests = interests.join(',');
+    }
 
     try {
-      const resultProfile = await updateProfile(
-        profile.id,
-        colorPalette
-          ? {
-              ...profileUpdates,
-              colorPalette: colorPalette.join(','),
-            }
-          : profileUpdates,
-      );
+      const resultProfile = await updateProfile(profile.id, partialProfile);
       return { profile: { ...profile, ...resultProfile } };
     } catch (error) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

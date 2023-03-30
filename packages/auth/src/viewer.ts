@@ -7,7 +7,7 @@ export type Viewer =
   | {
       isAnonymous: false;
       userId: string;
-      profileId: string;
+      profileId?: string | null;
     }
   | { isAnonymous: true };
 
@@ -26,4 +26,8 @@ export const getViewer = async (): Promise<Viewer> => {
     return { isAnonymous: true };
   }
   return session;
+};
+
+export const getProfileId = (viewer: Viewer) => {
+  return viewer.isAnonymous ? null : viewer.profileId;
 };

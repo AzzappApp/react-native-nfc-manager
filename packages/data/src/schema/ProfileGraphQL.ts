@@ -12,12 +12,23 @@ import {
   forwardConnectionArgs,
   globalIdField,
 } from 'graphql-relay';
-import { getProfilesPosts, getProfilesPostsCount, isFollowing } from '#domains';
+import { getProfileId } from '@azzapp/auth/viewer';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  getCompanyActivities,
+  getCompanyActivityById,
+  getProfileCategoryById,
+  getProfilesPosts,
+  getProfilesPostsCount,
+  isFollowing,
+} from '#domains';
+import localizedLabelResolver from '#helpers/localizationHelper';
 import CardGraphQL from './CardGraphQL';
+import { MediaImageGraphQL } from './MediaGraphQL';
 import { ProfileKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
-import type { Profile, Post } from '#domains';
+import type { Profile, Post, ProfileCategory, CompanyActivity } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
@@ -42,14 +53,24 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
     companyName: {
       type: GraphQLString,
     },
-    companyActivityId: {
-      type: GraphQLString,
-    },
-    isReady: {
-      type: new GraphQLNonNull(GraphQLBoolean),
+    companyActivity: {
+      type: CompanyActivityGraphQL,
+      resolve(profile) {
+        return profile.companyActivityId
+          ? getCompanyActivityById(profile.companyActivityId)
+          : null;
+      },
     },
     profileKind: {
       type: ProfileKind,
+    },
+    profileCategory: {
+      type: ProfileCategoryGraphQL,
+      resolve(profile) {
+        return profile.profileCategoryId
+          ? getProfileCategoryById(profile.profileCategoryId)
+          : null;
+      },
     },
     card: {
       type: CardGraphQL,
@@ -88,11 +109,12 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
     },
     isFollowing: {
       type: new GraphQLNonNull(GraphQLBoolean),
-      resolve(profile, _, { auth: userInfos }): Promise<boolean> | boolean {
-        if (userInfos.isAnonymous) {
+      resolve(profile, _, { auth }): Promise<boolean> | boolean {
+        const profileId = getProfileId(auth);
+        if (!profileId) {
           return false;
         }
-        return isFollowing(userInfos.profileId, profile.id);
+        return isFollowing(profileId, profile.id);
       },
     },
   }),
@@ -100,5 +122,53 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
 
 export const { connectionType: ProfileConnectionGraphQL } =
   connectionDefinitions({ nodeType: ProfileGraphQL });
+
+export const ProfileCategoryGraphQL = new GraphQLObjectType<
+  ProfileCategory,
+  GraphQLContext
+>({
+  name: 'ProfileCategory',
+  description: 'Represent a Profile Category',
+  interfaces: [NodeGraphQL],
+  fields: () => ({
+    id: globalIdField('ProfileCategory'),
+    profileKind: { type: new GraphQLNonNull(ProfileKind) },
+    label: {
+      type: GraphQLString,
+      resolve: localizedLabelResolver('labels'),
+    },
+    medias: {
+      type: new GraphQLList(new GraphQLNonNull(MediaImageGraphQL)),
+      resolve: async (profileCategory, _, { mediaLoader }) =>
+        convertToNonNullArray(
+          await mediaLoader.loadMany(profileCategory.medias as string[]),
+        ),
+    },
+    companyActivities: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(CompanyActivityGraphQL)),
+      ),
+      resolve(profileCategory): Promise<CompanyActivity[]> {
+        return getCompanyActivities(profileCategory.id);
+      },
+    },
+  }),
+});
+
+export const CompanyActivityGraphQL = new GraphQLObjectType<
+  CompanyActivity,
+  GraphQLContext
+>({
+  name: 'CompanyActivity',
+  description: 'Represent a Company Activity',
+  interfaces: [NodeGraphQL],
+  fields: () => ({
+    id: globalIdField('CompanyActivity'),
+    label: {
+      type: GraphQLString,
+      resolve: localizedLabelResolver('labels'),
+    },
+  }),
+});
 
 export default ProfileGraphQL;

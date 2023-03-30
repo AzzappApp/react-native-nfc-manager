@@ -10,7 +10,7 @@ export const generateTokens = async ({
   profileId,
 }: {
   userId: string;
-  profileId: string;
+  profileId?: string | null;
 }) => {
   const data = { userId, profileId };
   const token = await seal(data, TOKEN_SECRET, {
@@ -26,7 +26,7 @@ export const generateTokens = async ({
 
 export const verifyToken = (
   token: string,
-): Promise<{ userId: string; profileId: string }> =>
+): Promise<{ userId: string; profileId?: string }> =>
   unseal(token, TOKEN_SECRET, { ttl: TOKEN_EXP_TIME }) as Promise<any>;
 
 export const refreshTokens = async (refreshToken: string) => {
@@ -34,12 +34,9 @@ export const refreshTokens = async (refreshToken: string) => {
     ttl: TOKEN_EXP_TIME,
   });
 
-  if (
-    typeof data !== 'object' ||
-    typeof data?.userId !== 'string' ||
-    typeof data?.profileId !== 'string'
-  ) {
+  if (typeof data !== 'object' || typeof data?.userId !== 'string') {
     throw new Error('Invalid token');
   }
-  return generateTokens(data);
+  const { userId, profileId } = data;
+  return generateTokens({ userId, profileId });
 };

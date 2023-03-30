@@ -1,5 +1,6 @@
 import { GraphQLBoolean, GraphQLID, GraphQLNonNull } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
+import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { follows, unfollows } from '#domains';
 import ProfileGraphQL from '../ProfileGraphQL';
@@ -39,6 +40,10 @@ const toggleFollowingMutation = mutationWithClientMutationId({
     if (auth.isAnonymous) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
+    const profileId = getProfileId(auth);
+    if (!profileId) {
+      throw new Error(ERRORS.UNAUTORIZED);
+    }
 
     const { id: targetId, type } = fromGlobalId(args.profileId);
     if (type !== 'Profile') {
@@ -55,7 +60,6 @@ const toggleFollowingMutation = mutationWithClientMutationId({
       throw new Error(ERRORS.INVALID_REQUEST);
     }
 
-    const { profileId } = auth;
     try {
       if (args.follow) {
         await follows(profileId, targetId);

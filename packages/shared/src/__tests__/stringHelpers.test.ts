@@ -2,7 +2,7 @@ import {
   isValidEmail,
   isValidPassword,
   isNotFalsyString,
-  isValidUsername,
+  isValidUserName,
   isValidHex,
 } from '../stringHelpers';
 
@@ -40,22 +40,19 @@ describe('stringHelper', () => {
   });
   describe('isValidUsername', () => {
     test('should not contain only number', () => {
-      expect(isValidUsername('123456789')).toBe(false);
-    });
-    test('should have at least 4 characters', () => {
-      expect(isValidUsername('aze')).toBe(false);
+      expect(isValidUserName('123456789')).toBe(false);
     });
     test('should not contains special caracters', () => {
-      expect(isValidUsername('aze&é')).toBe(false);
+      expect(isValidUserName('aze&é')).toBe(false);
     });
     test('should be URI encoding compatible', () => {
-      expect(isValidUsername('aze ]%')).toBe(false);
+      expect(isValidUserName('aze ]%')).toBe(false);
     });
     test('should be a valid username', () => {
-      expect(isValidUsername('1aze')).toBe(true);
-      expect(isValidUsername('se._test')).toBe(true);
-      expect(isValidUsername('zer23sdf')).toBe(true);
-      expect(isValidUsername('superTester23_______')).toBe(true);
+      expect(isValidUserName('1aze')).toBe(true);
+      expect(isValidUserName('se._test')).toBe(true);
+      expect(isValidUserName('zer23sdf')).toBe(true);
+      expect(isValidUserName('superTester23_______')).toBe(true);
     });
   });
   describe('isValidHex', () => {

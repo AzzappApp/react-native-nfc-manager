@@ -42,7 +42,7 @@ const signin = async (req: Request) => {
     }
     if (!user && isInternationalPhoneNumber(credential)) {
       // looking for phonenumber only if the credential is a valid phonenumber
-      user = await getUserByPhoneNumber(credential);
+      user = await getUserByPhoneNumber(credential.replace(/\s/g, ''));
     }
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile
@@ -53,7 +53,7 @@ const signin = async (req: Request) => {
       [user] = profile ? await getUsersByIds([profile.userId]) : [];
     }
 
-    if (!user || !profile || !user.password) {
+    if (!user?.password) {
       return NextResponse.json(
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
@@ -70,15 +70,20 @@ const signin = async (req: Request) => {
     if (authMethod === 'token') {
       const { token, refreshToken } = await generateTokens({
         userId: user.id,
-        profileId: profile.id,
+        profileId: profile?.id,
       });
       return destroySession(
-        NextResponse.json({ ok: true, token, refreshToken }),
+        NextResponse.json({
+          ok: true,
+          profileId: profile?.id,
+          token,
+          refreshToken,
+        }),
       );
     } else {
-      return setSession(NextResponse.json({ ok: true }), {
+      return setSession(NextResponse.json({ profileId: profile?.id }), {
         userId: user.id,
-        profileId: profile.id,
+        profileId: profile?.id,
         isAnonymous: false,
       });
     }

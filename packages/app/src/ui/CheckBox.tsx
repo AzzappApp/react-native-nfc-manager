@@ -52,7 +52,6 @@ const CheckBox = ({
   return (
     <PressableNative
       accessibilityRole="checkbox"
-      testID="azzapp__CheckBox__view-wrapper"
       style={[styles.container, containerStyle]}
       onPress={onPress}
       accessibilityState={{ checked }}

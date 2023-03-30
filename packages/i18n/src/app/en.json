@@ -7,6 +7,10 @@
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
   },
+  "/cVb8L": {
+    "defaultMessage": "Please enter a valid phone number",
+    "description": "Signup Screen - Error message for invalid phone number"
+  },
   "/u5+bX": {
     "defaultMessage": "Press to edit this section of your profile",
     "description": "Accessibility hint for the profile block container"
@@ -26,10 +30,6 @@
   "19LN22": {
     "defaultMessage": "Tap to cancel your search",
     "description": "SearchBar accessibilityLabel Cancel Button"
-  },
-  "1ENz6W": {
-    "defaultMessage": "Tap to show the list of options",
-    "description": "DropDownList - AccessibilityLabel button to show the drop down list"
   },
   "1UGgMw": {
     "defaultMessage": "Sign Up",
@@ -63,25 +63,17 @@
     "defaultMessage": "Log In",
     "description": "SigninScreen - Login Button Placeholder"
   },
-  "5iui5g": {
-    "defaultMessage": "First name",
-    "description": "OnBoarding Name Screen - Enter your first name label textinput"
-  },
   "5jGwoy": {
     "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
     "description": "Accessibility hint of the rotate button in in the cover edition screen"
-  },
-  "6+FKio": {
-    "defaultMessage": "Tap to show secured text in clear",
-    "description": "TextInput - AccessibilityLabel button to show password in clear"
   },
   "6+YHde": {
     "defaultMessage": "Flip camera",
     "description": "camera flip button accessibility label"
   },
-  "65Pcwu": {
-    "defaultMessage": "Continue",
-    "description": "OnBoarding Name Company Screen - AccessibilityLabel Continue"
+  "6/FSaO": {
+    "defaultMessage": "What best describe you?",
+    "description": "NewProfileType User Type Screen - Title"
   },
   "6EPGoU": {
     "defaultMessage": "Off",
@@ -111,13 +103,17 @@
     "defaultMessage": "{title} - background image",
     "description": "CoverRenderer - Accessibility cover image"
   },
-  "6sBD1M": {
-    "defaultMessage": "Get started",
-    "description": "OnBoarding About Screen - AccessibilityLabel Get started"
+  "6o9Tli": {
+    "defaultMessage": "Choose a domain of activity",
+    "description": "ProfileForm - Activity BottomSheet - Title"
   },
   "74j5Wg": {
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
+  },
+  "7D3W/p": {
+    "defaultMessage": "Get started",
+    "description": "Interests pickers - Get started Button"
   },
   "7HPaV3": {
     "defaultMessage": "Tint",
@@ -167,6 +163,10 @@
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
   },
+  "B8fERH": {
+    "defaultMessage": "Last name",
+    "description": "ProfileForm last name textinput label"
+  },
   "BCtKX4": {
     "defaultMessage": "Tap to change the orientation of the content",
     "description": "Hint of the orientation button in cover edition"
@@ -183,10 +183,6 @@
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
   },
-  "Bq3ew9": {
-    "defaultMessage": "Skip",
-    "description": "OnBoarding About Screen - Skip process"
-  },
   "C1R1bc": {
     "defaultMessage": "Fade",
     "description": "Fade photo filter name"
@@ -194,6 +190,10 @@
   "C3M81B": {
     "defaultMessage": "Cancel and go back",
     "description": "TemplateSelector - AccessibilityLabel Link Cancel"
+  },
+  "C3jRta": {
+    "defaultMessage": "Enter your last name",
+    "description": "ProfileForm last name textinput placeholder"
   },
   "CCNK+L": {
     "defaultMessage": "Confirm password",
@@ -203,6 +203,10 @@
     "defaultMessage": "Trending profiles",
     "description": "SearchPage - Trending profile title"
   },
+  "CM2v8u": {
+    "defaultMessage": "Username can’t contain space or special caracters",
+    "description": "NewProfileScreen - Username Error"
+  },
   "CfCNOX": {
     "defaultMessage": "Foreground color",
     "description": "Title of the foreground color picker"
@@ -211,6 +215,10 @@
     "defaultMessage": "Reset password",
     "description": "ForgotpasswordScreen - Reset password"
   },
+  "DX5d2S": {
+    "defaultMessage": "Email address",
+    "description": "Signup Screen - email address input placeholder"
+  },
   "DXYRN3": {
     "defaultMessage": "Middle center",
     "description": "Label of the middle center position in cover edition"
@@ -218,10 +226,6 @@
   "DgczNZ": {
     "defaultMessage": "Log In",
     "description": "Signup Screen - Login link bottom screen"
-  },
-  "DwePHC": {
-    "defaultMessage": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter",
-    "description": "SignupScreen - error message when password is not compliant with our rules"
   },
   "E2sLo4": {
     "defaultMessage": "Tap to take a photo",
@@ -235,13 +239,9 @@
     "defaultMessage": "Adjust",
     "description": "Label of the adjust tab in cover edition"
   },
-  "EPprBn": {
-    "defaultMessage": "Usernames can only use Roman latines letters(a-z, A-Z), numbers, underscores and full stops. Should contains at least 4 characters",
-    "description": "Signup Screen - Error message for invalid username on textInput"
-  },
-  "Ee6pSd": {
-    "defaultMessage": "This username is not available",
-    "description": "Signup Screen - Error This username is not available"
+  "EKPaSj": {
+    "defaultMessage": "Select a calling code or email",
+    "description": "The accessibility label for the country selector"
   },
   "F1nOOr": {
     "defaultMessage": "Color",
@@ -279,33 +279,17 @@
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
     "description": "Signup Screen - Accessibility Label TextInput Password"
   },
-  "IG0zHo": {
-    "defaultMessage": "We need your full name so that we know how to call you",
-    "description": "OnBoarding Name Screen - Subtitle"
-  },
-  "IflgW1": {
-    "defaultMessage": "Enter your last name",
-    "description": "OnBoarding Name Screen - Accessibility TextInput last name"
-  },
   "J7Z2GR": {
     "defaultMessage": "Cut Video",
     "description": "Title of the cut video section in Image edition wizzard"
   },
-  "JQIn3j": {
-    "defaultMessage": "Enter your email address or phone number",
-    "description": "Signup Screen - Accessibility TextInput email address or phone number"
-  },
-  "JQwUqv": {
-    "defaultMessage": "Pick some topics about your company",
-    "description": "OnBoarding Name Company Screen - Subtitle Pick some topics about your company"
+  "JGmlYS": {
+    "defaultMessage": "Skip",
+    "description": "NewProfile About Screen - Skip process"
   },
   "JcQ1BH": {
     "defaultMessage": "Photo",
     "description": "Title of the photo view in image picker wizzard"
-  },
-  "K4JPQO": {
-    "defaultMessage": "Continue",
-    "description": "OnboardingScreen - Continue Button"
   },
   "KKW5Ea": {
     "defaultMessage": "Horizontal",
@@ -315,17 +299,37 @@
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
   },
+  "KimbRe": {
+    "defaultMessage": "Provide more details",
+    "description": "Company profile form - Title"
+  },
+  "L3Lqar": {
+    "defaultMessage": "User name",
+    "description": "ProfileForm username textinput label"
+  },
   "LGAptw": {
     "defaultMessage": "Phone number or email address",
     "description": "ForgotpasswordScreen - Phone number or email address placeholder"
+  },
+  "LLt2DI": {
+    "defaultMessage": "Email address",
+    "description": "The email address option in the country selector"
   },
   "M32J+R": {
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
   },
-  "ONJ+uo": {
-    "defaultMessage": "Last name",
-    "description": "OnBoarding Name Screen - Enter your last name label textinput"
+  "Mlk+KE": {
+    "defaultMessage": "Activity",
+    "description": "NewProfile Name Company Screen - Label Activity textinput"
+  },
+  "NTkvNY": {
+    "defaultMessage": "First name",
+    "description": "ProfileForm first name textinput label"
+  },
+  "O8JX0f": {
+    "defaultMessage": "Show password",
+    "description": "Password text input - show password button accessibility label"
   },
   "P2PER8": {
     "defaultMessage": "Sepia",
@@ -351,6 +355,14 @@
     "defaultMessage": "Documentary",
     "description": "Documentary photo filter name"
   },
+  "Q86fnn": {
+    "defaultMessage": "Choose a domain of activity",
+    "description": "NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
+  },
+  "QBLy42": {
+    "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
+    "description": "The accessibility hint for the country selector"
+  },
   "RTqCXo": {
     "defaultMessage": "Tap to accept the terms of service",
     "description": "Signup Screen - Accessibility checkbox terms of service"
@@ -362,10 +374,6 @@
   "SGt9OO": {
     "defaultMessage": "Edit my profile",
     "description": "Edit my profile button label in Profile Screen Button Bar"
-  },
-  "SWwxhL": {
-    "defaultMessage": "Pick some topics you like.",
-    "description": "OnBoarding About User Screen - SubTitle Pick some topics you like."
   },
   "SjPeXD": {
     "defaultMessage": "Hex",
@@ -379,13 +387,17 @@
     "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
     "description": "Accessibility hint of the rotate button in image edition wizzard"
   },
-  "Tmtm4h": {
-    "defaultMessage": "Choose a company activity",
-    "description": "OnBoarding Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
+  "T4JZ7B": {
+    "defaultMessage": "Enter your first name",
+    "description": "ProfileForm first name textinput placeholder"
   },
   "TtcQs5": {
     "defaultMessage": "Clipping",
     "description": "Label of the clipping switch in cover edition"
+  },
+  "Ttom1V": {
+    "defaultMessage": "Phone number",
+    "description": "Signup Screen - phone number input placeholder"
   },
   "UAcWni": {
     "defaultMessage": "Bottom left",
@@ -403,10 +415,6 @@
     "defaultMessage": "Create new password",
     "description": "ChangePasswordScreen - Create new password"
   },
-  "UTSFOW": {
-    "defaultMessage": "Business/company",
-    "description": "UserType: business/company"
-  },
   "UWbqab": {
     "defaultMessage": "Unfollow",
     "description": "Unfollow button label in Profile Screen Button Bar"
@@ -419,13 +427,17 @@
     "defaultMessage": "Shutter",
     "description": "Accessibility label for the camera shutter button"
   },
-  "V1zxkj": {
-    "defaultMessage": "Please enter a valid phone number or email address",
-    "description": "Signup Screen - Error message for invalid phone or email address on textInput "
-  },
   "VAgiN9": {
     "defaultMessage": "This phone number is already registered",
     "description": "Signup Screen - Error This phone number is already registered "
+  },
+  "VS1eqO": {
+    "defaultMessage": "This username is already used by someone else",
+    "description": "NewProfileScreen - Username already taken error"
+  },
+  "VaUk5U": {
+    "defaultMessage": "Pick some topics you like.",
+    "description": "NewProfile About User Screen - SubTitle Pick some topics you like."
   },
   "Vh3DQb": {
     "defaultMessage": "Saturation",
@@ -439,10 +451,6 @@
     "defaultMessage": "Enter your password",
     "description": "SignIn Screen - Accessibility TextInput email address "
   },
-  "X3tHsa": {
-    "defaultMessage": "Tap to sign in",
-    "description": "OnBoardingType User Type Screen - AccessibilityLabel Continue Button"
-  },
   "X5oGqP": {
     "defaultMessage": "Font color",
     "description": "Title of the color picker modal in cover edition for font color"
@@ -455,10 +463,6 @@
     "defaultMessage": "FONT SIZE {size}",
     "description": "Font size message in cover edition"
   },
-  "XfBKWm": {
-    "defaultMessage": "Activity",
-    "description": "OnBoarding Name Company Screen - Label Activity textinput"
-  },
   "YJRxy5": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
@@ -470,14 +474,6 @@
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
-  },
-  "ZP2YVW": {
-    "defaultMessage": "What best describe you?",
-    "description": "OnBoardingType User Type Screen - Title"
-  },
-  "ZgjKM3": {
-    "defaultMessage": "Get started",
-    "description": "OnBoarding About Screen - Get started Button"
   },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
@@ -506,6 +502,14 @@
   "bxkdJ/": {
     "defaultMessage": "Don't have an account?",
     "description": "SigninScreen - Don't have an account"
+  },
+  "calqIB": {
+    "defaultMessage": "Connect with phone number",
+    "description": "Signup Form Connect with phone number section title in country selection list"
+  },
+  "d3LNTq": {
+    "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
+    "description": "Signup Screen - error message when password is not compliant with our rules"
   },
   "dF52vj": {
     "defaultMessage": "Highlights",
@@ -563,6 +567,10 @@
     "defaultMessage": "Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.",
     "description": "Camera authorization screen content for camera permission"
   },
+  "g97Dlq": {
+    "defaultMessage": "Enter your email address",
+    "description": "Signup Screen - Accessibility TextInput email address"
+  },
   "gKqCS0": {
     "defaultMessage": "On",
     "description": "flash on accessibility value"
@@ -578,6 +586,10 @@
   "gRy2ak": {
     "defaultMessage": "Vigneting",
     "description": "Vigneting image edition parameters name"
+  },
+  "gXripn": {
+    "defaultMessage": "Name",
+    "description": "ProfileForm name textinput label"
   },
   "gXvULC": {
     "defaultMessage": "Latest",
@@ -607,10 +619,6 @@
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
   },
-  "iERvZO": {
-    "defaultMessage": "Pick some topics that describes your company.",
-    "description": "OnBoarding About Screen - SubTitle Pick some topics that describes your company."
-  },
   "ieyDkr": {
     "defaultMessage": "Bottom right",
     "description": "Label of the bottom right position in cover edition"
@@ -618,10 +626,6 @@
   "ivmD1N": {
     "defaultMessage": "Crop",
     "description": "Accessibility label of the crop button"
-  },
-  "jWEWL/": {
-    "defaultMessage": "Enter your first name",
-    "description": "OnBoarding Name Screen - Enter your first name placeholder"
   },
   "jbyp1F": {
     "defaultMessage": "Select an image",
@@ -631,10 +635,6 @@
     "defaultMessage": "Top right",
     "description": "Label of the top right position in cover edition"
   },
-  "k2OnxJ": {
-    "defaultMessage": "Tell us more about you?",
-    "description": "OnBoarding About Screen - Title Tell us more about you"
-  },
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
@@ -643,13 +643,17 @@
     "defaultMessage": "Create your cover from scratch",
     "description": "TemplateSelector - Create your cover from scratch Button"
   },
+  "kKfpW5": {
+    "defaultMessage": "Please enter a valid email address",
+    "description": "Signup Screen - Error message for invalid email address"
+  },
   "kjYrL+": {
     "defaultMessage": "Color #1",
     "description": "Label of the background pattern color tab in cover edition"
   },
-  "ksoDJ1": {
-    "defaultMessage": "Continue",
-    "description": "OnBoarding Name Screen - AccessibilityLabel Button Continue"
+  "kkCj3f": {
+    "defaultMessage": "Choose an user name",
+    "description": "ProfileForm username textinput placeholder"
   },
   "kuaFQc": {
     "defaultMessage": "Orientation",
@@ -658,10 +662,6 @@
   "l8fBNE": {
     "defaultMessage": "Edit Palette",
     "description": "ColorPicker component button Edit Palette"
-  },
-  "l9gQB2": {
-    "defaultMessage": "Continue",
-    "description": "OnBoardingType User Type Screen - Continue Button"
   },
   "lC1DXs": {
     "defaultMessage": "Retry",
@@ -699,10 +699,6 @@
     "defaultMessage": "Color",
     "description": "Label of the foreground color tab in cover edition"
   },
-  "maTkuw": {
-    "defaultMessage": "Enter your last name",
-    "description": "OnBoarding Name Screen - Enter your last name placeholder"
-  },
   "me0reI": {
     "defaultMessage": "Tap to change the position",
     "description": "Hint of the position button in cover edition"
@@ -714,10 +710,6 @@
   "mj17hv": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in cover edition"
-  },
-  "n+R1xX": {
-    "defaultMessage": "Choose a username",
-    "description": "Signup Screen - choose a username input placeholder"
   },
   "n8Bdhz": {
     "defaultMessage": "See all",
@@ -742,10 +734,6 @@
   "noNWRA": {
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
-  },
-  "nxN9u/": {
-    "defaultMessage": "Tell us more about your company",
-    "description": "OnBoarding Name Company Screen - Title"
   },
   "ny70pU": {
     "defaultMessage": "logout",
@@ -799,6 +787,10 @@
     "defaultMessage": "Describe your publication",
     "description": "Post creation screen textarea placeholder"
   },
+  "r+BJn9": {
+    "defaultMessage": "What's your name?",
+    "description": "Personal profile form - Title"
+  },
   "r/zo6r": {
     "defaultMessage": "Font",
     "description": "Label of the font button in cover edition"
@@ -806,10 +798,6 @@
   "r2XHrR": {
     "defaultMessage": "Middle right",
     "description": "Label of the middle right position in cover edition"
-  },
-  "r2oElc": {
-    "defaultMessage": "Enter your company name",
-    "description": "OnBoarding Name Company Screen - Accessibility TextInput Enter your company name"
   },
   "r3LnPL": {
     "defaultMessage": "Filter",
@@ -827,9 +815,9 @@
     "defaultMessage": "Allow Azzapp to access your camera and your microphone",
     "description": "Camera authorization screen title for camera permission"
   },
-  "ryq1Nd": {
-    "defaultMessage": "What's your name?",
-    "description": "OnBoarding Name Screen - Title"
+  "rfiLII": {
+    "defaultMessage": "Connect with email address",
+    "description": "Signup Form Connect with email address section title in country selection list"
   },
   "rzJ3iZ": {
     "defaultMessage": "Cancel",
@@ -838,6 +826,10 @@
   "s/244i": {
     "defaultMessage": "Update your cover",
     "description": "Cover edition screen title"
+  },
+  "s1m1n4": {
+    "defaultMessage": "Enter your phone number",
+    "description": "Signup Screen - Accessibility TextInput phone number"
   },
   "sIONS1": {
     "defaultMessage": "Adjust",
@@ -851,6 +843,10 @@
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
   },
+  "tFCDTN": {
+    "defaultMessage": "Continue",
+    "description": "NewProfileScreen - Continue Button"
+  },
   "u1bNBj": {
     "defaultMessage": "Color #2",
     "description": "Label of the background color tab in cover edition"
@@ -859,10 +855,6 @@
     "defaultMessage": "Video Shutter",
     "description": "Accessibility label for the video shutter button"
   },
-  "uM3ONA": {
-    "defaultMessage": "Enter your first name",
-    "description": "OnBoarding Name Screen - Accessibility TextInput first name"
-  },
   "uNR58P": {
     "defaultMessage": "Chrome",
     "description": "Chrome photo filter name"
@@ -870,10 +862,6 @@
   "uWN1s2": {
     "defaultMessage": "Tap to cancel the creation fo your cover",
     "description": "TemplateSelector - AccessibilityHint Link Cancel"
-  },
-  "uYooK1": {
-    "defaultMessage": "Enter your company name",
-    "description": "OnBoarding Name Company Screen - Enter your company name placeholder"
   },
   "ukFVmp": {
     "defaultMessage": "Normal",
@@ -887,10 +875,6 @@
     "defaultMessage": "Rotate",
     "description": "Accessibility label of the rotate button in the cover edition screen"
   },
-  "uzUgQ0": {
-    "defaultMessage": "Tell us more about your company?",
-    "description": "OnBoarding About Screen - Title Tell us more about your company"
-  },
   "v4LP9H": {
     "defaultMessage": "Instant",
     "description": "Instant photo filter name"
@@ -903,10 +887,6 @@
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
   },
-  "vgbI3l": {
-    "defaultMessage": "This username is already taken",
-    "description": "Signup Screen - Error message for  username is already taken"
-  },
   "w3ybid": {
     "defaultMessage": "Finish",
     "description": "Finish button label in image picker wizzard"
@@ -914,10 +894,6 @@
   "w96WJ0": {
     "defaultMessage": "Password doesn't match",
     "description": "ChangePasswordScreen Screen - error passwords doesn't match"
-  },
-  "wMRD7a": {
-    "defaultMessage": "Person",
-    "description": "UserType: personal"
   },
   "wfjPDR": {
     "defaultMessage": "Photos gallery",
@@ -938,10 +914,6 @@
   "x288ev": {
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
-  },
-  "x2jOn0": {
-    "defaultMessage": "Phone Number of email address",
-    "description": "Signup Screen - email address or phone number input placeholder"
   },
   "xaWatU": {
     "defaultMessage": "Cancel",
@@ -979,12 +951,16 @@
     "defaultMessage": "Take a video",
     "description": "Accessibility label of the video tabs in post  in image picking wizzard"
   },
-  "zSfUYY": {
-    "defaultMessage": "Company name",
-    "description": "OnBoarding Name Company Screen - Company name label textinput"
-  },
   "zXfzb7": {
     "defaultMessage": "or",
     "description": "OnBoarding Cover Component - Or text"
+  },
+  "zx+zCh": {
+    "defaultMessage": "Tell us more about your interests",
+    "description": "NewProfileType Interest Picker Screen - Title"
+  },
+  "zzoOTT": {
+    "defaultMessage": "Enter your name",
+    "description": "ProfileForm company name textinput placeholder"
   }
 }

@@ -1,7 +1,5 @@
-import { useEffect } from 'react';
 import { StyleSheet, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import { HEADER_HEIGHT } from '#components/Header';
 import useViewportSize, { insetTop, VW100 } from '#hooks/useViewportSize';
@@ -23,7 +21,6 @@ const HomeScreen = ({
       fragment HomeScreen_viewer on Viewer {
         profile {
           id
-          isReady
         }
         ...FollowedProfilesList_viewer
         ...FollowedProfilesPostsList_viewer
@@ -31,11 +28,6 @@ const HomeScreen = ({
     `,
     viewerRef,
   );
-
-  const router = useRouter();
-  useEffect(() => {
-    if (!viewer.profile?.isReady) router.showModal({ route: 'ONBOARDING' });
-  }, [router, viewer.profile?.isReady]);
 
   const vp = useViewportSize();
 

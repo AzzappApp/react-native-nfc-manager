@@ -98,7 +98,7 @@ const ChangePasswordScreen = ({
               onChangeText={setPassword}
               secureTextEntry
               autoCorrect={false}
-              containerStyle={styles.textinputContainer}
+              style={styles.textinput}
             />
             <SecuredTextInput
               placeholder={intl.formatMessage({
@@ -108,10 +108,11 @@ const ChangePasswordScreen = ({
               value={checkPassword}
               onChangeText={setCheckPassword}
               autoCapitalize="none"
-              containerStyle={styles.textinputContainer}
+              style={styles.textinput}
             />
             <Submit>
               <Button
+                testID="submitButton"
                 label={intl.formatMessage({
                   defaultMessage: 'Create new password',
                   description: 'ChangePasswordScreen - Create new password',
@@ -191,9 +192,7 @@ const styles = StyleSheet.create({
   inner: {
     padding: 20,
   },
-  textinputContainer: {
-    padding: 0,
-    margin: 0,
+  textinput: {
     marginBottom: 5,
   },
   button: {

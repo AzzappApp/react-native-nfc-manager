@@ -134,6 +134,12 @@ type Viewer {
 
   """Fetches all cover templates for a given kind ordered by Category"""
   coverTemplatesByCategory(segmented: Boolean): [CoverTemplateCategory!]!
+
+  """Return a list of profile categories"""
+  profileCategories: [ProfileCategory!]!
+
+  """Return a list of interests"""
+  interests: [Interest!]!
 }
 
 """Represent an Azzapp Profile"""
@@ -144,9 +150,9 @@ type Profile implements Node {
   firstName: String
   lastName: String
   companyName: String
-  companyActivityId: String
-  isReady: Boolean!
+  companyActivity: CompanyActivity
   profileKind: ProfileKind
+  profileCategory: ProfileCategory
   card: Card
   colorPalette: [String!]
   posts(
@@ -165,10 +171,27 @@ interface Node {
   id: ID!
 }
 
+"""Represent a Company Activity"""
+type CompanyActivity implements Node {
+  """The ID of an object"""
+  id: ID!
+  label: String
+}
+
 enum ProfileKind {
   business
   personal
   product
+}
+
+"""Represent a Profile Category"""
+type ProfileCategory implements Node {
+  """The ID of an object"""
+  id: ID!
+  profileKind: ProfileKind!
+  label: String
+  medias: [MediaImage!]
+  companyActivities: [CompanyActivity!]!
 }
 
 """An azzapp User card"""
@@ -426,6 +449,12 @@ type CoverTemplateCategory {
   templates: [CoverTemplate!]!
 }
 
+"""Represent a subject of interest"""
+type Interest {
+  tag: ID!
+  label: String
+}
+
 type Mutation {
   updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
@@ -446,6 +475,7 @@ input UpdateProfileInput {
   companyActivityId: String
   isReady: Boolean
   colorPalette: [String!]
+  interests: [String!]
   clientMutationId: String
 }
 

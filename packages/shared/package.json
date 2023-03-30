@@ -18,6 +18,7 @@
     "dev"
   ],
   "dependencies": {
+    "libphonenumber-js": "^1.10.18",
     "react-relay": "^14.1.0",
     "validator": "13.7.0"
   },

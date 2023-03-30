@@ -95,3 +95,13 @@ const resizeTransforms = (width: number, height?: number, pixelRatio = 1) => {
     return `q_auto:eco,w_${width}`;
   }
 };
+
+/**
+ * Returns the media id from a cloudinary url
+ * @param url the cloudinary url
+ * @returns the media id
+ */
+export const getMediaIDFromURL = (url: string) => {
+  const segments = url.split('/');
+  return segments[segments.length - 1].split('.')[0];
+};

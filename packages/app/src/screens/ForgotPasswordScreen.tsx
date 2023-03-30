@@ -145,6 +145,8 @@ const ForgotPasswordScreen = ({
                 autoComplete="email"
                 keyboardType="email-address"
                 autoCorrect={false}
+                autoFocus
+                style={styles.input}
               />
               <Submit>
                 <Button
@@ -233,4 +235,8 @@ const styles = StyleSheet.create({
   },
   logo: { width: 38, height: 54 },
   back: { color: colors.grey200 },
+  input: {
+    marginTop: 20,
+    marginHorizontal: 12,
+  },
 });

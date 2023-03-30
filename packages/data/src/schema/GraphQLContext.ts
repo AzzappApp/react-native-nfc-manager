@@ -1,4 +1,5 @@
 import DataLoader from 'dataloader';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import {
   getCardsByIds,
   getCardCoversByIds,
@@ -20,6 +21,7 @@ import type { Viewer } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
   auth: Viewer;
+  locale: string;
   profileLoader: DataLoader<string, Profile | null>;
   cardLoader: DataLoader<string, Card | null>;
   cardByProfileLoader: DataLoader<string, Card | null>;
@@ -29,11 +31,15 @@ export type GraphQLContext = {
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
 };
 
-export const createGraphQLContext = (userInfos?: Viewer): GraphQLContext => {
+export const createGraphQLContext = (
+  userInfos?: Viewer,
+  locale: string = DEFAULT_LOCALE,
+): GraphQLContext => {
   userInfos = userInfos ?? { isAnonymous: true };
 
   return {
     auth: userInfos,
+    locale,
     profileLoader: new DataLoader(getProfilesByIds),
     cardByProfileLoader: new DataLoader(getUsersCards),
     cardLoader: new DataLoader(getCardsByIds),

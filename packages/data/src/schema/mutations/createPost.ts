@@ -1,5 +1,6 @@
 import { GraphQLBoolean, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
+import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { createMedia, createPost, db } from '#domains';
 import PostGraphQL from '../PostGraphQL';
@@ -46,7 +47,8 @@ const createPostMutation = mutationWithClientMutationId({
     },
     { auth }: GraphQLContext,
   ) => {
-    if (auth.isAnonymous) {
+    const profileId = getProfileId(auth);
+    if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
@@ -55,7 +57,7 @@ const createPostMutation = mutationWithClientMutationId({
         await createMedia(media, trx);
         const post = await createPost(
           {
-            authorId: auth.profileId,
+            authorId: profileId,
             content,
             allowComments,
             allowLikes,

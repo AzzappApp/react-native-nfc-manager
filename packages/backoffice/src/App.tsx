@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { Admin, Resource, ListGuesser } from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens, signin } from '@azzapp/shared/WebAPI';
 import coverLayerList from '#components/CoverLayer';
 import coverTemplateList from '#components/CoverTemplate';
+import interest from '#components/Interest';
+import profileCatgoryList from '#components/ProfileCategory';
 import userList from '#components/UserList';
 import { getTokens, removeTokens, setTokens } from '#helpers/tokenStore';
 import type { AuthProvider } from 'react-admin';
@@ -110,7 +112,8 @@ const App = () => {
       <Resource {...userList} />
       <Resource {...coverLayerList} />
       <Resource {...coverTemplateList} />
-      <Resource name="Profile" list={ListGuesser} />
+      <Resource {...profileCatgoryList} />
+      <Resource {...interest} />
     </Admin>
   );
 };

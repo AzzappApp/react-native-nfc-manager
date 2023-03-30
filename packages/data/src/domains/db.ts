@@ -16,6 +16,9 @@ import type {
   Profile,
   Post,
   User,
+  ProfileCategory,
+  CompanyActivity,
+  Interest,
 } from '@prisma/client';
 
 export type Database = {
@@ -28,14 +31,17 @@ export type Database = {
     | 'subTitleStyle'
     | 'titleStyle'
   >;
-  CoverTemplate: CoverTemplate;
   CardModule: CardModule;
+  CompanyActivity: CompanyActivity;
+  CoverTemplate: CoverTemplate;
   CoverLayer: WithCreatedAt<CoverLayer>;
   Follow: WithCreatedAt<Follow>;
   Media: Media;
   Profile: WithTimeStamps<Profile>;
+  ProfileCategory: ProfileCategory;
   Post: WithoutJSONFields<WithCreatedAt<Post>, 'medias'>;
   User: WithTimeStamps<User>;
+  Interest: Interest;
 };
 
 const db = new Kysely<Database>({

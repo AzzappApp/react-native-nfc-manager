@@ -41,9 +41,9 @@ export type ChangePasswordRoute = {
   params?: never; //TODO this should coutain a reset token ?
 };
 
-export type OnBoardingRoute = {
-  route: 'ONBOARDING';
-  params?: never; //TODO this should coutain a reset token ?
+export type NewProfileRoute = {
+  route: 'NEW_PROFILE';
+  params?: never;
 };
 
 export type ProfileRoute = {
@@ -91,9 +91,8 @@ export type Route =
   | ProfilePostsRoute
   | PostRoute
   | NewPostRoute
-  | OnBoardingRoute
+  | NewProfileRoute
   | ChangePasswordRoute
-  | OnBoardingRoute
   | SignInRoute
   | SignUpRoute
   | ForgotPasswordRoute

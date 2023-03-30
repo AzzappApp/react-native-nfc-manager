@@ -38,6 +38,9 @@ const icons = {
   get chat() {
     return require('./assets/chat.png');
   },
+  get check() {
+    return require('./assets/check.png');
+  },
   get chevron() {
     return require('./assets/chevron.png');
   },
@@ -98,6 +101,9 @@ const icons = {
   get home() {
     return require('./assets/home.png');
   },
+  get input_clear() {
+    return require('./assets/input_clear.png');
+  },
   get lens() {
     return require('./assets/lens.png');
   },
@@ -109,6 +115,9 @@ const icons = {
   },
   get invert() {
     return require('./assets/invert.png');
+  },
+  get mail() {
+    return require('./assets/mail.png');
   },
   get magic() {
     return require('./assets/magic.png');

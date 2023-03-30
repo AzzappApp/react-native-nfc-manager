@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 
@@ -10,7 +10,16 @@ import type { ForwardedRef } from 'react';
 import type {
   GestureResponderEvent,
   TextInput as NativeTextInput,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
 } from 'react-native';
+
+type SecuredTextInputProps = Omit<TextInputProps, 'style'> & {
+  inputStyle?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle>;
+};
+
 /**
  * A SecruedTextInput the can show secured text clearly
  *
@@ -18,9 +27,8 @@ import type {
  * @param {TextInputProps} props
  * @return {React.Component<TextInputProps>}
  */
-
 const SecuredTextInput = (
-  props: TextInputProps,
+  { style, inputStyle, ...props }: SecuredTextInputProps,
   ref: ForwardedRef<NativeTextInput>,
 ) => {
   const intl = useIntl();
@@ -33,25 +41,35 @@ const SecuredTextInput = (
     [showPassword],
   );
 
+  const height = useMemo(
+    () => StyleSheet.flatten(style)?.height ?? 43,
+    [style],
+  );
+
   return (
-    <View>
-      <TextInput {...props} ref={ref} secureTextEntry={!showPassword} />
+    <View style={style}>
+      <TextInput
+        {...props}
+        ref={ref}
+        style={inputStyle}
+        secureTextEntry={!showPassword}
+      />
       <PressableNative
-        testID="azzapp__Input__secure-icon"
         style={styles.buttonSecure}
         onPress={onPressShowPassword}
-        accessibilityRole="button"
+        accessibilityRole="togglebutton"
+        accessibilityState={{ checked: showPassword }}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap to show secured text in clear',
+          defaultMessage: 'Show password',
           description:
-            'TextInput - AccessibilityLabel button to show password in clear',
+            'Password text input - show password button accessibility label',
         })}
       >
         <Icon
           icon="viewpassword"
           style={{
             width: 11,
-            height: StyleSheet.flatten(props.style)?.height ?? 43,
+            height,
             marginLeft: 10,
             marginRight: 10,
           }}

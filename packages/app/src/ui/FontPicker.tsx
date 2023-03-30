@@ -27,10 +27,10 @@ const FontPicker = ({
       headerTitle={title}
     >
       <SelectList
-        selectedItem={value}
-        onChange={onChange}
-        items={fonts}
-        renderItem={item => (
+        data={fonts}
+        selectedItemKey={value}
+        onItemSelected={onChange}
+        renderItem={({ item }) => (
           <Text
             style={{
               fontSize: 18,

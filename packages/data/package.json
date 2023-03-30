@@ -33,6 +33,7 @@
   ],
   "dependencies": {
     "@azzapp/auth": "*",
+    "@azzapp/i18n": "*",
     "@azzapp/relay": "*",
     "@azzapp/shared": "*",
     "@paralleldrive/cuid2": "^2.2.0",

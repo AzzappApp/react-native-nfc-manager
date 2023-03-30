@@ -1,5 +1,7 @@
 import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
+import { addAuthStateListener } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
+import fetchWithGlobalEvents from './fetchWithGlobalEvents';
 import type { Environment } from 'relay-runtime';
 
 let environment: Environment | null;
@@ -8,13 +10,14 @@ const listeners: Array<() => void> = [];
 export const getRelayEnvironment = () => {
   if (!environment) {
     environment = createRelayEnvironment({
-      fetchFunction: fetchWithAuthTokens,
+      fetchFunction: fetchWithGlobalEvents(fetchWithAuthTokens),
     });
+    addAuthStateListener(resetEnvironment);
   }
   return environment;
 };
 
-export const resetEnvironment = () => {
+const resetEnvironment = () => {
   environment?.commitUpdate(store => {
     (store as any).invalidateStore();
   });

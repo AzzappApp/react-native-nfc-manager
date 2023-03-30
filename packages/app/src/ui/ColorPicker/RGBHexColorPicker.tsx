@@ -2,6 +2,7 @@ import chroma from 'chroma-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import Label from '#ui/Label';
 import TextInput from '#ui/TextInput';
 import HexColorTextInput from '../HexColorTextInput';
 
@@ -152,30 +153,35 @@ const RGBHexColorPicker = ({
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
       <HexColorTextInput
+        testID="hexColorTextInput"
         style={{ marginTop: 0 }}
         value={chroma.hsv(hue, saturation, value).hex().toUpperCase()}
         onChangeColor={onChange}
       />
 
-      <TextInput
-        style={styles.textInputStyle}
-        containerStyle={{ padding: 0, marginRight: 10, flex: 1 }}
-        value={localColor.red}
-        onChangeText={onChangeRed}
-        onEndEditing={onEndSubmittingRed}
-        autoCapitalize="none"
-        autoComplete="off"
-        keyboardType="number-pad"
-        autoCorrect={false}
+      <Label
+        labelID="RGB"
         label={intl.formatMessage({
           defaultMessage: 'RGB',
           description: 'ColorPicker Component - TextInput Label : RGB Title',
         })}
-        errorContainerStyle={styles.errorContainerStyle}
-      />
+      >
+        <TextInput
+          testID="red"
+          accessibilityLabelledBy="RGB"
+          value={localColor.red}
+          onChangeText={onChangeRed}
+          onEndEditing={onEndSubmittingRed}
+          autoCapitalize="none"
+          autoComplete="off"
+          keyboardType="number-pad"
+          autoCorrect={false}
+          style={styles.textInputStyle}
+        />
+      </Label>
       <TextInput
-        style={styles.textInputStyle}
-        containerStyle={{ padding: 0, marginRight: 10, flex: 1 }}
+        testID="green"
+        accessibilityLabelledBy="RGB"
         value={localColor.green}
         onChangeText={onChangeGreen}
         onEndEditing={onEndSubmittingGreen}
@@ -183,11 +189,11 @@ const RGBHexColorPicker = ({
         autoComplete="off"
         keyboardType="number-pad"
         autoCorrect={false}
-        errorContainerStyle={styles.errorContainerStyle}
+        style={styles.textInputStyle}
       />
       <TextInput
-        style={styles.textInputStyle}
-        containerStyle={{ padding: 0, marginRight: 10, flex: 1 }}
+        testID="blue"
+        accessibilityLabelledBy="RGB"
         value={localColor.blue}
         onChangeText={onChangeBlue}
         onEndEditing={onEndSubmittingBlue}
@@ -195,7 +201,7 @@ const RGBHexColorPicker = ({
         autoComplete="off"
         keyboardType="number-pad"
         autoCorrect={false}
-        errorContainerStyle={styles.errorContainerStyle}
+        style={styles.textInputStyle}
       />
     </View>
   );
@@ -204,10 +210,8 @@ const RGBHexColorPicker = ({
 export default RGBHexColorPicker;
 
 const styles = StyleSheet.create({
-  errorContainerStyle: { minHeight: 0, height: 0 },
   textInputStyle: {
-    paddingLeft: 0,
-    paddingRight: 0,
+    marginRight: 10,
     textAlign: 'center',
     textAlignVertical: 'center',
   },
