@@ -173,8 +173,8 @@ const CoverTitleEditionPanel = ({
           {
             key: 'title',
             label: intl.formatMessage({
-              defaultMessage: 'Title',
-              description: 'Label of the title tab in cover edition',
+              defaultMessage: 'Name',
+              description: 'Label of the name tab in cover edition',
             }),
           },
           {

@@ -7,6 +7,7 @@ jest.mock('react-native-encrypted-storage', () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
+  clear: jest.fn(),
 }));
 
 jest.mock('@azzapp/shared/getRuntimeEnvironment', () =>
@@ -136,7 +137,7 @@ describe('AuthModule', () => {
     });
     jest.runAllTicks();
 
-    expect(EncryptedStorage.removeItem).toHaveBeenCalledWith('AZZAPP_AUTH');
+    expect(EncryptedStorage.clear).toHaveBeenCalled();
     expect(AuthStore.getAuthState()).toEqual({
       authenticated: false,
       hasBeenSignedIn: true,

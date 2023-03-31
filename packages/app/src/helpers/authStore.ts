@@ -87,7 +87,7 @@ export const init = async () => {
 
   addGlobalEventListener('SIGN_OUT', async () => {
     storage.delete(MMKVS_PROFILE_ID);
-    await EncryptedStorage.removeItem(ENCRYPTED_STORAGE_TOKENS_KEY);
+    await EncryptedStorage.clear();
     authTokens = null;
     emitAuthState();
   });

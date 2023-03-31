@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, Text, View } from 'react-native';
-import CountryFlag from 'react-native-country-flag';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors, fontFamilies } from '#theme';
 import useViewportSize, { VH100 } from '#hooks/useViewportSize';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import CountrySelector from './CountrySelector';
+import COUNTRY_FLAG from './CountrySelector/CountryFlag';
 import Icon from './Icon';
 import PressableBackground from './PressableBackground';
 import PressableNative from './PressableNative';
@@ -55,7 +55,10 @@ const EmailOrCountryCodeSelector = ({
         {value === 'email' ? (
           <Icon icon="mail" style={{ width: 24 }} />
         ) : (
-          <CountryFlag isoCode={value} size={18} />
+          <Image
+            source={{ uri: COUNTRY_FLAG[value] }}
+            style={{ width: 22, height: 16 }}
+          />
         )}
       </PressableNative>
       <BottomSheetModal

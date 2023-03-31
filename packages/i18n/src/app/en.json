@@ -335,10 +335,6 @@
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
   },
-  "PL6vuK": {
-    "defaultMessage": "Title",
-    "description": "Label of the title tab in cover edition"
-  },
   "PVzsRd": {
     "defaultMessage": "Foreground",
     "description": "Label of Foreground tab in cover edition"
@@ -894,6 +890,10 @@
   "w96WJ0": {
     "defaultMessage": "Password doesn't match",
     "description": "ChangePasswordScreen Screen - error passwords doesn't match"
+  },
+  "wZwtml": {
+    "defaultMessage": "Name",
+    "description": "Label of the name tab in cover edition"
   },
   "wfjPDR": {
     "defaultMessage": "Photos gallery",

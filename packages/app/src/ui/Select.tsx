@@ -115,7 +115,7 @@ const Select = <ItemT,>({
         item: selectedItem,
         index: selectedItemIndex,
         isInputElement: true,
-        selected: true,
+        isSelected: true,
       });
     }
     const label = (selectedItem as any)[labelField ?? 'label'];

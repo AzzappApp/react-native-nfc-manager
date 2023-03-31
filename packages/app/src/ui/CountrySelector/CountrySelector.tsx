@@ -2,12 +2,12 @@
 import i18nCountries from 'i18n-iso-countries';
 import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import { useCallback, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import CountryFlag from 'react-native-country-flag';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors, fontFamilies } from '#theme';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
-import SelectList from './SelectList';
-import type { SelectListItemInfo, SelectListProps } from './SelectList';
+import SelectList from './../SelectList';
+import COUNTRY_FLAG from './CountryFlag';
+import type { SelectListItemInfo, SelectListProps } from './../SelectList';
 import type { CountryCode } from 'libphonenumber-js';
 
 //TODO FIND a way to get the locales from the SUPPORTED_LOCALES
@@ -58,21 +58,6 @@ const CountrySelector = ({
 
   const keyExtractor = useCallback((item: CountryItem) => item.code, []);
 
-  const renderItem = useCallback(
-    ({
-      item: { callingCode, name, code },
-    }: SelectListItemInfo<CountryItem>) => {
-      return (
-        <View style={styles.countryItem}>
-          <CountryFlag isoCode={code} size={18} />
-          <Text style={styles.countryName}>{name}</Text>
-          <Text style={styles.countryCallingCode}>{`+${callingCode}`}</Text>
-        </View>
-      );
-    },
-    [],
-  );
-
   const onItemSelected = useCallback(
     (country: CountryItem) => {
       onChange(country.code);
@@ -87,6 +72,7 @@ const CountrySelector = ({
       selectedItemKey={value}
       renderItem={renderItem}
       onItemSelected={onItemSelected}
+      getItemLayout={getItemLayout}
       {...props}
     />
   );
@@ -100,11 +86,14 @@ type CountryItem = {
   code: CountryCode;
 };
 
+const ITEM_HEIGHT = 46;
 const styles = StyleSheet.create({
   countryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
+    height: ITEM_HEIGHT,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   countryName: {
     ...fontFamilies.semiBold,
@@ -116,4 +105,25 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: colors.grey400,
   },
+});
+
+const renderItem = ({
+  item: { callingCode, name, code },
+}: SelectListItemInfo<CountryItem>) => {
+  return (
+    <View style={styles.countryItem}>
+      <Image
+        source={{ uri: COUNTRY_FLAG[code] }}
+        style={{ width: 22, height: 16, borderRadius: 2 }}
+      />
+      <Text style={styles.countryName}>{name}</Text>
+      <Text style={styles.countryCallingCode}>{`+${callingCode}`}</Text>
+    </View>
+  );
+};
+
+const getItemLayout = (_data: any, index: number) => ({
+  length: ITEM_HEIGHT,
+  offset: ITEM_HEIGHT * index,
+  index,
 });
