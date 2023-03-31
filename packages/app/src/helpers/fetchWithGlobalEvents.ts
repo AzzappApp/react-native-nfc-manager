@@ -18,7 +18,7 @@ const fetchWithGlobalEvents =
     try {
       result = await fetchFunction(input, init);
     } catch (error) {
-      dispatchGlobalEvent({
+      await dispatchGlobalEvent({
         type: 'NETWORK_ERROR',
         payload: { params: [input, init], error },
       });

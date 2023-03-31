@@ -1,5 +1,5 @@
 import { IntlErrorCode } from '@formatjs/intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IntlProvider } from 'react-intl';
 import { View } from 'react-native';
 import {
@@ -43,8 +43,6 @@ import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
 
-import type { NativeRouterInit } from './components/NativeRouter';
-
 // #region Routing Definitions
 const screens = {
   SIGN_IN: SignInMobileScreen,
@@ -85,7 +83,7 @@ const init = async () => {
  */
 const App = () => {
   // #region Routing
-  const [routes, setRoutes] = useState<NativeRouterInit>(() => {
+  const initialRoutes = useMemo(() => {
     const { authenticated, profileId, hasBeenSignedIn } = getAuthState();
     if (!authenticated) {
       return hasBeenSignedIn ? signInRoutes : signUpRoutes;
@@ -94,20 +92,19 @@ const App = () => {
       return newProfileRoute;
     }
     return mainRoutes;
-  });
+  }, []);
+
+  const { router, routerState } = useNativeRouter(initialRoutes);
 
   const { authenticated } = useAuthState();
   useEffect(() => {
     if (
       !authenticated &&
-      routes.id !== signInRoutes.id &&
-      routes.id !== signUpRoutes.id
+      !unauthenticatedRoutes.includes(router.getCurrentRoute().route)
     ) {
-      setRoutes(signInRoutes);
+      router.replaceAll(signInRoutes);
     }
-  }, [authenticated, routes]);
-
-  const { router, routerState } = useNativeRouter(routes);
+  }, [authenticated, router]);
 
   // #endregion
 
@@ -126,15 +123,19 @@ const App = () => {
     });
   }, [router, screenIdToDispose]);
 
-  const onScreenDismissed = (id: string) => {
-    router.screenDismissed(id);
-  };
+  const onScreenDismissed = useCallback(
+    (id: string) => {
+      router.screenDismissed(id);
+    },
+    [router],
+  );
 
-  const onFinishTransitioning = () => {
+  const onFinishTransitioning = useCallback(() => {
     screenIdToDispose.forEach(screen =>
       RelayQueryManager.disposeQueryFor(screen),
     );
-  };
+    screenIdToDispose.length = 0;
+  }, [screenIdToDispose]);
   // #endregion
 
   // #region Internationalization
@@ -186,3 +187,5 @@ const App = () => {
 };
 
 export default waitFor(App, init());
+
+const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];

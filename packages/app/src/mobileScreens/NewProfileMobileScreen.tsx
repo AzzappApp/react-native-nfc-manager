@@ -33,7 +33,7 @@ const NewProfileMobileScreen = ({
     refreshToken: string;
     profileId: string;
   }) => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'PROFILE_CHANGE',
       payload: {
         authTokens: {

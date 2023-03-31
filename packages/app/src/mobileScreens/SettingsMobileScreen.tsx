@@ -23,7 +23,7 @@ const SettingsMobileScreen = ({
 }: RelayScreenProps<SettingsRoute, SettingsMobileScreenQuery>) => {
   const { viewer } = usePreloadedQuery(settingsScreenQuery, preloadedQuery);
   const logout = async () => {
-    dispatchGlobalEvent({ type: 'SIGN_OUT' });
+    void dispatchGlobalEvent({ type: 'SIGN_OUT' });
   };
   return (
     <SafeAreaView

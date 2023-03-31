@@ -79,7 +79,7 @@ describe('AuthModule', () => {
   });
 
   test('SIGN_UP events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_UP',
       payload: {
         authTokens: testToken,
@@ -101,7 +101,7 @@ describe('AuthModule', () => {
   });
 
   test('SIGN_IN events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: testToken,
@@ -123,7 +123,7 @@ describe('AuthModule', () => {
   });
 
   test('SIGN_OUT events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: testToken,
@@ -132,7 +132,7 @@ describe('AuthModule', () => {
     });
     jest.runAllTicks();
 
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_OUT',
     });
     jest.runAllTicks();
@@ -148,7 +148,7 @@ describe('AuthModule', () => {
   });
 
   test('TOKENS_REFRESHED events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: testToken,
@@ -157,7 +157,7 @@ describe('AuthModule', () => {
     });
     jest.runAllTicks();
 
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'TOKENS_REFRESHED',
       payload: {
         authTokens: { token: 'testToken2', refreshToken: 'testRefreshToken2' },
@@ -189,7 +189,7 @@ describe('AuthModule', () => {
   });
 
   test('PROFILE_CHANGE events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: testToken,
@@ -200,7 +200,7 @@ describe('AuthModule', () => {
 
     expect(authListener).toHaveBeenLastCalledWith(AuthStore.getAuthState());
 
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'PROFILE_CHANGE',
       payload: {
         profileId: 'testProfileId2',
@@ -219,7 +219,7 @@ describe('AuthModule', () => {
   });
 
   test('NETWORK_ERROR events updates auth state correctly', () => {
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: testToken,
@@ -230,7 +230,7 @@ describe('AuthModule', () => {
 
     expect(authListener).toHaveBeenLastCalledWith(AuthStore.getAuthState());
 
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'NETWORK_ERROR',
       payload: {
         error: new Error('test'),
@@ -246,7 +246,7 @@ describe('AuthModule', () => {
       profileId: testProfileId,
     });
 
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'NETWORK_ERROR',
       payload: {
         error: new Error(ERRORS.INVALID_TOKEN),

@@ -12,7 +12,7 @@ const SignUpMobileScreen = () => {
   const router = useRouter();
   const signup = async (params: SignUpParams) => {
     const tokens = await WebAPI.signup(params);
-    dispatchGlobalEvent({
+    await dispatchGlobalEvent({
       type: 'SIGN_UP',
       payload: { authTokens: tokens },
     });

@@ -36,7 +36,7 @@ export const isRelayScreen = (
   Component: any,
 ): Component is RelayScreenOptions<any> => {
   const type = typeof Component?.query;
-  return type === 'string' || type === 'function';
+  return type === 'object' || type === 'function';
 };
 
 /**

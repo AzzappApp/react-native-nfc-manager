@@ -32,7 +32,7 @@ async function fetchWithAuthTokens<JSON = unknown>(
       } catch {
         throw e;
       }
-      dispatchGlobalEvent({
+      await dispatchGlobalEvent({
         type: 'TOKENS_REFRESHED',
         payload: {
           authTokens: refreshedTokens,

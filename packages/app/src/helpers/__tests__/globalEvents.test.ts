@@ -11,7 +11,7 @@ describe('globalEvents', () => {
     const removeListener = addGlobalEventListener('SIGN_IN', listener);
     expect(removeListener).toBeDefined();
     expect(typeof removeListener).toBe('function');
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: { token: 'mockToken', refreshToken: 'mockRefreshToken' },
@@ -19,7 +19,7 @@ describe('globalEvents', () => {
     });
     expect(listener).toHaveBeenCalledTimes(1);
     removeListener();
-    dispatchGlobalEvent({
+    void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
         authTokens: { token: 'mockToken', refreshToken: 'mockRefreshToken' },

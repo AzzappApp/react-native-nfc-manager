@@ -349,26 +349,29 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoute]);
 
-  const replaceAll = (init: NativeRouterInit) => {
-    const { stack, modals } = routerStateRef.current;
-    const screenRemoved = [
-      ...getAllRoutesFromStack(modals),
-      ...getAllRoutesFromStack(stack),
-    ];
-    screenRemoved.forEach(({ id, state: route }) =>
-      dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
-    );
-    const nextState = initRouterState(init);
-    const screenPusheds = [
-      ...getAllRoutesFromStack(nextState.modals, [], true),
-      ...getAllRoutesFromStack(nextState.stack, [], true),
-    ];
-    screenPusheds.forEach(({ id, state: route }) =>
-      dispatchToListeners(screenWillBePushedListeners, { id, route }),
-    );
+  const replaceAll = useCallback(
+    (init: NativeRouterInit) => {
+      const { stack, modals } = routerStateRef.current;
+      const screenRemoved = [
+        ...getAllRoutesFromStack(modals),
+        ...getAllRoutesFromStack(stack),
+      ];
+      screenRemoved.forEach(({ id, state: route }) =>
+        dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
+      );
+      const nextState = initRouterState(init);
+      const screenPusheds = [
+        ...getAllRoutesFromStack(nextState.modals, [], true),
+        ...getAllRoutesFromStack(nextState.stack, [], true),
+      ];
+      screenPusheds.forEach(({ id, state: route }) =>
+        dispatchToListeners(screenWillBePushedListeners, { id, route }),
+      );
 
-    dispatch({ type: 'REPLACE_ALL', payload: nextState });
-  };
+      dispatch({ type: 'REPLACE_ALL', payload: nextState });
+    },
+    [dispatch, screenWillBePushedListeners, screenWillBeRemovedListeners],
+  );
 
   useEffect(() => {
     replaceAll(init);
@@ -395,7 +398,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
 
     // TODO doesn't works with stack in tabs
     const setTabIfExists = (route: Route) => {
-      const tabState = getActiveTabs(routerState);
+      const tabState = getActiveTabs(routerStateRef.current);
       if (!tabState) {
         return false;
       }
@@ -423,7 +426,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     // so until we needs it we won't implement that
     return {
       getCurrentRoute() {
-        return currentRoute.state;
+        return getCurrentRouteFromState(routerStateRef.current).state;
       },
       push(route: Route) {
         if (setTabIfExists(route)) {
@@ -502,8 +505,14 @@ export const useNativeRouter = (init: NativeRouterInit) => {
       addScreenWillBeRemovedListener: listener =>
         addListener(screenWillBeRemovedListeners, listener),
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    dispatch,
+    replaceAll,
+    routeDidChangeListeners,
+    routeWillChangeListeners,
+    screenWillBePushedListeners,
+    screenWillBeRemovedListeners,
+  ]);
 
   return { router, routerState };
 };

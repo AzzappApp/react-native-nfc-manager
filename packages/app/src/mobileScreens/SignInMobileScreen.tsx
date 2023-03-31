@@ -10,7 +10,7 @@ const SignInMobileScreen = () => {
   const nativeRouter = useRouter() as NativeRouter;
   const signin = async (params: SignInParams) => {
     const { token, refreshToken, profileId } = await WebAPI.signin(params);
-    dispatchGlobalEvent({
+    await dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: { authTokens: { token, refreshToken }, profileId },
     });

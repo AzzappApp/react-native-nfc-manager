@@ -87,7 +87,9 @@ type TypeToLister<TType extends GlobalEvents['type']> = TType extends 'SIGN_UP'
   ? TOKENS_REFRESHED
   : never;
 
-type EventListener<T extends GlobalEvents> = (event: T) => void;
+type EventListener<T extends GlobalEvents> =
+  | ((event: T) => Promise<any>)
+  | ((event: T) => void);
 
 const listeners: {
   [key in GlobalEvents['type']]?: Set<EventListener<TypeToLister<key>>>;
@@ -114,15 +116,22 @@ export const addGlobalEventListener = <T extends GlobalEvents['type']>(
 };
 
 /**
- * Dispatch a global event
+ * Dispatch a global event returnin a promise that resolves when all listeners
+ * have finished processing the event
+ *
  * @param event the event to dispatch
  */
-export const dispatchGlobalEvent = (event: GlobalEvents) => {
+export const dispatchGlobalEvent = (event: GlobalEvents): Promise<void> => {
   ensureMobile();
   const eventListeners = listeners[event.type];
+  const promises = [];
   for (const listener of eventListeners?.values() ?? []) {
-    (listener as any)(event);
+    const result = (listener as any)(event);
+    if (result instanceof Promise) {
+      promises.push(result.catch(() => void 0));
+    }
   }
+  return Promise.all(promises).then(() => void 0);
 };
 
 const ensureMobile = () => {
