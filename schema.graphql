@@ -46,6 +46,12 @@ type Query {
     """The user name of the profile"""
     userName: String!
   ): Profile
+
+  """Return a list of profile categories"""
+  profileCategories: [ProfileCategory!]!
+
+  """Return a list of interests"""
+  interests: [Interest!]!
 }
 
 """Represent an Application Viewer"""
@@ -134,12 +140,6 @@ type Viewer {
 
   """Fetches all cover templates for a given kind ordered by Category"""
   coverTemplatesByCategory(segmented: Boolean): [CoverTemplateCategory!]!
-
-  """Return a list of profile categories"""
-  profileCategories: [ProfileCategory!]!
-
-  """Return a list of interests"""
-  interests: [Interest!]!
 }
 
 """Represent an Azzapp Profile"""

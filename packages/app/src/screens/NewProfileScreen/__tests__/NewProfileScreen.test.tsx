@@ -31,7 +31,7 @@ describe('NewProfileScreen', () => {
     environment = createMockEnvironment();
     environment.mock.queueOperationResolver(operation =>
       MockPayloadGenerator.generate(operation, {
-        Viewer: () => ({
+        Query: () => ({
           profileCategories: range(0, 10).map(i => ({
             id: `profileCategory-${i}`,
             profileKind: i % 2 === 0 ? 'personal' : 'business',
@@ -60,16 +60,14 @@ describe('NewProfileScreen', () => {
       const data = useLazyLoadQuery<NewProfileScreenTestQuery>(
         graphql`
           query NewProfileScreenTestQuery @relay_test_operation {
-            viewer {
-              ...NewProfileScreen_viewer
-            }
+            ...NewProfileScreen_query
           }
         `,
         {},
       );
       return (
         <NewProfileScreen
-          viewer={data.viewer}
+          data={data}
           onClose={onClose}
           onProfileCreated={onProfileCreated}
         />

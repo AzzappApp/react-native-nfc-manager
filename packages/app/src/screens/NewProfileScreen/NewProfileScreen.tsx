@@ -5,10 +5,10 @@ import FadeSwitch from '#ui/FadeSwitch';
 import InterestPicker from './InterestPicker';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
-import type { NewProfileScreen_viewer$key } from '@azzapp/relay/artifacts/NewProfileScreen_viewer.graphql';
+import type { NewProfileScreen_query$key } from '@azzapp/relay/artifacts/NewProfileScreen_query.graphql';
 
 type NewProfileScreenProps = {
-  viewer: NewProfileScreen_viewer$key;
+  data: NewProfileScreen_query$key;
   onClose(): void;
   onProfileCreated(tokenResponse: {
     token: string;
@@ -18,13 +18,13 @@ type NewProfileScreenProps = {
 };
 
 const NewProfileScreen = ({
-  viewer,
+  data,
   onClose,
   onProfileCreated,
 }: NewProfileScreenProps) => {
   const { profileCategories, interests } = useFragment(
     graphql`
-      fragment NewProfileScreen_viewer on Viewer {
+      fragment NewProfileScreen_query on Query {
         profileCategories {
           id
           profileKind
@@ -36,7 +36,7 @@ const NewProfileScreen = ({
         }
       }
     `,
-    viewer,
+    data,
   );
 
   const [currentPage, setPage] = useState(0);

@@ -19,7 +19,7 @@ export const getRelayEnvironment = () => {
 
 const resetEnvironment = () => {
   environment?.commitUpdate(store => {
-    (store as any).invalidateStore();
+    store.getRoot().getLinkedRecord('viewer')?.invalidateRecord();
   });
   listeners.forEach(listener => listener());
 };

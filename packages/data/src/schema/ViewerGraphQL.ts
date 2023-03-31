@@ -22,8 +22,6 @@ import {
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
-  getInterests,
-  getProfileCategories,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -31,12 +29,8 @@ import {
 } from '#helpers/connectionsHelpers';
 import { CoverLayerGraphQL } from './CardGraphQL';
 import CoverTemplateGraphQL from './CoverTemplateGraphQL';
-import { InterestGraphQL } from './mutations/commonsTypes';
 import { PostConnectionGraphQL } from './PostGraphQL';
-import ProfileGraphQL, {
-  ProfileCategoryGraphQL,
-  ProfileConnectionGraphQL,
-} from './ProfileGraphQL';
+import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
 import type { Post, Profile, CoverTemplate } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { Viewer } from '@azzapp/auth/viewer';
@@ -301,20 +295,6 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         console.log(categories);
         return categories;
       },
-    },
-    profileCategories: {
-      description: 'Return a list of profile categories',
-      type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(ProfileCategoryGraphQL)),
-      ),
-      resolve: async () => getProfileCategories(),
-    },
-    interests: {
-      description: 'Return a list of interests',
-      type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(InterestGraphQL)),
-      ),
-      resolve: async () => getInterests(),
     },
   }),
 });

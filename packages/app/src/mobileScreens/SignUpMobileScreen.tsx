@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
+import { useRelayEnvironment } from 'react-relay';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import SignUpScreen from '#screens/SignUpScreen';
+import { preload as preloadNewProfile } from './NewProfileMobileScreen';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 
 const SignUpMobileScreen = () => {
@@ -15,6 +18,13 @@ const SignUpMobileScreen = () => {
     });
     router.replace({ route: 'NEW_PROFILE' });
   };
+
+  const environment = useRelayEnvironment();
+  useEffect(() => {
+    void preloadNewProfile(environment);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return <SignUpScreen signup={signup} />;
 };
 

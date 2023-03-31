@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { Image, PixelRatio } from 'react-native';
+import { fetchQuery, graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { useRouter } from '#PlatformEnvironment';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -8,20 +9,20 @@ import NewProfileScreen from '#screens/NewProfileScreen/NewProfileScreen';
 import type { NativeRouter } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
+import type { NewProfileMobileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileMobileScreenPreloadQuery.graphql';
 import type { NewProfileMobileScreenQuery } from '@azzapp/relay/artifacts/NewProfileMobileScreenQuery.graphql';
+import type { Environment } from 'react-relay';
 
 const newProfileScreenQuery = graphql`
   query NewProfileMobileScreenQuery {
-    viewer {
-      ...NewProfileScreen_viewer
-    }
+    ...NewProfileScreen_query
   }
 `;
 
 const NewProfileMobileScreen = ({
   preloadedQuery,
 }: RelayScreenProps<NewProfileRoute, NewProfileMobileScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(newProfileScreenQuery, preloadedQuery);
+  const data = usePreloadedQuery(newProfileScreenQuery, preloadedQuery);
 
   const onProfileCreated = ({
     token,
@@ -52,11 +53,39 @@ const NewProfileMobileScreen = ({
 
   return (
     <NewProfileScreen
-      viewer={viewer}
+      data={data}
       onProfileCreated={onProfileCreated}
       onClose={onClose}
     />
   );
+};
+
+export const preload = async (environment: Environment) => {
+  const pixelRatio = Math.min(2, PixelRatio.get());
+  const data = await fetchQuery<NewProfileMobileScreenPreloadQuery>(
+    environment,
+    graphql`
+      query NewProfileMobileScreenPreloadQuery($pixelRatio: Float!) {
+        ...NewProfileScreen_query
+        profileCategories {
+          id
+          medias {
+            preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
+          }
+        }
+      }
+    `,
+    { pixelRatio },
+  ).toPromise();
+
+  if (!data) {
+    return;
+  }
+  data.profileCategories.forEach(category => {
+    category.medias?.forEach(media => {
+      void Image.prefetch(media.preloadURI);
+    });
+  });
 };
 
 NewProfileMobileScreen.options = {
