@@ -328,6 +328,7 @@ const ProfileForm = ({
                     description:
                       'NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
                   })}
+                  itemContainerStyle={styles.selectItemContainerStyle}
                 />
               </Label>
             )}
@@ -399,6 +400,10 @@ type CompanyActivity = ArrayItemType<
 >;
 
 const styles = StyleSheet.create({
+  selectItemContainerStyle: {
+    marginBottom: 18,
+    paddingHorizontal: 30,
+  },
   root: {
     flex: 1,
     backgroundColor: '#FFF',

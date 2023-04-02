@@ -204,6 +204,9 @@ const BottomSheetModal = ({
             },
           ]}
         >
+          {!disableGestureInteraction && (
+            <View style={styles.gestureInteractionIndicator} />
+          )}
           {hasHeader && (
             <Header
               style={styles.accessoryView}
@@ -222,6 +225,14 @@ const BottomSheetModal = ({
 export default BottomSheetModal;
 
 const styles = StyleSheet.create({
+  gestureInteractionIndicator: {
+    backgroundColor: colors.black,
+    height: 4,
+    width: 20,
+    alignSelf: 'center',
+    borderRadius: 2,
+    marginBottom: 4,
+  },
   modalContainer: {
     flex: 1,
   },
