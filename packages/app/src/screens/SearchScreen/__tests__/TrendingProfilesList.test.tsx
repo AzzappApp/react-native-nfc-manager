@@ -168,7 +168,7 @@ const eventData = {
 describe('TrendingProfilesList', () => {
   test('should render initial list and loadMore after scrolling', async () => {
     renderScreen();
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('cover-list');
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks).toHaveLength(10);
     expect(coverLinks[0]).toHaveStyle({ width: 80 });

@@ -7,9 +7,9 @@ import { colors } from '#theme';
 import PressableNative from '#ui/PressableNative';
 import ViewTransition from '#ui/ViewTransition';
 import type {
-  CoverLayerlist_layers$data,
-  CoverLayerlist_layers$key,
-} from '@azzapp/relay/artifacts/CoverLayerlist_layers.graphql';
+  CoverLayerList_layers$data,
+  CoverLayerList_layers$key,
+} from '@azzapp/relay/artifacts/CoverLayerList_layers.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type {
   StyleProp,
@@ -20,7 +20,7 @@ import type {
 } from 'react-native';
 
 type CoverLayerListProps = {
-  layers: CoverLayerlist_layers$key;
+  layers: CoverLayerList_layers$key;
   selectedLayer: string | null | undefined;
   onSelectLayer: (media: string | null) => void;
   backgroundColor?: ColorValue;
@@ -38,7 +38,7 @@ const CoverLayerList = ({
 }: CoverLayerListProps) => {
   const medias = useFragment(
     graphql`
-      fragment CoverLayerlist_layers on CoverLayer @relay(plural: true) {
+      fragment CoverLayerList_layers on CoverLayer @relay(plural: true) {
         id
         uri
         # we use arbitrary values here, but it should be good enough
@@ -60,7 +60,7 @@ const CoverLayerList = ({
   const renderItem = useCallback(
     ({
       item,
-    }: ListRenderItemInfo<ArrayItemType<CoverLayerlist_layers$data> | null>) => {
+    }: ListRenderItemInfo<ArrayItemType<CoverLayerList_layers$data> | null>) => {
       // eslint-disable-next-line eqeqeq
       const selected = selectedMedia == item?.id;
       return (
@@ -114,6 +114,7 @@ const CoverLayerList = ({
       style={style}
       contentContainerStyle={styles.container}
       renderItem={renderItem}
+      testID="cover-layer-list"
       accessibilityRole="list"
     />
   );

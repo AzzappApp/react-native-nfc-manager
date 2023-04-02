@@ -66,7 +66,7 @@ describe('Recent Search component', () => {
       />,
     );
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('recent-search-list');
     expect(list).not.toBeNull();
     const items = screen.getAllByRole('link');
     expect(items.length).toBe(3);
@@ -82,7 +82,7 @@ describe('Recent Search component', () => {
       />,
     );
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('recent-search-list');
     expect(list).not.toBeNull();
     const items = screen.getAllByRole('link');
     expect(items.length).toBe(1);
@@ -98,10 +98,10 @@ describe('Recent Search component', () => {
       />,
     );
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('recent-search-list');
     expect(list).not.toBeNull();
     expect(
-      within(screen.getByRole('list')).getByText(
+      within(screen.getByTestId('recent-search-list')).getByText(
         'No recent search for azz2themoon',
       ),
     ).toBeTruthy();

@@ -139,6 +139,7 @@ const MediaVideoRenderer = (
       />
       {!videoReady && thumbnailURI && !currentTime && (
         <MediaImageRenderer
+          testID="thumbnail"
           source={source}
           alt={alt}
           aspectRatio={aspectRatio}

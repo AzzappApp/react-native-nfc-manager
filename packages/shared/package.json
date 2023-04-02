@@ -18,12 +18,12 @@
     "dev"
   ],
   "dependencies": {
-    "libphonenumber-js": "^1.10.18",
+    "libphonenumber-js": "^1.10.24",
     "react-relay": "^14.1.0",
-    "validator": "13.7.0"
+    "validator": "13.9.0"
   },
   "devDependencies": {
     "@types/react-relay": "^14.1.2",
-    "@types/validator": "^13.7.10"
+    "@types/validator": "^13.7.14"
   }
 }

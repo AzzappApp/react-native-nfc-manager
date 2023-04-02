@@ -94,6 +94,7 @@ const CoverList = ({
 
   return (
     <FlatList
+      testID="cover-list"
       accessibilityRole="list"
       data={users}
       keyExtractor={keyExtractor}

@@ -833,7 +833,7 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Foreground selection'));
     });
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('cover-layer-list');
     const foregroundsButtons = within(list).getAllByRole('button');
 
     expect(foregroundsButtons).toHaveLength(10);
@@ -877,7 +877,7 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Background selection'));
     });
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('cover-layer-list');
     const backgroundsButtons = within(list).getAllByRole('button');
 
     expect(backgroundsButtons).toHaveLength(10);

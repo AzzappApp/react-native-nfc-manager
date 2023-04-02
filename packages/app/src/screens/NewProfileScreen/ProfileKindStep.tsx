@@ -87,6 +87,7 @@ const ProfileKindStep = ({
     (media: Media) => (
       <View style={[styles.mediaImageContainer, { borderRadius }]}>
         <Image
+          testID="category-image"
           accessibilityRole="image"
           source={{ uri: media.uri }}
           style={[styles.mediaImage, { borderRadius, width: cardWidth }]}

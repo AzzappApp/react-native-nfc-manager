@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import { useRouter } from '#PlatformEnvironment';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import PostRenderer from '../PostRenderer';
-import type { PostRendererHandle } from '../PostRenderer';
 import type { PostLinkProps } from './postLinkTypes';
+import type { PostRendererHandle } from '../PostRenderer';
 import type { View, NativeMethods } from 'react-native';
 
 /**

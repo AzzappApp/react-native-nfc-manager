@@ -11,10 +11,9 @@ describe('ForgotPassword Screen', () => {
   });
 
   test('should render and show the enter email ', () => {
-    const { container, getByTestId } = render(
+    const { getByTestId } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
-    expect(container).not.toBeNull();
     expect(
       getByTestId('azzapp__ForgotPasswordScreen__ViewTransition-email'),
     ).toHaveStyle({

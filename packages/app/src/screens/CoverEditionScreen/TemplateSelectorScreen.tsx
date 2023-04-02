@@ -160,6 +160,7 @@ const TemplateSelectorScreen = ({
       </Text>
 
       <FlatList
+        testID="cover-template-list"
         data={coverTemplates}
         renderItem={renderItem}
         style={{ flex: 1 }}

@@ -92,16 +92,12 @@ describe('CoverRenderer', () => {
   test('should render the cover media and the text overlay media', () => {
     renderCover();
 
-    const images = screen.getAllByRole('image');
-    // 2 images: the cover media and the text overlay media + the qr code image button
-    expect(images.length).toBe(3);
-
-    expect(images[0]).toHaveProp(
+    expect(screen.getByTestId('cover-renderer-media')).toHaveProp(
       'accessibilityLabel',
       'User card title - User card subtitle - background image',
     );
 
-    expect(images[1]).toHaveProp(
+    expect(screen.getByTestId('cover-renderer-text')).toHaveProp(
       'accessibilityLabel',
       'User card title - User card subtitle',
     );
@@ -112,25 +108,24 @@ describe('CoverRenderer', () => {
       'if width is the cover base width, and the large version otherwise',
     () => {
       const { rerender } = renderCover();
-      const images = screen.getAllByRole('image');
-      expect(images[0]).toHaveProp('source', {
+      expect(screen.getByTestId('cover-renderer-media')).toHaveProp('source', {
         mediaID: 'media_id',
         requestedSize: 125,
         uri: 'media_small_uri',
       });
-      expect(images[1]).toHaveProp('source', {
+      expect(screen.getByTestId('cover-renderer-text')).toHaveProp('source', {
         mediaID: 'text_preview_media_id',
         requestedSize: 125,
         uri: 'text_preview_small_uri',
       });
 
       rerender({ width: COVER_BASE_WIDTH * 2 });
-      expect(images[0]).toHaveProp('source', {
+      expect(screen.getByTestId('cover-renderer-media')).toHaveProp('source', {
         mediaID: 'media_id',
         requestedSize: 250,
         uri: 'media_large_uri',
       });
-      expect(images[1]).toHaveProp('source', {
+      expect(screen.getByTestId('cover-renderer-text')).toHaveProp('source', {
         mediaID: 'text_preview_media_id',
         requestedSize: 250,
         uri: 'text_preview_large_uri',
@@ -143,18 +138,20 @@ describe('CoverRenderer', () => {
     renderCover({ onReadyForDisplay: onReadyForDisplayMock });
 
     expect(onReadyForDisplayMock).not.toHaveBeenCalled();
-    const images = screen.getAllByRole('image');
     act(() => {
-      fireEvent(images[0], 'onReadyForDisplay');
+      fireEvent(
+        screen.getByTestId('cover-renderer-media'),
+        'onReadyForDisplay',
+      );
     });
     expect(onReadyForDisplayMock).not.toHaveBeenCalled();
     act(() => {
-      fireEvent(images[1], 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(1);
 
     act(() => {
-      fireEvent(images[1], 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(2);
 
@@ -167,12 +164,15 @@ describe('CoverRenderer', () => {
     });
 
     act(() => {
-      fireEvent(images[1], 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(2);
 
     act(() => {
-      fireEvent(images[0], 'onReadyForDisplay');
+      fireEvent(
+        screen.getByTestId('cover-renderer-media'),
+        'onReadyForDisplay',
+      );
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(3);
   });

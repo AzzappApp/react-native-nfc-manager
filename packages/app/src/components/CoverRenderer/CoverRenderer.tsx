@@ -175,6 +175,7 @@ const CoverRenderer = (
       {media ? (
         <>
           <MediaImageRenderer
+            testID="cover-renderer-media"
             width={width}
             aspectRatio={COVER_RATIO}
             alt={intl.formatMessage(
@@ -191,6 +192,7 @@ const CoverRenderer = (
           />
           {textPreviewMedia && (
             <MediaImageRenderer
+              testID="cover-renderer-text"
               width={width}
               aspectRatio={COVER_RATIO}
               alt={`${title} - ${subTitle}`}
@@ -218,6 +220,7 @@ const CoverRenderer = (
         style={styles.qrCode}
       >
         <Image
+          testID="cover-renderer-qr-code"
           accessibilityRole="image"
           source={require('./assets/qr-code.png')}
           style={styles.layer}

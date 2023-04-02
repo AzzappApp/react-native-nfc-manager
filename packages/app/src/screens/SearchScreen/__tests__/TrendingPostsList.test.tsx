@@ -136,21 +136,11 @@ const renderScreen = () => {
     );
   };
 
-  const component = render(
+  return render(
     <RelayEnvironmentProvider environment={environment}>
       <TestRenderer />
     </RelayEnvironmentProvider>,
   );
-
-  return {
-    rerender() {
-      component.rerender(
-        <RelayEnvironmentProvider environment={environment}>
-          <TestRenderer />
-        </RelayEnvironmentProvider>,
-      );
-    },
-  };
 };
 
 const eventData = {
@@ -173,7 +163,7 @@ describe('TendingPostsList', () => {
   test('should render initial list and loadMore after scrolling', async () => {
     renderScreen();
 
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('post-grid-container');
     act(() => {
       fireEvent(list, 'layout', {
         nativeEvent: { layout: { width: 400, height: 800 } },

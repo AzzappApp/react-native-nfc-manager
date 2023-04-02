@@ -177,7 +177,7 @@ const eventData = {
 describe('Recommended Profiles list Component', () => {
   test('should render initial list and loadMore after scrolling', async () => {
     renderScreen();
-    const list = screen.getByRole('list');
+    const list = screen.getByTestId('cover-list');
 
     const coverLinks = screen.getAllByTestId('CoverLink');
     expect(coverLinks).toHaveLength(10);

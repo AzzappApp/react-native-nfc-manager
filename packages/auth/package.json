@@ -19,6 +19,6 @@
   ],
   "dependencies": {
     "@azzapp/shared": "*",
-    "iron-webcrypto": "^0.5.0"
+    "iron-webcrypto": "^0.6.0"
   }
 }

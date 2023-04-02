@@ -5,7 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import ProfileColorPalette from '#components/ProfileColorPalette';
 import TabsBar from '#ui/TabsBar';
 import ColorPreview from './ColorPreview';
-import CoverLayerList from './CoverLayerlist';
+import CoverLayerList from './CoverLayerList';
 import type { CoverEditionForegroundPanel_viewer$key } from '@azzapp/relay/artifacts/CoverEditionForegroundPanel_viewer.graphql';
 import type { CardCoverForegroundStyleInput } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -33,7 +33,7 @@ const CoverEditionForegroundPanel = ({
     graphql`
       fragment CoverEditionForegroundPanel_viewer on Viewer {
         coverForegrounds {
-          ...CoverLayerlist_layers
+          ...CoverLayerList_layers
         }
         profile {
           ...ProfileColorPalette_profile

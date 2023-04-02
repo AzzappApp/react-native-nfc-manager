@@ -199,7 +199,15 @@
         "@typescript-eslint/prefer-ts-expect-error": "error",
         "@typescript-eslint/sort-type-union-intersection-members": "error",
         "@typescript-eslint/switch-exhaustiveness-check": "error"
-      }
+      },
+      "overrides": [
+        {
+          "files": ["*.test.tsx", "*.test.ts"],
+          "rules": {
+            "@typescript-eslint/no-floating-promises": "off"
+          }
+        }
+      ]
     }
   ]
 }

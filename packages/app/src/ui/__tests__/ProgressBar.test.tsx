@@ -5,14 +5,14 @@ import ProgressBar from '../ProgressBar';
 
 describe('ProgressBar component', () => {
   test('should apply `style` props correctly', () => {
-    render(
+    const { root } = render(
       <ProgressBar
         style={{ backgroundColor: 'red', width: 345 }}
         progress={0}
       />,
     );
 
-    expect(screen.container).toHaveStyle({
+    expect(root).toHaveStyle({
       backgroundColor: 'red',
       width: 345,
     });

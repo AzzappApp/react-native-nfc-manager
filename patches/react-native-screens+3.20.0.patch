@@ -24,7 +24,7 @@ index 84158c6..687c7a8 100644
    RNSScreenStackAnimationNone,
    RNSScreenStackAnimationFade,
 diff --git a/node_modules/react-native-screens/ios/RNSScreen.h b/node_modules/react-native-screens/ios/RNSScreen.h
-index a2195b5..b6cefe2 100644
+index 6bd374c..603f2ed 100644
 --- a/node_modules/react-native-screens/ios/RNSScreen.h
 +++ b/node_modules/react-native-screens/ios/RNSScreen.h
 @@ -55,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
@@ -36,10 +36,10 @@ index a2195b5..b6cefe2 100644
  @property (nonatomic) RNSScreenSwipeDirection swipeDirection;
  @property (nonatomic) RNSScreenReplaceAnimation replaceAnimation;
 diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
-index 337b325..ec57576 100644
+index 4373c1a..acd3217 100644
 --- a/node_modules/react-native-screens/ios/RNSScreen.mm
 +++ b/node_modules/react-native-screens/ios/RNSScreen.mm
-@@ -186,6 +186,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
+@@ -187,6 +187,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
      case RNSScreenStackAnimationSimplePush:
      case RNSScreenStackAnimationSlideFromBottom:
      case RNSScreenStackAnimationFadeFromBottom:
@@ -47,7 +47,7 @@ index 337b325..ec57576 100644
        // Default
        break;
    }
-@@ -1179,6 +1180,7 @@ @implementation RNSScreenManager
+@@ -1180,6 +1181,7 @@ @implementation RNSScreenManager
  RCT_EXPORT_VIEW_PROPERTY(replaceAnimation, RNSScreenReplaceAnimation)
  RCT_EXPORT_VIEW_PROPERTY(stackPresentation, RNSScreenStackPresentation)
  RCT_EXPORT_VIEW_PROPERTY(stackAnimation, RNSScreenStackAnimation)
@@ -55,19 +55,19 @@ index 337b325..ec57576 100644
  RCT_EXPORT_VIEW_PROPERTY(swipeDirection, RNSScreenSwipeDirection)
  RCT_EXPORT_VIEW_PROPERTY(transitionDuration, NSNumber)
  
-@@ -1225,6 +1227,7 @@ @implementation RCTConvert (RNSScreen)
-     RNSScreenStackAnimation,
-     (@{
-       @"default" : @(RNSScreenStackAnimationDefault),
+@@ -1265,6 +1267,7 @@ @implementation RCTConvert (RNSScreen)
+       @"slide_from_bottom" : @(RNSScreenStackAnimationSlideFromBottom),
+       @"slide_from_right" : @(RNSScreenStackAnimationDefault),
+       @"slide_from_left" : @(RNSScreenStackAnimationDefault),
 +      @"custom" : @(RNSScreenStackAnimationCustom),
-       @"none" : @(RNSScreenStackAnimationNone),
-       @"fade" : @(RNSScreenStackAnimationFade),
-       @"fade_from_bottom" : @(RNSScreenStackAnimationFadeFromBottom),
+     }),
+     RNSScreenStackAnimationDefault,
+     integerValue)
 diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
-index f96eae7..40c8d88 100644
+index f96eae7..f867196 100644
 --- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
 +++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
-@@ -1,8 +1,22 @@
+@@ -1,8 +1,20 @@
  #import "RNSScreen.h"
  
 +
@@ -81,7 +81,6 @@ index f96eae7..40c8d88 100644
 +                                  withOptions:(NSDictionary *)options;
 +
 +@end
-+
  @interface RNSScreenStackAnimator : NSObject <UIViewControllerAnimatedTransitioning>
  
  - (instancetype)initWithOperation:(UINavigationControllerOperation)operation;
@@ -89,12 +88,11 @@ index f96eae7..40c8d88 100644
 ++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name;
  
  @end
-+
 diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
-index 6fc0542..35b9338 100644
+index 6fc0542..8e6d6f2 100644
 --- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
 +++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
-@@ -312,9 +312,54 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
+@@ -312,9 +312,55 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
    } else if (animation == RNSScreenStackAnimationFadeFromBottom) {
      [self animateFadeFromBottomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
      return;
@@ -148,24 +146,25 @@ index 6fc0542..35b9338 100644
 +                                   withOptions:options];
 +}
 +
++
  @end
 diff --git a/node_modules/react-native-screens/lib/typescript/types.d.ts b/node_modules/react-native-screens/lib/typescript/types.d.ts
-index 35369eb..fd2a6ee 100644
+index bcfb012..bb56b69 100644
 --- a/node_modules/react-native-screens/lib/typescript/types.d.ts
 +++ b/node_modules/react-native-screens/lib/typescript/types.d.ts
-@@ -1,6 +1,6 @@
+@@ -1,7 +1,7 @@
+ /// <reference types="react" />
  import { Animated, NativeSyntheticEvent, ViewProps, View, TargetedEvent, TextInputFocusEventData } from 'react-native';
- export declare type StackPresentationTypes = 'push' | 'modal' | 'transparentModal' | 'containedModal' | 'containedTransparentModal' | 'fullScreenModal' | 'formSheet';
--export declare type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left';
-+export declare type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left' | 'custom';
- export declare type BlurEffectTypes = 'extraLight' | 'light' | 'dark' | 'regular' | 'prominent' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial' | 'systemUltraThinMaterialLight' | 'systemThinMaterialLight' | 'systemMaterialLight' | 'systemThickMaterialLight' | 'systemChromeMaterialLight' | 'systemUltraThinMaterialDark' | 'systemThinMaterialDark' | 'systemMaterialDark' | 'systemThickMaterialDark' | 'systemChromeMaterialDark';
- export declare type ScreenReplaceTypes = 'push' | 'pop';
- export declare type SwipeDirectionTypes = 'vertical' | 'horizontal';
-@@ -176,6 +176,11 @@ export interface ScreenProps extends ViewProps {
+ export type StackPresentationTypes = 'push' | 'modal' | 'transparentModal' | 'containedModal' | 'containedTransparentModal' | 'fullScreenModal' | 'formSheet';
+-export type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left';
++export type StackAnimationTypes = 'default' | 'fade' | 'fade_from_bottom' | 'flip' | 'none' | 'simple_push' | 'slide_from_bottom' | 'slide_from_right' | 'slide_from_left' | 'custom';
+ export type BlurEffectTypes = 'extraLight' | 'light' | 'dark' | 'regular' | 'prominent' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial' | 'systemUltraThinMaterialLight' | 'systemThinMaterialLight' | 'systemMaterialLight' | 'systemThickMaterialLight' | 'systemChromeMaterialLight' | 'systemUltraThinMaterialDark' | 'systemThinMaterialDark' | 'systemMaterialDark' | 'systemThickMaterialDark' | 'systemChromeMaterialDark';
+ export type ScreenReplaceTypes = 'push' | 'pop';
+ export type SwipeDirectionTypes = 'vertical' | 'horizontal';
+@@ -177,6 +177,10 @@ export interface ScreenProps extends ViewProps {
       * - "none" – the screen appears/dissapears without an animation
       */
      stackAnimation?: StackAnimationTypes;
-+
 +    /**
 +     * Custom animator options
 +     */
@@ -173,8 +172,12 @@ index 35369eb..fd2a6ee 100644
      /**
       * How should the screen be presented.
       * The following values are currently supported:
+diff --git a/node_modules/react-native-screens/src/.DS_Store b/node_modules/react-native-screens/src/.DS_Store
+new file mode 100644
+index 0000000..33b71c5
+Binary files /dev/null and b/node_modules/react-native-screens/src/.DS_Store differ
 diff --git a/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js b/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
-index 762c349..37a9242 100644
+index 762c349..91c3c86 100644
 --- a/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
 +++ b/node_modules/react-native-screens/src/fabric/ScreenNativeComponent.js
 @@ -50,7 +50,8 @@ type StackAnimation =
@@ -183,7 +186,7 @@ index 762c349..37a9242 100644
    | 'slide_from_bottom'
 -  | 'fade_from_bottom';
 +  | 'fade_from_bottom'
-+  | 'custom'
++  | 'custom';
  
  type SwipeDirection = 'vertical' | 'horizontal';
  

@@ -98,7 +98,7 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByRole('image')[0]).toHaveProp('source', {
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
         uri: 'https://fakeMedia.com/0-0.jpg',
       });
 
@@ -114,7 +114,7 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByRole('image')[0]).toHaveProp('source', {
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
         uri: 'https://fakeMedia.com/1-0.jpg',
       });
     });

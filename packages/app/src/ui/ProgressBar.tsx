@@ -11,7 +11,9 @@ const ProgressBar = ({
 }: ProgressBarProps) => (
   <View style={[styles.progressBar, style]}>
     <View
+      accessible
       style={[styles.progressBarInner, { width: `${progress * 100}%` }]}
+      // TODO Added for testing purposes but is it really needed?
       accessibilityRole="progressbar"
       accessibilityLabel={accessibilityLabel}
       accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }}

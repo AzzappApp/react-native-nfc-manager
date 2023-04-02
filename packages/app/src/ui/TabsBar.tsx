@@ -85,7 +85,12 @@ const TabsBar = ({
   const styles = useVariantStyleSheet(computedStyles, variant);
 
   return (
-    <View style={[styles.container, style]} accessibilityRole="tablist">
+    <View
+      style={[styles.container, style]}
+      // TODO added for testing, but is it really revelant ?
+      accessible
+      accessibilityRole="tablist"
+    >
       {tabs.map(({ key, icon, tint, rightElement, label }, index) => (
         <Fragment key={key}>
           {variant === 'topbar' && <View style={styles.backgroundLine} />}

@@ -56,7 +56,7 @@ describe('PhotoGalleryMediaList', () => {
       jest.runAllTicks();
     });
 
-    expect(screen.getAllByRole('image')).toHaveLength(10);
+    expect(screen.getAllByRole('button')).toHaveLength(10);
   });
 
   // TODO onEndReached never called
@@ -130,7 +130,7 @@ describe('PhotoGalleryMediaList', () => {
     act(() => {
       jest.runAllTicks();
     });
-    expect(screen.getAllByRole('image')).toHaveLength(20);
+    expect(screen.getAllByRole('button')).toHaveLength(20);
   });
 
   test('Should filter media by album and kind if given', () => {

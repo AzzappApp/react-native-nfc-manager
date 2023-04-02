@@ -1,0 +1,14 @@
+diff --git a/node_modules/use-debounce/package.json b/node_modules/use-debounce/package.json
+index 1981720..23935a7 100644
+--- a/node_modules/use-debounce/package.json
++++ b/node_modules/use-debounce/package.json
+@@ -20,7 +20,8 @@
+         "import": "./dist/index.module.js",
+         "require": "./dist/index.js"
+       },
+-      "default": "./dist/index.module.js"
++      "default": "./dist/index.module.js",
++      "types": "./dist/index.d.ts"
+     },
+     "./package.json": "./package.json"
+   },

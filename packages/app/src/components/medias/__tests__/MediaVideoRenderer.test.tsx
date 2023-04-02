@@ -31,8 +31,10 @@ describe('MediaVideoRenderer', () => {
         alt="A video"
       />,
     );
-    const thumbnail = screen.getByRole('image');
-    expect(thumbnail).toHaveProp('accessibilityLabel', 'A video');
+    expect(screen.getByTestId('thumbnail')).toHaveProp(
+      'accessibilityLabel',
+      'A video',
+    );
   });
 
   it('should hide the thumbnail once the video is ready', () => {
@@ -49,11 +51,11 @@ describe('MediaVideoRenderer', () => {
       />,
     );
     const video = screen.getAllByLabelText('A video')[0];
-    expect(screen.queryByRole('image')).toBeTruthy();
+    expect(screen.queryByTestId('thumbnail')).toBeTruthy();
     act(() => {
       fireEvent(video, 'readyForDisplay');
     });
-    expect(screen.queryByRole('image')).not.toBeTruthy();
+    expect(screen.queryByTestId('thumbnail')).not.toBeTruthy();
   });
 
   it('should dispatch onReadyForDisplay only once by requested media', () => {
@@ -70,7 +72,7 @@ describe('MediaVideoRenderer', () => {
       />,
     );
     const getVideo = () => screen.getAllByLabelText('A video')[0];
-    const getThumbnail = () => screen.getByRole('image');
+    const getThumbnail = () => screen.getByTestId('thumbnail');
     act(() => {
       fireEvent(getThumbnail(), 'load');
     });
@@ -128,7 +130,7 @@ describe('MediaVideoRenderer', () => {
         onReadyForDisplay={onReadyForDisplay}
       />,
     );
-    expect(screen.queryByRole('image')).not.toBeTruthy();
+    expect(screen.queryByTestId('thumbnail')).not.toBeTruthy();
     act(() => {
       fireEvent(getVideo(), 'readyForDisplay');
     });

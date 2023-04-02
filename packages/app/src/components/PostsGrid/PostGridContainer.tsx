@@ -41,6 +41,7 @@ const PostGridContainer = ({
   return (
     <ScrollView
       accessibilityRole="list"
+      testID="post-grid-container"
       nestedScrollEnabled={nestedScrollEnabled}
       ref={ref => {
         scrollToTopInterceptor(ref);

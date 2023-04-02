@@ -46,7 +46,8 @@ const RecentSearch = ({
   };
 
   return (
-    <FlatList<string>
+    <FlatList
+      testID="recent-search-list"
       accessibilityRole="list"
       ListHeaderComponent={
         <Text style={[textStyles.title, styles.textStyleRecent]}>

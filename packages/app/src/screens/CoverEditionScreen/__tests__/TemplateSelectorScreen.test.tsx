@@ -121,7 +121,7 @@ describe('TemplateSelectorScreen component', () => {
 
   test('Should render the flatlist correctly with one cover template', () => {
     renderTemplateSelector();
-    expect(screen.getByRole('list')).toBeTruthy();
+    expect(screen.getByTestId('cover-template-list')).toBeTruthy();
     expect(screen.getAllByTestId('cover-preview')).toHaveLength(1);
   });
 
