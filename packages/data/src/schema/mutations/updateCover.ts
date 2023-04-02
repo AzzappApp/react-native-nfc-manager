@@ -174,7 +174,7 @@ const updateCover = mutationWithClientMutationId({
               case 'sourceMedia':
                 updates.sourceMediaId = value.id;
                 mediaOperations.push(
-                  ...replaceMedia(cover.sourceMediaId, input.sourceMedia, trx),
+                  ...replaceMedia(null, input.sourceMedia, trx),
                 );
                 break;
               case 'maskMedia':
