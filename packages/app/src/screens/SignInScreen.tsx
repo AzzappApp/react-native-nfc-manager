@@ -195,7 +195,7 @@ export default SignInScreen;
 function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {
   try {
     const phonenumber = parsePhoneNumber(phoneNumber, countryCode as any);
-    if (phonenumber) {
+    if (phonenumber.isValid()) {
       return phonenumber.formatInternational();
     }
   } catch {
