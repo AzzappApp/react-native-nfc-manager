@@ -43,6 +43,7 @@ jobs:
 
       - name : Fetch the previous query-map.json file from AzzappApp/azzapp-precompiled-queries repository
         uses: actions/checkout@v3
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
         with: 
           repository: 'AzzappApp/azzapp-precompiled-queries'
           path: 'azzapp-precompiled-queries'
@@ -51,15 +52,18 @@ jobs:
 
       - name: Copy the the previous query-map.json file
         run: cp -R azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json packages/relay  
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
 
        # use manual command instead of build command for passing --repersist option to relay
       - name: Force rebuild the query-map.json
         run: yarn relay:build --repersist
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
         env:
           CI: true  
 
       - name: Check if there is difference between 2 precompiled query map
         id: query-map-updated
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
         run: |
           if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json" "packages/relay/query-map.json"
           then
@@ -69,7 +73,7 @@ jobs:
           fi  
 
       - name: Copy the file back to azzapp-precompiled-queries repository
-        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         run: cp -r packages/relay/query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
         env:
           CI: true
@@ -77,7 +81,7 @@ jobs:
       # was not able to make a push and commit working on another repo. it was creating a submodule ...
       - uses: peter-evans/create-pull-request@v4
         id: cpr
-        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         with:
           token: ${{ secrets.QUERY_MAP_PAT }}
           commit-message: 'Update query-map.json'
@@ -93,7 +97,7 @@ jobs:
 
       # a github action on zzapp-precompiled-queries will delete the branch
       - name: Merging the PR
-        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         uses: actions/github-script@v6.4.0
         env:
           pull_number: ${{ steps.cpr.outputs.pull-request-number}}
