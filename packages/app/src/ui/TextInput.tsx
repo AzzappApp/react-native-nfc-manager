@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.grey50,
     borderRadius: 12,
-    fontColor: colors.black,
+    color: colors.black,
   },
   focused: {
     borderColor: colors.grey900,

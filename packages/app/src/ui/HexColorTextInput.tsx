@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   text: {
     ...fontFamilies.semiBold,
     paddingBottom: 5,
-    size: 14,
+    fontSize: 14,
   },
   container: {
     marginRight: 10,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     height: 43,
     width: 74,
     fontSize: 16,
-    fontColor: colors.black,
+    color: colors.black,
     textTransform: 'uppercase',
   },
 });

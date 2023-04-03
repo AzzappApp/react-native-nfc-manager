@@ -4,6 +4,7 @@ const esModules = [
   'react-native-qrcode-svg',
   'react-native-reanimated',
   'validator',
+  'use-debounce',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */

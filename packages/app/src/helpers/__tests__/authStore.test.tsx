@@ -1,5 +1,6 @@
 import EncryptedStorage from 'react-native-encrypted-storage';
 import ERRORS from '@azzapp/shared/errors';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import * as AuthStore from '../authStore';
 
@@ -42,8 +43,7 @@ jest.mock('react-native-mmkv', () => {
   return { MMKV: MMKVMock };
 });
 
-jest.useFakeTimers();
-describe('AuthModule', () => {
+describe('AuthStore', () => {
   const testToken = { token: 'testToken', refreshToken: 'testRefreshToken' };
   const testProfileId = 'testProfileID';
 
@@ -59,7 +59,7 @@ describe('AuthModule', () => {
     subscription();
   });
 
-  test('init() sets auth tokens correctly', () => {
+  test('init() sets auth tokens correctly', async () => {
     (EncryptedStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify(testToken),
     );
@@ -67,7 +67,7 @@ describe('AuthModule', () => {
     mockMMKV.getBoolean.mockReturnValueOnce(true);
     void AuthStore.init();
 
-    jest.runAllTicks();
+    await flushPromises();
 
     expect(EncryptedStorage.getItem).toHaveBeenCalledWith('AZZAPP_AUTH');
     expect(AuthStore.getTokens()).toEqual(testToken);
@@ -78,14 +78,14 @@ describe('AuthModule', () => {
     });
   });
 
-  test('SIGN_UP events updates auth state correctly', () => {
+  test('SIGN_UP events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_UP',
       payload: {
         authTokens: testToken,
       },
     });
-    jest.runAllTicks();
+    await flushPromises();
 
     expect(EncryptedStorage.setItem).toHaveBeenCalledWith(
       'AZZAPP_AUTH',
@@ -100,7 +100,7 @@ describe('AuthModule', () => {
     expect(authListener).toHaveBeenCalledTimes(1);
   });
 
-  test('SIGN_IN events updates auth state correctly', () => {
+  test('SIGN_IN events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
@@ -108,7 +108,7 @@ describe('AuthModule', () => {
         profileId: testProfileId,
       },
     });
-    jest.runAllTicks();
+    await flushPromises();
     expect(EncryptedStorage.setItem).toHaveBeenCalledWith(
       'AZZAPP_AUTH',
       JSON.stringify(testToken),
@@ -122,7 +122,7 @@ describe('AuthModule', () => {
     expect(authListener).toHaveBeenCalledTimes(1);
   });
 
-  test('SIGN_OUT events updates auth state correctly', () => {
+  test('SIGN_OUT events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
@@ -130,12 +130,11 @@ describe('AuthModule', () => {
         profileId: testProfileId,
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     void dispatchGlobalEvent({
       type: 'SIGN_OUT',
     });
-    jest.runAllTicks();
+    await flushPromises();
 
     expect(EncryptedStorage.clear).toHaveBeenCalled();
     expect(AuthStore.getAuthState()).toEqual({
@@ -147,7 +146,7 @@ describe('AuthModule', () => {
     expect(authListener).toHaveBeenCalledTimes(2);
   });
 
-  test('TOKENS_REFRESHED events updates auth state correctly', () => {
+  test('TOKENS_REFRESHED events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
@@ -155,16 +154,14 @@ describe('AuthModule', () => {
         profileId: testProfileId,
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     void dispatchGlobalEvent({
       type: 'TOKENS_REFRESHED',
       payload: {
         authTokens: { token: 'testToken2', refreshToken: 'testRefreshToken2' },
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(EncryptedStorage.setItem).toHaveBeenCalledWith(
       'AZZAPP_AUTH',
       JSON.stringify(testToken),
@@ -188,7 +185,7 @@ describe('AuthModule', () => {
     expect(authListener).toHaveBeenCalledTimes(1);
   });
 
-  test('PROFILE_CHANGE events updates auth state correctly', () => {
+  test('PROFILE_CHANGE events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
@@ -196,8 +193,7 @@ describe('AuthModule', () => {
         profileId: testProfileId,
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(authListener).toHaveBeenLastCalledWith(AuthStore.getAuthState());
 
     void dispatchGlobalEvent({
@@ -207,8 +203,7 @@ describe('AuthModule', () => {
         authTokens: testToken,
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(AuthStore.getAuthState()).toEqual({
       authenticated: true,
       hasBeenSignedIn: true,
@@ -218,7 +213,7 @@ describe('AuthModule', () => {
     expect(authListener).toHaveBeenCalledTimes(2);
   });
 
-  test('NETWORK_ERROR events updates auth state correctly', () => {
+  test('NETWORK_ERROR events updates auth state correctly', async () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
@@ -226,8 +221,7 @@ describe('AuthModule', () => {
         profileId: testProfileId,
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(authListener).toHaveBeenLastCalledWith(AuthStore.getAuthState());
 
     void dispatchGlobalEvent({
@@ -237,8 +231,7 @@ describe('AuthModule', () => {
         params: {},
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(authListener).toHaveBeenCalledTimes(1);
     expect(AuthStore.getAuthState()).toEqual({
       authenticated: true,
@@ -253,8 +246,7 @@ describe('AuthModule', () => {
         params: {},
       },
     });
-    jest.runAllTicks();
-
+    await flushPromises();
     expect(AuthStore.getAuthState()).toEqual({
       authenticated: false,
       hasBeenSignedIn: true,

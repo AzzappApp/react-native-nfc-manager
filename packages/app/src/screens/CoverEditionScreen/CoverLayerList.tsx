@@ -83,7 +83,7 @@ const CoverLayerList = ({
                 style={[
                   styles.image,
                   {
-                    borderRadius: !selected && borderRadius,
+                    borderRadius: !selected ? borderRadius : null,
                     backgroundColor,
                     tintColor,
                   },

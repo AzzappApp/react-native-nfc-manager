@@ -6,6 +6,7 @@ import {
 } from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
 import ERRORS from '@azzapp/shared/errors';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { createProfile } from '@azzapp/shared/WebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import NewProfileScreen from '..';
@@ -20,7 +21,6 @@ jest.mock('@azzapp/shared/WebAPI', () => ({
 }));
 jest.mock('#ui/FadeSwitch', () => 'FadeSwitch');
 
-jest.useFakeTimers();
 describe('NewProfileScreen', () => {
   let environment: RelayMockEnvironment;
 
@@ -160,7 +160,7 @@ describe('NewProfileScreen', () => {
   };
 
   describe('Profile Form', () => {
-    test('should allows the user to fill the form', () => {
+    test('should allows the user to fill the form', async () => {
       renderToProfileForm('personal');
 
       act(() => {
@@ -205,9 +205,7 @@ describe('NewProfileScreen', () => {
         expect.anything(),
       );
 
-      act(() => {
-        jest.runAllTicks();
-      });
+      await act(flushPromises);
       expect(onProfileCreated).toHaveBeenCalledWith({
         profileId: 'profile-0',
         token: 'fakeToken',
@@ -215,7 +213,7 @@ describe('NewProfileScreen', () => {
       });
     });
 
-    test('should allows the user to fill the form for business', () => {
+    test('should allows the user to fill the form for business', async () => {
       renderToProfileForm('business');
 
       act(() => {
@@ -247,6 +245,7 @@ describe('NewProfileScreen', () => {
       act(() => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
+      await act(flushPromises);
 
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -298,7 +297,7 @@ describe('NewProfileScreen', () => {
       expect(onProfileCreated);
     });
 
-    test('should display an error message when the user name is already taken', () => {
+    test('should display an error message when the user name is already taken', async () => {
       // TODO test validation as you type
       renderToProfileForm('personal');
 
@@ -345,16 +344,14 @@ describe('NewProfileScreen', () => {
       expect(
         screen.queryByText('This username is already used by someone else'),
       ).not.toBeTruthy();
-      act(() => {
-        jest.runAllTicks();
-      });
+      await act(flushPromises);
       expect(
         screen.queryByText('This username is already used by someone else'),
       ).toBeTruthy();
     });
   });
 
-  const renderToInterestPicker = () => {
+  const renderToInterestPicker = async () => {
     renderToProfileForm('business');
     createProfileMock.mockResolvedValue({
       profileId: 'profile-1',
@@ -370,18 +367,18 @@ describe('NewProfileScreen', () => {
 
     act(() => {
       fireEvent.press(screen.getByTestId('submit-button'));
-      jest.runAllTicks();
     });
+    await act(flushPromises);
   };
 
   describe('InterestPicker', () => {
-    test('should display the list of interests', () => {
-      renderToInterestPicker();
+    test('should display the list of interests', async () => {
+      await renderToInterestPicker();
       expect(screen.getAllByRole('togglebutton')).toHaveLength(15);
     });
 
-    test('should allows the user to select an interest', () => {
-      renderToInterestPicker();
+    test('should allows the user to select an interest', async () => {
+      await renderToInterestPicker();
 
       const interestButtons = screen.getAllByRole('togglebutton');
       act(() => {
@@ -408,14 +405,14 @@ describe('NewProfileScreen', () => {
           operation,
           MockPayloadGenerator.generate(operation),
         );
-        jest.runAllTicks();
       });
+      await act(flushPromises);
 
       expect(onClose).toHaveBeenCalled();
     });
 
-    test('should allows the user to skip an interest', () => {
-      renderToInterestPicker();
+    test('should allows the user to skip an interest', async () => {
+      await renderToInterestPicker();
       act(() => {
         fireEvent.press(screen.getByTestId('skip-button'));
       });

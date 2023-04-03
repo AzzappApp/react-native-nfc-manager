@@ -1,4 +1,5 @@
 import ERRORS from '@azzapp/shared/errors';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens } from '@azzapp/shared/WebAPI';
 import { getTokens } from '#helpers/authStore';
@@ -32,6 +33,7 @@ describe('fetchWithAuthTokens', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
+
   test('should not amend the request if there is no tokens in the store', () => {
     getTokensMock.mockReturnValueOnce(null);
     void fetchWithAuthTokens('https://example.com', { method: 'POST' });
@@ -54,7 +56,7 @@ describe('fetchWithAuthTokens', () => {
     });
   });
 
-  test('should refresh the token if the token is invalid', () => {
+  test('should refresh the token if the token is invalid', async () => {
     getTokensMock.mockReturnValueOnce({
       token: 'fakeToken',
       refreshToken: 'fakeRefreshToken',
@@ -70,7 +72,7 @@ describe('fetchWithAuthTokens', () => {
     });
 
     void fetchWithAuthTokens('https://example.com', { method: 'POST' });
-    jest.runAllTicks();
+    await flushPromises();
 
     expect(fetchJSONMock).toHaveBeenNthCalledWith(1, 'https://example.com', {
       method: 'POST',
@@ -125,7 +127,6 @@ describe('fetchWithAuthTokens', () => {
       expect(e.message).toBe(ERRORS.UNAUTORIZED);
     });
     expect(fetchJSONMock).toHaveBeenCalledTimes(1);
-    jest.runAllTicks();
   });
 
   test('should return the result of the request ', () => {
@@ -136,6 +137,5 @@ describe('fetchWithAuthTokens', () => {
         expect(res).toEqual({ data: 'fakeData' });
       },
     );
-    jest.runAllTicks();
   });
 });

@@ -1,10 +1,9 @@
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { render, screen, act, fireEvent } from '#helpers/testHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
 import ImagePicker from '..';
 import type { ImagePickerProps } from '../ImagePicker';
 import '@testing-library/jest-native/extend-expect';
-
-jest.useFakeTimers();
 
 jest.mock(
   '../PhotoGalleryMediaList',
@@ -113,12 +112,12 @@ jest.mock('#hooks/useCameraPermissions', () =>
   }),
 );
 
-const withPermissionStatus = (
+const withPermissionStatus = async (
   status: ReturnType<typeof useCameraPermissions>,
-  callback: () => void,
+  callback: () => Promise<any>,
 ) => {
   (useCameraPermissions as jest.Mock).mockReturnValue(status);
-  callback();
+  await callback();
   (useCameraPermissions as jest.Mock).mockReturnValue({
     cameraPermission: 'authorized',
     microphonePermission: 'authorized',
@@ -145,7 +144,7 @@ jest.mock(
     }),
 );
 
-const renderImagePicker = (props?: Partial<ImagePickerProps>) => {
+const renderImagePicker = async (props?: Partial<ImagePickerProps>) => {
   const picker = render(
     <ImagePicker
       onCancel={() => void 0}
@@ -153,44 +152,19 @@ const renderImagePicker = (props?: Partial<ImagePickerProps>) => {
       {...props}
     />,
   );
-  act(() => {
-    jest.runAllTicks();
-  });
+  await act(flushPromises);
   return picker;
-};
-
-const renderImagePickerToEditImageStep = (
-  props?: Partial<ImagePickerProps>,
-  kind: 'image' | 'video' = 'image',
-) => {
-  renderImagePicker(props);
-
-  act(() => {
-    fireEvent(screen.getByTestId('media-list'), 'mediaSelected', {
-      kind,
-      uri:
-        kind === 'image'
-          ? 'file://fakeuri.com/image2.jpg'
-          : 'file://fakeuri.com/video2.mp4',
-      width: 300,
-      height: 500,
-    });
-  });
-  act(() => {
-    const button = screen.getByText('Next').parent!;
-    fireEvent.press(button);
-  });
 };
 
 describe('ImagePicker', () => {
   describe('SelectImageStep', () => {
-    test('Should render the gallery list to allow the user to pick a media', () => {
-      renderImagePicker();
+    test('Should render the gallery list to allow the user to pick a media', async () => {
+      await renderImagePicker();
       expect(screen.queryByTestId('media-list')).toBeTruthy();
     });
 
-    test('Should display the media selected by the user', () => {
-      renderImagePicker();
+    test('Should display the media selected by the user', async () => {
+      await renderImagePicker();
       const list = screen.getByTestId('media-list');
 
       act(() => {
@@ -216,8 +190,9 @@ describe('ImagePicker', () => {
           width: 300,
           height: 500,
         });
-        jest.runAllTicks();
       });
+
+      await act(flushPromises);
 
       expect(screen.getByTestId('selected-media-video')).toHaveProp(
         'uri',
@@ -225,8 +200,8 @@ describe('ImagePicker', () => {
       );
     });
 
-    test('Should display a button to ask permission to access the gallery when the permission is denied', () => {
-      renderImagePicker();
+    test('Should display a button to ask permission to access the gallery when the permission is denied', async () => {
+      await renderImagePicker();
       const list = screen.getByTestId('media-list');
 
       act(() => {
@@ -237,19 +212,19 @@ describe('ImagePicker', () => {
       expect(permissionModal).toHaveProp('permissionsFor', 'gallery');
     });
 
-    test('Should filter the list depending on the kind of media allowed', () => {
-      renderImagePicker({ kind: 'image' });
+    test('Should filter the list depending on the kind of media allowed', async () => {
+      await renderImagePicker({ kind: 'image' });
       expect(screen.getByTestId('media-list')).toHaveProp('kind', 'image');
 
-      renderImagePicker({ kind: 'video' });
+      await renderImagePicker({ kind: 'video' });
       expect(screen.getByTestId('media-list')).toHaveProp('kind', 'video');
 
-      renderImagePicker({ kind: 'mixed' });
+      await renderImagePicker({ kind: 'mixed' });
       expect(screen.getByTestId('media-list')).toHaveProp('kind', 'mixed');
     });
 
-    test('Should filter the list depending on the selected album', () => {
-      renderImagePicker();
+    test('Should filter the list depending on the selected album', async () => {
+      await renderImagePicker();
       const albumPicker = screen.getByTestId('album-picker');
       act(() => {
         fireEvent(albumPicker, 'change', 'album1');
@@ -257,19 +232,19 @@ describe('ImagePicker', () => {
       expect(screen.getByTestId('media-list')).toHaveProp('album', 'album1');
     });
 
-    test('Should display a toolbar that allows to switch between allowed picker mode', () => {
-      renderImagePicker();
+    test('Should display a toolbar that allows to switch between allowed picker mode', async () => {
+      await renderImagePicker();
       expect(screen.queryByRole('tablist')).toBeTruthy();
       expect(screen.queryByLabelText('Photos gallery')).toBeTruthy();
       expect(screen.queryByLabelText('Take a picture')).toBeTruthy();
       expect(screen.queryByLabelText('Take a video')).toBeTruthy();
 
-      renderImagePicker({ kind: 'image' });
+      await renderImagePicker({ kind: 'image' });
       expect(screen.queryByLabelText('Take a video')).not.toBeTruthy();
     });
 
-    test('Should display the camera view when the user ask to take a picture', () => {
-      renderImagePicker();
+    test('Should display the camera view when the user ask to take a picture', async () => {
+      await renderImagePicker();
       act(() => {
         fireEvent.press(screen.getByLabelText('Take a picture'));
       });
@@ -277,15 +252,15 @@ describe('ImagePicker', () => {
       expect(screen.queryByTestId('camera-control-panel')).toBeTruthy();
     });
 
-    test('Should display permission modal when the user try to access the camera and the permission is denied', () => {
-      renderImagePicker({ kind: 'image' });
-      withPermissionStatus(
+    test('Should display permission modal when the user try to access the camera and the permission is denied', async () => {
+      await renderImagePicker({ kind: 'image' });
+      await withPermissionStatus(
         {
           cameraPermission: 'not-determined',
           microphonePermission: 'not-determined',
         },
-        () => {
-          renderImagePicker();
+        async () => {
+          await renderImagePicker();
           act(() => {
             fireEvent.press(screen.getByLabelText('Take a picture'));
           });
@@ -296,15 +271,15 @@ describe('ImagePicker', () => {
       );
     });
 
-    test('Should display permission modal when the user try to access the microphone and the permission is denied', () => {
-      renderImagePicker({ kind: 'image' });
-      withPermissionStatus(
+    test('Should display permission modal when the user try to access the microphone and the permission is denied', async () => {
+      await renderImagePicker({ kind: 'image' });
+      await withPermissionStatus(
         {
           cameraPermission: 'authorized',
           microphonePermission: 'not-determined',
         },
-        () => {
-          renderImagePicker();
+        async () => {
+          await renderImagePicker();
           act(() => {
             fireEvent.press(screen.getByLabelText('Take a video'));
           });
@@ -315,8 +290,8 @@ describe('ImagePicker', () => {
       );
     });
 
-    test('Should select the picture taken by the user and goes to the next step', () => {
-      renderImagePicker();
+    test('Should select the picture taken by the user and goes to the next step', async () => {
+      await renderImagePicker();
       act(() => {
         fireEvent.press(screen.getByLabelText('Take a picture'));
       });
@@ -326,8 +301,8 @@ describe('ImagePicker', () => {
       );
       act(() => {
         fireEvent(cameraControlPanel, 'takePhoto');
-        jest.runAllTicks();
       });
+      await act(flushPromises);
       expect(screen.getByTestId('selected-media-image')).toHaveProp('source', {
         kind: 'image',
         uri: 'file:///fakeuri.com/image.jpg',
@@ -337,8 +312,8 @@ describe('ImagePicker', () => {
       expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
     });
 
-    test('Should select the video taken by the user and goes to the next step', () => {
-      renderImagePicker({ kind: 'video' });
+    test('Should select the video taken by the user and goes to the next step', async () => {
+      await renderImagePicker({ kind: 'video' });
       act(() => {
         fireEvent.press(screen.getByLabelText('Take a video'));
       });
@@ -353,8 +328,8 @@ describe('ImagePicker', () => {
       act(() => {
         fireEvent(cameraControlPanel, 'startRecording');
         fireEvent(cameraControlPanel, 'stopRecording');
-        jest.runAllTicks();
       });
+      await act(flushPromises);
       expect(screen.getByTestId('selected-media-video')).toHaveProp(
         'uri',
         'file:///fakeuri.com/video.mp4',
@@ -363,16 +338,39 @@ describe('ImagePicker', () => {
     });
   });
 
+  const renderImagePickerToEditImageStep = async (
+    props?: Partial<ImagePickerProps>,
+    kind: 'image' | 'video' = 'image',
+  ) => {
+    await renderImagePicker(props);
+
+    act(() => {
+      fireEvent(screen.getByTestId('media-list'), 'mediaSelected', {
+        kind,
+        uri:
+          kind === 'image'
+            ? 'file://fakeuri.com/image2.jpg'
+            : 'file://fakeuri.com/video2.mp4',
+        width: 300,
+        height: 500,
+      });
+    });
+    act(() => {
+      const button = screen.getByText('Next').parent!;
+      fireEvent.press(button);
+    });
+  };
+
   describe('EditImageStep', () => {
     describe('Filter Tab', () => {
-      test('Should display the selected image and the filter selection list', () => {
-        renderImagePickerToEditImageStep();
+      test('Should display the selected image and the filter selection list', async () => {
+        await renderImagePickerToEditImageStep();
         expect(screen.queryByTestId('selected-media-image')).toBeTruthy();
         expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
       });
 
-      test('Should apply the selected filter to the image', () => {
-        renderImagePickerToEditImageStep();
+      test('Should apply the selected filter to the image', async () => {
+        await renderImagePickerToEditImageStep();
         const filterSelectionList = screen.getByTestId('filter-selection-list');
         act(() => {
           fireEvent(filterSelectionList, 'change', 'corail');
@@ -385,19 +383,19 @@ describe('ImagePicker', () => {
     });
 
     describe('Adjust Tab', () => {
-      test('Should display a list of edition parameters when user select the adjust tab', () => {
-        renderImagePickerToEditImageStep();
+      test('Should display a list of edition parameters when user select the adjust tab', async () => {
+        await renderImagePickerToEditImageStep();
         act(() => {
           fireEvent.press(screen.getByLabelText('Adjust'));
         });
         expect('image-parameters-selection-list').toBeTruthy();
       });
 
-      const renderToEditionParameterControl = (
+      const renderToEditionParameterControl = async (
         param = 'brightness',
         applyChange?: number,
       ) => {
-        renderImagePickerToEditImageStep();
+        await renderImagePickerToEditImageStep();
         act(() => {
           fireEvent.press(screen.getByLabelText('Adjust'));
         });
@@ -419,15 +417,15 @@ describe('ImagePicker', () => {
         }
       };
 
-      test('Should display edition mode when user select a parameter', () => {
-        renderToEditionParameterControl();
+      test('Should display edition mode when user select a parameter', async () => {
+        await renderToEditionParameterControl();
         expect(
           screen.queryByTestId('image-edition-parameter-control'),
         ).toBeTruthy();
       });
 
-      test('Should apply the selected parameter change to the image', () => {
-        renderToEditionParameterControl('brightness', 0.5);
+      test('Should apply the selected parameter change to the image', async () => {
+        await renderToEditionParameterControl('brightness', 0.5);
 
         expect(screen.getByTestId('selected-media-image')).toHaveProp(
           'editionParameters',
@@ -437,8 +435,8 @@ describe('ImagePicker', () => {
         );
       });
 
-      test('Should revert the change when the user cancel them', () => {
-        renderToEditionParameterControl('brightness', 0.5);
+      test('Should revert the change when the user cancel them', async () => {
+        await renderToEditionParameterControl('brightness', 0.5);
         act(() => {
           fireEvent.press(screen.getByText('Cancel').parent!);
         });
@@ -453,8 +451,8 @@ describe('ImagePicker', () => {
         ).not.toBeTruthy();
       });
 
-      test('Should valide the change when the user validate them', () => {
-        renderToEditionParameterControl('brightness', 0.5);
+      test('Should valide the change when the user validate them', async () => {
+        await renderToEditionParameterControl('brightness', 0.5);
         act(() => {
           fireEvent.press(screen.getByText('Validate').parent!);
         });
@@ -469,8 +467,8 @@ describe('ImagePicker', () => {
         ).not.toBeTruthy();
       });
 
-      test('Should enter crop mode if the user select the crop parameter', () => {
-        renderToEditionParameterControl('cropData');
+      test('Should enter crop mode if the user select the crop parameter', async () => {
+        await renderToEditionParameterControl('cropData');
         expect(screen.queryByTestId('selected-media-image')).toHaveProp(
           'cropEditionMode',
           true,
@@ -519,16 +517,19 @@ describe('ImagePicker', () => {
     });
 
     describe('Cut Video Tab', () => {
-      test('Should display the video cut tab, only if the selected media is a video', () => {
-        renderImagePickerToEditImageStep(undefined, 'image');
+      test('Should display the video cut tab, only if the selected media is a video', async () => {
+        await renderImagePickerToEditImageStep(undefined, 'image');
         expect(screen.queryByLabelText('Cut Video')).not.toBeTruthy();
 
-        renderImagePickerToEditImageStep(undefined, 'video');
+        await renderImagePickerToEditImageStep(undefined, 'video');
         expect(screen.queryByLabelText('Cut Video')).toBeTruthy();
       });
 
-      test('Should set the video time range when the user edit the video', () => {
-        renderImagePickerToEditImageStep({ maxVideoDuration: 11 }, 'video');
+      test('Should set the video time range when the user edit the video', async () => {
+        await renderImagePickerToEditImageStep(
+          { maxVideoDuration: 11 },
+          'video',
+        );
         act(() => {
           fireEvent.press(screen.getByLabelText('Cut Video'));
         });
@@ -547,9 +548,9 @@ describe('ImagePicker', () => {
     });
   });
 
-  test('Should dispatch on finish after the last step', () => {
+  test('Should dispatch on finish after the last step', async () => {
     const onFinished = jest.fn();
-    renderImagePickerToEditImageStep({ onFinished });
+    await renderImagePickerToEditImageStep({ onFinished });
 
     const filterSelectionList = screen.getByTestId('filter-selection-list');
     act(() => {

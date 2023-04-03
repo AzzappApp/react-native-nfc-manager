@@ -2,6 +2,7 @@ import '@testing-library/jest-native/extend-expect';
 import { createRef } from 'react';
 import { AppState } from 'react-native';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import CameraView from '#components/CameraView';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import type { CameraViewProps, CameraViewHandle } from '#components/CameraView';
@@ -9,10 +10,13 @@ import type { Ref } from 'react';
 import type { AppStateStatus } from 'react-native';
 
 const mockCameraRef = {
-  takePhoto: jest.fn().mockResolvedValue('file:///example.com/photo.jpg'),
+  takePhoto: jest
+    .fn()
+    .mockResolvedValue({ path: 'file:///example.com/photo.jpg' }),
   startRecording: jest.fn(),
   stopRecording: jest.fn(),
 };
+
 jest.mock('react-native-vision-camera', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const react = require('react');
@@ -46,8 +50,6 @@ jest.mock('#hooks/useCameraPermissions', () => () => ({
   microphonePermission: 'authorized',
 }));
 
-jest.useFakeTimers();
-
 describe('CameraView', () => {
   beforeEach(() => {
     AppState.currentState = 'active' as AppStateStatus;
@@ -57,7 +59,7 @@ describe('CameraView', () => {
     mockCameraRef.takePhoto.mockClear();
   });
 
-  const renderCameraView = (
+  const renderCameraView = async (
     props?: Partial<CameraViewProps & { ref: Ref<CameraViewHandle> }>,
     devices: any = {
       back: {
@@ -78,39 +80,37 @@ describe('CameraView', () => {
         {...props}
       />,
     );
-    act(() => {
-      jest.runAllTicks();
-    });
+    await act(flushPromises);
     return res;
   };
 
-  test('Should render the camera with the back device', () => {
-    renderCameraView();
+  test('Should render the camera with the back device', async () => {
+    await renderCameraView();
     const camera = screen.getByTestId('camera');
     expect(camera).toHaveProp('device', { id: 'back', hasFlash: true });
   });
 
-  test('Should call onInitialized when the camera is ready', () => {
+  test('Should call onInitialized when the camera is ready', async () => {
     const onInitialized = jest.fn();
-    renderCameraView({ onInitialized });
+    await renderCameraView({ onInitialized });
     const camera = screen.getByTestId('camera');
     fireEvent(camera, 'initialized');
     expect(onInitialized).toHaveBeenCalled();
   });
 
-  test('Should call onError when the camera encounters an error', () => {
+  test('Should call onError when the camera encounters an error', async () => {
     const onError = jest.fn();
-    renderCameraView({ onError });
+    await renderCameraView({ onError });
     const camera = screen.getByTestId('camera');
     fireEvent(camera, 'error', { code: 'unknown' });
     expect(onError).toHaveBeenCalledWith({ code: 'unknown' });
   });
 
-  test('Should allows the user to flip camera only if the camera supports it', () => {
-    renderCameraView(undefined, { back: { id: 'back' } });
+  test('Should allows the user to flip camera only if the camera supports it', async () => {
+    await renderCameraView(undefined, { back: { id: 'back' } });
     expect(screen.queryByLabelText('Flip camera')).toBeNull();
 
-    renderCameraView();
+    await renderCameraView();
     expect(screen.queryByLabelText('Flip camera')).toBeTruthy();
     expect(screen.getByTestId('camera')).toHaveProp('device', {
       id: 'back',
@@ -125,9 +125,9 @@ describe('CameraView', () => {
     });
   });
 
-  test('Should allows the user to activate the torch only if the camera supports it', () => {
+  test('Should allows the user to activate the torch only if the camera supports it', async () => {
     const ref = createRef<CameraViewHandle>();
-    renderCameraView(
+    await renderCameraView(
       { ref },
       {
         back: { id: 'back', hasFlash: true },
@@ -169,7 +169,7 @@ describe('CameraView', () => {
     );
   });
 
-  test('Should deactivate the camera when the app is in the background', () => {
+  test('Should deactivate the camera when the app is in the background', async () => {
     let listener: (appstatus: AppStateStatus) => void;
     jest
       .spyOn(AppState, 'addEventListener')
@@ -180,54 +180,52 @@ describe('CameraView', () => {
         };
       });
     const ref = createRef<CameraViewHandle>();
-    renderCameraView({ ref });
+    await renderCameraView({ ref });
     const camera = screen.getByTestId('camera');
     expect(camera).toHaveProp('isActive', true);
     void ref.current!.takePhoto();
-    jest.runAllTicks();
+    await flushPromises();
     expect(mockCameraRef.takePhoto).toHaveBeenCalledTimes(1);
     act(() => {
       listener('background');
     });
     expect(camera).toHaveProp('isActive', false);
     void ref.current!.takePhoto();
-    jest.runAllTicks();
+    await flushPromises();
     expect(mockCameraRef.takePhoto).toHaveBeenCalledTimes(1);
     act(() => {
       listener('active');
     });
     expect(camera).toHaveProp('isActive', true);
     void ref.current!.takePhoto();
-    jest.runAllTicks();
+    await flushPromises();
     expect(mockCameraRef.takePhoto).toHaveBeenCalledTimes(2);
   });
 
-  test('Should deactivate audio if the user did not give the permission', () => {
-    const { unmount } = renderCameraView();
+  test('Should deactivate audio if the user did not give the permission', async () => {
+    const { unmount } = await renderCameraView();
     expect(screen.getByTestId('camera')).toHaveProp('audio', true);
     unmount();
 
     (Camera.getMicrophonePermissionStatus as jest.Mock).mockResolvedValueOnce(
       'denied',
     );
-    renderCameraView();
+    await renderCameraView();
     expect(screen.getByTestId('camera')).toHaveProp('audio', false);
   });
 
-  test('Should take a photo and return the path of the picture', () => {
-    expect.assertions(1);
+  test('Should take a photo and return the path of the picture', async () => {
     const ref = createRef<CameraViewHandle>();
-    renderCameraView({ ref });
-    void ref.current!.takePhoto().then(path => {
-      expect(path).toEqual('file:///path/to/photo.jpg');
-    });
-    jest.runAllTicks();
+    await renderCameraView({ ref });
+    expect(await ref.current!.takePhoto()).toEqual(
+      'file:///example.com/photo.jpg',
+    );
   });
 
-  test('record session behavior', () => {
+  test('record session behavior', async () => {
     expect.assertions(4);
     const ref = createRef<CameraViewHandle>();
-    renderCameraView({ ref });
+    await renderCameraView({ ref });
 
     let startRecordingArgs: any = null;
     mockCameraRef.startRecording.mockImplementationOnce((args: any) => {
@@ -242,14 +240,14 @@ describe('CameraView', () => {
     });
     expect(mockCameraRef.stopRecording).toHaveBeenCalled();
     startRecordingArgs.onRecordingFinished('file:///path/to/video.mp4');
-    jest.runAllTicks();
+    await flushPromises();
 
     expect(() => {
       void session?.end();
     }).toThrowError('Recording already ended');
   });
 
-  it('renders the CameraView correctly with `initialCameraPosition` props to front', () => {
+  test('renders the CameraView correctly with `initialCameraPosition` props to front', async () => {
     render(
       <CameraView
         initialCameraPosition={'front'}
@@ -257,6 +255,8 @@ describe('CameraView', () => {
         onError={() => void 0}
       />,
     );
+
+    await act(flushPromises);
 
     const camera = screen.getByTestId('camera');
     expect(camera).toHaveProp('device', { id: 'front', hasFlash: true });

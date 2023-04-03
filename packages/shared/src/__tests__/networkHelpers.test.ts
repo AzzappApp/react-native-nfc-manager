@@ -1,4 +1,5 @@
 import ERRORS from '../errors';
+import { flushPromises } from '../jestHelpers';
 import {
   createAbortError,
   FetchError,
@@ -81,7 +82,7 @@ describe('networkHelpers', () => {
       expect(error.data).toEqual({ error: 'error' });
     });
 
-    test('should throw a timeout error if request timeout', () => {
+    test('should throw a timeout error if request timeout', async () => {
       jest.useFakeTimers();
 
       fetchMock.mockImplementation(
@@ -98,17 +99,17 @@ describe('networkHelpers', () => {
         error = e;
       });
       jest.advanceTimersByTime(999);
-      jest.runAllTicks();
+      await flushPromises();
       expect(error).toBe(null);
       expect(abortMock).not.toHaveBeenCalled();
       jest.advanceTimersByTime(10);
-      jest.runAllTicks();
+      await flushPromises();
       expect(abortMock).toHaveBeenCalled();
       expect(error).toBeInstanceOf(TypeError);
       expect(error.message).toBe(TIMEOUT_ERROR_MESSAGE);
     });
 
-    test.only('should retries before timeout', () => {
+    test('should retries before timeout', async () => {
       jest.useFakeTimers();
 
       fetchMock.mockImplementation(
@@ -122,23 +123,40 @@ describe('networkHelpers', () => {
       fetchJSON('fake', { timeout: 1000, retries: [1000, 3000] }).catch(e => {
         error = e;
       });
+      // after 1000
       jest.advanceTimersByTime(1000);
+      await flushPromises();
       expect(error).toBe(null);
       expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // after 2000
       jest.advanceTimersByTime(1000);
+      await flushPromises();
       expect(fetchMock).toHaveBeenCalledTimes(2);
       expect(error).toBe(null);
-      jest.advanceTimersByTime(4000);
+
+      // after 3000
+      jest.advanceTimersByTime(1000);
+      await flushPromises();
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(error).toBe(null);
+
+      // after 6000
+      jest.advanceTimersByTime(3000);
+      await flushPromises();
       expect(error).toBe(null);
       expect(fetchMock).toHaveBeenCalledTimes(3);
+
+      // after 7000
       jest.advanceTimersByTime(1000);
+      await flushPromises();
       expect(fetchMock).toHaveBeenCalledTimes(3);
       expect(abortMock).toHaveBeenCalled();
       expect(error).toBeInstanceOf(TypeError);
       expect(error.message).toBe(TIMEOUT_ERROR_MESSAGE);
     });
 
-    test('should not throw a timeout error if request is aborted', () => {
+    test('should not throw a timeout error if request is aborted', async () => {
       jest.useFakeTimers();
       fetchMock.mockImplementation(
         () =>
@@ -153,15 +171,17 @@ describe('networkHelpers', () => {
       fetchJSON('fake', { timeout: 1000 }).catch(e => {
         error = e;
       });
+      jest.advanceTimersByTime(500);
+      await flushPromises();
       jest.runAllTimers();
-      jest.runAllTicks();
+      await flushPromises();
       expect(abortMock).not.toHaveBeenCalled();
       expect(error).toBeInstanceOf(Error);
       expect(error.message).toBe('Aborted');
       expect(error.name).toBe('AbortError');
     });
 
-    test('should rethrow fetch error', () => {
+    test('should rethrow fetch error', async () => {
       jest.useFakeTimers();
       fetchMock.mockImplementation(
         () =>
@@ -177,12 +197,12 @@ describe('networkHelpers', () => {
         error = e;
       });
       jest.runAllTimers();
-      jest.runAllTicks();
+      await flushPromises();
       expect(error).toBeInstanceOf(TypeError);
       expect(error.message).toBe('other error');
     });
 
-    test('should throw an error if json decoding fails', () => {
+    test('should throw an error if json decoding fails', async () => {
       jest.useFakeTimers();
       fetchMock.mockReturnValue({
         ok: true,
@@ -195,7 +215,7 @@ describe('networkHelpers', () => {
       fetchJSON('fake').catch(e => {
         error = e;
       });
-      jest.runAllTicks();
+      await flushPromises();
       expect(error).toBeInstanceOf(FetchError);
       expect(error.message).toBe(ERRORS.JSON_DECODING_ERROR);
       expect(error.data).toEqual({ error: ERRORS.JSON_DECODING_ERROR });

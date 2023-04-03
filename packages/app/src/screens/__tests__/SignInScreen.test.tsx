@@ -1,9 +1,9 @@
 import ERRORS from '@azzapp/shared/errors';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
 import '@testing-library/jest-native/extend-expect';
 
-jest.useFakeTimers();
 describe('Signin Screen', () => {
   const signin = jest.fn();
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('Signin Screen', () => {
     });
   });
 
-  test('should display an error message if the `signin` callback fails', () => {
+  test('should display an error message if the `signin` callback fails', async () => {
     render(<SignInScreen signin={signin} />);
     signin.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
 
@@ -63,7 +63,7 @@ describe('Signin Screen', () => {
     expect(screen.queryByText('Invalid credentials')).not.toBeTruthy();
 
     act(() => fireEvent(buttonComponent, 'onPress'));
-    act(() => jest.runAllTicks());
+    await act(flushPromises);
     expect(screen.queryByText('Invalid credentials')).toBeTruthy();
   });
 });

@@ -403,6 +403,7 @@ const styles = StyleSheet.create({
   selectItemContainerStyle: {
     marginBottom: 18,
     paddingHorizontal: 30,
+    backgroundColor: '#fff',
   },
   root: {
     flex: 1,

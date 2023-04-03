@@ -30,7 +30,7 @@ const PostLink = ({
       });
       return;
     }
-    (container as any as NativeMethods).measureInWindow(
+    (container as NativeMethods).measureInWindow(
       async (x, y, width, height) => {
         await postRef.current?.snapshot();
         const videoTime = await postRef.current?.getCurrentVideoTime();

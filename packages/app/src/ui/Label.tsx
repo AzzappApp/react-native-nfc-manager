@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   label: {
     ...fontFamilies.semiBold,
     paddingBottom: 5,
-    size: 14,
+    fontSize: 14,
   },
   error: {
     ...textStyles.error,

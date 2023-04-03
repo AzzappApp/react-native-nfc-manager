@@ -3,11 +3,12 @@ import '@testing-library/jest-native/extend-expect';
 import { View } from 'react-native';
 import PostLink from '../PostLink';
 
-import type { PostRendererHandle, PostRendererProps } from '../PostRenderer';
+import type { PostRendererHandle, PostRendererProps } from '../../PostRenderer';
 import type { ForwardedRef } from 'react';
 
 let mockPostHandle: any = null;
-jest.mock('../PostRenderer', () => {
+
+jest.mock('../../PostRenderer', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function PostRenderer(
@@ -35,7 +36,7 @@ jest.mock('#PlatformEnvironment', () => ({
 
 const mockPostProps = {
   MOCK_POST: 'MOCK_POST',
-} as any as PostRendererProps;
+} as any;
 
 describe('PostLink', () => {
   afterEach(() => mockRouter.push.mockReset());
@@ -84,8 +85,7 @@ describe('PostLink', () => {
     });
   });
 
-  test('should push to post screen with animation if Post handle is present', () => {
-    jest.useFakeTimers();
+  test('should push to post screen with animation if Post handle is present', async () => {
     mockPostHandle = {
       getCurrentMediaRenderer: jest.fn(),
       getCurrentVideoTime: jest.fn().mockReturnValue(3.4),
@@ -104,9 +104,8 @@ describe('PostLink', () => {
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(mockPostHandle.snapshot).not.toHaveBeenCalled();
 
-    act(() => {
+    await act(() => {
       fireEvent.press(link);
-      jest.runAllTicks();
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith({

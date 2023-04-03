@@ -6,6 +6,7 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { segmentImage } from '#helpers/mediaHelpers';
 import { act, fireEvent, render, screen, within } from '#helpers/testHelpers';
 import CoverEditionScreen from '../CoverEditionScreen';
@@ -176,8 +177,6 @@ jest.mock('#components/ProfileColorPalette', () => {
   };
 });
 
-jest.useFakeTimers();
-
 describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 
@@ -302,7 +301,20 @@ describe('CoverEditionScreen', () => {
           width: 100,
           height: 100,
         },
-      } as any,
+        maskMedia: null,
+        segmented: false,
+        merged: false,
+        background: null,
+        backgroundStyle: null,
+        foreground: null,
+        foregroundStyle: null,
+        title: 'title',
+        titleStyle: null,
+        subTitle: null,
+        subTitleStyle: null,
+        contentStyle: null,
+        mediaStyle: null,
+      },
     });
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
     act(() => {
@@ -377,7 +389,7 @@ describe('CoverEditionScreen', () => {
   test(
     'Should compute the mask media when an image is selected ' +
       'and should apply the mask when the segmented button is checked',
-    () => {
+    async () => {
       renderCoverEditionScreen();
 
       segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
@@ -392,9 +404,7 @@ describe('CoverEditionScreen', () => {
       expect(segmentImageMock).toHaveBeenCalledWith(
         'file:///data/fake-media.jpg',
       );
-      act(() => {
-        jest.runAllTicks();
-      });
+      await act(flushPromises);
       expect(screen.getByTestId('editable-image')).not.toHaveProp(
         'source',
         expect.objectContaining({
@@ -426,9 +436,7 @@ describe('CoverEditionScreen', () => {
           editionParameters: {},
         });
       });
-      act(() => {
-        jest.runAllTicks();
-      });
+      await act(flushPromises);
 
       expect(screen.getByTestId('editable-image')).toHaveProp(
         'source',
@@ -938,7 +946,7 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByText('Cancel')).toBeTruthy();
   });
 
-  test('Should allow to save if the title is not empty, and if the sourceMedia is not empty', () => {
+  test('Should allow to save if the title is not empty, and if the sourceMedia is not empty', async () => {
     renderCoverEditionScreen();
     let saveButton = screen.getByText('Save');
     while (saveButton.props.accessibilityRole !== 'button') {
@@ -958,9 +966,8 @@ describe('CoverEditionScreen', () => {
         editionParameters: {},
       });
     });
-    act(() => {
-      jest.runAllTicks();
-    });
+    await act(flushPromises);
+
     expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
     act(() => {
       fireEvent.press(screen.getByLabelText('Title edition'));

@@ -1,3 +1,4 @@
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
 import '@testing-library/jest-native/extend-expect';
@@ -70,20 +71,21 @@ describe('ForgotPassword Screen', () => {
     cleanup();
   });
 
-  test('should display the confirmation message when a valid form is submitted', () => {
-    jest.useFakeTimers();
+  test('should display the confirmation message when a valid form is submitted', async () => {
     const { getByPlaceholderText, getByRole } = render(
       <ForgotPasswordScreen forgotPassword={forgotPassword} />,
     );
+    forgotPassword.mockResolvedValueOnce(void 0);
 
     const inputLogin = getByPlaceholderText('Phone number or email address');
-    fireEvent(inputLogin, 'onChangeText', 'test@test.com');
+    act(() => {
+      fireEvent(inputLogin, 'onChangeText', 'test@test.com');
+    });
     act(() => {
       fireEvent(getByRole('button'), 'onPress');
     });
-    act(() => {
-      jest.advanceTimersByTime(600);
-    });
+
+    await act(flushPromises);
 
     expect(
       screen.queryByTestId(

@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     borderColor: colors.grey50,
     borderRadius: 12,
     fontSize: 16,
-    fontColor: colors.black,
+    color: colors.black,
     borderWidth: 1,
   },
   clearIcon: {

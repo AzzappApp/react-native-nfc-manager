@@ -1,4 +1,5 @@
 import ERRORS from '@azzapp/shared/errors';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignUpScreen from '../SignUpScreen';
 import '@testing-library/jest-native/extend-expect';
@@ -17,7 +18,6 @@ jest.mock('#helpers/localeHelpers', () => ({
   useCurrentLocale: () => 'en',
 }));
 
-jest.useFakeTimers();
 describe('SignUpScreen', () => {
   const signup = jest.fn();
   beforeEach(() => {
@@ -201,7 +201,7 @@ describe('SignUpScreen', () => {
     expect(signup).toHaveBeenCalled();
   });
 
-  test('should display the already registered error message if signup return the error', () => {
+  test('should display the already registered error message if signup return the error', async () => {
     render(<SignUpScreen signup={signup} />);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -219,13 +219,11 @@ describe('SignUpScreen', () => {
     const emailAlreadyExistError = 'This email address is already registered';
     expect(screen.queryByText(emailAlreadyExistError)).not.toBeTruthy();
 
-    act(() => {
-      jest.runAllTicks();
-    });
+    await act(flushPromises);
     expect(screen.queryByText(emailAlreadyExistError)).toBeTruthy();
   });
 
-  test('should display unknown error in case of unknown error ;)', () => {
+  test('should display unknown error in case of unknown error ;)', async () => {
     render(<SignUpScreen signup={signup} />);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -242,10 +240,8 @@ describe('SignUpScreen', () => {
 
     const unknownError = 'Unknown error - Please retry';
     expect(screen.queryByText(unknownError)).not.toBeTruthy();
+    await act(flushPromises);
 
-    act(() => {
-      jest.runAllTicks();
-    });
     expect(screen.queryByText(unknownError)).toBeTruthy();
   });
 });
