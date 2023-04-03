@@ -73,7 +73,7 @@ jobs:
           fi  
 
       - name: Copy the file back to azzapp-precompiled-queries repository
-        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         run: cp -r packages/relay/query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
         env:
           CI: true
@@ -81,7 +81,7 @@ jobs:
       # was not able to make a push and commit working on another repo. it was creating a submodule ...
       - uses: peter-evans/create-pull-request@v4
         id: cpr
-        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if:  ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         with:
           token: ${{ secrets.QUERY_MAP_PAT }}
           commit-message: 'Update query-map.json'
@@ -97,7 +97,7 @@ jobs:
 
       # a github action on zzapp-precompiled-queries will delete the branch
       - name: Merging the PR
-        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
         uses: actions/github-script@v6.4.0
         env:
           pull_number: ${{ steps.cpr.outputs.pull-request-number}}
