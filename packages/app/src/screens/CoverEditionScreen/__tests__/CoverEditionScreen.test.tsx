@@ -934,15 +934,8 @@ describe('CoverEditionScreen', () => {
     expect(image).toHaveProp('backgroundImageColor', '#FF34A2');
   });
 
-  test('Should not allow to cancel in case of creation', () => {
-    const { unmount } = renderCoverEditionScreen();
-
-    expect(screen.queryByText('Cancel')).not.toBeTruthy();
-    unmount();
-    renderCoverEditionScreen({
-      coverData: fakeCover,
-    });
-
+  test('Should allow to cancel in case of creation', () => {
+    renderCoverEditionScreen();
     expect(screen.queryByText('Cancel')).toBeTruthy();
   });
 

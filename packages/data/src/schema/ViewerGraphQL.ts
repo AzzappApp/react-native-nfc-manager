@@ -292,7 +292,6 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
             }
           }
         });
-        console.log(categories);
         return categories;
       },
     },

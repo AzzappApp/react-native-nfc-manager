@@ -1,4 +1,4 @@
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import isEmail from 'validator/es/lib/isEmail';
 import type { CountryCode } from 'libphonenumber-js';
 export const isValidEmail: (email?: string) => boolean = email => {
@@ -103,3 +103,15 @@ export const isValidHex = (value: string, shortFormat?: boolean): boolean => {
     length === 6 // '#rrggbb' format
   );
 };
+
+/**
+ *The function parse the phone number string and then formats the parsed phone number string to the E.164 format
+ * The E.164 format is a standardized format for phone numbers that includes the country code, area code, and local subscriber number.
+ *
+ * @export
+ * @param {string} phoneNumber
+ * @return {*}
+ */
+export function formatPhoneNumber(phoneNumber: string) {
+  return parsePhoneNumber(phoneNumber).format('E.164');
+}

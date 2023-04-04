@@ -254,7 +254,16 @@ const updateCover = mutationWithClientMutationId({
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
+    profileLoader.clear(profileId);
+    cardByProfileLoader.clear(profileId);
+    if (card?.coverId) {
+      coverLoader.clear(card.coverId);
+    }
+    if (input.sourceMedia?.id) {
+      mediaLoader.clear(input.sourceMedia.id);
+    }
     const profile = await profileLoader.load(profileId);
+
     return { profile };
   },
 });

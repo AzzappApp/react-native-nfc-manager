@@ -251,6 +251,10 @@
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
   },
+  "Fd2baV": {
+    "defaultMessage": "Log in",
+    "description": "Signin Screen - Log in title"
+  },
   "FnmYrQ": {
     "defaultMessage": "Merge",
     "description": "Label of the merge switch in cover edition"
@@ -302,10 +306,6 @@
   "KimbRe": {
     "defaultMessage": "Provide more details",
     "description": "Company profile form - Title"
-  },
-  "L3Lqar": {
-    "defaultMessage": "User name",
-    "description": "ProfileForm username textinput label"
   },
   "LGAptw": {
     "defaultMessage": "Phone number or email address",
@@ -647,10 +647,6 @@
     "defaultMessage": "Color #1",
     "description": "Label of the background pattern color tab in cover edition"
   },
-  "kkCj3f": {
-    "defaultMessage": "Choose an user name",
-    "description": "ProfileForm username textinput placeholder"
-  },
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
@@ -662,6 +658,10 @@
   "lC1DXs": {
     "defaultMessage": "Retry",
     "description": "label of the button allowing  to retry loading cover image"
+  },
+  "lHXS3v": {
+    "defaultMessage": "Choose an username",
+    "description": "ProfileForm username textinput placeholder"
   },
   "lUOLXQ": {
     "defaultMessage": "Top left",
@@ -870,6 +870,10 @@
   "uyQGcW": {
     "defaultMessage": "Rotate",
     "description": "Accessibility label of the rotate button in the cover edition screen"
+  },
+  "v3CWFe": {
+    "defaultMessage": "Username*",
+    "description": "ProfileForm username textinput label"
   },
   "v4LP9H": {
     "defaultMessage": "Instant",

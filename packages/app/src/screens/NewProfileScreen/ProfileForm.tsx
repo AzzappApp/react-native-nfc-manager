@@ -82,7 +82,9 @@ const ProfileForm = ({
     },
     [setCompanyActivityId],
   );
-
+  const onChangeUsername = useCallback((text: string) => {
+    setUserName(text.toLowerCase());
+  }, []);
   const userNameIsValid = isValidUserName(userName);
   const userNameIsNotEmpty = isNotFalsyString(userName);
 
@@ -337,7 +339,7 @@ const ProfileForm = ({
         <Label
           labelID="userNameLabel"
           label={intl.formatMessage({
-            defaultMessage: 'User name',
+            defaultMessage: 'Username*',
             description: 'ProfileForm username textinput label',
           })}
           error={userNameError}
@@ -349,12 +351,12 @@ const ProfileForm = ({
             accessibilityLabelledBy="userNameLabel"
             ref={userNameInputRef}
             placeholder={intl.formatMessage({
-              defaultMessage: 'Choose an user name',
+              defaultMessage: 'Choose an username',
               description: 'ProfileForm username textinput placeholder',
             })}
             isErrored={userNameError != null}
             value={userName}
-            onChangeText={setUserName}
+            onChangeText={onChangeUsername}
             autoCapitalize="none"
             autoComplete="off"
             autoCorrect={false}

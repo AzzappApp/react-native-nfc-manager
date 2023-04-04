@@ -373,7 +373,6 @@ const CoverEditionScreen = ({
     !isCreation || (updates.sourceMedia != null && !!updates.title);
   const [maskComputing, setMaskComputing] = useState(false);
   const canSave = !saving && isDirty && isValid && !maskComputing;
-  const canCancel = !isCreation && !saving;
 
   const router = useRouter();
   const [commit] = useMutation<CoverEditionScreenMutation>(graphql`
@@ -608,14 +607,13 @@ const CoverEditionScreen = ({
       onCompleted() {
         setSaving(false);
         setUploadProgress(null);
-        if (isCreation && viewer) {
-          router.replace({
-            route: 'PROFILE',
-            params: { userName: viewer.profile!.userName },
-          });
-        } else {
-          router.back();
-        }
+        router.replace({
+          route: 'PROFILE',
+          params: {
+            userName: viewer!.profile!.userName,
+            profileID: viewer!.profile!.id,
+          },
+        });
       },
       onError(e) {
         // eslint-disable-next-line no-alert
@@ -628,9 +626,6 @@ const CoverEditionScreen = ({
   };
 
   const onCancel = () => {
-    if (!canCancel) {
-      return;
-    }
     router.back();
   };
   //#endregion
@@ -995,9 +990,8 @@ const CoverEditionScreen = ({
                 })
           }
           leftButton={
-            !cropEditionMode && !isCreation ? (
+            !cropEditionMode ? (
               <Button
-                disabled={!canCancel}
                 variant="secondary"
                 onPress={onCancel}
                 label={intl.formatMessage({

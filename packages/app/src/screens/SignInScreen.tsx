@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { fontFamilies, colors } from '#theme';
+import { fontFamilies, colors, textStyles } from '#theme';
 import Link from '#components/Link';
 import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
@@ -62,27 +62,38 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
     <View style={styles.root}>
       <View onTouchStart={Keyboard.dismiss} style={styles.background}>
         <Image
-          source={require('#assets/sign/sign_background.png')}
+          source={require('#assets/sign/darkensign_background.png')}
           resizeMode="cover"
         />
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
+        style={{ flex: 1 }}
       >
+        <View
+          style={styles.logoContainer}
+          onTouchStart={() => Keyboard.dismiss()}
+        >
+          <Image
+            source={require('#assets/logo-full_white.png')}
+            resizeMode="contain"
+            style={styles.logo}
+          />
+        </View>
         <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              <FormattedMessage
+                defaultMessage="Log in"
+                description="Signin Screen - Log in title"
+              />
+            </Text>
+          </View>
           <Form
             style={[styles.form, { marginBottom: vp`${insetBottom}` }]}
             onSubmit={onSubmit}
           >
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('#assets/logo-full.png')}
-                resizeMode="contain"
-                style={styles.logo}
-              />
-            </View>
-
             <TextInput
               placeholder={intl.formatMessage({
                 defaultMessage: 'Phone number or email address',
@@ -218,9 +229,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   logoContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
   },
   logo: {
     height: 34,
@@ -271,5 +282,18 @@ const styles = StyleSheet.create({
   linkLogout: {
     ...fontFamilies.fontMedium,
     paddingLeft: 5,
+  },
+  header: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  title: {
+    ...fontFamilies.semiBold,
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  subTitle: {
+    ...textStyles.normal,
+    color: colors.grey400,
   },
 });

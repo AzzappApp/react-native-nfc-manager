@@ -143,6 +143,7 @@ const TemplateSelectorScreen = ({
           marginBottom: vp`${insetBottom} + ${10}`,
           flex: 1,
           justifyContent: 'flex-end',
+          backgroundColor: 'white', //Avoid stange flickering when screen entering the view. This screen will be delete in next version
         },
       ]}
     >

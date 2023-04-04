@@ -11,6 +11,7 @@ import {
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
@@ -42,7 +43,7 @@ const signin = async (req: Request) => {
     }
     if (!user && isInternationalPhoneNumber(credential)) {
       // looking for phonenumber only if the credential is a valid phonenumber
-      user = await getUserByPhoneNumber(credential.replace(/\s/g, ''));
+      user = await getUserByPhoneNumber(formatPhoneNumber(credential));
     }
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile

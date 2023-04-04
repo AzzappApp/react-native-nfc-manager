@@ -9,6 +9,7 @@ import {
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
@@ -49,7 +50,7 @@ export const POST = async (req: Request) => {
     }
 
     if (isInternationalPhoneNumber(phoneNumber)) {
-      if (await getUserByPhoneNumber(phoneNumber!)) {
+      if (await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!))) {
         return NextResponse.json(
           { message: ERRORS.PHONENUMBER_ALREADY_EXISTS },
           { status: 400 },

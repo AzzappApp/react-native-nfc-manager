@@ -179,7 +179,7 @@ describe('NewProfileScreen', () => {
 
       act(() => {
         fireEvent.changeText(
-          screen.getByPlaceholderText('Choose an user name'),
+          screen.getByPlaceholderText('Choose an username'),
           'johndoe',
         );
       });
@@ -237,7 +237,7 @@ describe('NewProfileScreen', () => {
 
       act(() => {
         fireEvent.changeText(
-          screen.getByPlaceholderText('Choose an user name'),
+          screen.getByPlaceholderText('Choose an username'),
           'Azzapp',
         );
       });
@@ -250,7 +250,7 @@ describe('NewProfileScreen', () => {
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
           companyName: 'Azzapp',
-          userName: 'Azzapp',
+          userName: 'azzapp',
           profileCategoryId: 'profileCategory-1',
           companyActivityId: 'companyActivity-1-4',
           profileKind: 'business',
@@ -281,7 +281,7 @@ describe('NewProfileScreen', () => {
       ).not.toBeTruthy();
       act(() => {
         fireEvent.changeText(
-          screen.getByPlaceholderText('Choose an user name'),
+          screen.getByPlaceholderText('Choose an username'),
           'ddssd$$$',
         );
       });
@@ -317,7 +317,7 @@ describe('NewProfileScreen', () => {
 
       act(() => {
         fireEvent.changeText(
-          screen.getByPlaceholderText('Choose an user name'),
+          screen.getByPlaceholderText('Choose an username'),
           'johndoe',
         );
       });
@@ -360,7 +360,7 @@ describe('NewProfileScreen', () => {
     });
     act(() => {
       fireEvent.changeText(
-        screen.getByPlaceholderText('Choose an user name'),
+        screen.getByPlaceholderText('Choose an username'),
         'johndoe',
       );
     });
