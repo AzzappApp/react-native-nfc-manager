@@ -33,12 +33,13 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
-          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }-pr
+          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}-pr
         run: |
           ./retrieve-pullrequest-info.sh "$BRANCH_NAME" "$DB_NAME" "$ORG_NAME"   
     
       
       - name: Merging schema changes - if asked, please click on displayed link to authenticate
+        if: ${{ steps.get-pr-info.outputs.DEPLOY_REQUEST_NUMBER != ''}}
         id: merge-dr
         timeout-minutes: 10
         env:
@@ -47,7 +48,7 @@ jobs:
           GITHUB_USER: ${{github.actor}}
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
-          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }-pr
+          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}-pr
           DEPLOY_REQUEST_NUMBER: ${{ steps.get-pr-info.outputs.DEPLOY_REQUEST_NUMBER }}
         working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: |

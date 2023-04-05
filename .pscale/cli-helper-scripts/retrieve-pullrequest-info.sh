@@ -1,8 +1,7 @@
 #!/bin/bash
 
-#. use-pscale-docker-image.sh
-
-#. authenticate-ps.sh
+. use-pscale-docker-image.sh
+. authenticate-ps.sh
 
 
 
@@ -35,7 +34,7 @@ function find_deploy_request_number {
         fi
        
         local outputNumber=`echo $raw_output | jq ".[] | select(.branch == \"$branch\" and .state == \"open\") | .number "`
-        echo "and the winner $output" 
+
         # test whether output is pending, if so, increase wait timeout exponentially
         if [ -z "$outputNumber" ]; then
             # increase wait variable exponentially but only if it is less than max_timeout
