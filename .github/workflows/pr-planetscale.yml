@@ -37,7 +37,7 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
-          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}
+          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}_pr
           FROM_BRANCH: ${{ github.base_ref }}
         working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: |
@@ -66,7 +66,7 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
-          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}
+          BRANCH_NAME: ${{ steps.branch_name.outputs.BRANCH_NAME }}_pr
         run: |
           echo ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_NUMBER }}
           ./retrieve-deploy-diff-pull-request.sh ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_NUMBER }} "$BRANCH_NAME" "$DB_NAME" "$ORG_NAME" 
