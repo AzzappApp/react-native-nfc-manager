@@ -161,7 +161,8 @@ const CoverTemplate = ({
           source="data.backgroundId"
           reference="CoverLayer"
           filter={{ kind: 'background', available: 1 }}
-          perPage={25}
+          sort={{ field: 'name', order: 'ASC' }}
+          perPage={50}
         >
           <AutocompleteInput
             source="id"
@@ -169,7 +170,7 @@ const CoverTemplate = ({
             optionText="name"
             label="Select a background"
             helperText="Search based on the name of the Cover Layout - null means no name is defined"
-            //  filterToQuery={filterToQuery}
+            filterToQuery={filterToQuery}
           />
         </ReferenceInput>
         <div>
@@ -190,7 +191,8 @@ const CoverTemplate = ({
           source="data.foregroundId"
           reference="CoverLayer"
           filter={{ kind: 'foreground', available: 1 }}
-          perPage={25}
+          sort={{ field: 'name', order: 'ASC' }}
+          perPage={50}
         >
           <AutocompleteInput
             source="id"
@@ -198,7 +200,7 @@ const CoverTemplate = ({
             fullWidth
             label="Select a foreground"
             helperText="Search based on the name of the Cover Layout - null means no name is defined"
-            //  filterToQuery={filterToQuery}
+            filterToQuery={filterToQuery}
           />
         </ReferenceInput>
         <TextInput source="data.foregroundStyle.color" label="Color" />
