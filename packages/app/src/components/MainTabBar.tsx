@@ -1,6 +1,8 @@
 import { useRouter } from '#PlatformEnvironment';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
-import TabsBar from '#ui/TabsBar';
+
+import FooterBar from '#ui/FooterBar';
+import type { FooterBarItem } from '#ui/FooterBar';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 /**
@@ -14,45 +16,49 @@ const MainTabBar = ({
   style?: StyleProp<ViewStyle>;
 }) => {
   const router = useRouter();
-  const onTabPress = (tab: string) => {
-    router.push({ route: tab as any });
+  const onItemPress = (key: string) => {
+    router.push({ route: key as any });
   };
   const vp = useViewportSize();
+
   return (
-    <TabsBar
+    <FooterBar
       style={[{ marginBottom: vp`${insetBottom}` }, style]}
-      currentTab={['HOME', 'SEARCH', 'CHAT', 'SETTINGS'][currentIndex]}
-      tabs={[
-        {
-          key: 'HOME',
-          label: 'Home',
-          icon: 'home',
-        },
-        {
-          key: 'SEARCH',
-          label: 'Search',
-          icon: 'search',
-        },
-        {
-          key: 'NEW_POST',
-          label: 'New Post',
-          icon: 'add',
-        },
-        {
-          key: 'CHAT',
-          label: 'Chat',
-          icon: 'chat',
-        },
-        {
-          key: 'SETTINGS',
-          label: 'Settings',
-          icon: 'account',
-          tint: false,
-        },
-      ]}
-      onTabPress={onTabPress}
+      currentTab={['HOME', 'SEARCH', 'CHAT', 'ALBUMS'][currentIndex]}
+      iconSize={28}
+      tabs={TABS}
+      onItemPress={onItemPress}
+      decoration="label"
     />
   );
 };
+
+const TABS: FooterBarItem[] = [
+  {
+    key: 'HOME',
+    label: 'Home',
+    icon: 'home',
+  },
+  {
+    key: 'SEARCH',
+    label: 'Search',
+    icon: 'search',
+  },
+  {
+    key: 'NEW_POST',
+    label: 'Posts',
+    icon: 'add_circle',
+  },
+  {
+    key: 'CHAT',
+    label: 'Messages',
+    icon: 'chat',
+  },
+  {
+    key: 'ALBUMS',
+    label: 'Albums',
+    icon: 'albums',
+  },
+];
 
 export default MainTabBar;

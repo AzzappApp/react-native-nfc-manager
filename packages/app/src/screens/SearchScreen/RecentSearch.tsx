@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { FlatList, Text, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import Icon from '#ui/Icon';
 import PressableBackground from '#ui/PressableBackground';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 
 type RecentSearchProps = {
   searchValue: string | null | undefined;
@@ -50,7 +51,7 @@ const RecentSearch = ({
       testID="recent-search-list"
       accessibilityRole="list"
       ListHeaderComponent={
-        <Text style={[textStyles.title, styles.textStyleRecent]}>
+        <Text variant="large" style={styles.textStyleRecent}>
           <FormattedMessage
             defaultMessage="Recent searchs"
             description="ResetSearch - title "
@@ -62,7 +63,7 @@ const RecentSearch = ({
       style={styles.root}
       ListEmptyComponent={
         searchValue ? (
-          <Text style={[textStyles.button, styles.noRecentSearch]}>
+          <Text variant="button" style={styles.noRecentSearch}>
             <FormattedMessage
               defaultMessage="No recent search for {word}"
               description="ResetSearch - message when no history search found"
@@ -109,7 +110,7 @@ const SearchRecentItem = ({
         { word: item },
       )}
     >
-      <Text style={{ ...textStyles.sectionTitle }}>{item}</Text>
+      <Text variant="medium">{item}</Text>
       <PressableNative
         onPress={onRemove}
         accessibilityRole="button"
@@ -122,7 +123,7 @@ const SearchRecentItem = ({
           { word: item },
         )}
       >
-        <Icon icon="cross" style={{ height: 15, width: 15, marginRight: 25 }} />
+        <Icon icon="close" style={{ marginRight: 5 }} />
       </PressableNative>
     </PressableBackground>
   );
@@ -150,6 +151,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
   },
 });

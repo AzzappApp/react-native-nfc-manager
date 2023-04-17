@@ -1,6 +1,5 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { colors } from '#theme';
 import Button from '#ui/Button';
 import type { ButtonProps } from '#ui/Button';
 
@@ -27,12 +26,7 @@ export default ContinueButton;
 
 const styles = StyleSheet.create({
   button: {
-    height: 45,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
     marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 34,
   },
 });

@@ -6,21 +6,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import {
   isNotFalsyString,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
-
 import { useRouter } from '#PlatformEnvironment';
-import { colors, fontFamilies, textStyles } from '#theme';
+import { colors } from '#theme';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import PressableNative from '#ui/PressableNative';
 import SecuredTextInput from '#ui/SecuredTextInput';
+import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 
 type ChangePasswordScreenProps = {
@@ -66,7 +66,7 @@ const ChangePasswordScreen = ({
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <Container style={styles.mainContainer}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-VERTICAL_OFFSET}
@@ -82,7 +82,7 @@ const ChangePasswordScreen = ({
               />
             </View>
             <View style={styles.viewText}>
-              <Text style={styles.textForgot}>
+              <Text variant="xlarge" style={styles.textForgot}>
                 <FormattedMessage
                   defaultMessage="Create a new password"
                   description="ChangePasswordScreen - create a new password  title"
@@ -122,7 +122,6 @@ const ChangePasswordScreen = ({
                   description:
                     'ChangePassword Screen - AccessibilityLabel Reset password button',
                 })}
-                style={styles.button}
                 onPress={onSubmit}
                 disabled={
                   !isNotFalsyString(password) ||
@@ -132,8 +131,8 @@ const ChangePasswordScreen = ({
             </Submit>
             {passwordError && (
               <Text
+                variant="error"
                 style={{
-                  ...textStyles.error,
                   paddingLeft: 10,
                   marginTop: 10,
                 }}
@@ -146,8 +145,8 @@ const ChangePasswordScreen = ({
             )}
             {confirmError && (
               <Text
+                variant="error"
                 style={{
-                  ...textStyles.error,
                   paddingLeft: 10,
                   marginTop: 10,
                 }}
@@ -178,7 +177,7 @@ const ChangePasswordScreen = ({
           </Text>
         </PressableNative>
       </View>
-    </View>
+    </Container>
   );
 };
 
@@ -193,25 +192,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   textinput: {
-    marginBottom: 5,
-  },
-  button: {
-    marginTop: 5,
-    height: 45,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
+    marginBottom: 20,
   },
   textForgotExplain: {
-    ...fontFamilies.fontMedium,
-    color: colors.grey400,
     textAlign: 'center',
     marginTop: 20,
   },
   textForgot: {
-    ...fontFamilies.fontMedium,
-    color: colors.grey900,
     fontSize: 20,
   },
   viewText: {

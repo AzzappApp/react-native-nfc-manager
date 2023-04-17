@@ -1,13 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
@@ -19,11 +12,13 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
   TITLE_POSITIONS,
 } from '@azzapp/shared/cardHelpers';
-import { colors, fontFamilies, textStyles } from '#theme';
 import ProfileColorPalette from '#components/ProfileColorPalette';
 import DashedSlider from '#ui/DashedSlider';
+import FloatingButton from '#ui/FloatingButton';
 import FontPicker from '#ui/FontPicker';
 import TabsBar from '#ui/TabsBar';
+import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import type {
   CardCoverContentStyleInput,
@@ -164,21 +159,21 @@ const CoverTitleEditionPanel = ({
   const orientationsLabel = useOrientationsLabels();
 
   return (
-    <View style={[styles.root, style]}>
+    <View style={style}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
-        variant="topbar"
+        decoration="underline"
         tabs={[
           {
-            key: 'title',
+            tabKey: 'title',
             label: intl.formatMessage({
               defaultMessage: 'Name',
               description: 'Label of the name tab in cover edition',
             }),
           },
           {
-            key: 'subtitle',
+            tabKey: 'subtitle',
             label: intl.formatMessage({
               defaultMessage: 'Subtitle',
               description: 'Label of the subtitle tab in cover edition',
@@ -206,13 +201,7 @@ const CoverTitleEditionPanel = ({
           }
         />
         <View style={styles.buttonContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              { marginRight: 10 },
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={() => setFontPickerOpen(true)}
+          <FloatingButton
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Font',
@@ -222,6 +211,8 @@ const CoverTitleEditionPanel = ({
               defaultMessage: 'Tap to select a font',
               description: 'Hint of the font button in cover edition',
             })}
+            style={styles.button}
+            onPress={() => setFontPickerOpen(true)}
           >
             <Text
               style={{
@@ -231,13 +222,9 @@ const CoverTitleEditionPanel = ({
             >
               abc
             </Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              { marginRight: 10 },
-              pressed && styles.buttonPressed,
-            ]}
+          </FloatingButton>
+          <FloatingButton
+            style={styles.button}
             onPress={() => setColorPickerOpen(true)}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -251,7 +238,6 @@ const CoverTitleEditionPanel = ({
           >
             <Text
               style={{
-                ...fontFamilies.semiBold,
                 fontSize: 24,
                 color,
               }}
@@ -266,34 +252,10 @@ const CoverTitleEditionPanel = ({
                 backgroundColor: color,
               }}
             />
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              { marginRight: 10 },
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={onNextPlacement}
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Position',
-              description: 'Label of the position button in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to change the position',
-              description: 'Hint of the position button in cover edition',
-            })}
-            accessibilityValue={{
-              text: placementsLabels[placement],
-            }}
-          >
-            <TitlePositionIcon value={placement} />
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              pressed && styles.buttonPressed,
-            ]}
+          </FloatingButton>
+
+          <FloatingButton
+            style={styles.button}
             onPress={onNextOrientation}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -318,16 +280,47 @@ const CoverTitleEditionPanel = ({
               }
               style={styles.orientationIcon}
             />
-          </Pressable>
+          </FloatingButton>
+          <FloatingButton
+            style={styles.button}
+            onPress={onNextPlacement}
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Position',
+              description: 'Label of the position button in cover edition',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to change the position',
+              description: 'Hint of the position button in cover edition',
+            })}
+            accessibilityValue={{
+              text: placementsLabels[placement],
+            }}
+          >
+            <TitlePositionIcon value={placement} />
+          </FloatingButton>
         </View>
+
         <View style={styles.sliders}>
           <View style={styles.sliderContainer}>
+            <Text variant="small" style={[styles.sliderTitle]}>
+              <FormattedMessage
+                defaultMessage="Font Size - {size}"
+                description="Font size message in cover edition"
+                values={{
+                  size: fontSize,
+                }}
+              />
+            </Text>
             <DashedSlider
               value={fontSize}
               min={DEFAULT_COVER_MIN_FONT_SIZE}
               max={DEFAULT_COVER_MAX_FONT_SIZE}
               step={1}
-              interval={10}
+              interval={Math.floor(
+                (width - 80) /
+                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
+              )}
               onChange={onFontSizeChange}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Font size',
@@ -337,16 +330,8 @@ const CoverTitleEditionPanel = ({
                 defaultMessage: 'Slide to change the font size',
                 description: 'Hint of the font size slider in cover edition',
               })}
+              style={{ width: '100%' }}
             />
-            <Text style={[textStyles.small, styles.sliderTitle]}>
-              <FormattedMessage
-                defaultMessage="FONT SIZE {size}"
-                description="Font size message in cover edition"
-                values={{
-                  size: fontSize,
-                }}
-              />
-            </Text>
           </View>
         </View>
       </View>
@@ -382,39 +367,19 @@ const CoverTitleEditionPanel = ({
 
 export default CoverTitleEditionPanel;
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
-  root: {
-    paddingTop: 10,
-  },
+  button: { marginRight: 15 },
   contentContainer: {
     paddingHorizontal: 20,
     justifyContent: 'space-between',
   },
-  titleInput: {
-    marginTop: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: colors.grey50,
-    borderRadius: 15,
-    ...fontFamilies.semiBold,
-  },
+  titleInput: {},
   buttonContainer: {
     alignSelf: 'center',
     flexDirection: 'row',
     marginTop: 10,
-  },
-  button: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: colors.darkGrey,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonPressed: {
-    backgroundColor: colors.grey,
   },
   sliders: {
     marginTop: 10,

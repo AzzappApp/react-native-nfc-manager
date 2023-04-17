@@ -1,5 +1,6 @@
-import { Linking, Text } from 'react-native';
+import { Linking } from 'react-native';
 import { textStyles } from '#theme';
+import Text from '#ui/Text';
 import type { TextProps } from 'react-native';
 
 type HyperLinkProps = TextProps & {

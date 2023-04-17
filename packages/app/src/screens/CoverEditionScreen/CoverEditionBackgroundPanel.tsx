@@ -65,28 +65,27 @@ const CoverEditionBackgroundPanel = ({
     description: 'Label of the background color tab in cover edition',
   });
   return (
-    <View style={[styles.root, style]}>
+    <View style={style}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={setCurrentTab}
-        variant="topbar"
         tabs={[
           {
-            key: 'background',
+            tabKey: 'background',
             label: intl.formatMessage({
               defaultMessage: 'Background',
               description: 'Label of Background tab in cover edition',
             }),
           },
           {
-            key: 'patternColor',
+            tabKey: 'patternColor',
             label: patternColorLabel,
             rightElement: (
               <ColorPreview color={patternColor} style={{ marginLeft: 5 }} />
             ),
           },
           {
-            key: 'backgroundColor',
+            tabKey: 'backgroundColor',
             label: backgroundColorLabel,
             rightElement: (
               <ColorPreview color={backgroundColor} style={{ marginLeft: 5 }} />
@@ -126,9 +125,6 @@ const CoverEditionBackgroundPanel = ({
 export default CoverEditionBackgroundPanel;
 
 const styles = StyleSheet.create({
-  root: {
-    paddingTop: 10,
-  },
   content: {
     margin: 15,
   },

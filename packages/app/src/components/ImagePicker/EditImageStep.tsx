@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import IconButton from '#ui/IconButton';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import Text from '#ui/Text';
 import FilterSelectionList from '../FilterSelectionList';
 import ImageEditionFooter from '../ImageEditionFooter';
 import ImageEditionParameterControl from '../ImageEditionParameterControl';
@@ -20,8 +21,7 @@ import type {
   ImageOrientation,
   MediaVideo,
 } from '#helpers/mediaHelpers';
-import type { Tab } from '#ui/TabsBar';
-
+import type { FooterBarItem } from '#ui/FooterBar';
 /**
  * A step of the Image Picker that allows the user to edit the selected image
  * (crop, filter, brightness, contrast etc.)
@@ -104,10 +104,10 @@ const EditImageStep = () => {
   const isEditing = !!editedParameter;
   const paramsInfos = useEditionParametersDisplayInfos();
 
-  const tabs = useMemo<Tab[]>(() => {
-    const tabs: Tab[] = [
+  const tabs = useMemo<FooterBarItem[]>(() => {
+    const tabs: FooterBarItem[] = [
       {
-        icon: 'magic',
+        icon: 'filters',
         key: 'filter',
         label: intl.formatMessage({
           defaultMessage: 'Filter',
@@ -116,7 +116,7 @@ const EditImageStep = () => {
         }),
       },
       {
-        icon: 'parameters',
+        icon: 'settings',
         key: 'edit',
         label: intl.formatMessage({
           defaultMessage: 'Adjust',
@@ -127,7 +127,7 @@ const EditImageStep = () => {
     ];
     if (media?.kind === 'video') {
       tabs.push({
-        icon: 'clock',
+        icon: 'chrono',
         key: 'timeRange',
         label: intl.formatMessage({
           defaultMessage: 'Cut Video',
@@ -146,7 +146,7 @@ const EditImageStep = () => {
       headerRightButton={
         editedParameter === 'cropData' ? (
           <IconButton
-            icon="rotate"
+            icon="missing"
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Rotate',
               description:
@@ -173,7 +173,7 @@ const EditImageStep = () => {
           <>
             <View style={styles.titleContainer}>
               <View style={styles.titleLine} />
-              <Text style={[textStyles.title, styles.title]}>
+              <Text variant="large" style={styles.title}>
                 {currentTab === 'filter' && (
                   <FormattedMessage
                     defaultMessage="Filter"
@@ -264,11 +264,11 @@ const EditImageStep = () => {
           </View>
         )
       }
-      toolbarProps={
+      menuBarProps={
         !isEditing
           ? {
               currentTab,
-              onTabPress: setCurrentTab as any,
+              onItemPress: setCurrentTab as any,
               tabs,
             }
           : null

@@ -6,10 +6,8 @@ import {
   Image,
   PermissionsAndroid,
   Platform,
-  Text,
   useWindowDimensions,
 } from 'react-native';
-import { textStyles } from '#theme';
 import {
   formatVideoTime,
   getImageSize,
@@ -17,6 +15,7 @@ import {
   getVideoSize,
 } from '#helpers/mediaHelpers';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import type { Media } from '#helpers/mediaHelpers';
 import type {
   PhotoIdentifier,
@@ -211,8 +210,8 @@ const PhotoGalleryMediaList = ({
         />
         {item.type.startsWith('video') && (
           <Text
+            variant="button"
             style={[
-              textStyles.button,
               { position: 'absolute', bottom: 10, right: 10, color: 'white' },
             ]}
           >

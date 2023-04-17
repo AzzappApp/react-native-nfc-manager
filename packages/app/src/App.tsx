@@ -1,7 +1,7 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IntlProvider } from 'react-intl';
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -14,6 +14,7 @@ import {
   signInRoutes,
   signUpRoutes,
 } from '#mobileRoutes';
+import { colors } from '#theme';
 import useAuthState from '#hooks/userAuthState';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
@@ -52,6 +53,7 @@ const screens = {
   HOME: HomeMobileScreen,
   SEARCH: SearchMobileScreen,
   SETTINGS: SettingsMobileScreen,
+  ALBUMS: () => <View />,
   CHAT: () => <View />,
   POST: PostMobileScreen,
   PROFILE_POSTS: ProfilePostsMobileScreen,
@@ -162,9 +164,20 @@ const App = () => {
     return createPlatformEnvironment(router);
   }, [router]);
 
+  const colorScheme = useColorScheme();
+
+  const safeAreaBackgroundStyle = useMemo(() => {
+    return {
+      backgroundColor: colorScheme === 'light' ? colors.white : colors.black,
+    };
+  }, [colorScheme]);
+
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <SafeAreaProvider
+        initialMetrics={initialWindowMetrics}
+        style={safeAreaBackgroundStyle}
+      >
         <IntlProvider
           locale={locale}
           defaultLocale={DEFAULT_LOCALE}

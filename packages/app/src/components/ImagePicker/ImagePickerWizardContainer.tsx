@@ -8,12 +8,13 @@ import {
 import { useIntl } from 'react-intl';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomMenu from '#ui/BottomMenu';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
-import TabsBar from '#ui/TabsBar';
-import Header from '../Header';
+import Header from '#ui/Header';
 import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
-import type { TabsBarProps } from '#ui/TabsBar';
+import type { BottomMenuProps } from '#ui/BottomMenu';
 import type { ReactElement, ReactNode } from 'react';
 import type { ViewProps } from 'react-native';
 
@@ -51,7 +52,7 @@ export type ImagePickerStepDefinition = {
   /**
    * the props of the toolbar to display, if null, no toolbar is displayed
    */
-  toolbarProps?: Exclude<TabsBarProps, 'style' | 'variant'> | null;
+  menuBarProps?: Exclude<BottomMenuProps, 'style' | 'variant'> | null;
 };
 
 /**
@@ -131,7 +132,7 @@ const ImagePickerWizardRenderer = ({
   busy,
   topPanel,
   bottomPanel,
-  toolbarProps,
+  menuBarProps,
   canCancel,
   onBack,
   onNext,
@@ -184,12 +185,16 @@ const ImagePickerWizardRenderer = ({
   if (busy) {
     rightButton = <ActivityIndicator style={styles.activityIndicator} />;
   }
+
   return (
-    <View style={[styles.root, { paddingTop: safeAreaTop }, style]} {...props}>
+    <Container
+      style={[styles.root, { paddingTop: safeAreaTop }, style]}
+      {...props}
+    >
       <Header
-        leftButton={leftButton}
-        rightButton={rightButton}
-        title={headerTitle}
+        leftElement={leftButton}
+        rightElement={rightButton}
+        middleElement={headerTitle}
         style={styles.header}
       />
       <View style={styles.topPanel}>{topPanel}</View>
@@ -197,7 +202,7 @@ const ImagePickerWizardRenderer = ({
         <FadeSwitch transitionDuration={120} currentKey={stepId}>
           {bottomPanel}
         </FadeSwitch>
-        {toolbarProps && (
+        {menuBarProps && (
           <View
             style={[
               styles.tabBarContainer,
@@ -205,17 +210,16 @@ const ImagePickerWizardRenderer = ({
             ]}
             pointerEvents="box-none"
           >
-            <TabsBar variant="toolbar" {...toolbarProps} />
+            <BottomMenu {...menuBarProps} />
           </View>
         )}
       </View>
-    </View>
+    </Container>
   );
 };
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: 'white',
     flex: 1,
   },
   header: {

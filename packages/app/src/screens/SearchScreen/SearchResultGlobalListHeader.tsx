@@ -1,13 +1,14 @@
 import { useMemo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Text, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import CoverList from '#components/CoverList';
 import SkeletonPlaceholder from '#components/SkeletonPlaceholder';
+import Text from '#ui/Text';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 
 import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalListHeader_viewer.graphql';
@@ -61,7 +62,7 @@ const SearchResultGlobalListHeader = ({
 
   return (
     <>
-      <Text style={styles.titleSection}>
+      <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
           defaultMessage="Profiles"
           description="SearchPage - Result - Global search profiles title"
@@ -73,7 +74,7 @@ const SearchResultGlobalListHeader = ({
         containerStyle={styles.containerStyle}
         coverStyle={styles.coverStyle}
       />
-      <Text style={styles.titleSection}>
+      <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
           defaultMessage="Posts"
           description="SearchPage - Result - Global search posts title"
@@ -87,7 +88,7 @@ export default SearchResultGlobalListHeader;
 export const SearchResultGlobalListHeaderPlaceholder = () => {
   return (
     <>
-      <Text style={styles.titleSection}>
+      <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
           defaultMessage="Profiles"
           description="SearchPage - Result - Global search profiles title"
@@ -101,7 +102,7 @@ export const SearchResultGlobalListHeaderPlaceholder = () => {
         <SkeletonPlaceholder style={styles.profilePlaceHolder} />
       </View>
 
-      <Text style={styles.titleSection}>
+      <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
           defaultMessage="Posts"
           description="SearchPage - Result - Global search posts title"
@@ -114,7 +115,6 @@ export const SearchResultGlobalListHeaderPlaceholder = () => {
 const styles = StyleSheet.create({
   flexOne: { flex: 1 },
   titleSection: {
-    ...textStyles.sectionTitle,
     marginTop: 17,
     marginBottom: 7,
     marginLeft: 10,

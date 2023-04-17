@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
 import { formatVideoTime } from '#helpers/mediaHelpers';
 import useInterval from '#hooks/useInterval';
 import PressableBackground from '#ui/PressableBackground';
 import ProgressBar from '#ui/ProgressBar';
+import Text from '#ui/Text';
 import ViewTransition from '#ui/ViewTransition';
 import type { ViewProps } from 'react-native';
 
@@ -103,9 +104,7 @@ const CameraControlPanel = ({
         style={{ opacity: isRecording ? 1 : 0, alignSelf: 'stretch' }}
       />
       {timer != null && (
-        <Text style={textStyles.normal}>
-          {formatVideoTime(Math.round(timer / 1000))}
-        </Text>
+        <Text variant="small">{formatVideoTime(Math.round(timer / 1000))}</Text>
       )}
       {captureMode === 'photo' ? (
         <PressableBackground

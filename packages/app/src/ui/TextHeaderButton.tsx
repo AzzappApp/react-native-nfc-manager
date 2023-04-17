@@ -1,5 +1,6 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { textStyles } from '#theme';
+import Text from '#ui/Text';
 import PressableNative from './PressableNative';
 
 type TextHeaderButtonProps = {

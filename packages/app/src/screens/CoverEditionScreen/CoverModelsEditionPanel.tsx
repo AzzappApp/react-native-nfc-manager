@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import { FlatList, Dimensions, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, useRefetchableFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
-import { colors, fontFamilies } from '#theme';
-import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import CoverTemplateRenderer from './CoverTemplateRenderer';
 import type {
   CoverModelsEditionPanel_viewer$data,
@@ -43,6 +44,7 @@ const CoverModelsEditionPanel = ({
   selectedTemplateId,
   onSelectTemplate,
 }: CoverModelsEditionPanelProps) => {
+  const appearanceStyle = useStyleSheet(computedStyle);
   const [{ coverTemplatesByCategory }, refetch] = useRefetchableFragment(
     graphql`
       fragment CoverModelsEditionPanel_viewer on Viewer
@@ -114,6 +116,7 @@ const CoverModelsEditionPanel = ({
               borderColor:
                 selectedTemplateId === item.id ? colors.black : 'transparent',
             },
+            appearanceStyle.coverShadow,
           ]}
         >
           <CoverTemplateRenderer
@@ -147,11 +150,10 @@ const CoverModelsEditionPanel = ({
     if (item && item.templates?.length > 0) {
       return (
         <View style={styles.containerItemCtageory}>
-          <View style={styles.categoryContainer}>
-            <View style={styles.backgroundLine} />
-            <Text style={styles.textCategory}>{item.category}</Text>
-            <View style={styles.backgroundLine} />
-          </View>
+          <TabsBar
+            currentTab={item.category}
+            tabs={[{ tabKey: item.category, label: item.category }]}
+          />
           <FlatList
             data={item.templates}
             renderItem={renderTemplate}
@@ -200,22 +202,20 @@ const COVER_MINIATURE_WIDTH = width * COVER_MINIATURE_WIDTH_RATIO;
 const COVER_MINIATURE_HEIGHT = COVER_MINIATURE_WIDTH / COVER_RATIO;
 const BORDER_SELECTED_WIDTH = 3.75;
 
+const computedStyle = createStyleSheet(appearance => ({
+  coverShadow: {
+    shadowColor: appearance === 'light' ? colors.black : colors.white,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4.69 },
+    shadowRadius: 18.75,
+  },
+}));
+
 const styles = StyleSheet.create({
   containerItemCtageory: {
     height: 26 + COVER_MINIATURE_HEIGHT + 2 * BORDER_SELECTED_WIDTH,
   },
-  textCategory: {
-    marginHorizontal: 5,
-    ...fontFamilies.semiBold,
-    color: colors.black,
-    fontSize: 12,
-  },
-  categoryContainer: {
-    height: 26,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   containerTemplate: {
     width: COVER_MINIATURE_WIDTH + 2 * BORDER_SELECTED_WIDTH - 0.5,
     height: COVER_MINIATURE_HEIGHT + 2 * BORDER_SELECTED_WIDTH,
@@ -224,12 +224,6 @@ const styles = StyleSheet.create({
     borderWidth: BORDER_SELECTED_WIDTH,
   },
   mainFLContentContainer: { paddingBottom: TAB_BAR_HEIGHT + 30 },
-  backgroundLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.grey50,
-    alignSelf: 'center',
-  },
   root: {
     paddingTop: 10,
   },

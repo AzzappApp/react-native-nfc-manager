@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, Text, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
 import {
   fetchQuery,
   graphql,
@@ -14,16 +14,13 @@ import {
   isValidUserName,
 } from '@azzapp/shared/stringHelpers';
 import { useWebAPI } from '#PlatformEnvironment';
-import { colors, fontFamilies } from '#theme';
-import useViewportSize, {
-  VH100,
-  insetBottom,
-  insetTop,
-} from '#hooks/useViewportSize';
+import { colors } from '#theme';
+import useViewportSize, { VH100, insetTop } from '#hooks/useViewportSize';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
 import Select from '#ui/Select';
+import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ContinueButton from './ContinueButton';
 import NewProfileScreenPageHeader from './NewProfileScreenPageHeader';
@@ -202,8 +199,7 @@ const ProfileForm = ({
       style={[
         styles.root,
         {
-          paddingTop: vp`${insetTop} + ${90}`,
-          marginBottom: vp`${insetBottom} + ${10}`,
+          paddingTop: vp`${insetTop} + ${50}`,
         },
       ]}
     >
@@ -322,11 +318,11 @@ const ProfileForm = ({
                   bottomSheetHeight={vp`${VH100} - ${90} - ${insetTop}`}
                   onItemSelected={onActivitySelected}
                   bottomSheetTitle={intl.formatMessage({
-                    defaultMessage: 'Choose a domain of activity',
+                    defaultMessage: 'Select an activity',
                     description: 'ProfileForm - Activity BottomSheet - Title',
                   })}
                   placeHolder={intl.formatMessage({
-                    defaultMessage: 'Choose a domain of activity',
+                    defaultMessage: 'Select an activity',
                     description:
                       'NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
                   })}
@@ -368,14 +364,17 @@ const ProfileForm = ({
           {userNameIsNotEmpty && (
             <>
               <Icon
-                icon={userNameError ? 'input_clear' : 'check'}
-                style={{ tintColor: userNameError ? colors.red : colors.green }}
+                icon={userNameError ? 'closeFull' : 'missing'}
+                style={{
+                  tintColor: userNameError ? colors.red400 : colors.green,
+                }}
               />
 
               <Text
+                variant="large"
                 style={[
                   styles.urlText,
-                  userNameError != null && { color: colors.red },
+                  userNameError != null && { color: colors.red400 },
                 ]}
               >
                 https://www.azzapp.com/{userName}
@@ -405,11 +404,9 @@ const styles = StyleSheet.create({
   selectItemContainerStyle: {
     marginBottom: 18,
     paddingHorizontal: 30,
-    backgroundColor: '#fff',
   },
   root: {
     flex: 1,
-    backgroundColor: '#FFF',
   },
   form: {
     flex: 1,
@@ -429,9 +426,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   urlText: {
-    ...fontFamilies.normal,
-    fontSize: 14,
-    color: colors.black,
     marginLeft: 5,
   },
 });

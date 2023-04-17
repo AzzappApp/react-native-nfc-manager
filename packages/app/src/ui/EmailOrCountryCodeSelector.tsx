@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies } from '#theme';
+import { Image, StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { VH100 } from '#hooks/useViewportSize';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Text from '#ui/Text';
 import CountrySelector from './CountrySelector';
 import COUNTRY_FLAG from './CountrySelector/CountryFlag';
 import Icon from './Icon';
@@ -35,12 +37,13 @@ const EmailOrCountryCodeSelector = ({
   };
   const vp = useViewportSize();
   const intl = useIntl();
+  const appearanceStyle = useStyleSheet(computedStyles);
   return (
     <>
       <PressableNative
         {...props}
         onPress={() => setShowDropdown(true)}
-        style={[styles.button, style]}
+        style={[appearanceStyle.button, style]}
         accessibilityRole="button"
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Select a calling code or email',
@@ -53,7 +56,7 @@ const EmailOrCountryCodeSelector = ({
         })}
       >
         {value === 'email' ? (
-          <Icon icon="mail" style={{ width: 24 }} />
+          <Icon icon="mail" style={[{ width: 24 }, appearanceStyle.icon]} />
         ) : (
           <Image
             source={{ uri: COUNTRY_FLAG[value] }}
@@ -64,7 +67,7 @@ const EmailOrCountryCodeSelector = ({
       <BottomSheetModal
         visible={showDropdown}
         height={vp`${VH100} -${120}`}
-        contentContainerStyle={styles.bottomSheetContainer}
+        contentContainerStyle={appearanceStyle.bottomSheetContainer}
         onRequestClose={() => setShowDropdown(false)}
       >
         <CountrySelector
@@ -72,23 +75,27 @@ const EmailOrCountryCodeSelector = ({
           onChange={onSelect}
           ListHeaderComponent={
             <View>
-              <Text style={styles.section}>{emailSectionTitle}</Text>
+              <Text variant="large" style={styles.section}>
+                {emailSectionTitle}
+              </Text>
               <PressableBackground
                 onPress={() => onSelect('email')}
                 style={[
                   styles.emailItem,
-                  value === 'email' && styles.emailItemSelected,
+                  value === 'email' && appearanceStyle.emailItemSelected,
                 ]}
               >
-                <Icon icon="mail" style={{ width: 24 }} />
-                <Text style={styles.emailItemName}>
+                <Icon icon="mail" />
+                <Text variant="button" style={styles.emailItemName}>
                   <FormattedMessage
                     defaultMessage="Email address"
                     description="The email address option in the country selector"
                   />
                 </Text>
               </PressableBackground>
-              <Text style={styles.section}>{phoneSectionTitle}</Text>
+              <Text variant="large" style={styles.section}>
+                {phoneSectionTitle}
+              </Text>
             </View>
           }
         />
@@ -98,40 +105,43 @@ const EmailOrCountryCodeSelector = ({
 };
 export default EmailOrCountryCodeSelector;
 
-const styles = StyleSheet.create({
+const computedStyles = createStyleSheet(appearance => ({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 50,
-    height: 43,
-    backgroundColor: colors.grey50,
+    height: 47,
     borderRadius: 12,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
+  icon: {
+    tintColor: appearance === 'light' ? colors.black : colors.white,
   },
   bottomSheetContainer: {
     marginTop: 10,
     paddingHorizontal: 0,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
+  emailItemSelected: {
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
+}));
+
+const styles = StyleSheet.create({
   emailItem: {
     flexDirection: 'row',
-    backgroundColor: 'white',
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 30,
     marginBottom: 18,
   },
   emailItemName: {
-    ...fontFamilies.semiBold,
     flex: 1,
     marginLeft: 14,
-    fontSize: 14,
   },
-  emailItemSelected: {
-    backgroundColor: colors.grey50,
-  },
+
   section: {
-    ...fontFamilies.semiBold,
     marginBottom: 35,
     paddingHorizontal: 20,
-    fontSize: 16,
   },
 });

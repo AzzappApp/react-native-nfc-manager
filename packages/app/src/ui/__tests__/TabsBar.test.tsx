@@ -10,15 +10,13 @@ describe('TabsBar', () => {
         currentTab="azzapp"
         onTabPress={onTabPressMock}
         tabs={[
-          { key: 'account', icon: 'account', label: 'account' },
+          { tabKey: 'account', label: 'account' },
           {
-            key: 'add-something',
-            icon: 'plus',
+            tabKey: 'add-something',
             label: 'add something',
           },
           {
-            key: 'azzapp',
-            icon: 'azzapp',
+            tabKey: 'azzapp',
             label: 'Azzapp',
           },
         ]}

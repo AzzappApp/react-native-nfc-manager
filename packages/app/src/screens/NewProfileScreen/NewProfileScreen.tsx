@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
 import InterestPicker from './InterestPicker';
 import ProfileForm from './ProfileForm';
@@ -59,20 +60,20 @@ const NewProfileScreen = ({
   };
 
   const [profileCategoryId, setProfileCategoryId] = useState<string | null>(
-    profileCategories[0]?.id ?? null,
+    profileCategories?.[0]?.id ?? null,
   );
 
   const onProfileCategoryChange = useCallback((profileCategoryId: string) => {
     setProfileCategoryId(profileCategoryId);
   }, []);
 
-  const profileCategory = profileCategories.find(
+  const profileCategory = profileCategories?.find(
     pc => pc.id === profileCategoryId,
   );
   const profileKind = profileCategory?.profileKind;
 
   return (
-    <View style={styles.container}>
+    <Container style={styles.container}>
       <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
         {currentPage === 0 && (
           <View key="0" style={styles.page} collapsable={false}>
@@ -98,11 +99,15 @@ const NewProfileScreen = ({
 
         {currentPage === 2 && (
           <View key="2" style={styles.page} collapsable={false}>
-            <InterestPicker interests={interests} onClose={onClose} />
+            <InterestPicker
+              interests={interests}
+              onClose={onClose}
+              profileKind={profileKind!}
+            />
           </View>
         )}
       </FadeSwitch>
-    </View>
+    </Container>
   );
 };
 
@@ -111,7 +116,6 @@ export default NewProfileScreen;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   loaderPage: {
-    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },

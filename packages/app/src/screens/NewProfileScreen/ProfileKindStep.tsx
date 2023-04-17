@@ -6,7 +6,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
+import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import ToggleButton from '#ui/ToggleButton';
@@ -44,19 +44,28 @@ const profileCategoriesFragment = graphql`
   }
 `;
 
-// TODO preload medias
+/**
+ *
+ *
+ * @param {ProfileKindStepProps} {
+ *   profileCategories: profileCategoriesKey,
+ *   profileCategoryId,
+ *   onProfileCategoryChange,
+ *   onNext,
+ * }
+ * @return {*}
+ */
 const ProfileKindStep = ({
   profileCategories: profileCategoriesKey,
   profileCategoryId,
   onProfileCategoryChange,
   onNext,
 }: ProfileKindStepProps) => {
+  const vp = useViewportSize();
   const profileCategories = useFragment(
     profileCategoriesFragment,
     profileCategoriesKey,
   );
-
-  const vp = useViewportSize();
 
   const [cardWidth, setCardWidth] = useState(0);
   const onMediaListLayout = useCallback(
@@ -77,12 +86,14 @@ const ProfileKindStep = ({
           category.medias?.map(media => Image.prefetch(media.uri)),
         ),
       );
-    void prefetchImages();
+    if (profileCategories?.length > 0) {
+      void prefetchImages();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const borderRadius = COVER_CARD_RADIUS * cardWidth;
   const mediasKeyExtractor = useCallback((item: Media) => item.id, []);
+  const borderRadius = COVER_CARD_RADIUS * cardWidth;
   const renderMediasItem = useCallback(
     (media: Media) => (
       <View style={[styles.mediaImageContainer, { borderRadius }]}>
@@ -90,7 +101,7 @@ const ProfileKindStep = ({
           testID="category-image"
           accessibilityRole="image"
           source={{ uri: media.uri }}
-          style={[styles.mediaImage, { borderRadius, width: cardWidth }]}
+          style={[styles.mediaImage, { width: cardWidth, borderRadius }]}
         />
       </View>
     ),
@@ -126,7 +137,7 @@ const ProfileKindStep = ({
     }),
     [],
   );
-  const [categoryListHeight, setCategoryListHeight] = useState(0);
+
   const [categoryListReady, setCategoryListReady] = useState(false);
 
   const categoryListRef = useRef<FlatList>(null);
@@ -149,25 +160,12 @@ const ProfileKindStep = ({
     return () => clearTimeout(timeout);
   }, [categoryListReady, profileCategories, profileCategoryId]);
 
-  const onProfileListLayout = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height },
-      },
-    }: LayoutChangeEvent) => {
-      setCategoryListHeight(height);
-      scrollToSelectedCategory();
-    },
-    [scrollToSelectedCategory],
-  );
-
   return (
     <View
       style={[
         styles.root,
         {
-          paddingTop: vp`${insetTop} + ${90}`,
-          marginBottom: vp`${insetBottom} + ${10}`,
+          paddingTop: vp`${insetTop} + ${50}`,
         },
       ]}
     >
@@ -195,7 +193,7 @@ const ProfileKindStep = ({
         maskElement={
           <LinearGradient
             colors={['transparent', 'black', 'black', 'transparent']}
-            locations={[0.05, 0.2, 0.7, 0.95]}
+            locations={[0.0, 0.29, 0.64, 1]}
             style={{ flex: 1 }}
           />
         }
@@ -213,9 +211,9 @@ const ProfileKindStep = ({
           ]}
           contentContainerStyle={[
             styles.profileCategoriesListContent,
-            { paddingVertical: categoryListHeight / 4 },
+            { paddingVertical: 70 },
           ]}
-          onLayout={onProfileListLayout}
+          onLayout={scrollToSelectedCategory}
           showsVerticalScrollIndicator={false}
         />
       </MaskedView>
@@ -232,7 +230,6 @@ type Media = ArrayItemType<ProfileCategory['medias']>;
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#FFF',
   },
   mediasList: {
     flex: 1,
@@ -242,16 +239,16 @@ const styles = StyleSheet.create({
   mediaImageContainer: {
     marginLeft: 20,
     shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 15 },
     shadowRadius: 6,
-    backgroundColor: colors.lightGrey,
+    backgroundColor: colors.grey200,
   },
   mediaImage: {
     aspectRatio: COVER_RATIO,
   },
   profileCategoriesListContainer: {
-    flex: 1.2,
+    flex: 1,
   },
   profileCategoriesList: {
     flex: 1,

@@ -52,21 +52,21 @@ const CoverEditionForegroundPanel = ({
 
   const intl = useIntl();
   return (
-    <View style={[styles.root, style]}>
+    <View style={style}>
       <TabsBar
         currentTab="foreground"
         onTabPress={setCurrentTab}
-        variant="topbar"
+        decoration="underline"
         tabs={[
           {
-            key: 'foreground',
+            tabKey: 'foreground',
             label: intl.formatMessage({
               defaultMessage: 'Foreground',
               description: 'Label of Foreground tab in cover edition',
             }),
           },
           {
-            key: 'color',
+            tabKey: 'color',
             rightElement: (
               <ColorPreview color={color} style={{ marginLeft: 5 }} />
             ),
@@ -82,6 +82,7 @@ const CoverEditionForegroundPanel = ({
         selectedLayer={foreground}
         tintColor={color}
         onSelectLayer={onForegroundChange}
+        backgroundColor="#ffffff"
         style={styles.content}
       />
       {profile && (
@@ -105,9 +106,6 @@ const CoverEditionForegroundPanel = ({
 export default CoverEditionForegroundPanel;
 
 const styles = StyleSheet.create({
-  root: {
-    paddingTop: 10,
-  },
   content: {
     margin: 15,
   },

@@ -225,6 +225,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     paddingHorizontal: 10,
-    maxHeight: 43,
+    maxHeight: 47,
   },
 });

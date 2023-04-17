@@ -5,14 +5,13 @@ import CheckBox from '../CheckBox';
 
 const onChange = jest.fn();
 describe('Checkbox component', () => {
-  test('props `container` style should apply to the container wrapper', () => {
+  test('props `style` should apply to the container wrapper', () => {
     const containerStyle = { backgroundColor: 'red', width: 200 };
     render(
       <CheckBox
-        checked={true}
+        status="checked"
         onValueChange={onChange}
-        size={40}
-        containerStyle={containerStyle}
+        style={containerStyle}
       />,
     );
     const wrapper = screen.getByRole('checkbox');
@@ -23,17 +22,18 @@ describe('Checkbox component', () => {
       ]),
     );
   });
+
   test('callback `onChange` should not be call when disabled', () => {
-    render(<CheckBox checked={false} onValueChange={onChange} disabled />);
+    render(<CheckBox status="none" onValueChange={onChange} disabled />);
     const wrapper = screen.getByRole('checkbox');
     fireEvent(wrapper, 'onPress');
     expect(onChange).not.toBeCalled();
   });
-});
 
-test('should call `onChange` callback when triggering `onPress` event', () => {
-  render(<CheckBox checked={false} onValueChange={onChange} />);
-  const wrapper = screen.getByRole('checkbox');
-  fireEvent(wrapper, 'onPress');
-  expect(onChange).toBeCalled();
+  test('should call `onChange` callback when triggering `onPress` event', () => {
+    render(<CheckBox status="none" onValueChange={onChange} />);
+    const wrapper = screen.getByRole('checkbox');
+    fireEvent(wrapper, 'onPress');
+    expect(onChange).toBeCalled();
+  });
 });

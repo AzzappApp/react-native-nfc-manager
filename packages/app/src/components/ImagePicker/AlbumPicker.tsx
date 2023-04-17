@@ -1,14 +1,15 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, Image, Modal, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
+import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableBackground from '#ui/PressableBackground';
 import PressableNative from '#ui/PressableNative';
-import Header from '../Header';
+import Text from '#ui/Text';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { IntlShape } from 'react-intl';
 import type { ViewProps, ListRenderItemInfo } from 'react-native';
@@ -51,10 +52,10 @@ const AlbumPicker = ({
         })}
         {...props}
       >
-        <Text style={[textStyles.title, styles.title]}>
+        <Text variant="large" style={styles.title}>
           {value ?? latestAlbumTitme(intl)}
         </Text>
-        <Icon icon="arrow-down" style={styles.arrowIcon} />
+        <Icon icon="arrow_down" style={styles.arrowIcon} />
       </PressableNative>
       <Modal
         animationType="slide"
@@ -113,8 +114,8 @@ const AlbumPickerScreen = ({
   return (
     <View style={{ marginTop: top }}>
       <Header
-        leftButton={<IconButton icon="chevron" onPress={onClose} />}
-        title={intl.formatMessage({
+        leftElement={<IconButton icon="arrow_left" onPress={onClose} />}
+        middleElement={intl.formatMessage({
           defaultMessage: 'Select an album',
           description: 'Title of the album selection modal',
         })}
@@ -174,10 +175,10 @@ const AlbumRenderer = ({
         }}
       />
       <View>
-        <Text style={textStyles.normal}>
+        <Text variant="medium">
           {album ? album.title : latestAlbumTitme(intl)}
         </Text>
-        <Text style={textStyles.small}>{album ? album.count : 'all'}</Text>
+        <Text variant="small">{album ? album.count : 'all'}</Text>
       </View>
     </PressableBackground>
   );

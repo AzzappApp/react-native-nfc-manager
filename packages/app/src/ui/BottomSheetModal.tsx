@@ -10,10 +10,11 @@ import {
   View,
 } from 'react-native';
 import { colors } from '#theme';
-import Header from '#components/Header';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from './Button';
-import type { HeaderProps } from '#components/Header';
+import Header from './Header';
+import type { HeaderProps } from './Header';
 import type { ModalProps, StyleProp, ViewStyle } from 'react-native';
 
 export type BottomSheetModalProps = Omit<
@@ -27,15 +28,15 @@ export type BottomSheetModalProps = Omit<
   /**
    * @see HeaderProps#title
    */
-  headerTitle?: HeaderProps['title'];
+  headerTitle?: HeaderProps['middleElement'];
   /**
    * @see HeaderProps#rightButton
    */
-  headerLeftButton?: HeaderProps['leftButton'];
+  headerLeftButton?: HeaderProps['leftElement'];
   /**
    * @see HeaderProps#rightButton
    */
-  headerRightButton?: HeaderProps['rightButton'];
+  headerRightButton?: HeaderProps['rightElement'];
   /**
    * The variant of the bottomsheet @default 'default'
    */
@@ -46,9 +47,16 @@ export type BottomSheetModalProps = Omit<
    */
   contentContainerStyle?: StyleProp<ViewStyle>;
   /**
+   *
    * disableGestureInteraction
    */
   disableGestureInteraction?: boolean;
+  /**
+   * add a small horizontal line marker to indicate the gesture is available
+   *
+   * @type {boolean} @default true
+   */
+  showGestureIndicator?: boolean;
   /**
    * @see ModalProps#onRequestClose
    */
@@ -68,11 +76,12 @@ const BottomSheetModal = ({
   variant,
   disableGestureInteraction,
   contentContainerStyle,
+  showGestureIndicator = true,
   onRequestClose,
   ...props
 }: BottomSheetModalProps) => {
   const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
-
+  const appearanceStyle = useStyleSheet(computedStyle);
   const [isVisible, setIsVisible] = useState(false);
   const currentAnimationRef = useRef<Animated.CompositeAnimation | null>();
   useEffect(() => {
@@ -167,7 +176,7 @@ const BottomSheetModal = ({
               style={[
                 styles.absoluteFill,
                 {
-                  backgroundColor: colors.dark,
+                  backgroundColor: colors.black,
                   opacity: animation.interpolate({
                     inputRange: [0, 1],
                     outputRange: [0, 0.8],
@@ -187,6 +196,7 @@ const BottomSheetModal = ({
           {...pan.panHandlers}
           style={[
             styles.bottomSheetContainer,
+            appearanceStyle.bottomSheetContainer,
             contentContainerStyle,
             {
               height: vp`${height} + ${insetBottom}`,
@@ -204,15 +214,15 @@ const BottomSheetModal = ({
             },
           ]}
         >
-          {!disableGestureInteraction && (
-            <View style={styles.gestureInteractionIndicator} />
+          {!disableGestureInteraction && showGestureIndicator && (
+            <View style={appearanceStyle.gestureInteractionIndicator} />
           )}
           {hasHeader && (
             <Header
               style={styles.accessoryView}
-              title={headerTitle}
-              leftButton={headerLeftButton}
-              rightButton={headerRightButton}
+              middleElement={headerTitle}
+              leftElement={headerLeftButton}
+              rightElement={headerRightButton}
             />
           )}
           {children}
@@ -224,15 +234,22 @@ const BottomSheetModal = ({
 
 export default BottomSheetModal;
 
-const styles = StyleSheet.create({
+const computedStyle = createStyleSheet(appearance => ({
   gestureInteractionIndicator: {
-    backgroundColor: colors.black,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
     height: 4,
     width: 20,
     alignSelf: 'center',
     borderRadius: 2,
     marginBottom: 4,
   },
+  bottomSheetContainer: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    shadowColor: appearance === 'light' ? colors.grey900 : colors.grey800,
+  },
+}));
+
+const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
   },
@@ -245,12 +262,10 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     width: '100%',
-    backgroundColor: '#FFF',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingTop: 16,
     paddingHorizontal: 20,
-    shadowColor: colors.grey900,
     shadowOffset: {
       width: 0,
       height: 4,

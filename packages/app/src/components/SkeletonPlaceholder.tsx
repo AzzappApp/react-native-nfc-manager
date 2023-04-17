@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useColorScheme } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
   interpolate,
@@ -46,7 +46,7 @@ const Skeleton = ({
       },
     ],
   }));
-
+  const colorScheme = useColorScheme();
   return (
     <View
       style={[style, styles.container]}
@@ -57,7 +57,11 @@ const Skeleton = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
-          colors={[colors.grey50, highLightColor, colors.grey50]}
+          colors={[
+            colorScheme === 'light' ? colors.grey50 : colors.grey900,
+            highLightColor,
+            colorScheme === 'light' ? colors.grey50 : colors.grey900,
+          ]}
         />
       </Animated.View>
     </View>

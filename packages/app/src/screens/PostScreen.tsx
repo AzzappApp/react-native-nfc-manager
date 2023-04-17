@@ -8,12 +8,13 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { useRouter } from '#PlatformEnvironment';
-import Header from '#components/Header';
 import PostList from '#components/PostList';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { PostScreenFragment_post$key } from '@azzapp/relay/artifacts/PostScreenFragment_post.graphql';
 import type {
@@ -36,6 +37,7 @@ const PostScreen = ({
   initialVideoTime,
 }: PostScreenProps) => {
   const router = useRouter();
+  const intl = useIntl();
   const onClose = () => {
     router.back();
   };
@@ -90,12 +92,20 @@ const PostScreen = ({
   );
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: '#fff', overflow: 'hidden' }}
-    >
+    <SafeAreaView style={{ flex: 1, overflow: 'hidden' }}>
       <Header
-        title="Discover"
-        leftButton={<IconButton icon="chevron" onPress={onClose} />}
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Discover',
+          description: 'Post screen header title',
+        })}
+        leftElement={
+          <IconButton
+            icon="arrow_down"
+            onPress={onClose}
+            iconSize={26}
+            size={47}
+          />
+        }
       />
       <PostList
         style={{ flex: 1 }}

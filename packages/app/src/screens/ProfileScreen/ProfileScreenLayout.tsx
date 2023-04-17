@@ -4,9 +4,9 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { Transition } from 'react-transition-group';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import Header, { HEADER_HEIGHT } from '#components/Header';
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import FloatingIconButton from '#ui/FloatingIconButton';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import PressableNative from '#ui/PressableNative';
 import TextHeaderButton from '#ui/TextHeaderButton';
 import ViewTransition from '#ui/ViewTransition';
@@ -46,6 +46,7 @@ const ProfileScreenLayout = ({
   onClose,
 }: ProfileScreenLayoutProps) => {
   const vp = useViewportSize();
+  const intl = useIntl();
 
   return (
     <View style={styles.container}>
@@ -64,13 +65,16 @@ const ProfileScreenLayout = ({
                 disableAnimation={!ready}
               >
                 <Header
-                  title="Edit your profile"
-                  leftButton={
+                  middleElement={intl.formatMessage({
+                    defaultMessage: 'Edit your profile',
+                    description: 'Profile screen edit header',
+                  })}
+                  leftElement={
                     !saving ? (
                       <TextHeaderButton text="Cancel" onPress={onCancel} />
                     ) : null
                   }
-                  rightButton={
+                  rightElement={
                     saving ? (
                       <ActivityIndicator style={{ marginRight: 10 }} />
                     ) : canSave ? (
@@ -92,7 +96,12 @@ const ProfileScreenLayout = ({
                 pointerEvents={isEditing ? 'none' : 'auto'}
                 disableAnimation={!ready}
               >
-                <FloatingIconButton icon="chevron" onPress={onClose} />
+                <FloatingIconButton
+                  icon="arrow_down"
+                  onPress={onClose}
+                  iconSize={30}
+                  variant="grey"
+                />
               </ViewTransition>
 
               <ScrollView

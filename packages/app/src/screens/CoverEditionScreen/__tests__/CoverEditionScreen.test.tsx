@@ -611,7 +611,7 @@ describe('CoverEditionScreen', () => {
     });
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Title edition'));
+      fireEvent.press(screen.getByLabelText('Text'));
     });
 
     const image = screen.getByTestId('editable-image');
@@ -628,7 +628,7 @@ describe('CoverEditionScreen', () => {
     });
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Image edition'));
+      fireEvent.press(screen.getByLabelText('Image'));
     });
 
     const image = screen.getByTestId('editable-image');
@@ -645,7 +645,7 @@ describe('CoverEditionScreen', () => {
     });
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Image edition'));
+      fireEvent.press(screen.getByLabelText('Image'));
     });
 
     const image = screen.getByTestId('editable-image');
@@ -712,7 +712,7 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
     act(() => {
-      fireEvent.press(screen.getByLabelText('Title edition'));
+      fireEvent.press(screen.getByLabelText('Text'));
     });
 
     expect(screen.queryByText('fake-title')).toBeTruthy();
@@ -838,7 +838,7 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
     act(() => {
-      fireEvent.press(screen.getByLabelText('Foreground selection'));
+      fireEvent.press(screen.getByLabelText('Fore.'));
     });
 
     const list = screen.getByTestId('cover-layer-list');
@@ -882,7 +882,7 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
     act(() => {
-      fireEvent.press(screen.getByLabelText('Background selection'));
+      fireEvent.press(screen.getByLabelText('Back.'));
     });
 
     const list = screen.getByTestId('cover-layer-list');
@@ -963,7 +963,7 @@ describe('CoverEditionScreen', () => {
 
     expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
     act(() => {
-      fireEvent.press(screen.getByLabelText('Title edition'));
+      fireEvent.press(screen.getByLabelText('Text'));
     });
     act(() => {
       fireEvent(

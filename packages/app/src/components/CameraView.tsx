@@ -259,13 +259,12 @@ const CameraView = (
         <FloatingIconButton
           icon={
             flash === 'off'
-              ? 'flash-disabled'
+              ? 'flash_off'
               : flash === 'auto'
-              ? 'flash-auto'
-              : 'flash'
+              ? 'flash_auto'
+              : 'flash_on'
           }
           style={styles.flashButton}
-          variant="white"
           size={40}
           onPress={onFlashPressed}
           accessibilityRole="togglebutton"
@@ -298,9 +297,8 @@ const CameraView = (
       )}
       {supportsCameraFlipping && (
         <FloatingIconButton
-          icon="invert"
+          icon="revert"
           style={styles.flipButton}
-          variant="white"
           size={40}
           onPress={onFlipCameraPressed}
           accessibilityLabel={intl.formatMessage({

@@ -1,7 +1,8 @@
 import { FormattedMessage } from 'react-intl';
-import { PixelRatio, StyleSheet, View, Text } from 'react-native';
-import { colors, fontFamilies, textStyles } from '#theme';
+import { PixelRatio, StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
 import PressableBackground from '#ui/PressableBackground';
+import Text from '#ui/Text';
 import RecommendedProfilesList from './RecommendedProfilesList';
 import TrendingPostsList from './TrendingPostsList';
 import TrendingProfilesList from './TrendingProfilesList';
@@ -17,7 +18,7 @@ const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
       viewer={viewer}
       ListHeaderComponent={
         <>
-          <Text style={styles.titleSection}>
+          <Text variant="button" style={styles.titleSection}>
             <FormattedMessage
               defaultMessage="Trending profiles"
               description="SearchPage - Trending profile title"
@@ -27,7 +28,7 @@ const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
             <TrendingProfilesList viewer={viewer} />
             <SeeAll />
           </View>
-          <Text style={styles.titleSection}>
+          <Text variant="button" style={styles.titleSection}>
             <FormattedMessage
               defaultMessage="Profiles you may like"
               description="SearchPage - Profile recommendation title"
@@ -37,7 +38,7 @@ const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {
             <RecommendedProfilesList viewer={viewer} />
             <SeeAll />
           </View>
-          <Text style={styles.titleSection}>
+          <Text variant="button" style={styles.titleSection}>
             <FormattedMessage
               defaultMessage="Trending posts"
               description="SearchPage - Trending posts title"
@@ -62,7 +63,7 @@ const SeeAll = () => {
         // eslint-disable-next-line no-alert
         onPress={() => alert('todo')}
       >
-        <Text style={styles.seeAllFont}>
+        <Text variant="button" style={styles.seeAllFont}>
           <FormattedMessage
             defaultMessage="See all"
             description="CoverList - See all button"
@@ -76,7 +77,6 @@ const SeeAll = () => {
 const styles = StyleSheet.create({
   flexOne: { flex: 1 },
   titleSection: {
-    ...textStyles.sectionTitle,
     marginTop: 17,
     marginBottom: 7,
     marginLeft: 10,
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   seeAllFont: {
-    ...fontFamilies.semiBold,
     fontSize: 12,
     color: colors.black,
   },

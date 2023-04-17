@@ -1,12 +1,6 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import {
   COVER_BASE_WIDTH,
@@ -18,10 +12,10 @@ import {
   DEFAULT_COVER_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/cardHelpers';
-import { textStyles } from '#theme';
 import { EditableImageWithCropMode } from '#components/medias';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
+import Text from '#ui/Text';
 import type { EditableImageSource } from '#components/medias';
 import type { CropData, ImageEditionParameters } from '#helpers/mediaHelpers';
 import type {
@@ -328,7 +322,7 @@ const CoverPreviewRenderer = (
       <View style={[styles.topPanelContent, { borderRadius }]}>
         {loadingFailed ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorMessage}>
+            <Text variant="error" style={styles.errorMessage}>
               <FormattedMessage
                 defaultMessage="Failed to load the informations of your cover"
                 description="Error message displayed when cover image failed to load"
@@ -429,7 +423,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   errorMessage: {
-    ...textStyles.error,
     textAlign: 'center',
     marginBottom: 10,
   },

@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies } from '#theme';
+import { StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
@@ -99,6 +101,7 @@ const Select = <ItemT,>({
   style,
   ...props
 }: SelectProps<ItemT>) => {
+  const appearanceStyle = useStyleSheet(computedStyles);
   const [showDropDown, setShowDropDown] = useState(false);
 
   const selectedItemIndex = data.findIndex(
@@ -119,8 +122,18 @@ const Select = <ItemT,>({
       });
     }
     const label = (selectedItem as any)[labelField ?? 'label'];
-    return <Text style={styles.inputText}>{label}</Text>;
-  }, [data, labelField, renderItem, selectedItemIndex]);
+    return (
+      <Text variant="textField" style={appearanceStyle.inputText}>
+        {label}
+      </Text>
+    );
+  }, [
+    appearanceStyle.inputText,
+    data,
+    labelField,
+    renderItem,
+    selectedItemIndex,
+  ]);
 
   const onSelectListItemSelected = useCallback(
     (item: ItemT) => {
@@ -134,19 +147,21 @@ const Select = <ItemT,>({
     <>
       <PressableNative
         onPress={() => setShowDropDown(true)}
-        style={[styles.input, isErrored && styles.error, style]}
+        style={[appearanceStyle.input, isErrored && styles.error, style]}
         accessibilityRole="combobox"
         {...props}
       >
         {inputChildren != null ? (
           inputChildren
         ) : placeHolder ? (
-          <Text style={styles.placeHolder}>{placeHolder}</Text>
+          <Text variant="textField" style={appearanceStyle.placeholder}>
+            {placeHolder}
+          </Text>
         ) : (
           <View />
         )}
         <Icon
-          icon="chevron-down-full"
+          icon="arrow_down"
           style={{
             width: 11,
             height: 43,
@@ -160,7 +175,7 @@ const Select = <ItemT,>({
         headerTitle={bottomSheetTitle}
         height={bottomSheetHeight}
         variant="modal"
-        contentContainerStyle={styles.bottomSheetContentContainer}
+        contentContainerStyle={appearanceStyle.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
       >
         <SelectList
@@ -179,34 +194,33 @@ const Select = <ItemT,>({
 };
 
 export default Select;
-
-const styles = StyleSheet.create({
+const computedStyles = createStyleSheet(appearance => ({
   input: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 43,
-    backgroundColor: colors.grey50,
-    borderColor: colors.grey50,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
     paddingLeft: 20,
     paddingRight: 20,
     borderWidth: 1,
   },
   inputText: {
-    ...fontFamilies.normal,
-    fontSize: 16,
-    color: colors.black,
+    color: appearance === 'light' ? colors.black : colors.white,
   },
-  placeHolder: {
-    ...fontFamilies.normal,
-    color: colors.grey400,
-  },
-  error: {
-    borderColor: colors.red400,
+  placeholder: {
+    color: appearance === 'light' ? colors.grey400 : colors.grey400,
   },
   bottomSheetContentContainer: {
     paddingHorizontal: 0,
     marginHorizontal: 0,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+}));
+const styles = StyleSheet.create({
+  error: {
+    borderColor: colors.red400,
   },
 });

@@ -6,18 +6,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 
 import { useRouter } from '#PlatformEnvironment';
-import { colors, fontFamilies } from '#theme';
+import { colors } from '#theme';
 import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom, VW100 } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ViewTransition from '#ui/ViewTransition';
 import type { ForgotPasswordParams } from '@azzapp/shared/WebAPI';
@@ -64,7 +65,7 @@ const ForgotPasswordScreen = ({
   };
 
   return (
-    <View style={styles.flex}>
+    <Container style={styles.flex}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
@@ -89,13 +90,13 @@ const ForgotPasswordScreen = ({
                 />
               </View>
               <View style={styles.viewText}>
-                <Text style={styles.textForgot}>
+                <Text style={styles.textForgot} variant="xlarge">
                   <FormattedMessage
                     defaultMessage="Check your emails or messages!"
                     description="ForgotPasswordScreen - Check your emails or messages!"
                   />
                 </Text>
-                <Text style={styles.textForgotExplain}>
+                <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
                     defaultMessage="We just send you a link to create a new password"
                     description="ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
@@ -120,13 +121,13 @@ const ForgotPasswordScreen = ({
                 />
               </View>
               <View style={styles.viewText}>
-                <Text style={styles.textForgot}>
+                <Text style={styles.textForgot} variant="xlarge">
                   <FormattedMessage
                     defaultMessage="Forgot your password?"
                     description="ForgotPasswordScreen - Forgot your password title"
                   />
                 </Text>
-                <Text style={styles.textForgotExplain}>
+                <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
                     defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
                     description="ForgotPasswordScreen - Forgot your password description"
@@ -177,7 +178,7 @@ const ForgotPasswordScreen = ({
         }}
       >
         <PressableNative onPress={onBack}>
-          <Text style={styles.back}>
+          <Text style={styles.back} variant="medium">
             <FormattedMessage
               defaultMessage="Back to Log In"
               description="ForgotPasswordScreen - Back to Log In bottom screen link"
@@ -185,7 +186,7 @@ const ForgotPasswordScreen = ({
           </Text>
         </PressableNative>
       </View>
-    </View>
+    </Container>
   );
 };
 
@@ -205,15 +206,12 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   textForgotExplain: {
-    ...fontFamilies.fontMedium,
     color: colors.grey400,
     textAlign: 'center',
     marginTop: 20,
   },
   textForgot: {
-    ...fontFamilies.fontMedium,
     color: colors.grey900,
-    fontSize: 20,
   },
   viewText: {
     alignItems: 'center',

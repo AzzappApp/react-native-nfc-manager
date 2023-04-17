@@ -1,14 +1,15 @@
 import uniq from 'lodash/uniq';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Text, View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { useRouter } from '#PlatformEnvironment';
-import { colors, fontFamilies } from '#theme';
+import { colors } from '#theme';
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import TemplateSelectorItem, {
   TEMPLATE_SELECTOR_ITEM_WIDTH,
 } from './CoverTemplateRenderer';
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   titleText: {
-    ...fontFamilies.semiBold,
     fontSize: 20,
     textAlign: 'center',
     paddingTop: 0,
@@ -247,7 +247,6 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   subtitleText: {
-    ...fontFamilies.fontMedium,
     fontSize: 14,
     marginLeft: 33,
     marginRight: 33,

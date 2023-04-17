@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, StyleSheet, View, Text, Platform } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { ScrollView, StyleSheet, View, Platform } from 'react-native';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import { EditableImage, useFilterList } from './medias';
 import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { EditableImageSource } from './medias';
@@ -114,6 +116,7 @@ const FilterButton = ({
   onPress,
 }: FilterButtonProps) => {
   const [width, setWidth] = useState<number | null>(null);
+  const appearanceStyle = useStyleSheet(computedStyles);
   const onLayout = (event: LayoutChangeEvent) => {
     setWidth(event.nativeEvent.layout.width);
   };
@@ -133,9 +136,10 @@ const FilterButton = ({
         style={[
           styles.filterImageContainer,
           {
-            borderColor: selected ? colors.black : 'transparent',
             borderRadius: borderRadius + BORDER_SELECTED_WIDTH,
+            borderColor: 'transparent',
           },
+          selected && appearanceStyle.selected,
         ]}
       >
         <View style={[styles.wrapperEditableImage, { borderRadius }]}>
@@ -152,11 +156,8 @@ const FilterButton = ({
         </View>
       </View>
       <Text
-        style={[
-          textStyles.button,
-          styles.filterTitle,
-          selected && styles.filterTitleSelected,
-        ]}
+        variant="small"
+        style={[styles.filterTitle, selected && styles.filterTitleSelected]}
       >
         {label}
       </Text>
@@ -165,6 +166,11 @@ const FilterButton = ({
 };
 
 const BORDER_SELECTED_WIDTH = 3.75;
+const computedStyles = createStyleSheet(appearance => ({
+  selected: {
+    borderColor: appearance === 'light' ? colors.black : colors.white,
+  },
+}));
 
 const styles = StyleSheet.create({
   wrapperEditableImage: {
@@ -182,7 +188,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 4,
-    marginBottom: 10,
   },
   filterImage: {
     flex: 1,
@@ -190,11 +195,8 @@ const styles = StyleSheet.create({
   },
   filterTitle: {
     alignSelf: 'center',
-    color: colors.grey200,
-    marginBottom: 5,
   },
   filterTitleSelected: {
     alignSelf: 'center',
-    color: colors.black,
   },
 });

@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
+import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import { useEditionParametersDisplayInfos } from './medias';
 import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { ScrollViewProps } from 'react-native';
@@ -36,16 +37,17 @@ const ImageEditionParametersList = ({
           const { label, icon } = paramsInfos[param]!;
           return (
             <View key={param} style={styles.paramsButtonContainer}>
-              <PressableNative
+              <FloatingButton
                 onPress={() => onSelectParam(param)}
-                style={styles.paramsButton}
                 accessibilityRole="button"
               >
                 <View style={styles.paramIconContainer}>
                   <Icon icon={icon} style={styles.paramIcon} />
                 </View>
-                <Text style={styles.label}>{label}</Text>
-              </PressableNative>
+              </FloatingButton>
+              <Text variant="small" style={styles.text}>
+                {label}
+              </Text>
             </View>
           );
         })}
@@ -56,6 +58,7 @@ const ImageEditionParametersList = ({
 export default ImageEditionParametersList;
 
 const styles = StyleSheet.create({
+  text: { marginTop: 5 },
   paramsButtonContainer: {
     width: 80,
     alignItems: 'center',
@@ -69,18 +72,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: colors.grey100,
-    marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   paramIcon: {
-    width: 20,
-    height: 20,
-    tintColor: colors.black,
-  },
-  label: {
-    ...textStyles.button,
-    fontSize: 12,
+    width: 26,
+    height: 26,
   },
 });
 

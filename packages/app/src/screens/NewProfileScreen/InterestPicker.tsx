@@ -3,16 +3,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import {
   StyleSheet,
   View,
-  Text,
   Modal,
   ActivityIndicator,
   Animated,
   Easing,
 } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { colors, fontFamilies } from '#theme';
+import { colors } from '#theme';
 import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import ToggleButton from '#ui/ToggleButton';
 import ContinueButton from './ContinueButton';
 import NewProfileScreenPageHeader from './NewProfileScreenPageHeader';
@@ -23,9 +23,11 @@ import type { LayoutChangeEvent, ScrollView } from 'react-native';
 type InterestPickerProps = {
   interests: InterestPicker_interests$key;
   onClose: () => void;
+  profileKind: string;
 };
 
 const InterestPicker = ({
+  profileKind,
   interests: interestsKey,
   onClose,
 }: InterestPickerProps) => {
@@ -120,8 +122,8 @@ const InterestPicker = ({
       <View
         style={[
           {
-            paddingTop: vp`${insetTop} + ${90}`,
-            marginBottom: vp`${insetBottom} + ${10}`,
+            paddingTop: vp`${insetTop} + ${50}`,
+            marginBottom: vp`${insetBottom}`,
             flex: 1,
             justifyContent: 'center',
           },
@@ -130,14 +132,21 @@ const InterestPicker = ({
         <NewProfileScreenPageHeader
           activeIndex={2}
           title={
-            <FormattedMessage
-              defaultMessage="Tell us more about your interests"
-              description="NewProfileType Interest Picker Screen - Title"
-            />
+            profileKind === 'personnal' ? (
+              <FormattedMessage
+                defaultMessage="Tell us more about you"
+                description="NewProfileType Interest Picker Screen - Title for personal profile"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Tell us more about your company"
+                description="NewProfileType Interest Picker Screen - Title"
+              />
+            )
           }
         />
 
-        <Text style={styles.subtitleText}>
+        <Text variant="medium" style={styles.subtitleText}>
           <FormattedMessage
             defaultMessage="Pick some topics you like."
             description="NewProfile About User Screen - SubTitle Pick some topics you like."
@@ -197,7 +206,7 @@ const InterestPicker = ({
             accessibilityRole="button"
             onPress={onClose}
           >
-            <Text style={styles.skip}>
+            <Text variant="medium" style={styles.skip}>
               <FormattedMessage
                 defaultMessage="Skip"
                 description="NewProfile About Screen - Skip process"
@@ -226,7 +235,6 @@ export default InterestPicker;
 
 const styles = StyleSheet.create({
   subtitleText: {
-    ...fontFamilies.fontMedium,
     fontSize: 14,
     marginLeft: 33,
     marginRight: 33,

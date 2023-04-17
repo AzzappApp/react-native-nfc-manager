@@ -2,13 +2,12 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   View,
-  Text,
   Image,
+  Keyboard,
 } from 'react-native';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -16,17 +15,20 @@ import {
   isValidEmail,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
-import { textStyles, fontFamilies, colors } from '#theme';
+import { colors } from '#theme';
 import Link from '#components/Link';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
+import Container from '#ui/Container';
 import EmailOrCountryCodeSelector from '#ui/EmailOrCountryCodeSelector';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
+import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import PhoneInput from '../components/PhoneInput';
+import type { CheckboxStatus } from '#ui/CheckBox';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
@@ -47,8 +49,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
   const [password, setPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
 
-  const [checkedTos, setCheckedTos] = useState(false);
-  const [checkedPrivacy, setCheckedPrivacy] = useState(false);
+  const [checkedTos, setCheckedTos] = useState<CheckboxStatus>('none');
+  const [checkedPrivacy, setCheckedPrivacy] = useState<CheckboxStatus>('none');
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
   const passwordRef = useRef<NativeTextInput>(null);
@@ -83,7 +85,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
     setShowPasswordError(!passWordValid);
     canSignup &&= passWordValid;
 
-    const tosValid = checkedTos && checkedPrivacy;
+    const tosValid = checkedTos === 'checked' && checkedPrivacy === 'checked';
     setShowTOSError(!tosValid);
     canSignup &&= tosValid;
 
@@ -156,30 +158,27 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         keyboardVerticalOffset={-vp`${insetBottom}`}
         style={styles.content}
       >
-        <View
-          style={styles.logoContainer}
-          onTouchStart={() => Keyboard.dismiss()}
-        >
+        <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
             source={require('#assets/logo-full_white.png')}
             resizeMode="contain"
             style={styles.logo}
           />
         </View>
-        <View style={styles.body}>
+        <Container style={styles.body}>
           <Form
             style={[styles.form, { marginBottom: vp`${insetBottom}` }]}
             onSubmit={onSubmit}
           >
             <View style={styles.header}>
-              <Text style={styles.title}>
+              <Text style={styles.title} variant="xlarge">
                 <FormattedMessage
-                  defaultMessage="Welcome"
+                  defaultMessage="Welcome!"
                   description="Signup Screen - Welcome title"
                 />
               </Text>
 
-              <Text style={styles.subTitle}>
+              <Text style={styles.subTitle} variant="medium">
                 <FormattedMessage
                   defaultMessage="Let's get started with Azzapp!"
                   description="Signup Screen - Let's get started with Azzapp! subtitle"
@@ -225,7 +224,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   isErrored={!!phoneOrEmailError}
                   onSubmitEditing={focusPassword}
                   returnKeyType="next"
-                  style={{ flex: 1 }}
+                  style={styles.flex}
                 />
               ) : (
                 <PhoneInput
@@ -249,11 +248,13 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   isErrored={!!phoneOrEmailError}
                   onSubmitEditing={focusPassword}
                   returnKeyType="next"
-                  style={{ flex: 1 }}
+                  style={styles.flex}
                 />
               )}
             </View>
-            <Text style={styles.error}>{phoneOrEmailError}</Text>
+            <Text style={styles.error} variant="error">
+              {phoneOrEmailError}
+            </Text>
 
             <SecuredTextInput
               nativeID="password"
@@ -274,7 +275,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               onSubmitEditing={onSubmit}
               isErrored={showPasswordError}
             />
-            <Text style={styles.error}>
+            <Text style={styles.error} variant="error">
               {showPasswordError && (
                 <FormattedMessage
                   defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
@@ -285,7 +286,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 
             <CheckBox
               label={
-                <Text style={styles.checkLabel}>
+                <Text style={styles.checkLabel} variant="medium">
                   <FormattedMessage
                     defaultMessage="I agree to the"
                     description="Signup Screen - 'I agree to the' Terms of service "
@@ -300,7 +301,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   />
                 </Text>
               }
-              checked={checkedTos}
+              status={checkedTos}
               onValueChange={setCheckedTos}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Tap to accept the terms of service',
@@ -310,7 +311,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
             />
             <CheckBox
               label={
-                <Text style={styles.checkLabel}>
+                <Text style={styles.checkLabel} variant="medium">
                   <FormattedMessage
                     defaultMessage="I agree to the"
                     description="Signup Screen - 'I agree to the' Privacy Policy"
@@ -325,9 +326,9 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                   />
                 </Text>
               }
-              checked={checkedPrivacy}
+              status={checkedPrivacy}
               onValueChange={setCheckedPrivacy}
-              containerStyle={styles.checkboxContainer}
+              style={styles.checkboxContainer}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Tap to accept the privacy policy',
                 description:
@@ -351,7 +352,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               />
             </Submit>
             {showTOSError && (
-              <Text style={styles.formError}>
+              <Text style={styles.formError} variant="error">
                 <FormattedMessage
                   defaultMessage="You need to accept the Terms of Service and the Privacy Policy"
                   description="Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
@@ -359,14 +360,14 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               </Text>
             )}
             <View style={styles.footer}>
-              <Text style={styles.alrSignText}>
+              <Text style={styles.alrSignText} variant="medium">
                 <FormattedMessage
                   defaultMessage="Already have an account?"
                   description="Signup Screen - Already have an account?"
                 />
               </Text>
               <Link route="SIGN_IN" replace>
-                <Text style={styles.linkLogin}>
+                <Text style={styles.linkLogin} variant="medium">
                   <FormattedMessage
                     defaultMessage="Log In"
                     description="Signup Screen - Login link bottom screen"
@@ -375,7 +376,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
               </Link>
             </View>
           </Form>
-        </View>
+        </Container>
       </KeyboardAvoidingView>
     </View>
   );
@@ -384,6 +385,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 export default SignupScreen;
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   root: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -411,7 +413,6 @@ const styles = StyleSheet.create({
   body: {
     justifyContent: 'center',
     alignItem: 'center',
-    backgroundColor: 'white',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -426,12 +427,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    ...fontFamilies.semiBold,
-    fontSize: 20,
     marginBottom: 10,
   },
   subTitle: {
-    ...textStyles.normal,
     color: colors.grey400,
   },
   phoneOrEmailContainer: {
@@ -442,14 +440,10 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   error: {
-    ...textStyles.error,
     minHeight: 15,
     marginBottom: 5,
   },
   checkLabel: {
-    ...fontFamilies.fontMedium,
-    fontSize: 14,
-    color: colors.black,
     paddingLeft: 11,
   },
   checkboxContainer: {
@@ -457,14 +451,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    height: 45,
-    backgroundColor: colors.black,
+
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
   },
   formError: {
-    ...textStyles.error,
     paddingLeft: 10,
     marginTop: 10,
   },
@@ -478,7 +469,6 @@ const styles = StyleSheet.create({
     color: colors.grey200,
   },
   linkLogin: {
-    ...fontFamilies.fontMedium,
     paddingLeft: 5,
   },
 });

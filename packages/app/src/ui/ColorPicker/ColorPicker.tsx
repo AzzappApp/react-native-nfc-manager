@@ -46,7 +46,29 @@ const ColorPicker = ({
   };
 
   // #region Adding a color
-  const previouslySelectedColor = useRef<string | null>(null);
+  const previouslySelectedColor = useRef<string | null>(selectedColor);
+
+  // #region COLOR PALETTE ACTIONS
+  const onSelectColor = (color: string) => onChangeColor(color);
+
+  const onValidateColor = useCallback(() => {
+    previouslySelectedColor.current = selectedColor;
+    onRequestClose();
+  }, [onRequestClose, selectedColor]);
+
+  // #endregion
+
+  // #region EDIT PALETTE MODE
+  const onEditPalette = useCallback(() => {
+    setState('editingPalette');
+  }, []);
+
+  const onCancelEditPalette = useCallback(() => {
+    setColorsToRemove(new Set());
+    setState('colorChooser');
+  }, []);
+  // #endregion
+  // #region EDIT PALETTE ACTION
   const onRequestNewColor = () => {
     previouslySelectedColor.current = selectedColor;
     setState('addingColor');
@@ -66,19 +88,9 @@ const ColorPicker = ({
     );
     setState('colorChooser');
   }, [colorList, onUpdateColorList, selectedColor]);
-  // #endregion
 
   // #region Editing palette
   const [colorsToRemove, setColorsToRemove] = useState(new Set<string>());
-
-  const onEditPalette = useCallback(() => {
-    setState('editingPalette');
-  }, []);
-
-  const onCancelEditPalette = useCallback(() => {
-    setColorsToRemove(new Set());
-    setState('colorChooser');
-  }, []);
 
   const onRemoveColor = useCallback((color: string) => {
     setColorsToRemove(colorsToRemove => {
@@ -97,6 +109,7 @@ const ColorPicker = ({
 
   const intl = useIntl();
   const { bottom } = useSafeAreaInsets();
+
   return (
     <BottomSheetModal
       height={height}
@@ -138,27 +151,37 @@ const ColorPicker = ({
         />
       }
       headerRightButton={
-        state === 'colorChooser' ? undefined : (
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Save',
-              description: 'ColorPicker component Save button label',
-            })}
-            onPress={
-              state === 'addingColor' ? onSaveNewColor : onSavePaletteEdition
-            }
-            variant="primary"
-          />
-        )
+        <Button
+          label={
+            state === 'colorChooser'
+              ? intl.formatMessage({
+                  defaultMessage: 'Done',
+                  description: 'ColorPicker component Done button label',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Add',
+                  description: 'ColorPicker component Add Color button label',
+                })
+          }
+          onPress={
+            state === 'colorChooser'
+              ? onValidateColor
+              : state === 'addingColor'
+              ? onSaveNewColor
+              : onSavePaletteEdition
+          }
+          variant="primary"
+        />
       }
       disableGestureInteraction={state !== 'colorChooser'}
+      showGestureIndicator={false}
       onRequestClose={onClose}
     >
       {state !== 'addingColor' ? (
         <ColorPalette
           selectedColor={selectedColor}
           colorList={colorList?.filter(c => !colorsToRemove.has(c)) ?? []}
-          onSelectColor={onChangeColor}
+          onSelectColor={onSelectColor}
           onRequestNewColor={onRequestNewColor}
           onRemoveColor={onRemoveColor}
           editMode={state === 'editingPalette'}

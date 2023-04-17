@@ -2,9 +2,10 @@
 import i18nCountries from 'i18n-iso-countries';
 import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import { useCallback, useMemo } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies } from '#theme';
+import { Image, StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
+import Text from '#ui/Text';
 import SelectList from './../SelectList';
 import COUNTRY_FLAG from './CountryFlag';
 import type { SelectListItemInfo, SelectListProps } from './../SelectList';
@@ -96,10 +97,8 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   countryName: {
-    ...fontFamilies.semiBold,
     flex: 1,
     marginLeft: 10,
-    fontSize: 14,
   },
   countryCallingCode: {
     marginLeft: 10,
@@ -116,8 +115,13 @@ const renderItem = ({
         source={{ uri: COUNTRY_FLAG[code] }}
         style={{ width: 22, height: 16, borderRadius: 2 }}
       />
-      <Text style={styles.countryName}>{name}</Text>
-      <Text style={styles.countryCallingCode}>{`+${callingCode}`}</Text>
+      <Text variant="button" style={styles.countryName}>
+        {name}
+      </Text>
+      <Text
+        variant="button"
+        style={styles.countryCallingCode}
+      >{`+${callingCode}`}</Text>
     </View>
   );
 };

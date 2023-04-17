@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import type { Icons } from './Icon';
@@ -20,49 +20,54 @@ export type IconButtonProps = {
 const IconButton = ({
   onPress,
   icon,
-  iconSize = 18,
+  iconSize = 24,
   size = 50,
   style,
   iconStyle,
   nativeID,
   accessibilityLabel,
   accessibilityHint,
-}: IconButtonProps) => (
-  <PressableNative
-    accessibilityRole="button"
-    onPress={onPress}
-    style={[
-      { minWidth: size, height: size, borderRadius: size / 2 },
-      styles.button,
-      style,
-    ]}
-    nativeID={nativeID}
-    accessibilityLabel={accessibilityLabel}
-    accessibilityHint={accessibilityHint}
-  >
-    <Icon
-      icon={icon}
+}: IconButtonProps) => {
+  const styles = useStyleSheet(computedStyle);
+  return (
+    <PressableNative
+      accessibilityRole="button"
+      onPress={onPress}
       style={[
-        styles.image,
-        iconStyle,
-        {
-          width: iconSize,
-          height: iconSize,
-        },
+        { minWidth: size, height: size, borderRadius: size / 2 },
+        styles.button,
+        style,
       ]}
-    />
-  </PressableNative>
-);
+      nativeID={nativeID}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+    >
+      <Icon
+        icon={icon}
+        style={[
+          styles.image,
+          iconStyle,
+          {
+            width: iconSize,
+            height: iconSize,
+          },
+        ]}
+      />
+    </PressableNative>
+  );
+};
 
 export default IconButton;
 
-const styles = StyleSheet.create({
+const computedStyle = createStyleSheet(appearance => ({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
+    borderWidth: 1,
+    borderRadius: 25,
   },
   image: {
-    tintColor: colors.dark,
     resizeMode: 'contain',
   },
-});
+}));

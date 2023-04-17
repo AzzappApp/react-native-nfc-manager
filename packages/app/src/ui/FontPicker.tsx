@@ -1,7 +1,10 @@
 import { memo, useCallback } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import { useAvailableFonts } from '#helpers/mediaHelpers';
+import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
+import Button from './Button';
 import SelectList from './SelectList';
 
 const FontPicker = ({
@@ -24,13 +27,23 @@ const FontPicker = ({
   const renderItem = useCallback(({ item }: FontItemProps) => {
     return <MemoFontItem item={item} />;
   }, []);
-
+  const intl = useIntl();
   return (
     <BottomSheetModal
       visible={visible}
       onRequestClose={onRequestClose}
       height={height}
       headerTitle={title}
+      headerRightButton={
+        <Button
+          label={intl.formatMessage({
+            defaultMessage: 'Done',
+            description: 'FontPIcker component Done button label',
+          })}
+          onPress={onRequestClose}
+          variant="primary"
+        />
+      }
     >
       <SelectList
         data={fonts}
@@ -70,7 +83,6 @@ export default FontPicker;
 const styles = StyleSheet.create({
   text: {
     fontSize: 20,
-
     textAlign: 'center',
     alignSelf: 'center',
   },
@@ -79,6 +91,5 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'red',
   },
 });

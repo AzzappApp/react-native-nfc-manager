@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { useRouter } from '#PlatformEnvironment';
-import Header from '#components/Header';
 import PostList from '#components/PostList';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { ProfilePostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_posts.graphql';
 import type { ProfilePostsScreenFragment_profile$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_profile.graphql';
@@ -53,6 +54,7 @@ const ProfilePostsScreen = ({
       profileKey as ProfilePostsScreenFragment_posts$key,
     );
 
+  const intl = useIntl();
   const [refreshing, setRefreshing] = useState(false);
 
   const onEndReached = useCallback(() => {
@@ -89,8 +91,21 @@ const ProfilePostsScreen = ({
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
-        title={`${profile.userName} posts`}
-        leftButton={<IconButton icon="chevron" onPress={onClose} />}
+        middleElement={intl.formatMessage(
+          {
+            defaultMessage: '{firstName} posts',
+            description: 'ProfilePpostScreen title Header',
+          },
+          { firstName: profile.userName },
+        )}
+        leftElement={
+          <IconButton
+            icon="arrow_down"
+            onPress={onClose}
+            iconSize={26}
+            size={47}
+          />
+        }
       />
       <PostList
         style={{ flex: 1 }}

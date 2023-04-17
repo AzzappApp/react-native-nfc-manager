@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, TextInput, View, Text } from 'react-native';
+import { useIntl } from 'react-intl';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { fontFamilies, colors } from '#theme';
-
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Button from './Button';
+import Container from './Container';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import ViewTransition from './ViewTransition';
@@ -84,16 +86,20 @@ const SearchBar = ({
     textInputRef.current?.focus();
   };
 
+  const appearanceStyle = useStyleSheet(computedStyle);
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
       width: containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
-      borderColor: colors.grey900,
+      ...appearanceStyle.focused,
     });
     onFocus?.(e);
   };
 
   const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setFocusedStyle({ width: containerWidth, borderColor: colors.grey50 });
+    setFocusedStyle({
+      width: containerWidth,
+      ...appearanceStyle.focused,
+    });
     if (onBlur) {
       onBlur(e);
     }
@@ -102,7 +108,7 @@ const SearchBar = ({
   const intl = useIntl();
 
   return (
-    <View style={containerStyle}>
+    <Container style={containerStyle}>
       <View
         testID="azzapp__SearchBar__container-view"
         style={styles.container}
@@ -114,7 +120,7 @@ const SearchBar = ({
               <ViewTransition
                 testID="azzapp__SearchBar__view-inputcontainer"
                 style={[
-                  styles.innerSearchBarView,
+                  appearanceStyle.innerSearchBarView,
                   { width: containerWidth },
                   focusedStyle,
                 ]}
@@ -122,7 +128,7 @@ const SearchBar = ({
                 transitions={['width', 'borderColor']}
                 onTouchStart={focus}
               >
-                <Icon icon="lens" style={styles.lensIcon} />
+                <Icon icon="search" style={styles.lensIcon} />
                 <TextInput
                   testID="azzapp__searchbar__textInput"
                   accessibilityLabel={intl.formatMessage({
@@ -133,10 +139,10 @@ const SearchBar = ({
                   ref={textInputRef}
                   onFocus={onInputFocus}
                   onBlur={onInputBlur}
-                  style={[styles.input]}
+                  style={[styles.input, appearanceStyle.input]}
                   value={searchValue}
                   onChangeText={onSetValueText}
-                  selectionColor={colors.red}
+                  selectionColor={colors.primary400}
                   returnKeyType="search"
                   onSubmitEditing={onSubmitEditingLocal}
                 />
@@ -151,12 +157,11 @@ const SearchBar = ({
                     testID="azzapp__SearchBar__clear-button"
                     style={styles.cancelPressable}
                   >
-                    <Icon icon="cancel" style={styles.lensIcon} />
+                    <Icon icon="search" style={styles.lensIcon} />
                   </PressableNative>
                 )}
               </ViewTransition>
-
-              <PressableNative
+              <Button
                 accessibilityRole="button"
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Tap to cancel your search',
@@ -166,24 +171,39 @@ const SearchBar = ({
                 style={[styles.cancelButton]}
                 onLayout={onButtonLayout}
                 onPress={onPressCancel}
-              >
-                <Text numberOfLines={1}>
-                  <FormattedMessage
-                    defaultMessage="Cancel"
-                    description="SearchBar - Cancel button"
-                  />
-                </Text>
-              </PressableNative>
+                label={intl.formatMessage({
+                  defaultMessage: 'Cancel',
+                  description: 'SearchBar - Cancel button',
+                })}
+              />
             </>
           )}
         </View>
       </View>
-    </View>
+    </Container>
   );
 };
 
 export default SearchBar;
 const MARGIN_LEFT_BUTTON = 10;
+const computedStyle = createStyleSheet(appearance => ({
+  innerSearchBarView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    borderRadius: 12,
+    fontSize: 16,
+    color: appearance === 'light' ? colors.black : colors.grey400,
+    borderWidth: 1,
+  },
+  focused: {
+    borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
+  },
+  input: {
+    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
+  },
+}));
 const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
@@ -197,16 +217,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%', //important for animation,to be based on the maxWith of the parent
   },
-  innerSearchBarView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.grey50,
-    borderColor: colors.grey50,
-    borderRadius: 12,
-    fontSize: 16,
-    color: colors.black,
-    borderWidth: 1,
-  },
+
   clearIcon: {
     width: 15,
     height: 15,
@@ -214,8 +225,6 @@ const styles = StyleSheet.create({
     marginRight: 11,
   },
   lensIcon: {
-    width: 20,
-    height: 20,
     marginLeft: 16,
     marginRight: 11,
   },
@@ -229,7 +238,6 @@ const styles = StyleSheet.create({
     padding: 1,
   },
   input: {
-    ...fontFamilies.normal,
     flex: 1,
     height: 46,
   },

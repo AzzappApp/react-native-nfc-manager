@@ -1,6 +1,11 @@
-import { forwardRef, useMemo } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { forwardRef } from 'react';
+import { Platform, Pressable, View, useColorScheme } from 'react-native';
+import { colors } from '#theme';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
+import Text from '#ui/Text';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef } from 'react';
@@ -8,7 +13,7 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
-  variant?: 'primary' | 'secondary';
+  variant?: 'cancel' | 'primary' | 'secondary';
   style?: StyleProp<ViewStyle>;
 };
 
@@ -16,37 +21,41 @@ const Button = (
   { label, variant = 'primary', style, ...props }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
 ) => {
-  const variantStyles = stylesVariant[variant];
+  const colorScheme = useColorScheme();
+
+  const highlightColor =
+    variant === 'primary'
+      ? colorScheme === 'light'
+        ? colors.grey900
+        : colors.grey100
+      : undefined;
+  const variantStyles = useVariantStyleSheet(computedStyles, variant);
   const buttonProps = {
-    testID: 'azzapp_Button_pressable-wrapper',
     accessibilityRole: 'button',
-    children: <Text style={[styles.label, variantStyles.label]}>{label}</Text>,
+    children: (
+      <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+        {label}
+      </Text>
+    ),
     accessibilityState: { disabled: props.disabled ?? false },
     ref: forwardedRef,
     ...props,
   } as const;
 
-  const backgroundColor = useMemo(() => {
-    if (props.disabled) {
-      return colors.grey200;
-    }
-    const flatStyles = StyleSheet.flatten(style);
-    if ((flatStyles as ViewStyle)?.backgroundColor) {
-      return (flatStyles as ViewStyle).backgroundColor;
-    }
-    return variant === 'primary' ? colors.black : 'transparent';
-  }, [props.disabled, style, variant]);
-
   if (Platform.OS === 'android') {
     return (
-      <View style={[styles.androidContainer, style, { backgroundColor }]}>
+      <View style={[variantStyles.androidContainer, style]}>
         <Pressable
           {...buttonProps}
-          style={[styles.root, variantStyles.root, { backgroundColor }]}
+          style={[
+            variantStyles.root,
+            style,
+            props.disabled && variantStyles.disabled,
+          ]}
           android_ripple={{
             borderless: false,
             foreground: true,
-            color: colors.grey400,
+            color: highlightColor,
           }}
         />
       </View>
@@ -54,15 +63,23 @@ const Button = (
   } else if (variant === 'primary') {
     return (
       <PressableBackground
-        highlightColor={colors.grey900}
-        style={[styles.root, variantStyles.root, style, { backgroundColor }]}
+        highlightColor={highlightColor}
+        style={[
+          variantStyles.root,
+          style,
+          props.disabled && variantStyles.disabled,
+        ]}
         {...buttonProps}
       />
     );
   }
   return (
     <PressableOpacity
-      style={[styles.root, variantStyles.root, style, { backgroundColor }]}
+      style={[
+        variantStyles.root,
+        style,
+        props.disabled && variantStyles.disabled,
+      ]}
       {...buttonProps}
     />
   );
@@ -70,40 +87,61 @@ const Button = (
 
 export default forwardRef(Button);
 
-const styles = StyleSheet.create({
-  root: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-  },
-  label: {
-    ...textStyles.button,
-  },
-  androidContainer: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-});
-
-const stylesVariant = {
-  primary: StyleSheet.create({
+const computedStyles = createVariantsStyleSheet(appearance => ({
+  default: {
     root: {
+      height: 47,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 12,
       paddingHorizontal: 20,
-      height: 46,
     },
     label: {
-      color: '#fff',
+      flexWrap: 'nowrap',
     },
-  }),
-  secondary: StyleSheet.create({
+    androidContainer: {
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+  },
+  primary: {
     root: {
-      borderWidth: 1,
-      borderColor: colors.black,
-      paddingHorizontal: 18,
-      height: 46,
+      backgroundColor: appearance === 'light' ? colors.black : colors.white,
     },
     label: {
-      color: colors.black,
+      color: appearance === 'light' ? colors.white : colors.black,
     },
-  }),
-} as const;
+    disabled: {
+      backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey900,
+    },
+  },
+  secondary: {
+    root: {
+      backgroundColor: 'transparent',
+      borderColor: appearance === 'light' ? colors.black : colors.white,
+      borderWidth: 1,
+    },
+    label: {
+      color: appearance === 'light' ? colors.black : colors.white,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey200 : colors.grey900,
+      borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
+      backgroundColor: 'transparent',
+    },
+  },
+  cancel: {
+    root: {
+      backgroundColor: 'transparent',
+      borderColor: appearance === 'light' ? colors.grey200 : colors.grey400,
+      borderWidth: 1,
+    },
+    label: {
+      color: appearance === 'light' ? colors.grey200 : colors.grey400,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey100 : colors.grey400,
+      borderColor: appearance === 'light' ? colors.grey50 : colors.grey400,
+    },
+  },
+}));

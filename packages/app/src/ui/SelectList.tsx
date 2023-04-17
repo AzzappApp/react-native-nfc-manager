@@ -1,7 +1,10 @@
 import { memo, useCallback } from 'react';
-import { FlatList, StyleSheet, Text } from 'react-native';
-import { colors, fontFamilies } from '#theme';
-import PressableBackground from './PressableBackground';
+import { FlatList } from 'react-native';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Text from '#ui/Text';
+
+import PressableNative from './PressableNative';
 import type {
   StyleProp,
   ViewStyle,
@@ -138,21 +141,24 @@ function SelectListItem<ItemT>({
     onItemSelected(item);
   }, [item, onItemSelected]);
 
+  const appearanceStyle = useStyleSheet(computedStyle);
+
   return (
-    <PressableBackground
+    <PressableNative
       style={[
-        itemContainerStyle ?? styles.itemContainer,
+        itemContainerStyle,
+        appearanceStyle.itemContainer,
         isSelected &&
-          (selectedItemContainerStyle ?? styles.selectedItemContainer),
+          (selectedItemContainerStyle ?? appearanceStyle.selectedItemContainer),
       ]}
       onPress={onPress}
     >
       {renderItem?.({ item, isSelected, index }) ?? (
-        <Text style={styles.defaultItemRenderer}>
+        <Text variant="button" style={appearanceStyle.defaultItemRenderer}>
           {(item as any)?.[labelField]}
         </Text>
       )}
-    </PressableBackground>
+    </PressableNative>
   );
 }
 
@@ -160,18 +166,16 @@ const MemoSelectListItem = memo(
   SelectListItem,
 ) as unknown as typeof SelectListItem;
 
-const styles = StyleSheet.create({
-  itemContainer: {
-    backgroundColor: 'white',
-  },
-  selectedItemContainer: {
-    backgroundColor: colors.grey50,
-  },
+const computedStyle = createStyleSheet(appearance => ({
   defaultItemRenderer: {
-    ...fontFamilies.semiBold,
-    fontSize: 16,
     paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
   },
-});
+  selectedItemContainer: {
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+  },
+  itemContainer: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+}));

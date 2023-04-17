@@ -103,10 +103,6 @@
     "defaultMessage": "{title} - background image",
     "description": "CoverRenderer - Accessibility cover image"
   },
-  "6o9Tli": {
-    "defaultMessage": "Choose a domain of activity",
-    "description": "ProfileForm - Activity BottomSheet - Title"
-  },
   "74j5Wg": {
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
@@ -126,6 +122,10 @@
   "7j6ah2": {
     "defaultMessage": "Select this cover template template for your profile",
     "description": "TemplateSelectorTemplateItem accessibilityHint template item"
+  },
+  "7rGmW+": {
+    "defaultMessage": "Tell us more about your company",
+    "description": "NewProfileType Interest Picker Screen - Title"
   },
   "87390w": {
     "defaultMessage": "Let's get started with Azzapp!",
@@ -147,6 +147,10 @@
     "defaultMessage": "Torch",
     "description": "camera torch button accessibility label"
   },
+  "9gLFh9": {
+    "defaultMessage": "Done",
+    "description": "FontPIcker component Done button label"
+  },
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
@@ -154,10 +158,6 @@
   "AV7xEU": {
     "defaultMessage": "Font size",
     "description": "Label of the font size slider in cover edition"
-  },
-  "AfkzY0": {
-    "defaultMessage": "Welcome",
-    "description": "Signup Screen - Welcome title"
   },
   "AsCp0n": {
     "defaultMessage": "Validate",
@@ -267,6 +267,14 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Terms of service "
   },
+  "GlD8Yj": {
+    "defaultMessage": "Add",
+    "description": "ColorPicker component Add Color button label"
+  },
+  "GsE7SA": {
+    "defaultMessage": "Welcome!",
+    "description": "Signup Screen - Welcome title"
+  },
   "H5dcbM": {
     "defaultMessage": "Tap to start recording",
     "description": "Accessibility label for the camera shutter button"
@@ -278,6 +286,10 @@
   "HQ/owO": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
+  },
+  "HZP7u9": {
+    "defaultMessage": "Back.",
+    "description": "CoverEditionScreen bottom menu label for Background tab"
   },
   "IBgr9f": {
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
@@ -315,13 +327,25 @@
     "defaultMessage": "Email address",
     "description": "The email address option in the country selector"
   },
+  "LnYT8w": {
+    "defaultMessage": "Models",
+    "description": "CoverEditionScreen bottom menu label for models tab"
+  },
   "M32J+R": {
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
   },
+  "MYq2d8": {
+    "defaultMessage": "Select an activity",
+    "description": "ProfileForm - Activity BottomSheet - Title"
+  },
   "Mlk+KE": {
     "defaultMessage": "Activity",
     "description": "NewProfile Name Company Screen - Label Activity textinput"
+  },
+  "NJSilL": {
+    "defaultMessage": "Text",
+    "description": "CoverEditionScreen bottom menu label for Text tab"
   },
   "NTkvNY": {
     "defaultMessage": "First name",
@@ -351,13 +375,13 @@
     "defaultMessage": "Documentary",
     "description": "Documentary photo filter name"
   },
-  "Q86fnn": {
-    "defaultMessage": "Choose a domain of activity",
-    "description": "NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
-  },
   "QBLy42": {
     "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
     "description": "The accessibility hint for the country selector"
+  },
+  "QjKfB6": {
+    "defaultMessage": "Fore.",
+    "description": "CoverEditionScreen bottom menu label for Foreground tab"
   },
   "RTqCXo": {
     "defaultMessage": "Tap to accept the terms of service",
@@ -439,6 +463,10 @@
     "defaultMessage": "Saturation",
     "description": "Saturation image edition parameters name"
   },
+  "Vz5f5R": {
+    "defaultMessage": "Edit your profile",
+    "description": "Profile screen edit header"
+  },
   "WBD9Bx": {
     "defaultMessage": "Next",
     "description": "Button label of screens asking for camera/micro permissions"
@@ -455,8 +483,8 @@
     "defaultMessage": "Position",
     "description": "Label of the position button in cover edition"
   },
-  "Xaq6Uu": {
-    "defaultMessage": "FONT SIZE {size}",
+  "XbIJSS": {
+    "defaultMessage": "Font Size - {size}",
     "description": "Font size message in cover edition"
   },
   "YJRxy5": {
@@ -470,6 +498,14 @@
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
+  },
+  "ZZvty9": {
+    "defaultMessage": "Done",
+    "description": "ColorPicker component Done button label"
+  },
+  "ZjYrh6": {
+    "defaultMessage": "Discover",
+    "description": "Post screen header title"
   },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
@@ -498,6 +534,10 @@
   "bxkdJ/": {
     "defaultMessage": "Don't have an account?",
     "description": "SigninScreen - Don't have an account"
+  },
+  "c1kXnW": {
+    "defaultMessage": "Select an activity",
+    "description": "NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
   },
   "calqIB": {
     "defaultMessage": "Connect with phone number",
@@ -643,9 +683,17 @@
     "defaultMessage": "Please enter a valid email address",
     "description": "Signup Screen - Error message for invalid email address"
   },
+  "kWx3ez": {
+    "defaultMessage": "Tell us more about you",
+    "description": "NewProfileType Interest Picker Screen - Title for personal profile"
+  },
   "kjYrL+": {
     "defaultMessage": "Color #1",
     "description": "Label of the background pattern color tab in cover edition"
+  },
+  "kouZDU": {
+    "defaultMessage": "{firstName} posts",
+    "description": "ProfilePpostScreen title Header"
   },
   "kuaFQc": {
     "defaultMessage": "Orientation",
@@ -731,10 +779,6 @@
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
-  "ny70pU": {
-    "defaultMessage": "logout",
-    "description": "logout link"
-  },
   "oAzffi": {
     "defaultMessage": "Adjust",
     "description": "Title of the adjust section in Image edition wizzard"
@@ -746,6 +790,10 @@
   "p042gg": {
     "defaultMessage": "Profiles you may like",
     "description": "SearchPage - Profile recommendation title"
+  },
+  "p7k7BX": {
+    "defaultMessage": "Image",
+    "description": "CoverEditionScreen bottom menu label for Image tab"
   },
   "pBqrA+": {
     "defaultMessage": "Already have an account?",
@@ -798,10 +846,6 @@
   "r3LnPL": {
     "defaultMessage": "Filter",
     "description": "Accessibility label of the Filter tab in image editing view"
-  },
-  "rAaYKi": {
-    "defaultMessage": "Save",
-    "description": "ColorPicker component Save button label"
   },
   "rHj8v4": {
     "defaultMessage": "Password",
@@ -919,6 +963,10 @@
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
   },
+  "xNII0A": {
+    "defaultMessage": "Logout",
+    "description": "logout link"
+  },
   "xaWatU": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in cover edition screen"
@@ -958,10 +1006,6 @@
   "zXfzb7": {
     "defaultMessage": "or",
     "description": "OnBoarding Cover Component - Or text"
-  },
-  "zx+zCh": {
-    "defaultMessage": "Tell us more about your interests",
-    "description": "NewProfileType Interest Picker Screen - Title"
   },
   "zzoOTT": {
     "defaultMessage": "Enter your name",

@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { fontFamilies, textStyles } from '#theme';
+import Text from '#ui/Text';
 import type { StyleProp, ViewProps, TextStyle } from 'react-native';
 
 export type LabelProps = ViewProps & {
@@ -44,13 +44,14 @@ const Label = ({
 }: LabelProps) => {
   return (
     <View {...props}>
-      <Text nativeID={labelID} style={styles.label}>
+      <Text nativeID={labelID} style={styles.label} variant="button">
         {label}
       </Text>
       {children}
       {showError && (
         <Text
-          style={[styles.error, errorStyle]}
+          variant="error"
+          style={[errorStyle]}
           numberOfLines={2}
           allowFontScaling
         >
@@ -63,13 +64,7 @@ const Label = ({
 
 const styles = StyleSheet.create({
   label: {
-    ...fontFamilies.semiBold,
     paddingBottom: 5,
-    fontSize: 14,
-  },
-  error: {
-    ...textStyles.error,
-    minHeight: 15,
   },
 });
 

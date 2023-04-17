@@ -68,7 +68,7 @@ const PostGridContainer = ({
       <View
         style={[{ height: contentHeight, width: '100%' }, postsContainerStyle]}
       >
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#FFF' }]} />
+        <View style={StyleSheet.absoluteFill} />
         {children}
       </View>
       {ListFooterComponent}

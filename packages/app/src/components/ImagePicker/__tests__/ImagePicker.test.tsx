@@ -234,7 +234,7 @@ describe('ImagePicker', () => {
 
     test('Should display a toolbar that allows to switch between allowed picker mode', async () => {
       await renderImagePicker();
-      expect(screen.queryByRole('tablist')).toBeTruthy();
+      expect(screen.queryAllByRole('tablist')).toBeTruthy();
       expect(screen.queryByLabelText('Photos gallery')).toBeTruthy();
       expect(screen.queryByLabelText('Take a picture')).toBeTruthy();
       expect(screen.queryByLabelText('Take a video')).toBeTruthy();

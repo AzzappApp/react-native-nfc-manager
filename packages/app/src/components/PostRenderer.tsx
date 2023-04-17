@@ -1,8 +1,9 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors, fontFamilies } from '#theme';
+import { colors } from '#theme';
 import Icon from '#ui/Icon';
+import Text from '#ui/Text';
 import AuthorCartouche from './AuthorCartouche';
 import Link from './Link';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
@@ -174,7 +175,8 @@ const PostRenderer = (
                 aspectRatio={aspectRatio}
                 width={width}
               />
-              <Icon icon="play" style={styles.playIcon} />
+              {/* Play iconicon */}
+              <Icon icon="missing" style={styles.playIcon} />
             </>
           ) : (
             <MediaVideoRenderer
@@ -206,7 +208,7 @@ const PostRenderer = (
           <AuthorCartouche
             author={author}
             style={styles.smallAuthorCartouche}
-            small
+            variant="small"
           />
         )}
       </View>
@@ -228,7 +230,6 @@ const styles = StyleSheet.create({
     end: 10,
     height: 24,
     width: 24,
-    tintColor: '#FFF',
   },
   mediaContainerSmall: {
     borderRadius: 16,
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
     left: 5,
   },
   text: {
-    ...fontFamilies.semiBold,
     marginTop: 10,
     fontSize: 12,
     paddingHorizontal: 10,

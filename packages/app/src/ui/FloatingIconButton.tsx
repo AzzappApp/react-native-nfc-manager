@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
-import { StyleSheet } from 'react-native';
-import { colors } from '#theme';
+
 import Icon from '#ui/Icon';
 import FloatingButton from './FloatingButton';
 import type { Icons } from '#ui/Icon';
@@ -14,20 +13,13 @@ export type FloatingIconButtonProps = Omit<FloatingButtonProps, 'children'> & {
 };
 
 const FloatingIconButton = (
-  {
-    icon,
-    iconSize = 18,
-    variant = 'default',
-    ...props
-  }: FloatingIconButtonProps,
+  { icon, iconSize = 18, ...props }: FloatingIconButtonProps,
   ref: ForwardedRef<View>,
 ) => (
-  <FloatingButton ref={ref} variant={variant} {...props}>
+  <FloatingButton ref={ref} {...props}>
     <Icon
       icon={icon}
       style={[
-        styles.image,
-        variant !== 'default' && styles.imageLight,
         {
           width: iconSize,
           height: iconSize,
@@ -38,13 +30,3 @@ const FloatingIconButton = (
 );
 
 export default forwardRef(FloatingIconButton);
-
-const styles = StyleSheet.create({
-  image: {
-    tintColor: '#FFF',
-    resizeMode: 'contain',
-  },
-  imageLight: {
-    tintColor: colors.black,
-  },
-});

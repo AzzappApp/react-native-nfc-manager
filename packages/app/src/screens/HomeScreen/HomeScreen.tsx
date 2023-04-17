@@ -1,8 +1,19 @@
-import { StyleSheet, Image, Platform, View } from 'react-native';
+import { useCallback } from 'react';
+import {
+  StyleSheet,
+  Image,
+  Platform,
+  View,
+  useColorScheme,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import { HEADER_HEIGHT } from '#components/Header';
-import useViewportSize, { insetTop, VW100 } from '#hooks/useViewportSize';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useViewportSize, { insetTop } from '#hooks/useViewportSize';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
+import IconButton from '#ui/IconButton';
 import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
@@ -16,6 +27,10 @@ const HomeScreen = ({
   viewer: viewerRef,
   hasFocus = true,
 }: HomeScreenProps) => {
+  const vp = useViewportSize();
+  const colorScheme = useColorScheme();
+  const router = useRouter();
+  const appearanceStyle = useStyleSheet(computedStyle);
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
@@ -29,36 +44,67 @@ const HomeScreen = ({
     viewerRef,
   );
 
-  const vp = useViewportSize();
+  const goToSettings = useCallback(() => {
+    router.push({ route: 'SETTINGS' });
+  }, [router]);
 
   return (
     <FollowedProfilesPostsList
       viewer={viewer}
       canPlay={hasFocus}
       ListHeaderComponent={
-        <View style={{ marginTop: vp`${insetTop}` }}>
-          <View style={styles.header}>
-            <Image
-              source={require('#assets/logo-full.png')}
-              style={styles.logo}
-            />
-          </View>
+        <Container style={{ marginTop: vp`${insetTop}` }}>
+          <Header
+            leftElement={
+              <Image
+                source={
+                  colorScheme === 'dark'
+                    ? require('#assets/logo-full_white.png')
+                    : require('#assets/logo-full_dark.png')
+                }
+                style={styles.logo}
+              />
+            }
+            rightElement={
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <IconButton
+                  icon="notification"
+                  iconSize={30}
+                  size={45}
+                  style={{ borderWidth: 0, justifyContent: 'flex-end' }}
+                  onPress={goToSettings}
+                />
+                <IconButton
+                  icon="account"
+                  onPress={goToSettings}
+                  iconSize={30}
+                  size={45}
+                  style={{
+                    borderWidth: 0,
+                    justifyContent: 'flex-end',
+                    marginBottom: 3,
+                  }}
+                />
+              </View>
+            }
+            style={{ marginBottom: 8 }}
+          />
           <FollowedProfilesList
             viewer={viewer}
             style={styles.followedProfilesList}
           />
-        </View>
+        </Container>
       }
       stickyHeaderIndices={[0]}
-      style={[
-        styles.followedProfilesPosts,
-        Platform.OS !== 'web' && {
-          borderBottomLeftRadius: vp`${VW100} * ${0.16}`,
-          borderBottomRightRadius: vp`${VW100} * ${0.16}`,
-        },
-      ]}
+      style={[styles.followedProfilesPosts]}
       postsContainerStyle={[
-        styles.followedProfilesPostsListPostsContainer,
+        appearanceStyle.followedProfilesPostsListPostsContainer,
         styles.followedProfilesPostsListPostsContainerShadow,
       ]}
     />
@@ -67,19 +113,28 @@ const HomeScreen = ({
 
 export default HomeScreen;
 
+const computedStyle = createStyleSheet(appearance => ({
+  followedProfilesPostsListPostsContainer: {
+    paddingVertical: 8,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    zIndex: 20,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+  },
+}));
+
 const styles = StyleSheet.create({
   signupButton: { width: 150 },
   followedProfilesPosts: {
     flex: 1,
   },
   header: {
-    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
-    height: HEADER_HEIGHT,
+    height: 47,
   },
   logo: {
-    height: 24,
+    height: 28,
   },
   followedProfilesList: {
     height: 200,
@@ -92,16 +147,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  followedProfilesPostsListPostsContainer: {
-    paddingVertical: 8,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: '#FFF',
-    zIndex: 20,
-  },
+
   followedProfilesPostsListPostsContainerShadow: Platform.select({
     default: {
-      shadowColor: colors.dark,
+      shadowColor: colors.black,
       shadowOpacity: 0.4,
       shadowOffset: { width: 0, height: 10 },
       shadowRadius: 20,

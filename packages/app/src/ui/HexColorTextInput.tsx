@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import {
-  StyleSheet,
-  Text,
-  TextInput as NativeTextInput,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInput as NativeTextInput, View } from 'react-native';
 import { isValidHex } from '@azzapp/shared/stringHelpers';
-import { colors, fontFamilies } from '#theme';
+import { colors, textStyles } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Text from '#ui/Text';
 import type {
   TextInputProps as NativeTextInputProps,
   StyleProp,
@@ -75,6 +72,8 @@ const HexColorTextInput = ({
     if (isValidHex(newColor)) props.onChangeColor(newColor);
   };
 
+  const appearanceStyle = useStyleSheet(computedStyle);
+
   return (
     <View onTouchStart={focus} style={[styles.container]}>
       <Text style={styles.text}>
@@ -86,7 +85,11 @@ const HexColorTextInput = ({
 
       <View
         pointerEvents="box-none"
-        style={[styles.inputViewStyle, focusedStyle]}
+        style={[
+          styles.inputViewStyle,
+          appearanceStyle.inputViewStyle,
+          focusedStyle,
+        ]}
       >
         <View
           style={[styles.colorPreview, { backgroundColor: value }]}
@@ -105,12 +108,23 @@ const HexColorTextInput = ({
           ref={textInputRef}
           onFocus={onInputFocus}
           onBlur={onInputBlur}
-          style={[styles.input, style]}
+          style={[styles.input, appearanceStyle.input, style]}
         />
       </View>
     </View>
   );
 };
+
+const computedStyle = createStyleSheet(appearance => ({
+  inputViewStyle: {
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    borderWidth: 1,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
+  input: {
+    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
+  },
+}));
 
 const styles = StyleSheet.create({
   colorPreview: {
@@ -121,9 +135,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   text: {
-    ...fontFamilies.semiBold,
     paddingBottom: 5,
-    fontSize: 14,
   },
   container: {
     marginRight: 10,
@@ -134,20 +146,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.grey50,
     borderColor: colors.grey50,
-    height: 43,
+    height: 47,
     borderWidth: 1,
     borderRadius: 12,
   },
   input: {
-    ...fontFamilies.normal,
     flexDirection: 'row',
     alignItems: 'center',
     textAlign: 'center',
-    height: 43,
+    height: 47,
     width: 74,
-    fontSize: 16,
     color: colors.black,
     textTransform: 'uppercase',
+    ...textStyles.medium,
   },
 });
 

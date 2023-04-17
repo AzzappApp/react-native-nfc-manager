@@ -1,55 +1,49 @@
-import { useMemo } from 'react';
-import { StyleSheet, Switch as RNSwitch, Text, View } from 'react-native';
-import { colors, textStyles } from '#theme';
-import { createId } from '#helpers/idHelpers';
+import { Switch as RNSwitch } from 'react-native';
+import { colors } from '#theme';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
 import type { SwitchProps as RNSwitchProps } from 'react-native';
 
-type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {
-  label?: string;
+export type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {
+  variant?: 'large' | 'small';
   onValueChange?: (value: boolean) => void;
-  switchStyle?: RNSwitchProps['style'];
 };
 
-const Switch = ({
-  label,
-  thumbColor,
-  trackColor,
-  style,
-  switchStyle,
-  ...props
-}: SwitchProps) => {
-  const switchProps = {
-    thumbColor: thumbColor ?? '#fff',
-    trackColor: trackColor ?? { false: colors.grey, true: colors.black },
-    ...props,
-  };
-  const id = useMemo(() => createId(), []);
-  return label ? (
-    <View style={[styles.root, style]}>
-      <RNSwitch
-        {...switchProps}
-        accessibilityLabelledBy={id}
-        style={switchStyle}
-      />
-      <Text style={styles.text} nativeID={id}>
-        {label}
-      </Text>
-    </View>
-  ) : (
-    <RNSwitch {...switchProps} style={style} />
+const Switch = ({ variant = 'small', style, ...props }: SwitchProps) => {
+  const variantStyle = useVariantStyleSheet(computedStyle, variant);
+  return (
+    <RNSwitch
+      {...props}
+      style={[variantStyle.switch, style]}
+      thumbColor={colors.white}
+      trackColor={{
+        false: variantStyle.trackFalse.color,
+        true: variantStyle.trackTrue.color,
+      }}
+    />
   );
 };
 
 export default Switch;
 
-const styles = StyleSheet.create({
-  root: {
-    flexDirection: 'row',
-    alignItems: 'center',
+const computedStyle = createVariantsStyleSheet(appearance => ({
+  default: {
+    switch: {},
+    trackTrue: {
+      color: appearance === 'light' ? colors.black : colors.grey100,
+    },
+    trackFalse: {
+      color: appearance === 'light' ? colors.grey200 : colors.grey800,
+    },
   },
-  text: {
-    ...textStyles.small,
-    marginLeft: 10,
-    fontSize: 12,
+  small: {
+    switch: { transform: [{ scaleX: 0.67 }, { scaleY: 0.71 }] },
   },
-});
+  large: {
+    switch: {
+      transform: [{ scaleX: 49 / 51 }, { scaleY: 31 / 32 }],
+    },
+  },
+}));

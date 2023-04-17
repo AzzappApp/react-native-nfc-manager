@@ -1,11 +1,11 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { textStyles } from '#theme';
 import Link from '#components/Link';
 import ClientOnlySuspense from '#ui/ClientOnlySuspense';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
+import Text from '#ui/Text';
 import type { ProfileScreenButtonBarQuery } from '@azzapp/relay/artifacts/ProfileScreenButtonBarQuery.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -22,7 +22,7 @@ const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
 
   return (
     <View style={[styles.buttonBar, style]}>
-      <FloatingIconButton icon="azzapp" onPress={onHome} iconSize={23} />
+      <FloatingIconButton icon="missing" onPress={onHome} iconSize={23} />
       <ClientOnlySuspense
         fallback={
           <View style={[styles.mainButton, styles.mainButtonFallback]} />
@@ -32,7 +32,7 @@ const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
       </ClientOnlySuspense>
       <Link route="PROFILE_POSTS" params={{ userName }}>
         <FloatingIconButton
-          icon="flip"
+          icon="revert"
           iconSize={30}
           style={styles.userPostsButton}
         />
@@ -70,7 +70,6 @@ const ProfileScreenButtonActionButton = ({
   const intl = useIntl();
   return canEdit ? (
     <FloatingButton
-      variant="light"
       onPress={onEdit}
       style={styles.mainButton}
       accessibilityLabel={intl.formatMessage({
@@ -78,7 +77,7 @@ const ProfileScreenButtonActionButton = ({
         description: 'UserScreenButtonBar edit button accessibility label',
       })}
     >
-      <Text style={textStyles.normal}>
+      <Text variant="button">
         <FormattedMessage
           defaultMessage="Edit my profile"
           description="Edit my profile button label in Profile Screen Button Bar"
@@ -87,7 +86,6 @@ const ProfileScreenButtonActionButton = ({
     </FloatingButton>
   ) : (
     <FloatingButton
-      variant="light"
       onPress={() => onToggleFollow(!isFollowing)}
       style={styles.mainButton}
       accessibilityLabel={intl.formatMessage({
@@ -95,7 +93,7 @@ const ProfileScreenButtonActionButton = ({
         description: 'UserScreenButtonBar follow profile accessibility label',
       })}
     >
-      <Text style={textStyles.normal}>
+      <Text variant="button">
         {isFollowing ? (
           <FormattedMessage
             defaultMessage="Follow"

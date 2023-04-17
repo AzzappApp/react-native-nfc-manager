@@ -378,7 +378,7 @@ const MemoPostRenderer = ({
         videoDisabled={videoDisabled}
         small
         muted
-        style={[layout, { position: 'absolute', backgroundColor: 'white' }]}
+        style={[layout, { position: 'absolute' }]}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps

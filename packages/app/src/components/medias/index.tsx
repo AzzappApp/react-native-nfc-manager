@@ -87,21 +87,21 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
         }),
       },
       shadow: {
-        icon: 'contrast',
+        icon: 'shadow',
         label: intl.formatMessage({
           defaultMessage: 'Shadow',
           description: 'Shadow image edition parameters name',
         }),
       },
       sharpness: {
-        icon: 'contrast',
+        icon: 'sharpness',
         label: intl.formatMessage({
           defaultMessage: 'Sharpness',
           description: 'Sharpness image edition parameters name',
         }),
       },
       structure: {
-        icon: 'contrast',
+        icon: 'structure',
         label: intl.formatMessage({
           defaultMessage: 'Structure',
           description: 'Structure image edition parameters name',
@@ -115,14 +115,14 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
         }),
       },
       tint: {
-        icon: 'brightness',
+        icon: 'tint',
         label: intl.formatMessage({
           defaultMessage: 'Tint',
           description: 'Tint image edition parameters name',
         }),
       },
       vibrance: {
-        icon: 'vigneting',
+        icon: 'vibrance',
         label: intl.formatMessage({
           defaultMessage: 'Vibrance',
           description: 'Vibrance image edition parameters name',

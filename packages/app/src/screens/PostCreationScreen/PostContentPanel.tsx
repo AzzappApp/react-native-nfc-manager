@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  KeyboardAvoidingView,
-  Modal,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, textStyles } from '#theme';
-import Header from '#components/Header';
+import { colors } from '#theme';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
+import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
 import type { ViewProps } from 'react-native';
 
 type PostContentPanelProps = ViewProps & {
@@ -56,12 +51,13 @@ const PostContentPanel = ({
       <View style={[styles.container, style]} {...props}>
         <View style={styles.settingsContainer}>
           <View style={styles.switchContainer}>
-            <Icon icon="heart" style={styles.switchIcon} />
+            <Icon icon="like" style={styles.switchIcon} />
             <Switch value={allowLikes} onValueChange={onAllowLikesChange} />
           </View>
           <View style={styles.switchContainer}>
             <Icon icon="comment" style={styles.switchIcon} />
             <Switch
+              variant="small"
               value={allowComments}
               onValueChange={onAllowCommentsChange}
             />
@@ -73,11 +69,9 @@ const PostContentPanel = ({
           activeOpacity={0.8}
         >
           {content ? (
-            <Text style={textStyles.normal}>{content}</Text>
+            <Text>{content}</Text>
           ) : (
-            <Text style={[textStyles.normal, styles.placeHolder]}>
-              {textAraPlaceHolder}
-            </Text>
+            <Text style={styles.placeHolder}>{textAraPlaceHolder}</Text>
           )}
         </PressableNative>
       </View>
@@ -94,7 +88,7 @@ const PostContentPanel = ({
               height: 70 + safeAreaTop,
               paddingTop: safeAreaTop,
             }}
-            rightButton={
+            rightElement={
               <Button
                 label={intl.formatMessage({
                   defaultMessage: 'Ok',
@@ -112,7 +106,6 @@ const PostContentPanel = ({
               <TextInput
                 multiline
                 placeholder={textAraPlaceHolder}
-                style={textStyles.normal}
                 value={content}
                 onChangeText={onContentChange}
                 autoFocus
@@ -120,7 +113,7 @@ const PostContentPanel = ({
                 onBlur={onModalClose}
               />
             </View>
-            <Text style={[textStyles.small, styles.counter]}>
+            <Text variant="smallbold" style={styles.counter}>
               {content?.length ?? 0} / {MAX_CONTENT_LENGHT}
             </Text>
           </KeyboardAvoidingView>
@@ -150,7 +143,6 @@ const styles = StyleSheet.create({
   },
   switchIcon: {
     width: 20,
-    tintColor: colors.dark,
     marginRight: 10,
   },
   textArea: {

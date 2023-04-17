@@ -1,60 +1,64 @@
-import { StyleSheet, Text } from 'react-native';
-
+import { StyleSheet, useColorScheme } from 'react-native';
 import { Svg, Path, Rect } from 'react-native-svg';
-import { colors, fontFamilies } from '#theme';
+import { colors } from '#theme';
+import Text from '#ui/Text';
 
 import PressableNative from './PressableNative';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
-//TODO: can be improve by selecting position of the label
-//TODO: Dark Mode
+
+export type CheckboxStatus = 'checked' | 'mixed' | 'none';
 type CheckBoxProps = {
-  checked: boolean;
+  status: CheckboxStatus;
   disabled?: boolean;
-  onValueChange: (checked: boolean) => void;
-  borderRadius?: number;
-  borderColor?: string;
-  checkBorderColor?: string;
-  tintColor?: string;
-  checkTintColor?: string;
-  checkMarkColor?: string;
-  size?: number;
+  onValueChange: (status: CheckboxStatus) => void;
+  variant?: 'large' | 'small';
   label?: React.ReactNode | string;
   labelStyle?: StyleProp<TextStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
 };
 
-const checkMarkPath =
-  'M4.9249 10.0797L0.116333 5.27112L1.64368 3.74377L5.68858 7.78866L13.4324 0.0448719L14.9597 1.57222L6.45225 10.0797C6.03048 10.5014 5.34667 10.5014 4.9249 10.0797Z';
-const DEFAULT_SIZE = 18;
 const CheckBox = ({
-  size = DEFAULT_SIZE,
-  checked = false,
+  status = 'none',
   disabled = false,
   onValueChange,
-  containerStyle = {},
-  borderColor = colors.grey200,
-  checkBorderColor = colors.black,
-  tintColor = 'white',
-  checkTintColor = colors.black,
-  checkMarkColor = 'white',
-  borderRadius = 3,
+  variant = 'large',
+  style = {},
   labelStyle,
   label,
   accessibilityLabel,
 }: CheckBoxProps) => {
-  const ratio = size / DEFAULT_SIZE;
+  const ratio = variant === 'large' ? 1 : SMALL_SIZE_RATIO;
+  const size = variant === 'large' ? DEFAULT_SIZE : 14;
+
   const onPress = () => {
     if (!disabled) {
-      onValueChange(!checked);
+      //mix will be handle by the parent conponent
+      onValueChange(status === 'none' ? 'checked' : 'none');
     }
   };
+  const scheme = useColorScheme();
+  const fillColor =
+    status !== 'none'
+      ? scheme === 'light'
+        ? colors.black
+        : colors.grey100
+      : 'transparent';
+  const strokeColor =
+    status !== 'none'
+      ? scheme === 'light'
+        ? colors.black
+        : colors.grey100
+      : scheme === 'light'
+      ? colors.grey100
+      : colors.grey800;
+  const checkMark = scheme === 'light' ? colors.white : colors.black;
   return (
     <PressableNative
       accessibilityRole="checkbox"
-      style={[styles.container, containerStyle]}
+      style={[styles.container, style]}
       onPress={onPress}
-      accessibilityState={{ checked }}
+      accessibilityState={{ checked: status !== 'none' }}
       activeOpacity={1}
       accessibilityLabel={accessibilityLabel}
     >
@@ -65,30 +69,48 @@ const CheckBox = ({
           viewBox={`0 0 ${size + 2} ${size + 2}`}
         >
           <Rect
-            rx={borderRadius}
+            rx={3}
             width={size}
             height={size}
             x="1"
             y="1"
-            fill={checked ? checkTintColor : tintColor}
-            stroke={checked ? checkBorderColor : borderColor}
+            fill={fillColor}
+            stroke={strokeColor}
             strokeWidth="1"
           />
-          <Path
-            scale={ratio}
-            translateX={3 * ratio}
-            translateY={5 * ratio}
-            strokeWidth={1 / ratio}
-            stroke={checkMarkColor}
-            strokeLinecap="square"
-            strokeOpacity={checked || false ? 1 : 0}
-            fillOpacity={checked || false ? 1 : 0}
-            fill={checkMarkColor}
-            d={checkMarkPath}
-          />
+          {status === 'checked' && (
+            <Path
+              scale={ratio}
+              translateX={3 * ratio}
+              translateY={5 * ratio}
+              strokeWidth={1 / ratio}
+              stroke={checkMark}
+              strokeLinecap="square"
+              strokeOpacity={1}
+              fillOpacity={1}
+              fill={checkMark}
+              d={checkMarkPath}
+            />
+          )}
+          {status === 'mixed' && (
+            <Path
+              scale={ratio}
+              translateX={3 * ratio}
+              translateY={7.5 * ratio}
+              strokeWidth={1 / ratio}
+              stroke={checkMark}
+              strokeLinecap="square"
+              strokeOpacity={1}
+              fillOpacity={1}
+              fill={checkMark}
+              d={mixedMarkpath}
+            />
+          )}
         </Svg>
         {typeof label === 'string' ? (
-          <Text style={[styles.textStyle, labelStyle]}>{label}</Text>
+          <Text variant="medium" style={[labelStyle]}>
+            {label}
+          </Text>
         ) : (
           label
         )}
@@ -98,8 +120,13 @@ const CheckBox = ({
 };
 
 export default CheckBox;
+const checkMarkPath =
+  'M4.9249 10.0797L0.116333 5.27112L1.64368 3.74377L5.68858 7.78866L13.4324 0.0448719L14.9597 1.57222L6.45225 10.0797C6.03048 10.5014 5.34667 10.5014 4.9249 10.0797Z';
+const mixedMarkpath =
+  'M1.38 0.92h11.24s0.5 0 0.5 0.5v1.16s0 0.5 -0.5 0.5h-11.24s-0.5 0 -0.5 -0.5v-1.16s0 -0.5 0.5 -0.5';
+const DEFAULT_SIZE = 18;
+const SMALL_SIZE_RATIO = 7 / 9;
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center' },
-  textStyle: { ...fontFamilies.fontMedium, fontSize: 14, color: colors.black },
 });

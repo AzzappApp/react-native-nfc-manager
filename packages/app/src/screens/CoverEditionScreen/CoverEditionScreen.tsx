@@ -9,6 +9,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -20,10 +21,10 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import Header from '#components/Header';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import {
   calculImageSize,
@@ -31,12 +32,13 @@ import {
   isPNG,
   segmentImage,
 } from '#helpers/mediaHelpers';
-import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
+import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import FloatingIconButton from '#ui/FloatingIconButton';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import Switch from '#ui/Switch';
-import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import SwitchLabel from '#ui/SwitchLabel';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
@@ -946,9 +948,8 @@ const CoverEditionScreen = ({
 
   const [currentTab, setCurrentTab] = useState<string>('models');
 
-  const vp = useViewportSize();
   const intl = useIntl();
-
+  const appearanceStyle = useStyleSheet(computedStyle);
   const cropEditionMode = editedParameter === 'roll';
 
   const [bottomSheetHeights, setBottomSheetHeights] = useState(0);
@@ -963,22 +964,23 @@ const CoverEditionScreen = ({
     setHeightCover(layout.height);
   };
 
+  const { bottom, top } = useSafeAreaInsets();
+  const bottomMargin = bottom > 0 ? bottom : FIXED_BOTTOM_MARGIN;
+
   if (!viewer) {
     return null;
   }
 
   return (
-    <>
+    //ths container on top avoid some weid feeling when transitionning with transparent backgorund
+    <Container style={{ flex: 1 }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        contentContainerStyle={[
-          styles.root,
-          { paddingTop: vp`${insetTop}`, paddingBottom: vp`${insetBottom}` },
-        ]}
+        contentContainerStyle={[styles.root, { paddingTop: top }]}
         behavior="position"
       >
         <Header
-          title={
+          middleElement={
             isCreation
               ? intl.formatMessage({
                   defaultMessage: 'Create your cover',
@@ -989,7 +991,7 @@ const CoverEditionScreen = ({
                   description: 'Cover edition screen title',
                 })
           }
-          leftButton={
+          leftElement={
             !cropEditionMode ? (
               <Button
                 variant="secondary"
@@ -1001,10 +1003,10 @@ const CoverEditionScreen = ({
               />
             ) : null
           }
-          rightButton={
+          rightElement={
             cropEditionMode ? (
               <IconButton
-                icon="rotate"
+                icon="crop" //TODO: this button is not present in figma (rotation is still a WIP in figma), rotate does not exist anymore
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Rotate',
                   description:
@@ -1054,11 +1056,11 @@ const CoverEditionScreen = ({
             cropEditionMode={cropEditionMode}
             onCropDataChange={onCropDataChange}
             onLayout={onContainerLayout}
+            style={appearanceStyle.coverShadow}
           />
           {sourceMedia && !cropEditionMode && (
             <FloatingIconButton
               icon="crop"
-              variant="white"
               iconSize={24}
               onPress={onActivateCropMode}
               style={[
@@ -1076,27 +1078,30 @@ const CoverEditionScreen = ({
               })}
             />
           )}
-          <FloatingIconButton
-            icon="picture"
-            variant="white"
-            iconSize={24}
-            onPress={onPickImage}
-            style={[
-              styles.takePictureButton,
-              { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
-            ]}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Select an image',
-              description: 'Accessibility label of the image selection button',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage:
-                'Press this button to select an image from your library',
-              description: 'Accessibility hint of the image selection button',
-            })}
-          />
-          <View style={styles.toolbar}>
-            <Switch
+          {!cropEditionMode && (
+            <FloatingIconButton
+              icon="camera"
+              iconSize={24}
+              onPress={onPickImage}
+              style={[
+                styles.takePictureButton,
+                { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
+              ]}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Select an image',
+                description:
+                  'Accessibility label of the image selection button',
+              })}
+              accessibilityHint={intl.formatMessage({
+                defaultMessage:
+                  'Press this button to select an image from your library',
+                description: 'Accessibility hint of the image selection button',
+              })}
+            />
+          )}
+          <View style={[styles.toolbar, appearanceStyle.toolbar]}>
+            <SwitchLabel
+              variant="small"
               value={segmented ?? false}
               onValueChange={onToggleSegmentation}
               label={intl.formatMessage({
@@ -1104,10 +1109,10 @@ const CoverEditionScreen = ({
                 description: 'Label of the clipping switch in cover edition',
               })}
               style={styles.toolbarElement}
-              switchStyle={styles.switchStyle}
             />
             {currentTab !== 'models' && (
-              <Switch
+              <SwitchLabel
+                variant="small"
                 value={merged ?? false}
                 onValueChange={onToggleMerge}
                 label={intl.formatMessage({
@@ -1115,7 +1120,6 @@ const CoverEditionScreen = ({
                   description: 'Label of the merge switch in cover edition',
                 })}
                 style={[styles.toolbarElement]}
-                switchStyle={styles.switchStyle}
               />
             )}
           </View>
@@ -1162,7 +1166,12 @@ const CoverEditionScreen = ({
                   backgroundImageTintColor={backgroundStyle?.patternColor}
                   onFilterChange={onFilterChange}
                   onStartParameterEdition={onStartParameterEdition}
-                  style={styles.bottomPanel}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                    },
+                  ]}
                 />
               )}
               {currentTab === 'title' && (
@@ -1179,7 +1188,12 @@ const CoverEditionScreen = ({
                   onSubTitleStyleChange={onSubTitleStyleChange}
                   onContentStyleChange={onContentStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
-                  style={styles.bottomPanel}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                    },
+                  ]}
                 />
               )}
               {currentTab === 'background' && (
@@ -1190,7 +1204,12 @@ const CoverEditionScreen = ({
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
-                  style={styles.bottomPanel}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                    },
+                  ]}
                 />
               )}
               {currentTab === 'foreground' && (
@@ -1201,48 +1220,71 @@ const CoverEditionScreen = ({
                   onForegroundChange={onForegroundChange}
                   onForegroundStyleChange={onForegroundStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
-                  style={styles.bottomPanel}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                    },
+                  ]}
                 />
               )}
-              <TabsBar
-                variant="toolbar"
+              <BottomMenu
                 currentTab={currentTab}
-                onTabPress={setCurrentTab}
-                iconSize={24}
+                onItemPress={setCurrentTab}
+                showLabel
                 tabs={[
                   {
                     key: 'models',
-                    icon: 'modelsCoverTemplate',
-                    label: 'Models',
+                    icon: 'templates',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Models',
+                      description:
+                        'CoverEditionScreen bottom menu label for models tab',
+                    }),
                   },
                   {
                     key: 'image',
                     icon: 'image',
-                    label: 'Image edition',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Image',
+                      description:
+                        'CoverEditionScreen bottom menu label for Image tab',
+                    }),
                   },
                   {
                     key: 'title',
-                    icon: 'title',
-                    label: 'Title edition',
+                    icon: 'text',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Text',
+                      description:
+                        'CoverEditionScreen bottom menu label for Text tab',
+                    }),
                   },
                   {
                     key: 'foreground',
                     icon: 'foreground',
-                    label: 'Foreground selection',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Fore.',
+                      description:
+                        'CoverEditionScreen bottom menu label for Foreground tab',
+                    }),
                   },
                   {
                     key: 'background',
                     icon: 'background',
-                    label: 'Background selection',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Back.',
+                      description:
+                        'CoverEditionScreen bottom menu label for Background tab',
+                    }),
                   },
                 ]}
-                style={styles.tabsBar}
+                style={[styles.tabsBar, { bottom: bottomMargin }]}
               />
             </>
           )}
         </View>
       </KeyboardAvoidingView>
-
       <Modal
         visible={showImagePicker}
         animationType={sourceMedia ? 'slide' : 'none'}
@@ -1260,7 +1302,7 @@ const CoverEditionScreen = ({
         visible={!!uploadProgress}
         progressIndicator={uploadProgress}
       />
-    </>
+    </Container>
   );
 };
 
@@ -1268,11 +1310,24 @@ export default CoverEditionScreen;
 const { width } = Dimensions.get('window');
 const PADDING_TOP_TOPPANEL = 20;
 const ICON_SIZE = 50;
+const FIXED_BOTTOM_MARGIN = 15;
+const computedStyle = createStyleSheet(appearance => ({
+  toolbar: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    shadowColor: appearance === 'light' ? colors.grey900 : colors.grey600,
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 4,
+  },
+  coverShadow: {
+    shadowColor: appearance === 'light' ? colors.black : colors.white,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 40,
+  },
+}));
 const styles = StyleSheet.create({
-  switchStyle: { transform: [{ scaleX: 0.67 }, { scaleY: 0.71 }] },
   root: {
-    backgroundColor: '#fff',
-    position: 'absolute',
     width: '100%',
     height: '100%',
   },
@@ -1287,19 +1342,13 @@ const styles = StyleSheet.create({
   },
   cropButton: {
     position: 'absolute',
-    end: 20,
-    shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 2, height: 2 },
-    shadowRadius: 4,
+    end: 22.5,
+    borderWidth: 1,
   },
   takePictureButton: {
     position: 'absolute',
-    start: 20,
-    shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 2, height: 2 },
-    shadowRadius: 4,
+    start: 22.5,
+    borderWidth: 1,
   },
   cover: {
     flex: 1,
@@ -1314,16 +1363,15 @@ const styles = StyleSheet.create({
   },
   bottomPanelContainer: {
     width: '100%',
-    height: 324,
+    height: 334,
   },
   bottomPanel: {
     flex: 1,
-    marginVertical: 10,
-    marginBottom: TAB_BAR_HEIGHT,
+    marginTop: 10,
   },
   tabsBar: {
     position: 'absolute',
-    bottom: 0,
+    bottom: FIXED_BOTTOM_MARGIN,
     left: 10,
     width: width - 20,
     right: 10,
@@ -1331,12 +1379,7 @@ const styles = StyleSheet.create({
   toolbar: {
     flexDirection: 'row',
     height: 46,
-    borderRadius: 100,
-    backgroundColor: '#fff',
-    shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 4,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'space-between',
     alignSelf: 'center',

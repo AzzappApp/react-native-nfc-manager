@@ -60,6 +60,11 @@ export type ProfilePostsRoute = {
   params: { userName: string };
 };
 
+export type AlbumsRoute = {
+  route: 'ALBUMS';
+  params?: never;
+};
+
 export type PostRoute = {
   route: 'POST';
   params: {
@@ -83,6 +88,7 @@ export type CardModuleEditionRoute = {
 };
 
 export type Route =
+  | AlbumsRoute
   | HomeRoute
   | SearchRoute
   | ChatRoute

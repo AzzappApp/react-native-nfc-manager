@@ -1,13 +1,14 @@
 import { FormattedMessage } from 'react-intl';
-import { /*Pressable,*/ SafeAreaView, Text } from 'react-native';
+import { View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { useRouter } from '#PlatformEnvironment';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
+import Text from '#ui/Text';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { SettingsRoute } from '#routes';
 import type { SettingsMobileScreenQuery } from '@azzapp/relay/artifacts/SettingsMobileScreenQuery.graphql';
-
 const settingsScreenQuery = graphql`
   query SettingsMobileScreenQuery {
     viewer {
@@ -25,23 +26,27 @@ const SettingsMobileScreen = ({
   const logout = async () => {
     void dispatchGlobalEvent({ type: 'SIGN_OUT' });
   };
+
+  const router = useRouter();
   return (
-    <SafeAreaView
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-    >
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {viewer.profile && (
         <>
-          <TouchableOpacity onPress={logout}>
+          <TouchableOpacity onPress={logout} style={{ marginBottom: 30 }}>
             <Text>
               <FormattedMessage
-                defaultMessage="logout"
+                defaultMessage="Logout"
                 description="logout link"
               />
             </Text>
           </TouchableOpacity>
+          {/* AVoid getting stuck on the page and hav eto kill the app */}
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text>Go Back</Text>
+          </TouchableOpacity>
         </>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

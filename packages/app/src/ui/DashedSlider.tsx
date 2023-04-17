@@ -1,12 +1,16 @@
+import MaskedView from '@react-native-masked-view/masked-view';
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ViewProps } from 'react-native';
 
 type DashedSliderProps = ViewProps & {
+  variant?: 'default' | 'small';
   value: number;
   min: number;
   max: number;
@@ -18,6 +22,7 @@ type DashedSliderProps = ViewProps & {
 const DEFAULT_INTERVAL = 6;
 
 const DashedSlider = ({
+  variant = 'default',
   value,
   min,
   max,
@@ -27,11 +32,13 @@ const DashedSlider = ({
   style,
   ...props
 }: DashedSliderProps) => {
+  const appearanceStyle = useStyleSheet(computedStyle);
   const pan = useRef(new Animated.Value(value)).current;
+  const computedInterval = interval * (variant === 'small' ? 0.5 : 1);
 
   const isPaning = useRef(false);
-  const propsRef = useRef({ value, min, max, step, interval });
-  propsRef.current = { value, min, max, step, interval };
+  const propsRef = useRef({ value, min, max, step, computedInterval });
+  propsRef.current = { value, min, max, step, computedInterval };
   if (!isPaning) {
     pan.setValue(value);
   }
@@ -53,8 +60,8 @@ const DashedSlider = ({
         isPaning.current = true;
       },
       onPanResponderMove: (e, gestureState) => {
-        const { min, max, step, interval } = propsRef.current;
-        const dval = step * (gestureState.dx / interval);
+        const { min, max, step, computedInterval } = propsRef.current;
+        const dval = step * (gestureState.dx / computedInterval);
         animatedEvent(clamp(animationOffsetValue.current - dval, min, max));
       },
       onPanResponderRelease() {
@@ -82,47 +89,74 @@ const DashedSlider = ({
   }, [max, min, onChange, pan, step]);
 
   const steps = range(min, max, step);
-  const size = steps.length * interval;
+  const size = steps.length * computedInterval;
 
   return (
-    <View
-      {...props}
-      {...panResponder.panHandlers}
-      style={[style, styles.container]}
-      accessibilityRole="adjustable"
-      accessibilityValue={{ min, max, now: value }}
+    <MaskedView
+      maskElement={
+        <LinearGradient
+          colors={['transparent', colors.grey50, 'transparent']}
+          locations={[0.0, 0.5, 1]}
+          style={{ flex: 1 }}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 1 }}
+        />
+      }
     >
-      <Animated.View
+      <View
+        {...props}
+        {...panResponder.panHandlers}
         style={[
-          styles.dashContainer,
-          {
-            transform: [
-              {
-                translateX: pan.interpolate({
-                  inputRange: [min, max],
-                  outputRange: [0, -size],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ],
-          },
+          style,
+          styles.container,
+          variant === 'small' && { width: '50%' },
         ]}
+        accessibilityRole="adjustable"
+        accessibilityValue={{ min, max, now: value }}
       >
-        {steps.map(step => (
-          <View
-            key={step}
-            style={[styles.dash, { marginRight: interval - 1 }]}
-          />
-        ))}
-        <View style={styles.dash} />
-      </Animated.View>
-      <View style={styles.thumb} />
-    </View>
+        <Animated.View
+          style={[
+            styles.dashContainer,
+            {
+              transform: [
+                {
+                  translateX: pan.interpolate({
+                    inputRange: [min, max],
+                    outputRange: [0, -size],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {steps.map(step => (
+            <View
+              key={step}
+              style={[
+                styles.dash,
+                appearanceStyle.dash,
+                { marginRight: computedInterval - 1 },
+              ]}
+            />
+          ))}
+          <View style={[styles.dash, appearanceStyle.dash]} />
+        </Animated.View>
+        <View style={[styles.thumb, appearanceStyle.thumb]} />
+      </View>
+    </MaskedView>
   );
 };
 
 export default DashedSlider;
-
+const computedStyle = createStyleSheet(appearance => ({
+  thumb: {
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+  },
+  dash: {
+    backgroundColor: appearance === 'light' ? colors.grey200 : colors.white,
+  },
+}));
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -134,17 +168,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 14,
     left: '50%',
+    width: '100%',
   },
   dash: {
-    backgroundColor: colors.grey,
+    backgroundColor: colors.grey200,
     height: 12,
     width: 1,
     borderRadius: 3,
   },
   thumb: {
-    backgroundColor: colors.grey,
     height: 20,
-    width: 2,
+    width: 6,
     borderRadius: 3,
   },
 });

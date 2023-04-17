@@ -1,5 +1,8 @@
 import { View, StyleSheet } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+
+import Container from '#ui/Container';
 
 type NewProfileScreenPagerIndicatorProps = {
   activeIndex: number;
@@ -10,19 +13,17 @@ const NUMBER_PAGE = 3;
 const NewProfileScreenPagerIndicator = ({
   activeIndex,
 }: NewProfileScreenPagerIndicatorProps) => {
+  const appearanceStyle = useStyleSheet(computedStyle);
+
   return (
-    <View style={styles.container}>
+    <Container style={styles.container}>
       {Array.from({ length: NUMBER_PAGE }).map((_, index) => {
         if (index < activeIndex) {
           return (
             <View
               accessibilityState={{ selected: false }}
               key={`NewProfilepager-${index}`}
-              style={[
-                styles.common,
-                styles.smallCircle,
-                { backgroundColor: colors.red400 },
-              ]}
+              style={[styles.common, appearanceStyle.previousCircle]}
             />
           );
         } else if (index === activeIndex) {
@@ -31,7 +32,7 @@ const NewProfileScreenPagerIndicator = ({
               accessibilityRole="none"
               accessibilityState={{ selected: true }}
               key={`NewProfilepager-${index}`}
-              style={[styles.common, styles.selectedCircle]}
+              style={[styles.common, appearanceStyle.selectedCircle]}
             />
           );
         }
@@ -39,22 +40,34 @@ const NewProfileScreenPagerIndicator = ({
           <View
             accessibilityState={{ selected: false }}
             key={`NewProfilepager-${index}`}
-            style={[
-              styles.common,
-              styles.smallCircle,
-              { backgroundColor: '#D9D9D9' },
-            ]}
+            style={[styles.common, appearanceStyle.smallCircle]}
           />
         );
       })}
       <View />
-    </View>
+    </Container>
   );
 };
 
 export default NewProfileScreenPagerIndicator;
 
 const CIRCLE_POINT = 5;
+
+const computedStyle = createStyleSheet(appearance => ({
+  previousCircle: {
+    width: CIRCLE_POINT,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+  },
+  selectedCircle: {
+    width: 20,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+  },
+  smallCircle: {
+    width: CIRCLE_POINT,
+    backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey800,
+  },
+}));
+
 const styles = StyleSheet.create({
   container: {
     height: 10,
@@ -67,12 +80,5 @@ const styles = StyleSheet.create({
     borderRadius: CIRCLE_POINT / 2,
     marginLeft: CIRCLE_POINT / 2,
     marginRight: CIRCLE_POINT / 2,
-  },
-  smallCircle: {
-    width: CIRCLE_POINT,
-  },
-  selectedCircle: {
-    width: 20,
-    backgroundColor: colors.red400,
   },
 });

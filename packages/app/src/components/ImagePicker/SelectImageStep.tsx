@@ -23,7 +23,7 @@ import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
-import type { Tab } from '#ui/TabsBar';
+import type { FooterBarItem } from '#ui/FooterBar';
 import type { CameraViewHandle, RecordSession } from '../CameraView';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
@@ -173,7 +173,7 @@ const SelectImageStep = ({
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
 
   const tabs = useMemo(() => {
-    const tabs: Tab[] = [
+    const tabs: FooterBarItem[] = [
       {
         icon: 'grid',
         key: 'gallery',
@@ -186,7 +186,7 @@ const SelectImageStep = ({
     ];
     if (kind !== 'video') {
       tabs.push({
-        icon: 'picture',
+        icon: 'camera',
         key: 'photo',
         label: intl.formatMessage({
           defaultMessage: 'Take a picture',
@@ -238,9 +238,8 @@ const SelectImageStep = ({
                   <ImagePickerMediaRenderer />
                   {forceAspectRatio == null && (
                     <FloatingIconButton
-                      icon="adjust"
+                      icon="expand"
                       style={styles.adjustButton}
-                      variant="white"
                       size={40}
                       onPress={onAspectRatioToggle}
                     />
@@ -289,9 +288,9 @@ const SelectImageStep = ({
             />
           )
         }
-        toolbarProps={{
+        menuBarProps={{
           currentTab: pickerMode,
-          onTabPress: setPickerMode as any,
+          onItemPress: setPickerMode as any,
           tabs,
         }}
       />

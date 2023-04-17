@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
-import { StyleSheet, Text } from 'react-native';
-import { textStyles } from '#theme';
+import { StyleSheet } from 'react-native';
 import Button from '#ui/Button';
+import Text from '#ui/Text';
 
 const PermissionScreen = ({
   title,
@@ -15,8 +15,12 @@ const PermissionScreen = ({
   const intl = useIntl();
   return (
     <>
-      <Text style={styles.permissionScreenTitle}>{title}</Text>
-      <Text style={styles.permissionScreenContent}>{content}</Text>
+      <Text variant="large" style={styles.permissionScreenTitle}>
+        {title}
+      </Text>
+      <Text variant="medium" style={styles.permissionScreenContent}>
+        {content}
+      </Text>
       <Button
         label={intl.formatMessage({
           defaultMessage: 'Next',
@@ -39,12 +43,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   permissionScreenTitle: {
-    ...textStyles.title,
     marginBottom: 20,
     padding: 10,
   },
   permissionScreenContent: {
-    ...textStyles.normal,
     marginBottom: 30,
     padding: 10,
   },

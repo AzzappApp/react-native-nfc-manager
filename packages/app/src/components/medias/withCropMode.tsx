@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   },
   verticalLine: {
     width: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.grey800,
   },
   horizontalGrid: {
     ...mixins.absoluteFill,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   },
   horizontalLine: {
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.grey800,
   },
 });
 

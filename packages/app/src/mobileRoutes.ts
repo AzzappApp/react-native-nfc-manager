@@ -23,8 +23,8 @@ export const mainRoutes: NativeRouterInit = {
           route: 'CHAT',
         },
         {
-          id: 'SETTINGS',
-          route: 'SETTINGS',
+          id: 'ALBUMS',
+          route: 'ALBUMS',
         },
       ],
     },

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
+import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
 import type { Subscription, Observable } from 'relay-runtime';
 
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     padding: 20,
     borderRadius: 20,
-    shadowColor: colors.dark,
+    shadowColor: colors.black,
     shadowOpacity: 0.21,
     shadowOffset: { width: 0, height: 10 },
     shadowRadius: 10,

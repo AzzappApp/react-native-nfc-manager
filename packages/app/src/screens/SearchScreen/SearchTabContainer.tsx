@@ -1,8 +1,9 @@
 import { useState, useEffect, Suspense, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
-import { colors } from '#theme';
+import { colors, textStyles } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import SearchResultGlobal, {
   SearchResultGlobalPlaceHolder,
@@ -136,7 +137,7 @@ const SearchTabContainer = ({
   return (
     <TabView
       navigationState={{ index: pageIndexSelected, routes }}
-      renderTabBar={renderTabBar}
+      renderTabBar={TabBarSearch}
       renderScene={renderScene}
       onIndexChange={onIndexTabChange}
       style={styles.tabViewstyle}
@@ -146,7 +147,7 @@ const SearchTabContainer = ({
 
 export default SearchTabContainer;
 
-const renderTabBar = (
+const TabBarSearch = (
   props: SceneRendererProps & {
     navigationState: NavigationState<{
       key: string;
@@ -154,42 +155,65 @@ const renderTabBar = (
     }>;
   },
 ) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const appearanceStyle = useStyleSheet(computedStyle);
+  const colorScheme = useColorScheme();
+
   return (
     <TabBar
       {...props}
-      style={styles.tabBarStyle}
-      indicatorStyle={{
-        backgroundColor: colors.black,
-        height: 2,
-        borderRadius: 4,
-        marginLeft: 9,
-        marginRight: 9,
-        width: props.layout.width / 4 - 18,
-      }}
-      labelStyle={{ color: colors.black }}
-      inactiveColor={colors.grey50}
-      activeColor={colors.black}
-      renderLabel={({ route, color }) => (
+      style={appearanceStyle.tabBarStyle}
+      indicatorStyle={[
+        appearanceStyle.indicatorStyle,
+        {
+          width: props.layout.width / 4 - 18,
+        },
+      ]}
+      labelStyle={appearanceStyle.label}
+      inactiveColor={colorScheme === 'light' ? colors.grey50 : colors.grey900}
+      activeColor={colorScheme === 'light' ? colors.black : colors.white}
+      renderLabel={({ route }) => (
         <Icon
           icon={route.icon as Icons}
-          style={[styles.image, { tintColor: color }]}
+          style={[styles.image /*{ tintColor: color }*/]} //TODO: waiting for design spec, removing tintColor to display missing icon properly
         />
       )}
     />
   );
 };
 
+const computedStyle = createStyleSheet(appearance => ({
+  tabBarStyle: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    shadowOffset: { height: 0, width: 0 },
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  indicatorStyle: {
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    height: 2,
+    borderRadius: 4,
+    marginLeft: 9,
+    marginRight: 9,
+  },
+  label: {
+    ...textStyles.medium,
+    color: appearance === 'light' ? colors.black : colors.white,
+  },
+}));
+
 const routes = [
-  { key: 'searchGlobal', icon: 'foursquare', query: searchResultGlobalQuery },
+  { key: 'searchGlobal', icon: 'missing', query: searchResultGlobalQuery },
   {
     key: 'searchProfiles',
-    icon: 'searchprofile',
+    icon: 'missing',
     query: searchResultProfilesQuery,
   },
-  { key: 'searchPosts', icon: 'hashtag', query: searchResultPostsQuery },
+  { key: 'searchPosts', icon: 'missing', query: searchResultPostsQuery },
   {
     key: 'searchGlobalhWithLocation',
-    icon: 'location',
+    icon: 'missing',
     query: searchResultGlobalQuery,
   },
 ];
@@ -204,27 +228,18 @@ type TabQueries = {
 };
 
 const IMAGE_SIZE = 24;
+
 const styles = StyleSheet.create({
-  tabBarStyle: {
-    backgroundColor: 'white',
-    color: colors.black,
-    shadowOffset: { height: 0, width: 0 },
-    shadowColor: 'transparent',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
   tabViewstyle: {
     position: 'absolute',
     height: '100%',
     width: '100%',
-    backgroundColor: 'white',
   },
   image: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
-    tintColor: colors.grey50,
   },
   imageActive: {
-    tintColor: colors.black,
+    //tintColor: colors.black, TODO: waiting for specification
   },
 });

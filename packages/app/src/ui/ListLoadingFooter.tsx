@@ -12,7 +12,6 @@ const ListLoadingFooter = ({
         height: 48,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFF',
         zIndex: 100,
       },
       style,

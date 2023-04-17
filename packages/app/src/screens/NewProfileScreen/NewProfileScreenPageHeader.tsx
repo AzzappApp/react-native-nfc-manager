@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies } from '#theme';
+import { StyleSheet, View } from 'react-native';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import NewProfileScreenPagerIndicator from './NewProfileScreenPagerIndicator';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -20,10 +20,17 @@ const NewProfileScreenPageHeader = ({
     <View style={styles.header}>
       <View style={styles.headerSegment}>
         {onBack && (
-          <IconButton icon="back" onPress={onBack} style={styles.backIcon} />
+          <IconButton
+            icon="arrow_left"
+            onPress={onBack}
+            iconSize={28}
+            style={styles.backIcon}
+          />
         )}
       </View>
-      <Text style={styles.titleText}>{title}</Text>
+      <Text variant="xlarge" style={styles.titleText}>
+        {title}
+      </Text>
       <View style={styles.headerSegment} />
     </View>
     <NewProfileScreenPagerIndicator activeIndex={activeIndex} />
@@ -45,14 +52,12 @@ const styles = StyleSheet.create({
   backIcon: {
     height: 17,
     width: 10,
+    borderWidth: 0,
   },
   titleText: {
-    ...fontFamilies.semiBold,
     flex: 1,
-    fontSize: 20,
     textAlign: 'center',
     paddingTop: 0,
-    color: colors.black,
     textAlignVertical: 'center',
   },
 });

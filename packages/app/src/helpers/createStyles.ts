@@ -31,13 +31,17 @@ export const createStyleSheet = <T extends ComposableNamedStyles<T>>(
  * Use a style sheet object that has a light and dark version of the style object
  * and select the correct one based on the current color scheme
  *
- * @param styleSheet - A style sheet object that has a light and dark version of the style object
+ * @template T
+ * @param {ColorSchemeStyleSheet<T>} styleSheet
+ * @param {ColorSchemeName} [appearance] - The color scheme to use over the system one
  * @returns a react native style object
  */
-export const useStyleSheet = <T>(styleSheet: ColorSchemeStyleSheet<T>) => {
-  const colorScheme = useColorScheme() ?? 'light';
-
-  return styleSheet[colorScheme];
+export const useStyleSheet = <T>(
+  styleSheet: ColorSchemeStyleSheet<T>,
+  appearance?: ColorSchemeName,
+) => {
+  const colorScheme = useColorScheme();
+  return styleSheet[appearance ?? colorScheme ?? 'light'];
 };
 
 type VariantsStyleSheet<Variants extends keyof any, T> = Record<
@@ -116,14 +120,15 @@ const composeStyles = <T extends ComposableNamedStyles<T>>(
  *
  * @param styleSheet - A style sheet object that has multiple variants and a light and dark version of the style object
  * @param variant - The variant to use
+ * @param {ColorSchemeName} [appearance] - The color scheme to use over the system one
  * @returns a react native style object
+ *
  */
 export const useVariantStyleSheet = <Variants extends string, T>(
   styleSheet: VariantsStyleSheet<Variants, T>,
   variant: Variants,
-): T => {
-  return useStyleSheet(styleSheet[variant]);
-};
+  appearance?: ColorSchemeName,
+): T => useStyleSheet(styleSheet[variant], appearance);
 
 type ValueOf<T> = T[keyof T];
 
@@ -132,3 +137,11 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 ) => void
   ? I
   : never;
+
+/*
+ * A hook that returns the opposite color scheme of the current one.
+ */
+export function useInvertedColorScheme() {
+  const colorScheme = useColorScheme();
+  return colorScheme === 'dark' ? 'light' : 'dark';
+}

@@ -47,21 +47,21 @@ const CoverImageEditionPanel = ({
   }
 
   return (
-    <View style={[style, styles.root]}>
+    <View style={style}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
-        variant="topbar"
+        decoration="underline"
         tabs={[
           {
-            key: 'filter',
+            tabKey: 'filter',
             label: intl.formatMessage({
               defaultMessage: 'Effect',
               description: 'Label of the effect tab in cover edition',
             }),
           },
           {
-            key: 'edit',
+            tabKey: 'edit',
             label: intl.formatMessage({
               defaultMessage: 'Adjust',
               description: 'Label of the adjust tab in cover edition',
@@ -102,9 +102,6 @@ const CoverImageEditionPanel = ({
 export default CoverImageEditionPanel;
 
 const styles = StyleSheet.create({
-  root: {
-    paddingTop: 10,
-  },
   body: {
     flex: 1,
     justifyContent: 'center',
@@ -112,7 +109,7 @@ const styles = StyleSheet.create({
   filterSelectionListContentContainer: { paddingHorizontal: 20 },
   filterSelectionList: {
     flex: 1,
-    maxHeight: 200,
+    maxHeight: 300,
     marginTop: 20,
     marginBottom: 10,
   },

@@ -6,8 +6,8 @@ import useCameraPermissions, {
   requestMicrophonePermission,
 } from '#hooks/useCameraPermissions';
 import FadeSwitch from '#ui/FadeSwitch';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import Header from '../Header';
 import PermissionScreen from './PermissionScreen';
 
 type CameraModalProps = {
@@ -80,7 +80,9 @@ const PermissionModal = ({
     >
       <SafeAreaView style={styles.root}>
         <Header
-          leftButton={<IconButton icon="chevron" onPress={onRequestClose} />}
+          leftElement={
+            <IconButton icon="arrow_left" onPress={onRequestClose} />
+          }
         />
         <FadeSwitch currentKey={currentPermission} transitionDuration={220}>
           {currentPermission === 'camera' && (

@@ -1,10 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '#theme';
+import { StyleSheet, View } from 'react-native';
 import DashedSlider from '#ui/DashedSlider';
+import Text from '#ui/Text';
 import { editionParametersSettings } from './medias';
 import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type { ViewProps } from 'react-native';
-
 type ImageEditionParameterControlProps = ViewProps & {
   /**
    * The parameter to control.
@@ -60,7 +59,7 @@ const ImageEditionParameterControl = ({
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <Text style={[textStyles.normal, styles.sliderValue]}>
+      <Text variant="small" style={styles.sliderValue}>
         {displayedValue}
       </Text>
       <DashedSlider

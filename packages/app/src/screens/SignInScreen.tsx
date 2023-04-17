@@ -3,22 +3,23 @@ import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   View,
-  Text,
   StyleSheet,
+  Keyboard,
 } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { fontFamilies, colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import Link from '#components/Link';
 import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import SecuredTextInput from '#ui/SecuredTextInput';
+import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { SignInParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as NativeTextInput } from 'react-native';
@@ -60,7 +61,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
   const vp = useViewportSize();
   return (
     <View style={styles.root}>
-      <View onTouchStart={Keyboard.dismiss} style={styles.background}>
+      <View style={styles.background}>
         <Image
           source={require('#assets/sign/darkensign_background.png')}
           resizeMode="cover"
@@ -69,21 +70,18 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
-        style={{ flex: 1 }}
+        style={styles.keyboardVAvoidingiew}
       >
-        <View
-          style={styles.logoContainer}
-          onTouchStart={() => Keyboard.dismiss()}
-        >
+        <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
             source={require('#assets/logo-full_white.png')}
             resizeMode="contain"
             style={styles.logo}
           />
         </View>
-        <View style={styles.content}>
+        <Container style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.title}>
+            <Text variant="xlarge" style={styles.title}>
               <FormattedMessage
                 defaultMessage="Log in"
                 description="Signin Screen - Log in title"
@@ -136,7 +134,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
 
             <View style={styles.forgotPasswordContainer}>
               <Link modal route="FORGOT_PASSWORD">
-                <Text style={styles.greyText}>
+                <Text style={styles.greyText} variant="small">
                   <FormattedMessage
                     defaultMessage="Forgot your password?"
                     description="SigninScreen - Forgot your password?"
@@ -146,6 +144,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
             </View>
             <Submit>
               <Button
+                variant="primary"
                 testID="submitButton"
                 label={intl.formatMessage({
                   defaultMessage: 'Log In',
@@ -170,7 +169,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
                   marginTop: 20,
                 }}
               >
-                <Text style={styles.error}>
+                <Text variant="error">
                   <FormattedMessage
                     defaultMessage="Invalid credentials"
                     description="SigninScreen - Invalid Credentials"
@@ -179,14 +178,14 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
               </View>
             )}
             <View style={styles.footer}>
-              <Text style={styles.greyText}>
+              <Text style={styles.greyText} variant="medium">
                 <FormattedMessage
                   defaultMessage="Don't have an account?"
                   description="SigninScreen - Don't have an account"
                 />
               </Text>
               <Link modal route="SIGN_UP" replace>
-                <Text style={styles.linkLogout}>
+                <Text style={styles.linkLogout} variant="medium">
                   <FormattedMessage
                     defaultMessage="Sign Up"
                     description="SigninScreen - Sign Up"
@@ -195,7 +194,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
               </Link>
             </View>
           </Form>
-        </View>
+        </Container>
       </KeyboardAvoidingView>
     </View>
   );
@@ -217,6 +216,7 @@ function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {
 }
 
 const styles = StyleSheet.create({
+  keyboardVAvoidingiew: { flex: 1 },
   root: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -241,12 +241,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   textInput: {
-    marginBottom: 5,
+    marginBottom: 20,
   },
   content: {
     justifyContent: 'center',
     alignItem: 'center',
-    backgroundColor: 'white',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -255,23 +254,14 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   greyText: {
-    ...fontFamilies.fontMedium,
     color: colors.grey200,
   },
   button: {
     marginTop: 20,
-    height: 45,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
   },
   error: {
-    ...fontFamilies.fontMedium,
-    color: colors.red400,
     paddingLeft: 10,
     paddingRight: 10,
-    fontSize: 14,
   },
   footer: {
     flexDirection: 'row',
@@ -280,7 +270,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   linkLogout: {
-    ...fontFamilies.fontMedium,
     paddingLeft: 5,
   },
   header: {
@@ -288,12 +277,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    ...fontFamilies.semiBold,
-    fontSize: 20,
     marginBottom: 10,
-  },
-  subTitle: {
-    ...textStyles.normal,
-    color: colors.grey400,
   },
 });

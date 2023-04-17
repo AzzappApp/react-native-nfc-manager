@@ -66,7 +66,6 @@ export const POST = async (req: Request) => {
     );
   }
   if (!userName || !profileKind) {
-    console.log('userName or profileKind is missing');
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
@@ -90,7 +89,7 @@ export const POST = async (req: Request) => {
       companyName: companyName ?? null,
       companyActivityId: companyActivityId ?? null,
       profileCategoryId: profileCategoryId ?? null,
-      colorPalette: null,
+      colorPalette: '#FFFFFF,#000000', // from #197 specification issue
       interests: null,
     });
 

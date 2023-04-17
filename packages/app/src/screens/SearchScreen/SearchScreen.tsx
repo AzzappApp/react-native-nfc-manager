@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import useViewportSize, { insetTop } from '#hooks/useViewportSize';
+import Container from '#ui/Container';
 import SearchBar from '#ui/SearchBar';
 import ViewTransition from '#ui/ViewTransition';
 import RecentSearch from './RecentSearch';
@@ -76,7 +77,7 @@ const SearchScreen = ({
   };
 
   return (
-    <View
+    <Container
       style={[
         styles.flexOne,
         {
@@ -137,7 +138,7 @@ const SearchScreen = ({
           />
         )}
       </View>
-    </View>
+    </Container>
   );
 };
 
@@ -158,7 +159,6 @@ const styles = StyleSheet.create({
 
   flexOne: { flex: 1 },
   searchBarContainer: {
-    backgroundColor: 'white',
     paddingLeft: 10,
     paddingRight: 10,
     paddingBottom: 10,

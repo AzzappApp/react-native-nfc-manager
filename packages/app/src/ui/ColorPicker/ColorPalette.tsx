@@ -1,6 +1,12 @@
 import chroma from 'chroma-js';
 import { memo, useCallback, useState } from 'react';
-import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  useColorScheme,
+} from 'react-native';
 import { colors } from '#theme';
 import Icon from '#ui/Icon/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -71,7 +77,7 @@ const ColorPalette = ({
             },
           ]}
         >
-          <Icon icon="plus" style={styles.iconPlus} />
+          <Icon icon="add" />
         </View>
       </PressableNative>
       {colorList.map(color => (
@@ -116,7 +122,7 @@ const ColorPaletteItem = ({
   }, [editMode, onRemoveColor, color, onSelectColor]);
 
   const ITEM_CALCUL = itemWidth - ITEM_MARGIN;
-
+  const colorScheme = useColorScheme();
   const closeColor = chroma(color).darken(0.8).hex();
   return (
     <ViewTransition
@@ -127,7 +133,10 @@ const ColorPaletteItem = ({
           width: ITEM_CALCUL,
           height: ITEM_CALCUL,
           borderRadius: itemWidth / 2,
-          borderColor: `rgba(0,0,0,${selected ? 1 : 0})`,
+          borderColor:
+            colorScheme === 'light'
+              ? `rgba(0,0,0,${selected ? 1 : 0})`
+              : `rgba(255,255,255,${selected ? 1 : 0})`,
         },
       ]}
       transitions={['borderColor']}
@@ -159,14 +168,7 @@ const ColorPaletteItem = ({
           transitions={['backgroundColor', 'opacity']}
           transitionDuration={300}
         >
-          <Icon
-            icon="cross"
-            style={{
-              height: 14,
-              width: 14,
-              tintColor: colors.black,
-            }}
-          />
+          <Icon icon="close" />
         </ViewTransition>
       </Pressable>
     </ViewTransition>
@@ -184,7 +186,7 @@ const BORDER_WIDTH = 2;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   centerAlign: { justifyContent: 'center', alignItems: 'center' },
-  iconPlus: { width: 24, tintColor: colors.grey200 },
+
   itemContainer: {
     borderWidth: 2,
     justifyContent: 'center',
