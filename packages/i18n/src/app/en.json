@@ -1,8 +1,4 @@
 {
-  "+eDqFA": {
-    "defaultMessage": "Cancel",
-    "description": "OnBoarding Cover Component - Link Cancel"
-  },
   "+miIiv": {
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
@@ -50,10 +46,6 @@
   "4RJ0I8": {
     "defaultMessage": "Password",
     "description": "Password input placeholder"
-  },
-  "4lSCO+": {
-    "defaultMessage": "Create your cover from scratch",
-    "description": "TemplateSelector - AccessibilityLabel Button Create your cover from scratch"
   },
   "5/HOhV": {
     "defaultMessage": "Profiles",
@@ -151,6 +143,10 @@
     "defaultMessage": "Done",
     "description": "FontPIcker component Done button label"
   },
+  "A13zLr": {
+    "defaultMessage": "Please select a photo",
+    "description": "CoverEditionScreen Alert message select photo"
+  },
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
@@ -186,10 +182,6 @@
   "C1R1bc": {
     "defaultMessage": "Fade",
     "description": "Fade photo filter name"
-  },
-  "C3M81B": {
-    "defaultMessage": "Cancel and go back",
-    "description": "TemplateSelector - AccessibilityLabel Link Cancel"
   },
   "C3jRta": {
     "defaultMessage": "Enter your last name",
@@ -675,10 +667,6 @@
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
   },
-  "kAtJlh": {
-    "defaultMessage": "Create your cover from scratch",
-    "description": "TemplateSelector - Create your cover from scratch Button"
-  },
   "kKfpW5": {
     "defaultMessage": "Please enter a valid email address",
     "description": "Signup Screen - Error message for invalid email address"
@@ -727,10 +715,6 @@
     "defaultMessage": "Bottom center",
     "description": "Label of the bottom center position in cover edition"
   },
-  "m/dw+k": {
-    "defaultMessage": "Horizontal list of Cover Templates",
-    "description": "TemplateSelector - AccessibilityLabel List Templates"
-  },
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
     "description": "Signup Screen - Accessibility Sign Up button"
@@ -770,10 +754,6 @@
   "nMtsXg": {
     "defaultMessage": "Shadow",
     "description": "Shadow image edition parameters name"
-  },
-  "nQzYNz": {
-    "defaultMessage": "Choose a visual for your cover",
-    "description": "OnBoarding Cover Component - Title"
   },
   "noNWRA": {
     "defaultMessage": "Cut Video",
@@ -899,10 +879,6 @@
     "defaultMessage": "Chrome",
     "description": "Chrome photo filter name"
   },
-  "uWN1s2": {
-    "defaultMessage": "Tap to cancel the creation fo your cover",
-    "description": "TemplateSelector - AccessibilityHint Link Cancel"
-  },
   "ukFVmp": {
     "defaultMessage": "Normal",
     "description": "Name of the default filter (no filter applied) in image edition"
@@ -987,10 +963,6 @@
     "defaultMessage": "Tap to search for {word}",
     "description": "Recent Search - Accessibiltity Label remove element from history"
   },
-  "z0uhsM": {
-    "defaultMessage": "You’ll be able to modify it later",
-    "description": "OnBoarding Cover Component - Subtitle"
-  },
   "z7TgL0": {
     "defaultMessage": "Tonal",
     "description": "Tonal photo filter name"
@@ -1002,10 +974,6 @@
   "zMaylR": {
     "defaultMessage": "Take a video",
     "description": "Accessibility label of the video tabs in post  in image picking wizzard"
-  },
-  "zXfzb7": {
-    "defaultMessage": "or",
-    "description": "OnBoarding Cover Component - Or text"
   },
   "zzoOTT": {
     "defaultMessage": "Enter your name",

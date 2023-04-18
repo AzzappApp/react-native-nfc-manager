@@ -1,5 +1,11 @@
 import { useCallback, useEffect } from 'react';
-import { FlatList, Dimensions, StyleSheet, View } from 'react-native';
+import {
+  FlatList,
+  PixelRatio,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import { graphql, useRefetchableFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
@@ -32,6 +38,7 @@ type CoverModelsEditionPanelProps = {
   subTitle?: string | null;
   selectedTemplateId: string | null;
   onSelectTemplate: (templateId: string, data: TemplateData) => void;
+  isCreation: boolean;
 };
 
 const CoverModelsEditionPanel = ({
@@ -43,20 +50,37 @@ const CoverModelsEditionPanel = ({
   segmented,
   selectedTemplateId,
   onSelectTemplate,
+  isCreation,
 }: CoverModelsEditionPanelProps) => {
+  const { width } = useWindowDimensions();
+  const coverWidth = width * COVER_MINIATURE_RATIO;
+  const coverHeight = coverWidth / COVER_RATIO;
+
   const appearanceStyle = useStyleSheet(computedStyle);
   const [{ coverTemplatesByCategory }, refetch] = useRefetchableFragment(
     graphql`
       fragment CoverModelsEditionPanel_viewer on Viewer
       @refetchable(queryName: "CoverEditionRefetchQuery")
-      @argumentDefinitions(segmented: { type: "Boolean" }) {
+      @argumentDefinitions(
+        pixelRatio: { type: "Float", defaultValue: 2.0 }
+
+        width: { type: "Float", defaultValue: 0.0 }
+        segmented: { type: "Boolean" }
+      ) {
         coverTemplatesByCategory(segmented: $segmented) {
           category
           templates {
             id
+            kind
             ...CoverTemplateRenderer_template
             data {
               mediaStyle
+              sourceMedia {
+                id
+                width
+                height
+                uri: uri(width: $width, pixelRatio: $pixelRatio)
+              }
               background {
                 id
               }
@@ -95,8 +119,21 @@ const CoverModelsEditionPanel = ({
   );
 
   useEffect(() => {
-    refetch({ segmented });
-  }, [refetch, segmented]);
+    refetch({
+      segmented,
+      pixelRatio: PixelRatio.get(),
+      width: width * COVER_MINIATURE_RATIO,
+    });
+  }, [refetch, segmented, width]);
+
+  //select the first template if it's a creation case when loading the coverEditionScreen
+  useEffect(() => {
+    if (isCreation && coverTemplatesByCategory.length > 0) {
+      const template = coverTemplatesByCategory[0].templates[0];
+      onSelectTemplate(template.id, template.data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); //componnentDidMount behaviour
 
   const onTemplateRenderPress = useCallback(
     (template: Template) => {
@@ -112,6 +149,12 @@ const CoverModelsEditionPanel = ({
           style={[
             styles.containerTemplate,
             {
+              width: coverWidth + 2 * BORDER_SELECTED_WIDTH - 0.5,
+              height: coverHeight + 2 * BORDER_SELECTED_WIDTH,
+              borderRadius:
+                COVER_CARD_RADIUS * coverWidth + BORDER_SELECTED_WIDTH,
+            },
+            {
               marginLeft: index === 0 ? 20 : 0,
               borderColor:
                 selectedTemplateId === item.id ? colors.black : 'transparent',
@@ -122,22 +165,24 @@ const CoverModelsEditionPanel = ({
           <CoverTemplateRenderer
             template={item}
             onPress={() => onTemplateRenderPress(item)}
-            coverWidth={COVER_MINIATURE_WIDTH}
+            coverWidth={coverWidth}
             title={title}
             subTitle={subTitle}
             sourceMedia={
-              sourceUri && mediaSize
-                ? {
-                    uri: sourceUri,
-                    width: mediaSize.width,
-                    height: mediaSize.height,
-                  }
+              item.kind === 'personal'
+                ? sourceUri && mediaSize
+                  ? {
+                      uri: sourceUri,
+                      width: mediaSize.width,
+                      height: mediaSize.height,
+                    }
+                  : undefined
                 : undefined
             }
             withShadow={false}
             style={{
-              width: COVER_MINIATURE_WIDTH,
-              height: COVER_MINIATURE_WIDTH / COVER_RATIO,
+              width: coverWidth,
+              height: coverHeight,
             }}
           />
         </View>
@@ -149,7 +194,11 @@ const CoverModelsEditionPanel = ({
   const renderCategory = ({ item }: ListRenderItemInfo<Category>) => {
     if (item && item.templates?.length > 0) {
       return (
-        <View style={styles.containerItemCtageory}>
+        <View
+          style={{
+            height: 26 + coverHeight + 2 * BORDER_SELECTED_WIDTH,
+          }}
+        >
           <TabsBar
             currentTab={item.category}
             tabs={[{ tabKey: item.category, label: item.category }]}
@@ -167,6 +216,12 @@ const CoverModelsEditionPanel = ({
     }
     return null;
   };
+
+  const getItemLayoutCategory = (_data: any, index: number) => ({
+    length: 26 + coverHeight + 2 * BORDER_SELECTED_WIDTH,
+    offset: 100 * index,
+    index,
+  });
 
   return (
     <View style={[styles.root]}>
@@ -187,19 +242,10 @@ const keyExtractorCategory = (item: Category, index: number) =>
 const keyExtractorTemplates = (item: Template, index: number) =>
   item?.id ?? `templates-${index}`;
 
-const getItemLayoutCategory = (_data: any, index: number) => ({
-  length: 26 + COVER_MINIATURE_HEIGHT + 2 * BORDER_SELECTED_WIDTH,
-  offset: 100 * index,
-  index,
-});
-
 export default CoverModelsEditionPanel;
 
-// TODO refactor this, using Dimensions.get('window') is deprecated in favor of useWindowDimensions
-const { width } = Dimensions.get('window');
-const COVER_MINIATURE_WIDTH_RATIO = 4 / 15;
-const COVER_MINIATURE_WIDTH = width * COVER_MINIATURE_WIDTH_RATIO;
-const COVER_MINIATURE_HEIGHT = COVER_MINIATURE_WIDTH / COVER_RATIO;
+const COVER_MINIATURE_RATIO = 4 / 15; //arbitrary fixed value vased on the design
+
 const BORDER_SELECTED_WIDTH = 3.75;
 
 const computedStyle = createStyleSheet(appearance => ({
@@ -212,15 +258,7 @@ const computedStyle = createStyleSheet(appearance => ({
 }));
 
 const styles = StyleSheet.create({
-  containerItemCtageory: {
-    height: 26 + COVER_MINIATURE_HEIGHT + 2 * BORDER_SELECTED_WIDTH,
-  },
-
   containerTemplate: {
-    width: COVER_MINIATURE_WIDTH + 2 * BORDER_SELECTED_WIDTH - 0.5,
-    height: COVER_MINIATURE_HEIGHT + 2 * BORDER_SELECTED_WIDTH,
-    borderRadius:
-      COVER_CARD_RADIUS * COVER_MINIATURE_WIDTH + BORDER_SELECTED_WIDTH,
     borderWidth: BORDER_SELECTED_WIDTH,
   },
   mainFLContentContainer: { paddingBottom: TAB_BAR_HEIGHT + 30 },

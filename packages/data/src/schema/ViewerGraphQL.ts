@@ -257,7 +257,7 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
       resolve: async (
         viewer,
         { segmented }: { segmented: boolean },
-        { profileLoader },
+        { profileLoader, cardLoader },
       ): Promise<CoverTemplateCategory[]> => {
         const profileId = getProfileId(viewer);
         if (!profileId) {
@@ -265,9 +265,18 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         }
         const profile = await profileLoader.load(profileId);
 
+        let determinedSegmented = segmented;
+        if (segmented == null) {
+          // we need to determine which segmented value to use in order to  avoid to mulitple subsequent calls from client while loading the page
+          const card = await cardLoader.load(profileId);
+          if (card?.coverId == null) {
+            determinedSegmented = profile?.profileKind === 'personal';
+          }
+        }
+
         const templates = await getCoverTemplatesByKind(
           profile?.profileKind ?? 'personal',
-          segmented,
+          determinedSegmented,
         );
 
         const categories: CoverTemplateCategory[] = [];

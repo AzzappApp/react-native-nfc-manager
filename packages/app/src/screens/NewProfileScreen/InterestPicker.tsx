@@ -192,6 +192,7 @@ const InterestPicker = ({
             description: 'Interests pickers - Get started Button',
           })}
           onPress={onSubmit}
+          disabled={selectedInterests.size === 0}
         />
         <View
           style={{

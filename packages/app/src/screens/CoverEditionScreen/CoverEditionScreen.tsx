@@ -8,6 +8,8 @@ import {
   Modal,
   StyleSheet,
   View,
+  Image,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -57,7 +59,6 @@ import type {
 import type { TemplateData } from './CoverModelsEditionPanel';
 import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
-import type { CoverEditionScreen_template$key } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
 import type {
   CardCoverBackgroundStyleInput,
@@ -76,17 +77,12 @@ export type CoverEditionScreenProps = {
    * The relay viewer reference
    */
   viewer: CoverEditionScreen_viewer$key | null;
-
-  coverTemplate?: CoverEditionScreen_template$key | null;
 };
 
 /**
  * Allows un user to edit his Cover, the cover changes, can be previsualized
  */
-const CoverEditionScreen = ({
-  viewer: viewerKey,
-  coverTemplate: coverTemplateKey,
-}: CoverEditionScreenProps) => {
+const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   //#region Data dependencies
   const viewer = useFragment(
     graphql`
@@ -122,57 +118,6 @@ const CoverEditionScreen = ({
       }
     `,
     viewerKey,
-  );
-
-  const coverTemplate = useFragment<CoverEditionScreen_template$key>(
-    graphql`
-      fragment CoverEditionScreen_template on CoverTemplate {
-        id
-        colorPalette
-        tags
-        data {
-          mediaStyle
-          sourceMedia {
-            uri
-            id
-            width
-            height
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-          background {
-            id
-          }
-          foreground {
-            id
-          }
-          foregroundStyle {
-            color
-          }
-          segmented
-          merged
-          title
-          contentStyle {
-            orientation
-            placement
-          }
-          titleStyle {
-            fontFamily
-            fontSize
-            color
-          }
-          subTitle
-          subTitleStyle {
-            fontFamily
-            fontSize
-            color
-          }
-        }
-      }
-    `,
-    coverTemplateKey ?? null,
   );
 
   // we separate the cover fragment from the viewer fragment
@@ -236,24 +181,28 @@ const CoverEditionScreen = ({
     viewer?.profile ?? {};
   const [updates, setUpdates] = useState<CoverEditionValue>(() => {
     if (cover) return {};
-    if (coverTemplate) {
-      const { background, foreground, ...rest } = coverTemplate.data;
-      if (coverTemplate?.data) {
-        return {
-          ...rest,
-          backgroundId: background?.id,
-          foregroundId: foreground?.id,
-          title:
-            profileKind === 'personal'
-              ? `${firstName} ${lastName}`
-              : companyName,
-        };
-      }
-    }
-    return {
+    const updatesValue: CoverEditionValue = {
       title:
-        profileKind === 'personal' ? `${firstName} ${lastName}` : companyName,
+        profileKind === 'personal'
+          ? `${firstName} ${lastName}`.trim()
+          : companyName,
+      segmented: profileKind === 'personal',
     };
+
+    if (profileKind === 'personal') {
+      const assetDemo = Image.resolveAssetSource(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('#assets/demo_asset.png'),
+      );
+
+      updatesValue.sourceMedia = {
+        uri: assetDemo.uri,
+        width: assetDemo.width * assetDemo.scale,
+        height: assetDemo.height * assetDemo.scale,
+      };
+    }
+
+    return updatesValue;
   });
 
   const updateFields = useCallback(
@@ -364,16 +313,19 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Mutation, Cancel and navigation
+  const intl = useIntl();
   const rendererRef = useRef<CoverPreviewHandler | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
 
   const isCreation = !cover;
+  const [isDemoAsset, setIsDemoAsset] = useState(isCreation);
   const isDirty = Object.keys(updates).length > 0;
   const isValid =
     !isCreation || (updates.sourceMedia != null && !!updates.title);
   const [maskComputing, setMaskComputing] = useState(false);
+
   const canSave = !saving && isDirty && isValid && !maskComputing;
 
   const router = useRouter();
@@ -395,6 +347,16 @@ const CoverEditionScreen = ({
   const { uploadMedia, uploadSign } = useWebAPI();
   const onSave = async () => {
     if (!canSave) {
+      return;
+    }
+    if (isDemoAsset) {
+      Alert.alert(
+        '',
+        intl.formatMessage({
+          defaultMessage: 'Please select a photo',
+          description: 'CoverEditionScreen Alert message select photo',
+        }),
+      );
       return;
     }
     setSaving(true);
@@ -633,15 +595,7 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Image Picker state
-  const [showImagePicker, setShowImagePicker] = useState(() => {
-    if (cover) {
-      return false;
-    }
-    if (coverTemplate?.data && viewer?.profile?.profileKind !== 'personal') {
-      return false;
-    }
-    return true;
-  });
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   const onPickImage = () => {
     setShowImagePicker(true);
@@ -693,6 +647,7 @@ const CoverEditionScreen = ({
         },
       ],
     );
+    setIsDemoAsset(false);
     setShowImagePicker(false);
   };
 
@@ -941,14 +896,17 @@ const CoverEditionScreen = ({
         ['subTitleStyle', data.subTitleStyle ?? null],
         ['titleStyle', data.titleStyle],
       );
+
+      if (isCreation && profileKind !== 'personal') {
+        updateFields(['sourceMedia', data.sourceMedia]);
+      }
     },
-    [updateFields],
+    [isCreation, profileKind, updateFields],
   );
   //#endregion
 
   const [currentTab, setCurrentTab] = useState<string>('models');
 
-  const intl = useIntl();
   const appearanceStyle = useStyleSheet(computedStyle);
   const cropEditionMode = editedParameter === 'roll';
 
@@ -1045,7 +1003,13 @@ const CoverEditionScreen = ({
             backgroundImageColor={backgroundStyle?.backgroundColor}
             backgroundMultiply={merged}
             backgroundImageTintColor={backgroundStyle?.patternColor}
-            editionParameters={editionParameters}
+            editionParameters={{
+              ...editionParameters,
+              //TODO: find the right tuning, this is applying a filter on all the image, not only on the demo asset. maybe using a darkened demo asset?
+              brightness: isDemoAsset ? -0.5 : editionParameters.brightness,
+              contrast: isDemoAsset ? 0.5 : editionParameters.contrast,
+              saturation: isDemoAsset ? 0 : editionParameters.saturation,
+            }}
             filter={filter}
             title={title}
             subTitle={subTitle}
@@ -1153,6 +1117,7 @@ const CoverEditionScreen = ({
                   subTitle={subTitle}
                   selectedTemplateId={templateId}
                   onSelectTemplate={onSelectTemplate}
+                  isCreation={isCreation}
                 />
               )}
               {currentTab === 'image' && (

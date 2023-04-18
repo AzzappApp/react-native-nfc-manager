@@ -76,13 +76,14 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
     setQRCodeVisible(prev => !prev);
   };
 
+  // even if TemplateSelectorScreen, keeping it waiting this Nico/Robin design on the empty cover
   const ListHeaderComponent = useMemo(() => {
     if (data.profile && !data.profile.card?.id) {
       return (
         <Link
           route="CARD_MODULE_EDITION"
           params={{
-            module: 'template-selector',
+            module: 'cover',
           }}
         >
           <PressableScaleHighlight style={styles.listHeaderPressable}>

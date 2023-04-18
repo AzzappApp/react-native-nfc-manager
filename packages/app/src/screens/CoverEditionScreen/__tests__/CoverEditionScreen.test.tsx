@@ -13,13 +13,22 @@ import CoverEditionScreen from '../CoverEditionScreen';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 import type { CoverEditionScreenProps } from '../CoverEditionScreen';
 import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
-import type { CoverEditionScreen_template$data } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreenTestQuery } from '@azzapp/relay/artifacts/CoverEditionScreenTestQuery.graphql';
 import type { ReactTestInstance } from 'react-test-renderer';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
+//mock Image.resolveAssetSource
+jest.mock('react-native/Libraries/Image/resolveAssetSource', () => ({
+  __esModule: true,
+  default: () => {
+    return {
+      width: 100,
+      height: 100,
+      uri: 'http://fake-site/fake-media.jpg',
+      scale: 1,
+    };
+  },
+}));
 jest.mock('#components/ImagePicker', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
@@ -181,46 +190,14 @@ describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 
   type CoverData = Omit<CoverEditionScreen_cover$data, ' $fragmentType'>;
-  type CoverTemplateData = Omit<
-    CoverEditionScreen_template$data,
-    ' $fragmentType'
-  >;
-
-  const TEMPLATE_COVER_DATA: CoverTemplateData = {
-    id: 'coverTemplateId',
-    colorPalette: ['#233423'],
-    tags: ['tags'],
-    data: {
-      segmented: false,
-      merged: false,
-      background: null,
-      backgroundStyle: null,
-      foreground: null,
-      foregroundStyle: null,
-      title: 'Template title',
-      contentStyle: null,
-      titleStyle: null,
-      subTitleStyle: null,
-      subTitle: 'Template subTitle',
-      mediaStyle: null,
-      sourceMedia: {
-        id: 'sourceMediaId',
-        uri: 'https://example.com/sourceMedia.png',
-        width: 100,
-        height: 100,
-      },
-    },
-  };
 
   const renderCoverEditionScreen = ({
     coverData = null,
-    coverTemplateData = null,
     profileKind = 'personal',
     ...props
   }: Partial<
     CoverEditionScreenProps & {
       coverData: CoverData | null;
-      coverTemplateData: CoverTemplateData | null;
       profileKind: 'business' | 'personal';
     }
   > = {}) => {
@@ -250,12 +227,6 @@ describe('CoverEditionScreen', () => {
             uri: `https://example.com/coverForeground${i}.png`,
           })),
         }),
-        CoverTemplate: () => {
-          if (coverTemplateData) {
-            return coverTemplateData;
-          }
-          return null;
-        },
       }),
     );
 
@@ -266,20 +237,11 @@ describe('CoverEditionScreen', () => {
             viewer {
               ...CoverEditionScreen_viewer
             }
-            node(id: "test-cover-template-id") {
-              ...CoverEditionScreen_template
-            }
           }
         `,
         {},
       );
-      return (
-        <CoverEditionScreen
-          viewer={data.viewer}
-          coverTemplate={data.node}
-          {...props}
-        />
-      );
+      return <CoverEditionScreen viewer={data.viewer} {...props} />;
     };
 
     return render(
@@ -289,9 +251,9 @@ describe('CoverEditionScreen', () => {
     );
   };
 
-  test('Should render ImagePicker if there is no cover, or on image picker button', () => {
+  test('Should not render ImagePicker if there is no cover, or on image picker button', () => {
     const { unmount } = renderCoverEditionScreen();
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
+    expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
     unmount();
     renderCoverEditionScreen({
       coverData: {
@@ -323,23 +285,11 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByTestId('image-picker')).toBeTruthy();
   });
 
-  test('Should hide ImagePicker when user select and image', () => {
-    renderCoverEditionScreen();
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
-    act(() => {
-      fireEvent(screen.getByTestId('image-picker'), 'finished', {
-        uri: 'http://fake-site/fake-media.jpg',
-        width: 100,
-        height: 100,
-        editionParameters: {},
-      });
-    });
-    expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
-  });
-
   test('Should hide ImagePicker when user cancel if a sourceMedia exist', () => {
     renderCoverEditionScreen();
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Select an image'));
+    });
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'http://fake-site/fake-media.jpg',
@@ -359,94 +309,69 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
   });
 
-  test('Should router back method be called when ImagePicker is shown, sourceMedia does not exist and user cancel', () => {
+  test('Should compute the mask media when an image is selected and should apply the mask when the segmented button is checked', async () => {
     renderCoverEditionScreen();
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
 
     act(() => {
-      fireEvent(screen.getByTestId('image-picker'), 'cancel');
+      fireEvent(screen.getAllByRole('switch')[0], 'valueChange', false);
     });
-
-    expect(mockRouter.back).toHaveBeenCalled();
-  });
-
-  test('Should render ImagePicker if there is a personal cover template', () => {
-    renderCoverEditionScreen({
-      coverTemplateData: TEMPLATE_COVER_DATA,
+    segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Select an image'));
     });
-    expect(screen.queryByTestId('image-picker')).toBeTruthy();
-  });
-
-  test('Should not render ImagePicker if there a business cover template', () => {
-    renderCoverEditionScreen({
-      profileKind: 'business',
-      coverTemplateData: TEMPLATE_COVER_DATA,
+    act(() => {
+      fireEvent(screen.getByTestId('image-picker'), 'finished', {
+        uri: 'file:///data/fake-media.jpg',
+        width: 100,
+        height: 100,
+        editionParameters: {},
+      });
     });
+    expect(segmentImageMock).toHaveBeenCalledWith(
+      'file:///data/fake-media.jpg',
+    );
+    await act(flushPromises);
+    expect(screen.getByTestId('editable-image')).not.toHaveProp(
+      'source',
+      expect.objectContaining({
+        uri: 'file:///data/fake-media.jpg',
+        maskUri: 'file:///data/fake-mask.jpg',
+      }),
+    );
 
-    expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
+    act(() => {
+      fireEvent(screen.getAllByRole('switch')[0], 'valueChange', true);
+    });
+    expect(screen.getByTestId('editable-image')).toHaveProp(
+      'source',
+      expect.objectContaining({
+        uri: 'file:///data/fake-media.jpg',
+        maskUri: 'file:///data/fake-mask.jpg',
+      }),
+    );
+
+    segmentImageMock.mockResolvedValueOnce('/data/fake-mask2.jpg');
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Select an image'));
+    });
+    act(() => {
+      fireEvent(screen.getByTestId('image-picker'), 'finished', {
+        uri: 'file:///data/fake-media2.jpg',
+        width: 100,
+        height: 100,
+        editionParameters: {},
+      });
+    });
+    await act(flushPromises);
+
+    expect(screen.getByTestId('editable-image')).toHaveProp(
+      'source',
+      expect.objectContaining({
+        uri: 'file:///data/fake-media2.jpg',
+        maskUri: 'file:///data/fake-mask2.jpg',
+      }),
+    );
   });
-
-  test(
-    'Should compute the mask media when an image is selected ' +
-      'and should apply the mask when the segmented button is checked',
-    async () => {
-      renderCoverEditionScreen();
-
-      segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
-      act(() => {
-        fireEvent(screen.getByTestId('image-picker'), 'finished', {
-          uri: 'file:///data/fake-media.jpg',
-          width: 100,
-          height: 100,
-          editionParameters: {},
-        });
-      });
-      expect(segmentImageMock).toHaveBeenCalledWith(
-        'file:///data/fake-media.jpg',
-      );
-      await act(flushPromises);
-      expect(screen.getByTestId('editable-image')).not.toHaveProp(
-        'source',
-        expect.objectContaining({
-          uri: 'file:///data/fake-media.jpg',
-          maskUri: 'file:///data/fake-mask.jpg',
-        }),
-      );
-
-      act(() => {
-        fireEvent(screen.getAllByRole('switch')[0], 'valueChange', true);
-      });
-      expect(screen.getByTestId('editable-image')).toHaveProp(
-        'source',
-        expect.objectContaining({
-          uri: 'file:///data/fake-media.jpg',
-          maskUri: 'file:///data/fake-mask.jpg',
-        }),
-      );
-
-      segmentImageMock.mockResolvedValueOnce('/data/fake-mask2.jpg');
-      act(() => {
-        fireEvent.press(screen.getByLabelText('Select an image'));
-      });
-      act(() => {
-        fireEvent(screen.getByTestId('image-picker'), 'finished', {
-          uri: 'file:///data/fake-media2.jpg',
-          width: 100,
-          height: 100,
-          editionParameters: {},
-        });
-      });
-      await act(flushPromises);
-
-      expect(screen.getByTestId('editable-image')).toHaveProp(
-        'source',
-        expect.objectContaining({
-          uri: 'file:///data/fake-media2.jpg',
-          maskUri: 'file:///data/fake-mask2.jpg',
-        }),
-      );
-    },
-  );
 
   const fakeCover: CoverData = {
     background: {
@@ -951,6 +876,10 @@ describe('CoverEditionScreen', () => {
 
     expect(saveButton).toHaveProp('accessibilityState', { disabled: true });
     segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
+    expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
+    act(() => {
+      fireEvent.press(screen.getByLabelText('Select an image'));
+    });
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'http://fake-site/fake-media.jpg',
@@ -961,7 +890,7 @@ describe('CoverEditionScreen', () => {
     });
     await act(flushPromises);
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+    expect(saveButton).toHaveProp('accessibilityState', { disabled: true });
     act(() => {
       fireEvent.press(screen.getByLabelText('Text'));
     });

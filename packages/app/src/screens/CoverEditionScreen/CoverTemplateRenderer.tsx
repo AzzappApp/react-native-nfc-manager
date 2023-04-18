@@ -75,7 +75,6 @@ const CoveTemplateRenderer = ({
           type: "Float!"
           provider: "../providers/PixelRatio.relayprovider"
         }
-
         isNative: {
           type: "Boolean!"
           provider: "../providers/isNative.relayprovider"
@@ -83,6 +82,7 @@ const CoveTemplateRenderer = ({
       ) {
         id
         colorPalette
+        kind
         data {
           mediaStyle
           sourceMedia {
@@ -133,7 +133,10 @@ const CoveTemplateRenderer = ({
 
   const editableImageSource: EditableImageSource = useMemo(() => {
     return {
-      uri: sourceMedia?.uri ?? cover.data.sourceMedia.templateURI,
+      uri:
+        cover.kind !== 'personal'
+          ? cover.data.sourceMedia.templateURI
+          : sourceMedia?.uri ?? cover.data.sourceMedia.templateURI,
       backgroundUri: cover.data.background?.uri,
       foregroundUri: cover.data.foreground?.uri,
       kind: 'image',
@@ -142,7 +145,8 @@ const CoveTemplateRenderer = ({
     cover.data.background?.uri,
     cover.data.foreground?.uri,
     cover.data.sourceMedia.templateURI,
-    sourceMedia,
+    cover.kind,
+    sourceMedia?.uri,
   ]);
 
   //doing this to avoid typescript error in render ...
