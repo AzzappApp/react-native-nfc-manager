@@ -580,7 +580,7 @@ describe('ImagePicker', () => {
     });
 
     act(() => {
-      fireEvent.press(screen.getByText('Finish').parent!);
+      fireEvent.press(screen.getByText('Save').parent!);
     });
 
     expect(onFinished).toHaveBeenCalledWith({

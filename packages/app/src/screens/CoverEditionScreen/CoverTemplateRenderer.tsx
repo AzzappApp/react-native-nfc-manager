@@ -55,6 +55,18 @@ type CoverTemplateRendererProps = {
    * Additional style to apply to the container of the CoverTemplateRenderer
    */
   style?: StyleProp<ViewStyle>;
+  /**
+   *
+   *
+   * @type {ImageEditionParameters}
+   */
+  editionParameters?: ImageEditionParameters;
+  /**
+   * the maskUri to aply in segmented
+   *
+   * @type {(string | null | undefined)}
+   */
+  maskUri?: string | null | undefined;
 };
 
 const CoveTemplateRenderer = ({
@@ -65,7 +77,9 @@ const CoveTemplateRenderer = ({
   subTitle,
   sourceMedia,
   withShadow = true,
+  maskUri,
   style,
+  editionParameters,
 }: CoverTemplateRendererProps) => {
   const cover = useFragment(
     graphql`
@@ -139,6 +153,7 @@ const CoveTemplateRenderer = ({
           : sourceMedia?.uri ?? cover.data.sourceMedia.templateURI,
       backgroundUri: cover.data.background?.uri,
       foregroundUri: cover.data.foreground?.uri,
+      maskUri,
       kind: 'image',
     };
   }, [
@@ -146,12 +161,16 @@ const CoveTemplateRenderer = ({
     cover.data.foreground?.uri,
     cover.data.sourceMedia.templateURI,
     cover.kind,
+    maskUri,
     sourceMedia?.uri,
   ]);
 
   //doing this to avoid typescript error in render ...
-  const editionParameters: ImageEditionParameters =
-    cover.data.mediaStyle?.parameters ?? {};
+  const editionParametersMerged: ImageEditionParameters = {
+    ...(cover.data.mediaStyle?.parameters ?? {}),
+    cropData: editionParameters?.cropData,
+    orientation: editionParameters?.orientation,
+  };
 
   const filter = cover.data.mediaStyle
     ? (cover.data.mediaStyle.filter as string)
@@ -187,7 +206,7 @@ const CoveTemplateRenderer = ({
         backgroundImageColor={cover.data.backgroundStyle?.backgroundColor}
         backgroundMultiply={cover.data.merged}
         backgroundImageTintColor={cover.data.backgroundStyle?.patternColor}
-        editionParameters={editionParameters}
+        editionParameters={editionParametersMerged}
         filter={filter}
         title={title ?? cover.data.title}
         subTitle={subTitle ?? cover.data.subTitle}
@@ -195,7 +214,6 @@ const CoveTemplateRenderer = ({
         subTitleStyle={cover.data.subTitleStyle}
         contentStyle={cover.data.contentStyle}
         computing={false}
-        cropEditionMode={false}
         style={withShadow ? styles.coverShadow : undefined}
       />
     </PressableNative>

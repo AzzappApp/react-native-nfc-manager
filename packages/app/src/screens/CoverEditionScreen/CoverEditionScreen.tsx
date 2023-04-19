@@ -3,13 +3,13 @@ import zip from 'lodash/zip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  Dimensions,
   KeyboardAvoidingView,
   Modal,
   StyleSheet,
   View,
   Image,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -41,6 +41,8 @@ import FloatingIconButton from '#ui/FloatingIconButton';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import SwitchLabel from '#ui/SwitchLabel';
+
+import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
@@ -56,6 +58,8 @@ import type {
   ImageEditionParameters,
   ImageOrientation,
 } from '#helpers/mediaHelpers';
+import type { FooterBarItem } from '#ui/FooterBar';
+import type { TabViewHandler } from '#ui/TabView';
 import type { TemplateData } from './CoverModelsEditionPanel';
 import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
@@ -97,6 +101,10 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           firstName
           lastName
           companyName
+          companyActivity {
+            id
+            label
+          }
           profileKind
           card {
             id
@@ -187,6 +195,10 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           ? `${firstName} ${lastName}`.trim()
           : companyName,
       segmented: profileKind === 'personal',
+      subTitle:
+        profileKind === 'business'
+          ? viewer?.profile?.companyActivity?.label
+          : undefined,
     };
 
     if (profileKind === 'personal') {
@@ -881,10 +893,22 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   const onSelectTemplate = useCallback(
     (templateId: string, data: TemplateData) => {
       setTemplateId(templateId);
+      const mediaStayleParameters: any = {
+        ...(data?.mediaStyle?.parameters ?? {}),
+        cropData: editionParameters.cropData ?? null,
+      };
+      // orientation cannot be null or will cause a crash
+      if (editionParameters.orientation) {
+        mediaStayleParameters.orientation = editionParameters.orientation;
+      }
       updateFields(
         [
           'mediaStyle',
-          { ...data.mediaStyle, filter: data.mediaStyle?.filter ?? null },
+          {
+            ...data.mediaStyle,
+            filter: data.mediaStyle?.filter ?? null,
+            parameters: mediaStayleParameters,
+          },
         ],
         ['backgroundId', data.background?.id ?? null],
         ['foregroundId', data.foreground?.id ?? null],
@@ -896,12 +920,21 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         ['subTitleStyle', data.subTitleStyle ?? null],
         ['titleStyle', data.titleStyle],
       );
-
-      if (isCreation && profileKind !== 'personal') {
+      if (
+        isCreation &&
+        profileKind !== 'personal' &&
+        updates.sourceMedia?.id == null
+      ) {
         updateFields(['sourceMedia', data.sourceMedia]);
       }
     },
-    [isCreation, profileKind, updateFields],
+    [
+      editionParameters,
+      updates.sourceMedia?.id,
+      updateFields,
+      isCreation,
+      profileKind,
+    ],
   );
   //#endregion
 
@@ -921,9 +954,66 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   }: LayoutChangeEvent) => {
     setHeightCover(layout.height);
   };
-
+  const { width } = useWindowDimensions();
   const { bottom, top } = useSafeAreaInsets();
   const bottomMargin = bottom > 0 ? bottom : FIXED_BOTTOM_MARGIN;
+  //Bottom Menu navigation. cannot put it ouside as constant because of react-intl
+  const menus: FooterBarItem[] = useMemo(
+    () => [
+      {
+        key: 'models',
+        icon: 'templates',
+        label: intl.formatMessage({
+          defaultMessage: 'Models',
+          description: 'CoverEditionScreen bottom menu label for models tab',
+        }),
+      },
+      {
+        key: 'image',
+        icon: 'image',
+        label: intl.formatMessage({
+          defaultMessage: 'Image',
+          description: 'CoverEditionScreen bottom menu label for Image tab',
+        }),
+      },
+      {
+        key: 'title',
+        icon: 'text',
+        label: intl.formatMessage({
+          defaultMessage: 'Text',
+          description: 'CoverEditionScreen bottom menu label for Text tab',
+        }),
+      },
+      {
+        key: 'foreground',
+        icon: 'foreground',
+        label: intl.formatMessage({
+          defaultMessage: 'Fore.',
+          description:
+            'CoverEditionScreen bottom menu label for Foreground tab',
+        }),
+      },
+      {
+        key: 'background',
+        icon: 'background',
+        label: intl.formatMessage({
+          defaultMessage: 'Back.',
+          description:
+            'CoverEditionScreen bottom menu label for Background tab',
+        }),
+      },
+    ],
+    [intl],
+  );
+  const tabViewRef = useRef<TabViewHandler>(null);
+  const navigateToPanel = useCallback(
+    (menu: string) => {
+      setCurrentTab(menu);
+      const index = menus.findIndex(m => m.key === menu);
+      tabViewRef.current?.navigateToTab(index);
+    },
+    [menus],
+  );
 
   if (!viewer) {
     return null;
@@ -931,9 +1021,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   return (
     //ths container on top avoid some weid feeling when transitionning with transparent backgorund
-    <Container style={{ flex: 1 }}>
+    <Container style={styles.containerStyle}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
         contentContainerStyle={[styles.root, { paddingTop: top }]}
         behavior="position"
       >
@@ -1088,167 +1177,127 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             )}
           </View>
         </View>
-        <View
-          style={styles.bottomPanelContainer}
+
+        <TabView
           onLayout={onBottomPanelLayout}
+          style={{ minHeight: MINIMAL_BOTTOM_HEIGHT }}
+          ref={tabViewRef}
         >
-          {editedParameter != null ? (
-            <>
-              <ImageEditionParameterControl
-                value={editionParameters[editedParameter] as any}
-                parameter={editedParameter}
-                onChange={onEditedParameterValueChange}
-                style={{ flex: 1 }}
-              />
-              <ImageEditionFooter
-                onSave={onParameterEditionSave}
-                onCancel={onParameterEditionCancel}
-              />
-            </>
-          ) : (
-            <>
-              {currentTab === 'models' && (
-                <CoverModelsEditionPanel
-                  viewer={viewer}
-                  segmented={segmented ?? false}
-                  sourceUri={imageSource?.uri}
-                  mediaSize={sourceMediaSize}
-                  title={title}
-                  subTitle={subTitle}
-                  selectedTemplateId={templateId}
-                  onSelectTemplate={onSelectTemplate}
-                  isCreation={isCreation}
-                />
-              )}
-              {currentTab === 'image' && (
-                <CoverImageEditionPanel
-                  media={imageSource}
-                  filter={filter}
-                  editionParameters={editionParameters}
-                  merged={merged ?? false}
-                  foregroundImageTintColor={foregroundStyle?.color}
-                  backgroundImageColor={backgroundStyle?.backgroundColor}
-                  backgroundImageTintColor={backgroundStyle?.patternColor}
-                  onFilterChange={onFilterChange}
-                  onStartParameterEdition={onStartParameterEdition}
-                  style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                    },
-                  ]}
-                />
-              )}
-              {currentTab === 'title' && (
-                <CoverTitleEditionPanel
-                  viewer={viewer}
-                  title={title}
-                  subTitle={subTitle}
-                  titleStyle={titleStyle}
-                  subTitleStyle={subTitleStyle}
-                  contentStyle={contentStyle}
-                  onTitleChange={onTitleChange}
-                  onSubTitleChange={onSubTitleChange}
-                  onTitleStyleChange={onTitleStyleChange}
-                  onSubTitleStyleChange={onSubTitleStyleChange}
-                  onContentStyleChange={onContentStyleChange}
-                  bottomSheetHeights={bottomSheetHeights}
-                  style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                    },
-                  ]}
-                />
-              )}
-              {currentTab === 'background' && (
-                <CoverEditionBackgroundPanel
-                  viewer={viewer}
-                  background={backgroundId}
-                  backgroundStyle={backgroundStyle}
-                  onBackgroundChange={onBackgroundChange}
-                  onBackgroundStyleChange={onBackgroundStyleChange}
-                  bottomSheetHeights={bottomSheetHeights}
-                  style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                    },
-                  ]}
-                />
-              )}
-              {currentTab === 'foreground' && (
-                <CoverEditionForegroundPanel
-                  viewer={viewer}
-                  foreground={foregroundId}
-                  foregroundStyle={foregroundStyle}
-                  onForegroundChange={onForegroundChange}
-                  onForegroundStyleChange={onForegroundStyleChange}
-                  bottomSheetHeights={bottomSheetHeights}
-                  style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                    },
-                  ]}
-                />
-              )}
-              <BottomMenu
-                currentTab={currentTab}
-                onItemPress={setCurrentTab}
-                showLabel
-                tabs={[
-                  {
-                    key: 'models',
-                    icon: 'templates',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Models',
-                      description:
-                        'CoverEditionScreen bottom menu label for models tab',
-                    }),
-                  },
-                  {
-                    key: 'image',
-                    icon: 'image',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Image',
-                      description:
-                        'CoverEditionScreen bottom menu label for Image tab',
-                    }),
-                  },
-                  {
-                    key: 'title',
-                    icon: 'text',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Text',
-                      description:
-                        'CoverEditionScreen bottom menu label for Text tab',
-                    }),
-                  },
-                  {
-                    key: 'foreground',
-                    icon: 'foreground',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Fore.',
-                      description:
-                        'CoverEditionScreen bottom menu label for Foreground tab',
-                    }),
-                  },
-                  {
-                    key: 'background',
-                    icon: 'background',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Back.',
-                      description:
-                        'CoverEditionScreen bottom menu label for Background tab',
-                    }),
-                  },
-                ]}
-                style={[styles.tabsBar, { bottom: bottomMargin }]}
-              />
-            </>
-          )}
-        </View>
+          <CoverModelsEditionPanel
+            viewer={viewer}
+            segmented={segmented ?? false}
+            imageSource={imageSource}
+            mediaSize={sourceMediaSize}
+            title={title}
+            subTitle={subTitle}
+            selectedTemplateId={templateId}
+            onSelectTemplate={onSelectTemplate}
+            isCreation={isCreation}
+            editionParameters={editionParameters}
+          />
+
+          <CoverImageEditionPanel
+            media={imageSource}
+            filter={filter}
+            editionParameters={editionParameters}
+            merged={merged ?? false}
+            foregroundImageTintColor={foregroundStyle?.color}
+            backgroundImageColor={backgroundStyle?.backgroundColor}
+            backgroundImageTintColor={backgroundStyle?.patternColor}
+            onFilterChange={onFilterChange}
+            onStartParameterEdition={onStartParameterEdition}
+            style={[
+              styles.bottomPanel,
+              {
+                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                width,
+              },
+            ]}
+          />
+          <CoverTitleEditionPanel
+            viewer={viewer}
+            title={title}
+            subTitle={subTitle}
+            titleStyle={titleStyle}
+            subTitleStyle={subTitleStyle}
+            contentStyle={contentStyle}
+            onTitleChange={onTitleChange}
+            onSubTitleChange={onSubTitleChange}
+            onTitleStyleChange={onTitleStyleChange}
+            onSubTitleStyleChange={onSubTitleStyleChange}
+            onContentStyleChange={onContentStyleChange}
+            bottomSheetHeights={bottomSheetHeights}
+            style={[
+              styles.bottomPanel,
+              {
+                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                width,
+              },
+            ]}
+          />
+
+          <CoverEditionBackgroundPanel
+            viewer={viewer}
+            background={backgroundId}
+            backgroundStyle={backgroundStyle}
+            onBackgroundChange={onBackgroundChange}
+            onBackgroundStyleChange={onBackgroundStyleChange}
+            bottomSheetHeights={bottomSheetHeights}
+            style={[
+              styles.bottomPanel,
+              {
+                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                width,
+              },
+            ]}
+          />
+
+          <CoverEditionForegroundPanel
+            viewer={viewer}
+            foreground={foregroundId}
+            foregroundStyle={foregroundStyle}
+            onForegroundChange={onForegroundChange}
+            onForegroundStyleChange={onForegroundStyleChange}
+            bottomSheetHeights={bottomSheetHeights}
+            style={[
+              styles.bottomPanel,
+              {
+                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                width,
+              },
+            ]}
+          />
+        </TabView>
+        <BottomMenu
+          currentTab={currentTab}
+          onItemPress={navigateToPanel}
+          showLabel
+          tabs={menus}
+          style={[styles.tabsBar, { bottom: bottomMargin, width: width - 20 }]}
+        />
+        {editedParameter != null && (
+          <Container
+            style={[
+              {
+                position: 'absolute',
+                bottom: 0,
+                width,
+                minHeight: MINIMAL_BOTTOM_HEIGHT + 10,
+              },
+            ]}
+          >
+            <ImageEditionParameterControl
+              value={editionParameters[editedParameter] as any}
+              parameter={editedParameter}
+              onChange={onEditedParameterValueChange}
+              style={{ flex: 1 }}
+            />
+            <ImageEditionFooter
+              onSave={onParameterEditionSave}
+              onCancel={onParameterEditionCancel}
+            />
+          </Container>
+        )}
       </KeyboardAvoidingView>
       <Modal
         visible={showImagePicker}
@@ -1272,10 +1321,11 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 };
 
 export default CoverEditionScreen;
-const { width } = Dimensions.get('window');
-const PADDING_TOP_TOPPANEL = 20;
+
+const PADDING_TOP_TOPPANEL = 15;
 const ICON_SIZE = 50;
 const FIXED_BOTTOM_MARGIN = 15;
+const MINIMAL_BOTTOM_HEIGHT = 314;
 const computedStyle = createStyleSheet(appearance => ({
   toolbar: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
@@ -1292,18 +1342,21 @@ const computedStyle = createStyleSheet(appearance => ({
   },
 }));
 const styles = StyleSheet.create({
+  containerStyle: { flex: 1 },
+  bottomPanelContainer: {
+    minHeight: MINIMAL_BOTTOM_HEIGHT,
+    flex: 1,
+    flexDirection: 'row',
+  },
   root: {
     width: '100%',
     height: '100%',
   },
   topPanel: {
-    flex: 1,
+    height: '50%',
+    flexShrink: 1,
     alignItems: 'center',
     paddingTop: PADDING_TOP_TOPPANEL,
-  },
-  topPanelContent: {
-    flex: 1,
-    aspectRatio: COVER_RATIO,
   },
   cropButton: {
     position: 'absolute',
@@ -1326,10 +1379,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     aspectRatio: COVER_RATIO,
   },
-  bottomPanelContainer: {
-    width: '100%',
-    height: 334,
-  },
   bottomPanel: {
     flex: 1,
     marginTop: 10,
@@ -1338,7 +1387,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: FIXED_BOTTOM_MARGIN,
     left: 10,
-    width: width - 20,
     right: 10,
   },
   toolbar: {

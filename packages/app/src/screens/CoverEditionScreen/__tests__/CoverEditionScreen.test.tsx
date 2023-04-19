@@ -649,6 +649,7 @@ describe('CoverEditionScreen', () => {
       );
     });
     expect(screen.queryByText('fake-title')).not.toBeTruthy();
+
     expect(screen.queryByText('new-title')).toBeTruthy();
 
     const testStyleChangeFor = (text: ReactTestInstance) => {
@@ -674,23 +675,24 @@ describe('CoverEditionScreen', () => {
       expect(screen.queryByTestId('font-picker')).toHaveProp('visible', false);
 
       // Color change tests
-      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
+      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
         'visible',
         false,
       );
       act(() => {
-        fireEvent.press(screen.getByLabelText('Color'));
+        fireEvent.press(screen.getAllByLabelText('Color')[0]);
       });
-      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
+      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
         'visible',
         true,
       );
+
       expect(text).not.toHaveStyle({
         color: '#FF3322',
       });
       act(() => {
         fireEvent(
-          screen.getByTestId('profile-color-palette'),
+          screen.queryAllByTestId('profile-color-palette')[0],
           'changeColor',
           '#FF3322',
         );
@@ -698,14 +700,17 @@ describe('CoverEditionScreen', () => {
       expect(text).toHaveStyle({
         color: '#FF3322',
       });
-      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
+      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
         'visible',
         true,
       );
       act(() => {
-        fireEvent(screen.getByTestId('profile-color-palette'), 'requestClose');
+        fireEvent(
+          screen.queryAllByTestId('profile-color-palette')[0],
+          'requestClose',
+        );
       });
-      expect(screen.queryByTestId('profile-color-palette')).toHaveProp(
+      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
         'visible',
         false,
       );
@@ -766,7 +771,7 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Fore.'));
     });
 
-    const list = screen.getByTestId('cover-layer-list');
+    const list = screen.getByTestId('cover-layer-list-foreground');
     const foregroundsButtons = within(list).getAllByRole('button');
 
     expect(foregroundsButtons).toHaveLength(10);
@@ -789,12 +794,12 @@ describe('CoverEditionScreen', () => {
     );
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Color'));
+      fireEvent.press(screen.getAllByLabelText('Color')[1]);
     });
 
     act(() => {
       fireEvent(
-        screen.getByTestId('profile-color-palette'),
+        screen.getAllByTestId('profile-color-palette')[2],
         'changeColor',
         '#123456',
       );
@@ -810,7 +815,7 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Back.'));
     });
 
-    const list = screen.getByTestId('cover-layer-list');
+    const list = screen.getByTestId('cover-layer-list-background');
     const backgroundsButtons = within(list).getAllByRole('button');
 
     expect(backgroundsButtons).toHaveLength(10);
@@ -838,7 +843,7 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getByTestId('profile-color-palette'),
+        screen.getAllByTestId('profile-color-palette')[1],
         'changeColor',
         '#434239',
       );
@@ -851,7 +856,7 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getByTestId('profile-color-palette'),
+        screen.getAllByTestId('profile-color-palette')[1],
         'changeColor',
         '#FF34A2',
       );

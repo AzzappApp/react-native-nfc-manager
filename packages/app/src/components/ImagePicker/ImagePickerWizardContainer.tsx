@@ -169,8 +169,8 @@ const ImagePickerWizardRenderer = ({
         label={
           isLastStep
             ? intl.formatMessage({
-                defaultMessage: 'Finish',
-                description: 'Finish button label in image picker wizzard',
+                defaultMessage: 'Save',
+                description: 'Save button label in image picker wizzard',
               })
             : intl.formatMessage({
                 defaultMessage: 'Next',

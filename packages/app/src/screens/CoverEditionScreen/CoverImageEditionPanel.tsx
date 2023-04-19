@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    paddingBottom: 10,
   },
   filterSelectionListContentContainer: { paddingHorizontal: 20 },
   filterSelectionList: {
     flex: 1,
     maxHeight: 300,
     marginTop: 20,
-    marginBottom: 10,
   },
 });

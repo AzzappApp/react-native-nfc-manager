@@ -26,6 +26,7 @@ type CoverLayerListProps = {
   backgroundColor?: ColorValue;
   tintColor?: ColorValue;
   style: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 const CoverLayerList = ({
@@ -35,6 +36,7 @@ const CoverLayerList = ({
   backgroundColor = '#00000000',
   tintColor = '#000000',
   style,
+  testID = 'cover-layer-list',
 }: CoverLayerListProps) => {
   const medias = useFragment(
     graphql`
@@ -114,7 +116,7 @@ const CoverLayerList = ({
       style={style}
       contentContainerStyle={styles.container}
       renderItem={renderItem}
-      testID="cover-layer-list"
+      testID={testID}
       accessibilityRole="list"
     />
   );

@@ -84,6 +84,7 @@ const CoverEditionForegroundPanel = ({
         onSelectLayer={onForegroundChange}
         backgroundColor="#ffffff"
         style={styles.content}
+        testID="cover-layer-list-foreground"
       />
       {profile && (
         <ProfileColorPalette
@@ -107,6 +108,6 @@ export default CoverEditionForegroundPanel;
 
 const styles = StyleSheet.create({
   content: {
-    margin: 15,
+    marginVertical: 15,
   },
 });

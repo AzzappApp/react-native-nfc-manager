@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Animated,
@@ -133,30 +133,44 @@ const BottomSheetModal = ({
   useEffect(() => {
     disableGestureInteractionRef.current = disableGestureInteraction;
   }, [disableGestureInteraction]);
-  const pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () =>
-        disableGestureInteractionRef.current !== true,
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          animation.setValue(1 - gestureState.dy / height);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          if (gestureState.dy > height / 2) {
-            onRequestClose();
-          } else {
-            Animated.spring(animation, {
-              toValue: 1,
-              useNativeDriver: true,
-              bounciness: 0,
-            }).start();
+
+  // there is issue when the height is not known at the first render(if initial height is 0), it will crash on pandown
+  const createPanResponder = useCallback(
+    (height: number) => {
+      return PanResponder.create({
+        onStartShouldSetPanResponder: () =>
+          disableGestureInteractionRef.current !== true,
+        onPanResponderMove: (_, gestureState) => {
+          if (gestureState.dy > 0) {
+            if (height > 0) {
+              // division by zero (even if should not happened, it happened during dev and will crash the app)
+              animation.setValue(1 - gestureState.dy / height);
+            }
           }
-        }
-      },
-    }),
-  ).current;
+        },
+        onPanResponderRelease: (_, gestureState) => {
+          if (gestureState.dy > 0) {
+            if (gestureState.dy > height / 2) {
+              onRequestClose();
+            } else {
+              Animated.spring(animation, {
+                toValue: 1,
+                useNativeDriver: true,
+                bounciness: 0,
+              }).start();
+            }
+          }
+        },
+      });
+    },
+    [animation, onRequestClose],
+  );
+
+  const pan = useRef(createPanResponder(height));
+
+  useEffect(() => {
+    pan.current = createPanResponder(height);
+  }, [createPanResponder, height, pan]);
 
   return (
     <Modal
@@ -193,7 +207,7 @@ const BottomSheetModal = ({
         contentContainerStyle={styles.absoluteFill}
       >
         <Animated.View
-          {...pan.panHandlers}
+          {...pan?.current.panHandlers}
           style={[
             styles.bottomSheetContainer,
             appearanceStyle.bottomSheetContainer,

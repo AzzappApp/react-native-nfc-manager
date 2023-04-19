@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-import Container from './Container';
 import PressableNative from './PressableNative';
 
 import type { ReactNode } from 'react';
@@ -67,7 +66,11 @@ const TabsBar = ({
   const appearanceStyle = useStyleSheet(computedStyles);
 
   return (
-    <Container style={[styles.container, style]} accessibilityRole="tablist">
+    <View
+      style={[styles.container, style]}
+      accessibilityRole="tablist"
+      accessible
+    >
       {tabs.map(({ tabKey, rightElement, label }) => (
         <TabsBarItem
           key={tabKey}
@@ -80,7 +83,7 @@ const TabsBar = ({
         />
       ))}
       <View style={appearanceStyle.backgroundLine} />
-    </Container>
+    </View>
   );
 };
 
@@ -156,7 +159,6 @@ const computedStyles = createStyleSheet(appearance => ({
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: appearance === 'light' ? '#FFF' : '#111',
   },
 
   labelContainer: {

@@ -83,9 +83,12 @@ const ColorPicker = ({
 
   const onSaveNewColor = useCallback(() => {
     previouslySelectedColor.current = null;
-    onUpdateColorList(
-      colorList ? [...colorList, selectedColor] : [selectedColor],
-    );
+    //be sure color is uniq (no duplicate)
+    if (colorList?.findIndex(c => c === selectedColor) === -1) {
+      onUpdateColorList(
+        colorList ? [...colorList, selectedColor] : [selectedColor],
+      );
+    }
     setState('colorChooser');
   }, [colorList, onUpdateColorList, selectedColor]);
 

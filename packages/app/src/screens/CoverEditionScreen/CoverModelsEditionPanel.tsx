@@ -1,3 +1,4 @@
+import MaskedView from '@react-native-masked-view/masked-view';
 import { useCallback, useEffect } from 'react';
 import {
   FlatList,
@@ -6,12 +7,17 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useRefetchableFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import TabsBar, { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import TabsBar from '#ui/TabsBar';
 import CoverTemplateRenderer from './CoverTemplateRenderer';
+import type { EditableImageSource } from '#components/medias';
+import type { ImageEditionParameters } from '#helpers/mediaHelpers';
 import type {
   CoverModelsEditionPanel_viewer$data,
   CoverModelsEditionPanel_viewer$key,
@@ -32,18 +38,19 @@ export type TemplateData = Template['data'];
 type CoverModelsEditionPanelProps = {
   segmented: boolean;
   viewer: CoverModelsEditionPanel_viewer$key;
-  sourceUri?: string | null;
+  imageSource?: EditableImageSource | null;
   mediaSize?: { width: number; height: number } | null;
   title?: string | null;
   subTitle?: string | null;
   selectedTemplateId: string | null;
   onSelectTemplate: (templateId: string, data: TemplateData) => void;
   isCreation: boolean;
+  editionParameters?: ImageEditionParameters;
 };
 
 const CoverModelsEditionPanel = ({
   viewer,
-  sourceUri,
+  imageSource,
   mediaSize,
   title,
   subTitle,
@@ -51,11 +58,12 @@ const CoverModelsEditionPanel = ({
   selectedTemplateId,
   onSelectTemplate,
   isCreation,
+  editionParameters,
 }: CoverModelsEditionPanelProps) => {
   const { width } = useWindowDimensions();
   const coverWidth = width * COVER_MINIATURE_RATIO;
   const coverHeight = coverWidth / COVER_RATIO;
-
+  const { bottom } = useSafeAreaInsets();
   const appearanceStyle = useStyleSheet(computedStyle);
   const [{ coverTemplatesByCategory }, refetch] = useRefetchableFragment(
     graphql`
@@ -168,11 +176,12 @@ const CoverModelsEditionPanel = ({
             coverWidth={coverWidth}
             title={title}
             subTitle={subTitle}
+            maskUri={imageSource?.maskUri}
             sourceMedia={
               item.kind === 'personal'
-                ? sourceUri && mediaSize
+                ? imageSource?.uri && mediaSize
                   ? {
-                      uri: sourceUri,
+                      uri: imageSource?.uri,
                       width: mediaSize.width,
                       height: mediaSize.height,
                     }
@@ -184,6 +193,7 @@ const CoverModelsEditionPanel = ({
               width: coverWidth,
               height: coverHeight,
             }}
+            editionParameters={editionParameters}
           />
         </View>
       );
@@ -210,6 +220,7 @@ const CoverModelsEditionPanel = ({
             ItemSeparatorComponent={ItemSeparatorComponent}
             showsHorizontalScrollIndicator={false}
             keyExtractor={keyExtractorTemplates}
+            style={styles.visible}
           />
         </View>
       );
@@ -224,14 +235,32 @@ const CoverModelsEditionPanel = ({
   });
 
   return (
-    <View style={[styles.root]}>
-      <FlatList
-        renderItem={renderCategory}
-        data={coverTemplatesByCategory}
-        contentContainerStyle={styles.mainFLContentContainer}
-        keyExtractor={keyExtractorCategory}
-        getItemLayout={getItemLayoutCategory}
-      />
+    <View style={[styles.root, { width }]}>
+      <MaskedView
+        maskElement={
+          <LinearGradient
+            colors={[
+              'transparent',
+              colors.grey100,
+              colors.grey100,
+              'transparent',
+            ]}
+            locations={[0.0, 0.06, 0.994, 1]}
+            style={{ flex: 1 }}
+          />
+        }
+      >
+        <FlatList
+          renderItem={renderCategory}
+          data={coverTemplatesByCategory}
+          keyExtractor={keyExtractorCategory}
+          getItemLayout={getItemLayoutCategory}
+          contentContainerStyle={{
+            paddingBottom: BOTTOM_MENU_HEIGHT + (bottom > 0 ? bottom : 15) + 10,
+          }}
+          style={styles.visible}
+        />
+      </MaskedView>
     </View>
   );
 };
@@ -244,24 +273,23 @@ const keyExtractorTemplates = (item: Template, index: number) =>
 
 export default CoverModelsEditionPanel;
 
-const COVER_MINIATURE_RATIO = 4 / 15; //arbitrary fixed value vased on the design
-
+const COVER_MINIATURE_RATIO = 3.5 / 15; //arbitrary fixed value vased on the design
 const BORDER_SELECTED_WIDTH = 3.75;
-
 const computedStyle = createStyleSheet(appearance => ({
   coverShadow: {
     shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.11,
     shadowOffset: { width: 0, height: 4.69 },
     shadowRadius: 18.75,
   },
 }));
 
 const styles = StyleSheet.create({
+  visible: { overflow: 'visible' },
   containerTemplate: {
     borderWidth: BORDER_SELECTED_WIDTH,
   },
-  mainFLContentContainer: { paddingBottom: TAB_BAR_HEIGHT + 30 },
+
   root: {
     paddingTop: 10,
   },

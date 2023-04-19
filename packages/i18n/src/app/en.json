@@ -663,6 +663,10 @@
     "defaultMessage": "Top right",
     "description": "Label of the top right position in cover edition"
   },
+  "jyOPzp": {
+    "defaultMessage": "Save",
+    "description": "Save button label in image picker wizzard"
+  },
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
@@ -906,10 +910,6 @@
   "vDm98w": {
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
-  },
-  "w3ybid": {
-    "defaultMessage": "Finish",
-    "description": "Finish button label in image picker wizzard"
   },
   "w96WJ0": {
     "defaultMessage": "Password doesn't match",

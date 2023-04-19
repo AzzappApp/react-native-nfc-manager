@@ -100,6 +100,7 @@ const CoverEditionBackgroundPanel = ({
         tintColor={patternColor}
         onSelectLayer={onBackgroundChange}
         style={styles.content}
+        testID="cover-layer-list-background"
       />
       {profile && (
         <ProfileColorPalette
@@ -126,6 +127,6 @@ export default CoverEditionBackgroundPanel;
 
 const styles = StyleSheet.create({
   content: {
-    margin: 15,
+    marginVertical: 15,
   },
 });
