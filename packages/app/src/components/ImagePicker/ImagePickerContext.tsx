@@ -3,16 +3,13 @@ import {
   forwardRef,
   useCallback,
   useContext,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
 } from 'react';
-import type {
-  ImageEditionParameters,
-  Media,
-  TimeRange,
-  ImageOrientation,
-} from '#helpers/mediaHelpers';
+import type { EditionParameters, ImageOrientation } from '#components/gpu';
+import type { Media, TimeRange } from './imagePickerTypes';
 import type { ReactNode, ForwardedRef } from 'react';
 
 /**
@@ -43,7 +40,7 @@ export type ImagePickerState = {
   /**
    * the edition parameters applied to the media
    */
-  editionParameters: ImageEditionParameters;
+  editionParameters: EditionParameters;
   /**
    * the filter applied to the media
    */
@@ -81,21 +78,16 @@ export type ImagePickerState = {
    * an event dispatched by picker step to change the edition parameters applied to the media
    * @param editionParameters the new edition parameters
    */
-  onEditionParametersChange(editionParameters: ImageEditionParameters): void;
+  onEditionParametersChange(editionParameters: EditionParameters): void;
   /**
    * an event dispatched by picker step to change an edition parameter value
    * @param param the parameter to change
    * @param value the new value
    */
-  onParameterValueChange<T extends keyof ImageEditionParameters>(
+  onParameterValueChange<T extends keyof EditionParameters>(
     param: T,
-    value: ImageEditionParameters[T],
+    value: EditionParameters[T],
   ): void;
-  /**
-   * an event dispatched by picker step to reset the state of the picker
-   * @param duration the duration of the selected video
-   */
-  reset(duration?: number | null): void;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
@@ -149,12 +141,13 @@ const _ImagePickerContextProvider = (
   const [aspectRatio, setAspectRatio] = useState(
     typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
-  const [editionParameters, setEditionParameters] =
-    useState<ImageEditionParameters>({});
+  const [editionParameters, setEditionParameters] = useState<EditionParameters>(
+    {},
+  );
   const [timeRange, setTimeRange] = useState<TimeRange | null>(null);
   const [mediaFilter, setMediaFilter] = useState<string | null>(null);
 
-  const reset = useCallback(() => {
+  useEffect(() => {
     setEditionParameters({});
     let initialTimeRange: TimeRange | null = null;
     if (media?.kind === 'video') {
@@ -171,9 +164,8 @@ const _ImagePickerContextProvider = (
     (media: Media) => {
       setMedia(media);
       setAspectRatio(forceAspectRatio ?? null);
-      reset();
     },
-    [forceAspectRatio, reset],
+    [forceAspectRatio],
   );
 
   const onAspectRatioChange = useCallback(
@@ -182,9 +174,12 @@ const _ImagePickerContextProvider = (
         return;
       }
       setAspectRatio(aspectRatio ?? null);
-      reset();
+      setEditionParameters(editionParameters => ({
+        ...editionParameters,
+        cropData: null,
+      }));
     },
-    [media, reset],
+    [media],
   );
 
   const onTimeRangeChange = useCallback(
@@ -212,9 +207,9 @@ const _ImagePickerContextProvider = (
   );
 
   const onParameterValueChange = useCallback(
-    <T extends keyof ImageEditionParameters>(
+    <T extends keyof EditionParameters>(
       key: T,
-      value: ImageEditionParameters[T],
+      value: EditionParameters[T],
     ) => {
       setEditionParameters(params => ({ ...params, [key]: value }));
     },
@@ -242,7 +237,6 @@ const _ImagePickerContextProvider = (
       onParameterValueChange,
       onTimeRangeChange,
       onMediaFilterChange: setMediaFilter,
-      reset,
     }),
     [
       kind,
@@ -258,7 +252,6 @@ const _ImagePickerContextProvider = (
       onAspectRatioChange,
       onParameterValueChange,
       onTimeRangeChange,
-      reset,
     ],
   );
 
@@ -280,7 +273,10 @@ export const ImagePickerContextProvider = forwardRef(
   _ImagePickerContextProvider,
 );
 
-const getMediaAspectRatio = (media: Media, orientation?: ImageOrientation) => {
+const getMediaAspectRatio = (
+  media: Media,
+  orientation?: ImageOrientation | null,
+) => {
   const aspectRatio = media.width / media.height;
   return orientation === 'LEFT' || orientation === 'RIGHT'
     ? 1 / aspectRatio

@@ -16,7 +16,7 @@ import {
 } from '#helpers/mediaHelpers';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { Media } from '#helpers/mediaHelpers';
+import type { Media } from './imagePickerTypes';
 import type {
   PhotoIdentifier,
   PhotoIdentifiersPage,

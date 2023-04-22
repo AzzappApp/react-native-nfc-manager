@@ -30,7 +30,6 @@ import type { CameraRuntimeError } from 'react-native-vision-camera';
 export type SelectImageStepProps = {
   onNext(): void;
   onBack(): void;
-  MediaContainerComponent?: React.ElementType;
   initialCameraPosition?: 'back' | 'front';
 };
 
@@ -41,7 +40,6 @@ export type SelectImageStepProps = {
 const SelectImageStep = ({
   onBack,
   onNext,
-  MediaContainerComponent = Fragment,
   initialCameraPosition,
 }: SelectImageStepProps) => {
   // #region State management
@@ -233,19 +231,16 @@ const SelectImageStep = ({
         topPanel={
           pickerMode === 'gallery' ? (
             media != null ? (
-              <MediaContainerComponent>
-                <>
-                  <ImagePickerMediaRenderer />
-                  {forceAspectRatio == null && (
-                    <FloatingIconButton
-                      icon="expand"
-                      style={styles.adjustButton}
-                      size={40}
-                      onPress={onAspectRatioToggle}
-                    />
-                  )}
-                </>
-              </MediaContainerComponent>
+              <ImagePickerMediaRenderer>
+                {forceAspectRatio == null && (
+                  <FloatingIconButton
+                    icon="expand"
+                    style={styles.adjustButton}
+                    size={40}
+                    onPress={onAspectRatioToggle}
+                  />
+                )}
+              </ImagePickerMediaRenderer>
             ) : null
           ) : hasCameraPermission &&
             (pickerMode === 'photo' || hasMicrophonePermission) ? (

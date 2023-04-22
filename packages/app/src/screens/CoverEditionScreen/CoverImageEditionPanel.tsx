@@ -5,14 +5,24 @@ import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import FilterSelectionList from '#components/FilterSelectionList';
 import ImageEditionParametersList from '#components/ImageEditionParametersList';
 import TabsBar from '#ui/TabsBar';
-import type { EditableImageSource } from '#components/medias';
-import type { ImageEditionParameters } from '#helpers/mediaHelpers';
+import type { EditionParameters } from '#components/gpu';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CoverImageEditionPanelProps = {
-  media: EditableImageSource | null;
+  /**
+   * Source Media to Override the Source Media of the template
+   */
+  uri?: string;
+  /**
+   * The source media type
+   */
+  kind?: 'image' | 'video' | 'videoFrame';
+  /**
+   * if the source media is a videoFrame, the time of the frame to display
+   */
+  time?: number | null;
   filter: string | null;
-  editionParameters: ImageEditionParameters;
+  editionParameters: EditionParameters;
   merged: boolean;
   backgroundImageColor?: string | null;
   backgroundImageTintColor?: string | null;
@@ -23,13 +33,11 @@ type CoverImageEditionPanelProps = {
 };
 
 const CoverImageEditionPanel = ({
-  media,
+  uri,
+  kind,
+  time,
   filter,
   editionParameters,
-  merged,
-  backgroundImageColor,
-  backgroundImageTintColor,
-  foregroundImageTintColor,
   onFilterChange,
   onStartParameterEdition,
   style,
@@ -42,7 +50,7 @@ const CoverImageEditionPanel = ({
 
   const intl = useIntl();
 
-  if (!media) {
+  if (!uri) {
     return null;
   }
 
@@ -72,12 +80,12 @@ const CoverImageEditionPanel = ({
       <View style={styles.body}>
         {currentTab === 'filter' && (
           <FilterSelectionList
-            media={media}
-            editionParameters={editionParameters}
-            backgroundImageColor={backgroundImageColor}
-            backgroundImageTintColor={backgroundImageTintColor}
-            foregroundImageTintColor={foregroundImageTintColor}
-            backgroundMultiply={merged}
+            layer={{
+              kind: kind === 'video' ? 'videoFrame' : 'image',
+              uri,
+              time,
+              parameters: editionParameters,
+            }}
             aspectRatio={COVER_RATIO}
             selectedFilter={filter}
             onChange={onFilterChange}

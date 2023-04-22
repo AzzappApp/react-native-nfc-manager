@@ -5,18 +5,12 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import { EditableImage, useFilterList } from './medias';
-import type { ImageEditionParameters } from '#helpers/mediaHelpers';
-import type { EditableImageSource } from './medias';
+import { GPUImageView, useFilterList } from './gpu';
+import type { ImageLayer, VideoFrameLayer } from './gpu';
 import type { ScrollViewProps, LayoutChangeEvent } from 'react-native';
 
 type FilterSelectionListProps = ScrollViewProps & {
-  media: EditableImageSource;
-  editionParameters: ImageEditionParameters;
-  backgroundImageColor?: string | null;
-  backgroundImageTintColor?: string | null;
-  foregroundImageTintColor?: string | null;
-  backgroundMultiply?: boolean | null;
+  layer: ImageLayer | VideoFrameLayer;
   aspectRatio: number;
   selectedFilter: string | null;
   cardRadius?: number;
@@ -25,14 +19,9 @@ type FilterSelectionListProps = ScrollViewProps & {
 
 // TODO docs and tests once this component is production ready
 const FilterSelectionList = ({
-  media,
-  editionParameters,
+  layer,
   aspectRatio,
   selectedFilter,
-  backgroundImageColor,
-  backgroundImageTintColor,
-  foregroundImageTintColor,
-  backgroundMultiply,
   cardRadius = 0,
   onChange,
   ...props
@@ -46,12 +35,7 @@ const FilterSelectionList = ({
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
       <FilterButton
-        media={media}
-        editionParameters={editionParameters}
-        backgroundImageColor={backgroundImageColor}
-        backgroundImageTintColor={backgroundImageTintColor}
-        foregroundImageTintColor={foregroundImageTintColor}
-        backgroundMultiply={backgroundMultiply}
+        layer={layer}
         aspectRatio={aspectRatio}
         selected={selectedFilter === null}
         label={intl.formatMessage({
@@ -66,12 +50,7 @@ const FilterSelectionList = ({
       {filters.map(({ filter, label }) => (
         <FilterButton
           key={filter}
-          media={media}
-          editionParameters={editionParameters}
-          backgroundImageColor={backgroundImageColor}
-          backgroundImageTintColor={backgroundImageTintColor}
-          foregroundImageTintColor={foregroundImageTintColor}
-          backgroundMultiply={backgroundMultiply}
+          layer={layer}
           aspectRatio={aspectRatio}
           selected={filter === selectedFilter}
           label={label}
@@ -85,14 +64,8 @@ const FilterSelectionList = ({
 };
 
 export default FilterSelectionList;
-
 type FilterButtonProps = {
-  media: EditableImageSource;
-  editionParameters: ImageEditionParameters;
-  backgroundImageColor?: string | null;
-  backgroundImageTintColor?: string | null;
-  foregroundImageTintColor?: string | null;
-  backgroundMultiply?: boolean | null;
+  layer: ImageLayer | VideoFrameLayer;
   aspectRatio: number;
   selected: boolean;
   filter: string | null;
@@ -102,12 +75,7 @@ type FilterButtonProps = {
 };
 
 const FilterButton = ({
-  media,
-  editionParameters,
-  backgroundImageColor,
-  backgroundImageTintColor,
-  foregroundImageTintColor,
-  backgroundMultiply,
+  layer,
   aspectRatio,
   selected,
   label,
@@ -142,16 +110,10 @@ const FilterButton = ({
           selected && appearanceStyle.selected,
         ]}
       >
-        <View style={[styles.wrapperEditableImage, { borderRadius }]}>
-          <EditableImage
-            source={media}
-            backgroundImageColor={backgroundImageColor}
-            backgroundImageTintColor={backgroundImageTintColor}
-            foregroundImageTintColor={foregroundImageTintColor}
-            backgroundMultiply={backgroundMultiply}
-            editionParameters={editionParameters}
-            filters={filter ? [filter] : null}
+        <View style={[styles.imageWrapper, { borderRadius }]}>
+          <GPUImageView
             style={[styles.filterImage, { aspectRatio, borderRadius }]}
+            layers={[{ ...layer, filters: filter ? [filter] : [] }]}
           />
         </View>
       </View>
@@ -173,7 +135,7 @@ const computedStyles = createStyleSheet(appearance => ({
 }));
 
 const styles = StyleSheet.create({
-  wrapperEditableImage: {
+  imageWrapper: {
     flex: 1,
     backgroundColor: colors.grey200,
   },

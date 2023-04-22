@@ -24,10 +24,9 @@ class AZPMediaImageRendererManager: RCTViewManager {
   }
   
   @objc(addCacheEntry:size:uri:)
-  func addCacheEntry(_ mediaID: NSString, size: NSNumber, uri: NSString) {
+  func addCacheEntry(_ mediaID: NSString, size: NSNumber, uri: URL) {
     MediaImageURICache.shared.addCacheEntry(mediaID: mediaID, size: size, uri: uri)
   }
-  
 }
 
 struct AZPMediaImageRendererSource {
@@ -109,15 +108,15 @@ class AZPMediaImageRenderer: UIImageView {
       return;
     }
     
-    let request = source.uri.asImageRequest()
+    let request = ImageRequest(url: source.uri)
     let pipeline = ImagePipeline.shared;
     
-    if let imageContainer = pipeline.cache[request] {
+    if let imageContainer = pipeline.cache.cachedImage(for: request) {
       self.image = imageContainer.image;
       MediaImageURICache.shared.addCacheEntry(
         mediaID: source.mediaID,
         size: source.requestedSize,
-        uri: NSString(string: source.uri.absoluteString)
+        uri: source.uri
       )
       self.onLoad?(nil)
       return
@@ -134,7 +133,7 @@ class AZPMediaImageRenderer: UIImageView {
             MediaImageURICache.shared.addCacheEntry(
               mediaID: source.mediaID,
               size: source.requestedSize,
-              uri: NSString(string: source.uri.absoluteString)
+              uri: source.uri
             )
             self?.onLoad?(nil)
           case let .failure(error):
@@ -143,23 +142,22 @@ class AZPMediaImageRenderer: UIImageView {
       }
     )
     
-    guard let (nsPlaceholderURI, placeholderSize) = MediaImageURICache.shared.queryCache(
+    guard let (placeholderURI, placeholderSize) = MediaImageURICache.shared.queryCache(
             mediaID: source.mediaID,
             size: source.requestedSize
     ) else { return }
     
-    let placeholderURI = nsPlaceholderURI as String
-    
-    if let imageContainer = pipeline.cache.cachedImage(for: placeholderURI) {
+    if let imageContainer = pipeline.cache.cachedImage(for: ImageRequest(url: placeholderURI)) {
       self.image = imageContainer.image;
       self.onPlaceHolderImageLoad?(nil)
       return
     }
     
-    if (placeholderURI.starts(with: "file://")) {
+    if (placeholderURI.scheme == "file") {
       let fileManager = FileManager.default;
-      if (fileManager.fileExists(atPath: placeholderURI)) {
-        self.image = UIImage(contentsOfFile: placeholderURI);
+      let uriStr = placeholderURI.absoluteString
+      if (fileManager.fileExists(atPath: uriStr)) {
+        self.image = UIImage(contentsOfFile: uriStr);
         self.onPlaceHolderImageLoad?(nil)
         return
       }
@@ -180,15 +178,15 @@ class MediaImageURICache {
     cache.countLimit = 1000;
   }
   
-  func queryCache(mediaID: NSString, size: NSNumber) -> (NSString, NSNumber)? {
+  func queryCache(mediaID: NSString, size: NSNumber) -> (URL, NSNumber)? {
     guard let mediaCache = cache.object(forKey: mediaID) else {
       return nil;
     }
-    var uri: NSString? = nil;
+    var uri: URL? = nil;
     var currentUriSize: Float = 0
     let requestedSize: Float = Float(truncating: size)
     for (key, value) in mediaCache {
-      guard let entrySize = key as? NSNumber, let entryUri = value as? NSString else {
+      guard let entrySize = key as? NSNumber, let entryUri = value as? URL else {
         continue;
       }
       let compareSize = Float(truncating: entrySize)
@@ -203,7 +201,7 @@ class MediaImageURICache {
     return (uri, NSNumber(value: currentUriSize));
   };
   
-  func addCacheEntry(mediaID: NSString, size: NSNumber, uri: NSString) {
+  func addCacheEntry(mediaID: NSString, size: NSNumber, uri: URL) {
     if (cache.object(forKey: mediaID) == nil) {
       cache.setObject(NSMutableDictionary(), forKey: mediaID)
     }

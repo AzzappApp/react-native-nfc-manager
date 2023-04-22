@@ -25,22 +25,6 @@ jest.mock(
     }),
 );
 
-jest.mock('#components/medias', () => ({
-  EditableImageWithCropMode: (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('EditableImageWithCropMode', {
-      ...props,
-      testID: 'selected-media-image',
-    }),
-  EditableVideoWithCropMode: (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('EditableVideoWithCropMode', {
-      ...props,
-      testID: 'selected-media-video',
-    }),
-  useEditionParametersDisplayInfos: () => ({}),
-}));
-
 const mockCameraViewRef = {
   takePhoto: jest.fn(),
   startRecording: jest.fn(),
@@ -156,6 +140,20 @@ const renderImagePicker = async (props?: Partial<ImagePickerProps>) => {
   return picker;
 };
 
+jest.mock('#components/gpu/GPUNativeMethods');
+
+jest.mock('#components/Cropper', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { View } = require('react-native');
+  const Cropper = ({ children, ...props }: any) => (
+    <View {...props} testID="cropper">
+      {children(props.cropData)}
+    </View>
+  );
+
+  return Cropper;
+});
+
 describe('ImagePicker', () => {
   describe('SelectImageStep', () => {
     test('Should render the gallery list to allow the user to pick a media', async () => {
@@ -176,12 +174,14 @@ describe('ImagePicker', () => {
         });
       });
 
-      expect(screen.getByTestId('selected-media-image')).toHaveProp('source', {
-        kind: 'image',
-        uri: 'file://fakeuri.com/image2.jpg',
-        width: 300,
-        height: 500,
-      });
+      const imageView = screen.getByTestId('image-picker-media-image');
+      expect(imageView.type).toBe('AZPGPUImageView');
+      expect(imageView).toHaveProp('layers', [
+        expect.objectContaining({
+          kind: 'image',
+          uri: 'file://fakeuri.com/image2.jpg',
+        }),
+      ]);
 
       act(() => {
         fireEvent(list, 'mediaSelected', {
@@ -193,10 +193,16 @@ describe('ImagePicker', () => {
       });
 
       await act(flushPromises);
-
-      expect(screen.getByTestId('selected-media-video')).toHaveProp(
-        'uri',
-        'https://fakeuri.com/video.mp4',
+      const videoView = screen.getByTestId('image-picker-media-video');
+      expect(videoView.type).toBe('AZPGPUVideoView');
+      expect(screen.getByTestId('image-picker-media-video')).toHaveProp(
+        'layers',
+        [
+          expect.objectContaining({
+            kind: 'video',
+            uri: 'https://fakeuri.com/video.mp4',
+          }),
+        ],
       );
     });
 
@@ -303,12 +309,15 @@ describe('ImagePicker', () => {
         fireEvent(cameraControlPanel, 'takePhoto');
       });
       await act(flushPromises);
-      expect(screen.getByTestId('selected-media-image')).toHaveProp('source', {
-        kind: 'image',
-        uri: 'file:///fakeuri.com/image.jpg',
-        width: 100,
-        height: 100,
-      });
+      expect(screen.getByTestId('image-picker-media-image')).toHaveProp(
+        'layers',
+        [
+          expect.objectContaining({
+            kind: 'image',
+            uri: 'file:///fakeuri.com/image.jpg',
+          }),
+        ],
+      );
       expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
     });
 
@@ -330,9 +339,9 @@ describe('ImagePicker', () => {
         fireEvent(cameraControlPanel, 'stopRecording');
       });
       await act(flushPromises);
-      expect(screen.getByTestId('selected-media-video')).toHaveProp(
-        'uri',
-        'file:///fakeuri.com/video.mp4',
+      expect(screen.getByTestId('image-picker-media-video')).toHaveProp(
+        'layers',
+        [expect.objectContaining({ uri: 'file:///fakeuri.com/video.mp4' })],
       );
       expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
     });
@@ -365,7 +374,7 @@ describe('ImagePicker', () => {
     describe('Filter Tab', () => {
       test('Should display the selected image and the filter selection list', async () => {
         await renderImagePickerToEditImageStep();
-        expect(screen.queryByTestId('selected-media-image')).toBeTruthy();
+        expect(screen.queryByTestId('image-picker-media-image')).toBeTruthy();
         expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
       });
 
@@ -375,9 +384,13 @@ describe('ImagePicker', () => {
         act(() => {
           fireEvent(filterSelectionList, 'change', 'corail');
         });
-        expect(screen.getByTestId('selected-media-image')).toHaveProp(
-          'filters',
-          ['corail'],
+        expect(screen.getByTestId('image-picker-media-image')).toHaveProp(
+          'layers',
+          [
+            expect.objectContaining({
+              filters: ['corail'],
+            }),
+          ],
         );
       });
     });
@@ -427,11 +440,13 @@ describe('ImagePicker', () => {
       test('Should apply the selected parameter change to the image', async () => {
         await renderToEditionParameterControl('brightness', 0.5);
 
-        expect(screen.getByTestId('selected-media-image')).toHaveProp(
-          'editionParameters',
-          expect.objectContaining({
-            brightness: 0.5,
-          }),
+        expect(screen.getByTestId('image-picker-media-image')).toHaveProp(
+          'layers',
+          [
+            expect.objectContaining({
+              parameters: expect.objectContaining({ brightness: 0.5 }),
+            }),
+          ],
         );
       });
 
@@ -440,7 +455,7 @@ describe('ImagePicker', () => {
         act(() => {
           fireEvent.press(screen.getByText('Cancel').parent!);
         });
-        expect(screen.getByTestId('selected-media-image')).not.toHaveProp(
+        expect(screen.getByTestId('image-picker-media-image')).not.toHaveProp(
           'editionParameters',
           expect.objectContaining({
             brightness: 0.5,
@@ -451,16 +466,18 @@ describe('ImagePicker', () => {
         ).not.toBeTruthy();
       });
 
-      test('Should valide the change when the user validate them', async () => {
+      test('Should validate the change when the user validate them', async () => {
         await renderToEditionParameterControl('brightness', 0.5);
         act(() => {
           fireEvent.press(screen.getByText('Validate').parent!);
         });
-        expect(screen.getByTestId('selected-media-image')).toHaveProp(
-          'editionParameters',
-          expect.objectContaining({
-            brightness: 0.5,
-          }),
+        expect(screen.getByTestId('image-picker-media-image')).toHaveProp(
+          'layers',
+          [
+            expect.objectContaining({
+              parameters: expect.objectContaining({ brightness: 0.5 }),
+            }),
+          ],
         );
         expect(
           screen.queryByTestId('image-edition-parameter-control'),
@@ -469,7 +486,7 @@ describe('ImagePicker', () => {
 
       test('Should enter crop mode if the user select the crop parameter', async () => {
         await renderToEditionParameterControl('cropData');
-        expect(screen.queryByTestId('selected-media-image')).toHaveProp(
+        expect(screen.queryByTestId('cropper')).toHaveProp(
           'cropEditionMode',
           true,
         );
@@ -481,10 +498,12 @@ describe('ImagePicker', () => {
             0.5,
           );
         });
-        const getMedia = () => screen.getByTestId('selected-media-image');
-        expect(getMedia()).toHaveProp('editionParameters', {
-          roll: 0.5,
-        });
+        const getMedia = () => screen.getByTestId('image-picker-media-image');
+        expect(getMedia()).toHaveProp('layers', [
+          expect.objectContaining({
+            parameters: expect.objectContaining({ roll: 0.5 }),
+          }),
+        ]);
 
         act(() => {
           fireEvent(getMedia(), 'onCropDataChange', {
@@ -494,25 +513,51 @@ describe('ImagePicker', () => {
             height: 800,
           });
         });
-        expect(getMedia()).toHaveProp('editionParameters', {
-          roll: 0.5,
-          cropData: { x: 100, y: 100, width: 500, height: 800 },
-        });
+
+        expect(getMedia()).toHaveProp('layers', [
+          expect.objectContaining({
+            parameters: expect.objectContaining({
+              roll: 0.5,
+              cropData: { x: 100, y: 100, width: 500, height: 800 },
+            }),
+          }),
+        ]);
 
         act(() => {
           fireEvent.press(screen.getByLabelText('Rotate'));
         });
-        expect(getMedia()).toHaveProp('editionParameters', {
-          roll: 0.5,
-          cropData: { x: 100, y: 100, width: 500, height: 800 },
-          orientation: 'LEFT',
-        });
+        expect(getMedia()).toHaveProp('layers', [
+          expect.objectContaining({
+            parameters: expect.objectContaining({
+              roll: 0.5,
+              cropData: { x: 100, y: 100, width: 500, height: 800 },
+              orientation: 'RIGHT',
+            }),
+          }),
+        ]);
+
+        expect(getMedia()).toHaveProp('layers', [
+          expect.objectContaining({
+            parameters: expect.objectContaining({
+              roll: 0.5,
+              cropData: { x: 100, y: 100, width: 500, height: 800 },
+              orientation: 'RIGHT',
+            }),
+          }),
+        ]);
 
         act(() => {
           fireEvent.press(screen.getByText('Cancel').parent!);
         });
-        expect(getMedia()).toHaveProp('cropEditionMode', false);
-        expect(getMedia()).toHaveProp('editionParameters', {});
+        expect(screen.getByTestId('cropper')).toHaveProp(
+          'cropEditionMode',
+          false,
+        );
+        expect(getMedia()).toHaveProp('layers', [
+          expect.objectContaining({
+            parameters: {},
+          }),
+        ]);
       });
     });
 
@@ -540,10 +585,10 @@ describe('ImagePicker', () => {
             duration: 12.6,
           });
         });
-        const video = screen.getByTestId('selected-media-video');
-        expect(video).toHaveProp('startTime', 3.4);
-        // T
-        expect(video).toHaveProp('duration', 11);
+        const video = screen.getByTestId('image-picker-media-video');
+        expect(video).toHaveProp('layers', [
+          expect.objectContaining({ startTime: 3.4, duration: 11 }),
+        ]);
       });
     });
   });

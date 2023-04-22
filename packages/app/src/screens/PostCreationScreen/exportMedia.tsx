@@ -1,5 +1,5 @@
-import { exportImage, exportVideo } from '#helpers/mediaHelpers';
-import type { ImageEditionParameters } from '#helpers/mediaHelpers';
+import { exportImage, exportVideo } from '#components/gpu';
+import type { EditionParameters } from '#components/gpu';
 
 const VIDEO_MAX_SIZE = 1280;
 const IMAGE_MAX_SIZE = 2048;
@@ -19,7 +19,7 @@ const exportMedia = ({
   kind: 'image' | 'video';
   aspectRatio: number;
   filter?: string | null;
-  editionParameters?: ImageEditionParameters | null;
+  editionParameters?: EditionParameters | null;
   removeSound?: boolean;
   startTime?: number;
   duration?: number;
@@ -31,23 +31,33 @@ const exportMedia = ({
   };
   if (kind === 'image') {
     return exportImage({
-      uri,
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          filters: filter ? [filter] : [],
+          parameters: editionParameters ?? {},
+        },
+      ],
       size,
-      filters: filter ? [filter] : [],
-      parameters: editionParameters ?? {},
       format: 'JPEG',
       quality: 0.8,
     });
   } else {
     return exportVideo({
-      uri,
+      layers: [
+        {
+          kind: 'video',
+          uri,
+          filters: filter ? [filter] : [],
+          parameters: editionParameters ?? {},
+          startTime,
+          duration,
+        },
+      ],
       size,
       bitRate: VIDEO_BIT_RATE,
-      filters: filter ? [filter] : [],
-      parameters: editionParameters ?? {},
       removeSound,
-      startTime,
-      duration,
     });
   }
 };

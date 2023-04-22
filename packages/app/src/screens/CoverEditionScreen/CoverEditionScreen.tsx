@@ -23,43 +23,40 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
+import { exportImage } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
-import {
-  calculImageSize,
-  exportImage,
-  isPNG,
-  segmentImage,
-} from '#helpers/mediaHelpers';
+import { calculImageSize, isPNG, segmentImage } from '#helpers/mediaHelpers';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import SwitchLabel from '#ui/SwitchLabel';
-
 import TabView from '#ui/TabView';
+
 import UploadProgressModal from '#ui/UploadProgressModal';
+import ViewTransition from '#ui/ViewTransition';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
+import CoverEditionImagePickerMediaWrapper from './CoverEditionImagePickerMediaWrapper';
 import CoverEditionImagePickerSelectImageStep from './CoverEditionImagePickerSelectImageStep';
 import CoverImageEditionPanel from './CoverImageEditionPanel';
 import CoverModelsEditionPanel from './CoverModelsEditionPanel';
 import CoverPreviewRenderer from './CoverPreviewRenderer';
 import CoverTitleEditionPanel from './CoverTitleEditionPanel';
-import type { ImagePickerResult } from '#components/ImagePicker';
-import type { EditableImageSource } from '#components/medias';
 import type {
   CropData,
-  ImageEditionParameters,
+  EditionParameters,
   ImageOrientation,
-} from '#helpers/mediaHelpers';
+} from '#components/gpu';
+import type { ImagePickerResult } from '#components/ImagePicker';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { TabViewHandler } from '#ui/TabView';
 import type { TemplateData } from './CoverModelsEditionPanel';
 import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
@@ -316,12 +313,25 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     [updates, cover],
   );
 
+  const kind = 'image';
+  const uri = sourceMedia?.uri;
+  const maskUri = segmented ? maskMedia : null;
   const backgroundUri =
     viewer?.coverBackgrounds.find(background => background.id === backgroundId)
       ?.uri ?? null;
   const foregroundUri =
     viewer?.coverForegrounds.find(foreground => foreground.id === foregroundId)
       ?.uri ?? null;
+  const mediaSize = useMemo(() => {
+    if (sourceMedia) {
+      return {
+        width: sourceMedia.width,
+        height: sourceMedia.height,
+      };
+    }
+    return null;
+  }, [sourceMedia]);
+
   //#endregion
 
   //#region Mutation, Cancel and navigation
@@ -373,6 +383,12 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     }
     setSaving(true);
 
+    const renderer = rendererRef.current;
+    if (!renderer) {
+      //Todo: handle error
+      return;
+    }
+
     const shouldRecreateMedia =
       updates.sourceMedia != null ||
       updates.maskMedia != null ||
@@ -385,23 +401,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       updates.merged != null;
 
     const mediaPath: string | null = shouldRecreateMedia
-      ? await exportImage({
-          uri: sourceMedia!.uri,
-          size: { width: COVER_MAX_WIDTH, height: COVER_MAX_HEIGHT },
-          parameters: mediaStyle?.parameters as ImageEditionParameters,
-          filters: mediaStyle?.filter
-            ? ([mediaStyle.filter] as string[])
-            : undefined,
-          quality: 0.8,
-          maskUri: segmented
-            ? updates.maskMedia ?? cover?.maskMedia?.uri
-            : null,
-          backgroundColor: backgroundStyle?.backgroundColor,
-          backgroundImageUri: backgroundUri,
-          backgroundImageTintColor: backgroundStyle?.patternColor,
-          backgroundMultiply: merged,
-          foregroundImageUri: foregroundUri,
-          foregroundImageTintColor: foregroundStyle?.color,
+      ? await renderer.exporteMedia({
+          width: COVER_MAX_WIDTH,
+          height: COVER_MAX_HEIGHT,
         })
       : null;
 
@@ -412,9 +414,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       updates.subTitle != null ||
       updates.subTitleStyle != null;
 
-    const textPreviewMediaPath = ((shouldRecreateTextPreview &&
-      (await rendererRef.current?.capture())) ??
-      null) as string | null; // could have a 'false' type
+    const textPreviewMediaPath = shouldRecreateTextPreview
+      ? await renderer.exportTextMedia()
+      : null;
 
     const sourceMediaId = sourceMedia?.id;
     const shouldRecreateSourceMedia = updates.sourceMedia && !sourceMediaId;
@@ -628,7 +630,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     ) {
       const resize = calculImageSize(width, height, COVER_MAX_IMAGE_DIMENSION);
       const resizePath = await exportImage({
-        uri,
+        layers: [{ kind: 'image', uri }],
         size: { width: resize.width, height: resize.height },
         format: isPNG(uri) ? 'PNG' : 'JPEG',
       });
@@ -700,38 +702,6 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   };
   //#endregion
 
-  //#region displayed image
-  const imageSource = useMemo<EditableImageSource | null>(() => {
-    if (sourceMedia) {
-      return {
-        kind: 'image',
-        uri: sourceMedia.uri,
-        maskUri: !maskComputing && segmented ? maskMedia : null,
-        backgroundUri,
-        foregroundUri,
-      };
-    }
-    return null;
-  }, [
-    sourceMedia,
-    maskComputing,
-    segmented,
-    maskMedia,
-    backgroundUri,
-    foregroundUri,
-  ]);
-
-  const sourceMediaSize = useMemo(() => {
-    if (sourceMedia) {
-      return {
-        width: sourceMedia.width,
-        height: sourceMedia.height,
-      };
-    }
-    return null;
-  }, [sourceMedia]);
-  //#endregion
-
   //#region Media style edition
   const filter = useMemo<string | null>(
     () => (mediaStyle ? (mediaStyle.filter as string) : null),
@@ -743,25 +713,24 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   };
 
   const [editedParameter, setEditedParameter] = useState<
-    keyof ImageEditionParameters | null
+    keyof EditionParameters | null
   >(null);
 
-  const editionParameters = useMemo<ImageEditionParameters>(
-    () =>
-      (mediaStyle && (mediaStyle.parameters as ImageEditionParameters)) ?? {},
+  const editionParameters = useMemo<EditionParameters>(
+    () => (mediaStyle && (mediaStyle.parameters as EditionParameters)) ?? {},
     [mediaStyle],
   );
 
   const editionParametersSave = useRef(editionParameters);
-  const onStartParameterEdition = (param: keyof ImageEditionParameters) => {
+  const onStartParameterEdition = (param: keyof EditionParameters) => {
     editionParametersSave.current = editionParameters;
     setEditedParameter(param);
   };
 
   const onParameterValueChange = useCallback(
-    <T extends keyof ImageEditionParameters>(
+    <T extends keyof EditionParameters>(
       param: T,
-      value: ImageEditionParameters[T],
+      value: EditionParameters[T],
     ) => {
       // we can't use updateFields here because we need to update the mediaStyle
       // and we could have race conditions if multiple parameters are edited
@@ -812,17 +781,17 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     let nextOrientation: ImageOrientation;
     switch (editionParameters.orientation) {
       case 'LEFT':
-        nextOrientation = 'DOWN';
+        nextOrientation = 'UP';
         break;
       case 'DOWN':
-        nextOrientation = 'RIGHT';
+        nextOrientation = 'LEFT';
         break;
       case 'RIGHT':
-        nextOrientation = 'UP';
+        nextOrientation = 'DOWN';
         break;
       case 'UP':
       default:
-        nextOrientation = 'LEFT';
+        nextOrientation = 'RIGHT';
         break;
     }
     onParameterValueChange('orientation', nextOrientation);
@@ -948,12 +917,11 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     setBottomSheetHeights(event.nativeEvent.layout.height);
   };
 
-  const [heighCover, setHeightCover] = useState(0);
-  const onContainerLayout = ({
-    nativeEvent: { layout },
-  }: LayoutChangeEvent) => {
-    setHeightCover(layout.height);
+  const [coverHeight, setCoverHeight] = useState<number | null>(null);
+  const onCoverLayout = ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+    setCoverHeight(layout.height);
   };
+
   const { width } = useWindowDimensions();
   const { bottom, top } = useSafeAreaInsets();
   const bottomMargin = bottom > 0 ? bottom : FIXED_BOTTOM_MARGIN;
@@ -1005,15 +973,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     ],
     [intl],
   );
-  const tabViewRef = useRef<TabViewHandler>(null);
-  const navigateToPanel = useCallback(
-    (menu: string) => {
-      setCurrentTab(menu);
-      const index = menus.findIndex(m => m.key === menu);
-      tabViewRef.current?.navigateToTab(index);
-    },
-    [menus],
-  );
+  const navigateToPanel = useCallback((menu: string) => {
+    setCurrentTab(menu);
+  }, []);
 
   if (!viewer) {
     return null;
@@ -1079,38 +1041,53 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             )
           }
         />
-        <View style={styles.topPanel}>
-          <CoverPreviewRenderer
-            ref={rendererRef}
-            source={imageSource}
-            mediaSize={sourceMediaSize}
-            foregroundImageTintColor={
-              cropEditionMode
-                ? makeTranslucent(foregroundStyle?.color)
-                : foregroundStyle?.color
-            }
-            backgroundImageColor={backgroundStyle?.backgroundColor}
-            backgroundMultiply={merged}
-            backgroundImageTintColor={backgroundStyle?.patternColor}
-            editionParameters={{
-              ...editionParameters,
-              //TODO: find the right tuning, this is applying a filter on all the image, not only on the demo asset. maybe using a darkened demo asset?
-              brightness: isDemoAsset ? -0.5 : editionParameters.brightness,
-              contrast: isDemoAsset ? 0.5 : editionParameters.contrast,
-              saturation: isDemoAsset ? 0 : editionParameters.saturation,
-            }}
-            filter={filter}
-            title={title}
-            subTitle={subTitle}
-            titleStyle={titleStyle}
-            subTitleStyle={subTitleStyle}
-            contentStyle={contentStyle}
-            computing={segmented && maskComputing}
-            cropEditionMode={cropEditionMode}
-            onCropDataChange={onCropDataChange}
-            onLayout={onContainerLayout}
-            style={appearanceStyle.coverShadow}
-          />
+        <ViewTransition
+          style={[styles.topPanel, { opacity: coverHeight != null ? 1 : 0 }]}
+          transitionDuration={120}
+          transitions={['opacity']}
+        >
+          <PressableNative
+            style={{ flex: 1 }}
+            onPress={onPickImage}
+            disabled={cropEditionMode}
+            disabledOpacity={1}
+          >
+            <CoverPreviewRenderer
+              ref={rendererRef}
+              kind={kind}
+              uri={uri}
+              maskUri={maskUri}
+              mediaSize={mediaSize}
+              foregroundImageUri={foregroundUri}
+              foregroundImageTintColor={
+                cropEditionMode
+                  ? makeTranslucent(foregroundStyle?.color)
+                  : foregroundStyle?.color
+              }
+              backgroundImageUri={backgroundUri}
+              backgroundColor={backgroundStyle?.backgroundColor}
+              backgroundMultiply={merged}
+              backgroundImageTintColor={backgroundStyle?.patternColor}
+              editionParameters={{
+                ...editionParameters,
+                //TODO: find the right tuning, this is applying a filter on all the image, not only on the demo asset. maybe using a darkened demo asset?
+                brightness: isDemoAsset ? -0.5 : editionParameters.brightness,
+                contrast: isDemoAsset ? 0.5 : editionParameters.contrast,
+                saturation: isDemoAsset ? 0 : editionParameters.saturation,
+              }}
+              filter={filter}
+              title={title}
+              subTitle={subTitle}
+              titleStyle={titleStyle}
+              subTitleStyle={subTitleStyle}
+              contentStyle={contentStyle}
+              computing={segmented && maskComputing}
+              cropEditionMode={cropEditionMode}
+              onCropDataChange={onCropDataChange}
+              onLayout={onCoverLayout}
+              style={appearanceStyle.coverShadow}
+            />
+          </PressableNative>
           {sourceMedia && !cropEditionMode && (
             <FloatingIconButton
               icon="crop"
@@ -1118,7 +1095,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               onPress={onActivateCropMode}
               style={[
                 styles.cropButton,
-                { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
+                coverHeight != null && {
+                  top: (coverHeight - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL,
+                },
               ]}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Crop',
@@ -1138,7 +1117,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               onPress={onPickImage}
               style={[
                 styles.takePictureButton,
-                { top: (heighCover - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL },
+                coverHeight != null && {
+                  top: (coverHeight - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL,
+                },
               ]}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Select an image',
@@ -1176,98 +1157,123 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               />
             )}
           </View>
-        </View>
+        </ViewTransition>
 
         <TabView
+          currentTab={currentTab}
+          tabs={[
+            {
+              id: 'models',
+              element: (
+                <CoverModelsEditionPanel
+                  viewer={viewer}
+                  segmented={segmented ?? false}
+                  uri={uri}
+                  kind={kind}
+                  maskUri={maskUri}
+                  title={title}
+                  subTitle={subTitle}
+                  selectedTemplateId={templateId}
+                  onSelectTemplate={onSelectTemplate}
+                  isCreation={isCreation}
+                  editionParameters={editionParameters}
+                />
+              ),
+            },
+            {
+              id: 'image',
+              element: (
+                <CoverImageEditionPanel
+                  uri={uri}
+                  kind={kind}
+                  filter={filter}
+                  editionParameters={editionParameters}
+                  merged={merged ?? false}
+                  foregroundImageTintColor={foregroundStyle?.color}
+                  backgroundImageColor={backgroundStyle?.backgroundColor}
+                  backgroundImageTintColor={backgroundStyle?.patternColor}
+                  onFilterChange={onFilterChange}
+                  onStartParameterEdition={onStartParameterEdition}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                      width,
+                    },
+                  ]}
+                />
+              ),
+            },
+            {
+              id: 'title',
+              element: (
+                <CoverTitleEditionPanel
+                  viewer={viewer}
+                  title={title}
+                  subTitle={subTitle}
+                  titleStyle={titleStyle}
+                  subTitleStyle={subTitleStyle}
+                  contentStyle={contentStyle}
+                  onTitleChange={onTitleChange}
+                  onSubTitleChange={onSubTitleChange}
+                  onTitleStyleChange={onTitleStyleChange}
+                  onSubTitleStyleChange={onSubTitleStyleChange}
+                  onContentStyleChange={onContentStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                      width,
+                    },
+                  ]}
+                />
+              ),
+            },
+            {
+              id: 'foreground',
+              element: (
+                <CoverEditionForegroundPanel
+                  viewer={viewer}
+                  foreground={foregroundId}
+                  foregroundStyle={foregroundStyle}
+                  onForegroundChange={onForegroundChange}
+                  onForegroundStyleChange={onForegroundStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                      width,
+                    },
+                  ]}
+                />
+              ),
+            },
+            {
+              id: 'background',
+              element: (
+                <CoverEditionBackgroundPanel
+                  viewer={viewer}
+                  background={backgroundId}
+                  backgroundStyle={backgroundStyle}
+                  onBackgroundChange={onBackgroundChange}
+                  onBackgroundStyleChange={onBackgroundStyleChange}
+                  bottomSheetHeights={bottomSheetHeights}
+                  style={[
+                    styles.bottomPanel,
+                    {
+                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+                      width,
+                    },
+                  ]}
+                />
+              ),
+            },
+          ]}
           onLayout={onBottomPanelLayout}
-          style={{ minHeight: MINIMAL_BOTTOM_HEIGHT }}
-          ref={tabViewRef}
-        >
-          <CoverModelsEditionPanel
-            viewer={viewer}
-            segmented={segmented ?? false}
-            imageSource={imageSource}
-            mediaSize={sourceMediaSize}
-            title={title}
-            subTitle={subTitle}
-            selectedTemplateId={templateId}
-            onSelectTemplate={onSelectTemplate}
-            isCreation={isCreation}
-            editionParameters={editionParameters}
-          />
-
-          <CoverImageEditionPanel
-            media={imageSource}
-            filter={filter}
-            editionParameters={editionParameters}
-            merged={merged ?? false}
-            foregroundImageTintColor={foregroundStyle?.color}
-            backgroundImageColor={backgroundStyle?.backgroundColor}
-            backgroundImageTintColor={backgroundStyle?.patternColor}
-            onFilterChange={onFilterChange}
-            onStartParameterEdition={onStartParameterEdition}
-            style={[
-              styles.bottomPanel,
-              {
-                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                width,
-              },
-            ]}
-          />
-          <CoverTitleEditionPanel
-            viewer={viewer}
-            title={title}
-            subTitle={subTitle}
-            titleStyle={titleStyle}
-            subTitleStyle={subTitleStyle}
-            contentStyle={contentStyle}
-            onTitleChange={onTitleChange}
-            onSubTitleChange={onSubTitleChange}
-            onTitleStyleChange={onTitleStyleChange}
-            onSubTitleStyleChange={onSubTitleStyleChange}
-            onContentStyleChange={onContentStyleChange}
-            bottomSheetHeights={bottomSheetHeights}
-            style={[
-              styles.bottomPanel,
-              {
-                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                width,
-              },
-            ]}
-          />
-
-          <CoverEditionBackgroundPanel
-            viewer={viewer}
-            background={backgroundId}
-            backgroundStyle={backgroundStyle}
-            onBackgroundChange={onBackgroundChange}
-            onBackgroundStyleChange={onBackgroundStyleChange}
-            bottomSheetHeights={bottomSheetHeights}
-            style={[
-              styles.bottomPanel,
-              {
-                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                width,
-              },
-            ]}
-          />
-
-          <CoverEditionForegroundPanel
-            viewer={viewer}
-            foreground={foregroundId}
-            foregroundStyle={foregroundStyle}
-            onForegroundChange={onForegroundChange}
-            onForegroundStyleChange={onForegroundStyleChange}
-            bottomSheetHeights={bottomSheetHeights}
-            style={[
-              styles.bottomPanel,
-              {
-                marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                width,
-              },
-            ]}
-          />
-        </TabView>
+          style={{ minHeight: MINIMAL_BOTTOM_HEIGHT, flex: 1 }}
+        />
         <BottomMenu
           currentTab={currentTab}
           onItemPress={navigateToPanel}
@@ -1310,6 +1316,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[CoverEditionImagePickerSelectImageStep]}
+          TopPanelWrapper={CoverEditionImagePickerMediaWrapper}
         />
       </Modal>
       <UploadProgressModal
@@ -1335,6 +1342,7 @@ const computedStyle = createStyleSheet(appearance => ({
     shadowRadius: 4,
   },
   coverShadow: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
     shadowColor: appearance === 'light' ? colors.black : colors.white,
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 10 },

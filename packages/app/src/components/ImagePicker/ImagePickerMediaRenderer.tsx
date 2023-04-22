@@ -1,9 +1,13 @@
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { colors } from '#theme';
+import Cropper from '#components/Cropper';
 import {
-  EditableImageWithCropMode,
-  EditableVideoWithCropMode,
-  EditableImage,
-} from '../medias';
+  GPUImageView,
+  GPUVideoView,
+  Image,
+  Video,
+  VideoFrame,
+} from '#components/gpu';
 import { useImagePickerState } from './ImagePickerContext';
 
 type ImagePickerMediaRendererProps = {
@@ -11,6 +15,14 @@ type ImagePickerMediaRendererProps = {
    * if true, the crop edition mode is enabled
    */
   cropEditionMode?: boolean;
+  /**
+   * element to display alongside the media
+   * (e.g. a button to change the aspect ratio)
+   *
+   * It is useful to display buttons in image picker top panel without
+   * changing the component hierarchy (to avoid re-mounting the media)
+   */
+  children?: React.ReactNode;
 };
 
 /**
@@ -18,6 +30,7 @@ type ImagePickerMediaRendererProps = {
  */
 const ImagePickerMediaRenderer = ({
   cropEditionMode,
+  children,
 }: ImagePickerMediaRendererProps) => {
   const {
     media,
@@ -54,11 +67,9 @@ const ImagePickerMediaRenderer = ({
             { alignItems: 'center', justifyContent: 'center' },
           ]}
         >
-          <EditableImage
-            style={StyleSheet.absoluteFill}
-            editionParameters={editionParameters}
-            source={media}
-          />
+          <GPUImageView style={StyleSheet.absoluteFill}>
+            <VideoFrame uri={media.uri} parameters={editionParameters} />
+          </GPUImageView>
           <View
             style={[
               StyleSheet.absoluteFill,
@@ -71,35 +82,67 @@ const ImagePickerMediaRenderer = ({
     );
   }
 
-  return media.kind === 'image' ? (
-    <EditableImageWithCropMode
-      key={`${media.uri}-${aspectRatio}`}
-      source={media}
-      mediaSize={media}
-      aspectRatio={aspectRatio}
-      editionParameters={editionParameters}
-      cropEditionMode={cropEditionMode}
-      filters={mediaFilter ? [mediaFilter] : null}
-      onCropDataChange={cropData =>
-        onParameterValueChange('cropData', cropData)
-      }
-      style={{ flex: 1 }}
-    />
-  ) : (
-    <EditableVideoWithCropMode
-      mediaSize={media}
-      key={`${media.uri}-${aspectRatio}`}
-      aspectRatio={aspectRatio}
-      uri={media.uri}
-      editionParameters={editionParameters}
-      cropEditionMode={cropEditionMode}
-      filters={mediaFilter ? [mediaFilter] : null}
-      {...timeRange}
-      onCropDataChange={cropData =>
-        onParameterValueChange('cropData', cropData)
-      }
-      style={{ flex: 1 }}
-    />
+  return (
+    <View
+      style={{
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.grey100,
+      }}
+    >
+      <Cropper
+        // avoid unwanted transition effect when changing media or aspect ratio
+        key={`${media.uri}-${aspectRatio}`}
+        cropEditionMode={cropEditionMode}
+        mediaSize={media}
+        aspectRatio={aspectRatio}
+        cropData={editionParameters.cropData}
+        pitch={editionParameters.pitch}
+        roll={editionParameters.roll}
+        yaw={editionParameters.yaw}
+        orientation={editionParameters.orientation}
+        onCropDataChange={cropData =>
+          onParameterValueChange('cropData', cropData)
+        }
+        style={{
+          width: aspectRatio >= 1 ? '100%' : 'auto',
+          height: aspectRatio <= 1 ? '100%' : 'auto',
+          aspectRatio,
+          backgroundColor: 'black',
+        }}
+      >
+        {cropData =>
+          media.kind === 'image' ? (
+            <GPUImageView
+              style={{ flex: 1, aspectRatio }}
+              testID="image-picker-media-image"
+            >
+              <Image
+                uri={media.uri}
+                parameters={{ ...editionParameters, cropData }}
+                filters={mediaFilter ? [mediaFilter] : null}
+              />
+            </GPUImageView>
+          ) : (
+            <GPUVideoView
+              style={{ flex: 1, aspectRatio }}
+              testID="image-picker-media-video"
+            >
+              <Video
+                uri={media.uri}
+                parameters={{ ...editionParameters, cropData }}
+                filters={mediaFilter ? [mediaFilter] : null}
+                startTime={timeRange?.startTime}
+                duration={timeRange?.duration}
+              />
+            </GPUVideoView>
+          )
+        }
+      </Cropper>
+      {children}
+    </View>
   );
 };
 

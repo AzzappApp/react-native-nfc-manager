@@ -15,7 +15,7 @@ import FadeSwitch from '#ui/FadeSwitch';
 import Header from '#ui/Header';
 import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import type { BottomMenuProps } from '#ui/BottomMenu';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode, ComponentType } from 'react';
 import type { ViewProps } from 'react-native';
 
 export type ImagePickerStepDefinition = {
@@ -81,6 +81,7 @@ type ImagePickerWizardContainerProps = Exclude<ViewProps, 'children'> & {
   canCancel: boolean;
   busy?: boolean;
   exporting?: boolean;
+  TopPanelWrapper: ComponentType<any>;
   onBack(): void;
   onNext(): void;
 };
@@ -119,6 +120,7 @@ type ImagePickerWizardRendererProps = ImagePickerStepDefinition &
     busy?: boolean;
     onBack(): void;
     onNext(): void;
+    TopPanelWrapper: ComponentType<any>;
   };
 
 const ImagePickerWizardRenderer = ({
@@ -136,6 +138,7 @@ const ImagePickerWizardRenderer = ({
   canCancel,
   onBack,
   onNext,
+  TopPanelWrapper,
   style,
   ...props
 }: ImagePickerWizardRendererProps) => {
@@ -197,7 +200,9 @@ const ImagePickerWizardRenderer = ({
         middleElement={headerTitle}
         style={styles.header}
       />
-      <View style={styles.topPanel}>{topPanel}</View>
+      <View style={styles.topPanel}>
+        {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
+      </View>
       <View style={styles.bottomPanel}>
         <FadeSwitch transitionDuration={120} currentKey={stepId}>
           {bottomPanel}

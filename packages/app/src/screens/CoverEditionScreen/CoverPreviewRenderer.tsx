@@ -1,113 +1,63 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
-import { captureRef } from 'react-native-view-shot';
-import {
-  COVER_BASE_WIDTH,
-  COVER_CARD_RADIUS,
-  COVER_RATIO,
-  DEFAULT_COVER_CONTENT_ORTIENTATION,
-  DEFAULT_COVER_CONTENT_PLACEMENT,
-  DEFAULT_COVER_FONT_FAMILY,
-  DEFAULT_COVER_FONT_SIZE,
-  DEFAULT_COVER_TEXT_COLOR,
-} from '@azzapp/shared/cardHelpers';
-import { EditableImageWithCropMode } from '#components/medias';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { colors } from '#theme';
+import Cropper from '#components/Cropper';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
 import Text from '#ui/Text';
-import type { EditableImageSource } from '#components/medias';
-import type { CropData, ImageEditionParameters } from '#helpers/mediaHelpers';
+import CoverMediaPreview from './CoverMediaPreview';
+import CoverTextPreview from './CoverTextPreview';
 import type {
-  CardCoverContentStyleInput,
-  CardCoverTextStyleInput,
-} from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
+  CropData,
+  GPUImageViewHandle,
+  GPUVideoViewHandle,
+} from '#components/gpu';
+import type { CoverMediaPreviewProps } from './CoverMediaPreview';
+import type {
+  CoverTextPreviewProps,
+  CoverTextPreviewHandle,
+} from './CoverTextPreview';
 import type { ForwardedRef } from 'react';
-import type {
-  LayoutChangeEvent,
-  ViewStyle,
-  LayoutRectangle,
-  ViewProps,
-} from 'react-native';
+import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 
-type CoverPreviewRendererProps = ViewProps & {
-  /**
-   * The source media of the cover
-   */
-  source?: EditableImageSource | null;
-  /**
-   * The size of the source media
-   */
-  mediaSize?: { width: number; height: number } | null;
-  /**
-   * The background color of the cover
-   */
-  backgroundImageColor?: string | null;
-  /**
-   * The tint color of the background image
-   */
-  backgroundImageTintColor?: string | null;
-  /**
-   * The tint color of the foreground image
-   */
-  foregroundImageTintColor?: string | null;
-  /**
-   * Should the main image be multiplied by the background image
-   */
-  backgroundMultiply?: boolean | null;
-  /**
-   * The title of the cover
-   */
-  title: string | null | undefined;
-  /**
-   * The style of the title
-   */
-  titleStyle: CardCoverTextStyleInput | null | undefined;
-  /**
-   * The sub title of the cover
-   */
-  subTitle: string | null | undefined;
-  /**
-   * The style of the sub title
-   */
-  subTitleStyle: CardCoverTextStyleInput | null | undefined;
-  /**
-   * The style of the content
-   */
-  contentStyle: CardCoverContentStyleInput | null | undefined;
-  /**
-   * Edition parameters to apply on the sourceMedia image
-   */
-  editionParameters?: ImageEditionParameters | null;
-  /**
-   * Image filter to apply on the sourceMedia image
-   * @type {(string | null)}
-   */
-  filter?: string | null;
-  /**
-   * if true, a loading indicator will be displayed after a delay
-   */
-  computing?: boolean | null;
-  /**
-   * Enable the crop edition mode on the sourceMedia image
-   *
-   * @type {(boolean | null)}
-   */
-  cropEditionMode?: boolean | null;
-  /**
-   * Callback called when the crop data of the sourceMedia image change
-   */
-  onCropDataChange?: (cropData: CropData) => void;
-  /**
-   * use the default shadow effect arond the card
-   *
-   * @type {(boolean | null)}
-   */
-  withShadow?: boolean | null;
-};
+type CoverPreviewRendererProps = CoverTextPreviewProps &
+  Omit<
+    CoverMediaPreviewProps,
+    'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
+  > & {
+    /**
+     * the source media uri
+     */
+    uri?: string | null;
+    /**
+     * The size of the source media
+     */
+    mediaSize?: { width: number; height: number } | null;
+    /**
+     * if true, a loading indicator will be displayed after a delay
+     */
+    computing?: boolean | null;
+    /**
+     * Enable the crop edition mode on the sourceMedia image
+     *
+     * @type {(boolean | null)}
+     */
+    cropEditionMode?: boolean | null;
+    /**
+     * Callback called when the crop data of the sourceMedia image change
+     */
+    onCropDataChange?: (cropData: CropData) => void;
+  };
 
 export type CoverPreviewHandler = {
-  capture: () => Promise<string | null>;
+  exportTextMedia: () => Promise<string | null>;
+  exporteMedia: (size: {
+    width: number;
+    height: number;
+  }) => Promise<string | null>;
 };
 
 /**
@@ -117,23 +67,32 @@ export type CoverPreviewHandler = {
  */
 const CoverPreviewRenderer = (
   {
-    source,
-    mediaSize,
-    backgroundImageColor,
+    // media props
+    uri,
+    kind,
+    time,
+    startTime,
+    duration,
+    backgroundColor,
+    maskUri,
+    backgroundImageUri,
     backgroundImageTintColor,
+    foregroundImageUri,
     foregroundImageTintColor,
     backgroundMultiply,
     editionParameters,
     filter,
+    // text props
     title,
     titleStyle,
     subTitle,
     subTitleStyle,
     contentStyle,
+    // other props
+    mediaSize,
     computing,
     cropEditionMode,
     onCropDataChange,
-    onLayout,
     style,
     ...props
   }: CoverPreviewRendererProps,
@@ -141,11 +100,9 @@ const CoverPreviewRenderer = (
 ) => {
   const [containerLayout, setContainerLayout] =
     useState<LayoutRectangle | null>(null);
-  const onLayoutInner = (event: LayoutChangeEvent) => {
+  const onLayout = (event: LayoutChangeEvent) => {
     setContainerLayout(event.nativeEvent.layout);
-    if (onLayout) {
-      onLayout(event);
-    }
+    props.onLayout?.(event);
   };
 
   const borderRadius = Platform.select({
@@ -158,19 +115,26 @@ const CoverPreviewRenderer = (
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
-  const textOverlayRef = useRef<View | null>(null);
+  const mediaRef = useRef<GPUImageViewHandle | GPUVideoViewHandle | null>(null);
+  const textOverlayRef = useRef<CoverTextPreviewHandle | null>(null);
 
   useImperativeHandle(
     forwardedRef,
     () => ({
-      async capture() {
+      async exportTextMedia() {
         if (textOverlayRef.current == null) {
           return null;
         }
-        return captureRef(textOverlayRef.current, {
-          format: 'png',
-          quality: 1,
-        });
+        return textOverlayRef.current.capture();
+      },
+      async exporteMedia(size) {
+        if (mediaRef.current == null) {
+          return null;
+        }
+        if ('exportImage' in mediaRef.current) {
+          return mediaRef.current.exportImage({ size });
+        }
+        return mediaRef.current.exportVideo({ size });
       },
     }),
     [],
@@ -194,130 +158,18 @@ const CoverPreviewRenderer = (
     setLoadingFailed(false);
   };
 
-  const scale = containerLayout ? containerLayout.width / COVER_BASE_WIDTH : 1;
-
-  const orientation =
-    contentStyle?.orientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
-  const placement = contentStyle?.placement ?? DEFAULT_COVER_CONTENT_PLACEMENT;
-
-  const verticalPosition: 'bottom' | 'middle' | 'top' =
-    // prettier-ignore
-    placement.startsWith( 'top', )
-    ? 'top'
-    : placement.startsWith('bottom')
-    ? 'bottom'
-    : 'middle';
-
-  const horizontalPosition: 'center' | 'left' | 'right' =
-    // prettier-ignore
-    placement.endsWith( 'Left', )
-    ? 'left'
-    : placement.endsWith('Right')
-    ? 'right'
-    : 'center';
-
-  let overlayJustifyContent: ViewStyle['justifyContent'];
-  if (orientation === 'horizontal') {
-    overlayJustifyContent =
-      verticalPosition === 'top'
-        ? 'flex-start'
-        : verticalPosition === 'middle'
-        ? 'center'
-        : 'flex-end';
-  } else if (orientation === 'topToBottom') {
-    overlayJustifyContent =
-      horizontalPosition === 'left'
-        ? 'flex-end'
-        : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-start';
-  } else {
-    overlayJustifyContent =
-      horizontalPosition === 'left'
-        ? 'flex-start'
-        : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-end';
-  }
-
-  let textAlign: 'center' | 'left' | 'right';
-  if (orientation === 'horizontal') {
-    textAlign =
-      horizontalPosition === 'left'
-        ? 'left'
-        : horizontalPosition === 'center'
-        ? 'center'
-        : 'right';
-  } else if (orientation === 'topToBottom') {
-    textAlign =
-      verticalPosition === 'top'
-        ? 'left'
-        : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
-  } else {
-    textAlign =
-      verticalPosition === 'bottom'
-        ? 'left'
-        : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
-  }
-
-  const titleOverlayStyles: ViewStyle | null = containerLayout && {
-    position: 'absolute',
-    width:
-      orientation === 'horizontal'
-        ? containerLayout.width
-        : containerLayout.height,
-    height:
-      orientation === 'horizontal'
-        ? containerLayout.height
-        : containerLayout.width,
-    transform:
-      orientation !== 'horizontal'
-        ? [
-            { rotate: orientation === 'bottomToTop' ? '-90deg' : '90deg' },
-            {
-              translateX:
-                // prettier-ignore
-                (orientation === 'bottomToTop' ? -1 : 1) * 
-                (containerLayout.height - containerLayout.width) / 2,
-            },
-            {
-              translateY:
-                // prettier-ignore
-                (orientation === 'bottomToTop' ? 1 : -1) * 
-                (containerLayout.width - containerLayout.height) / 2,
-            },
-          ]
-        : [],
-    padding: '5%',
-    paddingTop: orientation === 'horizontal' ? '30%' : '5%',
-    paddingLeft: orientation === 'topToBottom' ? '30%' : '5%',
-    paddingRight: orientation === 'bottomToTop' ? '30%' : '5%',
-    justifyContent: overlayJustifyContent,
-  };
-
-  const titleTextStyle = {
-    fontFamily: titleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY,
-    color: titleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
-    fontSize: (titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale,
-    textAlign,
-  } as const;
-
-  const subTitleTextStyle = {
-    fontFamily: subTitleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY,
-    color: subTitleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
-    fontSize: (subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale,
-    textAlign,
-  } as const;
+  const appearanceStyle = useStyleSheet(computedStyle);
 
   return (
     <View
-      style={[styles.root, { borderRadius }, style]}
+      style={[
+        styles.root,
+        { borderRadius },
+        appearanceStyle.coverShadow,
+        style,
+      ]}
       {...props}
-      onLayout={onLayoutInner}
+      onLayout={onLayout}
     >
       <View style={[styles.topPanelContent, { borderRadius }]}>
         {loadingFailed ? (
@@ -339,42 +191,59 @@ const CoverPreviewRenderer = (
           </View>
         ) : (
           <>
-            {source && mediaSize && (
-              <EditableImageWithCropMode
-                source={source}
+            {mediaSize && uri && (
+              <Cropper
                 mediaSize={mediaSize}
                 aspectRatio={COVER_RATIO}
-                editionParameters={editionParameters ?? {}}
-                backgroundImageColor={backgroundImageColor}
-                backgroundImageTintColor={backgroundImageTintColor}
-                backgroundMultiply={backgroundMultiply}
-                foregroundImageTintColor={foregroundImageTintColor}
-                filters={filter ? [filter] : []}
+                cropData={editionParameters?.cropData}
+                orientation={editionParameters?.orientation}
+                pitch={editionParameters?.pitch}
+                yaw={editionParameters?.yaw}
+                roll={editionParameters?.roll}
                 cropEditionMode={cropEditionMode}
-                style={styles.cover}
-                onLoadStart={onLoadStart}
-                onLoad={onLoad}
-                onError={onError}
                 onCropDataChange={onCropDataChange}
-              />
+                style={styles.cover}
+              >
+                {cropData => (
+                  <CoverMediaPreview
+                    ref={mediaRef}
+                    uri={uri}
+                    kind={kind}
+                    time={time}
+                    startTime={startTime}
+                    duration={duration}
+                    backgroundColor={backgroundColor}
+                    maskUri={maskUri}
+                    backgroundImageUri={backgroundImageUri}
+                    backgroundImageTintColor={backgroundImageTintColor}
+                    foregroundImageUri={foregroundImageUri}
+                    foregroundImageTintColor={foregroundImageTintColor}
+                    backgroundMultiply={backgroundMultiply}
+                    filter={filter}
+                    editionParameters={{
+                      ...editionParameters,
+                      cropData,
+                    }}
+                    onLoadingStart={onLoadStart}
+                    onLoadingEnd={onLoad}
+                    onLoadingError={onError}
+                    style={styles.cover}
+                    testID="cover-edition-screen-cover-preview"
+                  />
+                )}
+              </Cropper>
             )}
 
-            <View
-              style={styles.titleOverlayContainer}
+            <CoverTextPreview
+              title={title}
+              subTitle={subTitle}
+              titleStyle={titleStyle}
+              subTitleStyle={subTitleStyle}
+              contentStyle={contentStyle}
               ref={textOverlayRef}
               pointerEvents="none"
-            >
-              <View style={titleOverlayStyles}>
-                <Text allowFontScaling={false} style={titleTextStyle}>
-                  {title ?? ''}
-                </Text>
-                {!!subTitle && (
-                  <Text allowFontScaling={false} style={subTitleTextStyle}>
-                    {subTitle}
-                  </Text>
-                )}
-              </View>
-            </View>
+              style={styles.titleOverlayContainer}
+            />
             {(computing || isLoading) && (
               <Delay delay={computing ? 0 : 500}>
                 <View style={styles.maskComputingOverlay}>
@@ -391,6 +260,15 @@ const CoverPreviewRenderer = (
 
 export default forwardRef(CoverPreviewRenderer);
 
+const computedStyle = createStyleSheet(appearance => ({
+  coverShadow: {
+    shadowColor: appearance === 'light' ? colors.black : colors.white,
+    shadowOpacity: 0.11,
+    shadowOffset: { width: 0, height: 4.69 },
+    shadowRadius: 18.75,
+  },
+}));
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -402,6 +280,7 @@ const styles = StyleSheet.create({
   },
   cover: {
     flex: 1,
+    aspectRatio: COVER_RATIO,
   },
   maskComputingOverlay: {
     position: 'absolute',

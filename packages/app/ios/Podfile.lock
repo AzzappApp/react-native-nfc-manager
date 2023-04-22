@@ -100,7 +100,6 @@ PODS:
   - MMKV (1.2.15):
     - MMKVCore (~> 1.2.15)
   - MMKVCore (1.2.15)
-  - Nuke (10.11.2)
   - OpenSSL-Universal (1.1.1100)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -536,7 +535,6 @@ DEPENDENCIES:
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - Nuke (from `https://github.com/kean/Nuke.git`, tag `10.11.2`)
   - OpenSSL-Universal (= 1.1.1100)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
@@ -626,9 +624,6 @@ EXTERNAL SOURCES:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
-  Nuke:
-    :git: https://github.com/kean/Nuke.git
-    :tag: 10.11.2
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -714,11 +709,6 @@ EXTERNAL SOURCES:
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
-CHECKOUT OPTIONS:
-  Nuke:
-    :git: https://github.com/kean/Nuke.git
-    :tag: 10.11.2
-
 SPEC CHECKSUMS:
   AppCenter: 3fd04aa1b166e16fdb03ec81dabe488aece83fbd
   appcenter-analytics: 1aea9ada8922d2e2df3e069a28eda21157c9d30d
@@ -746,7 +736,6 @@ SPEC CHECKSUMS:
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   MMKV: 7f34558bbb5a33b0eaefae2de4b6a20a2ffdad6f
   MMKVCore: ddf41b9d9262f058419f9ba7598719af56c02cd3
-  Nuke: 6b14bc2549b5558bf351905298403271973c5a80
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: bd6045fbd511da5efe6db89eecb21e4e36bd7cbf
@@ -793,6 +782,6 @@ SPEC CHECKSUMS:
   Yoga: cd7d7f509dbfac14ee7f31a6c750acb957cd5022
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 139bcd64a4283f083cc6d459d2e87333930f27fb
+PODFILE CHECKSUM: 9b09f54d6f49fc5b92dc0d50d8e2c9e4c47bc37d
 
 COCOAPODS: 1.11.3

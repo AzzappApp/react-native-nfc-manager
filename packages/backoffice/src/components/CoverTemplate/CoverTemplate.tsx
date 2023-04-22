@@ -83,7 +83,7 @@ const CoverTemplate = ({
               temperature: 6500,
               tint: 0,
               vibrance: 0,
-              vigneting: 0,
+              vignetting: 0,
               roll: 0,
             },
           },
@@ -334,7 +334,7 @@ const MEDIA_STYLE: any = {
   },
   tint: { defaultValue: 0, min: -150, max: 150, step: 5, interval: 10 },
   vibrance: { defaultValue: 0, min: -1, max: 1, step: 0.05, interval: 10 },
-  vigneting: { defaultValue: 0, min: -2, max: 2, step: 0.05, interval: 10 },
+  vignetting: { defaultValue: 0, min: -2, max: 2, step: 0.05, interval: 10 },
   roll: {
     defaultValue: 0,
     min: -20,

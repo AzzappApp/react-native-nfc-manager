@@ -1,14 +1,14 @@
 import { StyleSheet, View } from 'react-native';
 import DashedSlider from '#ui/DashedSlider';
 import Text from '#ui/Text';
-import { editionParametersSettings } from './medias';
-import type { ImageEditionParameters } from '#helpers/mediaHelpers';
+import { editionParametersSettings } from './gpu';
+import type { EditionParameters } from './gpu';
 import type { ViewProps } from 'react-native';
 type ImageEditionParameterControlProps = ViewProps & {
   /**
    * The parameter to control.
    */
-  parameter: keyof ImageEditionParameters;
+  parameter: keyof EditionParameters;
   /**
    * The value of the parameter.
    */

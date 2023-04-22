@@ -87,19 +87,13 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
           pixelRatio = 1,
           height,
           width,
-          thumbnail,
         }: {
           pixelRatio?: number;
           height?: number;
           width?: number;
-          thumbnail?: boolean;
         },
       ): string {
-        if (thumbnail) {
-          return getVideoThumbnailURL(id, width, pixelRatio, height);
-        } else {
-          return getVideoUrlForSize(id, width, pixelRatio, height);
-        }
+        return getVideoUrlForSize(id, width, height, pixelRatio);
       },
     },
     thumbnail: {
@@ -130,7 +124,7 @@ export const MediaVideoGraphql = new GraphQLObjectType<Media, GraphQLContext>({
           width: number;
         },
       ): string {
-        return getVideoThumbnailURL(id, width, pixelRatio, height);
+        return getVideoThumbnailURL(id, width, height, pixelRatio);
       },
     },
   }),

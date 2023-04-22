@@ -4,30 +4,30 @@ import { colors } from '#theme';
 import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import { useEditionParametersDisplayInfos } from './medias';
-import type { ImageEditionParameters } from '#helpers/mediaHelpers';
+import { useEditionParametersDisplayInfos } from './gpu';
+import type { EditionParameters } from './gpu';
 import type { ScrollViewProps } from 'react-native';
 
-type ImageEditionParametersListProps = ScrollViewProps & {
+type EditionParametersListProps = ScrollViewProps & {
   /**
    * A callback called when the user selects a parameter.
    * @param param Theselected parameter .
    */
-  onSelectParam(param: keyof ImageEditionParameters): void;
+  onSelectParam(param: keyof EditionParameters): void;
   /**
    * A list of parameters to exclude from the list.
    */
-  excludedParams?: Array<keyof ImageEditionParameters>;
+  excludedParams?: Array<keyof EditionParameters>;
 };
 
 /**
  * A list of buttons to select a parameter to edit.
  */
-const ImageEditionParametersList = ({
+const EditionParametersList = ({
   onSelectParam,
   excludedParams,
   ...props
-}: ImageEditionParametersListProps) => {
+}: EditionParametersListProps) => {
   const paramsInfos = useEditionParametersDisplayInfos();
   return (
     <ScrollView {...props} horizontal>
@@ -55,7 +55,7 @@ const ImageEditionParametersList = ({
   );
 };
 
-export default ImageEditionParametersList;
+export default EditionParametersList;
 
 const styles = StyleSheet.create({
   text: { marginTop: 5 },
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const parametersList: Array<keyof ImageEditionParameters> = [
+const parametersList: Array<keyof EditionParameters> = [
   'cropData',
   'brightness',
   'contrast',
@@ -93,5 +93,5 @@ const parametersList: Array<keyof ImageEditionParameters> = [
   'temperature',
   'tint',
   'vibrance',
-  'vigneting',
+  'vignetting',
 ];

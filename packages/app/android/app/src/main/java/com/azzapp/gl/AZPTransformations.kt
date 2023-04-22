@@ -219,12 +219,12 @@ object AZPTransformations {
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("vigneting")) {
+    if (parameters.hasKey("vignetting")) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_VIGNETTE,
-        mapOf("scale" to parameters.getDouble("vigneting").toFloat()),
+        mapOf("scale" to parameters.getDouble("vignetting").toFloat()),
         effectFactory
       )
     }

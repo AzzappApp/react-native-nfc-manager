@@ -19,6 +19,7 @@ module.exports = {
       },
       setupFilesAfterEnv: ['./scripts/jestSetup.js'],
       testMatch: ['<rootDir>/packages/app/src/**/*.test.{js,jsx,ts,tsx}'],
+      modulePathIgnorePatterns: ['<rootDir>/packages/app/src/lib'],
       transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
       moduleNameMapper: {
         '#(.*)': '<rootDir>/packages/app/src/$1',
@@ -34,6 +35,7 @@ module.exports = {
         '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
       },
       setupFilesAfterEnv: ['./scripts/jestSetup.js'],
+      modulePathIgnorePatterns: ['<rootDir>/packages/shared/src/lib'],
       testMatch: ['<rootDir>/packages/shared/src/**/*.test.{js,jsx,ts,tsx}'],
       transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
     },

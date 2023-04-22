@@ -1,10 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
 import SelectImageStep from './SelectImageStep';
-import type { ImageEditionParameters, TimeRange } from '#helpers/mediaHelpers';
+import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerState } from './ImagePickerContext';
+import type { TimeRange } from './imagePickerTypes';
 import type { ComponentType } from 'react';
 
 export type ImagePickerResult = {
@@ -31,7 +32,7 @@ export type ImagePickerResult = {
   /**
    * The edition parameters to be applied to the media
    */
-  editionParameters: ImageEditionParameters;
+  editionParameters: EditionParameters;
   /**
    * The filter to be applied to the media
    */
@@ -87,6 +88,10 @@ export type ImagePickerProps = {
    * A callback called when the media selection process is cancelled
    */
   onCancel?: () => void;
+  /**
+   * A component used to wrap the top panel of the wizard
+   */
+  TopPanelWrapper?: ComponentType<any>;
 };
 /**
  * A component used to select an image or a video and edit it
@@ -103,6 +108,7 @@ const ImagePicker = ({
   exporting = false,
   onFinished,
   onCancel,
+  TopPanelWrapper = Fragment,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
 
@@ -160,6 +166,7 @@ const ImagePicker = ({
         isFirstStep={isFirstStep}
         busy={exporting || busy}
         canCancel={canCancel}
+        TopPanelWrapper={TopPanelWrapper}
       >
         <Component onNext={onNext} onBack={onBack} />
       </ImagePickerWizardContainer>

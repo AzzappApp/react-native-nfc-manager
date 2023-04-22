@@ -1,59 +1,25 @@
-import {
-  Children,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useImperativeHandle,
-  useState,
-} from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import type { ForwardedRef } from 'react';
+import { Screen, ScreenContainer } from 'react-native-screens';
+import type { ReactElement } from 'react';
 import type { ViewProps } from 'react-native';
 
-export type TabViewHandler = {
-  navigateToTab: (index: number) => void;
+export type TabViewProps = Omit<ViewProps, 'children'> & {
+  currentTab: string;
+  tabs: Array<{ id: string; element: ReactElement }>;
 };
 
-const TabView = (
-  { children, style, ...props }: ViewProps,
-  forwardedRef: ForwardedRef<TabViewHandler>,
-) => {
-  const [translateX, setTranslateX] = useState(0);
-  const { width } = useWindowDimensions();
-  const childrenArray = Children.toArray(children);
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      async navigateToTab(index) {
-        setTranslateX(index * width);
-      },
-    }),
-    [width],
-  );
+const TabView = ({ tabs, currentTab, ...props }: TabViewProps) => {
   return (
-    <View
-      style={[
-        styles.bottomPanelContainer,
-        {
-          transform: [{ translateX: -translateX }],
-          width: childrenArray.length * width,
-        },
-        style,
-      ]}
-      {...props}
-    >
-      {childrenArray.map(child =>
-        isValidElement(child) ? cloneElement(child) : child,
-      )}
-    </View>
+    <ScreenContainer hasTwoStates {...props}>
+      {tabs.map(({ id, element }) => (
+        <Screen
+          key={id}
+          activityState={currentTab === id ? 2 : 0}
+          gestureEnabled={false}
+        >
+          {element}
+        </Screen>
+      ))}
+    </ScreenContainer>
   );
 };
-export default forwardRef(TabView);
-
-const styles = StyleSheet.create({
-  containerStyle: { flex: 1 },
-  bottomPanelContainer: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-});
+export default TabView;

@@ -25,12 +25,12 @@ export const COVER_BASE_WIDTH = 125;
 /**
  * The max width
  */
-export const COVER_MAX_WIDTH = 2048 * COVER_RATIO;
+export const COVER_MAX_HEIGHT = 2048;
 
 /**
  * The max width
  */
-export const COVER_MAX_HEIGHT = 2048 * COVER_RATIO;
+export const COVER_MAX_WIDTH = COVER_MAX_HEIGHT * COVER_RATIO;
 
 /**
  * list of possible covertitle position

@@ -103,7 +103,7 @@ const MediaVideoRenderer = (
 
   const src =
     typeof width === 'number'
-      ? getVideoUrlForSize(source, width, 2, aspectRatio)
+      ? getVideoUrlForSize(source, width, width / aspectRatio, 2)
       : // TODO handle max size
         getVideoUrlForSize(source, 1280);
 

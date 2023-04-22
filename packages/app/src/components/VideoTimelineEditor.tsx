@@ -9,14 +9,28 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
-import { EditableImage } from './medias';
-import type { ImageEditionParameters, TimeRange } from '#helpers/mediaHelpers';
+import { GPUImageView, VideoFrame } from './gpu';
+import type { EditionParameters } from './gpu';
 import type { ViewProps } from 'react-native';
+
+/**
+ * A time range
+ */
+type TimeRange = {
+  /**
+   * The start time of the time range in seconds
+   */
+  startTime: number;
+  /**
+   * The duration of the time range in seconds
+   */
+  duration: number;
+};
 
 type VideoTimelineEditorProps = ViewProps & {
   video: { uri: string; duration: number };
   aspectRatio: number;
-  editionParameters: ImageEditionParameters;
+  editionParameters: EditionParameters;
   maxDuration: number;
   width: number;
   imagesHeight: number;
@@ -151,12 +165,16 @@ const VideoTimelineEditor = ({
     <View {...props}>
       <View style={styles.root}>
         {range(0, video.duration, video.duration / nbImage).map(second => (
-          <EditableImage
+          <GPUImageView
             key={second}
-            source={{ uri: video.uri, kind: 'video', videoTime: second }}
-            editionParameters={editionParameters}
             style={{ height: imagesHeight, width: itemWidth }}
-          />
+          >
+            <VideoFrame
+              uri={video.uri}
+              parameters={editionParameters}
+              time={second}
+            />
+          </GPUImageView>
         ))}
         <GestureDetector gesture={startThumbGesture}>
           <Animated.View

@@ -7,21 +7,18 @@ import IconButton from '#ui/IconButton';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import Text from '#ui/Text';
 import FilterSelectionList from '../FilterSelectionList';
+import { useEditionParametersDisplayInfos } from '../gpu';
 import ImageEditionFooter from '../ImageEditionFooter';
 import ImageEditionParameterControl from '../ImageEditionParameterControl';
 import ImageEditionParametersList from '../ImageEditionParametersList';
-import { useEditionParametersDisplayInfos } from '../medias';
 import VideoTimelineEditor from '../VideoTimelineEditor';
 import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import type {
-  ImageEditionParameters,
-  ImageOrientation,
-  MediaVideo,
-} from '#helpers/mediaHelpers';
 import type { FooterBarItem } from '#ui/FooterBar';
+import type { MediaVideo } from './imagePickerTypes';
+import type { EditionParameters, ImageOrientation } from '../gpu';
 /**
  * A step of the Image Picker that allows the user to edit the selected image
  * (crop, filter, brightness, contrast etc.)
@@ -43,14 +40,14 @@ const EditImageStep = () => {
   const previousParameters = useRef(editionParameters);
   const previousTimeRange = useRef(timeRange);
   const [editedParameter, setEditedParam] = useState<
-    keyof ImageEditionParameters | null
+    keyof EditionParameters | null
   >(null);
   const [currentTab, setCurrentTab] = useState<'edit' | 'filter' | 'timeRange'>(
     'filter',
   );
 
   const onEditionStart = useCallback(
-    (param: keyof ImageEditionParameters) => {
+    (param: keyof EditionParameters) => {
       previousParameters.current = editionParameters;
       previousTimeRange.current = timeRange;
       setEditedParam(param);
@@ -81,17 +78,17 @@ const EditImageStep = () => {
     let nextOrientation: ImageOrientation;
     switch (editionParameters.orientation) {
       case 'LEFT':
-        nextOrientation = 'DOWN';
+        nextOrientation = 'UP';
         break;
       case 'DOWN':
-        nextOrientation = 'RIGHT';
+        nextOrientation = 'LEFT';
         break;
       case 'RIGHT':
-        nextOrientation = 'UP';
+        nextOrientation = 'DOWN';
         break;
       case 'UP':
       default:
-        nextOrientation = 'LEFT';
+        nextOrientation = 'RIGHT';
         break;
     }
     onParameterValueChange('orientation', nextOrientation);
@@ -205,8 +202,19 @@ const EditImageStep = () => {
             >
               {currentTab === 'filter' && (
                 <FilterSelectionList
-                  media={media!}
-                  editionParameters={editionParameters}
+                  layer={
+                    media?.kind === 'image'
+                      ? {
+                          kind: 'image',
+                          uri: media.uri,
+                          parameters: editionParameters,
+                        }
+                      : {
+                          kind: 'videoFrame',
+                          uri: media!.uri,
+                          parameters: editionParameters,
+                        }
+                  }
                   aspectRatio={aspectRatio}
                   selectedFilter={mediaFilter}
                   onChange={onMediaFilterChange}

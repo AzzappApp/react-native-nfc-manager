@@ -232,8 +232,8 @@ const icons = {
   get video() {
     return require('./assets/video.png');
   },
-  get vigneting() {
-    return require('./assets/vigneting.png');
+  get vignetting() {
+    return require('./assets/vignetting.png');
   },
   get width_full() {
     return require('./assets/width-full.png');

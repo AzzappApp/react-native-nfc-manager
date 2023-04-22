@@ -10,6 +10,7 @@ import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { segmentImage } from '#helpers/mediaHelpers';
 import { act, fireEvent, render, screen, within } from '#helpers/testHelpers';
 import CoverEditionScreen from '../CoverEditionScreen';
+import type { GPULayer } from '#components/gpu';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 import type { CoverEditionScreenProps } from '../CoverEditionScreen';
 import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
@@ -94,21 +95,6 @@ jest.mock('react-native-view-shot', () => ({
   captureRef: jest.fn(),
 }));
 
-jest.mock('#components/medias', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const EditableImageWithCropMode = (props: any) =>
-    React.createElement('EditableImageWithCropMode', {
-      ...props,
-      testID: 'editable-image',
-    });
-
-  return {
-    __esModule: true,
-    EditableImageWithCropMode,
-  };
-});
-
 jest.mock('#components/FilterSelectionList', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
@@ -186,6 +172,21 @@ jest.mock('#components/ProfileColorPalette', () => {
   };
 });
 
+jest.mock('#components/gpu/GPUNativeMethods');
+jest.mock('@react-native-camera-roll/camera-roll', () => ({}));
+
+jest.mock('#components/Cropper', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { View } = require('react-native');
+  const Cropper = ({ children, ...props }: any) => (
+    <View {...props} testID="cropper">
+      {children(props.cropData)}
+    </View>
+  );
+
+  return Cropper;
+});
+
 describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 
@@ -250,6 +251,13 @@ describe('CoverEditionScreen', () => {
       </RelayEnvironmentProvider>,
     );
   };
+
+  const getPreviewImage = () =>
+    screen.getByTestId('cover-edition-screen-cover-preview');
+  const getLayer = (index: number): GPULayer =>
+    screen.getByTestId('cover-edition-screen-cover-preview').props.layers[
+      index
+    ];
 
   test('Should not render ImagePicker if there is no cover, or on image picker button', () => {
     const { unmount } = renderCoverEditionScreen();
@@ -327,28 +335,17 @@ describe('CoverEditionScreen', () => {
         editionParameters: {},
       });
     });
+
     expect(segmentImageMock).toHaveBeenCalledWith(
       'file:///data/fake-media.jpg',
     );
     await act(flushPromises);
-    expect(screen.getByTestId('editable-image')).not.toHaveProp(
-      'source',
-      expect.objectContaining({
-        uri: 'file:///data/fake-media.jpg',
-        maskUri: 'file:///data/fake-mask.jpg',
-      }),
-    );
 
+    expect(getLayer(0).maskUri).not.toBe('file:///data/fake-mask.jpg');
     act(() => {
       fireEvent(screen.getAllByRole('switch')[0], 'valueChange', true);
     });
-    expect(screen.getByTestId('editable-image')).toHaveProp(
-      'source',
-      expect.objectContaining({
-        uri: 'file:///data/fake-media.jpg',
-        maskUri: 'file:///data/fake-mask.jpg',
-      }),
-    );
+    expect(getLayer(0).maskUri).toBe('file:///data/fake-mask.jpg');
 
     segmentImageMock.mockResolvedValueOnce('/data/fake-mask2.jpg');
     act(() => {
@@ -364,8 +361,7 @@ describe('CoverEditionScreen', () => {
     });
     await act(flushPromises);
 
-    expect(screen.getByTestId('editable-image')).toHaveProp(
-      'source',
+    expect(getLayer(0)).toEqual(
       expect.objectContaining({
         uri: 'file:///data/fake-media2.jpg',
         maskUri: 'file:///data/fake-mask2.jpg',
@@ -430,21 +426,29 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).toHaveProp('source', {
-      kind: 'image',
-      uri: 'http://fake-site/fake-media.jpg',
-      backgroundUri: 'https://example.com/coverBackground2.png',
-      maskUri: 'http://fake-site/fake-mask.jpg',
-      foregroundUri: 'https://example.com/coverForeground3.png',
-    });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-    });
-    expect(image).toHaveProp('filters', ['corail']);
-    expect(image).toHaveProp('backgroundImageColor', '#FF0000');
-    expect(image).toHaveProp('backgroundImageTintColor', '#00FF00');
-    expect(image).toHaveProp('foregroundImageTintColor', '#0000FF');
+    const image = getPreviewImage();
+    expect(image).toHaveStyle({ backgroundColor: '#FF0000' });
+    expect(image).toHaveProp('layers', [
+      expect.objectContaining({
+        kind: 'image',
+        uri: 'https://example.com/coverBackground2.png',
+        tintColor: '#00FF00',
+      }),
+      expect.objectContaining({
+        kind: 'image',
+        uri: 'http://fake-site/fake-media.jpg',
+        maskUri: 'http://fake-site/fake-mask.jpg',
+        parameters: expect.objectContaining({
+          brightness: 0.5,
+        }),
+        filters: ['corail'],
+      }),
+      expect.objectContaining({
+        kind: 'image',
+        uri: 'https://example.com/coverForeground3.png',
+        tintColor: '#0000FF',
+      }),
+    ]);
 
     const title = screen.getByText('fake-title');
     expect(title).toHaveStyle({
@@ -467,67 +471,75 @@ describe('CoverEditionScreen', () => {
       coverData: fakeCover,
     });
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).toHaveProp('cropEditionMode', false);
+    const cropper = screen.getByTestId('cropper');
+    expect(cropper).toHaveProp('cropEditionMode', false);
     act(() => {
       fireEvent.press(screen.getByLabelText('Crop'));
     });
-    expect(image).toHaveProp('cropEditionMode', true);
+    expect(cropper).toHaveProp('cropEditionMode', true);
     act(() => {
-      fireEvent(image, 'cropDataChange', {
+      fireEvent(cropper, 'cropDataChange', {
         x: 0,
         y: 0,
         width: 100,
         height: 200,
       });
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-      cropData: {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 200,
-      },
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+        cropData: {
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 200,
+        },
+      }),
+    );
 
     const rollControl = screen.getByTestId('image-edition-parameter-control');
     expect(rollControl).toHaveProp('parameter', 'roll');
     act(() => {
       fireEvent(rollControl, 'change', 20);
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-      roll: 20,
-      cropData: {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 200,
-      },
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+        roll: 20,
+        cropData: {
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 200,
+        },
+      }),
+    );
     act(() => {
       fireEvent.press(screen.getByLabelText('Rotate'));
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-      roll: 20,
-      orientation: 'LEFT',
-      cropData: {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 200,
-      },
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+        roll: 20,
+        orientation: 'RIGHT',
+        cropData: {
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 200,
+        },
+      }),
+    );
     act(() => {
       fireEvent.press(screen.getByText('Cancel').parent!);
     });
 
-    expect(image).toHaveProp('cropEditionMode', false);
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-    });
+    expect(cropper).toHaveProp('cropEditionMode', false);
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+      }),
+    );
   });
 
   test('Should activate the merge option when user toggle the merge switch', () => {
@@ -539,12 +551,11 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Text'));
     });
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).toHaveProp('backgroundMultiply', false);
+    expect(getLayer(1).blending).not.toBe('multiply');
     act(() => {
       fireEvent(screen.getAllByRole('switch')[1], 'valueChange', true);
     });
-    expect(image).toHaveProp('backgroundMultiply', true);
+    expect(getLayer(1).blending).toBe('multiply');
   });
 
   test('Should update the filter when user select a new one', () => {
@@ -556,12 +567,11 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Image'));
     });
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).toHaveProp('filters', ['corail']);
+    expect(getLayer(1).filters).toEqual(['corail']);
     act(() => {
       fireEvent(screen.getByTestId('filter-selection-list'), 'change', 'sepia');
     });
-    expect(image).toHaveProp('filters', ['sepia']);
+    expect(getLayer(1).filters).toEqual(['sepia']);
   });
 
   test('Should enter in parameter edition mode when user select a parameter', () => {
@@ -573,10 +583,11 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Image'));
     });
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+      }),
+    );
 
     act(() => {
       fireEvent.press(screen.getByLabelText('Adjust'));
@@ -595,15 +606,19 @@ describe('CoverEditionScreen', () => {
         0.8,
       );
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.8,
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.8,
+      }),
+    );
     act(() => {
       fireEvent.press(screen.getAllByText('Cancel')[1].parent!);
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.5,
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.5,
+      }),
+    );
     expect(screen.queryByTestId('image-edition-parameter-control')).toBeNull();
 
     act(() => {
@@ -626,9 +641,11 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent.press(screen.getByText('Validate').parent!);
     });
-    expect(image).toHaveProp('editionParameters', {
-      brightness: 0.9,
-    });
+    expect(getLayer(1).parameters).toEqual(
+      expect.objectContaining({
+        brightness: 0.9,
+      }),
+    );
     expect(screen.queryByTestId('image-edition-parameter-control')).toBeNull();
   });
 
@@ -776,22 +793,13 @@ describe('CoverEditionScreen', () => {
 
     expect(foregroundsButtons).toHaveLength(10);
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).not.toHaveProp(
-      'source',
-      expect.objectContaining({
-        uri: 'https://example.com/coverForeground7.png',
-      }),
+    expect(getLayer(2).uri).not.toBe(
+      'https://example.com/coverForeground7.png',
     );
     act(() => {
       fireEvent.press(foregroundsButtons[8]);
     });
-    expect(image).toHaveProp(
-      'source',
-      expect.objectContaining({
-        foregroundUri: 'https://example.com/coverForeground7.png',
-      }),
-    );
+    expect(getLayer(2).uri).toBe('https://example.com/coverForeground7.png');
 
     act(() => {
       fireEvent.press(screen.getAllByLabelText('Color')[1]);
@@ -799,12 +807,12 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[2],
+        screen.getAllByTestId('profile-color-palette')[1],
         'changeColor',
         '#123456',
       );
     });
-    expect(image).toHaveProp('foregroundImageTintColor', '#123456');
+    expect(getLayer(2).tintColor).toBe('#123456');
   });
 
   test('Should update the background image when the user select a new one', () => {
@@ -820,22 +828,13 @@ describe('CoverEditionScreen', () => {
 
     expect(backgroundsButtons).toHaveLength(10);
 
-    const image = screen.getByTestId('editable-image');
-    expect(image).not.toHaveProp(
-      'source',
-      expect.objectContaining({
-        uri: 'https://example.com/coverBackground4.png',
-      }),
+    expect(getLayer(0).uri).not.toBe(
+      'https://example.com/coverBackground4.png',
     );
     act(() => {
       fireEvent.press(backgroundsButtons[5]);
     });
-    expect(image).toHaveProp(
-      'source',
-      expect.objectContaining({
-        backgroundUri: 'https://example.com/coverBackground4.png',
-      }),
-    );
+    expect(getLayer(0).uri).toBe('https://example.com/coverBackground4.png');
 
     act(() => {
       fireEvent.press(screen.getByLabelText('Color #1'));
@@ -843,12 +842,12 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[1],
+        screen.getAllByTestId('profile-color-palette')[2],
         'changeColor',
         '#434239',
       );
     });
-    expect(image).toHaveProp('backgroundImageTintColor', '#434239');
+    expect(getLayer(0).tintColor).toBe('#434239');
 
     act(() => {
       fireEvent.press(screen.getByLabelText('Color #2'));
@@ -856,12 +855,12 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[1],
+        screen.getAllByTestId('profile-color-palette')[2],
         'changeColor',
         '#FF34A2',
       );
     });
-    expect(image).toHaveProp('backgroundImageColor', '#FF34A2');
+    expect(getPreviewImage()).toHaveStyle({ backgroundColor: '#FF34A2' });
   });
 
   test('Should allow to cancel in case of creation', () => {
