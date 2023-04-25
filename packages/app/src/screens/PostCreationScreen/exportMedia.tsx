@@ -5,7 +5,7 @@ const VIDEO_MAX_SIZE = 1280;
 const IMAGE_MAX_SIZE = 2048;
 const VIDEO_BIT_RATE = 3000000;
 
-const exportMedia = ({
+const exportMedia = async ({
   uri,
   kind,
   aspectRatio,
@@ -23,14 +23,15 @@ const exportMedia = ({
   removeSound?: boolean;
   startTime?: number;
   duration?: number;
-}): Promise<string> => {
+}): Promise<{ uri: string; size: { width: number; height: number } }> => {
   const maxSize = kind === 'image' ? IMAGE_MAX_SIZE : VIDEO_MAX_SIZE;
   const size = {
     width: aspectRatio >= 1 ? maxSize : maxSize * aspectRatio,
     height: aspectRatio < 1 ? maxSize : maxSize / aspectRatio,
   };
+  let result;
   if (kind === 'image') {
-    return exportImage({
+    result = await exportImage({
       layers: [
         {
           kind: 'image',
@@ -44,7 +45,7 @@ const exportMedia = ({
       quality: 0.8,
     });
   } else {
-    return exportVideo({
+    result = await exportVideo({
       layers: [
         {
           kind: 'video',
@@ -60,6 +61,7 @@ const exportMedia = ({
       removeSound,
     });
   }
+  return { uri: result, size };
 };
 
 export default exportMedia;

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { colors } from '#theme';
 import FooterBar from './FooterBar';
 import type { FooterBarProps } from './FooterBar';
 
@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     borderRadius: BOTTOM_MENU_HEIGHT / 2,
+    shadowColor: colors.grey900,
     shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 8.7 },
     shadowRadius: 19.8,

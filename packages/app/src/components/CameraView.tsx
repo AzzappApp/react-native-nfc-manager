@@ -36,6 +36,17 @@ export type CameraViewProps = ViewProps & {
 
   /* define the initial camera position. */
   initialCameraPosition?: 'back' | 'front';
+
+  /**
+   * Enables **photo capture** with the `takePhoto` function (see ["Taking Photos"](https://mrousavy.github.io/react-native-vision-camera/docs/guides/capturing#taking-photos))
+   */
+  photo?: boolean;
+  /**
+   * Enables **video capture** with the `startRecording` function (see ["Recording Videos"](https://mrousavy.github.io/react-native-vision-camera/docs/guides/capturing/#recording-videos))
+   *
+   * Note: If you want to use `video` and `frameProcessor` simultaneously, make sure [`supportsParallelVideoProcessing`](https://mrousavy.github.io/react-native-vision-camera/docs/guides/devices#the-supportsparallelvideoprocessing-prop) is `true`.
+   */
+  video?: boolean;
 };
 
 /**
@@ -79,6 +90,8 @@ const CameraView = (
     onInitialized,
     onError,
     initialCameraPosition = 'back',
+    photo,
+    video,
     ...props
   }: CameraViewProps,
   ref: ForwardedRef<CameraViewHandle>,
@@ -230,16 +243,16 @@ const CameraView = (
         <GestureDetector gesture={gesture}>
           <Camera
             ref={camera}
-            style={StyleSheet.absoluteFill}
+            style={styles.cameraStyle}
             device={device}
-            preset="high"
+            preset={video ? 'high' : 'photo'}
             fps={30}
             isActive={isActive}
             onInitialized={onInitialized}
             onError={onError}
             enableZoomGesture={true}
-            photo={true}
-            video={true}
+            photo={photo}
+            video={video}
             audio={hasMicrophonePermission}
             orientation="portrait"
           />
@@ -320,6 +333,7 @@ export default forwardRef(CameraView);
 const FOCUS_RING_SIZE = 100;
 
 const styles = StyleSheet.create({
+  cameraStyle: { flex: 1 },
   container: {
     flex: 1,
     backgroundColor: 'black',

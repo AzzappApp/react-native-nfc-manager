@@ -1,5 +1,5 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState, useEffect, memo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   FlatList,
@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   useWindowDimensions,
+  StyleSheet,
 } from 'react-native';
 import {
   formatVideoTime,
@@ -173,68 +174,107 @@ const PhotoGalleryMediaList = ({
 
   const { width: windowWidth } = useWindowDimensions();
 
-  const intl = useIntl();
-
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<PhotoIdentifier['node']>) => (
-      <PressableNative
-        style={[
-          {
-            width: windowWidth / 3,
-            height: windowWidth / 3,
-            borderRightWidth: index % 3 !== 2 ? 1 : 0,
-            borderBottomWidth: 1,
-            borderColor: 'transparent',
-          },
-          selectedMediaID === item.image.uri && {
-            opacity: 0.5,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityHint={intl.formatMessage({
-          defaultMessage: 'tap to select this media',
-          description:
-            'accessibility hint for media selection buttons in photo gallery',
-        })}
-        onPress={() => onMediaPress(item)}
-        activeOpacity={0.7}
-      >
-        <Image
-          accessibilityRole="image"
-          accessibilityIgnoresInvertColors={true}
-          style={{
-            flex: 1,
-            resizeMode: 'cover',
-          }}
-          source={{ uri: item.image.uri }}
-        />
-        {item.type.startsWith('video') && (
-          <Text
-            variant="button"
-            style={[
-              { position: 'absolute', bottom: 10, right: 10, color: 'white' },
-            ]}
-          >
-            {formatVideoTime(item.image.playableDuration)}
-          </Text>
-        )}
-      </PressableNative>
+      <MemoPhotoGalleyMediaItem
+        item={item}
+        index={index}
+        width={windowWidth / ITEM_PER_ROW}
+        selected={selectedMediaID === item.image.uri}
+        onMediaPress={onMediaPress}
+      />
     ),
-    [onMediaPress, intl, selectedMediaID, windowWidth],
+
+    [onMediaPress, selectedMediaID, windowWidth],
   );
 
   return (
     <FlatList
-      numColumns={3}
+      numColumns={ITEM_PER_ROW}
       data={medias}
-      keyExtractor={item => item.image.uri}
+      keyExtractor={keyExtractor}
       renderItem={renderItem}
       onEndReached={onEndReached}
-      style={{ flex: 1 }}
+      style={[styles.flatListStyle]}
       accessibilityRole="list"
       {...props}
     />
   );
 };
 
+const keyExtractor = (item: PhotoIdentifier['node']) => item.image.uri;
+
+// This list can be a litle laggy (due to the library we use for image at the moment). Using the RN preconisation for this list to try to improve a bit
+type PhotoGalleyMediaItemProps = {
+  item: PhotoIdentifier['node'];
+  index: number;
+  width: number;
+  selected: boolean;
+  onMediaPress: (media: PhotoIdentifier['node']) => void;
+};
+const PhotoGalleyMediaItem = ({
+  item,
+  index,
+  width,
+  selected,
+  onMediaPress,
+}: PhotoGalleyMediaItemProps) => {
+  const intl = useIntl();
+
+  const onPress = () => {
+    onMediaPress(item);
+  };
+  return (
+    <PressableNative
+      style={[
+        {
+          width,
+          height: width,
+          borderRightWidth: index % ITEM_PER_ROW !== 3 ? 1 : 0,
+          borderBottomWidth: 1,
+          borderColor: 'transparent',
+        },
+        selected && {
+          opacity: 0.5,
+        },
+      ]}
+      accessibilityRole="button"
+      accessibilityHint={intl.formatMessage({
+        defaultMessage: 'tap to select this media',
+        description:
+          'accessibility hint for media selection buttons in photo gallery',
+      })}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <Image
+        accessibilityRole="image"
+        accessibilityIgnoresInvertColors={true}
+        style={{
+          flex: 1,
+          resizeMode: 'cover',
+        }}
+        source={{ uri: item.image.uri }}
+      />
+      {item.type.startsWith('video') && (
+        <Text
+          variant="button"
+          style={[
+            { position: 'absolute', bottom: 10, right: 10, color: 'white' },
+          ]}
+        >
+          {formatVideoTime(item.image.playableDuration)}
+        </Text>
+      )}
+    </PressableNative>
+  );
+};
+const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
+
+const ITEM_PER_ROW = 4;
+
 export default PhotoGalleryMediaList;
+
+const styles = StyleSheet.create({
+  flatListStyle: { flex: 1 },
+});

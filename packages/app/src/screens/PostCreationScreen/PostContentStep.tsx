@@ -1,24 +1,13 @@
-import { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ImagePickerStep,
   ImagePickerMediaRenderer,
 } from '#components/ImagePicker';
 import PostContentPanel from './PostContentPanel';
-import PostCreationScreenContext from './PostCreationScreenContext';
 
 const PostContentStep = () => {
   const intl = useIntl();
-  const {
-    allowLikes,
-    allowComments,
-    content,
-    setAllowLikes,
-    setAllowComments,
-    setContent,
-  } = useContext(PostCreationScreenContext);
-  const { bottom: safeAreaBottom } = useSafeAreaInsets();
+
   return (
     <ImagePickerStep
       stepId={PostContentStep.STEP_ID}
@@ -26,22 +15,12 @@ const PostContentStep = () => {
         defaultMessage: 'New Post',
         description: 'New post screen title',
       })}
+      headerRightButtonTitle={intl.formatMessage({
+        defaultMessage: 'Publish',
+        description: 'Publish button action Post Content Screen',
+      })}
       topPanel={<ImagePickerMediaRenderer />}
-      bottomPanel={
-        <PostContentPanel
-          allowLikes={allowLikes}
-          allowComments={allowComments}
-          content={content}
-          onAllowLikesChange={setAllowLikes}
-          onAllowCommentsChange={setAllowComments}
-          onContentChange={setContent}
-          style={{
-            flex: 1,
-            marginBottom: safeAreaBottom,
-            marginTop: 20,
-          }}
-        />
-      }
+      bottomPanel={<PostContentPanel />}
     />
   );
 };

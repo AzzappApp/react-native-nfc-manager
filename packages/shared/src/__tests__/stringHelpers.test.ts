@@ -4,6 +4,7 @@ import {
   isNotFalsyString,
   isValidUserName,
   isValidHex,
+  formatDuration,
 } from '../stringHelpers';
 
 describe('stringHelper', () => {
@@ -50,9 +51,12 @@ describe('stringHelper', () => {
     });
     test('should be a valid username', () => {
       expect(isValidUserName('1aze')).toBe(true);
-      expect(isValidUserName('se._test')).toBe(true);
+      expect(isValidUserName('se_test')).toBe(true);
       expect(isValidUserName('zer23sdf')).toBe(true);
       expect(isValidUserName('superTester23_______')).toBe(true);
+    });
+    test('should be a invalid username', () => {
+      expect(isValidUserName('se._test')).toBe(false); //dot is not a valid caracters from https://github.com/AzzappApp/azzapp/issues/272
     });
   });
   describe('isValidHex', () => {
@@ -73,6 +77,22 @@ describe('stringHelper', () => {
       // empty
       expect(isValidHex('')).toBe(false);
       expect(isValidHex('#12345', true)).toBe(false);
+    });
+  });
+  describe('formatDuration', () => {
+    test('should return formatted duration in minutes and seconds', () => {
+      expect(formatDuration(90)).toBe('1:30');
+      expect(formatDuration(300)).toBe('5:00');
+    });
+
+    test('should return formatted duration with leading zero for seconds less than 10', () => {
+      expect(formatDuration(62)).toBe('1:02');
+      expect(formatDuration(120)).toBe('2:00');
+    });
+
+    test('should return formatted duration with only seconds', () => {
+      expect(formatDuration(45)).toBe('0:45');
+      expect(formatDuration(5)).toBe('0:05');
     });
   });
 });

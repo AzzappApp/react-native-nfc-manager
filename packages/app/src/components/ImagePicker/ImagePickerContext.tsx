@@ -22,6 +22,10 @@ export type ImagePickerState = {
    */
   forceAspectRatio: number | undefined;
   /**
+   * the aspect ratio of the camera
+   */
+  forceCameraRatio?: number | undefined;
+  /**
    * the maximum duration of a video to pick
    */
   maxVideoDuration: number;
@@ -57,8 +61,9 @@ export type ImagePickerState = {
    * an event dispatched by picker step when the media is changed
    *
    * @param media the selected media
+   * @param aspectRatio the aspect ratio of the media to force (usefull is difference between gallery and camera)
    */
-  onMediaChange(media: Media): void;
+  onMediaChange(media: Media, aspectRatio?: number | null | undefined): void;
   /**
    * an event dispatched by picker step when the desired aspect ratio is changed
    * @param value the new aspect ratio
@@ -122,6 +127,10 @@ type ImagePickerContextProviderProps = {
    */
   forceAspectRatio?: number;
   /**
+   * the ratio of the camera
+   */
+  forceCameraRatio?: number;
+  /**
    * the children of the provider
    */
   children: ReactNode;
@@ -134,6 +143,7 @@ const _ImagePickerContextProvider = (
     forceAspectRatio,
     exporting,
     children,
+    forceCameraRatio,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
@@ -161,9 +171,9 @@ const _ImagePickerContextProvider = (
   }, [maxVideoDuration, media]);
 
   const onMediaChange = useCallback(
-    (media: Media) => {
+    (media: Media, aspectRatio: number | null | undefined = null) => {
       setMedia(media);
-      setAspectRatio(forceAspectRatio ?? null);
+      setAspectRatio(forceAspectRatio ?? aspectRatio ?? null);
     },
     [forceAspectRatio],
   );
@@ -171,6 +181,7 @@ const _ImagePickerContextProvider = (
   const onAspectRatioChange = useCallback(
     (aspectRatio: number | undefined) => {
       if (!media) {
+        setAspectRatio(aspectRatio ?? null);
         return;
       }
       setAspectRatio(aspectRatio ?? null);
@@ -237,6 +248,7 @@ const _ImagePickerContextProvider = (
       onParameterValueChange,
       onTimeRangeChange,
       onMediaFilterChange: setMediaFilter,
+      forceCameraRatio,
     }),
     [
       kind,
@@ -252,6 +264,7 @@ const _ImagePickerContextProvider = (
       onAspectRatioChange,
       onParameterValueChange,
       onTimeRangeChange,
+      forceCameraRatio,
     ],
   );
 

@@ -12,8 +12,9 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+
 import CameraControlPanel from '../CameraControlPanel';
 import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
@@ -46,6 +47,7 @@ const SelectImageStep = ({
   const {
     kind,
     forceAspectRatio,
+    forceCameraRatio,
     maxVideoDuration,
     media,
     aspectRatio,
@@ -118,6 +120,7 @@ const SelectImageStep = ({
       // TODO
       return;
     }
+
     const path = await cameraRef.current.takePhoto();
     if (!path) {
       // TODO
@@ -125,14 +128,17 @@ const SelectImageStep = ({
     }
     const uri = `file://${path}`;
     const { width, height } = await getImageSize(uri);
-    onMediaChange({
-      kind: 'image',
-      uri,
-      height,
-      width,
-    });
+    onMediaChange(
+      {
+        kind: 'image',
+        uri,
+        height,
+        width,
+      },
+      forceCameraRatio,
+    );
     onNext();
-  }, [onMediaChange, onNext]);
+  }, [forceCameraRatio, onMediaChange, onNext]);
 
   const captureSession = useRef<RecordSession | null>(null);
   const onStartRecording = useCallback(() => {
@@ -155,20 +161,26 @@ const SelectImageStep = ({
     const { path, duration } = result;
     const uri = `file://${path}`;
     const { width, height } = await getVideoSize(uri);
-    onMediaChange({
-      kind: 'video',
-      uri,
-      height,
-      width,
-      duration,
-    });
+    onMediaChange(
+      {
+        kind: 'video',
+        uri,
+        height,
+        width,
+        duration,
+      },
+      forceCameraRatio,
+    );
     onNext();
-  }, [onMediaChange, onNext]);
+  }, [forceCameraRatio, onMediaChange, onNext]);
   // #endregion
 
   // #region display logic
   const intl = useIntl();
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
+  const marginBottom =
+    (safeAreaBottom > 0 ? safeAreaBottom : TOOL_BAR_BOTTOM_MARGIN) +
+    BOTTOM_MENU_HEIGHT;
 
   const tabs = useMemo(() => {
     const tabs: FooterBarItem[] = [
@@ -234,7 +246,7 @@ const SelectImageStep = ({
               <ImagePickerMediaRenderer>
                 {forceAspectRatio == null && (
                   <FloatingIconButton
-                    icon="expand"
+                    icon={aspectRatio === 1 ? 'reduce' : 'expand'}
                     style={styles.adjustButton}
                     size={40}
                     onPress={onAspectRatioToggle}
@@ -248,8 +260,10 @@ const SelectImageStep = ({
               ref={cameraRef}
               onError={onCameraError}
               onInitialized={onCameraInitialized}
-              style={{ width: '100%', height: '100%' }}
+              style={{ flex: 1 }}
               initialCameraPosition={initialCameraPosition}
+              photo={pickerMode === 'photo'}
+              video={pickerMode === 'video'}
             />
           ) : null
         }
@@ -262,10 +276,6 @@ const SelectImageStep = ({
               onGalleryPermissionFail={onGalleryPermissionFail}
               kind={kind}
               style={{ flex: 1 }}
-              contentContainerStyle={{
-                paddingBottom:
-                  safeAreaBottom + TAB_BAR_HEIGHT + TOOL_BAR_BOTTOM_MARGIN + 10,
-              }}
             />
           ) : (
             <CameraControlPanel
@@ -275,11 +285,12 @@ const SelectImageStep = ({
               onStopRecording={onStopRecording}
               maxVideoDuration={maxVideoDuration}
               ready={cameraInitialized}
-              style={{
-                flex: 1,
-                marginBottom:
-                  safeAreaBottom + TAB_BAR_HEIGHT + TOOL_BAR_BOTTOM_MARGIN,
-              }}
+              style={[
+                styles.cameraControlPanel,
+                {
+                  marginBottom,
+                },
+              ]}
             />
           )
         }
@@ -313,6 +324,11 @@ const MAX_ASPECT_RATIO = 2;
 const MIN_ASPECT_RATIO = 0.5;
 
 const styles = StyleSheet.create({
+  cameraControlPanel: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   imageEditor: {
     width: '100%',
     height: '100%',

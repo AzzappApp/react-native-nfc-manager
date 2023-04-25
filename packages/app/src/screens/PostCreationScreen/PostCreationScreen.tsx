@@ -14,7 +14,7 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
 import type { Observable } from 'relay-runtime';
 
-const POST_MAX_DURATION = 30;
+const POST_MAX_DURATION = 15;
 
 const PostCreationScreen = () => {
   const [allowLikes, setAllowLikes] = useState(true);
@@ -47,14 +47,14 @@ const PostCreationScreen = () => {
     kind,
     uri,
     aspectRatio,
-    width,
-    height,
+
     editionParameters,
     filter,
     timeRange,
   }: ImagePickerResult) => {
     setSaving(true);
-    const path = await exportMedia({
+
+    const exportedMedia = await exportMedia({
       uri,
       kind,
       editionParameters,
@@ -68,8 +68,8 @@ const PostCreationScreen = () => {
       target: 'post',
     });
     const file: any = {
-      name: getFileName(path),
-      uri: `file://${path}`,
+      name: getFileName(exportedMedia.uri),
+      uri: `file://${exportedMedia.uri}`,
       type: kind === 'image' ? 'image/jpeg' : 'video/quicktime',
     };
     const { progress: uploadProgress, promise: uploadPromise } =
@@ -82,8 +82,8 @@ const PostCreationScreen = () => {
           media: {
             kind: kind === 'video' ? 'video' : 'image',
             id: public_id,
-            width,
-            height,
+            width: exportedMedia.size.width,
+            height: exportedMedia.size.height,
           },
           allowComments,
           allowLikes,
@@ -118,6 +118,7 @@ const PostCreationScreen = () => {
     <PostCreationScreenContext.Provider value={contextValue}>
       <ImagePicker
         maxVideoDuration={POST_MAX_DURATION}
+        forceCameraRatio={1}
         onCancel={onCancel}
         onFinished={onFinished}
         busy={saving}

@@ -31,10 +31,8 @@ const FadeSwitch = ({
             ref={containerRef}
             style={[
               {
-                top: 0,
-                left: 0,
-                width: '100%',
                 height: '100%',
+                width: '100%',
                 opacity: state === 'entered' || state === 'entering' ? 1 : 0,
               },
             ]}

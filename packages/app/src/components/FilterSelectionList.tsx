@@ -81,6 +81,7 @@ const FilterButton = ({
   label,
   filter,
   cardRadius,
+
   onPress,
 }: FilterButtonProps) => {
   const [width, setWidth] = useState<number | null>(null);
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
-    height: '100%',
+    height: '90%',
   },
   filterImageContainer: {
     flex: 1,

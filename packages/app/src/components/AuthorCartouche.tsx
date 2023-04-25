@@ -23,7 +23,7 @@ const AuthorCartouche = ({
   ...props
 }: ViewProps & {
   author: AuthorCartoucheFragment_profile$key;
-  variant?: 'post' | 'small';
+  variant?: 'createPost' | 'post' | 'small';
 }) => {
   const author = useFragment(
     graphql`
@@ -64,8 +64,8 @@ const AuthorCartouche = ({
     >
       {author.card?.cover.media.id != null ? (
         <MediaImageRenderer
-          width={variant === 'small' ? 20 : 21}
-          aspectRatio={variant === 'small' ? 1 : COVER_RATIO}
+          width={variant === 'post' ? 21 : 12.5}
+          aspectRatio={COVER_RATIO}
           source={author.card.cover.media.id}
           uri={author.card?.cover.media.avatarURI}
           alt={'avatar'}
@@ -82,7 +82,7 @@ const AuthorCartouche = ({
         )
       )}
       <Text
-        variant="button"
+        variant={variant === 'post' ? 'button' : 'smallbold'}
         style={[variant === 'small' && variantStyle.userNameSmall]}
       >
         {author.userName}
@@ -101,8 +101,10 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     },
     containerSmall: {
       height: AUTHOR_CARTOUCHE_SMALL_HEIGHT,
-      padding: 4,
-      paddingEnd: 12,
+      paddingTop: 4,
+      paddingBottom: 4,
+      paddingLeft: 6,
+      paddingRight: 12,
       borderRadius: 20,
       flexDirection: 'row',
       alignItems: 'center',
@@ -114,6 +116,15 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     },
     userNameSmall: {
       color: 'white',
+    },
+  },
+  createPost: {
+    image: {
+      width: 12.5,
+      height: 20,
+      borderRadius: 3,
+      marginRight: 10,
+      backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey200,
     },
   },
   post: {
@@ -128,9 +139,9 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
   },
   small: {
     image: {
-      width: 20,
+      width: 12.5,
       height: 20,
-      borderRadius: 10,
+      borderRadius: 3,
       marginRight: 4,
       backgroundColor: colors.white,
     },
@@ -140,4 +151,4 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
 export default AuthorCartouche;
 
 export const AUTHOR_CARTOUCHE_HEIGHT = 40;
-export const AUTHOR_CARTOUCHE_SMALL_HEIGHT = 30;
+export const AUTHOR_CARTOUCHE_SMALL_HEIGHT = 28;

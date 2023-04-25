@@ -1,10 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
 import FilterSelectionList from '../FilterSelectionList';
 import { useEditionParametersDisplayInfos } from '../gpu';
@@ -97,7 +100,8 @@ const EditImageStep = () => {
   const intl = useIntl();
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
-
+  const bottomMargin =
+    safeAreaBottom > 0 ? safeAreaBottom : TOOL_BAR_BOTTOM_MARGIN;
   const isEditing = !!editedParameter;
   const paramsInfos = useEditionParametersDisplayInfos();
 
@@ -143,7 +147,7 @@ const EditImageStep = () => {
       headerRightButton={
         editedParameter === 'cropData' ? (
           <IconButton
-            icon="missing"
+            icon="rotate"
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Rotate',
               description:
@@ -163,43 +167,73 @@ const EditImageStep = () => {
       topPanel={
         <ImagePickerMediaRenderer
           cropEditionMode={editedParameter === 'cropData'}
-        />
+        >
+          {media?.kind === 'video' && (
+            <View style={styles.viewVideoDurationError}>
+              {media.duration > maxVideoDuration && (
+                <View style={styles.viewIconDuration}>
+                  <Icon icon="missing" style={{ width: 17, height: 17 }} />
+                </View>
+              )}
+              <Text variant="medium">{formatDuration(media.duration)}</Text>
+            </View>
+          )}
+        </ImagePickerMediaRenderer>
       }
       bottomPanel={
         editedParameter === null ? (
-          <>
-            <View style={styles.titleContainer}>
-              <View style={styles.titleLine} />
-              <Text variant="large" style={styles.title}>
-                {currentTab === 'filter' && (
-                  <FormattedMessage
-                    defaultMessage="Filter"
-                    description="Title of the filter section in Image edition wizzard"
-                  />
-                )}
-                {currentTab === 'edit' && (
-                  <FormattedMessage
-                    defaultMessage="Adjust"
-                    description="Title of the adjust section in Image edition wizzard"
-                  />
-                )}
-                {currentTab === 'timeRange' && (
-                  <FormattedMessage
-                    defaultMessage="Cut Video"
-                    description="Title of the cut video section in Image edition wizzard"
-                  />
-                )}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.contentContainer,
-                {
-                  marginBottom:
-                    TAB_BAR_HEIGHT + safeAreaBottom + TOOL_BAR_BOTTOM_MARGIN,
-                },
-              ]}
-            >
+          <View
+            style={{
+              flex: 1,
+              marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+            }}
+          >
+            {currentTab === 'filter' && (
+              <TabsBar
+                currentTab="filter"
+                tabs={[
+                  {
+                    tabKey: 'filter',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Filters',
+                      description:
+                        'Title of the filters section in Image edition wizzard',
+                    }),
+                  },
+                ]}
+              />
+            )}
+            {currentTab === 'edit' && (
+              <TabsBar
+                currentTab="filter"
+                tabs={[
+                  {
+                    tabKey: 'filter',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Adjust',
+                      description:
+                        'Title of the adjust section in Image edition wizzard',
+                    }),
+                  },
+                ]}
+              />
+            )}
+            {currentTab === 'timeRange' && (
+              <TabsBar
+                currentTab="filter"
+                tabs={[
+                  {
+                    tabKey: 'filter',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Cut Video',
+                      description:
+                        'Title of the cut video section in Image edition wizzar',
+                    }),
+                  },
+                ]}
+              />
+            )}
+            <View style={styles.contentContainer}>
               {currentTab === 'filter' && (
                 <FilterSelectionList
                   layer={
@@ -218,13 +252,14 @@ const EditImageStep = () => {
                   aspectRatio={aspectRatio}
                   selectedFilter={mediaFilter}
                   onChange={onMediaFilterChange}
-                  contentContainerStyle={{ paddingHorizontal: 20 }}
-                  style={{ flex: 1, maxHeight: 120 }}
+                  contentContainerStyle={styles.filterSelectionContentContainer}
+                  style={styles.filterSelectionStyle}
                 />
               )}
               {currentTab === 'edit' && (
                 <ImageEditionParametersList
-                  style={{ flexGrow: 0 }}
+                  style={styles.filterSelectionStyle}
+                  contentContainerStyle={styles.filterSelectionContentContainer}
                   onSelectParam={onEditionStart}
                 />
               )}
@@ -235,19 +270,18 @@ const EditImageStep = () => {
                   aspectRatio={aspectRatio}
                   maxDuration={maxVideoDuration}
                   onChange={onTimeRangeChange}
-                  width={windowWidth - 20}
-                  imagesHeight={80}
-                  style={{ alignSelf: 'center' }}
+                  width={windowWidth - 30}
+                  imagesHeight={50}
+                  style={styles.videoTimelineEditor}
                 />
               )}
             </View>
-          </>
+          </View>
         ) : (
           <View
             style={{
               flex: 1,
-              marginBottom: safeAreaBottom,
-              paddingVertical: 10,
+              paddingBottom: bottomMargin,
             }}
           >
             {editedParameter === 'cropData' ? (
@@ -255,14 +289,14 @@ const EditImageStep = () => {
                 value={editionParameters.roll}
                 parameter="roll"
                 onChange={value => onParameterValueChange('roll', value)}
-                style={{ flex: 1 }}
+                style={styles.filterSelectionStyle}
               />
             ) : (
               <ImageEditionParameterControl
                 value={editionParameters[editedParameter] as any}
                 parameter={editedParameter}
                 onChange={onCurrentParamChange}
-                style={{ flex: 1 }}
+                style={styles.filterSelectionStyle}
               />
             )}
             <ImageEditionFooter
@@ -290,6 +324,34 @@ EditImageStep.STEP_ID = 'EDIT_IMAGE';
 export default EditImageStep;
 
 const styles = StyleSheet.create({
+  videoTimelineEditor: {
+    flex: 1,
+    flexShrink: 0,
+    alignSelf: 'center',
+    maxHeight: 113,
+    marginTop: 30,
+  },
+  viewIconDuration: {
+    width: 17,
+    height: 17,
+    borderRadius: 8.5,
+    backgroundColor: colors.red400,
+    marginRight: 7,
+  },
+  viewVideoDurationError: {
+    position: 'absolute',
+    bottom: 25,
+    right: 15,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterSelectionStyle: { flex: 1, flexShrink: 0 },
+  filterSelectionContentContainer: {
+    paddingHorizontal: 20,
+    maxHeight: 113,
+    alignSelf: 'center',
+  },
   titleContainer: {
     alignItems: 'center',
     marginTop: 20,
@@ -305,12 +367,12 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: 1,
-    backgroundColor: colors.grey50,
+    backgroundColor: 'colors.grey50',
     transform: [{ translateY: -0.5 }],
   },
   contentContainer: {
     flex: 1,
-    marginVertical: 10,
-    justifyContent: 'center',
+    marginTop: 10,
+    justifyContent: 'flex-start',
   },
 });

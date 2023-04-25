@@ -101,6 +101,7 @@ const ProfileScreenLayout = ({
                   onPress={onClose}
                   iconSize={30}
                   variant="grey"
+                  iconStyle={{ tintColor: colors.white }}
                 />
               </ViewTransition>
 

@@ -47,6 +47,10 @@
     "defaultMessage": "Password",
     "description": "Password input placeholder"
   },
+  "4cXY7m": {
+    "defaultMessage": "Describe your post",
+    "description": "Post creation screen textarea placeholder"
+  },
   "5/HOhV": {
     "defaultMessage": "Profiles",
     "description": "SearchPage - Result - Global search profiles title"
@@ -287,10 +291,6 @@
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
     "description": "Signup Screen - Accessibility Label TextInput Password"
   },
-  "J7Z2GR": {
-    "defaultMessage": "Cut Video",
-    "description": "Title of the cut video section in Image edition wizzard"
-  },
   "JGmlYS": {
     "defaultMessage": "Skip",
     "description": "NewProfile About Screen - Skip process"
@@ -298,6 +298,10 @@
   "JcQ1BH": {
     "defaultMessage": "Photo",
     "description": "Title of the photo view in image picker wizzard"
+  },
+  "K8vqTk": {
+    "defaultMessage": "Filters",
+    "description": "Title of the filters section in Image edition wizzard"
   },
   "KKW5Ea": {
     "defaultMessage": "Horizontal",
@@ -318,6 +322,10 @@
   "LLt2DI": {
     "defaultMessage": "Email address",
     "description": "The email address option in the country selector"
+  },
+  "LOvPdv": {
+    "defaultMessage": "Crop",
+    "description": "Crop image edition parameters name"
   },
   "LnYT8w": {
     "defaultMessage": "Models",
@@ -467,6 +475,10 @@
     "defaultMessage": "Enter your password",
     "description": "SignIn Screen - Accessibility TextInput email address "
   },
+  "WsKWO4": {
+    "defaultMessage": "Description",
+    "description": "Post creation screen textarea modal title"
+  },
   "X5oGqP": {
     "defaultMessage": "Font color",
     "description": "Title of the color picker modal in cover edition for font color"
@@ -490,6 +502,10 @@
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
+  },
+  "YyZiop": {
+    "defaultMessage": "Cut Video",
+    "description": "Title of the cut video section in Image edition wizzar"
   },
   "ZZvty9": {
     "defaultMessage": "Done",
@@ -555,6 +571,10 @@
     "defaultMessage": "Structure",
     "description": "Structure image edition parameters name"
   },
+  "dtRVyb": {
+    "defaultMessage": "Publish",
+    "description": "Publish button action Post Content Screen"
+  },
   "dzmRcf": {
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
@@ -566,10 +586,6 @@
   "e9NfAF": {
     "defaultMessage": "Check your emails or messages!",
     "description": "ForgotPasswordScreen - Check your emails or messages!"
-  },
-  "ebisVt": {
-    "defaultMessage": "Adjust",
-    "description": "Adjust image edition parameters name"
   },
   "f2KYUh": {
     "defaultMessage": "Subtitle",
@@ -811,10 +827,6 @@
     "defaultMessage": "Middle left",
     "description": "Label of the middle left position in cover edition"
   },
-  "qyCo80": {
-    "defaultMessage": "Describe your publication",
-    "description": "Post creation screen textarea placeholder"
-  },
   "r+BJn9": {
     "defaultMessage": "What's your name?",
     "description": "Personal profile form - Title"
@@ -922,10 +934,6 @@
   "wfjPDR": {
     "defaultMessage": "Photos gallery",
     "description": "Accessibility label of the Photos gallery tabs in image picking wizzard"
-  },
-  "wjUxdq": {
-    "defaultMessage": "Filter",
-    "description": "Title of the filter section in Image edition wizzard"
   },
   "wkQ0bm": {
     "defaultMessage": "video",

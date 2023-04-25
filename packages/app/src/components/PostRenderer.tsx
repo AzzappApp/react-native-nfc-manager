@@ -176,7 +176,7 @@ const PostRenderer = (
                 width={width}
               />
               {/* Play iconicon */}
-              <Icon icon="missing" style={styles.playIcon} />
+              <Icon icon="play" style={styles.playIcon} />
             </>
           ) : (
             <MediaVideoRenderer

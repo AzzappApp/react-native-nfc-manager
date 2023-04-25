@@ -55,6 +55,10 @@ export type ImagePickerProps = {
    */
   forceAspectRatio?: number;
   /**
+   * The aspect ratio to force on the camera
+   */
+  forceCameraRatio?: number;
+  /**
    * The steps to display in the wizard
    * By default, it will display the SelectImageStep and the EditImageStep
    * You can add or remove steps, but you must make sure that the first step is a SelectImageStep
@@ -99,13 +103,14 @@ export type ImagePickerProps = {
  *
  */
 const ImagePicker = ({
-  maxVideoDuration = 10,
+  maxVideoDuration = 15,
   forceAspectRatio,
   steps = DEFAULT_STEPS,
   kind = 'mixed',
   busy,
   canCancel = true,
   exporting = false,
+  forceCameraRatio,
   onFinished,
   onCancel,
   TopPanelWrapper = Fragment,
@@ -155,6 +160,7 @@ const ImagePicker = ({
     <ImagePickerContextProvider
       ref={pickerStateRef}
       forceAspectRatio={forceAspectRatio}
+      forceCameraRatio={forceCameraRatio}
       maxVideoDuration={maxVideoDuration}
       exporting={exporting}
       kind={kind}

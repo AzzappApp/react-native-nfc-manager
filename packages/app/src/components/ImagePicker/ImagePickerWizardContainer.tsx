@@ -1,22 +1,29 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BottomMenu from '#ui/BottomMenu';
+import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
 import Header from '#ui/Header';
+import IconButton from '#ui/IconButton';
 import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import type { BottomMenuProps } from '#ui/BottomMenu';
 import type { ReactElement, ReactNode, ComponentType } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ViewProps, LayoutChangeEvent } from 'react-native';
 
 export type ImagePickerStepDefinition = {
   /**
@@ -33,6 +40,11 @@ export type ImagePickerStepDefinition = {
    * if null, and if the state allows it, the next button is displayed
    */
   headerRightButton?: ReactElement | null;
+  /**
+   * the right button  header
+   * Only change the label of the right header button
+   */
+  headerRightButtonTitle?: string | null;
   /**
    * prevent the navigation to the next step
    */
@@ -116,6 +128,7 @@ type ImagePickerWizardRendererProps = ImagePickerStepDefinition &
   ViewProps & {
     isLastStep: boolean;
     isFirstStep: boolean;
+    lastStepButtonLabel?: string;
     canCancel: boolean;
     busy?: boolean;
     onBack(): void;
@@ -135,6 +148,7 @@ const ImagePickerWizardRenderer = ({
   topPanel,
   bottomPanel,
   menuBarProps,
+  headerRightButtonTitle,
   canCancel,
   onBack,
   onNext,
@@ -143,11 +157,11 @@ const ImagePickerWizardRenderer = ({
   ...props
 }: ImagePickerWizardRendererProps) => {
   const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets();
-
+  const { width } = useWindowDimensions();
   const intl = useIntl();
   let leftButton = headerLeftButton;
   if (!leftButton) {
-    if ((isFirstStep && canCancel) || !preventNavigation) {
+    if (isFirstStep && canCancel) {
       leftButton = (
         <Button
           label={intl.formatMessage({
@@ -155,8 +169,16 @@ const ImagePickerWizardRenderer = ({
             description: 'Cancel button label in image picker wizzard',
           })}
           onPress={onBack}
-          variant="secondary"
-          style={styles.headerButtons}
+          variant="cancel"
+        />
+      );
+    } else if (!preventNavigation) {
+      leftButton = (
+        <IconButton
+          onPress={onBack}
+          iconSize={30}
+          icon="arrow_left"
+          style={{ borderWidth: 0 }}
         />
       );
     }
@@ -164,13 +186,14 @@ const ImagePickerWizardRenderer = ({
   if (busy) {
     leftButton = null;
   }
-
   let rightButton = headerRightButton;
   if (!rightButton && !preventNavigation) {
     rightButton = (
       <Button
         label={
-          isLastStep
+          headerRightButtonTitle
+            ? headerRightButtonTitle
+            : isLastStep
             ? intl.formatMessage({
                 defaultMessage: 'Save',
                 description: 'Save button label in image picker wizzard',
@@ -181,10 +204,30 @@ const ImagePickerWizardRenderer = ({
               })
         }
         onPress={onNext}
-        style={styles.headerButtons}
       />
     );
   }
+
+  const marginBottom =
+    safeAreaBottom > 0
+      ? safeAreaBottom
+      : TOOL_BAR_BOTTOM_MARGIN + (menuBarProps ? BOTTOM_MENU_HEIGHT : 0);
+
+  //this is the maximum height of the top panel when top and bottom are not absolute view
+
+  const [heightTopPanel, setHeightTopPanel] = useState(0);
+  const onLayout = useCallback(
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      setHeightTopPanel(
+        Math.min(
+          width,
+          layout.height - marginBottom - BOTTOM_PANEL_MININAL_SIZE,
+        ),
+      );
+    },
+    [marginBottom, width],
+  );
+
   if (busy) {
     rightButton = <ActivityIndicator style={styles.activityIndicator} />;
   }
@@ -200,53 +243,69 @@ const ImagePickerWizardRenderer = ({
         middleElement={headerTitle}
         style={styles.header}
       />
-      <View style={styles.topPanel}>
-        {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
-      </View>
-      <View style={styles.bottomPanel}>
-        <FadeSwitch transitionDuration={120} currentKey={stepId}>
-          {bottomPanel}
-        </FadeSwitch>
-        {menuBarProps && (
+
+      <View onLayout={onLayout} style={{ flex: 1 }}>
+        <FadeSwitch transitionDuration={130} currentKey={stepId}>
           <View
             style={[
-              styles.tabBarContainer,
-              { bottom: safeAreaBottom + TOOL_BAR_BOTTOM_MARGIN },
+              {
+                minHeight: heightTopPanel,
+                flex: 1,
+                maxHeight: width,
+              },
             ]}
-            pointerEvents="box-none"
           >
-            <BottomMenu {...menuBarProps} />
+            {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
           </View>
-        )}
+          <View
+            style={{
+              minHeight: BOTTOM_PANEL_MININAL_SIZE + marginBottom,
+              flex: 1,
+              flexShrink: 0,
+            }}
+          >
+            {bottomPanel}
+          </View>
+          {menuBarProps && (
+            <View
+              style={[
+                styles.tabBarContainer,
+                {
+                  bottom:
+                    safeAreaBottom > 0
+                      ? safeAreaBottom
+                      : TOOL_BAR_BOTTOM_MARGIN,
+                },
+              ]}
+              pointerEvents="box-none"
+            >
+              <BottomMenu {...menuBarProps} />
+            </View>
+          )}
+        </FadeSwitch>
       </View>
     </Container>
   );
 };
+
+const BOTTOM_PANEL_MININAL_SIZE = 183;
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
   header: {
-    height: 70,
-  },
-  headerButtons: {
-    width: 70,
-    height: 46,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    marginBottom: 10,
   },
   activityIndicator: {
     marginRight: 10,
   },
   topPanel: {
-    aspectRatio: 1,
-    // backgroundColor: colors.grey500,
+    flex: 1,
   },
-  bottomPanel: { flex: 1, marginTop: 1 },
+
   tabBarContainer: {
     position: 'absolute',
-    bottom: 0,
     alignItems: 'center',
     width: '100%',
   },

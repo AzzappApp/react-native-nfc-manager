@@ -7,6 +7,9 @@ const icons = {
   get missing() {
     return require('./assets/missing.png');
   },
+  get about() {
+    return require('./assets/about.png');
+  },
   get account() {
     return require('./assets/account.png');
   },
@@ -21,6 +24,9 @@ const icons = {
   },
   get albums() {
     return require('./assets/albums.png');
+  },
+  get approve() {
+    return require('./assets/approve.png');
   },
   get arrow_down() {
     return require('./assets/arrow_down.png');
@@ -81,6 +87,9 @@ const icons = {
   },
   get crop() {
     return require('./assets/crop.png');
+  },
+  get delete_filled() {
+    return require('./assets/delete_filled.png');
   },
   get delete() {
     return require('./assets/delete.png');
@@ -145,6 +154,12 @@ const icons = {
   get image_right() {
     return require('./assets/image_right.png');
   },
+  get information() {
+    return require('./assets/information.png');
+  },
+  get invite() {
+    return require('./assets/invite.png');
+  },
   get keyboard() {
     return require('./assets/keyboard.png');
   },
@@ -153,6 +168,12 @@ const icons = {
   },
   get link() {
     return require('./assets/link.png');
+  },
+  get locked() {
+    return require('./assets/locked.png');
+  },
+  get logout() {
+    return require('./assets/logout.png');
   },
   get mail() {
     return require('./assets/mail.png');
@@ -169,9 +190,6 @@ const icons = {
   get mobile() {
     return require('./assets/mobile.png');
   },
-  get multiple() {
-    return require('./assets/multiple.png');
-  },
   get notification() {
     return require('./assets/notification.png');
   },
@@ -183,6 +201,15 @@ const icons = {
   },
   get revert() {
     return require('./assets/revert.png');
+  },
+  get multiple() {
+    return require('./assets/multiple.png');
+  },
+  get play() {
+    return require('./assets/play.png');
+  },
+  get rotate() {
+    return require('./assets/rotate.png');
   },
   get saturation() {
     return require('./assets/saturation.png');
@@ -198,6 +225,9 @@ const icons = {
   },
   get sharpness() {
     return require('./assets/sharpness.png');
+  },
+  get stop() {
+    return require('./assets/stop.png');
   },
   get structure() {
     return require('./assets/structure.png');
@@ -225,6 +255,9 @@ const icons = {
   },
   get txt_align_right() {
     return require('./assets/txt_align_right.png');
+  },
+  get unlock_line() {
+    return require('./assets/unlock_line.png');
   },
   get vibrance() {
     return require('./assets/vibrance.png');

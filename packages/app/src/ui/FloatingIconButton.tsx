@@ -5,15 +5,16 @@ import FloatingButton from './FloatingButton';
 import type { Icons } from '#ui/Icon';
 import type { FloatingButtonProps } from './FloatingButton';
 import type { ForwardedRef } from 'react';
-import type { View } from 'react-native';
+import type { ImageStyle, StyleProp, View } from 'react-native';
 
 export type FloatingIconButtonProps = Omit<FloatingButtonProps, 'children'> & {
   icon: Icons;
   iconSize?: number;
+  iconStyle?: StyleProp<ImageStyle> | undefined;
 };
 
 const FloatingIconButton = (
-  { icon, iconSize = 18, ...props }: FloatingIconButtonProps,
+  { icon, iconSize = 18, iconStyle, ...props }: FloatingIconButtonProps,
   ref: ForwardedRef<View>,
 ) => (
   <FloatingButton ref={ref} {...props}>
@@ -24,6 +25,7 @@ const FloatingIconButton = (
           width: iconSize,
           height: iconSize,
         },
+        iconStyle,
       ]}
     />
   </FloatingButton>

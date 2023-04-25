@@ -101,10 +101,18 @@ const CameraControlPanel = ({
     <View style={[styles.root, style]} {...props}>
       <ProgressBar
         progress={progress}
-        style={{ opacity: isRecording ? 1 : 0, alignSelf: 'stretch' }}
+        style={{
+          opacity: isRecording ? 1 : 0,
+          alignSelf: 'stretch',
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+        }}
       />
       {timer != null && (
-        <Text variant="small">{formatVideoTime(Math.round(timer / 1000))}</Text>
+        <Text variant="small" style={{ marginBottom: 25 }}>
+          {formatVideoTime(Math.round(timer / 1000))}
+        </Text>
       )}
       {captureMode === 'photo' ? (
         <PressableBackground
@@ -186,7 +194,7 @@ const CAPTURE_BUTTON_SIZE = 80;
 const styles = StyleSheet.create({
   root: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingBottom: 20,
   },
   photoButton: {

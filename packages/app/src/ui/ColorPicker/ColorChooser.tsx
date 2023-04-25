@@ -18,7 +18,8 @@ const ColorChooser = ({ value, onChangeColor, style }: ColorChooserProps) => {
   };
 
   const onHueChange = (hue: number) => {
-    onChangeColor(chroma.hsv(hue, saturation, val).hex());
+    // Overwrite to provide pure hue color #275
+    onChangeColor(chroma.hsl(hue, 1, 0.5).hex());
   };
 
   const onHexChange = (hex: string) => {

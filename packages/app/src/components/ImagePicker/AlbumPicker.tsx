@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { FlatList, Image, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -112,7 +113,7 @@ const AlbumPickerScreen = ({
 
   const { top, bottom } = useSafeAreaInsets();
   return (
-    <View style={{ marginTop: top }}>
+    <Container style={{ paddingTop: top, flex: 1 }}>
       <Header
         leftElement={<IconButton icon="arrow_left" onPress={onClose} />}
         middleElement={intl.formatMessage({
@@ -126,7 +127,7 @@ const AlbumPickerScreen = ({
         renderItem={renderAlbum}
         contentContainerStyle={{ marginBottom: bottom }}
       />
-    </View>
+    </Container>
   );
 };
 
@@ -202,6 +203,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
   },
 });

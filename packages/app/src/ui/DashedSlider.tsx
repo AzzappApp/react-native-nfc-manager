@@ -34,6 +34,10 @@ const DashedSlider = ({
 }: DashedSliderProps) => {
   const appearanceStyle = useStyleSheet(computedStyle);
   const pan = useRef(new Animated.Value(value)).current;
+  // fix #287 : Changing from name to subtitle in coveredition did not update the value of the slider
+  useEffect(() => {
+    pan.setValue(value);
+  }, [pan, value]);
   const computedInterval = interval * (variant === 'small' ? 0.5 : 1);
 
   const isPaning = useRef(false);

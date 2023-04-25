@@ -14,10 +14,10 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
   return useMemo(
     () => ({
       cropData: {
-        icon: 'contrast',
+        icon: 'crop',
         label: intl.formatMessage({
-          defaultMessage: 'Adjust',
-          description: 'Adjust image edition parameters name',
+          defaultMessage: 'Crop',
+          description: 'Crop image edition parameters name',
         }),
       },
       brightness: {

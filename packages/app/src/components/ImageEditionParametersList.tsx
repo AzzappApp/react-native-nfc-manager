@@ -30,7 +30,7 @@ const EditionParametersList = ({
 }: EditionParametersListProps) => {
   const paramsInfos = useEditionParametersDisplayInfos();
   return (
-    <ScrollView {...props} horizontal>
+    <ScrollView {...props} horizontal showsHorizontalScrollIndicator={false}>
       {parametersList
         .filter(param => !excludedParams?.includes(param))
         .map(param => {

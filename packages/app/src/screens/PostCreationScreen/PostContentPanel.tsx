@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { memo, useContext, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLazyLoadQuery, graphql } from 'react-relay';
 import { colors } from '#theme';
+import AuthorCartouche from '#components/AuthorCartouche';
 import Button from '#ui/Button';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -10,27 +12,32 @@ import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { ViewProps } from 'react-native';
+import PostCreationScreenContext from './PostCreationScreenContext';
+import type { PostContentPanelQuery } from '@azzapp/relay/artifacts/PostContentPanelQuery.graphql';
 
-type PostContentPanelProps = ViewProps & {
-  allowLikes: boolean;
-  allowComments: boolean;
-  content: string;
-  onAllowLikesChange: (value: boolean) => void;
-  onAllowCommentsChange: (value: boolean) => void;
-  onContentChange: (value: string) => void;
-};
+const PostContentPanel = () => {
+  const { bottom: safeAreaBottom } = useSafeAreaInsets();
+  const {
+    allowLikes,
+    allowComments,
+    content,
+    setAllowLikes,
+    setAllowComments,
+    setContent,
+  } = useContext(PostCreationScreenContext);
+  const { viewer } = useLazyLoadQuery<PostContentPanelQuery>(
+    graphql`
+      query PostContentPanelQuery {
+        viewer {
+          profile {
+            ...AuthorCartoucheFragment_profile
+          }
+        }
+      }
+    `,
+    {},
+  );
 
-const PostContentPanel = ({
-  allowLikes,
-  allowComments,
-  content,
-  onAllowLikesChange,
-  onAllowCommentsChange,
-  onContentChange,
-  style,
-  ...props
-}: PostContentPanelProps) => {
   const [showContentModal, setShowContentModal] = useState(false);
   const onFocus = () => {
     setShowContentModal(true);
@@ -40,7 +47,7 @@ const PostContentPanel = ({
   };
   const intl = useIntl();
   const textAraPlaceHolder = intl.formatMessage({
-    defaultMessage: 'Describe your publication',
+    defaultMessage: 'Describe your post',
     description: 'Post creation screen textarea placeholder',
   });
 
@@ -48,18 +55,36 @@ const PostContentPanel = ({
 
   return (
     <>
-      <View style={[styles.container, style]} {...props}>
+      <View
+        style={[
+          styles.container,
+          {
+            marginBottom: safeAreaBottom > 0 ? safeAreaBottom : 15,
+          },
+        ]}
+      >
+        {viewer?.profile && (
+          <AuthorCartouche
+            author={viewer.profile}
+            variant="createPost"
+            style={{ paddingLeft: 0 }}
+          />
+        )}
         <View style={styles.settingsContainer}>
           <View style={styles.switchContainer}>
             <Icon icon="like" style={styles.switchIcon} />
-            <Switch value={allowLikes} onValueChange={onAllowLikesChange} />
+            <Switch
+              variant="large"
+              value={allowLikes}
+              onValueChange={setAllowLikes}
+            />
           </View>
           <View style={styles.switchContainer}>
             <Icon icon="comment" style={styles.switchIcon} />
             <Switch
-              variant="small"
+              variant="large"
               value={allowComments}
-              onValueChange={onAllowCommentsChange}
+              onValueChange={setAllowComments}
             />
           </View>
         </View>
@@ -71,7 +96,9 @@ const PostContentPanel = ({
           {content ? (
             <Text>{content}</Text>
           ) : (
-            <Text style={styles.placeHolder}>{textAraPlaceHolder}</Text>
+            <Text variant="textField" style={styles.placeHolder}>
+              {textAraPlaceHolder}
+            </Text>
           )}
         </PressableNative>
       </View>
@@ -85,9 +112,13 @@ const PostContentPanel = ({
           <Header
             style={{
               backgroundColor: 'white',
-              height: 70 + safeAreaTop,
-              paddingTop: safeAreaTop,
+              marginTop: safeAreaTop,
+              marginBottom: 10,
             }}
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Description',
+              description: 'Post creation screen textarea modal title',
+            })}
             rightElement={
               <Button
                 label={intl.formatMessage({
@@ -96,8 +127,6 @@ const PostContentPanel = ({
                     'Ok button label in post creation text edition modal',
                 })}
                 onPress={onModalClose}
-                variant="secondary"
-                style={styles.headerButtons}
               />
             }
           />
@@ -107,10 +136,11 @@ const PostContentPanel = ({
                 multiline
                 placeholder={textAraPlaceHolder}
                 value={content}
-                onChangeText={onContentChange}
+                onChangeText={setContent}
                 autoFocus
                 maxLength={MAX_CONTENT_LENGHT}
                 onBlur={onModalClose}
+                style={{ borderWidth: 0, flex: 1 }}
               />
             </View>
             <Text variant="smallbold" style={styles.counter}>
@@ -123,17 +153,17 @@ const PostContentPanel = ({
   );
 };
 
-export default PostContentPanel;
+export default memo(PostContentPanel);
 
-const MAX_CONTENT_LENGHT = 3000;
+const MAX_CONTENT_LENGHT = 2200;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingHorizontal: 10,
   },
   settingsContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     marginBottom: 8,
   },
   switchContainer: {
@@ -142,15 +172,14 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   switchIcon: {
-    width: 20,
-    marginRight: 10,
+    marginRight: 12,
   },
   textArea: {
     borderRadius: 12,
     backgroundColor: colors.grey50,
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
   },
   placeHolder: {
     color: colors.grey400,
@@ -158,12 +187,7 @@ const styles = StyleSheet.create({
   modal: {
     flex: 1,
   },
-  headerButtons: {
-    width: 70,
-    height: 46,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-  },
+
   contentModal: {
     flex: 1,
     backgroundColor: `${colors.black}AA`,

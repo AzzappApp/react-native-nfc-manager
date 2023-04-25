@@ -73,8 +73,8 @@ export const isInternationalPhoneNumber = (phoneNumber?: string | null) => {
   }
   return false;
 };
-export const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_.]{1,30}$/;
-export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_.]$/;
+export const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_]{1,30}$/;
+export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_]$/;
 /**
  * Validate username using simple regex (does not start with specific charaters, does not container special characters and only one _ allowed at the end)
  * Also check to be URLEncoded indentical
@@ -114,4 +114,16 @@ export const isValidHex = (value: string, shortFormat?: boolean): boolean => {
  */
 export function formatPhoneNumber(phoneNumber: string) {
   return parsePhoneNumber(phoneNumber).format('E.164');
+}
+
+/**
+ * Simple function to format duration in minutes and seconds
+ *
+ * @param {number} duration
+ * @return {*}
+ */
+export function formatDuration(duration: number) {
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
