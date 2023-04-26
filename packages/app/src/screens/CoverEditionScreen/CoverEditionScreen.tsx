@@ -27,6 +27,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import { exportImage, exportVideo } from '#components/gpu';
@@ -223,7 +224,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     }
     const isPersonal = profileKind === 'personal';
     const updatesValue: CoverEditionValue = {
-      title: isPersonal ? `${firstName} ${lastName}`.trim() : companyName,
+      title: isPersonal ? formatDisplayName(firstName, lastName) : companyName,
       segmented: isPersonal,
       subTitle: !isPersonal
         ? viewer?.profile?.companyActivity?.label
@@ -409,7 +410,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     useState<Observable<number> | null>(null);
 
   const isCreation = !cover;
-  const [isDemoAsset, setIsDemoAsset] = useState(isCreation);
+  const [isDemoAsset, setIsDemoAsset] = useState(
+    isCreation && profileKind === 'personal',
+  );
   const isDirty = Object.keys(updates).length > 0;
   const isValid =
     !isCreation || (updates.sourceMedia != null && !!updates.title);
@@ -1137,7 +1140,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           rightElement={
             cropEditionMode ? (
               <IconButton
-                icon="crop" //TODO: this button is not present in figma (rotation is still a WIP in figma), rotate does not exist anymore
+                icon="rotate"
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Rotate',
                   description:
@@ -1190,13 +1193,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               backgroundColor={backgroundStyle?.backgroundColor}
               backgroundMultiply={merged}
               backgroundImageTintColor={backgroundStyle?.patternColor}
-              editionParameters={{
-                ...editionParameters,
-                //TODO: find the right tuning, this is applying a filter on all the image, not only on the demo asset. maybe using a darkened demo asset?
-                brightness: isDemoAsset ? -0.5 : editionParameters.brightness,
-                contrast: isDemoAsset ? 0.5 : editionParameters.contrast,
-                saturation: isDemoAsset ? 0 : editionParameters.saturation,
-              }}
+              editionParameters={editionParameters}
               filter={filter}
               title={title}
               subTitle={subTitle}

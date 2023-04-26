@@ -127,3 +127,24 @@ export function formatDuration(duration: number) {
   const seconds = Math.floor(duration % 60);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
+
+/**
+ *
+ * Format the display name from first name and last name of a profile
+ *
+ * @export
+ * @param {(string | null | undefined)} firstName
+ * @param {(string | null | undefined)} lastName
+ * @return {*}
+ */
+export function formatDisplayName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+) {
+  if (isNotFalsyString(firstName) && isNotFalsyString(lastName)) {
+    return `${firstName} ${lastName}`;
+  }
+  if (isNotFalsyString(firstName)) return firstName;
+  if (isNotFalsyString(lastName)) return lastName;
+  return undefined;
+}

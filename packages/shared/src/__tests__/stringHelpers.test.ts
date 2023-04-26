@@ -5,6 +5,7 @@ import {
   isValidUserName,
   isValidHex,
   formatDuration,
+  formatDisplayName,
 } from '../stringHelpers';
 
 describe('stringHelper', () => {
@@ -93,6 +94,30 @@ describe('stringHelper', () => {
     test('should return formatted duration with only seconds', () => {
       expect(formatDuration(45)).toBe('0:45');
       expect(formatDuration(5)).toBe('0:05');
+    });
+  });
+
+  describe('formatDisplayName', () => {
+    it('should return formatted name when both firstName and lastName have truthy string values', () => {
+      expect(formatDisplayName('John', 'Doe')).toBe('John Doe');
+    });
+
+    it('should return firstName when it has a truthy string value and lastName is falsy', () => {
+      expect(formatDisplayName('John', null)).toBe('John');
+      expect(formatDisplayName('John', undefined)).toBe('John');
+      expect(formatDisplayName('John', '')).toBe('John');
+    });
+
+    it('should return lastName when it has a truthy string value and firstName is falsy', () => {
+      expect(formatDisplayName(null, 'Doe')).toBe('Doe');
+      expect(formatDisplayName(undefined, 'Doe')).toBe('Doe');
+      expect(formatDisplayName('', 'Doe')).toBe('Doe');
+    });
+
+    it('should return null when both firstName and lastName are falsy', () => {
+      expect(formatDisplayName(null, null)).toBe(undefined);
+      expect(formatDisplayName(undefined, undefined)).toBe(undefined);
+      expect(formatDisplayName('', '')).toBe(undefined);
     });
   });
 });

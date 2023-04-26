@@ -75,23 +75,24 @@ const CoverLayerList = ({
           ]}
         >
           <PressableNative
-            style={[styles.button, { borderRadius }]}
+            style={[styles.button, { borderRadius, backgroundColor }]}
             onPress={() => onSelectLayer(item?.id ?? null)}
             accessibilityRole="button"
           >
             {item?.smallURI ? (
-              <Image
-                source={{ uri: item?.smallURI }}
-                style={[
-                  styles.image,
-                  {
-                    borderRadius: !selected ? borderRadius : null,
-                    backgroundColor,
-                    tintColor,
-                  },
-                ]}
-                onLayout={onLayout}
-              />
+              <View style={{ borderRadius, overflow: 'hidden' }}>
+                <Image
+                  source={{ uri: item?.smallURI }}
+                  style={[
+                    styles.image,
+                    {
+                      backgroundColor,
+                      tintColor,
+                    },
+                  ]}
+                  onLayout={onLayout}
+                />
+              </View>
             ) : (
               <View
                 style={[
@@ -113,7 +114,7 @@ const CoverLayerList = ({
       data={[null, ...medias]}
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={style}
+      style={[styles.flatListStyle, style]}
       contentContainerStyle={styles.container}
       renderItem={renderItem}
       testID={testID}
@@ -125,6 +126,7 @@ const CoverLayerList = ({
 export default CoverLayerList;
 
 const styles = StyleSheet.create({
+  flatListStyle: { overflow: 'visible' },
   container: {
     paddingVertical: 10,
     paddingStart: 20,
@@ -135,7 +137,12 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    overflow: 'hidden',
+    overflow: 'visible',
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4.69 },
+    shadowRadius: 18.75,
+    elevation: 3,
   },
   image: {
     aspectRatio: COVER_RATIO,
