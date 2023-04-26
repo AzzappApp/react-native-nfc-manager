@@ -11,6 +11,7 @@ import {
   Image,
   Alert,
   useWindowDimensions,
+  useColorScheme,
 } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,6 +38,7 @@ import ImagePicker from '#components/ImagePicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
+import AnimatedCircleHint from '#ui/AnimatedCircleHint';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -435,12 +437,14 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       }
     }
   `);
-
+  const [showImageHint, setShowImageHint] = useState(false);
   const { uploadMedia, uploadSign } = useWebAPI();
+  const scheme = useColorScheme();
   const onSave = async () => {
     if (!canSave) {
       return;
     }
+
     if (isDemoAsset) {
       Alert.alert(
         '',
@@ -448,9 +452,14 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           defaultMessage: 'Please select a photo',
           description: 'CoverEditionScreen Alert message select photo',
         }),
+        [{ onPress: () => setShowImageHint(true) }],
+        {
+          userInterfaceStyle: scheme ?? 'light',
+        },
       );
       return;
     }
+    setShowImageHint(false);
     setSaving(true);
 
     const renderer = rendererRef.current;
@@ -706,7 +715,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       kind === 'image'
         ? COVER_SOURCE_MAX_IMAGE_DIMENSION
         : COVER_SOURCE_MAX_VIDEO_DIMENSION;
-
+    setShowImageHint(false);
     setIsDemoAsset(false);
     setShowImagePicker(false);
 
@@ -1229,6 +1238,15 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               })}
             />
           )}
+          <AnimatedCircleHint
+            style={{
+              position: 'absolute',
+              top: ((coverHeight ?? 0) - 220) / 2 + PADDING_TOP_TOPPANEL,
+              left: -110 + ICON_SIZE,
+            }}
+            hidesWhenStopped
+            animating={showImageHint}
+          />
           {!cropEditionMode && (
             <FloatingIconButton
               icon="camera"
@@ -1252,6 +1270,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               })}
             />
           )}
+
           <View style={[styles.toolbar, appearanceStyle.toolbar]}>
             {kind !== 'video' && (
               <SwitchLabel
