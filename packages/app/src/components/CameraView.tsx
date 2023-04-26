@@ -101,8 +101,12 @@ const CameraView = (
   const devices = useCameraDevices();
   const supportsCameraFlipping = devices.back != null && devices.front != null;
   const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
-    supportsCameraFlipping ? initialCameraPosition : 'back',
+    'back',
   );
+  const onCameraInitialized = useCallback(() => {
+    onInitialized();
+    setCameraPosition(supportsCameraFlipping ? initialCameraPosition : 'back');
+  }, [initialCameraPosition, onInitialized, supportsCameraFlipping]);
 
   const device = devices[cameraPosition];
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
@@ -110,6 +114,7 @@ const CameraView = (
 
   const isActive = useIsForeground();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
+
   useEffect(() => {
     Camera.getMicrophonePermissionStatus().then(
       status => setHasMicrophonePermission(status === 'authorized'),
@@ -248,7 +253,7 @@ const CameraView = (
             preset={video ? 'high' : 'photo'}
             fps={30}
             isActive={isActive}
-            onInitialized={onInitialized}
+            onInitialized={onCameraInitialized}
             onError={onError}
             enableZoomGesture={true}
             photo={photo}

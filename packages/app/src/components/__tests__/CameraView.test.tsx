@@ -259,6 +259,7 @@ describe('CameraView', () => {
     await act(flushPromises);
 
     const camera = screen.getByTestId('camera');
+    fireEvent(camera, 'initialized');
     expect(camera).toHaveProp('device', { id: 'front', hasFlash: true });
   });
   // TODO test focus behavior
