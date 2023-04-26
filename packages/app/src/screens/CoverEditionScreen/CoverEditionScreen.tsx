@@ -416,8 +416,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     isCreation && profileKind === 'personal',
   );
   const isDirty = Object.keys(updates).length > 0;
-  const isValid =
-    !isCreation || (updates.sourceMedia != null && !!updates.title);
+  const isValid = !isCreation || updates.sourceMedia != null;
   const [maskComputing, setMaskComputing] = useState(false);
 
   const canSave = !saving && isDirty && isValid && !maskComputing;

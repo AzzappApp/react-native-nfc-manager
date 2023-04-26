@@ -875,8 +875,21 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByText('Cancel')).toBeTruthy();
   });
 
-  test('Should allow to save if the title is not empty, and if the sourceMedia is not empty', async () => {
+  test('Button `save` should not be disabled if the sourceMedia is empty with a personal profileKind', async () => {
     renderCoverEditionScreen();
+    let saveButton = screen.getByText('Save');
+    while (saveButton.props.accessibilityRole !== 'button') {
+      if (!saveButton.parent) {
+        throw new Error('save button not found');
+      }
+      saveButton = saveButton.parent;
+    }
+
+    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+  });
+
+  test('Button `save` should be disabled if the sourceMedia is empty with a business profileKind', async () => {
+    renderCoverEditionScreen({ profileKind: 'business' });
     let saveButton = screen.getByText('Save');
     while (saveButton.props.accessibilityRole !== 'button') {
       if (!saveButton.parent) {
@@ -891,10 +904,10 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent.press(screen.getByLabelText('Select an image'));
     });
+
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'http://fake-site/fake-media.jpg',
-        kind: 'image',
         width: 100,
         height: 100,
         editionParameters: {},
@@ -902,7 +915,7 @@ describe('CoverEditionScreen', () => {
     });
     await act(flushPromises);
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: true });
+    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
     act(() => {
       fireEvent.press(screen.getByLabelText('Text'));
     });

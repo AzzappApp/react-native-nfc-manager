@@ -126,7 +126,7 @@ model CardCover {
   foregroundStyle    Json?
   segmented          Boolean
   merged             Boolean
-  title              String
+  title              String?
   titleStyle         Json?
   subTitle           String?
   subTitleStyle      Json?
