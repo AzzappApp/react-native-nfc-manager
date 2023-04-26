@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
@@ -67,10 +68,13 @@ const PostCreationScreen = () => {
       kind: kind === 'video' ? 'video' : 'image',
       target: 'post',
     });
+    const fileName = getFileName(exportedMedia.uri);
     const file: any = {
-      name: getFileName(exportedMedia.uri),
+      name: fileName,
       uri: `file://${exportedMedia.uri}`,
-      type: kind === 'image' ? 'image/jpeg' : 'video/quicktime',
+      type:
+        mime.lookup(fileName) ||
+        (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
     };
     const { progress: uploadProgress, promise: uploadPromise } =
       WebAPI.uploadMedia(file, uploadURL, uploadParameters);

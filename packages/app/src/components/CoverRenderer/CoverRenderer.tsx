@@ -9,7 +9,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import PressableNative from '#ui/PressableNative';
-import { MediaImageRenderer } from '../medias';
+import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
 import QRCodeModal from './QRCodeModal';
 import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
 import type { ForwardedRef } from 'react';
@@ -36,6 +36,12 @@ export type CoverRendererProps = {
    */
   hideBorderRadius?: boolean;
   /**
+   * if true, the cover will play the cover video (if the cover media is a video)
+   * Should be also set on the fragment definition
+   * @default false
+   */
+  videoEnabled?: boolean;
+  /**
    * Called when the cover is ready for display,
    * which means both the media and the text are ready for display,
    * even if the size of the downloaded image is different from the size of the cover
@@ -57,6 +63,7 @@ const CoverRenderer = (
     width = 125,
     hideBorderRadius,
     style,
+    videoEnabled,
     onReadyForDisplay,
   }: CoverRendererProps,
   forwardRef: ForwardedRef<View>,
@@ -83,14 +90,25 @@ const CoverRenderer = (
           provider: "../providers/isNative.relayprovider"
         }
       ) {
-        # On the cover medias, we fetch both the large and small version
-        # of the image to avoid a flickering effect when the profile screen is opened
         media {
           id
-          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          __typename
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
             @include(if: $isNative)
-          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            @include(if: $isNative)
+          ... on MediaVideo {
+            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+              @include(if: $isNative)
+          }
+          ... on MediaImage {
+            smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+              @include(if: $isNative)
+          }
+          ... on MediaVideo {
+            smallThumbnail: thumbnail(
+              width: 125
+              pixelRatio: $cappedPixelRatio
+            ) @include(if: $isNative)
+          }
         }
         textPreviewMedia {
           id
@@ -166,6 +184,21 @@ const CoverRenderer = (
   const intl = useIntl();
   //#endregion
 
+  const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
+  const isSmallCover = width === COVER_BASE_WIDTH;
+  const isVideoMedia = __typename === 'MediaVideo';
+
+  const mediaUri = isSmallCover
+    ? !isVideoMedia || videoEnabled
+      ? smallURI
+      : smallThumbnail
+    : !isVideoMedia || videoEnabled
+    ? uri
+    : thumbnail;
+
+  const MediaRenderer =
+    isVideoMedia && videoEnabled ? MediaVideoRenderer : MediaImageRenderer;
+
   return (
     <View
       ref={forwardRef}
@@ -174,8 +207,11 @@ const CoverRenderer = (
     >
       {media ? (
         <>
-          <MediaImageRenderer
+          <MediaRenderer
             testID="cover-renderer-media"
+            source={media.id}
+            uri={mediaUri}
+            thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
             width={width}
             aspectRatio={COVER_RATIO}
             alt={intl.formatMessage(
@@ -185,23 +221,21 @@ const CoverRenderer = (
               },
               { title: `${title} - ${subTitle}` },
             )}
-            source={media.id}
-            uri={width === COVER_BASE_WIDTH ? media.smallURI : media.largeURI}
             onReadyForDisplay={onMediaReadyForDisplay}
             style={styles.layer}
           />
           {textPreviewMedia && (
             <MediaImageRenderer
               testID="cover-renderer-text"
-              width={width}
-              aspectRatio={COVER_RATIO}
-              alt={`${title} - ${subTitle}`}
               source={textPreviewMedia.id}
               uri={
                 width === COVER_BASE_WIDTH
                   ? textPreviewMedia.smallURI
                   : textPreviewMedia.largeURI
               }
+              width={width}
+              aspectRatio={COVER_RATIO}
+              alt={`${title} - ${subTitle}`}
               onReadyForDisplay={onTextReadyForDisplay}
               style={styles.layer}
             />
@@ -220,9 +254,9 @@ const CoverRenderer = (
         style={styles.qrCode}
       >
         <Image
-          testID="cover-renderer-qr-code"
+          testID="cover-renderer-qrcode"
           accessibilityRole="image"
-          source={require('./assets/qr-code.png')}
+          source={require('#assets/qrcode.png')}
           style={styles.layer}
         />
       </PressableNative>

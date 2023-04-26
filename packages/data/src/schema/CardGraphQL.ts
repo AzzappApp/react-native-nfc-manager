@@ -56,7 +56,7 @@ export const CardCoverGraphQL = new GraphQLObjectType<
   description: 'Card cover display informations',
   fields: () => ({
     media: {
-      type: new GraphQLNonNull(MediaImageGraphQL),
+      type: new GraphQLNonNull(MediaGraphQL),
       description: 'The main media of the cover',
       resolve: (cardCover, _, { mediaLoader }): Promise<Media> =>
         mediaLoader.load(cardCover.mediaId) as Promise<Media>,
@@ -65,7 +65,7 @@ export const CardCoverGraphQL = new GraphQLObjectType<
       type: GraphQLJSON,
     },
     sourceMedia: {
-      type: new GraphQLNonNull(MediaImageGraphQL),
+      type: new GraphQLNonNull(MediaGraphQL),
       description: 'The source of the media used by the cover',
       resolve: (cardCover, _, { mediaLoader }): Promise<Media> =>
         // TODO prevent others to access to the source media

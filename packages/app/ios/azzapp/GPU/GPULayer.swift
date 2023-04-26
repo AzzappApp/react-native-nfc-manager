@@ -218,14 +218,14 @@ struct GPULayer: Equatable {
     withSize size: CGSize,
     onTopOf underlayImage: CIImage?,
     withImages layerImages: [GPULayerSource: CIImage]?,
-    forMetal: Bool = true
+    inverseOnSimulator: Bool = true
   ) -> CIImage? {
     guard var image = layerImages?[layer.source] else {
       return underlayImage
     }
     
     #if targetEnvironment(simulator)
-    if forMetal  {
+    if inverseOnSimulator  {
       image = adaptImageForSimulator(image)
     }
     #endif
@@ -346,7 +346,7 @@ struct GPULayer: Equatable {
     
     if let maskUri = layer.maskUri, var maskImage = layerImages?[.image(uri: maskUri)]  {
       #if targetEnvironment(simulator)
-      if forMetal  {
+      if inverseOnSimulator  {
         maskImage = adaptImageForSimulator(maskImage)
       }
       #endif

@@ -45,9 +45,9 @@ class GPUVideoViewManager: RCTViewManager {
       await self.exportGPULayers(
         gpuLayers,
         layersImages: layersImages,
-        backgroundColor: view.backgroundColor,
+        backgroundColor: view.backgroundColorCopy,
         size: size,
-        bitRate: bitRate.doubleValue,
+        bitRate: bitRate,
         removeSound: removeSound,
         resolve: resolve,
         reject: reject
@@ -110,12 +110,12 @@ class GPUVideoViewManager: RCTViewManager {
           reject("UNKNOWN", error.localizedDescription, error)
         }
       }
-      self.exportGPULayers(
+      await self.exportGPULayers(
         gpuLayers,
         layersImages: layersImages,
         backgroundColor: backgroundColor,
         size: size,
-        bitRate: bitRate.doubleValue,
+        bitRate: bitRate,
         removeSound: removeSound,
         resolve: resolve,
         reject: reject
@@ -128,10 +128,10 @@ class GPUVideoViewManager: RCTViewManager {
     layersImages: [GPULayerSource:CIImage],
     backgroundColor: UIColor?,
     size: CGSize,
-    bitRate: Double,
+    bitRate: NSNumber,
     removeSound: Bool,
     resolve: @escaping RCTPromiseResolveBlock,
-    reject: @escaping RCTPromiseRejectBlock) {
+    reject: @escaping RCTPromiseRejectBlock) async {
     
     let videoLayers = gpuLayers.filter {
       if case .video = $0.source {
@@ -153,7 +153,7 @@ class GPUVideoViewManager: RCTViewManager {
       return;
     }
     
-    let outputUrl = FileUtils.getRanfomFileURL(withExtension: ".mp4")
+    let outputUrl = FileUtils.getRanfomFileURL(withExtension: "mp4")
     
     var outputSize = size;
     if let cropRect = videoLayer.parameters?.cropData {
@@ -162,7 +162,19 @@ class GPUVideoViewManager: RCTViewManager {
       }
     }
     
-    let asset = AVURLAsset(url: uri)
+    var asset: AVAsset;
+    
+    if (uri.isFileURL) {
+      asset = AVAsset(url: uri)
+    } else {
+      do {
+        let tempUrl = try await downloadFile(url: uri)
+        asset = AVAsset(url: tempUrl)
+      } catch {
+        reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not download file", error)
+        return
+      }
+    }
     
     guard let videoTrack = asset.tracks(withMediaType: .video).first else {
       reject(GPUViewError.FAILED_TO_EXPORT_CODE, "No video track found in video layer", nil)
@@ -203,7 +215,7 @@ class GPUVideoViewManager: RCTViewManager {
           .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
           .transformed(by: CGAffineTransform(translationX: 0, y: videoImage.extent.height))
         
-        let size = videoImage.extent.size
+        let size = request.renderSize
         var image: CIImage? = nil
         if let backgroundColor = backgroundColor {
           image = CIImage(color: CIColor(color: backgroundColor))
@@ -211,7 +223,13 @@ class GPUVideoViewManager: RCTViewManager {
         }
         
         for layer in gpuLayers {
-          if let layerImage = GPULayer.draw(layer, withSize: size, onTopOf: image, withImages: layersImages, forMetal: false) {
+          var inverseImageOnSimulator: Bool {
+            switch layer.source {
+              case .image : return true
+              default: return false
+            }
+          }
+          if let layerImage = GPULayer.draw(layer, withSize: size, onTopOf: image, withImages: layersImages, inverseOnSimulator: inverseImageOnSimulator) {
             image = layerImage
           }
         }
@@ -226,6 +244,7 @@ class GPUVideoViewManager: RCTViewManager {
           
         request.finish(with: image, context: nil)
     })
+    composition.renderSize = outputSize
     
     let timescale = Int32(ceil(min(30, max(videoTrack.nominalFrameRate, 25))))
     composition.frameDuration = CMTimeMake(value: 1, timescale: timescale)
@@ -282,40 +301,50 @@ class GPUVideoViewManager: RCTViewManager {
     }
     writer.startSession(atSourceTime: timeRange.start)
     
-      let dispatchQueue = DispatchQueue.global(qos: .default)
+    let dispatchQueue = DispatchQueue.global(qos: .default)
+      
+    let finishWriting = {
+      writer.finishWriting {
+        resolve(outputUrl.path)
+      }
+    }
+    
+    let writeToAudioTrack = {
+      if let audioWriterInput = audioWriterInput, let audioReader = audioReader, let audioOutput = audioOutput {
+        audioWriterInput.requestMediaDataWhenReady(on: dispatchQueue) {
+          while(audioWriterInput.isReadyForMoreMediaData) {
+            if audioReader.status == .completed {
+              audioWriterInput.markAsFinished()
+              finishWriting()
+              return;
+            } else if audioReader.status == .failed {
+              reject(
+                GPUViewError.FAILED_TO_EXPORT_CODE,
+                "audioReader.status : failed",
+                videoReader.error
+              );
+              return;
+            }
+              
+            if let sampleBuffer = audioOutput.copyNextSampleBuffer() {
+              while (!audioWriterInput.isReadyForMoreMediaData) {
+                usleep(5000)
+              }
+              audioWriterInput.append(sampleBuffer)
+            }
+          }
+        }
+      } else {
+        finishWriting()
+      }
+    }
     
     videoWriterInput.requestMediaDataWhenReady(on: dispatchQueue) {
       while(videoWriterInput.isReadyForMoreMediaData) {
         if videoReader.status == .completed {
           videoWriterInput.markAsFinished()
-          if let audioWriterInput = audioWriterInput, let audioReader = audioReader, let audioOutput = audioOutput {
-            audioWriterInput.requestMediaDataWhenReady(on: dispatchQueue) {
-              while(audioWriterInput.isReadyForMoreMediaData) {
-                if audioReader.status == .completed {
-                  audioWriterInput.markAsFinished()
-                  writer.finishWriting {
-                    resolve(outputUrl.absoluteString)
-                  }
-                  return;
-                } else if audioReader.status == .failed {
-                  reject(
-                    GPUViewError.FAILED_TO_EXPORT_CODE,
-                    "audioReader.status : failed",
-                    videoReader.error
-                  );
-                  return;
-                }
-                  
-                if let sampleBuffer = audioOutput.copyNextSampleBuffer() {
-                  audioWriterInput.append(sampleBuffer)
-                }
-              }
-            }
-          } else {
-            writer.finishWriting {
-              resolve(outputUrl.absoluteString)
-            }
-          }
+          writeToAudioTrack()
+          return;
         } else if videoReader.status == .failed {
           reject(
             GPUViewError.FAILED_TO_EXPORT_CODE,
@@ -325,13 +354,34 @@ class GPUVideoViewManager: RCTViewManager {
           return;
         }
         if let sampleBuffer = videoOutput.copyNextSampleBuffer() {
+          while (!videoWriterInput.isReadyForMoreMediaData) {
+            usleep(5000)
+          }
           videoWriterInput.append(sampleBuffer)
         }
       }
     }
   }
+  
+  
+  private func downloadFile (url: URL) async throws -> URL {
+    return try await withCheckedThrowingContinuation({
+      (continuation: CheckedContinuation<URL, Error>) in
+      let task = URLSession.shared.downloadTask(with: url) {
+        downloadedURL, response, error in
+        guard let downloadedURL = downloadedURL else {
+          continuation.resume(throwing:
+            error ?? GPUViewError.failedToLoad(.video(uri: url, startTime: nil, duration: nil)))
+          return;
+        }
+        let tempFile = FileUtils.getRanfomFileURL(withExtension: url.pathExtension)
+        try? FileManager.default.copyItem(at: downloadedURL, to: tempFile)
+        continuation.resume(returning: tempFile)
+      }
+      task.resume()
+    })
+  }
 }
-
 
 @objc(AZPGPUVideoView)
 class GPUVideoView: UIView {
@@ -356,7 +406,7 @@ class GPUVideoView: UIView {
   var paused: ObjCBool = ObjCBool(false) {
     didSet {
       if paused.boolValue  {
-        player.pause()
+        player?.pause()
       } else {
         startPlayingIfReady()
       }
@@ -371,6 +421,14 @@ class GPUVideoView: UIView {
         return
       }
       self.gpuLayers = GPULayer.fromNSarray(layers)
+    }
+  }
+  
+  internal var backgroundColorCopy: UIColor?
+  
+  override var backgroundColor: UIColor? {
+    didSet {
+      self.backgroundColorCopy = backgroundColor
     }
   }
   
@@ -392,9 +450,9 @@ class GPUVideoView: UIView {
     }
   }
   
-  private var player: AVQueuePlayer!
+  private var player: AVQueuePlayer? = nil
   
-  private var playerLayer: AVPlayerLayer!
+  private var playerLayer: AVPlayerLayer? = nil
   
   private var playerObserverContext = 0
   
@@ -404,49 +462,23 @@ class GPUVideoView: UIView {
   
   internal var playerReady: Bool = false
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    player = AVQueuePlayer()
-    player.isMuted = true
-    player.allowsExternalPlayback = false
-    playerLayer = AVPlayerLayer(player: player)
-    playerLayer.frame = self.bounds;
-    playerLayer.videoGravity = .resizeAspectFill;
-    layer.addSublayer(playerLayer)
-    
-    player.addObserver(
-      self,
-      forKeyPath: #keyPath(AVPlayer.status),
-      options: [.old, .new],
-      context: &playerObserverContext
-    )
-  }
- 
-  @available(*, unavailable)
-  required init?(coder _: NSCoder) {
-    fatalError("init(coder:) is not implemented.")
-  }
-  
   deinit {
-    imagesLoadingTask?.cancel()
-    resetPlayerState()
-    playerLayer?.removeFromSuperlayer()
-    playerLayer = nil
-    player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status), context: &playerObserverContext)
-    player = nil
+    reset()
   }
   
   override func layoutSubviews() {
     super.layoutSubviews()
-    playerLayer.frame = self.bounds
+    if let playerLayer = playerLayer {
+      playerLayer.frame = self.bounds
+    }
+    // TODO we reset player item here since updating afterwards video composition size
+    // seems to have no effect however it would be cleaner to find a way to do so
+    setupPlayerItem()
   }
   
   private func syncLayers() {
-    imagesLoadingTask?.cancel()
-    imagesLoadingTask = nil
-    imageLoadingFailed = false
     guard let gpuLayers = gpuLayers else {
-      resetPlayerState()
+      reset()
       return
     }
     
@@ -477,7 +509,7 @@ class GPUVideoView: UIView {
     
     if videoSources.isEmpty {
       ReactLogger.log(level: RCTLogLevel.warning, message: "VideoImageView rendered without video layers")
-      resetPlayerState()
+      reset()
       return
     } else {
       if videoSources.count > 1 {
@@ -485,7 +517,7 @@ class GPUVideoView: UIView {
       }
       let (url, startTime, duration) = videoSources.first!
       if (url != asset?.url) {
-        resetPlayerState()
+        reset()
         asset = AVURLAsset(url: url)
         self.startTime = startTime
         self.duration = duration
@@ -493,14 +525,17 @@ class GPUVideoView: UIView {
       } else if startTime != self.startTime || duration != self.duration {
         self.startTime = startTime
         self.duration = duration
-        setUpLooper()
+        setUpPlayer()
       }
     }
     
+    imagesLoadingTask?.cancel()
+    imagesLoadingTask = nil
+    imageLoadingFailed = false
     if !layerSourceToLoad.isEmpty {
       imagesLoadingTask = Task {
         do {
-          player.pause()
+          player?.pause()
           onImagesLoadingStart?(nil)
           try await withThrowingTaskGroup(of: (GPULayerSource, CIImage).self) {
             group in
@@ -548,8 +583,12 @@ class GPUVideoView: UIView {
     guard let asset = asset else {
       return
     }
-    let backgroundColor = self.backgroundColor
-    let videoComposition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: {
+    let width = self.bounds.width
+    let height = self.bounds.height
+    if width == 0 || height == 0 {
+      return
+    }
+    let videoComposition = AVMutableVideoComposition(asset: asset, applyingCIFiltersWithHandler: {
       [weak self] request in
         let videoImage = request.sourceImage
         guard let videoView = self else {
@@ -571,16 +610,29 @@ class GPUVideoView: UIView {
           .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
           .transformed(by: CGAffineTransform(translationX: 0, y: videoImage.extent.height))
         
-        let size = videoImage.extent.size
+        let size = request.renderSize
         var image: CIImage? = nil
-        if let backgroundColor = backgroundColor {
+        if let backgroundColor = videoView.backgroundColorCopy {
           image = CIImage(color: CIColor(color: backgroundColor))
             .cropped(to: CGRectMake(0, 0, size.width, size.height))
         }
         
         if let layers = videoView.gpuLayers {
           for layer in layers {
-            if let layerImage = GPULayer.draw(layer, withSize: size, onTopOf: image, withImages: layersImages, forMetal: false) {
+            var inverseImageOnSimulator: Bool {
+              switch layer.source {
+                case .image : return true
+                default: return false
+              }
+            }
+            
+            if let layerImage = GPULayer.draw(
+              layer,
+              withSize: size,
+              onTopOf: image,
+              withImages: layersImages,
+              inverseOnSimulator: inverseImageOnSimulator
+            ) {
               image = layerImage
             }
           }
@@ -596,18 +648,40 @@ class GPUVideoView: UIView {
           
         request.finish(with: image, context: nil)
     })
+    let pixelRatio = UIScreen.main.scale
+    videoComposition.renderSize = CGSize(
+      width: width * pixelRatio,
+      height: height * pixelRatio
+    )
     playerItem = AVPlayerItem(asset: asset)
     playerItem!.videoComposition = videoComposition
-    setUpLooper()
+    setUpPlayer()
   }
   
-  private func setUpLooper() {
+  private func setUpPlayer() {
     guard let playerItem = playerItem else {
       return
     }
-    player.removeAllItems()
-    playerReady = false
+    resetPlayer()
     onPlayerStartBuffing?(nil)
+    
+    let player = AVQueuePlayer()
+    player.isMuted = true
+    player.allowsExternalPlayback = false
+    player.addObserver(
+      self,
+      forKeyPath: #keyPath(AVPlayer.status),
+      options: [.old, .new],
+      context: &playerObserverContext
+    )
+    self.player = player
+    
+    let playerLayer = AVPlayerLayer(player: player)
+    playerLayer.frame = self.bounds;
+    playerLayer.videoGravity = .resizeAspectFill;
+    layer.addSublayer(playerLayer)
+    self.playerLayer = playerLayer
+    
     let startTime = self.startTime ?? CMTime.zero
     let duration = self.duration ?? playerItem.duration - startTime
     playerLooper = AVPlayerLooper(
@@ -674,7 +748,7 @@ class GPUVideoView: UIView {
               } else {
                 onError?([ "code": GPUViewError.UNKNOWN_ERROR_CODE, "message": "unknown"])
               }
-              resetPlayerState()
+              reset()
               return;
             default:
               return
@@ -687,18 +761,32 @@ class GPUVideoView: UIView {
       return
     }
     if (!paused.boolValue) {
-      player.play()
+      player?.play()
     }
   }
   
-  private func resetPlayerState() {
+  private func reset() {
+    resetPlayer()
+    imagesLoadingTask?.cancel()
+    imagesLoadingTask = nil
     layersImages = nil
     playerItem = nil
     asset = nil
-    playerLooper = nil
-    playerReady = false
     startTime = nil
     duration = nil
-    player.removeAllItems()
+  }
+  
+  private func resetPlayer() {
+    playerLooper = nil
+    playerReady = false
+    if let player = player {
+      player.removeAllItems()
+      player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status), context: &playerObserverContext)
+      self.player = nil
+    }
+    if let playerLayer = playerLayer {
+      playerLayer.removeFromSuperlayer()
+      self.playerLayer = nil
+    }
   }
 }

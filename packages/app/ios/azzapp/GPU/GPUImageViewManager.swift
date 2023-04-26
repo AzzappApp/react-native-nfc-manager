@@ -134,7 +134,13 @@ class GPUImageViewManager: RCTViewManager {
     }
     
     for layer in gpuLayers {
-      if let layerImage = GPULayer.draw(layer, withSize: size, onTopOf: image, withImages: layersImages, forMetal: false) {
+      if let layerImage = GPULayer.draw(
+        layer,
+        withSize: size,
+        onTopOf: image,
+        withImages: layersImages,
+        inverseOnSimulator: false
+      ) {
         image = layerImage
       }
     }
@@ -174,7 +180,7 @@ class GPUImageViewManager: RCTViewManager {
       reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not write image data", error)
       return;
     }
-    resolve(fileUrl.absoluteString)
+    resolve(fileUrl.path)
   }
 }
 

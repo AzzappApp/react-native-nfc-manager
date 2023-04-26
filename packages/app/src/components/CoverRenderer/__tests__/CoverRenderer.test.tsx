@@ -30,7 +30,8 @@ const renderCover = (props?: Partial<CoverRendererProps>) => {
         cover: {
           media: {
             id: 'media_id',
-            largeURI: 'media_large_uri',
+            __typename: 'MediaImage',
+            uri: 'media_large_uri',
             smallURI: 'media_small_uri',
           },
           textPreviewMedia: {

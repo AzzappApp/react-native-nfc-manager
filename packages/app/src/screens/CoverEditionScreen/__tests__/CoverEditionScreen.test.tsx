@@ -227,6 +227,8 @@ describe('CoverEditionScreen', () => {
             id: `coverForegroundId${i}`,
             uri: `https://example.com/coverForeground${i}.png`,
           })),
+          segmentedTemplatesCategories: [],
+          unsegmentedTemplatesCategories: [],
         }),
       }),
     );
@@ -266,6 +268,7 @@ describe('CoverEditionScreen', () => {
     renderCoverEditionScreen({
       coverData: {
         sourceMedia: {
+          __typename: 'MediaImage',
           id: 'sourceMedia',
           uri: 'http://fake-site/fake-media.jpg',
           width: 100,
@@ -301,6 +304,7 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'http://fake-site/fake-media.jpg',
+        kind: 'image',
         width: 100,
         height: 100,
         editionParameters: {},
@@ -330,6 +334,7 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'file:///data/fake-media.jpg',
+        kind: 'image',
         width: 100,
         height: 100,
         editionParameters: {},
@@ -354,6 +359,7 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'file:///data/fake-media2.jpg',
+        kind: 'image',
         width: 100,
         height: 100,
         editionParameters: {},
@@ -402,6 +408,7 @@ describe('CoverEditionScreen', () => {
     merged: false,
     segmented: true,
     sourceMedia: {
+      __typename: 'MediaImage',
       id: 'sourceMediaId',
       uri: 'http://fake-site/fake-media.jpg',
       width: 1200,
@@ -887,6 +894,7 @@ describe('CoverEditionScreen', () => {
     act(() => {
       fireEvent(screen.getByTestId('image-picker'), 'finished', {
         uri: 'http://fake-site/fake-media.jpg',
+        kind: 'image',
         width: 100,
         height: 100,
         editionParameters: {},

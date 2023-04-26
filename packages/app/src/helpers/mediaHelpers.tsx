@@ -99,14 +99,19 @@ export const formatVideoTime = (timeInSeconds = 0) => {
  * @param {number} maxDimension - The maximum width or height of the image.
  * @returns An object with two properties, width and height.
  */
-export const calculImageSize = (
+export const downScaleImage = (
   width: number,
   height: number,
   maxDimension: number,
 ) => {
-  const maxSize = Math.min(Math.max(height, width), maxDimension);
-  const ratio = Math.min(maxSize / width, maxSize / height);
-  return { width: Math.ceil(width * ratio), height: Math.ceil(height * ratio) };
+  if (width <= maxDimension && height <= maxDimension) {
+    return { width, height };
+  }
+  const ratio = maxDimension / Math.max(width, height);
+  return {
+    width: width * ratio,
+    height: height * ratio,
+  };
 };
 
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');

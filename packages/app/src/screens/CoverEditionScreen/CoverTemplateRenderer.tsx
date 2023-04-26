@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import CoverMediaPreview from './CoverMediaPreview';
 import CoverTextPreview from './CoverTextPreview';
@@ -177,8 +177,25 @@ const CoveTemplateRenderer = ({
         pointerEvents="none"
         style={StyleSheet.absoluteFill}
       />
+
+      <Image
+        testID="cover-renderer-qrcode"
+        accessibilityRole="image"
+        source={require('#assets/qrcode.png')}
+        style={styles.qrCode}
+      />
     </View>
   );
 };
 
 export default memo(CoveTemplateRenderer);
+
+const styles = StyleSheet.create({
+  qrCode: {
+    position: 'absolute',
+    top: '10%',
+    height: '6.5%',
+    left: '45%',
+    width: '10%',
+  },
+});

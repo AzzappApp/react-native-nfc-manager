@@ -134,6 +134,11 @@ type ImagePickerContextProviderProps = {
    * the children of the provider
    */
   children: ReactNode;
+  /**
+   * Dispatched when the media is changed
+   * @param media the selected media
+   */
+  onMediaChange?(media: Media | null): void;
 };
 
 const _ImagePickerContextProvider = (
@@ -144,6 +149,7 @@ const _ImagePickerContextProvider = (
     exporting,
     children,
     forceCameraRatio,
+    onMediaChange: onMediaChangeProps,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
@@ -173,9 +179,10 @@ const _ImagePickerContextProvider = (
   const onMediaChange = useCallback(
     (media: Media, aspectRatio: number | null | undefined = null) => {
       setMedia(media);
+      onMediaChangeProps?.(media);
       setAspectRatio(forceAspectRatio ?? aspectRatio ?? null);
     },
-    [forceAspectRatio],
+    [forceAspectRatio, onMediaChangeProps],
   );
 
   const onAspectRatioChange = useCallback(

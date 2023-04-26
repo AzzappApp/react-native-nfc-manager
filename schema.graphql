@@ -210,11 +210,11 @@ type Card implements Node {
 """Card cover display informations"""
 type CardCover {
   """The main media of the cover"""
-  media: MediaImage!
+  media: Media!
   mediaStyle: JSON
 
   """The source of the media used by the cover"""
-  sourceMedia: MediaImage!
+  sourceMedia: Media!
 
   """The mask media of the cover"""
   maskMedia: MediaImage

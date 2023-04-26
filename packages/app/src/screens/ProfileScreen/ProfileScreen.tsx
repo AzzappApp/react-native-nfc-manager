@@ -131,6 +131,7 @@ const ProfileScreen = ({
               cover={profile.card?.cover}
               userName={profile.userName}
               width={vp`${VW100}`}
+              videoEnabled={ready}
               hideBorderRadius
             />
           ),

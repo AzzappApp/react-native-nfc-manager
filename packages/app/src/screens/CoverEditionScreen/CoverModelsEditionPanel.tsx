@@ -1,10 +1,10 @@
 import MaskedView from '@react-native-masked-view/masked-view';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql, useRefetchableFragment } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -15,24 +15,18 @@ import TabsBar from '#ui/TabsBar';
 import CoverTemplateRenderer from './CoverTemplateRenderer';
 import type { EditionParameters } from '#components/gpu';
 import type {
-  CoverModelsEditionPanel_viewer$data,
-  CoverModelsEditionPanel_viewer$key,
-} from '@azzapp/relay/artifacts/CoverModelsEditionPanel_viewer.graphql';
+  CoverModelsEditionPanel_categories$key,
+  CoverModelsEditionPanel_categories$data,
+} from '@azzapp/relay/artifacts/CoverModelsEditionPanel_categories.graphql';
 
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 
-type Category = ArrayItemType<
-  CoverModelsEditionPanel_viewer$data['coverTemplatesByCategory']
->;
-
+type Category = ArrayItemType<CoverModelsEditionPanel_categories$data>;
 type Template = ArrayItemType<Category['templates']>;
 
-export type TemplateData = Template['data'];
-
 type CoverModelsEditionPanelProps = {
-  segmented: boolean;
-  viewer: CoverModelsEditionPanel_viewer$key;
+  categories: CoverModelsEditionPanel_categories$key;
   /**
    * Source Media to Override the Source Media of the template
    */
@@ -52,84 +46,36 @@ type CoverModelsEditionPanelProps = {
   title?: string | null;
   subTitle?: string | null;
   selectedTemplateId: string | null;
-  onSelectTemplate: (templateId: string, data: TemplateData) => void;
+  onSelectTemplate: (templateId: string) => void;
   isCreation: boolean;
   editionParameters?: EditionParameters;
 };
 
 const CoverModelsEditionPanel = ({
-  viewer,
+  categories: categoriesKey,
   uri,
   kind,
   time,
   maskUri,
   title,
   subTitle,
-  segmented,
   selectedTemplateId,
   onSelectTemplate,
-  isCreation,
   editionParameters,
 }: CoverModelsEditionPanelProps) => {
-  const [{ coverTemplatesByCategory }, refetch] = useRefetchableFragment(
+  const categories = useFragment(
     graphql`
-      fragment CoverModelsEditionPanel_viewer on Viewer
-      @refetchable(queryName: "CoverEditionRefetchQuery")
-      @argumentDefinitions(segmented: { type: "Boolean" }) {
-        coverTemplatesByCategory(segmented: $segmented) {
-          category
-          templates {
-            id
-            kind
-            ...CoverTemplateRenderer_template
-            data {
-              mediaStyle
-              sourceMedia {
-                id
-                uri
-                width
-                height
-              }
-              background {
-                id
-              }
-              backgroundStyle {
-                backgroundColor
-                patternColor
-              }
-              foreground {
-                id
-              }
-              foregroundStyle {
-                color
-              }
-              segmented
-              merged
-              contentStyle {
-                orientation
-                placement
-              }
-              titleStyle {
-                fontFamily
-                fontSize
-                color
-              }
-              subTitleStyle {
-                fontFamily
-                fontSize
-                color
-              }
-            }
-          }
+      fragment CoverModelsEditionPanel_categories on CoverTemplateCategory
+      @relay(plural: true) {
+        category
+        templates {
+          id
+          ...CoverTemplateRenderer_template
         }
       }
     `,
-    viewer,
+    categoriesKey,
   );
-
-  useEffect(() => {
-    refetch({ segmented });
-  }, [refetch, segmented]);
 
   const { width } = useWindowDimensions();
   const coverWidth = width * COVER_MINIATURE_RATIO;
@@ -137,21 +83,12 @@ const CoverModelsEditionPanel = ({
   const { bottom } = useSafeAreaInsets();
   const appearanceStyle = useStyleSheet(computedStyle);
 
-  //select the first template if it's a creation case when loading the coverEditionScreen
-  useEffect(() => {
-    if (isCreation && coverTemplatesByCategory.length > 0) {
-      const template = coverTemplatesByCategory[0].templates[0];
-      onSelectTemplate(template.id, template.data);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); //componnentDidMount behaviour
-
   const intl = useIntl();
 
   const renderTemplate = useCallback(
     ({ item, index }: ListRenderItemInfo<Template>) => (
       <PressableNative
-        onPress={() => onSelectTemplate(item.id, item.data)}
+        onPress={() => onSelectTemplate(item.id)}
         accessibilityRole="button"
         accessibilityHint={intl.formatMessage({
           defaultMessage:
@@ -274,7 +211,7 @@ const CoverModelsEditionPanel = ({
       >
         <FlatList
           renderItem={renderCategory}
-          data={coverTemplatesByCategory}
+          data={categories}
           keyExtractor={keyExtractorCategory}
           getItemLayout={getItemLayoutCategory}
           contentContainerStyle={{

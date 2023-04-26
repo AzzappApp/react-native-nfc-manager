@@ -1,7 +1,17 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
+import {
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+  COVER_VIDEO_BITRATE,
+} from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -134,7 +144,11 @@ const CoverPreviewRenderer = (
         if ('exportImage' in mediaRef.current) {
           return mediaRef.current.exportImage({ size });
         }
-        return mediaRef.current.exportVideo({ size });
+        return mediaRef.current.exportVideo({
+          size,
+          removeSound: true,
+          bitRate: COVER_VIDEO_BITRATE,
+        });
       },
     }),
     [],
@@ -244,6 +258,12 @@ const CoverPreviewRenderer = (
               pointerEvents="none"
               style={styles.titleOverlayContainer}
             />
+            <Image
+              testID="cover-renderer-qrcode"
+              accessibilityRole="image"
+              source={require('#assets/qrcode.png')}
+              style={styles.qrCode}
+            />
             {(computing || isLoading) && (
               <Delay delay={computing ? 0 : 500}>
                 <View style={styles.maskComputingOverlay}>
@@ -304,5 +324,12 @@ const styles = StyleSheet.create({
   errorMessage: {
     textAlign: 'center',
     marginBottom: 10,
+  },
+  qrCode: {
+    position: 'absolute',
+    top: '10%',
+    height: '6.5%',
+    left: '45%',
+    width: '10%',
   },
 });

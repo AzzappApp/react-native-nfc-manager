@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual';
+import mapValues from 'lodash/mapValues';
 import zip from 'lodash/zip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -11,25 +12,30 @@ import {
   Alert,
   useWindowDimensions,
 } from 'react-native';
+import * as mime from 'react-native-mime-types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import { graphql, useFragment, useMutation, readInlineData } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   COVER_MAX_HEIGHT,
+  COVER_MAX_VIDEO_DURATTION,
   COVER_MAX_WIDTH,
   COVER_RATIO,
+  COVER_SOURCE_MAX_IMAGE_DIMENSION,
+  COVER_SOURCE_MAX_VIDEO_DIMENSION,
+  COVER_VIDEO_BITRATE,
 } from '@azzapp/shared/cardHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import { exportImage } from '#components/gpu';
+import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
-import { calculImageSize, isPNG, segmentImage } from '#helpers/mediaHelpers';
+import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -46,6 +52,7 @@ import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
 import CoverEditionImagePickerMediaWrapper from './CoverEditionImagePickerMediaWrapper';
 import CoverEditionImagePickerSelectImageStep from './CoverEditionImagePickerSelectImageStep';
+import CoverEditionVideoCropStep from './CoverEditionVideoCropStep';
 import CoverImageEditionPanel from './CoverImageEditionPanel';
 import CoverModelsEditionPanel from './CoverModelsEditionPanel';
 import CoverPreviewRenderer from './CoverPreviewRenderer';
@@ -57,9 +64,9 @@ import type {
 } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { TemplateData } from './CoverModelsEditionPanel';
 import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
+import type { CoverEditionScreen_template$key } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
 import type {
   CardCoverBackgroundStyleInput,
@@ -91,7 +98,24 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         ...CoverEditionBackgroundPanel_viewer
         ...CoverEditionForegroundPanel_viewer
         ...CoverTitleEditionPanel_viewer
-        ...CoverModelsEditionPanel_viewer
+        segmentedTemplatesCategories: coverTemplatesByCategory(
+          segmented: true
+        ) {
+          ...CoverModelsEditionPanel_categories
+          templates {
+            id
+            ...CoverEditionScreen_template
+          }
+        }
+        unsegmentedTemplatesCategories: coverTemplatesByCategory(
+          segmented: false
+        ) {
+          ...CoverModelsEditionPanel_categories
+          templates {
+            id
+            ...CoverEditionScreen_template
+          }
+        }
         profile {
           id
           userName
@@ -113,8 +137,6 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         coverBackgrounds {
           id
           uri
-          # we use arbitrary values here, but it should be good enough
-          smallURI: uri(width: 125, pixelRatio: 2)
         }
         coverForegrounds {
           id
@@ -132,6 +154,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       fragment CoverEditionScreen_cover on CardCover {
         mediaStyle
         sourceMedia {
+          __typename
           id
           uri
           width
@@ -184,21 +207,51 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   //#region Updates management
   const { firstName, lastName, companyName, profileKind } =
     viewer?.profile ?? {};
-  const [updates, setUpdates] = useState<CoverEditionValue>(() => {
-    if (cover) return {};
-    const updatesValue: CoverEditionValue = {
-      title:
-        profileKind === 'personal'
-          ? `${firstName} ${lastName}`.trim()
-          : companyName,
-      segmented: profileKind === 'personal',
-      subTitle:
-        profileKind === 'business'
-          ? viewer?.profile?.companyActivity?.label
-          : undefined,
-    };
 
-    if (profileKind === 'personal') {
+  const initialTemplate = useMemo(() => {
+    const categories =
+      profileKind === 'personal'
+        ? viewer?.segmentedTemplatesCategories
+        : viewer?.unsegmentedTemplatesCategories;
+    return categories?.[0]?.templates[0] ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [updates, setUpdates] = useState<CoverEditionValue>(() => {
+    if (cover) {
+      return {};
+    }
+    const isPersonal = profileKind === 'personal';
+    const updatesValue: CoverEditionValue = {
+      title: isPersonal ? `${firstName} ${lastName}`.trim() : companyName,
+      segmented: isPersonal,
+      subTitle: !isPersonal
+        ? viewer?.profile?.companyActivity?.label
+        : undefined,
+    };
+    if (initialTemplate) {
+      // can't understand why, but the compiler doesn't infer the type correctly
+      const { data } = readInlineData<CoverEditionScreen_template$key>(
+        templateDataFragment,
+        initialTemplate,
+      );
+      Object.assign(updatesValue, {
+        mediaStyle: data.mediaStyle,
+        backgroundId: data.background?.id ?? null,
+        foregroundId: data.foreground?.id ?? null,
+        contentStyle: data.contentStyle,
+        backgroundStyle: data.backgroundStyle ?? null,
+        foregroundStyle: data.foregroundStyle ?? null,
+        merged: data.merged,
+        segmented: data.segmented,
+        subTitleStyle: data.subTitleStyle ?? null,
+        titleStyle: data.titleStyle,
+        // will be erased by demo asset in personal profile case
+        sourceMedia: { ...data.sourceMedia, kind: 'image' },
+      });
+    }
+
+    if (isPersonal) {
       const assetDemo = Image.resolveAssetSource(
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         require('#assets/demo_asset.png'),
@@ -206,6 +259,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
       updatesValue.sourceMedia = {
         uri: assetDemo.uri,
+        kind: 'image',
         width: assetDemo.width * assetDemo.scale,
         height: assetDemo.height * assetDemo.scale,
       };
@@ -278,7 +332,20 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   } = useMemo<CoverEditionValue>(
     () => ({
       mediaStyle: firstNotUndefined(updates.mediaStyle, cover?.mediaStyle),
-      sourceMedia: firstNotUndefined(updates.sourceMedia, cover?.sourceMedia),
+      sourceMedia: firstNotUndefined(
+        updates.sourceMedia,
+        cover?.sourceMedia
+          ? {
+              kind:
+                cover.sourceMedia.__typename === 'MediaVideo'
+                  ? 'video'
+                  : 'image',
+              uri: cover.sourceMedia.uri,
+              width: cover.sourceMedia.width,
+              height: cover.sourceMedia.height,
+            }
+          : undefined,
+      ),
       maskMedia: firstNotUndefined(updates.maskMedia, cover?.maskMedia?.uri),
       backgroundId: firstNotUndefined(
         updates.backgroundId,
@@ -313,7 +380,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     [updates, cover],
   );
 
-  const kind = 'image';
+  const kind = sourceMedia?.kind ?? 'image';
   const uri = sourceMedia?.uri;
   const maskUri = segmented ? maskMedia : null;
   const backgroundUri =
@@ -421,11 +488,18 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     const sourceMediaId = sourceMedia?.id;
     const shouldRecreateSourceMedia = updates.sourceMedia && !sourceMediaId;
 
-    const mediaToUploads = [
-      mediaPath,
-      textPreviewMediaPath,
-      shouldRecreateSourceMedia && updates.sourceMedia?.uri, // TODO limit the size of the source media
-      updates.maskMedia, // TODO limit the size of the mask media
+    const mediaToUploads: Array<{
+      uri: string;
+      kind: 'image' | 'video';
+    } | null> = [
+      mediaPath ? { uri: `file://${mediaPath}`, kind } : null,
+      textPreviewMediaPath
+        ? { uri: `file://${textPreviewMediaPath}`, kind: 'image' }
+        : null,
+      shouldRecreateSourceMedia && updates.sourceMedia?.uri
+        ? { uri: updates.sourceMedia.uri, kind }
+        : null,
+      updates.maskMedia ? { uri: updates.maskMedia, kind: 'image' } : null,
     ];
 
     let uploadInfos: Array<{
@@ -435,13 +509,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
     try {
       uploadInfos = await Promise.all(
-        mediaToUploads.map(path =>
-          path
-            ? uploadSign({
-                kind: 'image',
-                target: 'cover',
-              })
-            : null,
+        mediaToUploads.map(media =>
+          media ? uploadSign({ kind: media.kind, target: 'cover' }) : null,
         ),
       );
     } catch (e) {
@@ -456,15 +525,22 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
           return null;
         }
         const { uploadURL, uploadParameters } = uploadInfos;
-        return uploadMedia(
-          {
-            name: getFileName(media),
-            uri: `file://${media}`,
-            type: 'image/jpeg',
-          } as any,
-          uploadURL,
-          uploadParameters,
-        );
+        const fileName = getFileName(media.uri);
+        return {
+          ...uploadMedia(
+            {
+              name: fileName,
+              uri: media.uri,
+              type:
+                mime.lookup(fileName) || kind === 'image'
+                  ? 'image/jpg'
+                  : 'video/mp4',
+            } as any,
+            uploadURL,
+            uploadParameters,
+          ),
+          kind: media.kind,
+        };
       },
     );
 
@@ -487,15 +563,12 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       [mediaInput, textPreviewMediaInput, sourceMediaInput, maskMediaInput] =
         await Promise.all(
           uploads.map(upload =>
-            upload?.promise.then(
-              uploadResult =>
-                ({
-                  id: uploadResult.public_id as string,
-                  width: uploadResult.width as number,
-                  height: uploadResult.height as number,
-                  kind: 'image',
-                } as const),
-            ),
+            upload?.promise.then(uploadResult => ({
+              id: uploadResult.public_id as string,
+              width: uploadResult.width as number,
+              height: uploadResult.height as number,
+              kind: upload.kind,
+            })),
           ),
         );
     } catch (e) {
@@ -610,6 +683,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   //#region Image Picker state
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [sourceMediaComputing, setSourceMediaComputing] = useState(false);
 
   const onPickImage = () => {
     setShowImagePicker(true);
@@ -617,57 +691,75 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   const onMediaSelected = async ({
     uri,
+    kind,
     width,
     height,
     editionParameters,
+    timeRange,
   }: ImagePickerResult) => {
-    //we will use the export image directly, no compression
-    const imagePickerBoxed = { width, height, uri };
-    const editionParametersBoxed = { ...editionParameters };
-    if (
-      width > COVER_MAX_IMAGE_DIMENSION ||
-      height > COVER_MAX_IMAGE_DIMENSION
-    ) {
-      const resize = calculImageSize(width, height, COVER_MAX_IMAGE_DIMENSION);
-      const resizePath = await exportImage({
-        layers: [{ kind: 'image', uri }],
-        size: { width: resize.width, height: resize.height },
-        format: isPNG(uri) ? 'PNG' : 'JPEG',
-      });
-      imagePickerBoxed.width = resize.width;
-      imagePickerBoxed.height = resize.height;
-      imagePickerBoxed.uri = `file://${resizePath}`;
+    const media = { kind, width, height, uri };
+    const parameters = { ...editionParameters };
+    const maxSize =
+      kind === 'image'
+        ? COVER_SOURCE_MAX_IMAGE_DIMENSION
+        : COVER_SOURCE_MAX_VIDEO_DIMENSION;
 
+    setIsDemoAsset(false);
+    setShowImagePicker(false);
+
+    if (
+      width > maxSize ||
+      height > maxSize ||
+      timeRange != null
+      // TODO the bitrate/framerate of the video might be too high perhaps we should also check that
+    ) {
+      const newSize = downScaleImage(width, height, maxSize);
+
+      updateFields(['sourceMedia', null]);
+      setSourceMediaComputing(true);
+      const resizePath =
+        kind === 'image'
+          ? await exportImage({
+              layers: [{ kind: 'image', uri }],
+              size: newSize,
+              format: isPNG(uri) ? 'PNG' : 'JPEG',
+            })
+          : await exportVideo({
+              layers: [
+                {
+                  kind: 'video',
+                  uri,
+                  startTime: timeRange?.startTime,
+                  duration: timeRange?.duration,
+                },
+              ],
+              size: newSize,
+              bitRate: COVER_VIDEO_BITRATE,
+            });
+      setSourceMediaComputing(false);
+
+      media.width = newSize.width;
+      media.height = newSize.height;
+      media.uri = `file://${resizePath}`;
+
+      const scale = newSize.width / width;
       //don't forget to update the crop data
-      if (editionParametersBoxed.cropData) {
-        editionParametersBoxed.cropData.width = Math.min(
-          resize.width,
-          editionParametersBoxed.cropData.width,
-        );
-        editionParametersBoxed.cropData.height = Math.min(
-          resize.height,
-          editionParametersBoxed.cropData.height,
-        );
+      if (parameters.cropData) {
+        parameters.cropData = mapValues(parameters.cropData, v => v * scale);
       }
     }
 
     updateFields(
-      ['sourceMedia', imagePickerBoxed],
-      [
-        'mediaStyle',
-        {
-          ...mediaStyle,
-          parameters: editionParametersBoxed,
-        },
-      ],
+      ['sourceMedia', media],
+      ['mediaStyle', { ...mediaStyle, parameters }],
+      ['segmented', segmented && kind === 'image'],
+      ['maskMedia', null],
     );
-    setIsDemoAsset(false);
-    setShowImagePicker(false);
   };
 
   useEffect(() => {
     let canceled = false;
-    if (sourceMedia && isFileURL(sourceMedia.uri)) {
+    if (sourceMedia && isFileURL(sourceMedia.uri) && kind === 'image') {
       setMaskComputing(true);
       segmentImage(sourceMedia.uri)
         .then(path => {
@@ -693,12 +785,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   }, [sourceMedia]);
 
   const onImagePickerCancel = () => {
-    if (sourceMedia) {
-      setShowImagePicker(false);
-    } else {
-      //the user should always be able to cancel, even cancelling the process
-      router.back();
-    }
+    setShowImagePicker(false);
   };
   //#endregion
 
@@ -846,7 +933,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
   };
   //#endregion
 
-  //#region Foreground and merge
+  //#region Foreground
   const onForegroundChange = (foregroundId: string | null) => {
     updateFields(['foregroundId', foregroundId]);
   };
@@ -857,11 +944,37 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   //#region Template selection
 
-  const [templateId, setTemplateId] = useState<string | null>(null);
+  const categories = segmented
+    ? viewer?.segmentedTemplatesCategories
+    : viewer?.unsegmentedTemplatesCategories;
+
+  const [templateId, setTemplateId] = useState<string | null>(
+    initialTemplate?.id ?? null,
+  );
 
   const onSelectTemplate = useCallback(
-    (templateId: string, data: TemplateData) => {
+    (templateId: string) => {
       setTemplateId(templateId);
+      if (!categories) {
+        return;
+      }
+      let template: CoverEditionScreen_template$key | null = null;
+      for (const category of categories) {
+        for (const categoryTemplate of category.templates) {
+          if (categoryTemplate.id === templateId) {
+            template = categoryTemplate;
+            break;
+          }
+        }
+        if (template) {
+          break;
+        }
+      }
+
+      if (!template) {
+        return;
+      }
+      const { data } = readInlineData(templateDataFragment, template);
       const mediaStayleParameters: any = {
         ...(data?.mediaStyle?.parameters ?? {}),
         cropData: editionParameters.cropData ?? null,
@@ -894,17 +1007,26 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         profileKind !== 'personal' &&
         updates.sourceMedia?.id == null
       ) {
-        updateFields(['sourceMedia', data.sourceMedia]);
+        updateFields([
+          'sourceMedia',
+          {
+            ...data.sourceMedia,
+            kind: 'image',
+          },
+        ]);
       }
     },
     [
-      editionParameters,
-      updates.sourceMedia?.id,
+      categories,
+      editionParameters.cropData,
+      editionParameters.orientation,
       updateFields,
       isCreation,
       profileKind,
+      updates.sourceMedia?.id,
     ],
   );
+
   //#endregion
 
   const [currentTab, setCurrentTab] = useState<string>('models');
@@ -1081,7 +1203,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               titleStyle={titleStyle}
               subTitleStyle={subTitleStyle}
               contentStyle={contentStyle}
-              computing={segmented && maskComputing}
+              computing={(segmented && maskComputing) || sourceMediaComputing}
               cropEditionMode={cropEditionMode}
               onCropDataChange={onCropDataChange}
               onLayout={onCoverLayout}
@@ -1134,28 +1256,28 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
             />
           )}
           <View style={[styles.toolbar, appearanceStyle.toolbar]}>
-            <SwitchLabel
-              variant="small"
-              value={segmented ?? false}
-              onValueChange={onToggleSegmentation}
-              label={intl.formatMessage({
-                defaultMessage: 'Clipping',
-                description: 'Label of the clipping switch in cover edition',
-              })}
-              style={styles.toolbarElement}
-            />
-            {currentTab !== 'models' && (
+            {kind !== 'video' && (
               <SwitchLabel
                 variant="small"
-                value={merged ?? false}
-                onValueChange={onToggleMerge}
+                value={segmented ?? false}
+                onValueChange={onToggleSegmentation}
                 label={intl.formatMessage({
-                  defaultMessage: 'Merge',
-                  description: 'Label of the merge switch in cover edition',
+                  defaultMessage: 'Clipping',
+                  description: 'Label of the clipping switch in cover edition',
                 })}
-                style={[styles.toolbarElement]}
+                style={styles.toolbarElement}
               />
             )}
+            <SwitchLabel
+              variant="small"
+              value={merged ?? false}
+              onValueChange={onToggleMerge}
+              label={intl.formatMessage({
+                defaultMessage: 'Merge',
+                description: 'Label of the merge switch in cover edition',
+              })}
+              style={[styles.toolbarElement]}
+            />
           </View>
         </ViewTransition>
 
@@ -1166,8 +1288,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               id: 'models',
               element: (
                 <CoverModelsEditionPanel
-                  viewer={viewer}
-                  segmented={segmented ?? false}
+                  categories={categories!}
                   uri={uri}
                   kind={kind}
                   maskUri={maskUri}
@@ -1311,11 +1432,15 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         onRequestClose={onImagePickerCancel}
       >
         <ImagePicker
-          kind="image"
+          kind="mixed"
           forceAspectRatio={COVER_RATIO}
+          maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
-          steps={[CoverEditionImagePickerSelectImageStep]}
+          steps={[
+            CoverEditionImagePickerSelectImageStep,
+            CoverEditionVideoCropStep,
+          ]}
           TopPanelWrapper={CoverEditionImagePickerMediaWrapper}
         />
       </Modal>
@@ -1329,10 +1454,89 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
 export default CoverEditionScreen;
 
+const templateDataFragment = graphql`
+  fragment CoverEditionScreen_template on CoverTemplate @inline {
+    data {
+      mediaStyle
+      sourceMedia {
+        id
+        uri
+        width
+        height
+      }
+      background {
+        id
+      }
+      backgroundStyle {
+        backgroundColor
+        patternColor
+      }
+      foreground {
+        id
+      }
+      foregroundStyle {
+        color
+      }
+      segmented
+      merged
+      contentStyle {
+        orientation
+        placement
+      }
+      titleStyle {
+        fontFamily
+        fontSize
+        color
+      }
+      subTitleStyle {
+        fontFamily
+        fontSize
+        color
+      }
+    }
+  }
+`;
+
+type CoverEditionValue = {
+  sourceMedia?: {
+    id?: string;
+    kind: 'image' | 'video';
+    uri: string;
+    width: number;
+    height: number;
+  } | null;
+  maskMedia?: string | null;
+  backgroundId?: string | null;
+  backgroundStyle?: CardCoverBackgroundStyleInput | null;
+  contentStyle?: CardCoverContentStyleInput | null;
+  foregroundId?: string | null;
+  foregroundStyle?: CardCoverForegroundStyleInput | null;
+  mediaStyle?: Record<string, unknown> | null;
+  merged?: boolean | null;
+  segmented?: boolean | null;
+  subTitle?: string | null;
+  subTitleStyle?: CardCoverTextStyleInput | null;
+  title?: string | null;
+  titleStyle?: CardCoverTextStyleInput | null;
+};
+
+const firstNotUndefined = <T extends any[]>(...values: T) => {
+  for (const value of values) {
+    if (value !== undefined) {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+const makeTranslucent = (color: string | null | undefined) =>
+  (color ?? '#000000') + 'CC';
+
 const PADDING_TOP_TOPPANEL = 15;
 const ICON_SIZE = 50;
 const FIXED_BOTTOM_MARGIN = 15;
 const MINIMAL_BOTTOM_HEIGHT = 314;
+
 const computedStyle = createStyleSheet(appearance => ({
   toolbar: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
@@ -1427,39 +1631,3 @@ const styles = StyleSheet.create({
     height: 16,
   },
 });
-
-type CoverEditionValue = {
-  sourceMedia?: {
-    id?: string;
-    uri: string;
-    width: number;
-    height: number;
-  } | null;
-  maskMedia?: string | null;
-  backgroundId?: string | null;
-  backgroundStyle?: CardCoverBackgroundStyleInput | null;
-  contentStyle?: CardCoverContentStyleInput | null;
-  foregroundId?: string | null;
-  foregroundStyle?: CardCoverForegroundStyleInput | null;
-  mediaStyle?: Record<string, unknown> | null;
-  merged?: boolean | null;
-  segmented?: boolean | null;
-  subTitle?: string | null;
-  subTitleStyle?: CardCoverTextStyleInput | null;
-  title?: string | null;
-  titleStyle?: CardCoverTextStyleInput | null;
-};
-
-const firstNotUndefined = <T extends any[]>(...values: T) => {
-  for (const value of values) {
-    if (value !== undefined) {
-      return value;
-    }
-  }
-  return undefined;
-};
-
-const makeTranslucent = (color: string | null | undefined) =>
-  (color ?? '#000000') + 'CC';
-
-const COVER_MAX_IMAGE_DIMENSION = 4096;

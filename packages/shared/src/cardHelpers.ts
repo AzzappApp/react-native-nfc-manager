@@ -13,6 +13,11 @@ export const COVER_RATIO = 0.625;
 export const COVER_MAX_VIDEO_DURATTION = 12;
 
 /**
+ * Cover video maxium duration in seconds
+ */
+export const COVER_VIDEO_BITRATE = 5000000;
+
+/**
  * The border radius that should be used when a cover is not displayed full screen
  */
 export const COVER_CARD_RADIUS = 0.128;
@@ -31,6 +36,16 @@ export const COVER_MAX_HEIGHT = 2048;
  * The max width
  */
 export const COVER_MAX_WIDTH = COVER_MAX_HEIGHT * COVER_RATIO;
+
+/**
+ * The max size of the cover image source file
+ */
+export const COVER_SOURCE_MAX_IMAGE_DIMENSION = 4096;
+
+/**
+ * The max size of the cover video source file
+ */
+export const COVER_SOURCE_MAX_VIDEO_DIMENSION = 1920;
 
 /**
  * list of possible covertitle position

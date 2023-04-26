@@ -98,7 +98,7 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
             >
               <Image
                 accessibilityRole="image"
-                source={require('../../components/CoverRenderer/assets/qr-code.png')}
+                source={require('#assets/qrcode.png')}
                 style={styles.layer}
               />
             </PressableNative>

@@ -555,6 +555,10 @@
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
     "description": "Signup Screen - error message when password is not compliant with our rules"
   },
+  "d3lnBJ": {
+    "defaultMessage": "Adjust your video",
+    "description": "Cover edition video crop step header title"
+  },
   "dF52vj": {
     "defaultMessage": "Highlights",
     "description": "Highlights image edition parameters name"

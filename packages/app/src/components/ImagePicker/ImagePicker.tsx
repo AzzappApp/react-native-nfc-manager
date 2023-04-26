@@ -1,11 +1,11 @@
-import { Fragment, useCallback, useRef, useState } from 'react';
+import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import EditImageStep from './EditImageStep';
 import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
 import SelectImageStep from './SelectImageStep';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerState } from './ImagePickerContext';
-import type { TimeRange } from './imagePickerTypes';
+import type { Media, TimeRange } from './imagePickerTypes';
 import type { ComponentType } from 'react';
 
 export type ImagePickerResult = {
@@ -63,7 +63,7 @@ export type ImagePickerProps = {
    * By default, it will display the SelectImageStep and the EditImageStep
    * You can add or remove steps, but you must make sure that the first step is a SelectImageStep
    */
-  steps?: Array<ComponentType<any>>;
+  steps?: Array<ComponentType<any> & { mediaKind?: 'image' | 'video' | null }>;
   /**
    * The kind of media to select
    * By default, it will allow to select both images and videos
@@ -105,7 +105,7 @@ export type ImagePickerProps = {
 const ImagePicker = ({
   maxVideoDuration = 15,
   forceAspectRatio,
-  steps = DEFAULT_STEPS,
+  steps: propSteps = DEFAULT_STEPS,
   kind = 'mixed',
   busy,
   canCancel = true,
@@ -118,6 +118,15 @@ const ImagePicker = ({
   const [stepIndex, setStepIndex] = useState(0);
 
   const pickerStateRef = useRef<ImagePickerState | null>(null);
+  const [media, setMedia] = useState<Media | null>(null);
+  const steps = useMemo(
+    () =>
+      propSteps.filter(
+        step =>
+          !media || step.mediaKind == null || step.mediaKind === media.kind,
+      ),
+    [propSteps, media],
+  );
 
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === steps.length - 1;
@@ -132,12 +141,21 @@ const ImagePicker = ({
       if (!media) {
         return;
       }
+      let resultTimeRange: TimeRange | null = null;
+      if (
+        media.kind === 'video' &&
+        timeRange &&
+        timeRange.startTime !== 0 &&
+        Math.abs(timeRange.duration - media.duration) > 0.1
+      ) {
+        resultTimeRange = timeRange;
+      }
       onFinished?.({
         ...media,
         aspectRatio,
         editionParameters,
         filter: mediaFilter,
-        timeRange,
+        timeRange: resultTimeRange,
       });
     } else {
       setStepIndex(stepIndex => stepIndex + 1);
@@ -164,6 +182,7 @@ const ImagePicker = ({
       maxVideoDuration={maxVideoDuration}
       exporting={exporting}
       kind={kind}
+      onMediaChange={setMedia}
     >
       <ImagePickerWizardContainer
         onBack={onBack}
