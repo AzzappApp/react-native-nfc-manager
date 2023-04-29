@@ -66,30 +66,20 @@ const HomeScreen = ({
               />
             }
             rightElement={
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  justifyContent: 'flex-end',
-                }}
-              >
+              <View style={styles.rightButtonContainer}>
                 <IconButton
                   icon="notification"
-                  iconSize={30}
+                  iconSize={24}
                   size={45}
-                  style={{ borderWidth: 0, justifyContent: 'flex-end' }}
+                  style={{ borderWidth: 0 }}
                   onPress={goToSettings}
                 />
                 <IconButton
                   icon="account"
                   onPress={goToSettings}
-                  iconSize={30}
+                  iconSize={26}
                   size={45}
-                  style={{
-                    borderWidth: 0,
-                    justifyContent: 'flex-end',
-                    marginBottom: 3,
-                  }}
+                  style={{ borderWidth: 0 }}
                 />
               </View>
             }
@@ -102,7 +92,7 @@ const HomeScreen = ({
         </Container>
       }
       stickyHeaderIndices={[0]}
-      style={[styles.followedProfilesPosts]}
+      style={styles.followedProfilesPosts}
       postsContainerStyle={[
         appearanceStyle.followedProfilesPostsListPostsContainer,
         styles.followedProfilesPostsListPostsContainerShadow,
@@ -136,6 +126,11 @@ const styles = StyleSheet.create({
   logo: {
     height: 28,
   },
+  rightButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 10,
+  },
   followedProfilesList: {
     height: 200,
     marginTop: 10,
@@ -147,7 +142,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   followedProfilesPostsListPostsContainerShadow: Platform.select({
     default: {
       shadowColor: colors.black,

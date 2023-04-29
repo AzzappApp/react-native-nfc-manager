@@ -102,8 +102,9 @@ const ProfilePostsScreen = ({
           <IconButton
             icon="arrow_down"
             onPress={onClose}
-            iconSize={26}
+            iconSize={30}
             size={47}
+            style={{ borderWidth: 0 }}
           />
         }
       />

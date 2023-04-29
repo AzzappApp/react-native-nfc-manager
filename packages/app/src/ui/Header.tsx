@@ -36,16 +36,22 @@ const Header = ({
   ...props
 }: HeaderProps) => {
   return (
-    <Container style={[styles.header, style]} {...props}>
-      <View style={styles.headerSegment}>{leftElement}</View>
-      <View style={styles.headerMiddle}>
-        {typeof middleElement === 'string' ? (
-          <Text variant="large">{middleElement}</Text>
-        ) : middleElement != null ? (
-          <View>{middleElement}</View>
-        ) : undefined}
-      </View>
-      <View style={[styles.headerSegment, styles.headerSegmentRight]}>
+    <Container
+      accessibilityRole="header"
+      style={[styles.header, style]}
+      {...props}
+    >
+      <View style={styles.headerInner}>
+        <View style={styles.headerMiddle}>
+          {typeof middleElement === 'string' ? (
+            <Text variant="large" style={styles.title} numberOfLines={1}>
+              {middleElement}
+            </Text>
+          ) : middleElement != null ? (
+            <View>{middleElement}</View>
+          ) : undefined}
+        </View>
+        {leftElement}
         {rightElement}
       </View>
     </Container>
@@ -57,29 +63,37 @@ export default Header;
 /**
  * The height of the header. Styling guide is defining 102 px height wiht 45 paddingTop margin.
  * All other part of figma does not use their template button
- * */
+ */
 export const HEADER_HEIGHT = 47;
 
 const styles = StyleSheet.create({
   header: {
     height: HEADER_HEIGHT,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
     paddingHorizontal: 20,
   },
+  headerInner: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   headerMiddle: {
-    flex: 1.7,
+    position: 'absolute',
+    left: 0,
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 47,
   },
-  headerSegment: {
-    justifyContent: 'flex-end',
+  title: {
+    textAlign: 'center',
+  },
+  headerSegmentLeft: {
+    justifyContent: 'center',
     alignItems: 'flex-start',
-    flex: 1,
   },
   headerSegmentRight: {
+    justifyContent: 'center',
     alignItems: 'flex-end',
   },
 });

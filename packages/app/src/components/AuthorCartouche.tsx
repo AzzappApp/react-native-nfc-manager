@@ -43,8 +43,14 @@ const AuthorCartouche = ({
           cover {
             media {
               id
-              avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
-                @include(if: $isNative)
+              ... on MediaImage {
+                avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
+                  @include(if: $isNative)
+              }
+              ... on MediaVideo {
+                avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
+                  @include(if: $isNative)
+              }
             }
           }
         }
@@ -105,12 +111,11 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       paddingBottom: 4,
       paddingLeft: 6,
       paddingRight: 12,
-      borderRadius: 20,
+      borderRadius: 10,
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.18)',
     },
-
     pictureSmall: {
       backgroundColor: '#FFF',
     },
