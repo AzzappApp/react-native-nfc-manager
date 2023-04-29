@@ -471,9 +471,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       updates.sourceMedia != null ||
       updates.maskMedia != null ||
       updates.mediaStyle != null ||
-      updates.backgroundId != null ||
+      cover?.background?.id !== updates.backgroundId ||
       updates.backgroundStyle != null ||
-      updates.foregroundId != null ||
+      cover?.foreground?.id !== updates.foregroundId ||
       updates.foregroundStyle != null ||
       updates.segmented != null ||
       updates.merged != null;
