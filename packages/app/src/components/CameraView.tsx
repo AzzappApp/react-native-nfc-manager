@@ -103,10 +103,15 @@ const CameraView = (
   const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
     'back',
   );
-  const onCameraInitialized = useCallback(() => {
-    onInitialized();
-    setCameraPosition(supportsCameraFlipping ? initialCameraPosition : 'back');
-  }, [initialCameraPosition, onInitialized, supportsCameraFlipping]);
+
+  useEffect(() => {
+    if (devices) {
+      //we can force the camera position once devices are loaded.
+      //we cannot use onCameraInitialize because it is called after switching camera position
+      setCameraPosition(devices.front != null ? initialCameraPosition : 'back');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [devices]);
 
   const device = devices[cameraPosition];
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
@@ -253,7 +258,7 @@ const CameraView = (
             preset={video ? 'high' : 'photo'}
             fps={30}
             isActive={isActive}
-            onInitialized={onCameraInitialized}
+            onInitialized={onInitialized}
             onError={onError}
             enableZoomGesture={true}
             photo={photo}
