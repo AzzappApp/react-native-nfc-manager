@@ -37,27 +37,11 @@ const CARD = {
     backgroundColor: '#FA3',
     overlayEffect: 'wave',
     title: 'fake title',
-    titlePosition: 'bottomRight',
-    titleFont: 'verdana',
-    titleFontSize: 13,
-    titleColor: '#FG3',
-    titleRotation: 30,
-    qrCodePosition: 'bottomLeft',
-    pictures: [
-      {
-        __typename: 'MediaImage',
-        id: 'fakeSource0',
-      },
-      {
-        __typename: 'MediaVideo',
-        id: 'fakeSource1',
-      },
-      {
-        __typename: 'MediaImage',
-        id: 'fakeSource2',
-      },
-    ],
-    pictureTransitionTimer: 5,
+    subTitle: 'fake subtitle',
+    media: {
+      __typename: 'MediaImage',
+      id: 'fakeSource0',
+    },
   },
 };
 

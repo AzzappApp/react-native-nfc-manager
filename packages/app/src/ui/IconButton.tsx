@@ -9,7 +9,7 @@ export type IconButtonProps = {
   icon: Icons;
   iconSize?: number;
   size?: number;
-  onPress: () => void;
+  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<ImageStyle>;
   nativeID?: string;

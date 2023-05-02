@@ -1,8 +1,9 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Text, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import {
   COVER_BASE_WIDTH,
+  COVER_RATIO,
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_PLACEMENT,
   DEFAULT_COVER_FONT_FAMILY,
@@ -14,12 +15,7 @@ import type {
   CardCoverTextStyleInput,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { ForwardedRef } from 'react';
-import type {
-  ViewProps,
-  ViewStyle,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 
 export type CoverTextPreviewProps = Omit<ViewProps, 'children'> & {
   /**
@@ -42,6 +38,10 @@ export type CoverTextPreviewProps = Omit<ViewProps, 'children'> & {
    * The style of the content
    */
   contentStyle: CardCoverContentStyleInput | null | undefined;
+  /**
+   * the height of the cover
+   */
+  height: number;
 };
 
 export type CoverTextPreviewHandle = {
@@ -55,18 +55,14 @@ const CoverTextPreview = (
     subTitle,
     subTitleStyle,
     contentStyle,
+    height,
     style,
     ...props
   }: CoverTextPreviewProps,
   forwardedRef: ForwardedRef<CoverTextPreviewHandle>,
 ) => {
-  const [containerLayout, setContainerLayout] =
-    useState<LayoutRectangle | null>(null);
-  const onLayout = (event: LayoutChangeEvent) => {
-    setContainerLayout(event.nativeEvent.layout);
-    props.onLayout?.(event);
-  };
-  const scale = containerLayout ? containerLayout.width / COVER_BASE_WIDTH : 1;
+  const width = height * COVER_RATIO;
+  const scale = width / COVER_BASE_WIDTH;
 
   const orientation =
     contentStyle?.orientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
@@ -136,16 +132,10 @@ const CoverTextPreview = (
         : 'right';
   }
 
-  const titleOverlayStyles: ViewStyle | null = containerLayout && {
+  const titleOverlayStyles: ViewStyle | null = {
     position: 'absolute',
-    width:
-      orientation === 'horizontal'
-        ? containerLayout.width
-        : containerLayout.height,
-    height:
-      orientation === 'horizontal'
-        ? containerLayout.height
-        : containerLayout.width,
+    width: orientation === 'horizontal' ? width : height,
+    height: orientation === 'horizontal' ? height : width,
     transform:
       orientation !== 'horizontal'
         ? [
@@ -154,13 +144,13 @@ const CoverTextPreview = (
               translateX:
                 // prettier-ignore
                 (orientation === 'bottomToTop' ? -1 : 1) * 
-                (containerLayout.height - containerLayout.width) / 2,
+                (height - width) / 2,
             },
             {
               translateY:
                 // prettier-ignore
                 (orientation === 'bottomToTop' ? 1 : -1) * 
-                (containerLayout.width - containerLayout.height) / 2,
+                (width - height) / 2,
             },
           ]
         : [],
@@ -204,12 +194,7 @@ const CoverTextPreview = (
   );
 
   return (
-    <View
-      ref={textOverlayRef}
-      style={[style, containerLayout == null && { opacity: 0 }]}
-      {...props}
-      onLayout={onLayout}
-    >
+    <View ref={textOverlayRef} style={[style, { height, width }]} {...props}>
       <View style={titleOverlayStyles}>
         <Text allowFontScaling={false} style={titleTextStyle}>
           {title ?? ''}

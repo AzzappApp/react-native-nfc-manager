@@ -4,7 +4,7 @@ import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import CoverList from '#components/CoverList';
-import SkeletonPlaceholder from '#components/SkeletonPlaceholder';
+import SkeletonPlaceholder from '#components/Skeleton';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 import type { SearchResultProfiles_viewer$key } from '@azzapp/relay/artifacts/SearchResultProfiles_viewer.graphql';
 import type { SearchResultProfilesQuery } from '@azzapp/relay/artifacts/SearchResultProfilesQuery.graphql';

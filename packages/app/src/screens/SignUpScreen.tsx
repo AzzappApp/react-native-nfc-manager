@@ -451,7 +451,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-
     justifyContent: 'center',
     alignItems: 'center',
   },

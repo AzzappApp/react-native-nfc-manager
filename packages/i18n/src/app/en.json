@@ -239,6 +239,10 @@
     "defaultMessage": "Select a calling code or email",
     "description": "The accessibility label for the country selector"
   },
+  "ElE0Uo": {
+    "defaultMessage": "Retry",
+    "description": "CoverEditionScreen alert message loading error retry button"
+  },
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
@@ -342,6 +346,10 @@
   "Mlk+KE": {
     "defaultMessage": "Activity",
     "description": "NewProfile Name Company Screen - Label Activity textinput"
+  },
+  "MuonO2": {
+    "defaultMessage": "Loading error",
+    "description": "CoverEditionScreen alert message loading error title"
   },
   "NJSilL": {
     "defaultMessage": "Text",
@@ -550,6 +558,10 @@
   "calqIB": {
     "defaultMessage": "Connect with phone number",
     "description": "Signup Form Connect with phone number section title in country selection list"
+  },
+  "cvIa5m": {
+    "defaultMessage": "Cancel",
+    "description": "CoverEditionScreen alert message loading error cancel button"
   },
   "d3LNTq": {
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
@@ -854,6 +866,10 @@
   "rKml3z": {
     "defaultMessage": "Allow Azzapp to access your camera and your microphone",
     "description": "Camera authorization screen title for camera permission"
+  },
+  "rbuw1H": {
+    "defaultMessage": "Could not load the cover edition screen",
+    "description": "CoverEditionScreen alert message loading error text"
   },
   "rfiLII": {
     "defaultMessage": "Connect with email address",

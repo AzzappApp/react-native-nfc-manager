@@ -8,7 +8,7 @@ type ImageEditionParameterControlProps = ViewProps & {
   /**
    * The parameter to control.
    */
-  parameter: keyof EditionParameters;
+  parameter?: keyof EditionParameters | null | undefined;
   /**
    * The value of the parameter.
    */
@@ -30,7 +30,7 @@ const ImageEditionParameterControl = ({
   style,
   ...props
 }: ImageEditionParameterControlProps) => {
-  const parameterSettings = editionParametersSettings[parameter];
+  const parameterSettings = parameter && editionParametersSettings[parameter];
   if (!parameterSettings) {
     return null;
   }

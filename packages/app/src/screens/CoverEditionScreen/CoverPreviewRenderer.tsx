@@ -1,12 +1,6 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
@@ -31,7 +25,6 @@ import type {
   CoverTextPreviewHandle,
 } from './CoverTextPreview';
 import type { ForwardedRef } from 'react';
-import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 
 type CoverPreviewRendererProps = CoverTextPreviewProps &
   Omit<
@@ -60,6 +53,18 @@ type CoverPreviewRendererProps = CoverTextPreviewProps &
      * Callback called when the crop data of the sourceMedia image change
      */
     onCropDataChange?: (cropData: CropData) => void;
+    /**
+     * Callback called when the cover preview is ready
+     */
+    onReady?: () => void;
+    /**
+     * Callback called when the cover preview failed to load
+     */
+    onError?: () => void;
+    /**
+     * the height of the cover
+     */
+    height: number;
   };
 
 export type CoverPreviewHandler = {
@@ -102,26 +107,16 @@ const CoverPreviewRenderer = (
     mediaSize,
     computing,
     cropEditionMode,
+    height,
     onCropDataChange,
+    onReady,
+    onError,
     style,
     ...props
   }: CoverPreviewRendererProps,
   forwardedRef: ForwardedRef<CoverPreviewHandler>,
 ) => {
-  const [containerLayout, setContainerLayout] =
-    useState<LayoutRectangle | null>(null);
-  const onLayout = (event: LayoutChangeEvent) => {
-    setContainerLayout(event.nativeEvent.layout);
-    props.onLayout?.(event);
-  };
-
-  const borderRadius = Platform.select({
-    web: COVER_CARD_RADIUS ? (`${COVER_CARD_RADIUS}%` as any) : null,
-    default:
-      containerLayout != null && COVER_CARD_RADIUS != null
-        ? COVER_CARD_RADIUS * containerLayout.width
-        : null,
-  });
+  const borderRadius = height * COVER_RATIO * COVER_CARD_RADIUS;
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
@@ -161,11 +156,16 @@ const CoverPreviewRenderer = (
   };
 
   const onLoad = () => {
-    setIsLoading(false);
+    // A delay to avoid flickering
+    setTimeout(() => {
+      setIsLoading(false);
+      onReady?.();
+    }, 50);
   };
 
-  const onError = () => {
+  const onLoadingError = () => {
     setLoadingFailed(true);
+    onError?.();
   };
 
   const onRetry = () => {
@@ -178,12 +178,11 @@ const CoverPreviewRenderer = (
     <View
       style={[
         styles.root,
-        { borderRadius },
+        { borderRadius, height },
         appearanceStyle.coverShadow,
         style,
       ]}
       {...props}
-      onLayout={onLayout}
     >
       <View style={[styles.topPanelContent, { borderRadius }]}>
         {loadingFailed ? (
@@ -240,7 +239,7 @@ const CoverPreviewRenderer = (
                     }}
                     onLoadingStart={onLoadStart}
                     onLoadingEnd={onLoad}
-                    onLoadingError={onError}
+                    onLoadingError={onLoadingError}
                     style={styles.cover}
                     testID="cover-edition-screen-cover-preview"
                   />
@@ -257,6 +256,7 @@ const CoverPreviewRenderer = (
               ref={textOverlayRef}
               pointerEvents="none"
               style={styles.titleOverlayContainer}
+              height={height}
             />
             <Image
               testID="cover-renderer-qrcode"
@@ -291,7 +291,6 @@ const computedStyle = createStyleSheet(appearance => ({
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
     aspectRatio: COVER_RATIO,
   },
   topPanelContent: {
@@ -312,8 +311,8 @@ const styles = StyleSheet.create({
   },
   titleOverlayContainer: {
     position: 'absolute',
-    height: '100%',
-    width: '100%',
+    top: 0,
+    left: 0,
   },
   errorContainer: {
     flex: 1,

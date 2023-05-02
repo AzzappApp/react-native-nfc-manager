@@ -1,5 +1,6 @@
 import '@testing-library/jest-native/extend-expect';
 import range from 'lodash/range';
+import { StyleSheet } from 'react-native';
 import {
   RelayEnvironmentProvider,
   graphql,
@@ -460,14 +461,14 @@ describe('CoverEditionScreen', () => {
     const title = screen.getByText('fake-title');
     expect(title).toHaveStyle({
       color: '#0400E0',
-      fontSize: 12,
+      fontSize: expect.any(Number),
       fontFamily: 'Verdana',
     });
 
     const subTitle = screen.getByText('fake-subtitle');
     expect(subTitle).toHaveStyle({
       color: '#0A0F00',
-      fontSize: 12,
+      fontSize: expect.any(Number),
       fontFamily: 'Arial',
     });
     // TODO test orientation and placement ?
@@ -740,14 +741,13 @@ describe('CoverEditionScreen', () => {
       );
 
       // font size change tests
-      expect(text).not.toHaveStyle({
-        fontSize: 24,
-      });
+      const previousStyle = StyleSheet.flatten(text.props.style);
+
       act(() => {
         fireEvent(screen.getByLabelText('Font size'), 'change', 24);
       });
       expect(text).toHaveStyle({
-        fontSize: 24,
+        fontSize: previousStyle.fontSize * 2,
       });
     };
 

@@ -267,7 +267,7 @@ const Cropper = ({
               mediaWidth - (3 * offsetWidth) / 4,
             ),
             originY: clamp(
-              offsetY - e.translationY / scale,
+              offsetY + e.translationY / scale,
               -offsetHeight / 2,
               mediaHeight - (3 * offsetHeight) / 4,
             ),

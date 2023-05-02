@@ -1,5 +1,5 @@
 import MaskedView from '@react-native-masked-view/masked-view';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -11,7 +11,13 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import PressableNative from '#ui/PressableNative';
-import TabsBar from '#ui/TabsBar';
+import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
+import Text from '#ui/Text';
+import {
+  COVER_TEMPLATE_MINIATURE_RATIO,
+  TEMPLATE_BORDER_WIDTH,
+  TEMPLATE_GAP,
+} from './coverEditionConstants';
 import CoverTemplateRenderer from './CoverTemplateRenderer';
 import type { EditionParameters } from '#components/gpu';
 import type {
@@ -49,6 +55,15 @@ type CoverModelsEditionPanelProps = {
   onSelectTemplate: (templateId: string) => void;
   isCreation: boolean;
   editionParameters?: EditionParameters;
+
+  /**
+   * callback called when the component is ready
+   */
+  onReady?: () => void;
+  /**
+   * callback called when the component is ready
+   */
+  onError?: () => void;
 };
 
 const CoverModelsEditionPanel = ({
@@ -62,6 +77,8 @@ const CoverModelsEditionPanel = ({
   selectedTemplateId,
   onSelectTemplate,
   editionParameters,
+  onReady,
+  onError,
 }: CoverModelsEditionPanelProps) => {
   const categories = useFragment(
     graphql`
@@ -77,16 +94,58 @@ const CoverModelsEditionPanel = ({
     categoriesKey,
   );
 
-  const { width } = useWindowDimensions();
-  const coverWidth = width * COVER_MINIATURE_RATIO;
-  const coverHeight = coverWidth / COVER_RATIO;
-  const { bottom } = useSafeAreaInsets();
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const templateCount = categories.reduce(
+    (acc, category) => acc + category.templates.length,
+    0,
+  );
 
+  const readyTemplateCount = useRef(0);
+  const readyDispatched = useRef(false);
+
+  const onTemplateReady = useCallback(() => {
+    readyTemplateCount.current += 1;
+    if (
+      readyTemplateCount.current >= templateCount &&
+      !readyDispatched.current
+    ) {
+      onReady?.();
+      readyDispatched.current = true;
+    }
+  }, [onReady, templateCount]);
+
+  const errorDispatched = useRef(false);
+
+  const onTemplateError = useCallback(() => {
+    if (!errorDispatched.current) {
+      onError?.();
+      errorDispatched.current = true;
+    }
+  }, [onError]);
+
+  // TODO reset readyTemplateCount and errorDispatched when categories change
+
+  const { width: windowWidth } = useWindowDimensions();
+  const coverWidth = windowWidth * COVER_TEMPLATE_MINIATURE_RATIO;
+  const coverHeight = coverWidth / COVER_RATIO;
+  const templateItemWidth = coverWidth + 2 * TEMPLATE_BORDER_WIDTH - 0.5;
+  const templateItemHeight = coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
+  const rowHeight = TAB_BAR_HEIGHT + coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
+  const { bottom: insetBottom } = useSafeAreaInsets();
+
+  const appearanceStyle = useStyleSheet(computedStyle);
   const intl = useIntl();
 
+  const getItemLayoutTemplate = useCallback(
+    (_: any, index: number) => ({
+      length: templateItemWidth,
+      offset: 20 + (templateItemWidth + TEMPLATE_GAP) * index,
+      index,
+    }),
+    [templateItemWidth],
+  );
+
   const renderTemplate = useCallback(
-    ({ item, index }: ListRenderItemInfo<Template>) => (
+    ({ item }: ListRenderItemInfo<Template>) => (
       <PressableNative
         onPress={() => onSelectTemplate(item.id)}
         accessibilityRole="button"
@@ -97,15 +156,12 @@ const CoverModelsEditionPanel = ({
             'TemplateSelectorTemplateItem accessibilityHint template item',
         })}
         style={[
-          styles.containerTemplate,
+          styles.templateContainer,
           {
-            width: coverWidth + 2 * BORDER_SELECTED_WIDTH - 0.5,
-            height: coverHeight + 2 * BORDER_SELECTED_WIDTH,
+            width: templateItemWidth,
+            height: templateItemHeight,
             borderRadius:
-              COVER_CARD_RADIUS * coverWidth + BORDER_SELECTED_WIDTH,
-          },
-          {
-            marginLeft: index === 0 ? 20 : 0,
+              COVER_CARD_RADIUS * coverWidth + TEMPLATE_BORDER_WIDTH,
             borderColor:
               selectedTemplateId === item.id ? colors.black : 'transparent',
           },
@@ -135,7 +191,10 @@ const CoverModelsEditionPanel = ({
               borderRadius: COVER_CARD_RADIUS * coverWidth,
               overflow: 'hidden',
             }}
+            height={coverHeight}
             editionParameters={editionParameters}
+            onReady={onTemplateReady}
+            onError={onTemplateError}
           />
         </Container>
       </PressableNative>
@@ -149,52 +208,58 @@ const CoverModelsEditionPanel = ({
       kind,
       maskUri,
       onSelectTemplate,
+      onTemplateReady,
       selectedTemplateId,
       subTitle,
+      templateItemHeight,
+      templateItemWidth,
       time,
       title,
       uri,
     ],
   );
 
-  const renderCategory = useCallback(
-    ({ item }: ListRenderItemInfo<Category>) => {
-      if (item.templates?.length > 0) {
-        return (
-          <View
-            style={{
-              height: 26 + coverHeight + 2 * BORDER_SELECTED_WIDTH,
-            }}
-          >
-            <TabsBar
-              currentTab={item.category}
-              tabs={[{ tabKey: item.category, label: item.category }]}
-            />
-            <FlatList
-              data={item.templates}
-              renderItem={renderTemplate}
-              horizontal
-              ItemSeparatorComponent={ItemSeparatorComponent}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={keyExtractorTemplates}
-              style={styles.visible}
-            />
-          </View>
-        );
-      }
-      return null;
-    },
-    [coverHeight, renderTemplate],
+  const getItemLayoutCategory = useCallback(
+    (_: any, index: number) => ({
+      length: rowHeight,
+      offset: rowHeight * index,
+      index,
+    }),
+    [rowHeight],
   );
 
-  const getItemLayoutCategory = (_data: any, index: number) => ({
-    length: 26 + coverHeight + 2 * BORDER_SELECTED_WIDTH,
-    offset: 100 * index,
-    index,
-  });
+  const renderCategory = useCallback(
+    ({ item }: ListRenderItemInfo<Category>) => (
+      <View style={{ height: rowHeight }}>
+        <View style={styles.categoryHeader}>
+          <View style={appearanceStyle.backgroundLine} />
+          <Text variant="smallbold" style={styles.categoryTitle}>
+            {item.category}
+          </Text>
+          <View style={appearanceStyle.backgroundLine} />
+        </View>
+        <FlatList
+          data={item.templates}
+          renderItem={renderTemplate}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={keyExtractorTemplates}
+          getItemLayout={getItemLayoutTemplate}
+          style={styles.templateList}
+          contentContainerStyle={styles.templateListContainer}
+        />
+      </View>
+    ),
+    [
+      appearanceStyle.backgroundLine,
+      getItemLayoutTemplate,
+      renderTemplate,
+      rowHeight,
+    ],
+  );
 
   return (
-    <View style={[styles.root, { width }]}>
+    <View style={[styles.root, { width: windowWidth }]}>
       <MaskedView
         maskElement={
           <LinearGradient
@@ -215,9 +280,10 @@ const CoverModelsEditionPanel = ({
           keyExtractor={keyExtractorCategory}
           getItemLayout={getItemLayoutCategory}
           contentContainerStyle={{
-            paddingBottom: BOTTOM_MENU_HEIGHT + (bottom > 0 ? bottom : 15) + 10,
+            paddingBottom:
+              BOTTOM_MENU_HEIGHT + (insetBottom > 0 ? insetBottom : 15) + 10,
           }}
-          style={styles.visible}
+          style={styles.templateList}
         />
       </MaskedView>
     </View>
@@ -232,14 +298,18 @@ const keyExtractorTemplates = (item: Template, index: number) =>
 
 export default CoverModelsEditionPanel;
 
-const COVER_MINIATURE_RATIO = 3.5 / 15; //arbitrary fixed value vased on the design
-const BORDER_SELECTED_WIDTH = 3.75;
 const computedStyle = createStyleSheet(appearance => ({
   coverShadow: {
     shadowColor: appearance === 'light' ? colors.black : colors.white,
     shadowOpacity: 0.11,
     shadowOffset: { width: 0, height: 4.69 },
     shadowRadius: 18.75,
+  },
+  backgroundLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    alignSelf: 'center',
   },
 }));
 
@@ -248,18 +318,23 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flex: 1,
   },
-  visible: { overflow: 'visible' },
-  containerTemplate: {
-    borderWidth: BORDER_SELECTED_WIDTH,
+  templateList: {
+    overflow: 'visible',
   },
-  body: {
-    flex: 1,
-    justifyContent: 'center',
+  templateListContainer: {
+    columnGap: TEMPLATE_GAP,
+    paddingHorizontal: 20,
   },
-  filterSelectionListContentContainer: { paddingHorizontal: 20 },
-  filterSelectionList: { flex: 1, maxHeight: 120 },
+  templateContainer: {
+    borderWidth: TEMPLATE_BORDER_WIDTH,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    height: TAB_BAR_HEIGHT,
+    alignItems: 'center',
+  },
+  categoryTitle: {
+    paddingHorizontal: 15,
+    textAlign: 'center',
+  },
 });
-
-const ItemSeparatorComponent = () => (
-  <View style={{ width: 15, backgroundColor: 'transparent' }} />
-);

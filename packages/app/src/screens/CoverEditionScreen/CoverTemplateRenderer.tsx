@@ -45,6 +45,19 @@ type CoverTemplateRendererProps = ViewProps & {
    * The edition parameters to applied to the media
    */
   editionParameters?: EditionParameters;
+  /**
+   * The height of the cover
+   */
+  height: number;
+
+  /**
+   * Callback called when the component is ready
+   */
+  onReady?: () => void;
+  /**
+   * Callback called when the component is ready
+   */
+  onError?: () => void;
 };
 
 const CoveTemplateRenderer = ({
@@ -56,6 +69,9 @@ const CoveTemplateRenderer = ({
   title,
   subTitle,
   editionParameters,
+  height,
+  onReady,
+  onError,
   ...props
 }: CoverTemplateRendererProps) => {
   const coverTemplate = useFragment(
@@ -167,6 +183,8 @@ const CoveTemplateRenderer = ({
         filter={filter}
         editionParameters={editionParametersMerged}
         style={StyleSheet.absoluteFill}
+        onLoadingEnd={onReady}
+        onLoadingError={onError}
       />
       <CoverTextPreview
         title={title ?? titleTemplate}
@@ -176,6 +194,7 @@ const CoveTemplateRenderer = ({
         contentStyle={contentStyle}
         pointerEvents="none"
         style={StyleSheet.absoluteFill}
+        height={height}
       />
 
       <Image

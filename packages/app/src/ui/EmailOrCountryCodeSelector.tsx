@@ -82,6 +82,7 @@ const EmailOrCountryCodeSelector = ({
                 onPress={() => onSelect('email')}
                 style={[
                   styles.emailItem,
+                  appearanceStyle.emailItem,
                   value === 'email' && appearanceStyle.emailItemSelected,
                 ]}
               >
@@ -120,6 +121,9 @@ const computedStyles = createStyleSheet(appearance => ({
   bottomSheetContainer: {
     marginTop: 10,
     paddingHorizontal: 0,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+  emailItem: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   emailItemSelected: {

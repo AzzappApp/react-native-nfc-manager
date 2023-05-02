@@ -10,11 +10,9 @@ import {
   View,
   Image,
   Alert,
-  useWindowDimensions,
-  useColorScheme,
+  Appearance,
 } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation, readInlineData } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -30,43 +28,45 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
-import { colors } from '#theme';
 import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
 import AnimatedCircleHint from '#ui/AnimatedCircleHint';
-import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
-import Button from '#ui/Button';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import FloatingIconButton from '#ui/FloatingIconButton';
-import Header from '#ui/Header';
-import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SwitchLabel from '#ui/SwitchLabel';
 import TabView from '#ui/TabView';
 
 import UploadProgressModal from '#ui/UploadProgressModal';
-import ViewTransition from '#ui/ViewTransition';
 import CoverEditionBackgroundPanel from './CoverEditionBackgroundPanel';
+import {
+  ICON_BUTTTON_SIZE,
+  TOP_PANEL_GAP,
+  TOP_PANEL_PADDING,
+} from './coverEditionConstants';
 import CoverEditionForegroundPanel from './CoverEditionForegroundPanel';
 import CoverEditionImagePickerMediaWrapper from './CoverEditionImagePickerMediaWrapper';
 import CoverEditionImagePickerSelectImageStep from './CoverEditionImagePickerSelectImageStep';
+import CoverEditionBottomMenu from './CoverEditionScreenBottomMenut';
+import CoverEditionScreenHeader from './CoverEditionScreenHeader';
+import { CameraButton, CropButton } from './CoverEditionScreensButtons';
+import CoverEditionScreenToolBar from './CoverEditionScreenToolBar';
 import CoverEditionVideoCropStep from './CoverEditionVideoCropStep';
 import CoverImageEditionPanel from './CoverImageEditionPanel';
 import CoverModelsEditionPanel from './CoverModelsEditionPanel';
 import CoverPreviewRenderer from './CoverPreviewRenderer';
 import CoverTitleEditionPanel from './CoverTitleEditionPanel';
+import useCoverEditionLayout from './useCoverEditionLayout';
 import type {
   CropData,
   EditionParameters,
   ImageOrientation,
 } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { FooterBarItem } from '#ui/FooterBar';
 import type { CoverPreviewHandler } from './CoverPreviewRenderer';
 import type { CoverEditionScreen_cover$key } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
 import type { CoverEditionScreen_template$key } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
@@ -80,7 +80,7 @@ import type {
   MediaInput,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
-import type { LayoutChangeEvent } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
 export type CoverEditionScreenProps = {
@@ -88,12 +88,31 @@ export type CoverEditionScreenProps = {
    * The relay viewer reference
    */
   viewer: CoverEditionScreen_viewer$key | null;
+
+  /**
+   * style of the screen
+   */
+  style?: StyleProp<ViewStyle>;
+
+  /**
+   * style of the screen
+   */
+  onReady?: () => void;
+  /**
+   * style of the screen
+   */
+  onError?: () => void;
 };
 
 /**
  * Allows un user to edit his Cover, the cover changes, can be previsualized
  */
-const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
+const CoverEditionScreen = ({
+  viewer: viewerKey,
+  onReady,
+  onError,
+  style,
+}: CoverEditionScreenProps) => {
   //#region Data dependencies
   const viewer = useFragment(
     graphql`
@@ -402,12 +421,45 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
     return null;
   }, [sourceMedia]);
 
+  // #region Ready state
+  // if there is no source media, the cover preview will not dispatch the onReady event
+  const coverPreviewReady = useRef(!sourceMedia);
+  const templatesReady = useRef(!sourceMedia);
+  useEffect(() => {
+    if (!sourceMedia) {
+      onReady?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onCoverPreviewReady = useCallback(() => {
+    coverPreviewReady.current = true;
+    if (templatesReady.current) {
+      onReady?.();
+    }
+  }, [onReady]);
+
+  const onTemplatesReady = useCallback(() => {
+    templatesReady.current = true;
+    if (coverPreviewReady.current) {
+      onReady?.();
+    }
+  }, [onReady]);
+
+  const errorDispatched = useRef(false);
+  const onMediaError = useCallback(() => {
+    if (!errorDispatched.current) {
+      errorDispatched.current = true;
+      onError?.();
+    }
+  }, [onError]);
   //#endregion
 
   //#region Mutation, Cancel and navigation
   const intl = useIntl();
   const rendererRef = useRef<CoverPreviewHandler | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showImageHint, setShowImageHint] = useState(false);
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
 
@@ -436,9 +488,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
       }
     }
   `);
-  const [showImageHint, setShowImageHint] = useState(false);
+
   const { uploadMedia, uploadSign } = useWebAPI();
-  const scheme = useColorScheme();
   const onSave = async () => {
     if (!canSave) {
       return;
@@ -453,12 +504,11 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
         }),
         [{ onPress: () => setShowImageHint(true) }],
         {
-          userInterfaceStyle: scheme ?? 'light',
+          userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
         },
       );
       return;
     }
-    setShowImageHint(false);
     setSaving(true);
 
     const renderer = rendererRef.current;
@@ -746,6 +796,7 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               ],
               size: newSize,
               bitRate: COVER_VIDEO_BITRATE,
+              removeSound: true,
             });
       setSourceMediaComputing(false);
 
@@ -1040,75 +1091,26 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   //#endregion
 
+  //#region Bottom menu
   const [currentTab, setCurrentTab] = useState<string>('models');
 
-  const appearanceStyle = useStyleSheet(computedStyle);
-  const cropEditionMode = editedParameter === 'roll';
-
-  const [bottomSheetHeights, setBottomSheetHeights] = useState(0);
-  const onBottomPanelLayout = (event: LayoutChangeEvent) => {
-    setBottomSheetHeights(event.nativeEvent.layout.height);
-  };
-
-  const [coverHeight, setCoverHeight] = useState<number | null>(null);
-  const onCoverLayout = ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-    setCoverHeight(layout.height);
-  };
-
-  const { width } = useWindowDimensions();
-  const { bottom, top } = useSafeAreaInsets();
-  const bottomMargin = bottom > 0 ? bottom : FIXED_BOTTOM_MARGIN;
-  //Bottom Menu navigation. cannot put it ouside as constant because of react-intl
-  const menus: FooterBarItem[] = useMemo(
-    () => [
-      {
-        key: 'models',
-        icon: 'templates',
-        label: intl.formatMessage({
-          defaultMessage: 'Models',
-          description: 'CoverEditionScreen bottom menu label for models tab',
-        }),
-      },
-      {
-        key: 'image',
-        icon: 'image',
-        label: intl.formatMessage({
-          defaultMessage: 'Image',
-          description: 'CoverEditionScreen bottom menu label for Image tab',
-        }),
-      },
-      {
-        key: 'title',
-        icon: 'text',
-        label: intl.formatMessage({
-          defaultMessage: 'Text',
-          description: 'CoverEditionScreen bottom menu label for Text tab',
-        }),
-      },
-      {
-        key: 'foreground',
-        icon: 'foreground',
-        label: intl.formatMessage({
-          defaultMessage: 'Fore.',
-          description:
-            'CoverEditionScreen bottom menu label for Foreground tab',
-        }),
-      },
-      {
-        key: 'background',
-        icon: 'background',
-        label: intl.formatMessage({
-          defaultMessage: 'Back.',
-          description:
-            'CoverEditionScreen bottom menu label for Background tab',
-        }),
-      },
-    ],
-    [intl],
-  );
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
   }, []);
+  //#endregion
+
+  const {
+    windowWidth,
+    bottomPanelHeight,
+    topPanelHeight,
+    coverHeight,
+    topPanelButtonsTop,
+    topMargin,
+    bottomMargin,
+    bottomSheetHeights,
+  } = useCoverEditionLayout();
+
+  const cropEditionMode = editedParameter === 'roll';
 
   if (!viewer) {
     return null;
@@ -1116,71 +1118,25 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
 
   return (
     //ths container on top avoid some weid feeling when transitionning with transparent backgorund
-    <Container style={styles.containerStyle}>
+    <Container style={[styles.root, style]}>
       <KeyboardAvoidingView
-        contentContainerStyle={[styles.root, { paddingTop: top }]}
+        contentContainerStyle={[
+          styles.keyboardAvoidingView,
+          { paddingTop: topMargin },
+        ]}
         behavior="position"
       >
-        <Header
-          middleElement={
-            isCreation
-              ? intl.formatMessage({
-                  defaultMessage: 'Create your cover',
-                  description: 'Cover creation screen title',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Update your cover',
-                  description: 'Cover edition screen title',
-                })
-          }
-          leftElement={
-            !cropEditionMode ? (
-              <Button
-                variant="secondary"
-                onPress={onCancel}
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'Cancel button label in cover edition screen',
-                })}
-              />
-            ) : null
-          }
-          rightElement={
-            cropEditionMode ? (
-              <IconButton
-                icon="rotate"
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Rotate',
-                  description:
-                    'Accessibility label of the rotate button in the cover edition screen',
-                })}
-                accessibilityHint={intl.formatMessage({
-                  defaultMessage:
-                    'Rotate the image by 90° clockwise. This will change the crop area.',
-                  description:
-                    'Accessibility hint of the rotate button in in the cover edition screen',
-                })}
-                onPress={onNextOrientation}
-              />
-            ) : (
-              <Button
-                disabled={!canSave}
-                onPress={onSave}
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'Save button label in cover edition screen',
-                })}
-              />
-            )
-          }
+        <CoverEditionScreenHeader
+          isCreation={isCreation}
+          cropEditionMode={cropEditionMode}
+          canSave={canSave}
+          onCancel={onCancel}
+          onSave={onSave}
+          onNextOrientation={onNextOrientation}
         />
-        <ViewTransition
-          style={[styles.topPanel, { opacity: coverHeight != null ? 1 : 0 }]}
-          transitionDuration={120}
-          transitions={['opacity']}
-        >
+        <View style={[styles.topPanel, { height: topPanelHeight }]}>
           <PressableNative
-            style={{ flex: 1 }}
+            style={{ height: coverHeight, aspectRatio: COVER_RATIO }}
             onPress={onPickImage}
             disabled={cropEditionMode}
             disabledOpacity={1}
@@ -1211,66 +1167,42 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               computing={(segmented && maskComputing) || sourceMediaComputing}
               cropEditionMode={cropEditionMode}
               onCropDataChange={onCropDataChange}
-              onLayout={onCoverLayout}
-              style={appearanceStyle.coverShadow}
+              onReady={onCoverPreviewReady}
+              onError={onMediaError}
+              height={coverHeight}
             />
           </PressableNative>
-          {sourceMedia && !cropEditionMode && (
-            <FloatingIconButton
-              icon="crop"
-              iconSize={24}
+          {sourceMedia && !cropEditionMode && !isDemoAsset && (
+            <CropButton
               onPress={onActivateCropMode}
-              style={[
-                styles.cropButton,
-                coverHeight != null && {
-                  top: (coverHeight - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL,
-                },
-              ]}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Crop',
-                description: 'Accessibility label of the crop button',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage:
-                  'Press this button to adjust the boundary of the selected image',
-                description: 'Accessibility hint of the crop button',
-              })}
+              style={{
+                position: 'absolute',
+                top: topPanelButtonsTop,
+                end: 22.5,
+              }}
             />
           )}
           <AnimatedCircleHint
             style={{
               position: 'absolute',
-              top: ((coverHeight ?? 0) - 220) / 2 + PADDING_TOP_TOPPANEL,
-              left: -110 + ICON_SIZE,
+              top: (coverHeight - 220) / 2 + TOP_PANEL_PADDING,
+              left: -110 + ICON_BUTTTON_SIZE,
             }}
             hidesWhenStopped
             animating={showImageHint}
           />
           {!cropEditionMode && (
-            <FloatingIconButton
-              icon="camera"
-              iconSize={24}
+            <CameraButton
               onPress={onPickImage}
-              style={[
-                styles.takePictureButton,
-                coverHeight != null && {
-                  top: (coverHeight - ICON_SIZE) / 2 + PADDING_TOP_TOPPANEL,
-                },
-              ]}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Select an image',
-                description:
-                  'Accessibility label of the image selection button',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage:
-                  'Press this button to select an image from your library',
-                description: 'Accessibility hint of the image selection button',
-              })}
+              style={{
+                position: 'absolute',
+                top: topPanelButtonsTop,
+                start: 22.5,
+              }}
             />
           )}
 
-          <View style={[styles.toolbar, appearanceStyle.toolbar]}>
+          <CoverEditionScreenToolBar>
             {kind !== 'video' && (
               <SwitchLabel
                 variant="small"
@@ -1280,21 +1212,21 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   defaultMessage: 'Clipping',
                   description: 'Label of the clipping switch in cover edition',
                 })}
-                style={styles.toolbarElement}
               />
             )}
-            <SwitchLabel
-              variant="small"
-              value={merged ?? false}
-              onValueChange={onToggleMerge}
-              label={intl.formatMessage({
-                defaultMessage: 'Merge',
-                description: 'Label of the merge switch in cover edition',
-              })}
-              style={[styles.toolbarElement]}
-            />
-          </View>
-        </ViewTransition>
+            {currentTab !== 'models' && (
+              <SwitchLabel
+                variant="small"
+                value={merged ?? false}
+                onValueChange={onToggleMerge}
+                label={intl.formatMessage({
+                  defaultMessage: 'Merge',
+                  description: 'Label of the merge switch in cover edition',
+                })}
+              />
+            )}
+          </CoverEditionScreenToolBar>
+        </View>
 
         <TabView
           currentTab={currentTab}
@@ -1313,6 +1245,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onSelectTemplate={onSelectTemplate}
                   isCreation={isCreation}
                   editionParameters={editionParameters}
+                  onReady={onTemplatesReady}
+                  onError={onMediaError}
                 />
               ),
             },
@@ -1331,11 +1265,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onFilterChange={onFilterChange}
                   onStartParameterEdition={onStartParameterEdition}
                   style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                      width,
-                    },
+                    styles.bottomPanelTab,
+                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1357,11 +1288,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onContentStyleChange={onContentStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                      width,
-                    },
+                    styles.bottomPanelTab,
+                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1377,11 +1305,8 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onForegroundStyleChange={onForegroundStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                      width,
-                    },
+                    styles.bottomPanelTab,
+                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1397,25 +1322,22 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
                   onBackgroundStyleChange={onBackgroundStyleChange}
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
-                    styles.bottomPanel,
-                    {
-                      marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
-                      width,
-                    },
+                    styles.bottomPanelTab,
+                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
             },
           ]}
-          onLayout={onBottomPanelLayout}
-          style={{ minHeight: MINIMAL_BOTTOM_HEIGHT, flex: 1 }}
+          style={{ height: bottomPanelHeight, width: windowWidth }}
         />
-        <BottomMenu
+        <CoverEditionBottomMenu
           currentTab={currentTab}
           onItemPress={navigateToPanel}
-          showLabel
-          tabs={menus}
-          style={[styles.tabsBar, { bottom: bottomMargin, width: width - 20 }]}
+          style={[
+            styles.tabsBar,
+            { bottom: bottomMargin, width: windowWidth - 20 },
+          ]}
         />
         {editedParameter != null && (
           <Container
@@ -1423,8 +1345,9 @@ const CoverEditionScreen = ({ viewer: viewerKey }: CoverEditionScreenProps) => {
               {
                 position: 'absolute',
                 bottom: 0,
-                width,
-                minHeight: MINIMAL_BOTTOM_HEIGHT + 10,
+                paddingBottom: bottomMargin,
+                width: windowWidth,
+                height: bottomPanelHeight - 10,
               },
             ]}
           >
@@ -1547,102 +1470,26 @@ const firstNotUndefined = <T extends any[]>(...values: T) => {
 const makeTranslucent = (color: string | null | undefined) =>
   (color ?? '#000000') + 'CC';
 
-const PADDING_TOP_TOPPANEL = 15;
-const ICON_SIZE = 50;
-const FIXED_BOTTOM_MARGIN = 15;
-const MINIMAL_BOTTOM_HEIGHT = 314;
-
-const computedStyle = createStyleSheet(appearance => ({
-  toolbar: {
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    shadowColor: appearance === 'light' ? colors.grey900 : colors.grey600,
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 4,
-  },
-  coverShadow: {
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 40,
-  },
-}));
 const styles = StyleSheet.create({
-  containerStyle: { flex: 1 },
-  bottomPanelContainer: {
-    minHeight: MINIMAL_BOTTOM_HEIGHT,
-    flex: 1,
-    flexDirection: 'row',
-  },
   root: {
+    flex: 1,
+  },
+  keyboardAvoidingView: {
     width: '100%',
     height: '100%',
   },
   topPanel: {
-    height: '50%',
-    flexShrink: 1,
     alignItems: 'center',
-    paddingTop: PADDING_TOP_TOPPANEL,
+    paddingTop: TOP_PANEL_PADDING,
+    rowGap: TOP_PANEL_GAP,
   },
-  cropButton: {
-    position: 'absolute',
-    end: 22.5,
-    borderWidth: 1,
-  },
-  takePictureButton: {
-    position: 'absolute',
-    start: 22.5,
-    borderWidth: 1,
-  },
-  cover: {
-    flex: 1,
-  },
-  maskComputingOverlay: {
-    position: 'absolute',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    aspectRatio: COVER_RATIO,
-  },
-  bottomPanel: {
+  bottomPanelTab: {
     flex: 1,
     marginTop: 10,
   },
   tabsBar: {
     position: 'absolute',
-    bottom: FIXED_BOTTOM_MARGIN,
     left: 10,
     right: 10,
-  },
-  toolbar: {
-    flexDirection: 'row',
-    height: 46,
-    borderRadius: 23,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-    marginTop: 10,
-    paddingLeft: 15,
-    paddingRight: 5,
-  },
-  toolbarElement: {
-    marginRight: 10,
-    height: 22,
-  },
-  imageButton: {
-    backgroundColor: colors.grey50,
-    height: 33,
-    width: 33,
-    padding: 0,
-    borderRadius: 16.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconPicture: {
-    width: 16,
-    height: 16,
   },
 });

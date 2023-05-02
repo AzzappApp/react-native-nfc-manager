@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     color: colors.grey400,
   },
   pressableRecentRow: {
+    backgroundColor: '#fff',
     height: 39,
     paddingHorizontal: 14,
     flexDirection: 'row',

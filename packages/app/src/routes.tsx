@@ -83,6 +83,7 @@ export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
   params: {
     module: string;
+    isCreation?: boolean;
   };
 };
 

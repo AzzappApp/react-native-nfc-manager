@@ -125,6 +125,25 @@ enum GPULayerSource: Equatable, Hashable {
       return "Video(uri: '\(uri)', startTime: \(String(describing: startTime)), duration: \(String(describing: duration)))"
     }
   }
+  
+  func hash(into hasher: inout Hasher) {
+    switch self {
+    case .image(uri: let uri):
+      hasher.combine("image")
+      hasher.combine(uri.absoluteString)
+      break;
+    case .videoFrame(uri: let uri, time: let time):
+      hasher.combine("videoFrame")
+      hasher.combine(uri.absoluteString)
+      hasher.combine(time.seconds)
+      break;
+    case .video(uri: let uri, startTime: let startTime, duration: let duration):
+      hasher.combine("video")
+      hasher.combine(uri.absoluteString)
+      hasher.combine(startTime?.seconds)
+      hasher.combine(duration?.seconds)
+    }
+  }
 }
 
 struct GPULayer: Equatable {
@@ -217,18 +236,11 @@ struct GPULayer: Equatable {
     layer: GPULayer,
     withSize size: CGSize,
     onTopOf underlayImage: CIImage?,
-    withImages layerImages: [GPULayerSource: CIImage]?,
-    inverseOnSimulator: Bool = true
+    withImages layerImages: [GPULayerSource: CIImage]?
   ) -> CIImage? {
     guard var image = layerImages?[layer.source] else {
       return underlayImage
     }
-    
-    #if targetEnvironment(simulator)
-    if inverseOnSimulator  {
-      image = adaptImageForSimulator(image)
-    }
-    #endif
     
     let parameters = layer.parameters ?? GPULayerEditionParameters()
     if let orientation = parameters.orientation {
@@ -344,13 +356,7 @@ struct GPULayer: Equatable {
       image = blendFilter.outputImage!
     }
     
-    if let maskUri = layer.maskUri, var maskImage = layerImages?[.image(uri: maskUri)]  {
-      #if targetEnvironment(simulator)
-      if inverseOnSimulator  {
-        maskImage = adaptImageForSimulator(maskImage)
-      }
-      #endif
-      
+    if let maskUri = layer.maskUri, let maskImage = layerImages?[.image(uri: maskUri)]  {
       let blendFilter = CIFilter.blendWithMask()
       blendFilter.inputImage = image
       blendFilter.backgroundImage = transparentImage
@@ -396,15 +402,6 @@ struct GPULayer: Equatable {
     ))
     return result
   }
-  
-  #if targetEnvironment(simulator)
-  private static func adaptImageForSimulator(_ image: CIImage) -> CIImage {
-    return image
-      .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
-      .transformed(by: CGAffineTransform(translationX: 0, y: image.extent.size.height))
-  }
-
-  #endif
 }
 
 

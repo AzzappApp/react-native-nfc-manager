@@ -84,6 +84,7 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
           route="CARD_MODULE_EDITION"
           params={{
             module: 'cover',
+            isCreation: true,
           }}
         >
           <PressableScaleHighlight style={styles.listHeaderPressable}>

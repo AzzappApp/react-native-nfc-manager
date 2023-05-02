@@ -212,8 +212,6 @@ class GPUVideoViewManager: RCTViewManager {
         let videoImage = request.sourceImage
         var layersImages = layersImages
         layersImages[videoLayer.source] = videoImage
-          .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
-          .transformed(by: CGAffineTransform(translationX: 0, y: videoImage.extent.height))
         
         let size = request.renderSize
         var image: CIImage? = nil
@@ -223,25 +221,21 @@ class GPUVideoViewManager: RCTViewManager {
         }
         
         for layer in gpuLayers {
-          var inverseImageOnSimulator: Bool {
-            switch layer.source {
-              case .image : return true
-              default: return false
-            }
-          }
-          if let layerImage = GPULayer.draw(layer, withSize: size, onTopOf: image, withImages: layersImages, inverseOnSimulator: inverseImageOnSimulator) {
+          if let layerImage = GPULayer.draw(
+            layer,
+            withSize: size,
+            onTopOf: image,
+            withImages: layersImages
+          ) {
             image = layerImage
           }
         }
         
-        guard var image = image else {
+        guard let image = image else {
           request.finish(with: videoImage, context: nil)
           return
         }
-        image = image
-          .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
-          .transformed(by: CGAffineTransform(translationX: 0, y: image.extent.height))
-          
+      
         request.finish(with: image, context: nil)
     })
     composition.renderSize = outputSize
@@ -607,8 +601,6 @@ class GPUVideoView: UIView {
       
         var layersImages = videoView.layersImages ?? [:]
         layersImages[videoLayer.source] = videoImage
-          .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
-          .transformed(by: CGAffineTransform(translationX: 0, y: videoImage.extent.height))
         
         let size = request.renderSize
         var image: CIImage? = nil
@@ -619,32 +611,21 @@ class GPUVideoView: UIView {
         
         if let layers = videoView.gpuLayers {
           for layer in layers {
-            var inverseImageOnSimulator: Bool {
-              switch layer.source {
-                case .image : return true
-                default: return false
-              }
-            }
-            
             if let layerImage = GPULayer.draw(
               layer,
               withSize: size,
               onTopOf: image,
-              withImages: layersImages,
-              inverseOnSimulator: inverseImageOnSimulator
+              withImages: layersImages
             ) {
               image = layerImage
             }
           }
         }
         
-        guard var image = image else {
+        guard let image = image else {
           request.finish(with: videoImage, context: nil)
           return
         }
-        image = image
-          .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
-          .transformed(by: CGAffineTransform(translationX: 0, y: image.extent.height))
           
         request.finish(with: image, context: nil)
     })

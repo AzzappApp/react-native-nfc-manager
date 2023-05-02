@@ -7,7 +7,7 @@ import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 
 import { colors } from '#theme';
 import CoverList from '#components/CoverList';
-import SkeletonPlaceholder from '#components/SkeletonPlaceholder';
+import SkeletonPlaceholder from '#components/Skeleton';
 import Text from '#ui/Text';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 

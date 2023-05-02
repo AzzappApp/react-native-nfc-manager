@@ -19,6 +19,8 @@
 		96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
 		96678DE529D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */; };
 		96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */; };
+		FD14042D29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */; };
+		FD14042E29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */; };
 		FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
 		FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
 		FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
@@ -115,6 +117,7 @@
 		96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-SemiBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Medium.ttf"; path = "../../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CIImage+invertY.swift"; sourceTree = "<group>"; };
 		FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzapp-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzappTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AZPMediaImageRendererManager.swift; path = azzapp/AZPMediaImageRendererManager.swift; sourceTree = "<group>"; };
@@ -299,6 +302,7 @@
 			children = (
 				FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */,
 				FDA79D6129E4891100E16407 /* UIColor.swift */,
+				FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */,
 			);
 			name = Extensions;
 			path = azzapp/Extensions;
@@ -606,6 +610,7 @@
 				FDA79D7529EE844000E16407 /* GPUViewError.swift in Sources */,
 				FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */,
+				FD14042E29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */,
 				FDA79D8029EEA61A00E16407 /* FileUtils.swift in Sources */,
 				FDA79D3929DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
 				FDA79D6929E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
@@ -631,6 +636,7 @@
 				FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
 				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
+				FD14042D29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */,
 				FDA79D6829E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
 				FDA79D3829DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
 				FDA79D7829EE8AAC00E16407 /* ReactLogger.swift in Sources */,

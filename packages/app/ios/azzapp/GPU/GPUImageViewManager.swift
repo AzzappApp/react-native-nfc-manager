@@ -138,8 +138,7 @@ class GPUImageViewManager: RCTViewManager {
         layer,
         withSize: size,
         onTopOf: image,
-        withImages: layersImages,
-        inverseOnSimulator: false
+        withImages: layersImages
       ) {
         image = layerImage
       }
@@ -342,9 +341,12 @@ class GPUImageView: UIView, MTKViewDelegate {
             group in
               for layerSource in layerSourceToLoad {
                 group.addTask {
-                  guard let image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
+                  guard var image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
                     throw GPUViewError.failedToLoad(layerSource)
                   }
+                  #if targetEnvironment(simulator)
+                  image = image.inverseY()
+                  #endif
                   return (layerSource, image)
                 }
               }

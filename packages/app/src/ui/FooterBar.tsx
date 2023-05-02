@@ -46,7 +46,7 @@ export type FooterBarProps = {
   /**
    * An event fired when the user press one of the tab
    */
-  onItemPress: (key: string) => void;
+  onItemPress?: (key: string) => void;
   /**
    * The size of icon used in the tabbar item
    */
@@ -118,7 +118,7 @@ type FooterBarItemProps = FooterBarItem & {
   /**
    * An event fired when the user press one of the tab
    */
-  onItemPress: (key: string) => void;
+  onItemPress?: (key: string) => void;
   /**
    * item is selected
    */
@@ -157,7 +157,7 @@ const FooterBarItem = ({
 }: FooterBarItemProps) => {
   const appearanceStyles = useStyleSheet(computedStyles);
 
-  const onPress = () => onItemPress(tabKey);
+  const onPress = () => onItemPress?.(tabKey);
 
   const shouldNotTint = tint === false || (tint === 'unactive' && isSelected);
 
