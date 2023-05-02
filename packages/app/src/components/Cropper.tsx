@@ -203,6 +203,7 @@ const Cropper = ({
   }, [cropData, cropDataProps, onCropDataChange]);
 
   const [cropDataCurrentValue, setCropDataCurrentValue] = useState(cropData);
+
   useEffect(() => {
     setCropDataCurrentValue(cropData);
   }, [cropData]);
@@ -219,7 +220,7 @@ const Cropper = ({
   }, [cropDataCurrentValue]);
 
   const onGestureEnd = useCallback(() => {
-    const cropData = getValidCropdata(
+    const cropDataCurrentValid = getValidCropdata(
       cropDataCurrentValue,
       aspectRatio,
       mediaSizeInfos.width,
@@ -227,10 +228,15 @@ const Cropper = ({
       mediaSizeInfos.imgQuad,
     );
 
-    if (!isEqual(cropData, cropDataCurrentValue)) {
+    if (!isEqual(cropData, cropDataCurrentValid)) {
+      //We need to send the parameters to the parent callback
+      if (onCropDataChange) {
+        onCropDataChange(cropDataCurrentValid);
+      }
       // TODO crop animation
-      setCropDataCurrentValue(cropData);
+      setCropDataCurrentValue(cropDataCurrentValid);
     }
+
     return cropDataCurrentValue;
   }, [
     cropDataCurrentValue,
@@ -238,6 +244,8 @@ const Cropper = ({
     mediaSizeInfos.width,
     mediaSizeInfos.height,
     mediaSizeInfos.imgQuad,
+    cropData,
+    onCropDataChange,
   ]);
 
   const panGesture = useMemo(
