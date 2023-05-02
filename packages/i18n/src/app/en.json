@@ -267,10 +267,6 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Terms of service "
   },
-  "GlD8Yj": {
-    "defaultMessage": "Add",
-    "description": "ColorPicker component Add Color button label"
-  },
   "GsE7SA": {
     "defaultMessage": "Welcome!",
     "description": "Signup Screen - Welcome title"
@@ -410,6 +406,10 @@
   "SmWLhs": {
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"
+  },
+  "Sy9kWZ": {
+    "defaultMessage": "Done",
+    "description": "ColorPicker component Done Color button label"
   },
   "T3U4SY": {
     "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",

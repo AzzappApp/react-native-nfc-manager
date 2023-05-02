@@ -84,7 +84,10 @@ const ColorPicker = ({
   const onSaveNewColor = useCallback(() => {
     previouslySelectedColor.current = null;
     //be sure color is uniq (no duplicate)
-    if (colorList?.findIndex(c => c === selectedColor) === -1) {
+    if (
+      colorList == null ||
+      colorList?.findIndex(c => c === selectedColor) === -1
+    ) {
       onUpdateColorList(
         colorList ? [...colorList, selectedColor] : [selectedColor],
       );
@@ -162,8 +165,8 @@ const ColorPicker = ({
                   description: 'ColorPicker component Done button label',
                 })
               : intl.formatMessage({
-                  defaultMessage: 'Add',
-                  description: 'ColorPicker component Add Color button label',
+                  defaultMessage: 'Done',
+                  description: 'ColorPicker component Done Color button label',
                 })
           }
           onPress={

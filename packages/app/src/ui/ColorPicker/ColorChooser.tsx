@@ -1,4 +1,6 @@
 import chroma from 'chroma-js';
+import clamp from 'lodash/clamp';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import HuePicker from './HuePicker';
 import RGBHexColorPicker from './RGBHexColorPicker';
@@ -12,32 +14,54 @@ export type ColorChooserProps = {
 };
 
 const ColorChooser = ({ value, onChangeColor, style }: ColorChooserProps) => {
-  const [hue, saturation, val] = hexToHSV(value);
-  const onSatValChange = ([saturation, val]: [number, number]) => {
-    onChangeColor(chroma.hsv(hue, saturation, val).hex());
+  const [hsv, setHsv] = useState({
+    hue: hexToHSV(value)[0],
+    saturation: hexToHSV(value)[1],
+    value: hexToHSV(value)[2],
+  });
+  const onSatValChange = ([saturation, value]: [number, number]) => {
+    setHsv(prev => {
+      return {
+        ...prev,
+        saturation: clamp(saturation, 0, 1),
+        value: clamp(value, 0, 1),
+      };
+    });
+    onChangeColor(chroma.hsv(hsv.hue, saturation, value).hex());
   };
 
   const onHueChange = (hue: number) => {
-    // Overwrite to provide pure hue color #275
-    onChangeColor(chroma.hsl(hue, 1, 0.5).hex());
+    setHsv(prev => {
+      return { ...prev, hue };
+    });
+    onChangeColor(chroma.hsv(hue, hsv.saturation, hsv.value).hex());
   };
 
   const onHexChange = (hex: string) => {
+    setHsv({
+      hue: hexToHSV(hex)[0],
+      saturation: hexToHSV(hex)[1],
+      value: hexToHSV(hex)[2],
+    });
     onChangeColor(hex);
   };
 
   return (
     <View style={[style]}>
       <SaturationValuePicker
-        hue={hue}
-        value={[saturation, val]}
+        hue={hsv.hue}
+        value={[hsv.saturation, hsv.value]}
         onChange={onSatValChange}
         style={styles.saturationValuePicker}
       />
-      <HuePicker value={hue} onChange={onHueChange} style={styles.huePicker} />
+      <HuePicker
+        value={hsv.hue}
+        onChange={onHueChange}
+        style={styles.huePicker}
+      />
       <RGBHexColorPicker
-        hue={hue}
-        value={[saturation, val]}
+        hue={hsv.hue}
+        value={[hsv.saturation, hsv.value]}
         onChange={onHexChange}
       />
     </View>
