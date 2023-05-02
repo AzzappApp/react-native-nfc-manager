@@ -20,7 +20,9 @@ const PostContentStep = () => {
         description: 'Publish button action Post Content Screen',
       })}
       topPanel={<ImagePickerMediaRenderer />}
-      bottomPanel={<PostContentPanel />}
+      bottomPanel={({ insetBottom, insetTop }) => (
+        <PostContentPanel insetBottom={insetBottom} insetTop={insetTop} />
+      )}
     />
   );
 };

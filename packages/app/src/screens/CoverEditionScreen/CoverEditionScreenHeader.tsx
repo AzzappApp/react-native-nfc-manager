@@ -1,7 +1,6 @@
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
-import Button from '#ui/Button';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
 
 export type CoverEditionScreenHeaderProps = {
@@ -37,14 +36,13 @@ const CoverEditionScreenHeader = ({
       }
       leftElement={
         !cropEditionMode ? (
-          <Button
+          <HeaderButton
             variant="secondary"
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
               description: 'Cancel button label in cover edition screen',
             })}
-            style={styles.buttons}
           />
         ) : null
       }
@@ -66,14 +64,13 @@ const CoverEditionScreenHeader = ({
             onPress={onNextOrientation}
           />
         ) : (
-          <Button
+          <HeaderButton
             disabled={!canSave}
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Save button label in cover edition screen',
             })}
-            style={styles.buttons}
           />
         )
       }
@@ -82,11 +79,3 @@ const CoverEditionScreenHeader = ({
 };
 
 export default CoverEditionScreenHeader;
-
-const styles = StyleSheet.create({
-  buttons: {
-    width: 74,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 0,
-  },
-});

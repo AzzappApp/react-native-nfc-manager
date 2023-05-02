@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import * as mime from 'react-native-mime-types';
-import { graphql, useMutation } from 'react-relay';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   SelectImageStep,
@@ -12,15 +12,31 @@ import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { PostCreationScreen_viewer$key } from '@azzapp/relay/artifacts/PostCreationScreen_viewer.graphql';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
 import type { Observable } from 'relay-runtime';
 
 const POST_MAX_DURATION = 15;
 
-const PostCreationScreen = () => {
+type PostCreationScreenProps = {
+  viewer: PostCreationScreen_viewer$key;
+};
+
+const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
+
+  const { profile } = useFragment(
+    graphql`
+      fragment PostCreationScreen_viewer on Viewer {
+        profile {
+          ...AuthorCartoucheFragment_profile
+        }
+      }
+    `,
+    viewerKey,
+  );
 
   const router = useRouter();
   const onCancel = () => {
@@ -114,9 +130,15 @@ const PostCreationScreen = () => {
       setAllowLikes,
       setAllowComments,
       setContent,
+      profile,
     }),
-    [allowComments, allowLikes, content],
+    [allowComments, allowLikes, content, profile],
   );
+
+  if (!profile) {
+    // TODO redirect to login ?
+    return null;
+  }
 
   return (
     <PostCreationScreenContext.Provider value={contextValue}>

@@ -1,11 +1,5 @@
 import { flushPromises } from '@azzapp/shared/jestHelpers';
-import {
-  render,
-  screen,
-  act,
-  fireEvent,
-  waitForElementToBeRemoved,
-} from '#helpers/testHelpers';
+import { render, screen, act, fireEvent } from '#helpers/testHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
 import ImagePicker from '..';
 import type { ImagePickerProps } from '../ImagePicker';
@@ -374,8 +368,6 @@ describe('ImagePicker', () => {
       const button = screen.getByText('Next').parent!;
       fireEvent.press(button);
     });
-    //waiting for the previous `Component` step to be full removed.
-    await waitForElementToBeRemoved(() => screen.queryByTestId('media-list'));
   };
 
   describe('EditImageStep', () => {

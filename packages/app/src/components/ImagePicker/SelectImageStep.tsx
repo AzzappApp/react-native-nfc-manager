@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -19,7 +18,6 @@ import CameraControlPanel from '../CameraControlPanel';
 import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
 import AlbumPicker from './AlbumPicker';
-import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
@@ -177,10 +175,6 @@ const SelectImageStep = ({
 
   // #region display logic
   const intl = useIntl();
-  const { bottom: safeAreaBottom } = useSafeAreaInsets();
-  const marginBottom =
-    (safeAreaBottom > 0 ? safeAreaBottom : TOOL_BAR_BOTTOM_MARGIN) +
-    BOTTOM_MENU_HEIGHT;
 
   const tabs = useMemo(() => {
     const tabs: FooterBarItem[] = [
@@ -267,7 +261,7 @@ const SelectImageStep = ({
             />
           ) : null
         }
-        bottomPanel={
+        bottomPanel={({ insetBottom }) =>
           pickerMode === 'gallery' ? (
             <PhotoGalleryMediaList
               selectedMediaID={media?.galleryUri}
@@ -276,6 +270,9 @@ const SelectImageStep = ({
               onGalleryPermissionFail={onGalleryPermissionFail}
               kind={kind}
               style={{ flex: 1 }}
+              contentContainerStyle={{
+                paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+              }}
             />
           ) : (
             <CameraControlPanel
@@ -287,9 +284,7 @@ const SelectImageStep = ({
               ready={cameraInitialized}
               style={[
                 styles.cameraControlPanel,
-                {
-                  marginBottom,
-                },
+                { marginBottom: insetBottom + BOTTOM_MENU_HEIGHT },
               ]}
             />
           )

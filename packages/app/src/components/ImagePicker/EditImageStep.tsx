@@ -1,21 +1,19 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
+import TitleWithLine from '#ui/TitleWithLine';
 import FilterSelectionList from '../FilterSelectionList';
 import { useEditionParametersDisplayInfos } from '../gpu';
 import ImageEditionFooter from '../ImageEditionFooter';
 import ImageEditionParameterControl from '../ImageEditionParameterControl';
 import ImageEditionParametersList from '../ImageEditionParametersList';
 import VideoTimelineEditor from '../VideoTimelineEditor';
-import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
@@ -98,10 +96,7 @@ const EditImageStep = () => {
   }, [editionParameters.orientation, onParameterValueChange]);
 
   const intl = useIntl();
-  const { bottom: safeAreaBottom } = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
-  const bottomMargin =
-    safeAreaBottom > 0 ? safeAreaBottom : TOOL_BAR_BOTTOM_MARGIN;
   const isEditing = !!editedParameter;
   const paramsInfos = useEditionParametersDisplayInfos();
 
@@ -180,57 +175,40 @@ const EditImageStep = () => {
           )}
         </ImagePickerMediaRenderer>
       }
-      bottomPanel={
+      bottomPanel={({ insetBottom }) =>
         editedParameter === null ? (
           <View
             style={{
               flex: 1,
-              marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT,
+              marginTop: 20,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
             }}
           >
             {currentTab === 'filter' && (
-              <TabsBar
-                currentTab="filter"
-                tabs={[
-                  {
-                    tabKey: 'filter',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Filters',
-                      description:
-                        'Title of the filters section in Image edition wizzard',
-                    }),
-                  },
-                ]}
+              <TitleWithLine
+                title={intl.formatMessage({
+                  defaultMessage: 'Filters',
+                  description:
+                    'Title of the filters section in Image edition wizzard',
+                })}
               />
             )}
             {currentTab === 'edit' && (
-              <TabsBar
-                currentTab="filter"
-                tabs={[
-                  {
-                    tabKey: 'filter',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Adjust',
-                      description:
-                        'Title of the adjust section in Image edition wizzard',
-                    }),
-                  },
-                ]}
+              <TitleWithLine
+                title={intl.formatMessage({
+                  defaultMessage: 'Adjust',
+                  description:
+                    'Title of the adjust section in Image edition wizzard',
+                })}
               />
             )}
             {currentTab === 'timeRange' && (
-              <TabsBar
-                currentTab="filter"
-                tabs={[
-                  {
-                    tabKey: 'filter',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Cut Video',
-                      description:
-                        'Title of the cut video section in Image edition wizzar',
-                    }),
-                  },
-                ]}
+              <TitleWithLine
+                title={intl.formatMessage({
+                  defaultMessage: 'Cut Video',
+                  description:
+                    'Title of the cut video section in Image edition wizzar',
+                })}
               />
             )}
             <View style={styles.contentContainer}>
@@ -281,7 +259,7 @@ const EditImageStep = () => {
           <View
             style={{
               flex: 1,
-              paddingBottom: bottomMargin,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
             }}
           >
             {editedParameter === 'cropData' ? (

@@ -1,29 +1,21 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
-import Button from '#ui/Button';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import useEditorLayout from '#hooks/useEditorLayout';
+import BottomMenu from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import FadeSwitch from '#ui/FadeSwitch';
 import Header from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
-import { TOOL_BAR_BOTTOM_MARGIN } from './imagePickerConstants';
 import type { BottomMenuProps } from '#ui/BottomMenu';
 import type { ReactElement, ReactNode, ComponentType } from 'react';
-import type { ViewProps, LayoutChangeEvent } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type ImagePickerStepDefinition = {
   /**
@@ -60,7 +52,13 @@ export type ImagePickerStepDefinition = {
   /**
    * the content to display in the bottom panel of the image picker
    */
-  bottomPanel: ReactNode;
+  bottomPanel:
+    | ReactNode
+    | ((metrics: {
+        insetBottom: number;
+        insetTop: number;
+        height: number;
+      }) => ReactNode);
   /**
    * the props of the toolbar to display, if null, no toolbar is displayed
    */
@@ -137,7 +135,6 @@ type ImagePickerWizardRendererProps = ImagePickerStepDefinition &
   };
 
 const ImagePickerWizardRenderer = ({
-  stepId,
   headerLeftButton,
   headerRightButton,
   headerTitle,
@@ -156,20 +153,18 @@ const ImagePickerWizardRenderer = ({
   style,
   ...props
 }: ImagePickerWizardRendererProps) => {
-  const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
   const intl = useIntl();
   let leftButton = headerLeftButton;
   if (!leftButton) {
     if (isFirstStep && canCancel) {
       leftButton = (
-        <Button
+        <HeaderButton
           label={intl.formatMessage({
             defaultMessage: 'Cancel',
             description: 'Cancel button label in image picker wizzard',
           })}
           onPress={onBack}
-          variant="cancel"
+          variant="secondary"
         />
       );
     } else if (!preventNavigation) {
@@ -189,7 +184,7 @@ const ImagePickerWizardRenderer = ({
   let rightButton = headerRightButton;
   if (!rightButton && !preventNavigation) {
     rightButton = (
-      <Button
+      <HeaderButton
         label={
           headerRightButtonTitle
             ? headerRightButtonTitle
@@ -208,25 +203,8 @@ const ImagePickerWizardRenderer = ({
     );
   }
 
-  const marginBottom =
-    safeAreaBottom > 0
-      ? safeAreaBottom
-      : TOOL_BAR_BOTTOM_MARGIN + (menuBarProps ? BOTTOM_MENU_HEIGHT : 0);
-
-  //this is the maximum height of the top panel when top and bottom are not absolute view
-
-  const [heightTopPanel, setHeightTopPanel] = useState(0);
-  const onLayout = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-      setHeightTopPanel(
-        Math.min(
-          width,
-          layout.height - marginBottom - BOTTOM_PANEL_MININAL_SIZE,
-        ),
-      );
-    },
-    [marginBottom, width],
-  );
+  const { insetBottom, bottomPanelHeight, insetTop, topPanelHeight } =
+    useEditorLayout({ topPanelAspectRatio: 1 });
 
   if (busy) {
     rightButton = <ActivityIndicator style={styles.activityIndicator} />;
@@ -234,7 +212,7 @@ const ImagePickerWizardRenderer = ({
 
   return (
     <Container
-      style={[styles.root, { paddingTop: safeAreaTop }, style]}
+      style={[styles.root, { paddingTop: insetTop }, style]}
       {...props}
     >
       <Header
@@ -244,51 +222,26 @@ const ImagePickerWizardRenderer = ({
         style={styles.header}
       />
 
-      <View onLayout={onLayout} style={{ flex: 1 }}>
-        <FadeSwitch transitionDuration={130} currentKey={stepId}>
-          <View
-            style={[
-              {
-                minHeight: heightTopPanel,
-                flex: 1,
-                maxHeight: width,
-              },
-            ]}
-          >
-            {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
-          </View>
-          <View
-            style={{
-              minHeight: BOTTOM_PANEL_MININAL_SIZE + marginBottom,
-              flex: 1,
-              flexShrink: 0,
-            }}
-          >
-            {bottomPanel}
-          </View>
-          {menuBarProps && (
-            <View
-              style={[
-                styles.tabBarContainer,
-                {
-                  bottom:
-                    safeAreaBottom > 0
-                      ? safeAreaBottom
-                      : TOOL_BAR_BOTTOM_MARGIN,
-                },
-              ]}
-              pointerEvents="box-none"
-            >
-              <BottomMenu {...menuBarProps} />
-            </View>
-          )}
-        </FadeSwitch>
+      <View style={{ height: topPanelHeight }}>
+        {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
       </View>
+      <View style={{ height: bottomPanelHeight }}>
+        {typeof bottomPanel === 'function'
+          ? bottomPanel({
+              insetBottom,
+              insetTop,
+              height: bottomPanelHeight,
+            })
+          : bottomPanel}
+      </View>
+      {menuBarProps && (
+        <View style={[styles.bottomMenuContainer, { bottom: insetBottom }]}>
+          <BottomMenu {...menuBarProps} />
+        </View>
+      )}
     </Container>
   );
 };
-
-const BOTTOM_PANEL_MININAL_SIZE = 183;
 
 const styles = StyleSheet.create({
   root: {
@@ -303,8 +256,7 @@ const styles = StyleSheet.create({
   topPanel: {
     flex: 1,
   },
-
-  tabBarContainer: {
+  bottomMenuContainer: {
     position: 'absolute',
     alignItems: 'center',
     width: '100%',

@@ -16,6 +16,4 @@ export {
   useImagePickerState,
 };
 
-export * from './imagePickerConstants';
-
 export type { ImagePickerResult };

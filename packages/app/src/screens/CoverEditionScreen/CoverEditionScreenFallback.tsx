@@ -23,18 +23,18 @@ const CoverEditionScreenFallback = ({
 }: CoverEditionScreenFallbackProps) => {
   const {
     windowWidth,
-    topMargin,
+    insetTop,
     topPanelHeight,
     coverHeight,
     topPanelButtonsTop,
-    bottomMargin,
+    insetBottom,
   } = useCoverEditionLayout();
 
   const coverBorderRadius = COVER_CARD_RADIUS * coverHeight * COVER_RATIO;
 
   const styles = useStyleSheet(stylesheet);
   return (
-    <Container style={[{ flex: 1, paddingTop: topMargin }, style]}>
+    <Container style={[{ flex: 1, paddingTop: insetTop }, style]}>
       <CoverEditionScreenHeader
         isCreation={isCreation ?? true}
         canSave={false}
@@ -82,7 +82,7 @@ const CoverEditionScreenFallback = ({
           position: 'absolute',
           left: 10,
           right: 10,
-          bottom: bottomMargin,
+          bottom: insetBottom,
           width: windowWidth - 20,
         }}
       />

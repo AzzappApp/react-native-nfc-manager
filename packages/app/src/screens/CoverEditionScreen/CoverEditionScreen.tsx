@@ -1105,8 +1105,8 @@ const CoverEditionScreen = ({
     topPanelHeight,
     coverHeight,
     topPanelButtonsTop,
-    topMargin,
-    bottomMargin,
+    insetTop,
+    insetBottom,
     bottomSheetHeights,
   } = useCoverEditionLayout();
 
@@ -1122,7 +1122,7 @@ const CoverEditionScreen = ({
       <KeyboardAvoidingView
         contentContainerStyle={[
           styles.keyboardAvoidingView,
-          { paddingTop: topMargin },
+          { paddingTop: insetTop },
         ]}
         behavior="position"
       >
@@ -1247,6 +1247,10 @@ const CoverEditionScreen = ({
                   editionParameters={editionParameters}
                   onReady={onTemplatesReady}
                   onError={onMediaError}
+                  style={styles.bottomPanelTab}
+                  contentContainerStyle={{
+                    paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  }}
                 />
               ),
             },
@@ -1266,7 +1270,7 @@ const CoverEditionScreen = ({
                   onStartParameterEdition={onStartParameterEdition}
                   style={[
                     styles.bottomPanelTab,
-                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
+                    { marginBottom: insetBottom + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1289,7 +1293,7 @@ const CoverEditionScreen = ({
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
                     styles.bottomPanelTab,
-                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
+                    { marginBottom: insetBottom + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1306,7 +1310,7 @@ const CoverEditionScreen = ({
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
                     styles.bottomPanelTab,
-                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
+                    { marginBottom: insetBottom + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1323,7 +1327,7 @@ const CoverEditionScreen = ({
                   bottomSheetHeights={bottomSheetHeights}
                   style={[
                     styles.bottomPanelTab,
-                    { marginBottom: bottomMargin + BOTTOM_MENU_HEIGHT },
+                    { marginBottom: insetBottom + BOTTOM_MENU_HEIGHT },
                   ]}
                 />
               ),
@@ -1336,7 +1340,7 @@ const CoverEditionScreen = ({
           onItemPress={navigateToPanel}
           style={[
             styles.tabsBar,
-            { bottom: bottomMargin, width: windowWidth - 20 },
+            { bottom: insetBottom, width: windowWidth - 20 },
           ]}
         />
         {editedParameter != null && (
@@ -1345,7 +1349,7 @@ const CoverEditionScreen = ({
               {
                 position: 'absolute',
                 bottom: 0,
-                paddingBottom: bottomMargin,
+                paddingBottom: insetBottom,
                 width: windowWidth,
                 height: bottomPanelHeight - 10,
               },

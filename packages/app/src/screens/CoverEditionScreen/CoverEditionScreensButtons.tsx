@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import type { StyleProp, ViewStyle } from 'react-native/types';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 export type CoverEditionScreensButton = {
   onPress?: () => void;

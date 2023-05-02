@@ -3,16 +3,14 @@ import { useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import PressableNative from '#ui/PressableNative';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
-import Text from '#ui/Text';
+import TitleWithLine from '#ui/TitleWithLine';
 import {
   COVER_TEMPLATE_MINIATURE_RATIO,
   TEMPLATE_BORDER_WIDTH,
@@ -26,12 +24,13 @@ import type {
 } from '@azzapp/relay/artifacts/CoverModelsEditionPanel_categories.graphql';
 
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from 'react-native';
+import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type Category = ArrayItemType<CoverModelsEditionPanel_categories$data>;
 type Template = ArrayItemType<Category['templates']>;
 
-type CoverModelsEditionPanelProps = {
+type CoverModelsEditionPanelProps = Omit<ViewProps, 'children'> & {
   categories: CoverModelsEditionPanel_categories$key;
   /**
    * Source Media to Override the Source Media of the template
@@ -64,6 +63,8 @@ type CoverModelsEditionPanelProps = {
    * callback called when the component is ready
    */
   onError?: () => void;
+
+  contentContainerStyle?: StyleProp<ViewStyle>;
 };
 
 const CoverModelsEditionPanel = ({
@@ -79,6 +80,8 @@ const CoverModelsEditionPanel = ({
   editionParameters,
   onReady,
   onError,
+  contentContainerStyle,
+  ...props
 }: CoverModelsEditionPanelProps) => {
   const categories = useFragment(
     graphql`
@@ -130,7 +133,6 @@ const CoverModelsEditionPanel = ({
   const templateItemWidth = coverWidth + 2 * TEMPLATE_BORDER_WIDTH - 0.5;
   const templateItemHeight = coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
   const rowHeight = TAB_BAR_HEIGHT + coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
-  const { bottom: insetBottom } = useSafeAreaInsets();
 
   const appearanceStyle = useStyleSheet(computedStyle);
   const intl = useIntl();
@@ -208,6 +210,7 @@ const CoverModelsEditionPanel = ({
       kind,
       maskUri,
       onSelectTemplate,
+      onTemplateError,
       onTemplateReady,
       selectedTemplateId,
       subTitle,
@@ -231,13 +234,7 @@ const CoverModelsEditionPanel = ({
   const renderCategory = useCallback(
     ({ item }: ListRenderItemInfo<Category>) => (
       <View style={{ height: rowHeight }}>
-        <View style={styles.categoryHeader}>
-          <View style={appearanceStyle.backgroundLine} />
-          <Text variant="smallbold" style={styles.categoryTitle}>
-            {item.category}
-          </Text>
-          <View style={appearanceStyle.backgroundLine} />
-        </View>
+        <TitleWithLine title={item.category} />
         <FlatList
           data={item.templates}
           renderItem={renderTemplate}
@@ -250,16 +247,11 @@ const CoverModelsEditionPanel = ({
         />
       </View>
     ),
-    [
-      appearanceStyle.backgroundLine,
-      getItemLayoutTemplate,
-      renderTemplate,
-      rowHeight,
-    ],
+    [getItemLayoutTemplate, renderTemplate, rowHeight],
   );
 
   return (
-    <View style={[styles.root, { width: windowWidth }]}>
+    <View {...props}>
       <MaskedView
         maskElement={
           <LinearGradient
@@ -279,10 +271,7 @@ const CoverModelsEditionPanel = ({
           data={categories}
           keyExtractor={keyExtractorCategory}
           getItemLayout={getItemLayoutCategory}
-          contentContainerStyle={{
-            paddingBottom:
-              BOTTOM_MENU_HEIGHT + (insetBottom > 0 ? insetBottom : 15) + 10,
-          }}
+          contentContainerStyle={contentContainerStyle}
           style={styles.templateList}
         />
       </MaskedView>
@@ -305,19 +294,9 @@ const computedStyle = createStyleSheet(appearance => ({
     shadowOffset: { width: 0, height: 4.69 },
     shadowRadius: 18.75,
   },
-  backgroundLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    alignSelf: 'center',
-  },
 }));
 
 const styles = StyleSheet.create({
-  root: {
-    paddingTop: 10,
-    flex: 1,
-  },
   templateList: {
     overflow: 'visible',
   },
@@ -327,14 +306,5 @@ const styles = StyleSheet.create({
   },
   templateContainer: {
     borderWidth: TEMPLATE_BORDER_WIDTH,
-  },
-  categoryHeader: {
-    flexDirection: 'row',
-    height: TAB_BAR_HEIGHT,
-    alignItems: 'center',
-  },
-  categoryTitle: {
-    paddingHorizontal: 15,
-    textAlign: 'center',
   },
 });

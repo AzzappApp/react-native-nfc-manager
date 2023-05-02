@@ -1,8 +1,6 @@
 import { memo, useContext, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLazyLoadQuery, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import Button from '#ui/Button';
@@ -13,10 +11,19 @@ import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import PostCreationScreenContext from './PostCreationScreenContext';
-import type { PostContentPanelQuery } from '@azzapp/relay/artifacts/PostContentPanelQuery.graphql';
+import type { ViewProps } from 'react-native';
 
-const PostContentPanel = () => {
-  const { bottom: safeAreaBottom } = useSafeAreaInsets();
+type PostContentPanelProps = Omit<ViewProps, 'children'> & {
+  insetBottom: number;
+  insetTop: number;
+};
+
+const PostContentPanel = ({
+  style,
+  insetBottom,
+  insetTop,
+  ...props
+}: PostContentPanelProps) => {
   const {
     allowLikes,
     allowComments,
@@ -24,19 +31,8 @@ const PostContentPanel = () => {
     setAllowLikes,
     setAllowComments,
     setContent,
+    profile,
   } = useContext(PostCreationScreenContext);
-  const { viewer } = useLazyLoadQuery<PostContentPanelQuery>(
-    graphql`
-      query PostContentPanelQuery {
-        viewer {
-          profile {
-            ...AuthorCartoucheFragment_profile
-          }
-        }
-      }
-    `,
-    {},
-  );
 
   const [showContentModal, setShowContentModal] = useState(false);
   const onFocus = () => {
@@ -51,25 +47,17 @@ const PostContentPanel = () => {
     description: 'Post creation screen textarea placeholder',
   });
 
-  const { top: safeAreaTop } = useSafeAreaInsets();
-
   return (
     <>
       <View
-        style={[
-          styles.container,
-          {
-            marginBottom: safeAreaBottom > 0 ? safeAreaBottom : 15,
-          },
-        ]}
+        style={[styles.container, { marginBottom: insetBottom + 10 }, style]}
+        {...props}
       >
-        {viewer?.profile && (
-          <AuthorCartouche
-            author={viewer.profile}
-            variant="createPost"
-            style={{ paddingLeft: 0 }}
-          />
-        )}
+        <AuthorCartouche
+          author={profile!}
+          variant="createPost"
+          style={{ paddingLeft: 0 }}
+        />
         <View style={styles.settingsContainer}>
           <View style={styles.switchContainer}>
             <Icon icon="like" style={styles.switchIcon} />
@@ -112,7 +100,7 @@ const PostContentPanel = () => {
           <Header
             style={{
               backgroundColor: 'white',
-              marginTop: safeAreaTop,
+              marginTop: insetTop,
               marginBottom: 10,
             }}
             middleElement={intl.formatMessage({
@@ -130,7 +118,10 @@ const PostContentPanel = () => {
               />
             }
           />
-          <KeyboardAvoidingView behavior="height" style={styles.contentModal}>
+          <KeyboardAvoidingView
+            behavior="height"
+            style={[styles.contentModal, { paddingBottom: insetBottom }]}
+          >
             <View style={styles.textArea}>
               <TextInput
                 multiline
@@ -187,7 +178,6 @@ const styles = StyleSheet.create({
   modal: {
     flex: 1,
   },
-
   contentModal: {
     flex: 1,
     backgroundColor: `${colors.black}AA`,

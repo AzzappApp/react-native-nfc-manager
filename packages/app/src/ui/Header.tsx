@@ -1,21 +1,21 @@
 import { StyleSheet, View } from 'react-native';
 import Text from '#ui/Text';
 import Container from './Container';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
 export type HeaderProps = ViewProps & {
   /**
    * The title to display in the header.
    */
-  middleElement?: ReactNode | null;
+  middleElement?: ReactNode;
   /**
    * The left button to display in the header.
    */
-  leftElement?: ReactElement | null;
+  leftElement?: ReactNode;
   /**
    * The right button to display in the header.
    */
-  rightElement?: ReactElement | null;
+  rightElement?: ReactNode;
 
   /**
    * The style to apply to the header.
