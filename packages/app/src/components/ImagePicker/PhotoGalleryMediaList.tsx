@@ -48,6 +48,9 @@ type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
    * Called when the user denies the gallery permission.
    */
   onGalleryPermissionFail: () => void;
+
+  /**autoSelectFirstItem */
+  autoSelectFirstItem?: boolean;
 };
 
 /**
@@ -60,6 +63,7 @@ const PhotoGalleryMediaList = ({
   kind,
   onMediaSelected,
   onGalleryPermissionFail,
+  autoSelectFirstItem = true,
   ...props
 }: PhotoGalleryMediaListProps) => {
   const [medias, setMedias] = useState<Array<PhotoIdentifier['node']>>([]);
@@ -187,6 +191,13 @@ const PhotoGalleryMediaList = ({
 
     [onMediaPress, selectedMediaID, windowWidth],
   );
+
+  //should select the first media when the list if no media is selected
+  useEffect(() => {
+    if (autoSelectFirstItem && selectedMediaID == null && medias?.length > 0) {
+      void onMediaPress(medias[0]);
+    }
+  }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaID]);
 
   return (
     <FlatList

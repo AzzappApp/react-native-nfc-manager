@@ -1,3 +1,4 @@
+import clamp from 'lodash/clamp';
 import {
   createContext,
   forwardRef,
@@ -65,10 +66,15 @@ export type ImagePickerState = {
    */
   onMediaChange(media: Media, aspectRatio?: number | null | undefined): void;
   /**
+   * a emthod to clear the selected media
+   *
+   */
+  clearMedia(): void;
+  /**
    * an event dispatched by picker step when the desired aspect ratio is changed
    * @param value the new aspect ratio
    */
-  onAspectRatioChange(value: number): void;
+  onAspectRatioChange(value: number | null): void;
   /**
    * an event dispatched by picker step to select a new time range in the video
    * @param timeRange the new time range
@@ -185,8 +191,14 @@ const _ImagePickerContextProvider = (
     [forceAspectRatio, onMediaChangeProps],
   );
 
+  const clearMedia = useCallback(() => {
+    setMedia(null);
+    onMediaChangeProps?.(null);
+    setAspectRatio(null);
+  }, [onMediaChangeProps]);
+
   const onAspectRatioChange = useCallback(
-    (aspectRatio: number | undefined) => {
+    (aspectRatio: number | null | undefined) => {
       if (!media) {
         setAspectRatio(aspectRatio ?? null);
         return;
@@ -256,6 +268,7 @@ const _ImagePickerContextProvider = (
       onTimeRangeChange,
       onMediaFilterChange: setMediaFilter,
       forceCameraRatio,
+      clearMedia,
     }),
     [
       kind,
@@ -272,6 +285,7 @@ const _ImagePickerContextProvider = (
       onParameterValueChange,
       onTimeRangeChange,
       forceCameraRatio,
+      clearMedia,
     ],
   );
 
@@ -298,7 +312,15 @@ const getMediaAspectRatio = (
   orientation?: ImageOrientation | null,
 ) => {
   const aspectRatio = media.width / media.height;
-  return orientation === 'LEFT' || orientation === 'RIGHT'
-    ? 1 / aspectRatio
-    : aspectRatio;
+  return clampAspectRatio(
+    orientation === 'LEFT' || orientation === 'RIGHT'
+      ? 1 / aspectRatio
+      : aspectRatio,
+  );
 };
+
+const MAX_ASPECT_RATIO = 2;
+const MIN_ASPECT_RATIO = 0.5;
+
+const clampAspectRatio = (aspectRatio: number) =>
+  clamp(aspectRatio, MIN_ASPECT_RATIO, MAX_ASPECT_RATIO);

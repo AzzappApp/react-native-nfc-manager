@@ -1,4 +1,3 @@
-import clamp from 'lodash/clamp';
 import React, {
   Fragment,
   useCallback,
@@ -51,6 +50,7 @@ const SelectImageStep = ({
     aspectRatio,
     onMediaChange,
     onAspectRatioChange,
+    clearMedia,
   } = useImagePickerState();
 
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
@@ -61,10 +61,7 @@ const SelectImageStep = ({
     if (!media) {
       return;
     }
-    const { width, height } = media;
-    onAspectRatioChange(
-      aspectRatio === 1 ? clampAspectRatio(width / height) : 1,
-    );
+    onAspectRatioChange(aspectRatio === 1 ? null : 1);
   };
 
   const [album, setAlbum] = useState<string | null>(null);
@@ -84,8 +81,21 @@ const SelectImageStep = ({
     setHasGalleryPermision(false);
   };
 
+  const onChangePickerMode = useCallback(
+    (mode: 'gallery' | 'photo' | 'video') => {
+      //we need to discard the current media if we switch from gallery to video/photo(to desactive the next button)
+      if (pickerMode === 'gallery') {
+        clearMedia();
+      }
+      setPickerMode(mode);
+      //TODO: the current behaviour is to directly go to the EditStep when taking a picture,discuss with Nico is alert is needed (and dont directly go to the next step)
+    },
+    [clearMedia, pickerMode],
+  );
+
   const onCameraPermissionModalClose = () => {
     if (hasGalleryPermission) {
+      onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
       setPermissionDenied(true);
@@ -291,7 +301,7 @@ const SelectImageStep = ({
         }
         menuBarProps={{
           currentTab: pickerMode,
-          onItemPress: setPickerMode as any,
+          onItemPress: onChangePickerMode as any,
           tabs,
         }}
       />
@@ -311,12 +321,6 @@ const SelectImageStep = ({
 SelectImageStep.STEP_ID = 'SELECT_IMAGE';
 
 export default SelectImageStep;
-
-const clampAspectRatio = (aspectRatio: number) =>
-  clamp(aspectRatio, MIN_ASPECT_RATIO, MAX_ASPECT_RATIO);
-
-const MAX_ASPECT_RATIO = 2;
-const MIN_ASPECT_RATIO = 0.5;
 
 const styles = StyleSheet.create({
   cameraControlPanel: {

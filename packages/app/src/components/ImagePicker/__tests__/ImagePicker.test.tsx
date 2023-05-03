@@ -537,16 +537,6 @@ describe('ImagePicker', () => {
           }),
         ]);
 
-        expect(getMedia()).toHaveProp('layers', [
-          expect.objectContaining({
-            parameters: expect.objectContaining({
-              roll: 0.5,
-              cropData: { x: 100, y: 100, width: 500, height: 800 },
-              orientation: 'RIGHT',
-            }),
-          }),
-        ]);
-
         act(() => {
           fireEvent.press(screen.getByText('Cancel').parent!);
         });
