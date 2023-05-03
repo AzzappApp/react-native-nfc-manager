@@ -251,6 +251,7 @@ const EditImageStep = () => {
                   width={windowWidth - 30}
                   imagesHeight={50}
                   style={styles.videoTimelineEditor}
+                  timeRange={timeRange}
                 />
               )}
             </View>

@@ -99,7 +99,6 @@ const PostContentPanel = ({
         <View style={styles.modal}>
           <Header
             style={{
-              backgroundColor: 'white',
               marginTop: insetTop,
               marginBottom: 10,
             }}
@@ -118,23 +117,26 @@ const PostContentPanel = ({
               />
             }
           />
-          <KeyboardAvoidingView
-            behavior="height"
-            style={[styles.contentModal, { paddingBottom: insetBottom }]}
-          >
-            <View style={styles.textArea}>
-              <TextInput
-                multiline
-                placeholder={textAraPlaceHolder}
-                value={content}
-                onChangeText={setContent}
-                autoFocus
-                maxLength={MAX_CONTENT_LENGHT}
-                onBlur={onModalClose}
-                style={{ borderWidth: 0, flex: 1 }}
-              />
-            </View>
-            <Text variant="smallbold" style={styles.counter}>
+          <KeyboardAvoidingView behavior="height" style={[styles.contentModal]}>
+            <TextInput
+              multiline
+              placeholder={textAraPlaceHolder}
+              value={content}
+              onChangeText={setContent}
+              autoFocus
+              maxLength={MAX_CONTENT_LENGHT}
+              onBlur={onModalClose}
+              style={{ borderWidth: 0, flex: 1 }}
+            />
+            <Text
+              variant="smallbold"
+              style={[
+                styles.counter,
+                content.length >= MAX_CONTENT_LENGHT && {
+                  color: colors.red400,
+                },
+              ]}
+            >
               {content?.length ?? 0} / {MAX_CONTENT_LENGHT}
             </Text>
           </KeyboardAvoidingView>

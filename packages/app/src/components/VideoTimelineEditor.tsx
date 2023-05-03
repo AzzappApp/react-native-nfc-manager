@@ -110,7 +110,9 @@ const VideoTimelineEditor = ({
     (timeRange?.startTime ?? 0) * secondPixel,
   );
   const rightPosition = useSharedValue(
-    Math.min(timeRange?.duration ?? mediaDuration, maxDuration) * secondPixel,
+    (Math.min(timeRange?.duration ?? mediaDuration, maxDuration) +
+      (timeRange?.startTime ?? 0)) *
+      secondPixel,
   );
 
   const dispatchChange = useCallback(() => {
@@ -292,7 +294,7 @@ const computedStyle = createStyleSheet(appearance => ({
     width: 6,
     top: -4,
     bottom: -4,
-    backgroundColor: appearance === 'light' ? colors.grey300 : colors.grey700,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
     borderRadius: 3,
   },
   thumbStart: {
