@@ -66,7 +66,7 @@ const ProfileScreen = ({
       },
       optimisticResponse: {
         toggleFollowing: {
-          user: {
+          profile: {
             id: profile.id,
             isFollowing: follow,
           },
