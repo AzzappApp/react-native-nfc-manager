@@ -29,6 +29,7 @@ export type LinkProps = Route & {
   replace?: boolean;
   modal?: boolean;
   children: ReactElement;
+  prefetch?: boolean;
 };
 
 const PlatformEnvironmentContext = createContext<PlatformEnvironment>(

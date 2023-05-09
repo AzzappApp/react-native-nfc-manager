@@ -35,6 +35,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
   },
+  "3+i2KR": {
+    "defaultMessage": "Category image",
+    "description": "ProfileKindStep - Category image alt"
+  },
   "428m8h": {
     "defaultMessage": "Add a color",
     "description": "ColorPicker component title when adding a color"

@@ -6,6 +6,7 @@ import ImagePicker, {
   SelectImageStep,
   EditImageStep,
 } from '#components/ImagePicker';
+import { addLocalCachedMediaFile } from '#components/medias';
 import { getFileName } from '#helpers/fileHelpers';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
@@ -111,6 +112,11 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
         },
       },
       onCompleted(response) {
+        addLocalCachedMediaFile(
+          public_id,
+          kind === 'video' ? 'video' : 'image',
+          `file://${exportedMedia.uri}`,
+        );
         // TODO use fragment instead of response
         router.replace({
           route: 'PROFILE_POSTS',

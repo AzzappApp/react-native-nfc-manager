@@ -1,5 +1,6 @@
-import { cloneElement } from 'react';
+import { cloneElement, useEffect } from 'react';
 import { useRouter } from '#PlatformEnvironment';
+import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import type { LinkProps } from '#PlatformEnvironment';
 import type { Route } from '#routes';
 import type { GestureResponderEvent } from 'react-native';
@@ -7,8 +8,23 @@ import type { GestureResponderEvent } from 'react-native';
 /**
  * Native implementation of the Link component.
  */
-const NativeLink = ({ route, params, replace, modal, children }: LinkProps) => {
+const NativeLink = ({
+  route,
+  params,
+  replace,
+  modal,
+  prefetch,
+  children,
+}: LinkProps) => {
   const router = useRouter();
+  const prefetchScreen = usePrefetchRoute();
+
+  useEffect(() => {
+    if (prefetch) {
+      prefetchScreen({ route, params } as Route);
+    }
+  }, [prefetch, prefetchScreen, route, params]);
+
   const onLinkPress = (event?: GestureResponderEvent) => {
     children.props.onPress?.(event);
     if (event?.isDefaultPrevented()) {

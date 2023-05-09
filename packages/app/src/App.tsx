@@ -15,6 +15,10 @@ import {
   signUpRoutes,
 } from '#mobileRoutes';
 import { colors } from '#theme';
+import {
+  ScreenPrefetcherProvider,
+  createScreenPrefetcher,
+} from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/userAuthState';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
@@ -43,6 +47,8 @@ import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
+import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
+import type { ROUTES } from '#routes';
 
 // #region Routing Definitions
 const screens = {
@@ -97,8 +103,8 @@ const App = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-
   const { authenticated } = useAuthState();
+
   useEffect(() => {
     if (
       !authenticated &&
@@ -110,26 +116,38 @@ const App = () => {
 
   // #endregion
 
-  // #region Relay Query Management
+  // #region Relay Query Management and Screen Prefetching
   const screenIdToDispose = useRef<string[]>([]).current;
 
+  const screenPrefetcher = useMemo(
+    () =>
+      createScreenPrefetcher(screens as Record<ROUTES, ScreenPrefetchOptions>),
+    [],
+  );
+
   useEffect(() => {
-    router.addScreenWillBePushedListener(({ id, route: { route, params } }) => {
-      const Component = screens[route];
+    router.addScreenWillBePushedListener(({ id, route }) => {
+      const Component = screens[route.route];
       if (isRelayScreen(Component)) {
-        RelayQueryManager.loadQueryFor(id, Component, params);
+        RelayQueryManager.loadQueryFor(id, Component, route.params);
       }
+      screenPrefetcher.screenWillBePushed(id, route);
     });
     router.addScreenWillBeRemovedListener(({ id }) => {
       screenIdToDispose.push(id);
+      screenPrefetcher.screenWillBeRemoved(id);
     });
-  }, [router, screenIdToDispose]);
+  }, [router, screenIdToDispose, screenPrefetcher]);
 
   const onScreenDismissed = useCallback(
     (id: string) => {
       router.screenDismissed(id);
+
+      // TODO should we not handle this in the router?
+      screenIdToDispose.push(id);
+      screenPrefetcher.screenWillBeRemoved(id);
     },
-    [router],
+    [router, screenIdToDispose, screenPrefetcher],
   );
 
   const onFinishTransitioning = useCallback(() => {
@@ -174,27 +192,29 @@ const App = () => {
 
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>
-      <SafeAreaProvider
-        initialMetrics={initialWindowMetrics}
-        style={safeAreaBackgroundStyle}
-      >
-        <IntlProvider
-          locale={locale}
-          defaultLocale={DEFAULT_LOCALE}
-          messages={langMessages}
-          onError={onIntlError}
+      <ScreenPrefetcherProvider value={screenPrefetcher}>
+        <SafeAreaProvider
+          initialMetrics={initialWindowMetrics}
+          style={safeAreaBackgroundStyle}
         >
-          <PlatformEnvironmentProvider value={platformEnvironment}>
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onScreenDismissed={onScreenDismissed}
-              onFinishTransitioning={onFinishTransitioning}
-            />
-          </PlatformEnvironmentProvider>
-        </IntlProvider>
-      </SafeAreaProvider>
+          <IntlProvider
+            locale={locale}
+            defaultLocale={DEFAULT_LOCALE}
+            messages={langMessages}
+            onError={onIntlError}
+          >
+            <PlatformEnvironmentProvider value={platformEnvironment}>
+              <ScreensRenderer
+                routerState={routerState}
+                screens={screens}
+                tabs={tabs}
+                onScreenDismissed={onScreenDismissed}
+                onFinishTransitioning={onFinishTransitioning}
+              />
+            </PlatformEnvironmentProvider>
+          </IntlProvider>
+        </SafeAreaProvider>
+      </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>
   );
 };

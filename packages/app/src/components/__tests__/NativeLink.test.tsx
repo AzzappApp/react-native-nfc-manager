@@ -14,6 +14,8 @@ jest.mock('#PlatformEnvironment', () => ({
   },
 }));
 
+jest.mock('#helpers/ScreenPrefetcher');
+
 describe('NativeLink', () => {
   afterEach(() => {
     mockRouter.push.mockReset();

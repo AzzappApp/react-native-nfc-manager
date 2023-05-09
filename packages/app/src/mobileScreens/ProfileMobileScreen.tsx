@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { useNativeNavigationEvent } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import ProfileScreen from '#screens/ProfileScreen';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -24,6 +25,21 @@ const ProfileMobileScreen = ({
     setReady(true);
   });
 
+  const prefetchScreen = usePrefetchRoute();
+  useEffect(() => {
+    const { viewer, profile } = data;
+    if (
+      viewer?.profile?.id &&
+      profile?.id &&
+      viewer.profile.id === profile.id
+    ) {
+      prefetchScreen({
+        route: 'CARD_MODULE_EDITION',
+        params: { module: 'cover' },
+      });
+    }
+  }, [data, prefetchScreen]);
+
   if (!data.profile) {
     return null;
   }
@@ -37,7 +53,13 @@ const getQuery = (params: ProfileRoute['params']) =>
 const profileScreenByIdQuery = graphql`
   query ProfileMobileScreenByIdQuery($profileID: ID!) {
     profile: node(id: $profileID) {
+      id
       ...ProfileScreen_profile
+    }
+    viewer {
+      profile {
+        id
+      }
     }
   }
 `;
@@ -45,7 +67,13 @@ const profileScreenByIdQuery = graphql`
 const profileScreenByNameQuery = graphql`
   query ProfileMobileScreenByUserNameQuery($userName: String!) {
     profile(userName: $userName) {
+      id
       ...ProfileScreen_profile
+    }
+    viewer {
+      profile {
+        id
+      }
     }
   }
 `;

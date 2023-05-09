@@ -25,6 +25,8 @@ const initialRoutes: NativeRouterInit = {
   ],
 };
 
+jest.mock('#helpers/ScreenPrefetcher');
+
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const { router } = useNativeRouter(initialRoutes);
   const platformEnvironment = useMemo(

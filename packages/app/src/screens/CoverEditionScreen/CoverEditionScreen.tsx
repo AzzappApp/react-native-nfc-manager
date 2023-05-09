@@ -33,6 +33,7 @@ import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
+import { addLocalCachedMediaFile } from '#components/medias';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
 import AnimatedCircleHint from '#ui/AnimatedCircleHint';
@@ -739,6 +740,14 @@ const CoverEditionScreen = ({
             profileID: viewer!.profile!.id,
           },
         });
+        if (mediaInput) {
+          const { id, kind } = mediaInput;
+          addLocalCachedMediaFile(
+            id,
+            kind as 'image' | 'video',
+            `file://${mediaPath!}`,
+          );
+        }
       },
       onError(e) {
         // eslint-disable-next-line no-alert
@@ -837,16 +846,18 @@ const CoverEditionScreen = ({
     if (sourceMedia && isFileURL(sourceMedia.uri) && kind === 'image') {
       setMaskComputing(true);
       segmentImage(sourceMedia.uri)
-        .then(path => {
-          if (canceled) {
-            return;
-          }
-          updateFields(['maskMedia', `file://${path}`]);
-        })
-        .catch(e => {
-          // TODO
-          console.log(e);
-        })
+        .then(
+          path => {
+            if (canceled) {
+              return;
+            }
+            updateFields(['maskMedia', `file://${path}`]);
+          },
+          e => {
+            // TODO
+            console.log(e);
+          },
+        )
         .finally(() => {
           setMaskComputing(false);
         });

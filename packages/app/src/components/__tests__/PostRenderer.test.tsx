@@ -19,7 +19,11 @@ import type { ForwardedRef } from 'react';
 
 jest.useFakeTimers();
 let mockMediaHandles: Record<string, any> = {};
-jest.mock('../medias', () => {
+
+jest.mock('#components/medias/NativeMediaImageRenderer');
+jest.mock('#components/medias/NativeMediaVideoRenderer');
+
+jest.mock('#components/medias', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function MediaVideoRenderer(

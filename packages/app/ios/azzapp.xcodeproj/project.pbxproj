@@ -21,8 +21,18 @@
 		96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */; };
 		FD14042D29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */; };
 		FD14042E29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */; };
-		FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
-		FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */; };
+		FD1404312A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
+		FD1404322A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
+		FD1404342A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */; };
+		FD1404352A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */; };
+		FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
+		FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
+		FD1404512A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */; };
+		FD1404522A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */; };
+		FD1404542A0949C000CCA6B9 /* MediaURICache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404532A0949C000CCA6B9 /* MediaURICache.swift */; };
+		FD1404552A0949C000CCA6B9 /* MediaURICache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404532A0949C000CCA6B9 /* MediaURICache.swift */; };
+		FD1EA61028B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
+		FD1EA61128B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
 		FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
@@ -33,14 +43,12 @@
 		FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD55E4BB28B53F8400321128 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */; };
 		FD55E4BC28B53F8400321128 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */; };
-		FD55E4BF28B6336700321128 /* AZPMediaVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */; };
-		FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */; };
 		FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
 		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
-		FD8F774628EC310F00E27551 /* AZPMediaHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelper.m */; };
-		FD8F774728EC310F00E27551 /* AZPMediaHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelper.m */; };
+		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
+		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FDA79D3229DD99D500E16407 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
 		FDA79D3329DD99D500E16407 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
 		FDA79D3829DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */; };
@@ -118,10 +126,15 @@
 		96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Medium.ttf"; path = "../../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CIImage+invertY.swift"; sourceTree = "<group>"; };
+		FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeline.swift; sourceTree = "<group>"; };
+		FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaVideoRendererManager.swift; sourceTree = "<group>"; };
+		FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaHelpers.swift; sourceTree = "<group>"; };
+		FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAssetCache.swift; sourceTree = "<group>"; };
+		FD1404532A0949C000CCA6B9 /* MediaURICache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURICache.swift; sourceTree = "<group>"; };
 		FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzapp-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzappTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AZPMediaImageRendererManager.swift; path = azzapp/AZPMediaImageRendererManager.swift; sourceTree = "<group>"; };
-		FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaImageRendererManager.m; path = azzapp/AZPMediaImageRendererManager.m; sourceTree = "<group>"; };
+		FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaImageRendererManager.swift; sourceTree = "<group>"; };
+		FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaImageRendererManager.m; sourceTree = "<group>"; };
 		FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPScrollToTopInterceptor.h; path = azzapp/AZPScrollToTopInterceptor.h; sourceTree = "<group>"; };
 		FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPScrollToTopInterceptor.m; path = azzapp/AZPScrollToTopInterceptor.m; sourceTree = "<group>"; };
 		FD4EC42428A54C8F00DDC5C9 /* AZPSnapshotManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshotManager.h; path = azzapp/AZPSnapshotManager.h; sourceTree = "<group>"; };
@@ -129,14 +142,10 @@
 		FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshot.h; path = azzapp/AZPSnapshot.h; sourceTree = "<group>"; };
 		FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshot.m; path = azzapp/AZPSnapshot.m; sourceTree = "<group>"; };
 		FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AppCenter-Config.plist"; path = "azzapp/AppCenter-Config.plist"; sourceTree = "<group>"; };
-		FD55E4BD28B6336700321128 /* AZPMediaVideoRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMediaVideoRenderer.h; path = azzapp/AZPMediaVideoRenderer.h; sourceTree = "<group>"; };
-		FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaVideoRenderer.m; path = azzapp/AZPMediaVideoRenderer.m; sourceTree = "<group>"; };
-		FD55E4C128B6649E00321128 /* AZPMediaVideoRendererManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMediaVideoRendererManager.h; path = azzapp/AZPMediaVideoRendererManager.h; sourceTree = "<group>"; };
-		FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaVideoRendererManager.m; path = azzapp/AZPMediaVideoRendererManager.m; sourceTree = "<group>"; };
+		FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaVideoRendererManager.m; sourceTree = "<group>"; };
 		FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPCustomReavealTransition.h; path = azzapp/AZPCustomReavealTransition.h; sourceTree = "<group>"; };
 		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPCustomReavealTransition.m; path = azzapp/AZPCustomReavealTransition.m; sourceTree = "<group>"; };
-		FD8F774428EC310F00E27551 /* AZPMediaHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPMediaHelper.h; path = azzapp/AZPMediaHelper.h; sourceTree = "<group>"; };
-		FD8F774528EC310F00E27551 /* AZPMediaHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPMediaHelper.m; path = azzapp/AZPMediaHelper.m; sourceTree = "<group>"; };
+		FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaHelpers.m; sourceTree = "<group>"; };
 		FDA79D3129DD99D500E16407 /* GPULayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayer.swift; sourceTree = "<group>"; };
 		FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayerImageLoader.swift; sourceTree = "<group>"; };
 		FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAssetTrack+orientationTransform.swift"; sourceTree = "<group>"; };
@@ -197,6 +206,7 @@
 				FDA79D7D29EEA60C00E16407 /* Utils */,
 				FDA79D7629EE8A9E00E16407 /* ReactUtils */,
 				FDA79D3A29DD9A6600E16407 /* Extensions */,
+				FD14042F2A0298A900CCA6B9 /* Medias */,
 				FDA79D3029DD993200E16407 /* GPU */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -209,20 +219,12 @@
 				FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */,
 				FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */,
 				FD55E4BA28B53F8400321128 /* AppCenter-Config.plist */,
-				FD55E4BD28B6336700321128 /* AZPMediaVideoRenderer.h */,
-				FD55E4BE28B6336700321128 /* AZPMediaVideoRenderer.m */,
-				FD55E4C128B6649E00321128 /* AZPMediaVideoRendererManager.h */,
-				FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */,
-				FD1EA60F28B8D7F400916DBC /* AZPMediaImageRendererManager.swift */,
 				FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */,
 				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
-				FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */,
 				FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */,
 				FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */,
 				FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */,
 				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */,
-				FD8F774428EC310F00E27551 /* AZPMediaHelper.h */,
-				FD8F774528EC310F00E27551 /* AZPMediaHelper.m */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -279,6 +281,22 @@
 				89C6BE57DB24E9ADA2F236DE /* Pods-azzapp-azzappTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		FD14042F2A0298A900CCA6B9 /* Medias */ = {
+			isa = PBXGroup;
+			children = (
+				FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */,
+				FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */,
+				FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */,
+				FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */,
+				FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */,
+				FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */,
+				FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */,
+				FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */,
+				FD1404532A0949C000CCA6B9 /* MediaURICache.swift */,
+			);
+			path = Medias;
 			sourceTree = "<group>";
 		};
 		FDA79D3029DD993200E16407 /* GPU */ = {
@@ -603,26 +621,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD1404352A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */,
 				FDA79D6029E0451500E16407 /* GPUFilterRegistry.swift in Sources */,
 				FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
-				FD1EA61128B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
+				FD1EA61128B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
 				FDA79D3329DD99D500E16407 /* GPULayer.swift in Sources */,
+				FD1404552A0949C000CCA6B9 /* MediaURICache.swift in Sources */,
 				FDA79D7529EE844000E16407 /* GPUViewError.swift in Sources */,
 				FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
-				FD55E4C028B6336700321128 /* AZPMediaVideoRenderer.m in Sources */,
 				FD14042E29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */,
 				FDA79D8029EEA61A00E16407 /* FileUtils.swift in Sources */,
 				FDA79D3929DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
 				FDA79D6929E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
 				FDA79D6329E4891100E16407 /* UIColor.swift in Sources */,
+				FD1404322A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
 				FDA79D3D29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
-				FD8F774728EC310F00E27551 /* AZPMediaHelper.m in Sources */,
+				FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FDA79D6629E596F400E16407 /* AZPGPUImageViewManager.m in Sources */,
 				FDA79D5D29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */,
 				FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FDA79D6C29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */,
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
+				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
+				FD1404522A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */,
 				FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
 				FDA79D7929EE8AAC00E16407 /* ReactLogger.swift in Sources */,
@@ -633,19 +655,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD1EA61028B8D7F400916DBC /* AZPMediaImageRendererManager.swift in Sources */,
+				FD1EA61028B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
 				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
 				FD14042D29FA841300CCA6B9 /* CIImage+invertY.swift in Sources */,
 				FDA79D6829E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
+				FD1404312A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
 				FDA79D3829DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
 				FDA79D7829EE8AAC00E16407 /* ReactLogger.swift in Sources */,
 				FDA79D7F29EEA61A00E16407 /* FileUtils.swift in Sources */,
 				FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
 				FDA79D6229E4891100E16407 /* UIColor.swift in Sources */,
-				FD8F774628EC310F00E27551 /* AZPMediaHelper.m in Sources */,
+				FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
+				FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				FDA79D6B29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */,
+				FD1404512A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */,
 				FDA79D3C29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
@@ -653,9 +678,10 @@
 				FDA79D7429EE844000E16407 /* GPUViewError.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				FDA79D5C29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */,
+				FD1404342A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */,
 				FDA79D3229DD99D500E16407 /* GPULayer.swift in Sources */,
-				FD55E4BF28B6336700321128 /* AZPMediaVideoRenderer.m in Sources */,
 				FDA79D5F29E0451500E16407 /* GPUFilterRegistry.swift in Sources */,
+				FD1404542A0949C000CCA6B9 /* MediaURICache.swift in Sources */,
 				FDA79D6529E596F400E16407 /* AZPGPUImageViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -19,6 +19,9 @@ jest.mock('@azzapp/relay/providers/isNative.relayprovider', () => ({
   },
 }));
 
+jest.mock('#components/medias/NativeMediaImageRenderer');
+jest.mock('#components/medias/NativeMediaVideoRenderer');
+
 let environement: RelayMockEnvironment;
 
 const renderCover = (props?: Partial<CoverRendererProps>) => {

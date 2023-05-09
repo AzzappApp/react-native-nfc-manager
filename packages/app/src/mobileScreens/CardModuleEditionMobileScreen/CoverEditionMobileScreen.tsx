@@ -1,13 +1,18 @@
 import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance, StyleSheet } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { fetchQuery, graphql, usePreloadedQuery } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter } from '#PlatformEnvironment';
+import { prefetchImage, prefetchVideo } from '#components/medias';
 import { useNativeNavigationEvent } from '#components/NativeRouter';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import CoverEditionScreen, {
   CoverEditionScreenFallback,
 } from '#screens/CoverEditionScreen';
 import Container from '#ui/Container';
+import type { CoverEditionMobileScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenPrefetchQuery.graphql';
 import type { CoverEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CoverEditionScreen_viewer.graphql';
 import type { PreloadedQuery } from 'react-relay';
@@ -106,6 +111,48 @@ const CoverEditionMobileScreen = ({
       )}
     </Container>
   );
+};
+
+CoverEditionMobileScreen.prefetch = () => {
+  const environment = getRelayEnvironment();
+  return fetchQuery<CoverEditionMobileScreenPrefetchQuery>(
+    environment,
+    graphql`
+      query CoverEditionMobileScreenPrefetchQuery {
+        viewer {
+          ...CoverEditionScreen_viewer @relay(mask: false)
+          profile {
+            card {
+              cover {
+                ...CoverEditionScreen_cover @relay(mask: false)
+              }
+            }
+          }
+        }
+      }
+    `,
+    {},
+  ).mergeMap(({ viewer }) => {
+    const cover = viewer?.profile?.card?.cover;
+    if (!cover) {
+      return [];
+    }
+    const { background, foreground, sourceMedia } = cover;
+    const medias = convertToNonNullArray([
+      background && { kind: 'image', uri: background.uri },
+      foreground && { kind: 'image', uri: foreground.uri },
+      sourceMedia && {
+        kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
+        uri: sourceMedia.uri,
+      },
+    ]);
+    return combineLatest(
+      medias.map(media => {
+        const prefetch = media.kind === 'image' ? prefetchImage : prefetchVideo;
+        return prefetch(media.uri);
+      }),
+    );
+  });
 };
 
 export default CoverEditionMobileScreen;

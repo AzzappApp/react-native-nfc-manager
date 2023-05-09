@@ -194,6 +194,9 @@ jest.mock('#components/Cropper', () => {
   return Cropper;
 });
 
+jest.mock('#components/medias/NativeMediaImageRenderer');
+jest.mock('#components/medias/NativeMediaVideoRenderer');
+
 describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 

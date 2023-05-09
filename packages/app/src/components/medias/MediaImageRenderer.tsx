@@ -1,5 +1,4 @@
 import { forwardRef, useRef } from 'react';
-import { NativeModules } from 'react-native';
 import NativeMediaImageRenderer from './NativeMediaImageRenderer';
 import type { MediaImageRendererProps } from './mediasTypes';
 import type { ForwardedRef } from 'react';
@@ -68,21 +67,10 @@ const MediaImageRenderer = (
       accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
-      style={[style, { width, aspectRatio, overflow: 'hidden' }]}
+      style={[{ width, aspectRatio, overflow: 'hidden' }, style]}
       {...props}
     />
   );
-};
-
-/**
- * Add an entry to the image cache, usefull to add local images to the cache
- *
- * @param mediaID  the mediaID of the image
- * @param size the width of the image
- * @param uri the uri of the image
- */
-export const addCacheEntry = (mediaID: string, size: number, uri: string) => {
-  NativeModules.AZPMediaImageRendererManager.addCacheEntry(mediaID, size, uri);
 };
 
 export default forwardRef(MediaImageRenderer);

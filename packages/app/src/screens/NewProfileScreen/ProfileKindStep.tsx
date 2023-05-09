@@ -1,11 +1,14 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { StyleSheet, FlatList, View, Image } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, FlatList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { colors } from '#theme';
+import { MediaImageRenderer, prefetchImage } from '#components/medias';
 import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
@@ -80,32 +83,43 @@ const ProfileKindStep = ({
   );
 
   useEffect(() => {
-    const prefetchImages = () =>
-      Promise.all(
-        profileCategories.flatMap(category =>
-          category.medias?.map(media => Image.prefetch(media.uri)),
-        ),
-      );
-    if (profileCategories?.length > 0) {
-      void prefetchImages();
-    }
+    const observables = convertToNonNullArray(
+      profileCategories.flatMap(category =>
+        category.medias?.map(media => prefetchImage(media.uri)),
+      ),
+    );
+    const subscription = observables.length
+      ? combineLatest(observables).subscribe({})
+      : null;
+
+    return () => {
+      subscription?.unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const intl = useIntl();
 
   const mediasKeyExtractor = useCallback((item: Media) => item.id, []);
   const borderRadius = COVER_CARD_RADIUS * cardWidth;
   const renderMediasItem = useCallback(
     (media: Media) => (
       <View style={[styles.mediaImageContainer, { borderRadius }]}>
-        <Image
+        <MediaImageRenderer
           testID="category-image"
-          accessibilityRole="image"
-          source={{ uri: media.uri }}
+          alt={intl.formatMessage({
+            defaultMessage: 'Category image',
+            description: 'ProfileKindStep - Category image alt',
+          })}
+          width={300}
+          aspectRatio={COVER_RATIO}
+          source={media.id}
+          uri={media.uri}
           style={[styles.mediaImage, { width: cardWidth, borderRadius }]}
         />
       </View>
     ),
-    [borderRadius, cardWidth],
+    [borderRadius, cardWidth, intl],
   );
 
   const selectedCategory = profileCategories.find(
@@ -179,7 +193,7 @@ const ProfileKindStep = ({
         }
       />
       {selectedCategory && (
-        <InfiniteCarousel<Media>
+        <InfiniteCarousel
           key={selectedCategory.id}
           items={selectedCategory.medias ?? []}
           keyExtractor={mediasKeyExtractor}

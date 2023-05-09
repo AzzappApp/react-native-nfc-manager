@@ -21,6 +21,9 @@ jest.mock('@azzapp/shared/WebAPI', () => ({
 }));
 jest.mock('#ui/FadeSwitch', () => 'FadeSwitch');
 
+jest.mock('#components/medias/NativeMediaImageRenderer');
+jest.mock('#components/medias/NativeMediaVideoRenderer');
+
 describe('NewProfileScreen', () => {
   let environment: RelayMockEnvironment;
 
@@ -99,6 +102,8 @@ describe('NewProfileScreen', () => {
       );
 
       expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
+        mediaID: 'media-0-0',
+        requestedSize: 300,
         uri: 'https://fakeMedia.com/0-0.jpg',
       });
 
@@ -115,6 +120,8 @@ describe('NewProfileScreen', () => {
       );
 
       expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
+        mediaID: 'media-1-0',
+        requestedSize: 300,
         uri: 'https://fakeMedia.com/1-0.jpg',
       });
     });

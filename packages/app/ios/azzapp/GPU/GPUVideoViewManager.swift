@@ -168,8 +168,8 @@ class GPUVideoViewManager: RCTViewManager {
       asset = AVAsset(url: uri)
     } else {
       do {
-        let tempUrl = try await downloadFile(url: uri)
-        asset = AVAsset(url: tempUrl)
+        let location = try await downloadFile(url: uri)
+        asset = AVAsset(url: location)
       } catch {
         reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not download file", error)
         return
@@ -446,7 +446,7 @@ class GPUVideoView: UIView {
   
   private var player: AVQueuePlayer? = nil
   
-  private var playerLayer: AVPlayerLayer? = nil
+  private var playerLayer: AVPlayerLayer!
   
   private var playerObserverContext = 0
   
@@ -456,15 +456,31 @@ class GPUVideoView: UIView {
   
   internal var playerReady: Bool = false
   
+  override required init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    playerLayer = AVPlayerLayer()
+    playerLayer.frame = self.bounds
+    playerLayer.videoGravity = .resizeAspectFill
+    self.layer.addSublayer(playerLayer)
+  }
+  
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) is not implemented.")
+  }
+  
   deinit {
     reset()
   }
   
   override func layoutSubviews() {
     super.layoutSubviews()
-    if let playerLayer = playerLayer {
-      playerLayer.frame = self.bounds
-    }
+
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    playerLayer.frame = bounds
+    CATransaction.commit()
     // TODO we reset player item here since updating afterwards video composition size
     // seems to have no effect however it would be cleaner to find a way to do so
     setupPlayerItem()
@@ -512,7 +528,7 @@ class GPUVideoView: UIView {
       let (url, startTime, duration) = videoSources.first!
       if (url != asset?.url) {
         reset()
-        asset = AVURLAsset(url: url)
+        asset = AVAssetCache.shared.avAsset(for: url) ?? AVURLAsset(url: url)
         self.startTime = startTime
         self.duration = duration
         setupPlayerItem()
@@ -656,12 +672,7 @@ class GPUVideoView: UIView {
       context: &playerObserverContext
     )
     self.player = player
-    
-    let playerLayer = AVPlayerLayer(player: player)
-    playerLayer.frame = self.bounds;
-    playerLayer.videoGravity = .resizeAspectFill;
-    layer.addSublayer(playerLayer)
-    self.playerLayer = playerLayer
+    self.playerLayer?.player = player
     
     let startTime = self.startTime ?? CMTime.zero
     let duration = self.duration ?? playerItem.duration - startTime
@@ -765,9 +776,6 @@ class GPUVideoView: UIView {
       player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status), context: &playerObserverContext)
       self.player = nil
     }
-    if let playerLayer = playerLayer {
-      playerLayer.removeFromSuperlayer()
-      self.playerLayer = nil
-    }
+    playerLayer.player = nil
   }
 }

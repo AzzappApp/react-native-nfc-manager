@@ -612,6 +612,11 @@ export const useScreenOptionsUpdater = () => {
   return setOptions;
 };
 
+export const useCurrentScreenID = () => {
+  const { id } = useContext(ScreenRendererContext);
+  return id;
+};
+
 const StackRenderer = ({
   stack,
   screens,
@@ -765,6 +770,7 @@ type NativeNavigationEvent =
   | 'willDisappear';
 
 const ScreenRendererContext = React.createContext<{
+  id: string;
   navigationEventEmitter: EventEmitter;
   setOptions: (
     value:
@@ -773,6 +779,7 @@ const ScreenRendererContext = React.createContext<{
       | null,
   ) => void;
 }>({
+  id: '',
   navigationEventEmitter: new EventEmitter(),
   setOptions: () => void 0,
 });
@@ -824,8 +831,8 @@ const ScreenRenderer = ({
   });
 
   const screenContextValue = useMemo(
-    () => ({ navigationEventEmitter, hasFocus, setOptions }),
-    [navigationEventEmitter, hasFocus],
+    () => ({ id, navigationEventEmitter, hasFocus, setOptions }),
+    [id, navigationEventEmitter, hasFocus],
   );
 
   if (!Component) {

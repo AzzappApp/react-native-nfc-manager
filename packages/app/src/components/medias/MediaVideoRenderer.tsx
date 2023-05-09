@@ -125,7 +125,7 @@ const MediaVideoRenderer = (
     >
       <NativeMediaVideoRenderer
         ref={videoRef}
-        uri={uri}
+        source={{ uri, mediaID: source }}
         muted={muted}
         paused={paused}
         currentTime={currentTime}

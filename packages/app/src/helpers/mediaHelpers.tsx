@@ -16,7 +16,7 @@ export const getImageSize = (uri: string) =>
     );
   });
 
-const { AZPMediaHelper } = NativeModules;
+const { AZPMediaHelpers } = NativeModules;
 
 /**
  * Returns the size of a video.
@@ -25,7 +25,7 @@ const { AZPMediaHelper } = NativeModules;
  */
 export const getVideoSize: (
   uri: string,
-) => Promise<{ width: number; height: number }> = AZPMediaHelper.getVideoSize;
+) => Promise<{ width: number; height: number }> = AZPMediaHelpers.getVideoSize;
 
 /**
  * Returns the real uri of a PHAsset.
@@ -34,7 +34,7 @@ export const getVideoSize: (
  */
 export const getPHAssetPath: (uri: string) => Promise<string | null> =
   Platform.select({
-    ios: AZPMediaHelper.getPHAssetPath,
+    ios: AZPMediaHelpers.getPHAssetPath,
     default: () => {
       throw new Error('getPHAssetPath is only available on iOS');
     },
@@ -47,7 +47,7 @@ export const getPHAssetPath: (uri: string) => Promise<string | null> =
  * @returns A promise that resolves with the URI of the mask.
  */
 export const segmentImage: (uri: string) => Promise<string | null> =
-  AZPMediaHelper.segmentImage;
+  AZPMediaHelpers.segmentImage;
 
 let availableFonts: string[] = [];
 
@@ -59,7 +59,7 @@ export const useAvailableFonts = () => {
   const [fonts, setFonts] = useState(availableFonts);
   useEffect(() => {
     if (availableFonts.length === 0) {
-      AZPMediaHelper.getAvailableFonts((fonts: string[]) => {
+      AZPMediaHelpers.getAvailableFonts((fonts: string[]) => {
         availableFonts = fonts;
         setFonts(fonts);
       });

@@ -23,6 +23,18 @@ const CardModuleEditionMobileScreen = ({
   }
 };
 
+CardModuleEditionMobileScreen.prefetch = ({
+  params,
+}: CardModuleEditionRoute) => {
+  switch (params?.module) {
+    case 'cover': {
+      return CoverEditionMobileScreen.prefetch();
+    }
+    default:
+      return null;
+  }
+};
+
 const getQuery = (params: CardModuleEditionRoute['params']) => {
   switch (params.module) {
     default:
