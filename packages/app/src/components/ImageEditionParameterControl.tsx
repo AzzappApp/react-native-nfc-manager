@@ -80,9 +80,11 @@ const styles = StyleSheet.create({
   root: {
     justifyContent: 'center',
     marginBottom: 25,
+    marginLeft: 20,
+    marginRight: 20,
   },
   sliderValue: {
-    marginBottom: 5,
+    marginBottom: 0,
     alignSelf: 'center',
     height: 20,
   },

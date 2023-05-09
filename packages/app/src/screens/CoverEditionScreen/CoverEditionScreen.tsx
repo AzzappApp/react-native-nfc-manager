@@ -11,6 +11,7 @@ import {
   Image,
   Alert,
   Appearance,
+  Platform,
 } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { graphql, useFragment, useMutation, readInlineData } from 'react-relay';
@@ -453,6 +454,18 @@ const CoverEditionScreen = ({
       onError?.();
     }
   }, [onError]);
+
+  const clippingEnable = useMemo(() => {
+    if (Platform.OS !== 'ios') {
+      return false;
+    }
+    if (kind === 'video') {
+      return false;
+    }
+    //get the ios version
+    const version = parseInt(Platform.Version, 10);
+    return version >= 15;
+  }, [kind]);
   //#endregion
 
   //#region Mutation, Cancel and navigation
@@ -1133,6 +1146,7 @@ const CoverEditionScreen = ({
           onCancel={onCancel}
           onSave={onSave}
           onNextOrientation={onNextOrientation}
+          editedParameter={editedParameter}
         />
         <View style={[styles.topPanel, { height: topPanelHeight }]}>
           <PressableNative
@@ -1172,16 +1186,19 @@ const CoverEditionScreen = ({
               height={coverHeight}
             />
           </PressableNative>
-          {sourceMedia && !cropEditionMode && !isDemoAsset && (
-            <CropButton
-              onPress={onActivateCropMode}
-              style={{
-                position: 'absolute',
-                top: topPanelButtonsTop,
-                end: 22.5,
-              }}
-            />
-          )}
+          {sourceMedia &&
+            !cropEditionMode &&
+            !isDemoAsset &&
+            !editedParameter && (
+              <CropButton
+                onPress={onActivateCropMode}
+                style={{
+                  position: 'absolute',
+                  top: topPanelButtonsTop,
+                  end: 22.5,
+                }}
+              />
+            )}
           <AnimatedCircleHint
             style={{
               position: 'absolute',
@@ -1191,7 +1208,7 @@ const CoverEditionScreen = ({
             hidesWhenStopped
             animating={showImageHint}
           />
-          {!cropEditionMode && (
+          {!cropEditionMode && !editedParameter && (
             <CameraButton
               onPress={onPickImage}
               style={{
@@ -1203,7 +1220,7 @@ const CoverEditionScreen = ({
           )}
 
           <CoverEditionScreenToolBar>
-            {kind !== 'video' && (
+            {clippingEnable && (
               <SwitchLabel
                 variant="small"
                 value={segmented ?? false}

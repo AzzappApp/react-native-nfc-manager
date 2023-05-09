@@ -1,8 +1,13 @@
-import MaskedView from '@react-native-masked-view/masked-view';
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
-import { Animated, PanResponder, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  PanResponder,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
@@ -94,18 +99,17 @@ const DashedSlider = ({
 
   const steps = range(min, max, step);
   const size = steps.length * computedInterval;
-
+  const colorScheme = useColorScheme();
+  const colorsGradient =
+    colorScheme === 'light'
+      ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
+      : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'];
   return (
-    <MaskedView
-      maskElement={
-        <LinearGradient
-          colors={['transparent', colors.grey50, 'transparent']}
-          locations={[0.0, 0.5, 1]}
-          style={{ flex: 1 }}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 1, y: 1 }}
-        />
-      }
+    <LinearGradient
+      colors={colorsGradient}
+      locations={[0.0, 0.5, 1]}
+      start={{ x: 0, y: 1 }}
+      end={{ x: 1, y: 1 }}
     >
       <View
         {...props}
@@ -148,7 +152,7 @@ const DashedSlider = ({
         </Animated.View>
         <View style={[styles.thumb, appearanceStyle.thumb]} />
       </View>
-    </MaskedView>
+    </LinearGradient>
   );
 };
 
@@ -165,17 +169,18 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40,
+    height: 23,
+    overflow: 'hidden',
+    width: '100%',
   },
   dashContainer: {
     flexDirection: 'row',
     position: 'absolute',
-    top: 14,
+    top: 6,
     left: '50%',
     width: '100%',
   },
   dash: {
-    backgroundColor: colors.grey200,
     height: 12,
     width: 1,
     borderRadius: 3,

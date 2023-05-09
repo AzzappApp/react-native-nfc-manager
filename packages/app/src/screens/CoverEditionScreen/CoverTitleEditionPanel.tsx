@@ -330,7 +330,7 @@ const CoverTitleEditionPanel = ({
                 defaultMessage: 'Slide to change the font size',
                 description: 'Hint of the font size slider in cover edition',
               })}
-              style={{ width: '100%' }}
+              style={{ width: '90%' }}
             />
           </View>
         </View>

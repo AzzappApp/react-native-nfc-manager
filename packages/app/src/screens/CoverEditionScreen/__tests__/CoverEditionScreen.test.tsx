@@ -19,6 +19,12 @@ import type { CoverEditionScreenTestQuery } from '@azzapp/relay/artifacts/CoverE
 import type { ReactTestInstance } from 'react-test-renderer';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
+// this mock is needed to test the merge switch
+jest.mock('react-native/Libraries/Utilities/Platform', () => ({
+  OS: 'ios',
+  Version: '16',
+  select: () => null,
+}));
 //mock Image.resolveAssetSource
 jest.mock('react-native/Libraries/Image/resolveAssetSource', () => ({
   __esModule: true,
@@ -620,7 +626,7 @@ describe('CoverEditionScreen', () => {
       }),
     );
     act(() => {
-      fireEvent.press(screen.getAllByText('Cancel')[1].parent!);
+      fireEvent.press(screen.getAllByText('Cancel')[0]);
     });
     expect(getLayer(1).parameters).toEqual(
       expect.objectContaining({

@@ -1,7 +1,9 @@
 import { useIntl } from 'react-intl';
+import { useEditionParametersDisplayInfos } from '#components/gpu';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
+import type { EditionParameters } from '#components/gpu';
 
 export type CoverEditionScreenHeaderProps = {
   isCreation: boolean;
@@ -10,6 +12,7 @@ export type CoverEditionScreenHeaderProps = {
   onCancel?: () => void;
   onSave?: () => void;
   onNextOrientation?: () => void;
+  editedParameter?: keyof EditionParameters | null;
 };
 
 const CoverEditionScreenHeader = ({
@@ -19,8 +22,11 @@ const CoverEditionScreenHeader = ({
   onCancel,
   onSave,
   onNextOrientation,
+  editedParameter,
 }: CoverEditionScreenHeaderProps) => {
   const intl = useIntl();
+  const paramsInfos = useEditionParametersDisplayInfos();
+
   return (
     <Header
       middleElement={
@@ -29,13 +35,15 @@ const CoverEditionScreenHeader = ({
               defaultMessage: 'Create your cover',
               description: 'Cover creation screen title',
             })
+          : editedParameter
+          ? paramsInfos[editedParameter]?.label ?? ''
           : intl.formatMessage({
               defaultMessage: 'Update your cover',
               description: 'Cover edition screen title',
             })
       }
       leftElement={
-        !cropEditionMode ? (
+        !editedParameter && !cropEditionMode ? (
           <HeaderButton
             variant="secondary"
             onPress={onCancel}
@@ -63,7 +71,7 @@ const CoverEditionScreenHeader = ({
             })}
             onPress={onNextOrientation}
           />
-        ) : (
+        ) : !editedParameter ? (
           <HeaderButton
             disabled={!canSave}
             onPress={onSave}
@@ -72,7 +80,7 @@ const CoverEditionScreenHeader = ({
               description: 'Save button label in cover edition screen',
             })}
           />
-        )
+        ) : null
       }
     />
   );
