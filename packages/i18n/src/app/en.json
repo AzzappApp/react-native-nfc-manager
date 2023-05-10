@@ -227,6 +227,10 @@
     "defaultMessage": "Log In",
     "description": "Signup Screen - Login link bottom screen"
   },
+  "E+83qW": {
+    "defaultMessage": "Vignette",
+    "description": "Vignette image edition parameters name"
+  },
   "E2sLo4": {
     "defaultMessage": "Tap to take a photo",
     "description": "Accessibility hint for the camera shutter button"
@@ -531,10 +535,6 @@
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
   },
-  "a17Y8A": {
-    "defaultMessage": "Temperature",
-    "description": "Temperature image edition parameters name"
-  },
   "aGgFjV": {
     "defaultMessage": "Tap to reset your passward",
     "description": "ChangePassword Screen - AccessibilityLabel Reset password button"
@@ -647,10 +647,6 @@
     "defaultMessage": "Tap to select a font",
     "description": "Hint of the font button in cover edition"
   },
-  "gRy2ak": {
-    "defaultMessage": "Vigneting",
-    "description": "Vigneting image edition parameters name"
-  },
   "gXripn": {
     "defaultMessage": "Name",
     "description": "ProfileForm name textinput label"
@@ -758,6 +754,10 @@
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
     "description": "Signup Screen - Accessibility Sign Up button"
+  },
+  "mCXDhl": {
+    "defaultMessage": "Warmth",
+    "description": "Temperature/warmth image edition parameters name"
   },
   "mPVwE6": {
     "defaultMessage": "Cancel",

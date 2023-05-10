@@ -73,8 +73,8 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
       temperature: {
         icon: 'temperature',
         label: intl.formatMessage({
-          defaultMessage: 'Temperature',
-          description: 'Temperature image edition parameters name',
+          defaultMessage: 'Warmth',
+          description: 'Temperature/warmth image edition parameters name',
         }),
       },
       tint: {
@@ -94,8 +94,8 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
       vignetting: {
         icon: 'vignetting',
         label: intl.formatMessage({
-          defaultMessage: 'Vigneting',
-          description: 'Vigneting image edition parameters name',
+          defaultMessage: 'Vignette',
+          description: 'Vignette image edition parameters name',
         }),
       },
     }),
