@@ -88,7 +88,6 @@ const SelectImageStep = ({
         clearMedia();
       }
       setPickerMode(mode);
-      //TODO: the current behaviour is to directly go to the EditStep when taking a picture,discuss with Nico is alert is needed (and dont directly go to the next step)
     },
     [clearMedia, pickerMode],
   );
@@ -283,6 +282,7 @@ const SelectImageStep = ({
               contentContainerStyle={{
                 paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
               }}
+              autoSelectFirstItem={media == null}
             />
           ) : (
             <CameraControlPanel
