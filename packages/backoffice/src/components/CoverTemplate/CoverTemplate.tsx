@@ -13,6 +13,8 @@ import {
   RadioButtonGroupInput,
   SaveButton,
   Toolbar,
+  ReferenceArrayInput,
+  SelectArrayInput,
 } from 'react-admin';
 import {
   COVER_RATIO,
@@ -25,15 +27,21 @@ import {
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_MAX_FONT_SIZE,
 } from '@azzapp/shared/cardHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import SectionTitle from '#components/SectionTitle';
 import type { ValidateForm } from 'react-admin';
 
 const CoverTemplate = ({
   validate,
   setImageDimension,
+  setImagePreviewDimension,
 }: {
   validate: ValidateForm | undefined;
   setImageDimension: (dimension: { width: number; height: number }) => void;
+  setImagePreviewDimension: (dimension: {
+    width: number;
+    height: number;
+  }) => void;
 }) => {
   return (
     <TabbedForm
@@ -119,34 +127,14 @@ const CoverTemplate = ({
         <SectionTitle label="Category" />
         <TextInput
           source="category.en"
-          label="Country Code - EN language code"
+          label="English category name"
           fullWidth
         />
         <TextInput source="tags" fullWidth />
       </FormTab>
       <FormTab label="Cover">
-        <ImageInput
-          source="data.sourceMedia.id"
-          label=""
-          accept="image/*"
-          helperText={`IMAGE SHOULD BE USING THE COVER RATIO ${COVER_RATIO} No control is done on t format of the
-          image. Please test the image before uploading it.`}
-        >
-          <ImageField
-            source="src"
-            title=""
-            sx={{ backgroundColor: 'rgba(233,233,233,0.2)' }}
-            //@ts-expect-error  onLoad type is not propagated from ra-material-ui
-            onLoad={({ nativeEvent }: any) => {
-              setImageDimension({
-                width: nativeEvent.srcElement.naturalWidth,
-                height: nativeEvent.srcElement.naturalHeight,
-              });
-            }}
-          />
-        </ImageInput>
         <div style={{ display: 'flex' }}>
-          <BooleanInput source="segmented" label="Segmented" />
+          <BooleanInput source="segmented" label="Clipped" />
           <BooleanInput source="merged" label="Merged" />
         </div>
         <SectionTitle label="Filter" />
@@ -306,6 +294,61 @@ const CoverTemplate = ({
           );
         })}
       </FormTab>
+      <FormTab label="Suggested">
+        <SectionTitle label="Template Suggestion -- Only for Business -- " />
+        <BooleanInput label="Suggested template" source="suggested" />
+        <SectionTitle label="Cover Image" />
+        <ImageInput
+          source="data.sourceMedia.id"
+          label=""
+          accept="image/*"
+          helperText={`Image of the cover. IMAGE SHOULD BE USING THE COVER RATIO ${COVER_RATIO}`}
+          format={formatMedias}
+        >
+          <ImageField
+            source="src"
+            title=""
+            sx={{ backgroundColor: 'rgba(233,233,233,0.2)' }}
+            //@ts-expect-error  onLoad type is not propagated from ra-material-ui
+            onLoad={({ nativeEvent }: any) => {
+              setImageDimension({
+                width: nativeEvent.srcElement.naturalWidth,
+                height: nativeEvent.srcElement.naturalHeight,
+              });
+            }}
+          />
+        </ImageInput>
+        <SectionTitle label="Preview Image of the cover." />
+        <ImageInput
+          source="previewMediaId"
+          label=""
+          accept="image/*"
+          helperText="Should not contain the Title and subtitle"
+          format={formatMedias}
+        >
+          <ImageField
+            source="src"
+            title=""
+            sx={{ backgroundColor: 'rgba(233,233,233,0.2)' }}
+            //@ts-expect-error  onLoad type is not propagated from ra-material-ui
+            onLoad={({ nativeEvent }: any) => {
+              setImagePreviewDimension({
+                width: nativeEvent.srcElement.naturalWidth,
+                height: nativeEvent.srcElement.naturalHeight,
+              });
+            }}
+          />
+        </ImageInput>
+        <SectionTitle label="Associated Compnay Activity. If empty, available for all business" />
+        <ReferenceArrayInput
+          source="companyActivities"
+          label="Company Activity"
+          reference="CompanyActivity"
+          perPage={150}
+        >
+          <SelectArrayInput source="id" optionText="labels.en" fullWidth />
+        </ReferenceArrayInput>
+      </FormTab>
     </TabbedForm>
   );
 };
@@ -346,6 +389,12 @@ const MEDIA_STYLE: any = {
 };
 
 export default CoverTemplate;
+
+const formatMedias = (media: any) => {
+  return typeof media === 'string'
+    ? { src: getImageURLForSize(media, 200) }
+    : media;
+};
 
 export const FONTS = [
   { id: 'Academy Engraved LET', name: 'Academy Engraved LET' },

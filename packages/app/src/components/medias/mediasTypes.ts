@@ -39,7 +39,10 @@ export type MediaImageRendererProps = {
    * (the displayed image might be an other version of the original image in a different size)
    */
   onReadyForDisplay?: () => void;
-
+  /**
+   * A callback called when an error was throw while loading the media
+   */
+  onError?: (error: Error) => void;
   /**
    * @see ViewProps#style
    */

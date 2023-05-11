@@ -15,6 +15,7 @@ import type { GPULayer } from '#components/gpu';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 import type { CoverEditionScreenProps } from '../CoverEditionScreen';
 import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
+import type { CoverEditionScreen_template$data } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
 import type { CoverEditionScreenTestQuery } from '@azzapp/relay/artifacts/CoverEditionScreenTestQuery.graphql';
 import type { ReactTestInstance } from 'react-test-renderer';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
@@ -201,15 +202,18 @@ describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
 
   type CoverData = Omit<CoverEditionScreen_cover$data, ' $fragmentType'>;
+  type TemplateData = Omit<CoverEditionScreen_template$data, ' $fragmentType'>;
 
   const renderCoverEditionScreen = ({
     coverData = null,
     profileKind = 'personal',
+    templateData = [],
     ...props
   }: Partial<
     CoverEditionScreenProps & {
       coverData: CoverData | null;
       profileKind: 'business' | 'personal';
+      templateData: Array<TemplateData | null>;
     }
   > = {}) => {
     environement = createMockEnvironment();
@@ -237,8 +241,15 @@ describe('CoverEditionScreen', () => {
             id: `coverForegroundId${i}`,
             uri: `https://example.com/coverForeground${i}.png`,
           })),
-          segmentedTemplatesCategories: [],
-          unsegmentedTemplatesCategories: [],
+          segmentedTemplatesCategories:
+            templateData.length > 0
+              ? [{ category: 'test', templates: templateData }]
+              : [],
+          unsegmentedTemplatesCategories:
+            templateData.length > 0
+              ? [{ category: 'test', templates: templateData }]
+              : [],
+          coverTemplatesSuggestion: templateData,
         }),
       }),
     );
@@ -385,6 +396,55 @@ describe('CoverEditionScreen', () => {
     );
   });
 
+  const fakeTemplate: TemplateData = {
+    suggested: false,
+    data: {
+      background: {
+        id: 'coverBackgroundIdTemplate',
+      },
+      backgroundStyle: {
+        backgroundColor: '#FFFF00',
+        patternColor: '#00FFFF',
+      },
+      contentStyle: {
+        orientation: 'topToBottom',
+        placement: 'middleRight',
+      },
+      foreground: {
+        id: 'coverForegroundIdTemplate',
+      },
+      foregroundStyle: {
+        color: '#AAFFFF',
+      },
+
+      mediaStyle: {
+        parameters: {
+          brightness: 0.1,
+          saturation: 0.9,
+        },
+        filter: 'templatefilter',
+      },
+      merged: false,
+      segmented: true,
+      subTitleStyle: {
+        color: '#0A0F00',
+        fontSize: 12,
+        fontFamily: 'Arial',
+      },
+      titleStyle: {
+        color: '#0400E0',
+        fontSize: 12,
+        fontFamily: 'Verdana',
+      },
+      sourceMedia: {
+        id: 'sourceMediaIdTemplate',
+        uri: 'http://fake-site/fake-template-media.jpg',
+        width: 1200,
+        height: 1920,
+      },
+    },
+  };
+
   const fakeCover: CoverData = {
     background: {
       id: 'coverBackgroundId2',
@@ -420,7 +480,7 @@ describe('CoverEditionScreen', () => {
     sourceMedia: {
       __typename: 'MediaImage',
       id: 'sourceMediaId',
-      uri: 'http://fake-site/fake-media.jpg',
+      uri: 'http://fake-site/cover-source-media.jpg',
       width: 1200,
       height: 1920,
     },
@@ -453,7 +513,7 @@ describe('CoverEditionScreen', () => {
       }),
       expect.objectContaining({
         kind: 'image',
-        uri: 'http://fake-site/fake-media.jpg',
+        uri: 'http://fake-site/cover-source-media.jpg',
         maskUri: 'http://fake-site/fake-mask.jpg',
         parameters: expect.objectContaining({
           brightness: 0.5,
@@ -884,8 +944,10 @@ describe('CoverEditionScreen', () => {
     expect(screen.queryByText('Cancel')).toBeTruthy();
   });
 
-  test('Button `save` should not be disabled if the sourceMedia is empty with a personal profileKind', async () => {
-    renderCoverEditionScreen();
+  test('Button `save` should enable if the sourceMedia is empty with a personal profileKind', async () => {
+    renderCoverEditionScreen({
+      templateData: [{ suggested: true, data: fakeCover }],
+    });
     let saveButton = screen.getByText('Save');
     while (saveButton.props.accessibilityRole !== 'button') {
       if (!saveButton.parent) {
@@ -897,8 +959,12 @@ describe('CoverEditionScreen', () => {
     expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
   });
 
-  test('Button `save` should be disabled if the sourceMedia is empty with a business profileKind', async () => {
-    renderCoverEditionScreen({ profileKind: 'business' });
+  // in any case the save button will be enable, if suggested template, the source media is used, otherwise a alert is shown
+  test('Button `save` should be enable if the sourceMedia is empty with a business profileKind and a suggested template exist', async () => {
+    renderCoverEditionScreen({
+      profileKind: 'business',
+      templateData: [{ suggested: true, data: fakeCover }],
+    });
     let saveButton = screen.getByText('Save');
     while (saveButton.props.accessibilityRole !== 'button') {
       if (!saveButton.parent) {
@@ -907,7 +973,7 @@ describe('CoverEditionScreen', () => {
       saveButton = saveButton.parent;
     }
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: true });
+    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
     segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
     act(() => {
@@ -937,6 +1003,40 @@ describe('CoverEditionScreen', () => {
     });
 
     expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+  });
+
+  test('Should select the first template, using the demo asset image if there is no cover with a personal profile', async () => {
+    renderCoverEditionScreen({
+      templateData: [fakeTemplate],
+    });
+    await act(flushPromises);
+    expect(getLayer(0).uri).toEqual('http://fake-site/fake-media.jpg');
+  });
+
+  test('should not load the template is a cover already exist', async () => {
+    renderCoverEditionScreen({
+      coverData: fakeCover,
+      templateData: [fakeTemplate],
+    });
+    await act(flushPromises);
+    expect(getLayer(1).uri).toEqual('http://fake-site/cover-source-media.jpg');
+  });
+
+  test('should load the template definition with source media  in case of business and suggested cover exist', async () => {
+    renderCoverEditionScreen({
+      profileKind: 'business',
+      coverData: null,
+      templateData: [{ ...fakeTemplate, suggested: true }],
+    });
+    await act(flushPromises);
+    expect(getLayer(0)).toMatchObject({
+      kind: 'image',
+      uri: 'http://fake-site/fake-template-media.jpg',
+      maskUri: undefined,
+      parameters: { brightness: 0.1, saturation: 0.9, cropData: undefined },
+      filters: ['templatefilter'],
+      blending: 'none',
+    });
   });
 
   xtest('Should save the cover', () => {

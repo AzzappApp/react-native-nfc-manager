@@ -16,7 +16,7 @@ type CoverTemplateRendererProps = ViewProps & {
   /**
    * Source Media to Override the Source Media of the template
    */
-  uri?: string;
+  uri: string;
   /**
    * The source media type
    */
@@ -76,29 +76,12 @@ const CoveTemplateRenderer = ({
 }: CoverTemplateRendererProps) => {
   const coverTemplate = useFragment(
     graphql`
-      fragment CoverTemplateRenderer_template on CoverTemplate
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
-      ) {
+      fragment CoverTemplateRenderer_template on CoverTemplate {
         id
         colorPalette
         kind
         data {
           mediaStyle
-          sourceMedia {
-            id
-            width
-            height
-            templateURI: uri(width: 200, pixelRatio: $pixelRatio)
-              @include(if: $isNative)
-          }
           background {
             id
             uri
@@ -116,7 +99,6 @@ const CoveTemplateRenderer = ({
           }
           segmented
           merged
-          title
           contentStyle {
             orientation
             placement
@@ -126,7 +108,6 @@ const CoveTemplateRenderer = ({
             fontSize
             color
           }
-          subTitle
           subTitleStyle {
             fontFamily
             fontSize
@@ -140,14 +121,11 @@ const CoveTemplateRenderer = ({
 
   const {
     data: {
-      sourceMedia,
       mediaStyle,
       background,
       backgroundStyle,
       foreground,
       foregroundStyle,
-      title: titleTemplate,
-      subTitle: subTitleTemplate,
       titleStyle,
       subTitleStyle,
       contentStyle,
@@ -170,7 +148,8 @@ const CoveTemplateRenderer = ({
   return (
     <View {...props}>
       <CoverMediaPreview
-        uri={(uri ?? sourceMedia?.templateURI)!}
+        // uri={(uri ?? sourceMedia?.templateURI)!}
+        uri={uri}
         kind={kind === 'video' ? 'videoFrame' : kind ?? 'image'}
         time={time}
         backgroundColor={backgroundStyle?.backgroundColor}
@@ -187,8 +166,8 @@ const CoveTemplateRenderer = ({
         onLoadingError={onError}
       />
       <CoverTextPreview
-        title={title ?? titleTemplate}
-        subTitle={subTitle ?? subTitleTemplate}
+        title={title}
+        subTitle={subTitle}
         titleStyle={titleStyle}
         subTitleStyle={subTitleStyle}
         contentStyle={contentStyle}

@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider     = "mysql"
-  url          = env("DATABASE_URL")
+  url          = "mysql://o6sfzjc0xx2rwl4jx0xx:pscale_pw_oSnFdhOFt4emj8zsWMXYNgchuLXFuCEaV02FEoRgowk@aws.connect.psdb.cloud/azzapp?sslaccept=strict"
   relationMode = "prisma"
 }
 
@@ -145,18 +145,21 @@ model CardModule {
 }
 
 model CoverTemplate {
-  id           String      @id
-  name         String
-  colorPalette String?
-  tags         String?
-  data         Json
-  segmented    Boolean
-  merged       Boolean
-  category     Json?
-  kind         ProfileKind
-  enabled      Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now())
+  id                String      @id
+  name              String
+  colorPalette      String?
+  tags              String?
+  data              Json
+  segmented         Boolean
+  merged            Boolean
+  category          Json?
+  kind              ProfileKind
+  previewMediaId    String?
+  suggested         Boolean     @default(false)
+  companyActivityIds String?
+  enabled           Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
 }
 
 model Post {

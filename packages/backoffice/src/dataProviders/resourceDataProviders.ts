@@ -32,6 +32,7 @@ export type ResourceDataProvider<
 };
 
 export type Resources =
+  | 'CompanyActivity'
   | 'CoverLayer'
   | 'CoverTemplate'
   | 'Interest'

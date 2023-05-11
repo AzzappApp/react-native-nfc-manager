@@ -2,11 +2,26 @@ import { createId } from '@paralleldrive/cuid2';
 import { db } from '@azzapp/data/domains';
 import { getList, getMany, getOne } from './genericDataProvider';
 import type { ResourceDataProvider } from './resourceDataProviders';
-import type { CoverTemplate } from '@azzapp/data/domains';
+import type { CoverTemplate, Media } from '@azzapp/data/domains';
 
-const CoverTemplateDataProviders: ResourceDataProvider<CoverTemplate> = {
+export type CoverTemplateWithCompanyActivities = CoverTemplate & {
+  companyActivities: Array<string | null>;
+};
+
+const CoverTemplateDataProviders: ResourceDataProvider<
+  CoverTemplate,
+  CoverTemplateWithCompanyActivities
+> = {
   getList: params => getList('CoverTemplate', params),
-  getOne: params => getOne('CoverTemplate', params),
+  getOne: async params => {
+    const { data: coverTemplate } = await getOne('CoverTemplate', params);
+    return {
+      data: {
+        ...coverTemplate,
+        companyActivities: coverTemplate.companyActivityIds?.split(',') ?? [],
+      },
+    };
+  },
   getMany: params => getMany('CoverTemplate', params),
   update: async params => {
     const id = params.id as string;
@@ -46,21 +61,28 @@ const CoverTemplateDataProviders: ResourceDataProvider<CoverTemplate> = {
   create: async params => {
     const { id: maybeId, ...coverTemplate } = params.data;
     const data = coverTemplate.data as any;
-    const media = data.sourceMedia;
+
+    const previewMediaId = coverTemplate.previewMediaId;
     const id = maybeId ?? createId();
     await db.transaction().execute(async trx => {
-      await trx.insertInto('Media').values(media).execute();
-      const templateWithMedia = {
-        ...coverTemplate,
-        data: JSON.stringify({
-          ...data,
-          sourceMediaId: media.id,
-        }),
-      };
+      const createInput = { ...coverTemplate };
+      if (previewMediaId) {
+        await trx
+          .insertInto('Media')
+          // eslint-disable-next-line @typescript-eslint/ban-types
+          .values(previewMediaId as unknown as Media)
+          .execute();
+        createInput.previewMediaId = (previewMediaId as unknown as Media).id;
+      }
+
+      if (data.sourceMedia) {
+        await trx.insertInto('Media').values(data.sourceMedia).execute();
+        data.sourceMediaId = data.sourceMedia.id;
+      }
 
       await trx
         .insertInto('CoverTemplate')
-        .values({ id, ...templateWithMedia })
+        .values({ id, ...createInput, data: JSON.stringify(data) })
         .executeTakeFirstOrThrow();
     });
 

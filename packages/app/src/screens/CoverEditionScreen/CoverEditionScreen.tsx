@@ -122,6 +122,11 @@ const CoverEditionScreen = ({
         ...CoverEditionBackgroundPanel_viewer
         ...CoverEditionForegroundPanel_viewer
         ...CoverTitleEditionPanel_viewer
+        ...CoverModelsEditionPanelTemplateSuggestedList_suggestion
+        coverTemplatesSuggestion {
+          id
+          ...CoverEditionScreen_template
+        }
         segmentedTemplatesCategories: coverTemplatesByCategory(
           segmented: true
         ) {
@@ -233,11 +238,14 @@ const CoverEditionScreen = ({
     viewer?.profile ?? {};
 
   const initialTemplate = useMemo(() => {
-    const categories =
-      profileKind === 'personal'
-        ? viewer?.segmentedTemplatesCategories
-        : viewer?.unsegmentedTemplatesCategories;
-    return categories?.[0]?.templates[0] ?? null;
+    if (profileKind === 'business' && viewer?.coverTemplatesSuggestion?.[0]) {
+      return viewer.coverTemplatesSuggestion?.[0];
+    } else if (profileKind === 'personal') {
+      return viewer?.segmentedTemplatesCategories?.[0]?.templates[0] ?? null;
+    } else {
+      //business case without suggestion
+      return viewer?.unsegmentedTemplatesCategories?.[0]?.templates[0] ?? null;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -255,11 +263,13 @@ const CoverEditionScreen = ({
     };
     if (initialTemplate) {
       // can't understand why, but the compiler doesn't infer the type correctly
-      const { data } = readInlineData<CoverEditionScreen_template$key>(
-        templateDataFragment,
-        initialTemplate,
-      );
-      Object.assign(updatesValue, {
+      const { data, suggested } =
+        readInlineData<CoverEditionScreen_template$key>(
+          templateDataFragment,
+          initialTemplate,
+        );
+
+      const templateValues: CoverEditionValue = {
         mediaStyle: data.mediaStyle,
         backgroundId: data.background?.id ?? null,
         foregroundId: data.foreground?.id ?? null,
@@ -270,23 +280,28 @@ const CoverEditionScreen = ({
         segmented: data.segmented,
         subTitleStyle: data.subTitleStyle ?? null,
         titleStyle: data.titleStyle,
-        // will be erased by demo asset in personal profile case
-        sourceMedia: { ...data.sourceMedia, kind: 'image' },
-      });
-    }
-
-    if (isPersonal) {
-      const assetDemo = Image.resolveAssetSource(
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('#assets/demo_asset.png'),
-      );
-
-      updatesValue.sourceMedia = {
-        uri: assetDemo.uri,
-        kind: 'image',
-        width: assetDemo.width * assetDemo.scale,
-        height: assetDemo.height * assetDemo.scale,
       };
+
+      if (!isPersonal && suggested && data.sourceMedia?.uri) {
+        templateValues.sourceMedia = {
+          uri: data.sourceMedia.uri,
+          kind: 'image',
+          width: data.sourceMedia.width,
+          height: data.sourceMedia.height,
+        };
+      } else {
+        const assetDemo = Image.resolveAssetSource(
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          require('#assets/demo_asset.png'),
+        );
+        templateValues.sourceMedia = {
+          uri: assetDemo.uri,
+          kind: 'image',
+          width: assetDemo.width * assetDemo.scale,
+          height: assetDemo.height * assetDemo.scale,
+        };
+      }
+      Object.assign(updatesValue, templateValues);
     }
 
     return updatesValue;
@@ -456,7 +471,7 @@ const CoverEditionScreen = ({
     }
   }, [onError]);
 
-  const clippingEnable = useMemo(() => {
+  const clippingEnabled = useMemo(() => {
     if (Platform.OS !== 'ios') {
       return false;
     }
@@ -832,7 +847,7 @@ const CoverEditionScreen = ({
         parameters.cropData = mapValues(parameters.cropData, v => v * scale);
       }
     }
-
+    setIsSelectedTemplateSuggested(false);
     updateFields(
       ['sourceMedia', media],
       ['mediaStyle', { ...mediaStyle, parameters }],
@@ -1038,6 +1053,20 @@ const CoverEditionScreen = ({
     initialTemplate?.id ?? null,
   );
 
+  const [isSelectedTemplateSuggested, setIsSelectedTemplateSuggested] =
+    useState(() => {
+      if (!cover && initialTemplate) {
+        const { suggested } = readInlineData<CoverEditionScreen_template$key>(
+          templateDataFragment,
+          initialTemplate,
+        );
+        if (suggested) {
+          return true;
+        }
+      }
+      return false;
+    });
+
   const onSelectTemplate = useCallback(
     (templateId: string) => {
       setTemplateId(templateId);
@@ -1056,11 +1085,26 @@ const CoverEditionScreen = ({
           break;
         }
       }
-
+      if (!template) {
+        // look inside the suggested templates
+        for (const suggestedTemplate of viewer?.coverTemplatesSuggestion ??
+          []) {
+          if (suggestedTemplate?.id === templateId) {
+            template = suggestedTemplate;
+            break;
+          }
+        }
+      }
       if (!template) {
         return;
       }
-      const { data } = readInlineData(templateDataFragment, template);
+
+      //look inside the suggested templates
+      const { data, suggested } = readInlineData(
+        templateDataFragment,
+        template,
+      );
+
       const mediaStayleParameters: any = {
         ...(data?.mediaStyle?.parameters ?? {}),
         cropData: editionParameters.cropData ?? null,
@@ -1088,11 +1132,9 @@ const CoverEditionScreen = ({
         ['subTitleStyle', data.subTitleStyle ?? null],
         ['titleStyle', data.titleStyle],
       );
-      if (
-        isCreation &&
-        profileKind !== 'personal' &&
-        updates.sourceMedia?.id == null
-      ) {
+
+      if (suggested) {
+        setIsSelectedTemplateSuggested(true);
         updateFields([
           'sourceMedia',
           {
@@ -1100,6 +1142,8 @@ const CoverEditionScreen = ({
             kind: 'image',
           },
         ]);
+      } else {
+        setIsSelectedTemplateSuggested(false);
       }
     },
     [
@@ -1107,9 +1151,7 @@ const CoverEditionScreen = ({
       editionParameters.cropData,
       editionParameters.orientation,
       updateFields,
-      isCreation,
-      profileKind,
-      updates.sourceMedia?.id,
+      viewer?.coverTemplatesSuggestion,
     ],
   );
 
@@ -1231,7 +1273,7 @@ const CoverEditionScreen = ({
           )}
 
           <CoverEditionScreenToolBar>
-            {clippingEnable && (
+            {!isSelectedTemplateSuggested && clippingEnabled && (
               <SwitchLabel
                 variant="small"
                 value={segmented ?? false}
@@ -1264,14 +1306,18 @@ const CoverEditionScreen = ({
               element: (
                 <CoverModelsEditionPanel
                   categories={categories!}
+                  viewer={viewer}
                   uri={uri}
                   kind={kind}
                   maskUri={maskUri}
                   title={title}
                   subTitle={subTitle}
+                  hasSuggestedTemplates={
+                    profileKind === 'business' &&
+                    (viewer?.coverTemplatesSuggestion?.length ?? 0) > 0
+                  }
                   selectedTemplateId={templateId}
                   onSelectTemplate={onSelectTemplate}
-                  isCreation={isCreation}
                   editionParameters={editionParameters}
                   onReady={onTemplatesReady}
                   onError={onMediaError}
@@ -1426,14 +1472,15 @@ export default CoverEditionScreen;
 
 const templateDataFragment = graphql`
   fragment CoverEditionScreen_template on CoverTemplate @inline {
+    suggested
     data {
-      mediaStyle
       sourceMedia {
         id
         uri
         width
         height
       }
+      mediaStyle
       background {
         id
       }

@@ -55,7 +55,9 @@ const CoverTemplatePreview: React.FC<CoverTemplatePreview> = ({
           1,
         );
       }
-      return values.sourceMedia?.id?.src;
+      return values.sourceMedia?.id?.src ?? values.segmented
+        ? 'static/demo_asset_segmented.png'
+        : 'static/demo_asset.png';
     }
   }, [containerHeight, values]);
 

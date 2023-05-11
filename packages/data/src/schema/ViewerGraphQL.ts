@@ -19,6 +19,7 @@ import {
   getAllProfilesWithCardCount,
   getCoverLayers,
   getCoverTemplatesByKind,
+  getCoverTemplatesSuggestion,
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
@@ -345,6 +346,23 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
           }
         });
         return categories;
+      },
+    },
+    coverTemplatesSuggestion: {
+      type: new GraphQLNonNull(new GraphQLList(CoverTemplateGraphQL)),
+      description: 'Return Suggested Cover Templates for business profile',
+      resolve: async (
+        viewer,
+        _,
+        { profileLoader },
+      ): Promise<Array<CoverTemplate | null>> => {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
+          return [];
+        }
+        const profile = await profileLoader.load(profileId);
+        if (profile?.profileKind !== 'business') return [];
+        return getCoverTemplatesSuggestion(profile.companyActivityId!);
       },
     },
   }),

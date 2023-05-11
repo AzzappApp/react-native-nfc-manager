@@ -1,7 +1,7 @@
 {
   "artificialDelayMilliseconds": 700,
   "keepExistingTerminalsOpen": false,
-  "runOnStartup": true,
+  "runOnStartup": false,
   "terminals": [
     {
       "splitTerminals": [
@@ -88,15 +88,6 @@
         {
           "name": "pscale",
           "commands": ["pscale connect --org azzapp azzapp main"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
-          "artificialDelayMilliseconds": 2000,
-          "name": "prisma studio",
-          "commands": ["cd packages/data", "yarn prisma studio"]
         }
       ]
     }

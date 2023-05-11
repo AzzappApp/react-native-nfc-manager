@@ -15,11 +15,23 @@ const CoverTemplateEdit = () => {
     width: number;
     height: number;
   }>();
+  const [imagePreviewDimension, setImagePreviewDimension] = useState<{
+    width: number;
+    height: number;
+  }>();
   const transform = async (dataForm: Record<string, any>) => {
-    const { data, category, colorPalette, ...rest } = dataForm;
+    const {
+      data,
+      category,
+      colorPalette,
+      previewMediaId,
+      companyActivities,
+      suggested,
+      ...rest
+    } = dataForm;
 
     try {
-      if (data.sourceMedia.id?.rawFile != null) {
+      if (suggested && data.sourceMedia.id?.rawFile != null) {
         const { uploadURL, uploadParameters } = await uploadSign(
           {
             kind: 'image',
@@ -36,20 +48,47 @@ const CoverTemplateEdit = () => {
         const { public_id } = await uploadPromise;
         data.sourceMedia = { ...imageDimension, id: public_id, kind: 'image' };
       }
+      if (suggested && previewMediaId.rawFile != null) {
+        const { uploadURL, uploadParameters } = await uploadSign(
+          {
+            kind: 'image',
+            target: 'cover', //maybe create a target coverlayer
+          },
+          injectToken(getTokens()?.token ?? undefined),
+        );
+
+        const { promise: uploadPromise } = uploadMedia(
+          data.sourceMedia.id.rawFile,
+          uploadURL,
+          uploadParameters,
+        );
+        const { public_id } = await uploadPromise;
+        data.sourceMedia = {
+          ...imagePreviewDimension,
+          id: public_id,
+          kind: 'image',
+        };
+      }
 
       if (colorPalette && colorPalette.length > 0) {
         rest.colorPalette = colorPalette;
       } else {
         delete rest.colorPalette;
       }
+
+      rest.suggested = suggested;
+      // convert companyActivity array of string into string separated by comma
+      if (suggested && companyActivities && companyActivities.length > 0) {
+        rest.companyActivityIds = companyActivities.join(',');
+      } else {
+        rest.companyActivityIds = null;
+      }
+      rest.category = JSON.stringify(category);
+
       data.merged = dataForm.merged;
       data.segmented = dataForm.segmented;
 
-      rest.category = JSON.stringify(category);
-      //boolean need to be converted in number apparantrly
-
       rest.data = data;
-
       return rest;
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -69,7 +108,7 @@ const CoverTemplateEdit = () => {
         },
       ),
     );
-    return validateFormCover(values, imageDimension);
+    return validateFormCover(values, imageDimension, imagePreviewDimension);
   };
 
   return (
@@ -80,6 +119,7 @@ const CoverTemplateEdit = () => {
       <CoverTemplate
         validate={validateForm}
         setImageDimension={setImageDimension}
+        setImagePreviewDimension={setImagePreviewDimension}
       />
     </Edit>
   );

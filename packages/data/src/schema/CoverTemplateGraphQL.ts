@@ -19,7 +19,7 @@ import { MediaImageGraphQL } from './MediaGraphQL';
 import { ProfileKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import type { GraphQLContext } from './GraphQLContext';
-import type { CoverTemplate } from '@prisma/client';
+import type { CoverTemplate, Media } from '@prisma/client';
 
 const CoverTemplateGraphQL = new GraphQLObjectType<
   CoverTemplate,
@@ -35,6 +35,22 @@ const CoverTemplateGraphQL = new GraphQLObjectType<
     data: { type: new GraphQLNonNull(CardCoverTemplateGraphQL) },
     enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
     category: { type: new GraphQLList(CoverTemplateCategorGraphQL) },
+    suggested: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+    },
+    previewMedia: {
+      type: MediaImageGraphQL,
+      resolve: (
+        { previewMediaId },
+        _,
+        { mediaLoader },
+      ): Promise<Media> | null => {
+        if (previewMediaId) {
+          return mediaLoader.load(previewMediaId) as Promise<Media>;
+        }
+        return null;
+      },
+    },
     colorPalette: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
       resolve({ colorPalette }) {
@@ -77,8 +93,19 @@ const CardCoverTemplateGraphQL = new GraphQLObjectType<
       type: GraphQLJSON,
     },
     sourceMedia: {
-      type: new GraphQLNonNull(MediaImageGraphQL),
-      description: 'The source of the media used by the cover',
+      type: MediaImageGraphQL,
+      description:
+        'The source of the media used by the cover for a suggested template',
+      resolve: (
+        { sourceMediaId },
+        _,
+        { mediaLoader },
+      ): Promise<Media> | null => {
+        if (sourceMediaId) {
+          return mediaLoader.load(sourceMediaId) as Promise<Media>;
+        }
+        return null;
+      },
     },
     background: {
       type: CoverLayerGraphQL,

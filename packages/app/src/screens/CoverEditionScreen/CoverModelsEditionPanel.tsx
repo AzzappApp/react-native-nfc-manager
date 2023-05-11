@@ -1,80 +1,76 @@
 import MaskedView from '@react-native-masked-view/masked-view';
-import { useCallback, useRef } from 'react';
-import { useIntl } from 'react-intl';
+import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import Container from '#ui/Container';
-import PressableNative from '#ui/PressableNative';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
-import TitleWithLine from '#ui/TitleWithLine';
 import {
   COVER_TEMPLATE_MINIATURE_RATIO,
   TEMPLATE_BORDER_WIDTH,
-  TEMPLATE_GAP,
 } from './coverEditionConstants';
-import CoverTemplateRenderer from './CoverTemplateRenderer';
-import type { EditionParameters } from '#components/gpu';
-import type {
-  CoverModelsEditionPanel_categories$key,
-  CoverModelsEditionPanel_categories$data,
-} from '@azzapp/relay/artifacts/CoverModelsEditionPanel_categories.graphql';
+import CoverModelsEditionPanelTemplateList from './CoverModelsEditionPanelTemplateList';
+import CoverModelsEditionPanelTemplateSuggestedList from './CoverModelsEditionPanelTemplateSuggestedList';
 
+import type { CoverTemplateItemProps } from './CoverModelsEditionPanelTemplateList';
+import type {
+  CoverModelsEditionPanel_categories$data,
+  CoverModelsEditionPanel_categories$key,
+} from '@azzapp/relay/artifacts/CoverModelsEditionPanel_categories.graphql';
+import type { CoverModelsEditionPanelTemplateSuggestedList_suggestion$key } from '@azzapp/relay/artifacts/CoverModelsEditionPanelTemplateSuggestedList_suggestion.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type Category = ArrayItemType<CoverModelsEditionPanel_categories$data>;
-type Template = ArrayItemType<Category['templates']>;
 
-type CoverModelsEditionPanelProps = Omit<ViewProps, 'children'> & {
-  categories: CoverModelsEditionPanel_categories$key;
-  /**
-   * Source Media to Override the Source Media of the template
-   */
-  uri?: string;
-  /**
-   * The source media type
-   */
-  kind?: 'image' | 'video' | 'videoFrame';
-  /**
-   * if the source media is a videoFrame, the time of the frame to display
-   */
-  time?: number | null;
-  /**
-   * the mask image uri
-   */
-  maskUri?: string | null;
-  title?: string | null;
-  subTitle?: string | null;
-  selectedTemplateId: string | null;
-  onSelectTemplate: (templateId: string) => void;
-  isCreation: boolean;
-  editionParameters?: EditionParameters;
-
-  /**
-   * callback called when the component is ready
-   */
-  onReady?: () => void;
-  /**
-   * callback called when the component is ready
-   */
-  onError?: () => void;
-
-  contentContainerStyle?: StyleProp<ViewStyle>;
-};
+type CoverModelsEditionPanelProps = CoverTemplateItemProps &
+  Omit<ViewProps, 'children'> & {
+    /**
+     *
+     *
+     * @type {CoverModelsEditionPanel_categories$key}
+     */
+    categories: CoverModelsEditionPanel_categories$key;
+    /**
+     *
+     *
+     * @type {CoverModelsEditionPanelTemplateSuggestedList_suggestion$key}
+     */
+    viewer: CoverModelsEditionPanelTemplateSuggestedList_suggestion$key;
+    /**
+     * suggestedTemplateMode , true is we are using the suggested template bahviour
+     *
+     * @type {boolean}
+     */
+    hasSuggestedTemplates: boolean;
+    /**
+     * callback called when the component is ready
+     *
+     */
+    onReady?: () => void;
+    /**
+     * callback called when the component is not ready
+     */
+    onError?: () => void;
+    /**
+     *  The flatlist contentContainerStyle
+     *
+     * @type {StyleProp<ViewStyle>}
+     */
+    contentContainerStyle?: StyleProp<ViewStyle>;
+  };
 
 const CoverModelsEditionPanel = ({
   categories: categoriesKey,
+  viewer: suggestionsKey,
   uri,
   kind,
-  time,
   maskUri,
   title,
   subTitle,
+  hasSuggestedTemplates = false,
   selectedTemplateId,
   onSelectTemplate,
   editionParameters,
@@ -97,28 +93,24 @@ const CoverModelsEditionPanel = ({
     categoriesKey,
   );
 
-  const templateCount = categories.reduce(
-    (acc, category) => acc + category.templates.length,
-    0,
-  );
-
-  const readyTemplateCount = useRef(0);
+  const readyCategoryCount = useRef(0);
   const readyDispatched = useRef(false);
-
-  const onTemplateReady = useCallback(() => {
-    readyTemplateCount.current += 1;
+  const categoryToRender = hasSuggestedTemplates ? 2 : 3;
+  const onCategoryReady = useCallback(() => {
+    readyCategoryCount.current += 1;
     if (
-      readyTemplateCount.current >= templateCount &&
+      readyCategoryCount.current >=
+        Math.min(categoryToRender, categories.length) &&
       !readyDispatched.current
     ) {
       onReady?.();
       readyDispatched.current = true;
     }
-  }, [onReady, templateCount]);
+  }, [categories.length, categoryToRender, onReady]);
 
   const errorDispatched = useRef(false);
 
-  const onTemplateError = useCallback(() => {
+  const onCategoryError = useCallback(() => {
     if (!errorDispatched.current) {
       onError?.();
       errorDispatched.current = true;
@@ -126,101 +118,10 @@ const CoverModelsEditionPanel = ({
   }, [onError]);
 
   // TODO reset readyTemplateCount and errorDispatched when categories change
-
   const { width: windowWidth } = useWindowDimensions();
   const coverWidth = windowWidth * COVER_TEMPLATE_MINIATURE_RATIO;
   const coverHeight = coverWidth / COVER_RATIO;
-  const templateItemWidth = coverWidth + 2 * TEMPLATE_BORDER_WIDTH - 0.5;
-  const templateItemHeight = coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
   const rowHeight = TAB_BAR_HEIGHT + coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
-
-  const appearanceStyle = useStyleSheet(computedStyle);
-  const intl = useIntl();
-
-  const getItemLayoutTemplate = useCallback(
-    (_: any, index: number) => ({
-      length: templateItemWidth,
-      offset: 20 + (templateItemWidth + TEMPLATE_GAP) * index,
-      index,
-    }),
-    [templateItemWidth],
-  );
-
-  const renderTemplate = useCallback(
-    ({ item }: ListRenderItemInfo<Template>) => (
-      <PressableNative
-        onPress={() => onSelectTemplate(item.id)}
-        accessibilityRole="button"
-        accessibilityHint={intl.formatMessage({
-          defaultMessage:
-            'Select this cover template template for your profile',
-          description:
-            'TemplateSelectorTemplateItem accessibilityHint template item',
-        })}
-        style={[
-          styles.templateContainer,
-          {
-            width: templateItemWidth,
-            height: templateItemHeight,
-            borderRadius:
-              COVER_CARD_RADIUS * coverWidth + TEMPLATE_BORDER_WIDTH,
-            borderColor:
-              selectedTemplateId === item.id ? colors.black : 'transparent',
-          },
-        ]}
-      >
-        <Container
-          style={[
-            {
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: COVER_CARD_RADIUS * coverWidth,
-            },
-            appearanceStyle.coverShadow,
-          ]}
-        >
-          <CoverTemplateRenderer
-            template={item}
-            title={title}
-            subTitle={subTitle}
-            uri={uri}
-            kind={kind}
-            time={time}
-            maskUri={maskUri}
-            style={{
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: COVER_CARD_RADIUS * coverWidth,
-              overflow: 'hidden',
-            }}
-            height={coverHeight}
-            editionParameters={editionParameters}
-            onReady={onTemplateReady}
-            onError={onTemplateError}
-          />
-        </Container>
-      </PressableNative>
-    ),
-    [
-      appearanceStyle.coverShadow,
-      coverHeight,
-      coverWidth,
-      editionParameters,
-      intl,
-      kind,
-      maskUri,
-      onSelectTemplate,
-      onTemplateError,
-      onTemplateReady,
-      selectedTemplateId,
-      subTitle,
-      templateItemHeight,
-      templateItemWidth,
-      time,
-      title,
-      uri,
-    ],
-  );
 
   const getItemLayoutCategory = useCallback(
     (_: any, index: number) => ({
@@ -232,23 +133,67 @@ const CoverModelsEditionPanel = ({
   );
 
   const renderCategory = useCallback(
-    ({ item }: ListRenderItemInfo<Category>) => (
-      <View style={{ height: rowHeight }}>
-        <TitleWithLine title={item.category} />
-        <FlatList
-          data={item.templates}
-          renderItem={renderTemplate}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={keyExtractorTemplates}
-          getItemLayout={getItemLayoutTemplate}
-          style={styles.templateList}
-          contentContainerStyle={styles.templateListContainer}
+    ({ item, index }: ListRenderItemInfo<Category | string>) => {
+      if (index === 0 && hasSuggestedTemplates) {
+        return (
+          <CoverModelsEditionPanelTemplateSuggestedList
+            viewer={suggestionsKey}
+            coverWidth={coverWidth}
+            coverHeight={coverHeight}
+            title={title}
+            subTitle={subTitle}
+            selectedTemplateId={selectedTemplateId}
+            onSelectTemplate={onSelectTemplate}
+            rowHeight={rowHeight}
+          />
+        );
+      }
+
+      return (
+        <CoverModelsEditionPanelTemplateList
+          item={item as Category}
+          coverWidth={coverWidth}
+          coverHeight={coverHeight}
+          uri={uri}
+          kind={kind}
+          maskUri={maskUri}
+          title={title}
+          subTitle={subTitle}
+          selectedTemplateId={selectedTemplateId}
+          onSelectTemplate={onSelectTemplate}
+          editionParameters={editionParameters}
+          onTemplateReady={onCategoryReady}
+          onTemplateError={onCategoryError}
+          rowHeight={rowHeight}
         />
-      </View>
-    ),
-    [getItemLayoutTemplate, renderTemplate, rowHeight],
+      );
+    },
+    [
+      hasSuggestedTemplates,
+      coverWidth,
+      coverHeight,
+      uri,
+      kind,
+      maskUri,
+      title,
+      subTitle,
+      selectedTemplateId,
+      onSelectTemplate,
+      editionParameters,
+      onCategoryReady,
+      onCategoryError,
+      rowHeight,
+      suggestionsKey,
+    ],
   );
+
+  const templateData = useMemo(() => {
+    if (hasSuggestedTemplates) {
+      return ['suggestion', ...categories];
+    } else {
+      return categories;
+    }
+  }, [categories, hasSuggestedTemplates]);
 
   return (
     <View {...props}>
@@ -268,43 +213,29 @@ const CoverModelsEditionPanel = ({
       >
         <FlatList
           renderItem={renderCategory}
-          data={categories}
+          data={templateData}
           keyExtractor={keyExtractorCategory}
           getItemLayout={getItemLayoutCategory}
           contentContainerStyle={contentContainerStyle}
           style={styles.templateList}
+          initialNumToRender={categoryToRender}
         />
       </MaskedView>
     </View>
   );
 };
 
-const keyExtractorCategory = (item: Category, index: number) =>
-  item?.category ?? `category-${index}`;
-
-const keyExtractorTemplates = (item: Template, index: number) =>
-  item?.id ?? `templates-${index}`;
+const keyExtractorCategory = (item: Category | string, index: number) => {
+  if (typeof item === 'string') {
+    return item;
+  }
+  return item?.category ?? `category-${index}`;
+};
 
 export default CoverModelsEditionPanel;
-
-const computedStyle = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
-}));
 
 const styles = StyleSheet.create({
   templateList: {
     overflow: 'visible',
-  },
-  templateListContainer: {
-    columnGap: TEMPLATE_GAP,
-    paddingHorizontal: 20,
-  },
-  templateContainer: {
-    borderWidth: TEMPLATE_BORDER_WIDTH,
   },
 });

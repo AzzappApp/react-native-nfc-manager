@@ -4,15 +4,44 @@ import { isValidHex } from '@azzapp/shared/stringHelpers';
 export const validateFormCover = async (
   values: any,
   imageDimension: { width: number; height: number } | undefined,
+  imagePreviewDimension: { width: number; height: number } | undefined,
 ) => {
   let errors = { data: {} } as any;
   //this will be a quick n dirty validation form
+  const isSourceMediaNull =
+    values.data.sourceMedia == null ||
+    values.data.sourceMedia?.id === undefined; //case when we have a asset demo
 
-  if (values.data.sourceMedia == null) {
-    errors.data.sourceMedia = { id: 'Image is required' };
+  const isPreviewMediaNull = values.previewMediaId == null;
+
+  // Suggested template should be business only
+  if (values.suggested && values.kind !== 'business') {
+    errors.kind = 'A suggested template should be business only';
   }
+
+  // Not Suggested template should not have sourceMedia
+  if (!values.suggested && !isSourceMediaNull) {
+    errors.data.sourceMedia = {
+      id: 'Cover Image is reserved for Suggested Template',
+    };
+  }
+
+  // Not Suggested template should not have previewMeida
+  if (!values.suggested && !isPreviewMediaNull) {
+    errors.previewMediaId = 'Preview Image is reserved for Suggested Template';
+  }
+
+  if (values.suggested) {
+    if (isSourceMediaNull) {
+      errors.data.sourceMedia = { id: 'Image is required' };
+    }
+    if (values.previewMediaId == null) {
+      errors.previewMediaId = { id: 'Preview Image is required' };
+    }
+  }
+
+  // Cover Media should respect the Cover Aspect Ratio
   if (imageDimension && imageDimension.width !== 0) {
-    //check the ratio
     const ratio = imageDimension.width / imageDimension.height;
     if (ratio !== COVER_RATIO) {
       errors.data.sourceMedia = {
@@ -20,6 +49,15 @@ export const validateFormCover = async (
       };
     }
   }
+
+  // preview Media should respect the Cover Aspect Ratio
+  if (imagePreviewDimension && imagePreviewDimension.width !== 0) {
+    const ratio = imagePreviewDimension.width / imagePreviewDimension.height;
+    if (ratio !== COVER_RATIO) {
+      errors.previewMediaId = `Image ratio is not respected, should be ${COVER_RATIO}`;
+    }
+  }
+
   if (values.category?.en == null) {
     errors.category = { en: 'Category is required' };
   }

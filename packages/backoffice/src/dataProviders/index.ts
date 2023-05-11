@@ -1,3 +1,4 @@
+import CompanyActivityProviders from './companyActivityProvider';
 import CoverLayerDataProviders from './coverLayerDataProvider';
 import CoverTemplateDataProviders from './coverTemplateDataProvider';
 import InterestDataProviders from './interestsDataProvider';
@@ -25,6 +26,13 @@ registerResourceDataProvider(
 registerResourceDataProvider(
   'ProfileCategory',
   ProfileCategoryDataProviders,
+  ['admin'],
+  ['admin'],
+);
+
+registerResourceDataProvider(
+  'CompanyActivity',
+  CompanyActivityProviders,
   ['admin'],
   ['admin'],
 );

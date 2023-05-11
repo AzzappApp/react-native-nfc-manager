@@ -149,6 +149,9 @@ type Viewer {
 
   """Fetches all cover templates for a given kind ordered by Category"""
   coverTemplatesByCategory(segmented: Boolean): [CoverTemplateCategory!]!
+
+  """Return Suggested Cover Templates for business profile"""
+  coverTemplatesSuggestion: [CoverTemplate]!
 }
 
 """Represent an Azzapp Profile"""
@@ -420,6 +423,8 @@ type CoverTemplate implements Node {
   data: CardCoverTemplate!
   enabled: Boolean!
   category: [CoverTemplateCategorGraphQL]
+  suggested: Boolean!
+  previewMedia: MediaImage
   colorPalette: [String!]
   tags: [String!]!
 }
