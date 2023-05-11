@@ -22,6 +22,9 @@ const icons = {
   get add() {
     return require('./assets/add.png');
   },
+  get azzapp() {
+    return require('./assets/azzapp.png');
+  },
   get albums() {
     return require('./assets/albums.png');
   },
@@ -49,6 +52,12 @@ const icons = {
   get background() {
     return require('./assets/background.png');
   },
+  get big_grid() {
+    return require('./assets/big_grid.png');
+  },
+  get bloc() {
+    return require('./assets/bloc.png');
+  },
   get border() {
     return require('./assets/border.png');
   },
@@ -64,8 +73,14 @@ const icons = {
   get carroussel_square() {
     return require('./assets/carroussel_square.png');
   },
+  get carroussel_webcards() {
+    return require('./assets/carroussel_webcards.png');
+  },
   get chat() {
     return require('./assets/chat.png');
+  },
+  get check() {
+    return require('./assets/check.png');
   },
   get chrono() {
     return require('./assets/chrono.png');
@@ -84,6 +99,9 @@ const icons = {
   },
   get comment() {
     return require('./assets/comment.png');
+  },
+  get contact() {
+    return require('./assets/contact.png');
   },
   get contrast() {
     return require('./assets/contrast.png');
@@ -120,6 +138,9 @@ const icons = {
   },
   get flash_on() {
     return require('./assets/flash_on.png');
+  },
+  get flip() {
+    return require('./assets/flip.png');
   },
   get font_color() {
     return require('./assets/font_color.png');
@@ -160,6 +181,9 @@ const icons = {
   get information() {
     return require('./assets/information.png');
   },
+  get inline() {
+    return require('./assets/inline.png');
+  },
   get invite() {
     return require('./assets/invite.png');
   },
@@ -168,6 +192,9 @@ const icons = {
   },
   get like() {
     return require('./assets/like.png');
+  },
+  get like_filled() {
+    return require('./assets/like_filled.png');
   },
   get link() {
     return require('./assets/link.png');
@@ -192,6 +219,9 @@ const icons = {
   },
   get mobile() {
     return require('./assets/mobile.png');
+  },
+  get more() {
+    return require('./assets/more.png');
   },
   get notification() {
     return require('./assets/notification.png');
@@ -223,8 +253,17 @@ const icons = {
   get settings() {
     return require('./assets/settings.png');
   },
+  get scroll() {
+    return require('./assets/scroll.png');
+  },
   get shadow() {
     return require('./assets/shadow.png');
+  },
+  get share() {
+    return require('./assets/share.png');
+  },
+  get shared_webcard() {
+    return require('./assets/shared_webcard.png');
   },
   get sharpness() {
     return require('./assets/sharpness.png');
@@ -270,6 +309,9 @@ const icons = {
   },
   get vignetting() {
     return require('./assets/vignetting.png');
+  },
+  get warning() {
+    return require('./assets/warning.png');
   },
   get width_full() {
     return require('./assets/width-full.png');

@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { colors } from '#theme';
 import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -41,9 +40,7 @@ const EditionParametersList = ({
                 onPress={() => onSelectParam(param)}
                 accessibilityRole="button"
               >
-                <View style={styles.paramIconContainer}>
-                  <Icon icon={icon} style={styles.paramIcon} />
-                </View>
+                <Icon icon={icon} style={styles.paramIcon} />
               </FloatingButton>
               <Text variant="small" style={styles.text}>
                 {label}
@@ -65,15 +62,6 @@ const styles = StyleSheet.create({
   },
   paramsButton: {
     alignItems: 'center',
-  },
-  paramIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: colors.grey100,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   paramIcon: {
     width: 26,
