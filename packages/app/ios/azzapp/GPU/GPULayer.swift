@@ -242,6 +242,27 @@ struct GPULayer: Equatable {
       return underlayImage
     }
     
+    let transparentImage = CIImage(color: CIColor(red: 0, green: 0, blue: 0, alpha: 0))
+      .cropped(to: CGRectMake(0, 0, image.extent.width, image.extent.height))
+    
+    //blending with mask should be done before cropping/orientation. scaling is not a issue itself
+    if let tintColor = layer.tintColor {
+      let blendFilter = CIFilter.blendWithAlphaMask()
+      blendFilter.inputImage = CIImage(color: CIColor(color: tintColor))
+        .cropped(to: CGRectMake(0, 0, image.extent.width, image.extent.height))
+      blendFilter.backgroundImage = transparentImage
+      blendFilter.maskImage = image
+      image = blendFilter.outputImage!
+    }
+    
+    if let maskUri = layer.maskUri, let maskImage = layerImages?[.image(uri: maskUri)]  {
+      let blendFilter = CIFilter.blendWithMask()
+      blendFilter.inputImage = image
+      blendFilter.backgroundImage = transparentImage
+      blendFilter.maskImage = scaleImage(maskImage, toSize: CGSize.init(width: image.extent.width, height: image.extent.height))
+      image = blendFilter.outputImage!
+    }
+    
     let parameters = layer.parameters ?? GPULayerEditionParameters()
     if let orientation = parameters.orientation {
       image = image.oriented(orientation)
@@ -343,27 +364,7 @@ struct GPULayer: Equatable {
         image = filterTransform(image)
       }
     }
-      
-    let transparentImage = CIImage(color: CIColor(red: 0, green: 0, blue: 0, alpha: 0))
-      .cropped(to: CGRectMake(0, 0, size.width, size.height))
-    
-    if let tintColor = layer.tintColor {
-      let blendFilter = CIFilter.blendWithAlphaMask()
-      blendFilter.inputImage = CIImage(color: CIColor(color: tintColor))
-        .cropped(to: CGRectMake(0, 0, size.width, size.height))
-      blendFilter.backgroundImage = transparentImage
-      blendFilter.maskImage = image
-      image = blendFilter.outputImage!
-    }
-    
-    if let maskUri = layer.maskUri, let maskImage = layerImages?[.image(uri: maskUri)]  {
-      let blendFilter = CIFilter.blendWithMask()
-      blendFilter.inputImage = image
-      blendFilter.backgroundImage = transparentImage
-      blendFilter.maskImage = scaleImage(maskImage, toSize: size)
-      image = blendFilter.outputImage!
-    }
-    
+
     if let backgroundColor = layer.backgroundColor {
       let backgroundImage = CIImage(color: CIColor(color: backgroundColor))
         .cropped(to: CGRectMake(0, 0, size.width, size.height))
