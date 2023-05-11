@@ -22,6 +22,8 @@ import {
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
+  getUserProfiles,
+  getUsersByIds,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -53,6 +55,47 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
           return null;
         }
         return profileLoader.load(profileId);
+      },
+    },
+    userProfiles: {
+      description: 'Return a list of Profiles of the current user',
+      type: new GraphQLList(new GraphQLNonNull(ProfileGraphQL)),
+      resolve: async (viewer): Promise<Profile[] | null> => {
+        if (viewer.isAnonymous) {
+          return null;
+        }
+
+        const profiles = getUserProfiles(viewer.userId);
+
+        return profiles;
+      },
+    },
+    email: {
+      description: 'Return the email of the current user',
+      type: GraphQLString,
+      resolve: async (viewer): Promise<string | null> => {
+        if (viewer.isAnonymous) {
+          return null;
+        }
+
+        const userId = viewer.userId;
+        const [user] = await getUsersByIds([userId]);
+
+        return user?.email ?? null;
+      },
+    },
+    phoneNumber: {
+      description: 'Return the phone number of the current user',
+      type: GraphQLString,
+      resolve: async (viewer): Promise<string | null> => {
+        if (viewer.isAnonymous) {
+          return null;
+        }
+
+        const userId = viewer.userId;
+        const [user] = await getUsersByIds([userId]);
+
+        return user?.phoneNumber ?? null;
       },
     },
     followedProfiles: {
@@ -331,4 +374,5 @@ const CoverTemplateCategoryGraphQL = new GraphQLObjectType({
     },
   }),
 });
+
 //create a grpahqlscalar type for {[lang:string]: CoverTemplate[]}

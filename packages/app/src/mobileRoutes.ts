@@ -26,6 +26,7 @@ export const mainRoutes: NativeRouterInit = {
           id: 'ALBUMS',
           route: 'ALBUMS',
         },
+        { id: 'ACCOUNT', route: 'ACCOUNT' },
       ],
     },
   ],

@@ -58,6 +58,15 @@ type Query {
 type Viewer {
   profile: Profile
 
+  """Return a list of Profiles of the current user"""
+  userProfiles: [Profile!]
+
+  """Return the email of the current user"""
+  email: String
+
+  """Return the phone number of the current user"""
+  phoneNumber: String
+
   """Return a list of Profiles that the current user is following"""
   followedProfiles(
     """Returns the items in the list that come after the specified cursor."""
@@ -163,6 +172,9 @@ type Profile implements Node {
     first: Int
   ): PostConnection
   isFollowing: Boolean!
+  nbPosts: Int!
+  nbFollowedProfiles: Int!
+  nbFollowersProfiles: Int!
 }
 
 """An object with an ID"""

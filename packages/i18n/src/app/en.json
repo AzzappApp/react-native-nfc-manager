@@ -3,6 +3,10 @@
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
   },
+  "/TIhgi": {
+    "defaultMessage": "Create a new account",
+    "description": "Create a new account button label"
+  },
   "/cVb8L": {
     "defaultMessage": "Please enter a valid phone number",
     "description": "Signup Screen - Error message for invalid phone number"
@@ -163,6 +167,10 @@
     "defaultMessage": "Font size",
     "description": "Label of the font size slider in cover edition"
   },
+  "AY9kr3": {
+    "defaultMessage": "Open user settings",
+    "description": "Open bottom menu to change user settings, like logout, change password, etc."
+  },
   "AsCp0n": {
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
@@ -186,6 +194,10 @@
   "BRodym": {
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
+  },
+  "Bswpqg": {
+    "defaultMessage": "Posts",
+    "description": "Number of posts"
   },
   "C1R1bc": {
     "defaultMessage": "Fade",
@@ -407,6 +419,10 @@
     "defaultMessage": "Edit my profile",
     "description": "Edit my profile button label in Profile Screen Button Bar"
   },
+  "SUCRjC": {
+    "defaultMessage": "My Webcards",
+    "description": "Account screen header title where current profile can be changed"
+  },
   "SjPeXD": {
     "defaultMessage": "Hex",
     "description": "HexColorTextInput Component Hex Title"
@@ -523,6 +539,10 @@
     "defaultMessage": "Cut Video",
     "description": "Title of the cut video section in Image edition wizzar"
   },
+  "ZNPb7F": {
+    "defaultMessage": "Change account",
+    "description": "Change account modal title"
+  },
   "ZZvty9": {
     "defaultMessage": "Done",
     "description": "ColorPicker component Done button label"
@@ -542,6 +562,10 @@
   "aOpC4m": {
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
+  },
+  "b/ugZW": {
+    "defaultMessage": "Followings",
+    "description": "Number of followed profiles"
   },
   "b4fFwm": {
     "defaultMessage": "Brightness",
@@ -702,6 +726,10 @@
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
+  },
+  "kJBZgb": {
+    "defaultMessage": "Connect to existing account",
+    "description": "Connect to existing account button label"
   },
   "kKfpW5": {
     "defaultMessage": "Please enter a valid email address",
@@ -986,6 +1014,10 @@
   "y3qZwL": {
     "defaultMessage": "Title",
     "description": "Label of the title input in cover edition"
+  },
+  "ySeX6t": {
+    "defaultMessage": "Followers",
+    "description": "Number of followers"
   },
   "ydBmYF": {
     "defaultMessage": "Auto",

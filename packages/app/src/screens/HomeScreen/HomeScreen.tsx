@@ -45,7 +45,7 @@ const HomeScreen = ({
   );
 
   const goToSettings = useCallback(() => {
-    router.push({ route: 'SETTINGS' });
+    router.push({ route: 'ACCOUNT' });
   }, [router]);
 
   return (

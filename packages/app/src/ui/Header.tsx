@@ -51,7 +51,7 @@ const Header = ({
             <View>{middleElement}</View>
           ) : undefined}
         </View>
-        {leftElement}
+        {rightElement ? leftElement ?? <View /> : leftElement}
         {rightElement}
       </View>
     </Container>

@@ -250,9 +250,9 @@ export default BottomSheetModal;
 
 const computedStyle = createStyleSheet(appearance => ({
   gestureInteractionIndicator: {
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.white,
     height: 4,
-    width: 20,
+    width: 40,
     alignSelf: 'center',
     borderRadius: 2,
     marginBottom: 4,

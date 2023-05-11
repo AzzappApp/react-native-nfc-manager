@@ -30,7 +30,7 @@ const routesMap: { [key in Route['route']]: string } = {
   POST: '/posts/[postId]',
   NEW_POST: '/[userName]/newPost',
   SEARCH: '/search',
-  SETTINGS: '/settings',
+  ACCOUNT: '/account',
   ALBUMS: '/albums',
   CHAT: '/chat',
   NEW_PROFILE: '/profile/new',

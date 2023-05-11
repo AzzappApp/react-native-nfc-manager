@@ -16,8 +16,8 @@ export type ChatRoute = {
   params?: never;
 };
 
-export type SettingsRoute = {
-  route: 'SETTINGS';
+export type AccountRoute = {
+  route: 'ACCOUNT';
   params?: never;
 };
 
@@ -92,7 +92,7 @@ export type Route =
   | HomeRoute
   | SearchRoute
   | ChatRoute
-  | SettingsRoute
+  | AccountRoute
   | ProfileRoute
   | ProfilePostsRoute
   | PostRoute

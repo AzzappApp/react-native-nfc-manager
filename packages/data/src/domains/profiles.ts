@@ -83,10 +83,12 @@ export const getAllProfilesWithCardCount = async (): Promise<number> =>
 
 /**
  * Retrieve the list of profiles a profile is following
- * @param userId - The id of the profile
+ * @param profileId - The id of the profile
  * @returns A list of users
  */
-export const getFollowedProfiles = async (userId: string): Promise<Profile[]> =>
+export const getFollowedProfiles = async (
+  profileId: string,
+): Promise<Profile[]> =>
   db
     .selectFrom('Profile')
     .selectAll()
@@ -94,8 +96,40 @@ export const getFollowedProfiles = async (userId: string): Promise<Profile[]> =>
     .whereExists(
       sql`(select Card.id from Card where Profile.id = Card.profileId)`,
     )
-    .where('Follow.followerId', '=', userId)
+    .where('Follow.followerId', '=', profileId)
     .execute();
+
+/**
+ * Retrieve the number of profiles a profile is following
+ * @param profileId - The id of the profile
+ * @returns the number of profiles a profile is following
+ */
+export const getFollowedProfilesCount = async (
+  profileId: string,
+): Promise<number> =>
+  db
+    .selectFrom('Profile')
+    .select(db.fn.countAll<number>().as('count'))
+    .innerJoin('Follow', 'Profile.id', 'Follow.followingId')
+    .where('Follow.followerId', '=', profileId)
+    .executeTakeFirstOrThrow()
+    .then(({ count }) => count);
+
+/**
+ * Retrieve the number of profiles a profile is being followed
+ * @param profileId - The id of the profile
+ * @returns the number of profiles a profile is being followed
+ */
+export const getFollowerProfilesCount = async (
+  profileId: string,
+): Promise<number> =>
+  db
+    .selectFrom('Profile')
+    .select(db.fn.countAll<number>().as('count'))
+    .innerJoin('Follow', 'Profile.id', 'Follow.followerId')
+    .where('Follow.followingId', '=', profileId)
+    .executeTakeFirstOrThrow()
+    .then(({ count }) => count);
 
 /**
  * Create a new profile

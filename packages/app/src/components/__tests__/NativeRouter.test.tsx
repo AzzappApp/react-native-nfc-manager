@@ -382,8 +382,8 @@ describe('NativeRouter', () => {
                     ],
                   },
                   {
-                    id: 'SETTINGS',
-                    route: 'SETTINGS',
+                    id: 'ACCOUNT',
+                    route: 'ACCOUNT',
                   },
                 ],
               },
@@ -392,7 +392,7 @@ describe('NativeRouter', () => {
         });
 
         act(() => {
-          result.current.router.push({ route: 'SETTINGS' });
+          result.current.router.push({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -426,10 +426,10 @@ describe('NativeRouter', () => {
                       ],
                     },
                     {
-                      "id": "SETTINGS",
+                      "id": "ACCOUNT",
                       "kind": "route",
                       "state": {
-                        "route": "SETTINGS",
+                        "route": "ACCOUNT",
                       },
                     },
                   ],
@@ -453,8 +453,8 @@ describe('NativeRouter', () => {
                     route: 'HOME',
                   },
                   {
-                    id: 'SETTINGS',
-                    route: 'SETTINGS',
+                    id: 'ACCOUNT',
+                    route: 'ACCOUNT',
                   },
                 ],
               },
@@ -467,7 +467,7 @@ describe('NativeRouter', () => {
         }));
 
         act(() => {
-          result.current.router.push({ route: 'SETTINGS' });
+          result.current.router.push({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -488,10 +488,10 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "SETTINGS",
+                      "id": "ACCOUNT",
                       "kind": "route",
                       "state": {
-                        "route": "SETTINGS",
+                        "route": "ACCOUNT",
                       },
                     },
                   ],
@@ -508,7 +508,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "SETTINGS",
+                  "route": "ACCOUNT",
                 },
               },
             ],
@@ -779,8 +779,8 @@ describe('NativeRouter', () => {
                 route: 'SIGN_IN',
               },
               {
-                id: 'SETTINGS',
-                route: 'SETTINGS',
+                id: 'ACCOUNT',
+                route: 'ACCOUNT',
               },
             ],
           });
@@ -998,8 +998,8 @@ describe('NativeRouter', () => {
                     ],
                   },
                   {
-                    id: 'SETTINGS',
-                    route: 'SETTINGS',
+                    id: 'ACCOUNT',
+                    route: 'ACCOUNT',
                   },
                 ],
               },
@@ -1008,7 +1008,7 @@ describe('NativeRouter', () => {
         });
 
         act(() => {
-          result.current.router.replace({ route: 'SETTINGS' });
+          result.current.router.replace({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1042,10 +1042,10 @@ describe('NativeRouter', () => {
                       ],
                     },
                     {
-                      "id": "SETTINGS",
+                      "id": "ACCOUNT",
                       "kind": "route",
                       "state": {
-                        "route": "SETTINGS",
+                        "route": "ACCOUNT",
                       },
                     },
                   ],
@@ -1069,8 +1069,8 @@ describe('NativeRouter', () => {
                     route: 'HOME',
                   },
                   {
-                    id: 'SETTINGS',
-                    route: 'SETTINGS',
+                    id: 'ACCOUNT',
+                    route: 'ACCOUNT',
                   },
                 ],
               },
@@ -1083,7 +1083,7 @@ describe('NativeRouter', () => {
         }));
 
         act(() => {
-          result.current.router.replace({ route: 'SETTINGS' });
+          result.current.router.replace({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1104,10 +1104,10 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "SETTINGS",
+                      "id": "ACCOUNT",
                       "kind": "route",
                       "state": {
-                        "route": "SETTINGS",
+                        "route": "ACCOUNT",
                       },
                     },
                   ],
@@ -1117,7 +1117,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "SETTINGS",
+                  "route": "ACCOUNT",
                 },
               },
             ],
@@ -1194,7 +1194,7 @@ describe('NativeRouter', () => {
           });
         });
         act(() => {
-          result.current.router.showModal({ route: 'SETTINGS' });
+          result.current.router.showModal({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1204,7 +1204,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "SETTINGS",
+                  "route": "ACCOUNT",
                 },
               },
             ],
@@ -1240,7 +1240,7 @@ describe('NativeRouter', () => {
           });
         });
         act(() => {
-          result.current.router.showModal({ route: 'SETTINGS' });
+          result.current.router.showModal({ route: 'ACCOUNT' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1257,7 +1257,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "SETTINGS",
+                  "route": "ACCOUNT",
                 },
               },
             ],
@@ -1530,8 +1530,8 @@ describe('NativeRouter', () => {
                 route: 'SIGN_IN',
               },
               {
-                id: 'SETTINGS',
-                route: 'SETTINGS',
+                id: 'ACCOUNT',
+                route: 'ACCOUNT',
               },
             ],
           });
@@ -1683,7 +1683,7 @@ describe('NativeRouter', () => {
             id: 'test',
             stack: [
               { id: 'HOME', route: 'HOME' },
-              { id: 'SETTINGS', route: 'SETTINGS' },
+              { id: 'ACCOUNT', route: 'ACCOUNT' },
             ],
             modals: [],
           });
@@ -1704,8 +1704,8 @@ describe('NativeRouter', () => {
         });
 
         expect(screenWillBeRemovedListenerSpy).toHaveBeenCalledWith({
-          id: 'SETTINGS',
-          route: { route: 'SETTINGS' },
+          id: 'ACCOUNT',
+          route: { route: 'ACCOUNT' },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
@@ -1816,7 +1816,7 @@ describe('NativeRouter', () => {
                 currentIndex: 0,
                 tabs: [
                   { id: 'HOME', route: 'HOME' },
-                  { id: 'SETTINGS', route: 'SETTINGS' },
+                  { id: 'ACCOUNT', route: 'ACCOUNT' },
                 ],
               },
             ],
@@ -1835,20 +1835,20 @@ describe('NativeRouter', () => {
         router.addRouteWillChangeListener(routeDidChangeListenerSpy);
 
         act(() => {
-          router.push({ route: 'SETTINGS' });
+          router.push({ route: 'ACCOUNT' });
         });
 
         expect(screenWillBePushedListenerSpy).toHaveBeenCalledWith({
           id: expect.any(String),
-          route: { route: 'SETTINGS' },
+          route: { route: 'ACCOUNT' },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'SETTINGS',
+          route: 'ACCOUNT',
         });
 
         expect(routeDidChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'SETTINGS',
+          route: 'ACCOUNT',
         });
       });
     });

@@ -15,6 +15,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
+import { buildUserUrl } from '#helpers/urlHelpers';
 import useViewportSize, { VH100, insetTop } from '#hooks/useViewportSize';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
@@ -377,7 +378,7 @@ const ProfileForm = ({
                   userNameError != null && { color: colors.red400 },
                 ]}
               >
-                https://www.azzapp.com/{userName}
+                {buildUserUrl(userName)}
               </Text>
             </>
           )}

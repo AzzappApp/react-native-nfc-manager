@@ -4,6 +4,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLList,
+  GraphQLInt,
 } from 'graphql';
 import {
   connectionDefinitions,
@@ -17,6 +18,8 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   getCompanyActivities,
   getCompanyActivityById,
+  getFollowedProfilesCount,
+  getFollowerProfilesCount,
   getProfileCategoryById,
   getProfilesPosts,
   getProfilesPostsCount,
@@ -115,6 +118,24 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
           return false;
         }
         return isFollowing(profileId, profile.id);
+      },
+    },
+    nbPosts: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve(profile): Promise<number> {
+        return getProfilesPostsCount(profile.id);
+      },
+    },
+    nbFollowedProfiles: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve(profile): Promise<number> {
+        return getFollowedProfilesCount(profile.id);
+      },
+    },
+    nbFollowersProfiles: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve(profile): Promise<number> {
+        return getFollowerProfilesCount(profile.id);
       },
     },
   }),

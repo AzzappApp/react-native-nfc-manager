@@ -31,6 +31,9 @@ const icons = {
   get arrow_down() {
     return require('./assets/arrow_down.png');
   },
+  get arrow_down_fill() {
+    return require('./assets/arrow_down_fill.png');
+  },
   get arrow_left() {
     return require('./assets/arrow_left.png');
   },

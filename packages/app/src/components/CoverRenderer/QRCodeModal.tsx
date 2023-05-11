@@ -5,6 +5,7 @@ import {
   View,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import { buildUserUrl } from '#helpers/urlHelpers';
 
 type QRCodeModalProps = {
   onRequestClose(): void;
@@ -23,7 +24,7 @@ const QRCodeModal = ({ onRequestClose, userName }: QRCodeModalProps) => (
       <View style={styles.overlay}>
         <View style={styles.qrCodeContainer}>
           <QRCode
-            value={`https://www.azzapp.com/${userName}`}
+            value={buildUserUrl(userName)}
             logo={require('#assets/logo.png')}
             size={240}
             logoBackgroundColor="#FFF"

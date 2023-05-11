@@ -33,6 +33,7 @@ import { getRelayEnvironment } from './helpers/relayEnvironment';
 import * as RelayQueryManager from './helpers/RelayQueryManager';
 import { isRelayScreen } from './helpers/relayScreen';
 import waitFor from './helpers/waitFor';
+import AccountMobileScreen from './mobileScreens/AccountMobileScreen';
 import CardModuleEditionMobileScreen from './mobileScreens/CardModuleEditionMobileScreen';
 import ChangePasswordMobileScreen from './mobileScreens/ChangePasswordMobileScreen';
 import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScreen';
@@ -43,7 +44,6 @@ import PostMobileScreen from './mobileScreens/PostMobileScreen';
 import ProfileMobileScreen from './mobileScreens/ProfileMobileScreen';
 import ProfilePostsMobileScreen from './mobileScreens/ProfilePostsMobileScreen';
 import SearchMobileScreen from './mobileScreens/SearchMobileScreen';
-import SettingsMobileScreen from './mobileScreens/SettingsMobileScreen';
 import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
 import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
 import { PlatformEnvironmentProvider } from './PlatformEnvironment';
@@ -58,7 +58,7 @@ const screens = {
   CHANGE_PASSWORD: ChangePasswordMobileScreen,
   HOME: HomeMobileScreen,
   SEARCH: SearchMobileScreen,
-  SETTINGS: SettingsMobileScreen,
+  ACCOUNT: AccountMobileScreen,
   ALBUMS: () => <View />,
   CHAT: () => <View />,
   POST: PostMobileScreen,
