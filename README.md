@@ -100,7 +100,6 @@ To launch the application source code test use the `test` script
 ```sh
 yarn test
 ```
-
 ## Sources structure
 
 The sources of the project are organized as a monorepo. Dependencies are managed through the `yarn` [workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) feature.
