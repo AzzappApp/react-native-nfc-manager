@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/relay",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "clean": "rm -rf artifacts"
