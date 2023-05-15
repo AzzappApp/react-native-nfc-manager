@@ -170,6 +170,10 @@ const ImagePickerWizardRenderer = ({
     } else if (!preventNavigation) {
       leftButton = (
         <IconButton
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Back',
+            description: 'Back button label in image picker wizzard',
+          })}
           onPress={onBack}
           iconSize={30}
           icon="arrow_left"
