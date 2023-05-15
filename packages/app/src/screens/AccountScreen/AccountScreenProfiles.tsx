@@ -1,7 +1,8 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { View } from 'react-native';
+import { View, Image, ScrollView } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 import {
   runOnJS,
   useAnimatedReaction,
@@ -13,6 +14,7 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { buildUserUrl } from '#helpers/urlHelpers';
+import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -42,6 +44,10 @@ export default function AccountScreenProfiles({
         userProfiles {
           id
           userName
+          firstName
+          companyActivity {
+            label
+          }
           nbPosts
           nbFollowedProfiles
           nbFollowersProfiles
@@ -84,6 +90,8 @@ export default function AccountScreenProfiles({
 
   const styles = useStyleSheet(computedStyles);
 
+  const vp = useViewportSize();
+
   return (
     <View style={{ alignItems: 'center' }}>
       <View style={styles.carouselContainer}>
@@ -95,7 +103,7 @@ export default function AccountScreenProfiles({
             style={{
               width: COVER_WIDTH * 3,
               justifyContent: 'center',
-              height: 250,
+              height: 235,
             }}
             mode="parallax"
             windowSize={4}
@@ -170,23 +178,78 @@ export default function AccountScreenProfiles({
           </Text>
         </View>
       </View>
-
-      <View style={styles.profileDataContainer}>
-        <PressableNative
-          accessibilityRole="button"
-          onPress={() =>
-            Clipboard.setString(
-              buildUserUrl(viewer.userProfiles?.[index]?.userName ?? ''),
-            )
-          }
+      <ScrollView>
+        <View
+          style={[
+            styles.profileDataContainer,
+            { paddingBottom: vp`${insetBottom}  + ${700}` },
+          ]}
         >
-          <View style={styles.profileUrlContainer}>
-            <Text variant="medium" style={styles.profileUrl} numberOfLines={1}>
-              {buildUserUrl(viewer.userProfiles?.[index]?.userName ?? '')}
-            </Text>
+          <PressableNative
+            accessibilityRole="button"
+            onPress={() =>
+              Clipboard.setString(
+                buildUserUrl(viewer.userProfiles?.[index]?.userName ?? ''),
+              )
+            }
+          >
+            <View style={styles.profileUrlContainer}>
+              <Text
+                variant="medium"
+                style={styles.profileUrl}
+                numberOfLines={1}
+              >
+                {buildUserUrl(viewer.userProfiles?.[index]?.userName ?? '')}
+              </Text>
+            </View>
+          </PressableNative>
+
+          <View style={styles.webCardContainer}>
+            <View style={{ flex: 1 }}>
+              <Image
+                source={require('#assets/logo-full_white.png')}
+                resizeMode="contain"
+                style={{ width: 85 }}
+              />
+            </View>
+            <View style={styles.webCardBackground}>
+              <Image source={require('#assets/webcard/logo-substract.png')} />
+              <Image
+                source={require('#assets/webcard/background.png')}
+                style={styles.webCardBackgroundImage}
+              />
+            </View>
+            <View style={styles.webCardContent}>
+              <View>
+                <Text variant="large" style={styles.webCardLabel}>
+                  {viewer.userProfiles?.[index]?.firstName}
+                </Text>
+                <Text variant="small" style={styles.webCardLabel}>
+                  {viewer.userProfiles?.[index]?.companyActivity?.label}
+                </Text>
+              </View>
+              <QRCode
+                value={buildUserUrl(
+                  viewer.userProfiles?.[index]?.userName ?? '',
+                )}
+                size={86.85}
+                color={colors.white}
+                backgroundColor={colors.black}
+                logoBackgroundColor={colors.black}
+                logo={require('#ui/Icon/assets/azzapp.png')}
+              />
+            </View>
+            <View style={styles.webCardFooter}>
+              <Text
+                variant="xsmall"
+                style={[styles.webCardLabel, { opacity: 0.5 }]}
+              >
+                {buildUserUrl(viewer.userProfiles?.[index]?.userName ?? '')}
+              </Text>
+            </View>
           </View>
-        </PressableNative>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -242,7 +305,7 @@ const computedStyles = createStyleSheet(appearance => ({
     paddingLeft: 10,
     paddingRight: 20,
     borderRadius: 12,
-    backgroundColor: colors.white,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -253,4 +316,41 @@ const computedStyles = createStyleSheet(appearance => ({
   arrowIcon: {
     tintColor: appearance === 'dark' ? colors.white : colors.black,
   },
+  webCardContainer: {
+    backgroundColor: colors.black,
+    paddingVertical: 20,
+    paddingHorizontal: 26,
+    borderRadius: 13,
+    width: '100%',
+    aspectRatio: 1.6,
+    shadowColor: colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowRadius: 10,
+    shadowOpacity: 0.9,
+  },
+  webCardBackground: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    overflow: 'hidden',
+    bottom: 0,
+    borderRadius: 13,
+  },
+  webCardBackgroundImage: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
+  webCardContent: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flex: 2,
+    flexDirection: 'row',
+  },
+  webCardLabel: { color: colors.white },
+  webCardFooter: { flex: 1, justifyContent: 'flex-end' },
 }));

@@ -116,22 +116,21 @@ const ImagePicker = ({
   TopPanelWrapper = Fragment,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
-
-  const pickerStateRef = useRef<ImagePickerState | null>(null);
   const [media, setMedia] = useState<Media | null>(null);
+  const pickerStateRef = useRef<ImagePickerState | null>(null);
+
   const steps = useMemo(
-    () =>
-      propSteps.filter(
-        step =>
-          !media || step.mediaKind == null || step.mediaKind === media.kind,
-      ),
-    [propSteps, media],
+    () => filterSteps(propSteps, media),
+    [media, propSteps],
   );
 
   const isFirstStep = stepIndex === 0;
-  const isLastStep = stepIndex === steps.length - 1;
 
   const onNext = useCallback(async () => {
+    //when call from the Component, the method reference is not updated
+    const nextSteps = filterSteps(propSteps, pickerStateRef?.current?.media);
+    const isLastStep = nextSteps.length === stepIndex + 1;
+
     if (isLastStep) {
       if (!pickerStateRef.current) {
         return;
@@ -160,7 +159,7 @@ const ImagePicker = ({
     } else {
       setStepIndex(stepIndex => stepIndex + 1);
     }
-  }, [isLastStep, onFinished]);
+  }, [onFinished, propSteps, stepIndex]);
 
   const onBack = useCallback(() => {
     if (isFirstStep) {
@@ -187,7 +186,7 @@ const ImagePicker = ({
       <ImagePickerWizardContainer
         onBack={onBack}
         onNext={onNext}
-        isLastStep={isLastStep}
+        isLastStep={stepIndex === steps.length - 1}
         isFirstStep={isFirstStep}
         busy={exporting || busy}
         canCancel={canCancel}
@@ -202,3 +201,11 @@ const ImagePicker = ({
 export const DEFAULT_STEPS = [SelectImageStep, EditImageStep];
 
 export default ImagePicker;
+
+const filterSteps = (
+  steps: Array<ComponentType<any> & { mediaKind?: 'image' | 'video' | null }>,
+  media: Media | null | undefined,
+) =>
+  steps.filter(
+    step => !media || step.mediaKind == null || step.mediaKind === media.kind,
+  );

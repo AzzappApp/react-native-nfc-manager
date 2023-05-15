@@ -247,6 +247,10 @@
     "defaultMessage": "Tap to take a photo",
     "description": "Accessibility hint for the camera shutter button"
   },
+  "E3geuM": {
+    "defaultMessage": "Back",
+    "description": "Back button label in image picker wizzard"
+  },
   "E5po/y": {
     "defaultMessage": "Enter your email address or phone number and we'll send you a link to create a new password",
     "description": "ForgotPasswordScreen - Forgot your password description"
