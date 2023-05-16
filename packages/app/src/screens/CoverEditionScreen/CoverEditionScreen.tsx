@@ -986,6 +986,7 @@ const CoverEditionScreen = ({
   }, [editionParameters.orientation, onParameterValueChange]);
 
   const onActivateCropMode = () => {
+    editionParametersSave.current = editionParameters;
     // a little hack since we allow roll to be edited in crop mode
     setEditedParameter('roll');
   };
