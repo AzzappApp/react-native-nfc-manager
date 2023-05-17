@@ -1,15 +1,15 @@
 import { graphql } from 'graphql';
 import { NextResponse } from 'next/server';
-import { getViewer } from '@azzapp/auth/viewer';
+import { getSessionData } from '@azzapp/auth/viewer';
 import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { SessionData } from '@azzapp/auth/viewer';
 
 export const POST = async (req: Request) => {
-  let viewerInfos: Viewer;
+  let viewerInfos: SessionData;
   try {
-    viewerInfos = await getViewer();
+    viewerInfos = await getSessionData();
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json(

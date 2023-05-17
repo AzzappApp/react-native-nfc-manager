@@ -12,10 +12,11 @@ import {
 import { InterestGraphQL } from './mutations/commonsTypes';
 import { nodeField, nodesField } from './NodeGraphQL';
 import ProfileGraphQL, { ProfileCategoryGraphQL } from './ProfileGraphQL';
+import UserGraphQL from './UserGraphQL';
 import ViewerGraphQL from './ViewerGraphQL';
 import type { Profile } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { User, Viewer } from '@azzapp/auth/viewer';
 
 const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
   name: 'Query',
@@ -24,6 +25,11 @@ const QueryGraphQL = new GraphQLObjectType<unknown, GraphQLContext>({
     viewer: {
       type: new GraphQLNonNull(ViewerGraphQL),
       resolve: (_root, _args, { auth: userInfos }): Viewer => userInfos,
+    },
+    currentUser: {
+      description: 'User infos of the authenticated user',
+      type: new GraphQLNonNull(UserGraphQL),
+      resolve: (_root, _args, { auth: userInfos }): User => userInfos,
     },
     node: nodeField,
     nodes: nodesField,

@@ -431,6 +431,10 @@
     "defaultMessage": "Hex",
     "description": "HexColorTextInput Component Hex Title"
   },
+  "Slf0gz": {
+    "defaultMessage": "Create a new profile",
+    "description": "Start new profile creation from account screen"
+  },
   "SmWLhs": {
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"

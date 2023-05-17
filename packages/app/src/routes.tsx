@@ -43,7 +43,9 @@ export type ChangePasswordRoute = {
 
 export type NewProfileRoute = {
   route: 'NEW_PROFILE';
-  params?: never;
+  params?: {
+    goBack: boolean;
+  };
 };
 
 export type ProfileRoute = {

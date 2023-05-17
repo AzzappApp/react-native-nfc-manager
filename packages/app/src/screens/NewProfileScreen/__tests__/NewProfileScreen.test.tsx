@@ -70,6 +70,7 @@ describe('NewProfileScreen', () => {
       );
       return (
         <NewProfileScreen
+          params={undefined}
           data={data}
           onClose={onClose}
           onProfileCreated={onProfileCreated}
@@ -214,6 +215,15 @@ describe('NewProfileScreen', () => {
 
       await act(flushPromises);
       expect(onProfileCreated).toHaveBeenCalledWith({
+        profileData: {
+          companyActivityId: null,
+          companyName: null,
+          firstName: 'John',
+          lastName: 'Doe',
+          profileCategoryId: 'profileCategory-0',
+          profileKind: 'personal',
+          userName: 'johndoe',
+        },
         profileId: 'profile-0',
         token: 'fakeToken',
         refreshToken: 'fakeRefreshToken',

@@ -3,15 +3,20 @@ import ERRORS from '@azzapp/shared/errors';
 import { getSession } from './session';
 import { verifyToken } from './tokens';
 
-export type Viewer =
+export type User =
   | {
       isAnonymous: false;
       userId: string;
-      profileId?: string | null;
     }
   | { isAnonymous: true };
 
-export const getViewer = async (): Promise<Viewer> => {
+export type Viewer = {
+  profileId?: string | null;
+};
+
+export type SessionData = User & Viewer;
+
+export const getSessionData = async (): Promise<SessionData> => {
   const token = headers().get('authorization')?.split(' ')?.[1] ?? null;
   if (token) {
     try {
@@ -29,5 +34,5 @@ export const getViewer = async (): Promise<Viewer> => {
 };
 
 export const getProfileId = (viewer: Viewer) => {
-  return viewer.isAnonymous ? null : viewer.profileId;
+  return viewer.profileId;
 };

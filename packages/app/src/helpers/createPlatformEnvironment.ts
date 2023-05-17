@@ -47,6 +47,11 @@ const createPlatformEnvironment = (
           fetchFunction: authenticatedFetch,
         },
       ),
+    switchProfile: (params: WebAPI.SwitchProfileParams, init) =>
+      WebAPI.switchProfile(
+        { ...params, authMethod: 'token' },
+        { ...init, fetchFunction: authenticatedFetch },
+      ),
     forgotPassword: (params: WebAPI.ForgotPasswordParams) =>
       WebAPI.forgotPassword(
         { ...params },

@@ -29,6 +29,9 @@ type MediaImage implements Media {
 type Query {
   viewer: Viewer!
 
+  """User infos of the authenticated user"""
+  currentUser: User!
+
   """Fetches an object given its ID"""
   node(
     """The ID of an object"""
@@ -57,15 +60,6 @@ type Query {
 """Represent an Application Viewer"""
 type Viewer {
   profile: Profile
-
-  """Return a list of Profiles of the current user"""
-  userProfiles: [Profile!]
-
-  """Return the email of the current user"""
-  email: String
-
-  """Return the phone number of the current user"""
-  phoneNumber: String
 
   """Return a list of Profiles that the current user is following"""
   followedProfiles(
@@ -433,8 +427,8 @@ type CoverTemplate implements Node {
 type CardCoverTemplate {
   mediaStyle: JSON
 
-  """The source of the media used by the cover"""
-  sourceMedia: MediaImage!
+  """The source of the media used by the cover for a suggested template"""
+  sourceMedia: MediaImage
 
   """The background of the cover"""
   background: CoverLayer
@@ -464,6 +458,18 @@ type CoverTemplateCategory {
 
   """The category templates"""
   templates: [CoverTemplate!]!
+}
+
+"""Represent an Application User"""
+type User {
+  """Returns the email of the user"""
+  email: String
+
+  """Returns the phone number of the user"""
+  phoneNumber: String
+
+  """Returns a list of Profiles of the user"""
+  profiles: [Profile!]
 }
 
 """Represent a subject of interest"""

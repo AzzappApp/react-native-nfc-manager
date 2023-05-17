@@ -27,6 +27,7 @@ type ProfileKindStepProps = {
   profileCategoryId: string;
   onProfileCategoryChange: (profileCategoryId: string) => void;
   onNext: () => void;
+  onBack: (() => void) | null;
 };
 
 const profileCategoriesFragment = graphql`
@@ -63,6 +64,7 @@ const ProfileKindStep = ({
   profileCategoryId,
   onProfileCategoryChange,
   onNext,
+  onBack,
 }: ProfileKindStepProps) => {
   const vp = useViewportSize();
   const profileCategories = useFragment(
@@ -191,6 +193,7 @@ const ProfileKindStep = ({
             description="NewProfileType User Type Screen - Title"
           />
         }
+        onBack={onBack}
       />
       {selectedCategory && (
         <InfiniteCarousel

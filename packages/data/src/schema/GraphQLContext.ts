@@ -17,10 +17,10 @@ import type {
   Profile,
   CoverTemplate,
 } from '#domains';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { SessionData } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
-  auth: Viewer;
+  auth: SessionData;
   locale: string;
   profileLoader: DataLoader<string, Profile | null>;
   cardLoader: DataLoader<string, Card | null>;
@@ -32,7 +32,7 @@ export type GraphQLContext = {
 };
 
 export const createGraphQLContext = (
-  userInfos?: Viewer,
+  userInfos?: SessionData,
   locale: string = DEFAULT_LOCALE,
 ): GraphQLContext => {
   userInfos = userInfos ?? { isAnonymous: true };

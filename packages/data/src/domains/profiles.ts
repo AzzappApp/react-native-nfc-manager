@@ -20,7 +20,12 @@ export const getProfilesByIds = (
  * @returns The list of profiles associated to the user
  */
 export const getUserProfiles = (userId: string): Promise<Profile[]> =>
-  db.selectFrom('Profile').selectAll().where('userId', '=', userId).execute();
+  db
+    .selectFrom('Profile')
+    .selectAll()
+    .where('userId', '=', userId)
+    .orderBy('userName')
+    .execute();
 
 /**
  * Retrieves a profile by their profilename

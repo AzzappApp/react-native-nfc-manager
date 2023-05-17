@@ -1,6 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useMemo, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { toGlobalId } from 'graphql-relay';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Image, ScrollView } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {
@@ -10,44 +11,47 @@ import {
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 import { graphql, useFragment } from 'react-relay';
+import { useDebounce } from 'use-debounce';
+import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { buildUserUrl } from '#helpers/urlHelpers';
+import useAuthState from '#hooks/userAuthState';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type {
-  AccountScreenProfiles_userProfiles$data,
-  AccountScreenProfiles_userProfiles$key,
-} from '@azzapp/relay/artifacts/AccountScreenProfiles_userProfiles.graphql';
+import type { AccountScreenProfiles_userProfiles$key } from '@azzapp/relay/artifacts/AccountScreenProfiles_userProfiles.graphql';
 import type { ICarouselInstance } from 'react-native-reanimated-carousel';
 
 type AccountScreenCoverProps = {
-  viewer: AccountScreenProfiles_userProfiles$key;
+  userProfiles: AccountScreenProfiles_userProfiles$key;
 };
 
 const COVER_WIDTH = 135;
 
 export default function AccountScreenProfiles({
-  viewer: viewerKey,
+  userProfiles: userProfilesKey,
 }: AccountScreenCoverProps) {
   const carouselRef = useRef<ICarouselInstance>(null);
   const progressValue = useSharedValue<number>(0);
 
-  const [index, setIndex] = useState(0);
-
-  const viewer = useFragment(
+  const { profiles: userProfiles } = useFragment(
     graphql`
-      fragment AccountScreenProfiles_userProfiles on Viewer {
-        userProfiles {
+      fragment AccountScreenProfiles_userProfiles on User {
+        profiles {
           id
           userName
           firstName
+          lastName
+          profileKind
           companyActivity {
             label
           }
+          companyName
           nbPosts
           nbFollowedProfiles
           nbFollowersProfiles
@@ -59,19 +63,22 @@ export default function AccountScreenProfiles({
         }
       }
     `,
-    viewerKey,
+    userProfilesKey,
   );
+
   const profiles = useMemo(() => {
-    const data: Array<
-      | NonNullable<
-          AccountScreenProfiles_userProfiles$data['userProfiles']
-        >[number]
-      | string
-    > = [];
-    data.push('first');
-    data.push(...(viewer.userProfiles ?? []));
-    return data;
-  }, [viewer.userProfiles]);
+    return ['new', ...(userProfiles ?? [])];
+  }, [userProfiles]);
+
+  const auth = useAuthState();
+
+  const authId = toGlobalId('Profile', auth.profileId ?? '');
+
+  const currentAuthId = useRef(authId);
+
+  const [index, setIndex] = useState(
+    Math.max(userProfiles?.findIndex(p => p.id === authId) ?? 0, 0),
+  );
 
   useAnimatedReaction(
     () => {
@@ -79,18 +86,74 @@ export default function AccountScreenProfiles({
     },
     (result, previous) => {
       if (
-        Math.round(result) !== Math.round(previous ?? 0) &&
-        Math.round(result) > 0
+        Math.floor(result) !== Math.floor(previous ?? 0) &&
+        Math.floor(result) > 0
       ) {
-        runOnJS(setIndex)(Math.round(result) - 1);
+        runOnJS(setIndex)(Math.floor(result) - 1);
       }
     },
     [],
   );
 
+  const webAPI = useWebAPI();
+
+  const currentProfile = userProfiles?.[index];
+
+  const [debouncedCurrentProfileId] = useDebounce(currentProfile?.id, 800);
+
+  useEffect(() => {
+    if (
+      debouncedCurrentProfileId &&
+      authId !== debouncedCurrentProfileId &&
+      authId === currentAuthId.current
+    ) {
+      webAPI
+        .switchProfile({ profileId: debouncedCurrentProfileId })
+        .then(response => {
+          currentAuthId.current = toGlobalId('Profile', response.profileId);
+          return dispatchGlobalEvent({
+            type: 'PROFILE_CHANGE',
+            payload: {
+              profileId: response.profileId,
+              authTokens: {
+                token: response.token,
+                refreshToken: response.refreshToken,
+              },
+            },
+          });
+        })
+        .catch(err => {
+          // TODO : handle error correctly / display message to user
+          console.error('error while switching profile', err);
+        });
+    }
+  }, [authId, debouncedCurrentProfileId, webAPI]);
+
+  useEffect(() => {
+    if (authId !== currentAuthId.current) {
+      const index = Math.max(
+        userProfiles?.findIndex(p => p.id === authId) ?? 0,
+        0,
+      );
+      if (index > 0) {
+        carouselRef.current?.scrollTo({
+          index: index + 1,
+          animated: false,
+        });
+        currentAuthId.current = authId;
+      }
+    }
+  }, [authId, userProfiles]);
+
   const styles = useStyleSheet(computedStyles);
 
   const vp = useViewportSize();
+
+  const intl = useIntl();
+
+  const router = useRouter();
+
+  const isPersonal = currentProfile?.profileKind === 'personal';
 
   return (
     <View style={{ alignItems: 'center' }}>
@@ -118,21 +181,31 @@ export default function AccountScreenProfiles({
             onProgressChange={(_, absoluteProgress) => {
               progressValue.value = absoluteProgress;
             }}
-            defaultIndex={Math.min(profiles.length, 1)}
+            defaultIndex={index + 1}
             renderItem={({ item }) =>
               typeof item === 'string' ? (
-                <View style={styles.addContainer}>
-                  <Icon icon="add" style={styles.icon} />
-                </View>
-              ) : (
-                <View
-                  style={{
-                    shadowColor: '#45444C',
-                    shadowOpacity: 0.3,
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowRadius: 6,
+                <PressableNative
+                  accessibilityRole="link"
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Create a new profile',
+                    description:
+                      'Start new profile creation from account screen',
+                  })}
+                  onPress={() => {
+                    router.push({
+                      route: 'NEW_PROFILE',
+                      params: {
+                        goBack: true,
+                      },
+                    });
                   }}
                 >
+                  <View style={styles.addContainer}>
+                    <Icon icon="add" style={styles.icon} />
+                  </View>
+                </PressableNative>
+              ) : (
+                <View style={styles.coverContainer}>
                   <CoverRenderer
                     width={COVER_WIDTH}
                     key={item.id}
@@ -147,7 +220,7 @@ export default function AccountScreenProfiles({
       </View>
       <View style={styles.countersContainer}>
         <View style={styles.counterContainer}>
-          <Text variant="xlarge">{viewer.userProfiles?.[index]?.nbPosts}</Text>
+          <Text variant="xlarge">{currentProfile?.nbPosts}</Text>
           <Text variant="small" style={styles.counterValue} numberOfLines={1}>
             <FormattedMessage
               defaultMessage="Posts"
@@ -156,9 +229,7 @@ export default function AccountScreenProfiles({
           </Text>
         </View>
         <View style={styles.counterContainer}>
-          <Text variant="xlarge">
-            {viewer.userProfiles?.[index]?.nbFollowersProfiles}
-          </Text>
+          <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
           <Text variant="small" style={styles.counterValue} numberOfLines={1}>
             <FormattedMessage
               defaultMessage="Followers"
@@ -167,9 +238,7 @@ export default function AccountScreenProfiles({
           </Text>
         </View>
         <View style={styles.counterContainer}>
-          <Text variant="xlarge">
-            {viewer.userProfiles?.[index]?.nbFollowedProfiles}
-          </Text>
+          <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>
           <Text variant="small" style={styles.counterValue} numberOfLines={1}>
             <FormattedMessage
               defaultMessage="Followings"
@@ -188,9 +257,7 @@ export default function AccountScreenProfiles({
           <PressableNative
             accessibilityRole="button"
             onPress={() =>
-              Clipboard.setString(
-                buildUserUrl(viewer.userProfiles?.[index]?.userName ?? ''),
-              )
+              Clipboard.setString(buildUserUrl(currentProfile?.userName ?? ''))
             }
           >
             <View style={styles.profileUrlContainer}>
@@ -199,7 +266,7 @@ export default function AccountScreenProfiles({
                 style={styles.profileUrl}
                 numberOfLines={1}
               >
-                {buildUserUrl(viewer.userProfiles?.[index]?.userName ?? '')}
+                {buildUserUrl(currentProfile?.userName ?? '')}
               </Text>
             </View>
           </PressableNative>
@@ -222,16 +289,19 @@ export default function AccountScreenProfiles({
             <View style={styles.webCardContent}>
               <View>
                 <Text variant="large" style={styles.webCardLabel}>
-                  {viewer.userProfiles?.[index]?.firstName}
+                  {isPersonal
+                    ? formatDisplayName(
+                        currentProfile?.firstName,
+                        currentProfile?.lastName,
+                      )
+                    : currentProfile?.companyName}
                 </Text>
                 <Text variant="small" style={styles.webCardLabel}>
-                  {viewer.userProfiles?.[index]?.companyActivity?.label}
+                  {isPersonal ? null : currentProfile?.companyActivity?.label}
                 </Text>
               </View>
               <QRCode
-                value={buildUserUrl(
-                  viewer.userProfiles?.[index]?.userName ?? '',
-                )}
+                value={buildUserUrl(currentProfile?.userName ?? '')}
                 size={86.85}
                 color={colors.white}
                 backgroundColor={colors.black}
@@ -244,7 +314,7 @@ export default function AccountScreenProfiles({
                 variant="xsmall"
                 style={[styles.webCardLabel, { opacity: 0.5 }]}
               >
-                {buildUserUrl(viewer.userProfiles?.[index]?.userName ?? '')}
+                {buildUserUrl(currentProfile?.userName ?? '')}
               </Text>
             </View>
           </View>
@@ -260,6 +330,14 @@ const computedStyles = createStyleSheet(appearance => ({
     alignItems: 'center',
     flexDirection: 'row',
     alignSelf: 'center',
+  },
+  coverContainer: {
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    borderRadius: 18,
+    shadowColor: '#45444C',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 6,
   },
   addContainer: {
     borderColor: colors.grey200,

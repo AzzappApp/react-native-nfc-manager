@@ -13,9 +13,8 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import AccountScreenMiddleHeader from './AccountScreenMiddleHeader';
-import AccountScreenCover from './AccountScreenProfiles';
-
-import type { AccountScreen_viewer$key } from '@azzapp/relay/artifacts/AccountScreen_viewer.graphql';
+import AccountScreenProfiles from './AccountScreenProfiles';
+import type { AccountScreen_user$key } from '@azzapp/relay/artifacts/AccountScreen_user.graphql';
 
 const reducer = (
   state: { showDropdown: boolean; requestedLogout: boolean },
@@ -45,24 +44,24 @@ const reducer = (
 };
 
 type AccountScreenProps = {
-  viewer: AccountScreen_viewer$key;
+  user: AccountScreen_user$key;
 };
 
-export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
+const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
   const [{ showDropdown, requestedLogout }, dispatch] = useReducer(reducer, {
     showDropdown: false,
     requestedLogout: false,
   });
 
-  const viewer = useFragment(
+  const { email, phoneNumber, ...userProfiles } = useFragment(
     graphql`
-      fragment AccountScreen_viewer on Viewer {
+      fragment AccountScreen_user on User {
         email
         phoneNumber
         ...AccountScreenProfiles_userProfiles
       }
     `,
-    viewerKey,
+    userKey,
   );
 
   const vp = useViewportSize();
@@ -78,7 +77,7 @@ export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
       <Header
         middleElement={
           <AccountScreenMiddleHeader
-            emailOrPhoneNumber={viewer.email ?? viewer.phoneNumber ?? ''}
+            emailOrPhoneNumber={email ?? phoneNumber ?? ''}
           />
         }
         rightElement={
@@ -95,9 +94,7 @@ export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
           />
         }
       />
-
-      <AccountScreenCover viewer={viewer} />
-
+      <AccountScreenProfiles userProfiles={userProfiles} />
       <BottomSheetModal
         visible={showDropdown}
         height={vp`${insetBottom}  + ${440}`}

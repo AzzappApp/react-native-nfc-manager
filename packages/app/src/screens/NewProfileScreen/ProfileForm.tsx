@@ -31,6 +31,7 @@ import type {
 } from '@azzapp/relay/artifacts/ProfileForm_profileCategory.graphql';
 import type { ProfileFormQuery } from '@azzapp/relay/artifacts/ProfileFormQuery.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as RNTextInput } from 'react-native';
 
 type ProfileForm = {
@@ -41,6 +42,7 @@ type ProfileForm = {
     token: string;
     refreshToken: string;
     profileId: string;
+    profileData: Omit<CreateProfileParams, 'authMethod'>;
   }) => void;
 };
 
@@ -99,16 +101,18 @@ const ProfileForm = ({
       refreshToken: string;
       profileId: string;
     };
+
+    const newProfile = {
+      companyName,
+      companyActivityId,
+      firstName,
+      lastName,
+      profileKind,
+      profileCategoryId,
+      userName,
+    };
     try {
-      response = await createProfile({
-        companyName,
-        companyActivityId,
-        firstName,
-        lastName,
-        profileKind,
-        profileCategoryId,
-        userName,
-      });
+      response = await createProfile(newProfile);
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.USERNAME_ALREADY_EXISTS) {
         setUserNameAlreadyExists(userName);
@@ -117,7 +121,10 @@ const ProfileForm = ({
       // TODO
       return;
     }
-    onProfileCreated(response);
+    onProfileCreated({
+      ...response,
+      profileData: newProfile,
+    });
   };
 
   const [debouncedUserName] = useDebounce(userName, 200);

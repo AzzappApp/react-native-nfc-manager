@@ -2,10 +2,10 @@ import { fromGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { destroySession, setSession } from '@azzapp/auth/session';
 import { generateTokens } from '@azzapp/auth/tokens';
-import { getViewer } from '@azzapp/auth/viewer';
+import { getSessionData } from '@azzapp/auth/viewer';
 import { createProfile, getProfileByUserName } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { User } from '@azzapp/auth/viewer';
 import type { ProfileKind } from '@azzapp/data/domains';
 
 type NewProfileBody = {
@@ -20,9 +20,9 @@ type NewProfileBody = {
 };
 
 export const POST = async (req: Request) => {
-  let viewer: Viewer;
+  let viewer: User;
   try {
-    viewer = await getViewer();
+    viewer = await getSessionData();
     if (viewer.isAnonymous) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },

@@ -1147,8 +1147,9 @@ const CoverEditionScreen = ({
         ['titleStyle', data.titleStyle],
       );
 
-      if (suggested) {
+      if (suggested && data.sourceMedia) {
         setIsSelectedTemplateSuggested(true);
+
         updateFields([
           'sourceMedia',
           {

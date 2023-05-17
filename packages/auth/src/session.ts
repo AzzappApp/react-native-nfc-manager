@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { seal, unseal } from './crypto';
 import type { NextResponse } from 'next/server';
-import type { Viewer } from 'viewer';
+import type { SessionData as UserSessionData } from 'viewer';
 
 const TTL = 15 * 24 * 3600;
 const PASSWORD = process.env.SECRET_COOKIE_PASSWORD as string;
@@ -14,7 +14,7 @@ const COOKIE_OPTIONS = {
 const COOKIE_NAME = 'azzapp-session';
 
 // TODO we might want to add a session id system to be able to track sessions
-type SessionData = Viewer;
+type SessionData = UserSessionData;
 
 export const getSession = (): Promise<SessionData | null> | null => {
   const seal = cookies().get(COOKIE_NAME)?.value;
