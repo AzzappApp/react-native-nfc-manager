@@ -144,3 +144,4 @@ packages/web/.vscode/settings.json
 
 packages/backoffice/.vscode/settings.json
 
+.vscode/launch.json

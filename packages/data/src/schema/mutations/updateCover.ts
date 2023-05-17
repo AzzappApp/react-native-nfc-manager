@@ -163,7 +163,7 @@ const updateCover = mutationWithClientMutationId({
           const updates: CoverUpdates = {};
 
           const entries = typedEntries(input);
-          entries.forEach(([key, value]) => {
+          entries.forEach(async ([key, value]) => {
             switch (key) {
               case 'media':
                 updates.mediaId = value.id;
@@ -173,9 +173,13 @@ const updateCover = mutationWithClientMutationId({
                 break;
               case 'sourceMedia':
                 updates.sourceMediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(null, input.sourceMedia, trx),
-                );
+                //be sure the media does not exist already (from covertemplate)
+                if (
+                  input.sourceMedia &&
+                  (await mediaLoader.load(input.sourceMedia.id)) == null
+                ) {
+                  await createMedia(input.sourceMedia, trx);
+                }
                 break;
               case 'maskMedia':
                 updates.maskMediaId = value.id;
@@ -314,6 +318,7 @@ const replaceMedia = (
   if (oldMediaId === newMedia?.id) {
     return [];
   }
+  //if the media is used in the coverTemplate, we cannot delete it (need a request in json)
   return [
     // TODO remove media from cloudinary
     oldMediaId ? removeMedia(oldMediaId, trx) : null,

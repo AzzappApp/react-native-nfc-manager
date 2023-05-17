@@ -689,6 +689,14 @@ const CoverEditionScreen = ({
       };
     } else if (sourceMediaInput) {
       input.sourceMedia = sourceMediaInput;
+    } else if (sourceMediaId && sourceMediaId !== cover?.sourceMedia?.id) {
+      //this case handle the case when the user select a business template with a cover already existing
+      input.sourceMedia = {
+        id: sourceMediaId,
+        height: sourceMedia.height,
+        width: sourceMedia.width,
+        kind: 'image',
+      };
     }
 
     if (maskMediaInput) {
@@ -748,13 +756,7 @@ const CoverEditionScreen = ({
       onCompleted() {
         setSaving(false);
         setUploadProgress(null);
-        router.replace({
-          route: 'PROFILE',
-          params: {
-            userName: viewer!.profile!.userName,
-            profileID: viewer!.profile!.id,
-          },
-        });
+
         if (mediaInput) {
           const { id, kind } = mediaInput;
           addLocalCachedMediaFile(
@@ -762,6 +764,17 @@ const CoverEditionScreen = ({
             kind as 'image' | 'video',
             `file://${mediaPath!}`,
           );
+        }
+        if (isCreation) {
+          router.replace({
+            route: 'PROFILE',
+            params: {
+              userName: viewer!.profile!.userName,
+              profileID: viewer!.profile!.id,
+            },
+          });
+        } else {
+          router.back();
         }
       },
       onError(e) {
