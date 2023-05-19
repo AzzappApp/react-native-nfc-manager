@@ -139,9 +139,12 @@ const VideoTimelineEditor = ({
       onStart: (event, ctx) => {
         ctx.startX = leftPosition.value;
         ctx.endX = rightPosition.value;
-        if (event.x < 6) {
+        if (event.x < THUMB_WIDTH * 2) {
           ctx.left = true;
-        } else if (event.x > rightPosition.value - leftPosition.value - 6) {
+        } else if (
+          event.x >
+          rightPosition.value - leftPosition.value - THUMB_WIDTH * 2
+        ) {
           ctx.right = true;
         }
       },
@@ -217,7 +220,10 @@ const VideoTimelineEditor = ({
         ))}
       </View>
       <PanGestureHandler onGestureEvent={eventHandler}>
-        <Animated.View style={[styles.timeRange, animatedStyle]}>
+        <Animated.View
+          style={[styles.timeRange, animatedStyle]}
+          hitSlop={{ left: 35, right: 35 }}
+        >
           <View style={[styles.thumb, styles.thumbStart]} />
           <View style={[styles.thumb, styles.thumbEnd]} />
         </Animated.View>
@@ -250,7 +256,7 @@ const VideoTimelineEditor = ({
 };
 
 export default VideoTimelineEditor;
-
+const THUMB_WIDTH = 6;
 const computedStyle = createStyleSheet(appearance => ({
   viewTimeMarker: {
     marginTop: 12,
@@ -291,11 +297,11 @@ const computedStyle = createStyleSheet(appearance => ({
   },
   thumb: {
     position: 'absolute',
-    width: 6,
+    width: THUMB_WIDTH,
     top: -4,
     bottom: -4,
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
-    borderRadius: 3,
+    borderRadius: THUMB_WIDTH / 2,
   },
   thumbStart: {
     left: -4,

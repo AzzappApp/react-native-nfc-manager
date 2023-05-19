@@ -65,7 +65,6 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
     kind,
     uri,
     aspectRatio,
-
     editionParameters,
     filter,
     timeRange,
