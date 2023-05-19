@@ -1,6 +1,6 @@
 import {
   GraphQLBoolean,
-  GraphQLFloat,
+  GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -11,8 +11,11 @@ import {
   forwardConnectionArgs,
   globalIdField,
 } from 'graphql-relay';
-import { db } from '#domains';
+import { GraphQLDateTime } from 'graphql-scalars';
+import { getProfileId } from '@azzapp/auth/viewer';
+import { db, getPostReaction } from '#domains';
 import MediaGraphQL from './MediaGraphQL';
+import { ReactionKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import ProfileGraphQL from './ProfileGraphQL';
 import type { Post, Media } from '#domains';
@@ -31,10 +34,6 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
       resolve(post, _, { profileLoader }) {
         return profileLoader.load(post.authorId);
       },
-    },
-    postDate: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The date of the publication',
     },
     media: {
       type: new GraphQLNonNull(MediaGraphQL),
@@ -61,6 +60,33 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
     allowLikes: {
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'Does this post allow likes',
+    },
+    viewerPostReaction: {
+      type: ReactionKind,
+      description: 'Reaction of the viewer on this post',
+      async resolve(post, _, { auth }) {
+        if (auth.isAnonymous) {
+          return null;
+        }
+        const profileId = getProfileId(auth);
+        if (!profileId) {
+          return null;
+        }
+        const reaction = await getPostReaction(profileId, post.id);
+        if (reaction) {
+          return reaction.reactionKind;
+        }
+        return null;
+      },
+    },
+    counterReactions: {
+      type: new GraphQLNonNull(GraphQLInt),
+      //TODO: discuss the best strategy to handle this. Maintain a counter or count each time
+      // some reference : https://medium.com/@morefree7/design-a-system-that-tracks-the-number-of-likes-ea69fdb41cf2
+    },
+    createdAt: {
+      type: new GraphQLNonNull(GraphQLDateTime),
+      description: 'Creation date ot the post',
     },
     relatedPosts: {
       type: new GraphQLNonNull(PostConnectionGraphQL),

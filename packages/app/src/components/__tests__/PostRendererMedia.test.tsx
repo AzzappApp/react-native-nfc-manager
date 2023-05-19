@@ -6,15 +6,15 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import PostRenderer from '../PostRenderer';
+import PostRendererMedia from '#components/PostRendererMedia';
+import type { PostRendererMediaProps } from '#components/PostRendererMedia';
 
 import type {
   MediaImageRendererProps,
   MediaVideoRendererHandle,
   MediaVideoRendererProps,
 } from '../medias';
-import type { PostRendererProps } from '../PostRenderer';
-import type { PostRendererTestQuery } from '@azzapp/relay/artifacts/PostRendererTestQuery.graphql';
+import type { PostRendererMediaTestQuery } from '@azzapp/relay/artifacts/PostRendererMediaTestQuery.graphql';
 import type { ForwardedRef } from 'react';
 
 jest.useFakeTimers();
@@ -58,57 +58,44 @@ jest.mock('#components/medias', () => {
 jest.mock('#ui/ViewTransition', () => 'ViewTransition');
 jest.mock('../Link', () => 'Link');
 
-const renderPost = (props?: Partial<PostRendererProps>) => {
+const renderPost = (props?: Partial<PostRendererMediaProps>) => {
   const environement = createMockEnvironment();
   environement.mock.queueOperationResolver(operation =>
     MockPayloadGenerator.generate(operation, {
       Post(_, generateId) {
         return {
           id: String(generateId()),
-          author: { id: 'azzapp', userName: 'azzap' },
-          postDate: 123123123,
           media: {
             __typename: 'MediaVideo',
             id: 'fakeSource0',
           },
-          content: 'post content',
-          allowComments: true,
-          allowLikes: false,
         };
       },
     }),
   );
 
-  const TestRenderer = (props?: Partial<PostRendererProps>) => {
-    const data = useLazyLoadQuery<PostRendererTestQuery>(
+  const TestRenderer = (props?: Partial<PostRendererMediaProps>) => {
+    const data = useLazyLoadQuery<PostRendererMediaTestQuery>(
       graphql`
-        query PostRendererTestQuery @relay_test_operation {
+        query PostRendererMediaTestQuery @relay_test_operation {
           post: node(id: "test-post") {
             id
-            ...PostRendererFragment_post
-            ... on Post {
-              author {
-                ...PostRendererFragment_author
-              }
-            }
+            ...PostRendererMediaFragment_post
           }
         }
       `,
       {},
     );
-    if (data?.post?.author) {
-      return (
-        <PostRenderer
-          post={data.post}
-          width={30}
-          author={data?.post?.author}
-          style={{ marginTop: 10 }}
-          initialTime={0}
-          {...props}
-        />
-      );
-    }
-    return null;
+
+    return (
+      <PostRendererMedia
+        post={data.post!}
+        width={30}
+        style={{ marginTop: 10 }}
+        initialTime={0}
+        {...props}
+      />
+    );
   };
   const component = render(
     <RelayEnvironmentProvider environment={environement}>
@@ -117,7 +104,7 @@ const renderPost = (props?: Partial<PostRendererProps>) => {
   );
 
   return {
-    rerender(updates?: Partial<PostRendererProps>) {
+    rerender(updates?: Partial<PostRendererMediaProps>) {
       component.rerender(
         <RelayEnvironmentProvider environment={environement}>
           <TestRenderer {...props} {...updates} />
@@ -127,28 +114,9 @@ const renderPost = (props?: Partial<PostRendererProps>) => {
   };
 };
 
-describe('PostRenderer', () => {
+describe('PostRendererMedia', () => {
   afterEach(() => {
     mockMediaHandles = {};
-  });
-
-  test('should display correctly and apply `props`', () => {
-    renderPost();
-
-    expect(screen.toJSON()).toHaveStyle({
-      marginTop: 10,
-    });
-    expect(screen.queryByText('post content')).toBeTruthy();
-  });
-
-  test('should not display the `content` of the post if `small` props is true', () => {
-    renderPost({ small: true });
-    expect(screen.queryByText('post content')).toBeNull();
-  });
-
-  test('should display `AuthorCartouche` if `small` props is true', () => {
-    renderPost({ small: true });
-    expect(screen.queryByText('azzap')).toBeTruthy();
   });
 
   test('should set the initial video time on video media if provided', () => {

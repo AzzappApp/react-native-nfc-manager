@@ -1,0 +1,158 @@
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
+import AuthorCartouche from '#components/AuthorCartouche';
+
+import PostRendererMedia from './PostRendererMedia';
+import type { MediaVideoRendererHandle } from '#components/medias';
+import type { PostRendererFeedFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFeedFragment_post.graphql';
+import type { ForwardedRef } from 'react';
+import type { ViewProps, HostComponent } from 'react-native';
+
+export type PostRendererFeedProps = ViewProps & {
+  /**
+   * the post
+   *
+   * @type {PostRendererMediaFragment_post$key}
+   */
+  post: PostRendererFeedFragment_post$key;
+  /**
+   *
+   *
+   * @type {number}
+   */
+  width: number;
+  /**
+   * are video muted
+   *
+   * @type {boolean}
+   */
+  muted?: boolean;
+  /**
+   * are video disabled
+   * @type {boolean}
+   */
+  videoDisabled?: boolean;
+  /**
+   * are video pause
+   *
+   * @type {boolean}
+   */
+  paused?: boolean;
+  /**
+   * iniital time of the video
+   *
+   * @type {(number | null)}
+   */
+  initialTime?: number | null;
+};
+
+export type PostRendererFeedHandle = {
+  getCurrentMediaRenderer(): HostComponent<any> | null;
+  getCurrentVideoTime(): Promise<number | null>;
+  snapshot(): Promise<void>;
+};
+
+const PostRendererFeed = (
+  {
+    post: postKey,
+    width,
+    muted = false,
+    videoDisabled = false,
+    paused = false,
+    initialTime,
+    style,
+    ...props
+  }: PostRendererFeedProps,
+  forwardedRef: ForwardedRef<PostRendererFeedHandle>,
+) => {
+  const post = useFragment(
+    graphql`
+      fragment PostRendererFeedFragment_post on Post {
+        ...PostRendererMediaFragment_post
+        author {
+          ...AuthorCartoucheFragment_profile
+        }
+      }
+    `,
+    postKey,
+  );
+
+  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
+    null,
+  );
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      getCurrentMediaRenderer() {
+        if (!mediaRef.current) {
+          return null;
+        }
+        if ('getContainer' in mediaRef.current) {
+          return mediaRef.current.getContainer();
+        } else {
+          return mediaRef.current;
+        }
+      },
+      async getCurrentVideoTime() {
+        if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
+          return mediaRef.current.getPlayerCurrentTime();
+        }
+        return null;
+      },
+      async snapshot() {
+        if (mediaRef.current && 'snapshot' in mediaRef.current) {
+          await mediaRef.current.snapshot();
+        }
+      },
+    }),
+    [],
+  );
+
+  return (
+    <View {...props} style={[styles.mediaContainer, style]}>
+      <PostRendererMedia
+        small
+        post={post}
+        width={width}
+        muted={muted}
+        paused={paused}
+        initialTime={initialTime}
+        videoDisabled={videoDisabled}
+        ref={mediaRef}
+      />
+      <AuthorCartouche
+        author={post.author}
+        style={styles.smallAuthorCartouche}
+        variant="small"
+      />
+    </View>
+  );
+};
+
+export default forwardRef(PostRendererFeed);
+
+const styles = StyleSheet.create({
+  mediaContainer: {
+    backgroundColor: colors.grey100,
+    overflow: 'hidden',
+    borderRadius: 16,
+  },
+  playIcon: {
+    position: 'absolute',
+    top: 10,
+    end: 10,
+    height: 24,
+    width: 24,
+  },
+  smallAuthorCartouche: {
+    position: 'absolute',
+    bottom: 5,
+    left: 5,
+  },
+  text: {
+    fontSize: 12,
+  },
+});

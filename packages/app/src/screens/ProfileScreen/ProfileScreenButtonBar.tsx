@@ -1,6 +1,7 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import { colors } from '#theme';
 import Link from '#components/Link';
 import ClientOnlySuspense from '#ui/ClientOnlySuspense';
 import FloatingButton from '#ui/FloatingButton';
@@ -22,7 +23,13 @@ const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
 
   return (
     <View style={[styles.buttonBar, style]}>
-      <FloatingIconButton icon="missing" onPress={onHome} iconSize={23} />
+      <FloatingIconButton
+        icon="azzapp"
+        onPress={onHome}
+        iconSize={26}
+        iconStyle={{ tintColor: colors.white }}
+        variant="grey"
+      />
       <ClientOnlySuspense
         fallback={
           <View style={[styles.mainButton, styles.mainButtonFallback]} />
@@ -32,8 +39,10 @@ const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
       </ClientOnlySuspense>
       <Link route="PROFILE_POSTS" params={{ userName }}>
         <FloatingIconButton
-          icon="revert"
-          iconSize={30}
+          icon="flip"
+          iconSize={26}
+          iconStyle={{ tintColor: colors.white }}
+          variant="grey"
           style={styles.userPostsButton}
         />
       </Link>
@@ -79,8 +88,8 @@ const ProfileScreenButtonActionButton = ({
     >
       <Text variant="button">
         <FormattedMessage
-          defaultMessage="Edit my profile"
-          description="Edit my profile button label in Profile Screen Button Bar"
+          defaultMessage="EDIT MY WEBCARD"
+          description="Edit my webcard button label in Profile Screen Button Bar"
         />
       </Text>
     </FloatingButton>

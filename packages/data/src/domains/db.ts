@@ -15,6 +15,7 @@ import type {
   Media,
   Profile,
   Post,
+  PostReaction,
   User,
   ProfileCategory,
   CompanyActivity,
@@ -40,6 +41,7 @@ export type Database = {
   Profile: WithTimeStamps<Profile>;
   ProfileCategory: ProfileCategory;
   Post: WithoutJSONFields<WithCreatedAt<Post>, 'medias'>;
+  PostReaction: WithCreatedAt<PostReaction>;
   User: WithTimeStamps<User>;
   Interest: Interest;
 };

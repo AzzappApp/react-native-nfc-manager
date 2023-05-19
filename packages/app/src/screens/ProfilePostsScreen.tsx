@@ -9,15 +9,18 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { ProfilePostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_posts.graphql';
 import type { ProfilePostsScreenFragment_profile$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_profile.graphql';
+import type { ProfilePostsScreenFragment_viewerProfile$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_viewerProfile.graphql';
 
 type ProfilePostsScreenProps = {
   profile: ProfilePostsScreenFragment_posts$key &
     ProfilePostsScreenFragment_profile$key;
+  viewerProfile: ProfilePostsScreenFragment_viewerProfile$key;
   hasFocus?: boolean;
 };
 
 const ProfilePostsScreen = ({
   profile: profileKey,
+  viewerProfile,
   hasFocus = true,
 }: ProfilePostsScreenProps) => {
   const profile = useFragment(
@@ -29,6 +32,16 @@ const ProfilePostsScreen = ({
       }
     `,
     profileKey as ProfilePostsScreenFragment_profile$key,
+  );
+
+  const { userName } = useFragment(
+    graphql`
+      fragment ProfilePostsScreenFragment_viewerProfile on Profile {
+        id
+        userName
+      }
+    `,
+    viewerProfile,
   );
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -88,23 +101,31 @@ const ProfilePostsScreen = ({
         : [],
     [data.posts?.edges],
   );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
-        middleElement={intl.formatMessage(
-          {
-            defaultMessage: '{firstName} posts',
-            description: 'ProfilePpostScreen title Header',
-          },
-          { firstName: profile.userName },
-        )}
+        middleElement={
+          userName === profile.userName
+            ? intl.formatMessage({
+                defaultMessage: 'My posts',
+                description: 'ProfilePostScreen viewer user title Header',
+              })
+            : intl.formatMessage(
+                {
+                  defaultMessage: '{firstName} posts',
+                  description: 'ProfilePostScreen title Header',
+                },
+                { firstName: profile.userName },
+              )
+        }
         leftElement={
           <IconButton
             icon="arrow_down"
             onPress={onClose}
             iconSize={30}
             size={47}
-            style={{ borderWidth: 0 }}
+            variant="icon"
           />
         }
       />

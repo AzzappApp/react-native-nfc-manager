@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
@@ -6,25 +7,44 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import Link from './Link';
 import MediaImageRenderer from './medias/MediaImageRenderer';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { ViewProps } from 'react-native';
 
+type AuthorCartoucheProps = ViewProps & {
+  /**
+   *
+   *
+   * @type {AuthorCartoucheFragment_profile$key}
+   */
+  author: AuthorCartoucheFragment_profile$key;
+  /**
+   * variant of the author cartouche
+   *
+   * @type {('createPost' | 'post' | 'small')}
+   */
+  variant?: 'createPost' | 'post' | 'small';
+  /**
+   * true if the cartouche is a link to the Profile page
+   *
+   * @type {boolean}
+   */
+  activeLink?: boolean;
+};
 /**
  * Author cartouche
  * Display a small cartouche with the author picture and username
  */
-// TODO components is dummy, replace with real component
 const AuthorCartouche = ({
   style,
   variant = 'post',
   author: authorKey,
+  activeLink = false,
   ...props
-}: ViewProps & {
-  author: AuthorCartoucheFragment_profile$key;
-  variant?: 'createPost' | 'post' | 'small';
-}) => {
+}: AuthorCartoucheProps) => {
   const author = useFragment(
     graphql`
       fragment AuthorCartoucheFragment_profile on Profile
@@ -38,6 +58,7 @@ const AuthorCartouche = ({
           provider: "../providers/isNative.relayprovider"
         }
       ) {
+        id
         userName
         card {
           cover {
@@ -58,7 +79,64 @@ const AuthorCartouche = ({
     `,
     authorKey,
   );
+
   const variantStyle = useVariantStyleSheet(computedStyle, variant);
+
+  const content = useMemo(() => {
+    return (
+      <>
+        {author.card?.cover.media.id != null ? (
+          <MediaImageRenderer
+            width={25}
+            aspectRatio={COVER_RATIO}
+            source={author.card.cover.media.id}
+            uri={author.card?.cover.media.avatarURI}
+            alt={'avatar'}
+            style={variantStyle.image}
+          />
+        ) : (
+          author.card?.cover.media.id == null && (
+            <View
+              style={[
+                variantStyle.image,
+                variant === 'small' && variantStyle.pictureSmall,
+              ]}
+            />
+          )
+        )}
+        <Text
+          variant={variant === 'post' ? 'button' : 'smallbold'}
+          style={[variant === 'small' && variantStyle.userNameSmall]}
+        >
+          {author?.userName}
+        </Text>
+      </>
+    );
+  }, [
+    author?.card?.cover.media.avatarURI,
+    author?.card?.cover.media.id,
+    author?.userName,
+    variant,
+    variantStyle.image,
+    variantStyle.pictureSmall,
+    variantStyle.userNameSmall,
+  ]);
+
+  if (activeLink) {
+    <Link route="PROFILE" params={{ userName: author.userName }}>
+      <PressableOpacity
+        style={[
+          variantStyle.container,
+          variant === 'small' && variantStyle.containerSmall,
+          style,
+        ]}
+        {...props}
+      >
+        {content}
+      </PressableOpacity>
+    </Link>;
+  }
+
   return (
     <View
       style={[
@@ -68,31 +146,7 @@ const AuthorCartouche = ({
       ]}
       {...props}
     >
-      {author.card?.cover.media.id != null ? (
-        <MediaImageRenderer
-          width={variant === 'post' ? 21 : 12.5}
-          aspectRatio={COVER_RATIO}
-          source={author.card.cover.media.id}
-          uri={author.card?.cover.media.avatarURI}
-          alt={'avatar'}
-          style={variantStyle.image}
-        />
-      ) : (
-        author.card?.cover.media.id == null && (
-          <View
-            style={[
-              variantStyle.image,
-              variant === 'small' && variantStyle.pictureSmall,
-            ]}
-          />
-        )
-      )}
-      <Text
-        variant={variant === 'post' ? 'button' : 'smallbold'}
-        style={[variant === 'small' && variantStyle.userNameSmall]}
-      >
-        {author.userName}
-      </Text>
+      {content}
     </View>
   );
 };

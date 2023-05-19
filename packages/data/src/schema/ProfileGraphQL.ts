@@ -93,7 +93,7 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
         user,
         args: ConnectionArguments,
       ): Promise<Connection<Post>> {
-        // TODO we should use a bookmark instead of offset, perhaps by using postDate as a bookmark
+        // TODO we should use a bookmark instead of offset, perhaps by using createdAt as a bookmark
         let { after, first } = args;
         after = after ?? null;
         first = first ?? 100;

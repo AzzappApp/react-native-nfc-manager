@@ -349,5 +349,3 @@ const CoverTemplateCategoryGraphQL = new GraphQLObjectType({
     },
   }),
 });
-
-//create a grpahqlscalar type for {[lang:string]: CoverTemplate[]}

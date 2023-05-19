@@ -47,6 +47,13 @@ export const ProfileKind = new GraphQLEnumType({
   },
 });
 
+export const ReactionKind = new GraphQLEnumType({
+  name: 'ReactionKind',
+  values: {
+    like: { value: 'like' },
+  },
+});
+
 export const InterestGraphQL = new GraphQLObjectType<Interest, GraphQLContext>({
   name: 'Interest',
   description: 'Represent a subject of interest',

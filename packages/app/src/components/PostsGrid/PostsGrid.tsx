@@ -53,15 +53,11 @@ const PostsGrid = ({
     graphql`
       fragment PostsGrid_posts on Post @relay(plural: true) {
         id
-        ...PostRendererFragment_post
-        author {
-          ...PostRendererFragment_author
-        }
+        ...PostRendererFeedFragment_post
         media {
           __typename
           aspectRatio
         }
-        content
       }
     `,
     postsKey,
@@ -374,9 +370,7 @@ const MemoPostRenderer = ({
         paused={paused}
         post={item}
         width={layout.width}
-        author={item.author}
         videoDisabled={videoDisabled}
-        small
         muted
         style={[layout, { position: 'absolute' }]}
       />

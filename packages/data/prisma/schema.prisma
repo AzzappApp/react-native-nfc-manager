@@ -145,31 +145,47 @@ model CardModule {
 }
 
 model CoverTemplate {
-  id                String      @id
-  name              String
-  colorPalette      String?
-  tags              String?
-  data              Json
-  segmented         Boolean
-  merged            Boolean
-  category          Json?
-  kind              ProfileKind
-  previewMediaId    String?
-  suggested         Boolean     @default(false)
+  id                 String      @id
+  name               String
+  colorPalette       String?
+  tags               String?
+  data               Json
+  segmented          Boolean
+  merged             Boolean
+  category           Json?
+  kind               ProfileKind
+  previewMediaId     String?
+  suggested          Boolean     @default(false)
   companyActivityIds String?
-  enabled           Boolean     @default(true)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @default(now())
+  enabled            Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @default(now())
 }
 
 model Post {
-  id            String   @id
-  authorId      String
-  medias        Json
-  content       String   @db.Text
-  allowComments Boolean
-  allowLikes    Boolean
-  createdAt     DateTime @default(now())
+  id               String   @id
+  authorId         String
+  medias           Json
+  content          String   @db.Text
+  allowComments    Boolean
+  allowLikes       Boolean
+  counterReactions Int      @default(0)
+  createdAt        DateTime @default(now())
 
   @@index([authorId])
+}
+
+enum ReactionKind {
+  like
+}
+
+model PostReaction {
+  profileId    String
+  postId       String
+  reactionKind ReactionKind
+  createdAt    DateTime     @default(now())
+
+  @@id([profileId, postId])
+  @@index([profileId])
+  @@index([postId])
 }

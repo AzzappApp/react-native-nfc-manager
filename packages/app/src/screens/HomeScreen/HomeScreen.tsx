@@ -71,7 +71,7 @@ const HomeScreen = ({
                   icon="notification"
                   iconSize={24}
                   size={45}
-                  style={{ borderWidth: 0 }}
+                  variant="icon"
                   onPress={goToSettings}
                 />
                 <IconButton
@@ -79,7 +79,7 @@ const HomeScreen = ({
                   onPress={goToSettings}
                   iconSize={26}
                   size={45}
-                  style={{ borderWidth: 0 }}
+                  variant="icon"
                 />
               </View>
             }

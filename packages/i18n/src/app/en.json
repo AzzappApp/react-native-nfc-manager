@@ -39,6 +39,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
   },
+  "2nXZgd": {
+    "defaultMessage": "{firstName} posts",
+    "description": "ProfilePostScreen title Header"
+  },
   "3+i2KR": {
     "defaultMessage": "Category image",
     "description": "ProfileKindStep - Category image alt"
@@ -46,6 +50,10 @@
   "428m8h": {
     "defaultMessage": "Add a color",
     "description": "ColorPicker component title when adding a color"
+  },
+  "46b+Vl": {
+    "defaultMessage": "Unfollow",
+    "description": ""
   },
   "4I6fyv": {
     "defaultMessage": "Phone number or email address",
@@ -143,6 +151,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
   },
+  "94qFUe": {
+    "defaultMessage": "EDIT MY WEBCARD",
+    "description": "Edit my webcard button label in Profile Screen Button Bar"
+  },
   "96x4pb": {
     "defaultMessage": "Back to Log In",
     "description": "ForgotPasswordScreen - Back to Log In bottom screen link"
@@ -219,9 +231,17 @@
     "defaultMessage": "Username can’t contain space or special caracters",
     "description": "NewProfileScreen - Username Error"
   },
+  "CcpVyl": {
+    "defaultMessage": "Share",
+    "description": ""
+  },
   "CfCNOX": {
     "defaultMessage": "Foreground color",
     "description": "Title of the foreground color picker"
+  },
+  "D98MFJ": {
+    "defaultMessage": "Related Posts",
+    "description": "Post screen header title"
   },
   "DWnvYf": {
     "defaultMessage": "Reset password",
@@ -339,6 +359,10 @@
     "defaultMessage": "Provide more details",
     "description": "Company profile form - Title"
   },
+  "L4Tupd": {
+    "defaultMessage": "Copy link",
+    "description": ""
+  },
   "LGAptw": {
     "defaultMessage": "Phone number or email address",
     "description": "ForgotpasswordScreen - Phone number or email address placeholder"
@@ -395,6 +419,10 @@
     "defaultMessage": "Select and display the album",
     "description": "Album Picker - Accessibliity label button select album"
   },
+  "Phg2FU": {
+    "defaultMessage": "Add a comment",
+    "description": ""
+  },
   "PjYjnk": {
     "defaultMessage": "Ok",
     "description": "Ok button label in post creation text edition modal"
@@ -418,10 +446,6 @@
   "RiA6pa": {
     "defaultMessage": "Font family",
     "description": "Title of the font picker modal in cover edition"
-  },
-  "SGt9OO": {
-    "defaultMessage": "Edit my profile",
-    "description": "Edit my profile button label in Profile Screen Button Bar"
   },
   "SUCRjC": {
     "defaultMessage": "My Webcards",
@@ -555,9 +579,9 @@
     "defaultMessage": "Done",
     "description": "ColorPicker component Done button label"
   },
-  "ZjYrh6": {
-    "defaultMessage": "Discover",
-    "description": "Post screen header title"
+  "Zlh6em": {
+    "defaultMessage": "Follow",
+    "description": ""
   },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
@@ -651,6 +675,10 @@
     "defaultMessage": "Press this button to adjust the boundary of the selected image",
     "description": "Accessibility hint of the crop button"
   },
+  "fKlLCN": {
+    "defaultMessage": "{text}...less",
+    "description": "ExpendableText  with less keyword to collapse the text"
+  },
   "fWSCbG": {
     "defaultMessage": "Tap to sign in",
     "description": "SignIn Screen - AccessibilityLabel Sign In button"
@@ -711,6 +739,10 @@
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
   },
+  "i9jMTB": {
+    "defaultMessage": "{countReactions} likes",
+    "description": "PastRendererActionBar - Like Counter"
+  },
   "ieyDkr": {
     "defaultMessage": "Bottom right",
     "description": "Label of the bottom right position in cover edition"
@@ -751,10 +783,6 @@
     "defaultMessage": "Color #1",
     "description": "Label of the background pattern color tab in cover edition"
   },
-  "kouZDU": {
-    "defaultMessage": "{firstName} posts",
-    "description": "ProfilePpostScreen title Header"
-  },
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
@@ -763,6 +791,10 @@
     "defaultMessage": "Edit Palette",
     "description": "ColorPicker component button Edit Palette"
   },
+  "l8m7U0": {
+    "defaultMessage": "{text}... more",
+    "description": "ExpendableText  with more keyword to expand the text"
+  },
   "lC1DXs": {
     "defaultMessage": "Retry",
     "description": "label of the button allowing  to retry loading cover image"
@@ -770,6 +802,10 @@
   "lHXS3v": {
     "defaultMessage": "Choose an username",
     "description": "ProfileForm username textinput placeholder"
+  },
+  "lPVOQn": {
+    "defaultMessage": "My posts",
+    "description": "ProfilePostScreen viewer user title Header"
   },
   "lUOLXQ": {
     "defaultMessage": "Top left",
@@ -874,6 +910,10 @@
   "qEenwJ": {
     "defaultMessage": "You need to accept the Terms of Service and the Privacy Policy",
     "description": "Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
+  },
+  "qFUOJM": {
+    "defaultMessage": "Unlike the post",
+    "description": "PostRendererActionBar unlike button accessibility"
   },
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
@@ -995,6 +1035,10 @@
     "defaultMessage": "Photos gallery",
     "description": "Accessibility label of the Photos gallery tabs in image picking wizzard"
   },
+  "wiGGit": {
+    "defaultMessage": "Report this post",
+    "description": ""
+  },
   "wkQ0bm": {
     "defaultMessage": "video",
     "description": "Title of the photo view in image picker wizzard"
@@ -1026,6 +1070,10 @@
   "ySeX6t": {
     "defaultMessage": "Followers",
     "description": "Number of followers"
+  },
+  "yXE1VN": {
+    "defaultMessage": "Like the post",
+    "description": "PostRendererActionBar like button accessibility"
   },
   "ydBmYF": {
     "defaultMessage": "Auto",

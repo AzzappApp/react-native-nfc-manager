@@ -367,9 +367,6 @@ type Post implements Node {
   """The author of the publication"""
   author: Profile!
 
-  """The date of the publication"""
-  postDate: Float!
-
   """The media of the publication"""
   media: Media!
 
@@ -381,6 +378,13 @@ type Post implements Node {
 
   """Does this post allow likes"""
   allowLikes: Boolean!
+
+  """Reaction of the viewer on this post"""
+  viewerPostReaction: ReactionKind
+  counterReactions: Int!
+
+  """Creation date ot the post"""
+  createdAt: DateTime!
   relatedPosts(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -389,6 +393,15 @@ type Post implements Node {
     first: Int
   ): PostConnection!
 }
+
+enum ReactionKind {
+  like
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
 
 """A connection to a list of items."""
 type ProfileConnection {
@@ -483,6 +496,7 @@ type Mutation {
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
+  togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
 }
 
 type UpdateProfilePayload {
@@ -596,5 +610,17 @@ input ToggleFollowingInput {
 
   """Should we follow or unfollow the user"""
   follow: Boolean!
+  clientMutationId: String
+}
+
+type TogglePostReactionPayload {
+  post: Post!
+  clientMutationId: String
+}
+
+input TogglePostReactionInput {
+  """The post id we want toggle like on"""
+  postId: ID!
+  reactionKind: ReactionKind
   clientMutationId: String
 }

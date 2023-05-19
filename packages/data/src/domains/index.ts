@@ -1,5 +1,6 @@
 import db from './db';
 import type {
+  ReactionKind,
   Card,
   CardCover,
   CardModule,
@@ -9,6 +10,7 @@ import type {
   Media,
   MediaKind,
   Post,
+  PostReaction,
   ProfileCategory,
   ProfileKind,
   Profile,
@@ -28,9 +30,11 @@ export type {
   Media,
   MediaKind,
   Post,
+  PostReaction,
   Profile,
   ProfileCategory,
   ProfileKind,
+  ReactionKind,
   Interest,
   User,
 };
@@ -50,3 +54,4 @@ export * from './profiles';
 export * from './coverTemplates';
 export * from './interests';
 export * from './profileCategories';
+export * from './postReactions';
