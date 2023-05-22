@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { View } from 'react-native';
-import type { ViewTransitionProps } from './helpers';
+import type { ViewTransitionProps } from './viewTransitionTypes';
 import type { ForwardedRef } from 'react';
 
 const ViewTransition = (

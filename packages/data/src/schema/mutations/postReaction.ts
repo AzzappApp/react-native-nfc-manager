@@ -8,7 +8,7 @@ import {
   insertPostReaction,
 } from '#domains/postReactions';
 import PostGraphQL from '#schema/PostGraphQL';
-import { ReactionKind } from './commonsTypes';
+import { ReactionKind } from '../commonsTypes';
 import type { ReactionKind as ReactionKindType } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
 

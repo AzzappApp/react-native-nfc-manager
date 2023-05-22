@@ -8,21 +8,42 @@ import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Text from '#ui/Text';
 import type { ProfileScreenButtonBarQuery } from '@azzapp/relay/artifacts/ProfileScreenButtonBarQuery.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native';
 
-type ProfileScreenButtonBarProps = {
+type ProfileScreenButtonBarProps = ViewProps & {
+  /**
+   * The user name of the current displayed profile
+   */
   userName: string;
+  /**
+   * A callback called when the user press the edit button
+   */
   onEdit: () => void;
+  /**
+   * A callback called when the user press the home button
+   */
   onHome: () => void;
+  /**
+   * A callback called when the user press the follow button
+   */
   onToggleFollow: (follow: boolean) => void;
-  style?: StyleProp<ViewStyle>;
 };
 
-const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
-  const { userName, style, onHome } = props;
-
+/**
+ * The button bar displayed at the bottom of the profile screen
+ * Responsible for retrieving the profile following status and displaying the follow button
+ * if the profile is not the current user, and the edit button if the profile is the current user
+ */
+const ProfileScreenButtonBar = ({
+  userName,
+  onEdit,
+  onHome,
+  onToggleFollow,
+  style,
+  ...props
+}: ProfileScreenButtonBarProps) => {
   return (
-    <View style={[styles.buttonBar, style]}>
+    <View style={[styles.buttonBar, style]} {...props}>
       <FloatingIconButton
         icon="azzapp"
         onPress={onHome}
@@ -35,7 +56,12 @@ const ProfileScreenButtonBar = (props: ProfileScreenButtonBarProps) => {
           <View style={[styles.mainButton, styles.mainButtonFallback]} />
         }
       >
-        <ProfileScreenButtonActionButton {...props} />
+        <ProfileScreenButtonActionButton
+          userName={userName}
+          onEdit={onEdit}
+          onHome={onHome}
+          onToggleFollow={onToggleFollow}
+        />
       </ClientOnlySuspense>
       <Link route="PROFILE_POSTS" params={{ userName }}>
         <FloatingIconButton
@@ -88,8 +114,8 @@ const ProfileScreenButtonActionButton = ({
     >
       <Text variant="button">
         <FormattedMessage
-          defaultMessage="EDIT MY WEBCARD"
-          description="Edit my webcard button label in Profile Screen Button Bar"
+          defaultMessage="Build my webcard"
+          description="Build my webcard button label in Profile Screen Button Bar"
         />
       </Text>
     </FloatingButton>

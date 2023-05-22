@@ -1,8 +1,6 @@
 import {
   GraphQLEnumType,
-  GraphQLFloat,
   GraphQLID,
-  GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -11,34 +9,7 @@ import localizedLabelResolver from '#helpers/localizationHelper';
 import type { GraphQLContext } from '#index';
 import type { Interest } from '@prisma/client';
 
-export const MediaInputGraphQL = new GraphQLInputObjectType({
-  name: 'MediaInput',
-  description: 'User Card media module media',
-  fields: () => ({
-    kind: {
-      type: new GraphQLNonNull(MediaKindGraphQL),
-    },
-    id: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-    width: {
-      type: new GraphQLNonNull(GraphQLFloat),
-    },
-    height: {
-      type: new GraphQLNonNull(GraphQLFloat),
-    },
-  }),
-});
-
-export const MediaKindGraphQL = new GraphQLEnumType({
-  name: 'MediaKind',
-  values: {
-    video: { value: 'video' },
-    image: { value: 'image' },
-  },
-});
-
-export const ProfileKind = new GraphQLEnumType({
+export const ProfileKindGraphQL = new GraphQLEnumType({
   name: 'ProfileKind',
   values: {
     business: { value: 'business' },
@@ -66,4 +37,14 @@ export const InterestGraphQL = new GraphQLObjectType<Interest, GraphQLContext>({
       resolve: localizedLabelResolver('labels'),
     },
   }),
+});
+
+export const TextAlignmentGraphQL = new GraphQLEnumType({
+  name: 'TextAlignment',
+  values: {
+    left: { value: 'left' },
+    center: { value: 'center' },
+    right: { value: 'right' },
+    justify: { value: 'justify' },
+  },
 });

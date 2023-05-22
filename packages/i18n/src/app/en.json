@@ -35,13 +35,29 @@
     "defaultMessage": "Sign Up",
     "description": "SigninScreen - Sign Up"
   },
+  "1bqCj6": {
+    "defaultMessage": "Ok",
+    "description": "Ok button label in text edition modal"
+  },
   "1cQrMk": {
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
   },
+  "2EoPMO": {
+    "defaultMessage": "Mobile",
+    "description": "ProfileScreen bottom menu accessibility label for Mobile tab"
+  },
+  "2ZlnoN": {
+    "defaultMessage": "Preview",
+    "description": "ProfileScreen bottom menu accessibility label for Preview button"
+  },
   "2nXZgd": {
     "defaultMessage": "{firstName} posts",
     "description": "ProfilePostScreen title Header"
+  },
+  "2wq5kX": {
+    "defaultMessage": "Tap to select a font",
+    "description": "Hint of the font dropdown button"
   },
   "3+i2KR": {
     "defaultMessage": "Category image",
@@ -111,6 +127,10 @@
     "defaultMessage": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter",
     "description": "ChangePasswordS Screen - Accessibility error message password rules"
   },
+  "6nn94+": {
+    "defaultMessage": "Done",
+    "description": "Done button label in profile edition screen"
+  },
   "6o2WcD": {
     "defaultMessage": "{title} - background image",
     "description": "CoverRenderer - Accessibility cover image"
@@ -147,13 +167,13 @@
     "defaultMessage": "Posts",
     "description": "SearchPage - Result - Global search posts title"
   },
+  "8e13No": {
+    "defaultMessage": "Select all",
+    "description": "Select all button label in profile edition screen"
+  },
   "9/DfwF": {
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
-  },
-  "94qFUe": {
-    "defaultMessage": "EDIT MY WEBCARD",
-    "description": "Edit my webcard button label in Profile Screen Button Bar"
   },
   "96x4pb": {
     "defaultMessage": "Back to Log In",
@@ -187,6 +207,10 @@
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
   },
+  "B3wodk": {
+    "defaultMessage": "Right",
+    "description": "Label of the right alignment button"
+  },
   "B8fERH": {
     "defaultMessage": "Last name",
     "description": "ProfileForm last name textinput label"
@@ -210,6 +234,10 @@
   "Bswpqg": {
     "defaultMessage": "Posts",
     "description": "Number of posts"
+  },
+  "Bv7fXL": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel edit modules button label in profile edition screen"
   },
   "C1R1bc": {
     "defaultMessage": "Fade",
@@ -235,13 +263,13 @@
     "defaultMessage": "Share",
     "description": ""
   },
-  "CfCNOX": {
-    "defaultMessage": "Foreground color",
-    "description": "Title of the foreground color picker"
-  },
   "D98MFJ": {
     "defaultMessage": "Related Posts",
     "description": "Post screen header title"
+  },
+  "DLIvhH": {
+    "defaultMessage": "Font Size : {size}",
+    "description": "Font size message in cover edition"
   },
   "DWnvYf": {
     "defaultMessage": "Reset password",
@@ -258,6 +286,10 @@
   "DgczNZ": {
     "defaultMessage": "Log In",
     "description": "Signup Screen - Login link bottom screen"
+  },
+  "DpvS7V": {
+    "defaultMessage": "Font",
+    "description": "Label of the ont dropdown button"
   },
   "E+83qW": {
     "defaultMessage": "Vignette",
@@ -287,6 +319,10 @@
     "defaultMessage": "Retry",
     "description": "CoverEditionScreen alert message loading error retry button"
   },
+  "Eoy6Sp": {
+    "defaultMessage": "Slide to change the vertical spacing",
+    "description": "Hint of the vertical spacing slider in simple text edition"
+  },
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
@@ -310,6 +346,10 @@
   "GY7j0U": {
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Terms of service "
+  },
+  "Gl+Mcq": {
+    "defaultMessage": "Center",
+    "description": "Label of the center alignment button"
   },
   "GsE7SA": {
     "defaultMessage": "Welcome!",
@@ -343,6 +383,10 @@
     "defaultMessage": "Photo",
     "description": "Title of the photo view in image picker wizzard"
   },
+  "K4Uiwb": {
+    "defaultMessage": "Preview",
+    "description": "Simple text  bottom menu label for Preview tab"
+  },
   "K8vqTk": {
     "defaultMessage": "Filters",
     "description": "Title of the filters section in Image edition wizzard"
@@ -354,6 +398,10 @@
   "KOjOOw": {
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
+  },
+  "KVGArG": {
+    "defaultMessage": "Margin top/bottom : {size}",
+    "description": "Font size message in cover edition"
   },
   "KimbRe": {
     "defaultMessage": "Provide more details",
@@ -383,6 +431,10 @@
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
   },
+  "MMkG6l": {
+    "defaultMessage": "Vertical Spacing",
+    "description": "Label of the Vertical Spacing slider in simple text edition"
+  },
   "MYq2d8": {
     "defaultMessage": "Select an activity",
     "description": "ProfileForm - Activity BottomSheet - Title"
@@ -407,6 +459,14 @@
     "defaultMessage": "Show password",
     "description": "Password text input - show password button accessibility label"
   },
+  "OPcjcW": {
+    "defaultMessage": "Tap to change the text alignment of the text",
+    "description": "Hint of the text alignment button"
+  },
+  "OxFSMO": {
+    "defaultMessage": "Select",
+    "description": "Accessibility label for the select button in the profile edition screen"
+  },
   "P2PER8": {
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
@@ -423,10 +483,6 @@
     "defaultMessage": "Add a comment",
     "description": ""
   },
-  "PjYjnk": {
-    "defaultMessage": "Ok",
-    "description": "Ok button label in post creation text edition modal"
-  },
   "PmtfGE": {
     "defaultMessage": "Documentary",
     "description": "Documentary photo filter name"
@@ -439,6 +495,14 @@
     "defaultMessage": "Fore.",
     "description": "CoverEditionScreen bottom menu label for Foreground tab"
   },
+  "RDYvOJ": {
+    "defaultMessage": "Desktop",
+    "description": "ProfileScreen bottom menu accessibility label for Desktop tab"
+  },
+  "RFGqFi": {
+    "defaultMessage": "Duplicate",
+    "description": "Accessibility label for the duplicate button in the profile edition screen"
+  },
   "RTqCXo": {
     "defaultMessage": "Tap to accept the terms of service",
     "description": "Signup Screen - Accessibility checkbox terms of service"
@@ -446,6 +510,10 @@
   "RiA6pa": {
     "defaultMessage": "Font family",
     "description": "Title of the font picker modal in cover edition"
+  },
+  "RpSI+X": {
+    "defaultMessage": "Moves the module up",
+    "description": "Accessibility hint for the move up button in the profile edition screen"
   },
   "SUCRjC": {
     "defaultMessage": "My Webcards",
@@ -483,6 +551,18 @@
     "defaultMessage": "Phone number",
     "description": "Signup Screen - phone number input placeholder"
   },
+  "Tw2G6K": {
+    "defaultMessage": "Shows the module in your webcard",
+    "description": "Accessibility hint for the show button in the profile edition screen"
+  },
+  "Tx4u9Y": {
+    "defaultMessage": "Simple text",
+    "description": "Simple text screen title"
+  },
+  "U9U7gk": {
+    "defaultMessage": "Hide",
+    "description": "Hide button in profile edition screen footer"
+  },
   "UAcWni": {
     "defaultMessage": "Bottom left",
     "description": "Label of the bottom left position in cover edition"
@@ -515,6 +595,14 @@
     "defaultMessage": "This phone number is already registered",
     "description": "Signup Screen - Error This phone number is already registered "
   },
+  "VBdLBY": {
+    "defaultMessage": "Deletes the module from your webcard",
+    "description": "Accessibility hint for the delete button in the profile edition screen"
+  },
+  "VQFKgi": {
+    "defaultMessage": "Hides the module in your webcard",
+    "description": "Accessibility hint for the hide button in the profile edition screen"
+  },
   "VS1eqO": {
     "defaultMessage": "This username is already used by someone else",
     "description": "NewProfileScreen - Username already taken error"
@@ -527,9 +615,13 @@
     "defaultMessage": "Saturation",
     "description": "Saturation image edition parameters name"
   },
-  "Vz5f5R": {
-    "defaultMessage": "Edit your profile",
-    "description": "Profile screen edit header"
+  "Vnd2TO": {
+    "defaultMessage": "Unselect",
+    "description": "Accessibility label for the select button in the profile edition screen"
+  },
+  "Vw6ZqZ": {
+    "defaultMessage": "Unselect",
+    "description": "Unselect all button label in profile edition screen"
   },
   "WBD9Bx": {
     "defaultMessage": "Next",
@@ -538,6 +630,14 @@
   "WO7pDf": {
     "defaultMessage": "Enter your password",
     "description": "SignIn Screen - Accessibility TextInput email address "
+  },
+  "Wa87wW": {
+    "defaultMessage": "Configuration",
+    "description": "Title of the configuration section in simple text edition"
+  },
+  "WgISAc": {
+    "defaultMessage": "Delete",
+    "description": "Accessibility label for the delete button in the profile edition screen"
   },
   "WsKWO4": {
     "defaultMessage": "Description",
@@ -550,6 +650,14 @@
   "X6lxBz": {
     "defaultMessage": "Position",
     "description": "Label of the position button in cover edition"
+  },
+  "XNJ3+V": {
+    "defaultMessage": "Hide",
+    "description": "Accessibility label for the hide button in the profile edition screen"
+  },
+  "XVlOcg": {
+    "defaultMessage": "Margin size",
+    "description": "Label of the font size slider in cover edition"
   },
   "XbIJSS": {
     "defaultMessage": "Font Size - {size}",
@@ -587,6 +695,10 @@
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
   },
+  "a1rHQ+": {
+    "defaultMessage": "Webcard builder",
+    "description": "Webcard builder header title"
+  },
   "aGgFjV": {
     "defaultMessage": "Tap to reset your passward",
     "description": "ChangePassword Screen - AccessibilityLabel Reset password button"
@@ -595,6 +707,18 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
   },
+  "aVbmnp": {
+    "defaultMessage": "Justify",
+    "description": "Label of the justify alignment button"
+  },
+  "abCe+w": {
+    "defaultMessage": "Edit Style",
+    "description": "Simple text bottom menu label for style tab"
+  },
+  "ad1v/l": {
+    "defaultMessage": "Edit Text",
+    "description": "Simple text bottom menu label for edit tab"
+  },
   "b/ugZW": {
     "defaultMessage": "Followings",
     "description": "Number of followed profiles"
@@ -602,6 +726,10 @@
   "b4fFwm": {
     "defaultMessage": "Brightness",
     "description": "Brightness image edition parameters name"
+  },
+  "bEGNeW": {
+    "defaultMessage": "Color",
+    "description": "Label of the background/foreground tint color in web card modules editors when there is no background color"
   },
   "bO/TfG": {
     "defaultMessage": "Privacy Policy",
@@ -619,6 +747,10 @@
     "defaultMessage": "Connect with phone number",
     "description": "Signup Form Connect with phone number section title in country selection list"
   },
+  "ckw6Kn": {
+    "defaultMessage": "Photo opacity : {opacity}",
+    "description": "Font size message in cover edition"
+  },
   "cvIa5m": {
     "defaultMessage": "Cancel",
     "description": "CoverEditionScreen alert message loading error cancel button"
@@ -634,6 +766,14 @@
   "dF52vj": {
     "defaultMessage": "Highlights",
     "description": "Highlights image edition parameters name"
+  },
+  "dG/x6l": {
+    "defaultMessage": "Color #2",
+    "description": "Label of the background/foreground background color in web card modules editors"
+  },
+  "dImcC+": {
+    "defaultMessage": "Duplicates the module in your webcard",
+    "description": "Accessibility hint for the duplicate button in the profile edition screen"
   },
   "dNmlSS": {
     "defaultMessage": "Tap to select a color",
@@ -663,6 +803,14 @@
     "defaultMessage": "Check your emails or messages!",
     "description": "ForgotPasswordScreen - Check your emails or messages!"
   },
+  "eLqeU7": {
+    "defaultMessage": "Moves the module down",
+    "description": "Accessibility hint for the move down button in the profile edition screen"
+  },
+  "ePdewE": {
+    "defaultMessage": "Move up",
+    "description": "Accessibility label for the move up button in the profile edition screen"
+  },
   "f2KYUh": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle tab in cover edition"
@@ -683,6 +831,10 @@
     "defaultMessage": "Tap to sign in",
     "description": "SignIn Screen - AccessibilityLabel Sign In button"
   },
+  "fbl908": {
+    "defaultMessage": "{nbSelectedModules} selected",
+    "description": "Webcard builder header title in module edition mode"
+  },
   "g67Jzi": {
     "defaultMessage": "Vibrance",
     "description": "Vibrance image edition parameters name"
@@ -702,10 +854,6 @@
   "gL9Uhd": {
     "defaultMessage": "Tap to edit your profile",
     "description": "UserScreenButtonBar edit button accessibility label"
-  },
-  "gLBaC+": {
-    "defaultMessage": "Tap to select a font",
-    "description": "Hint of the font button in cover edition"
   },
   "gXripn": {
     "defaultMessage": "Name",
@@ -731,9 +879,17 @@
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
   },
+  "hQErcO": {
+    "defaultMessage": "Background",
+    "description": "Simple text  bottom menu label for Background tab"
+  },
   "hc+1uI": {
     "defaultMessage": "Allow Azzapp to access your microphone",
     "description": "Camera authorization screen title for microphobe permission"
+  },
+  "hnj8Qa": {
+    "defaultMessage": "Text alignment",
+    "description": "Label of the text alignment button"
   },
   "hwL8A0": {
     "defaultMessage": "Follow",
@@ -747,9 +903,21 @@
     "defaultMessage": "Bottom right",
     "description": "Label of the bottom right position in cover edition"
   },
+  "ihqjKa": {
+    "defaultMessage": "Edit",
+    "description": "Edit modules button label in profile edition screen"
+  },
   "ivmD1N": {
     "defaultMessage": "Crop",
     "description": "Accessibility label of the crop button"
+  },
+  "jFpYcY": {
+    "defaultMessage": "Margin left/right : {size}",
+    "description": "Font size message in cover edition"
+  },
+  "jb3SxE": {
+    "defaultMessage": "Delete",
+    "description": "Delete button in profile edition screen footer"
   },
   "jbyp1F": {
     "defaultMessage": "Select an image",
@@ -778,10 +946,6 @@
   "kWx3ez": {
     "defaultMessage": "Tell us more about you",
     "description": "NewProfileType Interest Picker Screen - Title for personal profile"
-  },
-  "kjYrL+": {
-    "defaultMessage": "Color #1",
-    "description": "Label of the background pattern color tab in cover edition"
   },
   "kuaFQc": {
     "defaultMessage": "Orientation",
@@ -819,6 +983,14 @@
     "defaultMessage": "New Post",
     "description": "New post screen title"
   },
+  "ltR4XX": {
+    "defaultMessage": "Color #1",
+    "description": "Label of the background/foreground tint color in web card modules editors"
+  },
+  "lvy7m5": {
+    "defaultMessage": "Show",
+    "description": "Accessibility label for the show button in the profile edition screen"
+  },
   "m/3KOp": {
     "defaultMessage": "Bottom center",
     "description": "Label of the bottom center position in cover edition"
@@ -834,10 +1006,6 @@
   "mPVwE6": {
     "defaultMessage": "Cancel",
     "description": "ColorPicker component Cancel button label"
-  },
-  "mRqzw5": {
-    "defaultMessage": "Color",
-    "description": "Label of the foreground color tab in cover edition"
   },
   "me0reI": {
     "defaultMessage": "Tap to change the position",
@@ -867,13 +1035,29 @@
     "defaultMessage": "Shadow",
     "description": "Shadow image edition parameters name"
   },
+  "nXXtnK": {
+    "defaultMessage": "Change background color",
+    "description": "ProfileScreen bottom menu accessibility label for Change background color button"
+  },
+  "nYO3n5": {
+    "defaultMessage": "Left",
+    "description": "Label of the left alignment button"
+  },
   "noNWRA": {
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
+  "o5n4Hq": {
+    "defaultMessage": "Enter text",
+    "description": "Placeholder for text area in simple text edition screen"
+  },
   "oAzffi": {
     "defaultMessage": "Adjust",
     "description": "Title of the adjust section in Image edition wizzard"
+  },
+  "p+PC34": {
+    "defaultMessage": "Show",
+    "description": "Show button in profile edition screen footer"
   },
   "p0+sji": {
     "defaultMessage": "tap to select this media",
@@ -886,6 +1070,14 @@
   "p7k7BX": {
     "defaultMessage": "Image",
     "description": "CoverEditionScreen bottom menu label for Image tab"
+  },
+  "p7vdTv": {
+    "defaultMessage": "Move down",
+    "description": "Accessibility label for the move down button in the profile edition screen"
+  },
+  "pBRNQI": {
+    "defaultMessage": "Add a module",
+    "description": "ProfileScreen bottom menu accessibility label for Add a module button"
   },
   "pBqrA+": {
     "defaultMessage": "Already have an account?",
@@ -902,6 +1094,10 @@
   "pqxK1C": {
     "defaultMessage": "Contrast",
     "description": "Contrast image edition parameters name"
+  },
+  "q/LbR5": {
+    "defaultMessage": "Background",
+    "description": "Label of Background tab in simple text edition"
   },
   "q/ZByJ": {
     "defaultMessage": "Thermal",
@@ -926,10 +1122,6 @@
   "r+BJn9": {
     "defaultMessage": "What's your name?",
     "description": "Personal profile form - Title"
-  },
-  "r/zo6r": {
-    "defaultMessage": "Font",
-    "description": "Label of the font button in cover edition"
   },
   "r2XHrR": {
     "defaultMessage": "Middle right",
@@ -975,6 +1167,10 @@
     "defaultMessage": "Save",
     "description": "Save button label in cover edition screen"
   },
+  "sdffuN": {
+    "defaultMessage": "Vertical Spacing : {verticalSpacing}",
+    "description": "Vertical Spacing message in simple text edition"
+  },
   "sqy+v3": {
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
@@ -983,10 +1179,6 @@
     "defaultMessage": "Continue",
     "description": "NewProfileScreen - Continue Button"
   },
-  "u1bNBj": {
-    "defaultMessage": "Color #2",
-    "description": "Label of the background color tab in cover edition"
-  },
   "uHQfNw": {
     "defaultMessage": "Video Shutter",
     "description": "Accessibility label for the video shutter button"
@@ -994,6 +1186,10 @@
   "uNR58P": {
     "defaultMessage": "Chrome",
     "description": "Chrome photo filter name"
+  },
+  "uevgHG": {
+    "defaultMessage": "Build my webcard",
+    "description": "Build my webcard button label in Profile Screen Button Bar"
   },
   "ukFVmp": {
     "defaultMessage": "Normal",
@@ -1043,6 +1239,10 @@
     "defaultMessage": "video",
     "description": "Title of the photo view in image picker wizzard"
   },
+  "wpEPD0": {
+    "defaultMessage": "Edit Margin",
+    "description": "Simple text bottom menu label for margin tab"
+  },
   "x/HwUu": {
     "defaultMessage": "Take a picture",
     "description": "Accessibility label of the camera tabs in image picking wizzard"
@@ -1058,6 +1258,14 @@
   "xaWatU": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in cover edition screen"
+  },
+  "xdgLVe": {
+    "defaultMessage": "Background opacity",
+    "description": "Label of the Background opacity slider in simple text edition"
+  },
+  "xfDyjW": {
+    "defaultMessage": "Slide to change the background opacity",
+    "description": "Hint of the Background opacity slider in simple text edition"
   },
   "y37Ei7": {
     "defaultMessage": "Select an album",
@@ -1094,6 +1302,10 @@
   "zMaylR": {
     "defaultMessage": "Take a video",
     "description": "Accessibility label of the video tabs in post  in image picking wizzard"
+  },
+  "zqi7UK": {
+    "defaultMessage": "Margins",
+    "description": "Title of the margins section in simple text edition"
   },
   "zzoOTT": {
     "defaultMessage": "Enter your name",

@@ -27,8 +27,8 @@ import {
 } from '#domains';
 import localizedLabelResolver from '#helpers/localizationHelper';
 import CardGraphQL from './CardGraphQL';
+import { ProfileKindGraphQL } from './commonsTypes';
 import { MediaImageGraphQL } from './MediaGraphQL';
-import { ProfileKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import type { Profile, Post, ProfileCategory, CompanyActivity } from '#domains';
@@ -65,7 +65,7 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
       },
     },
     profileKind: {
-      type: ProfileKind,
+      type: ProfileKindGraphQL,
     },
     profileCategory: {
       type: ProfileCategoryGraphQL,
@@ -153,7 +153,7 @@ export const ProfileCategoryGraphQL = new GraphQLObjectType<
   interfaces: [NodeGraphQL],
   fields: () => ({
     id: globalIdField('ProfileCategory'),
-    profileKind: { type: new GraphQLNonNull(ProfileKind) },
+    profileKind: { type: new GraphQLNonNull(ProfileKindGraphQL) },
     label: {
       type: GraphQLString,
       resolve: localizedLabelResolver('labels'),

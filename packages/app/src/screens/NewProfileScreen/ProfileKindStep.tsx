@@ -5,7 +5,7 @@ import { StyleSheet, FlatList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer, prefetchImage } from '#components/medias';

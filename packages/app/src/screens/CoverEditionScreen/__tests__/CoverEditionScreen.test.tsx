@@ -137,13 +137,13 @@ jest.mock('#components/ImageEditionParametersList', () => {
   return ImageEditionParametersList;
 });
 
-jest.mock('#ui/FontPicker', () => {
+jest.mock('#ui/FontDropDownPicker', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
   const FontPicker = (props: any) =>
-    React.createElement('FontPicker', {
+    React.createElement('FontDropDownPicker', {
       ...props,
-      testID: 'font-picker',
+      testID: 'font-dropdown-picker',
     });
   return FontPicker;
 });
@@ -160,23 +160,23 @@ jest.mock('#screens/CoverEditionScreen/CoverModelsEditionPanel', () => {
   return CoverModelsEditionPanel;
 });
 
-jest.mock('#components/ProfileColorPalette', () => {
+jest.mock('#components/ProfileColorPicker', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
-  const ProfileColorPaletteModal = (props: any) =>
-    React.createElement('ProfileColorPaletteModal', {
+  const ProfileColorDropDownPicker = (props: any) =>
+    React.createElement('ProfileColorDropDownPicker', {
       ...props,
-      testID: 'profile-color-palette-modal',
+      testID: 'profile-dropdow-color-picker',
     });
-  const ProfileColorPalette = (props: any) =>
-    React.createElement('ProfileColorPalette', {
+  const ProfileColorPicker = (props: any) =>
+    React.createElement('ProfileColorPicker', {
       ...props,
-      testID: 'profile-color-palette',
+      testID: 'profile-color-picker',
     });
   return {
     __esModule: true,
-    default: ProfileColorPalette,
-    ProfileColorPaletteModal,
+    default: ProfileColorPicker,
+    ProfileColorDropDownPicker,
   };
 });
 
@@ -748,66 +748,35 @@ describe('CoverEditionScreen', () => {
 
     const testStyleChangeFor = (text: ReactTestInstance) => {
       // Font change tests
-      expect(screen.queryByTestId('font-picker')).toHaveProp('visible', false);
-      act(() => {
-        fireEvent.press(screen.getByLabelText('Font'));
-      });
-      expect(screen.queryByTestId('font-picker')).toHaveProp('visible', true);
       expect(text).not.toHaveStyle({
         fontFamily: 'Helvetica',
       });
       act(() => {
-        fireEvent(screen.getByTestId('font-picker'), 'change', 'Helvetica');
+        fireEvent(
+          screen.getByTestId('font-dropdown-picker'),
+          'fontFamilyChange',
+          'Helvetica',
+        );
       });
       expect(text).toHaveStyle({
         fontFamily: 'Helvetica',
       });
-      expect(screen.queryByTestId('font-picker')).toHaveProp('visible', true);
-      act(() => {
-        fireEvent(screen.getByTestId('font-picker'), 'requestClose');
-      });
-      expect(screen.queryByTestId('font-picker')).toHaveProp('visible', false);
 
       // Color change tests
-      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
-        'visible',
-        false,
-      );
-      act(() => {
-        fireEvent.press(screen.getAllByLabelText('Color')[0]);
-      });
-      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
-        'visible',
-        true,
-      );
 
       expect(text).not.toHaveStyle({
         color: '#FF3322',
       });
       act(() => {
         fireEvent(
-          screen.queryAllByTestId('profile-color-palette')[0],
-          'changeColor',
+          screen.getByTestId('profile-dropdow-color-picker'),
+          'colorChange',
           '#FF3322',
         );
       });
       expect(text).toHaveStyle({
         color: '#FF3322',
       });
-      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
-        'visible',
-        true,
-      );
-      act(() => {
-        fireEvent(
-          screen.queryAllByTestId('profile-color-palette')[0],
-          'requestClose',
-        );
-      });
-      expect(screen.queryAllByTestId('profile-color-palette')[0]).toHaveProp(
-        'visible',
-        false,
-      );
 
       // font size change tests
       const previousStyle = StyleSheet.flatten(text.props.style);
@@ -864,8 +833,8 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Fore.'));
     });
 
-    const list = screen.getByTestId('cover-layer-list-foreground');
-    const foregroundsButtons = within(list).getAllByRole('button');
+    const foregroundPanel = screen.getByTestId('cover-foreground-panel');
+    const foregroundsButtons = within(foregroundPanel).getAllByRole('button');
 
     expect(foregroundsButtons).toHaveLength(10);
 
@@ -878,13 +847,13 @@ describe('CoverEditionScreen', () => {
     expect(getLayer(2).uri).toBe('https://example.com/coverForeground7.png');
 
     act(() => {
-      fireEvent.press(screen.getAllByLabelText('Color')[1]);
+      fireEvent.press(screen.getAllByLabelText('Color')[0]);
     });
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[1],
-        'changeColor',
+        screen.getAllByTestId('profile-color-picker')[0],
+        'colorChange',
         '#123456',
       );
     });
@@ -899,8 +868,8 @@ describe('CoverEditionScreen', () => {
       fireEvent.press(screen.getByLabelText('Back.'));
     });
 
-    const list = screen.getByTestId('cover-layer-list-background');
-    const backgroundsButtons = within(list).getAllByRole('button');
+    const backgroundPanel = screen.getByTestId('cover-background-panel');
+    const backgroundsButtons = within(backgroundPanel).getAllByRole('button');
 
     expect(backgroundsButtons).toHaveLength(10);
 
@@ -918,8 +887,8 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[2],
-        'changeColor',
+        screen.getAllByTestId('profile-color-picker')[1],
+        'colorChange',
         '#434239',
       );
     });
@@ -931,8 +900,8 @@ describe('CoverEditionScreen', () => {
 
     act(() => {
       fireEvent(
-        screen.getAllByTestId('profile-color-palette')[2],
-        'changeColor',
+        screen.getAllByTestId('profile-color-picker')[1],
+        'colorChange',
         '#FF34A2',
       );
     });

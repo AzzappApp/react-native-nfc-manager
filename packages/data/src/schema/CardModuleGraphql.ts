@@ -1,0 +1,184 @@
+import {
+  GraphQLBoolean,
+  GraphQLEnumType,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLInterfaceType,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
+import mapValues from 'lodash/mapValues';
+import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { TextAlignmentGraphQL } from './commonsTypes';
+import StaticMediaGraphQL from './StaticMediaGraphQL';
+import type { GraphQLContext } from '#index';
+import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { CardModule } from '@prisma/client';
+import type { GraphQLFieldConfigMap } from 'graphql';
+
+export const ModuleKindGraphQL = new GraphQLEnumType({
+  name: 'CardModuleKind',
+  description: 'User Card module kind',
+  values: MODULE_KINDS.reduce(
+    (acc, kind) => ({ ...acc, [kind]: { value: kind } }),
+    {},
+  ),
+});
+
+const modulesCommonFields = {
+  id: {
+    type: new GraphQLNonNull(GraphQLID),
+    description:
+      'User Card module id, unique between all modules (but not a node id)',
+  },
+  kind: {
+    type: new GraphQLNonNull(ModuleKindGraphQL),
+    description: 'User Card module kind',
+  },
+  visible: {
+    type: new GraphQLNonNull(GraphQLBoolean),
+    description: 'User Card module visibility',
+  },
+};
+
+const CardModuleGraphQL = new GraphQLInterfaceType({
+  name: 'CardModule',
+  description: 'User Card module',
+  fields: () => modulesCommonFields,
+});
+
+export default CardModuleGraphQL;
+
+const createGrahQLCardModule = (
+  moduleKind: ModuleKind,
+  fields: GraphQLFieldConfigMap<CardModule, GraphQLContext>,
+): GraphQLObjectType => {
+  const kindName = `${moduleKind[0].toUpperCase()}${moduleKind.slice(1)}`;
+  return new GraphQLObjectType({
+    name: `CardModule${kindName}`,
+    description: `User Card module : ${kindName}`,
+    fields: () => ({
+      ...mapValues(fields, (field, key) => ({
+        resolve: (cardModule: CardModule) => (cardModule.data as any)?.[key],
+        ...field,
+      })),
+      ...modulesCommonFields,
+    }),
+    interfaces: [CardModuleGraphQL],
+    isTypeOf: (value: unknown) =>
+      typeof value === 'object' &&
+      value != null &&
+      (value as any).kind === moduleKind,
+  });
+};
+
+export const ModuleBackgroundStyleGraphQL = new GraphQLObjectType<
+  any,
+  GraphQLContext
+>({
+  name: 'ModuleBackgroundStyle',
+  description: 'Style of the background of a module',
+  fields: () => ({
+    backgroundColor: { type: new GraphQLNonNull(GraphQLString) },
+    patternColor: { type: new GraphQLNonNull(GraphQLString) },
+    opacity: { type: new GraphQLNonNull(GraphQLInt) },
+  }),
+});
+
+export const CardModuleBlockTextGraphQL = createGrahQLCardModule(
+  'blockText',
+  {},
+);
+
+export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {});
+
+export const CardModuleHorizontalPhotoGraphQL = createGrahQLCardModule(
+  'horizontalPhoto',
+  {},
+);
+
+export const CardModuleLineDividerGraphQL = createGrahQLCardModule(
+  'lineDivider',
+  {},
+);
+
+export const CardModuleOpeningHoursGraphQL = createGrahQLCardModule(
+  'openingHours',
+  {},
+);
+
+export const CardModulePhotoWithTextAndTitleGraphQL = createGrahQLCardModule(
+  'photoWithTextAndTitle',
+  {},
+);
+
+export const CardModuleSimpleButtonGraphQL = createGrahQLCardModule(
+  'simpleButton',
+  {},
+);
+
+export const CardModuleSimpleTextGraphQL = createGrahQLCardModule(
+  'simpleText',
+  {
+    text: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontFamily: {
+      type: GraphQLString,
+    },
+    fontSize: {
+      type: GraphQLInt,
+    },
+    color: {
+      type: GraphQLString,
+    },
+    verticalSpacing: {
+      type: GraphQLInt,
+    },
+    textAlign: {
+      type: TextAlignmentGraphQL,
+    },
+    marginHorizontal: {
+      type: GraphQLInt,
+    },
+    marginVertical: {
+      type: GraphQLInt,
+    },
+    background: {
+      type: StaticMediaGraphQL,
+      resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+        const { data } = cardModule as any;
+        return data.backgroundId
+          ? staticMediaLoader.load(data.backgroundId)
+          : null;
+      },
+    },
+    backgroundStyle: {
+      type: ModuleBackgroundStyleGraphQL,
+    },
+  },
+);
+
+export const CardModuleSimpleTitleGraphQL = createGrahQLCardModule(
+  'simpleTitle',
+  {},
+);
+
+export const CardModuleSocialLinksGraphQL = createGrahQLCardModule(
+  'socialLinks',
+  {},
+);
+
+export const CardModulesGraphql = [
+  CardModuleBlockTextGraphQL,
+  CardModuleCarouselGraphQL,
+  CardModuleHorizontalPhotoGraphQL,
+  CardModuleLineDividerGraphQL,
+  CardModuleOpeningHoursGraphQL,
+  CardModulePhotoWithTextAndTitleGraphQL,
+  CardModuleSimpleButtonGraphQL,
+  CardModuleSimpleTextGraphQL,
+  CardModuleSimpleTitleGraphQL,
+  CardModuleSocialLinksGraphQL,
+];

@@ -10,7 +10,7 @@ import {
   SaveButton,
   Toolbar,
 } from 'react-admin';
-import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { uploadMedia, uploadSign } from '@azzapp/shared/WebAPI';
 import { injectToken } from '#App';
 import { getTokens } from '#helpers/tokenStore';
@@ -29,7 +29,7 @@ export const validateForm = (
   return errors;
 };
 
-const CoverLayerCreate = () => {
+const StaticMediaCreate = () => {
   const transform = async (dataForm: Record<string, any>) => {
     //doing it here becase we need to run on client side (localstorage not found on backoffice)
     const { uri, ...data } = dataForm;
@@ -37,7 +37,7 @@ const CoverLayerCreate = () => {
       const { uploadURL, uploadParameters } = await uploadSign(
         {
           kind: 'image',
-          target: 'cover', //maybe create a target coverlayer
+          target: 'cover', //maybe create a target static media
         },
         injectToken(getTokens()?.token ?? undefined),
       );
@@ -62,7 +62,7 @@ const CoverLayerCreate = () => {
       <SimpleForm
         defaultValues={{
           available: true,
-          kind: 'foreground',
+          usage: 'coverForeground',
         }}
         validate={validateForm}
         toolbar={
@@ -79,7 +79,7 @@ const CoverLayerCreate = () => {
             <ImageInput
               source="uri"
               label=""
-              accept="image/png"
+              accept="image/*"
               helperText={`IMAGE SHOULD BE USING THE COVER RATIO ${COVER_RATIO} No control is done on t format of the
           image. Please test the image before uploading it.`}
             >
@@ -102,11 +102,12 @@ const CoverLayerCreate = () => {
           <SectionTitle label="Type" />
           <div style={{ marginBottom: 20 }}>
             <RadioButtonGroupInput
-              source="kind"
+              source="usage"
               label=""
               choices={[
-                { id: 'foreground', name: 'Foreground' },
-                { id: 'background', name: 'Background' },
+                { id: 'coverForeground', name: 'Cover Foreground' },
+                { id: 'coverBackground', name: 'Cover Background' },
+                { id: 'moduleBackground', name: 'Module Background' },
               ]}
             />
           </div>
@@ -119,7 +120,7 @@ const CoverLayerCreate = () => {
   );
 };
 
-export default CoverLayerCreate;
+export default StaticMediaCreate;
 
 const SectionTitle = ({ label }: { label: string }) => {
   return <span style={{ fontWeight: 'bold', fontSize: 20 }}>{label}</span>;

@@ -7,7 +7,7 @@ import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverList from '#components/CoverList';
 import QRCodeModal from '#components/CoverRenderer/QRCodeModal';
@@ -84,7 +84,7 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
           route="CARD_MODULE_EDITION"
           params={{
             module: 'cover',
-            isCreation: true,
+            isNew: true,
           }}
         >
           <PressableScaleHighlight style={styles.listHeaderPressable}>

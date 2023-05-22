@@ -19,7 +19,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { buildUserUrl } from '#helpers/urlHelpers';
-import useAuthState from '#hooks/userAuthState';
+import useAuthState from '#hooks/useAuthState';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';

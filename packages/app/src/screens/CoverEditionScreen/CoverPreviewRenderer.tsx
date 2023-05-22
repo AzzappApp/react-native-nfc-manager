@@ -5,7 +5,7 @@ import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
   COVER_VIDEO_BITRATE,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';

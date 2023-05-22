@@ -156,7 +156,7 @@ const RGBHexColorPicker = ({
         testID="hexColorTextInput"
         style={{ marginTop: 0 }}
         value={chroma.hsv(hue, saturation, value).hex().toUpperCase()}
-        onChangeColor={onChange}
+        onColorChange={onChange}
       />
 
       <Label

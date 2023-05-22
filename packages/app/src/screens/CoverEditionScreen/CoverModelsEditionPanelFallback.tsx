@@ -1,6 +1,6 @@
 import range from 'lodash/range';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';

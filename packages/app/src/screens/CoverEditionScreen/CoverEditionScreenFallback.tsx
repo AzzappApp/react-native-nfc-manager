@@ -1,5 +1,7 @@
+import { useCallback } from 'react';
 import { View } from 'react-native';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -30,6 +32,11 @@ const CoverEditionScreenFallback = ({
     insetBottom,
   } = useCoverEditionLayout();
 
+  const router = useRouter();
+  const onCancel = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const coverBorderRadius = COVER_CARD_RADIUS * coverHeight * COVER_RATIO;
 
   const styles = useStyleSheet(stylesheet);
@@ -39,6 +46,7 @@ const CoverEditionScreenFallback = ({
         isCreation={isCreation ?? true}
         canSave={false}
         cropEditionMode={false}
+        onCancel={onCancel}
       />
       <View
         style={{

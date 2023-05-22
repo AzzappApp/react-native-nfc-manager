@@ -1,7 +1,7 @@
 import { memo, useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';

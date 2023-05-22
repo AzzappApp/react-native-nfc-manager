@@ -8,6 +8,7 @@ import {
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLJSON } from 'graphql-scalars';
 import { getProfileId } from '@azzapp/auth/viewer';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import {
@@ -18,9 +19,9 @@ import {
   removeMedia,
   updateCardCover,
 } from '#domains';
-import { CardCoverTitleOrientationGraphQL } from '../CardGraphQL';
+import { CardCoverTitleOrientationGraphQL } from '../CardCoverGraphQL';
 import ProfileGraphQL from '../ProfileGraphQL';
-import { MediaInputGraphQL } from './commonsTypes';
+import { MediaInputGraphQL } from './commonsInputTypes';
 import type { Card, CoverUpdates, Media } from '#domains';
 import type { Database } from '#domains/db';
 import type { GraphQLContext } from '../GraphQLContext';
@@ -162,40 +163,48 @@ const updateCover = mutationWithClientMutationId({
           const mediaOperations: Array<Promise<any> | null> = [];
           const updates: CoverUpdates = {};
 
-          const entries = typedEntries(input);
+          const entries = convertToNonNullArray(typedEntries(input));
           entries.forEach(async ([key, value]) => {
             switch (key) {
               case 'media':
-                updates.mediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(cover.mediaId, input.media, trx),
-                );
+                if (value) {
+                  updates.mediaId = value.id;
+                  mediaOperations.push(
+                    ...replaceMedia(cover.mediaId, input.media, trx),
+                  );
+                }
                 break;
               case 'sourceMedia':
-                updates.sourceMediaId = value.id;
-                //be sure the media does not exist already (from covertemplate)
-                if (
-                  input.sourceMedia &&
-                  (await mediaLoader.load(input.sourceMedia.id)) == null
-                ) {
-                  await createMedia(input.sourceMedia, trx);
+                if (value) {
+                  updates.sourceMediaId = value.id;
+                  //be sure the media does not exist already (from covertemplate)
+                  if (
+                    input.sourceMedia &&
+                    (await mediaLoader.load(input.sourceMedia.id)) == null
+                  ) {
+                    await createMedia(input.sourceMedia, trx);
+                  }
                 }
                 break;
               case 'maskMedia':
-                updates.maskMediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(cover.maskMediaId, input.maskMedia, trx),
-                );
+                if (value) {
+                  updates.maskMediaId = value.id;
+                  mediaOperations.push(
+                    ...replaceMedia(cover.maskMediaId, input.maskMedia, trx),
+                  );
+                }
                 break;
               case 'textPreviewMedia':
-                updates.textPreviewMediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(
-                    cover.textPreviewMediaId,
-                    input.textPreviewMedia,
-                    trx,
-                  ),
-                );
+                if (value) {
+                  updates.textPreviewMediaId = value.id;
+                  mediaOperations.push(
+                    ...replaceMedia(
+                      cover.textPreviewMediaId,
+                      input.textPreviewMedia,
+                      trx,
+                    ),
+                  );
+                }
                 break;
               case 'mediaStyle':
                 updates.mediaStyle = value as any;

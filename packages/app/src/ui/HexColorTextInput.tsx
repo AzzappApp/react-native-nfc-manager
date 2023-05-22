@@ -17,12 +17,12 @@ type HexColorTextInputProps = Omit<
   Omit<NativeTextInputProps, 'onChangeText'>,
   'onChange'
 > & {
-  onChangeColor: (hexColor: string) => void;
+  onColorChange: (hexColor: string) => void;
   value: string;
 };
 
 /**
- * A wrapper around TextInput that adds Azzapp's default styling.
+ * A wrapper around TextInput that allow to input a hex color.
  *
  *
  * @param {TextInputProps} props
@@ -69,7 +69,7 @@ const HexColorTextInput = ({
     const newColor = '#' + text.replace(/([^0-9A-F]+)/gi, '').substring(0, 6);
     setColorValue(newColor);
     //only accept 6 digit format
-    if (isValidHex(newColor)) props.onChangeColor(newColor);
+    if (isValidHex(newColor)) props.onColorChange(newColor);
   };
 
   const appearanceStyle = useStyleSheet(computedStyle);

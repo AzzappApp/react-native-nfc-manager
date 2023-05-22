@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { useNativeNavigationEvent } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
@@ -11,6 +12,7 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ProfileRoute } from '#routes';
 import type { ProfileMobileScreenByIdQuery } from '@azzapp/relay/artifacts/ProfileMobileScreenByIdQuery.graphql';
 import type { ProfileMobileScreenByUserNameQuery } from '@azzapp/relay/artifacts/ProfileMobileScreenByUserNameQuery.graphql';
+import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
 const ProfileMobileScreen = ({
   preloadedQuery,
@@ -25,7 +27,7 @@ const ProfileMobileScreen = ({
     setReady(true);
   });
 
-  const prefetchScreen = usePrefetchRoute();
+  const prefetchRoute = usePrefetchRoute();
   useEffect(() => {
     const { viewer, profile } = data;
     if (
@@ -33,12 +35,15 @@ const ProfileMobileScreen = ({
       profile?.id &&
       viewer.profile.id === profile.id
     ) {
-      prefetchScreen({
-        route: 'CARD_MODULE_EDITION',
-        params: { module: 'cover' },
+      const modules: Array<ModuleKind | 'cover'> = ['cover', ...MODULE_KINDS];
+      modules.forEach(module => {
+        prefetchRoute({
+          route: 'CARD_MODULE_EDITION',
+          params: { module },
+        });
       });
     }
-  }, [data, prefetchScreen]);
+  }, [data, prefetchRoute]);
 
   if (!data.profile) {
     return null;

@@ -5,7 +5,7 @@ import HexColorTextInput from '../HexColorTextInput';
 
 describe('HexColorTextInput component', () => {
   test('setting props `value` should render the correct backgroundColor', () => {
-    render(<HexColorTextInput value="#2C73FA" onChangeColor={jest.fn()} />);
+    render(<HexColorTextInput value="#2C73FA" onColorChange={jest.fn()} />);
     const previewColor = screen.queryByTestId(
       'azzap_native_hexcolor_previewcolor',
     );
@@ -16,7 +16,7 @@ describe('HexColorTextInput component', () => {
   });
 
   test('calling on `onChange` with a wrong color should not change the preview color', () => {
-    render(<HexColorTextInput value="#2C73FA" onChangeColor={jest.fn()} />);
+    render(<HexColorTextInput value="#2C73FA" onColorChange={jest.fn()} />);
     const previewColor = screen.queryByTestId(
       'azzap_native_hexcolor_previewcolor',
     );

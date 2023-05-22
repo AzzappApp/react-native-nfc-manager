@@ -1,5 +1,4 @@
 import CompanyActivityProviders from './companyActivityProvider';
-import CoverLayerDataProviders from './coverLayerDataProvider';
 import CoverTemplateDataProviders from './coverTemplateDataProvider';
 import InterestDataProviders from './interestsDataProvider';
 import ProfileCategoryDataProviders from './profileCategoryDataProvider';
@@ -7,11 +6,12 @@ import {
   executeCommand,
   registerResourceDataProvider,
 } from './resourceDataProviders';
+import StaticMediaDataProviders from './staticMediaDataProvider';
 import UserDataProviders from './usersDataProviders';
 
 registerResourceDataProvider(
-  'CoverLayer',
-  CoverLayerDataProviders,
+  'StaticMedia',
+  StaticMediaDataProviders,
   ['admin'],
   ['admin'],
 );

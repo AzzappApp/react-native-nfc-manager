@@ -3,7 +3,10 @@ import Button from './Button';
 import { HEADER_HEIGHT } from './Header';
 import type { ButtonProps } from './Button';
 
-export const HeaderButton = ({ style, ...props }: ButtonProps) => (
+/**
+ * A button with a fixed width and height to be used in the header
+ */
+const HeaderButton = ({ style, ...props }: ButtonProps) => (
   <Button {...props} style={[styles.headerButton, style]} />
 );
 

@@ -39,6 +39,10 @@ export type IconButtonProps = ViewProps & {
    * @type {('border' | 'icon')}
    */
   variant?: 'border' | 'icon';
+  /**
+   * @see https://reactnative.dev/docs/pressable#disabled
+   */
+  disabled?: boolean;
 };
 
 const IconButton = ({
@@ -100,7 +104,6 @@ const computedStyle = createVariantsStyleSheet(() => ({
   border: {
     button: {
       borderWidth: 1,
-      borderRadius: 25,
     },
   },
 }));

@@ -17,7 +17,7 @@ import {
   getAllPosts,
   getAllProfilesWithCard,
   getAllProfilesWithCardCount,
-  getCoverLayers,
+  getStaticMediasByUsage,
   getCoverTemplatesByKind,
   getCoverTemplatesSuggestion,
   getFollowedProfiles,
@@ -28,10 +28,10 @@ import {
   connectionFromDateSortedItems,
   cursorToDate,
 } from '#helpers/connectionsHelpers';
-import { CoverLayerGraphQL } from './CardGraphQL';
 import CoverTemplateGraphQL from './CoverTemplateGraphQL';
 import { PostConnectionGraphQL } from './PostGraphQL';
 import ProfileGraphQL, { ProfileConnectionGraphQL } from './ProfileGraphQL';
+import StaticMediaGraphQL from './StaticMediaGraphQL';
 import type { Post, Profile, CoverTemplate } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { Viewer } from '@azzapp/auth/viewer';
@@ -217,16 +217,23 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
     coverBackgrounds: {
       description: 'Return a list of cover backgrounds',
       type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(CoverLayerGraphQL)),
+        new GraphQLList(new GraphQLNonNull(StaticMediaGraphQL)),
       ),
-      resolve: async () => getCoverLayers('background'),
+      resolve: async () => getStaticMediasByUsage('coverBackground'),
     },
     coverForegrounds: {
       description: 'Return a list of cover foregrounds',
       type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(CoverLayerGraphQL)),
+        new GraphQLList(new GraphQLNonNull(StaticMediaGraphQL)),
       ),
-      resolve: async () => getCoverLayers('foreground'),
+      resolve: async () => getStaticMediasByUsage('coverForeground'),
+    },
+    moduleBackgrounds: {
+      description: 'Return a list of module backgrounds',
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(StaticMediaGraphQL)),
+      ),
+      resolve: async () => getStaticMediasByUsage('moduleBackground'),
     },
     coverTemplates: {
       type: new GraphQLNonNull(

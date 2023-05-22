@@ -21,7 +21,7 @@ const validateForm = (values: Record<string, any>): Record<string, any> => {
   return errors;
 };
 
-const CoverLayerEdit = () => {
+const StaticMediaEdit = () => {
   const transform = async (data: any) => {
     return { ...data };
   };
@@ -74,11 +74,12 @@ const CoverLayerEdit = () => {
         <SectionTitle label="Type" />
         <div style={{ marginBottom: 20 }}>
           <RadioButtonGroupInput
-            source="kind"
+            source="usage"
             label=""
             choices={[
-              { id: 'foreground', name: 'Foreground' },
-              { id: 'background', name: 'Background' },
+              { id: 'coverForeground', name: 'Cover Foreground' },
+              { id: 'coverBackground', name: 'Cover Background' },
+              { id: 'moduleBackground', name: 'Module Background' },
             ]}
           />
         </div>
@@ -90,4 +91,4 @@ const CoverLayerEdit = () => {
   );
 };
 
-export default CoverLayerEdit;
+export default StaticMediaEdit;

@@ -6,42 +6,24 @@ import {
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import type { ForwardedRef } from 'react';
-import type {
-  ViewStyle,
-  StyleProp,
-  PressableProps,
-  View,
-  AccessibilityRole,
-  AccessibilityValue,
-} from 'react-native';
+import type { PressableProps, View, StyleProp, ViewStyle } from 'react-native';
 
-export type FloatingButtonProps = {
-  onPress?: () => void;
+export type FloatingButtonProps = Omit<PressableProps, 'style'> & {
   size?: number;
-  style?: StyleProp<ViewStyle>;
   variant?: 'grey' | 'normal'; //TODO: this variant does not exist in speficiation but some screen are still using a variation with grey.dont want to break everything
-  nativeID?: string;
-  disabled?: boolean;
-  children: PressableProps['children'];
-  accessibilityRole?: AccessibilityRole;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
-  accessibilityValue?: AccessibilityValue;
+  style?: StyleProp<ViewStyle>;
 };
 
 const FloatingButton = (
   {
     onPress,
     size = 50,
-    style,
     variant = 'normal',
     children,
-    nativeID,
     disabled = false,
     accessibilityRole = 'button',
-    accessibilityLabel,
-    accessibilityHint,
-    accessibilityValue,
+    style,
+    ...props
   }: FloatingButtonProps,
   ref: ForwardedRef<View>,
 ) => {
@@ -57,12 +39,9 @@ const FloatingButton = (
         pressed && appearanceStyle.pressed,
         style,
       ]}
-      nativeID={nativeID}
-      accessibilityRole={accessibilityRole}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityHint={accessibilityHint}
-      accessibilityValue={accessibilityValue}
       ref={ref}
+      accessibilityRole={accessibilityRole}
+      {...props}
     >
       {children}
     </Pressable>

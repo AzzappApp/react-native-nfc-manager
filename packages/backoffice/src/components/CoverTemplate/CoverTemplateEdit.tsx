@@ -35,7 +35,7 @@ const CoverTemplateEdit = () => {
         const { uploadURL, uploadParameters } = await uploadSign(
           {
             kind: 'image',
-            target: 'cover', //maybe create a target coverlayer
+            target: 'cover', //maybe create a target static media
           },
           injectToken(getTokens()?.token ?? undefined),
         );

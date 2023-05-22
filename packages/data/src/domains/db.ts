@@ -8,7 +8,7 @@ import type {
 import type {
   Card,
   CardCover,
-  CoverLayer,
+  StaticMedia,
   CoverTemplate,
   CardModule,
   Follow,
@@ -35,7 +35,7 @@ export type Database = {
   CardModule: CardModule;
   CompanyActivity: CompanyActivity;
   CoverTemplate: CoverTemplate;
-  CoverLayer: WithCreatedAt<CoverLayer>;
+  StaticMedia: WithCreatedAt<StaticMedia>;
   Follow: WithCreatedAt<Follow>;
   Media: Media;
   Profile: WithTimeStamps<Profile>;

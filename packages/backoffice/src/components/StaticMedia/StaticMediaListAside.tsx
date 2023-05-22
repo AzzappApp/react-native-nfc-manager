@@ -7,7 +7,7 @@ import {
   SavedQueriesList,
 } from 'react-admin';
 
-const CoverLayerListAside = () => {
+const StaticMediaListAside = () => {
   return (
     <div
       style={{
@@ -43,15 +43,21 @@ const CoverLayerListAside = () => {
         </FilterList>
         <FilterList label="Type" icon={undefined}>
           <FilterListItem
-            label="Foreground"
+            label="Cover Foreground"
             value={{
-              kind: 'foreground',
+              usage: 'coverForeground',
             }}
           />
           <FilterListItem
-            label="Background"
+            label="Cover Background"
             value={{
-              kind: 'background',
+              usage: 'coverBackground',
+            }}
+          />
+          <FilterListItem
+            label="Module Background"
+            value={{
+              usage: 'moduleBackground',
             }}
           />
         </FilterList>
@@ -60,4 +66,4 @@ const CoverLayerListAside = () => {
   );
 };
 
-export default CoverLayerListAside;
+export default StaticMediaListAside;

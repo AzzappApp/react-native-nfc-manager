@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { COVER_RATIO, COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO, COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent } from 'react-native';

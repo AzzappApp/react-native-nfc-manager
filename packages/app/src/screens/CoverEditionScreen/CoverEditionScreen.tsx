@@ -24,10 +24,11 @@ import {
   COVER_SOURCE_MAX_IMAGE_DIMENSION,
   COVER_SOURCE_MAX_VIDEO_DIMENSION,
   COVER_VIDEO_BITRATE,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import { firstNotUndefined } from '@azzapp/shared/valueHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
@@ -485,7 +486,6 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Mutation, Cancel and navigation
-  const intl = useIntl();
   const rendererRef = useRef<CoverPreviewHandler | null>(null);
   const [saving, setSaving] = useState(false);
   const [showImageHint, setShowImageHint] = useState(false);
@@ -1173,7 +1173,7 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Bottom menu
-  const [currentTab, setCurrentTab] = useState<string>('models');
+  const [currentTab, setCurrentTab] = useState('models');
 
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
@@ -1192,6 +1192,7 @@ const CoverEditionScreen = ({
   } = useCoverEditionLayout();
 
   const cropEditionMode = editedParameter === 'roll';
+  const intl = useIntl();
 
   if (!viewer) {
     return null;
@@ -1550,15 +1551,6 @@ type CoverEditionValue = {
   subTitleStyle?: CardCoverTextStyleInput | null;
   title?: string | null;
   titleStyle?: CardCoverTextStyleInput | null;
-};
-
-const firstNotUndefined = <T extends any[]>(...values: T) => {
-  for (const value of values) {
-    if (value !== undefined) {
-      return value;
-    }
-  }
-  return undefined;
 };
 
 const makeTranslucent = (color: string | null | undefined) =>

@@ -14,8 +14,8 @@ import {
 import { GraphQLDateTime } from 'graphql-scalars';
 import { getProfileId } from '@azzapp/auth/viewer';
 import { db, getPostReaction } from '#domains';
+import { ReactionKind } from './commonsTypes';
 import MediaGraphQL from './MediaGraphQL';
-import { ReactionKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
 import ProfileGraphQL from './ProfileGraphQL';
 import type { Post, Media } from '#domains';

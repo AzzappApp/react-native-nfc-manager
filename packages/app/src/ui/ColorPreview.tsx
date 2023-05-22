@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
-import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
+import type { ColorValue, ViewProps } from 'react-native';
 
 /**
  * A simple circle that shows a color.
@@ -8,17 +8,14 @@ import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 const ColorPreview = ({
   color,
   style,
-}: {
+  ...props
+}: ViewProps & {
   /**
    * The color to show.
    */
   color: ColorValue;
-  /**
-   * @see https://reactnative.dev/docs/view#style
-   */
-  style: StyleProp<ViewStyle>;
 }) => (
-  <View style={[styles.colorPreviewContainer, style]}>
+  <View style={[styles.colorPreviewContainer, style]} {...props}>
     <View style={[styles.colorPreview, { backgroundColor: color }]} />
   </View>
 );

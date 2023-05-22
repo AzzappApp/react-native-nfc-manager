@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Pressable } from 'react-native';
 import ViewTransition from './ViewTransition';
-import type { ViewTransitionProps } from './ViewTransition/helpers';
+import type { ViewTransitionProps } from './ViewTransition/viewTransitionTypes';
 import type { ForwardedRef } from 'react';
 import type { PressableProps, View } from 'react-native';
 

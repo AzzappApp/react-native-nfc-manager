@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_BASE_WIDTH } from '@azzapp/shared/cardHelpers';
+import { COVER_BASE_WIDTH } from '@azzapp/shared/coverHelpers';
 import CoverLink from './CoverLink';
 import type {
   CoverList_users$data,

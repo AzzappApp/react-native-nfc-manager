@@ -4,7 +4,7 @@ import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { createMedia, createPost, db } from '#domains';
 import PostGraphQL from '../PostGraphQL';
-import { MediaInputGraphQL } from './commonsTypes';
+import { MediaInputGraphQL } from './commonsInputTypes';
 import type { Media } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
 

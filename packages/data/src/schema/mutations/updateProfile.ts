@@ -9,8 +9,8 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains/profiles';
+import { ProfileKindGraphQL } from '../commonsTypes';
 import ProfileGraphQL from '../ProfileGraphQL';
-import { ProfileKind } from './commonsTypes';
 import type { Profile, ProfileKind as ProfileKindType } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
 
@@ -35,7 +35,7 @@ const updateProfileMutation = mutationWithClientMutationId({
       type: GraphQLString,
     },
     profileKind: {
-      type: ProfileKind,
+      type: ProfileKindGraphQL,
     },
     companyName: {
       type: GraphQLString,

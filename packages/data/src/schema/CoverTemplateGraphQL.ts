@@ -7,17 +7,16 @@ import {
 } from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { GraphQLJSON } from 'graphql-scalars';
-import { getCoverLayerById } from '#domains';
 import {
   CardCoverTextStyleGraphQL,
   CoverBackgroundStyleGraphQL,
   CoverContentStyleGraphQL,
   CoverForegroundStyleGraphQL,
-  CoverLayerGraphQL,
-} from './CardGraphQL';
+} from './CardCoverGraphQL';
+import { ProfileKindGraphQL } from './commonsTypes';
 import { MediaImageGraphQL } from './MediaGraphQL';
-import { ProfileKind } from './mutations/commonsTypes';
 import NodeGraphQL from './NodeGraphQL';
+import StaticMediaGraphQL from './StaticMediaGraphQL';
 import type { GraphQLContext } from './GraphQLContext';
 import type { CoverTemplate, Media } from '@prisma/client';
 
@@ -31,7 +30,7 @@ const CoverTemplateGraphQL = new GraphQLObjectType<
   fields: () => ({
     id: globalIdField('CoverTemplate'),
     name: { type: GraphQLString },
-    kind: { type: ProfileKind },
+    kind: { type: ProfileKindGraphQL },
     data: { type: new GraphQLNonNull(CardCoverTemplateGraphQL) },
     enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
     category: { type: new GraphQLList(CoverTemplateCategorGraphQL) },
@@ -108,19 +107,19 @@ const CardCoverTemplateGraphQL = new GraphQLObjectType<
       },
     },
     background: {
-      type: CoverLayerGraphQL,
+      type: StaticMediaGraphQL,
       description: 'The background of the cover',
-      resolve({ backgroundId }) {
-        return backgroundId ? getCoverLayerById(backgroundId) : null;
+      resolve({ backgroundId }, _, { staticMediaLoader }) {
+        return backgroundId ? staticMediaLoader.load(backgroundId) : null;
       },
     },
     backgroundStyle: {
       type: CoverBackgroundStyleGraphQL,
     },
     foreground: {
-      type: CoverLayerGraphQL,
-      resolve({ foregroundId }) {
-        return foregroundId ? getCoverLayerById(foregroundId) : null;
+      type: StaticMediaGraphQL,
+      resolve({ foregroundId }, _, { staticMediaLoader }) {
+        return foregroundId ? staticMediaLoader.load(foregroundId) : null;
       },
     },
     foregroundStyle: {

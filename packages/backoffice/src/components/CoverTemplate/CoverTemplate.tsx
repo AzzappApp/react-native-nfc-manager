@@ -26,7 +26,7 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_MAX_FONT_SIZE,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import SectionTitle from '#components/SectionTitle';
 import type { ValidateForm } from 'react-admin';
@@ -147,8 +147,8 @@ const CoverTemplate = ({
         <SectionTitle label="Background" />
         <ReferenceInput
           source="data.backgroundId"
-          reference="CoverLayer"
-          filter={{ kind: 'background', available: 1 }}
+          reference="StaticMedia"
+          filter={{ kind: 'coverBackground', available: 1 }}
           sort={{ field: 'name', order: 'ASC' }}
           perPage={50}
         >
@@ -177,8 +177,8 @@ const CoverTemplate = ({
         <SectionTitle label="Foreground" />
         <ReferenceInput
           source="data.foregroundId"
-          reference="CoverLayer"
-          filter={{ kind: 'foreground', available: 1 }}
+          reference="StaticMedia"
+          filter={{ kind: 'coverForeground', available: 1 }}
           sort={{ field: 'name', order: 'ASC' }}
           perPage={50}
         >

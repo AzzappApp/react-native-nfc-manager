@@ -3,11 +3,11 @@ import { db } from '@azzapp/data/domains';
 import { sqlCountToNumber } from '@azzapp/data/domains/generic';
 import type { Resources } from './resourceDataProviders';
 import type {
-  CoverLayer,
   CoverTemplate,
   ProfileCategory,
   User,
   Interest,
+  StaticMedia,
 } from '@azzapp/data/domains';
 import type {
   GetListParams,
@@ -24,8 +24,8 @@ import type {
   CreateResult,
 } from 'react-admin';
 
-type ResourcesToTypes<T extends Resources> = T extends 'CoverLayer'
-  ? CoverLayer
+type ResourcesToTypes<T extends Resources> = T extends 'StaticMedia'
+  ? StaticMedia
   : T extends 'CoverTemplate'
   ? CoverTemplate
   : T extends 'ProfileCategory'

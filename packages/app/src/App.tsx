@@ -19,7 +19,7 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import useAuthState from '#hooks/userAuthState';
+import useAuthState from '#hooks/useAuthState';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import { getAuthState, init as initAuthStore } from './helpers/authStore';

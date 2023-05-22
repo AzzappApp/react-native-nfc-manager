@@ -5,7 +5,6 @@ import type {
   CardCover,
   CardModule,
   CompanyActivity,
-  CoverLayer,
   Follow,
   Media,
   MediaKind,
@@ -16,6 +15,7 @@ import type {
   Profile,
   Interest,
   CoverTemplate,
+  StaticMedia,
   User,
 } from '@prisma/client';
 
@@ -25,7 +25,6 @@ export type {
   CardModule,
   CoverTemplate,
   CompanyActivity,
-  CoverLayer,
   Follow,
   Media,
   MediaKind,
@@ -37,6 +36,7 @@ export type {
   ReactionKind,
   Interest,
   User,
+  StaticMedia,
 };
 
 export { db };
@@ -45,7 +45,7 @@ export * from './cards';
 export * from './cardCovers';
 export * from './cardModules';
 export * from './companyActivities';
-export * from './coverLayers';
+export * from './staticMedias';
 export * from './posts';
 export * from './users';
 export * from './medias';

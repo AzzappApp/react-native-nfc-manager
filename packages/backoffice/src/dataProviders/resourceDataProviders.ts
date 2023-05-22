@@ -33,10 +33,10 @@ export type ResourceDataProvider<
 
 export type Resources =
   | 'CompanyActivity'
-  | 'CoverLayer'
   | 'CoverTemplate'
   | 'Interest'
   | 'ProfileCategory'
+  | 'StaticMedia'
   | 'User';
 
 const resourcesDataProviders: Map<

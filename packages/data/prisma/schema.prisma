@@ -88,18 +88,19 @@ enum MediaKind {
   video
 }
 
-model CoverLayer {
-  id        String    @id
-  kind      LayerKind
+model StaticMedia {
+  id        String           @id
+  usage     StaticMediaUsage
   name      String?
   tags      String?
-  available Boolean   @default(true)
-  createdAt DateTime  @default(now())
+  available Boolean          @default(true)
+  createdAt DateTime         @default(now())
 }
 
-enum LayerKind {
-  foreground
-  background
+enum StaticMediaUsage {
+  coverForeground
+  coverBackground
+  moduleBackground
 }
 
 model Card {
@@ -136,10 +137,12 @@ model CardCover {
 }
 
 model CardModule {
-  id     String @id
-  kind   String
-  cardId String
-  data   Json
+  id       String  @id
+  kind     String
+  cardId   String
+  data     Json
+  position Int
+  visible  Boolean @default(true)
 
   @@index([cardId])
 }

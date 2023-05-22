@@ -1,4 +1,4 @@
-import { COVER_CARD_RADIUS } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
 import Link from '../Link';

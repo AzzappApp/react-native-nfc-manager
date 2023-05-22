@@ -9,7 +9,7 @@ import {
   getProfileByUserName,
   getProfileCategories,
 } from '#domains';
-import { InterestGraphQL } from './mutations/commonsTypes';
+import { InterestGraphQL } from './commonsTypes';
 import { nodeField, nodesField } from './NodeGraphQL';
 import ProfileGraphQL, { ProfileCategoryGraphQL } from './ProfileGraphQL';
 import UserGraphQL from './UserGraphQL';

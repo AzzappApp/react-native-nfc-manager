@@ -1,4 +1,5 @@
 import type { ViewProps, ViewStyle } from 'react-native';
+import type { AnimatedStyleProp } from 'react-native-reanimated';
 
 export type TransitionableStyle = Exclude<
   keyof ViewStyle,
@@ -25,5 +26,6 @@ export type ViewTransitionProps = ViewProps & {
   transitions: readonly TransitionableStyle[];
   transitionDuration: number;
   disableAnimation?: boolean;
+  animatedStyle?: AnimatedStyleProp<ViewStyle>;
   easing?: Easing;
 };

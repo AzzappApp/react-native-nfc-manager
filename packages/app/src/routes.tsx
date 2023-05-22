@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
 export type HomeRoute = {
@@ -84,8 +85,9 @@ export type NewPostRoute = {
 export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
   params: {
-    module: string;
-    isCreation?: boolean;
+    module: ModuleKind | 'cover';
+    moduleId?: string;
+    isNew?: boolean;
   };
 };
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,

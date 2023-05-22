@@ -8,6 +8,7 @@ import {
   getProfilesByIds,
   getMediasByIds,
   getCoverTemplatesByIds,
+  getStaticMediasByIds,
 } from '#domains';
 import type {
   Card,
@@ -16,6 +17,7 @@ import type {
   Media,
   Profile,
   CoverTemplate,
+  StaticMedia,
 } from '#domains';
 import type { SessionData } from '@azzapp/auth/viewer';
 
@@ -28,6 +30,7 @@ export type GraphQLContext = {
   coverLoader: DataLoader<string, CardCover | null>;
   postLoader: DataLoader<string, Post | null>;
   mediaLoader: DataLoader<string, Media | null>;
+  staticMediaLoader: DataLoader<string, StaticMedia | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
 };
 
@@ -46,6 +49,7 @@ export const createGraphQLContext = (
     coverLoader: new DataLoader(getCardCoversByIds),
     postLoader: new DataLoader(getPostsByIds),
     mediaLoader: new DataLoader(getMediasByIds),
+    staticMediaLoader: new DataLoader(getStaticMediasByIds),
     coverTemplateLoader: new DataLoader(getCoverTemplatesByIds),
   };
 };

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import {

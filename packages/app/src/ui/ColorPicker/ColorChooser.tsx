@@ -9,11 +9,11 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 export type ColorChooserProps = {
   value: string;
-  onChangeColor: (value: string) => void;
+  onColorChange: (value: string) => void;
   style?: StyleProp<ViewStyle>;
 };
 
-const ColorChooser = ({ value, onChangeColor, style }: ColorChooserProps) => {
+const ColorChooser = ({ value, onColorChange, style }: ColorChooserProps) => {
   const [hsv, setHsv] = useState({
     hue: hexToHSV(value)[0],
     saturation: hexToHSV(value)[1],
@@ -27,14 +27,14 @@ const ColorChooser = ({ value, onChangeColor, style }: ColorChooserProps) => {
         value: clamp(value, 0, 1),
       };
     });
-    onChangeColor(chroma.hsv(hsv.hue, saturation, value).hex());
+    onColorChange(chroma.hsv(hsv.hue, saturation, value).hex());
   };
 
   const onHueChange = (hue: number) => {
     setHsv(prev => {
       return { ...prev, hue };
     });
-    onChangeColor(chroma.hsv(hue, hsv.saturation, hsv.value).hex());
+    onColorChange(chroma.hsv(hue, hsv.saturation, hsv.value).hex());
   };
 
   const onHexChange = (hex: string) => {
@@ -43,7 +43,7 @@ const ColorChooser = ({ value, onChangeColor, style }: ColorChooserProps) => {
       saturation: hexToHSV(hex)[1],
       value: hexToHSV(hex)[2],
     });
-    onChangeColor(hex);
+    onColorChange(hex);
   };
 
   return (

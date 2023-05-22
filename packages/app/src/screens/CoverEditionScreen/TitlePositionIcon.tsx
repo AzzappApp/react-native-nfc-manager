@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { TITLE_POSITIONS } from '@azzapp/shared/cardHelpers';
+import { TITLE_POSITIONS } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 
@@ -31,6 +31,7 @@ const computedStyleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.grey900 : colors.grey200,
   },
 }));
+
 const styles = StyleSheet.create({
   iconContainer: {
     width: 24,

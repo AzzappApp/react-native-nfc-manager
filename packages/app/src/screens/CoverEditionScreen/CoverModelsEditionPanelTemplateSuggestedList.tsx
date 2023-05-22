@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, FlatList, Image } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
