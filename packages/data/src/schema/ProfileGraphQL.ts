@@ -99,7 +99,6 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
         first = first ?? 100;
 
         const offset = after ? cursorToOffset(after) : 0;
-
         return connectionFromArraySlice(
           await getProfilesPosts(user.id, first, offset),
           { after, first },

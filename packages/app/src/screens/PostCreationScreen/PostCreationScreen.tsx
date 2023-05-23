@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react';
 import * as mime from 'react-native-mime-types';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  ConnectionHandler,
+  graphql,
+  useFragment,
+  useMutation,
+} from 'react-relay';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   SelectImageStep,
@@ -32,11 +37,16 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
     graphql`
       fragment PostCreationScreen_viewer on Viewer {
         profile {
+          id
           ...AuthorCartoucheFragment_profile
         }
       }
     `,
     viewerKey,
+  );
+  const connectionID = ConnectionHandler.getConnectionID(
+    profile!.id,
+    'ProfilePostsScreen_profile_connection_posts',
   );
 
   const router = useRouter();
@@ -45,12 +55,24 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
   };
 
   const [commit] = useMutation<PostCreationScreenMutation>(graphql`
-    mutation PostCreationScreenMutation($input: CreatePostInput!) {
+    mutation PostCreationScreenMutation(
+      $connections: [ID!]!
+      $input: CreatePostInput!
+    ) {
       createPost(input: $input) {
-        post {
+        post @prependNode(connections: $connections, edgeTypeName: "PostEdge") {
+          id
+          content
+          allowLikes
+          allowComments
           author {
             id
             userName
+          }
+          media {
+            id
+            width
+            height
           }
         }
       }
@@ -109,6 +131,7 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
           allowLikes,
           content,
         },
+        connections: [connectionID],
       },
       onCompleted(response) {
         addLocalCachedMediaFile(

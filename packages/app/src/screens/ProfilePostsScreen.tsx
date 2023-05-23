@@ -48,13 +48,13 @@ const ProfilePostsScreen = ({
     usePaginationFragment(
       graphql`
         fragment ProfilePostsScreenFragment_posts on Profile
-        @refetchable(queryName: "ProfilePostsQuery")
+        @refetchable(queryName: "ProfilePostsScreen_profile_posts_connection")
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
         ) {
           posts(after: $after, first: $first)
-            @connection(key: "Profile_posts") {
+            @connection(key: "ProfilePostsScreen_profile_connection_posts") {
             edges {
               node {
                 id
@@ -79,11 +79,15 @@ const ProfilePostsScreen = ({
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     if (!refreshing && !isLoadingNext) {
-      refetch({
-        onComplete() {
-          setRefreshing(false);
+      refetch(
+        {},
+        {
+          fetchPolicy: 'store-and-network',
+          onComplete() {
+            setRefreshing(false);
+          },
         },
-      });
+      );
     }
   }, [isLoadingNext, refetch, refreshing]);
 
