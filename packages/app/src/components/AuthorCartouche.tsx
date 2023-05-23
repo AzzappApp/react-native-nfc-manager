@@ -123,18 +123,20 @@ const AuthorCartouche = ({
   ]);
 
   if (activeLink) {
-    <Link route="PROFILE" params={{ userName: author.userName }}>
-      <PressableOpacity
-        style={[
-          variantStyle.container,
-          variant === 'small' && variantStyle.containerSmall,
-          style,
-        ]}
-        {...props}
-      >
-        {content}
-      </PressableOpacity>
-    </Link>;
+    return (
+      <Link route="PROFILE" params={{ userName: author.userName }}>
+        <PressableOpacity
+          style={[
+            variantStyle.container,
+            variant === 'small' && variantStyle.containerSmall,
+            style,
+          ]}
+          {...props}
+        >
+          {content}
+        </PressableOpacity>
+      </Link>
+    );
   }
 
   return (
