@@ -7,6 +7,7 @@ import type {
   CoverTemplate,
   Media,
   Post,
+  PostComment,
   Prisma,
   Profile,
   StaticMedia,
@@ -21,6 +22,7 @@ type EntityKind =
   | 'CoverTemplate'
   | 'Media'
   | 'Post'
+  | 'PostComment'
   | 'Profile'
   | 'StaticMedia'
   | 'User';
@@ -33,6 +35,8 @@ type EntityKindToEntity<T extends EntityKind> = T extends 'Card'
   ? Media
   : T extends 'Post'
   ? Post
+  : T extends 'PostComment'
+  ? PostComment
   : T extends 'Profile'
   ? Profile
   : T extends 'StaticMedia'

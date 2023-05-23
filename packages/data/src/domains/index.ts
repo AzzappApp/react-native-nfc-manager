@@ -10,6 +10,7 @@ import type {
   MediaKind,
   Post,
   PostReaction,
+  PostComment,
   ProfileCategory,
   ProfileKind,
   Profile,
@@ -30,6 +31,7 @@ export type {
   MediaKind,
   Post,
   PostReaction,
+  PostComment,
   Profile,
   ProfileCategory,
   ProfileKind,
@@ -55,3 +57,4 @@ export * from './coverTemplates';
 export * from './interests';
 export * from './profileCategories';
 export * from './postReactions';
+export * from './postComments';

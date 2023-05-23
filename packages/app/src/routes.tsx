@@ -77,6 +77,13 @@ export type PostRoute = {
   };
 };
 
+export type PostCommentsRoute = {
+  route: 'POST_COMMENTS';
+  params: {
+    postId: string;
+  };
+};
+
 export type NewPostRoute = {
   route: 'NEW_POST';
   params?: never;
@@ -100,6 +107,7 @@ export type Route =
   | ProfileRoute
   | ProfilePostsRoute
   | PostRoute
+  | PostCommentsRoute
   | NewPostRoute
   | NewProfileRoute
   | ChangePasswordRoute

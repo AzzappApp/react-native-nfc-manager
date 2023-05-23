@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Share } from 'react-native';
 
 import { useMutation, graphql, useFragment } from 'react-relay';
 
 import { useDebounce } from 'use-debounce';
+import { useRouter } from '#PlatformEnvironment';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
@@ -23,6 +24,8 @@ const PostRendererActionBar = ({
   style,
   ...props
 }: PostRendererActionBarProps) => {
+  const router = useRouter();
+  const intl = useIntl();
   const {
     viewerPostReaction,
     id: postId,
@@ -117,7 +120,22 @@ const PostRendererActionBar = ({
     viewerPostReaction,
   ]);
 
-  const intl = useIntl();
+  const goToComments = () => {
+    router.push({ route: 'POST_COMMENTS', params: { postId } });
+  };
+
+  const onShare = async () => {
+    // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
+    try {
+      await Share.share({
+        message: 'Azzapp | An app made for your business',
+      });
+      //TODO: handle result of the share when specified
+    } catch (error: any) {
+      //TODO error
+      console.log(error.message);
+    }
+  };
 
   return (
     <View {...props} style={[styles.container, style]}>
@@ -145,8 +163,30 @@ const PostRendererActionBar = ({
             }
           />
         )}
-        {allowComments && <Icon icon="comment" style={styles.icon} />}
-        <Icon icon="share" style={styles.icon} />
+        {allowComments && (
+          <IconButton
+            icon="comment"
+            style={styles.icon}
+            onPress={goToComments}
+            variant="icon"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Comment the post',
+              description:
+                'PostRendererActionBar Comment post button accessibility',
+            })}
+          />
+        )}
+        <IconButton
+          icon="share"
+          style={styles.icon}
+          variant="icon"
+          onPress={onShare}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Share the post',
+            description:
+              'PostRendererActionBar Share post button accessibility',
+          })}
+        />
       </View>
       {allowLikes && (
         <Text variant="smallbold">

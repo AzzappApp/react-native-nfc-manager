@@ -338,8 +338,8 @@ type CoverTemplateCategory = {
   category: string;
   templates: CoverTemplate[];
 };
-/* create the GraphQLObjectType for CoverTempalteByCategory});*/
 
+/* create the GraphQLObjectType for CoverTempalteByCategory});*/
 const CoverTemplateCategoryGraphQL = new GraphQLObjectType({
   name: 'CoverTemplateCategory',
   description: 'A cover template by category',

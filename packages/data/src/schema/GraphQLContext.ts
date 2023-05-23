@@ -4,6 +4,7 @@ import {
   getCardsByIds,
   getCardCoversByIds,
   getPostsByIds,
+  getPostCommentsByIds,
   getUsersCards,
   getProfilesByIds,
   getMediasByIds,
@@ -18,6 +19,7 @@ import type {
   Profile,
   CoverTemplate,
   StaticMedia,
+  PostComment,
 } from '#domains';
 import type { SessionData } from '@azzapp/auth/viewer';
 
@@ -29,6 +31,7 @@ export type GraphQLContext = {
   cardByProfileLoader: DataLoader<string, Card | null>;
   coverLoader: DataLoader<string, CardCover | null>;
   postLoader: DataLoader<string, Post | null>;
+  postCommentLoader: DataLoader<string, PostComment | null>;
   mediaLoader: DataLoader<string, Media | null>;
   staticMediaLoader: DataLoader<string, StaticMedia | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
@@ -48,6 +51,7 @@ export const createGraphQLContext = (
     cardLoader: new DataLoader(getCardsByIds),
     coverLoader: new DataLoader(getCardCoversByIds),
     postLoader: new DataLoader(getPostsByIds),
+    postCommentLoader: new DataLoader(getPostCommentsByIds),
     mediaLoader: new DataLoader(getMediasByIds),
     staticMediaLoader: new DataLoader(getStaticMediasByIds),
     coverTemplateLoader: new DataLoader(getCoverTemplatesByIds),

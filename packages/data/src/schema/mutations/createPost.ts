@@ -63,6 +63,7 @@ const createPostMutation = mutationWithClientMutationId({
             allowLikes,
             medias: [media.id],
             counterReactions: 0,
+            counterComments: 0,
           },
           trx,
         );

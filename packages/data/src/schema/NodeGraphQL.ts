@@ -5,6 +5,7 @@ import type {
   CardCover,
   CoverTemplate,
   Post,
+  PostComment,
   Profile,
   ProfileCategory,
   CompanyActivity,
@@ -16,6 +17,7 @@ const profileCategorySymbol = Symbol('ProfileCategory');
 const companyActivitySymbol = Symbol('CompanyActivity');
 const cardSymbol = Symbol('Card');
 const postSymbol = Symbol('Post');
+const postCommentSymbol = Symbol('PostComment');
 const coverTemplate = Symbol('CoverTemplate');
 
 const fetchNode = async (
@@ -24,6 +26,7 @@ const fetchNode = async (
     profileLoader,
     cardLoader,
     postLoader,
+    postCommentLoader,
     coverTemplateLoader,
   }: GraphQLContext,
 ): Promise<
@@ -32,6 +35,7 @@ const fetchNode = async (
   | CompanyActivity
   | CoverTemplate
   | Post
+  | PostComment
   | Profile
   | ProfileCategory
   | null
@@ -54,6 +58,11 @@ const fetchNode = async (
       );
     case 'Post':
       return withTypeSymbol(await postLoader.load(id), postSymbol);
+    case 'PostComment':
+      return withTypeSymbol(
+        await postCommentLoader.load(id),
+        postCommentSymbol,
+      );
     case 'CoverTemplate':
       return withTypeSymbol(await coverTemplateLoader.load(id), coverTemplate);
   }
@@ -78,6 +87,9 @@ const resolveNode = (value: any): string | undefined => {
   }
   if (value[postSymbol]) {
     return 'Post';
+  }
+  if (value[postCommentSymbol]) {
+    return 'PostComment';
   }
   if (value[coverTemplate]) {
     return 'CoverTemplate';

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { LayoutAnimation } from 'react-native';
+import { LayoutAnimation, Pressable } from 'react-native';
 import Text from '#ui/Text';
 import type { TextProps } from '#ui/Text';
 import type { NativeSyntheticEvent, TextLayoutEventData } from 'react-native';
@@ -23,7 +23,7 @@ const ExpendableText = ({
 
   useEffect(() => {
     LayoutAnimation.configureNext({
-      duration: 600,
+      duration: 220,
       create: { type: 'linear', property: 'opacity' },
       update: { type: 'spring', springDamping: 2 },
       delete: { type: 'linear', property: 'opacity' },
@@ -74,18 +74,20 @@ const ExpendableText = ({
   }, [clippedText, expanded, intl, label]);
 
   return (
-    <Text
-      {...props}
-      onPress={toggleExpand}
-      ellipsizeMode={undefined}
-      onTextLayout={onTextLayout}
-      numberOfLines={
-        //adding one more line at the first render to know if we must to clip witout take the size of a big text
-        expanded ? undefined : clippedText ? numberOfLines : numberOfLines + 1
-      }
-    >
-      {text}
-    </Text>
+    //using a pressable without feedback to avoid the ripple effect on all the text container
+    <Pressable onPress={toggleExpand}>
+      <Text
+        {...props}
+        ellipsizeMode={undefined}
+        onTextLayout={onTextLayout}
+        numberOfLines={
+          //adding one more line at the first render to know if we must to clip witout take the size of a big text
+          expanded ? undefined : clippedText ? numberOfLines : numberOfLines + 1
+        }
+      >
+        {text}
+      </Text>
+    </Pressable>
   );
 };
 

@@ -13,12 +13,19 @@ import {
 } from 'graphql-relay';
 import { GraphQLDateTime } from 'graphql-scalars';
 import { getProfileId } from '@azzapp/auth/viewer';
-import { db, getPostReaction } from '#domains';
+import { db, getPostComments, getPostReaction } from '#domains';
+import {
+  cursorToDate,
+  connectionFromDateSortedItems,
+} from '#helpers/connectionsHelpers';
 import { ReactionKind } from './commonsTypes';
 import MediaGraphQL from './MediaGraphQL';
 import NodeGraphQL from './NodeGraphQL';
+import PostCommentGraphQL, {
+  PostCommentConnectionGraphQL,
+} from './PostCommentGraphQL';
 import ProfileGraphQL from './ProfileGraphQL';
-import type { Post, Media } from '#domains';
+import type { Post, Media, PostComment } from '#domains';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ConnectionArguments, Connection } from 'graphql-relay';
 
@@ -84,9 +91,49 @@ const PostGraphQL = new GraphQLObjectType<Post, GraphQLContext>({
       //TODO: discuss the best strategy to handle this. Maintain a counter or count each time
       // some reference : https://medium.com/@morefree7/design-a-system-that-tracks-the-number-of-likes-ea69fdb41cf2
     },
+    counterComments: {
+      type: new GraphQLNonNull(GraphQLInt),
+      //TODO: discuss the best strategy to handle this. Maintain a counter or count each time
+      // some reference : https://medium.com/@morefree7/design-a-system-that-tracks-the-number-of-likes-ea69fdb41cf2
+    },
     createdAt: {
       type: new GraphQLNonNull(GraphQLDateTime),
       description: 'Creation date ot the post',
+    },
+    previewComment: {
+      type: PostCommentGraphQL,
+      description:
+        'Return the recommended comment for the post (for now the last one)',
+      resolve: async (post, _): Promise<PostComment | null> => {
+        const comments = await getPostComments(post.id, 1);
+        if (comments.length > 0) {
+          return comments[0];
+        }
+        return null;
+      },
+    },
+    comments: {
+      type: PostCommentConnectionGraphQL,
+      description: 'Return a list of comments for the post',
+      args: forwardConnectionArgs,
+      resolve: async (
+        post,
+        args: ConnectionArguments,
+      ): Promise<Connection<PostComment>> => {
+        const { after, first } = args;
+        const limit = first ?? 15;
+
+        const offset = after ? cursorToDate(after) : null;
+
+        //fetch one more item to know if there is a next page (avoid counting all the items, that could be a probleme on huge tables)
+        const postComments = await getPostComments(post.id, limit + 1, offset);
+        const hasNextPage = postComments.length > limit;
+        return connectionFromDateSortedItems(postComments.slice(0, -1), {
+          getDate: post => post.createdAt,
+          hasNextPage,
+          hasPreviousPage: offset !== null,
+        });
+      },
     },
     relatedPosts: {
       type: new GraphQLNonNull(PostConnectionGraphQL),

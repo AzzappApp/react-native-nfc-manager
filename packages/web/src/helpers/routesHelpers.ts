@@ -27,6 +27,7 @@ const routesMap: { [key in Route['route']]: string } = {
   CHANGE_PASSWORD: '/changePassword',
   PROFILE: '/[userName]',
   PROFILE_POSTS: '/[userName]/posts',
+  POST_COMMENTS: '/[postId]/comments',
   POST: '/posts/[postId]',
   NEW_POST: '/[userName]/newPost',
   SEARCH: '/search',

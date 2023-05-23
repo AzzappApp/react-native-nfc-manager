@@ -173,6 +173,7 @@ model Post {
   allowComments    Boolean
   allowLikes       Boolean
   counterReactions Int      @default(0)
+  counterComments  Int      @default(0)
   createdAt        DateTime @default(now())
 
   @@index([authorId])
@@ -190,5 +191,15 @@ model PostReaction {
 
   @@id([profileId, postId])
   @@index([profileId])
+  @@index([postId])
+}
+
+model PostComment {
+  id        String   @id
+  profileId String
+  postId    String
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+
   @@index([postId])
 }

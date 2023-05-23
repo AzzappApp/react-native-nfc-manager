@@ -28,6 +28,12 @@ type AuthorCartoucheProps = ViewProps & {
    */
   variant?: 'createPost' | 'post' | 'small';
   /**
+   *  username should be hidden. If not only the image cover will be renderer
+   *
+   * @type {boolean}
+   */
+  hideUserName?: boolean;
+  /**
    * true if the cartouche is a link to the Profile page
    *
    * @type {boolean}
@@ -43,6 +49,7 @@ const AuthorCartouche = ({
   variant = 'post',
   author: authorKey,
   activeLink = false,
+  hideUserName = false,
   ...props
 }: AuthorCartoucheProps) => {
   const author = useFragment(
@@ -96,43 +103,33 @@ const AuthorCartouche = ({
           />
         ) : (
           author.card?.cover.media.id == null && (
-            <View
-              style={[
-                variantStyle.image,
-                variant === 'small' && variantStyle.pictureSmall,
-              ]}
-            />
+            <View style={[variantStyle.image]} />
           )
         )}
-        <Text
-          variant={variant === 'post' ? 'button' : 'smallbold'}
-          style={[variant === 'small' && variantStyle.userNameSmall]}
-        >
-          {author?.userName}
-        </Text>
+        {!hideUserName && (
+          <Text
+            variant={variant === 'post' ? 'button' : 'smallbold'}
+            style={variantStyle.userName}
+          >
+            {author?.userName}
+          </Text>
+        )}
       </>
     );
   }, [
     author?.card?.cover.media.avatarURI,
     author?.card?.cover.media.id,
     author?.userName,
+    hideUserName,
     variant,
     variantStyle.image,
-    variantStyle.pictureSmall,
-    variantStyle.userNameSmall,
+    variantStyle.userName,
   ]);
 
   if (activeLink) {
     return (
       <Link route="PROFILE" params={{ userName: author.userName }}>
-        <PressableOpacity
-          style={[
-            variantStyle.container,
-            variant === 'small' && variantStyle.containerSmall,
-            style,
-          ]}
-          {...props}
-        >
+        <PressableOpacity style={[variantStyle.container, style]} {...props}>
           {content}
         </PressableOpacity>
       </Link>
@@ -140,14 +137,7 @@ const AuthorCartouche = ({
   }
 
   return (
-    <View
-      style={[
-        variantStyle.container,
-        variant === 'small' && variantStyle.containerSmall,
-        style,
-      ]}
-      {...props}
-    >
+    <View style={[variantStyle.container, style]} {...props}>
       {content}
     </View>
   );
@@ -161,23 +151,7 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       flexDirection: 'row',
       alignItems: 'center',
     },
-    containerSmall: {
-      height: AUTHOR_CARTOUCHE_SMALL_HEIGHT,
-      paddingTop: 4,
-      paddingBottom: 4,
-      paddingLeft: 6,
-      paddingRight: 12,
-      borderRadius: 10,
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.18)',
-    },
-    pictureSmall: {
-      backgroundColor: '#FFF',
-    },
-    userNameSmall: {
-      color: 'white',
-    },
+    userName: {},
   },
   createPost: {
     image: {
@@ -199,12 +173,26 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     text: { color: appearance === 'light' ? colors.black : colors.white },
   },
   small: {
+    container: {
+      height: AUTHOR_CARTOUCHE_SMALL_HEIGHT,
+      paddingTop: 4,
+      paddingBottom: 4,
+      paddingLeft: 6,
+      paddingRight: 12,
+      borderRadius: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.18)',
+    },
     image: {
       width: 12.5,
       height: 20,
       borderRadius: 3,
       marginRight: 4,
       backgroundColor: colors.white,
+    },
+    userName: {
+      color: 'white',
     },
   },
 }));

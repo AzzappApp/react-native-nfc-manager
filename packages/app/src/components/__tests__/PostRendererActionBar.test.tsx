@@ -4,6 +4,7 @@ import {
   RelayEnvironmentProvider,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+import '@testing-library/jest-native/extend-expect';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import PostRendererActionBar from '../PostRendererActionBar';
 import type { PostRendererMediaProps } from '#components/PostRendererMedia';
@@ -56,12 +57,49 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
     },
   };
 };
+const mockShare = jest.fn();
+const mockRouter = {
+  push: jest.fn(),
+  replace: jest.fn(),
+  back: jest.fn(),
+};
+
+const mockWebAPI = {
+  uploadSign: jest.fn(),
+  uploadMedia: jest.fn(),
+};
+
+jest.mock('#PlatformEnvironment', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react');
+  return {
+    useRouter() {
+      return mockRouter;
+    },
+    useWebAPI() {
+      return mockWebAPI;
+    },
+
+    PlatformEnvironmentProvider: ({
+      children,
+    }: {
+      children: React.ReactNode;
+    }) => {
+      return <>{children}</>;
+    },
+  };
+});
+
+jest.mock('react-native/Libraries/Share/Share', () => ({
+  share: mockShare,
+}));
 
 describe('PostRendererActionBar', () => {
-  it('should update the like counter on pressing the like IconButton', async () => {
+  afterEach(() => mockRouter.push.mockReset());
+  test('should update the like counter on pressing the like IconButton', async () => {
     renderActionBar();
     expect(screen.getByText('3 likes')).toBeTruthy();
-    const likeButton = screen.getByRole('button');
+    const likeButton = screen.getAllByRole('button')[0];
 
     act(() => {
       fireEvent.press(likeButton);
@@ -71,5 +109,32 @@ describe('PostRendererActionBar', () => {
       fireEvent.press(likeButton);
     });
     expect(screen.getByText('3 likes')).toBeTruthy();
+  });
+
+  test('should push the POST_COMMENT route on pressing comment icon', async () => {
+    renderActionBar();
+    expect(screen.getByText('3 likes')).toBeTruthy();
+    const commentButton = screen.getAllByRole('button')[1];
+
+    act(() => {
+      fireEvent.press(commentButton);
+    });
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      params: {
+        postId: expect.any(String),
+      },
+      route: 'POST_COMMENTS',
+    });
+  });
+
+  test('should display the share component on pressing share icon', async () => {
+    renderActionBar();
+    expect(screen.getByText('3 likes')).toBeTruthy();
+    const likeButton = screen.getAllByRole('button')[2];
+
+    act(() => {
+      fireEvent.press(likeButton);
+    });
+    expect(mockShare).toHaveBeenCalled();
   });
 });

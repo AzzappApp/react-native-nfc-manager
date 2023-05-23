@@ -1,5 +1,6 @@
 import { GraphQLObjectType } from 'graphql';
 import createPost from './createPost';
+import createPostComment from './createPostComment';
 import deleteModules from './deleteModules';
 import duplicateModule from './duplicateModule';
 import togglePostReaction from './postReaction';
@@ -23,6 +24,7 @@ const MutationGraphQL = new GraphQLObjectType({
     deleteModules,
     duplicateModule,
     updateModulesVisibility,
+    createPostComment,
   },
 });
 

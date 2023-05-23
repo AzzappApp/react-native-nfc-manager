@@ -80,7 +80,7 @@ const computedStyled = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
-    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
+    color: appearance === 'light' ? colors.black : colors.grey400,
   },
 
   focused: {

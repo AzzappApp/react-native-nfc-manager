@@ -20,6 +20,7 @@ import {
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
+import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import { getAuthState, init as initAuthStore } from './helpers/authStore';
@@ -62,6 +63,7 @@ const screens = {
   ALBUMS: () => <View />,
   CHAT: () => <View />,
   POST: PostMobileScreen,
+  POST_COMMENTS: PostCommentsMobileScreen,
   PROFILE_POSTS: ProfilePostsMobileScreen,
   NEW_POST: PostCreationMobileScreen,
   NEW_PROFILE: NewProfileMobileScreen,

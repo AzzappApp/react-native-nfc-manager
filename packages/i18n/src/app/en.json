@@ -175,6 +175,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
   },
+  "93KdNu": {
+    "defaultMessage": "Comments",
+    "description": "Post Comments header title"
+  },
   "96x4pb": {
     "defaultMessage": "Back to Log In",
     "description": "ForgotPasswordScreen - Back to Log In bottom screen link"
@@ -186,6 +190,10 @@
   "9gLFh9": {
     "defaultMessage": "Done",
     "description": "FontPIcker component Done button label"
+  },
+  "9uTr6e": {
+    "defaultMessage": "Add a comment",
+    "description": "Post comment textarea placeholdesd"
   },
   "A13zLr": {
     "defaultMessage": "Please select a photo",
@@ -463,6 +471,10 @@
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
   },
+  "Oqezmf": {
+    "defaultMessage": "Comment the post",
+    "description": "PostRendererActionBar Comment post button accessibility"
+  },
   "OxFSMO": {
     "defaultMessage": "Select",
     "description": "Accessibility label for the select button in the profile edition screen"
@@ -579,6 +591,10 @@
     "defaultMessage": "Create new password",
     "description": "ChangePasswordScreen - Create new password"
   },
+  "UQaIdM": {
+    "defaultMessage": "See {counterComments} comments",
+    "description": "PostRendererBottomPanel - Comment Counter"
+  },
   "UWbqab": {
     "defaultMessage": "Unfollow",
     "description": "Unfollow button label in Profile Screen Button Bar"
@@ -650,6 +666,10 @@
   "X6lxBz": {
     "defaultMessage": "Position",
     "description": "Label of the position button in cover edition"
+  },
+  "XID3dP": {
+    "defaultMessage": "Post",
+    "description": "Post Comment screen - create comment action button"
   },
   "XNJ3+V": {
     "defaultMessage": "Hide",
@@ -1022,6 +1042,10 @@
   "n8Bdhz": {
     "defaultMessage": "See all",
     "description": "CoverList - See all button"
+  },
+  "n9GfPA": {
+    "defaultMessage": "Share the post",
+    "description": "PostRendererActionBar Share post button accessibility"
   },
   "nHSXvS": {
     "defaultMessage": "Tap to activate torch",
