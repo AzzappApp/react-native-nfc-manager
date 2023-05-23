@@ -6,9 +6,8 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
-import DashedSlider from '#ui/DashedSlider';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
-import Text from '#ui/Text';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ProfileColorPicker_profile$key } from '@azzapp/relay/artifacts/ProfileColorPicker_profile.graphql';
 import type { TextAlignment } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
@@ -113,8 +112,8 @@ const SimpleTextStyleEditionPanel = ({
           onAlignmentChange={onTextAlignmentChange}
         />
       </View>
-      <View style={styles.sliderContainer}>
-        <Text variant="small" style={[styles.sliderTitle]}>
+      <LabeledDashedSlider
+        label={
           <FormattedMessage
             defaultMessage="Font Size : {size}"
             description="Font size message in cover edition"
@@ -122,56 +121,52 @@ const SimpleTextStyleEditionPanel = ({
               size: fontSize,
             }}
           />
-        </Text>
-        <DashedSlider
-          value={fontSize}
-          min={DEFAULT_COVER_MIN_FONT_SIZE}
-          max={DEFAULT_COVER_MAX_FONT_SIZE}
-          step={1}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-          )}
-          onChange={onFontSizeChange}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Font size',
-            description: 'Label of the font size slider in cover edition',
-          })}
-          accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
-          })}
-          style={{ width: '90%' }}
-        />
-      </View>
-      <View style={styles.sliderContainer}>
-        <Text variant="small" style={[styles.sliderTitle]}>
+        }
+        value={fontSize}
+        min={DEFAULT_COVER_MIN_FONT_SIZE}
+        max={DEFAULT_COVER_MAX_FONT_SIZE}
+        step={1}
+        interval={Math.floor(
+          (windowWidth - 80) /
+            (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
+        )}
+        onChange={onFontSizeChange}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Font size',
+          description: 'Label of the font size slider in cover edition',
+        })}
+        accessibilityHint={intl.formatMessage({
+          defaultMessage: 'Slide to change the font size',
+          description: 'Hint of the font size slider in cover edition',
+        })}
+        style={styles.slider}
+      />
+      <LabeledDashedSlider
+        label={
           <FormattedMessage
             defaultMessage="Vertical Spacing : {verticalSpacing}"
             description="Vertical Spacing message in simple text edition"
             values={{ verticalSpacing }}
           />
-        </Text>
-        <DashedSlider
-          value={verticalSpacing}
-          min={0}
-          max={10}
-          step={1}
-          interval={Math.floor((windowWidth - 80) / 10)}
-          onChange={onVerticalSpacingChange}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Vertical Spacing',
-            description:
-              'Label of the Vertical Spacing slider in simple text edition',
-          })}
-          accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the vertical spacing',
-            description:
-              'Hint of the vertical spacing slider in simple text edition',
-          })}
-          style={{ width: '90%' }}
-        />
-      </View>
+        }
+        value={verticalSpacing}
+        min={0}
+        max={10}
+        step={1}
+        interval={Math.floor((windowWidth - 80) / 10)}
+        onChange={onVerticalSpacingChange}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Vertical Spacing',
+          description:
+            'Label of the Vertical Spacing slider in simple text edition',
+        })}
+        accessibilityHint={intl.formatMessage({
+          defaultMessage: 'Slide to change the vertical spacing',
+          description:
+            'Hint of the vertical spacing slider in simple text edition',
+        })}
+        style={styles.slider}
+      />
     </View>
   );
 };
@@ -181,26 +176,17 @@ export default SimpleTextStyleEditionPanel;
 const styles = StyleSheet.create({
   root: {
     paddingHorizontal: 20,
-    paddingBottom: 10,
-    justifyContent: 'space-between',
+    paddingVertical: 15,
+    rowGap: 15,
+    justifyContent: 'center',
   },
   buttonContainer: {
     alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: 10,
     columnGap: 15,
   },
-  sliderContainer: {
-    overflow: 'hidden',
-    marginBottom: 10,
-    rowGap: 10,
-  },
-  sliderTitle: {
-    marginTop: 4,
+  slider: {
+    width: '90%',
     alignSelf: 'center',
-  },
-  titlePositionIcon: {
-    width: 24,
-    resizeMode: 'contain',
   },
 });

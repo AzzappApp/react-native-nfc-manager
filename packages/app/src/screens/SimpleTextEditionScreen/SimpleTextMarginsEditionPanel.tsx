@@ -1,7 +1,6 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import DashedSlider from '#ui/DashedSlider';
-import Text from '#ui/Text';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -47,8 +46,8 @@ const SimpleTextMarginEditionPanel = ({
         })}
       />
       <View style={styles.content}>
-        <View style={styles.sliderContainer}>
-          <Text variant="small" style={[styles.sliderTitle]}>
+        <LabeledDashedSlider
+          label={
             <FormattedMessage
               defaultMessage="Margin top/bottom : {size}"
               description="Font size message in cover edition"
@@ -56,27 +55,25 @@ const SimpleTextMarginEditionPanel = ({
                 size: marginVertical,
               }}
             />
-          </Text>
-          <DashedSlider
-            value={marginVertical}
-            min={0}
-            max={60}
-            step={1}
-            interval={Math.floor((windowWidth - 80) / 60)}
-            onChange={onMarginVerticalChange}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Margin size',
-              description: 'Label of the font size slider in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Slide to change the font size',
-              description: 'Hint of the font size slider in cover edition',
-            })}
-            style={{ width: '90%' }}
-          />
-        </View>
-        <View style={styles.sliderContainer}>
-          <Text variant="small" style={[styles.sliderTitle]}>
+          }
+          value={marginVertical}
+          min={0}
+          max={60}
+          step={1}
+          interval={Math.floor((windowWidth - 80) / 60)}
+          onChange={onMarginVerticalChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Margin size',
+            description: 'Label of the font size slider in cover edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the font size',
+            description: 'Hint of the font size slider in cover edition',
+          })}
+          style={styles.slider}
+        />
+        <LabeledDashedSlider
+          label={
             <FormattedMessage
               defaultMessage="Margin left/right : {size}"
               description="Font size message in cover edition"
@@ -84,25 +81,23 @@ const SimpleTextMarginEditionPanel = ({
                 size: marginHorizontal,
               }}
             />
-          </Text>
-          <DashedSlider
-            value={marginHorizontal}
-            min={0}
-            max={60}
-            step={1}
-            interval={Math.floor((windowWidth - 80) / 60)}
-            onChange={onMarginHorizontalChange}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Margin size',
-              description: 'Label of the font size slider in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Slide to change the font size',
-              description: 'Hint of the font size slider in cover edition',
-            })}
-            style={{ width: '90%' }}
-          />
-        </View>
+          }
+          value={marginHorizontal}
+          min={0}
+          max={60}
+          step={1}
+          interval={Math.floor((windowWidth - 80) / 60)}
+          onChange={onMarginHorizontalChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Margin size',
+            description: 'Label of the font size slider in cover edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the font size',
+            description: 'Hint of the font size slider in cover edition',
+          })}
+          style={styles.slider}
+        />
       </View>
     </View>
   );
@@ -112,21 +107,18 @@ export default SimpleTextMarginEditionPanel;
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 10,
+    paddingVertical: 15,
   },
   content: {
     marginTop: 20,
     flex: 1,
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    rowGap: 15,
   },
-  sliderContainer: {
-    overflow: 'hidden',
-    marginBottom: 10,
-    rowGap: 10,
-  },
-  sliderTitle: {
-    marginTop: 4,
+  slider: {
+    width: '90%',
     alignSelf: 'center',
   },
 });

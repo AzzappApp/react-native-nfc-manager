@@ -3,8 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
-import DashedSlider from '#ui/DashedSlider';
-import Text from '#ui/Text';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import type { SimpleTextEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleTextEditionBackgroundPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -124,34 +123,32 @@ const SimpleTextEditionBackgroundPanel = ({
         imageRatio={1}
         style={styles.mediaSelector}
       />
-      <View style={styles.sliderContainer}>
-        <Text variant="small" style={[styles.sliderTitle]}>
+      <LabeledDashedSlider
+        label={
           <FormattedMessage
             defaultMessage="Photo opacity : {opacity}"
             description="Font size message in cover edition"
             values={{ opacity }}
           />
-        </Text>
-        <DashedSlider
-          value={opacity}
-          min={0}
-          max={100}
-          step={5}
-          interval={Math.floor((windowWidth - 80) / 60)}
-          onChange={onOpacityChange}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Background opacity',
-            description:
-              'Label of the Background opacity slider in simple text edition',
-          })}
-          accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the background opacity',
-            description:
-              'Hint of the Background opacity slider in simple text edition',
-          })}
-          style={{ width: '90%' }}
-        />
-      </View>
+        }
+        value={opacity}
+        min={0}
+        max={100}
+        step={5}
+        interval={Math.floor((windowWidth - 80) / 60)}
+        onChange={onOpacityChange}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Background opacity',
+          description:
+            'Label of the Background opacity slider in simple text edition',
+        })}
+        accessibilityHint={intl.formatMessage({
+          defaultMessage: 'Slide to change the background opacity',
+          description:
+            'Hint of the Background opacity slider in simple text edition',
+        })}
+        style={styles.slider}
+      />
     </View>
   );
 };
@@ -163,13 +160,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 20,
   },
-  sliderContainer: {
-    overflow: 'hidden',
-    marginBottom: 20,
-    rowGap: 10,
-  },
-  sliderTitle: {
-    marginTop: 4,
+  slider: {
+    width: '90%',
     alignSelf: 'center',
   },
 });

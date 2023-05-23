@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import DashedSlider from '#ui/DashedSlider';
-import Text from '#ui/Text';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import { editionParametersSettings } from './gpu';
 import type { EditionParameters } from './gpu';
 import type { ViewProps } from 'react-native';
@@ -59,10 +58,8 @@ const ImageEditionParameterControl = ({
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <Text variant="small" style={styles.sliderValue}>
-        {displayedValue}
-      </Text>
-      <DashedSlider
+      <LabeledDashedSlider
+        label={displayedValue}
         value={value}
         min={min}
         max={max}

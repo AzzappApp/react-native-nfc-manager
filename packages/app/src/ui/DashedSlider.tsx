@@ -14,7 +14,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ViewProps } from 'react-native';
 
-type DashedSliderProps = ViewProps & {
+export type DashedSliderProps = ViewProps & {
   variant?: 'default' | 'small';
   value: number;
   min: number;

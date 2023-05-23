@@ -13,11 +13,10 @@ import {
   TITLE_POSITIONS,
 } from '@azzapp/shared/coverHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
-import DashedSlider from '#ui/DashedSlider';
 import FloatingButton from '#ui/FloatingButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import type {
@@ -158,7 +157,7 @@ const CoverTitleEditionPanel = ({
   const { width: windowWidth } = useWindowDimensions();
 
   return (
-    <View style={style}>
+    <View style={[styles.root, style]}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
@@ -180,13 +179,12 @@ const CoverTitleEditionPanel = ({
           },
         ]}
       />
-      <View style={[style, styles.contentContainer]}>
+      <View style={styles.contentContainer}>
         <TextInput
           value={(currentTab === 'subtitle' ? subTitle : title) ?? ''}
           onChangeText={
             currentTab === 'subtitle' ? onSubTitleChange : onTitleChange
           }
-          style={styles.titleInput}
           placeholder={
             currentTab === 'title'
               ? intl.formatMessage({
@@ -213,7 +211,6 @@ const CoverTitleEditionPanel = ({
           />
 
           <FloatingButton
-            style={styles.button}
             onPress={onNextOrientation}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -240,7 +237,6 @@ const CoverTitleEditionPanel = ({
             />
           </FloatingButton>
           <FloatingButton
-            style={styles.button}
             onPress={onNextPlacement}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -259,39 +255,33 @@ const CoverTitleEditionPanel = ({
           </FloatingButton>
         </View>
 
-        <View style={styles.sliders}>
-          <View style={styles.sliderContainer}>
-            <Text variant="small" style={[styles.sliderTitle]}>
-              <FormattedMessage
-                defaultMessage="Font Size - {size}"
-                description="Font size message in cover edition"
-                values={{
-                  size: fontSize,
-                }}
-              />
-            </Text>
-            <DashedSlider
-              value={fontSize}
-              min={DEFAULT_COVER_MIN_FONT_SIZE}
-              max={DEFAULT_COVER_MAX_FONT_SIZE}
-              step={1}
-              interval={Math.floor(
-                (windowWidth - 80) /
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-              )}
-              onChange={onFontSizeChange}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Font size',
-                description: 'Label of the font size slider in cover edition',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage: 'Slide to change the font size',
-                description: 'Hint of the font size slider in cover edition',
-              })}
-              style={{ width: '90%' }}
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Font size : {fontSize}"
+              description="Font size message in cover edition"
+              values={{ fontSize }}
             />
-          </View>
-        </View>
+          }
+          value={fontSize}
+          min={DEFAULT_COVER_MIN_FONT_SIZE}
+          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          step={1}
+          interval={Math.floor(
+            (windowWidth - 80) /
+              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
+          )}
+          onChange={onFontSizeChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Font size',
+            description: 'Label of the font size slider in cover edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the font size',
+            description: 'Hint of the font size slider in cover edition',
+          })}
+          style={styles.slider}
+        />
       </View>
     </View>
   );
@@ -300,36 +290,27 @@ const CoverTitleEditionPanel = ({
 export default CoverTitleEditionPanel;
 
 const styles = StyleSheet.create({
-  button: { marginRight: 15 },
+  root: {
+    flex: 1,
+  },
   contentContainer: {
+    flex: 1,
     paddingHorizontal: 20,
+    paddingVertical: 15,
     justifyContent: 'space-between',
   },
-  titleInput: {},
   buttonContainer: {
     alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: 10,
-  },
-  sliders: {
-    marginTop: 10,
-    flexDirection: 'row',
-  },
-  sliderContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  sliderTitle: {
-    marginTop: 4,
-    alignSelf: 'center',
-  },
-  titlePositionIcon: {
-    width: 24,
-    resizeMode: 'contain',
+    columnGap: 15,
   },
   orientationIcon: {
     width: 30,
     height: 30,
+  },
+  slider: {
+    width: '90%',
+    alignSelf: 'center',
   },
 });
 

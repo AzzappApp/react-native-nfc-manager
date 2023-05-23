@@ -659,10 +659,6 @@
     "defaultMessage": "Margin size",
     "description": "Label of the font size slider in cover edition"
   },
-  "XbIJSS": {
-    "defaultMessage": "Font Size - {size}",
-    "description": "Font size message in cover edition"
-  },
   "YJRxy5": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
@@ -706,6 +702,10 @@
   "aOpC4m": {
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
+  },
+  "aULhrq": {
+    "defaultMessage": "Font size : {fontSize}",
+    "description": "Font size message in cover edition"
   },
   "aVbmnp": {
     "defaultMessage": "Justify",
