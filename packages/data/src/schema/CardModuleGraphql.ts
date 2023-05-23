@@ -162,7 +162,44 @@ export const CardModuleSimpleTextGraphQL = createGrahQLCardModule(
 
 export const CardModuleSimpleTitleGraphQL = createGrahQLCardModule(
   'simpleTitle',
-  {},
+  {
+    text: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontFamily: {
+      type: GraphQLString,
+    },
+    fontSize: {
+      type: GraphQLInt,
+    },
+    color: {
+      type: GraphQLString,
+    },
+    verticalSpacing: {
+      type: GraphQLInt,
+    },
+    textAlign: {
+      type: TextAlignmentGraphQL,
+    },
+    marginHorizontal: {
+      type: GraphQLInt,
+    },
+    marginVertical: {
+      type: GraphQLInt,
+    },
+    background: {
+      type: StaticMediaGraphQL,
+      resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+        const { data } = cardModule as any;
+        return data.backgroundId
+          ? staticMediaLoader.load(data.backgroundId)
+          : null;
+      },
+    },
+    backgroundStyle: {
+      type: ModuleBackgroundStyleGraphQL,
+    },
+  },
 );
 
 export const CardModuleSocialLinksGraphQL = createGrahQLCardModule(

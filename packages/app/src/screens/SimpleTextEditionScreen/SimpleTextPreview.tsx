@@ -1,13 +1,13 @@
 import EditorScaledPreview from '#components/EditorScaledPreview';
 import { SimpleTextRendererRaw } from '#components/SimpleTextRenderer';
-import type { SimpleTextRenderer_module$data } from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
+import type { SimpleTextRawData } from '#components/SimpleTextRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextPreviewProps = ViewProps & {
   /**
    * the data of the module to preview.
    */
-  data: SimpleTextRenderer_module$data;
+  data: SimpleTextRawData;
   /**
    * A callback that is called when the module preview is pressed.
    */

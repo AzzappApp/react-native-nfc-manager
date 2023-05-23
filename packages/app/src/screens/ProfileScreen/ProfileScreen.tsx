@@ -17,6 +17,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KINDS,
   MODULE_KIND_SIMPLE_TEXT,
+  MODULE_KIND_SIMPLE_TITLE,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import CoverRenderer from '#components/CoverRenderer';
@@ -725,6 +726,9 @@ const _ProfileScreenBody = (
       {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
     >
       {module.kind === MODULE_KIND_SIMPLE_TEXT && (
+        <SimpleTextRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_SIMPLE_TITLE && (
         <SimpleTextRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>

@@ -5,7 +5,9 @@ import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
 import {
   MODULE_KIND_SIMPLE_TEXT,
+  MODULE_KIND_SIMPLE_TITLE,
   SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -22,6 +24,7 @@ import type { GraphQLContext } from '../GraphQLContext';
 
 type SaveSimpleTextModuleInput = Partial<{
   moduleId: string;
+  kind: string;
   text: string;
   fontFamily: string;
   fontSize: number;
@@ -43,6 +46,9 @@ const saveSimpleTextModule = mutationWithClientMutationId({
   inputFields: () => ({
     moduleId: {
       type: GraphQLID,
+    },
+    kind: {
+      type: new GraphQLNonNull(GraphQLString),
     },
     text: {
       type: GraphQLString,
@@ -99,6 +105,12 @@ const saveSimpleTextModule = mutationWithClientMutationId({
     if (!card) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
+    if (
+      input.kind !== MODULE_KIND_SIMPLE_TEXT &&
+      input.kind !== MODULE_KIND_SIMPLE_TITLE
+    ) {
+      throw new Error(ERRORS.INVALID_REQUEST);
+    }
 
     let module: CardModule | null = null;
     if (input.moduleId == null) {
@@ -112,11 +124,7 @@ const saveSimpleTextModule = mutationWithClientMutationId({
         console.log(e);
         throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
       }
-      if (
-        !module ||
-        module.kind !== MODULE_KIND_SIMPLE_TEXT ||
-        module.cardId !== card.id
-      ) {
+      if (!module || module.kind !== input.kind || module.cardId !== card.id) {
         throw new Error(ERRORS.INVALID_REQUEST);
       }
     }
@@ -129,10 +137,12 @@ const saveSimpleTextModule = mutationWithClientMutationId({
       } else {
         await createCardModule({
           cardId: card.id,
-          kind: MODULE_KIND_SIMPLE_TEXT,
+          kind: input.kind,
           position: await getCardModuleCount(card.id),
           data: {
-            ...SIMPLE_TEXT_DEFAULT_VALUES,
+            ...(input.kind === 'simpleText'
+              ? SIMPLE_TEXT_DEFAULT_VALUES
+              : SIMPLE_TITLE_DEFAULT_VALUES),
             ...omit(input, 'position'),
           },
           visible: true,

@@ -4,7 +4,9 @@ import { StyleSheet } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TEXT_MAX_LENGTH,
+  SIMPLE_TITLE_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#PlatformEnvironment';
@@ -35,6 +37,10 @@ export type SimpleTextEditionScreenProps = ViewProps & {
    * the current module to edit, if null, a new module will be created
    */
   module: SimpleTextEditionScreen_module$key | null;
+  /**
+   * The current module kind edited, can be simpleText or simpleTitle
+   */
+  moduleKind: 'simpleText' | 'simpleTitle';
 };
 
 /**
@@ -43,33 +49,60 @@ export type SimpleTextEditionScreenProps = ViewProps & {
 const SimpleTextEditionScreen = ({
   module,
   viewer: viewerKey,
+  moduleKind,
 }: SimpleTextEditionScreenProps) => {
   // #region Data retrieval
   const simpleText = useFragment(
     graphql`
-      fragment SimpleTextEditionScreen_module on CardModuleSimpleText {
+      fragment SimpleTextEditionScreen_module on CardModule {
         id
-        text
-        textAlign
-        color
-        fontSize
-        fontFamily
-        verticalSpacing
-        marginHorizontal
-        marginVertical
-        background {
-          id
-          uri
+        kind
+        ... on CardModuleSimpleText {
+          text
+          textAlign
+          color
+          fontSize
+          fontFamily
+          verticalSpacing
+          marginHorizontal
+          marginVertical
+          background {
+            id
+            uri
+          }
+          backgroundStyle {
+            backgroundColor
+            patternColor
+            opacity
+          }
         }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-          opacity
+        ... on CardModuleSimpleTitle {
+          text
+          textAlign
+          color
+          fontSize
+          fontFamily
+          verticalSpacing
+          marginHorizontal
+          marginVertical
+          background {
+            id
+            uri
+          }
+          backgroundStyle {
+            backgroundColor
+            patternColor
+            opacity
+          }
         }
       }
     `,
     module,
   );
+
+  if (simpleText && simpleText.kind !== moduleKind) {
+    // TODO error ?
+  }
 
   const viewer = useFragment(
     graphql`
@@ -92,7 +125,10 @@ const SimpleTextEditionScreen = ({
   const { data, updates, updateFields, fieldUpdateHandler, dirty } =
     useDataEditor({
       initialValue: simpleText,
-      defaultValue: SIMPLE_TEXT_DEFAULT_VALUES,
+      defaultValue:
+        moduleKind === 'simpleText'
+          ? SIMPLE_TEXT_DEFAULT_VALUES
+          : SIMPLE_TITLE_DEFAULT_VALUES,
     });
 
   const {
@@ -138,6 +174,7 @@ const SimpleTextEditionScreen = ({
     commit({
       variables: {
         input: {
+          kind: moduleKind,
           moduleId: simpleText?.id,
           backgroundId: background == null ? null : background.id,
           ...rest,
@@ -155,7 +192,7 @@ const SimpleTextEditionScreen = ({
         }
       },
     });
-  }, [canSave, commit, simpleText?.id, updates, router]);
+  }, [canSave, updates, commit, moduleKind, simpleText?.id, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -260,7 +297,7 @@ const SimpleTextEditionScreen = ({
       />
       <SimpleTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data as any}
+        data={data}
         onPreviewPress={onPreviewPress}
       />
       <TabView
@@ -332,7 +369,11 @@ const SimpleTextEditionScreen = ({
           description:
             'Placeholder for text area in simple text edition screen',
         })}
-        maxLength={SIMPLE_TEXT_MAX_LENGTH}
+        maxLength={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MAX_LENGTH
+            : SIMPLE_TITLE_MAX_LENGTH
+        }
         onClose={onCloseContentModal}
         onChangeText={onTextChange}
       />

@@ -58,3 +58,15 @@ export const SIMPLE_TEXT_DEFAULT_VALUES = {
 } as const;
 
 export const SIMPLE_TEXT_MAX_LENGTH = 2000;
+
+export const SIMPLE_TITLE_DEFAULT_VALUES = {
+  fontFamily: 'Arial',
+  fontSize: 18,
+  color: '#000000',
+  textAlign: 'center',
+  verticalSpacing: 0,
+  marginHorizontal: 10,
+  marginVertical: 20,
+} as const;
+
+export const SIMPLE_TITLE_MAX_LENGTH = 500;

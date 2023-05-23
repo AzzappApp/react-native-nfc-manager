@@ -29,22 +29,42 @@ export type SimpleTextRendererProps = ViewProps & {
 const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
   const data = useFragment(
     graphql`
-      fragment SimpleTextRenderer_module on CardModuleSimpleText {
-        text
-        fontFamily
-        fontSize
-        color
-        textAlign
-        verticalSpacing
-        marginHorizontal
-        marginVertical
-        background {
-          uri
+      fragment SimpleTextRenderer_module on CardModule {
+        ... on CardModuleSimpleText {
+          text
+          fontFamily
+          fontSize
+          color
+          textAlign
+          verticalSpacing
+          marginHorizontal
+          marginVertical
+          background {
+            uri
+          }
+          backgroundStyle {
+            backgroundColor
+            patternColor
+            opacity
+          }
         }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-          opacity
+        ... on CardModuleSimpleTitle {
+          text
+          fontFamily
+          fontSize
+          color
+          textAlign
+          verticalSpacing
+          marginHorizontal
+          marginVertical
+          background {
+            uri
+          }
+          backgroundStyle {
+            backgroundColor
+            patternColor
+            opacity
+          }
         }
       }
     `,
@@ -55,11 +75,16 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
 
 export default SimpleTextRenderer;
 
+export type SimpleTextRawData = Omit<
+  SimpleTextRenderer_module$data,
+  ' $fragmentType'
+>;
+
 type SimpleTextRendererRawProps = ViewProps & {
   /**
    * The data for the simple text module
    */
-  data: SimpleTextRenderer_module$data;
+  data: SimpleTextRawData;
 };
 
 /**

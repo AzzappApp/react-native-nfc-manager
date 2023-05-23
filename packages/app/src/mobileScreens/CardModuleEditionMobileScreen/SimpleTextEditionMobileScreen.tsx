@@ -1,5 +1,4 @@
 import { fetchQuery, graphql, usePreloadedQuery } from 'react-relay';
-import { MODULE_KIND_SIMPLE_TEXT } from '@azzapp/shared/cardModuleHelpers';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import SimpleTextEditionScreen from '#screens/SimpleTextEditionScreen';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
@@ -15,6 +14,10 @@ type SimpleTextEditionMobileScreenProps = {
    * The preloaded query for the screen
    */
   preloadedQuery: PreloadedQuery<SimpleTextEditionMobileScreenQuery>;
+  /**
+   * The current module kind edited, can be simpleText or simpleTitle
+   */
+  moduleKind: 'simpleText' | 'simpleTitle';
 };
 
 /**
@@ -24,6 +27,7 @@ type SimpleTextEditionMobileScreenProps = {
 const SimpleTextEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
+  moduleKind,
 }: SimpleTextEditionMobileScreenProps) => {
   const data = usePreloadedQuery(SimpleTextQuery, preloadedQuery);
 
@@ -31,15 +35,20 @@ const SimpleTextEditionMobileScreen = ({
   if (moduleId != null) {
     module =
       data.viewer.profile?.card?.modules.find(
-        module =>
-          module?.id === moduleId && module?.kind === MODULE_KIND_SIMPLE_TEXT,
+        module => module?.id === moduleId && module?.kind === moduleKind,
       ) ?? null;
     if (!module) {
       // TODO
     }
   }
 
-  return <SimpleTextEditionScreen module={module} viewer={data.viewer} />;
+  return (
+    <SimpleTextEditionScreen
+      module={module}
+      viewer={data.viewer}
+      moduleKind={moduleKind}
+    />
+  );
 };
 
 const SimpleTextQuery = graphql`

@@ -190,6 +190,17 @@ type ModuleBackgroundStyle {
 
 """User Card module : SimpleTitle"""
 type CardModuleSimpleTitle implements CardModule {
+  text: String!
+  fontFamily: String
+  fontSize: Int
+  color: String
+  verticalSpacing: Int
+  textAlign: TextAlignment
+  marginHorizontal: Int
+  marginVertical: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -782,6 +793,7 @@ type SaveSimpleTextModulePayload {
 
 input SaveSimpleTextModuleInput {
   moduleId: ID
+  kind: String!
   text: String
   fontFamily: String
   fontSize: Int

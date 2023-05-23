@@ -20,22 +20,22 @@ const CardModuleEditionMobileScreen = ({
   CoverEditionMobileScreenQuery | SimpleTextEditionMobileScreenQuery
 >) => {
   switch (params?.module) {
-    case 'cover': {
+    case 'cover':
       return (
         <CoverEditionMobileScreen
           preloadedQuery={preloadedQuery as any}
           isCreation={params.isNew}
         />
       );
-    }
-    case 'simpleText': {
+    case 'simpleText':
+    case 'simpleTitle':
       return (
         <SimpleTextEditionMobileScreen
           moduleId={params.moduleId}
           preloadedQuery={preloadedQuery as any}
+          moduleKind={params.module}
         />
       );
-    }
     default:
       return null;
   }
@@ -45,12 +45,11 @@ CardModuleEditionMobileScreen.prefetch = ({
   params,
 }: CardModuleEditionRoute) => {
   switch (params?.module) {
-    case 'simpleText': {
-      return SimpleTextEditionMobileScreen.prefetch();
-    }
-    case 'cover': {
+    case 'cover':
       return CoverEditionMobileScreen.prefetch();
-    }
+    case 'simpleText':
+    case 'simpleTitle':
+      return SimpleTextEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -58,9 +57,13 @@ CardModuleEditionMobileScreen.prefetch = ({
 
 const getQuery = (params: CardModuleEditionRoute['params']) => {
   switch (params.module) {
+    case 'cover':
+      return CoverEditionMobileScreenQueryNode;
     case 'simpleText':
+    case 'simpleTitle':
       return SimpleTextEditionMobileScreenNode;
     default:
+      // for type safety
       return CoverEditionMobileScreenQueryNode;
   }
 };
