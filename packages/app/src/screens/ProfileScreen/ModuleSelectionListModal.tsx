@@ -75,7 +75,7 @@ const modules: Array<{ label: string; value: ModuleKind; ready: boolean }> = [
   {
     label: 'Carousel',
     value: 'carousel',
-    ready: false,
+    ready: true,
   },
   {
     label: 'Line Divider',
