@@ -197,7 +197,6 @@ const SimpleTextEditionScreen = ({
   const onCancel = useCallback(() => {
     router.back();
   }, [router]);
-
   // #endregion
 
   // #region Fields edition handlers

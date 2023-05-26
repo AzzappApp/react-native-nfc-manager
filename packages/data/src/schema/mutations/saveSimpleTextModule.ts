@@ -132,7 +132,7 @@ const saveSimpleTextModule = mutationWithClientMutationId({
     try {
       if (module) {
         await updateCardModule(module.id, {
-          data: { ...(module.data as object), ...omit(input, 'position') },
+          data: { ...(module.data as object), ...omit(input, 'moduleId') },
         });
       } else {
         await createCardModule({
@@ -143,7 +143,7 @@ const saveSimpleTextModule = mutationWithClientMutationId({
             ...(input.kind === 'simpleText'
               ? SIMPLE_TEXT_DEFAULT_VALUES
               : SIMPLE_TITLE_DEFAULT_VALUES),
-            ...omit(input, 'position'),
+            ...omit(input, 'moduleId'),
           },
           visible: true,
         });

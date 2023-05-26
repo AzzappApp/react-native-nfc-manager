@@ -31,7 +31,7 @@ const useDataEditor = <
     options.initialUpdates ?? {},
   );
 
-  const data = useMemo<Partial<TValue> & TDefault>(
+  const data = useMemo<PartialIfNotInDefault<TValue, TDefault>>(
     () => ({ ...options.defaultValue, ...initialValue, ...updates } as any),
     [options.defaultValue, initialValue, updates],
   );
@@ -75,3 +75,9 @@ const useDataEditor = <
 };
 
 export default useDataEditor;
+
+type PartialIfNotInDefault<TValue, UDefault extends Partial<TValue>> = {
+  [K in keyof TValue]: UDefault[K] extends undefined
+    ? TValue[K] | undefined
+    : Exclude<TValue[K], undefined>;
+};

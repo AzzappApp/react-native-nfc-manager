@@ -79,3 +79,16 @@ export const LINE_DIVIDER_DEFAULT_VALUES = {
   colorTop: '#FFFFFF',
   colorBottom: '#000000', // use theme colors(not important from azzapp/app here)
 } as const;
+
+export const CAROUSEL_DEFAULT_VALUES = {
+  borderSize: 0,
+  borderColor: '#000000',
+  borderRadius: 0,
+  marginVertical: 20,
+  marginHorizontal: 20,
+  gap: 10,
+  imageHeight: 140,
+  squareRatio: false,
+} as const;
+
+export const CAROUSEL_IMAGE_MAX_WIDTH = 2048;

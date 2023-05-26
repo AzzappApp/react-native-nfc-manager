@@ -1,13 +1,17 @@
+import CarouselEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
 import CoverEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
+import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
 import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
+import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
 import type { CoverEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
+import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 
 /**
@@ -19,8 +23,9 @@ const CardModuleEditionMobileScreen = ({
   route: { params },
 }: RelayScreenProps<
   CardModuleEditionRoute,
+  | CarouselEditionMobileScreenQuery
   | CoverEditionMobileScreenQuery
-  | CoverEditionMobileScreenQuery
+  | LineDividerEditionMobileScreenQuery
   | SimpleTextEditionMobileScreenQuery
 >) => {
   switch (params?.module) {
@@ -47,6 +52,13 @@ const CardModuleEditionMobileScreen = ({
           preloadedQuery={preloadedQuery as any}
         />
       );
+    case 'carousel':
+      return (
+        <CarouselEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     default:
       return null;
   }
@@ -63,6 +75,8 @@ CardModuleEditionMobileScreen.prefetch = ({
       return SimpleTextEditionMobileScreen.prefetch();
     case 'lineDivider':
       return LineDividerEditionMobileScreen.prefetch();
+    case 'carousel':
+      return CarouselEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -77,6 +91,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
       return SimpleTextEditionMobileScreenNode;
     case 'lineDivider':
       return LineDividerEditionMobileScreenNode;
+    case 'carousel':
+      return CarouselEditionMobileScreenQueryNode;
     default:
       // for type safety
       return CoverEditionMobileScreenQueryNode;

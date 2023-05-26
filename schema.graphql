@@ -66,6 +66,18 @@ enum CardModuleKind {
 
 """User Card module : Carousel"""
 type CardModuleCarousel implements CardModule {
+  images: [MediaImage!]!
+  squareRatio: Boolean!
+  borderSize: Int!
+  borderColor: String!
+  borderRadius: Int!
+  marginVertical: Int!
+  marginHorizontal: Int!
+  imageHeight: Int!
+  gap: Int!
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -74,6 +86,28 @@ type CardModuleCarousel implements CardModule {
 
   """User Card module visibility"""
   visible: Boolean!
+}
+
+"""Media used in web card edition provided by azzapp"""
+type StaticMedia {
+  id: ID!
+  uri(width: Int, pixelRatio: Int): String!
+  name: String
+  usage: StaticMediaUsage!
+  tags: [String!]!
+}
+
+enum StaticMediaUsage {
+  coverBackground
+  coverForeground
+  moduleBackground
+}
+
+"""Style of the background of a module"""
+type ModuleBackgroundStyle {
+  backgroundColor: String!
+  patternColor: String!
+  opacity: Int!
 }
 
 """User Card module : HorizontalPhoto"""
@@ -151,13 +185,13 @@ type CardModuleSimpleButton implements CardModule {
 """User Card module : SimpleText"""
 type CardModuleSimpleText implements CardModule {
   text: String!
-  fontFamily: String
-  fontSize: Int
-  color: String
-  verticalSpacing: Int
-  textAlign: TextAlignment
-  marginHorizontal: Int
-  marginVertical: Int
+  fontFamily: String!
+  fontSize: Int!
+  color: String!
+  verticalSpacing: Int!
+  textAlign: TextAlignment!
+  marginHorizontal: Int!
+  marginVertical: Int!
   background: StaticMedia
   backgroundStyle: ModuleBackgroundStyle
 
@@ -178,38 +212,16 @@ enum TextAlignment {
   justify
 }
 
-"""Media used in web card edition provided by azzapp"""
-type StaticMedia {
-  id: ID!
-  uri(width: Int, pixelRatio: Int): String!
-  name: String
-  usage: StaticMediaUsage!
-  tags: [String!]!
-}
-
-enum StaticMediaUsage {
-  coverBackground
-  coverForeground
-  moduleBackground
-}
-
-"""Style of the background of a module"""
-type ModuleBackgroundStyle {
-  backgroundColor: String!
-  patternColor: String!
-  opacity: Int!
-}
-
 """User Card module : SimpleTitle"""
 type CardModuleSimpleTitle implements CardModule {
   text: String!
-  fontFamily: String
-  fontSize: Int
-  color: String
-  verticalSpacing: Int
-  textAlign: TextAlignment
-  marginHorizontal: Int
-  marginVertical: Int
+  fontFamily: String!
+  fontSize: Int!
+  color: String!
+  verticalSpacing: Int!
+  textAlign: TextAlignment!
+  marginHorizontal: Int!
+  marginVertical: Int!
   background: StaticMedia
   backgroundStyle: ModuleBackgroundStyle
 
@@ -711,6 +723,7 @@ type Mutation {
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
   saveSimpleTextModule(input: SaveSimpleTextModuleInput!): SaveSimpleTextModulePayload
   saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
+  saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
   duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
@@ -885,6 +898,27 @@ input SaveLineDividerModuleInput {
   height: Int
   colorTop: String
   colorBottom: String
+  clientMutationId: String
+}
+
+type SaveCarouselModulePayload {
+  card: Card!
+  clientMutationId: String
+}
+
+input SaveCarouselModuleInput {
+  moduleId: ID
+  images: [String!]
+  squareRatio: Boolean
+  borderSize: Int
+  borderColor: String
+  borderRadius: Int
+  marginVertical: Int
+  marginHorizontal: Int
+  imageHeight: Int
+  gap: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
   clientMutationId: String
 }
 

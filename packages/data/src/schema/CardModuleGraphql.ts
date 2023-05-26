@@ -4,6 +4,7 @@ import {
   GraphQLID,
   GraphQLInt,
   GraphQLInterfaceType,
+  GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -11,6 +12,7 @@ import {
 import mapValues from 'lodash/mapValues';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { TextAlignmentGraphQL } from './commonsTypes';
+import { MediaImageGraphQL } from './MediaGraphQL';
 import StaticMediaGraphQL from './StaticMediaGraphQL';
 import type { GraphQLContext } from '#index';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -91,7 +93,53 @@ export const CardModuleBlockTextGraphQL = createGrahQLCardModule(
   {},
 );
 
-export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {});
+export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {
+  images: {
+    type: new GraphQLNonNull(
+      new GraphQLList(new GraphQLNonNull(MediaImageGraphQL)),
+    ),
+    resolve: (cardModule: CardModule, _, { mediaLoader }) => {
+      const { data } = cardModule as any;
+      return data.images ? mediaLoader.loadMany(data.images) : [];
+    },
+  },
+  squareRatio: {
+    type: new GraphQLNonNull(GraphQLBoolean),
+  },
+  borderSize: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  borderColor: {
+    type: new GraphQLNonNull(GraphQLString),
+  },
+  borderRadius: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  marginVertical: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  marginHorizontal: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  imageHeight: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  gap: {
+    type: new GraphQLNonNull(GraphQLInt),
+  },
+  background: {
+    type: StaticMediaGraphQL,
+    resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+      const { data } = cardModule as any;
+      return data.backgroundId
+        ? staticMediaLoader.load(data.backgroundId)
+        : null;
+    },
+  },
+  backgroundStyle: {
+    type: ModuleBackgroundStyleGraphQL,
+  },
+});
 
 export const CardModuleHorizontalPhotoGraphQL = createGrahQLCardModule(
   'horizontalPhoto',
@@ -152,25 +200,25 @@ export const CardModuleSimpleTextGraphQL = createGrahQLCardModule(
       type: new GraphQLNonNull(GraphQLString),
     },
     fontFamily: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     fontSize: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     color: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     verticalSpacing: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     textAlign: {
-      type: TextAlignmentGraphQL,
+      type: new GraphQLNonNull(TextAlignmentGraphQL),
     },
     marginHorizontal: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     marginVertical: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     background: {
       type: StaticMediaGraphQL,
@@ -194,25 +242,25 @@ export const CardModuleSimpleTitleGraphQL = createGrahQLCardModule(
       type: new GraphQLNonNull(GraphQLString),
     },
     fontFamily: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     fontSize: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     color: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     verticalSpacing: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     textAlign: {
-      type: TextAlignmentGraphQL,
+      type: new GraphQLNonNull(TextAlignmentGraphQL),
     },
     marginHorizontal: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     marginVertical: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     background: {
       type: StaticMediaGraphQL,

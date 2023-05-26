@@ -4,6 +4,7 @@ import createPostComment from './createPostComment';
 import deleteModules from './deleteModules';
 import duplicateModule from './duplicateModule';
 import togglePostReaction from './postReaction';
+import saveCarouselModule from './saveCarouselModule';
 import saveLineDividerModule from './saveLineDividerModule';
 import saveSimpleTextModule from './saveSimpleTextModule';
 import swapModules from './swapModules';
@@ -22,6 +23,7 @@ const MutationGraphQL = new GraphQLObjectType({
     togglePostReaction,
     saveSimpleTextModule,
     saveLineDividerModule,
+    saveCarouselModule,
     swapModules,
     deleteModules,
     duplicateModule,

@@ -17,10 +17,12 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KINDS,
   MODULE_KIND_LINE_DIVIDER,
+  MODULE_KIND_CAROUSEL,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
+import CarouselRenderer from '#components/CarouselRenderer';
 import CoverRenderer from '#components/CoverRenderer';
 import LineDividerRenderer from '#components/LineDividerRenderer';
 import { createId } from '#helpers/idHelpers';
@@ -379,6 +381,7 @@ const _ProfileScreenBody = (
           visible
           ...SimpleTextRenderer_module
           ...LineDividerRenderer_module
+          ...CarouselRenderer_module
         }
       }
     `,
@@ -736,6 +739,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_LINE_DIVIDER && (
         <LineDividerRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_CAROUSEL && (
+        <CarouselRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>
   ));

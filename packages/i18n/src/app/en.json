@@ -11,6 +11,10 @@
     "defaultMessage": "Create a new account",
     "description": "Create a new account button label"
   },
+  "/UDdWv": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in carousel edition screen"
+  },
   "/cVb8L": {
     "defaultMessage": "Please enter a valid phone number",
     "description": "Signup Screen - Error message for invalid phone number"
@@ -35,6 +39,14 @@
     "defaultMessage": "Cancel",
     "description": "SearchBar - Cancel button"
   },
+  "0GLpq3": {
+    "defaultMessage": "Border color",
+    "description": "Title of the border color picker in carousel edition"
+  },
+  "106q2H": {
+    "defaultMessage": "Background",
+    "description": "Carousel  bottom menu label for Background tab"
+  },
   "19LN22": {
     "defaultMessage": "Tap to cancel your search",
     "description": "SearchBar accessibilityLabel Cancel Button"
@@ -42,6 +54,10 @@
   "1UGgMw": {
     "defaultMessage": "Sign Up",
     "description": "SigninScreen - Sign Up"
+  },
+  "1Ug6pn": {
+    "defaultMessage": "Border shape",
+    "description": "Title of the border shape section in carousel edition"
   },
   "1bqCj6": {
     "defaultMessage": "Ok",
@@ -70,6 +86,14 @@
   "3+i2KR": {
     "defaultMessage": "Category image",
     "description": "ProfileKindStep - Category image alt"
+  },
+  "3S8kZl": {
+    "defaultMessage": "Square ratio",
+    "description": "Accessibility value of the image ratio button in carousel edition"
+  },
+  "3pMfaY": {
+    "defaultMessage": "Preview",
+    "description": "Carousel  bottom menu label for Preview tab"
   },
   "428m8h": {
     "defaultMessage": "Add a color",
@@ -119,6 +143,10 @@
     "defaultMessage": "Access to the microphone allows you to record videos.",
     "description": "Camera authorization screen content for microphone permission"
   },
+  "6G2Uzh": {
+    "defaultMessage": "Select images",
+    "description": "Carousel bottom menu label for images tab"
+  },
   "6SitNY": {
     "defaultMessage": "Tap to switch between front and back camera",
     "description": "camera flip button accessibility hint"
@@ -158,6 +186,10 @@
   "7J2uu7": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in Line Divier module screen"
+  },
+  "7SXLKR": {
+    "defaultMessage": "Image gap : {size}",
+    "description": "Image gap label in carousel edition"
   },
   "7XIZlu": {
     "defaultMessage": "Tap me to show the QR Code fullscreen",
@@ -283,6 +315,10 @@
     "defaultMessage": "Share",
     "description": ""
   },
+  "CmkC/M": {
+    "defaultMessage": "Slide to change the border size",
+    "description": "Hint of the border size slider in carousel edition"
+  },
   "D98MFJ": {
     "defaultMessage": "Related Posts",
     "description": "Post screen header title"
@@ -334,6 +370,10 @@
   "EKPaSj": {
     "defaultMessage": "Select a calling code or email",
     "description": "The accessibility label for the country selector"
+  },
+  "EUi/Ij": {
+    "defaultMessage": "Slide to change the border radius",
+    "description": "Hint of the border radius slider in carousel edition"
   },
   "ElE0Uo": {
     "defaultMessage": "Retry",
@@ -435,6 +475,10 @@
     "defaultMessage": "Edit Bottom Color",
     "description": "Line Divider bottom menu label for bottom color tab"
   },
+  "KecYY9": {
+    "defaultMessage": "Border size : {size}",
+    "description": "Border size message in carousel edition"
+  },
   "KimbRe": {
     "defaultMessage": "Provide more details",
     "description": "Company profile form - Title"
@@ -458,6 +502,10 @@
   "LOvPdv": {
     "defaultMessage": "Crop",
     "description": "Crop image edition parameters name"
+  },
+  "Lls+Xd": {
+    "defaultMessage": "Border color",
+    "description": "Title of the border color section in carousel edition"
   },
   "LnYT8w": {
     "defaultMessage": "Models",
@@ -487,6 +535,10 @@
     "defaultMessage": "Loading error",
     "description": "CoverEditionScreen alert message loading error title"
   },
+  "N9T08H": {
+    "defaultMessage": "Images height : {size}",
+    "description": "Images height label in carousel edition"
+  },
   "NJSilL": {
     "defaultMessage": "Text",
     "description": "CoverEditionScreen bottom menu label for Text tab"
@@ -502,6 +554,10 @@
   "OPcjcW": {
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
+  },
+  "Oe7IDs": {
+    "defaultMessage": "Border radius",
+    "description": "Label of the border radius in carousel edition"
   },
   "Oqezmf": {
     "defaultMessage": "Comment the post",
@@ -639,6 +695,10 @@
     "defaultMessage": "Unfollow",
     "description": "Unfollow button label in Profile Screen Button Bar"
   },
+  "UfDt73": {
+    "defaultMessage": "Margin left/right : {size}",
+    "description": "Margin horizontal label in carousel edition"
+  },
   "UjPdhp": {
     "defaultMessage": "Press this button to select an image from your library",
     "description": "Accessibility hint of the image selection button"
@@ -731,6 +791,10 @@
     "defaultMessage": "Close",
     "description": "Bottom sheet close button"
   },
+  "YToMoq": {
+    "defaultMessage": "Border radius : {radius}",
+    "description": "Border radius in carousel edition"
+  },
   "YZLFbx": {
     "defaultMessage": "Top Margin size",
     "description": "Label of the top margin size slider in Line Divider edition"
@@ -738,6 +802,10 @@
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
+  },
+  "YkLUxp": {
+    "defaultMessage": "Images",
+    "description": "Title of the images section in carousel edition"
   },
   "YyZiop": {
     "defaultMessage": "Cut Video",
@@ -943,6 +1011,10 @@
     "defaultMessage": "Latest",
     "description": "Latest photos album title in image wizzard album selection "
   },
+  "gj4EIT": {
+    "defaultMessage": "Original ratio",
+    "description": "Accessibility value of the image ratio button in carousel edition"
+  },
   "gpYU75": {
     "defaultMessage": "Tap to reset your passward",
     "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
@@ -974,6 +1046,10 @@
   "hwL8A0": {
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
+  },
+  "i4akRg": {
+    "defaultMessage": "Edit Margin",
+    "description": "Carousel bottom menu label for margin tab"
   },
   "i9jMTB": {
     "defaultMessage": "{countReactions} likes",
@@ -1151,6 +1227,10 @@
     "defaultMessage": "Adjust",
     "description": "Title of the adjust section in Image edition wizzard"
   },
+  "oKWF+F": {
+    "defaultMessage": "Border size",
+    "description": "Label of the border size in carousel edition"
+  },
   "p+PC34": {
     "defaultMessage": "Show",
     "description": "Show button in profile edition screen footer"
@@ -1182,6 +1262,14 @@
   "pGovG7": {
     "defaultMessage": "Top to remove {word} from history",
     "description": "Recent Search - Accessibiltity Label remove element from history"
+  },
+  "pNz+pR": {
+    "defaultMessage": "Margins",
+    "description": "Title of the margins section in carousel edition"
+  },
+  "peQNDG": {
+    "defaultMessage": "Image ratio",
+    "description": "Accessibility label of the image ratio button in carousel edition"
   },
   "pfOnsu": {
     "defaultMessage": "Effect",
@@ -1254,6 +1342,10 @@
   "s/244i": {
     "defaultMessage": "Update your cover",
     "description": "Cover edition screen title"
+  },
+  "s0HnS4": {
+    "defaultMessage": "Photo carousel",
+    "description": "Photo carousel screen title"
   },
   "s1m1n4": {
     "defaultMessage": "Enter your phone number",
@@ -1359,6 +1451,14 @@
     "defaultMessage": "Logout",
     "description": "logout link"
   },
+  "xPITiW": {
+    "defaultMessage": "Margin top/bottom : {size}",
+    "description": "Margin vertical label in carousel edition"
+  },
+  "xV6Ifc": {
+    "defaultMessage": "Save",
+    "description": "Save button label in carousel edition screen"
+  },
   "xaWatU": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in cover edition screen"
@@ -1378,6 +1478,10 @@
   "y3qZwL": {
     "defaultMessage": "Title",
     "description": "Label of the title input in cover edition"
+  },
+  "y4GSiQ": {
+    "defaultMessage": "Edit Text",
+    "description": "Carousel bottom menu label for border tab"
   },
   "ySeX6t": {
     "defaultMessage": "Followers",

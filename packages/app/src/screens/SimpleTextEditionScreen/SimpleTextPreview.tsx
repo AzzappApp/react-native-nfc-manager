@@ -1,7 +1,7 @@
 import EditorScaledPreview from '#components/EditorScaledPreview';
 import { SimpleTextRendererRaw } from '#components/SimpleTextRenderer';
 import type { SimpleTextRawData } from '#components/SimpleTextRenderer';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type SimpleTextPreviewProps = ViewProps & {
   /**
