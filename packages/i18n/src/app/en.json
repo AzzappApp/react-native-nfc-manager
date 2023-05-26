@@ -1,4 +1,8 @@
 {
+  "+QfAxY": {
+    "defaultMessage": "Slide to change the bottom margin size",
+    "description": "Hint of the bottom margin slider in Line Divider edition"
+  },
   "+miIiv": {
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
@@ -14,6 +18,10 @@
   "/u5+bX": {
     "defaultMessage": "Press to edit this section of your profile",
     "description": "Accessibility hint for the profile block container"
+  },
+  "/x3J7F": {
+    "defaultMessage": "Bottom Color",
+    "description": "Bottom Color title in Line Divider module screen"
   },
   "07iiib": {
     "defaultMessage": "Cancel",
@@ -146,6 +154,10 @@
   "7HPaV3": {
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
+  },
+  "7J2uu7": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Line Divier module screen"
   },
   "7XIZlu": {
     "defaultMessage": "Tap me to show the QR Code fullscreen",
@@ -331,6 +343,10 @@
     "defaultMessage": "Slide to change the vertical spacing",
     "description": "Hint of the vertical spacing slider in simple text edition"
   },
+  "EvEO4G": {
+    "defaultMessage": "Height : {size}",
+    "description": "Height message in Line Divider edition"
+  },
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
@@ -362,6 +378,10 @@
   "GsE7SA": {
     "defaultMessage": "Welcome!",
     "description": "Signup Screen - Welcome title"
+  },
+  "H+03lA": {
+    "defaultMessage": "Bottom margin : {size}",
+    "description": "Bottom margin message in Line Divider edition"
   },
   "H5dcbM": {
     "defaultMessage": "Tap to start recording",
@@ -411,9 +431,17 @@
     "defaultMessage": "Margin top/bottom : {size}",
     "description": "Font size message in cover edition"
   },
+  "KbFrhj": {
+    "defaultMessage": "Edit Bottom Color",
+    "description": "Line Divider bottom menu label for bottom color tab"
+  },
   "KimbRe": {
     "defaultMessage": "Provide more details",
     "description": "Company profile form - Title"
+  },
+  "L0l2Pm": {
+    "defaultMessage": "Slide to change the height",
+    "description": "Hint of the height slider in Line Divider edition"
   },
   "L4Tupd": {
     "defaultMessage": "Copy link",
@@ -438,6 +466,10 @@
   "M32J+R": {
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
+  },
+  "M3vW6L": {
+    "defaultMessage": "Edit Top Color",
+    "description": "Line Divider bottom menu label for top color tab"
   },
   "MMkG6l": {
     "defaultMessage": "Vertical Spacing",
@@ -499,6 +531,10 @@
     "defaultMessage": "Documentary",
     "description": "Documentary photo filter name"
   },
+  "PnC9oY": {
+    "defaultMessage": "Bottom Margin size",
+    "description": "Label of the bottom margin size slider in Line Divider edition"
+  },
   "QBLy42": {
     "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
     "description": "The accessibility hint for the country selector"
@@ -506,6 +542,10 @@
   "QjKfB6": {
     "defaultMessage": "Fore.",
     "description": "CoverEditionScreen bottom menu label for Foreground tab"
+  },
+  "QwSn2g": {
+    "defaultMessage": "Preview",
+    "description": "Line Divider bottom menu label for Preview tab"
   },
   "RDYvOJ": {
     "defaultMessage": "Desktop",
@@ -603,6 +643,10 @@
     "defaultMessage": "Press this button to select an image from your library",
     "description": "Accessibility hint of the image selection button"
   },
+  "Usqg+8": {
+    "defaultMessage": "Slide to change the top margin size",
+    "description": "Hint of the top margin slider in Line Divider edition"
+  },
   "UtDANq": {
     "defaultMessage": "Shutter",
     "description": "Accessibility label for the camera shutter button"
@@ -687,6 +731,10 @@
     "defaultMessage": "Close",
     "description": "Bottom sheet close button"
   },
+  "YZLFbx": {
+    "defaultMessage": "Top Margin size",
+    "description": "Label of the top margin size slider in Line Divider edition"
+  },
   "YgcSzd": {
     "defaultMessage": "Create a new password",
     "description": "ChangePasswordScreen - create a new password  title"
@@ -723,6 +771,10 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
   },
+  "aQrtaq": {
+    "defaultMessage": "Top margin : {size}",
+    "description": "Top margin message in Line Divider edition"
+  },
   "aULhrq": {
     "defaultMessage": "Font size : {fontSize}",
     "description": "Font size message in cover edition"
@@ -758,6 +810,10 @@
   "bxkdJ/": {
     "defaultMessage": "Don't have an account?",
     "description": "SigninScreen - Don't have an account"
+  },
+  "c/1KI+": {
+    "defaultMessage": "Edit Settings",
+    "description": "Line Divider bottom menu label for settings tab"
   },
   "c1kXnW": {
     "defaultMessage": "Select an activity",
@@ -798,6 +854,10 @@
   "dNmlSS": {
     "defaultMessage": "Tap to select a color",
     "description": "Hint of the color button in cover edition"
+  },
+  "dab/aC": {
+    "defaultMessage": "Divider #1",
+    "description": "Line Divider text screen title"
   },
   "dl8CRm": {
     "defaultMessage": "Posterize",
@@ -955,6 +1015,10 @@
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
   },
+  "kIhbvL": {
+    "defaultMessage": "Height",
+    "description": "Label of the height slider in Line Divider edition"
+  },
   "kJBZgb": {
     "defaultMessage": "Connect to existing account",
     "description": "Connect to existing account button label"
@@ -1003,6 +1067,10 @@
     "defaultMessage": "New Post",
     "description": "New post screen title"
   },
+  "lbr9F8": {
+    "defaultMessage": "Margins",
+    "description": "Title of the margins section in Line Divider edition"
+  },
   "ltR4XX": {
     "defaultMessage": "Color #1",
     "description": "Label of the background/foreground tint color in web card modules editors"
@@ -1038,6 +1106,10 @@
   "mj17hv": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in cover edition"
+  },
+  "n38uGy": {
+    "defaultMessage": "Top Color",
+    "description": "Top Color title in Line Divider module screen"
   },
   "n8Bdhz": {
     "defaultMessage": "See all",
@@ -1143,6 +1215,10 @@
     "defaultMessage": "Middle left",
     "description": "Label of the middle left position in cover edition"
   },
+  "qpleHz": {
+    "defaultMessage": "Configuration",
+    "description": "Title of the configuration section in line divider edition"
+  },
   "r+BJn9": {
     "defaultMessage": "What's your name?",
     "description": "Personal profile form - Title"
@@ -1198,6 +1274,10 @@
   "sqy+v3": {
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
+  },
+  "syIp68": {
+    "defaultMessage": "Save",
+    "description": "Save button label in  Line Divier module screen"
   },
   "tFCDTN": {
     "defaultMessage": "Continue",
@@ -1314,6 +1394,10 @@
   "ymtf7H": {
     "defaultMessage": "Tap to search for {word}",
     "description": "Recent Search - Accessibiltity Label remove element from history"
+  },
+  "yvCtta": {
+    "defaultMessage": "Edit Margin",
+    "description": "Line Divider bottom menu label for margin tab"
   },
   "z7TgL0": {
     "defaultMessage": "Tonal",

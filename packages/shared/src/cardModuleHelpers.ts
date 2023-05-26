@@ -70,3 +70,12 @@ export const SIMPLE_TITLE_DEFAULT_VALUES = {
 } as const;
 
 export const SIMPLE_TITLE_MAX_LENGTH = 500;
+
+export const LINE_DIVIDER_DEFAULT_VALUES = {
+  orientation: 'bottomRight',
+  marginBottom: 0,
+  marginTop: 0,
+  height: 100,
+  colorTop: '#FFFFFF',
+  colorBottom: '#000000', // use theme colors(not important from azzapp/app here)
+} as const;

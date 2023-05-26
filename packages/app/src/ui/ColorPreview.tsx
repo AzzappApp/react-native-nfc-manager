@@ -2,21 +2,44 @@ import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import type { ColorValue, ViewProps } from 'react-native';
 
+type ColorPreviewProps = ViewProps & {
+  /**
+   * The color to preview
+   *
+   * @type {ColorValue}
+   */
+  color: ColorValue;
+  /**
+   *
+   *
+   * @type {ViewProps['style']}
+   */
+  style?: ViewProps['style'];
+  /**
+   * size of the color preview dot
+   *
+   * @type {number}
+   */
+  colorSize?: number;
+};
 /**
  * A simple circle that shows a color.
  */
 const ColorPreview = ({
   color,
   style,
+  colorSize = 10,
   ...props
-}: ViewProps & {
-  /**
-   * The color to show.
-   */
-  color: ColorValue;
-}) => (
+}: ColorPreviewProps) => (
   <View style={[styles.colorPreviewContainer, style]} {...props}>
-    <View style={[styles.colorPreview, { backgroundColor: color }]} />
+    <View
+      style={{
+        backgroundColor: color,
+        width: colorSize,
+        height: colorSize,
+        borderRadius: colorSize / 2,
+      }}
+    />
   </View>
 );
 
@@ -24,17 +47,12 @@ export default ColorPreview;
 
 const styles = StyleSheet.create({
   colorPreviewContainer: {
-    height: 12,
-    width: 12,
-    borderRadius: 6,
     borderColor: colors.black,
     borderWidth: 1,
-  },
-  colorPreview: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    borderColor: 'white',
-    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 14,
+    width: 14,
+    borderRadius: 7,
   },
 });

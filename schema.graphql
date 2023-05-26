@@ -90,6 +90,13 @@ type CardModuleHorizontalPhoto implements CardModule {
 
 """User Card module : LineDivider"""
 type CardModuleLineDivider implements CardModule {
+  orientation: LineDividerOrientation!
+  marginBottom: Int
+  marginTop: Int
+  height: Int!
+  colorTop: String!
+  colorBottom: String!
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -98,6 +105,11 @@ type CardModuleLineDivider implements CardModule {
 
   """User Card module visibility"""
   visible: Boolean!
+}
+
+enum LineDividerOrientation {
+  topLeft
+  bottomRight
 }
 
 """User Card module : OpeningHours"""
@@ -698,6 +710,7 @@ type Mutation {
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
   saveSimpleTextModule(input: SaveSimpleTextModuleInput!): SaveSimpleTextModulePayload
+  saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
   duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
@@ -857,6 +870,22 @@ input ModuleBackgroundInputStyle {
   backgroundColor: String!
   patternColor: String!
   opacity: Int!
+}
+
+type SaveLineDividerModulePayload {
+  card: Card!
+  clientMutationId: String
+}
+
+input SaveLineDividerModuleInput {
+  moduleId: ID
+  orientation: LineDividerOrientation
+  marginTop: Int
+  marginBottom: Int
+  height: Int
+  colorTop: String
+  colorBottom: String
+  clientMutationId: String
 }
 
 type SwapModulesPayload {

@@ -1,7 +1,9 @@
 import CoverEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
+import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
+import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
@@ -17,7 +19,9 @@ const CardModuleEditionMobileScreen = ({
   route: { params },
 }: RelayScreenProps<
   CardModuleEditionRoute,
-  CoverEditionMobileScreenQuery | SimpleTextEditionMobileScreenQuery
+  | CoverEditionMobileScreenQuery
+  | CoverEditionMobileScreenQuery
+  | SimpleTextEditionMobileScreenQuery
 >) => {
   switch (params?.module) {
     case 'cover':
@@ -36,6 +40,13 @@ const CardModuleEditionMobileScreen = ({
           moduleKind={params.module}
         />
       );
+    case 'lineDivider':
+      return (
+        <LineDividerEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     default:
       return null;
   }
@@ -50,6 +61,8 @@ CardModuleEditionMobileScreen.prefetch = ({
     case 'simpleText':
     case 'simpleTitle':
       return SimpleTextEditionMobileScreen.prefetch();
+    case 'lineDivider':
+      return LineDividerEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -62,6 +75,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
     case 'simpleText':
     case 'simpleTitle':
       return SimpleTextEditionMobileScreenNode;
+    case 'lineDivider':
+      return LineDividerEditionMobileScreenNode;
     default:
       // for type safety
       return CoverEditionMobileScreenQueryNode;

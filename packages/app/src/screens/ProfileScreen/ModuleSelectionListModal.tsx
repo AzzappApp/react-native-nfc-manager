@@ -35,6 +35,7 @@ const ModuleSelectionListModal = ({
               key={module.value}
               onPress={() => onSelectModuleKind(module.value)}
               label={module.label}
+              disabled={!module.ready}
             />
           ))}
         </ScrollView>
@@ -45,49 +46,60 @@ const ModuleSelectionListModal = ({
 
 export default ModuleSelectionListModal;
 
-const modules: Array<{ label: string; value: ModuleKind }> = [
+const modules: Array<{ label: string; value: ModuleKind; ready: boolean }> = [
   {
     label: 'Simple Button',
     value: 'simpleButton',
+    ready: false,
   },
   {
     label: 'Simple Text',
     value: 'simpleText',
+    ready: true,
   },
   {
     label: 'Block Text',
     value: 'blockText',
+    ready: false,
   },
   {
     label: 'Simple Title',
     value: 'simpleTitle',
+    ready: true,
   },
   {
     label: 'Horizontal Photo',
     value: 'horizontalPhoto',
+    ready: false,
   },
   {
     label: 'Carousel',
     value: 'carousel',
+    ready: false,
   },
   {
     label: 'Line Divider',
     value: 'lineDivider',
+    ready: true,
   },
   {
     label: 'Photo With Text and title',
     value: 'photoWithTextAndTitle',
+    ready: false,
   },
   {
     label: 'Opening Hours',
     value: 'openingHours',
+    ready: false,
   },
   {
     label: 'WebCards Carousel',
     value: 'webCardsCarousel',
+    ready: false,
   },
   {
     label: 'Social Links',
     value: 'socialLinks',
+    ready: false,
   },
 ];

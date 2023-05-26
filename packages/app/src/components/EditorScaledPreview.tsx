@@ -14,7 +14,7 @@ type EditorScaledPreviewProps = ViewProps & {
   /**
    * A callback that is called when the module preview is pressed.
    */
-  onPreviewPress: () => void;
+  onPreviewPress?: () => void;
 
   /**
    * style of the inner module container
@@ -59,6 +59,8 @@ const EditorScaledPreview = ({
       <PressableNative
         onPress={onPreviewPress}
         onLayout={onModuleContainerLayout}
+        disabledOpacity={onPreviewPress != null ? 0.3 : 1}
+        disabled={onPreviewPress == null}
         style={[
           styles.moduleContainer,
           {

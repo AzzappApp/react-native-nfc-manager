@@ -268,6 +268,9 @@ const icons = {
   get sharpness() {
     return require('./assets/sharpness.png');
   },
+  get sharpness_mirror() {
+    return require('./assets/sharpness_mirror.png');
+  },
   get stop() {
     return require('./assets/stop.png');
   },

@@ -5,6 +5,7 @@
  * https://www.figma.com/file/fmJgyUlpDU8G77GqH9H4rE/STYLE-GUIDE?node-id=3-344&t=xIPXRnOW3B8NjRW4-0
  *
  * **/
+import React, { cloneElement } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors, fontFamilies } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -18,13 +19,16 @@ import type { StyleProp, ViewStyle } from 'react-native';
 export type FooterBarItem = {
   /** unique tab key */
   key: string;
-
-  /** the icon displayed on the tab, required if not topbar */
-  icon: Icons;
-
+  /** the icon displayed on the tab */
+  icon?: Icons;
+  /**
+   * the icon component displayed on the tab
+   *
+   * @type {React.ReactNode}
+   */
+  IconComponent?: React.ReactElement;
   /** the label of the tab(use for accesibility also) */
   label: string;
-
   /**
    * by default tabs icons are tinted if this property is set to `'unactive'`
    * the icon will only be tinted when the tab is not selected
@@ -38,7 +42,6 @@ export type FooterBarProps = {
    * the list of tabs to display
    */
   tabs: readonly FooterBarItem[];
-
   /**
    * the currently selected tab
    */
@@ -95,10 +98,11 @@ const FooterBar = ({
       style={[styles.container, { height }, style]}
       accessibilityRole="tablist"
     >
-      {tabs.map(({ key, icon, tint, label }) => (
+      {tabs.map(({ key, icon, IconComponent, tint, label }) => (
         <FooterBarItem
           key={key}
           icon={icon}
+          IconComponent={IconComponent}
           label={label}
           tint={tint}
           isSelected={currentTab === key}
@@ -145,6 +149,7 @@ type FooterBarItemProps = FooterBarItem & {
 
 const FooterBarItem = ({
   icon,
+  IconComponent,
   label,
   onItemPress,
   isSelected,
@@ -155,6 +160,9 @@ const FooterBarItem = ({
   showCircle,
   iconSize,
 }: FooterBarItemProps) => {
+  if ((!icon && !IconComponent) || (icon && IconComponent)) {
+    throw new Error('You must provide an icon or an IconComponent');
+  }
   const appearanceStyles = useStyleSheet(computedStyles);
 
   const onPress = () => onItemPress?.(tabKey);
@@ -179,18 +187,33 @@ const FooterBarItem = ({
             appearanceStyles.circleWithLabel,
         ]}
       >
-        <Icon
-          icon={icon}
-          style={[
-            appearanceStyles.image,
-            { width: iconSize, height: iconSize },
-            isSelected &&
-              (showCircle
-                ? appearanceStyles.imageActiveCircle
-                : appearanceStyles.imageActive),
-            shouldNotTint && { tintColor: undefined },
-          ]}
-        />
+        {icon && (
+          <Icon
+            icon={icon}
+            style={[
+              appearanceStyles.image,
+              { width: iconSize, height: iconSize },
+              isSelected &&
+                (showCircle
+                  ? appearanceStyles.imageActiveCircle
+                  : appearanceStyles.imageActive),
+              shouldNotTint && { tintColor: undefined },
+            ]}
+          />
+        )}
+        {IconComponent &&
+          cloneElement(IconComponent, {
+            style: [
+              appearanceStyles.image,
+              { width: iconSize, height: iconSize },
+              isSelected &&
+                (showCircle
+                  ? appearanceStyles.imageActiveCircle
+                  : appearanceStyles.imageActive),
+              shouldNotTint && { tintColor: undefined },
+              IconComponent.props.style,
+            ],
+          })}
       </View>
       {decoration === 'label' && (
         <View style={[appearanceStyles.labelDecoration]}>

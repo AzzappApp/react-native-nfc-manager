@@ -98,9 +98,36 @@ export const CardModuleHorizontalPhotoGraphQL = createGrahQLCardModule(
   {},
 );
 
+export const LineDividerOrientationGraphQL = new GraphQLEnumType({
+  name: 'LineDividerOrientation',
+  values: {
+    topLeft: { value: 'topLeft' },
+    bottomRight: { value: 'bottomRight' },
+  },
+});
+
 export const CardModuleLineDividerGraphQL = createGrahQLCardModule(
   'lineDivider',
-  {},
+  {
+    orientation: {
+      type: new GraphQLNonNull(LineDividerOrientationGraphQL),
+    },
+    marginBottom: {
+      type: GraphQLInt,
+    },
+    marginTop: {
+      type: GraphQLInt,
+    },
+    height: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    colorTop: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    colorBottom: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+  },
 );
 
 export const CardModuleOpeningHoursGraphQL = createGrahQLCardModule(

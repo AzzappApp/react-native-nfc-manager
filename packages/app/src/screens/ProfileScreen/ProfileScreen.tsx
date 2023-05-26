@@ -16,11 +16,13 @@ import { Platform } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KINDS,
+  MODULE_KIND_LINE_DIVIDER,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import CoverRenderer from '#components/CoverRenderer';
+import LineDividerRenderer from '#components/LineDividerRenderer';
 import { createId } from '#helpers/idHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -376,6 +378,7 @@ const _ProfileScreenBody = (
           kind
           visible
           ...SimpleTextRenderer_module
+          ...LineDividerRenderer_module
         }
       }
     `,
@@ -730,6 +733,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_SIMPLE_TITLE && (
         <SimpleTextRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_LINE_DIVIDER && (
+        <LineDividerRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>
   ));
