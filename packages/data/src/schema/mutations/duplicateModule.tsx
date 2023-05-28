@@ -5,7 +5,7 @@ import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { db, createCardModule, getCardModulesByIds } from '#domains';
 import CardGraphQL from '#schema/CardGraphQL';
-import type { GraphQLContext } from '#index';
+import type { GraphQLContext } from '../GraphQLContext';
 
 type DuplicateModuleInput = {
   moduleId: string;

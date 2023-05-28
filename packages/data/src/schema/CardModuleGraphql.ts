@@ -14,7 +14,7 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { TextAlignmentGraphQL } from './commonsTypes';
 import { MediaImageGraphQL } from './MediaGraphQL';
 import StaticMediaGraphQL from './StaticMediaGraphQL';
-import type { GraphQLContext } from '#index';
+import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { CardModule } from '@prisma/client';
 import type { GraphQLFieldConfigMap } from 'graphql';

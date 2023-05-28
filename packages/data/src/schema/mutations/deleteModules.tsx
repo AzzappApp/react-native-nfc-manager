@@ -5,7 +5,7 @@ import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { db, getCardModulesByIds } from '#domains';
 import CardGraphQL from '#schema/CardGraphQL';
-import type { GraphQLContext } from '#index';
+import type { GraphQLContext } from '../GraphQLContext';
 
 type DeleteModulesInput = {
   modulesIds: string[];

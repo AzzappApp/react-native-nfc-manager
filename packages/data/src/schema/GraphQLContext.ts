@@ -37,6 +37,10 @@ export type GraphQLContext = {
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
 };
 
+const dataloadersOptions = {
+  batchScheduleFn: setTimeout,
+};
+
 export const createGraphQLContext = (
   userInfos?: SessionData,
   locale: string = DEFAULT_LOCALE,
@@ -46,14 +50,17 @@ export const createGraphQLContext = (
   return {
     auth: userInfos,
     locale,
-    profileLoader: new DataLoader(getProfilesByIds),
-    cardByProfileLoader: new DataLoader(getUsersCards),
-    cardLoader: new DataLoader(getCardsByIds),
-    coverLoader: new DataLoader(getCardCoversByIds),
-    postLoader: new DataLoader(getPostsByIds),
-    postCommentLoader: new DataLoader(getPostCommentsByIds),
-    mediaLoader: new DataLoader(getMediasByIds),
-    staticMediaLoader: new DataLoader(getStaticMediasByIds),
-    coverTemplateLoader: new DataLoader(getCoverTemplatesByIds),
+    profileLoader: new DataLoader(getProfilesByIds, dataloadersOptions),
+    cardByProfileLoader: new DataLoader(getUsersCards, dataloadersOptions),
+    cardLoader: new DataLoader(getCardsByIds, dataloadersOptions),
+    coverLoader: new DataLoader(getCardCoversByIds, dataloadersOptions),
+    postLoader: new DataLoader(getPostsByIds, dataloadersOptions),
+    postCommentLoader: new DataLoader(getPostCommentsByIds, dataloadersOptions),
+    mediaLoader: new DataLoader(getMediasByIds, dataloadersOptions),
+    staticMediaLoader: new DataLoader(getStaticMediasByIds, dataloadersOptions),
+    coverTemplateLoader: new DataLoader(
+      getCoverTemplatesByIds,
+      dataloadersOptions,
+    ),
   };
 };

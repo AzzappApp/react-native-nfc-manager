@@ -17,7 +17,7 @@
     "@azzapp/data": "*",
     "@azzapp/shared": "*",
     "lodash": "^4.17.21",
-    "next": "^13.2.4",
+    "next": "^13.4.3",
     "react": "^18.2.0",
     "react-admin": "^4.9.0",
     "react-dom": "^18.2.0"

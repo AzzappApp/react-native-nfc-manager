@@ -438,6 +438,7 @@ const CoverEditionScreen = ({
     }
     return null;
   }, [sourceMedia]);
+  //#endregion
 
   // #region Ready state
   // if there is no source media, the cover preview will not dispatch the onReady event

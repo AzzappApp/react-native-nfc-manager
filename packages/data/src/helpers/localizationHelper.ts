@@ -1,4 +1,4 @@
-import type { GraphQLContext } from '#index';
+import type { GraphQLContext } from '../schema/GraphQLContext';
 import type { GraphQLFieldResolver } from 'graphql';
 
 const localizedLabelResolver =

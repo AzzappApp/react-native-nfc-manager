@@ -45,5 +45,4 @@ export const POST = async (req: Request) => {
   }
 };
 
-// TODO blocked by https://github.com/vercel/next.js/issues/46337
-// export const runtime = 'edge';
+export const runtime = 'edge';

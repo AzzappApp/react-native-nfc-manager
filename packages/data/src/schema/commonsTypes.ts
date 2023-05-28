@@ -6,7 +6,7 @@ import {
   GraphQLString,
 } from 'graphql';
 import localizedLabelResolver from '#helpers/localizationHelper';
-import type { GraphQLContext } from '#index';
+import type { GraphQLContext } from './GraphQLContext';
 import type { Interest } from '@prisma/client';
 
 export const ProfileKindGraphQL = new GraphQLEnumType({
