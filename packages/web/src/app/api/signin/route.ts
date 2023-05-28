@@ -100,5 +100,3 @@ const signin = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: signin });
-
-export const runtime = 'edge';

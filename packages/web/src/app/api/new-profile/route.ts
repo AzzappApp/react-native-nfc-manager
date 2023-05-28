@@ -117,8 +117,6 @@ export const POST = async (req: Request) => {
   }
 };
 
-export const runtime = 'edge';
-
 function getIDFromGQLID(
   gqlID: string | null | undefined,
   expectedType: string,

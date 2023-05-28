@@ -323,6 +323,10 @@
     "defaultMessage": "Related Posts",
     "description": "Post screen header title"
   },
+  "DCMIvF": {
+    "defaultMessage": "Background opacity",
+    "description": "Label of the Background opacity slider in carousel edition"
+  },
   "DLIvhH": {
     "defaultMessage": "Font Size : {size}",
     "description": "Font size message in cover edition"
@@ -1063,6 +1067,10 @@
     "defaultMessage": "Edit",
     "description": "Edit modules button label in profile edition screen"
   },
+  "iuu5Vg": {
+    "defaultMessage": "Background",
+    "description": "Label of Background tab in carousel edition"
+  },
   "ivmD1N": {
     "defaultMessage": "Crop",
     "description": "Accessibility label of the crop button"
@@ -1366,6 +1374,10 @@
   "sqy+v3": {
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
+  },
+  "svvJtX": {
+    "defaultMessage": "Slide to change the background opacity",
+    "description": "Hint of the Background opacity slider in carousel edition"
   },
   "syIp68": {
     "defaultMessage": "Save",

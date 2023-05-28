@@ -23,5 +23,3 @@ const refreshTokensApi = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: refreshTokensApi });
-
-export const runtime = 'edge';

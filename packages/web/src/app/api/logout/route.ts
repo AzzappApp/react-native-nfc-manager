@@ -9,5 +9,3 @@ export const POST = async () => {
   }
   return res;
 };
-
-export const runtime = 'edge';
