@@ -720,19 +720,18 @@ const TabsRenderer = ({
             return null;
           }
 
+          const isActive = currentIndex === index;
           if (routeInfo.kind === 'stack') {
             return (
-              <Screen
-                key={routeInfo.id}
-                activityState={currentIndex === index ? 2 : 0}
-              >
+              <Screen key={routeInfo.id} activityState={isActive ? 2 : 0}>
                 <StackRenderer
                   stack={routeInfo.state}
                   screens={screens}
                   tabsRenderers={tabsRenderers}
                   defaultScreenOptions={defaultScreenOptions}
                   onFinishTransitioning={onFinishTransitioning}
-                  onScreenDismissed={onScreenDismissed}
+                  // we don't dispatch onDismissed for tab switch
+                  onScreenDismissed={isActive ? onScreenDismissed : undefined}
                   isModal
                   hasFocus={screenHasFocus}
                 />
@@ -748,7 +747,6 @@ const TabsRenderer = ({
               {...routeInfo.state}
               defaultScreenOptions={defaultScreenOptions}
               screens={screens}
-              onDismissed={() => onScreenDismissed?.(routeInfo.id)}
               isNativeStack={false}
               hasFocus={screenHasFocus}
             />
@@ -792,7 +790,7 @@ type ScreenRendererProps = Route & {
   defaultScreenOptions?: ScreenOptions;
   isModal?: boolean;
   hasFocus?: boolean;
-  onDismissed(): void;
+  onDismissed?: () => void;
 };
 
 const ScreenRenderer = ({
@@ -847,8 +845,9 @@ const ScreenRenderer = ({
   );
 
   const onDismissed = () => {
+    // TODO this event might be dispatched on tab switch which has no sense
     navigationEventEmitter.emit('dismissed');
-    onDismissedProp();
+    onDismissedProp?.();
   };
 
   return (
