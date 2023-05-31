@@ -56,6 +56,7 @@ export default function AccountScreenProfiles({
           nbFollowedProfiles
           nbFollowersProfiles
           card {
+            backgroundColor
             cover {
               ...CoverRenderer_cover
             }
@@ -211,6 +212,11 @@ export default function AccountScreenProfiles({
                     key={item.id}
                     userName={item.userName}
                     cover={item.card?.cover}
+                    style={
+                      item.card?.backgroundColor != null && {
+                        backgroundColor: item.card?.backgroundColor,
+                      }
+                    }
                   />
                 </View>
               )

@@ -51,6 +51,7 @@ const CoverList = ({
         id
         userName
         card {
+          backgroundColor
           cover {
             ...CoverRenderer_cover
           }
@@ -75,6 +76,9 @@ const CoverList = ({
         style={[
           styles.item,
           { height: horizontal ? '100%' : 'auto' },
+          item.card?.backgroundColor != null && {
+            backgroundColor: item.card?.backgroundColor,
+          },
           coverStyle,
         ]}
       />

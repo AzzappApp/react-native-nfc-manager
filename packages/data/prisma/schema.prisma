@@ -104,12 +104,13 @@ enum StaticMediaUsage {
 }
 
 model Card {
-  id        String   @id
-  profileId String
-  isMain    Boolean
-  coverId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id              String   @id
+  profileId       String
+  isMain          Boolean
+  coverId         String
+  backgroundColor String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 
   @@index([profileId])
 }

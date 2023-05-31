@@ -12,8 +12,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Platform } from 'react-native';
+import { useIntl } from 'react-intl';
+import { Platform, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { useDebounce } from 'use-debounce';
+import { CARD_DEFAULT_BACKGROUND_COLOR } from '@azzapp/shared/cardHelpers';
 import {
   MODULE_KINDS,
   MODULE_KIND_LINE_DIVIDER,
@@ -27,10 +30,9 @@ import CarouselRenderer from '#components/CarouselRenderer';
 import CoverRenderer from '#components/CoverRenderer';
 import HorizontalPhotoRenderer from '#components/HorizontalPhotoRenderer';
 import LineDividerRenderer from '#components/LineDividerRenderer';
+import ProfileColorPicker from '#components/ProfileColorPicker';
 import { createId } from '#helpers/idHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
-import BottomSheetModal from '#ui/BottomSheetModal';
-import Container from '#ui/Container';
 import SimpleTextRenderer from '../../components/SimpleTextRenderer';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
@@ -69,11 +71,13 @@ const ProfileScreen = ({
         userName
         card {
           id
+          backgroundColor
           cover {
             ...CoverRenderer_cover
           }
           ...ProfileScreenBody_card
         }
+        ...ProfileColorPicker_profile
       }
     `,
     profileKey,
@@ -113,6 +117,9 @@ const ProfileScreen = ({
   // #endregion
 
   // #region Color picker
+  const [backgroundColor, setBackgroundColor] = useState(
+    profile.card?.backgroundColor ?? CARD_DEFAULT_BACKGROUND_COLOR,
+  );
   const [showColorPicker, setShowColorPicker] = useState(false);
   const onRequestColorPicker = useCallback(() => {
     setShowColorPicker(true);
@@ -121,6 +128,33 @@ const ProfileScreen = ({
   const onCloseColorPicker = useCallback(() => {
     setShowColorPicker(false);
   }, []);
+
+  const [commitBackground] = useMutation(graphql`
+    mutation ProfileScreenUpdateCardMutation($input: UpdateCardInput!) {
+      updateCard(input: $input) {
+        card {
+          id
+          backgroundColor
+        }
+      }
+    }
+  `);
+
+  const firstTime = useRef(true);
+  const [debouncedBackgroundColor] = useDebounce(backgroundColor, 300);
+  useEffect(() => {
+    if (firstTime.current) {
+      firstTime.current = false;
+      return;
+    }
+    commitBackground({
+      variables: {
+        input: {
+          backgroundColor: debouncedBackgroundColor,
+        },
+      },
+    });
+  }, [commitBackground, debouncedBackgroundColor]);
   // #endregion
 
   // #region New Module
@@ -263,9 +297,11 @@ const ProfileScreen = ({
   // #endregion
 
   const vp = useViewportSize();
+  const intl = useIntl();
+
   return (
     <>
-      <Container style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor }}>
         <ProfileScreenHeader
           editing={editing}
           ready={ready}
@@ -281,6 +317,7 @@ const ProfileScreen = ({
         />
         <ProfileScreenScrollView editing={editing} ready={ready}>
           <ProfileBlockContainer
+            backgroundColor={backgroundColor}
             editing={editing}
             displayEditionButtons={false}
             onModulePress={onEditCover}
@@ -300,6 +337,7 @@ const ProfileScreen = ({
                 card={profile.card}
                 editing={editing}
                 selectionMode={selectionMode}
+                backgroundColor={backgroundColor}
                 onEditModule={onEditModule}
                 onSelectionStateChange={onSelectionStateChange}
               />
@@ -314,6 +352,7 @@ const ProfileScreen = ({
           selectionMode={selectionMode}
           hasSelectedModules={nbSelectedModules > 0}
           selectionContainsHiddenModules={selectionContainsHiddenModules}
+          backgroundColor={backgroundColor}
           onHome={onHome}
           onEdit={onEdit}
           onToggleFollow={onToggleFollow}
@@ -323,18 +362,29 @@ const ProfileScreen = ({
           onDelete={onDeleteSelectedModules}
           onToggleVisibility={onToggleSelectedModulesVisibility}
         />
-      </Container>
+      </View>
       <ModuleSelectionListModal
         visible={showModulePicker}
         onRequestClose={onCloseModulePicker}
         onSelectModuleKind={onSelectModuleKind}
         animationType="slide"
       />
-      <BottomSheetModal
-        visible={showColorPicker}
-        onRequestClose={onCloseColorPicker}
-        height={vp`${VW100} / ${2}`}
-      />
+      <Suspense>
+        <ProfileColorPicker
+          title={intl.formatMessage({
+            defaultMessage: 'Web card color',
+            description: 'Profile screen color picker title',
+          })}
+          profile={profile}
+          visible={showColorPicker}
+          selectedColor={
+            profile.card?.backgroundColor ?? CARD_DEFAULT_BACKGROUND_COLOR
+          }
+          height={350}
+          onColorChange={setBackgroundColor}
+          onRequestClose={onCloseColorPicker}
+        />
+      </Suspense>
     </>
   );
 };
@@ -351,6 +401,7 @@ type ProfileScreenBodyProps = {
   card: ProfileScreenBody_card$key;
   editing: boolean;
   selectionMode: boolean;
+  backgroundColor: string;
   onEditModule: (module: ModuleKind, moduleId: string) => void;
   onSelectionStateChange: (info: ModuleSelectionInfos) => void;
 };
@@ -367,6 +418,7 @@ const _ProfileScreenBody = (
     card,
     editing,
     selectionMode,
+    backgroundColor,
     onEditModule,
     onSelectionStateChange,
   }: ProfileScreenBodyProps,
@@ -377,6 +429,7 @@ const _ProfileScreenBody = (
     graphql`
       fragment ProfileScreenBody_card on Card {
         id
+        backgroundColor
         modules {
           id
           kind
@@ -732,6 +785,7 @@ const _ProfileScreenBody = (
       visible={module.visible}
       selectionMode={selectionMode}
       selected={!!selectedModules[module.id]}
+      backgroundColor={backgroundColor}
       {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
     >
       {module.kind === MODULE_KIND_SIMPLE_TEXT && (

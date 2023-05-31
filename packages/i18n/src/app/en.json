@@ -903,6 +903,10 @@
     "defaultMessage": "Justify",
     "description": "Label of the justify alignment button"
   },
+  "aWyLFo": {
+    "defaultMessage": "Web card color",
+    "description": "Profile screen color picker title"
+  },
   "abCe+w": {
     "defaultMessage": "Edit Style",
     "description": "Simple text bottom menu label for style tab"

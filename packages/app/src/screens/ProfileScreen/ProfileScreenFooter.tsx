@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import ColorPreview from '#ui/ColorPreview';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ViewTransition from '#ui/ViewTransition';
@@ -20,6 +21,7 @@ const ProfileScreenFooter = ({
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
+  backgroundColor,
   onHome,
   onEdit,
   onToggleFollow,
@@ -51,6 +53,7 @@ const ProfileScreenFooter = ({
   );
 
   const intl = useIntl();
+  const styles = useStyleSheet(stylesheet);
   const tabs = useMemo<FooterBarItem[]>(
     () => [
       {
@@ -82,7 +85,13 @@ const ProfileScreenFooter = ({
       },
       {
         key: 'colorpicker',
-        icon: 'color_picker',
+        IconComponent: (
+          <ColorPreview
+            color={backgroundColor}
+            style={styles.colorPreview}
+            colorSize={16}
+          />
+        ),
         label: intl.formatMessage({
           defaultMessage: 'Change background color',
           description:
@@ -99,10 +108,8 @@ const ProfileScreenFooter = ({
         }),
       },
     ],
-    [intl],
+    [backgroundColor, intl, styles.colorPreview],
   );
-
-  const styles = useStyleSheet(stylesheet);
 
   // TODO factorize this with editorLayout
   const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
@@ -231,5 +238,14 @@ const stylesheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
+  },
+  colorPreview: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: colors.grey200,
+    marginLeft: 1,
   },
 }));

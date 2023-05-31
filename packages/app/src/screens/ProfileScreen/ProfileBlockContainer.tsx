@@ -34,6 +34,7 @@ const ProfileBlockContainer = ({
   isFirst,
   selectionMode,
   selected,
+  backgroundColor,
   children,
   onModulePress,
   onMoveUp,
@@ -163,8 +164,7 @@ const ProfileBlockContainer = ({
       height: 8,
     },
     shadowRadius: 17,
-    // TODO replace with card background color
-    backgroundColor: 'white',
+    backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
 

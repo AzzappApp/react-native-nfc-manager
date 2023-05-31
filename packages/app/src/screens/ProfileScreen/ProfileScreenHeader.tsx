@@ -113,6 +113,7 @@ const ProfileScreenHeader = ({
               />
             )
           }
+          style={{ backgroundColor: 'transparent' }}
         />
       </ViewTransition>
       <ViewTransition

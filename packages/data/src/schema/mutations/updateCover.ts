@@ -257,6 +257,7 @@ const updateCover = mutationWithClientMutationId({
               profileId,
               isMain: true,
               coverId: coverId!,
+              backgroundColor: null,
             },
             trx,
           );

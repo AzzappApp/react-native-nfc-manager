@@ -77,6 +77,10 @@ export type ProfileScreenFooterProps = {
    */
   currentEditionView: 'desktop' | 'mobile' | 'preview';
   /**
+   * the background color of the profile
+   */
+  backgroundColor: string;
+  /**
    * A callback called when the user press the home button
    */
   onHome: () => void;
@@ -151,6 +155,10 @@ export type ProfileBlockContainerProps = {
    * If true, the swipeable actions are displayed
    */
   selectionMode?: boolean;
+  /**
+   * The background color of the card
+   */
+  backgroundColor: string;
   /**
    * Called when the user press a module, only enabled in edit mode
    */

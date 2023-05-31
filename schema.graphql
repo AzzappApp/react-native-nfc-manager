@@ -448,6 +448,9 @@ type Card implements Node {
   """Card cover display informations"""
   cover: CardCover!
 
+  """Card background color"""
+  backgroundColor: String
+
   """Definitions of the cards modules"""
   modules: [CardModule!]!
 }
@@ -736,6 +739,7 @@ type Mutation {
   saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
   saveHorizontalPhotoModule(input: SaveHorizontalPhotoModuleInput!): SaveHorizontalPhotoModulePayload
   saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
+  updateCard(input: UpdateCardInput!): UpdateCardPayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
   duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
@@ -952,6 +956,17 @@ input SaveCarouselModuleInput {
   gap: Int
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle
+  clientMutationId: String
+}
+
+type UpdateCardPayload {
+  card: Card
+  clientMutationId: String
+}
+
+input UpdateCardInput {
+  """The media of the publication"""
+  backgroundColor: String
   clientMutationId: String
 }
 

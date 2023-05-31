@@ -1,4 +1,9 @@
-import { GraphQLList, GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import {
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { getProfileId } from '@azzapp/auth/viewer';
 import { getCardModules } from '#domains';
@@ -25,6 +30,10 @@ const CardGraphQL = new GraphQLObjectType<Card, GraphQLContext>({
       type: new GraphQLNonNull(CardCoverGraphQL),
       description: 'Card cover display informations',
       resolve: (card, _, { coverLoader }) => coverLoader.load(card.coverId),
+    },
+    backgroundColor: {
+      type: GraphQLString,
+      description: 'Card background color',
     },
     modules: {
       type: new GraphQLNonNull(
