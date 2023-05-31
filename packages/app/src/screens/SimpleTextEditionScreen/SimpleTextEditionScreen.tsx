@@ -171,12 +171,16 @@ const SimpleTextEditionScreen = ({
       return;
     }
     const { background, ...rest } = updates;
+
     commit({
       variables: {
         input: {
           kind: moduleKind,
           moduleId: simpleText?.id,
-          backgroundId: background == null ? null : background.id,
+          backgroundId:
+            simpleText?.background?.id !== data.background?.id
+              ? background?.id ?? null
+              : simpleText?.background?.id ?? null,
           ...rest,
         },
       },
@@ -192,7 +196,16 @@ const SimpleTextEditionScreen = ({
         }
       },
     });
-  }, [canSave, updates, commit, moduleKind, simpleText?.id, router]);
+  }, [
+    canSave,
+    updates,
+    simpleText?.background,
+    simpleText?.id,
+    commit,
+    moduleKind,
+    data.background?.id,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
