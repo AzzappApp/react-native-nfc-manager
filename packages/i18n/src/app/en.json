@@ -71,6 +71,10 @@
     "defaultMessage": "Mobile",
     "description": "ProfileScreen bottom menu accessibility label for Mobile tab"
   },
+  "2OFXNQ": {
+    "defaultMessage": "Image Carousel",
+    "description": "Module selection list modal Image Carousel module label"
+  },
   "2ZlnoN": {
     "defaultMessage": "Preview",
     "description": "ProfileScreen bottom menu accessibility label for Preview button"
@@ -287,6 +291,10 @@
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
   },
+  "BSgZ1O": {
+    "defaultMessage": "Simple Title",
+    "description": "Module selection list modal simple title module label"
+  },
   "Bswpqg": {
     "defaultMessage": "Posts",
     "description": "Number of posts"
@@ -399,6 +407,10 @@
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
   },
+  "FHtB4h": {
+    "defaultMessage": "Social Links",
+    "description": "Module selection list modal Social Links module label"
+  },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
@@ -410,6 +422,10 @@
   "FnmYrQ": {
     "defaultMessage": "Merge",
     "description": "Label of the merge switch in cover edition"
+  },
+  "GKhDdS": {
+    "defaultMessage": "Block Text",
+    "description": "Module selection list modal block text module label"
   },
   "GQ5mTZ": {
     "defaultMessage": "RGB",
@@ -515,6 +531,10 @@
     "defaultMessage": "Copy link",
     "description": ""
   },
+  "L4n0w6": {
+    "defaultMessage": "Add a new section",
+    "description": "Module selection list modal header title"
+  },
   "LGAptw": {
     "defaultMessage": "Phone number or email address",
     "description": "ForgotpasswordScreen - Phone number or email address placeholder"
@@ -534,6 +554,10 @@
   "LnYT8w": {
     "defaultMessage": "Models",
     "description": "CoverEditionScreen bottom menu label for models tab"
+  },
+  "LsKCrf": {
+    "defaultMessage": "Simple Button",
+    "description": "Module selection list modal simple button module label"
   },
   "M32J+R": {
     "defaultMessage": "Next",
@@ -598,6 +622,10 @@
   "Oe7IDs": {
     "defaultMessage": "Border radius",
     "description": "Label of the border radius in carousel edition"
+  },
+  "OooM62": {
+    "defaultMessage": "Line Divider",
+    "description": "Module selection list modal Line Divider module label"
   },
   "Oqezmf": {
     "defaultMessage": "Comment the post",
@@ -1095,6 +1123,10 @@
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
   },
+  "hK042u": {
+    "defaultMessage": "Horizontal Photo",
+    "description": "Module selection list modal horizontal photo module label"
+  },
   "hLrm6h": {
     "defaultMessage": "Slide to change the Left/right margin size",
     "description": "Hint of the Left/right margin slider in HorizontalPhoto edition"
@@ -1307,6 +1339,10 @@
     "defaultMessage": "Border size",
     "description": "Label of the border size in carousel edition"
   },
+  "odCG09": {
+    "defaultMessage": "WebCards Carousel",
+    "description": "Module selection list modal WebCards Carousel module label"
+  },
   "p+PC34": {
     "defaultMessage": "Show",
     "description": "Show button in profile edition screen footer"
@@ -1343,6 +1379,10 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in carousel edition"
   },
+  "pYbQta": {
+    "defaultMessage": "Opening Hours",
+    "description": "Module selection list modal Opening Hours module label"
+  },
   "peQNDG": {
     "defaultMessage": "Image ratio",
     "description": "Accessibility label of the image ratio button in carousel edition"
@@ -1370,6 +1410,10 @@
   "qFUOJM": {
     "defaultMessage": "Unlike the post",
     "description": "PostRendererActionBar unlike button accessibility"
+  },
+  "qH9pOD": {
+    "defaultMessage": "Simple Text",
+    "description": "Module selection list modal simple text module label"
   },
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
@@ -1458,6 +1502,10 @@
   "tFCDTN": {
     "defaultMessage": "Continue",
     "description": "NewProfileScreen - Continue Button"
+  },
+  "tSppn5": {
+    "defaultMessage": "Photo With Text and title",
+    "description": "Module selection list modal Photo With Text and title module label"
   },
   "uHQfNw": {
     "defaultMessage": "Video Shutter",
