@@ -14,9 +14,9 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { TextAlignmentGraphQL } from './commonsTypes';
 import { MediaImageGraphQL } from './MediaGraphQL';
 import StaticMediaGraphQL from './StaticMediaGraphQL';
-import type { GraphQLContext } from './GraphQLContext';
+import type { CardModule, Media } from '#domains';
+import type { GraphQLContext } from '#index';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
-import type { CardModule } from '@prisma/client';
 import type { GraphQLFieldConfigMap } from 'graphql';
 
 export const ModuleKindGraphQL = new GraphQLEnumType({
@@ -143,7 +143,51 @@ export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {
 
 export const CardModuleHorizontalPhotoGraphQL = createGrahQLCardModule(
   'horizontalPhoto',
-  {},
+  {
+    image: {
+      type: new GraphQLNonNull(MediaImageGraphQL),
+      description:
+        'The Media image of the horizontal photo module, cannot be null',
+      resolve: async (
+        cardModule: CardModule,
+        _,
+        { mediaLoader },
+      ): Promise<Media> => {
+        const { data } = cardModule as any;
+        return mediaLoader.load(data.image) as Promise<Media>;
+      },
+    },
+    borderWidth: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    borderColor: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    borderRadius: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginVertical: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginHorizontal: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    height: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    background: {
+      type: StaticMediaGraphQL,
+      resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+        const { data } = cardModule as any;
+        return data.backgroundId
+          ? staticMediaLoader.load(data.backgroundId)
+          : null;
+      },
+    },
+    backgroundStyle: {
+      type: ModuleBackgroundStyleGraphQL,
+    },
+  },
 );
 
 export const LineDividerOrientationGraphQL = new GraphQLEnumType({

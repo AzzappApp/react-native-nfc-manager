@@ -20,10 +20,12 @@ import {
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
+  MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import CarouselRenderer from '#components/CarouselRenderer';
 import CoverRenderer from '#components/CoverRenderer';
+import HorizontalPhotoRenderer from '#components/HorizontalPhotoRenderer';
 import LineDividerRenderer from '#components/LineDividerRenderer';
 import { createId } from '#helpers/idHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
@@ -379,6 +381,7 @@ const _ProfileScreenBody = (
           id
           kind
           visible
+          ...HorizontalPhotoRenderer_module
           ...SimpleTextRenderer_module
           ...LineDividerRenderer_module
           ...CarouselRenderer_module
@@ -739,6 +742,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_LINE_DIVIDER && (
         <LineDividerRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_HORIZONTAL_PHOTO && (
+        <HorizontalPhotoRenderer module={module} />
       )}
       {module.kind === MODULE_KIND_CAROUSEL && (
         <CarouselRenderer module={module} />

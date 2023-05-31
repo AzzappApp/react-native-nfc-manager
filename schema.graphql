@@ -112,6 +112,17 @@ type ModuleBackgroundStyle {
 
 """User Card module : HorizontalPhoto"""
 type CardModuleHorizontalPhoto implements CardModule {
+  """The Media image of the horizontal photo module, cannot be null"""
+  image: MediaImage!
+  borderWidth: Int!
+  borderColor: String!
+  borderRadius: Int!
+  marginVertical: Int!
+  marginHorizontal: Int!
+  height: Int!
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -723,6 +734,7 @@ type Mutation {
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
   saveSimpleTextModule(input: SaveSimpleTextModuleInput!): SaveSimpleTextModulePayload
   saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
+  saveHorizontalPhotoModule(input: SaveHorizontalPhotoModuleInput!): SaveHorizontalPhotoModulePayload
   saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
@@ -898,6 +910,27 @@ input SaveLineDividerModuleInput {
   height: Int
   colorTop: String
   colorBottom: String
+  clientMutationId: String
+}
+
+type SaveHorizontalPhotoModulePayload {
+  card: Card!
+  clientMutationId: String
+}
+
+input SaveHorizontalPhotoModuleInput {
+  moduleId: ID
+  image: String!
+  borderWidth: Int
+  borderRadius: Int
+  borderColor: String
+  marginHorizontal: Int
+  marginVertical: Int
+  height: Int
+  color: String
+  tintColor: String
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
   clientMutationId: String
 }
 

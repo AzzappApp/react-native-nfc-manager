@@ -1,16 +1,19 @@
 import CarouselEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
 import CoverEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
+import HorizontalPhotoEditionMobileScreenNode from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
+import HorizontalPhotoEditionMobileScreen from './HorizontalPhotoEditionMobileScreen';
 import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
 import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
 import type { CoverEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
+import type { HorizontalPhotoEditionMobileScreenQuery } from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 
@@ -25,6 +28,8 @@ const CardModuleEditionMobileScreen = ({
   CardModuleEditionRoute,
   | CarouselEditionMobileScreenQuery
   | CoverEditionMobileScreenQuery
+  | CoverEditionMobileScreenQuery
+  | HorizontalPhotoEditionMobileScreenQuery
   | LineDividerEditionMobileScreenQuery
   | SimpleTextEditionMobileScreenQuery
 >) => {
@@ -52,6 +57,13 @@ const CardModuleEditionMobileScreen = ({
           preloadedQuery={preloadedQuery as any}
         />
       );
+    case 'horizontalPhoto':
+      return (
+        <HorizontalPhotoEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     case 'carousel':
       return (
         <CarouselEditionMobileScreen
@@ -75,6 +87,8 @@ CardModuleEditionMobileScreen.prefetch = ({
       return SimpleTextEditionMobileScreen.prefetch();
     case 'lineDivider':
       return LineDividerEditionMobileScreen.prefetch();
+    case 'horizontalPhoto':
+      return HorizontalPhotoEditionMobileScreen.prefetch();
     case 'carousel':
       return CarouselEditionMobileScreen.prefetch();
     default:
@@ -91,6 +105,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
       return SimpleTextEditionMobileScreenNode;
     case 'lineDivider':
       return LineDividerEditionMobileScreenNode;
+    case 'horizontalPhoto':
+      return HorizontalPhotoEditionMobileScreenNode;
     case 'carousel':
       return CarouselEditionMobileScreenQueryNode;
     default:

@@ -80,6 +80,15 @@ export const LINE_DIVIDER_DEFAULT_VALUES = {
   colorBottom: '#000000', // use theme colors(not important from azzapp/app here)
 } as const;
 
+export const HORIZONTAL_PHOTO_DEFAULT_VALUES = {
+  borderWidth: 0,
+  borderRadius: 1,
+  borderColor: '#000000',
+  marginHorizontal: 0,
+  marginVertical: 0,
+  height: 200,
+} as const;
+
 export const CAROUSEL_DEFAULT_VALUES = {
   borderSize: 0,
   borderColor: '#000000',

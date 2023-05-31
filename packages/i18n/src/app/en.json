@@ -219,6 +219,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
   },
+  "92LIBk": {
+    "defaultMessage": "Left/right margin: {size}",
+    "description": "Left/right margin message in Horizontal Photo edition"
+  },
   "93KdNu": {
     "defaultMessage": "Comments",
     "description": "Post Comments header title"
@@ -439,6 +443,10 @@
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
   },
+  "HZ+X+F": {
+    "defaultMessage": "Edit margins",
+    "description": "HorizontalPhoto bottom menu label for margins tab"
+  },
   "HZP7u9": {
     "defaultMessage": "Back.",
     "description": "CoverEditionScreen bottom menu label for Background tab"
@@ -450,6 +458,18 @@
   "JGmlYS": {
     "defaultMessage": "Skip",
     "description": "NewProfile About Screen - Skip process"
+  },
+  "JGsXLB": {
+    "defaultMessage": "Border color",
+    "description": "Border color tab label in HorizontalPhoto edition"
+  },
+  "JP/XFr": {
+    "defaultMessage": "Border size: {size}",
+    "description": "Border size message in Horizontal Photo edition"
+  },
+  "JTMdLw": {
+    "defaultMessage": "Height: {size}",
+    "description": "Height message in HorizontalPhoto edition"
   },
   "JcQ1BH": {
     "defaultMessage": "Photo",
@@ -531,6 +551,10 @@
     "defaultMessage": "Select an activity",
     "description": "ProfileForm - Activity BottomSheet - Title"
   },
+  "MilZHQ": {
+    "defaultMessage": "Edit the background",
+    "description": "HorizontalPhoto bottom menu label for background tab"
+  },
   "Mlk+KE": {
     "defaultMessage": "Activity",
     "description": "NewProfile Name Company Screen - Label Activity textinput"
@@ -538,6 +562,10 @@
   "MuonO2": {
     "defaultMessage": "Loading error",
     "description": "CoverEditionScreen alert message loading error title"
+  },
+  "N3IPaT": {
+    "defaultMessage": "Slide to change the background opacity",
+    "description": "Hint of the Photo Opacityslider in Horizontal photo edition"
   },
   "N9T08H": {
     "defaultMessage": "Images height : {size}",
@@ -551,6 +579,10 @@
     "defaultMessage": "First name",
     "description": "ProfileForm first name textinput label"
   },
+  "NUA5xk": {
+    "defaultMessage": "Slide to change the Border size",
+    "description": "Hint of the Border size slider in HorizontalPhoto edition"
+  },
   "O8JX0f": {
     "defaultMessage": "Show password",
     "description": "Password text input - show password button accessibility label"
@@ -558,6 +590,10 @@
   "OPcjcW": {
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
+  },
+  "OWJjBe": {
+    "defaultMessage": "Top/bottom margin size",
+    "description": "Label of the Top/bottom margin size slider in HorizontalPhoto edition"
   },
   "Oe7IDs": {
     "defaultMessage": "Border radius",
@@ -831,9 +867,21 @@
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
   },
+  "Zq9BX5": {
+    "defaultMessage": "Margins",
+    "description": "Title of the margins section in HorizontalPhoto edition"
+  },
+  "a/lfqT": {
+    "defaultMessage": "Background",
+    "description": "Label of Background tab in Horizontal photo edition"
+  },
   "a1rHQ+": {
     "defaultMessage": "Webcard builder",
     "description": "Webcard builder header title"
+  },
+  "a5bH/t": {
+    "defaultMessage": "Slide to change the Top/bottom marginsize",
+    "description": "Hint of the Top/bottom margin slider in HorizontalPhoto edition"
   },
   "aGgFjV": {
     "defaultMessage": "Tap to reset your passward",
@@ -951,6 +999,10 @@
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
   },
+  "e9/dam": {
+    "defaultMessage": "Background opacity",
+    "description": "Label of the Photo Opacityslider in Horizontal photo edition"
+  },
   "e9NfAF": {
     "defaultMessage": "Check your emails or messages!",
     "description": "ForgotPasswordScreen - Check your emails or messages!"
@@ -1007,6 +1059,10 @@
     "defaultMessage": "Tap to edit your profile",
     "description": "UserScreenButtonBar edit button accessibility label"
   },
+  "gTwvb8": {
+    "defaultMessage": "Divider #1",
+    "description": "HorizontalPhoto text screen title"
+  },
   "gXripn": {
     "defaultMessage": "Name",
     "description": "ProfileForm name textinput label"
@@ -1035,6 +1091,10 @@
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
   },
+  "hLrm6h": {
+    "defaultMessage": "Slide to change the Left/right margin size",
+    "description": "Hint of the Left/right margin slider in HorizontalPhoto edition"
+  },
   "hQErcO": {
     "defaultMessage": "Background",
     "description": "Simple text  bottom menu label for Background tab"
@@ -1058,6 +1118,10 @@
   "i9jMTB": {
     "defaultMessage": "{countReactions} likes",
     "description": "PastRendererActionBar - Like Counter"
+  },
+  "ie9VnD": {
+    "defaultMessage": "Preview",
+    "description": "HorizontalPhoto bottom menu label for Preview tab"
   },
   "ieyDkr": {
     "defaultMessage": "Bottom right",
@@ -1335,6 +1399,10 @@
     "defaultMessage": "Allow Azzapp to access your camera and your microphone",
     "description": "Camera authorization screen title for camera permission"
   },
+  "rVT4sq": {
+    "defaultMessage": "Top/bottom margin: {size}",
+    "description": "Top/bottom margin message in HorizontalPhoto edition"
+  },
   "rbuw1H": {
     "defaultMessage": "Could not load the cover edition screen",
     "description": "CoverEditionScreen alert message loading error text"
@@ -1459,6 +1527,10 @@
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
   },
+  "xLJO3E": {
+    "defaultMessage": "Left/right margin size",
+    "description": "Label of the Left/right margin size slider in HorizontalPhoto edition"
+  },
   "xNII0A": {
     "defaultMessage": "Logout",
     "description": "logout link"
@@ -1495,6 +1567,22 @@
     "defaultMessage": "Edit Text",
     "description": "Carousel bottom menu label for border tab"
   },
+  "y5mKgC": {
+    "defaultMessage": "Edit border",
+    "description": "HorizontalPhoto bottom menu label for border tab"
+  },
+  "yIhIng": {
+    "defaultMessage": "Border Shape",
+    "description": "Border Shape tab label in HorizontalPhoto edition"
+  },
+  "yKRJzZ": {
+    "defaultMessage": "Photo opacity : {opacity}",
+    "description": "Photo Opacity message in Horizontal photo edition"
+  },
+  "yR4YqE": {
+    "defaultMessage": "Border color",
+    "description": "Border color title in HorizontalPhoto edition"
+  },
   "ySeX6t": {
     "defaultMessage": "Followers",
     "description": "Number of followers"
@@ -1523,9 +1611,21 @@
     "defaultMessage": "Rotate",
     "description": "Accessibility label of the rotate button in image edition wizzard"
   },
+  "zMF822": {
+    "defaultMessage": "Height size",
+    "description": "Label of the Height size slider in HorizontalPhoto edition"
+  },
   "zMaylR": {
     "defaultMessage": "Take a video",
     "description": "Accessibility label of the video tabs in post  in image picking wizzard"
+  },
+  "zaXF8m": {
+    "defaultMessage": "Slide to change the height size",
+    "description": "Hint of the height slider in HorizontalPhoto edition"
+  },
+  "zho084": {
+    "defaultMessage": "Border size",
+    "description": "Label of the Border size slider in HorizontalPhoto edition"
   },
   "zqi7UK": {
     "defaultMessage": "Margins",

@@ -92,7 +92,7 @@ const saveLineDividerModule = mutationWithClientMutationId({
     try {
       if (module) {
         await updateCardModule(module.id, {
-          data: { ...(module.data as object), ...omit(input, 'position') },
+          data: { ...(module.data as object), ...omit(input, 'moduleId') },
         });
       } else {
         await createCardModule({
@@ -101,7 +101,7 @@ const saveLineDividerModule = mutationWithClientMutationId({
           position: await getCardModuleCount(card.id),
           data: {
             ...LINE_DIVIDER_DEFAULT_VALUES,
-            ...omit(input, 'position'),
+            ...omit(input, 'moduleId'),
           },
           visible: true,
         });

@@ -161,12 +161,15 @@ const saveCarouselModule = mutationWithClientMutationId({
             if (!resource) {
               throw new Error(ERRORS.INVALID_REQUEST);
             }
-            return createMedia({
-              id: resource.public_id,
-              height: resource.height,
-              width: resource.width,
-              kind: 'image',
-            });
+            return createMedia(
+              {
+                id: resource.public_id,
+                height: resource.height,
+                width: resource.width,
+                kind: 'image',
+              },
+              trx,
+            );
           }),
         );
         if (module) {
@@ -178,10 +181,6 @@ const saveCarouselModule = mutationWithClientMutationId({
             trx,
           );
         } else {
-          console.log({
-            ...CAROUSEL_DEFAULT_VALUES,
-            ...modulesData,
-          });
           await createCardModule(
             {
               cardId: card!.id,
@@ -204,8 +203,6 @@ const saveCarouselModule = mutationWithClientMutationId({
       console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-
-    console.log(mediasToDelete);
 
     try {
       await deleteMediaByPublicIds(

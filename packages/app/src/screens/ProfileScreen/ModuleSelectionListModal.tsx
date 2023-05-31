@@ -70,7 +70,7 @@ const modules: Array<{ label: string; value: ModuleKind; ready: boolean }> = [
   {
     label: 'Horizontal Photo',
     value: 'horizontalPhoto',
-    ready: false,
+    ready: true,
   },
   {
     label: 'Carousel',
