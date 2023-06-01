@@ -33,7 +33,7 @@ const ModuleSelectionListModal = ({
               'Module selection list modal simple button module label',
           }),
           image: require('./assets/simple-button.png'),
-          ready: false,
+          ready: true,
         },
         {
           moduleKind: 'simpleText',
