@@ -947,13 +947,13 @@
     "defaultMessage": "Hide",
     "description": "Accessibility label for the hide button in the profile edition screen"
   },
-  "XUiwhE": {
-    "defaultMessage": "Border Radius : {size}",
-    "description": "border Radius message in SimpleButton edition"
-  },
   "XR2SgB": {
     "defaultMessage": "Following",
     "description": "Title of the screen listing followed profiles"
+  },
+  "XUiwhE": {
+    "defaultMessage": "Border Radius : {size}",
+    "description": "border Radius message in SimpleButton edition"
   },
   "XVlOcg": {
     "defaultMessage": "Margin size",

@@ -129,6 +129,7 @@ const HomeProfilesList = ({ viewer, style }: HomeProfilesListProps) => {
     />
   ) : (
     <SuggestedProfilesList
+      style={style}
       viewer={data}
       profile={data.profile}
       ListHeaderComponent={ListHeaderComponent}
