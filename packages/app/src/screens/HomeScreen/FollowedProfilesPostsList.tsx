@@ -3,6 +3,7 @@ import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostsGrid';
+import { useFocusEffect } from '#hooks/useFocusEffect';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
@@ -69,6 +70,17 @@ const FollowedProfilesPostsList = ({
     );
   }, [refetch, refreshing]);
 
+  const refetchPosts = useCallback(() => {
+    refetch(
+      {},
+      {
+        fetchPolicy: 'store-or-network',
+      },
+    );
+  }, [refetch]);
+
+  useFocusEffect(refetchPosts);
+
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
       loadNext(20);
@@ -84,9 +96,9 @@ const FollowedProfilesPostsList = ({
   const posts: PostsGrid_posts$key = useMemo(
     () =>
       convertToNonNullArray(
-        data.followedProfilesPosts.edges?.map(edge => edge?.node) ?? [],
+        data.followedProfilesPosts?.edges?.map(edge => edge?.node) ?? [],
       ),
-    [data.followedProfilesPosts.edges],
+    [data.followedProfilesPosts?.edges],
   );
 
   return (

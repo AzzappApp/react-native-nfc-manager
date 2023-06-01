@@ -14,8 +14,8 @@ import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
+import HomeProfilesList from './HomeProfilesList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
 type HomeScreenProps = {
@@ -37,7 +37,7 @@ const HomeScreen = ({
         profile {
           id
         }
-        ...FollowedProfilesList_viewer
+        ...HomeProfilesList_viewer
         ...FollowedProfilesPostsList_viewer
       }
     `,
@@ -85,7 +85,7 @@ const HomeScreen = ({
             }
             style={{ marginBottom: 8 }}
           />
-          <FollowedProfilesList
+          <HomeProfilesList
             viewer={viewer}
             style={styles.followedProfilesList}
           />

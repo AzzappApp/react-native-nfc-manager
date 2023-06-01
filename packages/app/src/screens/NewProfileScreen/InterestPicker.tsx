@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
-import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
+import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ToggleButton from '#ui/ToggleButton';
@@ -122,8 +122,7 @@ const InterestPicker = ({
       <View
         style={[
           {
-            paddingTop: vp`${insetTop} + ${50}`,
-            marginBottom: vp`${insetBottom}`,
+            paddingTop: vp`50`,
             flex: 1,
             justifyContent: 'center',
           },

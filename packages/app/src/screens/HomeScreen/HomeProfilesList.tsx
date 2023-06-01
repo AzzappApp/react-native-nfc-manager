@@ -14,21 +14,22 @@ import QRCodeModal from '#components/CoverRenderer/QRCodeModal';
 import Link from '#components/Link';
 import PressableNative from '#ui/PressableNative';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
+import SuggestedProfilesList from './SuggestedProfilesList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { FollowedProfilesList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesList_viewer.graphql';
+import type { HomeProfilesList_viewer$key } from '@azzapp/relay/artifacts/HomeProfilesList_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type FollowedProfilesListProps = {
-  viewer: FollowedProfilesList_viewer$key;
+type HomeProfilesListProps = {
+  viewer: HomeProfilesList_viewer$key;
   style?: StyleProp<ViewStyle>;
 };
 
-const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
+const HomeProfilesList = ({ viewer, style }: HomeProfilesListProps) => {
   const intl = useIntl();
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
     graphql`
-      fragment FollowedProfilesList_viewer on Viewer
-      @refetchable(queryName: "FollowedProfilesListQuery")
+      fragment HomeProfilesList_viewer on Viewer
+      @refetchable(queryName: "HomeProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 10 }
@@ -49,21 +50,23 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
           }
           ...CoverList_users
         }
+        ...SuggestedProfilesList_viewer
       }
     `,
     viewer,
   );
 
+  const recommendedUsers = data.followedProfiles.edges
+    ?.map(edge => edge?.node)
+    .filter(item => !!item);
+
   const users: CoverList_users$key = useMemo(() => {
-    const recommendedUrsers = data.followedProfiles.edges
-      ?.map(edge => edge?.node)
-      .filter(item => !!item);
     return convertToNonNullArray(
       data.profile?.card?.id
-        ? [data.profile, ...(recommendedUrsers ?? [])]
-        : recommendedUrsers ?? [],
+        ? [data.profile, ...(recommendedUsers ?? [])]
+        : recommendedUsers ?? [],
     );
-  }, [data.followedProfiles.edges, data.profile]);
+  }, [recommendedUsers, data.profile]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
@@ -117,11 +120,17 @@ const FollowedProfilesList = ({ viewer, style }: FollowedProfilesListProps) => {
     }
   }, [data.profile, intl, qrCodeVisible]);
 
-  return (
+  return recommendedUsers?.length ? (
     <CoverList
       users={users}
       onEndReached={onEndReached}
       style={style}
+      ListHeaderComponent={ListHeaderComponent}
+    />
+  ) : (
+    <SuggestedProfilesList
+      viewer={data}
+      profile={data.profile}
       ListHeaderComponent={ListHeaderComponent}
     />
   );
@@ -130,7 +139,7 @@ const BORDER_RADIUS = Platform.select({
   web: '12.8%' as any,
   default: COVER_CARD_RADIUS * COVER_BASE_WIDTH,
 });
-export default FollowedProfilesList;
+export default HomeProfilesList;
 
 const styles = StyleSheet.create({
   listHeaderPressable: {

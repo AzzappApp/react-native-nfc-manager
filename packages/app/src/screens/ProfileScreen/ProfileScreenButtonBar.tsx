@@ -1,8 +1,11 @@
+import { useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import useToggle from '#hooks/useToggle';
 import ClientOnlySuspense from '#ui/ClientOnlySuspense';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -100,7 +103,18 @@ const ProfileScreenButtonActionButton = ({
   );
 
   const canEdit = userName === viewer.profile?.userName;
-  const { isFollowing } = profile ?? { isFollowing: false };
+
+  const [isFollowing, toggleFollowing] = useToggle(
+    Boolean(profile?.isFollowing),
+  );
+
+  const [debouncedIsFollowing] = useDebounce(isFollowing, 600);
+
+  useEffect(() => {
+    if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
+      onToggleFollow(debouncedIsFollowing);
+    }
+  }, [debouncedIsFollowing, onToggleFollow, profile?.isFollowing]);
 
   const intl = useIntl();
   return canEdit ? (
@@ -121,7 +135,7 @@ const ProfileScreenButtonActionButton = ({
     </FloatingButton>
   ) : (
     <FloatingButton
-      onPress={() => onToggleFollow(!isFollowing)}
+      onPress={toggleFollowing}
       style={styles.mainButton}
       accessibilityLabel={intl.formatMessage({
         defaultMessage: 'Tap to follow the profile',
@@ -131,13 +145,13 @@ const ProfileScreenButtonActionButton = ({
       <Text variant="button">
         {isFollowing ? (
           <FormattedMessage
-            defaultMessage="Follow"
-            description="Follow button label in Profile Screen Button Bar"
+            defaultMessage="Unfollow"
+            description="Unfollow button label in Profile Screen Button Bar"
           />
         ) : (
           <FormattedMessage
-            defaultMessage="Unfollow"
-            description="Unfollow button label in Profile Screen Button Bar"
+            defaultMessage="Follow"
+            description="Follow button label in Profile Screen Button Bar"
           />
         )}
       </Text>

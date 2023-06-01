@@ -34,6 +34,7 @@ import LineDividerRenderer from '#components/LineDividerRenderer';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import SimpleButtonRenderer from '#components/SimpleButtonRenderer';
 import { createId } from '#helpers/idHelpers';
+import useToggleFollow from '#hooks/useToggleFollow';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import SimpleTextRenderer from '../../components/SimpleTextRenderer';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
@@ -47,7 +48,6 @@ import type { ProfileScreenBody_card$key } from '@azzapp/relay/artifacts/Profile
 import type { ProfileScreenDeleteModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenDeleteModuleMutation.graphql';
 import type { ProfileScreenDuplicateModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenDuplicateModuleMutation.graphql';
 import type { ProfileScreenSwapModulesMutation } from '@azzapp/relay/artifacts/ProfileScreenSwapModulesMutation.graphql';
-import type { ProfileScreenToggleFollowMutation } from '@azzapp/relay/artifacts/ProfileScreenToggleFollowMutation.graphql';
 import type { ProfileScreenUpdateModulesVisibilityMutation } from '@azzapp/relay/artifacts/ProfileScreenUpdateModulesVisibilityMutation.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ForwardedRef } from 'react';
@@ -59,11 +59,13 @@ import type {
 type ProfileScreenProps = {
   profile: ProfileScreen_profile$key;
   ready?: boolean;
+  userProfileId?: string;
 };
 
 const ProfileScreen = ({
   profile: profileKey,
   ready = true,
+  userProfileId,
 }: ProfileScreenProps) => {
   // #region Data
   const profile = useFragment(
@@ -255,47 +257,8 @@ const ProfileScreen = ({
   }, []);
   // #endregion
 
-  // #region Follow
-  const [commitToggleFollow, toggleFollowingActive] =
-    useMutation<ProfileScreenToggleFollowMutation>(graphql`
-      mutation ProfileScreenToggleFollowMutation(
-        $input: ToggleFollowingInput!
-      ) {
-        toggleFollowing(input: $input) {
-          profile {
-            id
-            isFollowing
-          }
-        }
-      }
-    `);
+  const onToggleFollow = useToggleFollow(userProfileId);
 
-  const onToggleFollow = (follow: boolean) => {
-    // TODO do we really want to prevent fast clicking?
-    if (toggleFollowingActive) {
-      return;
-    }
-    commitToggleFollow({
-      variables: {
-        input: {
-          profileId: profile.id,
-          follow,
-        },
-      },
-      optimisticResponse: {
-        toggleFollowing: {
-          profile: {
-            id: profile.id,
-            isFollowing: follow,
-          },
-        },
-      },
-      onError(error) {
-        // TODO: handle error
-        console.log(error);
-      },
-    });
-  };
   // #endregion
 
   const vp = useViewportSize();
@@ -357,7 +320,9 @@ const ProfileScreen = ({
           backgroundColor={backgroundColor}
           onHome={onHome}
           onEdit={onEdit}
-          onToggleFollow={onToggleFollow}
+          onToggleFollow={(follow: boolean) =>
+            onToggleFollow(profile.id, follow)
+          }
           onEditingDisplayModeChange={setEditingDisplayMode}
           onRequestNewModule={onRequestNewModule}
           onRequestColorPicker={onRequestColorPicker}

@@ -9,7 +9,7 @@ import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer, prefetchImage } from '#components/medias';
-import useViewportSize, { insetTop } from '#hooks/useViewportSize';
+import useViewportSize from '#hooks/useViewportSize';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import ToggleButton from '#ui/ToggleButton';
@@ -181,7 +181,7 @@ const ProfileKindStep = ({
       style={[
         styles.root,
         {
-          paddingTop: vp`${insetTop} + ${50}`,
+          paddingTop: vp`50`,
         },
       ]}
     >

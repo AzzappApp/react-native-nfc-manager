@@ -49,7 +49,13 @@ const ProfileMobileScreen = ({
     return null;
   }
 
-  return <ProfileScreen ready={ready} profile={data.profile} />;
+  return (
+    <ProfileScreen
+      ready={ready}
+      profile={data.profile}
+      userProfileId={data.viewer.profile?.id ?? ''}
+    />
+  );
 };
 
 const getQuery = (params: ProfileRoute['params']) =>

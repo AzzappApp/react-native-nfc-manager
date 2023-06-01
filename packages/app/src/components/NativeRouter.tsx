@@ -617,6 +617,11 @@ export const useCurrentScreenID = () => {
   return id;
 };
 
+export const useScreenHasFocus = () => {
+  const { hasFocus } = useContext(ScreenRendererContext);
+  return hasFocus;
+};
+
 const StackRenderer = ({
   stack,
   screens,
@@ -770,6 +775,7 @@ type NativeNavigationEvent =
 const ScreenRendererContext = React.createContext<{
   id: string;
   navigationEventEmitter: EventEmitter;
+  hasFocus?: boolean;
   setOptions: (
     value:
       | ScreenOptions

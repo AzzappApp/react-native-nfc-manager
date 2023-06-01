@@ -951,6 +951,10 @@
     "defaultMessage": "Border Radius : {size}",
     "description": "border Radius message in SimpleButton edition"
   },
+  "XR2SgB": {
+    "defaultMessage": "Following",
+    "description": "Title of the screen listing followed profiles"
+  },
   "XVlOcg": {
     "defaultMessage": "Margin size",
     "description": "Label of the font size slider in cover edition"
@@ -1294,6 +1298,10 @@
   "iPwxyL": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in SimpleButton edition"
+  },
+  "ibMqDh": {
+    "defaultMessage": "Not following anyone",
+    "description": "Message displayed in the followed profiles screen when the user is not following anyone"
   },
   "ie9VnD": {
     "defaultMessage": "Preview",

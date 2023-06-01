@@ -98,6 +98,11 @@ export type CardModuleEditionRoute = {
   };
 };
 
+export type FollowedProfilesRoute = {
+  route: 'FOLLOWED_PROFILES';
+  params?: never;
+};
+
 export type Route =
   | AlbumsRoute
   | HomeRoute
@@ -114,6 +119,7 @@ export type Route =
   | SignInRoute
   | SignUpRoute
   | ForgotPasswordRoute
-  | CardModuleEditionRoute;
+  | CardModuleEditionRoute
+  | FollowedProfilesRoute;
 
 export type ROUTES = Route['route'];

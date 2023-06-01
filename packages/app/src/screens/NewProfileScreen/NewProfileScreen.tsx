@@ -1,6 +1,6 @@
 import { toGlobalId } from 'graphql-relay';
 import { useState, useCallback } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { useRouter } from '#PlatformEnvironment';
@@ -118,42 +118,44 @@ const NewProfileScreen = ({
   const router = useRouter();
 
   return (
-    <Container style={styles.container}>
-      <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
-        {currentPage === 0 && (
-          <View key="0" style={styles.page} collapsable={false}>
-            <ProfileKindStep
-              onBack={params?.goBack ? router.back : null}
-              profileCategories={profileCategories}
-              profileCategoryId={profileCategoryId!}
-              onNext={next}
-              onProfileCategoryChange={onProfileCategoryChange}
-            />
-          </View>
-        )}
+    <SafeAreaView style={styles.container}>
+      <Container style={styles.container}>
+        <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
+          {currentPage === 0 && (
+            <View key="0" style={styles.page} collapsable={false}>
+              <ProfileKindStep
+                onBack={params?.goBack ? router.back : null}
+                profileCategories={profileCategories}
+                profileCategoryId={profileCategoryId!}
+                onNext={next}
+                onProfileCategoryChange={onProfileCategoryChange}
+              />
+            </View>
+          )}
 
-        {currentPage === 1 && (
-          <View key="1" style={styles.page} collapsable={false}>
-            <ProfileForm
-              profileKind={profileKind!}
-              profileCategory={profileCategory!}
-              onProfileCreated={onProfileCreatedInner}
-              onBack={prev}
-            />
-          </View>
-        )}
+          {currentPage === 1 && (
+            <View key="1" style={styles.page} collapsable={false}>
+              <ProfileForm
+                profileKind={profileKind!}
+                profileCategory={profileCategory!}
+                onProfileCreated={onProfileCreatedInner}
+                onBack={prev}
+              />
+            </View>
+          )}
 
-        {currentPage === 2 && (
-          <View key="2" style={styles.page} collapsable={false}>
-            <InterestPicker
-              interests={interests}
-              onClose={onClose}
-              profileKind={profileKind!}
-            />
-          </View>
-        )}
-      </FadeSwitch>
-    </Container>
+          {currentPage === 2 && (
+            <View key="2" style={styles.page} collapsable={false}>
+              <InterestPicker
+                interests={interests}
+                onClose={onClose}
+                profileKind={profileKind!}
+              />
+            </View>
+          )}
+        </FadeSwitch>
+      </Container>
+    </SafeAreaView>
   );
 };
 

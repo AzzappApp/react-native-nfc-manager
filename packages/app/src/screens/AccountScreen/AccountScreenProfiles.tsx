@@ -16,6 +16,7 @@ import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { buildUserUrl } from '#helpers/urlHelpers';
@@ -243,15 +244,17 @@ export default function AccountScreenProfiles({
             />
           </Text>
         </View>
-        <View style={styles.counterContainer}>
-          <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>
-          <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-            <FormattedMessage
-              defaultMessage="Followings"
-              description="Number of followed profiles"
-            />
-          </Text>
-        </View>
+        <Link route="FOLLOWED_PROFILES">
+          <PressableNative style={styles.counterContainer}>
+            <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>
+            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
+              <FormattedMessage
+                defaultMessage="Followings"
+                description="Number of followed profiles"
+              />
+            </Text>
+          </PressableNative>
+        </Link>
       </View>
       <ScrollView>
         <View

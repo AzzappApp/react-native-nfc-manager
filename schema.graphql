@@ -311,6 +311,15 @@ type Query {
 type Viewer {
   profile: Profile
 
+  """Return a list of suggested profiles for current user"""
+  suggestedProfiles(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): ProfileConnection!
+
   """Return a list of Profiles that the current user is following"""
   followedProfiles(
     """Returns the items in the list that come after the specified cursor."""

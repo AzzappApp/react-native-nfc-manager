@@ -23,6 +23,7 @@ import {
   getFollowedProfiles,
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
+  getFollowedProfilesCount,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -56,6 +57,33 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         return profileLoader.load(profileId);
       },
     },
+    suggestedProfiles: {
+      description: 'Return a list of suggested profiles for current user',
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
+      args: forwardConnectionArgs,
+      resolve: async (
+        viewer,
+        args: ConnectionArguments,
+      ): Promise<Connection<Profile>> => {
+        const profileId = getProfileId(viewer);
+
+        if (!profileId || (await getFollowedProfilesCount(profileId)) > 0) {
+          return connectionFromArray([], args);
+        }
+        // TODO if we don't have any followed users, returns a list of recommended users ?
+        const { after, first } = args;
+        const limit = first ?? 100;
+        const offset = after ? cursorToOffset(after) : 0;
+        return connectionFromArraySlice(
+          await getAllProfilesWithCard(limit, offset, [profileId]),
+          args,
+          {
+            sliceStart: offset,
+            arrayLength: await getAllProfilesWithCardCount(),
+          },
+        );
+      },
+    },
     followedProfiles: {
       description:
         'Return a list of Profiles that the current user is following',
@@ -71,22 +99,8 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         }
         // TODO should we use pagination in database query?
         const followedProfiles = await getFollowedProfiles(profileId);
-        if (followedProfiles.length > 0) {
-          return connectionFromArray(followedProfiles, args);
-        }
 
-        // TODO if we don't have any followed users, returns a list of recommanded users ?
-        const { after, first } = args;
-        const limit = first ?? 100;
-        const offset = after ? cursorToOffset(after) : 0;
-        return connectionFromArraySlice(
-          await getAllProfilesWithCard(limit, offset, [profileId]),
-          args,
-          {
-            sliceStart: offset,
-            arrayLength: await getAllProfilesWithCardCount(),
-          },
-        );
+        return connectionFromArray(followedProfiles, args);
       },
     },
     followedProfilesPosts: {

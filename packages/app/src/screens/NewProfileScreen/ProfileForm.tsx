@@ -207,7 +207,7 @@ const ProfileForm = ({
       style={[
         styles.root,
         {
-          paddingTop: vp`${insetTop} + ${50}`,
+          paddingTop: vp`50`,
         },
       ]}
     >
