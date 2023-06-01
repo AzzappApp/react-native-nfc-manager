@@ -101,3 +101,20 @@ export const CAROUSEL_DEFAULT_VALUES = {
 } as const;
 
 export const CAROUSEL_IMAGE_MAX_WIDTH = 2048;
+
+export const SIMPLE_BUTTON_DEFAULT_VALUES = {
+  buttonLabel: '',
+  actionType: 'email',
+  actionLink: '',
+  fontFamily: 'Arial',
+  fontColor: '#FFFFFF',
+  fontSize: 14,
+  buttonColor: '#000000',
+  borderColor: '#000000',
+  borderWidth: 5,
+  borderRadius: 5,
+  marginTop: 0,
+  marginBottom: 0,
+  width: 150,
+  height: 50,
+} as const;

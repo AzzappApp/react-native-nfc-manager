@@ -24,6 +24,7 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_HORIZONTAL_PHOTO,
+  MODULE_KIND_SIMPLE_BUTTON,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import CarouselRenderer from '#components/CarouselRenderer';
@@ -31,6 +32,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import HorizontalPhotoRenderer from '#components/HorizontalPhotoRenderer';
 import LineDividerRenderer from '#components/LineDividerRenderer';
 import ProfileColorPicker from '#components/ProfileColorPicker';
+import SimpleButtonRenderer from '#components/SimpleButtonRenderer';
 import { createId } from '#helpers/idHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import SimpleTextRenderer from '../../components/SimpleTextRenderer';
@@ -435,6 +437,7 @@ const _ProfileScreenBody = (
           kind
           visible
           ...HorizontalPhotoRenderer_module
+          ...SimpleButtonRenderer_module
           ...SimpleTextRenderer_module
           ...LineDividerRenderer_module
           ...CarouselRenderer_module
@@ -802,6 +805,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_CAROUSEL && (
         <CarouselRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_SIMPLE_BUTTON && (
+        <SimpleButtonRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>
   ));

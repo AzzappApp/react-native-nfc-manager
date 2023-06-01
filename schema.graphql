@@ -136,8 +136,8 @@ type CardModuleHorizontalPhoto implements CardModule {
 """User Card module : LineDivider"""
 type CardModuleLineDivider implements CardModule {
   orientation: LineDividerOrientation!
-  marginBottom: Int
-  marginTop: Int
+  marginBottom: Int!
+  marginTop: Int!
   height: Int!
   colorTop: String!
   colorBottom: String!
@@ -183,6 +183,23 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
 
 """User Card module : SimpleButton"""
 type CardModuleSimpleButton implements CardModule {
+  buttonLabel: String!
+  actionType: String!
+  actionLink: String!
+  fontFamily: String!
+  fontColor: String!
+  fontSize: Int!
+  buttonColor: String!
+  borderColor: String!
+  borderWidth: Int!
+  borderRadius: Int!
+  marginTop: Int!
+  marginBottom: Int!
+  width: Int!
+  height: Int!
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -740,6 +757,7 @@ type Mutation {
   saveHorizontalPhotoModule(input: SaveHorizontalPhotoModuleInput!): SaveHorizontalPhotoModulePayload
   saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
   updateCard(input: UpdateCardInput!): UpdateCardPayload
+  saveSimpleButtonModule(input: SaveSimpleButtonModuleInput!): SaveSimpleButtonModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
   duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
@@ -965,8 +983,34 @@ type UpdateCardPayload {
 }
 
 input UpdateCardInput {
-  """The media of the publication"""
+  """The background color of the card"""
   backgroundColor: String
+  clientMutationId: String
+}
+
+type SaveSimpleButtonModulePayload {
+  card: Card!
+  clientMutationId: String
+}
+
+input SaveSimpleButtonModuleInput {
+  moduleId: ID
+  buttonLabel: String
+  actionType: String
+  actionLink: String
+  fontFamily: String
+  fontColor: String
+  fontSize: Int
+  buttonColor: String
+  borderColor: String
+  borderWidth: Int
+  borderRadius: Int
+  marginTop: Int
+  marginBottom: Int
+  width: Int
+  height: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
   clientMutationId: String
 }
 

@@ -63,7 +63,9 @@
       "splitTerminals": [
         {
           "name": "relay watch",
-          "commands": ["yarn relay:watch"]
+          "commands": [
+            "yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
+          ]
         }
       ]
     },

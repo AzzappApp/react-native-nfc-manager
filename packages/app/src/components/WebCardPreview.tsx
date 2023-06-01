@@ -8,6 +8,7 @@ import {
   MODULE_KIND_LINE_DIVIDER,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
+  MODULE_KIND_SIMPLE_BUTTON,
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
@@ -19,6 +20,9 @@ import HorizontalPhotoRenderer, {
 import LineDividerRenderer, {
   LineDividerRendererRaw,
 } from './LineDividerRenderer';
+import SimpleButtonRenderer, {
+  SimpleButtonRendererRaw,
+} from './SimpleButtonRenderer';
 import SimpleTextRenderer, {
   SimpleTextRendererRaw,
 } from './SimpleTextRenderer';
@@ -26,6 +30,7 @@ import SwitchToggle from './SwitchToggle';
 import type { CarouselRawData } from './CarouselRenderer';
 import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
 import type { LineDividerRawData } from './LineDividerRenderer';
+import type { SimpleButtonRawData } from './SimpleButtonRenderer';
 import type { SimpleTextRawData } from './SimpleTextRenderer';
 import type { WebCardPreviewQuery } from '@azzapp/relay/artifacts/WebCardPreviewQuery.graphql';
 import type {
@@ -61,10 +66,16 @@ type CarouselModuleInfo = {
   data: CarouselRawData;
 };
 
+type SimpleButtonInfo = {
+  kind: typeof MODULE_KIND_SIMPLE_BUTTON;
+  data: SimpleButtonRawData;
+};
+
 type ModuleInfo =
   | CarouselModuleInfo
   | HorizontalPhotoModuleInfo
   | LineDividerModuleInfo
+  | SimpleButtonInfo
   | SimpleTextModuleInfo;
 
 const WebCardPreview = ({
@@ -97,6 +108,7 @@ const WebCardPreview = ({
                 ...SimpleTextRenderer_module
                 ...LineDividerRenderer_module
                 ...CarouselRenderer_module
+                ...SimpleButtonRenderer_module
               }
             }
             ...ProfileColorPicker_profile
@@ -202,6 +214,14 @@ const WebCardPreview = ({
             onLayout={onEditedModuleLayout}
           />
         );
+      case MODULE_KIND_SIMPLE_BUTTON:
+        return (
+          <SimpleButtonRendererRaw
+            data={editedModuleInfo.data}
+            key={module.id}
+            onLayout={onEditedModuleLayout}
+          />
+        );
       default:
         return null;
     }
@@ -259,6 +279,8 @@ const WebCardPreview = ({
               );
             case MODULE_KIND_CAROUSEL:
               return <CarouselRenderer module={module} key={module.id} />;
+            case MODULE_KIND_SIMPLE_BUTTON:
+              return <SimpleButtonRenderer module={module} key={module.id} />;
             default:
               return null;
           }

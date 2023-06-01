@@ -52,7 +52,7 @@ const CardModuleGraphQL = new GraphQLInterfaceType({
 
 export default CardModuleGraphQL;
 
-const createGrahQLCardModule = (
+const createGraphQLCardModule = (
   moduleKind: ModuleKind,
   fields: GraphQLFieldConfigMap<CardModule, GraphQLContext>,
 ): GraphQLObjectType => {
@@ -88,12 +88,12 @@ export const ModuleBackgroundStyleGraphQL = new GraphQLObjectType<
   }),
 });
 
-export const CardModuleBlockTextGraphQL = createGrahQLCardModule(
+export const CardModuleBlockTextGraphQL = createGraphQLCardModule(
   'blockText',
   {},
 );
 
-export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {
+export const CardModuleCarouselGraphQL = createGraphQLCardModule('carousel', {
   images: {
     type: new GraphQLNonNull(
       new GraphQLList(new GraphQLNonNull(MediaImageGraphQL)),
@@ -141,7 +141,7 @@ export const CardModuleCarouselGraphQL = createGrahQLCardModule('carousel', {
   },
 });
 
-export const CardModuleHorizontalPhotoGraphQL = createGrahQLCardModule(
+export const CardModuleHorizontalPhotoGraphQL = createGraphQLCardModule(
   'horizontalPhoto',
   {
     image: {
@@ -198,17 +198,17 @@ export const LineDividerOrientationGraphQL = new GraphQLEnumType({
   },
 });
 
-export const CardModuleLineDividerGraphQL = createGrahQLCardModule(
+export const CardModuleLineDividerGraphQL = createGraphQLCardModule(
   'lineDivider',
   {
     orientation: {
       type: new GraphQLNonNull(LineDividerOrientationGraphQL),
     },
     marginBottom: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     marginTop: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
     height: {
       type: new GraphQLNonNull(GraphQLInt),
@@ -222,22 +222,17 @@ export const CardModuleLineDividerGraphQL = createGrahQLCardModule(
   },
 );
 
-export const CardModuleOpeningHoursGraphQL = createGrahQLCardModule(
+export const CardModuleOpeningHoursGraphQL = createGraphQLCardModule(
   'openingHours',
   {},
 );
 
-export const CardModulePhotoWithTextAndTitleGraphQL = createGrahQLCardModule(
+export const CardModulePhotoWithTextAndTitleGraphQL = createGraphQLCardModule(
   'photoWithTextAndTitle',
   {},
 );
 
-export const CardModuleSimpleButtonGraphQL = createGrahQLCardModule(
-  'simpleButton',
-  {},
-);
-
-export const CardModuleSimpleTextGraphQL = createGrahQLCardModule(
+export const CardModuleSimpleTextGraphQL = createGraphQLCardModule(
   'simpleText',
   {
     text: {
@@ -279,7 +274,7 @@ export const CardModuleSimpleTextGraphQL = createGrahQLCardModule(
   },
 );
 
-export const CardModuleSimpleTitleGraphQL = createGrahQLCardModule(
+export const CardModuleSimpleTitleGraphQL = createGraphQLCardModule(
   'simpleTitle',
   {
     text: {
@@ -321,11 +316,70 @@ export const CardModuleSimpleTitleGraphQL = createGrahQLCardModule(
   },
 );
 
-export const CardModuleSocialLinksGraphQL = createGrahQLCardModule(
+export const CardModuleSocialLinksGraphQL = createGraphQLCardModule(
   'socialLinks',
   {},
 );
 
+export const CardModuleSimpleButtonGraphQL = createGraphQLCardModule(
+  'simpleButton',
+  {
+    buttonLabel: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    actionType: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    actionLink: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontFamily: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontColor: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontSize: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    buttonColor: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    borderColor: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    borderWidth: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    borderRadius: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginTop: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginBottom: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    width: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    height: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    background: {
+      type: StaticMediaGraphQL,
+      resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+        const { data } = cardModule as any;
+        return data.backgroundId
+          ? staticMediaLoader.load(data.backgroundId)
+          : null;
+      },
+    },
+    backgroundStyle: {
+      type: ModuleBackgroundStyleGraphQL,
+    },
+  },
+);
 export const CardModulesGraphql = [
   CardModuleBlockTextGraphQL,
   CardModuleCarouselGraphQL,

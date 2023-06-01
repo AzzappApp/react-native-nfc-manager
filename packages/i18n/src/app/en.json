@@ -7,6 +7,14 @@
     "defaultMessage": "Invalid credentials",
     "description": "SigninScreen - Invalid Credentials"
   },
+  "/B90W7": {
+    "defaultMessage": "Phone Number",
+    "description": "The Phone Number URL option in the country selector for simple button module"
+  },
+  "/HGTcS": {
+    "defaultMessage": "Edit Borders",
+    "description": "SimpleButton bottom menu label for Borders tab"
+  },
   "/TIhgi": {
     "defaultMessage": "Create a new account",
     "description": "Create a new account button label"
@@ -47,9 +55,17 @@
     "defaultMessage": "Background",
     "description": "Carousel  bottom menu label for Background tab"
   },
+  "181cZj": {
+    "defaultMessage": "Marginbottom",
+    "description": "Label of the marginBottom slider in SimpleButton edition"
+  },
   "19LN22": {
     "defaultMessage": "Tap to cancel your search",
     "description": "SearchBar accessibilityLabel Cancel Button"
+  },
+  "1Qkx/y": {
+    "defaultMessage": "Select a calling code, email or an URL link",
+    "description": "Simplebutton - The accessibility label for the CountryCodeListWithOptions selector "
   },
   "1UGgMw": {
     "defaultMessage": "Sign Up",
@@ -66,6 +82,10 @@
   "1cQrMk": {
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
+  },
+  "1w+lKH": {
+    "defaultMessage": "Margin Bottom : {size}",
+    "description": "marginBottom message in SimpleButton edition"
   },
   "2EoPMO": {
     "defaultMessage": "Mobile",
@@ -86,6 +106,10 @@
   "3+i2KR": {
     "defaultMessage": "Category image",
     "description": "ProfileKindStep - Category image alt"
+  },
+  "341ly2": {
+    "defaultMessage": "Slide to change the marginTop",
+    "description": "Hint of the marginTop slider in SimpleButton edition"
   },
   "3S8kZl": {
     "defaultMessage": "Square ratio",
@@ -114,6 +138,10 @@
   "4cXY7m": {
     "defaultMessage": "Describe your post",
     "description": "Post creation screen textarea placeholder"
+  },
+  "5+o7Ct": {
+    "defaultMessage": "Width",
+    "description": "Label of the width slider in SimpleButton edition"
   },
   "5/HOhV": {
     "defaultMessage": "Profiles",
@@ -147,6 +175,10 @@
     "defaultMessage": "Select images",
     "description": "Carousel bottom menu label for images tab"
   },
+  "6QQ7op": {
+    "defaultMessage": "Button color",
+    "description": "Button color tab label in SimpleButton edition"
+  },
   "6SitNY": {
     "defaultMessage": "Tap to switch between front and back camera",
     "description": "camera flip button accessibility hint"
@@ -175,6 +207,10 @@
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
   },
+  "75driK": {
+    "defaultMessage": "Button color",
+    "description": "Button color title in SimpleButton edition"
+  },
   "7D3W/p": {
     "defaultMessage": "Get started",
     "description": "Interests pickers - Get started Button"
@@ -190,6 +226,10 @@
   "7SXLKR": {
     "defaultMessage": "Image gap : {size}",
     "description": "Image gap label in carousel edition"
+  },
+  "7WfrZL": {
+    "defaultMessage": "Border Width : {size}",
+    "description": "borderWidth message in SimpleButton edition"
   },
   "7XIZlu": {
     "defaultMessage": "Tap me to show the QR Code fullscreen",
@@ -211,6 +251,10 @@
     "defaultMessage": "Posts",
     "description": "SearchPage - Result - Global search posts title"
   },
+  "8PWU0/": {
+    "defaultMessage": "Bordercolor color",
+    "description": "Bordercolor color title in SimpleButton edition"
+  },
   "8e13No": {
     "defaultMessage": "Select all",
     "description": "Select all button label in profile edition screen"
@@ -231,6 +275,10 @@
     "defaultMessage": "Back to Log In",
     "description": "ForgotPasswordScreen - Back to Log In bottom screen link"
   },
+  "9CiKNc": {
+    "defaultMessage": "Edit Settings",
+    "description": "SimpleButton bottom menu label for Settings tab"
+  },
   "9djJN/": {
     "defaultMessage": "Torch",
     "description": "camera torch button accessibility label"
@@ -242,6 +290,10 @@
   "9uTr6e": {
     "defaultMessage": "Add a comment",
     "description": "Post comment textarea placeholdesd"
+  },
+  "A/5Yu9": {
+    "defaultMessage": "Edit Margins",
+    "description": "SimpleButton bottom menu label for Margins tab"
   },
   "A13zLr": {
     "defaultMessage": "Please select a photo",
@@ -271,6 +323,10 @@
     "defaultMessage": "Last name",
     "description": "ProfileForm last name textinput label"
   },
+  "B9eFeU": {
+    "defaultMessage": "Margins",
+    "description": "Title of the Margins section in SimpleButton edition"
+  },
   "BCtKX4": {
     "defaultMessage": "Tap to change the orientation of the content",
     "description": "Hint of the orientation button in cover edition"
@@ -290,6 +346,18 @@
   "BSgZ1O": {
     "defaultMessage": "Simple Title",
     "description": "Module selection list modal simple title module label"
+  },
+  "BcDGTQ": {
+    "defaultMessage": "Button Options",
+    "description": "Label of the action type selector in SimpleButton Settings edition"
+  },
+  "BouRHB": {
+    "defaultMessage": "Width : {size}",
+    "description": "width message in SimpleButton edition"
+  },
+  "Bq9+dy": {
+    "defaultMessage": "Preview",
+    "description": "SimpleButton bottom menu label for Preview tab"
   },
   "Bswpqg": {
     "defaultMessage": "Posts",
@@ -379,13 +447,13 @@
     "defaultMessage": "Adjust",
     "description": "Label of the adjust tab in cover edition"
   },
-  "EKPaSj": {
-    "defaultMessage": "Select a calling code or email",
-    "description": "The accessibility label for the country selector"
-  },
   "EUi/Ij": {
     "defaultMessage": "Slide to change the border radius",
     "description": "Hint of the border radius slider in carousel edition"
+  },
+  "EkMdxM": {
+    "defaultMessage": "Contact by phone number",
+    "description": "Signup Form Connect with phone number section title in country selection list SimpleButton Settings edition"
   },
   "ElE0Uo": {
     "defaultMessage": "Retry",
@@ -483,6 +551,10 @@
     "defaultMessage": "Height: {size}",
     "description": "Height message in HorizontalPhoto edition"
   },
+  "JZnfAI": {
+    "defaultMessage": "Slide to change the width",
+    "description": "Hint of the width slider in SimpleButton edition"
+  },
   "JcQ1BH": {
     "defaultMessage": "Photo",
     "description": "Title of the photo view in image picker wizzard"
@@ -494,6 +566,10 @@
   "K8vqTk": {
     "defaultMessage": "Filters",
     "description": "Title of the filters section in Image edition wizzard"
+  },
+  "KFjQt1": {
+    "defaultMessage": "Opens a list of countries, an email address and an URL link and allows you to select if you want to use an email, a link or a phone number for the simple button action",
+    "description": "Simplebutton - The accessibility hint for the CountryCodeListWithOptions"
   },
   "KKW5Ea": {
     "defaultMessage": "Horizontal",
@@ -554,6 +630,10 @@
   "LsKCrf": {
     "defaultMessage": "Simple Button",
     "description": "Module selection list modal simple button module label"
+  },
+  "LxNxj5": {
+    "defaultMessage": "Fontsize",
+    "description": "Label of the fontSize slider in SimpleButton edition"
   },
   "M32J+R": {
     "defaultMessage": "Next",
@@ -635,6 +715,10 @@
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
   },
+  "PUC+CX": {
+    "defaultMessage": "Border Radius",
+    "description": "Label of the borderRadius slider in SimpleButton edition"
+  },
   "PVzsRd": {
     "defaultMessage": "Foreground",
     "description": "Label of Foreground tab in cover edition"
@@ -654,10 +738,6 @@
   "PnC9oY": {
     "defaultMessage": "Bottom Margin size",
     "description": "Label of the bottom margin size slider in Line Divider edition"
-  },
-  "QBLy42": {
-    "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
-    "description": "The accessibility hint for the country selector"
   },
   "QjKfB6": {
     "defaultMessage": "Fore.",
@@ -682,6 +762,10 @@
   "RiA6pa": {
     "defaultMessage": "Font family",
     "description": "Title of the font picker modal in cover edition"
+  },
+  "Rnyz/r": {
+    "defaultMessage": "Configuration",
+    "description": "Configuration tab label in SimpleButton edition"
   },
   "RpSI+X": {
     "defaultMessage": "Moves the module up",
@@ -714,6 +798,10 @@
   "T4JZ7B": {
     "defaultMessage": "Enter your first name",
     "description": "ProfileForm first name textinput placeholder"
+  },
+  "Th5e4c": {
+    "defaultMessage": "Slide to change the border Width",
+    "description": "Hint of the borderWidth slider in SimpleButton edition"
   },
   "TtcQs5": {
     "defaultMessage": "Clipping",
@@ -775,6 +863,14 @@
     "defaultMessage": "Shutter",
     "description": "Accessibility label for the camera shutter button"
   },
+  "V2Eflx": {
+    "defaultMessage": "Slide to change the marginBottom",
+    "description": "Hint of the marginBottom slider in SimpleButton edition"
+  },
+  "V6G3FX": {
+    "defaultMessage": "Link URL",
+    "description": "The link URL option in the country selector for simple button module"
+  },
   "VAgiN9": {
     "defaultMessage": "This phone number is already registered",
     "description": "Signup Screen - Error This phone number is already registered "
@@ -803,6 +899,10 @@
     "defaultMessage": "Unselect",
     "description": "Accessibility label for the select button in the profile edition screen"
   },
+  "VoVt5c": {
+    "defaultMessage": "Select a calling code or email",
+    "description": "Signup - The accessibility label for the country selector"
+  },
   "Vw6ZqZ": {
     "defaultMessage": "Unselect",
     "description": "Unselect all button label in profile edition screen"
@@ -823,6 +923,10 @@
     "defaultMessage": "Delete",
     "description": "Accessibility label for the delete button in the profile edition screen"
   },
+  "Wn+KmR": {
+    "defaultMessage": "Margintop",
+    "description": "Label of the marginTop slider in SimpleButton edition"
+  },
   "WsKWO4": {
     "defaultMessage": "Description",
     "description": "Post creation screen textarea modal title"
@@ -842,6 +946,10 @@
   "XNJ3+V": {
     "defaultMessage": "Hide",
     "description": "Accessibility label for the hide button in the profile edition screen"
+  },
+  "XUiwhE": {
+    "defaultMessage": "Border Radius : {size}",
+    "description": "border Radius message in SimpleButton edition"
   },
   "XVlOcg": {
     "defaultMessage": "Margin size",
@@ -886,6 +994,10 @@
   "ZZvty9": {
     "defaultMessage": "Done",
     "description": "ColorPicker component Done button label"
+  },
+  "Zf2i/A": {
+    "defaultMessage": "Height : {size}",
+    "description": "height message in SimpleButton edition"
   },
   "Zlh6em": {
     "defaultMessage": "Follow",
@@ -943,6 +1055,10 @@
     "defaultMessage": "Edit Text",
     "description": "Simple text bottom menu label for edit tab"
   },
+  "akBwx4": {
+    "defaultMessage": "Height",
+    "description": "Label of the height slider in SimpleButton edition"
+  },
   "b/ugZW": {
     "defaultMessage": "Followings",
     "description": "Number of followed profiles"
@@ -954,6 +1070,10 @@
   "bEGNeW": {
     "defaultMessage": "Color",
     "description": "Label of the background/foreground tint color in web card modules editors when there is no background color"
+  },
+  "bF695g": {
+    "defaultMessage": "Edit Background",
+    "description": "SimpleButton bottom menu label for Background tab"
   },
   "bO/TfG": {
     "defaultMessage": "Privacy Policy",
@@ -1011,6 +1131,10 @@
     "defaultMessage": "Divider #1",
     "description": "Line Divider text screen title"
   },
+  "djBfrw": {
+    "defaultMessage": "Simple button",
+    "description": "SimpleButton text screen title"
+  },
   "dl8CRm": {
     "defaultMessage": "Posterize",
     "description": "Posterize photo filter name"
@@ -1046,6 +1170,10 @@
   "ePdewE": {
     "defaultMessage": "Move up",
     "description": "Accessibility label for the move up button in the profile edition screen"
+  },
+  "epg2X1": {
+    "defaultMessage": "Slide to change the Font Size",
+    "description": "Hint of the fontSize slider in SimpleButton edition"
   },
   "f2KYUh": {
     "defaultMessage": "Subtitle",
@@ -1119,6 +1247,10 @@
     "defaultMessage": "Failed to load the informations of your cover",
     "description": "Error message displayed when cover image failed to load"
   },
+  "hD/JKe": {
+    "defaultMessage": "Fontsize : {size}",
+    "description": "fontSize message in SimpleButton edition"
+  },
   "hFNpbJ": {
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
@@ -1147,6 +1279,10 @@
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
   },
+  "hxYiB6": {
+    "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
+    "description": "Signup- The accessibility hint for the country selector"
+  },
   "i4akRg": {
     "defaultMessage": "Edit Margin",
     "description": "Carousel bottom menu label for margin tab"
@@ -1154,6 +1290,10 @@
   "i9jMTB": {
     "defaultMessage": "{countReactions} likes",
     "description": "PastRendererActionBar - Like Counter"
+  },
+  "iPwxyL": {
+    "defaultMessage": "Slide to change the height",
+    "description": "Hint of the height slider in SimpleButton edition"
   },
   "ie9VnD": {
     "defaultMessage": "Preview",
@@ -1327,6 +1467,10 @@
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
+  "o3aIiw": {
+    "defaultMessage": "Border Shape",
+    "description": "Border Shape tab label in SimpleButton edition"
+  },
   "o5n4Hq": {
     "defaultMessage": "Enter text",
     "description": "Placeholder for text area in simple text edition screen"
@@ -1342,6 +1486,10 @@
   "odCG09": {
     "defaultMessage": "WebCards Carousel",
     "description": "Module selection list modal WebCards Carousel module label"
+  },
+  "ok4cTE": {
+    "defaultMessage": "Border color",
+    "description": "Border color tab label in SimpleButton edition"
   },
   "p+PC34": {
     "defaultMessage": "Show",
@@ -1487,6 +1635,10 @@
     "defaultMessage": "Vertical Spacing : {verticalSpacing}",
     "description": "Vertical Spacing message in simple text edition"
   },
+  "sldNyG": {
+    "defaultMessage": "Email address",
+    "description": "The email address option in the country selector for simple button module"
+  },
   "sqy+v3": {
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
@@ -1510,6 +1662,10 @@
   "tSppn5": {
     "defaultMessage": "Photo With Text and title",
     "description": "Module selection list modal Photo With Text and title module label"
+  },
+  "u0bldw": {
+    "defaultMessage": "Slide to change the border Radius",
+    "description": "Hint of the borderRadius slider in SimpleButton edition"
   },
   "uHQfNw": {
     "defaultMessage": "Video Shutter",
@@ -1551,6 +1707,10 @@
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
   },
+  "w6NGI9": {
+    "defaultMessage": "Button Label",
+    "description": "Label of the buttonLabel input in SimpleButton Settings edition"
+  },
   "w96WJ0": {
     "defaultMessage": "Password doesn't match",
     "description": "ChangePasswordScreen Screen - error passwords doesn't match"
@@ -1582,6 +1742,10 @@
   "x288ev": {
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
+  },
+  "xEKupz": {
+    "defaultMessage": "Border Width",
+    "description": "Label of the borderWidth slider in SimpleButton edition"
   },
   "xLJO3E": {
     "defaultMessage": "Left/right margin size",
@@ -1650,6 +1814,10 @@
   "ydBmYF": {
     "defaultMessage": "Auto",
     "description": "flash auto accessibility value"
+  },
+  "ymaJdr": {
+    "defaultMessage": "Margin Top : {size}",
+    "description": "marginTop message in SimpleButton edition"
   },
   "ymtf7H": {
     "defaultMessage": "Tap to search for {word}",

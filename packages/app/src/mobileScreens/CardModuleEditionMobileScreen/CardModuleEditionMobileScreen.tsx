@@ -2,12 +2,14 @@ import CarouselEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/Carous
 import CoverEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import HorizontalPhotoEditionMobileScreenNode from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
+import SimpleButtonEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
 import HorizontalPhotoEditionMobileScreen from './HorizontalPhotoEditionMobileScreen';
 import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
+import SimpleButtonEditionMobileScreen from './SimpleButtonEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
@@ -15,6 +17,7 @@ import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/C
 import type { CoverEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import type { HorizontalPhotoEditionMobileScreenQuery } from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
+import type { SimpleButtonEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 
 /**
@@ -31,6 +34,7 @@ const CardModuleEditionMobileScreen = ({
   | CoverEditionMobileScreenQuery
   | HorizontalPhotoEditionMobileScreenQuery
   | LineDividerEditionMobileScreenQuery
+  | SimpleButtonEditionMobileScreenQuery
   | SimpleTextEditionMobileScreenQuery
 >) => {
   switch (params?.module) {
@@ -71,6 +75,13 @@ const CardModuleEditionMobileScreen = ({
           preloadedQuery={preloadedQuery as any}
         />
       );
+    case 'simpleButton':
+      return (
+        <SimpleButtonEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     default:
       return null;
   }
@@ -91,6 +102,8 @@ CardModuleEditionMobileScreen.prefetch = ({
       return HorizontalPhotoEditionMobileScreen.prefetch();
     case 'carousel':
       return CarouselEditionMobileScreen.prefetch();
+    case 'simpleButton':
+      return SimpleButtonEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -109,6 +122,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
       return HorizontalPhotoEditionMobileScreenNode;
     case 'carousel':
       return CarouselEditionMobileScreenQueryNode;
+    case 'simpleButton':
+      return SimpleButtonEditionMobileScreenNode;
     default:
       // for type safety
       return CoverEditionMobileScreenQueryNode;

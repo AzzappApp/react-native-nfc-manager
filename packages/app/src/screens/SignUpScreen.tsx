@@ -21,7 +21,7 @@ import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import Container from '#ui/Container';
-import EmailOrCountryCodeSelector from '#ui/EmailOrCountryCodeSelector';
+import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
@@ -29,6 +29,7 @@ import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import PhoneInput from '../components/PhoneInput';
 import type { CheckboxStatus } from '#ui/CheckBox';
+import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
@@ -56,6 +57,16 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
   const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
+  const SELECTORS: Array<CountryCodeListOption<'email'>> = [
+    {
+      type: 'email',
+      title: intl.formatMessage({
+        defaultMessage: 'Email address',
+        description: 'The email address option in the country selector',
+      }),
+      icon: 'mail',
+    },
+  ];
 
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
@@ -187,8 +198,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
             </View>
 
             <View style={styles.phoneOrEmailContainer}>
-              <EmailOrCountryCodeSelector
-                emailSectionTitle={intl.formatMessage({
+              <CountryCodeListWithOptions<'email'>
+                otherSectionTitle={intl.formatMessage({
                   defaultMessage: 'Connect with email address',
                   description:
                     'Signup Form Connect with email address section title in country selection list',
@@ -199,8 +210,20 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                     'Signup Form Connect with phone number section title in country selection list',
                 })}
                 value={countryCodeOrEmail}
+                options={SELECTORS}
                 onChange={setCountryCodeOrEmail}
                 style={styles.countryCodeOrEmailButton}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Select a calling code or email',
+                  description:
+                    'Signup - The accessibility label for the country selector',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage:
+                    'Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number',
+                  description:
+                    'Signup- The accessibility hint for the country selector',
+                })}
               />
               {countryCodeOrEmail === 'email' ? (
                 <TextInput

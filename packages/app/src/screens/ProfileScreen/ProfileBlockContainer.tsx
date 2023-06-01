@@ -236,7 +236,9 @@ const ProfileBlockContainer = ({
                   : undefined
               }
             >
-              {children}
+              <View pointerEvents={editing ? 'none' : 'box-none'}>
+                {children}
+              </View>
               {!visible && (
                 <View
                   style={{

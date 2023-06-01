@@ -7,6 +7,7 @@ import togglePostReaction from './postReaction';
 import saveCarouselModule from './saveCarouselModule';
 import saveHorizontalPhotoModule from './saveHorizontalPhotoModule';
 import saveLineDividerModule from './saveLineDividerModule';
+import saveSimpleButtonModule from './saveSimpleButtonModule';
 import saveSimpleTextModule from './saveSimpleTextModule';
 import swapModules from './swapModules';
 import toggleFollowing from './toggleFollowing';
@@ -28,6 +29,7 @@ const MutationGraphQL = new GraphQLObjectType({
     saveHorizontalPhotoModule,
     saveCarouselModule,
     updateCard,
+    saveSimpleButtonModule,
     swapModules,
     deleteModules,
     duplicateModule,
