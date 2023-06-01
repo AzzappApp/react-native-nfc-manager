@@ -75,10 +75,6 @@
     "defaultMessage": "Image Carousel",
     "description": "Module selection list modal Image Carousel module label"
   },
-  "2ZlnoN": {
-    "defaultMessage": "Preview",
-    "description": "ProfileScreen bottom menu accessibility label for Preview button"
-  },
   "2nXZgd": {
     "defaultMessage": "{firstName} posts",
     "description": "ProfilePostScreen title Header"
@@ -851,6 +847,10 @@
     "defaultMessage": "Margin size",
     "description": "Label of the font size slider in cover edition"
   },
+  "XmCDkN": {
+    "defaultMessage": "Mobile",
+    "description": "Mobile view mode title in web card preview"
+  },
   "YJRxy5": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
@@ -1502,6 +1502,10 @@
   "tFCDTN": {
     "defaultMessage": "Continue",
     "description": "NewProfileScreen - Continue Button"
+  },
+  "tOY0CE": {
+    "defaultMessage": "Desktop",
+    "description": "Desktop view mode title in web card preview"
   },
   "tSppn5": {
     "defaultMessage": "Photo With Text and title",

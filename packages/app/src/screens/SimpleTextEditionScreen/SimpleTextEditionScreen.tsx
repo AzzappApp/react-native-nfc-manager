@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
@@ -10,11 +10,12 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#PlatformEnvironment';
+import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import TextAreaModal from '#ui/TextAreaModal';
@@ -373,6 +374,33 @@ const SimpleTextEditionScreen = ({
           },
         ]}
       />
+      <View
+        style={{
+          position: 'absolute',
+          top: HEADER_HEIGHT + insetTop,
+          height: topPanelHeight + bottomPanelHeight,
+          width: windowWidth,
+          opacity: currentTab === 'preview' ? 1 : 0,
+        }}
+        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
+      >
+        <Suspense>
+          <WebCardPreview
+            editedModuleId={simpleText?.id}
+            visible={currentTab === 'preview'}
+            editedModuleInfo={{
+              kind: moduleKind,
+              data,
+            }}
+            style={{
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+          />
+        </Suspense>
+      </View>
       <TextAreaModal
         visible={showContentModal}
         value={text ?? ''}

@@ -1,24 +1,26 @@
 import { GraphQLError } from 'graphql';
-import { useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
   CAROUSEL_IMAGE_MAX_WIDTH,
+  MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
+import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -514,6 +516,33 @@ const CarouselEditionScreen = ({
           },
         ]}
       />
+      <View
+        style={{
+          position: 'absolute',
+          top: HEADER_HEIGHT + insetTop,
+          height: topPanelHeight + bottomPanelHeight,
+          width: windowWidth,
+          opacity: currentTab === 'preview' ? 1 : 0,
+        }}
+        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
+      >
+        <Suspense>
+          <WebCardPreview
+            editedModuleId={carousel?.id}
+            visible={currentTab === 'preview'}
+            editedModuleInfo={{
+              kind: MODULE_KIND_CAROUSEL,
+              data: previewData,
+            }}
+            style={{
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+          />
+        </Suspense>
+      </View>
       <CarouselEditionBottomMenu
         currentTab={currentTab}
         onItemPress={setCurrentTab}

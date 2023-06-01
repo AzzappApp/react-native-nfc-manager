@@ -95,7 +95,7 @@ export type ProfileScreenFooterProps = {
   /**
    * A callback called when the user switch the edit mode display mode
    */
-  onEditingDisplayModeChange: (view: 'desktop' | 'mobile' | 'preview') => void;
+  onEditingDisplayModeChange: (view: 'desktop' | 'mobile') => void;
   /**
    * A callback called when the user press the add module button
    */

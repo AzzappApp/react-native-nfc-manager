@@ -1,14 +1,18 @@
-import { useCallback, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  MODULE_KIND_HORIZONTAL_PHOTO,
+} from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
+import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -16,7 +20,7 @@ import { CameraButton } from '#screens/CoverEditionScreen/CoverEditionScreensBut
 import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
@@ -431,6 +435,33 @@ const HorizontalPhotoEditionScreen = ({
           },
         ]}
       />
+      <View
+        style={{
+          position: 'absolute',
+          top: HEADER_HEIGHT + insetTop,
+          height: topPanelHeight + bottomPanelHeight,
+          width: windowWidth,
+          opacity: currentTab === 'preview' ? 1 : 0,
+        }}
+        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
+      >
+        <Suspense>
+          <WebCardPreview
+            editedModuleId={horizontalPhoto?.id}
+            visible={currentTab === 'preview'}
+            editedModuleInfo={{
+              kind: MODULE_KIND_HORIZONTAL_PHOTO,
+              data,
+            }}
+            style={{
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+          />
+        </Suspense>
+      </View>
       <HorizontalPhotoEditionBottomMenu
         currentTab={currentTab}
         onItemPress={onCurrentTabChange}

@@ -38,7 +38,6 @@ const ProfileScreenFooter = ({
       switch (key) {
         case 'mobile':
         case 'desktop':
-        case 'preview':
           onEditingDisplayModeChange(key);
           break;
         case 'add':
@@ -96,15 +95,6 @@ const ProfileScreenFooter = ({
           defaultMessage: 'Change background color',
           description:
             'ProfileScreen bottom menu accessibility label for Change background color button',
-        }),
-      },
-      {
-        key: 'preview',
-        icon: 'preview',
-        label: intl.formatMessage({
-          defaultMessage: 'Preview',
-          description:
-            'ProfileScreen bottom menu accessibility label for Preview button',
         }),
       },
     ],

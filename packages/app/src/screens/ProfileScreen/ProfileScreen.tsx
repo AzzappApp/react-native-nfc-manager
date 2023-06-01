@@ -102,7 +102,7 @@ const ProfileScreen = ({
   // #region Edition state
   const [editing, setEditing] = useState(false);
   const [editingDisplayMode, setEditingDisplayMode] = useState<
-    'desktop' | 'mobile' | 'preview'
+    'desktop' | 'mobile'
   >('mobile');
 
   const onEdit = useCallback(() => {
