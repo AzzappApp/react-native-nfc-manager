@@ -1,0 +1,20 @@
+input SaveCarouselModuleInput {
+  moduleId: ID
+  images: [String!]
+  squareRatio: Boolean
+  borderSize: Int
+  borderColor: String
+  borderRadius: Int
+  marginVertical: Int
+  marginHorizontal: Int
+  imageHeight: Int
+  gap: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
+  clientMutationId: String
+}
+
+type SaveCarouselModulePayload {
+  card: Card!
+  clientMutationId: String
+}

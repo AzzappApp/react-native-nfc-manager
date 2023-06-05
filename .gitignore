@@ -140,7 +140,7 @@ dist
 trash
 packages/app/ios/.xcode.env.local
 packages/web/.vscode/settings.json
-
+schema.graphql
 
 packages/backoffice/.vscode/settings.json
 

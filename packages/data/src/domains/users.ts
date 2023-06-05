@@ -1,4 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
+import ERRORS from '@azzapp/shared/errors';
 import db from './db';
 import { getEntitiesByIds } from './generic';
 import type { User } from '@prisma/client';
@@ -57,4 +58,24 @@ export const createUser = async (
   };
   await db.insertInto('User').values(user).execute();
   return { ...user, createdAt: new Date() };
+};
+
+export const updateUser = async (
+  userId: string,
+  data: Partial<Omit<User, 'createdAt' | 'id' | 'updatedAt'>>,
+): Promise<Partial<User>> => {
+  const user = {
+    updatedAt: new Date(),
+    ...data,
+  };
+  const result = await db
+    .updateTable('Profile')
+    .set(user)
+    .where('id', '=', userId)
+    .execute();
+  if (result.length > 0) {
+    return user;
+  } else {
+    throw new Error(ERRORS.USER_NOT_FOUND);
+  }
 };

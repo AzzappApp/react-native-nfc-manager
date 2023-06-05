@@ -1,0 +1,12 @@
+input UpdateCardInput {
+  """
+  The background color of the card
+  """
+  backgroundColor: String
+  clientMutationId: String
+}
+
+type UpdateCardPayload {
+  card: Card
+  clientMutationId: String
+}

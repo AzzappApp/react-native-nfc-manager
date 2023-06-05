@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from 'graphql';
-import { mutationWithClientMutationId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -11,56 +9,11 @@ import {
   getCardModulesByIds,
   updateCardModule,
 } from '#domains';
-import CardGraphQL from '#schema/CardGraphQL';
-import { LineDividerOrientationGraphQL } from '#schema/CardModuleGraphql';
 import type { Card, CardModule } from '#domains';
-import type { GraphQLContext } from '../GraphQLContext';
+import type { MutationResolvers } from '#schema/__generated__/types';
 
-type SaveLineDividerModuleInput = Partial<{
-  moduleId: string;
-  kind: string;
-  orientation: string;
-  marginBottom: number;
-  marginTop: number;
-  height: number;
-  colorTop: number;
-  colorBottom: number;
-}>;
-
-const saveLineDividerModule = mutationWithClientMutationId({
-  name: 'SaveLineDividerModule',
-  inputFields: () => ({
-    moduleId: {
-      type: GraphQLID,
-    },
-    orientation: {
-      type: LineDividerOrientationGraphQL,
-    },
-    marginTop: {
-      type: GraphQLInt,
-    },
-    marginBottom: {
-      type: GraphQLInt,
-    },
-    height: {
-      type: GraphQLInt,
-    },
-    colorTop: {
-      type: GraphQLString,
-    },
-    colorBottom: {
-      type: GraphQLString,
-    },
-  }),
-  outputFields: {
-    card: {
-      type: new GraphQLNonNull(CardGraphQL),
-    },
-  },
-  mutateAndGetPayload: async (
-    input: SaveLineDividerModuleInput,
-    { auth, cardByProfileLoader }: GraphQLContext,
-  ) => {
+const saveLineDividerModule: MutationResolvers['saveLineDividerModule'] =
+  async (_, { input }, { auth, cardByProfileLoader }) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -112,7 +65,6 @@ const saveLineDividerModule = mutationWithClientMutationId({
     }
 
     return { card };
-  },
-});
+  };
 
 export default saveLineDividerModule;

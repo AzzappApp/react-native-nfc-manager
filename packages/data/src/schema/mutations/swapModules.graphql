@@ -1,0 +1,10 @@
+input SwapModulesInput {
+  moduleAId: ID!
+  moduleBId: ID!
+  clientMutationId: String
+}
+
+type SwapModulesPayload {
+  card: Card!
+  clientMutationId: String
+}

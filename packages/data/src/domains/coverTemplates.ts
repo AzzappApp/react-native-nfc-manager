@@ -21,7 +21,7 @@ export const getCoverTemplatesByIds = (
  */
 export const getCoverTemplatesByKind = (
   kind: ProfileKind,
-  segmented?: boolean,
+  segmented?: boolean | null,
 ): Promise<CoverTemplate[]> => {
   let request = db
     .selectFrom('CoverTemplate')

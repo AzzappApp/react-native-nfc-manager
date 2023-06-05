@@ -1,7 +1,7 @@
 import { graphql } from 'graphql';
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@azzapp/auth/viewer';
-import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
+import { createGraphQLContext, schema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import type { SessionData } from '@azzapp/auth/viewer';
@@ -27,7 +27,7 @@ export const POST = async (req: Request) => {
   const requestParams = await req.json();
   try {
     const result = await graphql({
-      schema: graphQLSchema,
+      schema,
       rootValue: {},
       source: requestParams.id
         ? (queryMap as any)[requestParams.id]

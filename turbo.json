@@ -13,6 +13,11 @@
       ]
     },
     "//#relay:prepare": {
+      "dependsOn": ["graphql-codegen"],
+      "inputs": []
+    },
+    "//#graphql-codegen": {
+      "dependsOn": [],
       "inputs": []
     },
     "lint": {},

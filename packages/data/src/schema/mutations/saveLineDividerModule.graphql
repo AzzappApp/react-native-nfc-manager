@@ -1,0 +1,15 @@
+input SaveLineDividerModuleInput {
+  moduleId: ID
+  orientation: LineDividerOrientation
+  marginTop: Int
+  marginBottom: Int
+  height: Int
+  colorTop: String
+  colorBottom: String
+  clientMutationId: String
+}
+
+type SaveLineDividerModulePayload {
+  card: Card!
+  clientMutationId: String
+}

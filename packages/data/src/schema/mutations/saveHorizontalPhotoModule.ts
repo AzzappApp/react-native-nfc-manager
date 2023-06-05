@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from 'graphql';
-import { mutationWithClientMutationId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
 import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -15,80 +13,12 @@ import {
   removeMedias,
   updateCardModule,
 } from '#domains';
-import CardGraphQL from '#schema/CardGraphQL';
-import { ModuleBackgroundStyleInputGraphQL } from './commonsInputTypes';
 import type { Card, CardModule } from '#domains';
-import type { GraphQLContext } from '../GraphQLContext';
+import type { MutationResolvers } from '#schema/__generated__/types';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
-type SaveHorizontalPhotoModuleInput = Partial<{
-  moduleId: string;
-  borderWidth: number;
-  borderRadius: number;
-  borderColor: string;
-  marginHorizontal: number;
-  marginVertical: number;
-  height: number;
-  color: string;
-  tintColor: string;
-  image: string;
-  backgroundId: string;
-  backgroundStyle: {
-    backgroundColor: string;
-    patternColor: string;
-    opacity: number;
-  };
-}>;
-
-const saveHorizontalPhotoModule = mutationWithClientMutationId({
-  name: 'SaveHorizontalPhotoModule',
-  inputFields: () => ({
-    moduleId: {
-      type: GraphQLID,
-    },
-    image: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-    borderWidth: {
-      type: GraphQLInt,
-    },
-    borderRadius: {
-      type: GraphQLInt,
-    },
-    borderColor: {
-      type: GraphQLString,
-    },
-    marginHorizontal: {
-      type: GraphQLInt,
-    },
-    marginVertical: {
-      type: GraphQLInt,
-    },
-    height: {
-      type: GraphQLInt,
-    },
-    color: {
-      type: GraphQLString,
-    },
-    tintColor: {
-      type: GraphQLString,
-    },
-    backgroundId: {
-      type: GraphQLID,
-    },
-    backgroundStyle: {
-      type: ModuleBackgroundStyleInputGraphQL,
-    },
-  }),
-  outputFields: {
-    card: {
-      type: new GraphQLNonNull(CardGraphQL),
-    },
-  },
-  mutateAndGetPayload: async (
-    input: SaveHorizontalPhotoModuleInput,
-    { auth, cardByProfileLoader, mediaLoader }: GraphQLContext,
-  ) => {
+const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] =
+  async (_, { input }, { auth, cardByProfileLoader, mediaLoader }) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -163,7 +93,7 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
       });
       //this is mandatory or the media return will be null
       if (newImage) {
-        mediaLoader.clear(input.image!);
+        mediaLoader.clear(input.image);
         await removeMedias([(module?.data as any)?.image]);
       }
 
@@ -171,7 +101,6 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-  },
-});
+  };
 
 export default saveHorizontalPhotoModule;

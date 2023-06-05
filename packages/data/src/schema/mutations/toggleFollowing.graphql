@@ -1,0 +1,18 @@
+input ToggleFollowingInput {
+  """
+  The id of the user we want toggle following on
+  """
+  profileId: ID!
+
+  """
+  Should we follow or unfollow the user
+  """
+  follow: Boolean!
+  clientMutationId: String
+}
+
+type ToggleFollowingPayload {
+  viewer: Viewer!
+  profile: Profile!
+  clientMutationId: String
+}

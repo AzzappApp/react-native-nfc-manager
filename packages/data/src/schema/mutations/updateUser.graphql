@@ -1,0 +1,12 @@
+input UpdateUserInput {
+  email: String
+  phoneNumber: String
+  currentPassword: String
+  newPassword: String
+  clientMutationId: String
+}
+
+type UpdateUserPayload {
+  user: User
+  clientMutationId: String
+}

@@ -1,6 +1,6 @@
 import { graphql } from 'graphql';
 import { cache } from 'react';
-import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
+import { createGraphQLContext, schema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import type { SessionData } from '@azzapp/auth/viewer';
@@ -38,7 +38,7 @@ const preloadServerQuery = async <TQuery extends OperationType>(
   }
 
   const response = await graphql({
-    schema: graphQLSchema,
+    schema,
     source: params.text ? params.text : (queryMap as any)[params.id!],
     variableValues: queryVariables,
     contextValue: createCachedGraphQLContext(viewer ?? { isAnonymous: true }),

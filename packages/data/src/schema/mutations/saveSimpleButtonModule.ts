@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from 'graphql';
-import { mutationWithClientMutationId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
 import {
@@ -14,99 +12,11 @@ import {
   getCardModulesByIds,
   updateCardModule,
 } from '#domains';
-import CardGraphQL from '#schema/CardGraphQL';
-import { ModuleBackgroundStyleInputGraphQL } from './commonsInputTypes';
 import type { Card, CardModule } from '#domains';
-import type { GraphQLContext } from '../GraphQLContext';
+import type { MutationResolvers } from '#schema/__generated__/types';
 
-type SaveSimpleButtonModuleInput = Partial<{
-  moduleId: string;
-  buttonLabel: string;
-  actionType: string;
-  actionLink: string;
-  fontFamily: string;
-  fontColor: string;
-  fontSize: number;
-  buttonColor: string;
-  borderColor: string;
-  borderWidth: number;
-  borderRadius: number;
-  marginTop: number;
-  marginBottom: number;
-  width: number;
-  height: number;
-  backgroundId: string;
-  backgroundStyle: {
-    backgroundColor: string;
-    patternColor: string;
-    opacity: number;
-  };
-}>;
-
-const saveSimpleButtonModule = mutationWithClientMutationId({
-  name: 'SaveSimpleButtonModule',
-  inputFields: () => ({
-    moduleId: {
-      type: GraphQLID,
-    },
-    buttonLabel: {
-      type: GraphQLString,
-    },
-    actionType: {
-      type: GraphQLString,
-    },
-    actionLink: {
-      type: GraphQLString,
-    },
-    fontFamily: {
-      type: GraphQLString,
-    },
-    fontColor: {
-      type: GraphQLString,
-    },
-    fontSize: {
-      type: GraphQLInt,
-    },
-    buttonColor: {
-      type: GraphQLString,
-    },
-    borderColor: {
-      type: GraphQLString,
-    },
-    borderWidth: {
-      type: GraphQLInt,
-    },
-    borderRadius: {
-      type: GraphQLInt,
-    },
-    marginTop: {
-      type: GraphQLInt,
-    },
-    marginBottom: {
-      type: GraphQLInt,
-    },
-    width: {
-      type: GraphQLInt,
-    },
-    height: {
-      type: GraphQLInt,
-    },
-    backgroundId: {
-      type: GraphQLID,
-    },
-    backgroundStyle: {
-      type: ModuleBackgroundStyleInputGraphQL,
-    },
-  }),
-  outputFields: {
-    card: {
-      type: new GraphQLNonNull(CardGraphQL),
-    },
-  },
-  mutateAndGetPayload: async (
-    input: SaveSimpleButtonModuleInput,
-    { auth, cardByProfileLoader }: GraphQLContext,
-  ) => {
+const saveSimpleButtonModule: MutationResolvers['saveSimpleButtonModule'] =
+  async (_, { input }, { auth, cardByProfileLoader }) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -158,7 +68,6 @@ const saveSimpleButtonModule = mutationWithClientMutationId({
     }
 
     return { card };
-  },
-});
+  };
 
 export default saveSimpleButtonModule;

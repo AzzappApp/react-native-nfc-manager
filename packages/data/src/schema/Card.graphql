@@ -1,0 +1,25 @@
+"""
+An azzapp User card
+"""
+type Card implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  user: Profile!
+
+  """
+  Card cover display informations
+  """
+  cover: CardCover!
+
+  """
+  Card background color
+  """
+  backgroundColor: String
+
+  """
+  Definitions of the cards modules
+  """
+  modules: [CardModule!]!
+}

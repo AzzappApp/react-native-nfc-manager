@@ -1,0 +1,20 @@
+input SaveSimpleTextModuleInput {
+  moduleId: ID
+  kind: String!
+  text: String
+  fontFamily: String
+  fontSize: Int
+  color: String
+  verticalSpacing: Int
+  textAlign: TextAlignment
+  marginHorizontal: Int
+  marginVertical: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
+  clientMutationId: String
+}
+
+type SaveSimpleTextModulePayload {
+  card: Card!
+  clientMutationId: String
+}

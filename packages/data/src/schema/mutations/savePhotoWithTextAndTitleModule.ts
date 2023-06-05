@@ -1,12 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import {
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLNonNull,
-  GraphQLString,
-} from 'graphql';
-import { mutationWithClientMutationId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
 import {
@@ -24,118 +16,12 @@ import {
   createMedia,
   removeMedias,
 } from '#domains';
-import CardGraphQL from '#schema/CardGraphQL';
-import {
-  ItemMarginGraphQL,
-  HorizontalArrangementGraphQL,
-  VerticalArrangementGraphQL,
-} from '#schema/CardModuleGraphql';
-import { TextAlignmentGraphQL } from '#schema/commonsTypes';
-import { ModuleBackgroundStyleInputGraphQL } from './commonsInputTypes';
 import type { Card, CardModule } from '#domains';
-import type { GraphQLContext } from '../GraphQLContext';
+import type { MutationResolvers } from '#schema/__generated__/types';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
-type SavePhotoWithTextAndTitleModuleInput = Partial<{
-  moduleId: string;
-  image: string;
-  fontFamily: string;
-  fontColor: string;
-  textAlign: 'center' | 'justify' | 'left' | 'right';
-  imageMargin: 'width_full' | 'width_limited';
-  arrangement: 'left' | 'right';
-  verticalArrangement: 'bottom' | 'top';
-  gap: number;
-  fontSize: number;
-  textSize: number;
-  borderRadius: number;
-  marginHorizontal: number;
-  marginVertical: number;
-  backgroundId: string;
-  verticalSpacing: number;
-  aspectRatio: number;
-  text: string;
-  title: string;
-  backgroundStyle: {
-    backgroundColor: string;
-    patternColor: string;
-    opacity: number;
-  };
-}>;
-
-const savePhotoWithTextAndTitleModule = mutationWithClientMutationId({
-  name: 'SavePhotoWithTextAndTitleModule',
-  inputFields: () => ({
-    moduleId: {
-      type: GraphQLID,
-    },
-    image: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-    text: {
-      type: GraphQLString,
-    },
-    title: {
-      type: GraphQLString,
-    },
-    fontFamily: {
-      type: GraphQLString,
-    },
-    fontColor: {
-      type: GraphQLString,
-    },
-    textAlign: {
-      type: TextAlignmentGraphQL,
-    },
-    imageMargin: {
-      type: ItemMarginGraphQL,
-    },
-    horizontalArrangement: {
-      type: HorizontalArrangementGraphQL,
-    },
-    verticalArrangement: {
-      type: VerticalArrangementGraphQL,
-    },
-    gap: {
-      type: GraphQLInt,
-    },
-    fontSize: {
-      type: GraphQLInt,
-    },
-    textSize: {
-      type: GraphQLInt,
-    },
-    borderRadius: {
-      type: GraphQLInt,
-    },
-    marginHorizontal: {
-      type: GraphQLInt,
-    },
-    marginVertical: {
-      type: GraphQLInt,
-    },
-    verticalSpacing: {
-      type: GraphQLInt,
-    },
-    aspectRatio: {
-      type: GraphQLFloat,
-    },
-    backgroundId: {
-      type: GraphQLID,
-    },
-    backgroundStyle: {
-      type: ModuleBackgroundStyleInputGraphQL,
-    },
-  }),
-  outputFields: {
-    card: {
-      type: new GraphQLNonNull(CardGraphQL),
-    },
-  },
-  mutateAndGetPayload: async (
-    input: SavePhotoWithTextAndTitleModuleInput,
-    { auth, cardByProfileLoader, mediaLoader }: GraphQLContext,
-  ) => {
+const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTitleModule'] =
+  async (_, { input }, { auth, cardByProfileLoader, mediaLoader }) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -211,7 +97,7 @@ const savePhotoWithTextAndTitleModule = mutationWithClientMutationId({
       });
       //this is mandatory or the media return will be null
       if (newImage) {
-        mediaLoader.clear(input.image!);
+        mediaLoader.clear(input.image);
         await removeMedias([(module?.data as any)?.image]);
       }
 
@@ -219,7 +105,6 @@ const savePhotoWithTextAndTitleModule = mutationWithClientMutationId({
     } catch (e) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-  },
-});
+  };
 
 export default savePhotoWithTextAndTitleModule;

@@ -14,9 +14,9 @@ const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`
  */
 export const getImageURLForSize = (
   id: string,
-  width?: number,
-  height?: number,
-  pixelRatio = 1,
+  width?: number | null,
+  height?: number | null,
+  pixelRatio: number | null = 1,
 ) => {
   if (
     process.env.NODE_ENV !== 'production' &&
@@ -27,7 +27,7 @@ export const getImageURLForSize = (
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
   }
-  const transforms = resizeTransforms(width, height, pixelRatio);
+  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
   return `${CLOUDINARY_BASE_URL}/image/upload/${transforms}/${id}`;
 };
 
@@ -42,9 +42,9 @@ export const getImageURLForSize = (
  */
 export const getVideoUrlForSize = (
   id: string,
-  width?: number,
-  height?: number,
-  pixelRatio = 1,
+  width?: number | null,
+  height?: number | null,
+  pixelRatio: number | null = 1,
 ) => {
   if (
     process.env.NODE_ENV !== 'production' &&
@@ -55,7 +55,7 @@ export const getVideoUrlForSize = (
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.mp4`;
   }
-  const transforms = resizeTransforms(width, height, pixelRatio);
+  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
   return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${id}.mp4`;
 };
 
@@ -70,9 +70,9 @@ export const getVideoUrlForSize = (
  */
 export const getVideoThumbnailURL = (
   id: string,
-  width?: number,
-  height?: number,
-  pixelRatio = 1,
+  width?: number | null,
+  height?: number | null,
+  pixelRatio: number | null = 1,
 ) => {
   if (
     process.env.NODE_ENV !== 'production' &&
@@ -83,11 +83,15 @@ export const getVideoThumbnailURL = (
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.jpg`;
   }
-  const transforms = resizeTransforms(width, height, pixelRatio);
+  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
   return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${id}.jpg`;
 };
 
-const resizeTransforms = (width: number, height?: number, pixelRatio = 1) => {
+const resizeTransforms = (
+  width: number,
+  height?: number | null,
+  pixelRatio = 1,
+) => {
   width = Math.round(width * pixelRatio);
   if (height != null) {
     return `c_fill,q_auto:eco,w_${width},h_${height}`;
