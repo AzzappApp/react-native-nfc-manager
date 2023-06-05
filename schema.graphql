@@ -329,6 +329,15 @@ type Viewer {
     first: Int
   ): ProfileConnection!
 
+  """Return a list of Profiles that follow the current user"""
+  followers(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+  ): ProfileConnection!
+
   """Return a list of Post that the current user is following author"""
   followedProfilesPosts(
     """Returns the items in the list that come after the specified cursor."""
@@ -434,6 +443,7 @@ type Profile implements Node {
   nbPosts: Int!
   nbFollowedProfiles: Int!
   nbFollowersProfiles: Int!
+  public: Boolean!
 }
 
 """An object with an ID"""
@@ -760,6 +770,7 @@ type Mutation {
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
+  removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
   saveSimpleTextModule(input: SaveSimpleTextModuleInput!): SaveSimpleTextModulePayload
   saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
@@ -885,6 +896,18 @@ input ToggleFollowingInput {
 
   """Should we follow or unfollow the user"""
   follow: Boolean!
+  clientMutationId: String
+}
+
+type RemoveFollowerPayload {
+  viewer: Viewer!
+  removedFollowerId: ID!
+  clientMutationId: String
+}
+
+input RemoveFollowerInput {
+  """The id of the user we want remove as follower"""
+  profileId: ID!
   clientMutationId: String
 }
 

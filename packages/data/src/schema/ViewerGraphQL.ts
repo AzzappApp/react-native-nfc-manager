@@ -24,6 +24,7 @@ import {
   getFollowedProfilesPosts,
   getFollowedProfilesPostsCount,
   getFollowedProfilesCount,
+  getFollowerProfiles,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -101,6 +102,36 @@ const ViewerGraphQL = new GraphQLObjectType<Viewer, GraphQLContext>({
         const followedProfiles = await getFollowedProfiles(profileId);
 
         return connectionFromArray(followedProfiles, args);
+      },
+    },
+    followers: {
+      description: 'Return a list of Profiles that follow the current user',
+      type: new GraphQLNonNull(ProfileConnectionGraphQL),
+      args: forwardConnectionArgs,
+      resolve: async (
+        viewer,
+        args: ConnectionArguments,
+      ): Promise<Connection<Profile>> => {
+        const profileId = getProfileId(viewer);
+        if (!profileId) {
+          return connectionFromArray([], args);
+        }
+
+        const first = args.first ?? 100;
+        const offset = args.after ? cursorToDate(args.after) : null;
+
+        const followersProfiles = await getFollowerProfiles(
+          profileId,
+          first,
+          offset,
+        );
+
+        return connectionFromDateSortedItems(followersProfiles, {
+          getDate: post => post.followCreatedAt,
+          // approximations that should be good enough, and avoid a query
+          hasNextPage: followersProfiles.length > 0,
+          hasPreviousPage: offset !== null,
+        });
       },
     },
     followedProfilesPosts: {

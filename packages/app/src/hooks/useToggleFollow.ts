@@ -48,6 +48,15 @@ const updater = (
 
   profile?.setValue(follow, 'isFollowing');
 
+  const nbFollowers = profile?.getValue('nbFollowersProfiles');
+
+  if (typeof nbFollowers === 'number') {
+    profile?.setValue(
+      follow ? nbFollowers + 1 : nbFollowers - 1,
+      'nbFollowersProfiles',
+    );
+  }
+
   const viewer = store.getRoot().getLinkedRecord('viewer');
 
   if (viewer) {

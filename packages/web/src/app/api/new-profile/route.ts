@@ -91,6 +91,7 @@ export const POST = async (req: Request) => {
       profileCategoryId: profileCategoryId ?? null,
       colorPalette: '#FFFFFF,#000000', // from #197 specification issue
       interests: null,
+      public: false,
     });
 
     if (authMethod === 'token') {

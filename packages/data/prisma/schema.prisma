@@ -33,6 +33,7 @@ model Profile {
   companyActivityId String?
   colorPalette      String?
   interests         String?
+  public            Boolean     @default(false)
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @default(now())
 

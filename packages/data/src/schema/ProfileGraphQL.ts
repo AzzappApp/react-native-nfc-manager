@@ -137,6 +137,12 @@ const ProfileGraphQL: GraphQLObjectType = new GraphQLObjectType<
         return getFollowerProfilesCount(profile.id);
       },
     },
+    public: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      resolve(profile): boolean {
+        return profile.public ?? false;
+      },
+    },
   }),
 });
 

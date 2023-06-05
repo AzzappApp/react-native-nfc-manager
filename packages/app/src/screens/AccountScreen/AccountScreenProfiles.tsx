@@ -235,15 +235,17 @@ export default function AccountScreenProfiles({
             />
           </Text>
         </View>
-        <View style={styles.counterContainer}>
-          <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
-          <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-            <FormattedMessage
-              defaultMessage="Followers"
-              description="Number of followers"
-            />
-          </Text>
-        </View>
+        <Link route="FOLLOWERS">
+          <PressableNative style={styles.counterContainer}>
+            <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
+            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
+              <FormattedMessage
+                defaultMessage="Followers"
+                description="Number of followers"
+              />
+            </Text>
+          </PressableNative>
+        </Link>
         <Link route="FOLLOWED_PROFILES">
           <PressableNative style={styles.counterContainer}>
             <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>

@@ -121,6 +121,31 @@ export const getFollowedProfilesCount = async (
     .then(({ count }) => count);
 
 /**
+ * Retrieve the list of profiles a profile is being followed
+ * @param profileId - The id of the profile
+ * @returns the list of profiles a profile is being followed
+ */
+export const getFollowerProfiles = async (
+  profileId: string,
+  limit: number,
+  after: Date | null = null,
+): Promise<Array<Profile & { followCreatedAt: Date }>> => {
+  let query = db
+    .selectFrom('Profile')
+    .selectAll()
+    .innerJoin('Follow', 'Profile.id', 'Follow.followerId')
+    .select(['Follow.createdAt as followCreatedAt'])
+    .where('Follow.followingId', '=', profileId)
+    .orderBy('Follow.createdAt', 'desc');
+
+  if (after) {
+    query = query.where('Follow.createdAt', '<', after);
+  }
+
+  return query.limit(limit).execute();
+};
+
+/**
  * Retrieve the number of profiles a profile is being followed
  * @param profileId - The id of the profile
  * @returns the number of profiles a profile is being followed

@@ -21,6 +21,7 @@ import {
 } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
+import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
 import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
@@ -71,6 +72,7 @@ const screens = {
   CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
   PROFILE: ProfileMobileScreen,
   FOLLOWED_PROFILES: FollowedProfilesMobileScreen,
+  FOLLOWERS: FollowersMobileScreen,
 };
 
 const tabs = {
