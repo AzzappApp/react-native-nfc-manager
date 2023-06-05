@@ -9,6 +9,7 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
+  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
@@ -20,6 +21,9 @@ import HorizontalPhotoRenderer, {
 import LineDividerRenderer, {
   LineDividerRendererRaw,
 } from './LineDividerRenderer';
+import PhotoWithTextAndTitleRenderer, {
+  PhotoWithTextAndTitleRendererRaw,
+} from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer, {
   SimpleButtonRendererRaw,
 } from './SimpleButtonRenderer';
@@ -30,6 +34,7 @@ import SwitchToggle from './SwitchToggle';
 import type { CarouselRawData } from './CarouselRenderer';
 import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
 import type { LineDividerRawData } from './LineDividerRenderer';
+import type { PhotoWithTextAndTitleRawData } from './PhotoWithTextAndTitleRenderer';
 import type { SimpleButtonRawData } from './SimpleButtonRenderer';
 import type { SimpleTextRawData } from './SimpleTextRenderer';
 import type { WebCardPreviewQuery } from '@azzapp/relay/artifacts/WebCardPreviewQuery.graphql';
@@ -71,10 +76,16 @@ type SimpleButtonInfo = {
   data: SimpleButtonRawData;
 };
 
+type PhotoWithTextAndTitleInfo = {
+  kind: typeof MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE;
+  data: PhotoWithTextAndTitleRawData;
+};
+
 type ModuleInfo =
   | CarouselModuleInfo
   | HorizontalPhotoModuleInfo
   | LineDividerModuleInfo
+  | PhotoWithTextAndTitleInfo
   | SimpleButtonInfo
   | SimpleTextModuleInfo;
 
@@ -109,6 +120,7 @@ const WebCardPreview = ({
                 ...LineDividerRenderer_module
                 ...CarouselRenderer_module
                 ...SimpleButtonRenderer_module
+                ...PhotoWithTextAndTitleRenderer_module
               }
             }
             ...ProfileColorPicker_profile
@@ -222,6 +234,15 @@ const WebCardPreview = ({
             onLayout={onEditedModuleLayout}
           />
         );
+      case MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE:
+        return (
+          <PhotoWithTextAndTitleRendererRaw
+            data={editedModuleInfo.data}
+            key={module.id}
+            onLayout={onEditedModuleLayout}
+            viewMode={viewMode}
+          />
+        );
       default:
         return null;
     }
@@ -281,6 +302,13 @@ const WebCardPreview = ({
               return <CarouselRenderer module={module} key={module.id} />;
             case MODULE_KIND_SIMPLE_BUTTON:
               return <SimpleButtonRenderer module={module} key={module.id} />;
+            case MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE:
+              return (
+                <PhotoWithTextAndTitleRenderer
+                  module={module}
+                  key={module.id}
+                />
+              );
             default:
               return null;
           }

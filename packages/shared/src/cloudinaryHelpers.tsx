@@ -116,7 +116,6 @@ type DeleteResourceResult = {
 export const deleteMediaByPublicIds = async (
   medias: Array<{ publicId: string; kind: 'image' | 'video' }>,
 ) => {
-  console.log(medias);
   const videosIds = medias
     .filter(media => media.kind === 'video')
     .map(media => media.publicId);

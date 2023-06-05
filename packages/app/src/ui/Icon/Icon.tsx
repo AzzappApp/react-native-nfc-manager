@@ -178,6 +178,12 @@ const icons = {
   get image_right() {
     return require('./assets/image_right.png');
   },
+  get image_top() {
+    return require('./assets/image_top.png');
+  },
+  get image_bottom() {
+    return require('./assets/image_bottom.png');
+  },
   get information() {
     return require('./assets/information.png');
   },

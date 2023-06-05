@@ -2,6 +2,7 @@ import CarouselEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/Carous
 import CoverEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import HorizontalPhotoEditionMobileScreenNode from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
+import PhotoWithTextAndTitleEditionMobileScreenNode from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
 import SimpleButtonEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
@@ -9,6 +10,7 @@ import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
 import HorizontalPhotoEditionMobileScreen from './HorizontalPhotoEditionMobileScreen';
 import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
+import PhotoWithTextAndTitleEditionMobileScreen from './PhotoWithTextAndTitleEditionMobileScreen';
 import SimpleButtonEditionMobileScreen from './SimpleButtonEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -17,6 +19,7 @@ import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/C
 import type { CoverEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CoverEditionMobileScreenQuery.graphql';
 import type { HorizontalPhotoEditionMobileScreenQuery } from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
 import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
+import type { PhotoWithTextAndTitleEditionMobileScreenQuery } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
 import type { SimpleButtonEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 
@@ -34,6 +37,7 @@ const CardModuleEditionMobileScreen = ({
   | CoverEditionMobileScreenQuery
   | HorizontalPhotoEditionMobileScreenQuery
   | LineDividerEditionMobileScreenQuery
+  | PhotoWithTextAndTitleEditionMobileScreenQuery
   | SimpleButtonEditionMobileScreenQuery
   | SimpleTextEditionMobileScreenQuery
 >) => {
@@ -82,6 +86,14 @@ const CardModuleEditionMobileScreen = ({
           preloadedQuery={preloadedQuery as any}
         />
       );
+
+    case 'photoWithTextAndTitle':
+      return (
+        <PhotoWithTextAndTitleEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     default:
       return null;
   }
@@ -104,6 +116,8 @@ CardModuleEditionMobileScreen.prefetch = ({
       return CarouselEditionMobileScreen.prefetch();
     case 'simpleButton':
       return SimpleButtonEditionMobileScreen.prefetch();
+    case 'photoWithTextAndTitle':
+      return PhotoWithTextAndTitleEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -124,6 +138,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
       return CarouselEditionMobileScreenQueryNode;
     case 'simpleButton':
       return SimpleButtonEditionMobileScreenNode;
+    case 'photoWithTextAndTitle':
+      return PhotoWithTextAndTitleEditionMobileScreenNode;
     default:
       // for type safety
       return CoverEditionMobileScreenQueryNode;

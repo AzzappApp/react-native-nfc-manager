@@ -1,6 +1,7 @@
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
   GraphQLID,
   GraphQLInt,
   GraphQLInterfaceType,
@@ -227,9 +228,107 @@ export const CardModuleOpeningHoursGraphQL = createGraphQLCardModule(
   {},
 );
 
+export const HorizontalArrangementGraphQL = new GraphQLEnumType({
+  name: 'HorizontalArrangement',
+  values: {
+    left: { value: 'left' },
+    right: { value: 'right' },
+  },
+});
+
+export const VerticalArrangementGraphQL = new GraphQLEnumType({
+  name: 'VerticalArrangement',
+  values: {
+    top: { value: 'top' },
+    bottom: { value: 'bottom' },
+  },
+});
+
+export const ItemMarginGraphQL = new GraphQLEnumType({
+  name: 'ItemMargin',
+  values: {
+    width_limited: { value: 'width_limited' },
+    width_full: { value: 'width_full' },
+  },
+});
+
 export const CardModulePhotoWithTextAndTitleGraphQL = createGraphQLCardModule(
   'photoWithTextAndTitle',
-  {},
+  {
+    image: {
+      type: new GraphQLNonNull(MediaImageGraphQL),
+      description:
+        'The Media image of the horizontal photo module, cannot be null',
+      resolve: async (
+        cardModule: CardModule,
+        _,
+        { mediaLoader },
+      ): Promise<Media> => {
+        const { data } = cardModule as any;
+        return mediaLoader.load(data.image) as Promise<Media>;
+      },
+    },
+    fontFamily: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    fontColor: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    textAlign: {
+      type: new GraphQLNonNull(TextAlignmentGraphQL),
+    },
+    imageMargin: {
+      type: new GraphQLNonNull(ItemMarginGraphQL),
+    },
+    horizontalArrangement: {
+      type: new GraphQLNonNull(HorizontalArrangementGraphQL),
+    },
+    verticalArrangement: {
+      type: new GraphQLNonNull(VerticalArrangementGraphQL),
+    },
+    gap: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    fontSize: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    textSize: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    title: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    text: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    borderRadius: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginHorizontal: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    marginVertical: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    verticalSpacing: {
+      type: new GraphQLNonNull(GraphQLInt),
+    },
+    aspectRatio: {
+      type: new GraphQLNonNull(GraphQLFloat),
+    },
+    background: {
+      type: StaticMediaGraphQL,
+      resolve: (cardModule: CardModule, _, { staticMediaLoader }) => {
+        const { data } = cardModule as any;
+        return data.backgroundId
+          ? staticMediaLoader.load(data.backgroundId)
+          : null;
+      },
+    },
+    backgroundStyle: {
+      type: ModuleBackgroundStyleGraphQL,
+    },
+  },
 );
 
 export const CardModuleSimpleTextGraphQL = createGraphQLCardModule(

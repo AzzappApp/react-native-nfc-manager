@@ -1,38 +1,61 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from 'graphql';
+import {
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { getProfileId } from '@azzapp/auth/viewer';
-import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
+} from '@azzapp/shared/cardModuleHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   createCardModule,
-  createMedia,
-  db,
   getCardModuleCount,
   getCardModulesByIds,
-  removeMedias,
   updateCardModule,
+  db,
+  createMedia,
+  removeMedias,
 } from '#domains';
 import CardGraphQL from '#schema/CardGraphQL';
+import {
+  ItemMarginGraphQL,
+  HorizontalArrangementGraphQL,
+  VerticalArrangementGraphQL,
+} from '#schema/CardModuleGraphql';
+import { TextAlignmentGraphQL } from '#schema/commonsTypes';
 import { ModuleBackgroundStyleInputGraphQL } from './commonsInputTypes';
 import type { Card, CardModule } from '#domains';
 import type { GraphQLContext } from '../GraphQLContext';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
-type SaveHorizontalPhotoModuleInput = Partial<{
+type SavePhotoWithTextAndTitleModuleInput = Partial<{
   moduleId: string;
-  borderWidth: number;
+  image: string;
+  fontFamily: string;
+  fontColor: string;
+  textAlign: 'center' | 'justify' | 'left' | 'right';
+  imageMargin: 'width_full' | 'width_limited';
+  arrangement: 'left' | 'right';
+  verticalArrangement: 'bottom' | 'top';
+  gap: number;
+  fontSize: number;
+  textSize: number;
   borderRadius: number;
-  borderColor: string;
   marginHorizontal: number;
   marginVertical: number;
-  height: number;
-  color: string;
-  tintColor: string;
-  image: string;
   backgroundId: string;
+  verticalSpacing: number;
+  aspectRatio: number;
+  text: string;
+  title: string;
   backgroundStyle: {
     backgroundColor: string;
     patternColor: string;
@@ -40,8 +63,8 @@ type SaveHorizontalPhotoModuleInput = Partial<{
   };
 }>;
 
-const saveHorizontalPhotoModule = mutationWithClientMutationId({
-  name: 'SaveHorizontalPhotoModule',
+const savePhotoWithTextAndTitleModule = mutationWithClientMutationId({
+  name: 'SavePhotoWithTextAndTitleModule',
   inputFields: () => ({
     moduleId: {
       type: GraphQLID,
@@ -49,14 +72,41 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
     image: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    borderWidth: {
+    text: {
+      type: GraphQLString,
+    },
+    title: {
+      type: GraphQLString,
+    },
+    fontFamily: {
+      type: GraphQLString,
+    },
+    fontColor: {
+      type: GraphQLString,
+    },
+    textAlign: {
+      type: TextAlignmentGraphQL,
+    },
+    imageMargin: {
+      type: ItemMarginGraphQL,
+    },
+    horizontalArrangement: {
+      type: HorizontalArrangementGraphQL,
+    },
+    verticalArrangement: {
+      type: VerticalArrangementGraphQL,
+    },
+    gap: {
+      type: GraphQLInt,
+    },
+    fontSize: {
+      type: GraphQLInt,
+    },
+    textSize: {
       type: GraphQLInt,
     },
     borderRadius: {
       type: GraphQLInt,
-    },
-    borderColor: {
-      type: GraphQLString,
     },
     marginHorizontal: {
       type: GraphQLInt,
@@ -64,14 +114,11 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
     marginVertical: {
       type: GraphQLInt,
     },
-    height: {
+    verticalSpacing: {
       type: GraphQLInt,
     },
-    color: {
-      type: GraphQLString,
-    },
-    tintColor: {
-      type: GraphQLString,
+    aspectRatio: {
+      type: GraphQLFloat,
     },
     backgroundId: {
       type: GraphQLID,
@@ -86,7 +133,7 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (
-    input: SaveHorizontalPhotoModuleInput,
+    input: SavePhotoWithTextAndTitleModuleInput,
     { auth, cardByProfileLoader, mediaLoader }: GraphQLContext,
   ) => {
     const profileId = getProfileId(auth);
@@ -109,6 +156,7 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
       try {
         [module] = await getCardModulesByIds([input.moduleId]);
       } catch (e) {
+        console.log(e);
         throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
       }
       if (!module || module.cardId !== card.id) {
@@ -151,10 +199,10 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
         } else {
           await createCardModule({
             cardId: card!.id,
-            kind: 'horizontalPhoto',
+            kind: MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
             position: await getCardModuleCount(card!.id),
             data: {
-              ...HORIZONTAL_PHOTO_DEFAULT_VALUES,
+              ...PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
               ...omit(input, 'moduleId'),
             },
             visible: true,
@@ -174,4 +222,4 @@ const saveHorizontalPhotoModule = mutationWithClientMutationId({
   },
 });
 
-export default saveHorizontalPhotoModule;
+export default savePhotoWithTextAndTitleModule;

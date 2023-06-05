@@ -32,6 +32,14 @@ export type TextAreaModalProps = Omit<
    * A callback that is called when the user close the modal
    */
   onClose: () => void;
+  /**
+   * A Item component to render on top of the modal, under the header
+   */
+  ItemTopComponent?: React.ReactElement;
+  /**
+   * If true, the modal will close when the textInput onBlur is called
+   */
+  closeOnBlur?: boolean;
 };
 
 /**
@@ -43,10 +51,19 @@ const TextAreaModal = ({
   maxLength,
   onChangeText,
   onClose,
+  ItemTopComponent,
+  closeOnBlur = true,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
   const { top: insetTop } = useSafeAreaInsets();
+
+  const onBlur = () => {
+    if (closeOnBlur) {
+      onClose();
+    }
+  };
+
   return (
     <Modal transparent animationType="fade" onRequestClose={onClose} {...props}>
       <View style={styles.modal}>
@@ -70,6 +87,7 @@ const TextAreaModal = ({
           }
         />
         <KeyboardAvoidingView behavior="height" style={styles.contentModal}>
+          {ItemTopComponent}
           <TextInput
             multiline
             placeholder={placeholder}
@@ -77,7 +95,7 @@ const TextAreaModal = ({
             onChangeText={onChangeText}
             autoFocus
             maxLength={maxLength}
-            onBlur={onClose}
+            onBlur={onBlur}
             style={{ borderWidth: 0, flex: 1 }}
           />
           {maxLength != null && (

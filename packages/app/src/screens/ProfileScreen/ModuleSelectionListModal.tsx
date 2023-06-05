@@ -101,7 +101,7 @@ const ModuleSelectionListModal = ({
               'Module selection list modal Photo With Text and title module label',
           }),
           image: require('./assets/simple-button.png'),
-          ready: false,
+          ready: true,
         },
         {
           moduleKind: 'openingHours',

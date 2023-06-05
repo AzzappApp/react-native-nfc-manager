@@ -171,6 +171,27 @@ type CardModuleOpeningHours implements CardModule {
 
 """User Card module : PhotoWithTextAndTitle"""
 type CardModulePhotoWithTextAndTitle implements CardModule {
+  """The Media image of the horizontal photo module, cannot be null"""
+  image: MediaImage!
+  fontFamily: String!
+  fontColor: String!
+  textAlign: TextAlignment!
+  imageMargin: ItemMargin!
+  horizontalArrangement: HorizontalArrangement!
+  verticalArrangement: VerticalArrangement!
+  gap: Int!
+  fontSize: Int!
+  textSize: Int!
+  title: String!
+  text: String!
+  borderRadius: Int!
+  marginHorizontal: Int!
+  marginVertical: Int!
+  verticalSpacing: Int!
+  aspectRatio: Float!
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
   """User Card module id, unique between all modules (but not a node id)"""
   id: ID!
 
@@ -179,6 +200,28 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
 
   """User Card module visibility"""
   visible: Boolean!
+}
+
+enum TextAlignment {
+  left
+  center
+  right
+  justify
+}
+
+enum ItemMargin {
+  width_limited
+  width_full
+}
+
+enum HorizontalArrangement {
+  left
+  right
+}
+
+enum VerticalArrangement {
+  top
+  bottom
 }
 
 """User Card module : SimpleButton"""
@@ -231,13 +274,6 @@ type CardModuleSimpleText implements CardModule {
 
   """User Card module visibility"""
   visible: Boolean!
-}
-
-enum TextAlignment {
-  left
-  center
-  right
-  justify
 }
 
 """User Card module : SimpleTitle"""
@@ -776,6 +812,7 @@ type Mutation {
   saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveLineDividerModulePayload
   saveHorizontalPhotoModule(input: SaveHorizontalPhotoModuleInput!): SaveHorizontalPhotoModulePayload
   saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
+  savePhotoWithTextAndTitleModule(input: SavePhotoWithTextAndTitleModuleInput!): SavePhotoWithTextAndTitleModulePayload
   updateCard(input: UpdateCardInput!): UpdateCardPayload
   saveSimpleButtonModule(input: SaveSimpleButtonModuleInput!): SaveSimpleButtonModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
@@ -932,8 +969,10 @@ input SaveSimpleTextModuleInput {
   moduleId: ID
   kind: String!
   text: String
+  title: String
   fontFamily: String
   fontSize: Int
+  textSize: Int
   color: String
   verticalSpacing: Int
   textAlign: TextAlignment
@@ -1004,6 +1043,35 @@ input SaveCarouselModuleInput {
   marginHorizontal: Int
   imageHeight: Int
   gap: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
+  clientMutationId: String
+}
+
+type SavePhotoWithTextAndTitleModulePayload {
+  card: Card!
+  clientMutationId: String
+}
+
+input SavePhotoWithTextAndTitleModuleInput {
+  moduleId: ID
+  image: String!
+  text: String
+  title: String
+  fontFamily: String
+  fontColor: String
+  textAlign: TextAlignment
+  imageMargin: ItemMargin
+  horizontalArrangement: HorizontalArrangement
+  verticalArrangement: VerticalArrangement
+  gap: Int
+  fontSize: Int
+  textSize: Int
+  borderRadius: Int
+  marginHorizontal: Int
+  marginVertical: Int
+  verticalSpacing: Int
+  aspectRatio: Float
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle
   clientMutationId: String

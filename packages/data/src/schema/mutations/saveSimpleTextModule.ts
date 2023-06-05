@@ -26,6 +26,8 @@ type SaveSimpleTextModuleInput = Partial<{
   moduleId: string;
   kind: string;
   text: string;
+  title: string;
+  textSize: string;
   fontFamily: string;
   fontSize: number;
   color: string;
@@ -53,12 +55,16 @@ const saveSimpleTextModule = mutationWithClientMutationId({
     text: {
       type: GraphQLString,
     },
+    title: {
+      type: GraphQLString,
+    },
     fontFamily: {
       type: GraphQLString,
     },
     fontSize: {
       type: GraphQLInt,
     },
+    textSize: { type: GraphQLInt },
     color: {
       type: GraphQLString,
     },

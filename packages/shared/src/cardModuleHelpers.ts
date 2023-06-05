@@ -118,3 +118,22 @@ export const SIMPLE_BUTTON_DEFAULT_VALUES = {
   width: 150,
   height: 50,
 } as const;
+
+export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES = {
+  fontFamily: 'Arial',
+  fontColor: '#000000',
+  textAlign: 'left',
+  imageMargin: 'width_full',
+  verticalArrangement: 'top',
+  horizontalArrangement: 'left',
+  gap: 10,
+  fontSize: 20,
+  textSize: 14,
+  borderRadius: 0,
+  marginHorizontal: 10,
+  marginVertical: 0,
+  aspectRatio: 1,
+  verticalSpacing: 1,
+  text: '',
+  title: '',
+} as const;

@@ -140,8 +140,8 @@ const HorizontalPhotoBorderEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Left/right margin: {size}"
-              description="Left/right margin message in Horizontal Photo edition"
+              defaultMessage="Border radius: {size}"
+              description="Border radius message in Horizontal Photo edition"
               values={{
                 size: borderRadius,
               }}
@@ -154,14 +154,14 @@ const HorizontalPhotoBorderEditionPanel = ({
           interval={Math.floor((windowWidth - 80) / 50)}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Left/right margin size',
+            defaultMessage: 'Image border radius size',
             description:
-              'Label of the Left/right margin size slider in HorizontalPhoto edition',
+              'Label of the Border radius size slider in HorizontalPhoto edition',
           })}
           accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the Left/right margin size',
+            defaultMessage: 'Slide to change the image border radius size',
             description:
-              'Hint of the Left/right margin slider in HorizontalPhoto edition',
+              'Hint of the Border radius slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
         />
