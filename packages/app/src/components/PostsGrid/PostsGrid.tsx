@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
@@ -19,6 +19,7 @@ type PostsGrid = {
   ListHeaderComponent?: ReactNode;
   ListFooterComponent?: ReactNode;
   stickyHeaderIndices?: number[] | undefined;
+  onReady?: () => void;
   onRefresh?: () => void;
   onEndReached?: () => void;
   onScroll?: (scrollPosition: number) => void;
@@ -41,6 +42,7 @@ const PostsGrid = ({
   ListHeaderComponent,
   ListFooterComponent,
   stickyHeaderIndices,
+  onReady,
   onRefresh,
   onEndReached,
   onScroll: onScrollCallback,
@@ -292,6 +294,19 @@ const PostsGrid = ({
     [posts, postsMap],
   );
 
+  const readyDisplayed = useRef(false);
+  const nbPostReady = useRef(0);
+  const onPostReady = useCallback(() => {
+    if (readyDisplayed.current) {
+      return;
+    }
+    nbPostReady.current++;
+    if (nbPostReady.current >= itemRefs.current.length) {
+      readyDisplayed.current = true;
+      onReady?.();
+    }
+  }, [onReady]);
+
   const GridContainer = Platform.select({
     default: PostGridContainer,
     web: useWindowScroll ? PostGridWindowScrollContainer : PostGridContainer,
@@ -341,6 +356,7 @@ const PostsGrid = ({
             windowWidth={windowWidth}
             layout={data.layout}
             paused={!canPlay}
+            onReady={onPostReady}
           />
         );
       })}
@@ -356,12 +372,14 @@ const MemoPostRenderer = ({
   windowWidth,
   paused,
   videoDisabled,
+  onReady,
 }: {
   item: Post;
   paused?: boolean;
   videoDisabled?: boolean;
   windowWidth: number;
   layout: ItemLayout;
+  onReady?: () => void;
 }) =>
   useMemo(
     () => (
@@ -373,6 +391,7 @@ const MemoPostRenderer = ({
         videoDisabled={videoDisabled}
         muted
         style={[layout, { position: 'absolute' }]}
+        onReady={onReady}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps

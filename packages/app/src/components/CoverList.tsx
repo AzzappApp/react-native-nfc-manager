@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_BASE_WIDTH } from '@azzapp/shared/coverHelpers';
@@ -18,6 +18,8 @@ type CoverListProps = {
   coverStyle?: StyleProp<ViewStyle>;
   horizontal?: boolean;
   numColums?: number;
+  onReady?: () => void;
+  initialNumToRender?: number;
   ListHeaderComponent?:
     | React.ComponentType<any>
     | React.ReactElement
@@ -33,6 +35,8 @@ const CoverList = ({
   containerStyle,
   horizontal = true,
   numColums = 1,
+  initialNumToRender = 5,
+  onReady,
   ListHeaderComponent,
 }: CoverListProps) => {
   const coverWidth = useMemo(() => {
@@ -66,6 +70,14 @@ const CoverList = ({
     [],
   );
 
+  const coversReady = useRef(0);
+  const onCoverReady = useCallback(() => {
+    coversReady.current++;
+    if (coversReady.current >= initialNumToRender) {
+      onReady?.();
+    }
+  }, [initialNumToRender, onReady]);
+
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
       <CoverLink
@@ -81,9 +93,10 @@ const CoverList = ({
           },
           coverStyle,
         ]}
+        onReadyForDisplay={onCoverReady}
       />
     ),
-    [coverStyle, coverWidth, horizontal],
+    [coverStyle, coverWidth, horizontal, onCoverReady],
   );
 
   //TODO: handle vertical layout with height instead of width
@@ -113,6 +126,7 @@ const CoverList = ({
       style={style}
       getItemLayout={getItemLayout}
       ListHeaderComponent={ListHeaderComponent}
+      initialNumToRender={initialNumToRender}
     />
   );
 };

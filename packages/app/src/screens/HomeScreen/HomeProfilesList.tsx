@@ -21,10 +21,15 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 type HomeProfilesListProps = {
   viewer: HomeProfilesList_viewer$key;
+  onReady?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
-const HomeProfilesList = ({ viewer, style }: HomeProfilesListProps) => {
+const HomeProfilesList = ({
+  viewer,
+  onReady,
+  style,
+}: HomeProfilesListProps) => {
   const intl = useIntl();
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
     graphql`
@@ -126,6 +131,7 @@ const HomeProfilesList = ({ viewer, style }: HomeProfilesListProps) => {
       onEndReached={onEndReached}
       style={style}
       ListHeaderComponent={ListHeaderComponent}
+      onReady={onReady}
     />
   ) : (
     <SuggestedProfilesList
@@ -133,6 +139,7 @@ const HomeProfilesList = ({ viewer, style }: HomeProfilesListProps) => {
       viewer={data}
       profile={data.profile}
       ListHeaderComponent={ListHeaderComponent}
+      onReady={onReady}
     />
   );
 };
@@ -158,7 +165,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-
   qrCode: {
     position: 'absolute',
     top: '10%',

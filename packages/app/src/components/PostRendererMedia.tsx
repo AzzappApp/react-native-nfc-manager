@@ -51,6 +51,10 @@ export type PostRendererMediaProps = ViewProps & {
    * @type {(number | null)}
    */
   initialTime?: number | null;
+  /**
+   * A callback that is called once the media is ready to be displayed.
+   */
+  onReady?: () => void;
 };
 
 // TODO docs and tests once this component is production ready
@@ -63,6 +67,7 @@ const PostRendererMedia = (
     videoDisabled = false,
     paused = false,
     initialTime,
+    onReady,
     ...props
   }: PostRendererMediaProps,
   forwardedRef: ForwardedRef<HostComponent<any> | MediaVideoRendererHandle>,
@@ -142,6 +147,7 @@ const PostRendererMedia = (
               uri={small ? smallThumbnail : largeThumbnail}
               aspectRatio={aspectRatio}
               width={width}
+              onReadyForDisplay={onReady}
             />
             {/* Play iconicon */}
             <Icon icon="play" style={styles.playIcon} />
@@ -159,6 +165,7 @@ const PostRendererMedia = (
             muted={muted}
             paused={paused}
             currentTime={initialTime}
+            onReadyForDisplay={onReady}
           />
         ))}
       {__typename === 'MediaImage' && (
@@ -170,6 +177,7 @@ const PostRendererMedia = (
           uri={small ? smallURI : largeURI}
           aspectRatio={aspectRatio}
           width={width}
+          onReadyForDisplay={onReady}
         />
       )}
     </View>

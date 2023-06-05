@@ -46,6 +46,10 @@ export type PostRendererFeedProps = ViewProps & {
    * @type {(number | null)}
    */
   initialTime?: number | null;
+  /**
+   * A callback that is called when the post media is ready to be displayed.
+   */
+  onReady?: () => void;
 };
 
 export type PostRendererFeedHandle = {
@@ -62,6 +66,7 @@ const PostRendererFeed = (
     videoDisabled = false,
     paused = false,
     initialTime,
+    onReady,
     style,
     ...props
   }: PostRendererFeedProps,
@@ -122,6 +127,7 @@ const PostRendererFeed = (
         initialTime={initialTime}
         videoDisabled={videoDisabled}
         ref={mediaRef}
+        onReady={onReady}
       />
       <AuthorCartouche
         author={post.author}

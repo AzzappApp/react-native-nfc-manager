@@ -18,6 +18,7 @@ type FollowedProfilesPostsListProps = {
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
   onScroll?: (scrollPosition: number) => void;
+  onReady?: () => void;
 };
 
 const FollowedProfilesPostsList = ({
@@ -28,6 +29,7 @@ const FollowedProfilesPostsList = ({
   style,
   postsContainerStyle,
   onScroll,
+  onReady,
 }: FollowedProfilesPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -117,6 +119,7 @@ const FollowedProfilesPostsList = ({
       postsContainerStyle={postsContainerStyle}
       onScroll={onScroll}
       useWindowScroll
+      onReady={onReady}
     />
   );
 };

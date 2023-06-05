@@ -13,6 +13,7 @@ type FollowedProfilesListProps = {
   style?: StyleProp<ViewStyle>;
   profile: HomeProfilesList_viewer$data['profile'];
   ListHeaderComponent: React.ComponentType<any> | React.ReactElement | null;
+  onReady?: () => void;
 };
 
 const SuggestedProfilesList = ({
@@ -20,6 +21,7 @@ const SuggestedProfilesList = ({
   profile,
   style,
   ListHeaderComponent,
+  onReady,
 }: FollowedProfilesListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -72,6 +74,7 @@ const SuggestedProfilesList = ({
       onEndReached={onEndReached}
       style={style}
       ListHeaderComponent={ListHeaderComponent}
+      onReady={onReady}
     />
   );
 };

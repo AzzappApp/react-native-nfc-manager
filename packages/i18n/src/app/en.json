@@ -55,10 +55,6 @@
     "defaultMessage": "Border color",
     "description": "Title of the border color picker in carousel edition"
   },
-  "0OPgK9": {
-    "defaultMessage": "Save",
-    "description": "Edit email address modal save button label"
-  },
   "106q2H": {
     "defaultMessage": "Background",
     "description": "Carousel  bottom menu label for Background tab"
@@ -1387,10 +1383,6 @@
     "defaultMessage": "Background",
     "description": "Simple text  bottom menu label for Background tab"
   },
-  "hSV0Sf": {
-    "defaultMessage": "Please enter a valid email address",
-    "description": "Error message when the user enters an invalid email address"
-  },
   "hc+1uI": {
     "defaultMessage": "Allow Azzapp to access your microphone",
     "description": "Camera authorization screen title for microphobe permission"
@@ -1470,10 +1462,6 @@
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
-  },
-  "k3hj2G": {
-    "defaultMessage": "Cancel",
-    "description": "Edit email address modal cancel button label"
   },
   "kIhbvL": {
     "defaultMessage": "Height",

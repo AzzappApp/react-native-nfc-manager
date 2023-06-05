@@ -170,7 +170,7 @@ describe('TrendingProfilesList', () => {
     renderScreen();
     const list = screen.getByTestId('cover-list');
     const coverLinks = screen.getAllByTestId('CoverLink');
-    expect(coverLinks).toHaveLength(10);
+    expect(coverLinks).toHaveLength(5);
     expect(coverLinks[0]).toHaveStyle({ width: 80 });
 
     act(() => {
