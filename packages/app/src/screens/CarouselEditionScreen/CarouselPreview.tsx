@@ -1,6 +1,7 @@
-import { StyleSheet, View } from 'react-native';
-import { colors } from '#theme';
+import { View } from 'react-native';
+import { colors, shadow } from '#theme';
 import { CarouselRendererRaw } from '#components/CarouselRenderer';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { CarouselRawData } from '#components/CarouselRenderer';
 import type { ViewProps } from 'react-native';
 
@@ -23,6 +24,7 @@ const CarouselPreview = ({ data, height, ...props }: CarouselPreviewProps) => {
   const moduleHeight = imageHeight + marginVertical * 2 + borderSize * 2;
   const scale = Math.min(height / moduleHeight, 1);
 
+  const styles = useStyleSheet(styleSheet);
   return (
     <View {...props}>
       <View
@@ -47,12 +49,6 @@ const CarouselPreview = ({ data, height, ...props }: CarouselPreviewProps) => {
 
 export default CarouselPreview;
 
-const styles = StyleSheet.create({
-  module: {
-    shadowColor: colors.black,
-    shadowOpacity: 0.42,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 17,
-    width: '100%',
-  },
-});
+const styleSheet = createStyleSheet(apperance => ({
+  module: [{ width: '100%' }, shadow(apperance)],
+}));

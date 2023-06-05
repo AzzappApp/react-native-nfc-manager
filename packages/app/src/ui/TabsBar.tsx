@@ -1,5 +1,5 @@
 import { Fragment, useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -63,7 +63,7 @@ const TabsBar = ({
   onTabPress,
   style,
 }: TabsBarProps) => {
-  const appearanceStyle = useStyleSheet(computedStyles);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View
@@ -82,7 +82,7 @@ const TabsBar = ({
           rightElement={rightElement}
         />
       ))}
-      <View style={appearanceStyle.backgroundLine} />
+      <View style={styles.backgroundLine} />
     </View>
   );
 };
@@ -113,7 +113,7 @@ const TabsBarItem = ({
   decoration,
   rightElement,
 }: TabsBarItemProps) => {
-  const appearanceStyle = useStyleSheet(computedStyles);
+  const styles = useStyleSheet(styleSheet);
 
   const onPress = useCallback(() => {
     if (onTabPress) onTabPress(tabKey);
@@ -121,18 +121,18 @@ const TabsBarItem = ({
 
   return (
     <Fragment>
-      <View style={appearanceStyle.backgroundLine} />
+      <View style={styles.backgroundLine} />
       <PressableNative
         accessibilityRole="tab"
         accessibilityLabel={label}
         accessibilityState={{ selected: isSelected }}
         onPress={onPress}
         style={[
-          appearanceStyle.tab,
-          isSelected && decoration === 'underline' && appearanceStyle.selected,
+          styles.tab,
+          isSelected && decoration === 'underline' && styles.selected,
         ]}
       >
-        <View style={appearanceStyle.labelContainer}>
+        <View style={styles.labelContainer}>
           <Text variant="smallbold">{label}</Text>
           {rightElement}
         </View>
@@ -141,15 +141,12 @@ const TabsBarItem = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flexDirection: 'row',
     height: TAB_BAR_HEIGHT,
     justifyContent: 'space-around',
   },
-});
-
-const computedStyles = createStyleSheet(appearance => ({
   backgroundLine: {
     flex: 1,
     height: 1,
@@ -171,4 +168,5 @@ const computedStyles = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
 }));
+
 export default TabsBar;

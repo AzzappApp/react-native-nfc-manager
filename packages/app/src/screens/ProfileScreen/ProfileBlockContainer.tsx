@@ -1,6 +1,11 @@
 import { useCallback, useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -10,7 +15,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -155,15 +160,9 @@ const ProfileBlockContainer = ({
     marginVertical: editingSharedValue.value * 20,
   }));
 
+  const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius: editingSharedValue.value * COVER_CARD_RADIUS * windowWith,
-    shadowColor: colors.black,
-    shadowOpacity: editingSharedValue.value * 0.35,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowRadius: 17,
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
@@ -219,7 +218,10 @@ const ProfileBlockContainer = ({
       ]}
     >
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={moduleContainerStyle} onLayout={onLayout}>
+        <Animated.View
+          style={[moduleContainerStyle, shadow(appearance)]}
+          onLayout={onLayout}
+        >
           {/** this ViewTransition is only here because ios bug with shadow and overlow hidden */}
           <Animated.View style={moduleInnerContainerStyle}>
             <PressableNative

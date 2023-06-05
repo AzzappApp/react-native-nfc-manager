@@ -1,9 +1,10 @@
 import { useCallback, useState } from 'react';
-import { Image, Platform, StyleSheet, View, FlatList } from 'react-native';
+import { Image, Platform, View, FlatList } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import ViewTransition from '#ui/ViewTransition';
 import type {
@@ -86,6 +87,8 @@ const StaticMediaList = ({
     default: COVER_CARD_RADIUS * width,
   });
 
+  const styles = useStyleSheet(styleSheet);
+
   const renderItem = useCallback(
     ({
       item,
@@ -161,6 +164,7 @@ const StaticMediaList = ({
       selectedMedia,
       svgMode,
       tintColor,
+      styles,
     ],
   );
 
@@ -180,7 +184,7 @@ const StaticMediaList = ({
 
 export default StaticMediaList;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   flatListStyle: { overflow: 'visible' },
   container: {
     paddingVertical: 10,
@@ -188,15 +192,13 @@ const styles = StyleSheet.create({
     columnGap: 10,
     alignItems: 'center',
   },
-  button: {
-    flex: 1,
-    overflow: 'visible',
-    shadowColor: '#000000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-    elevation: 3,
-  },
+  button: [
+    {
+      flex: 1,
+      overflow: 'visible',
+    },
+    shadow(appearance),
+  ],
   image: {
     height: '100%',
   },
@@ -204,4 +206,4 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.black,
   },
-});
+}));

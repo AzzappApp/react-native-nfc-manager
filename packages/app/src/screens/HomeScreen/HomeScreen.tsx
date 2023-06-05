@@ -1,14 +1,8 @@
 import { useCallback } from 'react';
-import {
-  StyleSheet,
-  Image,
-  Platform,
-  View,
-  useColorScheme,
-} from 'react-native';
+import { Image, View, useColorScheme } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useRouter } from '#PlatformEnvironment';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
@@ -27,10 +21,6 @@ const HomeScreen = ({
   viewer: viewerRef,
   hasFocus = true,
 }: HomeScreenProps) => {
-  const vp = useViewportSize();
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-  const appearanceStyle = useStyleSheet(computedStyle);
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
@@ -44,9 +34,14 @@ const HomeScreen = ({
     viewerRef,
   );
 
+  const router = useRouter();
   const goToSettings = useCallback(() => {
     router.push({ route: 'ACCOUNT' });
   }, [router]);
+
+  const vp = useViewportSize();
+  const styles = useStyleSheet(styleSheet);
+  const colorScheme = useColorScheme();
 
   return (
     <FollowedProfilesPostsList
@@ -93,27 +88,14 @@ const HomeScreen = ({
       }
       stickyHeaderIndices={[0]}
       style={styles.followedProfilesPosts}
-      postsContainerStyle={[
-        appearanceStyle.followedProfilesPostsListPostsContainer,
-        styles.followedProfilesPostsListPostsContainerShadow,
-      ]}
+      postsContainerStyle={styles.followedProfilesPostsListPostsContainerShadow}
     />
   );
 };
 
 export default HomeScreen;
 
-const computedStyle = createStyleSheet(appearance => ({
-  followedProfilesPostsListPostsContainer: {
-    paddingVertical: 8,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 20,
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-  },
-}));
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   signupButton: { width: 150 },
   followedProfilesPosts: {
     flex: 1,
@@ -142,13 +124,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  followedProfilesPostsListPostsContainerShadow: Platform.select({
-    default: {
-      shadowColor: colors.black,
-      shadowOpacity: 0.4,
-      shadowOffset: { width: 0, height: 10 },
-      shadowRadius: 20,
+  followedProfilesPostsListPostsContainerShadow: [
+    {
+      paddingVertical: 8,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      zIndex: 20,
+      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
     },
-    android: { elevation: 10 },
-  }),
-});
+    shadow(appearance),
+  ],
+}));

@@ -10,7 +10,7 @@ export type TitleWithLineProps = Omit<ViewProps, 'children'> & {
 };
 
 const TitleWithLine = ({ title, style, ...props }: TitleWithLineProps) => {
-  const styles = useStyleSheet(stylesheet);
+  const styles = useStyleSheet(styleSheet);
   return (
     <View style={[styles.root, style]} {...props}>
       <View style={styles.backgroundLine} />
@@ -24,7 +24,7 @@ const TitleWithLine = ({ title, style, ...props }: TitleWithLineProps) => {
 
 export default TitleWithLine;
 
-const stylesheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     flexDirection: 'row',
     height: TAB_BAR_HEIGHT,

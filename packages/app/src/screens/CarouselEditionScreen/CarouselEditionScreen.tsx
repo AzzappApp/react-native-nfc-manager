@@ -11,7 +11,6 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
-import { colors } from '#theme';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import WebCardPreview from '#components/WebCardPreview';
@@ -569,16 +568,10 @@ const CarouselEditionScreen = ({
     </Container>
   );
 };
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  carouselContainer: {
-    flex: 1,
-    shadowColor: colors.black,
-    shadowOpacity: 0.42,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 17,
   },
   tabsBar: {
     position: 'absolute',

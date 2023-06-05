@@ -337,13 +337,13 @@ export type IconProps = Omit<ImageProps, 'source'> & {
 };
 
 const Icon = ({ icon, ...props }: IconProps) => {
-  const style = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
   return (
     <Image
       {...props}
       style={[
         { resizeMode: 'contain' },
-        shouldTintColor(icon) && style.tintColor,
+        shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}
       source={icons[icon]}
@@ -351,7 +351,7 @@ const Icon = ({ icon, ...props }: IconProps) => {
   );
 };
 
-const computedStyle = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   tintColor: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },

@@ -1,14 +1,15 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, FlatList, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { MediaImageRenderer, prefetchImage } from '#components/medias';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize from '#hooks/useViewportSize';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
@@ -101,6 +102,7 @@ const ProfileKindStep = ({
   }, []);
 
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
   const mediasKeyExtractor = useCallback((item: Media) => item.id, []);
   const borderRadius = COVER_CARD_RADIUS * cardWidth;
@@ -121,7 +123,13 @@ const ProfileKindStep = ({
         />
       </View>
     ),
-    [borderRadius, cardWidth, intl],
+    [
+      borderRadius,
+      cardWidth,
+      intl,
+      styles.mediaImage,
+      styles.mediaImageContainer,
+    ],
   );
 
   const selectedCategory = profileCategories.find(
@@ -142,7 +150,7 @@ const ProfileKindStep = ({
         style={styles.profileCategoryItem}
       />
     ),
-    [profileCategoryId, onProfileCategoryChange],
+    [profileCategoryId, styles.profileCategoryItem, onProfileCategoryChange],
   );
 
   const getProfileCategoryItemLayout = useCallback(
@@ -244,7 +252,7 @@ export default ProfileKindStep;
 type ProfileCategory = ArrayItemType<ProfileKindStep_profileCategories$data>;
 type Media = ArrayItemType<ProfileCategory['medias']>;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(apperance => ({
   root: {
     flex: 1,
   },
@@ -253,14 +261,13 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingRight: 20,
   },
-  mediaImageContainer: {
-    marginLeft: 20,
-    shadowColor: colors.black,
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 15 },
-    shadowRadius: 6,
-    backgroundColor: colors.grey200,
-  },
+  mediaImageContainer: [
+    {
+      marginLeft: 20,
+      backgroundColor: colors.grey200,
+    },
+    shadow(apperance),
+  ],
   mediaImage: {
     aspectRatio: COVER_RATIO,
   },
@@ -276,4 +283,4 @@ const styles = StyleSheet.create({
   profileCategoryItem: {
     marginVertical: 9,
   },
-});
+}));

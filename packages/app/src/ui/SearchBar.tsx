@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -86,11 +86,12 @@ const SearchBar = ({
     textInputRef.current?.focus();
   };
 
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
+
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
       width: containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
-      ...appearanceStyle.focused,
+      ...styles.focused,
     });
     onFocus?.(e);
   };
@@ -98,7 +99,7 @@ const SearchBar = ({
   const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
       width: containerWidth,
-      ...appearanceStyle.focused,
+      ...styles.focused,
     });
     if (onBlur) {
       onBlur(e);
@@ -120,7 +121,7 @@ const SearchBar = ({
               <ViewTransition
                 testID="azzapp__SearchBar__view-inputcontainer"
                 style={[
-                  appearanceStyle.innerSearchBarView,
+                  styles.innerSearchBarView,
                   { width: containerWidth },
                   focusedStyle,
                 ]}
@@ -139,7 +140,7 @@ const SearchBar = ({
                   ref={textInputRef}
                   onFocus={onInputFocus}
                   onBlur={onInputBlur}
-                  style={[styles.input, appearanceStyle.input]}
+                  style={styles.input}
                   value={searchValue}
                   onChangeText={onSetValueText}
                   selectionColor={colors.primary400}
@@ -168,7 +169,7 @@ const SearchBar = ({
                   description: 'SearchBar accessibilityLabel Cancel Button',
                 })}
                 testID="azzapp__SearchBar__cancel-button"
-                style={[styles.cancelButton]}
+                style={styles.cancelButton}
                 onLayout={onButtonLayout}
                 onPress={onPressCancel}
                 label={intl.formatMessage({
@@ -186,7 +187,8 @@ const SearchBar = ({
 
 export default SearchBar;
 const MARGIN_LEFT_BUTTON = 10;
-const computedStyle = createStyleSheet(appearance => ({
+
+const styleSheet = createStyleSheet(appearance => ({
   innerSearchBarView: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,10 +203,10 @@ const computedStyle = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
   },
   input: {
+    flex: 1,
+    height: 46,
     color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
   },
-}));
-const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -217,7 +219,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%', //important for animation,to be based on the maxWith of the parent
   },
-
   clearIcon: {
     width: 15,
     height: 15,
@@ -237,10 +238,6 @@ const styles = StyleSheet.create({
     height: 15,
     padding: 1,
   },
-  input: {
-    flex: 1,
-    height: 46,
-  },
   cancelButton: {
     height: 46,
     marginLeft: MARGIN_LEFT_BUTTON,
@@ -253,4 +250,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+}));

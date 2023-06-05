@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { VH100 } from '#hooks/useViewportSize';
@@ -44,7 +44,7 @@ const CountryCodeListWithOptions = <T extends string>({
     setShowDropdown(false);
   };
   const vp = useViewportSize();
-  const appearanceStyle = useStyleSheet(computedStyles);
+  const styles = useStyleSheet(styleSheet);
 
   const isSelectorType = () => {
     return options.some(option => option.type === value);
@@ -58,14 +58,11 @@ const CountryCodeListWithOptions = <T extends string>({
       <PressableNative
         {...props}
         onPress={() => setShowDropdown(true)}
-        style={[appearanceStyle.button, style]}
+        style={[styles.button, style]}
         accessibilityRole="button"
       >
         {isSelectorType() ? (
-          <Icon
-            icon={selectorIcon()!}
-            style={[{ width: 24 }, appearanceStyle.icon]}
-          />
+          <Icon icon={selectorIcon()!} style={[{ width: 24 }, styles.icon]} />
         ) : (
           <Image
             source={{ uri: COUNTRY_FLAG[value as CountryCode] }}
@@ -76,7 +73,7 @@ const CountryCodeListWithOptions = <T extends string>({
       <BottomSheetModal
         visible={showDropdown}
         height={vp`${VH100} -${120}`}
-        contentContainerStyle={appearanceStyle.bottomSheetContainer}
+        contentContainerStyle={styles.bottomSheetContainer}
         onRequestClose={() => setShowDropdown(false)}
       >
         <CountrySelector
@@ -94,8 +91,7 @@ const CountryCodeListWithOptions = <T extends string>({
                     onPress={() => onSelect(type)}
                     style={[
                       styles.emailItem,
-                      appearanceStyle.emailItem,
-                      value === type && appearanceStyle.emailItemSelected,
+                      value === type && styles.emailItemSelected,
                     ]}
                   >
                     <Icon icon={icon} />
@@ -117,7 +113,7 @@ const CountryCodeListWithOptions = <T extends string>({
 };
 export default CountryCodeListWithOptions;
 
-const computedStyles = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -135,28 +131,22 @@ const computedStyles = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   emailItem: {
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
-  },
-  emailItemSelected: {
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-  },
-}));
-
-const styles = StyleSheet.create({
-  emailItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 30,
     marginBottom: 18,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+  emailItemSelected: {
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
   emailItemName: {
     flex: 1,
     marginLeft: 14,
   },
-
   section: {
     marginBottom: 35,
     paddingHorizontal: 20,
   },
-});
+}));

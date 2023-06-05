@@ -14,7 +14,7 @@ import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -147,7 +147,7 @@ export default function AccountScreenProfiles({
     }
   }, [authId, userProfiles]);
 
-  const styles = useStyleSheet(computedStyles);
+  const styles = useStyleSheet(styleSheet);
 
   const vp = useViewportSize();
 
@@ -207,7 +207,7 @@ export default function AccountScreenProfiles({
                   </View>
                 </PressableNative>
               ) : (
-                <View style={styles.coverContainer}>
+                <View style={[styles.coverContainer]}>
                   <CoverRenderer
                     width={COVER_WIDTH}
                     key={item.id}
@@ -335,21 +335,20 @@ export default function AccountScreenProfiles({
   );
 }
 
-const computedStyles = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   carouselContainer: {
     paddingTop: 14,
     alignItems: 'center',
     flexDirection: 'row',
     alignSelf: 'center',
   },
-  coverContainer: {
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-    borderRadius: 18,
-    shadowColor: '#45444C',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 6,
-  },
+  coverContainer: [
+    {
+      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+      borderRadius: 18,
+    },
+    shadow(appearance, 'center'),
+  ],
   addContainer: {
     borderColor: colors.grey200,
     borderWidth: 2,
@@ -384,42 +383,37 @@ const computedStyles = createStyleSheet(appearance => ({
     width: '100%',
     rowGap: 10,
   },
-  profileUrlContainer: {
-    shadowColor: colors.black,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 20,
-    height: 52,
-    width: '100%',
-    paddingLeft: 10,
-    paddingRight: 20,
-    borderRadius: 12,
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+  profileUrlContainer: [
+    {
+      height: 52,
+      width: '100%',
+      paddingLeft: 10,
+      paddingRight: 20,
+      borderRadius: 12,
+      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    shadow(appearance),
+  ],
   profileUrl: {
     flex: 1,
   },
   arrowIcon: {
     tintColor: appearance === 'dark' ? colors.white : colors.black,
   },
-  webCardContainer: {
-    backgroundColor: colors.black,
-    paddingVertical: 20,
-    paddingHorizontal: 26,
-    borderRadius: 13,
-    width: '100%',
-    aspectRatio: 1.6,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 10,
+  webCardContainer: [
+    {
+      backgroundColor: colors.black,
+      paddingVertical: 20,
+      paddingHorizontal: 26,
+      borderRadius: 13,
+      width: '100%',
+      aspectRatio: 1.6,
     },
-    shadowRadius: 10,
-    shadowOpacity: 0.9,
-  },
+    shadow(appearance),
+  ],
   webCardBackground: {
     position: 'absolute',
     left: 0,

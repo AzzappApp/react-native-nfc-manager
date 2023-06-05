@@ -479,6 +479,7 @@ export const CardModuleSimpleButtonGraphQL = createGraphQLCardModule(
     },
   },
 );
+
 export const CardModulesGraphql = [
   CardModuleBlockTextGraphQL,
   CardModuleCarouselGraphQL,

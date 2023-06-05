@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { COVER_RATIO, COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -14,6 +15,8 @@ const CoverEditionImagePickerMediaWrapper = ({
   const onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
     setHeight(nativeEvent.layout.height);
   };
+
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View style={styles.container} onLayout={onLayout}>
@@ -33,20 +36,19 @@ const CoverEditionImagePickerMediaWrapper = ({
 
 export default CoverEditionImagePickerMediaWrapper;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(apperance => ({
   radiusBox: {
     flex: 1,
     overflow: 'hidden',
     backgroundColor: colors.grey100,
   },
-  shadowBox: {
-    flex: 1,
-    aspectRatio: COVER_RATIO,
-    shadowColor: colors.black,
-    shadowOpacity: 0.42,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 17,
-  },
+  shadowBox: [
+    {
+      flex: 1,
+      aspectRatio: COVER_RATIO,
+    },
+    shadow(apperance, 'center'),
+  ],
   container: {
     flex: 1,
     marginBottom: 39,
@@ -54,4 +56,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+}));

@@ -64,13 +64,11 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
     userKey,
   );
 
-  const vp = useViewportSize();
-
-  const appearanceStyle = useStyleSheet(computedStyles);
+  const logout = useLogout();
 
   const intl = useIntl();
-
-  const logout = useLogout();
+  const vp = useViewportSize();
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View>
@@ -98,7 +96,7 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
       <BottomSheetModal
         visible={showDropdown}
         height={vp`${insetBottom}  + ${440}`}
-        contentContainerStyle={appearanceStyle.bottomSheetContainer}
+        contentContainerStyle={styles.bottomSheetContainer}
         onDismiss={() => {
           if (requestedLogout) {
             logout();
@@ -108,16 +106,16 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
           dispatch({ type: 'CLOSE_DROPDOWN' });
         }}
       >
-        <View style={appearanceStyle.bottomSheetOptionsContainer}>
+        <View style={styles.bottomSheetOptionsContainer}>
           <PressableNative
             onPress={() => {
               dispatch({ type: 'LOGOUT' });
             }}
-            style={appearanceStyle.bottomSheetOptionButton}
+            style={styles.bottomSheetOptionButton}
           >
-            <View style={appearanceStyle.bottomSheetOptionContainer}>
-              <View style={appearanceStyle.bottomSheetOptionIconLabel}>
-                <Icon icon="logout" style={appearanceStyle.icon} />
+            <View style={styles.bottomSheetOptionContainer}>
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon icon="logout" style={styles.icon} />
                 <Text>
                   <FormattedMessage
                     defaultMessage="Logout"
@@ -125,7 +123,7 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
                   />
                 </Text>
               </View>
-              <Icon icon="arrow_right" style={appearanceStyle.icon} />
+              <Icon icon="arrow_right" style={styles.icon} />
             </View>
           </PressableNative>
         </View>
@@ -134,7 +132,7 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
   );
 };
 
-const computedStyles = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   icon: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },

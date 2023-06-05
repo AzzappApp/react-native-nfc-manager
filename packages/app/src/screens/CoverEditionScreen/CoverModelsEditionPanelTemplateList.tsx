@@ -2,7 +2,7 @@ import { memo, useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
 import PressableNative from '#ui/PressableNative';
@@ -292,13 +292,13 @@ const TemplateItem = ({
   onTemplateError,
   onTemplateReady,
 }: CoverModelsEditionPanelTemplateListItemProps) => {
-  const appearanceStyle = useStyleSheet(computedStyle);
-  const intl = useIntl();
-
   const onPress = useCallback(
     () => onSelectTemplate(item.id),
     [item.id, onSelectTemplate],
   );
+
+  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <PressableNative
@@ -310,7 +310,7 @@ const TemplateItem = ({
           'TemplateSelectorTemplateItem accessibilityHint template item',
       })}
       style={[
-        appearanceStyle.templateContainer,
+        styles.templateContainer,
         {
           width: templateItemWidth,
           height: templateItemHeight,
@@ -326,7 +326,7 @@ const TemplateItem = ({
             height: coverHeight,
             borderRadius: COVER_CARD_RADIUS * coverWidth,
           },
-          appearanceStyle.coverShadow,
+          styles.coverShadow,
         ]}
       >
         {uri && (
@@ -356,13 +356,8 @@ const TemplateItem = ({
 
 const TemplateItemMemo = memo(TemplateItem); //if perf issue, we can improve the memoization with a custom comparison function
 
-const computedStyle = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
+const styleSheet = createStyleSheet(appearance => ({
+  coverShadow: shadow(appearance, 'center'),
   templateContainer: {
     borderWidth: TEMPLATE_BORDER_WIDTH,
   },

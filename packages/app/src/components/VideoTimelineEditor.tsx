@@ -201,7 +201,7 @@ const VideoTimelineEditor = ({
     return formatDuration(duration);
   };
 
-  const styles = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View {...props}>
@@ -256,8 +256,10 @@ const VideoTimelineEditor = ({
 };
 
 export default VideoTimelineEditor;
+
 const THUMB_WIDTH = 6;
-const computedStyle = createStyleSheet(appearance => ({
+
+const styleSheet = createStyleSheet(appearance => ({
   viewTimeMarker: {
     marginTop: 12,
     flexDirection: 'row',

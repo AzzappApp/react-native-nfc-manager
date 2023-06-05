@@ -52,7 +52,7 @@ const ProfileScreenFooter = ({
   );
 
   const intl = useIntl();
-  const styles = useStyleSheet(stylesheet);
+  const styles = useStyleSheet(styleSheet);
   const tabs = useMemo<FooterBarItem[]>(
     () => [
       {
@@ -209,7 +209,7 @@ const ProfileScreenFooter = ({
 
 export default ProfileScreenFooter;
 
-const stylesheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   buttonBar: {
     position: 'absolute',
     width: '100%',

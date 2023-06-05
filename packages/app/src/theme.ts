@@ -89,3 +89,18 @@ export const mixins = {
     left: 0,
   },
 } as const;
+
+export const shadow = (
+  appearence: 'dark' | 'light',
+  direction: 'bottom' | 'center' | 'top' = 'bottom',
+) =>
+  <const>{
+    shadowColor: appearence === 'dark' ? '#636363' : '#000',
+    shadowOffset: {
+      width: 0,
+      height: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 1,
+  };

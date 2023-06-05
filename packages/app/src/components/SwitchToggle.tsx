@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Animated } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { colors, shadow, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type {
   ViewProps,
@@ -60,7 +60,7 @@ const SwitchToggle = <T,>({
     setLayout(event.nativeEvent.layout);
   };
 
-  const styles = useStyleSheet(stylesheet);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <Pressable
@@ -122,7 +122,7 @@ const SwitchToggle = <T,>({
 
 export default SwitchToggle;
 
-const stylesheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     flexDirection: 'row',
     height: 35,
@@ -136,16 +136,15 @@ const stylesheet = createStyleSheet(appearance => ({
     alignSelf: 'center',
     color: appearance === 'dark' ? colors.white : colors.black,
   },
-  thumb: {
-    position: 'absolute',
-    top: 2,
-    height: 31,
-    width: '49%',
-    borderRadius: 20,
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 1,
-  },
+  thumb: [
+    {
+      position: 'absolute',
+      top: 2,
+      height: 31,
+      width: '49%',
+      borderRadius: 20,
+      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
+    },
+    shadow(appearance, 'center'),
+  ],
 }));

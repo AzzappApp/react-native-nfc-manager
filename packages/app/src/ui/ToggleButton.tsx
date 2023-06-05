@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableBackground from '#ui/PressableBackground';
@@ -19,19 +18,14 @@ const ToggleButton = ({
   onPress,
   style = {},
 }: ToggleButtonProps) => {
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
   return (
     <PressableBackground
       onPress={onPress}
       highlightColor={undefined}
       accessibilityRole="togglebutton"
       accessibilityState={{ checked: toggled }}
-      style={[
-        styles.container,
-        appearanceStyle.container,
-        toggled && appearanceStyle.toggleContainer,
-        style,
-      ]}
+      style={[styles.container, toggled && styles.toggleContainer, style]}
     >
       <Text
         variant="button"
@@ -39,7 +33,7 @@ const ToggleButton = ({
           {
             textAlignVertical: 'center',
           },
-          toggled && appearanceStyle.toggleLabel,
+          toggled && styles.toggleLabel,
         ]}
       >
         {label}
@@ -52,8 +46,17 @@ const ToggleButton = ({
 export default memo(ToggleButton);
 
 export const TOGGLE_BUTTON_HEIGHT = 35;
-const computedStyle = createStyleSheet(appearance => ({
+
+const styleSheet = createStyleSheet(appearance => ({
   container: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    height: TOGGLE_BUTTON_HEIGHT,
+    borderRadius: 100,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
     borderColor: appearance === 'light' ? colors.black : colors.white,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
@@ -64,16 +67,3 @@ const computedStyle = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.white : colors.black,
   },
 }));
-const styles = StyleSheet.create({
-  container: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    height: TOGGLE_BUTTON_HEIGHT,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: colors.black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-});

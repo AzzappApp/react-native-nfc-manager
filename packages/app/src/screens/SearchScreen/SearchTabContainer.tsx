@@ -1,8 +1,8 @@
 import { useState, useEffect, Suspense, useCallback } from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
-import { colors, textStyles } from '#theme';
+import { colors, shadow, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import SearchResultGlobal, {
@@ -44,6 +44,7 @@ const SearchTabContainer = ({
   });
   const [pageIndexSelected, setPageindexSelected] = useState(0);
   const environnement = useRelayEnvironment();
+  const styles = useStyleSheet(styleSheet);
 
   useEffect(() => {
     if (searchValue && environnement) {
@@ -156,20 +157,20 @@ const TabBarSearch = (
   },
 ) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
   const colorScheme = useColorScheme();
 
   return (
     <TabBar
       {...props}
-      style={appearanceStyle.tabBarStyle}
+      style={styles.tabBarStyle}
       indicatorStyle={[
-        appearanceStyle.indicatorStyle,
+        styles.indicatorStyle,
         {
           width: props.layout.width / 4 - 18,
         },
       ]}
-      labelStyle={appearanceStyle.label}
+      labelStyle={styles.label}
       inactiveColor={colorScheme === 'light' ? colors.grey50 : colors.grey900}
       activeColor={colorScheme === 'light' ? colors.black : colors.white}
       renderLabel={({ route }) => (
@@ -182,14 +183,15 @@ const TabBarSearch = (
   );
 };
 
-const computedStyle = createStyleSheet(appearance => ({
-  tabBarStyle: {
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    shadowOffset: { height: 0, width: 0 },
-    shadowColor: 'transparent',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
+const IMAGE_SIZE = 24;
+
+const styleSheet = createStyleSheet(appearance => ({
+  tabBarStyle: [
+    {
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    },
+    shadow(appearance, 'center'),
+  ],
   indicatorStyle: {
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
     height: 2,
@@ -200,6 +202,18 @@ const computedStyle = createStyleSheet(appearance => ({
   label: {
     ...textStyles.medium,
     color: appearance === 'light' ? colors.black : colors.white,
+  },
+  tabViewstyle: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+  },
+  image: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+  },
+  imageActive: {
+    //tintColor: colors.black, TODO: waiting for specification
   },
 }));
 
@@ -226,20 +240,3 @@ type TabQueries = {
     | PreloadedQuery<SearchResultGlobalQuery>
     | undefined;
 };
-
-const IMAGE_SIZE = 24;
-
-const styles = StyleSheet.create({
-  tabViewstyle: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-  },
-  image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-  },
-  imageActive: {
-    //tintColor: colors.black, TODO: waiting for specification
-  },
-});

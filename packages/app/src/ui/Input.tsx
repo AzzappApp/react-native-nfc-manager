@@ -49,8 +49,6 @@ const Input = (
   }: TextInputProps,
   ref: ForwardedRef<NativeTextInput>,
 ) => {
-  const styles = useStyleSheet(computedStyled);
-  const scheme = useColorScheme();
   const [isFocused, setIsFocused] = useState(false);
 
   const onFocusInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
@@ -62,6 +60,9 @@ const Input = (
     setIsFocused(false);
     onBlur?.(e);
   };
+
+  const scheme = useColorScheme();
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View
@@ -90,7 +91,7 @@ const Input = (
   );
 };
 
-const computedStyled = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   rightElement: { marginRight: 13.5 },
   leftElement: { marginLeft: 16 },
   errored: {

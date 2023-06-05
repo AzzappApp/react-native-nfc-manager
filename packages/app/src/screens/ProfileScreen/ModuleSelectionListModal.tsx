@@ -1,8 +1,10 @@
 import chunk from 'lodash/chunk';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, Modal, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Modal, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -136,7 +138,10 @@ const ModuleSelectionListModal = ({
       ] as const,
     [intl],
   );
+
   const { top, bottom } = useSafeAreaInsets();
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <Modal onRequestClose={onRequestClose} {...props}>
       <Container style={{ flex: 1, paddingTop: top }}>
@@ -177,7 +182,7 @@ const ModuleSelectionListModal = ({
 
 export default ModuleSelectionListModal;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   buttonContainer: {
     padding: 20,
     gap: 10,
@@ -186,17 +191,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-  button: {
-    padding: 10,
-    borderRadius: 10,
-    gap: 10,
-    shadowOpacity: 0.42,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 8,
-    backgroundColor: '#fff',
-  },
+  button: [
+    {
+      padding: 10,
+      borderRadius: 10,
+      gap: 10,
+    },
+    shadow(appearance),
+  ],
   buttonImage: {
     padding: 10,
     aspectRatio: 1,
   },
-});
+}));

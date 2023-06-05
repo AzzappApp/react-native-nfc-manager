@@ -38,7 +38,6 @@ const PostScreen = ({
   hasFocus = true,
   initialVideoTime,
 }: PostScreenProps) => {
-  const styles = useStyleSheet(stylesAppearance);
   const router = useRouter();
   const intl = useIntl();
   const onClose = () => {
@@ -94,6 +93,7 @@ const PostScreen = ({
     [initialVideoTime, post.id],
   );
 
+  const styles = useStyleSheet(styleSheet);
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <Header
@@ -194,7 +194,7 @@ const RelatedPostLoaderInner = (
 
 const RelatedPostLoader = forwardRef(RelatedPostLoaderInner);
 
-const stylesAppearance = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   safeAreaView: {
     flex: 1,
     overflow: 'hidden',

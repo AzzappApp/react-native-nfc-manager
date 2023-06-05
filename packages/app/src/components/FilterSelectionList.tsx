@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, StyleSheet, View, Platform } from 'react-native';
-import { colors } from '#theme';
+import { ScrollView, View, Platform } from 'react-native';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -85,7 +85,6 @@ const FilterButton = ({
   onPress,
 }: FilterButtonProps) => {
   const [width, setWidth] = useState<number | null>(null);
-  const appearanceStyle = useStyleSheet(computedStyles);
   const onLayout = (event: LayoutChangeEvent) => {
     setWidth(event.nativeEvent.layout.width);
   };
@@ -95,6 +94,7 @@ const FilterButton = ({
     default: width != null && cardRadius != null ? cardRadius * width : null,
   });
 
+  const styles = useStyleSheet(styleSheet);
   return (
     <PressableNative
       onPress={onPress}
@@ -108,7 +108,7 @@ const FilterButton = ({
             borderRadius: borderRadius + BORDER_SELECTED_WIDTH,
             borderColor: 'transparent',
           },
-          selected && appearanceStyle.selected,
+          selected && styles.selected,
         ]}
       >
         <View style={[styles.imageWrapper, { borderRadius }]}>
@@ -129,13 +129,8 @@ const FilterButton = ({
 };
 
 const BORDER_SELECTED_WIDTH = 3.75;
-const computedStyles = createStyleSheet(appearance => ({
-  selected: {
-    borderColor: appearance === 'light' ? colors.black : colors.white,
-  },
-}));
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   imageWrapper: {
     flex: 1,
     backgroundColor: colors.grey200,
@@ -144,13 +139,15 @@ const styles = StyleSheet.create({
     marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
     height: '90%',
   },
-  filterImageContainer: {
-    flex: 1,
-    borderWidth: BORDER_SELECTED_WIDTH,
-    shadowColor: colors.black,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 4,
+  filterImageContainer: [
+    {
+      flex: 1,
+      borderWidth: BORDER_SELECTED_WIDTH,
+    },
+    shadow(appearance, 'center'),
+  ],
+  selected: {
+    borderColor: appearance === 'light' ? colors.black : colors.white,
   },
   filterImage: {
     flex: 1,
@@ -162,4 +159,4 @@ const styles = StyleSheet.create({
   filterTitleSelected: {
     alignSelf: 'center',
   },
-});
+}));

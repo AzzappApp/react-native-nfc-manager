@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { View } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { useRouter } from '#PlatformEnvironment';
-import { colors } from '#theme';
+import { shadow } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
@@ -39,7 +39,7 @@ const CoverEditionScreenFallback = ({
 
   const coverBorderRadius = COVER_CARD_RADIUS * coverHeight * COVER_RATIO;
 
-  const styles = useStyleSheet(stylesheet);
+  const styles = useStyleSheet(styleSheet);
   return (
     <Container style={[{ flex: 1, paddingTop: insetTop }, style]}>
       <CoverEditionScreenHeader
@@ -100,11 +100,6 @@ const CoverEditionScreenFallback = ({
 
 export default CoverEditionScreenFallback;
 
-const stylesheet = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
+const styleSheet = createStyleSheet(appearance => ({
+  coverShadow: shadow(appearance, 'center'),
 }));

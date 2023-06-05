@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { colors } from '#theme';
+import { View } from 'react-native';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import type {
   LayoutChangeEvent,
@@ -54,6 +55,8 @@ const EditorScaledPreview = ({
       ? Math.min(layout.height / moduleContainerLayout?.height, 1)
       : 1;
 
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <View {...props} style={style} onLayout={onLayout}>
       <PressableNative
@@ -86,14 +89,13 @@ const EditorScaledPreview = ({
 
 export default EditorScaledPreview;
 
-const styles = StyleSheet.create({
-  moduleContainer: {
-    position: 'absolute',
-    width: '100%',
-    backgroundColor: colors.white,
-    shadowColor: colors.black,
-    shadowOpacity: 0.42,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 17,
-  },
-});
+const styleSheet = createStyleSheet(apperance => ({
+  moduleContainer: [
+    {
+      position: 'absolute',
+      width: '100%',
+      backgroundColor: colors.white,
+    },
+    shadow(apperance),
+  ],
+}));

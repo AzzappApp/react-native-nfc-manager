@@ -6,10 +6,8 @@ export type ColorSchemeName = 'dark' | 'light';
 
 type ColorSchemeStyleSheet<T> = Record<ColorSchemeName, T>;
 
-type ComposableStyle<T> = Array<StyleProp<T>> | StyleProp<T>;
-
 type ComposableNamedStyles<T> = {
-  [P in keyof T]: ComposableStyle<ImageStyle | TextStyle | ViewStyle>;
+  [P in keyof T]: StyleProp<ImageStyle | TextStyle | ViewStyle>;
 };
 
 /**
@@ -22,8 +20,8 @@ export const createStyleSheet = <T extends ComposableNamedStyles<T>>(
   factory: (appeareance: ColorSchemeName) => T,
 ): ColorSchemeStyleSheet<T> => {
   return {
-    light: StyleSheet.create(factory('light') as any),
-    dark: StyleSheet.create(factory('dark') as any),
+    light: StyleSheet.create(composeStyles(factory('light')) as any),
+    dark: StyleSheet.create(composeStyles(factory('dark')) as any),
   };
 };
 
@@ -102,15 +100,11 @@ const composeStyles = <T extends ComposableNamedStyles<T>>(
 ): StyleSheet.NamedStyles<T> => {
   const result: T = {} as any;
   Object.keys(styles).forEach(key => {
-    let value = styles[key as keyof T];
-    if (Array.isArray(value)) {
-      value = Object.assign({}, ...(styles[key as keyof T] as any));
-    } else if (!value) {
-      value = {} as any;
-    }
-    result[key as keyof T] = value;
+    const value = styles[key as keyof T];
+    result[key as keyof T] = Array.isArray(value)
+      ? StyleSheet.flatten(styles[key as keyof T] as any)
+      : value ?? {};
   });
-
   return result as any;
 };
 
@@ -137,11 +131,3 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 ) => void
   ? I
   : never;
-
-/*
- * A hook that returns the opposite color scheme of the current one.
- */
-export function useInvertedColorScheme() {
-  const colorScheme = useColorScheme();
-  return colorScheme === 'dark' ? 'light' : 'dark';
-}

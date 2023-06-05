@@ -6,7 +6,7 @@
  *
  * **/
 import React, { cloneElement } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors, fontFamilies } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from './Container';
@@ -93,6 +93,7 @@ const FooterBar = ({
   tabItemStyle,
   showCircle = false,
 }: FooterBarProps) => {
+  const styles = useStyleSheet(styleSheet);
   return (
     <Container
       style={[styles.container, { height }, style]}
@@ -163,7 +164,7 @@ const FooterBarItem = ({
   if ((!icon && !IconComponent) || (icon && IconComponent)) {
     throw new Error('You must provide an icon or an IconComponent');
   }
-  const appearanceStyles = useStyleSheet(computedStyles);
+  const styles = useStyleSheet(styleSheet);
 
   const onPress = () => onItemPress?.(tabKey);
 
@@ -175,28 +176,26 @@ const FooterBarItem = ({
       accessibilityLabel={label}
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
-      style={[style ?? appearanceStyles.tab]}
+      style={[style ?? styles.tab]}
     >
       <View
         style={[
           { backgroundColor: 'transparent' },
-          showCircle && isSelected && appearanceStyles.selectedMenu,
+          showCircle && isSelected && styles.selectedMenu,
           showCircle &&
             isSelected &&
             decoration === 'label' &&
-            appearanceStyles.circleWithLabel,
+            styles.circleWithLabel,
         ]}
       >
         {icon && (
           <Icon
             icon={icon}
             style={[
-              appearanceStyles.image,
+              styles.image,
               { width: iconSize, height: iconSize },
               isSelected &&
-                (showCircle
-                  ? appearanceStyles.imageActiveCircle
-                  : appearanceStyles.imageActive),
+                (showCircle ? styles.imageActiveCircle : styles.imageActive),
               shouldNotTint && { tintColor: undefined },
             ]}
           />
@@ -204,45 +203,37 @@ const FooterBarItem = ({
         {IconComponent &&
           cloneElement(IconComponent, {
             style: [
-              appearanceStyles.image,
+              styles.image,
               { width: iconSize, height: iconSize },
               isSelected &&
-                (showCircle
-                  ? appearanceStyles.imageActiveCircle
-                  : appearanceStyles.imageActive),
+                (showCircle ? styles.imageActiveCircle : styles.imageActive),
               shouldNotTint && { tintColor: undefined },
               IconComponent.props.style,
             ],
           })}
       </View>
       {decoration === 'label' && (
-        <View style={[appearanceStyles.labelDecoration]}>
+        <View style={[styles.labelDecoration]}>
           <Text
             variant="xsmall"
-            style={[
-              appearanceStyles.label,
-              isSelected && appearanceStyles.activeLabel,
-            ]}
+            style={[styles.label, isSelected && styles.activeLabel]}
           >
             {label}
           </Text>
         </View>
       )}
       {decoration === 'underline' && isSelected && (
-        <View style={appearanceStyles.underline} />
+        <View style={styles.underline} />
       )}
     </PressableNative>
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
-});
-
-const computedStyles = createStyleSheet(appearance => ({
   tab: {
     flex: 1,
     alignItems: 'center',
@@ -291,4 +282,5 @@ const computedStyles = createStyleSheet(appearance => ({
     borderRadius: 17,
   },
 }));
+
 export default FooterBar;
