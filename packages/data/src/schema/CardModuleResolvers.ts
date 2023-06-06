@@ -8,6 +8,7 @@ import type {
   CardModuleSimpleButtonResolvers,
   CardModuleSimpleTextResolvers,
   CardModuleSimpleTitleResolvers,
+  CardModulePhotoWithTextAndTitleResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -157,3 +158,36 @@ export const CardModuleSimpleButton: CardModuleSimpleButtonResolvers = {
   width: getData('width'),
   background,
 };
+
+export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleResolvers =
+  {
+    image: async (cardModule, _, { mediaLoader }) => {
+      const { data } = cardModule;
+      if (data && typeof data === 'object' && 'image' in data) {
+        const image = await mediaLoader.load(data.image as string);
+        if (image) {
+          return image;
+        }
+      }
+
+      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    },
+    title: getData('title'),
+    text: getData('text'),
+    backgroundStyle: getData('backgroundStyle', true),
+    fontFamily: getData('fontFamily'),
+    marginHorizontal: getData('marginHorizontal'),
+    fontSize: getData('fontSize'),
+    textAlign: getData('textAlign'),
+    marginVertical: getData('marginVertical'),
+    verticalSpacing: getData('verticalSpacing'),
+    background,
+    aspectRatio: getData('aspectRatio'),
+    borderRadius: getData('borderRadius'),
+    fontColor: getData('fontColor'),
+    gap: getData('gap'),
+    horizontalArrangement: getData('horizontalArrangement'),
+    imageMargin: getData('imageMargin'),
+    textSize: getData('textSize'),
+    verticalArrangement: getData('verticalArrangement'),
+  };

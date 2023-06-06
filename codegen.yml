@@ -35,6 +35,7 @@ generates:
         CardModuleSimpleText: \@prisma/client#CardModule as CardModuleSimpleTextModel
         CardModuleSimpleTitle: \@prisma/client#CardModule as CardModuleSimpleTitleModel
         CardModuleSimpleButton: \@prisma/client#CardModule as CardModuleSimpleButtonModel
+        CardModulePhotoWithTextAndTitle: \@prisma/client#CardModule as CardModulePhotoWithTextAndTitleModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

@@ -28,4 +28,10 @@ export const CardCoverTemplate: CardCoverTemplateResolvers = {
   foreground: ({ foregroundId }, _, { staticMediaLoader }) => {
     return foregroundId ? staticMediaLoader.load(foregroundId) : null;
   },
+  sourceMedia: ({ sourceMediaId }, _, { mediaLoader }) => {
+    if (sourceMediaId) {
+      return mediaLoader.load(sourceMediaId) as Promise<Media>;
+    }
+    return null;
+  },
 };
