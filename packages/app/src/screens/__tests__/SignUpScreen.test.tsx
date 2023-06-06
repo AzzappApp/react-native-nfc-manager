@@ -47,7 +47,7 @@ describe('SignUpScreen', () => {
     expect(submitButton).not.toBeDisabled();
   });
 
-  test('should call the `signup` callback if form is valid', () => {
+  test('should call the `signup` callback if form is valid', async () => {
     render(<SignUpScreen signup={signup} />);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -64,9 +64,10 @@ describe('SignUpScreen', () => {
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
     });
+    await act(flushPromises);
   });
 
-  test('should call the `signup` callback if form is filled with a valid phone number', () => {
+  test('should call the `signup` callback if form is filled with a valid phone number', async () => {
     render(<SignUpScreen signup={signup} />);
     const emailOrCountryButton = screen.getByLabelText(
       'Select a calling code or email',
@@ -93,6 +94,7 @@ describe('SignUpScreen', () => {
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
     });
+    await act(flushPromises);
   });
 
   test('should not call the `signup` callback if phone number is not valid', () => {
@@ -171,7 +173,7 @@ describe('SignUpScreen', () => {
     expect(screen.queryByText(passwordError)).toBeTruthy();
   });
 
-  test('should not call the `signup` callback if the checkbox are not checked', () => {
+  test('should not call the `signup` callback if the checkbox are not checked', async () => {
     render(<SignUpScreen signup={signup} />);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -199,6 +201,7 @@ describe('SignUpScreen', () => {
 
     expect(screen.queryByText(tosError)).not.toBeTruthy();
     expect(signup).toHaveBeenCalled();
+    await act(flushPromises);
   });
 
   test('should display the already registered error message if signup return the error', async () => {

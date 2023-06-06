@@ -6,6 +6,7 @@ import {
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
+import ActivityIndicator from './ActivityIndicator';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef } from 'react';
@@ -15,10 +16,11 @@ export type ButtonProps = PressableProps & {
   label: string;
   variant?: 'cancel' | 'primary' | 'secondary';
   style?: StyleProp<ViewStyle>;
+  loading?: boolean;
 };
 
 const Button = (
-  { label, variant = 'primary', style, ...props }: ButtonProps,
+  { label, variant = 'primary', loading, style, ...props }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
 ) => {
   const colorScheme = useColorScheme();
@@ -32,7 +34,9 @@ const Button = (
   const variantStyles = useVariantStyleSheet(computedStyles, variant);
   const buttonProps = {
     accessibilityRole: 'button',
-    children: (
+    children: loading ? (
+      <ActivityIndicator color={colorScheme === 'light' ? 'white' : 'black'} />
+    ) : (
       <Text variant="button" style={variantStyles.label} numberOfLines={1}>
         {label}
       </Text>

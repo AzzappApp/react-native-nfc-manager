@@ -1,6 +1,6 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, Image, View } from 'react-native';
+import { Image, View } from 'react-native';
 import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
@@ -9,6 +9,7 @@ import {
 import { shadow } from '#theme';
 import Cropper from '#components/Cropper';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
 import Text from '#ui/Text';
@@ -262,7 +263,7 @@ const CoverPreviewRenderer = (
             {(computing || isLoading) && (
               <Delay delay={computing ? 0 : 500}>
                 <View style={styles.maskComputingOverlay}>
-                  <ActivityIndicator size="large" color="white" />
+                  <ActivityIndicator color="white" />
                 </View>
               </Delay>
             )}

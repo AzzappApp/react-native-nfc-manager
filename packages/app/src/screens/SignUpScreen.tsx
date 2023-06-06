@@ -54,6 +54,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
   const [checkedPrivacy, setCheckedPrivacy] = useState<CheckboxStatus>('none');
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
@@ -67,6 +69,15 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
       icon: 'mail',
     },
   ];
+
+  const onPhoneNumberChange = useCallback(
+    (value?: string | null) => {
+      if (!isSubmitting) {
+        setPhoneNumber(value ?? '');
+      }
+    },
+    [isSubmitting],
+  );
 
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
@@ -102,6 +113,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 
     if (canSignup) {
       try {
+        setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
           await signup({ email, password });
         } else {
@@ -139,6 +151,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
           );
         }
       }
+      setIsSubmitting(false);
     }
   }, [
     checkedPrivacy,
@@ -168,6 +181,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
         style={styles.content}
+        pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
         <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
@@ -234,7 +248,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                       'Signup Screen - email address input placeholder',
                   })}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={isSubmitting ? undefined : setEmail}
                   autoCapitalize="none"
                   autoComplete="email"
                   keyboardType="email-address"
@@ -258,7 +272,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                       'Signup Screen - phone number input placeholder',
                   })}
                   value={phoneNumber}
-                  onChange={value => setPhoneNumber(value ?? '')}
+                  onChange={onPhoneNumberChange}
                   defaultCountry={countryCodeOrEmail}
                   autoCapitalize="none"
                   keyboardType="phone-pad"
@@ -287,7 +301,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                 description: 'Signup Screen - password textinput placeholder',
               })}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage:
                   'Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case',
@@ -372,6 +386,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                 })}
                 style={styles.button}
                 disabled={(!phoneNumber && !email) || !password}
+                loading={isSubmitting}
               />
             </Submit>
             {showTOSError && (

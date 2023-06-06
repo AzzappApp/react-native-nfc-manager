@@ -1,4 +1,5 @@
-import { ActivityIndicator, View } from 'react-native';
+import { View } from 'react-native';
+import ActivityIndicator from './ActivityIndicator';
 import type { ViewProps } from 'react-native';
 
 const ListLoadingFooter = ({

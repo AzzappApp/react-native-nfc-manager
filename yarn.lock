@@ -3005,11 +3005,6 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@hookform/resolvers@^2.8.0":
-  version "2.9.11"
-  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-2.9.11.tgz#9ce96e7746625a89239f68ca57c4f654264c17ef"
-  integrity sha512-bA3aZ79UgcHj7tFV7RlgThzwSSHZgvfbt2wprldRkYBcMopdMvHyO17Wwp/twcJasNFischFfS7oz8Katz8DdQ==
-
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
@@ -9020,6 +9015,11 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+lottie-react-native@^6.0.0-rc.6:
+  version "6.0.0-rc.6"
+  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-6.0.0-rc.6.tgz#2d7e40ca8f473ed6ecb3a71623910a488884d8d8"
+  integrity sha512-P0xyb/2MtWo+JVWq3eY2TYomfhefDAxa3N4+jw2UP248g7X1k/TqmmuNrztgQwsJzcubxY/Ro/PVVOupIAWCcg==
+
 loud-rejection@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/loud-rejection/-/loud-rejection-2.2.0.tgz#4255eb6e9c74045b0edc021fa7397ab655a8517c"
@@ -10557,11 +10557,6 @@ react-freeze@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.0.tgz#b21c65fe1783743007c8c9a2952b1c8879a77354"
   integrity sha512-yQaiOqDmoKqks56LN9MTgY06O0qQHgV4FUrikH357DydArSZHQhl0BJFqGKIZoTqi8JizF9Dxhuk1FIZD6qCaw==
-
-react-hook-form@^7.20.0:
-  version "7.44.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.44.2.tgz#220186d3e380b3d6b15083b094a6ca77d3797a8b"
-  integrity sha512-IyihmIbCwzDI/iqlecTRa7+4BCnzNx40upSlGvIU7qwENhTf6APatm4bmL9ANtWKPYlD67SIlxfls7GwCUe+Lg==
 
 react-hook-form@^7.40.0:
   version "7.43.7"
@@ -12824,7 +12819,7 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zod@3.21.4, zod@^3.0.0:
+zod@3.21.4:
   version "3.21.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
   integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==
