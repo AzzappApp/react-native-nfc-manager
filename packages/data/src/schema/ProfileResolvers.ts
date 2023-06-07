@@ -52,8 +52,8 @@ export const Profile: ProfileResolvers = {
       },
     );
   },
-  isFollowing: async (profile, _) => {
-    return isFollowing(profile.id, profile.id);
+  isFollowing: async (profile, _, { auth }) => {
+    return auth.profileId ? isFollowing(auth.profileId, profile.id) : false;
   },
   nbPosts: async (profile, _) => {
     return getProfilesPostsCount(profile.id);
