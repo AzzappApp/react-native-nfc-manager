@@ -66,7 +66,7 @@ const updateCover: MutationResolvers['updateCover'] = async (
         const cover = await createCardCover(
           {
             mediaId: input.media!.id,
-            mediaStyle: input.mediaStyle as any,
+            mediaStyle: input.mediaStyle as Prisma.JsonValue,
             sourceMediaId: input.sourceMedia!.id,
             textPreviewMediaId: input.textPreviewMedia!.id,
             maskMediaId: input.maskMedia?.id ?? null,

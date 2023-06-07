@@ -1,22 +1,17 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
+import AccountHeader from '#components/AccountHeader';
 import useToggle from '#hooks/useToggle';
-import Header from '#ui/Header';
 import Icon from '#ui/Icon';
-import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import AccountDetailsEmailForm from './AccountDetailsEmailForm';
 import AccountDetailsPasswordForm from './AccountDetailsPasswordForm';
 import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
 import type { AccountDetailsScreen_query$key } from '@azzapp/relay/artifacts/AccountDetailsScreen_query.graphql';
-
-const COVER_WIDTH = 29;
 
 const AccountDetailsScreen = ({
   data,
@@ -33,20 +28,13 @@ const AccountDetailsScreen = ({
         viewer {
           profile {
             userName
-            card {
-              backgroundColor
-              cover {
-                ...CoverRenderer_cover
-              }
-            }
+            ...AccountHeader_profile
           }
         }
       }
     `,
     data,
   );
-
-  const router = useRouter();
 
   const profile = viewer?.profile;
 
@@ -55,6 +43,8 @@ const AccountDetailsScreen = ({
     useToggle(false);
   const [passwordVisible, togglePasswordVisible] = useToggle(false);
 
+  const intl = useIntl();
+
   return (
     <View
       style={{
@@ -62,39 +52,15 @@ const AccountDetailsScreen = ({
         rowGap: 15,
       }}
     >
-      <Header
-        leftElement={
-          <IconButton
-            icon="arrow_left"
-            onPress={router.back}
-            iconSize={28}
-            variant="icon"
-          />
-        }
-        middleElement={
-          <Text variant="large">
-            <FormattedMessage
-              defaultMessage="Account details"
-              description="Title of the account details screen where user can change their email, phone number ..."
-            />
-          </Text>
-        }
-        rightElement={
-          profile && (
-            <CoverRenderer
-              width={COVER_WIDTH}
-              userName={profile.userName}
-              cover={profile.card?.cover}
-              style={
-                profile.card?.backgroundColor != null && {
-                  backgroundColor: profile.card?.backgroundColor,
-                }
-              }
-            />
-          )
-        }
+      <AccountHeader
+        userName={profile?.userName}
+        profile={viewer.profile}
+        title={intl.formatMessage({
+          defaultMessage: 'Account details',
+          description:
+            'Title of the account details screen where user can change their email, phone number ...',
+        })}
       />
-
       <Icon icon="warning" style={styles.warningIcon} />
       <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
         <Text variant="xsmall" style={styles.warningMessage}>

@@ -129,6 +129,25 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
               </View>
             </PressableNative>
           </Link>
+          <Link route="INVITE_FRIENDS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="invite" style={styles.icon} />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Invite friends"
+                      description="Invite friends to join the app"
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" style={styles.icon} />
+              </View>
+            </PressableNative>
+          </Link>
           <PressableNative
             onPress={() => {
               dispatch({ type: 'LOGOUT' });

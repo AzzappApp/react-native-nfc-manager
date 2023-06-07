@@ -193,6 +193,9 @@ const icons = {
   get invite() {
     return require('./assets/invite.png');
   },
+  get invite_via() {
+    return require('./assets/invite_via.png');
+  },
   get keyboard() {
     return require('./assets/keyboard.png');
   },
@@ -213,6 +216,9 @@ const icons = {
   },
   get mail() {
     return require('./assets/mail.png');
+  },
+  get mail_line() {
+    return require('./assets/mail_line.png');
   },
   get margins() {
     return require('./assets/margins.png');
@@ -277,6 +283,9 @@ const icons = {
   get sharpness_mirror() {
     return require('./assets/sharpness_mirror.png');
   },
+  get sms() {
+    return require('./assets/sms.png');
+  },
   get stop() {
     return require('./assets/stop.png');
   },
@@ -321,6 +330,9 @@ const icons = {
   },
   get warning() {
     return require('./assets/warning.png');
+  },
+  get whatsapp() {
+    return require('./assets/whatsapp.png');
   },
   get width_full() {
     return require('./assets/width-full.png');

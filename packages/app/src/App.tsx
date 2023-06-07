@@ -23,6 +23,7 @@ import useAuthState from '#hooks/useAuthState';
 import AccountDetailsMobileScreen from '#mobileScreens/AccountDetailsMobileScreen';
 import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
 import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
+import InviteFriendsMobileScreen from '#mobileScreens/InviteFriendsMobileScreen';
 import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
@@ -75,6 +76,7 @@ const screens = {
   FOLLOWED_PROFILES: FollowedProfilesMobileScreen,
   FOLLOWERS: FollowersMobileScreen,
   ACCOUNT_DETAILS: AccountDetailsMobileScreen,
+  INVITE_FRIENDS: InviteFriendsMobileScreen,
 };
 
 const tabs = {
