@@ -69,7 +69,7 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Margin Top : {size}"
+            defaultMessage="Top margin : {size}"
             description="marginTop message in SimpleButton edition"
             values={{
               size: marginTop,
@@ -83,11 +83,11 @@ const SimpleButtonMarginsEditionPanel = ({
         interval={Math.floor((windowWidth - 80) / 60)}
         onChange={onMargintopChange}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Margintop',
+          defaultMessage: 'Top margin',
           description: 'Label of the marginTop slider in SimpleButton edition',
         })}
         accessibilityHint={intl.formatMessage({
-          defaultMessage: 'Slide to change the marginTop',
+          defaultMessage: 'Slide to change the Top margin',
           description: 'Hint of the marginTop slider in SimpleButton edition',
         })}
         style={styles.slider}
@@ -95,8 +95,8 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Margin Bottom : {size}"
-            description="marginBottom message in SimpleButton edition"
+            defaultMessage="Bottom margin : {size}"
+            description="Bottom margin message in SimpleButton edition"
             values={{
               size: marginBottom,
             }}
@@ -109,14 +109,14 @@ const SimpleButtonMarginsEditionPanel = ({
         interval={Math.floor((windowWidth - 80) / 60)}
         onChange={onMarginbottomChange}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Marginbottom',
+          defaultMessage: 'Bottom margin',
           description:
             'Label of the marginBottom slider in SimpleButton edition',
         })}
         accessibilityHint={intl.formatMessage({
-          defaultMessage: 'Slide to change the marginBottom',
+          defaultMessage: 'Slide to change the Bottom margin',
           description:
-            'Hint of the marginBottom slider in SimpleButton edition',
+            'Hint of the marginBottom marginttom slider in SimpleButton edition',
         })}
         style={styles.slider}
       />

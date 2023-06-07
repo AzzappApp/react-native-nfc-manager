@@ -85,7 +85,7 @@ const SimpleButtonBordersEditionPanel = ({
         {
           tabKey: 'borders',
           label: intl.formatMessage({
-            defaultMessage: 'Border Shape',
+            defaultMessage: 'Border shape',
             description: 'Border Shape tab label in SimpleButton edition',
           }),
         },
@@ -110,7 +110,7 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border Width : {size}"
+              defaultMessage="Border width : {size}"
               description="borderWidth message in SimpleButton edition"
               values={{
                 size: borderWidth,
@@ -124,14 +124,14 @@ const SimpleButtonBordersEditionPanel = ({
           interval={30}
           onChange={onBorderwidthChange}
           accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Border Width',
+            defaultMessage: 'Border width',
             description:
-              'Label of the borderWidth slider in SimpleButton edition',
+              'Label of the border Width slider in SimpleButton edition',
           })}
           accessibilityHint={intl.formatMessage({
             defaultMessage: 'Slide to change the border Width',
             description:
-              'Hint of the borderWidth slider in SimpleButton edition',
+              'Hint of the border Width slider in SimpleButton edition',
           })}
           style={styles.slider}
         />
@@ -139,8 +139,8 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border Radius : {size}"
-              description="border Radius message in SimpleButton edition"
+              defaultMessage="Border radius : {size}"
+              description="border radius message in SimpleButton edition"
               values={{
                 size: borderRadius,
               }}
@@ -171,7 +171,7 @@ const SimpleButtonBordersEditionPanel = ({
           height={bottomSheetHeight}
           profile={profile}
           title={intl.formatMessage({
-            defaultMessage: 'Bordercolor color',
+            defaultMessage: 'Border color',
             description: 'Bordercolor color title in SimpleButton edition',
           })}
           selectedColor={borderColor}

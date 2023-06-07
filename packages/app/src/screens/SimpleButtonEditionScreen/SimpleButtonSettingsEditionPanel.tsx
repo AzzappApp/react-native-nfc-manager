@@ -284,7 +284,7 @@ const SimpleButtonSettingsEditionPanel = ({
           )}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Fontsize',
+            defaultMessage: 'Font size',
             description: 'Label of the fontSize slider in SimpleButton edition',
           })}
           accessibilityHint={intl.formatMessage({

@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KIND_SIMPLE_BUTTON,
@@ -283,98 +283,104 @@ const SimpleButtonEditionScreen = ({
           />
         }
       />
-      <SimpleButtonPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data}
-      />
-      <TabView
-        style={{ height: bottomPanelHeight }}
-        currentTab={currentTab}
-        tabs={[
-          {
-            id: 'settings',
-            element: (
-              <SimpleButtonSettingsEditionPanel
-                viewer={viewer}
-                buttonLabel={buttonLabel}
-                onButtonLabelChange={onButtonLabelChange}
-                actionType={actionType}
-                onActionTypeChange={onActionTypeChange}
-                actionLink={actionLink}
-                onActionLinkChange={onActionLinkChange}
-                fontFamily={fontFamily}
-                onFontFamilyChange={onFontFamilyChange}
-                fontColor={fontColor}
-                onFontColorChange={onFontColorChange}
-                fontSize={fontSize}
-                onFontSizeChange={onFontSizeChange}
-                buttonColor={buttonColor}
-                onButtonColorChange={onButtonColorChange}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
-                bottomSheetHeight={bottomPanelHeight}
-              />
-            ),
-          },
-          {
-            id: 'borders',
-            element: (
-              <SimpleButtonBordersEditionPanel
-                viewer={viewer}
-                borderColor={borderColor}
-                onBordercolorChange={onBordercolorChange}
-                borderWidth={borderWidth}
-                onBorderwidthChange={onBorderwidthChange}
-                borderRadius={borderRadius}
-                onBorderradiusChange={onBorderradiusChange}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
-                bottomSheetHeight={bottomPanelHeight}
-              />
-            ),
-          },
-          {
-            id: 'margins',
-            element: (
-              <SimpleButtonMarginsEditionPanel
-                marginTop={marginTop}
-                onMargintopChange={onMargintopChange}
-                marginBottom={marginBottom}
-                onMarginbottomChange={onMarginbottomChange}
-                width={width}
-                onWidthChange={onWidthChange}
-                height={height}
-                onHeightChange={onHeightChange}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
-              />
-            ),
-          },
-          {
-            id: 'background',
-            element: (
-              <SimpleButtonBackgroundEditionPanel
-                viewer={viewer}
-                backgroundId={background?.id}
-                backgroundStyle={backgroundStyle}
-                onBackgroundChange={onBackgroundChange}
-                onBackgroundStyleChange={onBackgroundStyleChange}
-                bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
-              />
-            ),
-          },
-        ]}
-      />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="position"
+        keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
+      >
+        <SimpleButtonPreview
+          style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+          data={data}
+        />
+        <TabView
+          style={{ height: bottomPanelHeight }}
+          currentTab={currentTab}
+          tabs={[
+            {
+              id: 'settings',
+              element: (
+                <SimpleButtonSettingsEditionPanel
+                  viewer={viewer}
+                  buttonLabel={buttonLabel}
+                  onButtonLabelChange={onButtonLabelChange}
+                  actionType={actionType}
+                  onActionTypeChange={onActionTypeChange}
+                  actionLink={actionLink}
+                  onActionLinkChange={onActionLinkChange}
+                  fontFamily={fontFamily}
+                  onFontFamilyChange={onFontFamilyChange}
+                  fontColor={fontColor}
+                  onFontColorChange={onFontColorChange}
+                  fontSize={fontSize}
+                  onFontSizeChange={onFontSizeChange}
+                  buttonColor={buttonColor}
+                  onButtonColorChange={onButtonColorChange}
+                  style={{
+                    flex: 1,
+                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  }}
+                  bottomSheetHeight={bottomPanelHeight}
+                />
+              ),
+            },
+            {
+              id: 'borders',
+              element: (
+                <SimpleButtonBordersEditionPanel
+                  viewer={viewer}
+                  borderColor={borderColor}
+                  onBordercolorChange={onBordercolorChange}
+                  borderWidth={borderWidth}
+                  onBorderwidthChange={onBorderwidthChange}
+                  borderRadius={borderRadius}
+                  onBorderradiusChange={onBorderradiusChange}
+                  style={{
+                    flex: 1,
+                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  }}
+                  bottomSheetHeight={bottomPanelHeight}
+                />
+              ),
+            },
+            {
+              id: 'margins',
+              element: (
+                <SimpleButtonMarginsEditionPanel
+                  marginTop={marginTop}
+                  onMargintopChange={onMargintopChange}
+                  marginBottom={marginBottom}
+                  onMarginbottomChange={onMarginbottomChange}
+                  width={width}
+                  onWidthChange={onWidthChange}
+                  height={height}
+                  onHeightChange={onHeightChange}
+                  style={{
+                    flex: 1,
+                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  }}
+                />
+              ),
+            },
+            {
+              id: 'background',
+              element: (
+                <SimpleButtonBackgroundEditionPanel
+                  viewer={viewer}
+                  backgroundId={background?.id}
+                  backgroundStyle={backgroundStyle}
+                  onBackgroundChange={onBackgroundChange}
+                  onBackgroundStyleChange={onBackgroundStyleChange}
+                  bottomSheetHeight={bottomPanelHeight}
+                  style={{
+                    flex: 1,
+                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  }}
+                />
+              ),
+            },
+          ]}
+        />
+      </KeyboardAvoidingView>
       <View
         style={{
           position: 'absolute',

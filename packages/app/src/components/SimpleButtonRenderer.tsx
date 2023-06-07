@@ -143,7 +143,14 @@ export const SimpleButtonRendererRaw = ({
   return (
     <View
       {...props}
-      style={[style, { backgroundColor, height, alignItems: 'center' }]}
+      style={[
+        style,
+        {
+          backgroundColor,
+          height: height + marginTop + marginBottom,
+          alignItems: 'center',
+        },
+      ]}
       onLayout={onLayout}
     >
       {background && (
@@ -166,7 +173,7 @@ export const SimpleButtonRendererRaw = ({
       <PressableOpacity onPress={onPress}>
         <View
           style={{
-            height: height - marginTop - marginBottom,
+            height,
             width,
             marginBottom,
             marginTop,
@@ -184,7 +191,9 @@ export const SimpleButtonRendererRaw = ({
               fontFamily,
               color: fontColor,
               fontSize,
+              flexWrap: 'nowrap',
             }}
+            numberOfLines={1}
           >
             {buttonLabel}
           </Text>
