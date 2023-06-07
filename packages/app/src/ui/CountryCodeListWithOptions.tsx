@@ -21,7 +21,7 @@ export type CountryCodeListOption<T extends string> = {
 };
 
 type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
-  otherSectionTitle: string;
+  otherSectionTitle?: string;
   options: Array<CountryCodeListOption<T>>;
   phoneSectionTitle: string;
   value: CountryCode | T;
@@ -69,6 +69,7 @@ const CountryCodeListWithOptions = <T extends string>({
             style={{ width: 22, height: 16 }}
           />
         )}
+        <Icon icon="arrow_down" style={styles.chevronDown} />
       </PressableNative>
       <BottomSheetModal
         visible={showDropdown}
@@ -81,9 +82,11 @@ const CountryCodeListWithOptions = <T extends string>({
           onChange={onSelect}
           ListHeaderComponent={
             <View>
-              <Text variant="large" style={styles.section}>
-                {otherSectionTitle}
-              </Text>
+              {otherSectionTitle ? (
+                <Text variant="large" style={styles.section}>
+                  {otherSectionTitle}
+                </Text>
+              ) : null}
               {options.map(({ type, title, icon }) => {
                 return (
                   <PressableBackground
@@ -117,6 +120,8 @@ const styleSheet = createStyleSheet(appearance => ({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
+    columnGap: 6,
     width: 50,
     height: 47,
     borderRadius: 12,
@@ -125,6 +130,7 @@ const styleSheet = createStyleSheet(appearance => ({
   icon: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },
+  chevronDown: { width: 9 },
   bottomSheetContainer: {
     marginTop: 10,
     paddingHorizontal: 0,

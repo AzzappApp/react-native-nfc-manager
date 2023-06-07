@@ -25,16 +25,16 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   const partialUser: Partial<User> = {};
 
   if (email) {
-    const exisitingUser = await getUserByEmail(email);
-    if (exisitingUser && exisitingUser.id !== userId) {
+    const existingUser = await getUserByEmail(email);
+    if (existingUser && existingUser.id !== userId) {
       throw new Error(ERRORS.EMAIL_ALREADY_EXISTS);
     }
     partialUser.email = email;
   }
 
   if (phoneNumber) {
-    const exisitingUser = await getUserByPhoneNumber(phoneNumber);
-    if (exisitingUser && exisitingUser.id !== userId) {
+    const existingUser = await getUserByPhoneNumber(phoneNumber);
+    if (existingUser && existingUser.id !== userId) {
       throw new Error(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
     partialUser.phoneNumber = phoneNumber;

@@ -298,8 +298,12 @@ export default function AccountScreenProfiles({
               />
             </View>
             <View style={styles.webCardContent}>
-              <View>
-                <Text variant="large" style={styles.webCardLabel}>
+              <View style={styles.webCardInfos}>
+                <Text
+                  variant="large"
+                  style={styles.webCardLabel}
+                  numberOfLines={1}
+                >
                   {isPersonal
                     ? formatDisplayName(
                         currentProfile?.firstName,
@@ -433,7 +437,9 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     flex: 2,
     flexDirection: 'row',
+    gap: 10,
   },
   webCardLabel: { color: colors.white },
   webCardFooter: { flex: 1, justifyContent: 'flex-end' },
+  webCardInfos: { flex: 1 },
 }));

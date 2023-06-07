@@ -55,6 +55,10 @@
     "defaultMessage": "Border color",
     "description": "Title of the border color picker in carousel edition"
   },
+  "0OPgK9": {
+    "defaultMessage": "Save",
+    "description": "Edit email address modal save button label"
+  },
   "106q2H": {
     "defaultMessage": "Background",
     "description": "Carousel  bottom menu label for Background tab"
@@ -155,6 +159,10 @@
     "defaultMessage": "Unfollow",
     "description": ""
   },
+  "4CRZbo": {
+    "defaultMessage": "Account details",
+    "description": "Title of the section where user can view their account details"
+  },
   "4FXymb": {
     "defaultMessage": "Slide to change the Top/Bottom Margin",
     "description": "Hint of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition"
@@ -170,6 +178,10 @@
   "4cXY7m": {
     "defaultMessage": "Describe your post",
     "description": "Post creation screen textarea placeholder"
+  },
+  "4uxpwv": {
+    "defaultMessage": "Select your country",
+    "description": "Account details - Section title in country selection list"
   },
   "5+o7Ct": {
     "defaultMessage": "Width",
@@ -218,6 +230,10 @@
   "6V9XJr": {
     "defaultMessage": "Allow Azzapp to access your photos",
     "description": "Camera authorization screen title for photos permission"
+  },
+  "6hz6o+": {
+    "defaultMessage": "Unknown error - Please retry",
+    "description": "Account Details Screen - Error Unknown error - Please retry"
   },
   "6j49Wn": {
     "defaultMessage": "Negative",
@@ -283,6 +299,10 @@
     "defaultMessage": "Let's get started with Azzapp!",
     "description": "Signup Screen - Let's get started with Azzapp! subtitle"
   },
+  "8CmYio": {
+    "defaultMessage": "Phone",
+    "description": "Phone field in the account details screen"
+  },
   "8PT+FO": {
     "defaultMessage": "Posts",
     "description": "SearchPage - Result - Global search posts title"
@@ -326,6 +346,10 @@
   "9uTr6e": {
     "defaultMessage": "Add a comment",
     "description": "Post comment textarea placeholdesd"
+  },
+  "9zdGXr": {
+    "defaultMessage": "Your current password is incorrect",
+    "description": "Account Details Screen -  Error Your current password is incorrect"
   },
   "A/5Yu9": {
     "defaultMessage": "Edit Margins",
@@ -423,6 +447,10 @@
     "defaultMessage": "Trending profiles",
     "description": "SearchPage - Trending profile title"
   },
+  "CGs2Xn": {
+    "defaultMessage": "Add an email address",
+    "description": "placeholder in account details screen when no email address is registered"
+  },
   "CM2v8u": {
     "defaultMessage": "Username can’t contain space or special caracters",
     "description": "NewProfileScreen - Username Error"
@@ -458,6 +486,10 @@
   "DXYRN3": {
     "defaultMessage": "Middle center",
     "description": "Label of the middle center position in cover edition"
+  },
+  "DgSMP9": {
+    "defaultMessage": "Current password",
+    "description": "Account Details - Change password form - current password label"
   },
   "DgczNZ": {
     "defaultMessage": "Log In",
@@ -523,9 +555,17 @@
     "defaultMessage": "Text size : {size}",
     "description": "textSize message in PhotoWithTextAndTitle edition"
   },
+  "F6MOFe": {
+    "defaultMessage": "Opens a list of countries and allows you to select a calling code",
+    "description": "Account details - The accessibility hint for the country selector"
+  },
   "FCi1T9": {
     "defaultMessage": "Slide to change the borderRadius",
     "description": "Hint of the borderRadius slider in PhotoWithTextAndTitle edition"
+  },
+  "FE/z6a": {
+    "defaultMessage": "This phone number is already registered",
+    "description": "Account Details Screen - Error This phone number is already registered "
   },
   "FHtB4h": {
     "defaultMessage": "Social Links",
@@ -554,6 +594,10 @@
   "GQ5mTZ": {
     "defaultMessage": "RGB",
     "description": "ColorPicker Component - TextInput Label : RGB Title"
+  },
+  "GXaNDm": {
+    "defaultMessage": "Account details",
+    "description": "Title of the account details screen where user can change their email, phone number ..."
   },
   "GY7j0U": {
     "defaultMessage": "I agree to the",
@@ -602,6 +646,18 @@
   "IBgr9f": {
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
     "description": "Signup Screen - Accessibility Label TextInput Password"
+  },
+  "IhMo2f": {
+    "defaultMessage": "Edit password",
+    "description": "Edit password modal title"
+  },
+  "IoW7Fw": {
+    "defaultMessage": "Email",
+    "description": "Email field in the account details screen"
+  },
+  "J6PIIv": {
+    "defaultMessage": "Save",
+    "description": "Edit password modal save button label"
   },
   "JGmlYS": {
     "defaultMessage": "Skip",
@@ -795,6 +851,10 @@
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
   },
+  "PTMgPC": {
+    "defaultMessage": "Edit email address",
+    "description": "Edit email address modal title"
+  },
   "PUC+CX": {
     "defaultMessage": "Border Radius",
     "description": "Label of the borderRadius slider in SimpleButton edition"
@@ -826,6 +886,10 @@
   "QwSn2g": {
     "defaultMessage": "Preview",
     "description": "Line Divider bottom menu label for Preview tab"
+  },
+  "RDCQtK": {
+    "defaultMessage": "Account details",
+    "description": "Link to open account details form to change email, phone number, etc."
   },
   "RDYvOJ": {
     "defaultMessage": "Desktop",
@@ -867,6 +931,10 @@
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"
   },
+  "SugoCC": {
+    "defaultMessage": "Edit phone number",
+    "description": "Edit phone number modal title"
+  },
   "Sy9kWZ": {
     "defaultMessage": "Done",
     "description": "ColorPicker component Done Color button label"
@@ -878,6 +946,10 @@
   "T4JZ7B": {
     "defaultMessage": "Enter your first name",
     "description": "ProfileForm first name textinput placeholder"
+  },
+  "TNL2or": {
+    "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
+    "description": "Account details - error message when password is not compliant with our rules"
   },
   "Th5e4c": {
     "defaultMessage": "Slide to change the border Width",
@@ -930,6 +1002,10 @@
   "UWbqab": {
     "defaultMessage": "Unfollow",
     "description": "Unfollow button label in Profile Screen Button Bar"
+  },
+  "UaM9R9": {
+    "defaultMessage": "Please enter a valid phone number",
+    "description": "Error message when the user enters an invalid phone number"
   },
   "UfDt73": {
     "defaultMessage": "Margin left/right : {size}",
@@ -1083,6 +1159,10 @@
     "defaultMessage": "Horizontal alignment for web only",
     "description": "Label of the Horizontal alignment button"
   },
+  "ZLVIR9": {
+    "defaultMessage": "Please enter your current password",
+    "description": "Error message when no current password is provided"
+  },
   "ZNPb7F": {
     "defaultMessage": "Change account",
     "description": "Change account modal title"
@@ -1206,6 +1286,10 @@
   "ckw6Kn": {
     "defaultMessage": "Photo opacity : {opacity}",
     "description": "Font size message in cover edition"
+  },
+  "cp6916": {
+    "defaultMessage": "Select a calling code",
+    "description": "Account details - The accessibility label for the country selector"
   },
   "cvIa5m": {
     "defaultMessage": "Cancel",
@@ -1383,6 +1467,10 @@
     "defaultMessage": "Background",
     "description": "Simple text  bottom menu label for Background tab"
   },
+  "hSV0Sf": {
+    "defaultMessage": "Please enter a valid email address",
+    "description": "Error message when the user enters an invalid email address"
+  },
   "hc+1uI": {
     "defaultMessage": "Allow Azzapp to access your microphone",
     "description": "Camera authorization screen title for microphobe permission"
@@ -1443,6 +1531,10 @@
     "defaultMessage": "Slide to change theVertical Spacing",
     "description": "Hint of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
   },
+  "jPNeTz": {
+    "defaultMessage": "New password",
+    "description": "Account Details - Change password form - new password label"
+  },
   "jb3SxE": {
     "defaultMessage": "Delete",
     "description": "Delete button in profile edition screen footer"
@@ -1462,6 +1554,10 @@
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
+  },
+  "k3hj2G": {
+    "defaultMessage": "Cancel",
+    "description": "Edit email address modal cancel button label"
   },
   "kIhbvL": {
     "defaultMessage": "Height",
@@ -1498,6 +1594,10 @@
   "lHXS3v": {
     "defaultMessage": "Choose an username",
     "description": "ProfileForm username textinput placeholder"
+  },
+  "lP56Cx": {
+    "defaultMessage": "Cancel",
+    "description": "Edit password modal cancel button label"
   },
   "lPVOQn": {
     "defaultMessage": "My posts",
@@ -1655,6 +1755,10 @@
     "defaultMessage": "Top to remove {word} from history",
     "description": "Recent Search - Accessibiltity Label remove element from history"
   },
+  "pHIgNB": {
+    "defaultMessage": "This email address is already registered",
+    "description": "Account Details Screen - Error This email address is already registered "
+  },
   "pNz+pR": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in carousel edition"
@@ -1719,6 +1823,10 @@
     "defaultMessage": "What's your name?",
     "description": "Personal profile form - Title"
   },
+  "r/msQn": {
+    "defaultMessage": "Save",
+    "description": "Edit phone number modal save button label"
+  },
   "r2XHrR": {
     "defaultMessage": "Middle right",
     "description": "Label of the middle right position in cover edition"
@@ -1746,6 +1854,10 @@
   "rfiLII": {
     "defaultMessage": "Connect with email address",
     "description": "Signup Form Connect with email address section title in country selection list"
+  },
+  "rjw+jc": {
+    "defaultMessage": "Username",
+    "description": "Username field in the account details screen"
   },
   "rzJ3iZ": {
     "defaultMessage": "Cancel",
@@ -1786,6 +1898,10 @@
   "sdffuN": {
     "defaultMessage": "Vertical Spacing : {verticalSpacing}",
     "description": "Vertical Spacing message in simple text edition"
+  },
+  "sj3LNu": {
+    "defaultMessage": "Password",
+    "description": "Password field in the account details screen"
   },
   "sldNyG": {
     "defaultMessage": "Email address",
@@ -1835,6 +1951,10 @@
     "defaultMessage": "Chrome",
     "description": "Chrome photo filter name"
   },
+  "uO2e5W": {
+    "defaultMessage": "Add a phone number",
+    "description": "placeholder in account details screen when no phone number is registered"
+  },
   "uQktw0": {
     "defaultMessage": "Left/Right margin",
     "description": "Label of the Left/Right margin slider in PhotoWithTextAndTitle edition"
@@ -1850,6 +1970,10 @@
   "ukFVmp": {
     "defaultMessage": "Normal",
     "description": "Name of the default filter (no filter applied) in image edition"
+  },
+  "utIq6e": {
+    "defaultMessage": "Your account details are linked to all your webcards.",
+    "description": "Warning label displayed at the top on the screen to indicate that updates go through all profiles"
   },
   "uvBCJV": {
     "defaultMessage": "No recent search for {word}",
@@ -1951,6 +2075,10 @@
     "defaultMessage": "Slide to change the background opacity",
     "description": "Hint of the Background opacity slider in simple text edition"
   },
+  "xyV44Y": {
+    "defaultMessage": "Cancel",
+    "description": "Edit phone number modal cancel button label"
+  },
   "y37Ei7": {
     "defaultMessage": "Select an album",
     "description": "Title of the album selection modal"
@@ -2034,6 +2162,10 @@
   "zqi7UK": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in simple text edition"
+  },
+  "zxsBTT": {
+    "defaultMessage": "Webcard details",
+    "description": "Title of the section where user can view their webcard details"
   },
   "zzoOTT": {
     "defaultMessage": "Enter your name",

@@ -108,6 +108,11 @@ export type FollowersRoute = {
   params?: never;
 };
 
+export type AccountDetailsRoute = {
+  route: 'ACCOUNT_DETAILS';
+  params?: never;
+};
+
 export type Route =
   | AlbumsRoute
   | HomeRoute
@@ -126,6 +131,7 @@ export type Route =
   | ForgotPasswordRoute
   | CardModuleEditionRoute
   | FollowedProfilesRoute
-  | FollowersRoute;
+  | FollowersRoute
+  | AccountDetailsRoute;
 
 export type ROUTES = Route['route'];

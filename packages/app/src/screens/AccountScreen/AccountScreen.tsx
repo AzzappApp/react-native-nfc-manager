@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useLogout } from '#hooks/useLogout';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
@@ -70,6 +71,10 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
   const vp = useViewportSize();
   const styles = useStyleSheet(styleSheet);
 
+  const close = () => {
+    dispatch({ type: 'CLOSE_DROPDOWN' });
+  };
+
   return (
     <View>
       <Header
@@ -102,11 +107,28 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
             logout();
           }
         }}
-        onRequestClose={() => {
-          dispatch({ type: 'CLOSE_DROPDOWN' });
-        }}
+        onRequestClose={close}
       >
         <View style={styles.bottomSheetOptionsContainer}>
+          <Link route="ACCOUNT_DETAILS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="warning" style={styles.icon} />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Account details"
+                      description="Link to open account details form to change email, phone number, etc."
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" style={styles.icon} />
+              </View>
+            </PressableNative>
+          </Link>
           <PressableNative
             onPress={() => {
               dispatch({ type: 'LOGOUT' });
@@ -140,7 +162,11 @@ const styleSheet = createStyleSheet(appearance => ({
     marginTop: 10,
     paddingHorizontal: 0,
   },
-  bottomSheetOptionsContainer: { paddingHorizontal: 20, paddingTop: 20 },
+  bottomSheetOptionsContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    rowGap: 20,
+  },
   bottomSheetOptionButton: {
     height: 32,
   },

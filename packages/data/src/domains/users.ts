@@ -69,7 +69,7 @@ export const updateUser = async (
     ...data,
   };
   const result = await db
-    .updateTable('Profile')
+    .updateTable('User')
     .set(user)
     .where('id', '=', userId)
     .execute();

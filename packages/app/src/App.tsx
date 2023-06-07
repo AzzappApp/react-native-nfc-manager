@@ -20,6 +20,7 @@ import {
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
+import AccountDetailsMobileScreen from '#mobileScreens/AccountDetailsMobileScreen';
 import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
 import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
 import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
@@ -73,6 +74,7 @@ const screens = {
   PROFILE: ProfileMobileScreen,
   FOLLOWED_PROFILES: FollowedProfilesMobileScreen,
   FOLLOWERS: FollowersMobileScreen,
+  ACCOUNT_DETAILS: AccountDetailsMobileScreen,
 };
 
 const tabs = {
