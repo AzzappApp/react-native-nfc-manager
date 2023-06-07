@@ -14,6 +14,7 @@ import type {
   LayoutChangeEvent,
   LayoutRectangle,
   ColorValue,
+  TextStyle,
 } from 'react-native';
 
 export type PhotoWithTextAndTitleRendererProps = ViewProps & {
@@ -233,7 +234,7 @@ export const PhotoWithTextAndTitleRendererRaw = ({
         >
           <Text
             style={{
-              textAlign,
+              textAlign: textAlign as TextStyle['textAlign'],
               fontSize,
               fontFamily,
               color: fontColor as ColorValue,
@@ -243,7 +244,7 @@ export const PhotoWithTextAndTitleRendererRaw = ({
           </Text>
           <Text
             style={{
-              textAlign,
+              textAlign: textAlign as TextStyle['textAlign'],
               fontSize: textSize,
               fontFamily,
               marginTop: 7,

@@ -180,27 +180,6 @@ type CardModuleOpeningHours implements CardModule {
   """
   visible: Boolean!
 }
-
-"""
-User Card module : PhotoWithTextAndTitle
-"""
-type CardModulePhotoWithTextAndTitle implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-
 """
 User Card module : SimpleButton
 """
@@ -308,26 +287,6 @@ type CardModuleSimpleTitle implements CardModule {
 }
 
 """
-User Card module : SocialLinks
-"""
-type CardModuleSocialLinks implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-
-"""
 User Card module : PhotoWithTextAndTitle
 """
 type CardModulePhotoWithTextAndTitle implements CardModule {
@@ -359,6 +318,52 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
   """
   id: ID!
 
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  visible: Boolean!
+}
+
+type SocialLink {
+  socialId: String!
+  link: String!
+  position: Int!
+}
+
+enum CardModuleSocialLinksArrangement {
+  inline
+  multiline
+}
+"""
+User Card module : CardModuleSocialLinks
+"""
+type CardModuleSocialLinks implements CardModule {
+  links: [SocialLink!]!
+  iconColor: String!
+  arrangement: CardModuleSocialLinksArrangement!
+  iconSize: Int!
+  borderWidth: Int!
+  columnGap: Int!
+  marginTop: Int!
+  marginBottom: Int!
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
   visible: Boolean!
 }
 

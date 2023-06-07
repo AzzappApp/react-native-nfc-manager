@@ -30,6 +30,9 @@ type Mutation {
   savePhotoWithTextAndTitleModule(
     input: SavePhotoWithTextAndTitleModuleInput!
   ): SavePhotoWithTextAndTitleModulePayload
+  saveSocialLinksModule(
+    input: SaveSocialLinksModuleInput!
+  ): SaveSocialLinksModulePayload
 }
 
 """

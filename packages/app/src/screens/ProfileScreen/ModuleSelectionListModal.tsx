@@ -130,7 +130,7 @@ const ModuleSelectionListModal = ({
           }),
           image_light: require('./../../assets/module/socialLinks_light.png'),
           image_dark: require('./../../assets/module/socialLinks_dark.png'),
-          ready: false,
+          ready: true,
         },
         //TODO: waiting for specification and thumbnail
         // {

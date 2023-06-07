@@ -66,8 +66,6 @@ const FollowersScreenList = ({
     if (currentProfileId) {
       const connectionID = data.followers.__id;
 
-      console.log({ profileId });
-
       commit({
         variables: {
           input: {

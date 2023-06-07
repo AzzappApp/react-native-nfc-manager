@@ -4,13 +4,13 @@ hooks:
     - prettier --write
 ignoreNoDocuments: true
 schema:
-  - './packages/data/src/schema/**/*.graphql'
+  - "./packages/data/src/schema/**/*.graphql"
 generates:
   ./packages/data/src/schema/__generated__/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
-      - './codegen-typedefs.js'
+      - "./codegen-typedefs.js"
     config:
       useTypeImports: true
       enumsAsTypes: true
@@ -36,8 +36,9 @@ generates:
         CardModuleSimpleTitle: \@prisma/client#CardModule as CardModuleSimpleTitleModel
         CardModuleSimpleButton: \@prisma/client#CardModule as CardModuleSimpleButtonModel
         CardModulePhotoWithTextAndTitle: \@prisma/client#CardModule as CardModulePhotoWithTextAndTitleModel
-      defaultMapper: 'Partial<{T}>'
-      maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
+        CardModuleSocialLinks: \@prisma/client#CardModule as CardModuleSocialLinksModel
+      defaultMapper: "Partial<{T}>"
+      maybeValue: "T extends PromiseLike<infer U> ? Promise<U | null> : T | null"
       scalars:
         JSON: Record<string, unknown>
         ID: string

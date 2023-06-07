@@ -10,6 +10,7 @@ import saveLineDividerModule from './saveLineDividerModule';
 import savePhotoWithTextAndTitleModule from './savePhotoWithTextAndTitleModule';
 import saveSimpleButtonModule from './saveSimpleButtonModule';
 import saveSimpleTextModule from './saveSimpleTextModule';
+import saveSocialLinksModule from './saveSocialLinksModule';
 import swapModules from './swapModules';
 import toggleFollowing from './toggleFollowing';
 import updateCard from './updateCard';
@@ -78,6 +79,9 @@ export const Mutation: MutationResolvers = {
   updateCard: createMutationWithClientMutationId(updateCard),
   saveSimpleButtonModule: createMutationWithClientMutationId(
     saveSimpleButtonModule,
+  ),
+  saveSocialLinksModule: createMutationWithClientMutationId(
+    saveSocialLinksModule,
   ),
   swapModules: createMutationWithClientMutationId(swapModules),
   deleteModules: createMutationWithClientMutationId(deleteModules),

@@ -92,7 +92,6 @@ export const PostComment: PostCommentResolvers = {
     if (author) {
       return author;
     }
-    console.log('author not found', post.profileId);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   },
 };

@@ -9,6 +9,7 @@ import type {
   CardModuleSimpleTextResolvers,
   CardModuleSimpleTitleResolvers,
   CardModulePhotoWithTextAndTitleResolvers,
+  CardModuleSocialLinksResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -191,3 +192,16 @@ export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleRes
     textSize: getData('textSize'),
     verticalArrangement: getData('verticalArrangement'),
   };
+
+export const CardModuleSocialLinks: CardModuleSocialLinksResolvers = {
+  links: getData('links'),
+  iconColor: getData('iconColor'),
+  arrangement: getData('arrangement'),
+  iconSize: getData('iconSize'),
+  borderWidth: getData('borderWidth'),
+  columnGap: getData('columnGap'),
+  marginTop: getData('marginTop'),
+  marginBottom: getData('marginBottom'),
+  backgroundStyle: getData('backgroundStyle', true),
+  background,
+};

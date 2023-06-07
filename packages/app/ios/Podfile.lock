@@ -101,9 +101,9 @@ PODS:
   - lottie-react-native (6.0.0-rc.6):
     - lottie-ios (~> 3.5.0)
     - React-Core
-  - MMKV (1.2.15):
-    - MMKVCore (~> 1.2.15)
-  - MMKVCore (1.2.15)
+  - MMKV (1.2.16):
+    - MMKVCore (~> 1.2.16)
+  - MMKVCore (1.2.16)
   - OpenSSL-Universal (1.1.1100)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -467,6 +467,8 @@ PODS:
     - React-Core
   - RNLocalize (2.2.6):
     - React-Core
+  - RNReactNativeHapticFeedback (2.0.3):
+    - React-Core
   - RNReanimated (2.17.0):
     - DoubleConversion
     - FBLazyVector
@@ -583,6 +585,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
+  - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
@@ -711,6 +714,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNLocalize:
     :path: "../../../node_modules/react-native-localize"
+  RNReactNativeHapticFeedback:
+    :path: "../../../node_modules/react-native-haptic-feedback"
   RNReanimated:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
@@ -749,8 +754,8 @@ SPEC CHECKSUMS:
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: c55158d67d0629a260625cc2ded2052b829e3c3e
   lottie-react-native: 701060db35cf892b3baa26e8f0fccdc9101a2f80
-  MMKV: 7f34558bbb5a33b0eaefae2de4b6a20a2ffdad6f
-  MMKVCore: ddf41b9d9262f058419f9ba7598719af56c02cd3
+  MMKV: 784471ce430a2e2d16afef9053d63fab1b357d9e
+  MMKVCore: 9cfef4c48c6c46f66226fc2e4634d78490206a48
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: bd6045fbd511da5efe6db89eecb21e4e36bd7cbf
@@ -790,6 +795,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6
   RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
   RNLocalize: d4b8af4e442d4bcca54e68fc687a2129b4d71a81
+  RNReactNativeHapticFeedback: afa5bf2794aecbb2dba2525329253da0d66656df
   RNReanimated: d4f363f4987ae0ade3e36ff81c94e68261bf4b8d
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315

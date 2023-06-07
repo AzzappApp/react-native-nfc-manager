@@ -252,7 +252,7 @@ const SimpleButtonEditionScreen = ({
     insetBottom,
     insetTop,
     windowWidth,
-  } = useEditorLayout({ bottomPanelMinHeight: 400 });
+  } = useEditorLayout({ bottomPanelMinHeight: 450 });
   const intl = useIntl();
 
   return (

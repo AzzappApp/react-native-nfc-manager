@@ -19,6 +19,10 @@
     "defaultMessage": "Background opacity",
     "description": "Label of the Photo Opacityslider in PhotoWithTextAndTitle edition"
   },
+  "/RQXwq": {
+    "defaultMessage": "Margins",
+    "description": "Title of the Margins section in SocialLinks edition"
+  },
   "/TIhgi": {
     "defaultMessage": "Create a new account",
     "description": "Create a new account button label"
@@ -99,6 +103,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "SigninScreen - Forgot your password?"
   },
+  "1hCUG8": {
+    "defaultMessage": "Links",
+    "description": "Title of the Links section in SocialLinks edition"
+  },
   "1j/CQs": {
     "defaultMessage": "Settings",
     "description": "Title of the settings section in Line Divider edition"
@@ -123,6 +131,10 @@
     "defaultMessage": "{firstName} posts",
     "description": "ProfilePostScreen title Header"
   },
+  "2pxyFy": {
+    "defaultMessage": "Color",
+    "description": "Settings color tab label in SocialLinks edition"
+  },
   "2wq5kX": {
     "defaultMessage": "Tap to select a font",
     "description": "Hint of the font dropdown button"
@@ -143,6 +155,10 @@
     "defaultMessage": "Title",
     "description": "Title placeholder in PhotoWithTextAndTitle module"
   },
+  "3dZY/8": {
+    "defaultMessage": "Background opacity",
+    "description": "Label of the Photo Opacityslider in SocialLinks edition"
+  },
   "3pMfaY": {
     "defaultMessage": "Preview",
     "description": "Carousel  bottom menu label for Preview tab"
@@ -154,6 +170,14 @@
   "46b+Vl": {
     "defaultMessage": "Unfollow",
     "description": ""
+  },
+  "46wzuE": {
+    "defaultMessage": "Slide to change the background opacity",
+    "description": "Hint of the Photo Opacityslider in SocialLinks edition"
+  },
+  "4CH1RT": {
+    "defaultMessage": "Bottom margin",
+    "description": "Label of the Bottom margin slider in SocialLinks edition"
   },
   "4CRZbo": {
     "defaultMessage": "Account details",
@@ -459,6 +483,10 @@
     "defaultMessage": "Slide to change the border size",
     "description": "Hint of the border size slider in carousel edition"
   },
+  "D44+KI": {
+    "defaultMessage": "Edit Links",
+    "description": "SocialLinks bottom menu label for Links tab"
+  },
   "D98MFJ": {
     "defaultMessage": "Related Posts",
     "description": "Post screen header title"
@@ -563,10 +591,6 @@
     "defaultMessage": "Opens a list of countries and allows you to select a calling code",
     "description": "Account details - The accessibility hint for the country selector"
   },
-  "FCi1T9": {
-    "defaultMessage": "Slide to change the borderRadius",
-    "description": "Hint of the borderRadius slider in PhotoWithTextAndTitle edition"
-  },
   "FD5kqW": {
     "defaultMessage": "Text Block",
     "description": "Module selection list modal block text module label"
@@ -590,6 +614,10 @@
   "FoeiuO": {
     "defaultMessage": "Top/Bottom Margin",
     "description": "Label of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition"
+  },
+  "G3rkTV": {
+    "defaultMessage": "Edit Margins",
+    "description": "SocialLinks bottom menu label for Margins tab"
   },
   "GQ5mTZ": {
     "defaultMessage": "RGB",
@@ -771,6 +799,10 @@
     "defaultMessage": "Top margin",
     "description": "Label of the marginTop slider in SimpleButton edition"
   },
+  "Lstcrv": {
+    "defaultMessage": "SocialLinks",
+    "description": "SocialLinks text screen title"
+  },
   "M/YmS/": {
     "defaultMessage": "Border shape",
     "description": "Border shape tab label in HorizontalPhoto edition"
@@ -822,6 +854,10 @@
   "N9T08H": {
     "defaultMessage": "Images height : {size}",
     "description": "Images height label in carousel edition"
+  },
+  "NBYg3y": {
+    "defaultMessage": "Border size",
+    "description": "Label of the Border size slider in SocialLinks edition"
   },
   "NJSilL": {
     "defaultMessage": "Text",
@@ -907,6 +943,10 @@
     "defaultMessage": "Desktop",
     "description": "ProfileScreen bottom menu accessibility label for Desktop tab"
   },
+  "REyvTQ": {
+    "defaultMessage": "Slide to change the Border size",
+    "description": "Hint of the Border size slider in SocialLinks edition"
+  },
   "RFGqFi": {
     "defaultMessage": "Duplicate",
     "description": "Accessibility label for the duplicate button in the profile edition screen"
@@ -947,6 +987,10 @@
     "defaultMessage": "Trending posts",
     "description": "SearchPage - Trending posts title"
   },
+  "SucweD": {
+    "defaultMessage": "Slide to change the Icon Size",
+    "description": "Hint of the Icon Size slider in SocialLinks edition"
+  },
   "SugoCC": {
     "defaultMessage": "Edit phone number",
     "description": "Edit phone number modal title"
@@ -966,6 +1010,10 @@
   "T4JZ7B": {
     "defaultMessage": "Enter your first name",
     "description": "ProfileForm first name textinput placeholder"
+  },
+  "T96AA8": {
+    "defaultMessage": "Top margin",
+    "description": "Label of the Top margin slider in SocialLinks edition"
   },
   "TLk4ML": {
     "defaultMessage": "Text",
@@ -994,6 +1042,10 @@
   "Tx4u9Y": {
     "defaultMessage": "Simple text",
     "description": "Simple text screen title"
+  },
+  "TzpWh8": {
+    "defaultMessage": "Photo opacity : {opacity}",
+    "description": "Photo Opacity message in SocialLinks edition"
   },
   "U9U7gk": {
     "defaultMessage": "Hide",
@@ -1074,6 +1126,10 @@
   "Vh3DQb": {
     "defaultMessage": "Saturation",
     "description": "Saturation image edition parameters name"
+  },
+  "VnEbPX": {
+    "defaultMessage": "Spacing : {size}",
+    "description": "Spacing message in SocialLinks edition"
   },
   "Vnd2TO": {
     "defaultMessage": "Unselect",
@@ -1211,6 +1267,10 @@
     "defaultMessage": "Background",
     "description": "Label of Background tab in Horizontal photo edition"
   },
+  "a1dd+L": {
+    "defaultMessage": "Icon Size",
+    "description": "Label of the Icon Size slider in SocialLinks edition"
+  },
   "a1rHQ+": {
     "defaultMessage": "Webcard builder",
     "description": "Webcard builder header title"
@@ -1230,6 +1290,10 @@
   "aQrtaq": {
     "defaultMessage": "Top margin : {size}",
     "description": "Top margin message in Line Divider edition"
+  },
+  "aTDzdA": {
+    "defaultMessage": "Settings",
+    "description": "Settings tab label in SocialLinks edition"
   },
   "aULhrq": {
     "defaultMessage": "Font size : {fontSize}",
@@ -1254,6 +1318,10 @@
   "akBwx4": {
     "defaultMessage": "Height",
     "description": "Label of the height slider in SimpleButton edition"
+  },
+  "aptKIZ": {
+    "defaultMessage": "Bottom margin : {size}",
+    "description": "Bottom margin message in SocialLinks edition"
   },
   "b/ugZW": {
     "defaultMessage": "Followings",
@@ -1411,6 +1479,10 @@
     "defaultMessage": "{nbSelectedModules} selected",
     "description": "Webcard builder header title in module edition mode"
   },
+  "fe7br4": {
+    "defaultMessage": "Spacing",
+    "description": "Label of the Spacing slider in SocialLinks edition"
+  },
   "fotQfe": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
@@ -1507,6 +1579,10 @@
     "defaultMessage": "{countReactions} likes",
     "description": "PastRendererActionBar - Like Counter"
   },
+  "iC1CvY": {
+    "defaultMessage": "Edit Background",
+    "description": "SocialLinks bottom menu label for Background tab"
+  },
   "iPwxyL": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in SimpleButton edition"
@@ -1590,6 +1666,10 @@
   "kWx3ez": {
     "defaultMessage": "Tell us more about you",
     "description": "NewProfileType Interest Picker Screen - Title for personal profile"
+  },
+  "kcISgN": {
+    "defaultMessage": "Slide to change the Top margin",
+    "description": "Hint of the Top margin slider in SocialLinks edition"
   },
   "kf7mLc": {
     "defaultMessage": "Image",
@@ -1707,6 +1787,10 @@
     "defaultMessage": "Shadow",
     "description": "Shadow image edition parameters name"
   },
+  "nTFAl3": {
+    "defaultMessage": "IconColor color",
+    "description": "IconColor color title in SocialLinks edition"
+  },
   "nXXtnK": {
     "defaultMessage": "Change background color",
     "description": "ProfileScreen bottom menu accessibility label for Change background color button"
@@ -1767,6 +1851,10 @@
     "defaultMessage": "Already have an account?",
     "description": "Signup Screen - Already have an account?"
   },
+  "pG2lWw": {
+    "defaultMessage": "Border size : {size}",
+    "description": "Border size message in SocialLinks edition"
+  },
   "pGovG7": {
     "defaultMessage": "Top to remove {word} from history",
     "description": "Recent Search - Accessibiltity Label remove element from history"
@@ -1786,6 +1874,10 @@
   "pfOnsu": {
     "defaultMessage": "Effect",
     "description": "Label of the effect tab in cover edition"
+  },
+  "pmqXBM": {
+    "defaultMessage": "Edit Settings",
+    "description": "SocialLinks bottom menu label for Settings tab"
   },
   "pqxK1C": {
     "defaultMessage": "Contrast",
@@ -1903,6 +1995,10 @@
     "defaultMessage": "Slide to change the image border radius size",
     "description": "Hint of the Border radius slider in HorizontalPhoto edition"
   },
+  "sZy58x": {
+    "defaultMessage": "Preview",
+    "description": "SocialLinks bottom menu label for Preview tab"
+  },
   "sdffuN": {
     "defaultMessage": "Vertical Spacing : {verticalSpacing}",
     "description": "Vertical Spacing message in simple text edition"
@@ -1983,6 +2079,10 @@
     "defaultMessage": "Build my webcard",
     "description": "Build my webcard button label in Profile Screen Button Bar"
   },
+  "ufbGn8": {
+    "defaultMessage": "Top margin : {size}",
+    "description": "Top margin message in SocialLinks edition"
+  },
   "uisFlX": {
     "defaultMessage": "Slide to change the Bottom margin",
     "description": "Hint of the marginBottom marginttom slider in SimpleButton edition"
@@ -2023,6 +2123,10 @@
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
   },
+  "w+BjOj": {
+    "defaultMessage": "Slide to change the Spacing",
+    "description": "Hint of the Spacing slider in SocialLinks edition"
+  },
   "w6NGI9": {
     "defaultMessage": "Button Label",
     "description": "Label of the buttonLabel input in SimpleButton Settings edition"
@@ -2030,6 +2134,10 @@
   "w96WJ0": {
     "defaultMessage": "Password doesn't match",
     "description": "ChangePasswordScreen Screen - error passwords doesn't match"
+  },
+  "wWS00d": {
+    "defaultMessage": "Icon Size : {size}",
+    "description": "Icon Size message in SocialLinks edition"
   },
   "wZwtml": {
     "defaultMessage": "Name",
@@ -2126,6 +2234,10 @@
   "yXE1VN": {
     "defaultMessage": "Like the post",
     "description": "PostRendererActionBar like button accessibility"
+  },
+  "yZLBxF": {
+    "defaultMessage": "Slide to change the Bottom margin",
+    "description": "Hint of the Bottom margin slider in SocialLinks edition"
   },
   "ydBmYF": {
     "defaultMessage": "Auto",

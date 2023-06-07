@@ -26,6 +26,7 @@ import {
   MODULE_KIND_HORIZONTAL_PHOTO,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
+  MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
 import CarouselRenderer from '#components/CarouselRenderer';
@@ -35,6 +36,7 @@ import LineDividerRenderer from '#components/LineDividerRenderer';
 import PhotoWithTextAndTitleRenderer from '#components/PhotoWithTextAndTitleRenderer';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import SimpleButtonRenderer from '#components/SimpleButtonRenderer';
+import SocialLinksRenderer from '#components/SocialLinksRenderer';
 import { createId } from '#helpers/idHelpers';
 import useToggleFollow from '#hooks/useToggleFollow';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
@@ -404,6 +406,7 @@ const _ProfileScreenBody = (
           kind
           visible
           ...PhotoWithTextAndTitleRenderer_module
+          ...SocialLinksRenderer_module
           ...HorizontalPhotoRenderer_module
           ...SimpleButtonRenderer_module
           ...SimpleTextRenderer_module
@@ -779,6 +782,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE && (
         <PhotoWithTextAndTitleRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_SOCIAL_LINKS && (
+        <SocialLinksRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>
   ));

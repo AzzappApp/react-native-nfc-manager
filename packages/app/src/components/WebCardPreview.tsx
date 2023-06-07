@@ -10,6 +10,7 @@ import {
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
+  MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
@@ -30,6 +31,9 @@ import SimpleButtonRenderer, {
 import SimpleTextRenderer, {
   SimpleTextRendererRaw,
 } from './SimpleTextRenderer';
+import SocialLinksRenderer, {
+  SocialLinksRendererRaw,
+} from './SocialLinksRenderer';
 import SwitchToggle from './SwitchToggle';
 import type { CarouselRawData } from './CarouselRenderer';
 import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
@@ -81,13 +85,19 @@ type PhotoWithTextAndTitleInfo = {
   data: PhotoWithTextAndTitleRawData;
 };
 
+type SocialLinksModuleInfo = {
+  kind: typeof MODULE_KIND_SOCIAL_LINKS;
+  data: PhotoWithTextAndTitleRawData;
+};
+
 type ModuleInfo =
   | CarouselModuleInfo
   | HorizontalPhotoModuleInfo
   | LineDividerModuleInfo
   | PhotoWithTextAndTitleInfo
   | SimpleButtonInfo
-  | SimpleTextModuleInfo;
+  | SimpleTextModuleInfo
+  | SocialLinksModuleInfo;
 
 const WebCardPreview = ({
   editedModuleInfo,
@@ -121,6 +131,7 @@ const WebCardPreview = ({
                 ...CarouselRenderer_module
                 ...SimpleButtonRenderer_module
                 ...PhotoWithTextAndTitleRenderer_module
+                ...SocialLinksRenderer_module
               }
             }
             ...ProfileColorPicker_profile
@@ -243,6 +254,14 @@ const WebCardPreview = ({
             viewMode={viewMode}
           />
         );
+      case MODULE_KIND_SOCIAL_LINKS:
+        return (
+          <SocialLinksRendererRaw
+            data={editedModuleInfo.data}
+            key={module.id}
+            onLayout={onEditedModuleLayout}
+          />
+        );
       default:
         return null;
     }
@@ -309,6 +328,8 @@ const WebCardPreview = ({
                   key={module.id}
                 />
               );
+            case MODULE_KIND_SOCIAL_LINKS:
+              return <SocialLinksRenderer module={module} key={module.id} />;
             default:
               return null;
           }

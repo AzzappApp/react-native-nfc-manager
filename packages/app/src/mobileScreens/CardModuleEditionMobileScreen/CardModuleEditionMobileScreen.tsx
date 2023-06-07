@@ -5,6 +5,7 @@ import LineDividerEditionMobileScreenNode from '@azzapp/relay/artifacts/LineDivi
 import PhotoWithTextAndTitleEditionMobileScreenNode from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
 import SimpleButtonEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
+import SocialLinksEditionMobileScreenNode from '@azzapp/relay/artifacts/SocialLinksEditionMobileScreenQuery.graphql';
 import relayScreen from '#helpers/relayScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import CoverEditionMobileScreen from './CoverEditionMobileScreen';
@@ -13,6 +14,7 @@ import LineDividerEditionMobileScreen from './LineDividerEditionMobileScreen';
 import PhotoWithTextAndTitleEditionMobileScreen from './PhotoWithTextAndTitleEditionMobileScreen';
 import SimpleButtonEditionMobileScreen from './SimpleButtonEditionMobileScreen';
 import SimpleTextEditionMobileScreen from './SimpleTextEditionMobileScreen';
+import SocialLinksEditionMobileScreen from './SocialLinksEditionMobileScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CardModuleEditionRoute } from '#routes';
 import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
@@ -22,6 +24,7 @@ import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifact
 import type { PhotoWithTextAndTitleEditionMobileScreenQuery } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
 import type { SimpleButtonEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
+import type { SocialLinksEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SocialLinksEditionMobileScreenQuery.graphql';
 
 /**
  * Display the edition screen for a card module or the card cover
@@ -40,6 +43,7 @@ const CardModuleEditionMobileScreen = ({
   | PhotoWithTextAndTitleEditionMobileScreenQuery
   | SimpleButtonEditionMobileScreenQuery
   | SimpleTextEditionMobileScreenQuery
+  | SocialLinksEditionMobileScreenQuery
 >) => {
   switch (params?.module) {
     case 'cover':
@@ -94,6 +98,13 @@ const CardModuleEditionMobileScreen = ({
           preloadedQuery={preloadedQuery as any}
         />
       );
+    case 'socialLinks':
+      return (
+        <SocialLinksEditionMobileScreen
+          moduleId={params.moduleId}
+          preloadedQuery={preloadedQuery as any}
+        />
+      );
     default:
       return null;
   }
@@ -118,6 +129,8 @@ CardModuleEditionMobileScreen.prefetch = ({
       return SimpleButtonEditionMobileScreen.prefetch();
     case 'photoWithTextAndTitle':
       return PhotoWithTextAndTitleEditionMobileScreen.prefetch();
+    case 'socialLinks':
+      return SocialLinksEditionMobileScreen.prefetch();
     default:
       return null;
   }
@@ -140,6 +153,8 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
       return SimpleButtonEditionMobileScreenNode;
     case 'photoWithTextAndTitle':
       return PhotoWithTextAndTitleEditionMobileScreenNode;
+    case 'socialLinks':
+      return SocialLinksEditionMobileScreenNode;
     default:
       // for type safety
       return CoverEditionMobileScreenQueryNode;

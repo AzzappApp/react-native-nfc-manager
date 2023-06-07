@@ -137,3 +137,14 @@ export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES = {
   text: '',
   title: '',
 } as const;
+
+export const SOCIAL_LINKS_DEFAULT_VALUES = {
+  links: [],
+  iconColor: '#000000',
+  arrangement: 'inline',
+  iconSize: 40,
+  borderWidth: 2,
+  columnGap: 15,
+  marginTop: 20,
+  marginBottom: 20,
+} as const;

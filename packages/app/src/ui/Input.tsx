@@ -11,9 +11,12 @@ import type {
   TextInputProps as NativeTextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
 } from 'react-native';
 
-export type TextInputProps = NativeTextInputProps & {
+export type TextInputProps = Omit<NativeTextInputProps, 'style'> & {
   /**
    * Whether the input is in error state
    */
@@ -26,6 +29,14 @@ export type TextInputProps = NativeTextInputProps & {
    * The right button to display in the header.
    */
   rightElement?: ReactNode;
+  /**
+   * the style to apply to the view container around the elements and textInput
+   */
+  style?: StyleProp<ViewStyle>;
+  /**
+   * the style to apply to the TextInput
+   */
+  inputStyle?: StyleProp<TextStyle>;
 };
 
 /**
@@ -45,6 +56,7 @@ const Input = (
     style,
     rightElement,
     leftElement,
+    inputStyle,
     ...props
   }: TextInputProps,
   ref: ForwardedRef<NativeTextInput>,
@@ -84,7 +96,7 @@ const Input = (
         }
         onFocus={onFocusInner}
         onBlur={onBlurInner}
-        style={styles.input}
+        style={[styles.input, inputStyle]}
       />
       {rightElement && <View style={styles.rightElement}>{rightElement}</View>}
     </View>
