@@ -20,6 +20,14 @@ const HorizontalPhotoEditionBottomMenu = (
       tabs={useMemo(
         () => [
           {
+            key: 'settings',
+            icon: 'settings',
+            label: intl.formatMessage({
+              defaultMessage: 'Settgins',
+              description: 'HorizontalPhoto bottom menu label for settings tab',
+            }),
+          },
+          {
             key: 'border',
             icon: 'border',
             label: intl.formatMessage({

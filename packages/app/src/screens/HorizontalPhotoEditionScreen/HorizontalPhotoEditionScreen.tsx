@@ -30,6 +30,7 @@ import HorizontalPhotoBorderEditionPanel from './HorizontalPhotoBorderEditionPan
 import HorizontalPhotoEditionBottomMenu from './HorizontalPhotoEditionBottomMenu';
 import HorizontalPhotoMarginsEditionPanel from './HorizontalPhotoMarginsEditionPanel';
 import HorizontalPhotoPreview from './HorizontalPhotoPreview';
+import HorizontalPhotoSettingsEditionPanel from './HorizontalPhotoSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { HorizontalPhotoEditionScreen_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_module.graphql';
 import type { HorizontalPhotoEditionScreen_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_viewer.graphql';
@@ -309,7 +310,7 @@ const HorizontalPhotoEditionScreen = ({
 
   // #region tabs
 
-  const [currentTab, setCurrentTab] = useState('border');
+  const [currentTab, setCurrentTab] = useState('settings');
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
       setCurrentTab(currentTab);
@@ -379,6 +380,19 @@ const HorizontalPhotoEditionScreen = ({
         currentTab={currentTab}
         tabs={[
           {
+            id: 'settings',
+            element: (
+              <HorizontalPhotoSettingsEditionPanel
+                height={height}
+                onHeightChange={onHeightChange}
+                style={{
+                  flex: 1,
+                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                }}
+              />
+            ),
+          },
+          {
             id: 'border',
             element: (
               <HorizontalPhotoBorderEditionPanel
@@ -405,8 +419,6 @@ const HorizontalPhotoEditionScreen = ({
                 onMarginHorizontalChange={onMarginhorizontalChange}
                 marginVertical={marginVertical}
                 onMarginVerticalChange={onMarginverticalChange}
-                height={height}
-                onHeightChange={onHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

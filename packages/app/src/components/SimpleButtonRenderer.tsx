@@ -155,9 +155,10 @@ export const SimpleButtonRendererRaw = ({
             height={layout?.height ?? 0}
             preserveAspectRatio="xMidYMid slice"
             style={{
-              opacity: backgroundStyle?.opacity
-                ? backgroundStyle?.opacity / 100
-                : 1,
+              opacity:
+                backgroundStyle?.opacity != null
+                  ? backgroundStyle?.opacity / 100
+                  : 1,
             }}
           />
         </View>

@@ -882,7 +882,7 @@ describe('CoverEditionScreen', () => {
     expect(getLayer(0).uri).toBe('https://example.com/coverBackground4.png');
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Color #1'));
+      fireEvent.press(screen.getByLabelText('Color #2'));
     });
 
     act(() => {
@@ -895,7 +895,7 @@ describe('CoverEditionScreen', () => {
     expect(getLayer(0).tintColor).toBe('#434239');
 
     act(() => {
-      fireEvent.press(screen.getByLabelText('Color #2'));
+      fireEvent.press(screen.getByLabelText('Color #1'));
     });
 
     act(() => {

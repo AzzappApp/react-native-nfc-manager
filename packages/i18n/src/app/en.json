@@ -767,6 +767,10 @@
     "defaultMessage": "Fontsize",
     "description": "Label of the fontSize slider in SimpleButton edition"
   },
+  "M/YmS/": {
+    "defaultMessage": "Border shape",
+    "description": "Border shape tab label in HorizontalPhoto edition"
+  },
   "M32J+R": {
     "defaultMessage": "Next",
     "description": "Next button label in image picker wizzard"
@@ -1107,6 +1111,10 @@
     "defaultMessage": "Post",
     "description": "Post Comment screen - create comment action button"
   },
+  "XMUFR1": {
+    "defaultMessage": "Settgins",
+    "description": "HorizontalPhoto bottom menu label for settings tab"
+  },
   "XNJ3+V": {
     "defaultMessage": "Hide",
     "description": "Accessibility label for the hide button in the profile edition screen"
@@ -1306,10 +1314,6 @@
   "dF52vj": {
     "defaultMessage": "Highlights",
     "description": "Highlights image edition parameters name"
-  },
-  "dG/x6l": {
-    "defaultMessage": "Color #2",
-    "description": "Label of the background/foreground background color in web card modules editors"
   },
   "dImcC+": {
     "defaultMessage": "Duplicates the module in your webcard",
@@ -1623,13 +1627,13 @@
     "defaultMessage": "Image/Text Gap : {size}",
     "description": "Image/Text Gap message in PhotoWithTextAndTitle edition"
   },
-  "ltR4XX": {
-    "defaultMessage": "Color #1",
-    "description": "Label of the background/foreground tint color in web card modules editors"
-  },
   "lvy7m5": {
     "defaultMessage": "Show",
     "description": "Accessibility label for the show button in the profile edition screen"
+  },
+  "lzKX7u": {
+    "defaultMessage": "Settings",
+    "description": "Title of the settings section in HorizontalPhoto edition"
   },
   "m/3KOp": {
     "defaultMessage": "Bottom center",
@@ -1935,6 +1939,10 @@
     "defaultMessage": "Photo With Text and title",
     "description": "Module selection list modal Photo With Text and title module label"
   },
+  "tuDqJ+": {
+    "defaultMessage": "Color #2",
+    "description": "Label of the background/foreground tint color in web card modules editors"
+  },
   "u0bldw": {
     "defaultMessage": "Slide to change the border Radius",
     "description": "Hint of the borderRadius slider in SimpleButton edition"
@@ -2095,10 +2103,6 @@
     "defaultMessage": "Edit border",
     "description": "HorizontalPhoto bottom menu label for border tab"
   },
-  "yIhIng": {
-    "defaultMessage": "Border Shape",
-    "description": "Border Shape tab label in HorizontalPhoto edition"
-  },
   "yKRJzZ": {
     "defaultMessage": "Photo opacity : {opacity}",
     "description": "Photo Opacity message in Horizontal photo edition"
@@ -2163,6 +2167,9 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in simple text edition"
   },
+  "zrCtLh": {
+    "defaultMessage": "Color #1",
+    "description": "Label of the background/foreground background color in web card modules editors"
   "zxsBTT": {
     "defaultMessage": "Webcard details",
     "description": "Title of the section where user can view their webcard details"

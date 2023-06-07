@@ -105,7 +105,7 @@ const EditorLayerSelectorPanel = ({
   const hasBackground = !!backgroundColor;
   const tintColorLabel = hasBackground
     ? intl.formatMessage({
-        defaultMessage: 'Color #1',
+        defaultMessage: 'Color #2',
         description:
           'Label of the background/foreground tint color in web card modules editors',
       })
@@ -116,7 +116,7 @@ const EditorLayerSelectorPanel = ({
       });
 
   const backgroundColorLabel = intl.formatMessage({
-    defaultMessage: 'Color #2',
+    defaultMessage: 'Color #1',
     description:
       'Label of the background/foreground background color in web card modules editors',
   });
@@ -127,13 +127,6 @@ const EditorLayerSelectorPanel = ({
         {
           tabKey: 'media',
           label: title,
-        },
-        {
-          tabKey: 'tintColor',
-          label: tintColorLabel,
-          rightElement: (
-            <ColorPreview color={tintColor} style={{ marginLeft: 5 }} />
-          ),
         },
         hasBackground
           ? {
@@ -147,6 +140,13 @@ const EditorLayerSelectorPanel = ({
               ),
             }
           : null,
+        {
+          tabKey: 'tintColor',
+          label: tintColorLabel,
+          rightElement: (
+            <ColorPreview color={tintColor} style={{ marginLeft: 5 }} />
+          ),
+        },
       ]),
     [
       backgroundColor,

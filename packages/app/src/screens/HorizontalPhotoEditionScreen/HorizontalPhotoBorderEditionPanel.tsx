@@ -87,8 +87,8 @@ const HorizontalPhotoBorderEditionPanel = ({
         {
           tabKey: 'border',
           label: intl.formatMessage({
-            defaultMessage: 'Border Shape',
-            description: 'Border Shape tab label in HorizontalPhoto edition',
+            defaultMessage: 'Border shape',
+            description: 'Border shape tab label in HorizontalPhoto edition',
           }),
         },
         {

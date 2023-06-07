@@ -126,7 +126,7 @@ export const HorizontalPhotoRendererRaw = ({
   return (
     <View
       {...props}
-      style={[style, { backgroundColor, height }]}
+      style={[style, { backgroundColor, height: height + 2 * marginVertical }]}
       onLayout={onLayout}
     >
       {background && (
@@ -135,12 +135,13 @@ export const HorizontalPhotoRendererRaw = ({
             uri={background.uri}
             color={backgroundStyle?.patternColor ?? '#000'}
             width={layout?.width ?? 0}
-            height={height}
+            height={height + 2 * marginVertical}
             preserveAspectRatio="xMidYMid slice"
             style={{
-              opacity: backgroundStyle?.opacity
-                ? backgroundStyle?.opacity / 100
-                : 1,
+              opacity:
+                backgroundStyle?.opacity != null
+                  ? backgroundStyle?.opacity / 100
+                  : 1,
             }}
           />
         </View>
@@ -148,7 +149,7 @@ export const HorizontalPhotoRendererRaw = ({
       {image?.uri && (
         <View
           style={{
-            height: height - 2 * marginVertical,
+            height,
             borderWidth,
             borderRadius,
             marginHorizontal,
