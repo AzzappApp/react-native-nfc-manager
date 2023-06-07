@@ -191,6 +191,10 @@
     "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
     "description": "Accessibility hint of the rotate button in in the cover edition screen"
   },
+  "5xUXWH": {
+    "defaultMessage": "Aspect ratio: {size}",
+    "description": "Aspect ratio message in PhotoWithTextAndTitle edition"
+  },
   "6+YHde": {
     "defaultMessage": "Flip camera",
     "description": "camera flip button accessibility label"
@@ -483,6 +487,10 @@
     "defaultMessage": "Log In",
     "description": "Signup Screen - Login link bottom screen"
   },
+  "Dj4Rzr": {
+    "defaultMessage": "Slide to change the border radius",
+    "description": "Hint of the borderRadius slider in PhotoWithTextAndTitle edition"
+  },
   "DpvS7V": {
     "defaultMessage": "Font",
     "description": "Label of the ont dropdown button"
@@ -550,10 +558,6 @@
   "F6MOFe": {
     "defaultMessage": "Opens a list of countries and allows you to select a calling code",
     "description": "Account details - The accessibility hint for the country selector"
-  },
-  "FCi1T9": {
-    "defaultMessage": "Slide to change the borderRadius",
-    "description": "Hint of the borderRadius slider in PhotoWithTextAndTitle edition"
   },
   "FE/z6a": {
     "defaultMessage": "This phone number is already registered",
@@ -778,6 +782,10 @@
   "MMkG6l": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the Vertical Spacing slider in simple text edition"
+  },
+  "MVOJWf": {
+    "defaultMessage": "Border radius : {size}",
+    "description": "borderRadius message in PhotoWithTextAndTitle edition"
   },
   "MYq2d8": {
     "defaultMessage": "Select an activity",
@@ -1042,10 +1050,6 @@
   "VBdLBY": {
     "defaultMessage": "Deletes the module from your webcard",
     "description": "Accessibility hint for the delete button in the profile edition screen"
-  },
-  "VPKdFj": {
-    "defaultMessage": "Aspect Ratio: {size}",
-    "description": "Title size message in PhotoWithTextAndTitle edition"
   },
   "VQFKgi": {
     "defaultMessage": "Hides the module in your webcard",
@@ -1535,6 +1539,10 @@
     "defaultMessage": "New password",
     "description": "Account Details - Change password form - new password label"
   },
+  "jUgt3y": {
+    "defaultMessage": "Border radius",
+    "description": "Label of the borderRadius slider in PhotoWithTextAndTitle edition"
+  },
   "jb3SxE": {
     "defaultMessage": "Delete",
     "description": "Delete button in profile edition screen footer"
@@ -1778,10 +1786,6 @@
   "pfOnsu": {
     "defaultMessage": "Effect",
     "description": "Label of the effect tab in cover edition"
-  },
-  "plzkij": {
-    "defaultMessage": "BorderRadius",
-    "description": "Label of the borderRadius slider in PhotoWithTextAndTitle edition"
   },
   "pqxK1C": {
     "defaultMessage": "Contrast",
@@ -2078,10 +2082,6 @@
   "xV6Ifc": {
     "defaultMessage": "Save",
     "description": "Save button label in carousel edition screen"
-  },
-  "xVK1f0": {
-    "defaultMessage": "BorderRadius : {size}",
-    "description": "borderRadius message in PhotoWithTextAndTitle edition"
   },
   "xaWatU": {
     "defaultMessage": "Cancel",

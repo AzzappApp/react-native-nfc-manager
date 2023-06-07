@@ -49,6 +49,7 @@ const PhotoWithTextAndTitleRenderer = ({
             id
             uri(width: $screenWidth, pixelRatio: $pixelRatio)
           }
+          aspectRatio
           fontFamily
           fontColor
           textAlign

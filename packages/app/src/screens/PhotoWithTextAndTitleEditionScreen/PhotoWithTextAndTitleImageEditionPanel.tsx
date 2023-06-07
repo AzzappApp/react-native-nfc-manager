@@ -134,7 +134,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="BorderRadius : {size}"
+              defaultMessage="Border radius : {size}"
               description="borderRadius message in PhotoWithTextAndTitle edition"
               values={{
                 size: borderRadius,
@@ -148,12 +148,12 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           interval={15}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'BorderRadius',
+            defaultMessage: 'Border radius',
             description:
               'Label of the borderRadius slider in PhotoWithTextAndTitle edition',
           })}
           accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the borderRadius',
+            defaultMessage: 'Slide to change the border radius',
             description:
               'Hint of the borderRadius slider in PhotoWithTextAndTitle edition',
           })}
@@ -162,10 +162,10 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Aspect Ratio: {size}"
-              description="Title size message in PhotoWithTextAndTitle edition"
+              defaultMessage="Aspect ratio: {size}"
+              description="Aspect ratio message in PhotoWithTextAndTitle edition"
               values={{
-                size: aspectRatio,
+                size: aspectRatio.toFixed(2),
               }}
             />
           }
