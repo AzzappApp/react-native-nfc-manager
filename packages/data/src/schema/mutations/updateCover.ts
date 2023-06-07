@@ -50,7 +50,7 @@ const updateCover: MutationResolvers['updateCover'] = async (
 
   try {
     await db.transaction().execute(async trx => {
-      let coverId = cover?.id;
+      let coverId;
       if (!cover) {
         // souceMedia can exist in `Media` table (business template + using business image)
         const mediaExist =
@@ -86,6 +86,7 @@ const updateCover: MutationResolvers['updateCover'] = async (
         );
         coverId = cover.id;
       } else {
+        coverId = cover.id;
         const mediaOperations: Array<Promise<any> | null> = [];
         const updates: CoverUpdates = {};
 
@@ -175,16 +176,16 @@ const updateCover: MutationResolvers['updateCover'] = async (
 
         await Promise.all(mediaOperations);
 
-        await updateCardCover(coverId!, updates, trx);
+        await updateCardCover(coverId, updates, trx);
 
-        coverLoader.clear(coverId!);
+        coverLoader.clear(coverId);
       }
       if (!card) {
         await createCard(
           {
             profileId,
             isMain: true,
-            coverId: coverId!,
+            coverId,
             backgroundColor: null,
           },
           trx,
