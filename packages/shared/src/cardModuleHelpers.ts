@@ -61,7 +61,7 @@ export const SIMPLE_TEXT_MAX_LENGTH = 2000;
 
 export const SIMPLE_TITLE_DEFAULT_VALUES = {
   fontFamily: 'Arial',
-  fontSize: 18,
+  fontSize: 20,
   color: '#000000',
   textAlign: 'center',
   verticalSpacing: 0,
@@ -69,7 +69,7 @@ export const SIMPLE_TITLE_DEFAULT_VALUES = {
   marginVertical: 20,
 } as const;
 
-export const SIMPLE_TITLE_MAX_LENGTH = 500;
+export const SIMPLE_TITLE_MAX_LENGTH = 300;
 
 export const LINE_DIVIDER_DEFAULT_VALUES = {
   orientation: 'bottomRight',
