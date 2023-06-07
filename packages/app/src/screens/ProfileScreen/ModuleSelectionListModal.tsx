@@ -1,15 +1,12 @@
-import chunk from 'lodash/chunk';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, Modal, ScrollView, View } from 'react-native';
+import { FlatList, Modal, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { shadow } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
+import ModuleSelectionListModalItem from './ModuleSelectionListModalItem';
+import type { ModuleSelectionListItem } from './ModuleSelectionListModalItem';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ModalProps } from 'react-native';
 
@@ -30,49 +27,54 @@ const ModuleSelectionListModal = ({
         {
           moduleKind: 'simpleButton',
           label: intl.formatMessage({
-            defaultMessage: 'Simple Button',
+            defaultMessage: 'Button',
             description:
               'Module selection list modal simple button module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/simpleButton_light.png'),
+          image_dark: require('./../../assets/module/simpleButton_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'simpleText',
           label: intl.formatMessage({
-            defaultMessage: 'Simple Text',
+            defaultMessage: 'Text',
             description: 'Module selection list modal simple text module label',
           }),
-          image: require('./assets/simple-text.png'),
+          image_light: require('./../../assets/module/simpleText_light.png'),
+          image_dark: require('./../../assets/module/simpleText_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'blockText',
           label: intl.formatMessage({
-            defaultMessage: 'Block Text',
+            defaultMessage: 'Text Block',
             description: 'Module selection list modal block text module label',
           }),
-          image: require('./assets/simple-text.png'),
+          image_light: require('./../../assets/module/blockText_light.png'),
+          image_dark: require('./../../assets/module/blockText_dark.png'),
           ready: false,
         },
         {
           moduleKind: 'simpleTitle',
           label: intl.formatMessage({
-            defaultMessage: 'Simple Title',
+            defaultMessage: 'Title',
             description:
               'Module selection list modal simple title module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/simpleTitle_light.png'),
+          image_dark: require('./../../assets/module/simpleTitle_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'horizontalPhoto',
           label: intl.formatMessage({
-            defaultMessage: 'Horizontal Photo',
+            defaultMessage: 'Image',
             description:
               'Module selection list modal horizontal photo module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/horizontalPhoto_light.png'),
+          image_dark: require('./../../assets/module/horizontalPhoto_dark.png'),
           ready: true,
         },
         {
@@ -82,69 +84,85 @@ const ModuleSelectionListModal = ({
             description:
               'Module selection list modal Image Carousel module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/carousel_light.png'),
+          image_dark: require('./../../assets/module/carousel_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'lineDivider',
           label: intl.formatMessage({
-            defaultMessage: 'Line Divider',
+            defaultMessage: 'Divider',
             description:
               'Module selection list modal Line Divider module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/lineDivider_light.png'),
+          image_dark: require('./../../assets/module/lineDivider_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'photoWithTextAndTitle',
           label: intl.formatMessage({
-            defaultMessage: 'Photo With Text and title',
+            defaultMessage: 'Text Image',
             description:
               'Module selection list modal Photo With Text and title module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/photoWithTextAndTitle_light.png'),
+          image_dark: require('./../../assets/module/photoWithTextAndTitle_dark.png'),
           ready: true,
         },
         {
           moduleKind: 'openingHours',
           label: intl.formatMessage({
-            defaultMessage: 'Opening Hours',
+            defaultMessage: 'Schedule',
             description:
               'Module selection list modal Opening Hours module label',
           }),
-          image: require('./assets/simple-button.png'),
-          ready: false,
-        },
-        {
-          moduleKind: 'webCardsCarousel',
-          label: intl.formatMessage({
-            defaultMessage: 'WebCards Carousel',
-            description:
-              'Module selection list modal WebCards Carousel module label',
-          }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/openingHours_light.png'),
+          image_dark: require('./../../assets/module/openingHours_dark.png'),
           ready: false,
         },
         {
           moduleKind: 'socialLinks',
           label: intl.formatMessage({
-            defaultMessage: 'Social Links',
+            defaultMessage: 'Social',
             description:
               'Module selection list modal Social Links module label',
           }),
-          image: require('./assets/simple-button.png'),
+          image_light: require('./../../assets/module/socialLinks_light.png'),
+          image_dark: require('./../../assets/module/socialLinks_dark.png'),
           ready: false,
         },
+        //TODO: waiting for specification and thumbnail
+        // {
+        //   moduleKind: 'webCardsCarousel',
+        //   label: intl.formatMessage({
+        //     defaultMessage: 'WebCards Carousel',
+        //     description:
+        //       'Module selection list modal WebCards Carousel module label',
+        //   }),
+        //   image_light: require('./assets/simple-button.png'),
+        //   image_dark: require('./assets/simple-button.png'),
+        //   ready: false,
+        // },
       ] as const,
     [intl],
   );
 
   const { top, bottom } = useSafeAreaInsets();
-  const styles = useStyleSheet(styleSheet);
+  const renderItem = useCallback(
+    ({ item }: { item: ModuleSelectionListItem }) => (
+      <ModuleSelectionListModalItem
+        module={item}
+        key={item.moduleKind}
+        onSelect={onSelectModuleKind}
+      />
+    ),
+    [onSelectModuleKind],
+  );
 
   return (
     <Modal onRequestClose={onRequestClose} {...props}>
-      <Container style={{ flex: 1, paddingTop: top }}>
+      <Container style={[styles.root, { paddingTop: top }]}>
         <Header
           leftElement={
             <IconButton icon="arrow_down" onPress={onRequestClose} />
@@ -154,27 +172,18 @@ const ModuleSelectionListModal = ({
             description: 'Module selection list modal header title',
           })}
         />
-        <ScrollView
-          style={{ flex: 1, paddingBottom: bottom }}
-          contentContainerStyle={styles.buttonContainer}
-        >
-          {chunk(modules, 2).map((line, index) => (
-            <View key={index} style={styles.buttonLine}>
-              {line.map(({ image, label, ready, moduleKind }) => (
-                <PressableNative
-                  key={moduleKind}
-                  style={styles.button}
-                  onPress={() => onSelectModuleKind(moduleKind)}
-                  disabled={!ready}
-                  accessibilityRole="button"
-                >
-                  <Image source={image} style={styles.buttonImage} />
-                  <Text variant="button">{label}</Text>
-                </PressableNative>
-              ))}
-            </View>
-          ))}
-        </ScrollView>
+        <FlatList
+          numColumns={2}
+          data={modules}
+          renderItem={renderItem}
+          contentContainerStyle={{
+            rowGap: 10,
+            columnGap: 10,
+            paddingBottom: bottom + 30,
+          }}
+          style={styles.flatList}
+          showsVerticalScrollIndicator={false}
+        />
       </Container>
     </Modal>
   );
@@ -182,25 +191,10 @@ const ModuleSelectionListModal = ({
 
 export default ModuleSelectionListModal;
 
-const styleSheet = createStyleSheet(appearance => ({
-  buttonContainer: {
-    padding: 20,
-    gap: 10,
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  flatList: {
+    paddingHorizontal: 10,
+    paddingTop: 20,
   },
-  buttonLine: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  button: [
-    {
-      padding: 10,
-      borderRadius: 10,
-      gap: 10,
-    },
-    shadow(appearance),
-  ],
-  buttonImage: {
-    padding: 10,
-    aspectRatio: 1,
-  },
-}));
+});

@@ -43,6 +43,10 @@
     "defaultMessage": "Bottom Color",
     "description": "Bottom Color title in Line Divider module screen"
   },
+  "0+zM5f": {
+    "defaultMessage": "Title",
+    "description": "Module selection list modal simple title module label"
+  },
   "07iiib": {
     "defaultMessage": "Cancel",
     "description": "Cancel button in Image edition screen"
@@ -391,10 +395,6 @@
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
   },
-  "BSgZ1O": {
-    "defaultMessage": "Simple Title",
-    "description": "Module selection list modal simple title module label"
-  },
   "BcDGTQ": {
     "defaultMessage": "Button Options",
     "description": "Label of the action type selector in SimpleButton Settings edition"
@@ -434,6 +434,10 @@
   "CCbp9S": {
     "defaultMessage": "Trending profiles",
     "description": "SearchPage - Trending profile title"
+  },
+  "CFE9+a": {
+    "defaultMessage": "Button",
+    "description": "Module selection list modal simple button module label"
   },
   "CGs2Xn": {
     "defaultMessage": "Add an email address",
@@ -559,13 +563,17 @@
     "defaultMessage": "Opens a list of countries and allows you to select a calling code",
     "description": "Account details - The accessibility hint for the country selector"
   },
+  "FCi1T9": {
+    "defaultMessage": "Slide to change the borderRadius",
+    "description": "Hint of the borderRadius slider in PhotoWithTextAndTitle edition"
+  },
+  "FD5kqW": {
+    "defaultMessage": "Text Block",
+    "description": "Module selection list modal block text module label"
+  },
   "FE/z6a": {
     "defaultMessage": "This phone number is already registered",
     "description": "Account Details Screen - Error This phone number is already registered "
-  },
-  "FHtB4h": {
-    "defaultMessage": "Social Links",
-    "description": "Module selection list modal Social Links module label"
   },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
@@ -582,10 +590,6 @@
   "FoeiuO": {
     "defaultMessage": "Top/Bottom Margin",
     "description": "Label of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition"
-  },
-  "GKhDdS": {
-    "defaultMessage": "Block Text",
-    "description": "Module selection list modal block text module label"
   },
   "GQ5mTZ": {
     "defaultMessage": "RGB",
@@ -731,6 +735,14 @@
     "defaultMessage": "Add a new section",
     "description": "Module selection list modal header title"
   },
+  "LCBQR+": {
+    "defaultMessage": "Divider",
+    "description": "Module selection list modal Line Divider module label"
+  },
+  "LDSGS1": {
+    "defaultMessage": "Free",
+    "description": "Module Selection List - Free label for module"
+  },
   "LGAptw": {
     "defaultMessage": "Phone number or email address",
     "description": "ForgotpasswordScreen - Phone number or email address placeholder"
@@ -758,14 +770,6 @@
   "Lp4WhG": {
     "defaultMessage": "Top margin",
     "description": "Label of the marginTop slider in SimpleButton edition"
-  },
-  "LsKCrf": {
-    "defaultMessage": "Simple Button",
-    "description": "Module selection list modal simple button module label"
-  },
-  "LxNxj5": {
-    "defaultMessage": "Fontsize",
-    "description": "Label of the fontSize slider in SimpleButton edition"
   },
   "M/YmS/": {
     "defaultMessage": "Border shape",
@@ -802,6 +806,10 @@
   "MuonO2": {
     "defaultMessage": "Loading error",
     "description": "CoverEditionScreen alert message loading error title"
+  },
+  "N+we9p": {
+    "defaultMessage": "Text Image",
+    "description": "Module selection list modal Photo With Text and title module label"
   },
   "N2/KC6": {
     "defaultMessage": "Title size",
@@ -842,10 +850,6 @@
   "Oe7IDs": {
     "defaultMessage": "Border radius",
     "description": "Label of the border radius in carousel edition"
-  },
-  "OooM62": {
-    "defaultMessage": "Line Divider",
-    "description": "Module selection list modal Line Divider module label"
   },
   "Oqezmf": {
     "defaultMessage": "Comment the post",
@@ -923,6 +927,10 @@
     "defaultMessage": "Moves the module up",
     "description": "Accessibility hint for the move up button in the profile edition screen"
   },
+  "SKonZe": {
+    "defaultMessage": "Social",
+    "description": "Module selection list modal Social Links module label"
+  },
   "SUCRjC": {
     "defaultMessage": "My Webcards",
     "description": "Account screen header title where current profile can be changed"
@@ -959,17 +967,17 @@
     "defaultMessage": "Enter your first name",
     "description": "ProfileForm first name textinput placeholder"
   },
-  "TiTw6m": {
-    "defaultMessage": "Border shape",
-    "description": "Border Shape tab label in SimpleButton edition"
+  "TLk4ML": {
+    "defaultMessage": "Text",
+    "description": "Module selection list modal simple text module label"
   },
   "TNL2or": {
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
     "description": "Account details - error message when password is not compliant with our rules"
   },
-  "Th5e4c": {
-    "defaultMessage": "Slide to change the border Width",
-    "description": "Hint of the borderWidth slider in SimpleButton edition"
+  "TiTw6m": {
+    "defaultMessage": "Border shape",
+    "description": "Border Shape tab label in SimpleButton edition"
   },
   "TtcQs5": {
     "defaultMessage": "Clipping",
@@ -1194,6 +1202,10 @@
   "Zq9BX5": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
+  },
+  "ZvFZeW": {
+    "defaultMessage": "Schedule",
+    "description": "Module selection list modal Opening Hours module label"
   },
   "a/lfqT": {
     "defaultMessage": "Background",
@@ -1459,10 +1471,6 @@
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
   },
-  "hK042u": {
-    "defaultMessage": "Horizontal Photo",
-    "description": "Module selection list modal horizontal photo module label"
-  },
   "hLrm6h": {
     "defaultMessage": "Slide to change the Left/right margin size",
     "description": "Hint of the Left/right margin slider in HorizontalPhoto edition"
@@ -1583,6 +1591,10 @@
     "defaultMessage": "Tell us more about you",
     "description": "NewProfileType Interest Picker Screen - Title for personal profile"
   },
+  "kf7mLc": {
+    "defaultMessage": "Image",
+    "description": "Module selection list modal horizontal photo module label"
+  },
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
@@ -1630,10 +1642,6 @@
   "lfepeY": {
     "defaultMessage": "Image/Text Gap : {size}",
     "description": "Image/Text Gap message in PhotoWithTextAndTitle edition"
-  },
-  "ltR4XX": {
-    "defaultMessage": "Color #1",
-    "description": "Label of the background/foreground tint color in web card modules editors"
   },
   "lvgj9M": {
     "defaultMessage": "Slide to change the Top margin",
@@ -1723,10 +1731,6 @@
     "defaultMessage": "Border size",
     "description": "Label of the border size in carousel edition"
   },
-  "odCG09": {
-    "defaultMessage": "WebCards Carousel",
-    "description": "Module selection list modal WebCards Carousel module label"
-  },
   "ok4cTE": {
     "defaultMessage": "Border color",
     "description": "Border color tab label in SimpleButton edition"
@@ -1775,10 +1779,6 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in carousel edition"
   },
-  "pYbQta": {
-    "defaultMessage": "Opening Hours",
-    "description": "Module selection list modal Opening Hours module label"
-  },
   "peQNDG": {
     "defaultMessage": "Image ratio",
     "description": "Accessibility label of the image ratio button in carousel edition"
@@ -1810,10 +1810,6 @@
   "qFUOJM": {
     "defaultMessage": "Unlike the post",
     "description": "PostRendererActionBar unlike button accessibility"
-  },
-  "qH9pOD": {
-    "defaultMessage": "Simple Text",
-    "description": "Module selection list modal simple text module label"
   },
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
@@ -1943,13 +1939,13 @@
     "defaultMessage": "Desktop",
     "description": "Desktop view mode title in web card preview"
   },
-  "tSppn5": {
-    "defaultMessage": "Photo With Text and title",
-    "description": "Module selection list modal Photo With Text and title module label"
-  },
   "tuDqJ+": {
     "defaultMessage": "Color #2",
     "description": "Label of the background/foreground tint color in web card modules editors"
+  },
+  "twJLQV": {
+    "defaultMessage": "Bottom margin",
+    "description": "Label of the marginBottom slider in SimpleButton edition"
   },
   "u0bldw": {
     "defaultMessage": "Slide to change the border Radius",
@@ -2178,6 +2174,7 @@
   "zrCtLh": {
     "defaultMessage": "Color #1",
     "description": "Label of the background/foreground background color in web card modules editors"
+  },
   "zxsBTT": {
     "defaultMessage": "Webcard details",
     "description": "Title of the section where user can view their webcard details"
