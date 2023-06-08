@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useRouter } from '#PlatformEnvironment';
+import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowedProfilesScreenList from './FollowedProfilesScreenList';
@@ -31,7 +31,7 @@ const FollowedProfilesScreen = ({
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
+    <Container style={{ flex: 1 }}>
       <Header
         leftElement={
           <IconButton
@@ -50,7 +50,7 @@ const FollowedProfilesScreen = ({
         currentProfileId={viewer.profile?.id ?? ''}
         viewer={viewer}
       />
-    </View>
+    </Container>
   );
 };
 
