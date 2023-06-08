@@ -4,6 +4,7 @@ import { Linking, Platform, StyleSheet, View, Share } from 'react-native';
 import { openComposer } from 'react-native-email-link';
 import { graphql, useFragment } from 'react-relay';
 import AccountHeader from '#components/AccountHeader';
+import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -53,7 +54,7 @@ const InviteFriendsScreen = ({ viewer }: InviteFriendsScreenProps) => {
   }, [whatsappMessage]);
 
   return (
-    <View
+    <Container
       style={{
         flex: 1,
         rowGap: 15,
@@ -159,7 +160,7 @@ const InviteFriendsScreen = ({ viewer }: InviteFriendsScreenProps) => {
           <Icon icon="arrow_right" />
         </PressableNative>
       </View>
-    </View>
+    </Container>
   );
 };
 

@@ -5,6 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
 import useToggle from '#hooks/useToggle';
+import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -46,7 +47,7 @@ const AccountDetailsScreen = ({
   const intl = useIntl();
 
   return (
-    <View
+    <Container
       style={{
         flex: 1,
         rowGap: 15,
@@ -173,7 +174,7 @@ const AccountDetailsScreen = ({
         visible={passwordVisible}
         toggleBottomSheet={togglePasswordVisible}
       />
-    </View>
+    </Container>
   );
 };
 
