@@ -219,7 +219,7 @@ const ProfileBlockContainer = ({
     >
       <GestureDetector gesture={panGesture}>
         <Animated.View
-          style={[moduleContainerStyle, shadow(appearance)]}
+          style={[moduleContainerStyle, editing && shadow(appearance)]}
           onLayout={onLayout}
         >
           {/** this ViewTransition is only here because ios bug with shadow and overlow hidden */}
