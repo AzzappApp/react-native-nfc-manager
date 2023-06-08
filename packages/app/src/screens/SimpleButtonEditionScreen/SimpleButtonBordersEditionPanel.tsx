@@ -110,7 +110,7 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border width : {size}"
+              defaultMessage="Border size : {size}"
               description="borderWidth message in SimpleButton edition"
               values={{
                 size: borderWidth,

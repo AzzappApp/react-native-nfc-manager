@@ -30,7 +30,7 @@ const HorizontalPhotoSettingsEditionPanel = ({
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
-          defaultMessage: 'Settings',
+          defaultMessage: 'Configuration',
           description:
             'Title of the settings section in HorizontalPhoto edition',
         })}

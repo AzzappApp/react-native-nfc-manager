@@ -333,7 +333,7 @@ const HorizontalPhotoEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Horizontal Photo',
+          defaultMessage: 'Horizontal Image',
           description: 'HorizontalPhoto text screen title',
         })}
         leftElement={

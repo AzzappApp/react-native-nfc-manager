@@ -37,6 +37,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
         variant="post"
         hideUserName
         style={styles.commentCartouche}
+        activeLink
       />
       <View style={{ flex: 1 }}>
         <Text variant="small">

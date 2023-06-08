@@ -23,7 +23,7 @@ const HorizontalPhotoEditionBottomMenu = (
             key: 'settings',
             icon: 'settings',
             label: intl.formatMessage({
-              defaultMessage: 'Settgins',
+              defaultMessage: 'Configuration',
               description: 'HorizontalPhoto bottom menu label for settings tab',
             }),
           },

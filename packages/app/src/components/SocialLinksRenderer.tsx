@@ -131,7 +131,7 @@ export const SocialLinksRendererRaw = ({
 
   const onPressSocialLink = async (link: SocialLink) => {
     const url = SOCIAL_LINKS.find(l => l.id === link.socialId)?.mask;
-    await Linking.openURL(`http://${url}/${link.link}`);
+    await Linking.openURL(`http://${url}${link.link}`);
   };
 
   return (

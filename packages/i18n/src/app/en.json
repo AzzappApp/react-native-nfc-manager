@@ -651,10 +651,6 @@
     "defaultMessage": "New password",
     "description": "ChangePassword Screen - New password"
   },
-  "HPGpYz": {
-    "defaultMessage": "Horizontal Photo",
-    "description": "HorizontalPhoto text screen title"
-  },
   "HQ/owO": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
@@ -1095,6 +1091,10 @@
     "defaultMessage": "Margin left/right : {size}",
     "description": "Margin horizontal label in carousel edition"
   },
+  "Ufi7bl": {
+    "defaultMessage": "Configuration",
+    "description": "HorizontalPhoto bottom menu label for settings tab"
+  },
   "UjPdhp": {
     "defaultMessage": "Press this button to select an image from your library",
     "description": "Accessibility hint of the image selection button"
@@ -1118,6 +1118,10 @@
   "VBdLBY": {
     "defaultMessage": "Deletes the module from your webcard",
     "description": "Accessibility hint for the delete button in the profile edition screen"
+  },
+  "VFuMD/": {
+    "defaultMessage": "Font size : {size}",
+    "description": "fontSize message in SimpleButton edition"
   },
   "VQFKgi": {
     "defaultMessage": "Hides the module in your webcard",
@@ -1151,6 +1155,10 @@
     "defaultMessage": "Unselect",
     "description": "Unselect all button label in profile edition screen"
   },
+  "W+0IGT": {
+    "defaultMessage": "Configuration",
+    "description": "Title of the settings section in HorizontalPhoto edition"
+  },
   "WBD9Bx": {
     "defaultMessage": "Next",
     "description": "Button label of screens asking for camera/micro permissions"
@@ -1182,10 +1190,6 @@
   "XID3dP": {
     "defaultMessage": "Post",
     "description": "Post Comment screen - create comment action button"
-  },
-  "XMUFR1": {
-    "defaultMessage": "Settgins",
-    "description": "HorizontalPhoto bottom menu label for settings tab"
   },
   "XNJ3+V": {
     "defaultMessage": "Hide",
@@ -1367,6 +1371,10 @@
     "defaultMessage": "Privacy Policy",
     "description": "Signup Screen - Privacy Policy Hyperlink Clickable label"
   },
+  "be8Hdp": {
+    "defaultMessage": "Border size : {size}",
+    "description": "borderWidth message in SimpleButton edition"
+  },
   "bv6Xu2": {
     "defaultMessage": "Invite with Whatsapp",
     "description": "Invite with Whatsapp button"
@@ -1374,6 +1382,10 @@
   "bxkdJ/": {
     "defaultMessage": "Don't have an account?",
     "description": "SigninScreen - Don't have an account"
+  },
+  "bzKT8e": {
+    "defaultMessage": "Horizontal Image",
+    "description": "HorizontalPhoto text screen title"
   },
   "c/1KI+": {
     "defaultMessage": "Edit Settings",
@@ -1562,10 +1574,6 @@
   "h98t/F": {
     "defaultMessage": "Failed to load the informations of your cover",
     "description": "Error message displayed when cover image failed to load"
-  },
-  "hD/JKe": {
-    "defaultMessage": "Fontsize : {size}",
-    "description": "fontSize message in SimpleButton edition"
   },
   "hFNpbJ": {
     "defaultMessage": "Tap to accept the privacy policy",
@@ -1763,10 +1771,6 @@
     "defaultMessage": "Show",
     "description": "Accessibility label for the show button in the profile edition screen"
   },
-  "lzKX7u": {
-    "defaultMessage": "Settings",
-    "description": "Title of the settings section in HorizontalPhoto edition"
-  },
   "m/3KOp": {
     "defaultMessage": "Bottom center",
     "description": "Label of the bottom center position in cover edition"
@@ -1926,10 +1930,6 @@
   "q/ZByJ": {
     "defaultMessage": "Thermal",
     "description": "Thermal photo filter name"
-  },
-  "qAlZKO": {
-    "defaultMessage": "Border width : {size}",
-    "description": "borderWidth message in SimpleButton edition"
   },
   "qEenwJ": {
     "defaultMessage": "You need to accept the Terms of Service and the Privacy Policy",
