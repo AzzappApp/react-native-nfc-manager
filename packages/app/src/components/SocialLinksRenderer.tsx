@@ -47,6 +47,7 @@ const SocialLinksRenderer = ({
             position
           }
           iconColor
+          iconSize
           arrangement
           borderWidth
           columnGap
