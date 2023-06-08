@@ -169,6 +169,7 @@ export default function AccountScreenProfiles({
               width: COVER_WIDTH * 3,
               justifyContent: 'center',
               height: 235,
+              overflow: 'visible',
             }}
             mode="parallax"
             windowSize={4}
