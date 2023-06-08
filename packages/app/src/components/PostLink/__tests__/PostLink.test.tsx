@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
 
 let mockPostHandle: any = null;
 
-jest.mock('../../PostRenderer', () => {
+jest.mock('../../PostRendererFeed', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function PostRenderer(
@@ -16,9 +16,9 @@ jest.mock('../../PostRenderer', () => {
     ref: ForwardedRef<PostRendererHandle>,
   ) {
     useImperativeHandle(ref, () => mockPostHandle, []);
-    return createElement('PostRenderer', {
+    return createElement('PostRendererFeed', {
       ...props,
-      testID: 'postRenderer',
+      testID: 'postRendererFeed',
     });
   }
 
@@ -44,7 +44,7 @@ describe('PostLink', () => {
     render(<PostLink {...mockPostProps} postId="fakeId" />);
 
     const link = screen.getByRole('link');
-    const Post = screen.getByTestId('postRenderer');
+    const Post = screen.getByTestId('postRendererFeed');
 
     expect(Post).toHaveProp('paused', undefined);
 

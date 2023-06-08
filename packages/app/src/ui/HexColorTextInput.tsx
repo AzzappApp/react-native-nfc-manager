@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet, TextInput as NativeTextInput, View } from 'react-native';
+import { TextInput as NativeTextInput, View } from 'react-native';
 import { isValidHex } from '@azzapp/shared/stringHelpers';
 import { colors, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -17,12 +17,12 @@ type HexColorTextInputProps = Omit<
   Omit<NativeTextInputProps, 'onChangeText'>,
   'onChange'
 > & {
-  onChangeColor: (hexColor: string) => void;
+  onColorChange: (hexColor: string) => void;
   value: string;
 };
 
 /**
- * A wrapper around TextInput that adds Azzapp's default styling.
+ * A wrapper around TextInput that allow to input a hex color.
  *
  *
  * @param {TextInputProps} props
@@ -69,10 +69,10 @@ const HexColorTextInput = ({
     const newColor = '#' + text.replace(/([^0-9A-F]+)/gi, '').substring(0, 6);
     setColorValue(newColor);
     //only accept 6 digit format
-    if (isValidHex(newColor)) props.onChangeColor(newColor);
+    if (isValidHex(newColor)) props.onColorChange(newColor);
   };
 
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View onTouchStart={focus} style={[styles.container]}>
@@ -85,11 +85,7 @@ const HexColorTextInput = ({
 
       <View
         pointerEvents="box-none"
-        style={[
-          styles.inputViewStyle,
-          appearanceStyle.inputViewStyle,
-          focusedStyle,
-        ]}
+        style={[styles.inputViewStyle, focusedStyle]}
       >
         <View
           style={[styles.colorPreview, { backgroundColor: value }]}
@@ -108,25 +104,14 @@ const HexColorTextInput = ({
           ref={textInputRef}
           onFocus={onInputFocus}
           onBlur={onInputBlur}
-          style={[styles.input, appearanceStyle.input, style]}
+          style={[styles.input, style]}
         />
       </View>
     </View>
   );
 };
 
-const computedStyle = createStyleSheet(appearance => ({
-  inputViewStyle: {
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderWidth: 1,
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-  },
-  input: {
-    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
-  },
-}));
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   colorPreview: {
     width: 26,
     height: 26,
@@ -144,11 +129,11 @@ const styles = StyleSheet.create({
   inputViewStyle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.grey50,
-    borderColor: colors.grey50,
     height: 47,
-    borderWidth: 1,
     borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
   input: {
     flexDirection: 'row',
@@ -156,11 +141,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     height: 47,
     width: 74,
-    color: colors.black,
     textTransform: 'uppercase',
+    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
     ...textStyles.medium,
   },
-});
+}));
 
 // this component can be used in multiple places, like list, making it a pure component can be a good idea
 // passing object like style will cause rerender. Still have to test it again with

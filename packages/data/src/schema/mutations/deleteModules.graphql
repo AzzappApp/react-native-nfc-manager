@@ -1,0 +1,9 @@
+input DeleteModulesInput {
+  modulesIds: [ID!]!
+  clientMutationId: String
+}
+
+type DeleteModulesPayload {
+  card: Card!
+  clientMutationId: String
+}

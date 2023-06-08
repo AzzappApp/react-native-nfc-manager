@@ -31,6 +31,7 @@ import type {
 } from '@azzapp/relay/artifacts/ProfileForm_profileCategory.graphql';
 import type { ProfileFormQuery } from '@azzapp/relay/artifacts/ProfileFormQuery.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as RNTextInput } from 'react-native';
 
 type ProfileForm = {
@@ -41,6 +42,7 @@ type ProfileForm = {
     token: string;
     refreshToken: string;
     profileId: string;
+    profileData: Omit<CreateProfileParams, 'authMethod'>;
   }) => void;
 };
 
@@ -87,37 +89,43 @@ const ProfileForm = ({
   const userNameIsNotEmpty = isNotFalsyString(userName);
 
   const { createProfile } = useWebAPI();
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const onSubmit = async () => {
     if (!userNameIsValid || !userNameIsNotEmpty) {
       return;
     }
 
-    setLoading(true);
+    setIsSubmitting(true);
     let response: {
       token: string;
       refreshToken: string;
       profileId: string;
     };
+
+    const newProfile = {
+      companyName,
+      companyActivityId,
+      firstName,
+      lastName,
+      profileKind,
+      profileCategoryId,
+      userName,
+    };
     try {
-      response = await createProfile({
-        companyName,
-        companyActivityId,
-        firstName,
-        lastName,
-        profileKind,
-        profileCategoryId,
-        userName,
-      });
+      response = await createProfile(newProfile);
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.USERNAME_ALREADY_EXISTS) {
         setUserNameAlreadyExists(userName);
       }
-      setLoading(false);
+      setIsSubmitting(false);
       // TODO
       return;
     }
-    onProfileCreated(response);
+    onProfileCreated({
+      ...response,
+      profileData: newProfile,
+    });
+    setIsSubmitting(false);
   };
 
   const [debouncedUserName] = useDebounce(userName, 200);
@@ -128,7 +136,7 @@ const ProfileForm = ({
     if (
       isNotFalsyString(debouncedUserName) &&
       isValidUserName(debouncedUserName) &&
-      !loading
+      !isSubmitting
     ) {
       subscription = fetchQuery<ProfileFormQuery>(
         environment,
@@ -156,7 +164,7 @@ const ProfileForm = ({
     return () => {
       subscription?.unsubscribe();
     };
-  }, [debouncedUserName, environment, loading]);
+  }, [debouncedUserName, environment, isSubmitting]);
 
   const lastNameInputRef = useRef<RNTextInput>(null);
   const userNameInputRef = useRef<RNTextInput>(null);
@@ -200,7 +208,7 @@ const ProfileForm = ({
       style={[
         styles.root,
         {
-          paddingTop: vp`${insetTop} + ${50}`,
+          paddingTop: vp`50`,
         },
       ]}
     >
@@ -241,7 +249,7 @@ const ProfileForm = ({
                   description: 'ProfileForm first name textinput placeholder',
                 })}
                 value={firstName ?? ''}
-                onChangeText={setFirstName}
+                onChangeText={isSubmitting ? undefined : setFirstName}
                 autoCapitalize="words"
                 autoComplete="name"
                 autoCorrect={false}
@@ -266,7 +274,7 @@ const ProfileForm = ({
                   description: 'ProfileForm last name textinput placeholder',
                 })}
                 value={lastName ?? ''}
-                onChangeText={setLastName}
+                onChangeText={isSubmitting ? undefined : setLastName}
                 autoCapitalize="words"
                 autoComplete="name-family"
                 autoCorrect={false}
@@ -293,7 +301,7 @@ const ProfileForm = ({
                   description: 'ProfileForm company name textinput placeholder',
                 })}
                 value={companyName ?? ''}
-                onChangeText={setCompanyName}
+                onChangeText={isSubmitting ? undefined : setCompanyName}
                 autoCapitalize="words"
                 autoComplete="name"
                 autoCorrect={false}
@@ -353,7 +361,7 @@ const ProfileForm = ({
             })}
             isErrored={userNameError != null}
             value={userName}
-            onChangeText={onChangeUsername}
+            onChangeText={isSubmitting ? undefined : onChangeUsername}
             autoCapitalize="none"
             autoComplete="off"
             autoCorrect={false}
@@ -387,7 +395,8 @@ const ProfileForm = ({
         <Submit>
           <ContinueButton
             testID="submit-button"
-            disabled={!userNameIsNotEmpty || loading}
+            disabled={!userNameIsNotEmpty || isSubmitting}
+            loading={isSubmitting}
           />
         </Submit>
       </Form>

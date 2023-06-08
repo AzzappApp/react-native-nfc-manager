@@ -175,7 +175,9 @@ class MediaImageRenderer: UIImageView {
         size: source.requestedSize,
         uri: source.uri
       )
-      self.onLoad?(nil)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+        self.onLoad?(nil)
+      }
       return
     }
     

@@ -14,7 +14,6 @@ import { colors } from '#theme';
 import Link from '#components/Link';
 import { getLocales } from '#helpers/localeHelpers';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
-
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
@@ -32,6 +31,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
   const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
   const [signinError, setSigninError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const intl = useIntl();
 
@@ -46,11 +46,13 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
     );
 
     try {
+      setIsSubmitting(true);
       await signin({ credential: intlPhoneNumber ?? credential, password });
     } catch (error) {
       //TODO handle more error cases ?
       setSigninError(true);
     }
+    setIsSubmitting(false);
   }, [signin, credential, password]);
 
   const passwordRef = useRef<NativeTextInput>(null);
@@ -59,6 +61,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
   };
 
   const vp = useViewportSize();
+
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -71,6 +74,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
         style={styles.keyboardVAvoidingiew}
+        pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
         <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
@@ -99,7 +103,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
                   'SignIn Screen Phone number or email address input placeholder',
               })}
               value={credential}
-              onChangeText={setCredential}
+              onChangeText={isSubmitting ? undefined : setCredential}
               autoCapitalize="none"
               autoComplete="email"
               keyboardType="email-address"
@@ -121,7 +125,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
                 description: 'Password input placeholder',
               })}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Enter your password',
                 description:
@@ -159,6 +163,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
                 disabled={
                   !isNotFalsyString(credential) || !isNotFalsyString(password)
                 }
+                loading={isSubmitting}
               />
             </Submit>
             {signinError && (

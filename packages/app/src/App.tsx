@@ -19,7 +19,12 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import useAuthState from '#hooks/userAuthState';
+import useAuthState from '#hooks/useAuthState';
+import AccountDetailsMobileScreen from '#mobileScreens/AccountDetailsMobileScreen';
+import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
+import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
+import InviteFriendsMobileScreen from '#mobileScreens/InviteFriendsMobileScreen';
+import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
 import MainTabBar from './components/MainTabBar';
 import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
 import { getAuthState, init as initAuthStore } from './helpers/authStore';
@@ -62,11 +67,16 @@ const screens = {
   ALBUMS: () => <View />,
   CHAT: () => <View />,
   POST: PostMobileScreen,
+  POST_COMMENTS: PostCommentsMobileScreen,
   PROFILE_POSTS: ProfilePostsMobileScreen,
   NEW_POST: PostCreationMobileScreen,
   NEW_PROFILE: NewProfileMobileScreen,
   CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
   PROFILE: ProfileMobileScreen,
+  FOLLOWED_PROFILES: FollowedProfilesMobileScreen,
+  FOLLOWERS: FollowersMobileScreen,
+  ACCOUNT_DETAILS: AccountDetailsMobileScreen,
+  INVITE_FRIENDS: InviteFriendsMobileScreen,
 };
 
 const tabs = {

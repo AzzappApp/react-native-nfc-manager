@@ -1,9 +1,5 @@
 import { forwardRef, useState } from 'react';
-import {
-  StyleSheet,
-  TextInput as NativeTextInput,
-  useColorScheme,
-} from 'react-native';
+import { TextInput as NativeTextInput, useColorScheme } from 'react-native';
 import { colors, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ForwardedRef } from 'react';
@@ -28,7 +24,7 @@ const TextInput = (
   { isErrored, onFocus, onBlur, style, ...props }: TextInputProps,
   ref: ForwardedRef<NativeTextInput>,
 ) => {
-  const appearanceStyles = useStyleSheet(computedStyled);
+  const styles = useStyleSheet(styleSheet);
   const scheme = useColorScheme();
   const [isFocused, setIsFocused] = useState(false);
 
@@ -53,8 +49,8 @@ const TextInput = (
       onFocus={onFocusInner}
       onBlur={onBlurInner}
       style={[
-        appearanceStyles.input,
-        isFocused && appearanceStyles.focused,
+        styles.input,
+        isFocused && styles.focused,
         isErrored && styles.errored,
         style,
       ]}
@@ -62,13 +58,7 @@ const TextInput = (
   );
 };
 
-const styles = StyleSheet.create({
-  errored: {
-    borderColor: colors.red400,
-  },
-});
-
-const computedStyled = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   text: {
     color: appearance === 'light' ? colors.black : colors.grey400,
   },
@@ -80,11 +70,13 @@ const computedStyled = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
-    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
+    color: appearance === 'light' ? colors.black : colors.grey400,
   },
-
   focused: {
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
+  },
+  errored: {
+    borderColor: colors.red400,
   },
 }));
 

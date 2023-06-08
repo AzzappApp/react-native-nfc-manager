@@ -20,7 +20,12 @@ export const getProfilesByIds = (
  * @returns The list of profiles associated to the user
  */
 export const getUserProfiles = (userId: string): Promise<Profile[]> =>
-  db.selectFrom('Profile').selectAll().where('userId', '=', userId).execute();
+  db
+    .selectFrom('Profile')
+    .selectAll()
+    .where('userId', '=', userId)
+    .orderBy('userName')
+    .execute();
 
 /**
  * Retrieves a profile by their profilename
@@ -114,6 +119,31 @@ export const getFollowedProfilesCount = async (
     .where('Follow.followerId', '=', profileId)
     .executeTakeFirstOrThrow()
     .then(({ count }) => count);
+
+/**
+ * Retrieve the list of profiles a profile is being followed
+ * @param profileId - The id of the profile
+ * @returns the list of profiles a profile is being followed
+ */
+export const getFollowerProfiles = async (
+  profileId: string,
+  limit: number,
+  after: Date | null = null,
+): Promise<Array<Profile & { followCreatedAt: Date }>> => {
+  let query = db
+    .selectFrom('Profile')
+    .selectAll()
+    .innerJoin('Follow', 'Profile.id', 'Follow.followerId')
+    .select(['Follow.createdAt as followCreatedAt'])
+    .where('Follow.followingId', '=', profileId)
+    .orderBy('Follow.createdAt', 'desc');
+
+  if (after) {
+    query = query.where('Follow.createdAt', '<', after);
+  }
+
+  return query.limit(limit).execute();
+};
 
 /**
  * Retrieve the number of profiles a profile is being followed

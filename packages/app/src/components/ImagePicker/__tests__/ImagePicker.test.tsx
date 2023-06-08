@@ -532,7 +532,7 @@ describe('ImagePicker', () => {
             parameters: expect.objectContaining({
               roll: 0.5,
               cropData: { x: 100, y: 100, width: 500, height: 800 },
-              orientation: 'RIGHT',
+              orientation: 'LEFT',
             }),
           }),
         ]);

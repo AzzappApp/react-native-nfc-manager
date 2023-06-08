@@ -1,4 +1,4 @@
-import { COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isValidHex } from '@azzapp/shared/stringHelpers';
 
 export const validateFormCover = async (

@@ -1,0 +1,55 @@
+type Mutation {
+  updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
+  updateUser(input: UpdateUserInput!): UpdateUserPayload
+  updateCover(input: UpdateCoverInput!): UpdateCoverPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
+  removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload
+  togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
+  saveSimpleTextModule(
+    input: SaveSimpleTextModuleInput!
+  ): SaveSimpleTextModulePayload
+  saveLineDividerModule(
+    input: SaveLineDividerModuleInput!
+  ): SaveLineDividerModulePayload
+  saveHorizontalPhotoModule(
+    input: SaveHorizontalPhotoModuleInput!
+  ): SaveHorizontalPhotoModulePayload
+  saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
+  updateCard(input: UpdateCardInput!): UpdateCardPayload
+  saveSimpleButtonModule(
+    input: SaveSimpleButtonModuleInput!
+  ): SaveSimpleButtonModulePayload
+  swapModules(input: SwapModulesInput!): SwapModulesPayload
+  deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
+  duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
+  updateModulesVisibility(
+    input: UpdateModulesVisibilityInput!
+  ): UpdateModulesVisibilityPayload
+  createPostComment(input: CreatePostCommentInput!): CreatePostCommentPayload
+  savePhotoWithTextAndTitleModule(
+    input: SavePhotoWithTextAndTitleModuleInput!
+  ): SavePhotoWithTextAndTitleModulePayload
+  saveSocialLinksModule(
+    input: SaveSocialLinksModuleInput!
+  ): SaveSocialLinksModulePayload
+}
+
+"""
+User Card media module media
+"""
+input MediaInput {
+  kind: MediaKind!
+  id: String!
+  width: Float!
+  height: Float!
+}
+
+"""
+Style of the background of a module
+"""
+input ModuleBackgroundInputStyle {
+  backgroundColor: String!
+  patternColor: String!
+  opacity: Int!
+}

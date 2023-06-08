@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
-import { getViewer } from '@azzapp/auth/viewer';
+import { getSessionData } from '@azzapp/auth/viewer';
 import HomeWebScreenQueryNode from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 import preloadServerQuery from '#helpers/preloadServerQuery';
 import HomeWebScreen from './HomeWebScreen';
 import type { HomeWebScreenQuery } from '@azzapp/relay/artifacts/HomeWebScreenQuery.graphql';
 
 const HomePage = async () => {
-  const viewer = await getViewer();
+  const viewer = await getSessionData();
 
   if (viewer.isAnonymous) {
     return redirect('/signin');

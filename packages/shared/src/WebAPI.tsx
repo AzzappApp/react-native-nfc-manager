@@ -1,6 +1,7 @@
 /**
  * API methods used by all clients
  */
+import { fromGlobalId } from 'graphql-relay';
 import { fetchJSON, postFormData } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
@@ -73,6 +74,24 @@ export const createProfile: APIMethod<
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
+  });
+
+export type SwitchProfileParams = {
+  profileId: string;
+  authMethod?: 'cookie' | 'token';
+};
+
+export const switchProfile: APIMethod<
+  SwitchProfileParams,
+  TokensResponse & { profileId: string }
+> = (data, init) =>
+  apiFetch(`${API_ENDPOINT}/switch-profile`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify({
+      ...data,
+      profileId: fromGlobalId(data.profileId).id,
+    }),
   });
 
 export type ForgotPasswordParams = {

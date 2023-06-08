@@ -55,3 +55,18 @@ export const createCard = async (
     updatedAt: new Date(),
   };
 };
+
+/**
+ * Update a card.
+ *
+ * @param id - The id of the card to update
+ * @param values - the card fields, excluding the id and the cardDate
+ * @param qc - The query creator to use (profile for transactions)
+ */
+export const updateCard = async (
+  id: string,
+  values: Partial<Omit<Card, 'createdAt' | 'id' | 'updatedAt'>>,
+  qc: QueryCreator<Database> = db,
+): Promise<void> => {
+  await qc.updateTable('Card').set(values).where('id', '=', id).execute();
+};

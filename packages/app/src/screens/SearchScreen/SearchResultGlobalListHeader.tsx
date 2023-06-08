@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 
 import { colors } from '#theme';
 import CoverList from '#components/CoverList';

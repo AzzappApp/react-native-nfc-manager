@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/monorepo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "packageManager": "yarn@1.22.19",
   "workspaces": {
@@ -16,8 +16,10 @@
     "test": "jest",
     "build": "turbo run build",
     "dev": "node ./scripts/dev.js",
+    "predev": "yarn graphql-codegen",
     "build:ios": "turbo run build:ios",
     "build:android": "turbo run build:android",
+    "graphql-codegen": "graphql-codegen",
     "relay:build": "relay-compiler",
     "relay:watch": "relay-compiler --watch",
     "relay:prepare": "touch ./packages/relay/query-map.json",
@@ -26,7 +28,7 @@
     "deploy:android": "yarn workspace @azzapp/app deploy:android",
     "run:ios": "yarn workspace @azzapp/app run:ios",
     "run:android": "yarn workspace @azzapp/app run:android",
-    "update-graphql-schema": "node ./scripts/updateGraphQLSchema.js",
+    "update-graphql-schema": "yarn graphql-codegen",
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo"
   },
   "devScripts": [
@@ -40,6 +42,11 @@
     "@babel/register": "^7.21.0",
     "@babel/runtime": "^7.21.0",
     "@formatjs/cli-lib": "^6.0.3",
+    "@graphql-codegen/add": "^5.0.0",
+    "@graphql-codegen/cli": "^4.0.1",
+    "@graphql-codegen/schema-ast": "^4.0.0",
+    "@graphql-codegen/typescript": "^4.0.0",
+    "@graphql-codegen/typescript-resolvers": "^4.0.0",
     "@svgr/webpack": "^7.0.0",
     "@testing-library/jest-native": "^5.4.2",
     "@testing-library/react-hooks": "^8.0.1",

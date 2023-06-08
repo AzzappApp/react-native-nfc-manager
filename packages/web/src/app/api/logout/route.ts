@@ -9,6 +9,3 @@ export const POST = async () => {
   }
   return res;
 };
-
-// TODO blocked by https://github.com/vercel/next.js/issues/46337
-// export const runtime = 'edge';

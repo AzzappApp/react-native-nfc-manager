@@ -1,0 +1,57 @@
+"""
+A video media
+"""
+type MediaVideo implements Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+  thumbnail(
+    pixelRatio: Float
+    height: Float
+    width: Float
+    time: Float
+  ): String!
+}
+
+interface Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+}
+
+"""
+An image media
+"""
+type MediaImage implements Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+}
+
+"""
+Media used in web card edition provided by azzapp
+"""
+type StaticMedia {
+  id: ID!
+  uri(width: Int, pixelRatio: Int): String!
+  name: String
+  usage: StaticMediaUsage!
+  tags: [String!]!
+}
+
+enum StaticMediaUsage {
+  coverBackground
+  coverForeground
+  moduleBackground
+}
+
+enum MediaKind {
+  video
+  image
+}

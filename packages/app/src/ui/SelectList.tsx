@@ -141,20 +141,20 @@ function SelectListItem<ItemT>({
     onItemSelected(item);
   }, [item, onItemSelected]);
 
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <PressableNative
       style={[
         itemContainerStyle,
-        appearanceStyle.itemContainer,
+        styles.itemContainer,
         isSelected &&
-          (selectedItemContainerStyle ?? appearanceStyle.selectedItemContainer),
+          (selectedItemContainerStyle ?? styles.selectedItemContainer),
       ]}
       onPress={onPress}
     >
       {renderItem?.({ item, isSelected, index }) ?? (
-        <Text variant="button" style={appearanceStyle.defaultItemRenderer}>
+        <Text variant="button" style={styles.defaultItemRenderer}>
           {(item as any)?.[labelField]}
         </Text>
       )}
@@ -166,7 +166,7 @@ const MemoSelectListItem = memo(
   SelectListItem,
 ) as unknown as typeof SelectListItem;
 
-const computedStyle = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   defaultItemRenderer: {
     paddingVertical: 6,
     flexDirection: 'row',

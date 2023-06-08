@@ -24,10 +24,11 @@ import {
   COVER_SOURCE_MAX_IMAGE_DIMENSION,
   COVER_SOURCE_MAX_VIDEO_DIMENSION,
   COVER_VIDEO_BITRATE,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import { firstNotUndefined } from '@azzapp/shared/valueHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
@@ -437,6 +438,7 @@ const CoverEditionScreen = ({
     }
     return null;
   }, [sourceMedia]);
+  //#endregion
 
   // #region Ready state
   // if there is no source media, the cover preview will not dispatch the onReady event
@@ -485,7 +487,6 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Mutation, Cancel and navigation
-  const intl = useIntl();
   const rendererRef = useRef<CoverPreviewHandler | null>(null);
   const [saving, setSaving] = useState(false);
   const [showImageHint, setShowImageHint] = useState(false);
@@ -689,6 +690,14 @@ const CoverEditionScreen = ({
       };
     } else if (sourceMediaInput) {
       input.sourceMedia = sourceMediaInput;
+    } else if (sourceMediaId && sourceMediaId !== cover?.sourceMedia?.id) {
+      //this case handle the case when the user select a business template with a cover already existing
+      input.sourceMedia = {
+        id: sourceMediaId,
+        height: sourceMedia.height,
+        width: sourceMedia.width,
+        kind: 'image',
+      };
     }
 
     if (maskMediaInput) {
@@ -748,13 +757,7 @@ const CoverEditionScreen = ({
       onCompleted() {
         setSaving(false);
         setUploadProgress(null);
-        router.replace({
-          route: 'PROFILE',
-          params: {
-            userName: viewer!.profile!.userName,
-            profileID: viewer!.profile!.id,
-          },
-        });
+
         if (mediaInput) {
           const { id, kind } = mediaInput;
           addLocalCachedMediaFile(
@@ -762,6 +765,17 @@ const CoverEditionScreen = ({
             kind as 'image' | 'video',
             `file://${mediaPath!}`,
           );
+        }
+        if (isCreation) {
+          router.replace({
+            route: 'PROFILE',
+            params: {
+              userName: viewer!.profile!.userName,
+              profileID: viewer!.profile!.id,
+            },
+          });
+        } else {
+          router.back();
         }
       },
       onError(e) {
@@ -986,6 +1000,7 @@ const CoverEditionScreen = ({
   }, [editionParameters.orientation, onParameterValueChange]);
 
   const onActivateCropMode = () => {
+    editionParametersSave.current = editionParameters;
     // a little hack since we allow roll to be edited in crop mode
     setEditedParameter('roll');
   };
@@ -1133,8 +1148,9 @@ const CoverEditionScreen = ({
         ['titleStyle', data.titleStyle],
       );
 
-      if (suggested) {
+      if (suggested && data.sourceMedia) {
         setIsSelectedTemplateSuggested(true);
+
         updateFields([
           'sourceMedia',
           {
@@ -1158,7 +1174,7 @@ const CoverEditionScreen = ({
   //#endregion
 
   //#region Bottom menu
-  const [currentTab, setCurrentTab] = useState<string>('models');
+  const [currentTab, setCurrentTab] = useState('models');
 
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
@@ -1177,6 +1193,7 @@ const CoverEditionScreen = ({
   } = useCoverEditionLayout();
 
   const cropEditionMode = editedParameter === 'roll';
+  const intl = useIntl();
 
   if (!viewer) {
     return null;
@@ -1535,15 +1552,6 @@ type CoverEditionValue = {
   subTitleStyle?: CardCoverTextStyleInput | null;
   title?: string | null;
   titleStyle?: CardCoverTextStyleInput | null;
-};
-
-const firstNotUndefined = <T extends any[]>(...values: T) => {
-  for (const value of values) {
-    if (value !== undefined) {
-      return value;
-    }
-  }
-  return undefined;
 };
 
 const makeTranslucent = (color: string | null | undefined) =>

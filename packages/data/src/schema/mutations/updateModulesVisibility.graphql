@@ -1,0 +1,10 @@
+input UpdateModulesVisibilityInput {
+  modulesIds: [ID!]!
+  visible: Boolean!
+  clientMutationId: String
+}
+
+type UpdateModulesVisibilityPayload {
+  card: Card!
+  clientMutationId: String
+}

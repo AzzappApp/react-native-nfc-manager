@@ -1,12 +1,17 @@
+import { toGlobalId } from 'graphql-relay';
 import { useState, useCallback } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
+import { typedEntries } from '@azzapp/shared/objectHelpers';
+import { useRouter } from '#PlatformEnvironment';
 import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
 import InterestPicker from './InterestPicker';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
+import type { NewProfileRoute } from '#routes';
 import type { NewProfileScreen_query$key } from '@azzapp/relay/artifacts/NewProfileScreen_query.graphql';
+import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 
 type NewProfileScreenProps = {
   data: NewProfileScreen_query$key;
@@ -15,13 +20,16 @@ type NewProfileScreenProps = {
     token: string;
     refreshToken: string;
     profileId: string;
+    profileData: Omit<CreateProfileParams, 'authMethod'>;
   }): void;
+  params: NewProfileRoute['params'];
 };
 
 const NewProfileScreen = ({
   data,
   onClose,
   onProfileCreated,
+  params,
 }: NewProfileScreenProps) => {
   const { profileCategories, interests } = useFragment(
     graphql`
@@ -50,11 +58,46 @@ const NewProfileScreen = ({
     setPage(pa => Math.max(0, pa - 1));
   }, [setPage]);
 
+  const environment = useRelayEnvironment();
+
   const onProfileCreatedInner = (tokenResponse: {
     token: string;
     refreshToken: string;
     profileId: string;
+    profileData: Omit<CreateProfileParams, 'authMethod'>;
   }) => {
+    const { profileData, profileId } = tokenResponse;
+    environment.commitUpdate(updater => {
+      const root = updater.getRoot();
+      const user = root.getLinkedRecord('currentUser');
+      const profiles = user?.getLinkedRecords('profiles');
+      if (!profiles) {
+        return;
+      }
+
+      const newProfile = updater.create(
+        toGlobalId('Profile', profileId),
+        'Profile',
+      );
+
+      typedEntries(profileData).forEach(([key, value]) => {
+        newProfile.setValue(value, key);
+      });
+
+      user?.setLinkedRecords(
+        profiles
+          ?.concat(newProfile)
+          .sort((a, b) =>
+            ((a.getValue('userName') as string) ?? '').localeCompare(
+              (b.getValue('userName') as string) ?? '',
+            ),
+          ),
+        'profiles',
+      );
+
+      root.setLinkedRecord(user, 'currentUser');
+    });
+
     onProfileCreated(tokenResponse);
     next();
   };
@@ -72,42 +115,47 @@ const NewProfileScreen = ({
   );
   const profileKind = profileCategory?.profileKind;
 
+  const router = useRouter();
+
   return (
-    <Container style={styles.container}>
-      <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
-        {currentPage === 0 && (
-          <View key="0" style={styles.page} collapsable={false}>
-            <ProfileKindStep
-              profileCategories={profileCategories}
-              profileCategoryId={profileCategoryId!}
-              onNext={next}
-              onProfileCategoryChange={onProfileCategoryChange}
-            />
-          </View>
-        )}
+    <SafeAreaView style={styles.container}>
+      <Container style={styles.container}>
+        <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
+          {currentPage === 0 && (
+            <View key="0" style={styles.page} collapsable={false}>
+              <ProfileKindStep
+                onBack={params?.goBack ? router.back : null}
+                profileCategories={profileCategories}
+                profileCategoryId={profileCategoryId!}
+                onNext={next}
+                onProfileCategoryChange={onProfileCategoryChange}
+              />
+            </View>
+          )}
 
-        {currentPage === 1 && (
-          <View key="1" style={styles.page} collapsable={false}>
-            <ProfileForm
-              profileKind={profileKind!}
-              profileCategory={profileCategory!}
-              onProfileCreated={onProfileCreatedInner}
-              onBack={prev}
-            />
-          </View>
-        )}
+          {currentPage === 1 && (
+            <View key="1" style={styles.page} collapsable={false}>
+              <ProfileForm
+                profileKind={profileKind!}
+                profileCategory={profileCategory!}
+                onProfileCreated={onProfileCreatedInner}
+                onBack={prev}
+              />
+            </View>
+          )}
 
-        {currentPage === 2 && (
-          <View key="2" style={styles.page} collapsable={false}>
-            <InterestPicker
-              interests={interests}
-              onClose={onClose}
-              profileKind={profileKind!}
-            />
-          </View>
-        )}
-      </FadeSwitch>
-    </Container>
+          {currentPage === 2 && (
+            <View key="2" style={styles.page} collapsable={false}>
+              <InterestPicker
+                interests={interests}
+                onClose={onClose}
+                profileKind={profileKind!}
+              />
+            </View>
+          )}
+        </FadeSwitch>
+      </Container>
+    </SafeAreaView>
   );
 };
 

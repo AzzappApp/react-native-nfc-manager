@@ -27,6 +27,14 @@ const initialRoutes: NativeRouterInit = {
 
 jest.mock('#helpers/ScreenPrefetcher');
 
+jest.mock('react-intl', () => {
+  const reactIntl = jest.requireActual('react-intl');
+  return {
+    ...reactIntl,
+    FormattedRelativeTime: ({ value }: { value: number }) => value,
+  };
+});
+
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const { router } = useNativeRouter(initialRoutes);
   const platformEnvironment = useMemo(

@@ -2,8 +2,8 @@ import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, FlatList, Image } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
-import { colors } from '#theme';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
@@ -315,7 +315,7 @@ const TemplateSuggestionItem = ({
     () => onSelectTemplate(id),
     [id, onSelectTemplate],
   );
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const appearanceStyle = useStyleSheet(styleSheet);
 
   if (!previewMedia) {
     return null;
@@ -394,13 +394,8 @@ const TemplateSuggestionItem = ({
 
 const TemplateSuggestionMemo = memo(TemplateSuggestionItem); //if perf issue, we can improve the memoization with a custom comparison function
 
-const computedStyle = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
+const styleSheet = createStyleSheet(appearance => ({
+  coverShadow: shadow(appearance, 'center'),
   templateContainer: {
     borderWidth: TEMPLATE_BORDER_WIDTH,
   },

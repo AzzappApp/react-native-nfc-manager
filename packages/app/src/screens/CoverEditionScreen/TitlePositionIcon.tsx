@@ -1,10 +1,10 @@
-import { StyleSheet, View } from 'react-native';
-import { TITLE_POSITIONS } from '@azzapp/shared/cardHelpers';
+import { View } from 'react-native';
+import { TITLE_POSITIONS } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 
 export const TitlePositionIcon = ({ value }: { value: string }) => {
-  const appearanceStyle = useStyleSheet(computedStyleSheet);
+  const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.iconContainer}>
       {TITLE_POSITIONS.map(position => (
@@ -12,8 +12,7 @@ export const TitlePositionIcon = ({ value }: { value: string }) => {
           key={position}
           style={[
             styles.iconButton,
-            appearanceStyle.iconButton,
-            position === value && appearanceStyle.iconButtonSelected,
+            position === value && styles.iconButtonSelected,
           ]}
         />
       ))}
@@ -21,17 +20,18 @@ export const TitlePositionIcon = ({ value }: { value: string }) => {
   );
 };
 
-const computedStyleSheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   iconButton: {
     backgroundColor: appearance === 'light' ? colors.grey900 : colors.grey200,
     opacity: 0.2,
+    width: 6.5,
+    height: 5.33,
+    borderRadius: 1,
   },
   iconButtonSelected: {
     opacity: 1,
     backgroundColor: appearance === 'light' ? colors.grey900 : colors.grey200,
   },
-}));
-const styles = StyleSheet.create({
   iconContainer: {
     width: 24,
     height: 24,
@@ -40,9 +40,4 @@ const styles = StyleSheet.create({
     alignContent: 'space-between',
     flexWrap: 'wrap',
   },
-  iconButton: {
-    width: 6.5,
-    height: 5.33,
-    borderRadius: 1,
-  },
-});
+}));

@@ -178,6 +178,12 @@ const icons = {
   get image_right() {
     return require('./assets/image_right.png');
   },
+  get image_top() {
+    return require('./assets/image_top.png');
+  },
+  get image_bottom() {
+    return require('./assets/image_bottom.png');
+  },
   get information() {
     return require('./assets/information.png');
   },
@@ -186,6 +192,9 @@ const icons = {
   },
   get invite() {
     return require('./assets/invite.png');
+  },
+  get invite_via() {
+    return require('./assets/invite_via.png');
   },
   get keyboard() {
     return require('./assets/keyboard.png');
@@ -207,6 +216,9 @@ const icons = {
   },
   get mail() {
     return require('./assets/mail.png');
+  },
+  get mail_line() {
+    return require('./assets/mail_line.png');
   },
   get margins() {
     return require('./assets/margins.png');
@@ -268,6 +280,12 @@ const icons = {
   get sharpness() {
     return require('./assets/sharpness.png');
   },
+  get sharpness_mirror() {
+    return require('./assets/sharpness_mirror.png');
+  },
+  get sms() {
+    return require('./assets/sms.png');
+  },
   get stop() {
     return require('./assets/stop.png');
   },
@@ -313,6 +331,9 @@ const icons = {
   get warning() {
     return require('./assets/warning.png');
   },
+  get whatsapp() {
+    return require('./assets/whatsapp.png');
+  },
   get width_full() {
     return require('./assets/width-full.png');
   },
@@ -328,13 +349,13 @@ export type IconProps = Omit<ImageProps, 'source'> & {
 };
 
 const Icon = ({ icon, ...props }: IconProps) => {
-  const style = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
   return (
     <Image
       {...props}
       style={[
         { resizeMode: 'contain' },
-        shouldTintColor(icon) && style.tintColor,
+        shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}
       source={icons[icon]}
@@ -342,7 +363,7 @@ const Icon = ({ icon, ...props }: IconProps) => {
   );
 };
 
-const computedStyle = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   tintColor: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },

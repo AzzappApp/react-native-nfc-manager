@@ -21,7 +21,7 @@ import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import Container from '#ui/Container';
-import EmailOrCountryCodeSelector from '#ui/EmailOrCountryCodeSelector';
+import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
@@ -29,6 +29,7 @@ import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import PhoneInput from '../components/PhoneInput';
 import type { CheckboxStatus } from '#ui/CheckBox';
+import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { SignUpParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
@@ -53,9 +54,30 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
   const [checkedPrivacy, setCheckedPrivacy] = useState<CheckboxStatus>('none');
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
+  const SELECTORS: Array<CountryCodeListOption<'email'>> = [
+    {
+      type: 'email',
+      title: intl.formatMessage({
+        defaultMessage: 'Email address',
+        description: 'The email address option in the country selector',
+      }),
+      icon: 'mail',
+    },
+  ];
+
+  const onPhoneNumberChange = useCallback(
+    (value?: string | null) => {
+      if (!isSubmitting) {
+        setPhoneNumber(value ?? '');
+      }
+    },
+    [isSubmitting],
+  );
 
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
@@ -91,6 +113,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
 
     if (canSignup) {
       try {
+        setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
           await signup({ email, password });
         } else {
@@ -128,6 +151,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
           );
         }
       }
+      setIsSubmitting(false);
     }
   }, [
     checkedPrivacy,
@@ -157,6 +181,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={-vp`${insetBottom}`}
         style={styles.content}
+        pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
         <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
@@ -187,8 +212,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
             </View>
 
             <View style={styles.phoneOrEmailContainer}>
-              <EmailOrCountryCodeSelector
-                emailSectionTitle={intl.formatMessage({
+              <CountryCodeListWithOptions<'email'>
+                otherSectionTitle={intl.formatMessage({
                   defaultMessage: 'Connect with email address',
                   description:
                     'Signup Form Connect with email address section title in country selection list',
@@ -199,8 +224,20 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                     'Signup Form Connect with phone number section title in country selection list',
                 })}
                 value={countryCodeOrEmail}
+                options={SELECTORS}
                 onChange={setCountryCodeOrEmail}
                 style={styles.countryCodeOrEmailButton}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Select a calling code or email',
+                  description:
+                    'Signup - The accessibility label for the country selector',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage:
+                    'Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number',
+                  description:
+                    'Signup- The accessibility hint for the country selector',
+                })}
               />
               {countryCodeOrEmail === 'email' ? (
                 <TextInput
@@ -211,7 +248,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                       'Signup Screen - email address input placeholder',
                   })}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={isSubmitting ? undefined : setEmail}
                   autoCapitalize="none"
                   autoComplete="email"
                   keyboardType="email-address"
@@ -235,7 +272,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                       'Signup Screen - phone number input placeholder',
                   })}
                   value={phoneNumber}
-                  onChange={value => setPhoneNumber(value ?? '')}
+                  onChange={onPhoneNumberChange}
                   defaultCountry={countryCodeOrEmail}
                   autoCapitalize="none"
                   keyboardType="phone-pad"
@@ -264,7 +301,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                 description: 'Signup Screen - password textinput placeholder',
               })}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage:
                   'Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case',
@@ -349,6 +386,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
                 })}
                 style={styles.button}
                 disabled={(!phoneNumber && !email) || !password}
+                loading={isSubmitting}
               />
             </Submit>
             {showTOSError && (

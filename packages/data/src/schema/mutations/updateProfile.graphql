@@ -1,0 +1,16 @@
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  profileKind: ProfileKind
+  companyName: String
+  companyActivityId: String
+  isReady: Boolean
+  colorPalette: [String!]
+  interests: [String!]
+  clientMutationId: String
+}
+
+type UpdateProfilePayload {
+  profile: Profile
+  clientMutationId: String
+}

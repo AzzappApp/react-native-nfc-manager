@@ -79,17 +79,17 @@ const EditImageStep = () => {
     let nextOrientation: ImageOrientation;
     switch (editionParameters.orientation) {
       case 'LEFT':
-        nextOrientation = 'UP';
+        nextOrientation = 'DOWN';
         break;
       case 'DOWN':
-        nextOrientation = 'LEFT';
+        nextOrientation = 'RIGHT';
         break;
       case 'RIGHT':
-        nextOrientation = 'DOWN';
+        nextOrientation = 'UP';
         break;
       case 'UP':
       default:
-        nextOrientation = 'RIGHT';
+        nextOrientation = 'LEFT';
         break;
     }
     onParameterValueChange('orientation', nextOrientation);

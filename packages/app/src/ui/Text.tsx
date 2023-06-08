@@ -8,7 +8,7 @@ import {
 import type { ColorSchemeName } from '#helpers/createStyles';
 import type { TextProps as NativeTextProps } from 'react-native';
 
-type TextProps = NativeTextProps & {
+export type TextProps = NativeTextProps & {
   variant?:
     | 'button'
     | 'error'

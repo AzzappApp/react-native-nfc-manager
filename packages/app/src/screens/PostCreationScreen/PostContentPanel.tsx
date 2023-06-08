@@ -1,27 +1,23 @@
 import { memo, useContext, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
-import Button from '#ui/Button';
-import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
+import TextAreaModal from '#ui/TextAreaModal';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ViewProps } from 'react-native';
 
 type PostContentPanelProps = Omit<ViewProps, 'children'> & {
   insetBottom: number;
-  insetTop: number;
 };
 
 const PostContentPanel = ({
   style,
   insetBottom,
-  insetTop,
   ...props
 }: PostContentPanelProps) => {
   const {
@@ -90,58 +86,14 @@ const PostContentPanel = ({
           )}
         </PressableNative>
       </View>
-      <Modal
-        transparent
-        animationType="fade"
+      <TextAreaModal
         visible={showContentModal}
-        onRequestClose={onModalClose}
-      >
-        <View style={styles.modal}>
-          <Header
-            style={{
-              marginTop: insetTop,
-              marginBottom: 10,
-            }}
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Description',
-              description: 'Post creation screen textarea modal title',
-            })}
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Ok',
-                  description:
-                    'Ok button label in post creation text edition modal',
-                })}
-                onPress={onModalClose}
-              />
-            }
-          />
-          <KeyboardAvoidingView behavior="height" style={[styles.contentModal]}>
-            <TextInput
-              multiline
-              placeholder={textAraPlaceHolder}
-              value={content}
-              onChangeText={setContent}
-              autoFocus
-              maxLength={MAX_CONTENT_LENGHT}
-              onBlur={onModalClose}
-              style={{ borderWidth: 0, flex: 1 }}
-            />
-            <Text
-              variant="smallbold"
-              style={[
-                styles.counter,
-                content.length >= MAX_CONTENT_LENGHT && {
-                  color: colors.red400,
-                },
-              ]}
-            >
-              {content?.length ?? 0} / {MAX_CONTENT_LENGHT}
-            </Text>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
+        value={content ?? ''}
+        placeholder={textAraPlaceHolder}
+        maxLength={MAX_CONTENT_LENGHT}
+        onClose={onModalClose}
+        onChangeText={setContent}
+      />
     </>
   );
 };

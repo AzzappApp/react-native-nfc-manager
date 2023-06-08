@@ -1,0 +1,25 @@
+input SaveSimpleButtonModuleInput {
+  moduleId: ID
+  buttonLabel: String
+  actionType: String
+  actionLink: String
+  fontFamily: String
+  fontColor: String
+  fontSize: Int
+  buttonColor: String
+  borderColor: String
+  borderWidth: Int
+  borderRadius: Int
+  marginTop: Int
+  marginBottom: Int
+  width: Int
+  height: Int
+  backgroundId: ID
+  backgroundStyle: ModuleBackgroundInputStyle
+  clientMutationId: String
+}
+
+type SaveSimpleButtonModulePayload {
+  card: Card!
+  clientMutationId: String
+}

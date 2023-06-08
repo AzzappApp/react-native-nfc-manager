@@ -1,14 +1,15 @@
 import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { Image, View } from 'react-native';
 import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
   COVER_VIDEO_BITRATE,
-} from '@azzapp/shared/cardHelpers';
-import { colors } from '#theme';
+} from '@azzapp/shared/coverHelpers';
+import { shadow } from '#theme';
 import Cropper from '#components/Cropper';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
 import Text from '#ui/Text';
@@ -172,16 +173,11 @@ const CoverPreviewRenderer = (
     setLoadingFailed(false);
   };
 
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View
-      style={[
-        styles.root,
-        { borderRadius, height },
-        appearanceStyle.coverShadow,
-        style,
-      ]}
+      style={[styles.root, { borderRadius, height }, styles.coverShadow, style]}
       {...props}
     >
       <View style={[styles.topPanelContent, { borderRadius }]}>
@@ -267,7 +263,7 @@ const CoverPreviewRenderer = (
             {(computing || isLoading) && (
               <Delay delay={computing ? 0 : 500}>
                 <View style={styles.maskComputingOverlay}>
-                  <ActivityIndicator size="large" color="white" />
+                  <ActivityIndicator color="white" />
                 </View>
               </Delay>
             )}
@@ -280,19 +276,11 @@ const CoverPreviewRenderer = (
 
 export default forwardRef(CoverPreviewRenderer);
 
-const computedStyle = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
-}));
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     aspectRatio: COVER_RATIO,
   },
+  coverShadow: shadow(appearance, 'center'),
   topPanelContent: {
     flex: 1,
     overflow: 'hidden',
@@ -331,4 +319,4 @@ const styles = StyleSheet.create({
     left: '45%',
     width: '10%',
   },
-});
+}));

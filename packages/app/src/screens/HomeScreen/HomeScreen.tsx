@@ -1,52 +1,63 @@
-import { useCallback } from 'react';
-import {
-  StyleSheet,
-  Image,
-  Platform,
-  View,
-  useColorScheme,
-} from 'react-native';
+import { useCallback, useRef } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import { useRouter } from '#PlatformEnvironment';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
-import IconButton from '#ui/IconButton';
-import FollowedProfilesList from './FollowedProfilesList';
 import FollowedProfilesPostsList from './FollowedProfilesPostsList';
+import HomeHeader from './HomeHeader';
+import HomeProfilesList from './HomeProfilesList';
 import type { HomeScreen_viewer$key } from '@azzapp/relay/artifacts/HomeScreen_viewer.graphql';
 
 type HomeScreenProps = {
   viewer: HomeScreen_viewer$key;
   hasFocus?: boolean;
+  onReady?: () => void;
 };
 
 const HomeScreen = ({
   viewer: viewerRef,
   hasFocus = true,
+  onReady,
 }: HomeScreenProps) => {
-  const vp = useViewportSize();
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-  const appearanceStyle = useStyleSheet(computedStyle);
   const viewer = useFragment(
     graphql`
       fragment HomeScreen_viewer on Viewer {
         profile {
           id
         }
-        ...FollowedProfilesList_viewer
+        ...HomeProfilesList_viewer
         ...FollowedProfilesPostsList_viewer
       }
     `,
     viewerRef,
   );
 
+  const router = useRouter();
   const goToSettings = useCallback(() => {
     router.push({ route: 'ACCOUNT' });
   }, [router]);
+
+  const vp = useViewportSize();
+  const styles = useStyleSheet(styleSheet);
+
+  const postsReady = useRef(false);
+  const coversReady = useRef(false);
+
+  const onPostsReady = useCallback(() => {
+    postsReady.current = true;
+    if (coversReady.current) {
+      onReady?.();
+    }
+  }, [onReady]);
+
+  const onCoversReady = useCallback(() => {
+    coversReady.current = true;
+    if (postsReady.current) {
+      onReady?.();
+    }
+  }, [onReady]);
 
   return (
     <FollowedProfilesPostsList
@@ -54,82 +65,27 @@ const HomeScreen = ({
       canPlay={hasFocus}
       ListHeaderComponent={
         <Container style={{ marginTop: vp`${insetTop}` }}>
-          <Header
-            leftElement={
-              <Image
-                source={
-                  colorScheme === 'dark'
-                    ? require('#assets/logo-full_white.png')
-                    : require('#assets/logo-full_dark.png')
-                }
-                style={styles.logo}
-              />
-            }
-            rightElement={
-              <View style={styles.rightButtonContainer}>
-                <IconButton
-                  icon="notification"
-                  iconSize={24}
-                  size={45}
-                  style={{ borderWidth: 0 }}
-                  onPress={goToSettings}
-                />
-                <IconButton
-                  icon="account"
-                  onPress={goToSettings}
-                  iconSize={26}
-                  size={45}
-                  style={{ borderWidth: 0 }}
-                />
-              </View>
-            }
-            style={{ marginBottom: 8 }}
-          />
-          <FollowedProfilesList
+          <HomeHeader goToSettings={goToSettings} />
+          <HomeProfilesList
             viewer={viewer}
             style={styles.followedProfilesList}
+            onReady={onCoversReady}
           />
         </Container>
       }
       stickyHeaderIndices={[0]}
       style={styles.followedProfilesPosts}
-      postsContainerStyle={[
-        appearanceStyle.followedProfilesPostsListPostsContainer,
-        styles.followedProfilesPostsListPostsContainerShadow,
-      ]}
+      postsContainerStyle={styles.followedProfilesPostsListPostsContainerShadow}
+      onReady={onPostsReady}
     />
   );
 };
 
 export default HomeScreen;
 
-const computedStyle = createStyleSheet(appearance => ({
-  followedProfilesPostsListPostsContainer: {
-    paddingVertical: 8,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 20,
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-  },
-}));
-
-const styles = StyleSheet.create({
-  signupButton: { width: 150 },
+const styleSheet = createStyleSheet(appearance => ({
   followedProfilesPosts: {
     flex: 1,
-  },
-  header: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 47,
-  },
-  logo: {
-    height: 28,
-  },
-  rightButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 10,
   },
   followedProfilesList: {
     height: 200,
@@ -137,18 +93,14 @@ const styles = StyleSheet.create({
     marginBottom: 13,
     marginLeft: 10,
   },
-  signupSection: {
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  followedProfilesPostsListPostsContainerShadow: Platform.select({
-    default: {
-      shadowColor: colors.black,
-      shadowOpacity: 0.4,
-      shadowOffset: { width: 0, height: 10 },
-      shadowRadius: 20,
+  followedProfilesPostsListPostsContainerShadow: [
+    {
+      paddingVertical: 8,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      zIndex: 20,
+      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
     },
-    android: { elevation: 10 },
-  }),
-});
+    shadow(appearance),
+  ],
+}));

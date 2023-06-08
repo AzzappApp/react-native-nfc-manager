@@ -1,6 +1,8 @@
+import { useCallback } from 'react';
 import { View } from 'react-native';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
-import { colors } from '#theme';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { useRouter } from '#PlatformEnvironment';
+import { shadow } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
@@ -30,15 +32,21 @@ const CoverEditionScreenFallback = ({
     insetBottom,
   } = useCoverEditionLayout();
 
+  const router = useRouter();
+  const onCancel = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const coverBorderRadius = COVER_CARD_RADIUS * coverHeight * COVER_RATIO;
 
-  const styles = useStyleSheet(stylesheet);
+  const styles = useStyleSheet(styleSheet);
   return (
     <Container style={[{ flex: 1, paddingTop: insetTop }, style]}>
       <CoverEditionScreenHeader
         isCreation={isCreation ?? true}
         canSave={false}
         cropEditionMode={false}
+        onCancel={onCancel}
       />
       <View
         style={{
@@ -92,11 +100,6 @@ const CoverEditionScreenFallback = ({
 
 export default CoverEditionScreenFallback;
 
-const stylesheet = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
+const styleSheet = createStyleSheet(appearance => ({
+  coverShadow: shadow(appearance, 'center'),
 }));

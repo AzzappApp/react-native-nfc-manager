@@ -33,6 +33,7 @@ model Profile {
   companyActivityId String?
   colorPalette      String?
   interests         String?
+  public            Boolean     @default(false)
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @default(now())
 
@@ -88,27 +89,29 @@ enum MediaKind {
   video
 }
 
-model CoverLayer {
-  id        String    @id
-  kind      LayerKind
+model StaticMedia {
+  id        String           @id
+  usage     StaticMediaUsage
   name      String?
   tags      String?
-  available Boolean   @default(true)
-  createdAt DateTime  @default(now())
+  available Boolean          @default(true)
+  createdAt DateTime         @default(now())
 }
 
-enum LayerKind {
-  foreground
-  background
+enum StaticMediaUsage {
+  coverForeground
+  coverBackground
+  moduleBackground
 }
 
 model Card {
-  id        String   @id
-  profileId String
-  isMain    Boolean
-  coverId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id              String   @id
+  profileId       String
+  isMain          Boolean
+  coverId         String
+  backgroundColor String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 
   @@index([profileId])
 }
@@ -136,40 +139,69 @@ model CardCover {
 }
 
 model CardModule {
-  id     String @id
-  kind   String
-  cardId String
-  data   Json
+  id       String  @id
+  kind     String
+  cardId   String
+  data     Json
+  position Int
+  visible  Boolean @default(true)
 
   @@index([cardId])
 }
 
 model CoverTemplate {
-  id                String      @id
-  name              String
-  colorPalette      String?
-  tags              String?
-  data              Json
-  segmented         Boolean
-  merged            Boolean
-  category          Json?
-  kind              ProfileKind
-  previewMediaId    String?
-  suggested         Boolean     @default(false)
+  id                 String      @id
+  name               String
+  colorPalette       String?
+  tags               String?
+  data               Json
+  segmented          Boolean
+  merged             Boolean
+  category           Json?
+  kind               ProfileKind
+  previewMediaId     String?
+  suggested          Boolean     @default(false)
   companyActivityIds String?
-  enabled           Boolean     @default(true)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @default(now())
+  enabled            Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @default(now())
 }
 
 model Post {
-  id            String   @id
-  authorId      String
-  medias        Json
-  content       String   @db.Text
-  allowComments Boolean
-  allowLikes    Boolean
-  createdAt     DateTime @default(now())
+  id               String   @id
+  authorId         String
+  medias           Json
+  content          String   @db.Text
+  allowComments    Boolean
+  allowLikes       Boolean
+  counterReactions Int      @default(0)
+  counterComments  Int      @default(0)
+  createdAt        DateTime @default(now())
 
   @@index([authorId])
+}
+
+enum ReactionKind {
+  like
+}
+
+model PostReaction {
+  profileId    String
+  postId       String
+  reactionKind ReactionKind
+  createdAt    DateTime     @default(now())
+
+  @@id([profileId, postId])
+  @@index([profileId])
+  @@index([postId])
+}
+
+model PostComment {
+  id        String   @id
+  profileId String
+  postId    String
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([postId])
 }

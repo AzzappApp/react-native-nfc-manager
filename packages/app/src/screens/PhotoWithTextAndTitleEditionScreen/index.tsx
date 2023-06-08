@@ -1,0 +1,3 @@
+import PhotoWithTextAndTitleEditionScreen from './PhotoWithTextAndTitleEditionScreen';
+
+export default PhotoWithTextAndTitleEditionScreen;

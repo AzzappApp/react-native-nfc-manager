@@ -1,0 +1,10 @@
+input DuplicateModuleInput {
+  moduleId: ID!
+  clientMutationId: String
+}
+
+type DuplicateModulePayload {
+  card: Card!
+  createdModuleId: ID!
+  clientMutationId: String
+}

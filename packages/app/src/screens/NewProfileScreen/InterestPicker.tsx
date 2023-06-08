@@ -1,16 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  StyleSheet,
-  View,
-  Modal,
-  ActivityIndicator,
-  Animated,
-  Easing,
-} from 'react-native';
+import { StyleSheet, View, Animated, Easing } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
-import useViewportSize, { insetBottom, insetTop } from '#hooks/useViewportSize';
+import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ToggleButton from '#ui/ToggleButton';
@@ -118,117 +111,105 @@ const InterestPicker = ({
   );
 
   return (
-    <>
-      <View
-        style={[
-          {
-            paddingTop: vp`${insetTop} + ${50}`,
-            marginBottom: vp`${insetBottom}`,
-            flex: 1,
-            justifyContent: 'center',
-          },
-        ]}
+    <View
+      style={[
+        {
+          paddingTop: vp`50`,
+          flex: 1,
+          justifyContent: 'center',
+        },
+      ]}
+    >
+      <NewProfileScreenPageHeader
+        activeIndex={2}
+        title={
+          profileKind === 'personnal' ? (
+            <FormattedMessage
+              defaultMessage="Tell us more about you"
+              description="NewProfileType Interest Picker Screen - Title for personal profile"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Tell us more about your company"
+              description="NewProfileType Interest Picker Screen - Title"
+            />
+          )
+        }
+      />
+
+      <Text variant="medium" style={styles.subtitleText}>
+        <FormattedMessage
+          defaultMessage="Pick some topics you like."
+          description="NewProfile About User Screen - SubTitle Pick some topics you like."
+        />
+      </Text>
+      <Animated.ScrollView
+        ref={scrollViewRef}
+        horizontal
+        style={{ flex: 1, minHeight: 149, opacity: ready }}
+        contentContainerStyle={{
+          justifyContent: 'center',
+          flexDirection: 'column',
+        }}
+        contentOffset={{ x: 20, y: 0 }}
+        showsHorizontalScrollIndicator={false}
+        pointerEvents={savingInterest ? 'none' : 'auto'}
       >
-        <NewProfileScreenPageHeader
-          activeIndex={2}
-          title={
-            profileKind === 'personnal' ? (
-              <FormattedMessage
-                defaultMessage="Tell us more about you"
-                description="NewProfileType Interest Picker Screen - Title for personal profile"
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Tell us more about your company"
-                description="NewProfileType Interest Picker Screen - Title"
-              />
-            )
-          }
-        />
-
-        <Text variant="medium" style={styles.subtitleText}>
-          <FormattedMessage
-            defaultMessage="Pick some topics you like."
-            description="NewProfile About User Screen - SubTitle Pick some topics you like."
-          />
-        </Text>
-        <Animated.ScrollView
-          ref={scrollViewRef}
-          horizontal
-          style={{ flex: 1, minHeight: 149, opacity: ready }}
-          contentContainerStyle={{
-            justifyContent: 'center',
-            flexDirection: 'column',
-          }}
-          contentOffset={{ x: 20, y: 0 }}
-          showsHorizontalScrollIndicator={false}
-        >
-          {interestsChunked.map((interests, i) => (
-            <View
-              key={i}
-              style={{
-                flexDirection: 'row',
-                paddingBottom: i < interestsChunked.length - 1 ? 22 : 0,
-              }}
-              onLayout={i === 0 ? onInterestLayout : undefined}
-            >
-              {interests.map(item => (
-                <ToggleButton
-                  key={item.tag}
-                  label={item.label}
-                  toggled={selectedInterests.has(item.tag)}
-                  onPress={() => onSelectInterest(item.tag)}
-                  style={{ marginTop: 0, marginBottom: 0, marginRight: 10 }}
-                />
-              ))}
-            </View>
-          ))}
-        </Animated.ScrollView>
-
-        <ContinueButton
-          testID="get-started-button"
-          label={intl.formatMessage({
-            defaultMessage: 'Get started',
-            description: 'Interests pickers - Get started Button',
-          })}
-          onPress={onSubmit}
-          disabled={selectedInterests.size === 0}
-        />
-        <View
-          style={{
-            marginBottom: vp`${insetBottom} `,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <PressableNative
-            testID="skip-button"
-            accessibilityRole="button"
-            onPress={onClose}
+        {interestsChunked.map((interests, i) => (
+          <View
+            key={i}
+            style={{
+              flexDirection: 'row',
+              paddingBottom: i < interestsChunked.length - 1 ? 22 : 0,
+            }}
+            onLayout={i === 0 ? onInterestLayout : undefined}
           >
-            <Text variant="medium" style={styles.skip}>
-              <FormattedMessage
-                defaultMessage="Skip"
-                description="NewProfile About Screen - Skip process"
+            {interests.map(item => (
+              <ToggleButton
+                key={item.tag}
+                label={item.label}
+                toggled={selectedInterests.has(item.tag)}
+                onPress={() => onSelectInterest(item.tag)}
+                style={{ marginTop: 0, marginBottom: 0, marginRight: 10 }}
               />
-            </Text>
-          </PressableNative>
-        </View>
-      </View>
-      <Modal transparent visible={savingInterest}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-          }}
+            ))}
+          </View>
+        ))}
+      </Animated.ScrollView>
+
+      <ContinueButton
+        testID="get-started-button"
+        label={intl.formatMessage({
+          defaultMessage: 'Get started',
+          description: 'Interests pickers - Get started Button',
+        })}
+        onPress={onSubmit}
+        loading={savingInterest}
+        disabled={selectedInterests.size === 0}
+      />
+      <View
+        style={{
+          marginBottom: vp`${insetBottom} `,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <PressableNative
+          testID="skip-button"
+          accessibilityRole="button"
+          onPress={onClose}
+          disabled={savingInterest}
         >
-          <ActivityIndicator size="large" color={colors.black} />
-        </View>
-      </Modal>
-    </>
+          <Text variant="medium" style={styles.skip}>
+            <FormattedMessage
+              defaultMessage="Skip"
+              description="NewProfile About Screen - Skip process"
+            />
+          </Text>
+        </PressableNative>
+      </View>
+    </View>
   );
 };
 

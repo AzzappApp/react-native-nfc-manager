@@ -1,6 +1,6 @@
+import PostRendererFeed from '#components/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Link from '../Link';
-import PostRenderer from '../PostRenderer';
 import type { PostLinkProps } from './postLinkTypes';
 
 /**
@@ -19,7 +19,7 @@ const PostLink = ({
         style={[style, { borderRadius: 16, overflow: 'hidden' }]}
       >
         {({ pressed }) => (
-          <PostRenderer
+          <PostRendererFeed
             {...props}
             style={postRendererStyle}
             paused={pressed ? true : props.paused}

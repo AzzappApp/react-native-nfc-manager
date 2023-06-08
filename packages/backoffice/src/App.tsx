@@ -3,10 +3,10 @@ import { Admin, Resource } from 'react-admin';
 import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens, signin } from '@azzapp/shared/WebAPI';
-import coverLayerList from '#components/CoverLayer';
 import coverTemplateList from '#components/CoverTemplate';
 import interest from '#components/Interest';
 import profileCatgoryList from '#components/ProfileCategory';
+import staticMediaList from '#components/StaticMedia';
 import userList from '#components/UserList';
 import { getTokens, removeTokens, setTokens } from '#helpers/tokenStore';
 import type { AuthProvider } from 'react-admin';
@@ -110,7 +110,7 @@ const App = () => {
   return (
     <Admin dataProvider={dataProvider} authProvider={authProvider} requireAuth>
       <Resource {...userList} />
-      <Resource {...coverLayerList} />
+      <Resource {...staticMediaList} />
       <Resource {...coverTemplateList} />
       <Resource {...profileCatgoryList} />
       <Resource {...interest} />

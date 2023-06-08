@@ -17,6 +17,7 @@ module.exports = {
       },
       customScalarTypes: {
         JSON: 'Record<string, unknown>',
+        DateTime: 'Date',
       },
     },
   },

@@ -1,11 +1,7 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import ProfileColorPalette from '#components/ProfileColorPalette';
-import TabsBar from '#ui/TabsBar';
-import ColorPreview from './ColorPreview';
-import CoverLayerList from './CoverLayerList';
+import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
 import type { CoverEditionForegroundPanel_viewer$key } from '@azzapp/relay/artifacts/CoverEditionForegroundPanel_viewer.graphql';
 import type { CardCoverForegroundStyleInput } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -33,81 +29,42 @@ const CoverEditionForegroundPanel = ({
     graphql`
       fragment CoverEditionForegroundPanel_viewer on Viewer {
         coverForegrounds {
-          ...CoverLayerList_layers
+          ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPalette_profile
+          ...ProfileColorPicker_profile
         }
       }
     `,
     viewer,
   );
 
-  const [currentTab, setCurrentTab] = useState('foreground');
-
   const color = foregroundStyle?.color ?? '#000000';
-  const onColorChange = (color: string) => {
-    onForegroundStyleChange({ color });
-  };
+  const onColorChange = useCallback(
+    (_: any, color: string) => {
+      onForegroundStyleChange({ color });
+    },
+    [onForegroundStyleChange],
+  );
 
   const intl = useIntl();
   return (
-    <View style={style}>
-      <TabsBar
-        currentTab="foreground"
-        onTabPress={setCurrentTab}
-        decoration="underline"
-        tabs={[
-          {
-            tabKey: 'foreground',
-            label: intl.formatMessage({
-              defaultMessage: 'Foreground',
-              description: 'Label of Foreground tab in cover edition',
-            }),
-          },
-          {
-            tabKey: 'color',
-            rightElement: (
-              <ColorPreview color={color} style={{ marginLeft: 5 }} />
-            ),
-            label: intl.formatMessage({
-              defaultMessage: 'Color',
-              description: 'Label of the foreground color tab in cover edition',
-            }),
-          },
-        ]}
-      />
-      <CoverLayerList
-        layers={coverForegrounds}
-        selectedLayer={foreground}
-        tintColor={color}
-        onSelectLayer={onForegroundChange}
-        backgroundColor="#ffffff"
-        style={styles.content}
-        testID="cover-layer-list-foreground"
-      />
-      {profile && (
-        <ProfileColorPalette
-          profile={profile}
-          visible={currentTab === 'color'}
-          selectedColor={color}
-          onChangeColor={onColorChange}
-          onRequestClose={() => setCurrentTab('foreground')}
-          height={bottomSheetHeights}
-          title={intl.formatMessage({
-            defaultMessage: 'Foreground color',
-            description: 'Title of the foreground color picker',
-          })}
-        />
-      )}
-    </View>
+    <EditorLayerSelectorPanel
+      title={intl.formatMessage({
+        defaultMessage: 'Foreground',
+        description: 'Label of Foreground tab in cover edition',
+      })}
+      profile={profile!}
+      medias={coverForegrounds}
+      selectedMedia={foreground}
+      tintColor={color}
+      onMediaChange={onForegroundChange}
+      onColorChange={onColorChange}
+      bottomSheetHeight={bottomSheetHeights}
+      style={style}
+      testID="cover-foreground-panel"
+    />
   );
 };
 
 export default CoverEditionForegroundPanel;
-
-const styles = StyleSheet.create({
-  content: {
-    marginVertical: 15,
-  },
-});

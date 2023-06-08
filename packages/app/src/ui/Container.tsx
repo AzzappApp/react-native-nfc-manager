@@ -22,7 +22,7 @@ type ContainerProps = ViewProps & {
  *
  */
 const Container = ({ appearance, ...props }: ContainerProps) => {
-  const styles = useStyleSheet(stylesAppearance, appearance);
+  const styles = useStyleSheet(styleSheet, appearance);
 
   return createElement(View, {
     ...props,
@@ -31,7 +31,7 @@ const Container = ({ appearance, ...props }: ContainerProps) => {
   });
 };
 
-const stylesAppearance = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   view: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },

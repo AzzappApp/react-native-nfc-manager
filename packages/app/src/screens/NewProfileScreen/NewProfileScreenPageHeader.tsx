@@ -24,6 +24,7 @@ const NewProfileScreenPageHeader = ({
             icon="arrow_left"
             onPress={onBack}
             iconSize={28}
+            variant="icon"
             style={styles.backIcon}
           />
         )}
@@ -52,7 +53,6 @@ const styles = StyleSheet.create({
   backIcon: {
     height: 17,
     width: 10,
-    borderWidth: 0,
   },
   titleText: {
     flex: 1,

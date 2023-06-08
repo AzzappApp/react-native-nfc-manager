@@ -1,7 +1,7 @@
 import range from 'lodash/range';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
-import { colors } from '#theme';
+import { View, useWindowDimensions } from 'react-native';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors, shadow } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
@@ -19,14 +19,14 @@ const CoverModelsEditionPanelFallback = () => {
   const templateItemHeight = coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
   const rowHeight = TAB_BAR_HEIGHT + coverHeight + 2 * TEMPLATE_BORDER_WIDTH;
 
-  const appearanceStyle = useStyleSheet(computedStyle);
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View style={[styles.root, { width: windowWidth }]}>
       {range(5).map(index => (
         <View key={index} style={{ height: rowHeight }}>
           <View style={styles.categoryHeader}>
-            <View style={appearanceStyle.backgroundLine} />
+            <View style={styles.backgroundLine} />
           </View>
           <View style={styles.templateList}>
             {range(5).map(index => (
@@ -49,7 +49,7 @@ const CoverModelsEditionPanelFallback = () => {
                       height: coverHeight,
                       borderRadius: COVER_CARD_RADIUS * coverWidth,
                     },
-                    appearanceStyle.coverShadow,
+                    styles.coverShadow,
                   ]}
                 />
               </View>
@@ -63,22 +63,7 @@ const CoverModelsEditionPanelFallback = () => {
 
 export default CoverModelsEditionPanelFallback;
 
-const computedStyle = createStyleSheet(appearance => ({
-  coverShadow: {
-    shadowColor: appearance === 'light' ? colors.black : colors.white,
-    shadowOpacity: 0.11,
-    shadowOffset: { width: 0, height: 4.69 },
-    shadowRadius: 18.75,
-  },
-  backgroundLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    alignSelf: 'center',
-  },
-}));
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     paddingTop: 10,
     flex: 1,
@@ -92,10 +77,17 @@ const styles = StyleSheet.create({
     height: TAB_BAR_HEIGHT,
     alignItems: 'center',
   },
+  backgroundLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    alignSelf: 'center',
+  },
   templateList: {
     overflow: 'visible',
     flexDirection: 'row',
     columnGap: TEMPLATE_GAP,
     paddingHorizontal: 20,
   },
-});
+  coverShadow: shadow(appearance, 'center'),
+}));

@@ -1,19 +1,22 @@
 import db from './db';
 import type {
+  ReactionKind,
   Card,
   CardCover,
   CardModule,
   CompanyActivity,
-  CoverLayer,
   Follow,
   Media,
   MediaKind,
   Post,
+  PostReaction,
+  PostComment,
   ProfileCategory,
   ProfileKind,
   Profile,
   Interest,
   CoverTemplate,
+  StaticMedia,
   User,
 } from '@prisma/client';
 
@@ -23,16 +26,19 @@ export type {
   CardModule,
   CoverTemplate,
   CompanyActivity,
-  CoverLayer,
   Follow,
   Media,
   MediaKind,
   Post,
+  PostReaction,
+  PostComment,
   Profile,
   ProfileCategory,
   ProfileKind,
+  ReactionKind,
   Interest,
   User,
+  StaticMedia,
 };
 
 export { db };
@@ -41,7 +47,7 @@ export * from './cards';
 export * from './cardCovers';
 export * from './cardModules';
 export * from './companyActivities';
-export * from './coverLayers';
+export * from './staticMedias';
 export * from './posts';
 export * from './users';
 export * from './medias';
@@ -50,3 +56,5 @@ export * from './profiles';
 export * from './coverTemplates';
 export * from './interests';
 export * from './profileCategories';
+export * from './postReactions';
+export * from './postComments';

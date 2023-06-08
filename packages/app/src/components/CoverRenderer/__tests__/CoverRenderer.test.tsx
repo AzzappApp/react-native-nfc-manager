@@ -6,7 +6,7 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import { COVER_BASE_WIDTH } from '@azzapp/shared/cardHelpers';
+import { COVER_BASE_WIDTH } from '@azzapp/shared/coverHelpers';
 import { render } from '#helpers/testHelpers';
 import CoverRenderer from '..';
 import type { CoverRendererProps } from '..';

@@ -1,20 +1,14 @@
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
-import {
-  Animated,
-  PanResponder,
-  StyleSheet,
-  View,
-  useColorScheme,
-} from 'react-native';
+import { Animated, PanResponder, View, useColorScheme } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ViewProps } from 'react-native';
 
-type DashedSliderProps = ViewProps & {
+export type DashedSliderProps = ViewProps & {
   variant?: 'default' | 'small';
   value: number;
   min: number;
@@ -37,7 +31,6 @@ const DashedSlider = ({
   style,
   ...props
 }: DashedSliderProps) => {
-  const appearanceStyle = useStyleSheet(computedStyle);
   const pan = useRef(new Animated.Value(value)).current;
   // fix #287 : Changing from name to subtitle in coveredition did not update the value of the slider
   useEffect(() => {
@@ -104,6 +97,8 @@ const DashedSlider = ({
     colorScheme === 'light'
       ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
       : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'];
+
+  const styles = useStyleSheet(styleSheet);
   return (
     <LinearGradient
       colors={colorsGradient}
@@ -141,31 +136,20 @@ const DashedSlider = ({
           {steps.map(step => (
             <View
               key={step}
-              style={[
-                styles.dash,
-                appearanceStyle.dash,
-                { marginRight: computedInterval - 1 },
-              ]}
+              style={[styles.dash, { marginRight: computedInterval - 1 }]}
             />
           ))}
-          <View style={[styles.dash, appearanceStyle.dash]} />
+          <View style={styles.dash} />
         </Animated.View>
-        <View style={[styles.thumb, appearanceStyle.thumb]} />
+        <View style={styles.thumb} />
       </View>
     </LinearGradient>
   );
 };
 
 export default DashedSlider;
-const computedStyle = createStyleSheet(appearance => ({
-  thumb: {
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
-  },
-  dash: {
-    backgroundColor: appearance === 'light' ? colors.grey200 : colors.white,
-  },
-}));
-const styles = StyleSheet.create({
+
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -184,10 +168,12 @@ const styles = StyleSheet.create({
     height: 12,
     width: 1,
     borderRadius: 3,
+    backgroundColor: appearance === 'light' ? colors.grey200 : colors.white,
   },
   thumb: {
     height: 20,
     width: 6,
     borderRadius: 3,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
   },
-});
+}));

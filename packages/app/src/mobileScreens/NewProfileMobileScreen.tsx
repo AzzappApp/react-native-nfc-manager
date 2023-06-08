@@ -25,6 +25,7 @@ const newProfileScreenQuery = graphql`
 
 const NewProfileMobileScreen = ({
   preloadedQuery,
+  route,
 }: RelayScreenProps<NewProfileRoute, NewProfileMobileScreenQuery>) => {
   const data = usePreloadedQuery(newProfileScreenQuery, preloadedQuery);
 
@@ -52,14 +53,19 @@ const NewProfileMobileScreen = ({
   const nativeRouter = useRouter() as NativeRouter;
 
   const onClose = useCallback(() => {
-    nativeRouter.replaceAll(mainRoutes);
-  }, [nativeRouter]);
+    if (route.params?.goBack) {
+      nativeRouter.back();
+    } else {
+      nativeRouter.replaceAll(mainRoutes);
+    }
+  }, [nativeRouter, route.params?.goBack]);
 
   return (
     <NewProfileScreen
       data={data}
       onProfileCreated={onProfileCreated}
       onClose={onClose}
+      params={route.params}
     />
   );
 };

@@ -11,9 +11,14 @@ type UserWebScreenProps = {
 };
 
 const UserWebScreen = ({ serverQuery }: UserWebScreenProps) => {
-  const { profile } = useServerQuery<ProfileWebScreenQuery>(
+  const { profile, viewer } = useServerQuery<ProfileWebScreenQuery>(
     graphql`
       query ProfileWebScreenQuery($userName: String!) {
+        viewer {
+          profile {
+            id
+          }
+        }
         profile(userName: $userName) {
           ...ProfileScreen_profile
         }
@@ -22,7 +27,9 @@ const UserWebScreen = ({ serverQuery }: UserWebScreenProps) => {
     serverQuery,
   );
 
-  return <ProfileScreen profile={profile!} />;
+  return (
+    <ProfileScreen profile={profile!} userProfileId={viewer.profile?.id} />
+  );
 };
 
 export default UserWebScreen;

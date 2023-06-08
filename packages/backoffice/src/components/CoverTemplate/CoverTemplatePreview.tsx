@@ -6,7 +6,7 @@ import {
   DEFAULT_COVER_FONT_FAMILY,
   DEFAULT_COVER_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 
 import ImageTintColor from '#components/ImageTintColor';

@@ -18,10 +18,21 @@ import type { CoverEditionScreen_viewer$key } from '@azzapp/relay/artifacts/Cove
 import type { PreloadedQuery } from 'react-relay';
 
 type CoverEditionMobileScreenProps = {
+  /**
+   * Whether the screen is used for a new cover creation
+   */
   isCreation?: boolean;
+  /**
+   * The preloaded query for the screen
+   */
   preloadedQuery: PreloadedQuery<CoverEditionMobileScreenQuery>;
 };
 
+/**
+ * Mobile specific screen for the cover edition
+ * (In case of future web support)
+ * Will display a fallback while the query is loading or the screen is animating
+ */
 const CoverEditionMobileScreen = ({
   isCreation,
   preloadedQuery,

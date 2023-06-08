@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
@@ -11,13 +11,12 @@ import {
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
   TITLE_POSITIONS,
-} from '@azzapp/shared/cardHelpers';
-import ProfileColorPalette from '#components/ProfileColorPalette';
-import DashedSlider from '#ui/DashedSlider';
+} from '@azzapp/shared/coverHelpers';
+import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import FloatingButton from '#ui/FloatingButton';
-import FontPicker from '#ui/FontPicker';
+import FontDropDownPicker from '#ui/FontDropDownPicker';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
 import type {
@@ -63,7 +62,7 @@ const CoverTitleEditionPanel = ({
     graphql`
       fragment CoverTitleEditionPanel_viewer on Viewer {
         profile {
-          ...ProfileColorPalette_profile
+          ...ProfileColorPicker_profile
         }
       }
     `,
@@ -93,9 +92,6 @@ const CoverTitleEditionPanel = ({
     }),
     [contentStyle],
   );
-
-  const [fontPickerOpen, setFontPickerOpen] = useState(false);
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
 
   const onFontFamilyChange = (fontFamily: string) => {
     if (currentTab === 'title') {
@@ -158,8 +154,10 @@ const CoverTitleEditionPanel = ({
   const placementsLabels = usePlacementsLabels();
   const orientationsLabel = useOrientationsLabels();
 
+  const { width: windowWidth } = useWindowDimensions();
+
   return (
-    <View style={style}>
+    <View style={[styles.root, style]}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
@@ -181,13 +179,12 @@ const CoverTitleEditionPanel = ({
           },
         ]}
       />
-      <View style={[style, styles.contentContainer]}>
+      <View style={styles.contentContainer}>
         <TextInput
           value={(currentTab === 'subtitle' ? subTitle : title) ?? ''}
           onChangeText={
             currentTab === 'subtitle' ? onSubTitleChange : onTitleChange
           }
-          style={styles.titleInput}
           placeholder={
             currentTab === 'title'
               ? intl.formatMessage({
@@ -201,61 +198,19 @@ const CoverTitleEditionPanel = ({
           }
         />
         <View style={styles.buttonContainer}>
-          <FloatingButton
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Font',
-              description: 'Label of the font button in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to select a font',
-              description: 'Hint of the font button in cover edition',
-            })}
-            style={styles.button}
-            onPress={() => setFontPickerOpen(true)}
-          >
-            <Text
-              style={{
-                fontSize: 21,
-                fontFamily,
-              }}
-            >
-              abc
-            </Text>
-          </FloatingButton>
-          <FloatingButton
-            style={styles.button}
-            onPress={() => setColorPickerOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Color',
-              description: 'Label of the color button in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to select a color',
-              description: 'Hint of the color button in cover edition',
-            })}
-          >
-            <Text
-              style={{
-                fontSize: 24,
-                color,
-              }}
-            >
-              A
-            </Text>
-            <View
-              style={{
-                width: 25,
-                height: 3,
-                borderRadius: 4,
-                backgroundColor: color,
-              }}
-            />
-          </FloatingButton>
+          <FontDropDownPicker
+            fontFamily={fontFamily}
+            onFontFamilyChange={onFontFamilyChange}
+            bottomSheetHeight={bottomSheetHeights}
+          />
+          <ProfileColorDropDownPicker
+            profile={profile!}
+            color={color}
+            onColorChange={onColorChange}
+            bottomSheetHeight={bottomSheetHeights}
+          />
 
           <FloatingButton
-            style={styles.button}
             onPress={onNextOrientation}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -282,7 +237,6 @@ const CoverTitleEditionPanel = ({
             />
           </FloatingButton>
           <FloatingButton
-            style={styles.button}
             onPress={onNextPlacement}
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -301,105 +255,62 @@ const CoverTitleEditionPanel = ({
           </FloatingButton>
         </View>
 
-        <View style={styles.sliders}>
-          <View style={styles.sliderContainer}>
-            <Text variant="small" style={[styles.sliderTitle]}>
-              <FormattedMessage
-                defaultMessage="Font Size - {size}"
-                description="Font size message in cover edition"
-                values={{
-                  size: fontSize,
-                }}
-              />
-            </Text>
-            <DashedSlider
-              value={fontSize}
-              min={DEFAULT_COVER_MIN_FONT_SIZE}
-              max={DEFAULT_COVER_MAX_FONT_SIZE}
-              step={1}
-              interval={Math.floor(
-                (width - 80) /
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-              )}
-              onChange={onFontSizeChange}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Font size',
-                description: 'Label of the font size slider in cover edition',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage: 'Slide to change the font size',
-                description: 'Hint of the font size slider in cover edition',
-              })}
-              style={{ width: '90%' }}
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Font size : {fontSize}"
+              description="Font size message in cover edition"
+              values={{ fontSize }}
             />
-          </View>
-        </View>
-      </View>
-      <FontPicker
-        title={intl.formatMessage({
-          defaultMessage: 'Font family',
-          description: 'Title of the font picker modal in cover edition',
-        })}
-        value={fontFamily as any}
-        visible={fontPickerOpen}
-        onRequestClose={() => setFontPickerOpen(false)}
-        onChange={onFontFamilyChange}
-        height={bottomSheetHeights}
-      />
-      {profile && (
-        <ProfileColorPalette
-          profile={profile}
-          title={intl.formatMessage({
-            defaultMessage: 'Font color',
-            description:
-              'Title of the color picker modal in cover edition for font color',
+          }
+          value={fontSize}
+          min={DEFAULT_COVER_MIN_FONT_SIZE}
+          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          step={1}
+          interval={Math.floor(
+            (windowWidth - 80) /
+              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
+          )}
+          onChange={onFontSizeChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Font size',
+            description: 'Label of the font size slider in cover edition',
           })}
-          selectedColor={color}
-          visible={colorPickerOpen}
-          onRequestClose={() => setColorPickerOpen(false)}
-          onChangeColor={onColorChange}
-          height={bottomSheetHeights}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the font size',
+            description: 'Hint of the font size slider in cover edition',
+          })}
+          style={styles.slider}
         />
-      )}
+      </View>
     </View>
   );
 };
 
 export default CoverTitleEditionPanel;
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  button: { marginRight: 15 },
+  root: {
+    flex: 1,
+  },
   contentContainer: {
+    flex: 1,
     paddingHorizontal: 20,
+    paddingVertical: 15,
     justifyContent: 'space-between',
   },
-  titleInput: {},
   buttonContainer: {
     alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: 10,
-  },
-  sliders: {
-    marginTop: 10,
-    flexDirection: 'row',
-  },
-  sliderContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  sliderTitle: {
-    marginTop: 4,
-    alignSelf: 'center',
-  },
-  titlePositionIcon: {
-    width: 24,
-    resizeMode: 'contain',
+    columnGap: 15,
   },
   orientationIcon: {
     width: 30,
     height: 30,
+  },
+  slider: {
+    width: '90%',
+    alignSelf: 'center',
   },
 });
 

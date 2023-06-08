@@ -1,0 +1,97 @@
+import { connectionFromArray } from 'graphql-relay';
+import { getProfileId } from '@azzapp/auth/viewer';
+import ERRORS from '@azzapp/shared/errors';
+import { db, getPostComments, getPostReaction } from '#domains';
+import {
+  cursorToDate,
+  connectionFromDateSortedItems,
+} from '#helpers/connectionsHelpers';
+import { idResolver } from './utils';
+import type { Media } from '#domains';
+import type {
+  PostCommentResolvers,
+  PostResolvers,
+} from './__generated__/types';
+
+export const Post: PostResolvers = {
+  id: idResolver('Post'),
+  author: async (post, _, { profileLoader }) => {
+    const author = await profileLoader.load(post.authorId);
+    if (author) {
+      return author;
+    }
+    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+  },
+  media: async (post, _, { mediaLoader }) => {
+    return mediaLoader
+      .loadMany(post.medias as string[])
+      .then(
+        medias =>
+          (
+            medias.filter(
+              media => media && !(media instanceof Error),
+            ) as Media[]
+          )[0]!,
+      )
+      .catch(err => {
+        throw err;
+      });
+  },
+  content: async post => {
+    return post.content ?? '';
+  },
+  viewerPostReaction: async (post, _, { auth }) => {
+    if (auth.isAnonymous) {
+      return null;
+    }
+    const profileId = getProfileId(auth);
+    if (!profileId) {
+      return null;
+    }
+    const reaction = await getPostReaction(profileId, post.id);
+    if (reaction) {
+      return reaction.reactionKind;
+    }
+    return null;
+  },
+  previewComment: async (post, _) => {
+    const comments = await getPostComments(post.id, 1);
+    if (comments.length > 0) {
+      return comments[0];
+    }
+    return null;
+  },
+  comments: async (post, args) => {
+    const { after, first } = args;
+    const limit = first ?? 15;
+
+    const offset = after ? cursorToDate(after) : null;
+
+    //fetch one more item to know if there is a next page (avoid counting all the items, that could be a probleme on huge tables)
+    const postComments = await getPostComments(post.id, limit + 1, offset);
+    const hasNextPage = postComments.length > limit;
+    return connectionFromDateSortedItems(postComments.slice(0, -1), {
+      getDate: post => post.createdAt,
+      hasNextPage,
+      hasPreviousPage: offset !== null,
+    });
+  },
+  relatedPosts: async (post, args) => {
+    // TODO dummy implementation just to test frontend
+    return connectionFromArray(
+      await db.selectFrom('Post').selectAll().execute(),
+      args,
+    );
+  },
+};
+
+export const PostComment: PostCommentResolvers = {
+  id: idResolver('PostComment'),
+  author: async (post, _, { profileLoader }) => {
+    const author = await profileLoader.load(post.profileId);
+    if (author) {
+      return author;
+    }
+    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+  },
+};

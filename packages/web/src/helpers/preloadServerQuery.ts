@@ -1,9 +1,9 @@
 import { graphql } from 'graphql';
 import { cache } from 'react';
-import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
+import { createGraphQLContext, schema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { SessionData } from '@azzapp/auth/viewer';
 import type { VariablesOf, GraphQLTaggedNode } from 'react-relay';
 import type { ConcreteRequest, OperationType } from 'relay-runtime';
 
@@ -16,7 +16,7 @@ export type ServerQuery<TQuery extends OperationType> = {
 const preloadServerQuery = async <TQuery extends OperationType>(
   gqlQuery: GraphQLTaggedNode,
   variables: VariablesOf<TQuery>,
-  viewer?: Viewer,
+  viewer?: SessionData,
 ): Promise<ServerQuery<TQuery>> => {
   if (typeof gqlQuery === 'function') {
     gqlQuery = gqlQuery();
@@ -38,7 +38,7 @@ const preloadServerQuery = async <TQuery extends OperationType>(
   }
 
   const response = await graphql({
-    schema: graphQLSchema,
+    schema,
     source: params.text ? params.text : (queryMap as any)[params.id!],
     variableValues: queryVariables,
     contextValue: createCachedGraphQLContext(viewer ?? { isAnonymous: true }),
@@ -59,7 +59,7 @@ const preloadServerQuery = async <TQuery extends OperationType>(
 
 export default preloadServerQuery;
 
-const createCachedGraphQLContext = cache((contextData: Viewer) =>
+const createCachedGraphQLContext = cache((contextData: SessionData) =>
   createGraphQLContext(contextData),
 );
 

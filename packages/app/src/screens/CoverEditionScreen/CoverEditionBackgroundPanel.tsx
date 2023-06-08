@@ -1,11 +1,7 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import ProfileColorPalette from '#components/ProfileColorPalette';
-import TabsBar from '#ui/TabsBar';
-import ColorPreview from './ColorPreview';
-import CoverLayerList from './CoverLayerList';
+import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
 import type { CoverEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/CoverEditionBackgroundPanel_viewer.graphql';
 import type { CardCoverBackgroundStyleInput } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -33,10 +29,10 @@ const CoverEditionBackgroundPanel = ({
     graphql`
       fragment CoverEditionBackgroundPanel_viewer on Viewer {
         coverBackgrounds {
-          ...CoverLayerList_layers
+          ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPalette_profile
+          ...ProfileColorPicker_profile
         }
       }
     `,
@@ -45,88 +41,37 @@ const CoverEditionBackgroundPanel = ({
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
   const patternColor = backgroundStyle?.patternColor ?? '#000000';
-  const [currentTab, setCurrentTab] = useState('background');
 
-  const onColorChange = (color: string) => {
-    if (currentTab === 'backgroundColor') {
-      onBackgroundStyleChange({ backgroundColor: color, patternColor });
-    } else {
-      onBackgroundStyleChange({ backgroundColor, patternColor: color });
-    }
-  };
+  const onColorChange = useCallback(
+    (color: 'backgroundColor' | 'tintColor', value: string) => {
+      if (color === 'backgroundColor') {
+        onBackgroundStyleChange({ backgroundColor: value, patternColor });
+      } else {
+        onBackgroundStyleChange({ backgroundColor, patternColor: value });
+      }
+    },
+    [backgroundColor, onBackgroundStyleChange, patternColor],
+  );
 
   const intl = useIntl();
-  const patternColorLabel = intl.formatMessage({
-    defaultMessage: 'Color #1',
-    description: 'Label of the background pattern color tab in cover edition',
-  });
-  const backgroundColorLabel = intl.formatMessage({
-    defaultMessage: 'Color #2',
-    description: 'Label of the background color tab in cover edition',
-  });
   return (
-    <View style={style}>
-      <TabsBar
-        currentTab={currentTab}
-        onTabPress={setCurrentTab}
-        tabs={[
-          {
-            tabKey: 'background',
-            label: intl.formatMessage({
-              defaultMessage: 'Background',
-              description: 'Label of Background tab in cover edition',
-            }),
-          },
-          {
-            tabKey: 'patternColor',
-            label: patternColorLabel,
-            rightElement: (
-              <ColorPreview color={patternColor} style={{ marginLeft: 5 }} />
-            ),
-          },
-          {
-            tabKey: 'backgroundColor',
-            label: backgroundColorLabel,
-            rightElement: (
-              <ColorPreview color={backgroundColor} style={{ marginLeft: 5 }} />
-            ),
-          },
-        ]}
-      />
-      <CoverLayerList
-        layers={coverBackgrounds}
-        selectedLayer={background}
-        backgroundColor={backgroundColor}
-        tintColor={patternColor}
-        onSelectLayer={onBackgroundChange}
-        style={styles.content}
-        testID="cover-layer-list-background"
-      />
-      {profile && (
-        <ProfileColorPalette
-          visible={currentTab !== 'background'}
-          height={bottomSheetHeights}
-          profile={profile}
-          title={
-            currentTab === 'backgroundColor'
-              ? backgroundColorLabel
-              : patternColorLabel
-          }
-          selectedColor={
-            currentTab === 'backgroundColor' ? backgroundColor : patternColor
-          }
-          onChangeColor={onColorChange}
-          onRequestClose={() => setCurrentTab('background')}
-        />
-      )}
-    </View>
+    <EditorLayerSelectorPanel
+      title={intl.formatMessage({
+        defaultMessage: 'Background',
+        description: 'Label of Background tab in cover edition',
+      })}
+      profile={profile!}
+      medias={coverBackgrounds}
+      selectedMedia={background}
+      tintColor={patternColor}
+      backgroundColor={backgroundColor}
+      onMediaChange={onBackgroundChange}
+      onColorChange={onColorChange}
+      bottomSheetHeight={bottomSheetHeights}
+      style={style}
+      testID="cover-background-panel"
+    />
   );
 };
 
 export default CoverEditionBackgroundPanel;
-
-const styles = StyleSheet.create({
-  content: {
-    marginVertical: 15,
-  },
-});

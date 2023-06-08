@@ -3,6 +3,7 @@ import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostsGrid';
+import { useFocusEffect } from '#hooks/useFocusEffect';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
@@ -17,6 +18,7 @@ type FollowedProfilesPostsListProps = {
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
   onScroll?: (scrollPosition: number) => void;
+  onReady?: () => void;
 };
 
 const FollowedProfilesPostsList = ({
@@ -27,6 +29,7 @@ const FollowedProfilesPostsList = ({
   style,
   postsContainerStyle,
   onScroll,
+  onReady,
 }: FollowedProfilesPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -69,6 +72,17 @@ const FollowedProfilesPostsList = ({
     );
   }, [refetch, refreshing]);
 
+  const refetchPosts = useCallback(() => {
+    refetch(
+      {},
+      {
+        fetchPolicy: 'store-or-network',
+      },
+    );
+  }, [refetch]);
+
+  useFocusEffect(refetchPosts);
+
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
       loadNext(20);
@@ -84,9 +98,9 @@ const FollowedProfilesPostsList = ({
   const posts: PostsGrid_posts$key = useMemo(
     () =>
       convertToNonNullArray(
-        data.followedProfilesPosts.edges?.map(edge => edge?.node) ?? [],
+        data.followedProfilesPosts?.edges?.map(edge => edge?.node) ?? [],
       ),
-    [data.followedProfilesPosts.edges],
+    [data.followedProfilesPosts?.edges],
   );
 
   return (
@@ -105,6 +119,7 @@ const FollowedProfilesPostsList = ({
       postsContainerStyle={postsContainerStyle}
       onScroll={onScroll}
       useWindowScroll
+      onReady={onReady}
     />
   );
 };

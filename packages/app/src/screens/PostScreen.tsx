@@ -13,7 +13,9 @@ import { SafeAreaView } from 'react-native';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { useRouter } from '#PlatformEnvironment';
+import { colors } from '#theme';
 import PostList from '#components/PostList';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { PostScreenFragment_post$key } from '@azzapp/relay/artifacts/PostScreenFragment_post.graphql';
@@ -91,11 +93,12 @@ const PostScreen = ({
     [initialVideoTime, post.id],
   );
 
+  const styles = useStyleSheet(styleSheet);
   return (
-    <SafeAreaView style={{ flex: 1, overflow: 'hidden' }}>
+    <SafeAreaView style={styles.safeAreaView}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Discover',
+          defaultMessage: 'Related Posts',
           description: 'Post screen header title',
         })}
         leftElement={
@@ -190,3 +193,11 @@ const RelatedPostLoaderInner = (
 };
 
 const RelatedPostLoader = forwardRef(RelatedPostLoaderInner);
+
+const styleSheet = createStyleSheet(appearance => ({
+  safeAreaView: {
+    flex: 1,
+    overflow: 'hidden',
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+}));

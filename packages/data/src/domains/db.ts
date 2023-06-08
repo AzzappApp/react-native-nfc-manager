@@ -8,13 +8,15 @@ import type {
 import type {
   Card,
   CardCover,
-  CoverLayer,
+  StaticMedia,
   CoverTemplate,
   CardModule,
   Follow,
   Media,
   Profile,
   Post,
+  PostComment,
+  PostReaction,
   User,
   ProfileCategory,
   CompanyActivity,
@@ -34,12 +36,14 @@ export type Database = {
   CardModule: CardModule;
   CompanyActivity: CompanyActivity;
   CoverTemplate: CoverTemplate;
-  CoverLayer: WithCreatedAt<CoverLayer>;
+  StaticMedia: WithCreatedAt<StaticMedia>;
   Follow: WithCreatedAt<Follow>;
   Media: Media;
   Profile: WithTimeStamps<Profile>;
   ProfileCategory: ProfileCategory;
   Post: WithoutJSONFields<WithCreatedAt<Post>, 'medias'>;
+  PostComment: WithCreatedAt<PostComment>;
+  PostReaction: WithCreatedAt<PostReaction>;
   User: WithTimeStamps<User>;
   Interest: Interest;
 };

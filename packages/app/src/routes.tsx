@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
 export type HomeRoute = {
@@ -43,7 +44,9 @@ export type ChangePasswordRoute = {
 
 export type NewProfileRoute = {
   route: 'NEW_PROFILE';
-  params?: never;
+  params?: {
+    goBack: boolean;
+  };
 };
 
 export type ProfileRoute = {
@@ -74,6 +77,13 @@ export type PostRoute = {
   };
 };
 
+export type PostCommentsRoute = {
+  route: 'POST_COMMENTS';
+  params: {
+    postId: string;
+  };
+};
+
 export type NewPostRoute = {
   route: 'NEW_POST';
   params?: never;
@@ -82,9 +92,30 @@ export type NewPostRoute = {
 export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
   params: {
-    module: string;
-    isCreation?: boolean;
+    module: ModuleKind | 'cover';
+    moduleId?: string;
+    isNew?: boolean;
   };
+};
+
+export type FollowedProfilesRoute = {
+  route: 'FOLLOWED_PROFILES';
+  params?: never;
+};
+
+export type FollowersRoute = {
+  route: 'FOLLOWERS';
+  params?: never;
+};
+
+export type AccountDetailsRoute = {
+  route: 'ACCOUNT_DETAILS';
+  params?: never;
+};
+
+export type InviteFriendsRoute = {
+  route: 'INVITE_FRIENDS';
+  params?: never;
 };
 
 export type Route =
@@ -96,12 +127,17 @@ export type Route =
   | ProfileRoute
   | ProfilePostsRoute
   | PostRoute
+  | PostCommentsRoute
   | NewPostRoute
   | NewProfileRoute
   | ChangePasswordRoute
   | SignInRoute
   | SignUpRoute
   | ForgotPasswordRoute
-  | CardModuleEditionRoute;
+  | CardModuleEditionRoute
+  | FollowedProfilesRoute
+  | FollowersRoute
+  | AccountDetailsRoute
+  | InviteFriendsRoute;
 
 export type ROUTES = Route['route'];

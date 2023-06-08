@@ -18,7 +18,7 @@ export type ColorPickerProps = {
   height?: number;
   selectedColor: string;
   colorList: readonly string[] | null;
-  onChangeColor: (color: string) => void;
+  onColorChange: (color: string) => void;
   onUpdateColorList: (color: string[]) => void;
   onRequestClose: () => void;
 };
@@ -30,7 +30,7 @@ const ColorPicker = ({
   selectedColor,
   colorList,
   onRequestClose,
-  onChangeColor,
+  onColorChange,
   onUpdateColorList,
 }: ColorPickerProps) => {
   const [state, setState] = useState<
@@ -49,7 +49,7 @@ const ColorPicker = ({
   const previouslySelectedColor = useRef<string | null>(selectedColor);
 
   // #region COLOR PALETTE ACTIONS
-  const onSelectColor = (color: string) => onChangeColor(color);
+  const onSelectColor = (color: string) => onColorChange(color);
 
   const onValidateColor = useCallback(() => {
     previouslySelectedColor.current = selectedColor;
@@ -76,10 +76,10 @@ const ColorPicker = ({
 
   const onCancelNewColor = useCallback(() => {
     const previousColor = previouslySelectedColor.current ?? selectedColor;
-    onChangeColor(previousColor);
+    onColorChange(previousColor);
     previouslySelectedColor.current = null;
     setState('colorChooser');
-  }, [onChangeColor, selectedColor]);
+  }, [onColorChange, selectedColor]);
 
   const onSaveNewColor = useCallback(() => {
     previouslySelectedColor.current = null;
@@ -194,7 +194,7 @@ const ColorPicker = ({
           style={{ marginBottom: bottom }}
         />
       ) : (
-        <ColorChooser value={selectedColor} onChangeColor={onChangeColor} />
+        <ColorChooser value={selectedColor} onColorChange={onColorChange} />
       )}
     </BottomSheetModal>
   );

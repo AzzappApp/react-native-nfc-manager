@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useLogout } from '#hooks/useLogout';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
@@ -13,9 +14,8 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import AccountScreenMiddleHeader from './AccountScreenMiddleHeader';
-import AccountScreenCover from './AccountScreenProfiles';
-
-import type { AccountScreen_viewer$key } from '@azzapp/relay/artifacts/AccountScreen_viewer.graphql';
+import AccountScreenProfiles from './AccountScreenProfiles';
+import type { AccountScreen_user$key } from '@azzapp/relay/artifacts/AccountScreen_user.graphql';
 
 const reducer = (
   state: { showDropdown: boolean; requestedLogout: boolean },
@@ -45,40 +45,42 @@ const reducer = (
 };
 
 type AccountScreenProps = {
-  viewer: AccountScreen_viewer$key;
+  user: AccountScreen_user$key;
 };
 
-export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
+const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
   const [{ showDropdown, requestedLogout }, dispatch] = useReducer(reducer, {
     showDropdown: false,
     requestedLogout: false,
   });
 
-  const viewer = useFragment(
+  const { email, phoneNumber, ...userProfiles } = useFragment(
     graphql`
-      fragment AccountScreen_viewer on Viewer {
+      fragment AccountScreen_user on User {
         email
         phoneNumber
         ...AccountScreenProfiles_userProfiles
       }
     `,
-    viewerKey,
+    userKey,
   );
 
-  const vp = useViewportSize();
-
-  const appearanceStyle = useStyleSheet(computedStyles);
+  const logout = useLogout();
 
   const intl = useIntl();
+  const vp = useViewportSize();
+  const styles = useStyleSheet(styleSheet);
 
-  const logout = useLogout();
+  const close = () => {
+    dispatch({ type: 'CLOSE_DROPDOWN' });
+  };
 
   return (
     <View>
       <Header
         middleElement={
           <AccountScreenMiddleHeader
-            emailOrPhoneNumber={viewer.email ?? viewer.phoneNumber ?? ''}
+            emailOrPhoneNumber={email ?? phoneNumber ?? ''}
           />
         }
         rightElement={
@@ -95,32 +97,66 @@ export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
           />
         }
       />
-
-      <AccountScreenCover viewer={viewer} />
-
+      <AccountScreenProfiles userProfiles={userProfiles} />
       <BottomSheetModal
         visible={showDropdown}
         height={vp`${insetBottom}  + ${440}`}
-        contentContainerStyle={appearanceStyle.bottomSheetContainer}
+        contentContainerStyle={styles.bottomSheetContainer}
         onDismiss={() => {
           if (requestedLogout) {
             logout();
           }
         }}
-        onRequestClose={() => {
-          dispatch({ type: 'CLOSE_DROPDOWN' });
-        }}
+        onRequestClose={close}
       >
-        <View style={appearanceStyle.bottomSheetOptionsContainer}>
+        <View style={styles.bottomSheetOptionsContainer}>
+          <Link route="ACCOUNT_DETAILS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="warning" style={styles.icon} />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Account details"
+                      description="Link to open account details form to change email, phone number, etc."
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" style={styles.icon} />
+              </View>
+            </PressableNative>
+          </Link>
+          <Link route="INVITE_FRIENDS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="invite" style={styles.icon} />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Invite friends"
+                      description="Invite friends to join the app"
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" style={styles.icon} />
+              </View>
+            </PressableNative>
+          </Link>
           <PressableNative
             onPress={() => {
               dispatch({ type: 'LOGOUT' });
             }}
-            style={appearanceStyle.bottomSheetOptionButton}
+            style={styles.bottomSheetOptionButton}
           >
-            <View style={appearanceStyle.bottomSheetOptionContainer}>
-              <View style={appearanceStyle.bottomSheetOptionIconLabel}>
-                <Icon icon="logout" style={appearanceStyle.icon} />
+            <View style={styles.bottomSheetOptionContainer}>
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon icon="logout" style={styles.icon} />
                 <Text>
                   <FormattedMessage
                     defaultMessage="Logout"
@@ -128,7 +164,7 @@ export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
                   />
                 </Text>
               </View>
-              <Icon icon="arrow_right" style={appearanceStyle.icon} />
+              <Icon icon="arrow_right" style={styles.icon} />
             </View>
           </PressableNative>
         </View>
@@ -137,7 +173,7 @@ export const AccountScreen = ({ viewer: viewerKey }: AccountScreenProps) => {
   );
 };
 
-const computedStyles = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   icon: {
     tintColor: appearance === 'light' ? colors.black : colors.white,
   },
@@ -145,7 +181,11 @@ const computedStyles = createStyleSheet(appearance => ({
     marginTop: 10,
     paddingHorizontal: 0,
   },
-  bottomSheetOptionsContainer: { paddingHorizontal: 20, paddingTop: 20 },
+  bottomSheetOptionsContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    rowGap: 20,
+  },
   bottomSheetOptionButton: {
     height: 32,
   },

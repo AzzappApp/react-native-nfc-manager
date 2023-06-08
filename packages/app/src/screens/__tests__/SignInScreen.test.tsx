@@ -28,7 +28,7 @@ describe('Signin Screen', () => {
     expect(passwordInput.props.value).toBe('myPassword');
   });
 
-  test('should call the `signin` callback if credential and password are filled', () => {
+  test('should call the `signin` callback if credential and password are filled', async () => {
     render(<SignInScreen signin={signin} />);
 
     const credentialInput = screen.getByPlaceholderText(
@@ -45,6 +45,8 @@ describe('Signin Screen', () => {
       credential: 'myname',
       password: 'myPassword',
     });
+
+    await act(flushPromises);
   });
 
   test('should display an error message if the `signin` callback fails', async () => {

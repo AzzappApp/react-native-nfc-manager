@@ -1,15 +1,15 @@
 import { graphql } from 'graphql';
 import { NextResponse } from 'next/server';
-import { getViewer } from '@azzapp/auth/viewer';
-import { createGraphQLContext, graphQLSchema } from '@azzapp/data';
+import { getSessionData } from '@azzapp/auth/viewer';
+import { createGraphQLContext, schema } from '@azzapp/data';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { SessionData } from '@azzapp/auth/viewer';
 
 export const POST = async (req: Request) => {
-  let viewerInfos: Viewer;
+  let viewerInfos: SessionData;
   try {
-    viewerInfos = await getViewer();
+    viewerInfos = await getSessionData();
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json(
@@ -27,7 +27,7 @@ export const POST = async (req: Request) => {
   const requestParams = await req.json();
   try {
     const result = await graphql({
-      schema: graphQLSchema,
+      schema,
       rootValue: {},
       source: requestParams.id
         ? (queryMap as any)[requestParams.id]
@@ -47,6 +47,3 @@ export const POST = async (req: Request) => {
     );
   }
 };
-
-// TODO blocked by https://github.com/vercel/next.js/issues/46755 and https://github.com/vercel/next.js/issues/46337
-//export const runtime = 'edge';

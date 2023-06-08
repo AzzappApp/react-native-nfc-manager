@@ -1,0 +1,56 @@
+"""
+Template for a cover
+"""
+type CoverTemplate implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  name: String
+  kind: ProfileKind
+  data: CardCoverTemplate!
+  enabled: Boolean!
+  category: [CoverTemplateCategorGraphQL]
+  suggested: Boolean!
+  previewMedia: MediaImage
+  colorPalette: [String!]
+  tags: [String!]!
+}
+
+"""
+Category of a cover template
+"""
+type CoverTemplateCategorGraphQL {
+  """
+  Should be a country code
+  """
+  id: String
+  cateogry: String
+}
+
+"""
+Card cover display informations
+"""
+type CardCoverTemplate {
+  mediaStyle: JSON
+
+  """
+  The source of the media used by the cover for a suggested template
+  """
+  sourceMedia: MediaImage
+
+  """
+  The background of the cover
+  """
+  background: StaticMedia
+  backgroundStyle: CardCoverBackgroundStyle
+  foreground: StaticMedia
+  foregroundStyle: CardCoverForegroundStyle
+  segmented: Boolean!
+  merged: Boolean!
+  title: String
+  titleStyle: CardCoverTextStyle
+  subTitle: String
+  subTitleStyle: CardCoverTextStyle
+  contentStyle: CardCoverContentStyle
+}

@@ -1,0 +1,95 @@
+"""
+Represent an Azzapp Profile
+"""
+type Profile implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  userName: String!
+  firstName: String
+  lastName: String
+  companyName: String
+  companyActivity: CompanyActivity
+  profileKind: ProfileKind
+  profileCategory: ProfileCategory
+  card: Card
+  colorPalette: [String!]
+  posts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection
+  isFollowing: Boolean!
+  nbPosts: Int!
+  nbFollowedProfiles: Int!
+  nbFollowersProfiles: Int!
+  public: Boolean!
+}
+
+"""
+A connection to a list of items.
+"""
+type ProfileConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ProfileEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type ProfileEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Profile
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+enum ProfileKind {
+  business
+  personal
+  product
+}
+
+"""
+Represent a Profile Category
+"""
+type ProfileCategory implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  profileKind: ProfileKind!
+  label: String
+  medias: [MediaImage!]
+  companyActivities: [CompanyActivity!]!
+}
+
+"""
+Represent a Company Activity
+"""
+type CompanyActivity implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+}

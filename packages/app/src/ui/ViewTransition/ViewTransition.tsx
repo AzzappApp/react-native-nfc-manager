@@ -14,7 +14,7 @@ import type {
   TransitionableStyle,
   TransitionValues,
   ViewTransitionProps,
-} from './helpers';
+} from './viewTransitionTypes';
 import type { ForwardedRef } from 'react';
 import type { ViewStyle, View, TransformsStyle } from 'react-native';
 import type { AnimatedStyleProp } from 'react-native-reanimated';
@@ -25,6 +25,7 @@ const ViewTransition = (
     transitionDuration,
     disableAnimation,
     easing = 'linear',
+    animatedStyle,
     style,
     ...props
   }: ViewTransitionProps,
@@ -121,7 +122,7 @@ const ViewTransition = (
   return (
     <Animated.View
       ref={ref as any}
-      style={[style, animatedStyles]}
+      style={[style, animatedStyles, animatedStyle]}
       {...props}
     />
   );

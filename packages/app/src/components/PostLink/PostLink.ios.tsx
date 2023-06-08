@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { useRouter } from '#PlatformEnvironment';
+import PostRendererFeed from '#components/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import PostRenderer from '../PostRenderer';
+import type { PostRendererFeedHandle } from '#components/PostRendererFeed';
 import type { PostLinkProps } from './postLinkTypes';
-import type { PostRendererHandle } from '../PostRenderer';
 import type { View, NativeMethods } from 'react-native';
 
 /**
@@ -16,7 +16,7 @@ const PostLink = ({
   postRendererStyle,
   ...props
 }: PostLinkProps) => {
-  const postRef = useRef<PostRendererHandle | null>(null);
+  const postRef = useRef<PostRendererFeedHandle | null>(null);
   const ref = useRef<View | null>(null);
 
   const router = useRouter();
@@ -54,7 +54,7 @@ const PostLink = ({
       style={[style, { borderRadius: 16, overflow: 'hidden' }]}
     >
       {({ pressed }) => (
-        <PostRenderer
+        <PostRendererFeed
           {...props}
           ref={postRef}
           style={postRendererStyle}

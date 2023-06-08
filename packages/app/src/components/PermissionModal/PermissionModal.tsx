@@ -86,7 +86,7 @@ const PermissionModal = ({
               <IconButton
                 icon="arrow_left"
                 onPress={onRequestClose}
-                style={styles.backButton}
+                variant="icon"
               />
             }
           />
@@ -166,8 +166,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-  },
-  backButton: {
-    borderWidth: 0,
   },
 });

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import NativeLink from '../NativeLink';
 
 const mockRouter = {
@@ -88,5 +88,18 @@ describe('NativeLink', () => {
       params: { userName: 'hello' },
     });
     expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  test('should push route when children is a view', () => {
+    render(
+      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
+        <View testID="pressable" />
+      </NativeLink>,
+    );
+    fireEvent.press(screen.getByTestId('pressable'));
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      route: 'PROFILE',
+      params: { userName: 'hello' },
+    });
   });
 });

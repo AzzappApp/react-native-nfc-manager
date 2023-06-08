@@ -11,6 +11,11 @@ const userPostsScreenQuery = graphql`
       ...ProfilePostsScreenFragment_posts
       ...ProfilePostsScreenFragment_profile
     }
+    viewer {
+      profile {
+        ...ProfilePostsScreenFragment_viewerProfile
+      }
+    }
   }
 `;
 
@@ -18,11 +23,20 @@ const ProfilePostsMobileScreen = ({
   preloadedQuery,
   hasFocus,
 }: RelayScreenProps<ProfilePostsRoute, ProfilePostsMobileScreenQuery>) => {
-  const data = usePreloadedQuery(userPostsScreenQuery, preloadedQuery);
-  if (!data.profile) {
+  const { profile, viewer } = usePreloadedQuery(
+    userPostsScreenQuery,
+    preloadedQuery,
+  );
+  if (!(profile && viewer.profile)) {
     return null;
   }
-  return <ProfilePostsScreen hasFocus={hasFocus} profile={data.profile} />;
+  return (
+    <ProfilePostsScreen
+      hasFocus={hasFocus}
+      profile={profile}
+      viewerProfile={viewer.profile}
+    />
+  );
 };
 
 export default relayScreen(ProfilePostsMobileScreen, {

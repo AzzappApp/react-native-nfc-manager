@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
-import { colors } from '#theme';
+import { Modal, View } from 'react-native';
+import { shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
 import type { Subscription, Observable } from 'relay-runtime';
@@ -34,6 +35,8 @@ const UploadProgressModal = ({
     return () => subscribtion?.unsubscribe();
   }, [progressIndicator]);
 
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <Modal
       visible={visible}
@@ -54,7 +57,7 @@ const UploadProgressModal = ({
 
 export default UploadProgressModal;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -63,15 +66,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  modal: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderRadius: 20,
-    shadowColor: colors.black,
-    shadowOpacity: 0.21,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 10,
-  },
+  modal: [
+    {
+      backgroundColor: '#FFF',
+      padding: 20,
+      borderRadius: 20,
+    },
+    shadow(appearance),
+  ],
   title: {
     textAlign: 'center',
     marginBottom: 20,
@@ -80,4 +82,4 @@ const styles = StyleSheet.create({
     width: 200,
     marginBottom: 10,
   },
-});
+}));

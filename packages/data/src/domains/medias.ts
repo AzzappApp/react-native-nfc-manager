@@ -43,3 +43,17 @@ export const removeMedia = async (
 ): Promise<void> => {
   await qc.deleteFrom('Media').where('id', '=', id).execute();
 };
+
+/**
+ * Delete multiple medias.
+ *
+ * @param ids - the list of medias ids to delete
+ * @param qc - The query creator to use (user for transactions)
+ * @returns The created media
+ */
+export const removeMedias = async (
+  ids: string[],
+  qc: QueryCreator<Database> = db,
+): Promise<void> => {
+  await qc.deleteFrom('Media').where('id', 'in', ids).execute();
+};

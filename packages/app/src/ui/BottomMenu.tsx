@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { colors } from '#theme';
+import { shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import FooterBar from './FooterBar';
 import type { FooterBarProps } from './FooterBar';
 
@@ -20,6 +20,7 @@ const BottomMenu = ({
   style,
   ...props
 }: BottomMenuProps) => {
+  const styles = useStyleSheet(styleSheet);
   return (
     <FooterBar
       height={BOTTOM_MENU_HEIGHT}
@@ -33,25 +34,24 @@ const BottomMenu = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    height: BOTTOM_MENU_HEIGHT,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    borderRadius: BOTTOM_MENU_HEIGHT / 2,
-    shadowColor: colors.grey900,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 8.7 },
-    shadowRadius: 19.8,
-    columnGap: 10,
-  },
+const styleSheet = createStyleSheet(appearance => ({
+  container: [
+    {
+      flexDirection: 'row',
+      height: BOTTOM_MENU_HEIGHT,
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+      borderRadius: BOTTOM_MENU_HEIGHT / 2,
+      columnGap: 10,
+    },
+    shadow(appearance),
+  ],
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 50,
   },
-});
+}));
 
 export default BottomMenu;

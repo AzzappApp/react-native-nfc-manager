@@ -5,10 +5,11 @@ import AccountScreen from '#screens/AccountScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountRoute } from '#routes';
 import type { AccountMobileScreenQuery } from '@azzapp/relay/artifacts/AccountMobileScreenQuery.graphql';
+
 const accountScreenQuery = graphql`
   query AccountMobileScreenQuery {
-    viewer {
-      ...AccountScreen_viewer
+    currentUser {
+      ...AccountScreen_user
     }
   }
 `;
@@ -16,11 +17,11 @@ const accountScreenQuery = graphql`
 const AccountMobileScreen = ({
   preloadedQuery,
 }: RelayScreenProps<AccountRoute, AccountMobileScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(accountScreenQuery, preloadedQuery);
+  const { currentUser } = usePreloadedQuery(accountScreenQuery, preloadedQuery);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <AccountScreen viewer={viewer} />
+      <AccountScreen user={currentUser} />
     </SafeAreaView>
   );
 };

@@ -2,6 +2,7 @@ import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
 import { addAuthStateListener } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
+import type { AuthState } from './authStore';
 import type { Environment } from 'relay-runtime';
 
 let environment: Environment | null;
@@ -17,9 +18,12 @@ export const getRelayEnvironment = () => {
   return environment;
 };
 
-const resetEnvironment = () => {
+const resetEnvironment = (state: AuthState) => {
   environment?.commitUpdate(store => {
     store.getRoot().getLinkedRecord('viewer')?.invalidateRecord();
+    if (!state.authenticated) {
+      store.getRoot().getLinkedRecord('currentUser')?.invalidateRecord();
+    }
   });
   listeners.forEach(listener => listener());
 };

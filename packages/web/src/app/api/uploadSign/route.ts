@@ -2,19 +2,19 @@
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
 import { getCrypto } from '@azzapp/auth/crypto';
-import { getViewer } from '@azzapp/auth/viewer';
+import { getSessionData } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import cors from '#helpers/cors';
-import type { Viewer } from '@azzapp/auth/viewer';
+import type { SessionData } from '@azzapp/auth/viewer';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
 const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
 
 const uploadSignApi = async (req: Request) => {
-  let viewer: Viewer;
+  let viewer: SessionData;
   try {
-    viewer = await getViewer();
+    viewer = await getSessionData();
 
     if (viewer.isAnonymous) {
       return NextResponse.json(
@@ -75,8 +75,7 @@ const uploadSignApi = async (req: Request) => {
 
 export const { POST, OPTIONS } = cors({ POST: uploadSignApi });
 
-// TODO blocked by https://github.com/vercel/next.js/issues/46755 and by https://github.com/vercel/next.js/issues/46337
-//export const runtime = 'edge';
+export const runtime = 'edge';
 
 // extracted from Cloudinary SDK to avoid importing the whole SDK
 // which has edge runtime issues

@@ -144,7 +144,6 @@ const ImagePicker = ({
       if (
         media.kind === 'video' &&
         timeRange &&
-        timeRange.startTime !== 0 &&
         Math.abs(timeRange.duration - media.duration) > 0.1
       ) {
         resultTimeRange = timeRange;

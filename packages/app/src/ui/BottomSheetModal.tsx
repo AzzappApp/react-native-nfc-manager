@@ -5,11 +5,10 @@ import {
   KeyboardAvoidingView,
   Modal,
   PanResponder,
-  StyleSheet,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from './Button';
@@ -81,9 +80,9 @@ const BottomSheetModal = ({
   ...props
 }: BottomSheetModalProps) => {
   const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
-  const appearanceStyle = useStyleSheet(computedStyle);
   const [isVisible, setIsVisible] = useState(false);
   const currentAnimationRef = useRef<Animated.CompositeAnimation | null>();
+
   useEffect(() => {
     let canceled = false;
     if (visible) {
@@ -172,6 +171,8 @@ const BottomSheetModal = ({
     pan.current = createPanResponder(height);
   }, [createPanResponder, height, pan]);
 
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <Modal
       animationType="none"
@@ -210,7 +211,6 @@ const BottomSheetModal = ({
           {...pan?.current.panHandlers}
           style={[
             styles.bottomSheetContainer,
-            appearanceStyle.bottomSheetContainer,
             contentContainerStyle,
             {
               height: vp`${height} + ${insetBottom}`,
@@ -229,7 +229,7 @@ const BottomSheetModal = ({
           ]}
         >
           {!disableGestureInteraction && showGestureIndicator && (
-            <View style={appearanceStyle.gestureInteractionIndicator} />
+            <View style={styles.gestureInteractionIndicator} />
           )}
           {hasHeader && (
             <Header
@@ -248,7 +248,7 @@ const BottomSheetModal = ({
 
 export default BottomSheetModal;
 
-const computedStyle = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(appearance => ({
   gestureInteractionIndicator: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.white,
     height: 4,
@@ -257,13 +257,6 @@ const computedStyle = createStyleSheet(appearance => ({
     borderRadius: 2,
     marginBottom: 4,
   },
-  bottomSheetContainer: {
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    shadowColor: appearance === 'light' ? colors.grey900 : colors.grey800,
-  },
-}));
-
-const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
   },
@@ -271,26 +264,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  bottomSheetContainer: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    width: '100%',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingTop: 16,
-    paddingHorizontal: 20,
-    shadowOffset: {
-      width: 0,
-      height: 4,
+  bottomSheetContainer: [
+    {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      width: '100%',
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      paddingTop: 16,
+      paddingHorizontal: 20,
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 29,
-
-    elevation: 7,
-  },
+    shadow(appearance, 'top'),
+  ],
   accessoryView: {
     marginBottom: 10,
     paddingHorizontal: 0,
   },
-});
+}));

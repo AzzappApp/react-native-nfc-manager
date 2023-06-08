@@ -2,7 +2,7 @@ import { useMemo, useCallback, memo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverList from '#components/CoverList';
 import SkeletonPlaceholder from '#components/Skeleton';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';

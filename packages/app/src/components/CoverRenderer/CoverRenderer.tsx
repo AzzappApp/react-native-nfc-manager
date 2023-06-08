@@ -6,7 +6,7 @@ import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
-} from '@azzapp/shared/cardHelpers';
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import PressableNative from '#ui/PressableNative';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
