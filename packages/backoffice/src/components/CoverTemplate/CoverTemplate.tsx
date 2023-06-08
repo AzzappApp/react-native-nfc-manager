@@ -148,7 +148,7 @@ const CoverTemplate = ({
         <ReferenceInput
           source="data.backgroundId"
           reference="StaticMedia"
-          filter={{ kind: 'coverBackground', available: 1 }}
+          filter={{ usage: 'coverBackground', available: 1 }}
           sort={{ field: 'name', order: 'ASC' }}
           perPage={50}
         >
@@ -178,7 +178,7 @@ const CoverTemplate = ({
         <ReferenceInput
           source="data.foregroundId"
           reference="StaticMedia"
-          filter={{ kind: 'coverForeground', available: 1 }}
+          filter={{ usage: 'coverForeground', available: 1 }}
           sort={{ field: 'name', order: 'ASC' }}
           perPage={50}
         >
