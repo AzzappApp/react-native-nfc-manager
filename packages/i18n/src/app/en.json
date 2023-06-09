@@ -1239,6 +1239,10 @@
     "defaultMessage": "Images",
     "description": "Title of the images section in carousel edition"
   },
+  "YrwqNo": {
+    "defaultMessage": "Contact Card",
+    "description": "Title of the contact card screen, displayed in the header."
+  },
   "YyZiop": {
     "defaultMessage": "Cut Video",
     "description": "Title of the cut video section in Image edition wizzar"

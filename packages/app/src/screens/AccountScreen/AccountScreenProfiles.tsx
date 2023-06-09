@@ -184,7 +184,7 @@ export default function AccountScreenProfiles({
             onProgressChange={(_, absoluteProgress) => {
               progressValue.value = absoluteProgress;
             }}
-            defaultIndex={index + 1}
+            defaultIndex={Math.min(index + 1, profiles.length)}
             renderItem={({ item }) =>
               typeof item === 'string' ? (
                 <PressableNative
