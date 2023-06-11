@@ -10,6 +10,7 @@ import type {
   CardModuleSimpleTitleResolvers,
   CardModulePhotoWithTextAndTitleResolvers,
   CardModuleSocialLinksResolvers,
+  CardModuleBlockTextResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -204,4 +205,34 @@ export const CardModuleSocialLinks: CardModuleSocialLinksResolvers = {
   marginBottom: getData('marginBottom'),
   backgroundStyle: getData('backgroundStyle', true),
   background,
+};
+
+const textBackground = (
+  cardModule: CardModuleModel,
+  _: unknown,
+  { staticMediaLoader }: GraphQLContext,
+) => {
+  const { data } = cardModule;
+  return typeof data === 'object' &&
+    data &&
+    'backgroundId' in data &&
+    typeof data.textBackgroundId === 'string'
+    ? staticMediaLoader.load(data.textBackgroundId)
+    : null;
+};
+
+export const CardModuleBlockText: CardModuleBlockTextResolvers = {
+  fontFamily: getData('fontFamily'),
+  fontColor: getData('fontColor'),
+  textAlign: getData('textAlign'),
+  fontSize: getData('fontSize'),
+  verticalSpacing: getData('verticalSpacing'),
+  textMarginVertical: getData('textMarginVertical'),
+  textMarginHorizontal: getData('textMarginHorizontal'),
+  marginHorizontal: getData('marginHorizontal'),
+  marginVertical: getData('marginVertical'),
+  backgroundStyle: getData('backgroundStyle', true),
+  textBackgroundStyle: getData('textBackgroundStyle', true),
+  background,
+  textBackground,
 };

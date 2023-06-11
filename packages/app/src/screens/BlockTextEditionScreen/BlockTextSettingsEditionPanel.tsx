@@ -1,0 +1,254 @@
+import { useState, useCallback, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useFragment, graphql } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  DEFAULT_COVER_MIN_FONT_SIZE,
+  DEFAULT_COVER_MAX_FONT_SIZE,
+} from '@azzapp/shared/coverHelpers';
+import ProfileColorPicker, {
+  ProfileColorDropDownPicker,
+} from '#components/ProfileColorPicker';
+
+import AlignmentButton from '#ui/AlignmentButton';
+import ColorPreview from '#ui/ColorPreview';
+import FontDropDownPicker from '#ui/FontDropDownPicker';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
+import TabsBar from '#ui/TabsBar';
+import type { BlockTextSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextSettingsEditionPanel_viewer.graphql';
+import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { ViewProps } from 'react-native';
+
+type BlockTextSettingsEditionPanelProps = ViewProps & {
+  viewer: BlockTextSettingsEditionPanel_viewer$key;
+  /**
+   * The fontFamily currently set on the module
+   */
+  fontFamily: string;
+  /**
+   * A callback called when the user update the fontFamily
+   */
+  onFontFamilyChange: (fontFamily: string) => void;
+  /**
+   * The fontColor currently set on the module
+   */
+  fontColor: string;
+  /**
+   * A callback called when the user update the fontColor
+   */
+  onFontColorChange: (fontColor: string) => void;
+  /**
+   * The textAlign currently set on the module
+   */
+  textAlign: TextAlignment;
+  /**
+   * A callback called when the user update the textAlign
+   */
+  onTextAlignChange: (textAlign: TextAlignment) => void;
+  /**
+   * The fontSize currently set on the module
+   */
+  fontSize: number;
+  /**
+   * A callback called when the user update the fontSize
+   */
+  onFontSizeChange: (fontSize: number) => void;
+  /**
+   * The verticalSpacing currently set on the module
+   */
+  verticalSpacing: number;
+  /**
+   * A callback called when the user update the verticalSpacing
+   */
+  onVerticalSpacingChange: (verticalSpacing: number) => void;
+  /**
+   * The height of the bottom sheet
+   */
+  bottomSheetHeight: number;
+};
+
+/**
+ * A Panel to edit the Settings of the BlockText edition screen
+ */
+const BlockTextSettingsEditionPanel = ({
+  viewer,
+  fontFamily,
+  onFontFamilyChange,
+  fontColor,
+  onFontColorChange,
+  textAlign,
+  onTextAlignChange,
+  fontSize,
+  onFontSizeChange,
+  verticalSpacing,
+  onVerticalSpacingChange,
+  style,
+  bottomSheetHeight,
+  ...props
+}: BlockTextSettingsEditionPanelProps) => {
+  const intl = useIntl();
+  const { width: windowWidth } = useWindowDimensions();
+
+  const [currentTab, setCurrentTab] = useState<string>('settings');
+
+  const { profile } = useFragment(
+    graphql`
+      fragment BlockTextSettingsEditionPanel_viewer on Viewer {
+        profile {
+          ...ProfileColorPicker_profile
+        }
+      }
+    `,
+    viewer,
+  );
+
+  const onProfileColorPickerClose = useCallback(() => {
+    setCurrentTab('settings');
+  }, [setCurrentTab]);
+
+  const tabs = useMemo(
+    () =>
+      convertToNonNullArray([
+        {
+          tabKey: 'settings',
+          label: intl.formatMessage({
+            defaultMessage: 'Settings Shape',
+            description: 'Settings Shape tab label in BlockText edition',
+          }),
+        },
+        {
+          tabKey: 'color',
+          label: intl.formatMessage({
+            defaultMessage: 'Settings color',
+            description: 'Settings color tab label in BlockText edition',
+          }),
+          rightElement: (
+            <ColorPreview color={fontColor} style={{ marginLeft: 5 }} />
+          ),
+        },
+      ]),
+    [fontColor, intl],
+  );
+
+  return (
+    <View style={[styles.root, style]} {...props}>
+      <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
+      <View style={styles.paramContainer}>
+        <View style={styles.buttonContainer}>
+          <FontDropDownPicker
+            fontFamily={fontFamily}
+            onFontFamilyChange={onFontFamilyChange}
+            bottomSheetHeight={bottomSheetHeight}
+          />
+          <ProfileColorDropDownPicker
+            profile={profile!}
+            color={fontColor}
+            onColorChange={onFontColorChange}
+            bottomSheetHeight={bottomSheetHeight}
+          />
+          <AlignmentButton
+            alignment={textAlign}
+            onAlignmentChange={onTextAlignChange}
+          />
+        </View>
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Font Size : {size}"
+              description="fontSize message in BlockText edition"
+              values={{
+                size: fontSize,
+              }}
+            />
+          }
+          value={fontSize}
+          min={DEFAULT_COVER_MIN_FONT_SIZE}
+          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          step={1}
+          interval={Math.floor(
+            (windowWidth - 80) /
+              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
+          )}
+          onChange={onFontSizeChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'FontSize',
+            description: 'Label of the fontSize slider in BlockText edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the fontSize',
+            description: 'Hint of the fontSize slider in BlockText edition',
+          })}
+          style={styles.slider}
+        />
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Vertical Space : {size}"
+              description="vertical Spacing message in BlockText edition"
+              values={{
+                size: verticalSpacing,
+              }}
+            />
+          }
+          value={verticalSpacing}
+          min={0}
+          max={10}
+          step={1}
+          interval={Math.floor((windowWidth - 80) / 10)}
+          onChange={onVerticalSpacingChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Vertical Spacing',
+            description:
+              'Label of the verticalSpacing slider in BlockText edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the vertical Spacing',
+            description:
+              'Hint of the vertical Spacing slider in BlockText edition',
+          })}
+          style={styles.slider}
+        />
+      </View>
+      {profile && (
+        <ProfileColorPicker
+          visible={currentTab !== 'settings'}
+          height={bottomSheetHeight}
+          profile={profile}
+          title={intl.formatMessage({
+            defaultMessage: ' color',
+            description: ' color title in BlockText edition',
+          })}
+          selectedColor={fontColor}
+          onColorChange={onFontColorChange}
+          onRequestClose={onProfileColorPickerClose}
+        />
+      )}
+    </View>
+  );
+};
+
+export default BlockTextSettingsEditionPanel;
+
+const styles = StyleSheet.create({
+  root: {
+    paddingHorizontal: 20,
+    rowGap: 15,
+    justifyContent: 'flex-start',
+  },
+  buttonContainer: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    columnGap: 15,
+  },
+  paramContainer: {
+    width: '100%',
+    flex: 1,
+    rowGap: 25,
+    justifyContent: 'center',
+  },
+  slider: {
+    width: '90%',
+    alignSelf: 'center',
+  },
+});

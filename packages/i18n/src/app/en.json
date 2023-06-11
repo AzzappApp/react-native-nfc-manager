@@ -1,4 +1,8 @@
 {
+  "+5tXtC": {
+    "defaultMessage": "Save",
+    "description": "Save button label in  Line Divider module screen"
+  },
   "+QfAxY": {
     "defaultMessage": "Slide to change the bottom margin size",
     "description": "Hint of the bottom margin slider in Line Divider edition"
@@ -23,6 +27,10 @@
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in SocialLinks edition"
   },
+  "/SGxw5": {
+    "defaultMessage": "Text top/bottom margin : {size}",
+    "description": "Text top/bottom margin message in BlockText edition"
+  },
   "/TIhgi": {
     "defaultMessage": "Create a new account",
     "description": "Create a new account button label"
@@ -38,6 +46,10 @@
   "/cVb8L": {
     "defaultMessage": "Please enter a valid phone number",
     "description": "Signup Screen - Error message for invalid phone number"
+  },
+  "/lVuhj": {
+    "defaultMessage": "Font Size : {size}",
+    "description": "fontSize message in BlockText edition"
   },
   "/u5+bX": {
     "defaultMessage": "Press to edit this section of your profile",
@@ -114,6 +126,14 @@
   "26s2Jf": {
     "defaultMessage": "No followers",
     "description": "Message displayed in the followers screen when the user has no followers"
+  },
+  "2Bk2+R": {
+    "defaultMessage": "Save",
+    "description": "Save button label in Block Text module screen"
+  },
+  "2DBmzT": {
+    "defaultMessage": "Space left/right : {size}",
+    "description": "Space left/right message in BlockText edition"
   },
   "2EoPMO": {
     "defaultMessage": "Mobile",
@@ -275,6 +295,10 @@
     "defaultMessage": "{title} - background image",
     "description": "CoverRenderer - Accessibility cover image"
   },
+  "6tePdC": {
+    "defaultMessage": "Preview",
+    "description": "BlockText bottom menu label for Preview tab"
+  },
   "6x/B5C": {
     "defaultMessage": "Title size : {size}",
     "description": "Title size message in PhotoWithTextAndTitle edition"
@@ -294,10 +318,6 @@
   "7HPaV3": {
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
-  },
-  "7J2uu7": {
-    "defaultMessage": "Cancel",
-    "description": "Cancel button label in Line Divier module screen"
   },
   "7SXLKR": {
     "defaultMessage": "Image gap : {size}",
@@ -331,6 +351,14 @@
     "defaultMessage": "Select all",
     "description": "Select all button label in profile edition screen"
   },
+  "8oWzcI": {
+    "defaultMessage": "Vertical Spacing",
+    "description": "Label of the verticalSpacing slider in BlockText edition"
+  },
+  "9+XQvm": {
+    "defaultMessage": "Settings color",
+    "description": "Settings color tab label in BlockText edition"
+  },
   "9/DfwF": {
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
@@ -350,6 +378,14 @@
   "9CiKNc": {
     "defaultMessage": "Edit Settings",
     "description": "SimpleButton bottom menu label for Settings tab"
+  },
+  "9PmLw5": {
+    "defaultMessage": "color",
+    "description": " color title in BlockText edition"
+  },
+  "9V1VyB": {
+    "defaultMessage": "Space left/right",
+    "description": "Label of the Space left/right slider in BlockText edition"
   },
   "9djJN/": {
     "defaultMessage": "Torch",
@@ -378,6 +414,10 @@
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
+  },
+  "AL14KG": {
+    "defaultMessage": "Vertical Space : {size}",
+    "description": "vertical Spacing message in BlockText edition"
   },
   "AV7xEU": {
     "defaultMessage": "Font size",
@@ -439,6 +479,10 @@
     "defaultMessage": "Posts",
     "description": "Number of posts"
   },
+  "BuqklW": {
+    "defaultMessage": "FontSize",
+    "description": "Label of the fontSize slider in BlockText edition"
+  },
   "Bv7fXL": {
     "defaultMessage": "Cancel",
     "description": "Cancel edit modules button label in profile edition screen"
@@ -482,6 +526,10 @@
   "CmkC/M": {
     "defaultMessage": "Slide to change the border size",
     "description": "Hint of the border size slider in carousel edition"
+  },
+  "D1GdDl": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Simple Button module screen"
   },
   "D44+KI": {
     "defaultMessage": "Edit Links",
@@ -587,6 +635,10 @@
     "defaultMessage": "Text size : {size}",
     "description": "textSize message in PhotoWithTextAndTitle edition"
   },
+  "F4CT77": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Line Divider module screen"
+  },
   "F6MOFe": {
     "defaultMessage": "Opens a list of countries and allows you to select a calling code",
     "description": "Account details - The accessibility hint for the country selector"
@@ -602,6 +654,10 @@
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
+  },
+  "FbPo0C": {
+    "defaultMessage": "Slide to change the Text top/bottom margin",
+    "description": "Hint of the Text top/bottom margin slider in BlockText edition"
   },
   "Fd2baV": {
     "defaultMessage": "Log in",
@@ -622,6 +678,10 @@
   "GQ5mTZ": {
     "defaultMessage": "RGB",
     "description": "ColorPicker Component - TextInput Label : RGB Title"
+  },
+  "GU8tZS": {
+    "defaultMessage": "Slide to change the background opacity",
+    "description": "Hint of the Photo Opacityslider in BlockText edition"
   },
   "GXaNDm": {
     "defaultMessage": "Account details",
@@ -654,6 +714,10 @@
   "HQ/owO": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
+  },
+  "HXeYa9": {
+    "defaultMessage": "Edit TextBackground",
+    "description": "BlockText bottom menu label for TextBackground tab"
   },
   "HZ+X+F": {
     "defaultMessage": "Edit margins",
@@ -710,6 +774,10 @@
   "K4Uiwb": {
     "defaultMessage": "Preview",
     "description": "Simple text  bottom menu label for Preview tab"
+  },
+  "K6szu7": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Block Text module screen"
   },
   "K8vqTk": {
     "defaultMessage": "Filters",
@@ -782,6 +850,10 @@
   "LOvPdv": {
     "defaultMessage": "Crop",
     "description": "Crop image edition parameters name"
+  },
+  "LYTS8u": {
+    "defaultMessage": "Save",
+    "description": "Save button label in Socia Link module screen"
   },
   "Lb36ju": {
     "defaultMessage": "Slide to change the Text size",
@@ -891,6 +963,10 @@
     "defaultMessage": "Border radius",
     "description": "Label of the border radius in carousel edition"
   },
+  "OjytWi": {
+    "defaultMessage": "Margin left/right : {size}",
+    "description": "margin size message in cover edition"
+  },
   "Oqezmf": {
     "defaultMessage": "Comment the post",
     "description": "PostRendererActionBar Comment post button accessibility"
@@ -939,6 +1015,10 @@
     "defaultMessage": "Preview",
     "description": "Line Divider bottom menu label for Preview tab"
   },
+  "R2ZPmW": {
+    "defaultMessage": "Space top/bottom : {size}",
+    "description": "Space top/bottom message in BlockText edition"
+  },
   "RDCQtK": {
     "defaultMessage": "Account details",
     "description": "Link to open account details form to change email, phone number, etc."
@@ -982,6 +1062,10 @@
   "SjPeXD": {
     "defaultMessage": "Hex",
     "description": "HexColorTextInput Component Hex Title"
+  },
+  "SkGmfi": {
+    "defaultMessage": "TextBackground",
+    "description": "Label of TextBackground tab in Horizontal photo edition"
   },
   "Slf0gz": {
     "defaultMessage": "Create a new profile",
@@ -1107,6 +1191,10 @@
     "defaultMessage": "Shutter",
     "description": "Accessibility label for the camera shutter button"
   },
+  "V0juXX": {
+    "defaultMessage": "Save",
+    "description": "Save button label in Simple Button module screen"
+  },
   "V6G3FX": {
     "defaultMessage": "Link URL",
     "description": "The link URL option in the country selector for simple button module"
@@ -1187,6 +1275,14 @@
     "defaultMessage": "Position",
     "description": "Label of the position button in cover edition"
   },
+  "XA/JDM": {
+    "defaultMessage": "Photo opacity : {opacity}",
+    "description": "Photo Opacity message in BlockText edition"
+  },
+  "XDF/aT": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Photo with text and title module screen"
+  },
   "XID3dP": {
     "defaultMessage": "Post",
     "description": "Post Comment screen - create comment action button"
@@ -1203,13 +1299,13 @@
     "defaultMessage": "Following",
     "description": "Title of the screen listing followed profiles"
   },
-  "XVlOcg": {
-    "defaultMessage": "Margin size",
-    "description": "Label of the font size slider in cover edition"
-  },
   "XmCDkN": {
     "defaultMessage": "Mobile",
     "description": "Mobile view mode title in web card preview"
+  },
+  "Xu37wL": {
+    "defaultMessage": "Slide to change the textBackground opacity",
+    "description": "Hint of the Photo Opacityslider in BlockText edition"
   },
   "Y9Wn80": {
     "defaultMessage": "Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}",
@@ -1239,10 +1335,6 @@
     "defaultMessage": "Images",
     "description": "Title of the images section in carousel edition"
   },
-  "YrwqNo": {
-    "defaultMessage": "Contact Card",
-    "description": "Title of the contact card screen, displayed in the header."
-  },
   "YyZiop": {
     "defaultMessage": "Cut Video",
     "description": "Title of the cut video section in Image edition wizzar"
@@ -1250,6 +1342,10 @@
   "Z/JEKj": {
     "defaultMessage": "Horizontal alignment for web only",
     "description": "Label of the Horizontal alignment button"
+  },
+  "Z9Kyor": {
+    "defaultMessage": "Slide to change the fontSize",
+    "description": "Hint of the fontSize slider in BlockText edition"
   },
   "ZLVIR9": {
     "defaultMessage": "Please enter your current password",
@@ -1407,6 +1503,10 @@
     "defaultMessage": "Slide to change the Image/Text Gap",
     "description": "Hint of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
   },
+  "cSQSLt": {
+    "defaultMessage": "Text left/right margin : {size}",
+    "description": "textMarginHorizontal message in BlockText edition"
+  },
   "calqIB": {
     "defaultMessage": "Connect with phone number",
     "description": "Signup Form Connect with phone number section title in country selection list"
@@ -1471,6 +1571,10 @@
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
   },
+  "e1XbtE": {
+    "defaultMessage": "BlockText",
+    "description": "BlockText text screen title"
+  },
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
@@ -1527,6 +1631,10 @@
     "defaultMessage": "Spacing",
     "description": "Label of the Spacing slider in SocialLinks edition"
   },
+  "fkPpUB": {
+    "defaultMessage": "Edit SectionBackground",
+    "description": "BlockText bottom menu label for SectionBackground tab"
+  },
   "fotQfe": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
@@ -1563,6 +1671,10 @@
     "defaultMessage": "Latest",
     "description": "Latest photos album title in image wizzard album selection "
   },
+  "ga/0jg": {
+    "defaultMessage": "Slide to change the Text left/right margin",
+    "description": "Hint of the Text left/right margin slider in BlockText edition"
+  },
   "gj4EIT": {
     "defaultMessage": "Original ratio",
     "description": "Accessibility value of the image ratio button in carousel edition"
@@ -1582,6 +1694,10 @@
   "hFNpbJ": {
     "defaultMessage": "Tap to accept the privacy policy",
     "description": "Signup Screen - Accessibility checkbox  Privacy Policy"
+  },
+  "hJX+Br": {
+    "defaultMessage": "Slide to change the vertical Spacing",
+    "description": "Hint of the vertical Spacing slider in BlockText edition"
   },
   "hLrm6h": {
     "defaultMessage": "Slide to change the Left/right margin size",
@@ -1606,6 +1722,10 @@
   "hnj8Qa": {
     "defaultMessage": "Text alignment",
     "description": "Label of the text alignment button"
+  },
+  "hogMDt": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Social Link module screen"
   },
   "hwL8A0": {
     "defaultMessage": "Follow",
@@ -1655,10 +1775,6 @@
     "defaultMessage": "Crop",
     "description": "Accessibility label of the crop button"
   },
-  "jFpYcY": {
-    "defaultMessage": "Margin left/right : {size}",
-    "description": "Font size message in cover edition"
-  },
   "jGL8Jo": {
     "defaultMessage": "Slide to change theVertical Spacing",
     "description": "Hint of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
@@ -1678,6 +1794,10 @@
   "jbyp1F": {
     "defaultMessage": "Select an image",
     "description": "Accessibility label of the image selection button"
+  },
+  "jddgDJ": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button label in Horizontal Photo module screen"
   },
   "jjn0/J": {
     "defaultMessage": "Top right",
@@ -1714,6 +1834,10 @@
   "kcISgN": {
     "defaultMessage": "Slide to change the Top margin",
     "description": "Hint of the Top margin slider in SocialLinks edition"
+  },
+  "kez1qy": {
+    "defaultMessage": "Edit editor",
+    "description": "BlockText bottom menu label for editor tab"
   },
   "kf7mLc": {
     "defaultMessage": "Image",
@@ -1783,6 +1907,10 @@
     "defaultMessage": "Tap to sign up",
     "description": "Signup Screen - Accessibility Sign Up button"
   },
+  "m6YUMx": {
+    "defaultMessage": "Slide to change the Space left/right",
+    "description": "Hint of the Space left/right slider in BlockText edition"
+  },
   "mCXDhl": {
     "defaultMessage": "Warmth",
     "description": "Temperature/warmth image edition parameters name"
@@ -1843,9 +1971,25 @@
     "defaultMessage": "Left",
     "description": "Label of the left alignment button"
   },
+  "nmvYrw": {
+    "defaultMessage": "Save",
+    "description": "Save button label in Horizontal Photo module screen"
+  },
   "noNWRA": {
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
+  },
+  "nwwOkD": {
+    "defaultMessage": "Settings Shape",
+    "description": "Settings Shape tab label in BlockText edition"
+  },
+  "nybB30": {
+    "defaultMessage": "Text left/right margin",
+    "description": "Label of the Text left/right margin slider in BlockText edition"
+  },
+  "o+JAoD": {
+    "defaultMessage": "Text top/bottom margin",
+    "description": "Label of the Text top/bottom margin slider in BlockText edition"
   },
   "o5n4Hq": {
     "defaultMessage": "Enter text",
@@ -1935,6 +2079,14 @@
     "defaultMessage": "Thermal",
     "description": "Thermal photo filter name"
   },
+  "q63qIK": {
+    "defaultMessage": "Margin size",
+    "description": "Label of the margin size slider in cover edition"
+  },
+  "q8/tam": {
+    "defaultMessage": "Space top/bottom",
+    "description": "Label of the Space top/bottom slider in BlockText edition"
+  },
   "qEenwJ": {
     "defaultMessage": "You need to accept the Terms of Service and the Privacy Policy",
     "description": "Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
@@ -1950,6 +2102,10 @@
   "qkbfOu": {
     "defaultMessage": "Middle left",
     "description": "Label of the middle left position in cover edition"
+  },
+  "qp953u": {
+    "defaultMessage": "Save",
+    "description": "Save button label in  Photo with text and title module screen"
   },
   "qpleHz": {
     "defaultMessage": "Configuration",
@@ -1995,6 +2151,10 @@
     "defaultMessage": "Connect with email address",
     "description": "Signup Form Connect with email address section title in country selection list"
   },
+  "rgQ1ol": {
+    "defaultMessage": "Edit Margins",
+    "description": "BlockText bottom menu label for Margins tab"
+  },
   "rjw+jc": {
     "defaultMessage": "Username",
     "description": "Username field in the account details screen"
@@ -2014,6 +2174,10 @@
   "s1m1n4": {
     "defaultMessage": "Enter your phone number",
     "description": "Signup Screen - Accessibility TextInput phone number"
+  },
+  "s5MWk0": {
+    "defaultMessage": "TextBackground opacity",
+    "description": "Label of the Photo Opacityslider in BlockText edition"
   },
   "sIONS1": {
     "defaultMessage": "Adjust",
@@ -2058,10 +2222,6 @@
   "svvJtX": {
     "defaultMessage": "Slide to change the background opacity",
     "description": "Hint of the Background opacity slider in carousel edition"
-  },
-  "syIp68": {
-    "defaultMessage": "Save",
-    "description": "Save button label in  Line Divier module screen"
   },
   "tBKg6x": {
     "defaultMessage": "Left/Right margin : {size}",
@@ -2163,6 +2323,14 @@
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
   },
+  "varCCz": {
+    "defaultMessage": "Background opacity",
+    "description": "Label of the Photo Opacityslider in BlockText edition"
+  },
+  "vpm4+X": {
+    "defaultMessage": "Edit Settings",
+    "description": "BlockText bottom menu label for Settings tab"
+  },
   "w+BjOj": {
     "defaultMessage": "Slide to change the Spacing",
     "description": "Hint of the Spacing slider in SocialLinks edition"
@@ -2231,6 +2399,10 @@
     "defaultMessage": "Cancel",
     "description": "Cancel button label in cover edition screen"
   },
+  "xbxx1v": {
+    "defaultMessage": "Margins",
+    "description": "Title of the Margins section in BlockText edition"
+  },
   "xdgLVe": {
     "defaultMessage": "Background opacity",
     "description": "Label of the Background opacity slider in simple text edition"
@@ -2238,6 +2410,14 @@
   "xfDyjW": {
     "defaultMessage": "Slide to change the background opacity",
     "description": "Hint of the Background opacity slider in simple text edition"
+  },
+  "xo15bY": {
+    "defaultMessage": "Slide to change the font size",
+    "description": "Hint of the margin size slider in cover edition"
+  },
+  "xqefEf": {
+    "defaultMessage": "Slide to change the Space top/bottom",
+    "description": "Hint of the Space top/bottom slider in BlockText edition"
   },
   "xyV44Y": {
     "defaultMessage": "Cancel",

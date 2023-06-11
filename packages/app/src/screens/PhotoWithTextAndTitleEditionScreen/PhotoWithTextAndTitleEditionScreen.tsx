@@ -343,9 +343,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onBorderRadiusChange = fieldUpdateHandler('borderRadius');
 
-  const onHorizontalMarginChange = fieldUpdateHandler('marginHorizontal');
+  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
 
-  const onVerticalMarginChange = fieldUpdateHandler('marginVertical');
+  const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
 
   const onVerticalSpacingChange = fieldUpdateHandler('verticalSpacing');
 
@@ -415,7 +415,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description:
+                'Cancel button label in Photo with text and title module screen',
             })}
           />
         }
@@ -425,7 +426,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description:
+                'Save button label in  Photo with text and title module screen',
             })}
           />
         }
@@ -492,9 +494,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleMarginsEditionPanel
                 marginHorizontal={marginHorizontal}
-                onHorizontalMarginChange={onHorizontalMarginChange}
+                onMarginHorizontalChange={onMarginHorizontalChange}
                 marginVertical={marginVertical}
-                onVerticalMarginChange={onVerticalMarginChange}
+                onMarginVerticalChange={onMarginVerticalChange}
                 gap={gap}
                 onGapChange={onGapChange}
                 style={{

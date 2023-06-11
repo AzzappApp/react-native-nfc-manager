@@ -4,6 +4,7 @@ import deleteModules from './deleteModules';
 import duplicateModule from './duplicateModule';
 import togglePostReaction from './postReaction';
 import removeFollower from './removeFollower';
+import saveBlockTextModule from './saveBlockTextModule';
 import saveCarouselModule from './saveCarouselModule';
 import saveHorizontalPhotoModule from './saveHorizontalPhotoModule';
 import saveLineDividerModule from './saveLineDividerModule';
@@ -60,6 +61,7 @@ export const Mutation: MutationResolvers = {
   updateProfile: createMutationWithClientMutationId(updateProfile),
   updateUser: createMutationWithClientMutationId(updateUser),
   updateCover: createMutationWithClientMutationId(updateCover),
+  updateCard: createMutationWithClientMutationId(updateCard),
   createPost: createMutationWithClientMutationId(createPost),
   toggleFollowing: createMutationWithClientMutationId(toggleFollowing),
   removeFollower: createMutationWithClientMutationId(removeFollower),
@@ -76,13 +78,13 @@ export const Mutation: MutationResolvers = {
   savePhotoWithTextAndTitleModule: createMutationWithClientMutationId(
     savePhotoWithTextAndTitleModule,
   ),
-  updateCard: createMutationWithClientMutationId(updateCard),
   saveSimpleButtonModule: createMutationWithClientMutationId(
     saveSimpleButtonModule,
   ),
   saveSocialLinksModule: createMutationWithClientMutationId(
     saveSocialLinksModule,
   ),
+  saveBlockTextModule: createMutationWithClientMutationId(saveBlockTextModule),
   swapModules: createMutationWithClientMutationId(swapModules),
   deleteModules: createMutationWithClientMutationId(deleteModules),
   duplicateModule: createMutationWithClientMutationId(duplicateModule),

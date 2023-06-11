@@ -268,7 +268,7 @@ const SimpleButtonEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description: 'Cancel button label in Simple Button module screen',
             })}
           />
         }
@@ -278,7 +278,7 @@ const SimpleButtonEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description: 'Save button label in Simple Button module screen',
             })}
           />
         }

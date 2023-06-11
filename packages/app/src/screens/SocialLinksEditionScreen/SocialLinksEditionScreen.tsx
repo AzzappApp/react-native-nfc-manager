@@ -257,7 +257,7 @@ const SocialLinksEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description: 'Cancel button label in Social Link module screen',
             })}
           />
         }
@@ -267,7 +267,7 @@ const SocialLinksEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description: 'Save button label in Socia Link module screen',
             })}
           />
         }

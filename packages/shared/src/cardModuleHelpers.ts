@@ -148,3 +148,16 @@ export const SOCIAL_LINKS_DEFAULT_VALUES = {
   marginTop: 20,
   marginBottom: 20,
 } as const;
+
+export const BLOCK_TEXT_DEFAULT_VALUES = {
+  fontFamily: 'Arial',
+  fontColor: '#000000',
+  textAlign: 'left',
+  fontSize: 14,
+  verticalSpacing: 1,
+  textMarginHorizontal: 20,
+  textMarginVertical: 20,
+  marginHorizontal: 20,
+  marginVertical: 20,
+  text: '',
+} as const;

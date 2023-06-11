@@ -53,7 +53,7 @@ const ModuleSelectionListModal = ({
           }),
           image_light: require('./../../assets/module/blockText_light.png'),
           image_dark: require('./../../assets/module/blockText_dark.png'),
-          ready: false,
+          ready: true,
         },
         {
           moduleKind: 'simpleTitle',

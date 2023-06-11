@@ -27,8 +27,10 @@ import {
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
+import BlockTextRenderer from '#components/BlockTextRenderer';
 import CarouselRenderer from '#components/CarouselRenderer';
 import CoverRenderer from '#components/CoverRenderer';
 import HorizontalPhotoRenderer from '#components/HorizontalPhotoRenderer';
@@ -405,6 +407,7 @@ const _ProfileScreenBody = (
           id
           kind
           visible
+          ...BlockTextRenderer_module
           ...PhotoWithTextAndTitleRenderer_module
           ...SocialLinksRenderer_module
           ...HorizontalPhotoRenderer_module
@@ -785,6 +788,9 @@ const _ProfileScreenBody = (
       )}
       {module.kind === MODULE_KIND_SOCIAL_LINKS && (
         <SocialLinksRenderer module={module} />
+      )}
+      {module.kind === MODULE_KIND_BLOCK_TEXT && (
+        <BlockTextRenderer module={module} />
       )}
     </ProfileBlockContainerMemo>
   ));

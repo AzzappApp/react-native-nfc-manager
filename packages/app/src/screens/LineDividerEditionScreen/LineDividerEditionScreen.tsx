@@ -209,7 +209,7 @@ const LineDividerEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description: 'Cancel button label in Line Divider module screen',
             })}
           />
         }
@@ -219,7 +219,7 @@ const LineDividerEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description: 'Save button label in  Line Divider module screen',
             })}
           />
         }

@@ -11,9 +11,11 @@ import {
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
+import BlockTextRenderer, { BlockTextRendererRaw } from './BlockTextRenderer';
 import CarouselRenderer, { CarouselRendererRaw } from './CarouselRenderer';
 import CoverRenderer from './CoverRenderer';
 import HorizontalPhotoRenderer, {
@@ -35,6 +37,7 @@ import SocialLinksRenderer, {
   SocialLinksRendererRaw,
 } from './SocialLinksRenderer';
 import SwitchToggle from './SwitchToggle';
+import type { BlockTextRawData } from './BlockTextRenderer';
 import type { CarouselRawData } from './CarouselRenderer';
 import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
 import type { LineDividerRawData } from './LineDividerRenderer';
@@ -90,7 +93,13 @@ type SocialLinksModuleInfo = {
   data: PhotoWithTextAndTitleRawData;
 };
 
+type BlockTextModuleInfo = {
+  kind: typeof MODULE_KIND_BLOCK_TEXT;
+  data: BlockTextRawData;
+};
+
 type ModuleInfo =
+  | BlockTextModuleInfo
   | CarouselModuleInfo
   | HorizontalPhotoModuleInfo
   | LineDividerModuleInfo
@@ -132,6 +141,7 @@ const WebCardPreview = ({
                 ...SimpleButtonRenderer_module
                 ...PhotoWithTextAndTitleRenderer_module
                 ...SocialLinksRenderer_module
+                ...BlockTextRenderer_module
               }
             }
             ...ProfileColorPicker_profile
@@ -262,6 +272,14 @@ const WebCardPreview = ({
             onLayout={onEditedModuleLayout}
           />
         );
+      case MODULE_KIND_BLOCK_TEXT:
+        return (
+          <BlockTextRendererRaw
+            data={editedModuleInfo.data}
+            key={module.id}
+            onLayout={onEditedModuleLayout}
+          />
+        );
       default:
         return null;
     }
@@ -330,6 +348,8 @@ const WebCardPreview = ({
               );
             case MODULE_KIND_SOCIAL_LINKS:
               return <SocialLinksRenderer module={module} key={module.id} />;
+            case MODULE_KIND_BLOCK_TEXT:
+              return <BlockTextRenderer module={module} key={module.id} />;
             default:
               return null;
           }

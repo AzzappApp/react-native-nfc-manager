@@ -1,0 +1,65 @@
+import { fetchQuery, graphql, usePreloadedQuery } from 'react-relay';
+import { MODULE_KIND_BLOCK_TEXT } from '@azzapp/shared/cardModuleHelpers';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import BlockTextEditionScreen from '#screens/BlockTextEditionScreen';
+import type { BlockTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/BlockTextEditionMobileScreenQuery.graphql';
+import type { BlockTextEditionScreen_module$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_module.graphql';
+import type { PreloadedQuery } from 'react-relay';
+
+type BlockTextEditionMobileScreenProps = {
+  /**
+   * The id of the module to edit
+   */
+  moduleId?: string;
+  /**
+   * The preloaded query for the screen
+   */
+  preloadedQuery: PreloadedQuery<BlockTextEditionMobileScreenQuery>;
+};
+
+/**
+ * Mobile specific screen for the BlockText edition
+ * (In case of future web support)
+ */
+const BlockTextEditionMobileScreen = ({
+  moduleId,
+  preloadedQuery,
+}: BlockTextEditionMobileScreenProps) => {
+  const data = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+
+  let module: BlockTextEditionScreen_module$key | null = null;
+  if (moduleId != null) {
+    module =
+      data.viewer.profile?.card?.modules.find(
+        module =>
+          module?.id === moduleId && module?.kind === MODULE_KIND_BLOCK_TEXT,
+      ) ?? null;
+    if (!module) {
+      // TODO
+    }
+  }
+
+  return <BlockTextEditionScreen module={module} viewer={data.viewer} />;
+};
+
+const BlockTextQuery = graphql`
+  query BlockTextEditionMobileScreenQuery {
+    viewer {
+      ...BlockTextEditionScreen_viewer
+      profile {
+        card {
+          modules {
+            id
+            kind
+            ...BlockTextEditionScreen_module
+          }
+        }
+      }
+    }
+  }
+`;
+
+export default BlockTextEditionMobileScreen;
+
+BlockTextEditionMobileScreen.prefetch = () =>
+  fetchQuery(getRelayEnvironment(), BlockTextQuery, {});

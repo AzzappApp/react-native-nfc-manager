@@ -64,11 +64,11 @@ const SimpleTextMarginEditionPanel = ({
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
-            description: 'Label of the font size slider in cover edition',
+            description: 'Label of the margin size slider in cover edition',
           })}
           accessibilityHint={intl.formatMessage({
             defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
+            description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
         />
@@ -76,7 +76,7 @@ const SimpleTextMarginEditionPanel = ({
           label={
             <FormattedMessage
               defaultMessage="Margin left/right : {size}"
-              description="Font size message in cover edition"
+              description="margin size message in cover edition"
               values={{
                 size: marginHorizontal,
               }}
@@ -90,11 +90,11 @@ const SimpleTextMarginEditionPanel = ({
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
-            description: 'Label of the font size slider in cover edition',
+            description: 'Label of the margin size slider in cover edition',
           })}
           accessibilityHint={intl.formatMessage({
             defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
+            description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
         />
