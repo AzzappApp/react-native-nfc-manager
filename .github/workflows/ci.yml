@@ -10,9 +10,6 @@ jobs:
   continuous-integration :
     name: Validate and test and Build
     runs-on: macos-12
-    env:
-      TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
-      TURBO_TEAM: azzapp
     steps:
       - uses: actions/checkout@v3
 
