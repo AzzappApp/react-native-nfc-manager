@@ -88,7 +88,7 @@ const RGBHexColorPicker = ({
         setLocalColor(prev => ({ ...prev, green: '' }));
       } else if (!isNaN(+color)) {
         const green = Math.min(parseInt(color, 10), 255);
-        const previous = chromaColorRgb.current[0];
+        const previous = chromaColorRgb.current[1];
         if (previous === green) {
           setLocalColor(prev => ({ ...prev, green: String(green) }));
           return;
@@ -122,7 +122,7 @@ const RGBHexColorPicker = ({
         setLocalColor(prev => ({ ...prev, blue: '' }));
       } else if (!isNaN(+color)) {
         const blue = Math.min(parseInt(color, 10), 255);
-        const previous = chroma.hsv(hue, saturation, value).rgb()[0];
+        const previous = chromaColorRgb.current[2];
         if (previous === blue) {
           setLocalColor(prev => ({ ...prev, blue: String(blue) }));
           return;
@@ -138,7 +138,7 @@ const RGBHexColorPicker = ({
         );
       }
     },
-    [hue, localColor.green, localColor.red, onChange, saturation, value],
+    [localColor.green, localColor.red, onChange],
   );
 
   const onEndSubmittingBlue = useCallback(() => {
