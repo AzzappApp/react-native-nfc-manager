@@ -170,7 +170,7 @@ const BlockTextEditionScreen = ({
       textBackgroundId:
         blockText?.textBackground?.id !== data.textBackground?.id
           ? updateTextBackground?.id ?? null
-          : blockText?.background?.id ?? null,
+          : blockText?.textBackground?.id ?? null,
       ...rest,
     };
 
@@ -300,7 +300,7 @@ const BlockTextEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'BlockText',
+          defaultMessage: 'Text Block',
           description: 'BlockText text screen title',
         })}
         leftElement={

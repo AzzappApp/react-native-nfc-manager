@@ -15,6 +15,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
+import TitleWithLine from '#ui/TitleWithLine';
 import BlockTextRenderer, {
   BlockTextRendererRaw,
 } from './cardModules/BlockTextRenderer';
@@ -292,6 +293,13 @@ const WebCardPreview = ({
   return (
     <View {...props} style={[{ flex: 1 }, style]}>
       <Container style={{ padding: 8 }}>
+        <TitleWithLine
+          style={{ backgroundColor: 'transparent' }}
+          title={intl.formatMessage({
+            defaultMessage: 'Preview',
+            description: 'Webcard preview - Preview title',
+          })}
+        />
         <SwitchToggle
           value={viewMode}
           onChange={setViewMode}

@@ -271,10 +271,6 @@
     "defaultMessage": "Tap to switch between front and back camera",
     "description": "camera flip button accessibility hint"
   },
-  "6To5Jx": {
-    "defaultMessage": "Anyone can download your contact card from your profile.",
-    "description": "Description of the public contact card toggle."
-  },
   "6V9XJr": {
     "defaultMessage": "Allow Azzapp to access your photos",
     "description": "Camera authorization screen title for photos permission"
@@ -302,10 +298,6 @@
   "6tePdC": {
     "defaultMessage": "Preview",
     "description": "BlockText bottom menu label for Preview tab"
-  },
-  "6uZTai": {
-    "defaultMessage": "Your Contact Card is a convenient way to share your contact information.",
-    "description": "Description of the contact card screen."
   },
   "6x/B5C": {
     "defaultMessage": "Title size : {size}",
@@ -523,10 +515,6 @@
     "defaultMessage": "Username can’t contain space or special caracters",
     "description": "NewProfileScreen - Username Error"
   },
-  "CVzXRv": {
-    "defaultMessage": "Share",
-    "description": "Share button label"
-  },
   "CcpVyl": {
     "defaultMessage": "Share",
     "description": ""
@@ -538,10 +526,6 @@
   "CmkC/M": {
     "defaultMessage": "Slide to change the border size",
     "description": "Hint of the border size slider in carousel edition"
-  },
-  "CzmHsY": {
-    "defaultMessage": "Public contact card",
-    "description": "When true the contact card is public"
   },
   "D1GdDl": {
     "defaultMessage": "Cancel",
@@ -723,6 +707,10 @@
     "defaultMessage": "Tap to start recording",
     "description": "Accessibility label for the camera shutter button"
   },
+  "HKohVF": {
+    "defaultMessage": "Social platforms",
+    "description": "SocialLinks text screen title"
+  },
   "HLKVM1": {
     "defaultMessage": "New password",
     "description": "ChangePassword Screen - New password"
@@ -835,6 +823,10 @@
     "defaultMessage": "Invite Friends",
     "description": "Title of the screen where the user can invite friends to the app"
   },
+  "KvhpyG": {
+    "defaultMessage": "Text Block",
+    "description": "BlockText text screen title"
+  },
   "L0l2Pm": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in Line Divider edition"
@@ -886,10 +878,6 @@
   "Lp4WhG": {
     "defaultMessage": "Top margin",
     "description": "Label of the marginTop slider in SimpleButton edition"
-  },
-  "Lstcrv": {
-    "defaultMessage": "SocialLinks",
-    "description": "SocialLinks text screen title"
   },
   "M/YmS/": {
     "defaultMessage": "Border shape",
@@ -967,10 +955,6 @@
     "defaultMessage": "Show password",
     "description": "Password text input - show password button accessibility label"
   },
-  "OKOTHE": {
-    "defaultMessage": "Anyone can download your contact card from your profile.",
-    "description": "Description of the display on my webcard toggle."
-  },
   "OPcjcW": {
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
@@ -1026,10 +1010,6 @@
   "PnC9oY": {
     "defaultMessage": "Bottom Margin size",
     "description": "Label of the bottom margin size slider in Line Divider edition"
-  },
-  "Q0rNS5": {
-    "defaultMessage": "Edit card details",
-    "description": "Edit card details button label"
   },
   "QjKfB6": {
     "defaultMessage": "Fore.",
@@ -1110,6 +1090,10 @@
   "Sy9kWZ": {
     "defaultMessage": "Done",
     "description": "ColorPicker component Done Color button label"
+  },
+  "Sz0fxO": {
+    "defaultMessage": "Preview",
+    "description": "Webcard preview - Preview title"
   },
   "T0/SRc": {
     "defaultMessage": "Top margin : {size}",
@@ -1359,10 +1343,6 @@
     "defaultMessage": "Images",
     "description": "Title of the images section in carousel edition"
   },
-  "YrwqNo": {
-    "defaultMessage": "Contact Card",
-    "description": "Title of the contact card screen, displayed in the header."
-  },
   "YyZiop": {
     "defaultMessage": "Cut Video",
     "description": "Title of the cut video section in Image edition wizzar"
@@ -1603,10 +1583,6 @@
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
   },
-  "e1XbtE": {
-    "defaultMessage": "BlockText",
-    "description": "BlockText text screen title"
-  },
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
@@ -1630,10 +1606,6 @@
   "eXD2ND": {
     "defaultMessage": "Border radius : {size}",
     "description": "border radius message in SimpleButton edition"
-  },
-  "eav1ar": {
-    "defaultMessage": "Display on my webcard",
-    "description": "When true the contact card is displayed on the webcard"
   },
   "epg2X1": {
     "defaultMessage": "Slide to change the Font Size",
@@ -1754,10 +1726,6 @@
   "hgtV7c": {
     "defaultMessage": "Invite friends via ...",
     "description": "Invite friends through other apps"
-  },
-  "hha9F6": {
-    "defaultMessage": "Add to Apple Wallet",
-    "description": "Add to Apple Wallet button label"
   },
   "hnj8Qa": {
     "defaultMessage": "Text alignment",

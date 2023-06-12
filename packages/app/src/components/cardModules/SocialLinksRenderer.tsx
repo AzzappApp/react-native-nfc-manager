@@ -205,7 +205,6 @@ export const SocialLinksRendererRaw = ({
 };
 
 export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
-  { id: 'apple', mask: 'apple.com/' },
   { id: 'behance', mask: 'behance.net/' },
   { id: 'dev', mask: 'dev.to/' },
   { id: 'discord', mask: 'discord.gg/' },

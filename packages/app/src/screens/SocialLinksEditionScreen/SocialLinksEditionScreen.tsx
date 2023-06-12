@@ -248,7 +248,7 @@ const SocialLinksEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'SocialLinks',
+          defaultMessage: 'Social platforms',
           description: 'SocialLinks text screen title',
         })}
         leftElement={
