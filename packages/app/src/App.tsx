@@ -21,6 +21,7 @@ import {
 } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import AccountDetailsMobileScreen from '#mobileScreens/AccountDetailsMobileScreen';
+import ContactCardMobileScreen from '#mobileScreens/ContactCardMobileScreen';
 import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
 import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
 import InviteFriendsMobileScreen from '#mobileScreens/InviteFriendsMobileScreen';
@@ -77,6 +78,7 @@ const screens = {
   FOLLOWERS: FollowersMobileScreen,
   ACCOUNT_DETAILS: AccountDetailsMobileScreen,
   INVITE_FRIENDS: InviteFriendsMobileScreen,
+  CONTACT_CARD: ContactCardMobileScreen,
 };
 
 const tabs = {

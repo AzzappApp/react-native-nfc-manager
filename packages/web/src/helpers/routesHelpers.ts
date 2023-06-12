@@ -36,6 +36,7 @@ const routesMap: { [key in Route['route']]: string } = {
   FOLLOWERS: '/followers',
   ACCOUNT_DETAILS: '/account/details',
   INVITE_FRIENDS: '/account/inviteFriends',
+  CONTACT_CARD: '/contactCard',
   ALBUMS: '/albums',
   CHAT: '/chat',
   NEW_PROFILE: '/profile/new',

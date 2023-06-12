@@ -2,8 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { toGlobalId } from 'graphql-relay';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Image, ScrollView } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
+import { View, ScrollView } from 'react-native';
 import {
   runOnJS,
   useAnimatedReaction,
@@ -12,9 +11,9 @@ import {
 import Carousel from 'react-native-reanimated-carousel';
 import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors, shadow } from '#theme';
+import ContactCard from '#components/ContactCard';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -46,13 +45,7 @@ export default function AccountScreenProfiles({
         profiles {
           id
           userName
-          firstName
-          lastName
-          profileKind
-          companyActivity {
-            label
-          }
-          companyName
+          ...ContactCard_card
           nbPosts
           nbFollowedProfiles
           nbFollowersProfiles
@@ -154,8 +147,6 @@ export default function AccountScreenProfiles({
   const intl = useIntl();
 
   const router = useRouter();
-
-  const isPersonal = currentProfile?.profileKind === 'personal';
 
   return (
     <View style={{ alignItems: 'center' }}>
@@ -282,58 +273,16 @@ export default function AccountScreenProfiles({
               </Text>
             </View>
           </PressableNative>
-
-          <View style={styles.webCardContainer}>
-            <View style={{ flex: 1 }}>
-              <Image
-                source={require('#assets/logo-full_white.png')}
-                resizeMode="contain"
-                style={{ width: 85 }}
-              />
-            </View>
-            <View style={styles.webCardBackground}>
-              <Image source={require('#assets/webcard/logo-substract.png')} />
-              <Image
-                source={require('#assets/webcard/background.png')}
-                style={styles.webCardBackgroundImage}
-              />
-            </View>
-            <View style={styles.webCardContent}>
-              <View style={styles.webCardInfos}>
-                <Text
-                  variant="large"
-                  style={styles.webCardLabel}
-                  numberOfLines={1}
-                >
-                  {isPersonal
-                    ? formatDisplayName(
-                        currentProfile?.firstName,
-                        currentProfile?.lastName,
-                      )
-                    : currentProfile?.companyName}
-                </Text>
-                <Text variant="small" style={styles.webCardLabel}>
-                  {isPersonal ? null : currentProfile?.companyActivity?.label}
-                </Text>
-              </View>
-              <QRCode
-                value={buildUserUrl(currentProfile?.userName ?? '')}
-                size={86.85}
-                color={colors.white}
-                backgroundColor={colors.black}
-                logoBackgroundColor={colors.black}
-                logo={require('#ui/Icon/assets/azzapp.png')}
-              />
-            </View>
-            <View style={styles.webCardFooter}>
-              <Text
-                variant="xsmall"
-                style={[styles.webCardLabel, { opacity: 0.5 }]}
-              >
-                {buildUserUrl(currentProfile?.userName ?? '')}
-              </Text>
-            </View>
-          </View>
+          <Link route="CONTACT_CARD">
+            <PressableNative>
+              {currentProfile ? (
+                <ContactCard
+                  userName={currentProfile.userName}
+                  profile={currentProfile}
+                />
+              ) : null}
+            </PressableNative>
+          </Link>
         </View>
       </ScrollView>
     </View>

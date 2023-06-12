@@ -118,6 +118,11 @@ export type InviteFriendsRoute = {
   params?: never;
 };
 
+export type ContactCardRoute = {
+  route: 'CONTACT_CARD';
+  params?: never;
+};
+
 export type Route =
   | AlbumsRoute
   | HomeRoute
@@ -138,6 +143,7 @@ export type Route =
   | FollowedProfilesRoute
   | FollowersRoute
   | AccountDetailsRoute
-  | InviteFriendsRoute;
+  | InviteFriendsRoute
+  | ContactCardRoute;
 
 export type ROUTES = Route['route'];

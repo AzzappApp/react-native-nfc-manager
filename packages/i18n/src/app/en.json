@@ -1567,6 +1567,10 @@
     "defaultMessage": "Publish",
     "description": "Publish button action Post Content Screen"
   },
+  "dvb46X": {
+    "defaultMessage": "Cancel",
+    "description": "Edit contact card modal cancel button title"
+  },
   "dzmRcf": {
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
@@ -1774,6 +1778,10 @@
   "ivmD1N": {
     "defaultMessage": "Crop",
     "description": "Accessibility label of the crop button"
+  },
+  "j1i7qm": {
+    "defaultMessage": "Edit Contact Card",
+    "description": "Edit Contact Card Modal title"
   },
   "jGL8Jo": {
     "defaultMessage": "Slide to change theVertical Spacing",
@@ -2374,6 +2382,10 @@
   "x288ev": {
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
+  },
+  "xJBeUF": {
+    "defaultMessage": "Save",
+    "description": "Edit contact card modal save button label"
   },
   "xLJO3E": {
     "defaultMessage": "Left/right margin size",

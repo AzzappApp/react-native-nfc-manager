@@ -114,7 +114,7 @@ export const createScreenPrefetcher = (
 
   const screenWillBePushed = (id: string, route: Route) => {
     const Component = screens[route.route];
-    if (Component.getRoutesToPrefetch) {
+    if (Component?.getRoutesToPrefetch) {
       const routes = Component.getRoutesToPrefetch(route);
       routes.forEach(route => prefetchRoute(id, route));
     }
