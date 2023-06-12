@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -58,6 +59,8 @@ const TextAreaModal = ({
   const intl = useIntl();
   const { top: insetTop } = useSafeAreaInsets();
 
+  const [text, setText] = useState(value);
+
   const onBlur = () => {
     if (closeOnBlur) {
       onClose();
@@ -72,6 +75,16 @@ const TextAreaModal = ({
             marginTop: insetTop,
             marginBottom: 10,
           }}
+          leftElement={
+            <HeaderButton
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Cancel button label in text edition modal',
+              })}
+              variant="secondary"
+              onPress={onClose}
+            />
+          }
           middleElement={intl.formatMessage({
             defaultMessage: 'Description',
             description: 'Post creation screen textarea modal title',
@@ -82,7 +95,10 @@ const TextAreaModal = ({
                 defaultMessage: 'Ok',
                 description: 'Ok button label in text edition modal',
               })}
-              onPress={onClose}
+              onPress={() => {
+                onChangeText(text);
+                onClose();
+              }}
             />
           }
         />
@@ -91,8 +107,8 @@ const TextAreaModal = ({
           <TextInput
             multiline
             placeholder={placeholder}
-            value={value}
-            onChangeText={onChangeText}
+            value={text}
+            onChangeText={setText}
             autoFocus
             maxLength={maxLength}
             onBlur={onBlur}
