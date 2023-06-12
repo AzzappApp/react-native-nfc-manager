@@ -1,4 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
 import range from 'lodash/range';
 import { StyleSheet } from 'react-native';
 import {
@@ -7,12 +6,11 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
-import { flushPromises } from '@azzapp/shared/jestHelpers';
+import { flushPromises, mockReactComponent } from '@azzapp/shared/jestHelpers';
 import { segmentImage } from '#helpers/mediaHelpers';
 import { act, fireEvent, render, screen, within } from '#helpers/testHelpers';
 import CoverEditionScreen from '../CoverEditionScreen';
 import type { GPULayer } from '#components/gpu';
-import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 import type { CoverEditionScreenProps } from '../CoverEditionScreen';
 import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
 import type { CoverEditionScreen_template$data } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
@@ -38,17 +36,14 @@ jest.mock('react-native/Libraries/Image/resolveAssetSource', () => ({
     };
   },
 }));
-jest.mock('#components/ImagePicker', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const ImagePicker = (props: ImagePickerProps) =>
-    React.createElement('ImagePicker', { ...props, testID: 'image-picker' });
-  return {
-    __esModule: true,
-    default: ImagePicker,
-    ImagePickerStep: 'ImagePickerStep',
-  };
-});
+
+jest.mock('#components/ImagePicker', () => ({
+  __esModule: true,
+  default: mockReactComponent('ImagePicker', {
+    testID: 'image-picker',
+  }),
+  ImagePickerStep: 'ImagePickerStep',
+}));
 
 jest.mock('#helpers/mediaHelpers', () => ({
   segmentImage: jest.fn(),
@@ -95,93 +90,47 @@ jest.mock('#PlatformEnvironment', () => {
   };
 });
 
-const segmentImageMock = segmentImage as jest.MockedFunction<
-  typeof segmentImage
->;
+const segmentImageMock = jest.mocked(segmentImage);
 
-jest.mock('react-native-view-shot', () => ({
-  captureRef: jest.fn(),
+jest.mock('#components/FilterSelectionList', () =>
+  mockReactComponent('FilterSelectionList', {
+    testID: 'filter-selection-list',
+  }),
+);
+
+jest.mock('#components/ImageEditionParameterControl', () =>
+  mockReactComponent('ImageEditionParameterControl', {
+    testID: 'image-edition-parameter-control',
+  }),
+);
+
+jest.mock('#components/ImageEditionParametersList', () =>
+  mockReactComponent('ImageEditionParametersList', {
+    testID: 'image-edition-parameters-list',
+  }),
+);
+
+jest.mock('#ui/FontDropDownPicker', () =>
+  mockReactComponent('FontDropDownPicker', {
+    testID: 'font-dropdown-picker',
+  }),
+);
+
+jest.mock('#screens/CoverEditionScreen/CoverModelsEditionPanel', () =>
+  mockReactComponent('CoverModelsEditionPanel', {
+    testID: 'cover-models-edition-panel',
+  }),
+);
+
+jest.mock('#components/ProfileColorPicker', () => ({
+  __esModule: true,
+  default: mockReactComponent('ProfileColorPicker', {
+    testID: 'profile-color-picker',
+  }),
+  ProfileColorDropDownPicker: mockReactComponent('ProfileColorDropDownPicker', {
+    testID: 'profile-dropdown-color-picker',
+  }),
 }));
-
-jest.mock('#components/FilterSelectionList', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const FilterSelectionList = (props: any) =>
-    React.createElement('FilterSelectionList', {
-      ...props,
-      testID: 'filter-selection-list',
-    });
-  return FilterSelectionList;
-});
-
-jest.mock('#components/ImageEditionParameterControl', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const ImageEditionParameterControl = (props: any) =>
-    React.createElement('ImageEditionParameterControl', {
-      ...props,
-      testID: 'image-edition-parameter-control',
-    });
-
-  return ImageEditionParameterControl;
-});
-
-jest.mock('#components/ImageEditionParametersList', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const ImageEditionParametersList = (props: any) =>
-    React.createElement('ImageEditionParametersList', {
-      ...props,
-      testID: 'image-edition-parameters-list',
-    });
-  return ImageEditionParametersList;
-});
-
-jest.mock('#ui/FontDropDownPicker', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const FontPicker = (props: any) =>
-    React.createElement('FontDropDownPicker', {
-      ...props,
-      testID: 'font-dropdown-picker',
-    });
-  return FontPicker;
-});
-
-jest.mock('#screens/CoverEditionScreen/CoverModelsEditionPanel', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-
-  const CoverModelsEditionPanel = (props: any) =>
-    React.createElement('CoverModelsEditionPanel', {
-      ...props,
-      testID: 'cover-models-edition-panel',
-    });
-  return CoverModelsEditionPanel;
-});
-
-jest.mock('#components/ProfileColorPicker', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  const ProfileColorDropDownPicker = (props: any) =>
-    React.createElement('ProfileColorDropDownPicker', {
-      ...props,
-      testID: 'profile-dropdow-color-picker',
-    });
-  const ProfileColorPicker = (props: any) =>
-    React.createElement('ProfileColorPicker', {
-      ...props,
-      testID: 'profile-color-picker',
-    });
-  return {
-    __esModule: true,
-    default: ProfileColorPicker,
-    ProfileColorDropDownPicker,
-  };
-});
-
-jest.mock('#components/gpu/GPUNativeMethods');
-jest.mock('@react-native-camera-roll/camera-roll', () => ({}));
 
 jest.mock('#components/Cropper', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -194,9 +143,6 @@ jest.mock('#components/Cropper', () => {
 
   return Cropper;
 });
-
-jest.mock('#components/medias/NativeMediaImageRenderer');
-jest.mock('#components/medias/NativeMediaVideoRenderer');
 
 describe('CoverEditionScreen', () => {
   let environement: RelayMockEnvironment;
@@ -769,7 +715,7 @@ describe('CoverEditionScreen', () => {
       });
       act(() => {
         fireEvent(
-          screen.getByTestId('profile-dropdow-color-picker'),
+          screen.getByTestId('profile-dropdown-color-picker'),
           'colorChange',
           '#FF3322',
         );
@@ -925,7 +871,7 @@ describe('CoverEditionScreen', () => {
       saveButton = saveButton.parent;
     }
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+    expect(saveButton).toHaveAccessibilityState({ disabled: false });
   });
 
   // in any case the save button will be enable, if suggested template, the source media is used, otherwise a alert is shown
@@ -942,7 +888,7 @@ describe('CoverEditionScreen', () => {
       saveButton = saveButton.parent;
     }
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+    expect(saveButton).toHaveAccessibilityState({ disabled: false });
     segmentImageMock.mockResolvedValueOnce('/data/fake-mask.jpg');
     expect(screen.queryByTestId('image-picker')).not.toBeTruthy();
     act(() => {
@@ -959,7 +905,7 @@ describe('CoverEditionScreen', () => {
     });
     await act(flushPromises);
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+    expect(saveButton).toHaveAccessibilityState({ disabled: false });
     act(() => {
       fireEvent.press(screen.getByLabelText('Text'));
     });
@@ -971,7 +917,7 @@ describe('CoverEditionScreen', () => {
       );
     });
 
-    expect(saveButton).toHaveProp('accessibilityState', { disabled: false });
+    expect(saveButton).toHaveAccessibilityState({ disabled: false });
   });
 
   test('Should select the first template, using the demo asset image if there is no cover with a personal profile', async () => {

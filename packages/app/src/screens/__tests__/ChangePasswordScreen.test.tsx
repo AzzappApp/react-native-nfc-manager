@@ -1,6 +1,5 @@
 import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ChangePasswordScreen from '../ChangePasswordScreen';
-import '@testing-library/jest-native/extend-expect';
 
 describe('ChangePasswordScreen Screen', () => {
   const changePassword = jest.fn();

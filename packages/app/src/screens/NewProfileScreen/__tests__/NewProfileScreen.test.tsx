@@ -12,7 +12,6 @@ import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import NewProfileScreen from '..';
 import type { NewProfileScreenTestQuery } from '@azzapp/relay/artifacts/NewProfileScreenTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
@@ -102,11 +101,10 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
-        mediaID: 'media-0-0',
-        requestedSize: 300,
-        uri: 'https://fakeMedia.com/0-0.jpg',
-      });
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp(
+        'source',
+        'media-0-0',
+      );
 
       act(() => {
         fireEvent.press(profileKindButtons[1]);
@@ -120,11 +118,10 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
-        mediaID: 'media-1-0',
-        requestedSize: 300,
-        uri: 'https://fakeMedia.com/1-0.jpg',
-      });
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp(
+        'source',
+        'media-1-0',
+      );
     });
 
     test('should display the personal profile form when user choose a personal profile', () => {

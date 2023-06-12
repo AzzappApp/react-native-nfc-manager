@@ -135,8 +135,8 @@ const PostRendererMedia = (
 
   return (
     <View {...props} style={styles.mediaContainer}>
-      {__typename === 'MediaVideo' &&
-        (videoDisabled ? (
+      {__typename === 'MediaVideo' ? (
+        videoDisabled ? (
           <>
             <MediaImageRenderer
               ref={forwardedRef as any}
@@ -148,6 +148,7 @@ const PostRendererMedia = (
               aspectRatio={aspectRatio}
               width={width}
               onReadyForDisplay={onReady}
+              testID="PostRendererMedia_media"
             />
             {/* Play iconicon */}
             <Icon icon="play" style={styles.playIcon} />
@@ -166,9 +167,10 @@ const PostRendererMedia = (
             paused={paused}
             currentTime={initialTime}
             onReadyForDisplay={onReady}
+            testID="PostRendererMedia_media"
           />
-        ))}
-      {__typename === 'MediaImage' && (
+        )
+      ) : (
         <MediaImageRenderer
           ref={forwardedRef as any}
           source={id}
@@ -178,6 +180,7 @@ const PostRendererMedia = (
           aspectRatio={aspectRatio}
           width={width}
           onReadyForDisplay={onReady}
+          testID="PostRendererMedia_media"
         />
       )}
     </View>

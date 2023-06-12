@@ -1,4 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
 import { act, fireEvent, render } from '#helpers/testHelpers';
 import SecuredTextInput from '../SecuredTextInput';
 

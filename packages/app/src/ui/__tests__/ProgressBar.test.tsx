@@ -1,6 +1,4 @@
 import { render, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
-
 import ProgressBar from '../ProgressBar';
 
 describe('ProgressBar component', () => {

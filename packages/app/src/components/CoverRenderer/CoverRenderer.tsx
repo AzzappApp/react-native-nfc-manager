@@ -208,7 +208,7 @@ const CoverRenderer = (
       {media ? (
         <>
           <MediaRenderer
-            testID="cover-renderer-media"
+            testID="CoverRenderer_media"
             source={media.id}
             uri={mediaUri}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
@@ -226,7 +226,7 @@ const CoverRenderer = (
           />
           {textPreviewMedia && (
             <MediaImageRenderer
-              testID="cover-renderer-text"
+              testID="CoverRenderer_text"
               source={textPreviewMedia.id}
               uri={
                 width === COVER_BASE_WIDTH

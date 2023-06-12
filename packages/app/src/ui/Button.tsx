@@ -20,7 +20,14 @@ export type ButtonProps = PressableProps & {
 };
 
 const Button = (
-  { label, variant = 'primary', loading, style, ...props }: ButtonProps,
+  {
+    label,
+    variant = 'primary',
+    loading,
+    disabled,
+    style,
+    ...props
+  }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
 ) => {
   const colorScheme = useColorScheme();
@@ -41,7 +48,11 @@ const Button = (
         {label}
       </Text>
     ),
-    accessibilityState: { disabled: props.disabled ?? false },
+    accessibilityState: {
+      disabled: disabled ?? false,
+      busy: loading ?? false,
+    },
+    disabled: disabled ?? loading ?? false,
     ref: forwardedRef,
     ...props,
   } as const;
@@ -54,7 +65,7 @@ const Button = (
           style={[
             variantStyles.root,
             style,
-            props.disabled && variantStyles.disabled,
+            disabled && variantStyles.disabled,
           ]}
           android_ripple={{
             borderless: false,
@@ -68,22 +79,14 @@ const Button = (
     return (
       <PressableBackground
         highlightColor={highlightColor}
-        style={[
-          variantStyles.root,
-          style,
-          props.disabled && variantStyles.disabled,
-        ]}
+        style={[variantStyles.root, style, disabled && variantStyles.disabled]}
         {...buttonProps}
       />
     );
   }
   return (
     <PressableOpacity
-      style={[
-        variantStyles.root,
-        style,
-        props.disabled && variantStyles.disabled,
-      ]}
+      style={[variantStyles.root, style, disabled && variantStyles.disabled]}
       {...buttonProps}
     />
   );

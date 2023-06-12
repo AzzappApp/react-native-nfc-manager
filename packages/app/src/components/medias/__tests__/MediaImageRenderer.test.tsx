@@ -1,8 +1,8 @@
 import { fireEvent, render, act } from '@testing-library/react-native';
 import MediaImageRenderer from '../MediaImageRenderer';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('../NativeMediaImageRenderer', () => 'NativeMediaImageRenderer');
+
 describe('MediaImageRenderer', () => {
   it('should render a NativeMediaImageRenderer with correct role and label', () => {
     const { root } = render(

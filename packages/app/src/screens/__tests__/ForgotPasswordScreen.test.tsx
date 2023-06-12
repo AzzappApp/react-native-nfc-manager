@@ -1,7 +1,6 @@
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('#ui/ViewTransition', () => 'ViewTransition');
 

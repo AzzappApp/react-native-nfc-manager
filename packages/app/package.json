@@ -2,6 +2,7 @@
   "name": "@azzapp/app",
   "version": "0.0.4",
   "scripts": {
+    "test": "jest",
     "build:lib": "yarn lib:clean && yarn lib:compile && yarn lib:definition && yarn assets:copy",
     "build:ios": "bundle exec fastlane ios sign",
     "build:ios:native": "SKIP_BUNDLING=true bundle exec fastlane ios build",
@@ -94,8 +95,5 @@
     "react-test-renderer": "^18.2.0",
     "relay-test-utils": "^14.1.0",
     "rimraf": "^4.1.2"
-  },
-  "jest": {
-    "preset": "react-native"
   }
 }

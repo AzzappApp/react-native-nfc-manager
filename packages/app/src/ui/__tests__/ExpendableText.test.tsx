@@ -1,6 +1,5 @@
 import { act, fireEvent, render } from '#helpers/testHelpers';
 import ExpendableText from '../ExpendableText';
-import '@testing-library/jest-native/extend-expect';
 
 describe('ExpendableText', () => {
   test('renders label without option to expand', () => {

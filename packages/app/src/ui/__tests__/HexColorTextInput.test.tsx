@@ -1,5 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
-
 import { render, screen, act, fireEvent } from '#helpers/testHelpers';
 import HexColorTextInput from '../HexColorTextInput';
 

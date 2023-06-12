@@ -1,10 +1,5 @@
 import CameraControlPanel from '#components/CameraControlPanel';
 import { fireEvent, render, screen } from '#helpers/testHelpers';
-import '@testing-library/jest-native/extend-expect';
-
-jest.mock('#helpers/mediaHelpers', () => ({
-  formatVideoTime: (time: number) => `${time}s`,
-}));
 
 describe('CameraControlPanel', () => {
   test('Should render a shutter button in photo mode', () => {

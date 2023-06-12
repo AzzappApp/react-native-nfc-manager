@@ -5,18 +5,6 @@ import { getPHAssetPath } from '#helpers/mediaHelpers';
 import { render } from '#helpers/testHelpers';
 import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 
-jest.mock('@react-native-camera-roll/camera-roll', () => ({
-  CameraRoll: {
-    getPhotos: jest.fn(),
-  },
-}));
-jest.mock('#helpers/mediaHelpers', () => ({
-  formatVideoTime: jest.fn(),
-  getImageSize: jest.fn(),
-  getPHAssetPath: jest.fn(),
-  getVideoSize: jest.fn(),
-}));
-
 const getPhotos = CameraRoll.getPhotos as jest.Mock;
 
 describe('PhotoGalleryMediaList', () => {

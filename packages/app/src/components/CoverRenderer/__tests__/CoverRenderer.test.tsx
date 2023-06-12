@@ -1,5 +1,4 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
 import {
   graphql,
   RelayEnvironmentProvider,
@@ -13,17 +12,7 @@ import type { CoverRendererProps } from '..';
 import type { CoverRendererTestQuery } from '@azzapp/relay/artifacts/CoverRendererTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-jest.mock('@azzapp/relay/providers/isNative.relayprovider', () => ({
-  get() {
-    return true;
-  },
-}));
-
-jest.mock('#components/medias/NativeMediaImageRenderer');
-jest.mock('#components/medias/NativeMediaVideoRenderer');
-
 let environement: RelayMockEnvironment;
-
 const renderCover = (props?: Partial<CoverRendererProps>) => {
   environement = createMockEnvironment();
   environement.mock.queueOperationResolver(operation =>
@@ -48,6 +37,7 @@ const renderCover = (props?: Partial<CoverRendererProps>) => {
       }),
     }),
   );
+
   const TestRenderer = (props?: Partial<CoverRendererProps>) => {
     const data = useLazyLoadQuery<CoverRendererTestQuery>(
       graphql`
@@ -96,13 +86,13 @@ describe('CoverRenderer', () => {
   test('should render the cover media and the text overlay media', () => {
     renderCover();
 
-    expect(screen.getByTestId('cover-renderer-media')).toHaveProp(
-      'accessibilityLabel',
+    expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+      'alt',
       'User card title - User card subtitle - background image',
     );
 
-    expect(screen.getByTestId('cover-renderer-text')).toHaveProp(
-      'accessibilityLabel',
+    expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
+      'alt',
       'User card title - User card subtitle',
     );
   });
@@ -112,28 +102,50 @@ describe('CoverRenderer', () => {
       'if width is the cover base width, and the large version otherwise',
     () => {
       const { rerender } = renderCover();
-      expect(screen.getByTestId('cover-renderer-media')).toHaveProp('source', {
-        mediaID: 'media_id',
-        requestedSize: 125,
-        uri: 'media_small_uri',
-      });
-      expect(screen.getByTestId('cover-renderer-text')).toHaveProp('source', {
-        mediaID: 'text_preview_media_id',
-        requestedSize: 125,
-        uri: 'text_preview_small_uri',
-      });
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'source',
+        'media_id',
+      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'width',
+        125,
+      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'uri',
+        'media_small_uri',
+      );
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
+        'source',
+        'text_preview_media_id',
+      );
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('width', 125);
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
+        'uri',
+        'text_preview_small_uri',
+      );
 
       rerender({ width: COVER_BASE_WIDTH * 2 });
-      expect(screen.getByTestId('cover-renderer-media')).toHaveProp('source', {
-        mediaID: 'media_id',
-        requestedSize: 250,
-        uri: 'media_large_uri',
-      });
-      expect(screen.getByTestId('cover-renderer-text')).toHaveProp('source', {
-        mediaID: 'text_preview_media_id',
-        requestedSize: 250,
-        uri: 'text_preview_large_uri',
-      });
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'source',
+        'media_id',
+      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'width',
+        250,
+      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
+        'uri',
+        'media_large_uri',
+      );
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
+        'source',
+        'text_preview_media_id',
+      );
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('width', 250);
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
+        'uri',
+        'text_preview_large_uri',
+      );
     },
   );
 
@@ -143,19 +155,16 @@ describe('CoverRenderer', () => {
 
     expect(onReadyForDisplayMock).not.toHaveBeenCalled();
     act(() => {
-      fireEvent(
-        screen.getByTestId('cover-renderer-media'),
-        'onReadyForDisplay',
-      );
+      fireEvent(screen.getByTestId('CoverRenderer_media'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).not.toHaveBeenCalled();
     act(() => {
-      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('CoverRenderer_text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(1);
 
     act(() => {
-      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('CoverRenderer_text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(2);
 
@@ -168,15 +177,12 @@ describe('CoverRenderer', () => {
     });
 
     act(() => {
-      fireEvent(screen.getByTestId('cover-renderer-text'), 'onReadyForDisplay');
+      fireEvent(screen.getByTestId('CoverRenderer_text'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(2);
 
     act(() => {
-      fireEvent(
-        screen.getByTestId('cover-renderer-media'),
-        'onReadyForDisplay',
-      );
+      fireEvent(screen.getByTestId('CoverRenderer_media'), 'onReadyForDisplay');
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(3);
   });

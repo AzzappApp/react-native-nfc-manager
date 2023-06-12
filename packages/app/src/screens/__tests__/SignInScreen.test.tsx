@@ -2,7 +2,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
-import '@testing-library/jest-native/extend-expect';
 
 describe('Signin Screen', () => {
   const signin = jest.fn();
@@ -30,6 +29,7 @@ describe('Signin Screen', () => {
 
   test('should call the `signin` callback if credential and password are filled', async () => {
     render(<SignInScreen signin={signin} />);
+    signin.mockResolvedValueOnce({});
 
     const credentialInput = screen.getByPlaceholderText(
       'Phone number or email address',
@@ -46,7 +46,9 @@ describe('Signin Screen', () => {
       password: 'myPassword',
     });
 
+    expect(buttonComponent).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
+    expect(buttonComponent).not.toHaveAccessibilityState({ busy: true });
   });
 
   test('should display an error message if the `signin` callback fails', async () => {

@@ -4,5 +4,13 @@
     "rootDir": "./src",
     "baseUrl": "./src",
     "outDir": "./lib"
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "scripts",
+    "tsconfig.json",
+    "tsconfig.lib.json",
+    "jest.config.js"
+  ]
 }

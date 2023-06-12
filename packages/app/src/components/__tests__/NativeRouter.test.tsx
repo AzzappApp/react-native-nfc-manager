@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useNativeRouter } from '../NativeRouter';
 
-jest.mock('../../helpers/idHelpers', () => ({ createId: () => `created-id` }));
+jest.mock('#helpers/idHelpers', () => ({ createId: () => `created-id` }));
 
 describe('NativeRouter', () => {
   describe('useNativeRouter', () => {

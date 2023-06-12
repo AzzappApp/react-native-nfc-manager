@@ -2,7 +2,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignUpScreen from '../SignUpScreen';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('#helpers/localeHelpers', () => ({
@@ -49,6 +48,8 @@ describe('SignUpScreen', () => {
 
   test('should call the `signup` callback if form is valid', async () => {
     render(<SignUpScreen signup={signup} />);
+    signup.mockResolvedValueOnce({});
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -64,11 +65,15 @@ describe('SignUpScreen', () => {
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
     });
+    expect(submitButton).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
+    expect(submitButton).toHaveAccessibilityState({ busy: false });
   });
 
   test('should call the `signup` callback if form is filled with a valid phone number', async () => {
     render(<SignUpScreen signup={signup} />);
+    signup.mockResolvedValueOnce({});
+
     const emailOrCountryButton = screen.getByLabelText(
       'Select a calling code or email',
     );
@@ -94,11 +99,15 @@ describe('SignUpScreen', () => {
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
     });
+
+    expect(submitButton).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
+    expect(submitButton).toHaveAccessibilityState({ busy: false });
   });
 
   test('should not call the `signup` callback if phone number is not valid', () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailOrCountryButton = screen.getByLabelText(
       'Select a calling code or email',
     );
@@ -131,6 +140,7 @@ describe('SignUpScreen', () => {
 
   test('should not call the `signup` callback if email is not valid', () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -154,6 +164,7 @@ describe('SignUpScreen', () => {
 
   test('should not call the `signup` callback if password is not valid', () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -175,6 +186,7 @@ describe('SignUpScreen', () => {
 
   test('should not call the `signup` callback if the checkbox are not checked', async () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -206,6 +218,7 @@ describe('SignUpScreen', () => {
 
   test('should display the already registered error message if signup return the error', async () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -228,6 +241,7 @@ describe('SignUpScreen', () => {
 
   test('should display unknown error in case of unknown error ;)', async () => {
     render(<SignUpScreen signup={signup} />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
