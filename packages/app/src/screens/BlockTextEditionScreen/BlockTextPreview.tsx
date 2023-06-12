@@ -1,6 +1,6 @@
-import { BlockTextRendererRaw } from '#components/BlockTextRenderer';
+import { BlockTextRendererRaw } from '#components/cardModules/BlockTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { BlockTextRawData } from '#components/BlockTextRenderer';
+import type { BlockTextRawData } from '#components/cardModules/BlockTextRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type BlockTextPreviewProps = ViewProps & {

@@ -4,7 +4,7 @@ import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import { SOCIAL_LINKS } from '#components/SocialLinksRenderer';
+import { SOCIAL_LINKS } from '#components/cardModules/SocialLinksRenderer';
 import SortableList from '#components/SortableScrollView/SortableScrollView';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';

@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 import { colors, shadow } from '#theme';
-import { CarouselRendererRaw } from '#components/CarouselRenderer';
+import { CarouselRendererRaw } from '#components/cardModules/CarouselRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { CarouselRawData } from '#components/CarouselRenderer';
+import type { CarouselRawData } from '#components/cardModules/CarouselRenderer';
 import type { ViewProps } from 'react-native';
 
 type CarouselPreviewProps = ViewProps & {

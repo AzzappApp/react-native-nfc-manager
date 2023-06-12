@@ -1,21 +1,15 @@
-import chroma from 'chroma-js';
-import { useState, useCallback } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { useCallback } from 'react';
+import { Linking, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
 import PressableOpacity from '#ui/PressableOpacity';
+import CardModuleBackground from './CardModuleBackground';
 import type { SimpleButtonEditionValue } from '#screens/SimpleButtonEditionScreen/simpleButtonEditionScreenTypes';
 import type {
   SimpleButtonRenderer_module$data,
   SimpleButtonRenderer_module$key,
 } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
-import type {
-  ViewProps,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type SimpleButtonRendererProps = ViewProps & {
   /**
@@ -114,20 +108,6 @@ export const SimpleButtonRendererRaw = ({
     data,
   ) as SimpleButtonEditionValue;
 
-  const [layout, setLayout] = useState<LayoutRectangle | null>(null);
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      props.onLayout?.(e);
-      setLayout(e.nativeEvent.layout);
-    },
-    [props],
-  );
-  const backgroundColor = backgroundStyle
-    ? chroma(backgroundStyle.backgroundColor)
-        .alpha(backgroundStyle.opacity / 100)
-        .hex()
-    : colors.white;
-
   const onPress = useCallback(async () => {
     if (actionLink) {
       if (actionType === 'link') {
@@ -141,35 +121,20 @@ export const SimpleButtonRendererRaw = ({
   }, [actionLink, actionType]);
 
   return (
-    <View
+    <CardModuleBackground
       {...props}
+      backgroundUri={background?.uri}
+      backgroundOpacity={backgroundStyle?.opacity}
+      backgroundColor={backgroundStyle?.backgroundColor}
+      patternColor={backgroundStyle?.patternColor}
       style={[
         style,
         {
-          backgroundColor,
           height: height + marginTop + marginBottom,
           alignItems: 'center',
         },
       ]}
-      onLayout={onLayout}
     >
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-            style={{
-              opacity:
-                backgroundStyle?.opacity != null
-                  ? backgroundStyle?.opacity / 100
-                  : 1,
-            }}
-          />
-        </View>
-      )}
       <PressableOpacity onPress={onPress}>
         <View
           style={{
@@ -199,17 +164,6 @@ export const SimpleButtonRendererRaw = ({
           </Text>
         </View>
       </PressableOpacity>
-    </View>
+    </CardModuleBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});

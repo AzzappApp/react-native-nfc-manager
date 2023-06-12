@@ -1,19 +1,12 @@
-import chroma from 'chroma-js';
-import { useState, useCallback } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { View, Image } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   HorizontalPhotoRenderer_module$data,
   HorizontalPhotoRenderer_module$key,
 } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
-import type {
-  ViewProps,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type HorizontalPhotoRendererProps = ViewProps & {
   /**
@@ -108,44 +101,15 @@ export const HorizontalPhotoRendererRaw = ({
     image,
   } = Object.assign({}, HORIZONTAL_PHOTO_DEFAULT_VALUES, data);
 
-  const [layout, setLayout] = useState<LayoutRectangle | null>(null);
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      props.onLayout?.(e);
-      setLayout(e.nativeEvent.layout);
-    },
-    [props],
-  );
-
-  const backgroundColor = backgroundStyle
-    ? chroma(backgroundStyle.backgroundColor)
-        .alpha(backgroundStyle.opacity / 100)
-        .hex()
-    : colors.white;
-
   return (
-    <View
+    <CardModuleBackground
       {...props}
-      style={[style, { backgroundColor, height: height + 2 * marginVertical }]}
-      onLayout={onLayout}
+      backgroundUri={background?.uri}
+      backgroundOpacity={backgroundStyle?.opacity}
+      backgroundColor={backgroundStyle?.backgroundColor}
+      patternColor={backgroundStyle?.patternColor}
+      style={style}
     >
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={height + 2 * marginVertical}
-            preserveAspectRatio="xMidYMid slice"
-            style={{
-              opacity:
-                backgroundStyle?.opacity != null
-                  ? backgroundStyle?.opacity / 100
-                  : 1,
-            }}
-          />
-        </View>
-      )}
       {image?.uri && (
         <View
           style={{
@@ -155,7 +119,6 @@ export const HorizontalPhotoRendererRaw = ({
             marginHorizontal,
             marginVertical,
             borderColor,
-            width: (layout?.width ?? 0) - 2 * marginHorizontal,
             overflow: 'hidden',
           }}
         >
@@ -166,17 +129,6 @@ export const HorizontalPhotoRendererRaw = ({
           />
         </View>
       )}
-    </View>
+    </CardModuleBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});

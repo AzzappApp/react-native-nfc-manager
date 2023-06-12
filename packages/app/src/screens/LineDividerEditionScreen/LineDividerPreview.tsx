@@ -1,6 +1,6 @@
+import { LineDividerRendererRaw } from '#components/cardModules/LineDividerRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { LineDividerRendererRaw } from '#components/LineDividerRenderer';
-import type { LineDividerRawData } from '#components/LineDividerRenderer';
+import type { LineDividerRawData } from '#components/cardModules/LineDividerRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type LineDividerPreviewProps = ViewProps & {

@@ -1,6 +1,6 @@
+import { SimpleTextRendererRaw } from '#components/cardModules/SimpleTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { SimpleTextRendererRaw } from '#components/SimpleTextRenderer';
-import type { SimpleTextRawData } from '#components/SimpleTextRenderer';
+import type { SimpleTextRawData } from '#components/cardModules/SimpleTextRenderer';
 import type { ViewProps } from 'react-native';
 
 type SimpleTextPreviewProps = ViewProps & {

@@ -1,12 +1,9 @@
-import chroma from 'chroma-js';
-import { useState, useCallback } from 'react';
-import { Linking, StyleSheet, ScrollView, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { Linking, ScrollView, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   SocialLink,
   SocialLinksEditionValue,
@@ -16,11 +13,7 @@ import type {
   SocialLinksRenderer_module$data,
   SocialLinksRenderer_module$key,
 } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
-import type {
-  ViewProps,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type SocialLinksRendererProps = ViewProps & {
   /**
@@ -111,20 +104,6 @@ export const SocialLinksRendererRaw = ({
     data,
   ) as unknown as SocialLinksEditionValue;
 
-  const [layout, setLayout] = useState<LayoutRectangle | null>(null);
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      props.onLayout?.(e);
-      setLayout(e.nativeEvent.layout);
-    },
-    [props],
-  );
-  const backgroundColor = backgroundStyle
-    ? chroma(backgroundStyle.backgroundColor)
-        .alpha(backgroundStyle.opacity / 100)
-        .hex()
-    : colors.white;
-
   const linksOrdered = [...(links ?? [])].sort(
     (a, b) => a.position - b.position,
   );
@@ -135,24 +114,14 @@ export const SocialLinksRendererRaw = ({
   };
 
   return (
-    <View {...props} style={[style, { backgroundColor }]} onLayout={onLayout}>
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-            style={{
-              opacity:
-                backgroundStyle?.opacity != null
-                  ? backgroundStyle?.opacity / 100
-                  : 1,
-            }}
-          />
-        </View>
-      )}
+    <CardModuleBackground
+      {...props}
+      backgroundUri={background?.uri}
+      backgroundOpacity={backgroundStyle?.opacity}
+      backgroundColor={backgroundStyle?.backgroundColor}
+      patternColor={backgroundStyle?.patternColor}
+      style={style}
+    >
       {arrangement === 'inline' ? (
         <ScrollView
           horizontal
@@ -231,20 +200,9 @@ export const SocialLinksRendererRaw = ({
           ))}
         </View>
       )}
-    </View>
+    </CardModuleBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});
 
 export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'apple', mask: 'apple.com/' },

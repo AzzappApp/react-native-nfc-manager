@@ -30,19 +30,19 @@ import {
   MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#PlatformEnvironment';
-import BlockTextRenderer from '#components/BlockTextRenderer';
-import CarouselRenderer from '#components/CarouselRenderer';
+import BlockTextRenderer from '#components/cardModules/BlockTextRenderer';
+import CarouselRenderer from '#components/cardModules/CarouselRenderer';
+import HorizontalPhotoRenderer from '#components/cardModules/HorizontalPhotoRenderer';
+import LineDividerRenderer from '#components/cardModules/LineDividerRenderer';
+import PhotoWithTextAndTitleRenderer from '#components/cardModules/PhotoWithTextAndTitleRenderer';
+import SimpleButtonRenderer from '#components/cardModules/SimpleButtonRenderer';
+import SocialLinksRenderer from '#components/cardModules/SocialLinksRenderer';
 import CoverRenderer from '#components/CoverRenderer';
-import HorizontalPhotoRenderer from '#components/HorizontalPhotoRenderer';
-import LineDividerRenderer from '#components/LineDividerRenderer';
-import PhotoWithTextAndTitleRenderer from '#components/PhotoWithTextAndTitleRenderer';
 import ProfileColorPicker from '#components/ProfileColorPicker';
-import SimpleButtonRenderer from '#components/SimpleButtonRenderer';
-import SocialLinksRenderer from '#components/SocialLinksRenderer';
 import { createId } from '#helpers/idHelpers';
 import useToggleFollow from '#hooks/useToggleFollow';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
-import SimpleTextRenderer from '../../components/SimpleTextRenderer';
+import SimpleTextRenderer from '../../components/cardModules/SimpleTextRenderer';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenFooter from './ProfileScreenFooter';

@@ -1,20 +1,12 @@
-import chroma from 'chroma-js';
-import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { Text } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { SIMPLE_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleTextRenderer_module$data,
   SimpleTextRenderer_module$key,
 } from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
-import type {
-  ViewProps,
-  ColorValue,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+import type { ViewProps, ColorValue } from 'react-native';
 
 export type SimpleTextRendererProps = ViewProps & {
   /**
@@ -110,53 +102,22 @@ export const SimpleTextRendererRaw = ({
     backgroundStyle,
   } = Object.assign({}, SIMPLE_TEXT_DEFAULT_VALUES, data);
 
-  const [layout, setLayout] = useState<LayoutRectangle | null>(null);
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      props.onLayout?.(e);
-      setLayout(e.nativeEvent.layout);
-    },
-    [props],
-  );
-
-  const backgroundColor = backgroundStyle
-    ? chroma(backgroundStyle.backgroundColor)
-        .alpha(backgroundStyle.opacity / 100)
-        .hex()
-    : colors.white;
-
   return (
-    <View
+    <CardModuleBackground
       {...props}
+      backgroundUri={background?.uri}
+      backgroundOpacity={backgroundStyle?.opacity}
+      backgroundColor={backgroundStyle?.backgroundColor}
+      patternColor={backgroundStyle?.patternColor}
       style={[
+        style,
         {
           paddingHorizontal: marginHorizontal,
           paddingVertical: marginVertical,
           flexShrink: 0,
-          opacity: layout ? 1 : 0,
         },
-        { backgroundColor },
-        style,
       ]}
-      onLayout={onLayout}
     >
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-            style={{
-              opacity:
-                backgroundStyle?.opacity != null
-                  ? backgroundStyle?.opacity / 100
-                  : 1,
-            }}
-          />
-        </View>
-      )}
       <Text
         style={{
           textAlign,
@@ -171,17 +132,6 @@ export const SimpleTextRendererRaw = ({
       >
         {text}
       </Text>
-    </View>
+    </CardModuleBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});

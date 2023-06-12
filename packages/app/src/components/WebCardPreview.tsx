@@ -15,35 +15,39 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
-import BlockTextRenderer, { BlockTextRendererRaw } from './BlockTextRenderer';
-import CarouselRenderer, { CarouselRendererRaw } from './CarouselRenderer';
-import CoverRenderer from './CoverRenderer';
+import BlockTextRenderer, {
+  BlockTextRendererRaw,
+} from './cardModules/BlockTextRenderer';
+import CarouselRenderer, {
+  CarouselRendererRaw,
+} from './cardModules/CarouselRenderer';
 import HorizontalPhotoRenderer, {
   HorizontalPhotoRendererRaw,
-} from './HorizontalPhotoRenderer';
+} from './cardModules/HorizontalPhotoRenderer';
 import LineDividerRenderer, {
   LineDividerRendererRaw,
-} from './LineDividerRenderer';
+} from './cardModules/LineDividerRenderer';
 import PhotoWithTextAndTitleRenderer, {
   PhotoWithTextAndTitleRendererRaw,
-} from './PhotoWithTextAndTitleRenderer';
+} from './cardModules/PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer, {
   SimpleButtonRendererRaw,
-} from './SimpleButtonRenderer';
+} from './cardModules/SimpleButtonRenderer';
 import SimpleTextRenderer, {
   SimpleTextRendererRaw,
-} from './SimpleTextRenderer';
+} from './cardModules/SimpleTextRenderer';
 import SocialLinksRenderer, {
   SocialLinksRendererRaw,
-} from './SocialLinksRenderer';
+} from './cardModules/SocialLinksRenderer';
+import CoverRenderer from './CoverRenderer';
 import SwitchToggle from './SwitchToggle';
-import type { BlockTextRawData } from './BlockTextRenderer';
-import type { CarouselRawData } from './CarouselRenderer';
-import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
-import type { LineDividerRawData } from './LineDividerRenderer';
-import type { PhotoWithTextAndTitleRawData } from './PhotoWithTextAndTitleRenderer';
-import type { SimpleButtonRawData } from './SimpleButtonRenderer';
-import type { SimpleTextRawData } from './SimpleTextRenderer';
+import type { BlockTextRawData } from './cardModules/BlockTextRenderer';
+import type { CarouselRawData } from './cardModules/CarouselRenderer';
+import type { HorizontalPhotoRawData } from './cardModules/HorizontalPhotoRenderer';
+import type { LineDividerRawData } from './cardModules/LineDividerRenderer';
+import type { PhotoWithTextAndTitleRawData } from './cardModules/PhotoWithTextAndTitleRenderer';
+import type { SimpleButtonRawData } from './cardModules/SimpleButtonRenderer';
+import type { SimpleTextRawData } from './cardModules/SimpleTextRenderer';
 import type { WebCardPreviewQuery } from '@azzapp/relay/artifacts/WebCardPreviewQuery.graphql';
 import type {
   LayoutChangeEvent,
