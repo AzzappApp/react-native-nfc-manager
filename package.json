@@ -16,7 +16,6 @@
     "test": "turbo run test",
     "build": "turbo run build",
     "dev": "node ./scripts/dev.js",
-    "predev": "yarn graphql-codegen",
     "build:ios": "turbo run build:ios",
     "build:android": "turbo run build:android",
     "graphql-codegen": "graphql-codegen",
@@ -32,7 +31,8 @@
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo"
   },
   "devScripts": [
-    "relay:watch"
+    "relay:watch",
+    "graphql-codegen --watch"
   ],
   "devDependencies": {
     "@babel/cli": "^7.21.0",
