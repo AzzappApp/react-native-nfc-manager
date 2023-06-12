@@ -1,59 +1,75 @@
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { Database } from './db';
-import type { Media } from '@prisma/client';
-import type { QueryCreator } from 'kysely';
+import { eq, inArray } from 'drizzle-orm';
+import { mysqlEnum, double, varchar } from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import type { DbTransaction } from './db';
+import type { InferModel } from 'drizzle-orm';
+
+export const MediaTable = mysqlTable('Media', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  kind: mysqlEnum('kind', ['image', 'video']).notNull(),
+  height: double('height').notNull(),
+  width: double('width').notNull(),
+});
+
+export type Media = InferModel<typeof MediaTable>;
+export type NewMedia = InferModel<typeof MediaTable, 'insert'>;
 
 /**
- * Retrieve a list of medias by their ids.
- * @param ids - The ids of the medias to retrieve
- * @returns A list of medias, where the order of the medias matches the order of the ids
+ * Retrieve a list of media by their ids.
+ * @param ids - The ids of the media to retrieve
+ * @returns A list of media, where the order of the media matches the order of the ids
  */
-export const getMediasByIds = (
-  ids: readonly string[],
-): Promise<Array<Media | null>> => {
-  return getEntitiesByIds('Media', ids, 'id');
+export const getMediasByIds = (ids: string[]): Promise<Media[]> => {
+  return db.select().from(MediaTable).where(inArray(MediaTable.id, ids));
 };
 
 /**
  * Create a media.
  *
  * @param media - the media fields, excluding the id
- * @param qc - The query creator to use (user for transactions)
+ * @param tx - The query creator to use (user for transactions)
  * @returns The created media
  */
 export const createMedia = async (
-  media: Media,
-  qc: QueryCreator<Database> = db,
+  newMedia: NewMedia,
+  tx: DbTransaction = db,
 ): Promise<Media> => {
-  await qc.insertInto('Media').values(media).execute();
-  return media;
+  await tx.insert(MediaTable).values(newMedia).execute();
+  return newMedia;
+};
+
+export const createMedias = async (
+  newMedias: NewMedia[],
+  tx: DbTransaction = db,
+): Promise<Media[]> => {
+  await tx.insert(MediaTable).values(newMedias).execute();
+  return newMedias;
 };
 
 /**
  * Delete a media.
  *
  * @param id - the id of the media to delete
- * @param qc - The query creator to use (user for transactions)
+ * @param tx - The query creator to use (user for transactions)
  * @returns The created media
  */
 export const removeMedia = async (
   id: string,
-  qc: QueryCreator<Database> = db,
+  tx: DbTransaction = db,
 ): Promise<void> => {
-  await qc.deleteFrom('Media').where('id', '=', id).execute();
+  await tx.delete(MediaTable).where(eq(MediaTable.id, id)).execute();
 };
 
 /**
- * Delete multiple medias.
+ * Delete multiple media.
  *
- * @param ids - the list of medias ids to delete
- * @param qc - The query creator to use (user for transactions)
+ * @param ids - the list of media ids to delete
+ * @param tx - The query creator to use (user for transactions)
  * @returns The created media
  */
 export const removeMedias = async (
   ids: string[],
-  qc: QueryCreator<Database> = db,
+  tx: DbTransaction = db,
 ): Promise<void> => {
-  await qc.deleteFrom('Media').where('id', 'in', ids).execute();
+  await tx.delete(MediaTable).where(inArray(MediaTable.id, ids)).execute();
 };

@@ -1,3 +1,4 @@
+import { like } from 'drizzle-orm';
 import {
   connectionFromArray,
   connectionFromArraySlice,
@@ -16,13 +17,15 @@ import {
   getStaticMediasByUsage,
   getCoverTemplatesByKind,
   getCoverTemplatesSuggestion,
+  ProfileTable,
+  post,
 } from '#domains';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
 } from '#helpers/connectionsHelpers';
+import type { CoverTemplate } from '#domains';
 import type { ViewerResolvers } from './__generated__/types';
-import type { CoverTemplate, Prisma } from '@prisma/client';
 
 export const Viewer: ViewerResolvers = {
   profile: async (_root, _, { auth, profileLoader }) => {
@@ -78,12 +81,18 @@ export const Viewer: ViewerResolvers = {
       offset,
     );
 
-    return connectionFromDateSortedItems(followersProfiles, {
-      getDate: post => post.followCreatedAt,
-      // approximations that should be good enough, and avoid a query
-      hasNextPage: followersProfiles.length > 0,
-      hasPreviousPage: offset !== null,
-    });
+    return connectionFromDateSortedItems(
+      followersProfiles.map(p => ({
+        ...p.Profile,
+        followCreatedAt: p.followCreatedAt,
+      })),
+      {
+        getDate: post => post.followCreatedAt,
+        // approximations that should be good enough, and avoid a query
+        hasNextPage: followersProfiles.length > 0,
+        hasPreviousPage: offset !== null,
+      },
+    );
   },
   followedProfilesPosts: async (_root, args, { auth }) => {
     const profileId = auth.profileId;
@@ -110,21 +119,18 @@ export const Viewer: ViewerResolvers = {
   trendingProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
-      await db.selectFrom('Profile').selectAll().execute(),
+      await db.select().from(ProfileTable).execute(),
       args,
     );
   },
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db.selectFrom('Post').selectAll().execute(),
-      args,
-    );
+    return connectionFromArray(await db.select().from(post).execute(), args);
   },
   recommendedProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
-      await db.selectFrom('Profile').selectAll().execute(),
+      await db.select().from(ProfileTable).execute(),
       args,
     );
   },
@@ -132,9 +138,9 @@ export const Viewer: ViewerResolvers = {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
       await db
-        .selectFrom('Post')
-        .selectAll()
-        .where('content', 'like', `%${args.search}%`)
+        .select()
+        .from(post)
+        .where(like(post.content, `%${args.search}%`))
         .execute(),
       args,
     );
@@ -143,9 +149,9 @@ export const Viewer: ViewerResolvers = {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
       await db
-        .selectFrom('Profile')
-        .selectAll()
-        .where('userName', 'like', `%${args.search}%`)
+        .select()
+        .from(ProfileTable)
+        .where(like(ProfileTable.userName, `%${args.search}%`))
         .execute(),
       args,
     );
@@ -190,7 +196,7 @@ export const Viewer: ViewerResolvers = {
       [];
     // TODO refactor this, this is a mess, we should not use the en label as a group by ...
     templates.forEach(template => {
-      const category = (template.category as Prisma.JsonObject)?.en as string; //strong typing cames from the prisma documentation
+      const category = template.category?.en;
 
       if (category) {
         // find object in categories array with category name === category

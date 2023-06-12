@@ -1,40 +1,104 @@
 import { createId } from '@paralleldrive/cuid2';
-import db from './db';
-import { getEntitiesByIds, jsonFieldSerializer } from './generic';
-import type { Database } from './db';
-import type { CardCover } from '@prisma/client';
-import type { QueryCreator } from 'kysely';
+import { inArray, eq } from 'drizzle-orm';
+import { datetime, json, varchar } from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+  mysqlTable,
+} from './db';
+import { customTinyInt } from './generic';
+import type { DbTransaction } from './db';
+import type { InferModel } from 'drizzle-orm';
+
+export const CardCoverTable = mysqlTable('CardCover', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  title: varchar('title', { length: DEFAULT_VARCHAR_LENGTH }),
+  backgroundId: varchar('backgroundId', { length: DEFAULT_VARCHAR_LENGTH }),
+  backgroundStyle: json('backgroundStyle'),
+  contentStyle: json('contentStyle'),
+  createdAt: datetime('createdAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+  foregroundId: varchar('foregroundId', { length: DEFAULT_VARCHAR_LENGTH }),
+  foregroundStyle: json('foregroundStyle'),
+  maskMediaId: varchar('maskMediaId', { length: DEFAULT_VARCHAR_LENGTH }),
+  mediaId: varchar('mediaId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+  mediaStyle: json('mediaStyle').notNull(),
+  merged: customTinyInt('merged').notNull(),
+  segmented: customTinyInt('segmented').notNull(),
+  sourceMediaId: varchar('sourceMediaId', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  }).notNull(),
+  subTitle: varchar('subTitle', { length: DEFAULT_VARCHAR_LENGTH }),
+  subTitleStyle: json('subTitleStyle'),
+  textPreviewMediaId: varchar('textPreviewMediaId', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  }).notNull(),
+  titleStyle: json('titleStyle'),
+  updatedAt: datetime('updatedAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+});
+
+export type CardCover = InferModel<typeof CardCoverTable>;
+export type NewCardCover = Omit<
+  InferModel<typeof CardCoverTable, 'insert'>,
+  'id'
+>;
 
 /**
  * Retrieve a list of covers by their ids
  * @param ids - The ids of the covers to retrieve
  * @returns A list of covers, where the order of the covers matches the order of the ids
  */
-export const getCardCoversByIds = (
-  ids: readonly string[],
-): Promise<Array<CardCover | null>> => getEntitiesByIds('CardCover', ids);
+export const getCardCoversByIds = (ids: string[]): Promise<CardCover[]> =>
+  db
+    .select()
+    .from(CardCoverTable)
+    .where(inArray(CardCoverTable.id, ids))
+    .execute();
 
 /**
  * Create a card cover.
  *
  * @param values - the cardCover fields, excluding the id and the cardCoverDate
- * @param qc - The query creator to use (profile for transactions)
+ * @param tx - The query creator to use (profile for transactions)
  * @returns The created cardCover
  */
 export const createCardCover = async (
-  values: Omit<CardCover, 'createdAt' | 'id' | 'updatedAt'>,
-  qc: QueryCreator<Database> = db,
+  values: NewCardCover,
+  tx: DbTransaction = db,
 ): Promise<CardCover> => {
-  const cardCover = cardSerializer({
-    id: createId(),
+  const addedCardCover = {
     ...values,
-  });
-  await qc.insertInto('CardCover').values(cardCover).execute();
+    id: createId(),
+  };
+  await tx.insert(CardCoverTable).values(addedCardCover).execute();
+
   // TODO should we return the cardCover from the database instead? createdAt might be different
   return {
-    ...cardCover,
+    ...addedCardCover,
+    backgroundId: addedCardCover.backgroundId ?? null,
+    backgroundStyle: addedCardCover.backgroundStyle ?? null,
+    foregroundId: addedCardCover.foregroundId ?? null,
+    foregroundStyle: addedCardCover.foregroundStyle ?? null,
+    segmented: addedCardCover.segmented ?? false,
+    merged: addedCardCover.merged ?? false,
+    title: addedCardCover.title ?? null,
+    titleStyle: addedCardCover.titleStyle ?? null,
+    subTitle: addedCardCover.subTitle ?? null,
+    subTitleStyle: addedCardCover.subTitleStyle ?? null,
+    contentStyle: addedCardCover.contentStyle ?? null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    maskMediaId: addedCardCover.maskMediaId ?? null,
   };
 };
 
@@ -46,31 +110,20 @@ export type CoverUpdates = Partial<
  * Create a card cover.
  *
  * @param values - the cardCover fields, excluding the id and the cardCoverDate
- * @param qc - The query creator to use (profile for transactions)
+ * @param tx - The query creator to use (profile for transactions)
  * @returns The created cardCover
  */
 export const updateCardCover = async (
   id: string,
   updates: CoverUpdates,
-  qc: QueryCreator<Database> = db,
+  tx: DbTransaction = db,
 ): Promise<void> => {
-  await qc
-    .updateTable('CardCover')
-    .where('id', '=', id)
+  await tx
+    .update(CardCoverTable)
     .set({
+      ...updates,
       updatedAt: new Date(),
-      ...cardSerializer(updates),
     })
+    .where(eq(CardCoverTable.id, id))
     .execute();
 };
-
-const jsonFields = [
-  'mediaStyle',
-  'backgroundStyle',
-  'foregroundStyle',
-  'contentStyle',
-  'titleStyle',
-  'subTitleStyle',
-] as const;
-
-const cardSerializer = jsonFieldSerializer(jsonFields);

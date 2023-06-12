@@ -41,6 +41,13 @@ const dataloadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
+const getEntitiesByIds =
+  <T extends { id: string }>(getData: (ids: string[]) => Promise<T[]>) =>
+  async (ids: readonly string[]) => {
+    const entities = await getData(ids as string[]);
+    return ids.map(id => entities.find(entity => entity.id === id) ?? null);
+  };
+
 export const createGraphQLContext = (
   userInfos?: SessionData,
   locale: string = DEFAULT_LOCALE,
@@ -50,16 +57,42 @@ export const createGraphQLContext = (
   return {
     auth: userInfos,
     locale,
-    profileLoader: new DataLoader(getProfilesByIds, dataloadersOptions),
-    cardByProfileLoader: new DataLoader(getUsersCards, dataloadersOptions),
-    cardLoader: new DataLoader(getCardsByIds, dataloadersOptions),
-    coverLoader: new DataLoader(getCardCoversByIds, dataloadersOptions),
-    postLoader: new DataLoader(getPostsByIds, dataloadersOptions),
-    postCommentLoader: new DataLoader(getPostCommentsByIds, dataloadersOptions),
-    mediaLoader: new DataLoader(getMediasByIds, dataloadersOptions),
-    staticMediaLoader: new DataLoader(getStaticMediasByIds, dataloadersOptions),
+    profileLoader: new DataLoader(
+      getEntitiesByIds(getProfilesByIds),
+      dataloadersOptions,
+    ),
+    cardByProfileLoader: new DataLoader(async (ids: readonly string[]) => {
+      const cards = await getUsersCards(ids as string[]);
+      const cardsMap = new Map(cards.map(card => [card.profileId, card]));
+
+      return ids.map(id => cardsMap.get(id) ?? null);
+    }, dataloadersOptions),
+    cardLoader: new DataLoader(
+      getEntitiesByIds(getCardsByIds),
+      dataloadersOptions,
+    ),
+    coverLoader: new DataLoader(
+      getEntitiesByIds(getCardCoversByIds),
+      dataloadersOptions,
+    ),
+    postLoader: new DataLoader(
+      getEntitiesByIds(getPostsByIds),
+      dataloadersOptions,
+    ),
+    postCommentLoader: new DataLoader(
+      getEntitiesByIds(getPostCommentsByIds),
+      dataloadersOptions,
+    ),
+    mediaLoader: new DataLoader(
+      getEntitiesByIds(getMediasByIds),
+      dataloadersOptions,
+    ),
+    staticMediaLoader: new DataLoader(
+      getEntitiesByIds(getStaticMediasByIds),
+      dataloadersOptions,
+    ),
     coverTemplateLoader: new DataLoader(
-      getCoverTemplatesByIds,
+      getEntitiesByIds(getCoverTemplatesByIds),
       dataloadersOptions,
     ),
   };

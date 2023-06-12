@@ -1,6 +1,7 @@
+import { inArray } from 'drizzle-orm';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, getCardModulesByIds } from '#domains';
+import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
@@ -26,9 +27,9 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
 
     try {
       await db
-        .updateTable('CardModule')
+        .update(CardModuleTable)
         .set({ visible })
-        .where('id', 'in', modulesIds)
+        .where(inArray(CardModuleTable.id, modulesIds))
         .execute();
     } catch (e) {
       console.error(e);

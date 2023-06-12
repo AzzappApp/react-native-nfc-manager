@@ -46,7 +46,7 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
       }
     }
     let newImage: CloudinaryResource | undefined = undefined;
-    if (input.image && input.image !== (module?.data as any)?.image) {
+    if (input.image && input.image !== module?.data?.image) {
       newImage = (
         await getMediaInfoByPublicIds([
           { publicId: input.image, kind: 'image' },
@@ -55,7 +55,7 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
     }
 
     try {
-      await db.transaction().execute(async trx => {
+      await db.transaction(async trx => {
         if (newImage) {
           await createMedia(
             {
@@ -94,7 +94,9 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
       //this is mandatory or the media return will be null
       if (newImage) {
         mediaLoader.clear(input.image);
-        await removeMedias([(module?.data as any)?.image]);
+        if (module?.data?.image) {
+          await removeMedias([module?.data?.image]);
+        }
       }
 
       return { card };

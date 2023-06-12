@@ -1,5 +1,23 @@
-import db from './db';
-import type { ProfileCategory } from '@prisma/client';
+import { eq, asc } from 'drizzle-orm';
+import { json, int, mysqlEnum, varchar } from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import { customLabels, customTinyInt } from './generic';
+import type { InferModel } from 'drizzle-orm';
+
+export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
+  labels: customLabels('labels'),
+  medias: json('medias').notNull(),
+  available: customTinyInt('available').default(true).notNull(),
+  order: int('order').notNull(),
+});
+
+export type ProfileCategory = InferModel<typeof ProfileCategoryTable>;
+export type NewProfileCategory = InferModel<
+  typeof ProfileCategoryTable,
+  'insert'
+>;
 
 /**
  * Retrieves a list of all profile categories
@@ -7,10 +25,10 @@ import type { ProfileCategory } from '@prisma/client';
  */
 export const getProfileCategories = async (): Promise<ProfileCategory[]> =>
   db
-    .selectFrom('ProfileCategory')
-    .selectAll()
-    .where('available', '=', true)
-    .orderBy('order', 'asc')
+    .select()
+    .from(ProfileCategoryTable)
+    .where(eq(ProfileCategoryTable.available, true))
+    .orderBy(asc(ProfileCategoryTable.order))
     .execute();
 
 /**
@@ -20,11 +38,10 @@ export const getProfileCategories = async (): Promise<ProfileCategory[]> =>
  */
 export const getProfileCategoryById = async (
   id: string,
-): Promise<ProfileCategory | null> => {
-  const result = await db
-    .selectFrom('ProfileCategory')
-    .selectAll()
-    .where('id', '=', id)
-    .executeTakeFirst();
-  return result ?? null;
-};
+): Promise<ProfileCategory | null> =>
+  db
+    .select()
+    .from(ProfileCategoryTable)
+    .where(eq(ProfileCategoryTable.id, id))
+    .execute()
+    .then(res => res.pop() ?? null);

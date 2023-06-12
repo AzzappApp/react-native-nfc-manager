@@ -15,12 +15,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if schema.prisma file changed in PR
+      - name: Check if schema file changed in PR
         id: changed-files
         uses: tj-actions/changed-files@v35.5.0
         with:
           files: |
-            packages/data/prisma/schema.prisma
+            packages/data/drizzle/meta/_journal.json
 
       - name: Get the current branch name lowercase without dashes
         shell: bash
@@ -43,9 +43,9 @@ jobs:
         run: |
           ./create-db-branch-dr-and-connection.sh "$BRANCH_NAME" "$FROM_BRANCH"
 
-      - name: Create the prisma .env file for pushing the schema
+      - name: Create the .env file for pushing the schema
         if: steps.changed-files.outputs.any_changed == 'true'
-        run: echo "DATABASE_URL='${{ steps.create-db-branch-and-dr.outputs.CONNECT_STRING }}${{secrets.DB_NAME}}?sslaccept=strict'" > packages/data/.env
+        run: echo "DATABASE_URL='${{ steps.create-db-branch-and-dr.outputs.CONNECT_STRING }}${{secrets.DB_NAME}}?ssl={\"rejectUnauthorized\":true}'" > packages/data/.env
 
       - name: Yarn install
         if: steps.changed-files.outputs.any_changed == 'true'
@@ -54,7 +54,7 @@ jobs:
       - name: Push schema changes
         if: steps.changed-files.outputs.any_changed == 'true'
         working-directory: packages/data
-        run: yarn prisma db push
+        run: yarn push-migration
 
       - name: Get Planetscale Pull request info
         if: steps.changed-files.outputs.any_changed == 'true'

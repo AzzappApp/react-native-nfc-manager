@@ -1,7 +1,7 @@
 import { connectionFromArray } from 'graphql-relay';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, getPostComments, getPostReaction } from '#domains';
+import { db, getPostComments, getPostReaction, post } from '#domains';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
@@ -76,12 +76,9 @@ export const Post: PostResolvers = {
       hasPreviousPage: offset !== null,
     });
   },
-  relatedPosts: async (post, args) => {
+  relatedPosts: async (_post, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db.selectFrom('Post').selectAll().execute(),
-      args,
-    );
+    return connectionFromArray(await db.select().from(post).execute(), args);
   },
 };
 

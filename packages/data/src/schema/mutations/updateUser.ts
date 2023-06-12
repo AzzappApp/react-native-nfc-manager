@@ -6,8 +6,8 @@ import {
   getUsersByIds,
   updateUser,
 } from '#domains';
+import type { User } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
-import type { User } from '@prisma/client';
 
 const updateUserMutation: MutationResolvers['updateUser'] = async (
   _,

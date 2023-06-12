@@ -1,5 +1,23 @@
-import db from './db';
-import type { CompanyActivity } from '@prisma/client';
+import { eq } from 'drizzle-orm';
+import { int, varchar } from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import { customLabels } from './generic';
+import type { InferModel } from 'drizzle-orm';
+
+export const CompanyActivityTable = mysqlTable('CompanyActivity', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  labels: customLabels('labels'),
+  profileCategoryId: varchar('profileCategoryId', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  }).notNull(),
+  order: int('order').notNull(),
+});
+
+export type CompanyActivity = InferModel<typeof CompanyActivityTable>;
+export type NewCompanyActivity = InferModel<
+  typeof CompanyActivityTable,
+  'insert'
+>;
 
 /**
  * Retrieves a list of all company activities
@@ -9,11 +27,15 @@ import type { CompanyActivity } from '@prisma/client';
 export const getCompanyActivities = async (
   profileCategoryId?: string,
 ): Promise<CompanyActivity[]> => {
-  let query = db.selectFrom('CompanyActivity').selectAll();
-  if (profileCategoryId) {
-    query = query.where('profileCategoryId', '=', profileCategoryId);
-  }
-  return query.execute();
+  return db
+    .select()
+    .from(CompanyActivityTable)
+    .where(
+      profileCategoryId
+        ? eq(CompanyActivityTable.profileCategoryId, profileCategoryId)
+        : undefined,
+    )
+    .execute();
 };
 
 /**
@@ -24,10 +46,10 @@ export const getCompanyActivities = async (
 export const getCompanyActivityById = async (
   id: string,
 ): Promise<CompanyActivity | null> => {
-  const result = await db
-    .selectFrom('CompanyActivity')
-    .selectAll()
-    .where('id', '=', id)
-    .executeTakeFirst();
-  return result ?? null;
+  return db
+    .select()
+    .from(CompanyActivityTable)
+    .where(eq(CompanyActivityTable.id, id))
+    .execute()
+    .then(res => res.pop() ?? null);
 };

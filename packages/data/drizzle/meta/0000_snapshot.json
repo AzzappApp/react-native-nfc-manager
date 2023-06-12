@@ -1,0 +1,1049 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "mysql",
+  "tables": {
+    "Card": {
+      "name": "Card",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "isMain": {
+          "autoincrement": false,
+          "name": "isMain",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coverId": {
+          "autoincrement": false,
+          "name": "coverId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "profileId": {
+          "autoincrement": false,
+          "name": "profileId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "backgroundColor": {
+          "autoincrement": false,
+          "name": "backgroundColor",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Card_profileId_idx": {
+          "name": "Card_profileId_idx",
+          "columns": [
+            "profileId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "CardCover": {
+      "name": "CardCover",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "autoincrement": false,
+          "name": "title",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "backgroundId": {
+          "autoincrement": false,
+          "name": "backgroundId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "backgroundStyle": {
+          "autoincrement": false,
+          "name": "backgroundStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentStyle": {
+          "autoincrement": false,
+          "name": "contentStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "foregroundId": {
+          "autoincrement": false,
+          "name": "foregroundId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foregroundStyle": {
+          "autoincrement": false,
+          "name": "foregroundStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maskMediaId": {
+          "autoincrement": false,
+          "name": "maskMediaId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mediaId": {
+          "autoincrement": false,
+          "name": "mediaId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mediaStyle": {
+          "autoincrement": false,
+          "name": "mediaStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "merged": {
+          "autoincrement": false,
+          "name": "merged",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "segmented": {
+          "autoincrement": false,
+          "name": "segmented",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sourceMediaId": {
+          "autoincrement": false,
+          "name": "sourceMediaId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subTitle": {
+          "autoincrement": false,
+          "name": "subTitle",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subTitleStyle": {
+          "autoincrement": false,
+          "name": "subTitleStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "textPreviewMediaId": {
+          "autoincrement": false,
+          "name": "textPreviewMediaId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titleStyle": {
+          "autoincrement": false,
+          "name": "titleStyle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "CardModule": {
+      "name": "CardModule",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kind": {
+          "autoincrement": false,
+          "name": "kind",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cardId": {
+          "autoincrement": false,
+          "name": "cardId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "autoincrement": false,
+          "name": "position",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "visible": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "visible",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "CardModule_cardId_idx": {
+          "name": "CardModule_cardId_idx",
+          "columns": [
+            "cardId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "CompanyActivity": {
+      "name": "CompanyActivity",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "labels": {
+          "autoincrement": false,
+          "name": "labels",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "profileCategoryId": {
+          "autoincrement": false,
+          "name": "profileCategoryId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "autoincrement": false,
+          "name": "order",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "CoverTemplate": {
+      "name": "CoverTemplate",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colorPalette": {
+          "autoincrement": false,
+          "name": "colorPalette",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "enabled": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "enabled",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "merged": {
+          "autoincrement": false,
+          "name": "merged",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "segmented": {
+          "autoincrement": false,
+          "name": "segmented",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tags": {
+          "autoincrement": false,
+          "name": "tags",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "autoincrement": false,
+          "name": "category",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "autoincrement": false,
+          "name": "kind",
+          "type": "enum('personal','business')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previewMediaId": {
+          "autoincrement": false,
+          "name": "previewMediaId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "suggested": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "suggested",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "companyActivityIds": {
+          "autoincrement": false,
+          "name": "companyActivityIds",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "Follow": {
+      "name": "Follow",
+      "columns": {
+        "followerId": {
+          "autoincrement": false,
+          "name": "followerId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "followingId": {
+          "autoincrement": false,
+          "name": "followingId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "Follow_followerId_followingId": {
+          "name": "Follow_followerId_followingId",
+          "columns": [
+            "followerId",
+            "followingId"
+          ]
+        }
+      },
+      "indexes": {
+        "Follow_followerId_idx": {
+          "name": "Follow_followerId_idx",
+          "columns": [
+            "followerId"
+          ],
+          "isUnique": false
+        },
+        "Follow_followingId_idx": {
+          "name": "Follow_followingId_idx",
+          "columns": [
+            "followingId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "Interest": {
+      "name": "Interest",
+      "columns": {
+        "tag": {
+          "autoincrement": false,
+          "name": "tag",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "labels": {
+          "autoincrement": false,
+          "name": "labels",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "Media": {
+      "name": "Media",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kind": {
+          "autoincrement": false,
+          "name": "kind",
+          "type": "enum('image','video')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "height": {
+          "autoincrement": false,
+          "name": "height",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "width": {
+          "autoincrement": false,
+          "name": "width",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "Post": {
+      "name": "Post",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "authorId": {
+          "autoincrement": false,
+          "name": "authorId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "autoincrement": false,
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "allowComments": {
+          "autoincrement": false,
+          "name": "allowComments",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "allowLikes": {
+          "autoincrement": false,
+          "name": "allowLikes",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "medias": {
+          "autoincrement": false,
+          "name": "medias",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counterReactions": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "counterReactions",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counterComments": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "counterComments",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Post_authorId_idx": {
+          "name": "Post_authorId_idx",
+          "columns": [
+            "authorId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "PostComment": {
+      "name": "PostComment",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "profileId": {
+          "autoincrement": false,
+          "name": "profileId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postId": {
+          "autoincrement": false,
+          "name": "postId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comment": {
+          "autoincrement": false,
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "PostComment_postId_idx": {
+          "name": "PostComment_postId_idx",
+          "columns": [
+            "postId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "PostReaction": {
+      "name": "PostReaction",
+      "columns": {
+        "profileId": {
+          "autoincrement": false,
+          "name": "profileId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postId": {
+          "autoincrement": false,
+          "name": "postId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reactionKind": {
+          "autoincrement": false,
+          "name": "reactionKind",
+          "type": "enum('like')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "PostReaction_postId_profileId": {
+          "name": "PostReaction_postId_profileId",
+          "columns": [
+            "postId",
+            "profileId"
+          ]
+        }
+      },
+      "indexes": {
+        "PostReaction_postId_idx": {
+          "name": "PostReaction_postId_idx",
+          "columns": [
+            "postId"
+          ],
+          "isUnique": false
+        },
+        "PostReaction_profileId_idx": {
+          "name": "PostReaction_profileId_idx",
+          "columns": [
+            "profileId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "Profile": {
+      "name": "Profile",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "autoincrement": false,
+          "name": "userId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userName": {
+          "autoincrement": false,
+          "name": "userName",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "firstName": {
+          "autoincrement": false,
+          "name": "firstName",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastName": {
+          "autoincrement": false,
+          "name": "lastName",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profileKind": {
+          "autoincrement": false,
+          "name": "profileKind",
+          "type": "enum('personal','business')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "companyName": {
+          "autoincrement": false,
+          "name": "companyName",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colorPalette": {
+          "autoincrement": false,
+          "name": "colorPalette",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profileCategoryId": {
+          "autoincrement": false,
+          "name": "profileCategoryId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interests": {
+          "autoincrement": false,
+          "name": "interests",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "companyActivityId": {
+          "autoincrement": false,
+          "name": "companyActivityId",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "public": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "public",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Profile_userId_idx": {
+          "name": "Profile_userId_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        },
+        "Profile_userName_key": {
+          "name": "Profile_userName_key",
+          "columns": [
+            "userName"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {}
+    },
+    "ProfileCategory": {
+      "name": "ProfileCategory",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "profileKind": {
+          "autoincrement": false,
+          "name": "profileKind",
+          "type": "enum('personal','business')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "labels": {
+          "autoincrement": false,
+          "name": "labels",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "medias": {
+          "autoincrement": false,
+          "name": "medias",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "available": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "available",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "autoincrement": false,
+          "name": "order",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "StaticMedia": {
+      "name": "StaticMedia",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "usage": {
+          "autoincrement": false,
+          "name": "usage",
+          "type": "enum('coverForeground','coverBackground','moduleBackground')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "available": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "available",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tags": {
+          "autoincrement": false,
+          "name": "tags",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "User": {
+      "name": "User",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "autoincrement": false,
+          "name": "email",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "autoincrement": false,
+          "name": "password",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phoneNumber": {
+          "autoincrement": false,
+          "name": "phoneNumber",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP(3))",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "datetime(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "roles": {
+          "autoincrement": false,
+          "name": "roles",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "User_email_key": {
+          "name": "User_email_key",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        },
+        "User_phoneNumber_key": {
+          "name": "User_phoneNumber_key",
+          "columns": [
+            "phoneNumber"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {}
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

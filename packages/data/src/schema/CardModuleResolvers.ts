@@ -48,18 +48,13 @@ const background = (
 };
 
 function getData<TResult, B>(
-  key: string,
+  key: keyof CardModuleModel['data'],
   optional?: B,
 ): (cardModule: CardModuleModel) => B extends true ? TResult | null : TResult;
-function getData<TResult>(key: string, optional: true) {
+function getData<TResult>(key: keyof CardModuleModel['data'], optional: true) {
   return (cardModule: CardModuleModel): TResult | null => {
     const { data } = cardModule;
-    if (
-      data &&
-      typeof data === 'object' &&
-      key in data &&
-      !Array.isArray(data)
-    ) {
+    if (data && key in data) {
       return data[key] as TResult;
     }
     if (optional) {
@@ -82,11 +77,8 @@ export const CardModuleCarousel: CardModuleCarouselResolvers = {
   squareRatio: getData('squareRatio'),
   images: async (cardModule, _, { mediaLoader }) => {
     const { data } = cardModule;
-    return data &&
-      typeof data === 'object' &&
-      'images' in data &&
-      Array.isArray(data.images)
-      ? ((await mediaLoader.loadMany(data.images as string[])).filter(
+    return data?.images
+      ? ((await mediaLoader.loadMany(data.images)).filter(
           m => m && !(m instanceof Error),
         ) as Media[])
       : [];
@@ -213,10 +205,7 @@ const textBackground = (
   { staticMediaLoader }: GraphQLContext,
 ) => {
   const { data } = cardModule;
-  return typeof data === 'object' &&
-    data &&
-    'backgroundId' in data &&
-    typeof data.textBackgroundId === 'string'
+  return data.textBackgroundId
     ? staticMediaLoader.load(data.textBackgroundId)
     : null;
 };

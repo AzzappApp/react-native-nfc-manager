@@ -6,16 +6,9 @@ import { getSessionData } from '@azzapp/auth/viewer';
 import { createProfile, getProfileByUserName } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import type { User } from '@azzapp/auth/viewer';
-import type { ProfileKind } from '@azzapp/data/domains';
+import type { NewProfile } from '@azzapp/data/domains';
 
-type NewProfileBody = {
-  userName: string;
-  profileKind: ProfileKind;
-  profileCategoryId: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  companyName?: string | null;
-  companyActivityId?: string | null;
+type NewProfileBody = NewProfile & {
   authMethod?: 'cookie' | 'token';
 };
 
@@ -84,14 +77,12 @@ export const POST = async (req: Request) => {
       userId: viewer.userId,
       userName,
       profileKind,
-      firstName: firstName ?? null,
-      lastName: lastName ?? null,
-      companyName: companyName ?? null,
-      companyActivityId: companyActivityId ?? null,
-      profileCategoryId: profileCategoryId ?? null,
+      firstName,
+      lastName,
+      companyName,
+      companyActivityId,
+      profileCategoryId,
       colorPalette: '#FFFFFF,#000000', // from #197 specification issue
-      interests: null,
-      public: false,
     });
 
     if (authMethod === 'token') {

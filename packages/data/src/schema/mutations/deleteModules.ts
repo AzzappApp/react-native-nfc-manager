@@ -1,7 +1,7 @@
-import { sql } from 'kysely';
+import { inArray, sql } from 'drizzle-orm';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, getCardModulesByIds } from '#domains';
+import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
@@ -27,10 +27,10 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   }
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await trx
-        .deleteFrom('CardModule')
-        .where('id', 'in', modulesIds)
+        .delete(CardModuleTable)
+        .where(inArray(CardModuleTable.id, modulesIds))
         .execute();
 
       // TODO : We need to evaluate if this the performance of this query
@@ -49,7 +49,7 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
         SET CardModule.position = NewPos.position - 1
         WHERE CardModule.cardId = ${card.id}
       `;
-      await trx.executeQuery(updatePosQuery.compile(trx));
+      await trx.execute(updatePosQuery);
     });
   } catch (e) {
     console.error(e);

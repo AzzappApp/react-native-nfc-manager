@@ -8,7 +8,7 @@ const InterestCreate = () => {
     const { labels, tag } = dataForm;
     return {
       tag,
-      labels: JSON.stringify(labels),
+      labels,
     };
   };
 

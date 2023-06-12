@@ -27,7 +27,7 @@ const swapModules: MutationResolvers['swapModules'] = async (
   }
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await updateCardModule(moduleAId, { position: moduleB.position }, trx);
       await updateCardModule(moduleBId, { position: moduleA.position }, trx);
     });

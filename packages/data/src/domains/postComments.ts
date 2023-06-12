@@ -1,7 +1,43 @@
 import { createId } from '@paralleldrive/cuid2';
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { PostComment } from '@prisma/client';
+import { eq, sql, and, desc, inArray } from 'drizzle-orm';
+import { text, index, datetime, varchar } from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+  mysqlTable,
+} from './db';
+import { post } from './posts';
+import type { InferModel } from 'drizzle-orm';
+
+export const PostCommentTable = mysqlTable(
+  'PostComment',
+  {
+    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
+      .primaryKey()
+      .notNull(),
+    profileId: varchar('profileId', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }).notNull(),
+    postId: varchar('postId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    comment: text('comment').notNull(),
+    createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+  },
+  table => {
+    return {
+      postIdIdx: index('PostComment_postId_idx').on(table.postId),
+    };
+  },
+);
+
+export type PostComment = InferModel<typeof PostCommentTable>;
+export type NewPostComment = InferModel<typeof PostCommentTable, 'insert'>;
+
 /**
  * insert a post reaction
  *
@@ -15,26 +51,25 @@ export const insertPostComment = async (
   postId: string,
   comment: string,
 ): Promise<PostComment> =>
-  db.transaction().execute(async trx => {
+  db.transaction(async trx => {
     const id = createId();
-    const postComment = {
+    const addedPostComment = {
       id,
       profileId,
       postId,
       comment,
-      createdAt: new Date(), // better to return the correct date for the sorting, returningAll is not working and avoid a query request
     };
-    await trx.insertInto('PostComment').values(postComment).execute();
+    await trx.insert(PostCommentTable).values(addedPostComment).execute();
 
     await trx
-      .updateTable('Post')
-      .where('id', '=', postId)
-      .set(eb => ({
-        counterComments: eb.bxp('counterComments', '+', 1),
-      }))
+      .update(post)
+      .set({
+        counterComments: sql`${post.counterComments} + 1`,
+      })
+      .where(eq(post.id, postId))
       .execute();
 
-    return postComment;
+    return { ...addedPostComment, createdAt: new Date() };
   });
 
 /**
@@ -48,16 +83,18 @@ export const getPostComments = async (
   limit: number,
   after: Date | null = null,
 ): Promise<PostComment[]> => {
-  let query = db
-    .selectFrom('PostComment')
-    .selectAll()
-    .where('postId', '=', postId)
-    .orderBy('createdAt', 'desc');
-
-  if (after) {
-    query = query.where('createdAt', '<', after);
-  }
-  return query.limit(limit).execute();
+  return db
+    .select()
+    .from(PostCommentTable)
+    .where(
+      and(
+        eq(PostCommentTable.postId, postId),
+        after ? sql`${PostCommentTable.createdAt} < ${after}` : undefined,
+      ),
+    )
+    .orderBy(desc(PostCommentTable.createdAt))
+    .limit(limit)
+    .execute();
 };
 
 /**
@@ -65,6 +102,9 @@ export const getPostComments = async (
  * @param ids - The ids of the comments to retrieve
  * @returns A list of comments, where the order of the posts matches the order of the ids
  */
-export const getPostCommentsByIds = (
-  ids: readonly string[],
-): Promise<Array<PostComment | null>> => getEntitiesByIds('PostComment', ids);
+export const getPostCommentsByIds = (ids: string[]): Promise<PostComment[]> =>
+  db
+    .select()
+    .from(PostCommentTable)
+    .where(inArray(PostCommentTable.id, ids))
+    .execute();

@@ -1,56 +1,98 @@
 import { createId } from '@paralleldrive/cuid2';
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { Database } from './db';
-import type { Card } from '@prisma/client';
-import type { QueryCreator } from 'kysely';
+import { inArray, and, eq } from 'drizzle-orm';
+import { datetime, index, varchar } from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+  mysqlTable,
+} from './db';
+import { customTinyInt } from './generic';
+import type { DbTransaction } from './db';
+import type { InferModel } from 'drizzle-orm';
+
+export const CardTable = mysqlTable(
+  'Card',
+  {
+    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
+      .primaryKey()
+      .notNull(),
+    isMain: customTinyInt('isMain').notNull(),
+    coverId: varchar('coverId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    profileId: varchar('profileId', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }).notNull(),
+    updatedAt: datetime('updatedAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    backgroundColor: varchar('backgroundColor', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }),
+  },
+  table => {
+    return {
+      profileIdIdx: index('Card_profileId_idx').on(table.profileId),
+    };
+  },
+);
+
+export type Card = InferModel<typeof CardTable>;
+export type NewCard = Omit<InferModel<typeof CardTable, 'insert'>, 'id'>;
 
 /**
- * Retrieve a list of cards by their ids
- * @param ids - The ids of the cards to retrieve
- * @returns A list of cards, where the order of the cards matches the order of the ids
+ * Retrieve a list of card by their ids
+ * @param ids - The ids of the card to retrieve
+ * @returns A list of card, where the order of the card matches the order of the ids
  */
-export const getCardsByIds = (
-  ids: readonly string[],
-): Promise<Array<Card | null>> => getEntitiesByIds('Card', ids);
+export const getCardsByIds = (ids: string[]): Promise<Card[]> =>
+  db.select().from(CardTable).where(inArray(CardTable.id, ids)).execute();
 
 /**
  * Retrieve the main card for a list of profiles
  * @param profileIds - The ids of the profiles to retrieve the main card for
- * @returns A list of cards, where the order of the cards matches the order of the profileIds
+ * @returns A list of card, where the order of the card matches the order of the profileIds
  */
-export const getUsersCards = async (profileIds: readonly string[]) => {
-  const cards = await db
-    .selectFrom('Card')
-    .selectAll()
-    .where('profileId', 'in', profileIds)
-    .where('isMain', '=', true)
+export const getUsersCards = async (profileIds: string[]) => {
+  return db
+    .select()
+    .from(CardTable)
+    .where(
+      and(inArray(CardTable.profileId, profileIds), eq(CardTable.isMain, true)),
+    )
     .execute();
-
-  const cardsMap = new Map(cards.map(card => [card.profileId, card]));
-
-  return profileIds.map(id => cardsMap.get(id) ?? null);
 };
 
 /**
  * Create a card.
  *
  * @param values - the card fields, excluding the id and the cardDate
- * @param qc - The query creator to use (profile for transactions)
+ * @param tx - The query creator to use (profile for transactions)
  * @returns The created card
  */
 export const createCard = async (
-  values: Omit<Card, 'createdAt' | 'id' | 'updatedAt'>,
-  qc: QueryCreator<Database> = db,
+  values: NewCard,
+  tx: DbTransaction = db,
 ): Promise<Card> => {
-  const card = {
-    id: createId(),
+  const addedCard = {
     ...values,
+    id: createId(),
   };
-  await qc.insertInto('Card').values(card).execute();
+
+  console.log({ addedCard });
+  await tx.insert(CardTable).values(addedCard).execute();
   // TODO should we return the card from the database instead? createdAt might be different
   return {
-    ...card,
+    ...addedCard,
+    backgroundColor: addedCard.backgroundColor ?? null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -61,12 +103,16 @@ export const createCard = async (
  *
  * @param id - The id of the card to update
  * @param values - the card fields, excluding the id and the cardDate
- * @param qc - The query creator to use (profile for transactions)
+ * @param tx - The query creator to use (profile for transactions)
  */
 export const updateCard = async (
   id: string,
-  values: Partial<Omit<Card, 'createdAt' | 'id' | 'updatedAt'>>,
-  qc: QueryCreator<Database> = db,
+  values: Partial<Card>,
+  tx: DbTransaction = db,
 ): Promise<void> => {
-  await qc.updateTable('Card').set(values).where('id', '=', id).execute();
+  await tx
+    .update(CardTable)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(CardTable.id, id))
+    .execute();
 };

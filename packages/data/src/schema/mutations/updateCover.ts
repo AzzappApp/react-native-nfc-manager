@@ -7,15 +7,13 @@ import {
   createCard,
   createCardCover,
   createMedia,
+  createMedias,
   db,
-  removeMedia,
+  removeMedias,
   updateCardCover,
 } from '#domains';
-import type { Card, CoverUpdates, Media } from '#domains';
-import type { Database } from '#domains/db';
+import type { Card, CoverUpdates, Media, NewMedia } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
-import type { Prisma } from '@prisma/client';
-import type { Transaction } from 'kysely';
 
 const updateCover: MutationResolvers['updateCover'] = async (
   _,
@@ -49,24 +47,27 @@ const updateCover: MutationResolvers['updateCover'] = async (
   }
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       let coverId;
       if (!cover) {
         // souceMedia can exist in `Media` table (business template + using business image)
         const mediaExist =
           (await mediaLoader.load(input.sourceMedia!.id)) != null;
 
-        await Promise.all([
-          createMedia(input.media!, trx),
-          !mediaExist && createMedia(input.sourceMedia!, trx),
-          createMedia(input.textPreviewMedia!, trx),
-          input.maskMedia && createMedia(input.maskMedia, trx),
-        ]);
+        const mediasToCreate = [input.media!, input.textPreviewMedia!].concat(
+          input.maskMedia ?? [],
+        );
+
+        if (!mediaExist) {
+          mediasToCreate.push(input.sourceMedia!);
+        }
+
+        await createMedias(mediasToCreate, trx);
 
         const cover = await createCardCover(
           {
             mediaId: input.media!.id,
-            mediaStyle: input.mediaStyle as Prisma.JsonValue,
+            mediaStyle: input.mediaStyle,
             sourceMediaId: input.sourceMedia!.id,
             textPreviewMediaId: input.textPreviewMedia!.id,
             maskMediaId: input.maskMedia?.id ?? null,
@@ -87,7 +88,10 @@ const updateCover: MutationResolvers['updateCover'] = async (
         coverId = cover.id;
       } else {
         coverId = cover.id;
-        const mediaOperations: Array<Promise<any> | null> = [];
+
+        const mediasToCreate: NewMedia[] = [];
+        const mediasToDelete: string[] = [];
+
         const updates: CoverUpdates = {};
 
         const entries = convertToNonNullArray(typedEntries(input));
@@ -96,8 +100,11 @@ const updateCover: MutationResolvers['updateCover'] = async (
             case 'media':
               if (value) {
                 updates.mediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(cover.mediaId, input.media, trx),
+                replaceMedia(
+                  cover.mediaId,
+                  input.media,
+                  mediasToCreate,
+                  mediasToDelete,
                 );
               }
               break;
@@ -116,25 +123,29 @@ const updateCover: MutationResolvers['updateCover'] = async (
             case 'maskMedia':
               if (value) {
                 updates.maskMediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(cover.maskMediaId, input.maskMedia, trx),
+
+                replaceMedia(
+                  cover.maskMediaId,
+                  input.maskMedia,
+                  mediasToCreate,
+                  mediasToDelete,
                 );
               }
               break;
             case 'textPreviewMedia':
               if (value) {
                 updates.textPreviewMediaId = value.id;
-                mediaOperations.push(
-                  ...replaceMedia(
-                    cover.textPreviewMediaId,
-                    input.textPreviewMedia,
-                    trx,
-                  ),
+
+                replaceMedia(
+                  cover.textPreviewMediaId,
+                  input.textPreviewMedia,
+                  mediasToCreate,
+                  mediasToDelete,
                 );
               }
               break;
             case 'mediaStyle':
-              updates.mediaStyle = value as Prisma.JsonValue;
+              updates.mediaStyle = value;
               break;
             case 'backgroundId':
               updates.backgroundId = value;
@@ -149,10 +160,10 @@ const updateCover: MutationResolvers['updateCover'] = async (
               updates.foregroundStyle = value;
               break;
             case 'segmented':
-              updates.segmented = value ?? undefined;
+              updates.segmented = value ?? false;
               break;
             case 'merged':
-              updates.merged = value ?? undefined;
+              updates.merged = value ?? false;
               break;
             case 'title':
               updates.title = value;
@@ -174,12 +185,16 @@ const updateCover: MutationResolvers['updateCover'] = async (
           }
         });
 
-        await Promise.all(mediaOperations);
+        await Promise.all([
+          createMedias(mediasToCreate, trx),
+          removeMedias(mediasToDelete, trx),
+        ]);
 
         await updateCardCover(coverId, updates, trx);
 
         coverLoader.clear(coverId);
       }
+
       if (!card) {
         await createCard(
           {
@@ -215,15 +230,18 @@ export default updateCover;
 const replaceMedia = (
   oldMediaId: string | null | undefined,
   newMedia: Media | null | undefined,
-  trx: Transaction<Database>,
+  mediasToCreate: NewMedia[],
+  mediasToDelete: string[],
 ) => {
+  console.log({ oldMediaId, new: newMedia?.id });
   if (oldMediaId === newMedia?.id) {
-    return [];
+    return;
   }
-  //if the media is used in the coverTemplate, we cannot delete it (need a request in json)
-  return [
-    // TODO remove media from cloudinary
-    oldMediaId ? removeMedia(oldMediaId, trx) : null,
-    newMedia ? createMedia(newMedia, trx) : null,
-  ];
+
+  if (oldMediaId) {
+    mediasToDelete.push(oldMediaId);
+  }
+  if (newMedia) {
+    mediasToCreate.push(newMedia);
+  }
 };

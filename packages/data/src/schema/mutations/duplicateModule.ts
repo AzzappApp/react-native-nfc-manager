@@ -1,7 +1,13 @@
+import { and, eq, gt, sql } from 'drizzle-orm';
 import omit from 'lodash/omit';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, createCardModule, getCardModulesByIds } from '#domains';
+import {
+  db,
+  createCardModule,
+  getCardModulesByIds,
+  CardModuleTable,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
@@ -24,14 +30,18 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 
   let createdModuleId: string | null = null;
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await trx
-        .updateTable('CardModule')
-        .set(({ bxp }) => ({
-          position: bxp('position', '+', 1),
-        }))
-        .where('position', '>', module.position)
-        .where('cardId', '=', card.id)
+        .update(CardModuleTable)
+        .set({
+          position: sql`${CardModuleTable.position} + 1`,
+        })
+        .where(
+          and(
+            gt(CardModuleTable.position, module.position),
+            eq(CardModuleTable.cardId, card.id),
+          ),
+        )
         .execute();
 
       const newModule = await createCardModule(

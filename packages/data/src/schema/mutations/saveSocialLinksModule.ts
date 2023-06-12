@@ -48,7 +48,7 @@ const saveSocialLinksModule: MutationResolvers['saveSocialLinksModule'] =
     try {
       if (module) {
         await updateCardModule(module.id, {
-          data: { ...(module.data as object), ...omit(input, 'moduleId') },
+          data: { ...module.data, ...omit(input, 'moduleId') },
         });
       } else {
         await createCardModule({

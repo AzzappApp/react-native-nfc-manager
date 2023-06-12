@@ -14,7 +14,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
   }
 
   try {
-    const post = await db.transaction().execute(async trx => {
+    const post = await db.transaction(async trx => {
       await createMedia(media, trx);
       const post = await createPost(
         {

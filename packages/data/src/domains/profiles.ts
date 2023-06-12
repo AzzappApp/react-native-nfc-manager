@@ -1,30 +1,98 @@
 import { createId } from '@paralleldrive/cuid2';
-import { sql } from 'kysely';
+import {
+  eq,
+  asc,
+  inArray,
+  exists,
+  sql,
+  notInArray,
+  and,
+  lt,
+  desc,
+} from 'drizzle-orm';
+import {
+  mysqlEnum,
+  datetime,
+  index,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/mysql-core';
 import ERRORS from '@azzapp/shared/errors';
-import db from './db';
-import { getEntitiesByIds, sqlCountToNumber } from './generic';
-import type { Profile } from '@prisma/client';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+  mysqlTable,
+} from './db';
+import { FollowTable } from './follows';
+import { customTinyInt } from './generic';
+import type { Profile } from '#schema/ProfileResolvers';
+import type { InferModel } from 'drizzle-orm';
+
+export const ProfileTable = mysqlTable(
+  'Profile',
+  {
+    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
+      .primaryKey()
+      .notNull(),
+    userId: varchar('userId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    userName: varchar('userName', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    firstName: varchar('firstName', { length: DEFAULT_VARCHAR_LENGTH }),
+    lastName: varchar('lastName', { length: DEFAULT_VARCHAR_LENGTH }),
+    profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
+    companyName: varchar('companyName', { length: DEFAULT_VARCHAR_LENGTH }),
+    createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    updatedAt: datetime('updatedAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    colorPalette: varchar('colorPalette', { length: DEFAULT_VARCHAR_LENGTH }),
+    profileCategoryId: varchar('profileCategoryId', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }),
+    interests: varchar('interests', { length: DEFAULT_VARCHAR_LENGTH }),
+    companyActivityId: varchar('companyActivityId', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }),
+    public: customTinyInt('public').default(false).notNull(),
+  },
+  table => {
+    return {
+      userIdIdx: index('Profile_userId_idx').on(table.userId),
+      userNameKey: uniqueIndex('Profile_userName_key').on(table.userName),
+    };
+  },
+);
+
+export type Profile = InferModel<typeof ProfileTable>;
+export type NewProfile = Omit<InferModel<typeof ProfileTable, 'insert'>, 'id'>;
 
 /**
- * Retrieves a list of profiles by their ids.
- * @param ids - The ids of the profiles to retrieve
- * @returns A list of profiles, where the order of the profiles matches the order of the ids
+ * Retrieves a list of profile by their ids.
+ * @param ids - The ids of the profile to retrieve
+ * @returns A list of profile, where the order of the profile matches the order of the ids
  */
-export const getProfilesByIds = (
-  ids: readonly string[],
-): Promise<Array<Profile | null>> => getEntitiesByIds('Profile', ids);
+export const getProfilesByIds = (ids: string[]): Promise<Profile[]> =>
+  db.select().from(ProfileTable).where(inArray(ProfileTable.id, ids)).execute();
 
 /**
  * Retrieves a list of associated to an user
  * @param id - The id of the user
- * @returns The list of profiles associated to the user
+ * @returns The list of profile associated to the user
  */
 export const getUserProfiles = (userId: string): Promise<Profile[]> =>
   db
-    .selectFrom('Profile')
-    .selectAll()
-    .where('userId', '=', userId)
-    .orderBy('userName')
+    .select()
+    .from(ProfileTable)
+    .where(eq(ProfileTable.userId, userId))
+    .orderBy(asc(ProfileTable.userName))
     .execute();
 
 /**
@@ -35,164 +103,177 @@ export const getUserProfiles = (userId: string): Promise<Profile[]> =>
  */
 export const getProfileByUserName = async (
   profileName: string,
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 ): Promise<Profile | null> => {
-  const profile = await db
-    .selectFrom('Profile')
-    .selectAll()
-    .where('userName', '=', profileName)
-    .executeTakeFirst();
-
-  return profile ?? null;
+  return db
+    .select()
+    .from(ProfileTable)
+    .where(eq(ProfileTable.userName, profileName))
+    .execute()
+    .then(res => res.pop() ?? null);
 };
 
 /**
- * Retrieves all profiles with a card
- * @param limit - The maximum number of profiles to retrieve
- * @param offset - The number of profiles to skip
- * @param excludedProfilesIds - The ids of the profiles to exclude from the result
- * @returns A list of profiles
+ * Retrieves all profile with a card
+ * @param limit - The maximum number of profile to retrieve
+ * @param offset - The number of profile to skip
+ * @param excludedprofileIds - The ids of the profile to exclude from the result
+ * @returns A list of profile
  */
 export const getAllProfilesWithCard = async (
   limit: number,
   offset: number,
-  excludedProfilesIds: string[] | null | undefined,
+  excludedprofileIds: string[] | null | undefined,
 ): Promise<Profile[]> => {
-  let query = db
-    .selectFrom('Profile')
-    .selectAll()
-    .whereExists(
-      sql`(select Card.id from Card where Profile.id = Card.profileId)`,
-    );
-
-  if (excludedProfilesIds?.length) {
-    query = query.where('Profile.id', 'not in', excludedProfilesIds);
-  }
-
-  return query.limit(limit).offset(offset).execute();
+  return db
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        exists(sql`select Card.id from Card where Profile.id = Card.profileId`),
+        excludedprofileIds?.length
+          ? notInArray(ProfileTable.id, excludedprofileIds)
+          : undefined,
+      ),
+    )
+    .limit(limit)
+    .offset(offset)
+    .execute();
 };
 
 /**
- * Retrieves the number of profiles with a card
+ * Retrieves the number of profile with a card
  *
- * @returns The number of profiles with a card
+ * @returns The number of profile with a card
  */
 export const getAllProfilesWithCardCount = async (): Promise<number> =>
   db
-    .selectFrom('Profile')
-    .select(db.fn.count('id').as('nbProfiles'))
-    .whereExists(
-      sql`(select Card.id from Card where Profile.id = Card.profileId)`,
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .where(
+      exists(sql`(select Card.id from Card where Profile.id = Card.profileId)`),
     )
-    .executeTakeFirstOrThrow()
-    .then(({ nbProfiles }) => sqlCountToNumber(nbProfiles));
+    .execute()
+    .then(res => res[0].count);
 
 /**
- * Retrieve the list of profiles a profile is following
+ * Retrieve the list of profile a profile is following
  * @param profileId - The id of the profile
- * @returns A list of users
+ * @returns A list of profile
  */
 export const getFollowedProfiles = async (
   profileId: string,
 ): Promise<Profile[]> =>
   db
-    .selectFrom('Profile')
-    .selectAll()
-    .innerJoin('Follow', 'Profile.id', 'Follow.followingId')
-    .whereExists(
-      sql`(select Card.id from Card where Profile.id = Card.profileId)`,
-    )
-    .where('Follow.followerId', '=', profileId)
-    .execute();
+    .select({ Profile: ProfileTable })
+    .from(ProfileTable)
+    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
+    .where(eq(FollowTable.followerId, profileId))
+    .execute()
+    .then(res => res.map(({ Profile }) => Profile));
 
 /**
- * Retrieve the number of profiles a profile is following
+ * Retrieve the number of profile a profile is following
  * @param profileId - The id of the profile
- * @returns the number of profiles a profile is following
+ * @returns the number of profile a profile is following
  */
 export const getFollowedProfilesCount = async (
   profileId: string,
 ): Promise<number> =>
   db
-    .selectFrom('Profile')
-    .select(db.fn.countAll<number>().as('count'))
-    .innerJoin('Follow', 'Profile.id', 'Follow.followingId')
-    .where('Follow.followerId', '=', profileId)
-    .executeTakeFirstOrThrow()
-    .then(({ count }) => count);
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
+    .where(eq(FollowTable.followerId, profileId))
+    .execute()
+    .then(res => res[0].count);
 
 /**
- * Retrieve the list of profiles a profile is being followed
+ * Retrieve the list of profile a profile is being followed
  * @param profileId - The id of the profile
- * @returns the list of profiles a profile is being followed
+ * @returns the list of profile a profile is being followed
  */
 export const getFollowerProfiles = async (
   profileId: string,
   limit: number,
   after: Date | null = null,
-): Promise<Array<Profile & { followCreatedAt: Date }>> => {
-  let query = db
-    .selectFrom('Profile')
-    .selectAll()
-    .innerJoin('Follow', 'Profile.id', 'Follow.followerId')
-    .select(['Follow.createdAt as followCreatedAt'])
-    .where('Follow.followingId', '=', profileId)
-    .orderBy('Follow.createdAt', 'desc');
-
-  if (after) {
-    query = query.where('Follow.createdAt', '<', after);
-  }
-
-  return query.limit(limit).execute();
-};
+): Promise<Array<{ Profile: Profile; followCreatedAt: Date }>> =>
+  db
+    .select({
+      Profile: ProfileTable,
+      followCreatedAt: FollowTable.createdAt,
+    })
+    .from(ProfileTable)
+    .innerJoin(FollowTable, eq(FollowTable.followerId, ProfileTable.id))
+    .where(
+      and(
+        eq(FollowTable.followingId, profileId),
+        after ? lt(FollowTable.createdAt, after) : undefined,
+      ),
+    )
+    .orderBy(desc(FollowTable.createdAt))
+    .limit(limit)
+    .execute();
 
 /**
- * Retrieve the number of profiles a profile is being followed
+ * Retrieve the number of profile a profile is being followed
  * @param profileId - The id of the profile
- * @returns the number of profiles a profile is being followed
+ * @returns the number of profile a profile is being followed
  */
 export const getFollowerProfilesCount = async (
   profileId: string,
 ): Promise<number> =>
   db
-    .selectFrom('Profile')
-    .select(db.fn.countAll<number>().as('count'))
-    .innerJoin('Follow', 'Profile.id', 'Follow.followerId')
-    .where('Follow.followingId', '=', profileId)
-    .executeTakeFirstOrThrow()
-    .then(({ count }) => count);
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .innerJoin(FollowTable, eq(FollowTable.followerId, ProfileTable.id))
+    .where(eq(FollowTable.followingId, profileId))
+    .execute()
+    .then(res => res[0].count);
 
 /**
  * Create a new profile
- * @param data - The profiles fields, excluding the id
+ * @param data - The profile fields, excluding the id
  * @returns The newly created profile
  */
-export const createProfile = async (
-  data: Omit<Profile, 'createdAt' | 'id' | 'updatedAt'>,
-): Promise<Profile> => {
-  const profile = {
-    id: createId(),
-    updatedAt: new Date(),
+export const createProfile = async (data: NewProfile): Promise<Profile> => {
+  const addedProfile = {
     ...data,
+    id: createId(),
   };
-  await db.insertInto('Profile').values(profile).execute();
-  return { ...profile, createdAt: new Date() };
+  await db.insert(ProfileTable).values(addedProfile).execute();
+  return {
+    ...addedProfile,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    firstName: data.firstName ?? '',
+    lastName: data.lastName ?? '',
+    companyName: data.companyName ?? '',
+    colorPalette: data.colorPalette ?? '',
+    profileCategoryId: data.profileCategoryId ?? null,
+    interests: data.interests ?? null,
+    companyActivityId: data.companyActivityId ?? null,
+    public: data.public ?? false,
+  };
 };
 
 export const updateProfile = async (
   profileId: string,
-  data: Partial<Omit<Profile, 'createdAt' | 'id' | 'updatedAt'>>,
+  updates: Partial<Profile>,
 ): Promise<Partial<Profile>> => {
-  const profile = {
+  const updatedProfile = {
     updatedAt: new Date(),
-    ...data,
+    ...updates,
   };
+
   const result = await db
-    .updateTable('Profile')
-    .set(profile)
-    .where('id', '=', profileId)
+    .update(ProfileTable)
+    .set(updatedProfile)
+    .where(eq(ProfileTable.id, profileId))
     .execute();
-  if (result.length > 0) {
-    return profile;
+
+  if (result.rowsAffected > 0) {
+    return updatedProfile;
   } else {
     throw new Error(ERRORS.USER_NOT_FOUND);
   }

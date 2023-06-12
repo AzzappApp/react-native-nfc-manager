@@ -65,7 +65,7 @@ export const Profile: ProfileResolvers = {
     return getFollowerProfilesCount(profile.id);
   },
   public: async (profile, _) => {
-    return profile.public ?? false;
+    return !!profile.public;
   },
 };
 

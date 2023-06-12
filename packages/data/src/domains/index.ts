@@ -1,45 +1,4 @@
 import db from './db';
-import type {
-  ReactionKind,
-  Card,
-  CardCover,
-  CardModule,
-  CompanyActivity,
-  Follow,
-  Media,
-  MediaKind,
-  Post,
-  PostReaction,
-  PostComment,
-  ProfileCategory,
-  ProfileKind,
-  Profile,
-  Interest,
-  CoverTemplate,
-  StaticMedia,
-  User,
-} from '@prisma/client';
-
-export type {
-  Card,
-  CardCover,
-  CardModule,
-  CoverTemplate,
-  CompanyActivity,
-  Follow,
-  Media,
-  MediaKind,
-  Post,
-  PostReaction,
-  PostComment,
-  Profile,
-  ProfileCategory,
-  ProfileKind,
-  ReactionKind,
-  Interest,
-  User,
-  StaticMedia,
-};
 
 export { db };
 

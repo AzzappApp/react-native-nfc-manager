@@ -3,13 +3,12 @@ import type {
   CardCoverTemplateResolvers,
   CoverTemplateResolvers,
 } from './__generated__/types';
-import type { Media } from '@prisma/client';
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
   previewMedia: async ({ previewMediaId }, _, { mediaLoader }) => {
     if (previewMediaId) {
-      return mediaLoader.load(previewMediaId) as Promise<Media>;
+      return mediaLoader.load(previewMediaId);
     }
     return null;
   },
@@ -30,7 +29,7 @@ export const CardCoverTemplate: CardCoverTemplateResolvers = {
   },
   sourceMedia: ({ sourceMediaId }, _, { mediaLoader }) => {
     if (sourceMediaId) {
-      return mediaLoader.load(sourceMediaId) as Promise<Media>;
+      return mediaLoader.load(sourceMediaId);
     }
     return null;
   },

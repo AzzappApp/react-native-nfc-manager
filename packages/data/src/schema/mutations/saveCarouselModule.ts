@@ -64,7 +64,7 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   let mediasToCreates: Array<CloudinaryResource | undefined> = [];
   let mediasToDelete: string[] = [];
   if (input.images?.length) {
-    const oldMedias = ((module?.data as any)?.images as string[]) ?? [];
+    const oldMedias = module?.data?.images ?? [];
     const newMedias = input.images.filter(image => !oldMedias.includes(image));
     mediasToDelete = oldMedias.filter(image => !input.images?.includes(image));
     mediasToCreates = await getMediaInfoByPublicIds(
@@ -78,7 +78,7 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   const modulesData = omit(input, ['moduleId']);
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await Promise.all(
         mediasToCreates.map(resource => {
           if (!resource) {

@@ -1,18 +1,80 @@
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { CoverTemplate, ProfileKind } from '@prisma/client';
+import { eq, inArray, and, isNull, or } from 'drizzle-orm';
+import {
+  mysqlEnum,
+  datetime,
+  varchar,
+  customType,
+} from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+  mysqlTable,
+} from './db';
+import { customTinyInt } from './generic';
+import type { InferModel } from 'drizzle-orm';
+
+type CoverTemplateData = {
+  sourceMediaId?: string;
+};
+
+export const CoverTemplateTable = mysqlTable('CoverTemplate', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  name: varchar('name', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+  colorPalette: varchar('colorPalette', { length: DEFAULT_VARCHAR_LENGTH }),
+  enabled: customTinyInt('enabled').default(true).notNull(),
+  createdAt: datetime('createdAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+  updatedAt: datetime('updatedAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+  data: customType<{ data: CoverTemplateData }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as CoverTemplateData,
+    dataType: () => 'json',
+  })('data').notNull(),
+  merged: customTinyInt('merged').notNull(),
+  segmented: customTinyInt('segmented').notNull(),
+  tags: varchar('tags', { length: DEFAULT_VARCHAR_LENGTH }),
+  category: customType<{ data: { en?: string } }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as { en: string },
+    dataType: () => 'json',
+  })('category'),
+  kind: mysqlEnum('kind', ['personal', 'business']).notNull(),
+  previewMediaId: varchar('previewMediaId', { length: DEFAULT_VARCHAR_LENGTH }),
+  suggested: customTinyInt('suggested').default(false).notNull(),
+  companyActivityIds: varchar('companyActivityIds', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  }),
+});
+
+export type CoverTemplate = InferModel<typeof CoverTemplateTable>;
+export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
+
 /**
  * Retrireves a list of cover templates by their ids.
  *
- * @param {readonly} ids
+ * @param {string[]} ids
  * @param {*} string
  * @param {*} []
- * @return {*}  {(Promise<Array<CoverTemplate | null>>)}
+ * @return {*}  {(Promise<Array<CoverTemplate>>)}
  */
 export const getCoverTemplatesByIds = (
-  ids: readonly string[],
-): Promise<Array<CoverTemplate | null>> => {
-  return getEntitiesByIds('CoverTemplate', ids, 'id');
+  ids: string[],
+): Promise<CoverTemplate[]> => {
+  return db
+    .select()
+    .from(CoverTemplateTable)
+    .where(inArray(CoverTemplateTable.id, ids))
+    .execute();
 };
 
 /**
@@ -20,19 +82,23 @@ export const getCoverTemplatesByIds = (
  * @param {ProfileKind} kind - ProfileKind
  */
 export const getCoverTemplatesByKind = (
-  kind: ProfileKind,
+  kind: CoverTemplate['kind'],
   segmented?: boolean | null,
 ): Promise<CoverTemplate[]> => {
-  let request = db
-    .selectFrom('CoverTemplate')
-    .selectAll()
-    .where('enabled', '=', true)
-    .where('suggested', '=', false)
-    .where('kind', '=', kind);
-  if (segmented != null) {
-    request = request.where('segmented', '=', segmented);
-  }
-  return request.execute();
+  return db
+    .select()
+    .from(CoverTemplateTable)
+    .where(
+      and(
+        eq(CoverTemplateTable.enabled, true),
+        eq(CoverTemplateTable.kind, kind),
+        eq(CoverTemplateTable.suggested, false),
+        segmented != null
+          ? eq(CoverTemplateTable.segmented, !!segmented)
+          : undefined,
+      ),
+    )
+    .execute();
 };
 
 /**
@@ -45,16 +111,18 @@ export const getCoverTemplatesSuggestion = (
   companyActivityId: string,
 ): Promise<CoverTemplate[]> => {
   return db
-    .selectFrom('CoverTemplate')
-    .selectAll()
-    .where('enabled', '=', true)
-    .where('suggested', '=', true)
-    .where('kind', '=', 'business')
-    .where(({ or, cmpr }) =>
-      or([
-        cmpr('companyActivityIds', 'in', [companyActivityId]),
-        cmpr('companyActivityIds', 'is', null),
-      ]),
+    .select()
+    .from(CoverTemplateTable)
+    .where(
+      and(
+        eq(CoverTemplateTable.enabled, true),
+        eq(CoverTemplateTable.kind, 'business'),
+        eq(CoverTemplateTable.suggested, true),
+        or(
+          isNull(CoverTemplateTable.companyActivityIds),
+          inArray(CoverTemplateTable.companyActivityIds, [companyActivityId]),
+        ),
+      ),
     )
     .execute();
 };
