@@ -105,7 +105,7 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderSize}
           min={0}
-          max={10}
+          max={50}
           step={1}
           interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderSizeChange}
@@ -129,7 +129,7 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={120}
+          max={200}
           step={1}
           interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderRadiusChange}

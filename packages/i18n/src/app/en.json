@@ -331,10 +331,6 @@
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
   },
-  "7SXLKR": {
-    "defaultMessage": "Image gap : {size}",
-    "description": "Image gap label in carousel edition"
-  },
   "7XIZlu": {
     "defaultMessage": "Tap me to show the QR Code fullscreen",
     "description": "CoverRenderer - Accessibility Qr code button"
@@ -647,6 +643,10 @@
     "defaultMessage": "Height : {size}",
     "description": "Height message in Line Divider edition"
   },
+  "F+VwnA": {
+    "defaultMessage": "Gap : {size}",
+    "description": "Image gap label in carousel edition"
+  },
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
@@ -822,6 +822,10 @@
   "KLAB5I": {
     "defaultMessage": "Unfollow",
     "description": "PostItem Modal - unfollow Label"
+  },
+  "KLdXMC": {
+    "defaultMessage": "Image carousel",
+    "description": "Image carousel screen title"
   },
   "KOjOOw": {
     "defaultMessage": "Search for profiles, posts...",
@@ -1203,10 +1207,6 @@
     "defaultMessage": "Please enter a valid phone number",
     "description": "Error message when the user enters an invalid phone number"
   },
-  "UfDt73": {
-    "defaultMessage": "Margin left/right : {size}",
-    "description": "Margin horizontal label in carousel edition"
-  },
   "Ufi7bl": {
     "defaultMessage": "Configuration",
     "description": "HorizontalPhoto bottom menu label for settings tab"
@@ -1390,6 +1390,10 @@
   "ZLVIR9": {
     "defaultMessage": "Please enter your current password",
     "description": "Error message when no current password is provided"
+  },
+  "ZLqplQ": {
+    "defaultMessage": "Top/Bottom Margin : {size}",
+    "description": "Margin vertical label in carousel edition"
   },
   "ZNPb7F": {
     "defaultMessage": "Change account",
@@ -2223,6 +2227,10 @@
     "defaultMessage": "Username",
     "description": "Username field in the account details screen"
   },
+  "rlOj9I": {
+    "defaultMessage": "Left/Right Margin : {size}",
+    "description": "Margin horizontal label in carousel edition"
+  },
   "rzJ3iZ": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in image picker wizzard"
@@ -2230,10 +2238,6 @@
   "s/244i": {
     "defaultMessage": "Update your cover",
     "description": "Cover edition screen title"
-  },
-  "s0HnS4": {
-    "defaultMessage": "Photo carousel",
-    "description": "Photo carousel screen title"
   },
   "s1m1n4": {
     "defaultMessage": "Enter your phone number",
@@ -2446,10 +2450,6 @@
   "xNII0A": {
     "defaultMessage": "Logout",
     "description": "logout link"
-  },
-  "xPITiW": {
-    "defaultMessage": "Margin top/bottom : {size}",
-    "description": "Margin vertical label in carousel edition"
   },
   "xTEIZX": {
     "defaultMessage": "Border width",

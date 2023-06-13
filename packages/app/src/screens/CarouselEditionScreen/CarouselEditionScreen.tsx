@@ -409,8 +409,8 @@ const CarouselEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Photo carousel',
-          description: 'Photo carousel screen title',
+          defaultMessage: 'Image carousel',
+          description: 'Image carousel screen title',
         })}
         leftElement={
           <HeaderButton
@@ -451,6 +451,8 @@ const CarouselEditionScreen = ({
                 onAddImage={onShowImagePicker}
                 onRemoveImage={onRemoveImage}
                 onSquareRatioChange={onSquareRatioChange}
+                imageHeight={imageHeight}
+                onImageHeightChange={onImageHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -484,11 +486,9 @@ const CarouselEditionScreen = ({
                 marginVertical={marginVertical}
                 marginHorizontal={marginHorizontal}
                 gap={gap}
-                imageHeight={imageHeight}
                 onMarginVerticalChange={onMarginVerticalChange}
                 onMarginHorizontalChange={onMarginHorizontalChange}
                 onGapChange={onGapChange}
-                onImageHeightChange={onImageHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

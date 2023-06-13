@@ -93,10 +93,10 @@ export const CAROUSEL_DEFAULT_VALUES = {
   borderSize: 0,
   borderColor: '#000000',
   borderRadius: 0,
-  marginVertical: 20,
-  marginHorizontal: 20,
+  marginVertical: 0,
+  marginHorizontal: 0,
   gap: 10,
-  imageHeight: 140,
+  imageHeight: 400,
   squareRatio: false,
 } as const;
 

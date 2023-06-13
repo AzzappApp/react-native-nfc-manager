@@ -18,10 +18,6 @@ type CarouselEditionMarginPanelProps = ViewProps & {
    */
   marginHorizontal: number;
   /**
-   * The image height currently set on the module
-   */
-  imageHeight: number;
-  /**
    * A callback called when the user update the horizontal margin
    */
   onGapChange: (gap: number) => void;
@@ -33,10 +29,6 @@ type CarouselEditionMarginPanelProps = ViewProps & {
    * A callback called when the user update the horizontal margin
    */
   onMarginHorizontalChange: (marginHorizontal: number) => void;
-  /**
-   * A callback called when the user update the image height
-   */
-  onImageHeightChange: (value: number) => void;
 };
 
 /**
@@ -46,11 +38,9 @@ const CarouselEditionMarginPanel = ({
   gap,
   marginVertical,
   marginHorizontal,
-  imageHeight,
   onMarginVerticalChange,
   onMarginHorizontalChange,
   onGapChange,
-  onImageHeightChange,
   style,
   ...props
 }: CarouselEditionMarginPanelProps) => {
@@ -69,23 +59,7 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Images height : {size}"
-              description="Images height label in carousel edition"
-              values={{ size: imageHeight }}
-            />
-          }
-          value={imageHeight}
-          min={40}
-          max={600}
-          step={5}
-          interval={Math.floor((windowWidth - 80) / 60)}
-          onChange={onImageHeightChange}
-          style={styles.slider}
-        />
-        <LabeledDashedSlider
-          label={
-            <FormattedMessage
-              defaultMessage="Margin top/bottom : {size}"
+              defaultMessage="Top/Bottom Margin : {size}"
               description="Margin vertical label in carousel edition"
               values={{
                 size: marginVertical,
@@ -94,7 +68,7 @@ const CarouselEditionMarginPanel = ({
           }
           value={marginVertical}
           min={0}
-          max={60}
+          max={100}
           step={1}
           interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginVerticalChange}
@@ -103,7 +77,7 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Margin left/right : {size}"
+              defaultMessage="Left/Right Margin : {size}"
               description="Margin horizontal label in carousel edition"
               values={{
                 size: marginHorizontal,
@@ -121,7 +95,7 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Image gap : {size}"
+              defaultMessage="Gap : {size}"
               description="Image gap label in carousel edition"
               values={{ size: gap }}
             />

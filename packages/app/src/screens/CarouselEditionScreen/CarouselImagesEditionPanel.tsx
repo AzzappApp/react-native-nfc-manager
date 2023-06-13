@@ -1,7 +1,14 @@
-import { useIntl } from 'react-intl';
-import { StyleSheet, View, ScrollView, Image } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Image,
+  useWindowDimensions,
+} from 'react-native';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import PressableNative from '#ui/PressableNative';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -28,6 +35,10 @@ type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
    */
   squareRatio: boolean;
   /**
+   * The image height currently set on the module
+   */
+  imageHeight: number;
+  /**
    * Called when the user wants to add an image.
    */
   onAddImage: () => void;
@@ -39,6 +50,10 @@ type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
    * Called when the user wants to change the image ratio.
    */
   onSquareRatioChange: (value: boolean) => void;
+  /**
+   * A callback called when the user update the image height
+   */
+  onImageHeightChange: (value: number) => void;
 };
 
 /**
@@ -50,10 +65,14 @@ const CarouselImagesEditionPanel = ({
   onAddImage,
   onRemoveImage,
   onSquareRatioChange,
+  imageHeight,
+  onImageHeightChange,
   style,
   ...props
 }: CarouselImagesEditionPanelProps) => {
   const intl = useIntl();
+
+  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -103,7 +122,7 @@ const CarouselImagesEditionPanel = ({
             >
               <Image source={{ uri: image.uri }} style={styles.image} />
               <View style={styles.imageDeleteButton}>
-                <Icon icon="delete" />
+                <Icon icon="close" />
               </View>
             </PressableNative>
           ))}
@@ -114,6 +133,23 @@ const CarouselImagesEditionPanel = ({
             style={images.length ? { marginLeft: 15 } : undefined}
           />
         </ScrollView>
+
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Images height : {size}"
+              description="Images height label in carousel edition"
+              values={{ size: imageHeight }}
+            />
+          }
+          value={imageHeight}
+          min={20}
+          max={600}
+          step={5}
+          interval={Math.floor((windowWidth - 80) / 60)}
+          onChange={onImageHeightChange}
+          style={styles.slider}
+        />
       </View>
     </View>
   );
@@ -122,6 +158,7 @@ const CarouselImagesEditionPanel = ({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    paddingBottom: 20,
   },
   content: {
     flex: 1,
@@ -147,6 +184,7 @@ const styles = StyleSheet.create({
   },
   slider: {
     width: 200,
+    alignSelf: 'center',
   },
   imageContainer: {
     width: 80,
