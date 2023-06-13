@@ -4,6 +4,7 @@ type Mutation {
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
   updateCard(input: UpdateCardInput!): UpdateCardPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
   removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload

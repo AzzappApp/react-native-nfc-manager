@@ -26,10 +26,16 @@ export const post = mysqlTable(
       .primaryKey()
       .notNull(),
     authorId: varchar('authorId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
-    content: text('content').notNull(),
+    content: text('content'),
     allowComments: customTinyInt('allowComments').notNull(),
     allowLikes: customTinyInt('allowLikes').notNull(),
     createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    updatedAt: datetime('updatedAt', {
       mode: 'date',
       fsp: DEFAULT_DATETIME_PRECISION,
     })
@@ -180,8 +186,28 @@ export const createPost = async (
   // TODO should we return the post from the database instead? createdAt might be different
   return {
     ...addedPost,
+    content: addedPost.content ?? null,
     counterReactions: 0,
     counterComments: 0,
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
+};
+
+/**
+ * update the post
+ *
+ * @param {string} postId
+ * @param {(Partial<Omit<Post, 'createdAt' | 'id'>>)} data
+ * @return {*}  {Promise<Partial<Post>>}
+ */
+export const updatePost = async (
+  postId: string,
+  data: Partial<Omit<Post, 'createdAt' | 'id' | 'media'>>,
+): Promise<void> => {
+  await db
+    .update(post)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(post.id, postId))
+    .execute();
 };

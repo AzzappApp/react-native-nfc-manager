@@ -27,6 +27,7 @@ type Profile implements Node {
     first: Int
   ): PostConnection
   isFollowing: Boolean!
+  isViewer: Boolean!
   nbPosts: Int!
   nbFollowedProfiles: Int!
   nbFollowersProfiles: Int!

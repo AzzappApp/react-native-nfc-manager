@@ -8,6 +8,13 @@
       "when": 1686211463914,
       "tag": "0000_smart_sasquatch",
       "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1686646324511,
+      "tag": "0001_true_spectrum",
+      "breakpoints": false
     }
   ]
 }

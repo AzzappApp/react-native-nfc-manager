@@ -1,0 +1,17 @@
+ALTER TABLE `Card` MODIFY COLUMN `isMain` tinyint(1) NOT NULL;
+ALTER TABLE `CardCover` MODIFY COLUMN `merged` tinyint(1) NOT NULL;
+ALTER TABLE `CardCover` MODIFY COLUMN `segmented` tinyint(1) NOT NULL;
+ALTER TABLE `CardModule` MODIFY COLUMN `visible` tinyint(1) NOT NULL DEFAULT true;
+ALTER TABLE `CoverTemplate` MODIFY COLUMN `enabled` tinyint(1) NOT NULL DEFAULT true;
+ALTER TABLE `CoverTemplate` MODIFY COLUMN `merged` tinyint(1) NOT NULL;
+ALTER TABLE `CoverTemplate` MODIFY COLUMN `segmented` tinyint(1) NOT NULL;
+ALTER TABLE `CoverTemplate` MODIFY COLUMN `suggested` tinyint(1) NOT NULL;
+ALTER TABLE `CoverTemplate` MODIFY COLUMN `suggested` tinyint(1) NOT NULL DEFAULT false;
+ALTER TABLE `Post` MODIFY COLUMN `content` text;
+ALTER TABLE `Post` MODIFY COLUMN `allowComments` tinyint(1) NOT NULL;
+ALTER TABLE `Post` MODIFY COLUMN `allowLikes` tinyint(1) NOT NULL;
+ALTER TABLE `Profile` MODIFY COLUMN `public` tinyint(1) NOT NULL;
+ALTER TABLE `Profile` MODIFY COLUMN `public` tinyint(1) NOT NULL DEFAULT false;
+ALTER TABLE `ProfileCategory` MODIFY COLUMN `available` tinyint(1) NOT NULL DEFAULT true;
+ALTER TABLE `StaticMedia` MODIFY COLUMN `available` tinyint(1) NOT NULL DEFAULT true;
+ALTER TABLE `Post` ADD `updatedAt` datetime(3) DEFAULT (CURRENT_TIMESTAMP(3)) NOT NULL;

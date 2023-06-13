@@ -17,6 +17,7 @@ import toggleFollowing from './toggleFollowing';
 import updateCard from './updateCard';
 import updateCover from './updateCover';
 import updateModulesVisibility from './updateModulesVisibility';
+import updatePost from './updatePost';
 import updateProfile from './updateProfile';
 import updateUser from './updateUser';
 import type {
@@ -63,6 +64,7 @@ export const Mutation: MutationResolvers = {
   updateCover: createMutationWithClientMutationId(updateCover),
   updateCard: createMutationWithClientMutationId(updateCard),
   createPost: createMutationWithClientMutationId(createPost),
+  updatePost: createMutationWithClientMutationId(updatePost),
   toggleFollowing: createMutationWithClientMutationId(toggleFollowing),
   removeFollower: createMutationWithClientMutationId(removeFollower),
   togglePostReaction: createMutationWithClientMutationId(togglePostReaction),

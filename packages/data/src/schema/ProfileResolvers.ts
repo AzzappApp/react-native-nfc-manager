@@ -55,6 +55,9 @@ export const Profile: ProfileResolvers = {
   isFollowing: async (profile, _, { auth }) => {
     return auth.profileId ? isFollowing(auth.profileId, profile.id) : false;
   },
+  isViewer: async (profile, _, { auth }) => {
+    return auth.profileId === profile.id;
+  },
   nbPosts: async (profile, _) => {
     return getProfilesPostsCount(profile.id);
   },

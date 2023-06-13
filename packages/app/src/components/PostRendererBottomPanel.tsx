@@ -7,15 +7,16 @@ import { relativeDateMinute } from '#helpers/dateHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
 import PressableOpacity from '#ui/PressableOpacity';
+import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import { useRouter } from './NativeRouter';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
-
 import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelToggleFollowMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelToggleFollowMutation.graphql';
+import type { PostRendererBottomPanelUpdatePostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
 
 type PostRendererBottomPanelProps = {
   /**
@@ -58,12 +59,18 @@ const PostRendererBottomPanel = ({
         id
         content
         counterComments
+        allowComments
+        allowLikes
         previewComment {
           id
           comment
           author {
             userName
           }
+        }
+        author {
+          id
+          isViewer
         }
         createdAt
       }
@@ -127,6 +134,37 @@ const PostRendererBottomPanel = ({
         }
       }
     `);
+
+  const [commitUpdatePost] =
+    useMutation<PostRendererBottomPanelUpdatePostMutation>(graphql`
+      mutation PostRendererBottomPanelUpdatePostMutation(
+        $input: UpdatePostInput!
+      ) {
+        updatePost(input: $input) {
+          post {
+            id
+            allowComments
+            allowLikes
+          }
+        }
+      }
+    `);
+
+  const setAllowComments = () => {
+    commitUpdatePost({
+      variables: {
+        input: { postId: post.id, allowComments: !post.allowComments },
+      },
+    });
+  };
+
+  const setAllowLikes = () => {
+    commitUpdatePost({
+      variables: {
+        input: { postId: post.id, allowLikes: !post.allowLikes },
+      },
+    });
+  };
 
   const toggleFollow = () => {
     if (toggleFollowingActive) {
@@ -201,43 +239,106 @@ const PostRendererBottomPanel = ({
         onRequestClose={toggleModal}
       >
         <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
+          {post.author.isViewer && (
+            <View style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Likes"
+                  description="PostItem Modal - Likes switch Label"
+                />
+              </Text>
+              <Switch
+                variant="large"
+                value={post.allowLikes}
+                onValueChange={setAllowLikes}
+              />
+            </View>
+          )}
+          {post.author.isViewer && (
+            <View style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Comments"
+                  description="PostItem Modal - Comments switch Label"
+                />
+              </Text>
+              <Switch
+                variant="large"
+                value={post.allowComments}
+                onValueChange={setAllowComments}
+              />
+            </View>
+          )}
+
           <PressableOpacity onPress={copyLink} style={styles.modalLine}>
             <Text variant="medium">
-              <FormattedMessage defaultMessage="Copy link" description="" />
+              <FormattedMessage
+                defaultMessage="Copy link"
+                description="PostItem Modal - Copy Link Label"
+              />
             </Text>
           </PressableOpacity>
           <PressableOpacity onPress={onShare} style={styles.modalLine}>
             <Text variant="medium">
-              <FormattedMessage defaultMessage="Share" description="" />
+              <FormattedMessage
+                defaultMessage="Share"
+                description="PostItem Modal - Share Label"
+              />
             </Text>
           </PressableOpacity>
           <PressableOpacity onPress={addComment} style={styles.modalLine}>
             <Text variant="medium">
-              <FormattedMessage defaultMessage="Add a comment" description="" />
-            </Text>
-          </PressableOpacity>
-          <PressableOpacity onPress={toggleFollow} style={styles.modalLine}>
-            {author?.isFollowing ? (
-              <Text variant="medium">
-                <FormattedMessage defaultMessage="Follow" description="" />
-              </Text>
-            ) : (
-              <Text variant="medium" style={{ color: colors.grey400 }}>
-                <FormattedMessage defaultMessage="Unfollow" description="" />
-              </Text>
-            )}
-          </PressableOpacity>
-          <PressableOpacity
-            onPress={report}
-            style={[styles.modalLine, styles.errorModalLine]}
-          >
-            <Text variant="error">
               <FormattedMessage
-                defaultMessage="Report this post"
-                description=""
+                defaultMessage="Add a comment"
+                description="PostItem Modal - Add a comment Label"
               />
             </Text>
           </PressableOpacity>
+          {!post.author.isViewer && (
+            <PressableOpacity onPress={toggleFollow} style={styles.modalLine}>
+              {author?.isFollowing ? (
+                <Text variant="medium">
+                  <FormattedMessage
+                    defaultMessage="Follow"
+                    description="PostItem Modal - Follows Label"
+                  />
+                </Text>
+              ) : (
+                <Text variant="medium" style={{ color: colors.grey400 }}>
+                  <FormattedMessage
+                    defaultMessage="Unfollow"
+                    description="PostItem Modal - unfollow Label"
+                  />
+                </Text>
+              )}
+            </PressableOpacity>
+          )}
+          {!post.author.isViewer && (
+            <PressableOpacity
+              onPress={report}
+              style={[styles.modalLine, styles.errorModalLine]}
+            >
+              <Text variant="error">
+                <FormattedMessage
+                  defaultMessage="Report this post"
+                  description="PostItem Modal - Likes Label"
+                />
+              </Text>
+            </PressableOpacity>
+          )}
+          {post.author.isViewer && (
+            <PressableOpacity
+              onPress={report}
+              style={[styles.modalLine, styles.errorModalLine]}
+            >
+              <Text variant="error">
+                <FormattedMessage
+                  defaultMessage="Delete this post"
+                  description="PostItem Modal - Delete this post"
+                />
+              </Text>
+            </PressableOpacity>
+          )}
         </View>
       </BottomSheetModal>
     </>
@@ -248,8 +349,18 @@ export default PostRendererBottomPanel;
 
 const styles = StyleSheet.create({
   bottomContainerPost: { marginHorizontal: 20, rowGap: 10 },
-  modalLine: { height: 32, marginHorizontal: 20 },
-  errorModalLine: { alignItems: 'center' },
+  modalLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 32,
+    marginHorizontal: 20,
+  },
+  errorModalLine: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   relativeTime: { color: colors.grey400 },
   textCommentCounter: { color: colors.grey400, marginTop: 5 },
   content: {

@@ -1,4 +1,8 @@
 {
+  "++A1LG": {
+    "defaultMessage": "Follow",
+    "description": "PostItem Modal - Follows Label"
+  },
   "+5tXtC": {
     "defaultMessage": "Save",
     "description": "Save button label in  Line Divider module screen"
@@ -159,6 +163,10 @@
     "defaultMessage": "Tap to select a font",
     "description": "Hint of the font dropdown button"
   },
+  "2yYWZb": {
+    "defaultMessage": "Add a comment",
+    "description": "PostItem Modal - Add a comment Label"
+  },
   "3+i2KR": {
     "defaultMessage": "Category image",
     "description": "ProfileKindStep - Category image alt"
@@ -186,10 +194,6 @@
   "428m8h": {
     "defaultMessage": "Add a color",
     "description": "ColorPicker component title when adding a color"
-  },
-  "46b+Vl": {
-    "defaultMessage": "Unfollow",
-    "description": ""
   },
   "46wzuE": {
     "defaultMessage": "Slide to change the background opacity",
@@ -338,6 +342,10 @@
   "7j6ah2": {
     "defaultMessage": "Select this cover template template for your profile",
     "description": "TemplateSelectorTemplateItem accessibilityHint template item"
+  },
+  "7kcyZE": {
+    "defaultMessage": "Report this post",
+    "description": "PostItem Modal - Likes Label"
   },
   "7rGmW+": {
     "defaultMessage": "Tell us more about your company",
@@ -526,10 +534,6 @@
   "CVzXRv": {
     "defaultMessage": "Share",
     "description": "Share button label"
-  },
-  "CcpVyl": {
-    "defaultMessage": "Share",
-    "description": ""
   },
   "CerSTi": {
     "defaultMessage": "Border color",
@@ -815,6 +819,10 @@
     "defaultMessage": "Horizontal",
     "description": "Label of the horizontal orientation in cover edition"
   },
+  "KLAB5I": {
+    "defaultMessage": "Unfollow",
+    "description": "PostItem Modal - unfollow Label"
+  },
   "KOjOOw": {
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
@@ -846,10 +854,6 @@
   "L0l2Pm": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in Line Divider edition"
-  },
-  "L4Tupd": {
-    "defaultMessage": "Copy link",
-    "description": ""
   },
   "L4n0w6": {
     "defaultMessage": "Add a new section",
@@ -1018,10 +1022,6 @@
   "ParXIq": {
     "defaultMessage": "Select and display the album",
     "description": "Album Picker - Accessibliity label button select album"
-  },
-  "Phg2FU": {
-    "defaultMessage": "Add a comment",
-    "description": ""
   },
   "PmtfGE": {
     "defaultMessage": "Documentary",
@@ -1279,6 +1279,10 @@
     "defaultMessage": "Configuration",
     "description": "Title of the settings section in HorizontalPhoto edition"
   },
+  "W/q0Ca": {
+    "defaultMessage": "Copy link",
+    "description": "PostItem Modal - Copy Link Label"
+  },
   "WBD9Bx": {
     "defaultMessage": "Next",
     "description": "Button label of screens asking for camera/micro permissions"
@@ -1410,10 +1414,6 @@
   "Zf2i/A": {
     "defaultMessage": "Height : {size}",
     "description": "height message in SimpleButton edition"
-  },
-  "Zlh6em": {
-    "defaultMessage": "Follow",
-    "description": ""
   },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
@@ -1674,6 +1674,10 @@
   "fkPpUB": {
     "defaultMessage": "Edit SectionBackground",
     "description": "BlockText bottom menu label for SectionBackground tab"
+  },
+  "fm8vGg": {
+    "defaultMessage": "Comments",
+    "description": "PostItem Modal - Comments switch Label"
   },
   "fotQfe": {
     "defaultMessage": "Vertical Spacing",
@@ -2103,6 +2107,10 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in carousel edition"
   },
+  "pOBqGC": {
+    "defaultMessage": "Likes",
+    "description": "PostItem Modal - Likes switch Label"
+  },
   "peQNDG": {
     "defaultMessage": "Image ratio",
     "description": "Accessibility label of the image ratio button in carousel edition"
@@ -2123,9 +2131,17 @@
     "defaultMessage": "Background",
     "description": "Label of Background tab in simple text edition"
   },
+  "q/RH9/": {
+    "defaultMessage": "Share",
+    "description": "PostItem Modal - Share Label"
+  },
   "q/ZByJ": {
     "defaultMessage": "Thermal",
     "description": "Thermal photo filter name"
+  },
+  "q3qdLJ": {
+    "defaultMessage": "Delete this post",
+    "description": "PostItem Modal - Delete this post"
   },
   "q63qIK": {
     "defaultMessage": "Margin size",
@@ -2402,10 +2418,6 @@
   "wfjPDR": {
     "defaultMessage": "Photos gallery",
     "description": "Accessibility label of the Photos gallery tabs in image picking wizzard"
-  },
-  "wiGGit": {
-    "defaultMessage": "Report this post",
-    "description": ""
   },
   "wkQ0bm": {
     "defaultMessage": "video",

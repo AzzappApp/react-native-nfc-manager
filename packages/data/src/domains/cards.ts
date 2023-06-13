@@ -87,7 +87,6 @@ export const createCard = async (
     id: createId(),
   };
 
-  console.log({ addedCard });
   await tx.insert(CardTable).values(addedCard).execute();
   // TODO should we return the card from the database instead? createdAt might be different
   return {
