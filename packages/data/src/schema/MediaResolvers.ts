@@ -31,7 +31,7 @@ export const MediaVideo: MediaVideoResolvers = {
     return getVideoThumbnailURL(id, width, height, pixelRatio);
   },
   aspectRatio: ({ width, height }) => {
-    return width ?? 1 / (height ?? 1);
+    return (width ?? 1) / (height ?? 1);
   },
 };
 
