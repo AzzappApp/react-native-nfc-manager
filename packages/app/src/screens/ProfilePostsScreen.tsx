@@ -1,49 +1,43 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import PostList from '#components/PostList';
+import relayScreen from '#helpers/relayScreen';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ProfilePostsRoute } from '#routes';
 import type { ProfilePostsScreenFragment_posts$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_posts.graphql';
-import type { ProfilePostsScreenFragment_profile$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_profile.graphql';
-import type { ProfilePostsScreenFragment_viewerProfile$key } from '@azzapp/relay/artifacts/ProfilePostsScreenFragment_viewerProfile.graphql';
+import type { ProfilePostsScreenQuery } from '@azzapp/relay/artifacts/ProfilePostsScreenQuery.graphql';
 
-type ProfilePostsScreenProps = {
-  profile: ProfilePostsScreenFragment_posts$key &
-    ProfilePostsScreenFragment_profile$key;
-  viewerProfile: ProfilePostsScreenFragment_viewerProfile$key;
-  hasFocus?: boolean;
-};
+const userPostsScreenQuery = graphql`
+  query ProfilePostsScreenQuery($userName: String!) {
+    profile(userName: $userName) {
+      id
+      userName
+      ...PostRendererFragment_author
+      ...ProfilePostsScreenFragment_posts
+    }
+    viewer {
+      profile {
+        id
+        userName
+      }
+    }
+  }
+`;
 
 const ProfilePostsScreen = ({
-  profile: profileKey,
-  viewerProfile,
-  hasFocus = true,
-}: ProfilePostsScreenProps) => {
-  const profile = useFragment(
-    graphql`
-      fragment ProfilePostsScreenFragment_profile on Profile {
-        id
-        userName
-        ...PostRendererFragment_author
-      }
-    `,
-    profileKey as ProfilePostsScreenFragment_profile$key,
+  preloadedQuery,
+  hasFocus,
+}: RelayScreenProps<ProfilePostsRoute, ProfilePostsScreenQuery>) => {
+  const { profile, viewer } = usePreloadedQuery(
+    userPostsScreenQuery,
+    preloadedQuery,
   );
-
-  const { userName } = useFragment(
-    graphql`
-      fragment ProfilePostsScreenFragment_viewerProfile on Profile {
-        id
-        userName
-      }
-    `,
-    viewerProfile,
-  );
-
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
@@ -64,7 +58,7 @@ const ProfilePostsScreen = ({
           }
         }
       `,
-      profileKey as ProfilePostsScreenFragment_posts$key,
+      profile as ProfilePostsScreenFragment_posts$key,
     );
 
   const intl = useIntl();
@@ -106,11 +100,15 @@ const ProfilePostsScreen = ({
     [data.posts?.edges],
   );
 
+  if (!profile) {
+    return null;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
         middleElement={
-          userName === profile.userName
+          viewer.profile?.userName === profile.userName
             ? intl.formatMessage({
                 defaultMessage: 'My posts',
                 description: 'ProfilePostScreen viewer user title Header',
@@ -146,4 +144,7 @@ const ProfilePostsScreen = ({
   );
 };
 
-export default ProfilePostsScreen;
+export default relayScreen(ProfilePostsScreen, {
+  query: userPostsScreenQuery,
+  getVariables: ({ userName }) => ({ userName }),
+});

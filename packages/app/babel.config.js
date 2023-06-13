@@ -1,4 +1,9 @@
-const baseConfig = require('./babel.config.base.js');
+const path = require('path');
+
+const relayArtifactDirectory = path.join(
+  path.dirname(require.resolve('@azzapp/relay/package.json')),
+  'artifacts',
+);
 
 module.exports = {
   presets: [
@@ -9,5 +14,26 @@ module.exports = {
       },
     ],
   ],
-  plugins: [...baseConfig.getPlugins(true), 'react-native-reanimated/plugin'],
+  plugins: [
+    // TODO allowList to avoid bad env injected ?
+    ['module:react-native-dotenv', { moduleName: 'process.env' }],
+    [
+      'module-resolver',
+      {
+        alias: {
+          '^#(.+)': './src/\\1',
+          '@azzapp/shared': '../shared/src',
+        },
+      },
+    ],
+    ['relay', { artifactDirectory: relayArtifactDirectory }],
+    [
+      'formatjs',
+      {
+        removeDefaultMessage: process.env.NODE_ENV === 'production',
+        idInterpolationPattern: '[sha1:contenthash:base64:6]',
+      },
+    ],
+    'react-native-reanimated/plugin',
+  ],
 };

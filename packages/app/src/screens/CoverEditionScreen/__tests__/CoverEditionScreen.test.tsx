@@ -64,28 +64,11 @@ const mockRouter = {
   back: jest.fn(),
 };
 
-const mockWebAPI = {
-  uploadSign: jest.fn(),
-  uploadMedia: jest.fn(),
-};
-
-jest.mock('#PlatformEnvironment', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
+jest.mock('#components/NativeRouter', () => {
   return {
+    ...jest.requireActual('#components/NativeRouter'),
     useRouter() {
       return mockRouter;
-    },
-    useWebAPI() {
-      return mockWebAPI;
-    },
-
-    PlatformEnvironmentProvider: ({
-      children,
-    }: {
-      children: React.ReactNode;
-    }) => {
-      return <>{children}</>;
     },
   };
 });

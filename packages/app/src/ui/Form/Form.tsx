@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useContext, cloneElement } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 import FormContext from './FormContext';
 import type { ReactElement } from 'react';
@@ -18,10 +18,6 @@ const Form = ({ onSubmit, ...props }: ViewProps & { onSubmit(): void }) => {
     }),
     [],
   );
-  if (Platform.OS === 'web') {
-    /* accessiblity form is handled by react native web */
-    props = { ...props, accessibilityRole: 'form' as any };
-  }
 
   return (
     <FormContext.Provider value={contextValue}>

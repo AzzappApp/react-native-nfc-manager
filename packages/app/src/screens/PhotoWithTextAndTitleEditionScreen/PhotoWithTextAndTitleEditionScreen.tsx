@@ -8,14 +8,15 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import exportMedia from '#screens/PostCreationScreen/exportMedia';
@@ -180,7 +181,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const isValid = isNotFalsyString(text) && isNotFalsyString(title) && image;
   const canSave = dirty && isValid && !saving;
 
-  const WebAPI = useWebAPI();
   const router = useRouter();
 
   const [uploadProgress, setUploadProgress] =
@@ -199,7 +199,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     if (!mediaId && updateImage?.uri) {
       //we need to save the media first
-      const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
+      const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
         target: 'cover',
       });
@@ -210,8 +210,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
         type: 'image/jpeg',
       };
 
-      const { progress: uploadProgress, promise: uploadPromise } =
-        WebAPI.uploadMedia(file, uploadURL, uploadParameters);
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
@@ -256,7 +259,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
     photoWithTextAndTitle?.background?.id,
     data?.image?.id,
     commit,
-    WebAPI,
     router,
   ]);
 

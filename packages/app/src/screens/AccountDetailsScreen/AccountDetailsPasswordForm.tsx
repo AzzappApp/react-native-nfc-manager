@@ -3,10 +3,10 @@ import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -44,7 +44,7 @@ const AccountDetailsPasswordForm = ({
 
   const intl = useIntl();
 
-  const vp = useViewportSize();
+  const insets = useSafeAreaInsets();
 
   const [commitMutation] = useUpdateUser();
 
@@ -91,7 +91,7 @@ const AccountDetailsPasswordForm = ({
   return (
     <BottomSheetModal
       visible={visible}
-      height={vp`${insetBottom}  + ${280}`}
+      height={insets.bottom + 280}
       onRequestClose={toggleBottomSheet}
       headerTitle={intl.formatMessage({
         defaultMessage: 'Edit password',

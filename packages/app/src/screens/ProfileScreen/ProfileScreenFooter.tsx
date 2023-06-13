@@ -11,7 +11,73 @@ import ViewTransition from '#ui/ViewTransition';
 import ProfileScreenButtonBar from './ProfileScreenButtonBar';
 import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { ProfileScreenFooterProps } from './profileScreenTypes';
+
+export type ProfileScreenFooterProps = {
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+  /**
+   * Whether the profile is in selection mode
+   */
+  selectionMode: boolean;
+  /**
+   * true when the profile is ready to be displayed (animation finished)
+   */
+  ready: boolean;
+  /**
+   * The user name of the current displayed profile
+   */
+  userName: string;
+  /**
+   * True when the user select some modules
+   */
+  hasSelectedModules: boolean;
+  /**
+   * True when selection contains hidden modules
+   */
+  selectionContainsHiddenModules: boolean;
+  /**
+   * edit mode display mode
+   */
+  currentEditionView: 'desktop' | 'mobile' | 'preview';
+  /**
+   * the background color of the profile
+   */
+  backgroundColor: string;
+  /**
+   * A callback called when the user press the home button
+   */
+  onHome: () => void;
+  /**
+   * A callback called when the user press the edit button
+   */
+  onEdit: () => void;
+  /**
+   * A callback called when the user press the follow button
+   */
+  onToggleFollow: (follow: boolean) => void;
+  /**
+   * A callback called when the user switch the edit mode display mode
+   */
+  onEditingDisplayModeChange: (view: 'desktop' | 'mobile') => void;
+  /**
+   * A callback called when the user press the add module button
+   */
+  onRequestNewModule: () => void;
+  /**
+   * A callback called when the user press the color picker button
+   */
+  onRequestColorPicker: () => void;
+  /**
+   * Called when the user press the hide button in edit selection mode
+   */
+  onToggleVisibility: (visible: boolean) => void;
+  /**
+   * Called when the user press the delete button in edit selection mode
+   */
+  onDelete: () => void;
+};
 
 const ProfileScreenFooter = ({
   editing,

@@ -1,15 +1,24 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { createId } from '#helpers/idHelpers';
-import PostLink from '../PostLink';
-import PostGridContainer from './PostGridContainer';
-import PostGridWindowScrollContainer from './PostGridWindowScrollContainer';
-import type { ItemLayout, Post } from './types';
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
+import useScrollToTopInterceptor from '#hooks/useScrollToTopInterceptor/useScrollToTopInterceptor.ios';
+import PostLink from './PostLink';
+import type {
+  PostsGrid_posts$data,
+  PostsGrid_posts$key,
+} from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
+import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type PostsGrid = {
   posts: PostsGrid_posts$key;
@@ -25,7 +34,6 @@ type PostsGrid = {
   onScroll?: (scrollPosition: number) => void;
   style?: StyleProp<ViewStyle>;
   postsContainerStyle?: StyleProp<ViewStyle>;
-  useWindowScroll?: boolean;
   nestedScrollEnabled?: boolean;
 };
 
@@ -48,7 +56,6 @@ const PostsGrid = ({
   onScroll: onScrollCallback,
   style,
   postsContainerStyle,
-  useWindowScroll,
   nestedScrollEnabled = false,
 }: PostsGrid) => {
   const posts = useFragment(
@@ -307,64 +314,103 @@ const PostsGrid = ({
     }
   }, [onReady]);
 
-  const GridContainer = Platform.select({
-    default: PostGridContainer,
-    web: useWindowScroll ? PostGridWindowScrollContainer : PostGridContainer,
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const scrollToTopInterceptor = useScrollToTopInterceptor(() => {
+    if (scrollViewRef.current) {
+      onWillScrollToTop?.();
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
   });
 
+  const scrollViewRefCallback = useCallback(
+    (ref: ScrollView | null) => {
+      scrollToTopInterceptor(ref);
+      scrollViewRef.current = ref;
+    },
+    [scrollToTopInterceptor],
+  );
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    setScrollViewHeight?.(e.nativeEvent.layout.height);
+  };
+
+  const onHeaderLayout = (e: LayoutChangeEvent) => {
+    setHeaderSize?.(e.nativeEvent.layout.height);
+  };
+
   return (
-    <GridContainer
-      contentHeight={contentHeight}
-      stickyHeaderIndices={stickyHeaderIndices}
-      refreshing={refreshing}
-      ListHeaderComponent={ListHeaderComponent}
-      ListFooterComponent={ListFooterComponent}
-      style={style}
-      postsContainerStyle={postsContainerStyle}
+    <ScrollView
+      accessibilityRole="list"
+      testID="post-grid-container"
       nestedScrollEnabled={nestedScrollEnabled}
-      onRefresh={onRefresh}
-      onScroll={onScroll}
-      onScrollStart={onScrollStart}
-      onScrollEnd={onScrollEnd}
-      onScrollViewHeightChange={setScrollViewHeight}
-      onHeaderHeightChange={setHeaderSize}
-      onWillScrollToTop={onWillScrollToTop}
+      ref={scrollViewRefCallback}
+      style={style}
+      stickyHeaderIndices={stickyHeaderIndices}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing ?? false}
+          onRefresh={onRefresh}
+        />
+      }
+      scrollEventThrottle={16}
+      onScroll={e => onScroll?.(e.nativeEvent.contentOffset.y)}
+      onScrollBeginDrag={onScrollStart}
+      onMomentumScrollEnd={onScrollEnd}
+      onLayout={onLayout}
     >
+      {ListHeaderComponent && (
+        <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
+      )}
       <View
-        style={[
-          {
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            opacity: isScrolling ? 1 : 0,
-          },
-        ]}
+        style={[{ height: contentHeight, width: '100%' }, postsContainerStyle]}
       >
-        {placeHolders}
+        <View style={StyleSheet.absoluteFill} />
+        <View
+          style={[
+            {
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              opacity: isScrolling ? 1 : 0,
+            },
+          ]}
+        >
+          {placeHolders}
+        </View>
+        {items.map(([id, key]) => {
+          const data = postsMap.get(id);
+          if (!data) {
+            console.warn('null data for id ' + id);
+            return null;
+          }
+          return (
+            <MemoPostRenderer
+              key={key}
+              item={data.item}
+              videoDisabled={!data.isVideo || !canPlay}
+              windowWidth={windowWidth}
+              layout={data.layout}
+              paused={!canPlay}
+              onReady={onPostReady}
+            />
+          );
+        })}
       </View>
-      {items.map(([id, key]) => {
-        const data = postsMap.get(id);
-        if (!data) {
-          console.warn('null data for id ' + id);
-          return null;
-        }
-        return (
-          <MemoPostRenderer
-            key={key}
-            item={data.item}
-            videoDisabled={!data.isVideo || !canPlay}
-            windowWidth={windowWidth}
-            layout={data.layout}
-            paused={!canPlay}
-            onReady={onPostReady}
-          />
-        );
-      })}
-    </GridContainer>
+      {ListFooterComponent}
+    </ScrollView>
   );
 };
 
 export default PostsGrid;
+
+type Post = ArrayItemType<PostsGrid_posts$data>;
+export type ItemLayout = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
 
 const MemoPostRenderer = ({
   item,

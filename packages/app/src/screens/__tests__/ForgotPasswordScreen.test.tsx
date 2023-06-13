@@ -1,19 +1,19 @@
 import { flushPromises } from '@azzapp/shared/jestHelpers';
+import { forgotPassword } from '#helpers/MobileWebAPI';
 import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
 
+jest.mock('#helpers/MobileWebAPI');
 jest.mock('#ui/ViewTransition', () => 'ViewTransition');
 
 describe('ForgotPassword Screen', () => {
-  const forgotPassword = jest.fn();
+  const forgotPasswordMock = jest.mocked(forgotPassword);
   beforeEach(() => {
-    forgotPassword.mockReset();
+    forgotPasswordMock.mockReset();
   });
 
   test('should render and show the enter email ', () => {
-    const { getByTestId } = render(
-      <ForgotPasswordScreen forgotPassword={forgotPassword} />,
-    );
+    const { getByTestId } = render(<ForgotPasswordScreen />);
     expect(
       getByTestId('azzapp__ForgotPasswordScreen__ViewTransition-email'),
     ).toHaveStyle({
@@ -26,7 +26,7 @@ describe('ForgotPassword Screen', () => {
 
   test('should call the `forgotPassword` callback when the form is submitted', () => {
     const { getByRole, getByPlaceholderText } = render(
-      <ForgotPasswordScreen forgotPassword={forgotPassword} />,
+      <ForgotPasswordScreen />,
     );
     const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => {
@@ -43,7 +43,7 @@ describe('ForgotPassword Screen', () => {
 
   test('should not call the `forgotPassword` callback when the provided email is invalid', () => {
     const { getByRole, getByPlaceholderText } = render(
-      <ForgotPasswordScreen forgotPassword={forgotPassword} />,
+      <ForgotPasswordScreen />,
     );
     const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => {
@@ -60,7 +60,7 @@ describe('ForgotPassword Screen', () => {
 
   test('Change password button should be `disabled` when the provided email is invalid', () => {
     const { queryByRole, getByPlaceholderText } = render(
-      <ForgotPasswordScreen forgotPassword={forgotPassword} />,
+      <ForgotPasswordScreen />,
     );
     const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
@@ -72,9 +72,9 @@ describe('ForgotPassword Screen', () => {
 
   test('should display the confirmation message when a valid form is submitted', async () => {
     const { getByPlaceholderText, getByRole } = render(
-      <ForgotPasswordScreen forgotPassword={forgotPassword} />,
+      <ForgotPasswordScreen />,
     );
-    forgotPassword.mockResolvedValueOnce(void 0);
+    forgotPasswordMock.mockResolvedValueOnce({} as any);
 
     const inputLogin = getByPlaceholderText('Phone number or email address');
     act(() => {

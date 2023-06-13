@@ -10,11 +10,12 @@ import {
   MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -160,7 +161,6 @@ const CarouselEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
-  const { uploadMedia, uploadSign } = useWebAPI();
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
 
@@ -260,7 +260,7 @@ const CarouselEditionScreen = ({
         }
       },
     });
-  }, [canSave, updates, commit, carousel?.id, uploadSign, uploadMedia, router]);
+  }, [canSave, updates, commit, carousel?.id, router]);
 
   const onCancel = useCallback(() => {
     router.back();

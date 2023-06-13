@@ -3,7 +3,6 @@
   "version": "0.0.4",
   "scripts": {
     "test": "jest",
-    "build:lib": "yarn lib:clean && yarn lib:compile && yarn lib:definition && yarn assets:copy",
     "build:ios": "bundle exec fastlane ios sign",
     "build:ios:native": "SKIP_BUNDLING=true bundle exec fastlane ios build",
     "build:ios:bundle": "./scripts/bundle-ios.sh",
@@ -14,20 +13,10 @@
     "run:ios": "react-native run-ios --no-packager",
     "deploy:ios": "bundle exec fastlane ios deploy",
     "deploy:android": "bundle exec fastlane android deploy",
-    "lib:clean": "rimraf lib",
-    "lib:definition": "tsc -p tsconfig.lib.json",
-    "lib:definition:watch": "yarn lib:definition --watch",
-    "lib:compile": "babel src --config-file ./babel.config.lib.js -d lib --extensions '.ts,.tsx,.js,.jsx'",
-    "lib:compile:watch": "yarn lib:compile --watch",
-    "assets:copy": "node scripts/copy-assets",
-    "assets:watch": "yarn assets:copy && node scripts/watch-assets",
     "pod-install": "cd ios && bundle exec pod install",
-    "clean": "watchman watch-del-all && rm -Rf lib && rm -Rf node_modules &&  rm -Rf ios/Pods && rm -Rf ios/build  && cd android && ./gradlew clean"
+    "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build  && cd android && ./gradlew clean"
   },
   "devScripts": [
-    "lib:compile:watch",
-    "lib:definition:watch",
-    "assets:watch",
     "rn:watch"
   ],
   "dependencies": {
@@ -70,7 +59,6 @@
     "react-native-tab-view": "^3.5.1",
     "react-native-view-shot": "^3.5.0",
     "react-native-vision-camera": "^2.15.4",
-    "react-native-web": "^0.19.1",
     "react-native-email-link": "^1.14.5",
     "react-phone-number-input": "^3.2.19",
     "react-native-reanimated-carousel": "^3.3.0",

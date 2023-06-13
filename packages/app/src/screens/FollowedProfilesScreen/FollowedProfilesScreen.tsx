@@ -1,57 +1,64 @@
 import { useIntl } from 'react-intl';
-import { graphql, useFragment } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
+import { SafeAreaView } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { useRouter } from '#components/NativeRouter';
+import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowedProfilesScreenList from './FollowedProfilesScreenList';
-import type { FollowedProfilesScreen_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowedProfilesRoute } from '#routes';
+import type { FollowedProfilesScreenQuery } from '@azzapp/relay/artifacts/FollowedProfilesScreenQuery.graphql';
 
-type FollowedProfilesScreenProps = {
-  viewer: FollowedProfilesScreen_viewer$key;
-};
+const followedProfilesScreenQuery = graphql`
+  query FollowedProfilesScreenQuery {
+    viewer {
+      profile {
+        id
+      }
+      ...FollowedProfilesScreenList_viewer
+    }
+  }
+`;
 
 const FollowedProfilesScreen = ({
-  viewer: viewerKey,
-}: FollowedProfilesScreenProps) => {
-  const intl = useIntl();
-
-  const viewer = useFragment(
-    graphql`
-      fragment FollowedProfilesScreen_viewer on Viewer {
-        profile {
-          id
-        }
-        ...FollowedProfilesScreenList_viewer
-      }
-    `,
-    viewerKey,
+  preloadedQuery,
+}: RelayScreenProps<FollowedProfilesRoute, FollowedProfilesScreenQuery>) => {
+  const { viewer } = usePreloadedQuery(
+    followedProfilesScreenQuery,
+    preloadedQuery,
   );
 
   const router = useRouter();
+  const intl = useIntl();
 
   return (
-    <Container style={{ flex: 1 }}>
-      <Header
-        leftElement={
-          <IconButton
-            icon="arrow_left"
-            iconSize={28}
-            onPress={router.back}
-            variant="icon"
-          />
-        }
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Following',
-          description: 'Title of the screen listing followed profiles',
-        })}
-      />
-      <FollowedProfilesScreenList
-        currentProfileId={viewer.profile?.id ?? ''}
-        viewer={viewer}
-      />
-    </Container>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Container style={{ flex: 1 }}>
+        <Header
+          leftElement={
+            <IconButton
+              icon="arrow_left"
+              iconSize={28}
+              onPress={router.back}
+              variant="icon"
+            />
+          }
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Following',
+            description: 'Title of the screen listing followed profiles',
+          })}
+        />
+        <FollowedProfilesScreenList
+          currentProfileId={viewer.profile?.id ?? ''}
+          viewer={viewer}
+        />
+      </Container>
+    </SafeAreaView>
   );
 };
 
-export default FollowedProfilesScreen;
+export default relayScreen(FollowedProfilesScreen, {
+  query: followedProfilesScreenQuery,
+});

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
@@ -6,7 +6,6 @@ import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import useToggle from '#hooks/useToggle';
-import ClientOnlySuspense from '#ui/ClientOnlySuspense';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Text from '#ui/Text';
@@ -54,7 +53,7 @@ const ProfileScreenButtonBar = ({
         iconStyle={{ tintColor: colors.white }}
         variant="grey"
       />
-      <ClientOnlySuspense
+      <Suspense
         fallback={
           <View style={[styles.mainButton, styles.mainButtonFallback]} />
         }
@@ -65,7 +64,7 @@ const ProfileScreenButtonBar = ({
           onHome={onHome}
           onToggleFollow={onToggleFollow}
         />
-      </ClientOnlySuspense>
+      </Suspense>
       <Link route="PROFILE_POSTS" params={{ userName }}>
         <FloatingIconButton
           icon="flip"

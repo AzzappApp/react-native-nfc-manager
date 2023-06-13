@@ -1,15 +1,11 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { Suspense, forwardRef, useImperativeHandle, useRef } from 'react';
 
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
-
 import useToggle from '#hooks/useToggle';
-import ClientOnlySuspense from '#ui/ClientOnlySuspense';
-
 import IconButton from '#ui/IconButton';
-
 import PostRendererBottomPanel, {
   PostRendererBottomPanelSkeleton,
 } from './PostRendererBottomPanel';
@@ -163,14 +159,14 @@ const PostRenderer = (
           videoDisabled={videoDisabled}
         />
       </View>
-      <ClientOnlySuspense fallback={<PostRendererBottomPanelSkeleton />}>
+      <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
           toggleModal={toggleModal}
           showModal={showModal}
           author={author}
           post={post}
         />
-      </ClientOnlySuspense>
+      </Suspense>
     </View>
   );
 };

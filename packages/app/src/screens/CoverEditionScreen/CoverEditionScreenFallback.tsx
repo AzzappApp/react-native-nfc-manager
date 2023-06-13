@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { useRouter } from '#PlatformEnvironment';
 import { shadow } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';

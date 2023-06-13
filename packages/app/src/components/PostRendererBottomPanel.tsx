@@ -2,13 +2,13 @@
 import { FormattedMessage, FormattedRelativeTime } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import { useRouter } from './NativeRouter';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';

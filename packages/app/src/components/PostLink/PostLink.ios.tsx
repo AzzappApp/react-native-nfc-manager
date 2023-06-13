@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import PostRendererFeed from '#components/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { PostRendererFeedHandle } from '#components/PostRendererFeed';

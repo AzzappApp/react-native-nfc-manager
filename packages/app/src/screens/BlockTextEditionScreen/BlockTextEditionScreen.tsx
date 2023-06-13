@@ -7,7 +7,7 @@ import {
   MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';

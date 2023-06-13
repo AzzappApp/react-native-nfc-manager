@@ -1,11 +1,4 @@
 /**
- * A module for dispatching global events throughout the app.
- * Should be used only on mobile app and in mobile specific components.
- */
-
-import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
-
-/**
  * Events dispatched when an user signs up
  */
 export type SIGN_UP_EVENTS = {
@@ -105,7 +98,6 @@ export const addGlobalEventListener = <T extends GlobalEvents['type']>(
   type: T,
   listener: EventListener<TypeToLister<T>>,
 ) => {
-  ensureMobile();
   if (!listeners[type]) {
     (listeners as any)[type] = new Set();
   }
@@ -122,7 +114,6 @@ export const addGlobalEventListener = <T extends GlobalEvents['type']>(
  * @param event the event to dispatch
  */
 export const dispatchGlobalEvent = (event: GlobalEvents): Promise<void> => {
-  ensureMobile();
   const eventListeners = listeners[event.type];
   const promises = [];
   for (const listener of eventListeners?.values() ?? []) {
@@ -132,13 +123,4 @@ export const dispatchGlobalEvent = (event: GlobalEvents): Promise<void> => {
     }
   }
   return Promise.all(promises).then(() => void 0);
-};
-
-const ensureMobile = () => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() !== 'react-native'
-  ) {
-    throw new Error('globalEvents module is not supported on web');
-  }
 };

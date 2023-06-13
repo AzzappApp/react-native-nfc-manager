@@ -1,9 +1,9 @@
 import { graphql, useFragment } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
+import { useRouter } from './NativeRouter';
 import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
 
 const COVER_WIDTH = 29;

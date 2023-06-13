@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Image, Platform, View, FlatList } from 'react-native';
+import { Image, View, FlatList } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -82,11 +82,7 @@ const StaticMediaList = ({
     setWidth(event.nativeEvent.layout.width);
   };
 
-  const borderRadius = Platform.select({
-    web: `${COVER_CARD_RADIUS}%` as any,
-    default: COVER_CARD_RADIUS * width,
-  });
-
+  const borderRadius = COVER_CARD_RADIUS * width;
   const styles = useStyleSheet(styleSheet);
 
   const renderItem = useCallback(

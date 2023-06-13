@@ -1,33 +1,38 @@
 import { range } from 'lodash';
-import {
-  RelayEnvironmentProvider,
-  graphql,
-  useLazyLoadQuery,
-} from 'react-relay';
+import { Suspense } from 'react';
+import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
+import NewProfileScreenQueryNode from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
-import { createProfile } from '@azzapp/shared/WebAPI';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { createProfile } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
-import NewProfileScreen from '..';
-import type { NewProfileScreenTestQuery } from '@azzapp/relay/artifacts/NewProfileScreenTestQuery.graphql';
+import { NewProfileScreen } from '../NewProfileScreen';
+import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
-jest.mock('@azzapp/shared/WebAPI', () => ({
-  createProfile: jest.fn(),
-}));
 jest.mock('#ui/FadeSwitch', () => 'FadeSwitch');
 
 jest.mock('#components/medias/NativeMediaImageRenderer');
 jest.mock('#components/medias/NativeMediaVideoRenderer');
+jest.mock('#helpers/MobileWebAPI');
+jest.mock('#helpers/globalEvents');
+
+const mockRouter = {
+  back: jest.fn(),
+  replaceAll: jest.fn(),
+};
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
+  useRouter() {
+    return mockRouter;
+  },
+}));
 
 describe('NewProfileScreen', () => {
   let environment: RelayMockEnvironment;
-
-  const onClose = jest.fn();
-  const onProfileCreated = jest.fn();
 
   const renderNewProfileScreen = () => {
     environment = createMockEnvironment();
@@ -57,23 +62,26 @@ describe('NewProfileScreen', () => {
         }),
       }),
     );
+    environment.mock.queuePendingOperation(NewProfileScreenQueryNode, {});
 
+    const preloadedQuery = loadQuery<NewProfileScreenQuery>(
+      environment,
+      NewProfileScreenQueryNode,
+      {},
+    );
     const TestRenderer = () => {
-      const data = useLazyLoadQuery<NewProfileScreenTestQuery>(
-        graphql`
-          query NewProfileScreenTestQuery @relay_test_operation {
-            ...NewProfileScreen_query
-          }
-        `,
-        {},
-      );
       return (
-        <NewProfileScreen
-          params={undefined}
-          data={data}
-          onClose={onClose}
-          onProfileCreated={onProfileCreated}
-        />
+        <Suspense>
+          <NewProfileScreen
+            screenId="NEW_PROFILE"
+            hasFocus
+            route={{
+              route: 'NEW_PROFILE',
+              params: { goBack: false },
+            }}
+            preloadedQuery={preloadedQuery}
+          />
+        </Suspense>
       );
     };
 
@@ -88,9 +96,8 @@ describe('NewProfileScreen', () => {
     jest.clearAllMocks();
   });
 
-  const createProfileMock = createProfile as jest.MockedFunction<
-    typeof createProfile
-  >;
+  const createProfileMock = jest.mocked(createProfile);
+  const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
 
   describe('ProfileKindStep', () => {
     test('should allows the user to choose which kind of profile', () => {
@@ -198,7 +205,6 @@ describe('NewProfileScreen', () => {
       act(() => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
-
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
           firstName: 'John',
@@ -207,24 +213,21 @@ describe('NewProfileScreen', () => {
           profileCategoryId: 'profileCategory-0',
           profileKind: 'personal',
         }),
-        expect.anything(),
       );
 
       await act(flushPromises);
-      expect(onProfileCreated).toHaveBeenCalledWith({
-        profileData: {
-          companyActivityId: null,
-          companyName: null,
-          firstName: 'John',
-          lastName: 'Doe',
-          profileCategoryId: 'profileCategory-0',
-          profileKind: 'personal',
-          userName: 'johndoe',
+
+      expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
+        type: 'PROFILE_CHANGE',
+        payload: {
+          authTokens: {
+            token: 'fakeToken',
+            refreshToken: 'fakeRefreshToken',
+          },
+          profileId: 'profile-0',
         },
-        profileId: 'profile-0',
-        token: 'fakeToken',
-        refreshToken: 'fakeRefreshToken',
       });
+      await act(flushPromises);
     });
 
     test('should allows the user to fill the form for business', async () => {
@@ -269,7 +272,6 @@ describe('NewProfileScreen', () => {
           companyActivityId: 'companyActivity-1-4',
           profileKind: 'business',
         }),
-        expect.anything(),
       );
     });
 
@@ -308,7 +310,6 @@ describe('NewProfileScreen', () => {
       });
 
       expect(createProfileMock).not.toHaveBeenCalled();
-      expect(onProfileCreated);
     });
 
     test('should display an error message when the user name is already taken', async () => {
@@ -352,7 +353,6 @@ describe('NewProfileScreen', () => {
           profileCategoryId: 'profileCategory-0',
           profileKind: 'personal',
         }),
-        expect.anything(),
       );
 
       expect(
@@ -422,7 +422,7 @@ describe('NewProfileScreen', () => {
       });
       await act(flushPromises);
 
-      expect(onClose).toHaveBeenCalled();
+      expect(mockRouter.replaceAll).toHaveBeenCalled();
     });
 
     test('should allows the user to skip an interest', async () => {
@@ -430,7 +430,7 @@ describe('NewProfileScreen', () => {
       act(() => {
         fireEvent.press(screen.getByTestId('skip-button'));
       });
-      expect(onClose).toHaveBeenCalled();
+      expect(mockRouter.replaceAll).toHaveBeenCalled();
     });
   });
 });

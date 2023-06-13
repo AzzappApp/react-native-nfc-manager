@@ -1,16 +1,35 @@
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
+import { mainRoutes } from '#mobileRoutes';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { signin } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
 
+jest.mock('#helpers/MobileWebAPI');
+jest.mock('#helpers/globalEvents');
+
+const mockRouter = {
+  replaceAll: jest.fn(),
+};
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
+  useRouter() {
+    return mockRouter;
+  },
+}));
+
 describe('Signin Screen', () => {
-  const signin = jest.fn();
+  const signinMock = jest.mocked(signin);
+  const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
+
   beforeEach(() => {
-    signin.mockReset();
+    signinMock.mockReset();
+    dispatchGlobalEventMock.mockReset();
   });
 
   test('submit button should be `disabled` if both credential and password are empty', () => {
-    render(<SignInScreen signin={signin} />);
+    render(<SignInScreen />);
 
     const credentialInput = screen.getByPlaceholderText(
       'Phone number or email address',
@@ -28,8 +47,12 @@ describe('Signin Screen', () => {
   });
 
   test('should call the `signin` callback if credential and password are filled', async () => {
-    render(<SignInScreen signin={signin} />);
-    signin.mockResolvedValueOnce({});
+    render(<SignInScreen />);
+    signinMock.mockResolvedValueOnce({
+      token: 'fake-token',
+      refreshToken: 'fake-refreshToken',
+      profileId: 'fake-profileId',
+    });
 
     const credentialInput = screen.getByPlaceholderText(
       'Phone number or email address',
@@ -48,12 +71,22 @@ describe('Signin Screen', () => {
 
     expect(buttonComponent).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
-    expect(buttonComponent).not.toHaveAccessibilityState({ busy: true });
+    expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
+      type: 'SIGN_IN',
+      payload: {
+        authTokens: {
+          token: 'fake-token',
+          refreshToken: 'fake-refreshToken',
+        },
+        profileId: 'fake-profileId',
+      },
+    });
+    expect(mockRouter.replaceAll).toHaveBeenCalledWith(mainRoutes);
   });
 
   test('should display an error message if the `signin` callback fails', async () => {
-    render(<SignInScreen signin={signin} />);
-    signin.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
+    render(<SignInScreen />);
+    signinMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
 
     const credentialInput = screen.getByPlaceholderText(
       'Phone number or email address',

@@ -29,14 +29,15 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { firstNotUndefined } from '@azzapp/shared/valueHelpers';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { exportImage, exportVideo } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ImagePicker from '#components/ImagePicker';
 import { addLocalCachedMediaFile } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
 import { getFileName, isFileURL } from '#helpers/fileHelpers';
 import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import AnimatedCircleHint from '#ui/AnimatedCircleHint';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -508,7 +509,7 @@ const CoverEditionScreen = ({
     mutation CoverEditionScreenMutation($input: UpdateCoverInput!) {
       updateCover(input: $input) {
         profile {
-          ...ProfileScreen_profile
+          ...ProfileScreenContent_profile
           card {
             cover {
               ...CoverEditionScreen_cover
@@ -519,7 +520,6 @@ const CoverEditionScreen = ({
     }
   `);
 
-  const { uploadMedia, uploadSign } = useWebAPI();
   const onSave = async () => {
     if (!canSave) {
       return;

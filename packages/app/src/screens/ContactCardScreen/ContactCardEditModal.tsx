@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import useViewportSize, { insetTop } from '#hooks/useViewportSize';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 
@@ -13,14 +13,13 @@ const ContactCardEditModal = ({
 }) => {
   const intl = useIntl();
 
-  const vp = useViewportSize();
-
+  const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
   return (
     <BottomSheetModal
       visible={visible}
-      height={vp`${height - 30} - ${insetTop}`}
+      height={height - 30 - insets.top}
       onRequestClose={toggleBottomSheet}
       headerTitle={intl.formatMessage({
         defaultMessage: 'Edit Contact Card',

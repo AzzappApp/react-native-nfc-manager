@@ -12,8 +12,18 @@ import {
   EDIT_TRANSITION_DURATION,
   useProfileEditScale,
 } from './profileScreenHelpers';
-import type { ProfileScreenScrollViewProps } from './profileScreenTypes';
-import type { LayoutChangeEvent } from 'react-native';
+import type { LayoutChangeEvent, ScrollViewProps } from 'react-native';
+
+export type ProfileScreenScrollViewProps = ScrollViewProps & {
+  /**
+   * true when the profile is ready to be displayed (animation finished)
+   */
+  ready: boolean;
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+};
 
 /**
  * A wrapper component for the profile screen content. Handle the edit animation

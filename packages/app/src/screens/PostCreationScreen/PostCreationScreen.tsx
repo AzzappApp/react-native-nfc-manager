@@ -3,51 +3,58 @@ import * as mime from 'react-native-mime-types';
 import {
   ConnectionHandler,
   graphql,
-  useFragment,
   useMutation,
+  usePreloadedQuery,
 } from 'react-relay';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
 } from '#components/ImagePicker';
 import { addLocalCachedMediaFile } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import relayScreen from '#helpers/relayScreen';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { PostCreationScreen_viewer$key } from '@azzapp/relay/artifacts/PostCreationScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { NewPostRoute } from '#routes';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
+import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
 import type { Observable } from 'relay-runtime';
 
 const POST_MAX_DURATION = 15;
 
-type PostCreationScreenProps = {
-  viewer: PostCreationScreen_viewer$key;
-};
+const postCreationcreenQuery = graphql`
+  query PostCreationScreenQuery {
+    viewer {
+      profile {
+        id
+        ...AuthorCartoucheFragment_profile
+      }
+    }
+  }
+`;
 
-const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
+const PostCreationScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<NewPostRoute, PostCreationScreenQuery>) => {
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
+  const {
+    viewer: { profile },
+  } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
 
-  const { profile } = useFragment(
-    graphql`
-      fragment PostCreationScreen_viewer on Viewer {
-        profile {
-          id
-          ...AuthorCartoucheFragment_profile
-        }
-      }
-    `,
-    viewerKey,
-  );
-  const connectionID = ConnectionHandler.getConnectionID(
-    profile!.id,
-    'ProfilePostsScreen_profile_connection_posts',
-  );
+  const connectionID =
+    profile?.id &&
+    ConnectionHandler.getConnectionID(
+      profile.id,
+      'ProfilePostsScreen_profile_connection_posts',
+    );
 
   const router = useRouter();
   const onCancel = () => {
@@ -79,7 +86,6 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
     }
   `);
 
-  const WebAPI = useWebAPI();
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -102,7 +108,7 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
       ...timeRange,
     });
 
-    const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
+    const { uploadURL, uploadParameters } = await uploadSign({
       kind: kind === 'video' ? 'video' : 'image',
       target: 'post',
     });
@@ -114,8 +120,11 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
         mime.lookup(fileName) ||
         (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
     };
-    const { progress: uploadProgress, promise: uploadPromise } =
-      WebAPI.uploadMedia(file, uploadURL, uploadParameters);
+    const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+      file,
+      uploadURL,
+      uploadParameters,
+    );
     setUploadProgress(uploadProgress);
     const { public_id } = await uploadPromise;
     commit({
@@ -131,7 +140,7 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
           allowLikes,
           content,
         },
-        connections: [connectionID],
+        connections: [connectionID!],
       },
       onCompleted(response) {
         addLocalCachedMediaFile(
@@ -187,4 +196,10 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
   );
 };
 
-export default PostCreationScreen;
+PostCreationScreen.options = {
+  stackAnimation: 'slide_from_bottom',
+};
+
+export default relayScreen(PostCreationScreen, {
+  query: postCreationcreenQuery,
+});

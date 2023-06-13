@@ -1,9 +1,9 @@
 import { useReducer } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import { useLogout } from '#hooks/useLogout';
+import { useRouter } from '#components/NativeRouter';
+import { logout } from '#helpers/MobileWebAPI';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
@@ -67,8 +67,6 @@ const AccountScreenMiddleHeader = ({
 
   const router = useRouter();
 
-  const logout = useLogout();
-
   return (
     <View>
       <PressableNative
@@ -101,10 +99,10 @@ const AccountScreenMiddleHeader = ({
         })}
         onDismiss={() => {
           if (goToSignIn) {
-            logout();
+            void logout();
           } else if (goToSignUp) {
             router.replace({ route: 'SIGN_UP' });
-            logout();
+            void logout();
           }
         }}
       >

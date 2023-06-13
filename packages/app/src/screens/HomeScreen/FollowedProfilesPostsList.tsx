@@ -118,7 +118,6 @@ const FollowedProfilesPostsList = ({
       style={style}
       postsContainerStyle={postsContainerStyle}
       onScroll={onScroll}
-      useWindowScroll
       onReady={onReady}
     />
   );

@@ -9,18 +9,19 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { colors, shadow } from '#theme';
 import ContactCard from '#components/ContactCard';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { switchProfile } from '#helpers/MobileWebAPI';
 import { buildUserUrl } from '#helpers/urlHelpers';
 import useAuthState from '#hooks/useAuthState';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -90,8 +91,6 @@ export default function AccountScreenProfiles({
     [],
   );
 
-  const webAPI = useWebAPI();
-
   const currentProfile = userProfiles?.[index];
 
   const [debouncedCurrentProfileId] = useDebounce(currentProfile?.id, 800);
@@ -102,8 +101,7 @@ export default function AccountScreenProfiles({
       authId !== debouncedCurrentProfileId &&
       authId === currentAuthId.current
     ) {
-      webAPI
-        .switchProfile({ profileId: debouncedCurrentProfileId })
+      switchProfile({ profileId: debouncedCurrentProfileId })
         .then(response => {
           currentAuthId.current = toGlobalId('Profile', response.profileId);
           return dispatchGlobalEvent({
@@ -122,7 +120,7 @@ export default function AccountScreenProfiles({
           console.error('error while switching profile', err);
         });
     }
-  }, [authId, debouncedCurrentProfileId, webAPI]);
+  }, [authId, debouncedCurrentProfileId]);
 
   useEffect(() => {
     if (authId !== currentAuthId.current) {
@@ -140,13 +138,10 @@ export default function AccountScreenProfiles({
     }
   }, [authId, userProfiles]);
 
-  const styles = useStyleSheet(styleSheet);
-
-  const vp = useViewportSize();
-
-  const intl = useIntl();
-
   const router = useRouter();
+  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={{ alignItems: 'center' }}>
@@ -254,7 +249,7 @@ export default function AccountScreenProfiles({
         <View
           style={[
             styles.profileDataContainer,
-            { paddingBottom: vp`${insetBottom}  + ${700}` },
+            { paddingBottom: insets.bottom + 700 },
           ]}
         >
           <PressableNative

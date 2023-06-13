@@ -7,13 +7,14 @@ import {
   MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { CameraButton } from '#screens/CoverEditionScreen/CoverEditionScreensButtons';
@@ -156,7 +157,6 @@ const HorizontalPhotoEditionScreen = ({
   const isValid = image?.id ?? image?.uri;
   const canSave = dirty && isValid && !saving;
 
-  const WebAPI = useWebAPI();
   const router = useRouter();
 
   const onSave = useCallback(async () => {
@@ -172,7 +172,7 @@ const HorizontalPhotoEditionScreen = ({
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
       //we need to save the media first
-      const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
+      const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
         target: 'cover',
       });
@@ -183,8 +183,11 @@ const HorizontalPhotoEditionScreen = ({
         type: 'image/jpeg',
       };
 
-      const { progress: uploadProgress, promise: uploadPromise } =
-        WebAPI.uploadMedia(file, uploadURL, uploadParameters);
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
@@ -226,7 +229,6 @@ const HorizontalPhotoEditionScreen = ({
     horizontalPhoto?.background?.id,
     data?.image?.id,
     commit,
-    WebAPI,
     router,
   ]);
 

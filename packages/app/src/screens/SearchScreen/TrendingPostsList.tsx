@@ -92,7 +92,6 @@ const TrendingPostsList = ({
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       nestedScrollEnabled
-      useWindowScroll
       ListHeaderComponent={ListHeaderComponent}
     />
   );

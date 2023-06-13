@@ -13,7 +13,6 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/app": "*",
     "@azzapp/auth": "*",
     "@azzapp/data": "*",
     "@azzapp/i18n": "*",
@@ -27,15 +26,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.3.2",
-    "react-native-web": "0.19.1",
-    "react-native-web-linear-gradient": "^1.1.2",
     "react-relay": "^14.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.31",
-    "@types/react-dom": "^18.0.11",
-    "babel-plugin-react-native-web": "^0.19.1",
-    "react-native-web-image-loader": "^0.1.1"
+    "@types/react-dom": "^18.0.11"
   }
 }

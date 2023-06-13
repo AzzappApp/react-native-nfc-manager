@@ -9,6 +9,7 @@ import {
   Image,
   Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isPhoneNumber,
@@ -17,7 +18,9 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
+import { useRouter } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { signup } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import Container from '#ui/Container';
@@ -30,16 +33,11 @@ import TextInput from '#ui/TextInput';
 import PhoneInput from '../components/PhoneInput';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
-import type { SignUpParams } from '@azzapp/shared/WebAPI';
+import type { TokensResponse } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
-
 import type { TextInput as NativeTextInput } from 'react-native';
 
-type SignupScreenProps = {
-  signup: (params: SignUpParams) => Promise<void>;
-};
-
-const SignupScreen = ({ signup }: SignupScreenProps) => {
+const SignupScreen = () => {
   const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
     CountryCode | 'email'
   >('email');
@@ -79,6 +77,8 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
     [isSubmitting],
   );
 
+  const router = useRouter();
+
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
     let canSignup = true;
@@ -112,12 +112,13 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
     canSignup &&= tosValid;
 
     if (canSignup) {
+      let tokens: TokensResponse;
       try {
         setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
-          await signup({ email, password });
+          tokens = await signup({ email, password });
         } else {
-          await signup({
+          tokens = await signup({
             phoneNumber: parsePhoneNumber(
               phoneNumber,
               countryCodeOrEmail,
@@ -150,8 +151,15 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
             }),
           );
         }
+        setIsSubmitting(false);
+        return;
       }
-      setIsSubmitting(false);
+
+      await dispatchGlobalEvent({
+        type: 'SIGN_UP',
+        payload: { authTokens: tokens },
+      });
+      router.replace({ route: 'NEW_PROFILE' });
     }
   }, [
     checkedPrivacy,
@@ -161,14 +169,14 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
     intl,
     password,
     phoneNumber,
-    signup,
+    router,
   ]);
 
   const focusPassword = () => {
     passwordRef?.current?.focus();
   };
 
-  const vp = useViewportSize();
+  const insets = useSafeAreaInsets();
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -179,7 +187,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={-vp`${insetBottom}`}
+        keyboardVerticalOffset={insets.bottom}
         style={styles.content}
         pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
@@ -192,7 +200,7 @@ const SignupScreen = ({ signup }: SignupScreenProps) => {
         </View>
         <Container style={styles.body}>
           <Form
-            style={[styles.form, { marginBottom: vp`${insetBottom}` }]}
+            style={[styles.form, { marginBottom: insets.bottom }]}
             onSubmit={onSubmit}
           >
             <View style={styles.header}>

@@ -4,9 +4,8 @@ import { Alert, Appearance, StyleSheet } from 'react-native';
 import { fetchQuery, graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { useRouter } from '#PlatformEnvironment';
 import { prefetchImage, prefetchVideo } from '#components/medias';
-import { useNativeNavigationEvent } from '#components/NativeRouter';
+import { useRouter, useNativeNavigationEvent } from '#components/NativeRouter';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import CoverEditionScreen, {
   CoverEditionScreenFallback,

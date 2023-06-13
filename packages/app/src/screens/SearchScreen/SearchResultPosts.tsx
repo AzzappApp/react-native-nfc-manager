@@ -109,7 +109,6 @@ const SearchResultPosts = ({
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       nestedScrollEnabled
-      useWindowScroll
       style={{ marginTop: 10 }}
     />
   );

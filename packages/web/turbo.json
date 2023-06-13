@@ -3,7 +3,7 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "dependsOn": ["//#relay:build", "^build", "@azzapp/app#build:lib"],
+      "dependsOn": ["//#relay:build", "^build"],
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]
     },
@@ -12,7 +12,7 @@
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["//#relay:build", "^build", "@azzapp/app#build:lib"]
+      "dependsOn": ["//#relay:build", "^build"]
     }
   }
 }

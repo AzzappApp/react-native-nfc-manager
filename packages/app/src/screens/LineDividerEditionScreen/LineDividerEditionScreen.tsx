@@ -7,7 +7,7 @@ import {
   MODULE_KIND_LINE_DIVIDER,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';

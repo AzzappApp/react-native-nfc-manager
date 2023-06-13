@@ -7,7 +7,53 @@ import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import ViewTransition from '#ui/ViewTransition';
 import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
-import type { ProfileScreenHeaderProps } from './profileScreenTypes';
+
+export type ProfileScreenHeaderProps = {
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+  /**
+   * true when the profile is ready to be displayed (animation finished)
+   */
+  ready: boolean;
+  /**
+   * Whether the profile is in selection mode
+   */
+  selectionMode: boolean;
+  /**
+   * The number of selected modules
+   */
+  nbSelectedModules: number;
+  /**
+   * The number of selected modules
+   */
+  selectionContainsAllModules: boolean;
+  /**
+   * Called when the user press the close button in view mode
+   */
+  onClose: () => void;
+  /**
+   * Called when the user press the cancel button in edit mode
+   */
+  onDone: () => void;
+  /**
+   * Called when the user press the edit modules button in view mode
+   */
+  onEditModules: () => void;
+  /**
+   * Called when the user press the close button in view mode
+   */
+  onCancelEditModules: () => void;
+  /**
+   * Called when the user press the select all button in selection mode
+   */
+  onSelectAllModules: () => void;
+  /**
+   * Called when the user press the unselect all button in selection mode
+   */
+  onUnSelectAllModules: () => void;
+};
 
 /**
  * The header of the profile screen.

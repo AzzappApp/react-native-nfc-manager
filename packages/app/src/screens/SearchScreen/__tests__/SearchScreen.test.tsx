@@ -1,12 +1,9 @@
-import {
-  useLazyLoadQuery,
-  graphql,
-  RelayEnvironmentProvider,
-} from 'react-relay';
+import { loadQuery, RelayEnvironmentProvider } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
+import SearchScreenQueryNode from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
-import SearchScreen from '../SearchScreen';
-import type { SearchScreenTestQuery } from '@azzapp/relay/artifacts/SearchScreenTestQuery.graphql';
+import { SearchScreen } from '../SearchScreen';
+import type { SearchScreenQuery } from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 
 jest.mock('#ui/ViewTransition', () => 'ViewTransition');
 
@@ -91,19 +88,23 @@ const renderScreen = () => {
     });
   });
 
-  const TestRenderer = () => {
-    const data = useLazyLoadQuery<SearchScreenTestQuery>(
-      graphql`
-        query SearchScreenTestQuery @relay_test_operation {
-          viewer {
-            ...SearchScreen_viewer
-          }
-        }
-      `,
-      {},
-    );
+  const preloadedQuery = loadQuery<SearchScreenQuery>(
+    environment,
+    SearchScreenQueryNode,
+    {},
+  );
 
-    return <SearchScreen viewer={data.viewer} />;
+  const TestRenderer = () => {
+    return (
+      <SearchScreen
+        screenId="SEARCH"
+        hasFocus={true}
+        preloadedQuery={preloadedQuery}
+        route={{
+          route: 'SEARCH',
+        }}
+      />
+    );
   };
 
   const component = render(

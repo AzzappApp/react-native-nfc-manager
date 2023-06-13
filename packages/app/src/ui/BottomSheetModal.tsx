@@ -8,9 +8,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Button from './Button';
 import Header from './Header';
 import type { HeaderProps } from './Header';
@@ -62,6 +62,9 @@ export type BottomSheetModalProps = Omit<
   onRequestClose: () => void;
 };
 
+// TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
+// this is confusing and should be fixed
+
 /**
  * A simple bottom sheet component
  */
@@ -108,7 +111,7 @@ const BottomSheetModal = ({
     };
   }, [animation, visible]);
 
-  const vp = useViewportSize();
+  const insets = useSafeAreaInsets();
   const intl = useIntl();
 
   if (variant === 'default' && headerRightButton === undefined) {
@@ -213,15 +216,15 @@ const BottomSheetModal = ({
             styles.bottomSheetContainer,
             contentContainerStyle,
             {
-              height: vp`${height} + ${insetBottom}`,
-              paddingBottom: vp`${insetBottom}`,
+              height: height + insets.bottom,
+              paddingBottom: insets.bottom,
             },
             {
               transform: [
                 {
                   translateY: animation.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, -(height + vp`${insetBottom}`)],
+                    outputRange: [0, -(height + insets.bottom)],
                   }),
                 },
               ],

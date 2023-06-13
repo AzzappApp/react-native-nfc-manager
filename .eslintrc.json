@@ -119,6 +119,7 @@
     ],
     "import/namespace": "off",
     "import/no-unresolved": "off",
+    "import/no-named-as-default": "off",
     "react/react-in-jsx-scope": "off",
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",

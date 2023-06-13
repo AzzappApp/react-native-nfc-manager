@@ -8,7 +8,8 @@ jest.mock('#components/CoverRenderer', () => 'CoverRenderer');
 const mockRouter = {
   push: jest.fn(),
 };
-jest.mock('#PlatformEnvironment', () => ({
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
   useRouter() {
     return mockRouter;
   },

@@ -1,13 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, View } from 'react-native';
-import NativeLink from '../NativeLink';
+import Link from '../Link';
 
 const mockRouter = {
   push: jest.fn(),
   replace: jest.fn(),
   showModal: jest.fn(),
 };
-jest.mock('#PlatformEnvironment', () => ({
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
   useRouter() {
     return mockRouter;
   },
@@ -15,7 +16,7 @@ jest.mock('#PlatformEnvironment', () => ({
 
 jest.mock('#helpers/ScreenPrefetcher');
 
-describe('NativeLink', () => {
+describe('Link', () => {
   afterEach(() => {
     mockRouter.push.mockReset();
     mockRouter.replace.mockReset();
@@ -24,9 +25,9 @@ describe('NativeLink', () => {
 
   test('should set accessiblity role on given children', () => {
     render(
-      <NativeLink route="HOME">
+      <Link route="HOME">
         <Pressable testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     expect(screen.queryByTestId('pressable')).toHaveProp(
       'accessibilityRole',
@@ -36,9 +37,9 @@ describe('NativeLink', () => {
 
   test('should push route when pressed', () => {
     render(
-      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="PROFILE" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
@@ -49,9 +50,9 @@ describe('NativeLink', () => {
 
   test('should not push route if event is default prevented', () => {
     render(
-      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="PROFILE" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'), {
       isDefaultPrevented() {
@@ -63,9 +64,9 @@ describe('NativeLink', () => {
 
   test('should show modal  when pressed and modal is true', () => {
     render(
-      <NativeLink route="PROFILE" modal params={{ userName: 'hello' }}>
+      <Link route="PROFILE" modal params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.showModal).toHaveBeenCalledWith({
@@ -77,9 +78,9 @@ describe('NativeLink', () => {
 
   test('should replace router  when pressed and replace is true', () => {
     render(
-      <NativeLink route="PROFILE" replace params={{ userName: 'hello' }}>
+      <Link route="PROFILE" replace params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -91,9 +92,9 @@ describe('NativeLink', () => {
 
   test('should push route when children is a view', () => {
     render(
-      <NativeLink route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="PROFILE" params={{ userName: 'hello' }}>
         <View testID="pressable" />
-      </NativeLink>,
+      </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({

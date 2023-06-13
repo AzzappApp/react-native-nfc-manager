@@ -16,20 +16,11 @@ const mockRouter = {
   back: jest.fn(),
 };
 
-const mockWebAPI = {
-  uploadSign: jest.fn(),
-  uploadMedia: jest.fn(),
-};
-
-jest.mock('#PlatformEnvironment', () => {
-  const PlatformEnvironment = jest.requireActual('#PlatformEnvironment');
+jest.mock('#components/NativeRouter', () => {
   return {
-    ...PlatformEnvironment,
+    ...jest.requireActual('#components/NativeRouter'),
     useRouter() {
       return mockRouter;
-    },
-    useWebAPI() {
-      return mockWebAPI;
     },
   };
 });

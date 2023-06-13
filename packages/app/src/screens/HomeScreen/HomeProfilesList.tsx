@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -143,10 +143,7 @@ const HomeProfilesList = ({
     />
   );
 };
-const BORDER_RADIUS = Platform.select({
-  web: '12.8%' as any,
-  default: COVER_CARD_RADIUS * COVER_BASE_WIDTH,
-});
+
 export default HomeProfilesList;
 
 const styles = StyleSheet.create({
@@ -155,7 +152,7 @@ const styles = StyleSheet.create({
     width: COVER_BASE_WIDTH,
     aspectRatio: COVER_RATIO,
     backgroundColor: colors.grey100,
-    borderRadius: BORDER_RADIUS,
+    borderRadius: COVER_CARD_RADIUS * COVER_BASE_WIDTH,
     overflow: 'hidden',
   },
   layer: {

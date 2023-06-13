@@ -15,10 +15,12 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import { useFragment, graphql } from 'react-relay';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
 import ContactCard from '#components/ContactCard';
+import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -26,31 +28,33 @@ import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
-import type { ContactCardScreen_viewer$key } from '@azzapp/relay/artifacts/ContactCardScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactCardRoute } from '#routes';
+import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 
-type ContactCardScreenProps = {
-  viewer: ContactCardScreen_viewer$key;
-};
+const contactCardMobileScreenQuery = graphql`
+  query ContactCardScreenQuery {
+    viewer {
+      profile {
+        userName
+        ...AccountHeader_profile
+        ...ContactCard_card
+      }
+    }
+  }
+`;
 
 const defaultTimingParam = {
   duration: 400,
   easing: Easing.bezier(0.25, 0.1, 0.25, 1),
 };
 
-const ContactCardScreen = ({ viewer }: ContactCardScreenProps) => {
-  const { profile } = useFragment(
-    graphql`
-      fragment ContactCardScreen_viewer on Viewer {
-        profile {
-          userName
-          ...AccountHeader_profile
-          ...ContactCard_card
-        }
-      }
-    `,
-    viewer,
-  );
-
+const ContactCardScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
+  const {
+    viewer: { profile },
+  } = usePreloadedQuery(contactCardMobileScreenQuery, preloadedQuery);
   const intl = useIntl();
 
   const fullScreen = useSharedValue<boolean>(false);
@@ -114,111 +118,124 @@ const ContactCardScreen = ({ viewer }: ContactCardScreenProps) => {
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
   return (
-    <Container style={styles.container}>
-      <Animated.View style={headerStyle}>
-        <AccountHeader
-          userName={profile?.userName}
-          profile={profile}
-          title={intl.formatMessage({
-            defaultMessage: 'Contact Card',
-            description:
-              'Title of the contact card screen, displayed in the header.',
-          })}
-        />
-      </Animated.View>
-      {profile && (
-        <Pressable onPress={() => (fullScreen.value = !fullScreen.value)}>
-          <Animated.View style={[styles.header, style]}>
-            <ContactCard userName={profile?.userName ?? ''} profile={profile} />
-          </Animated.View>
-        </Pressable>
-      )}
-
-      <Animated.View style={[footerStyle, styles.footer]}>
-        <Text variant="xsmall" style={styles.contactCardDescriptionText}>
-          <FormattedMessage
-            defaultMessage="Your Contact Card is a convenient way to share your contact information."
-            description="Description of the contact card screen."
-          />
-        </Text>
-
-        <Button
-          variant="secondary"
-          style={{
-            borderRadius: 27,
-            height: 29,
-          }}
-          label={intl.formatMessage({
-            defaultMessage: 'Edit card details',
-            description: 'Edit card details button label',
-          })}
-          onPress={toggleContactEditModal}
-        />
-
-        <View style={{ width: '100%' }}>
-          <View style={styles.publicOptions}>
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Public contact card"
-                description="When true the contact card is public"
-              />
-            </Text>
-            <Switch variant="large" />
-          </View>
-          <Text variant="xsmall">
-            <FormattedMessage
-              defaultMessage="Anyone can download your contact card from your profile."
-              description="Description of the public contact card toggle."
-            />
-          </Text>
-        </View>
-
-        <View style={{ width: '100%' }}>
-          <View style={styles.publicOptions}>
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Display on my webcard"
-                description="When true the contact card is displayed on the webcard"
-              />
-            </Text>
-            <Switch variant="large" />
-          </View>
-          <Text variant="xsmall">
-            <FormattedMessage
-              defaultMessage="Anyone can download your contact card from your profile."
-              description="Description of the display on my webcard toggle."
-            />
-          </Text>
-        </View>
-
-        <View style={styles.buttons}>
-          <PressableNative style={styles.addToWalletButton}>
-            <Image
-              source={require('#assets/wallet.png')}
-              style={{ position: 'absolute', left: 4, marginVertical: 'auto' }}
-            />
-            <Text variant="button" style={{ color: colors.white }}>
-              <FormattedMessage
-                defaultMessage="Add to Apple Wallet"
-                description="Add to Apple Wallet button label"
-              />
-            </Text>
-          </PressableNative>
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Share',
-              description: 'Share button label',
+    <SafeAreaView style={{ flex: 1 }}>
+      <Container style={styles.container}>
+        <Animated.View style={headerStyle}>
+          <AccountHeader
+            userName={profile?.userName}
+            profile={profile}
+            title={intl.formatMessage({
+              defaultMessage: 'Contact Card',
+              description:
+                'Title of the contact card screen, displayed in the header.',
             })}
           />
-        </View>
-      </Animated.View>
-      <ContactCardEditModal
-        visible={contactCardEditModal}
-        toggleBottomSheet={toggleContactEditModal}
-      />
-    </Container>
+        </Animated.View>
+        {profile && (
+          <Pressable onPress={() => (fullScreen.value = !fullScreen.value)}>
+            <Animated.View style={[styles.header, style]}>
+              <ContactCard
+                userName={profile?.userName ?? ''}
+                profile={profile}
+              />
+            </Animated.View>
+          </Pressable>
+        )}
+
+        <Animated.View style={[footerStyle, styles.footer]}>
+          <Text variant="xsmall" style={styles.contactCardDescriptionText}>
+            <FormattedMessage
+              defaultMessage="Your Contact Card is a convenient way to share your contact information."
+              description="Description of the contact card screen."
+            />
+          </Text>
+
+          <Button
+            variant="secondary"
+            style={{
+              borderRadius: 27,
+              height: 29,
+            }}
+            label={intl.formatMessage({
+              defaultMessage: 'Edit card details',
+              description: 'Edit card details button label',
+            })}
+            onPress={toggleContactEditModal}
+          />
+
+          <View style={{ width: '100%' }}>
+            <View style={styles.publicOptions}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Public contact card"
+                  description="When true the contact card is public"
+                />
+              </Text>
+              <Switch variant="large" />
+            </View>
+            <Text variant="xsmall">
+              <FormattedMessage
+                defaultMessage="Anyone can download your contact card from your profile."
+                description="Description of the public contact card toggle."
+              />
+            </Text>
+          </View>
+
+          <View style={{ width: '100%' }}>
+            <View style={styles.publicOptions}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Display on my webcard"
+                  description="When true the contact card is displayed on the webcard"
+                />
+              </Text>
+              <Switch variant="large" />
+            </View>
+            <Text variant="xsmall">
+              <FormattedMessage
+                defaultMessage="Anyone can download your contact card from your profile."
+                description="Description of the display on my webcard toggle."
+              />
+            </Text>
+          </View>
+
+          <View style={styles.buttons}>
+            <PressableNative style={styles.addToWalletButton}>
+              <Image
+                source={require('#assets/wallet.png')}
+                style={{
+                  position: 'absolute',
+                  left: 4,
+                  marginVertical: 'auto',
+                }}
+              />
+              <Text variant="button" style={{ color: colors.white }}>
+                <FormattedMessage
+                  defaultMessage="Add to Apple Wallet"
+                  description="Add to Apple Wallet button label"
+                />
+              </Text>
+            </PressableNative>
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Share',
+                description: 'Share button label',
+              })}
+            />
+          </View>
+        </Animated.View>
+        <ContactCardEditModal
+          visible={contactCardEditModal}
+          toggleBottomSheet={toggleContactEditModal}
+        />
+      </Container>
+    </SafeAreaView>
   );
 };
+
+export default relayScreen(ContactCardScreen, {
+  query: contactCardMobileScreenQuery,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -252,5 +269,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default ContactCardScreen;

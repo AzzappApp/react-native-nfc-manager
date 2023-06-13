@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import {
   MODULE_KIND_CAROUSEL,
@@ -13,7 +13,6 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
   MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
-import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
 import TitleWithLine from '#ui/TitleWithLine';
 import BlockTextRenderer, {
@@ -203,10 +202,11 @@ const WebCardPreview = ({
     }
   }, [visible]);
 
-  const vp = useViewportSize();
   const intl = useIntl();
 
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
+
+  const { width: screenWidth } = useWindowDimensions();
 
   if (!profile?.card) {
     return null;
@@ -330,7 +330,7 @@ const WebCardPreview = ({
         <CoverRenderer
           cover={cover}
           userName={userName}
-          width={vp`${VW100}`}
+          width={screenWidth}
           hideBorderRadius
         />
         {modules.map(module => {

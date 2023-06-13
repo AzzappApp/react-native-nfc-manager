@@ -123,7 +123,6 @@ const SearchResultGlobal = ({
       }
       onRefresh={onRefresh}
       onEndReached={onEndReached}
-      useWindowScroll
     />
   );
 };

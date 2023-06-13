@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  useWindowDimensions,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   fetchQuery,
   graphql,
@@ -13,10 +19,9 @@ import {
   isNotFalsyString,
   isValidUserName,
 } from '@azzapp/shared/stringHelpers';
-import { useWebAPI } from '#PlatformEnvironment';
 import { colors } from '#theme';
+import { createProfile } from '#helpers/MobileWebAPI';
 import { buildUserUrl } from '#helpers/urlHelpers';
-import useViewportSize, { VH100, insetTop } from '#hooks/useViewportSize';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
@@ -88,7 +93,6 @@ const ProfileForm = ({
   const userNameIsValid = isValidUserName(userName);
   const userNameIsNotEmpty = isNotFalsyString(userName);
 
-  const { createProfile } = useWebAPI();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const onSubmit = async () => {
     if (!userNameIsValid || !userNameIsNotEmpty) {
@@ -177,8 +181,9 @@ const ProfileForm = ({
     userNameInputRef.current?.focus();
   };
 
-  const vp = useViewportSize();
   const intl = useIntl();
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
 
   const userNameInvalidError = intl.formatMessage({
     defaultMessage: 'Username can’t contain space or special caracters',
@@ -203,15 +208,7 @@ const ProfileForm = ({
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={[
-        styles.root,
-        {
-          paddingTop: vp`50`,
-        },
-      ]}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.root}>
       <Form style={styles.form} onSubmit={onSubmit}>
         <NewProfileScreenPageHeader
           onBack={onBack}
@@ -324,7 +321,7 @@ const ProfileForm = ({
                   data={companyActivities}
                   selectedItemKey={companyActivityId}
                   keyExtractor={companyActivityKeyExtractor}
-                  bottomSheetHeight={vp`${VH100} - ${90} - ${insetTop}`}
+                  bottomSheetHeight={windowHeight - 90 - insets.top}
                   onItemSelected={onActivitySelected}
                   bottomSheetTitle={intl.formatMessage({
                     defaultMessage: 'Select an activity',
@@ -417,6 +414,7 @@ const styles = StyleSheet.create({
   },
   root: {
     flex: 1,
+    paddingTop: 50,
   },
   form: {
     flex: 1,

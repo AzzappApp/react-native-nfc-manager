@@ -1,7 +1,6 @@
-import { useRouter } from '#PlatformEnvironment';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
-
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FooterBar from '#ui/FooterBar';
+import { useRouter } from './NativeRouter';
 import type { FooterBarItem } from '#ui/FooterBar';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -19,11 +18,12 @@ const MainTabBar = ({
   const onItemPress = (key: string) => {
     router.push({ route: key as any });
   };
-  const vp = useViewportSize();
+
+  const inset = useSafeAreaInsets();
 
   return (
     <FooterBar
-      style={[{ marginBottom: vp`${insetBottom}` }, style]}
+      style={[{ marginBottom: inset.bottom }, style]}
       currentTab={['HOME', 'SEARCH', 'CHAT', 'ALBUMS'][currentIndex]}
       iconSize={28}
       tabs={TABS}

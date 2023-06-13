@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useFragment, graphql } from 'react-relay';
-import useViewportSize, { insetTop } from '#hooks/useViewportSize';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import SearchBar from '#ui/SearchBar';
 import ViewTransition from '#ui/ViewTransition';
@@ -10,29 +11,26 @@ import RecentSearch from './RecentSearch';
 import SearchTabContainer from './SearchTabContainer';
 import useRecentSearch from './useRecentSearch';
 import WallRecommendation from './WallRecommendation';
-import type { SearchScreen_viewer$key } from '@azzapp/relay/artifacts/SearchScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { SearchRoute } from '#routes';
+import type { SearchScreenQuery } from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 
-type SearchScreenProps = {
-  viewer: SearchScreen_viewer$key;
-  hasFocus?: boolean;
-};
+const searchScreenQuery = graphql`
+  query SearchScreenQuery {
+    viewer {
+      ...TrendingProfilesList_viewer
+      ...TrendingPostsList_viewer
+      ...RecommendedProfilesList_viewer
+    }
+  }
+`;
 
-const SearchScreen = ({
-  viewer: viewerRef,
+export const SearchScreen = ({
+  preloadedQuery,
   hasFocus = true,
-}: SearchScreenProps) => {
-  const viewer = useFragment(
-    graphql`
-      fragment SearchScreen_viewer on Viewer {
-        ...TrendingProfilesList_viewer
-        ...TrendingPostsList_viewer
-        ...RecommendedProfilesList_viewer
-      }
-    `,
-    viewerRef,
-  );
+}: RelayScreenProps<SearchRoute, SearchScreenQuery>) => {
+  const { viewer } = usePreloadedQuery(searchScreenQuery, preloadedQuery);
 
-  const vp = useViewportSize();
   const intl = useIntl();
 
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
@@ -76,15 +74,10 @@ const SearchScreen = ({
     }
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <Container
-      style={[
-        styles.flexOne,
-        {
-          paddingTop: vp`${insetTop}`,
-        },
-      ]}
-    >
+    <Container style={[styles.flexOne, { paddingTop: insets.top }]}>
       <SearchBar
         placeholder={intl.formatMessage({
           defaultMessage: 'Search for profiles, posts...',
@@ -142,7 +135,9 @@ const SearchScreen = ({
   );
 };
 
-export default SearchScreen;
+export default relayScreen(SearchScreen, {
+  query: searchScreenQuery,
+});
 
 const ANIMATION_DURATION = 300;
 const styles = StyleSheet.create({

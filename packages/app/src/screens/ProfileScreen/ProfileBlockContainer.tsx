@@ -24,8 +24,83 @@ import {
   EDIT_TRANSITION_DURATION,
   useProfileEditScale,
 } from './profileScreenHelpers';
-import type { ProfileBlockContainerProps } from './profileScreenTypes';
 import type { LayoutChangeEvent } from 'react-native';
+
+export type ProfileBlockContainerProps = {
+  /**
+   * The children of the container
+   */
+  children: React.ReactNode;
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+  /**
+   * when true, the animation are disabled
+   */
+  disableAnimation?: boolean;
+  /**
+   * If false, the edition buttons are not displayed
+   *
+   * @default true
+   */
+  displayEditionButtons?: boolean;
+  /**
+   * Whether the block is visible in the webcard
+   * @default true
+   */
+  visible?: boolean;
+  /**
+   * Whether the block is selected in the webcard
+   * @default true
+   */
+  selected?: boolean;
+  /**
+   * Whether the block is the first one (used to hide the move up button)
+   */
+  isFirst?: boolean;
+  /**
+   * Whether the block is the last one (used to hide the move down button)
+   */
+  isLast?: boolean;
+  /**
+   * If true, the swipeable actions are displayed
+   */
+  selectionMode?: boolean;
+  /**
+   * The background color of the card
+   */
+  backgroundColor: string;
+  /**
+   * Called when the user press a module, only enabled in edit mode
+   */
+  onModulePress: () => void;
+  /**
+   * Called when the user press the move up button
+   */
+  onMoveUp?: () => void;
+
+  /**
+   * Called when the user press the move down button
+   */
+  onMoveDown?: () => void;
+  /**
+   * Called when the user press the remove button
+   */
+  onRemove?: () => void;
+  /**
+   * Called when the user press the duplicate button
+   */
+  onDuplicate?: () => void;
+  /**
+   * Called when the user press the toggle visibility button
+   */
+  onToggleVisibility?: (visible: boolean) => void;
+  /**
+   * Called when the user select the block
+   */
+  onSelect?: (selected: boolean) => void;
+};
 
 /**
  * A simple wrapper for the webcard cover and modules that handles the edit transition

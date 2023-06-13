@@ -10,7 +10,6 @@ import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer, prefetchImage } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useViewportSize from '#hooks/useViewportSize';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import ToggleButton from '#ui/ToggleButton';
@@ -67,7 +66,6 @@ const ProfileKindStep = ({
   onNext,
   onBack,
 }: ProfileKindStepProps) => {
-  const vp = useViewportSize();
   const profileCategories = useFragment(
     profileCategoriesFragment,
     profileCategoriesKey,
@@ -185,14 +183,7 @@ const ProfileKindStep = ({
   }, [categoryListReady, profileCategories, profileCategoryId]);
 
   return (
-    <View
-      style={[
-        styles.root,
-        {
-          paddingTop: vp`50`,
-        },
-      ]}
-    >
+    <View style={styles.root}>
       <NewProfileScreenPageHeader
         activeIndex={0}
         title={
@@ -255,6 +246,7 @@ type Media = ArrayItemType<ProfileCategory['medias']>;
 const styleSheet = createStyleSheet(apperance => ({
   root: {
     flex: 1,
+    paddingTop: 50,
   },
   mediasList: {
     flex: 1,
