@@ -1,5 +1,6 @@
 import chroma from 'chroma-js';
 import { useState, useCallback } from 'react';
+import { useIntl } from 'react-intl';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
@@ -171,6 +172,8 @@ export const PhotoWithTextAndTitleRendererRaw = ({
       ? 'column'
       : 'column-reverse';
 
+  const intl = useIntl();
+
   return (
     <View {...props} style={[style, { backgroundColor }]} onLayout={onLayout}>
       {background && (
@@ -240,7 +243,11 @@ export const PhotoWithTextAndTitleRendererRaw = ({
               color: fontColor as ColorValue,
             }}
           >
-            {title}
+            {title ||
+              intl.formatMessage({
+                defaultMessage: 'Add section Title here',
+                description: 'PhotoWithTextAndTitle default module title',
+              })}
           </Text>
           <Text
             style={{
@@ -255,7 +262,12 @@ export const PhotoWithTextAndTitleRendererRaw = ({
                   : undefined,
             }}
           >
-            {text}
+            {text ||
+              intl.formatMessage({
+                defaultMessage:
+                  "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
+                description: 'PhotoWithTextAndTitle default module text',
+              })}
           </Text>
         </View>
       </View>

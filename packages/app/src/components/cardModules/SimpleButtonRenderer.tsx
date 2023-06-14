@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useIntl } from 'react-intl';
 import { Linking, Text, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -108,6 +109,8 @@ export const SimpleButtonRendererRaw = ({
     data,
   ) as SimpleButtonEditionValue;
 
+  const intl = useIntl();
+
   const onPress = useCallback(async () => {
     if (actionLink) {
       if (actionType === 'link') {
@@ -160,7 +163,14 @@ export const SimpleButtonRendererRaw = ({
             }}
             numberOfLines={1}
           >
-            {buttonLabel}
+            {
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+              buttonLabel ||
+                intl.formatMessage({
+                  defaultMessage: 'Button Label',
+                  description: 'Placeholder for button that has no label yet',
+                })
+            }
           </Text>
         </View>
       </PressableOpacity>

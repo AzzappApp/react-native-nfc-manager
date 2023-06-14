@@ -310,7 +310,7 @@ const SimpleTextEditionScreen = ({
       />
       <SimpleTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data}
+        data={{ ...data, kind: moduleKind }}
         onPreviewPress={onPreviewPress}
       />
       <TabView

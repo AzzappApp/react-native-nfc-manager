@@ -23,11 +23,7 @@ const SimpleTextPreview = ({
   ...props
 }: SimpleTextPreviewProps) => {
   return (
-    <EditorScaledPreview
-      onPreviewPress={onPreviewPress}
-      moduleContainerStyle={!data.text && { height: '50%' }}
-      {...props}
-    >
+    <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <SimpleTextRendererRaw data={data} />
     </EditorScaledPreview>
   );

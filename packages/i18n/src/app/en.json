@@ -683,6 +683,10 @@
     "defaultMessage": "Log in",
     "description": "Signin Screen - Log in title"
   },
+  "FiW5y4": {
+    "defaultMessage": "Button Label",
+    "description": "Placeholder for button that has no label yet"
+  },
   "FnmYrQ": {
     "defaultMessage": "Merge",
     "description": "Label of the merge switch in cover edition"
@@ -883,6 +887,10 @@
     "defaultMessage": "Crop",
     "description": "Crop image edition parameters name"
   },
+  "LV5peF": {
+    "defaultMessage": "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
+    "description": "PhotoWithTextAndTitle default module text"
+  },
   "LYTS8u": {
     "defaultMessage": "Save",
     "description": "Save button label in Socia Link module screen"
@@ -974,6 +982,10 @@
   "NUA5xk": {
     "defaultMessage": "Slide to change the Border size",
     "description": "Hint of the Border size slider in HorizontalPhoto edition"
+  },
+  "O5dF2l": {
+    "defaultMessage": "Add section Title here",
+    "description": "PhotoWithTextAndTitle default module title"
   },
   "O8JX0f": {
     "defaultMessage": "Show password",
@@ -1082,6 +1094,10 @@
   "RpSI+X": {
     "defaultMessage": "Moves the module up",
     "description": "Accessibility hint for the move up button in the profile edition screen"
+  },
+  "SD0DRz": {
+    "defaultMessage": "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
+    "description": "Default text for the BlockText module"
   },
   "SKonZe": {
     "defaultMessage": "Social",
@@ -1427,6 +1443,10 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
   },
+  "ZswZeP": {
+    "defaultMessage": "Add section Title here",
+    "description": "Default text for the simple title module"
+  },
   "ZvFZeW": {
     "defaultMessage": "Schedule",
     "description": "Module selection list modal Opening Hours module label"
@@ -1706,6 +1726,10 @@
   "gL9Uhd": {
     "defaultMessage": "Tap to edit your profile",
     "description": "UserScreenButtonBar edit button accessibility label"
+  },
+  "gM5BpS": {
+    "defaultMessage": "Add your Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
+    "description": "Default text for the simple text module"
   },
   "gSuTT0": {
     "defaultMessage": "Top/Bottom margin : {size}",

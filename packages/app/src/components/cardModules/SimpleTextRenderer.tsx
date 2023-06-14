@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { Text } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { SIMPLE_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -22,6 +23,7 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
   const data = useFragment(
     graphql`
       fragment SimpleTextRenderer_module on CardModule {
+        kind
         ... on CardModuleSimpleText {
           text
           fontFamily
@@ -62,6 +64,7 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
     `,
     module,
   );
+
   return <SimpleTextRendererRaw data={data} {...props} />;
 };
 
@@ -100,7 +103,10 @@ export const SimpleTextRendererRaw = ({
     marginVertical,
     background,
     backgroundStyle,
+    kind,
   } = Object.assign({}, SIMPLE_TEXT_DEFAULT_VALUES, data);
+
+  const intl = useIntl();
 
   return (
     <CardModuleBackground
@@ -130,7 +136,20 @@ export const SimpleTextRendererRaw = ({
               : undefined,
         }}
       >
-        {text}
+        {
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          text ||
+            (kind === 'simpleText'
+              ? intl.formatMessage({
+                  defaultMessage:
+                    "Add your Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
+                  description: 'Default text for the simple text module',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Add section Title here',
+                  description: 'Default text for the simple title module',
+                }))
+        }
       </Text>
     </CardModuleBackground>
   );

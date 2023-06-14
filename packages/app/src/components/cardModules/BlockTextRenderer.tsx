@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import Text from '#ui/Text';
@@ -100,6 +101,8 @@ export const BlockTextRendererRaw = ({
     backgroundStyle,
   } = Object.assign({}, BLOCK_TEXT_DEFAULT_VALUES, data);
 
+  const intl = useIntl();
+
   return (
     <CardModuleBackground
       {...props}
@@ -133,7 +136,12 @@ export const BlockTextRendererRaw = ({
                 : undefined,
           }}
         >
-          {text}
+          {text ||
+            intl.formatMessage({
+              defaultMessage:
+                "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
+              description: 'Default text for the BlockText module',
+            })}
         </Text>
       </CardModuleBackground>
     </CardModuleBackground>
