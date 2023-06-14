@@ -2,15 +2,6 @@ import { createIntl, IntlErrorCode } from '@formatjs/intl';
 import { cache } from 'react';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 
-const appMessages: { readonly [lang: string]: Record<string, string> } = {
-  get en() {
-    return require('@azzapp/i18n/compiled/app/en.json');
-  },
-  get fr() {
-    return require('@azzapp/i18n/compiled/app/fr.json');
-  },
-};
-
 const webMessages: { readonly [lang: string]: Record<string, string> } = {
   get en() {
     return require('@azzapp/i18n/compiled/web/en.json');
@@ -21,13 +12,9 @@ const webMessages: { readonly [lang: string]: Record<string, string> } = {
 };
 
 export const getTranslationMessages = (locale = DEFAULT_LOCALE) => {
-  const messages = Object.assign(
-    {},
-    appMessages[DEFAULT_LOCALE],
-    webMessages[DEFAULT_LOCALE],
-  );
+  const messages = Object.assign({}, webMessages[DEFAULT_LOCALE]);
   if (locale !== DEFAULT_LOCALE) {
-    Object.assign(messages, appMessages[locale], webMessages[locale]);
+    Object.assign(messages, webMessages[locale]);
   }
   return messages;
 };

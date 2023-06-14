@@ -25,7 +25,7 @@ import db, {
   mysqlTable,
 } from './db';
 import { FollowTable } from './follows';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { Profile } from '#schema/ProfileResolvers';
 import type { InferModel } from 'drizzle-orm';
 
@@ -79,8 +79,15 @@ export type NewProfile = Omit<InferModel<typeof ProfileTable, 'insert'>, 'id'>;
  * @param ids - The ids of the profile to retrieve
  * @returns A list of profile, where the order of the profile matches the order of the ids
  */
-export const getProfilesByIds = (ids: string[]) =>
-  db.select().from(ProfileTable).where(inArray(ProfileTable.id, ids)).execute();
+export const getProfilesByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(ProfileTable)
+      .where(inArray(ProfileTable.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * Retrieves a list of associated to an user

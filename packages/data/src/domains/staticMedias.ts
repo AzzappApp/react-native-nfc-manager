@@ -6,7 +6,7 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
   mysqlTable,
 } from './db';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { InferModel } from 'drizzle-orm';
 
 export const StaticMediaTable = mysqlTable('StaticMedia', {
@@ -35,13 +35,15 @@ export type NewStaticMedia = InferModel<typeof StaticMediaTable, 'insert'>;
  * @param ids - The ids of the medias to retrieve
  * @returns A list of medias, where the order of the medias matches the order of the ids
  */
-export const getStaticMediasByIds = (ids: string[]) => {
-  return db
-    .select()
-    .from(StaticMediaTable)
-    .where(inArray(StaticMediaTable.id, ids))
-    .execute();
-};
+export const getStaticMediasByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(StaticMediaTable)
+      .where(inArray(StaticMediaTable.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * Retrieves all cover foregrounds in the database.

@@ -55,6 +55,7 @@ export type NewCardModule = Omit<
 
 type ModuleData = {
   gap?: number | null;
+  backgroundId?: string | null;
   backgroundStyle?: {
     backgroundColor?: string;
     opacity?: number;

@@ -32,6 +32,22 @@ export const getImageURLForSize = (
 };
 
 /**
+ * Helpers used to create cloudinary URL for image
+ *
+ * @param id the id of the cloudinary file
+ * @returns
+ */
+export const getImageURL = (id: string) => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    getRuntimeEnvironment() === 'react-native'
+  ) {
+    throw new Error('getImageURL is not supported on react-native');
+  }
+  return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
+};
+
+/**
  * Helpers used to create cloudinary url for video given size parameters
  *
  * @param id the id of the cloudinary file

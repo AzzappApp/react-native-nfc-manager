@@ -7,7 +7,7 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
   mysqlTable,
 } from './db';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -53,8 +53,15 @@ export type NewCard = Omit<InferModel<typeof CardTable, 'insert'>, 'id'>;
  * @param ids - The ids of the card to retrieve
  * @returns A list of card, where the order of the card matches the order of the ids
  */
-export const getCardsByIds = (ids: string[]) =>
-  db.select().from(CardTable).where(inArray(CardTable.id, ids)).execute();
+export const getCardsByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(CardTable)
+      .where(inArray(CardTable.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * Retrieve the main card for a list of profiles

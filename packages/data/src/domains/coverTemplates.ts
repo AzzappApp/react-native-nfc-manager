@@ -11,7 +11,7 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
   mysqlTable,
 } from './db';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { InferModel } from 'drizzle-orm';
 
 type CoverTemplateData = {
@@ -67,13 +67,15 @@ export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
  * @param {*} []
  * @return {*}  {(Promise<Array<CoverTemplate>>)}
  */
-export const getCoverTemplatesByIds = (ids: string[]) => {
-  return db
-    .select()
-    .from(CoverTemplateTable)
-    .where(inArray(CoverTemplateTable.id, ids))
-    .execute();
-};
+export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(CoverTemplateTable)
+      .where(inArray(CoverTemplateTable.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * It returns a promise that resolves to an array of cover templates for a given profile kind

@@ -7,6 +7,7 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
   mysqlTable,
 } from './db';
+import { sortEntitiesByIds } from './generic';
 import { post } from './posts';
 import type { InferModel } from 'drizzle-orm';
 
@@ -102,9 +103,12 @@ export const getPostComments = async (
  * @param ids - The ids of the comments to retrieve
  * @returns A list of comments, where the order of the posts matches the order of the ids
  */
-export const getPostCommentsByIds = (ids: string[]) =>
-  db
-    .select()
-    .from(PostCommentTable)
-    .where(inArray(PostCommentTable.id, ids))
-    .execute();
+export const getPostCommentsByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(PostCommentTable)
+      .where(inArray(PostCommentTable.id, ids as string[]))
+      .execute(),
+  );

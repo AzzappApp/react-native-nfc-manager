@@ -15,7 +15,7 @@ import db, {
   mysqlTable,
 } from './db';
 import { FollowTable } from './follows';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -60,8 +60,15 @@ export type NewPost = Omit<InferModel<typeof post, 'insert'>, 'id'>;
  * @param ids - The ids of the post to retrieve
  * @returns A list of post, where the order of the post matches the order of the ids
  */
-export const getPostsByIds = (ids: string[]) =>
-  db.select().from(post).where(inArray(post.id, ids)).execute();
+export const getPostsByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(post)
+      .where(inArray(post.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * Retrieve a profile's post, ordered by date, with pagination.

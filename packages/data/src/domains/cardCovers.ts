@@ -7,7 +7,7 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
   mysqlTable,
 } from './db';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -58,12 +58,15 @@ export type NewCardCover = Omit<
  * @param ids - The ids of the covers to retrieve
  * @returns A list of covers, where the order of the covers matches the order of the ids
  */
-export const getCardCoversByIds = (ids: string[]) =>
-  db
-    .select()
-    .from(CardCoverTable)
-    .where(inArray(CardCoverTable.id, ids))
-    .execute();
+export const getCardCoversByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(CardCoverTable)
+      .where(inArray(CardCoverTable.id, ids as string[]))
+      .execute(),
+  );
 
 /**
  * Create a card cover.
