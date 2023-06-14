@@ -50,7 +50,7 @@ export const insertPostComment = async (
   profileId: string,
   postId: string,
   comment: string,
-): Promise<PostComment> =>
+) =>
   db.transaction(async trx => {
     const id = createId();
     const addedPostComment = {
@@ -82,7 +82,7 @@ export const getPostComments = async (
   postId: string,
   limit: number,
   after: Date | null = null,
-): Promise<PostComment[]> => {
+) => {
   return db
     .select()
     .from(PostCommentTable)
@@ -102,7 +102,7 @@ export const getPostComments = async (
  * @param ids - The ids of the comments to retrieve
  * @returns A list of comments, where the order of the posts matches the order of the ids
  */
-export const getPostCommentsByIds = (ids: string[]): Promise<PostComment[]> =>
+export const getPostCommentsByIds = (ids: string[]) =>
   db
     .select()
     .from(PostCommentTable)

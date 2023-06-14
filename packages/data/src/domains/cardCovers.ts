@@ -58,7 +58,7 @@ export type NewCardCover = Omit<
  * @param ids - The ids of the covers to retrieve
  * @returns A list of covers, where the order of the covers matches the order of the ids
  */
-export const getCardCoversByIds = (ids: string[]): Promise<CardCover[]> =>
+export const getCardCoversByIds = (ids: string[]) =>
   db
     .select()
     .from(CardCoverTable)
@@ -75,7 +75,7 @@ export const getCardCoversByIds = (ids: string[]): Promise<CardCover[]> =>
 export const createCardCover = async (
   values: NewCardCover,
   tx: DbTransaction = db,
-): Promise<CardCover> => {
+) => {
   const addedCardCover = {
     ...values,
     id: createId(),
@@ -117,7 +117,7 @@ export const updateCardCover = async (
   id: string,
   updates: CoverUpdates,
   tx: DbTransaction = db,
-): Promise<void> => {
+) => {
   await tx
     .update(CardCoverTable)
     .set({

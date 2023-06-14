@@ -23,7 +23,7 @@ export type NewProfileCategory = InferModel<
  * Retrieves a list of all profile categories
  * @returns A list of profile categories
  */
-export const getProfileCategories = async (): Promise<ProfileCategory[]> =>
+export const getProfileCategories = async () =>
   db
     .select()
     .from(ProfileCategoryTable)
@@ -36,9 +36,7 @@ export const getProfileCategories = async (): Promise<ProfileCategory[]> =>
  * @param id - The id of the profile category to retrieve
  * @returns The profile category if found, otherwise null
  */
-export const getProfileCategoryById = async (
-  id: string,
-): Promise<ProfileCategory | null> =>
+export const getProfileCategoryById = async (id: string) =>
   db
     .select()
     .from(ProfileCategoryTable)

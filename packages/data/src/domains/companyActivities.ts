@@ -24,9 +24,7 @@ export type NewCompanyActivity = InferModel<
  * @param profileCategoryId - The id of the profile category to filter the list by
  * @returns A list of company activities
  */
-export const getCompanyActivities = async (
-  profileCategoryId?: string,
-): Promise<CompanyActivity[]> => {
+export const getCompanyActivities = async (profileCategoryId?: string) => {
   return db
     .select()
     .from(CompanyActivityTable)
@@ -43,9 +41,7 @@ export const getCompanyActivities = async (
  * @param id - The id of the company activity to retrieve
  * @returns
  */
-export const getCompanyActivityById = async (
-  id: string,
-): Promise<CompanyActivity | null> => {
+export const getCompanyActivityById = async (id: string) => {
   return db
     .select()
     .from(CompanyActivityTable)

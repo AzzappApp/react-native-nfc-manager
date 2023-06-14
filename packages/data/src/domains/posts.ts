@@ -60,7 +60,7 @@ export type NewPost = Omit<InferModel<typeof post, 'insert'>, 'id'>;
  * @param ids - The ids of the post to retrieve
  * @returns A list of post, where the order of the post matches the order of the ids
  */
-export const getPostsByIds = (ids: string[]): Promise<Post[]> =>
+export const getPostsByIds = (ids: string[]) =>
   db.select().from(post).where(inArray(post.id, ids)).execute();
 
 /**
@@ -75,7 +75,7 @@ export const getProfilesPosts = (
   profileId: string,
   limit: number,
   offset: number,
-): Promise<Post[]> =>
+) =>
   db
     .select()
     .from(post)
@@ -90,7 +90,7 @@ export const getProfilesPosts = (
  * @param profileId - The id of the profile
  * @returns he number of post the profile has
  */
-export const getProfilesPostsCount = (profileId: string): Promise<number> =>
+export const getProfilesPostsCount = (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(post)
@@ -105,10 +105,7 @@ export const getProfilesPostsCount = (profileId: string): Promise<number> =>
  * @param offset - the offset of the first post to retrieve (based on postDate)
  * @returns A list of post
  */
-export const getAllPosts = async (
-  limit: number,
-  after: Date | null = null,
-): Promise<Post[]> => {
+export const getAllPosts = async (limit: number, after: Date | null = null) => {
   return db
     .select()
     .from(post)
@@ -131,7 +128,7 @@ export const getFollowedProfilesPosts = async (
   profileId: string,
   limit: number,
   after: Date | null = null,
-): Promise<Post[]> => {
+) => {
   return db
     .select({
       Post: post,
@@ -156,9 +153,7 @@ export const getFollowedProfilesPosts = async (
  * @param profileId - The id of the profile
  * @returns The number of post from the profiles a profile is following
  */
-export const getFollowedProfilesPostsCount = async (
-  profileId: string,
-): Promise<number> =>
+export const getFollowedProfilesPostsCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(post)
@@ -174,10 +169,7 @@ export const getFollowedProfilesPostsCount = async (
  * @param tx - The query creator to use (profile for transactions)
  * @returns The created post
  */
-export const createPost = async (
-  values: NewPost,
-  tx: DbTransaction = db,
-): Promise<Post> => {
+export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
   const addedPost = {
     ...values,
     id: createId(),
@@ -204,7 +196,7 @@ export const createPost = async (
 export const updatePost = async (
   postId: string,
   data: Partial<Omit<Post, 'createdAt' | 'id' | 'media'>>,
-): Promise<void> => {
+) => {
   await db
     .update(post)
     .set({ ...data, updatedAt: new Date() })

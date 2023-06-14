@@ -53,7 +53,7 @@ export type NewCard = Omit<InferModel<typeof CardTable, 'insert'>, 'id'>;
  * @param ids - The ids of the card to retrieve
  * @returns A list of card, where the order of the card matches the order of the ids
  */
-export const getCardsByIds = (ids: string[]): Promise<Card[]> =>
+export const getCardsByIds = (ids: string[]) =>
   db.select().from(CardTable).where(inArray(CardTable.id, ids)).execute();
 
 /**
@@ -78,10 +78,7 @@ export const getUsersCards = async (profileIds: string[]) => {
  * @param tx - The query creator to use (profile for transactions)
  * @returns The created card
  */
-export const createCard = async (
-  values: NewCard,
-  tx: DbTransaction = db,
-): Promise<Card> => {
+export const createCard = async (values: NewCard, tx: DbTransaction = db) => {
   const addedCard = {
     ...values,
     id: createId(),
@@ -108,7 +105,7 @@ export const updateCard = async (
   id: string,
   values: Partial<Card>,
   tx: DbTransaction = db,
-): Promise<void> => {
+) => {
   await tx
     .update(CardTable)
     .set({ ...values, updatedAt: new Date() })

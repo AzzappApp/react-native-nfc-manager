@@ -79,7 +79,7 @@ export type NewProfile = Omit<InferModel<typeof ProfileTable, 'insert'>, 'id'>;
  * @param ids - The ids of the profile to retrieve
  * @returns A list of profile, where the order of the profile matches the order of the ids
  */
-export const getProfilesByIds = (ids: string[]): Promise<Profile[]> =>
+export const getProfilesByIds = (ids: string[]) =>
   db.select().from(ProfileTable).where(inArray(ProfileTable.id, ids)).execute();
 
 /**
@@ -87,7 +87,7 @@ export const getProfilesByIds = (ids: string[]): Promise<Profile[]> =>
  * @param id - The id of the user
  * @returns The list of profile associated to the user
  */
-export const getUserProfiles = (userId: string): Promise<Profile[]> =>
+export const getUserProfiles = (userId: string) =>
   db
     .select()
     .from(ProfileTable)
@@ -101,10 +101,7 @@ export const getUserProfiles = (userId: string): Promise<Profile[]> =>
  * @param profileName - The profilename of the profile to retrieve
  * @returns - The profile if found, otherwise null
  */
-export const getProfileByUserName = async (
-  profileName: string,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-): Promise<Profile | null> => {
+export const getProfileByUserName = async (profileName: string) => {
   return db
     .select()
     .from(ProfileTable)
@@ -124,7 +121,7 @@ export const getAllProfilesWithCard = async (
   limit: number,
   offset: number,
   excludedprofileIds: string[] | null | undefined,
-): Promise<Profile[]> => {
+) => {
   return db
     .select()
     .from(ProfileTable)
@@ -146,7 +143,7 @@ export const getAllProfilesWithCard = async (
  *
  * @returns The number of profile with a card
  */
-export const getAllProfilesWithCardCount = async (): Promise<number> =>
+export const getAllProfilesWithCardCount = async () =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
@@ -161,9 +158,7 @@ export const getAllProfilesWithCardCount = async (): Promise<number> =>
  * @param profileId - The id of the profile
  * @returns A list of profile
  */
-export const getFollowedProfiles = async (
-  profileId: string,
-): Promise<Profile[]> =>
+export const getFollowedProfiles = async (profileId: string) =>
   db
     .select({ Profile: ProfileTable })
     .from(ProfileTable)
@@ -177,9 +172,7 @@ export const getFollowedProfiles = async (
  * @param profileId - The id of the profile
  * @returns the number of profile a profile is following
  */
-export const getFollowedProfilesCount = async (
-  profileId: string,
-): Promise<number> =>
+export const getFollowedProfilesCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
@@ -197,7 +190,7 @@ export const getFollowerProfiles = async (
   profileId: string,
   limit: number,
   after: Date | null = null,
-): Promise<Array<{ Profile: Profile; followCreatedAt: Date }>> =>
+) =>
   db
     .select({
       Profile: ProfileTable,
@@ -220,9 +213,7 @@ export const getFollowerProfiles = async (
  * @param profileId - The id of the profile
  * @returns the number of profile a profile is being followed
  */
-export const getFollowerProfilesCount = async (
-  profileId: string,
-): Promise<number> =>
+export const getFollowerProfilesCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
@@ -236,7 +227,7 @@ export const getFollowerProfilesCount = async (
  * @param data - The profile fields, excluding the id
  * @returns The newly created profile
  */
-export const createProfile = async (data: NewProfile): Promise<Profile> => {
+export const createProfile = async (data: NewProfile) => {
   const addedProfile = {
     ...data,
     id: createId(),
@@ -260,7 +251,7 @@ export const createProfile = async (data: NewProfile): Promise<Profile> => {
 export const updateProfile = async (
   profileId: string,
   updates: Partial<Profile>,
-): Promise<Partial<Profile>> => {
+) => {
   const updatedProfile = {
     updatedAt: new Date(),
     ...updates,

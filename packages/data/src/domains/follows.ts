@@ -46,10 +46,7 @@ export type NewFollow = InferModel<typeof FollowTable, 'insert'>;
  * @param targetId - The id of the potential followed user
  * @returns true if the user is following the target, false otherwise
  */
-export const isFollowing = async (
-  userId: string,
-  targetId: string,
-): Promise<boolean> =>
+export const isFollowing = async (userId: string, targetId: string) =>
   db
     .select()
     .from(FollowTable)
@@ -68,10 +65,7 @@ export const isFollowing = async (
  * @param userId - The id of the follower
  * @param targetId - The id of the followed user
  */
-export const follows = async (
-  userId: string,
-  targetId: string,
-): Promise<void> =>
+export const follows = async (userId: string, targetId: string) =>
   db
     .insert(FollowTable)
     .values({
@@ -87,7 +81,7 @@ export const follows = async (
  * @param userId - The id of the follower
  * @param targetId - The id of the followed user
  */
-export const unfollows = (userId: string, targetId: string): Promise<void> =>
+export const unfollows = (userId: string, targetId: string) =>
   db
     .delete(FollowTable)
     .where(

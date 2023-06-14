@@ -67,9 +67,7 @@ export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
  * @param {*} []
  * @return {*}  {(Promise<Array<CoverTemplate>>)}
  */
-export const getCoverTemplatesByIds = (
-  ids: string[],
-): Promise<CoverTemplate[]> => {
+export const getCoverTemplatesByIds = (ids: string[]) => {
   return db
     .select()
     .from(CoverTemplateTable)
@@ -84,7 +82,7 @@ export const getCoverTemplatesByIds = (
 export const getCoverTemplatesByKind = (
   kind: CoverTemplate['kind'],
   segmented?: boolean | null,
-): Promise<CoverTemplate[]> => {
+) => {
   return db
     .select()
     .from(CoverTemplateTable)
@@ -107,9 +105,7 @@ export const getCoverTemplatesByKind = (
  * @param {string} companyActivityId
  * @return {*}  {Promise<CoverTemplate[]>}
  */
-export const getCoverTemplatesSuggestion = (
-  companyActivityId: string,
-): Promise<CoverTemplate[]> => {
+export const getCoverTemplatesSuggestion = (companyActivityId: string) => {
   return db
     .select()
     .from(CoverTemplateTable)

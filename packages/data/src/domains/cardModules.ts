@@ -126,10 +126,7 @@ export const getCardModulesByIds = (ids: string[]): Promise<CardModule[]> =>
  * @param cardId - The card id
  * @returns The card modules
  */
-export const getCardModules = async (
-  cardId: string,
-  includeHidden = false,
-): Promise<CardModule[]> => {
+export const getCardModules = async (cardId: string, includeHidden = false) => {
   return db
     .select()
     .from(CardModuleTable)
@@ -151,7 +148,7 @@ export const getCardModules = async (
  * @param qc - The query creator to use (profile for transactions)
  * @returns The created card
  */
-export const getCardModuleCount = async (cardId: string): Promise<number> =>
+export const getCardModuleCount = async (cardId: string) =>
   db
 
     .select({ count: sql`count(*)`.mapWith(Number) })
@@ -170,7 +167,7 @@ export const getCardModuleCount = async (cardId: string): Promise<number> =>
 export const createCardModule = async (
   values: NewCardModule,
   tx: DbTransaction = db,
-): Promise<CardModule> => {
+) => {
   const addedCardModule = {
     ...values,
     id: createId(),
@@ -190,7 +187,7 @@ export const updateCardModule = async (
   id: string,
   values: Partial<CardModule>,
   tx: DbTransaction = db,
-): Promise<void> => {
+) => {
   await tx
     .update(CardModuleTable)
     .set(values)

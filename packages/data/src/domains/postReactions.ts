@@ -54,7 +54,7 @@ export const insertPostReaction = async (
   profileId: string,
   postId: string,
   reactionKind: PostReaction['reactionKind'],
-): Promise<void> =>
+) =>
   db.transaction(async trx => {
     await trx
       .insert(PostReactionTable)
@@ -81,10 +81,7 @@ export const insertPostReaction = async (
  * @param {string} postId
  * @return {*}  {Promise<void>}
  */
-export const deletePostReaction = async (
-  profileId: string,
-  postId: string,
-): Promise<void> =>
+export const deletePostReaction = async (profileId: string, postId: string) =>
   db.transaction(async trx => {
     await trx
       .delete(PostReactionTable)

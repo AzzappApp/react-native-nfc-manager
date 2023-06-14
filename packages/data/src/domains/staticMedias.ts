@@ -35,7 +35,7 @@ export type NewStaticMedia = InferModel<typeof StaticMediaTable, 'insert'>;
  * @param ids - The ids of the medias to retrieve
  * @returns A list of medias, where the order of the medias matches the order of the ids
  */
-export const getStaticMediasByIds = (ids: string[]): Promise<StaticMedia[]> => {
+export const getStaticMediasByIds = (ids: string[]) => {
   return db
     .select()
     .from(StaticMediaTable)
@@ -47,9 +47,7 @@ export const getStaticMediasByIds = (ids: string[]): Promise<StaticMedia[]> => {
  * Retrieves all cover foregrounds in the database.
  * @returns A list of cover foregrounds.
  */
-export const getStaticMediasByUsage = (
-  usage: StaticMedia['usage'],
-): Promise<StaticMedia[]> =>
+export const getStaticMediasByUsage = (usage: StaticMedia['usage']) =>
   db
     .select()
     .from(StaticMediaTable)
