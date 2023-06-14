@@ -1407,10 +1407,6 @@
     "defaultMessage": "Please enter your current password",
     "description": "Error message when no current password is provided"
   },
-  "ZLqplQ": {
-    "defaultMessage": "Top/Bottom Margin : {size}",
-    "description": "Margin vertical label in carousel edition"
-  },
   "ZNPb7F": {
     "defaultMessage": "Change account",
     "description": "Change account modal title"
@@ -1466,6 +1462,10 @@
   "a5bH/t": {
     "defaultMessage": "Slide to change the Top/bottom marginsize",
     "description": "Hint of the Top/bottom margin slider in HorizontalPhoto edition"
+  },
+  "a6YBsH": {
+    "defaultMessage": "Left margin : {size}",
+    "description": "Margin horizontal label in carousel edition"
   },
   "aGgFjV": {
     "defaultMessage": "Tap to reset your passward",
@@ -1598,6 +1598,10 @@
   "dImcC+": {
     "defaultMessage": "Duplicates the module in your webcard",
     "description": "Accessibility hint for the duplicate button in the profile edition screen"
+  },
+  "dLGTA2": {
+    "defaultMessage": "Top/Bottom margin : {size}",
+    "description": "Margin vertical label in carousel edition"
   },
   "dNmlSS": {
     "defaultMessage": "Tap to select a color",
@@ -2250,10 +2254,6 @@
   "rjw+jc": {
     "defaultMessage": "Username",
     "description": "Username field in the account details screen"
-  },
-  "rlOj9I": {
-    "defaultMessage": "Left/Right Margin : {size}",
-    "description": "Margin horizontal label in carousel edition"
   },
   "rzJ3iZ": {
     "defaultMessage": "Cancel",
