@@ -1739,10 +1739,6 @@
     "defaultMessage": "On",
     "description": "flash on accessibility value"
   },
-  "gL9Uhd": {
-    "defaultMessage": "Tap to edit your profile",
-    "description": "UserScreenButtonBar edit button accessibility label"
-  },
   "gM5BpS": {
     "defaultMessage": "Add your Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
     "description": "Default text for the simple text module"

@@ -112,7 +112,7 @@ const ProfileScreen = ({
   const [editMode, toggleEditMode] = useToggle(false);
   const editModeTransition = useDerivedValue(() => {
     return withTiming(editMode ? 1 : 0, {
-      duration: 400,
+      duration: 300,
     });
   });
 
@@ -121,7 +121,7 @@ const ProfileScreen = ({
       opacity: interpolate(
         editModeTransition.value,
         [0, 0.2, 0.8, 1],
-        [1, 0.1, 0.1, 0],
+        [1, 0.1, 0.0, 0],
       ),
     };
   }, [editModeTransition.value]);
@@ -151,7 +151,10 @@ const ProfileScreen = ({
       >
         <ProfilePostsList hasFocus={showPost} profile={data.profile} />
       </Animated.View>
-      <Animated.View style={[styles.buttonBar, { bottom }, buttonBarStyle]}>
+      <Animated.View
+        style={[styles.buttonBar, { bottom }, buttonBarStyle]}
+        pointerEvents={editMode ? 'none' : 'box-none'}
+      >
         <ProfileScreenButtonBar
           userName={data.profile.userName!}
           onHome={onHome}
