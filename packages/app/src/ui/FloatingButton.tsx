@@ -57,7 +57,6 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       justifyContent: 'center',
       backgroundColor: appearance === 'light' ? colors.white : colors.black,
       borderColor: appearance === 'light' ? colors.black : colors.white,
-      borderWidth: 1,
       opacity: 1,
     },
     disabled: {
@@ -73,9 +72,10 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     root: {
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(0,0,0,0.4)',
-      borderColor: 'transparent',
-      borderWidth: 0,
+      backgroundColor:
+        appearance === 'light'
+          ? 'rgba(14, 18, 22, 0.4)'
+          : 'rgba(14, 18, 22, 0.6)',
       opacity: 1,
     },
     disabled: {

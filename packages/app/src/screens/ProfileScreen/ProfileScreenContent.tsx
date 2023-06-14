@@ -8,7 +8,6 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ProfileColorPicker from '#components/ProfileColorPicker';
-import useToggleFollow from '#hooks/useToggleFollow';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
@@ -25,7 +24,8 @@ import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 type ProfileScreenProps = {
   profile: ProfileScreenContent_profile$key;
   ready?: boolean;
-  userProfileId?: string;
+  editMode?: boolean;
+  toggleEditMode: () => void;
 };
 
 /**
@@ -35,7 +35,8 @@ type ProfileScreenProps = {
 const ProfileScreenContent = ({
   profile: profileKey,
   ready = true,
-  userProfileId,
+  editMode = false,
+  toggleEditMode,
 }: ProfileScreenProps) => {
   // #region Data
   const profile = useFragment(
@@ -60,9 +61,6 @@ const ProfileScreenContent = ({
 
   // #region Navigation
   const router = useRouter();
-  const onHome = () => {
-    router.backToTop();
-  };
 
   const onClose = useCallback(() => {
     router.back();
@@ -70,19 +68,15 @@ const ProfileScreenContent = ({
   // #endregion
 
   // #region Edition state
-  const [editing, setEditing] = useState(false);
+
   const [editingDisplayMode, setEditingDisplayMode] = useState<
     'desktop' | 'mobile'
   >('mobile');
 
-  const onEdit = useCallback(() => {
-    setEditing(true);
-  }, []);
-
   const onDone = useCallback(() => {
-    setEditing(false);
+    toggleEditMode();
     setEditingDisplayMode('mobile');
-  }, []);
+  }, [toggleEditMode]);
 
   // #endregion
 
@@ -223,8 +217,6 @@ const ProfileScreenContent = ({
   }, []);
   // #endregion
 
-  const onToggleFollow = useToggleFollow(userProfileId);
-
   // #endregion
 
   const intl = useIntl();
@@ -234,7 +226,7 @@ const ProfileScreenContent = ({
     <>
       <View style={{ flex: 1, backgroundColor }}>
         <ProfileScreenHeader
-          editing={editing}
+          editing={editMode}
           ready={ready}
           nbSelectedModules={nbSelectedModules}
           selectionMode={selectionMode}
@@ -246,10 +238,10 @@ const ProfileScreenContent = ({
           onSelectAllModules={onSelectAllModules}
           onUnSelectAllModules={onUnSelectAllModules}
         />
-        <ProfileScreenScrollView editing={editing} ready={ready}>
+        <ProfileScreenScrollView editing={editMode} ready={ready}>
           <ProfileBlockContainer
             backgroundColor={backgroundColor}
-            editing={editing}
+            editing={editMode}
             displayEditionButtons={false}
             onModulePress={onEditCover}
           >
@@ -266,7 +258,7 @@ const ProfileScreenContent = ({
               <ProfileScreenBody
                 ref={profileBodyRef}
                 card={profile.card}
-                editing={editing}
+                editing={editMode}
                 selectionMode={selectionMode}
                 backgroundColor={backgroundColor}
                 onEditModule={onEditModule}
@@ -276,19 +268,13 @@ const ProfileScreenContent = ({
           </Suspense>
         </ProfileScreenScrollView>
         <ProfileScreenFooter
-          editing={editing}
+          editing={editMode}
           ready={ready}
-          userName={profile.userName}
           currentEditionView={editingDisplayMode}
           selectionMode={selectionMode}
           hasSelectedModules={nbSelectedModules > 0}
           selectionContainsHiddenModules={selectionContainsHiddenModules}
           backgroundColor={backgroundColor}
-          onHome={onHome}
-          onEdit={onEdit}
-          onToggleFollow={(follow: boolean) =>
-            onToggleFollow(profile.id, follow)
-          }
           onEditingDisplayModeChange={setEditingDisplayMode}
           onRequestNewModule={onRequestNewModule}
           onRequestColorPicker={onRequestColorPicker}

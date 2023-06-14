@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -18,6 +18,10 @@ type ProfileScreenButtonBarProps = ViewProps & {
    */
   userName: string;
   /**
+   *  true when the webcard is visible (as opposite of displaying the post list)
+   */
+  isWebCardDisplayed: boolean;
+  /**
    * A callback called when the user press the edit button
    */
   onEdit: () => void;
@@ -29,6 +33,10 @@ type ProfileScreenButtonBarProps = ViewProps & {
    * A callback called when the user press the follow button
    */
   onToggleFollow: (follow: boolean) => void;
+  /**
+   * A callback called when the user press flip button
+   */
+  onFlip: () => void;
 };
 
 /**
@@ -41,6 +49,8 @@ const ProfileScreenButtonBar = ({
   onEdit,
   onHome,
   onToggleFollow,
+  onFlip,
+  isWebCardDisplayed,
   style,
   ...props
 }: ProfileScreenButtonBarProps) => {
@@ -61,19 +71,18 @@ const ProfileScreenButtonBar = ({
         <ProfileScreenButtonActionButton
           userName={userName}
           onEdit={onEdit}
-          onHome={onHome}
+          isWebCardDisplayed={isWebCardDisplayed}
           onToggleFollow={onToggleFollow}
         />
       </Suspense>
-      <Link route="PROFILE_POSTS" params={{ userName }}>
-        <FloatingIconButton
-          icon="flip"
-          iconSize={26}
-          iconStyle={{ tintColor: colors.white }}
-          variant="grey"
-          style={styles.userPostsButton}
-        />
-      </Link>
+      <FloatingIconButton
+        icon="flip"
+        iconSize={26}
+        iconStyle={{ tintColor: colors.white }}
+        variant="grey"
+        style={styles.userPostsButton}
+        onPress={onFlip}
+      />
     </View>
   );
 };
@@ -83,25 +92,20 @@ export default ProfileScreenButtonBar;
 const ProfileScreenButtonActionButton = ({
   userName,
   onEdit,
+  isWebCardDisplayed,
   onToggleFollow,
-}: ProfileScreenButtonBarProps) => {
-  const { profile, viewer } = useLazyLoadQuery<ProfileScreenButtonBarQuery>(
+}: Omit<ProfileScreenButtonBarProps, 'onFlip' | 'onHome'>) => {
+  const { profile } = useLazyLoadQuery<ProfileScreenButtonBarQuery>(
     graphql`
       query ProfileScreenButtonBarQuery($userName: String!) {
         profile(userName: $userName) {
           isFollowing
-        }
-        viewer {
-          profile {
-            userName
-          }
+          isViewer
         }
       }
     `,
     { userName },
   );
-
-  const canEdit = userName === viewer.profile?.userName;
 
   const [isFollowing, toggleFollowing] = useToggle(
     Boolean(profile?.isFollowing),
@@ -116,32 +120,59 @@ const ProfileScreenButtonActionButton = ({
   }, [debouncedIsFollowing, onToggleFollow, profile?.isFollowing]);
 
   const intl = useIntl();
-  return canEdit ? (
-    <FloatingButton
-      onPress={onEdit}
-      style={styles.mainButton}
-      accessibilityLabel={intl.formatMessage({
-        defaultMessage: 'Tap to edit your profile',
-        description: 'UserScreenButtonBar edit button accessibility label',
-      })}
-    >
-      <Text variant="button">
-        <FormattedMessage
-          defaultMessage="Build my webcard"
-          description="Build my webcard button label in Profile Screen Button Bar"
-        />
-      </Text>
-    </FloatingButton>
+
+  const router = useRouter();
+  const onCreateNewPost = () => {
+    router.push({ route: 'NEW_POST' });
+  };
+
+  return profile?.isViewer ? (
+    isWebCardDisplayed ? (
+      <FloatingButton
+        onPress={onEdit}
+        style={styles.mainButton}
+        variant="grey"
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to edit your profile',
+          description: 'ProfileScreenButtonBar edit button accessibility label',
+        })}
+      >
+        <Text variant="button" style={styles.textButton}>
+          <FormattedMessage
+            defaultMessage="Build my webcard"
+            description="Build my webcard button label in Profile Screen Button Bar"
+          />
+        </Text>
+      </FloatingButton>
+    ) : (
+      <FloatingButton
+        variant="grey"
+        onPress={onCreateNewPost}
+        style={styles.mainButton}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to create a new post',
+          description: 'ProfileScreenButtonBar edit button accessibility label',
+        })}
+      >
+        <Text variant="button" style={styles.textButton}>
+          <FormattedMessage
+            defaultMessage="Create a new post"
+            description="Profile post create a new post"
+          />
+        </Text>
+      </FloatingButton>
+    )
   ) : (
     <FloatingButton
       onPress={toggleFollowing}
       style={styles.mainButton}
+      variant="grey"
       accessibilityLabel={intl.formatMessage({
         defaultMessage: 'Tap to follow the profile',
         description: 'UserScreenButtonBar follow profile accessibility label',
       })}
     >
-      <Text variant="button">
+      <Text variant="button" style={styles.textButton}>
         {isFollowing ? (
           <FormattedMessage
             defaultMessage="Unfollow"
@@ -159,6 +190,7 @@ const ProfileScreenButtonActionButton = ({
 };
 
 const styles = StyleSheet.create({
+  textButton: { color: colors.white },
   buttonBar: {
     flexDirection: 'row',
     alignItems: 'center',

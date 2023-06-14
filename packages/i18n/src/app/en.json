@@ -67,6 +67,10 @@
     "defaultMessage": "Title",
     "description": "Module selection list modal simple title module label"
   },
+  "068BZ9": {
+    "defaultMessage": "Create a new post",
+    "description": "Profile post create a new post"
+  },
   "07iiib": {
     "defaultMessage": "Cancel",
     "description": "Cancel button in Image edition screen"
@@ -699,6 +703,10 @@
     "defaultMessage": "Edit Margins",
     "description": "SocialLinks bottom menu label for Margins tab"
   },
+  "GL1Voe": {
+    "defaultMessage": "Tap to edit your profile",
+    "description": "ProfileScreenButtonBar edit button accessibility label"
+  },
   "GQ5mTZ": {
     "defaultMessage": "RGB",
     "description": "ColorPicker Component - TextInput Label : RGB Title"
@@ -882,6 +890,10 @@
   "LLt2DI": {
     "defaultMessage": "Email address",
     "description": "The email address option in the country selector"
+  },
+  "LNyhUn": {
+    "defaultMessage": "Tap to create a new post",
+    "description": "ProfileScreenButtonBar edit button accessibility label"
   },
   "LOvPdv": {
     "defaultMessage": "Crop",

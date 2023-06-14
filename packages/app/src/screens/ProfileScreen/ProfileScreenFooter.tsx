@@ -8,7 +8,6 @@ import ColorPreview from '#ui/ColorPreview';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ViewTransition from '#ui/ViewTransition';
-import ProfileScreenButtonBar from './ProfileScreenButtonBar';
 import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
 import type { FooterBarItem } from '#ui/FooterBar';
 
@@ -26,10 +25,6 @@ export type ProfileScreenFooterProps = {
    */
   ready: boolean;
   /**
-   * The user name of the current displayed profile
-   */
-  userName: string;
-  /**
    * True when the user select some modules
    */
   hasSelectedModules: boolean;
@@ -45,18 +40,6 @@ export type ProfileScreenFooterProps = {
    * the background color of the profile
    */
   backgroundColor: string;
-  /**
-   * A callback called when the user press the home button
-   */
-  onHome: () => void;
-  /**
-   * A callback called when the user press the edit button
-   */
-  onEdit: () => void;
-  /**
-   * A callback called when the user press the follow button
-   */
-  onToggleFollow: (follow: boolean) => void;
   /**
    * A callback called when the user switch the edit mode display mode
    */
@@ -82,15 +65,11 @@ export type ProfileScreenFooterProps = {
 const ProfileScreenFooter = ({
   editing,
   ready,
-  userName,
   currentEditionView,
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
   backgroundColor,
-  onHome,
-  onEdit,
-  onToggleFollow,
   onEditingDisplayModeChange,
   onRequestNewModule,
   onRequestColorPicker,
@@ -171,27 +150,6 @@ const ProfileScreenFooter = ({
   const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
   return (
     <>
-      <ViewTransition
-        transitions={['opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
-        style={[
-          styles.buttonBar,
-          {
-            bottom: bottomMargin,
-            opacity: editing ? 0 : 1,
-          },
-        ]}
-        pointerEvents={editing ? 'none' : 'auto'}
-        disableAnimation={!ready}
-      >
-        <ProfileScreenButtonBar
-          userName={userName}
-          onHome={onHome}
-          onEdit={onEdit}
-          onToggleFollow={onToggleFollow}
-        />
-      </ViewTransition>
-
       <ViewTransition
         transitions={['opacity']}
         transitionDuration={EDIT_TRANSITION_DURATION}

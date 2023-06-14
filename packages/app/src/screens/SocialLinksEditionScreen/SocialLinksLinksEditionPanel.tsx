@@ -121,6 +121,8 @@ const SocialLinksLinksEditionPanel = ({
         <SocialIcon
           icon={item.id as SocialIcons}
           style={{
+            width: 30,
+            height: 30,
             tintColor: isNotFalsyString(value)
               ? colorScheme === 'dark'
                 ? colors.white
