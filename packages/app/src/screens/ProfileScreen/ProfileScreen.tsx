@@ -12,7 +12,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
-import ProfilePostsList from '#components/ProfilePostsList';
+import { ProfilePostsList } from '#components/PostList';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useToggle from '#hooks/useToggle';
@@ -74,7 +74,10 @@ const ProfileScreen = ({
   });
 
   const frontStyle = useAnimatedStyle(() => {
-    const flipVal = interpolate(transition.value, [0, 1], [0, 180]);
+    const flipVal = !showPost
+      ? interpolate(transition.value, [0, 1], [0, 180])
+      : interpolate(transition.value, [1, 0], [180, 360]);
+
     const scale = interpolate(transition.value, [0, 0.5, 1], [1, 0.7, 1]);
     return {
       borderRadius: 40,
@@ -90,10 +93,12 @@ const ProfileScreen = ({
         },
       ],
     };
-  }, [transition.value]);
+  }, [transition.value, showPost]);
 
   const backStyle = useAnimatedStyle(() => {
-    const flipVal = interpolate(transition.value, [0, 1], [180, 360]);
+    const flipVal = !showPost
+      ? interpolate(transition.value, [0, 1], [180, 360])
+      : interpolate(transition.value, [1, 0], [0, 180]);
     const scale = interpolate(transition.value, [0, 0.5, 1], [1, 0.7, 1]);
     return {
       opacity: interpolate(transition.value, [0, 1], [0, 1]),
@@ -107,7 +112,7 @@ const ProfileScreen = ({
         },
       ],
     };
-  }, [transition.value]);
+  }, [transition.value, showPost]);
 
   const [editMode, toggleEditMode] = useToggle(false);
   const editModeTransition = useDerivedValue(() => {
@@ -178,8 +183,7 @@ const styles = StyleSheet.create({
     backfaceVisibility: 'hidden',
   },
   back: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
     backfaceVisibility: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
