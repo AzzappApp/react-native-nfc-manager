@@ -12,7 +12,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
-import { ProfilePostsList } from '#components/PostList';
+import ProfilePostsList from '#components/ProfilePostsList';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useToggle from '#hooks/useToggle';
