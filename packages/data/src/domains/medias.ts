@@ -20,14 +20,16 @@ export type NewMedia = InferModel<typeof MediaTable, 'insert'>;
  * @param ids - The ids of the media to retrieve
  * @returns A list of media, where the order of the media matches the order of the ids
  */
-export const getMediasByIds = async (ids: readonly string[]) =>
+export const getMediasByIds = async (
+  ids: readonly string[],
+  tx: DbTransaction = db,
+) =>
   sortEntitiesByIds(
     ids,
-    await db
+    await tx
       .select()
       .from(MediaTable)
-      .where(inArray(MediaTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(MediaTable.id, ids as string[])),
   );
 
 /**
@@ -41,7 +43,7 @@ export const createMedia = async (
   newMedia: NewMedia,
   tx: DbTransaction = db,
 ) => {
-  await tx.insert(MediaTable).values(newMedia).execute();
+  await tx.insert(MediaTable).values(newMedia);
   return newMedia;
 };
 
@@ -49,7 +51,7 @@ export const createMedias = async (
   newMedias: NewMedia[],
   tx: DbTransaction = db,
 ) => {
-  await tx.insert(MediaTable).values(newMedias).execute();
+  await tx.insert(MediaTable).values(newMedias);
   return newMedias;
 };
 
@@ -61,7 +63,7 @@ export const createMedias = async (
  * @returns The created media
  */
 export const removeMedia = async (id: string, tx: DbTransaction = db) => {
-  await tx.delete(MediaTable).where(eq(MediaTable.id, id)).execute();
+  await tx.delete(MediaTable).where(eq(MediaTable.id, id));
 };
 
 /**
@@ -72,5 +74,5 @@ export const removeMedia = async (id: string, tx: DbTransaction = db) => {
  * @returns The created media
  */
 export const removeMedias = async (ids: string[], tx: DbTransaction = db) => {
-  await tx.delete(MediaTable).where(inArray(MediaTable.id, ids)).execute();
+  await tx.delete(MediaTable).where(inArray(MediaTable.id, ids));
 };

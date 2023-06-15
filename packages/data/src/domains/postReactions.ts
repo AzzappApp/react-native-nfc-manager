@@ -56,22 +56,18 @@ export const insertPostReaction = async (
   reactionKind: PostReaction['reactionKind'],
 ) =>
   db.transaction(async trx => {
-    await trx
-      .insert(PostReactionTable)
-      .values({
-        profileId,
-        postId,
-        reactionKind,
-      })
-      .execute();
+    await trx.insert(PostReactionTable).values({
+      profileId,
+      postId,
+      reactionKind,
+    });
 
     await trx
       .update(post)
       .set({
         counterReactions: sql`${post.counterReactions} + 1`,
       })
-      .where(eq(post.id, postId))
-      .execute();
+      .where(eq(post.id, postId));
   });
 
 /**
@@ -90,16 +86,14 @@ export const deletePostReaction = async (profileId: string, postId: string) =>
           eq(PostReactionTable.profileId, profileId),
           eq(PostReactionTable.postId, postId),
         ),
-      )
-      .execute();
+      );
 
     await trx
       .update(post)
       .set({
         counterReactions: sql`${post.counterReactions} - 1`,
       })
-      .where(eq(post.id, postId))
-      .execute();
+      .where(eq(post.id, postId));
   });
 
 /**
@@ -119,5 +113,5 @@ export const getPostReaction = async (profileId: string, postId: string) =>
         eq(PostReactionTable.postId, postId),
       ),
     )
-    .execute()
+
     .then(res => res.pop() ?? null);

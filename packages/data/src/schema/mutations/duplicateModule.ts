@@ -41,8 +41,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
             gt(CardModuleTable.position, module.position),
             eq(CardModuleTable.cardId, card.id),
           ),
-        )
-        .execute();
+        );
 
       const newModule = await createCardModule(
         { ...omit(module, 'id'), position: module.position + 1 },

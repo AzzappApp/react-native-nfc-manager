@@ -85,8 +85,7 @@ export const getProfilesByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(ProfileTable)
-      .where(inArray(ProfileTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(ProfileTable.id, ids as string[])),
   );
 
 /**
@@ -94,13 +93,14 @@ export const getProfilesByIds = async (ids: readonly string[]) =>
  * @param id - The id of the user
  * @returns The list of profile associated to the user
  */
-export const getUserProfiles = (userId: string) =>
-  db
+export const getUserProfiles = async (userId: string) => {
+  const res = await db
     .select()
     .from(ProfileTable)
     .where(eq(ProfileTable.userId, userId))
-    .orderBy(asc(ProfileTable.userName))
-    .execute();
+    .orderBy(asc(ProfileTable.userName));
+  return res;
+};
 
 /**
  * Retrieves a profile by their profilename
@@ -113,7 +113,7 @@ export const getProfileByUserName = async (profileName: string) => {
     .select()
     .from(ProfileTable)
     .where(eq(ProfileTable.userName, profileName))
-    .execute()
+
     .then(res => res.pop() ?? null);
 };
 
@@ -141,8 +141,7 @@ export const getAllProfilesWithCard = async (
       ),
     )
     .limit(limit)
-    .offset(offset)
-    .execute();
+    .offset(offset);
 };
 
 /**
@@ -157,7 +156,7 @@ export const getAllProfilesWithCardCount = async () =>
     .where(
       exists(sql`(select Card.id from Card where Profile.id = Card.profileId)`),
     )
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -171,7 +170,7 @@ export const getFollowedProfiles = async (profileId: string) =>
     .from(ProfileTable)
     .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
     .where(eq(FollowTable.followerId, profileId))
-    .execute()
+
     .then(res => res.map(({ Profile }) => Profile));
 
 /**
@@ -185,7 +184,7 @@ export const getFollowedProfilesCount = async (profileId: string) =>
     .from(ProfileTable)
     .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
     .where(eq(FollowTable.followerId, profileId))
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -212,8 +211,7 @@ export const getFollowerProfiles = async (
       ),
     )
     .orderBy(desc(FollowTable.createdAt))
-    .limit(limit)
-    .execute();
+    .limit(limit);
 
 /**
  * Retrieve the number of profile a profile is being followed
@@ -226,7 +224,7 @@ export const getFollowerProfilesCount = async (profileId: string) =>
     .from(ProfileTable)
     .innerJoin(FollowTable, eq(FollowTable.followerId, ProfileTable.id))
     .where(eq(FollowTable.followingId, profileId))
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -239,7 +237,7 @@ export const createProfile = async (data: NewProfile) => {
     ...data,
     id: createId(),
   };
-  await db.insert(ProfileTable).values(addedProfile).execute();
+  await db.insert(ProfileTable).values(addedProfile);
   return {
     ...addedProfile,
     createdAt: new Date(),
@@ -267,9 +265,7 @@ export const updateProfile = async (
   const result = await db
     .update(ProfileTable)
     .set(updatedProfile)
-    .where(eq(ProfileTable.id, profileId))
-    .execute();
-
+    .where(eq(ProfileTable.id, profileId));
   if (result.rowsAffected > 0) {
     return updatedProfile;
   } else {

@@ -60,15 +60,14 @@ export const insertPostComment = async (
       postId,
       comment,
     };
-    await trx.insert(PostCommentTable).values(addedPostComment).execute();
+    await trx.insert(PostCommentTable).values(addedPostComment);
 
     await trx
       .update(post)
       .set({
         counterComments: sql`${post.counterComments} + 1`,
       })
-      .where(eq(post.id, postId))
-      .execute();
+      .where(eq(post.id, postId));
 
     return { ...addedPostComment, createdAt: new Date() };
   });
@@ -94,8 +93,7 @@ export const getPostComments = async (
       ),
     )
     .orderBy(desc(PostCommentTable.createdAt))
-    .limit(limit)
-    .execute();
+    .limit(limit);
 };
 
 /**
@@ -109,6 +107,5 @@ export const getPostCommentsByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(PostCommentTable)
-      .where(inArray(PostCommentTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(PostCommentTable.id, ids as string[])),
   );

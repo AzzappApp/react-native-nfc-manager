@@ -29,8 +29,7 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
       await db
         .update(CardModuleTable)
         .set({ visible })
-        .where(inArray(CardModuleTable.id, modulesIds))
-        .execute();
+        .where(inArray(CardModuleTable.id, modulesIds));
     } catch (e) {
       console.error(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

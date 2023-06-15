@@ -32,8 +32,7 @@ export const getCompanyActivities = async (profileCategoryId?: string) => {
       profileCategoryId
         ? eq(CompanyActivityTable.profileCategoryId, profileCategoryId)
         : undefined,
-    )
-    .execute();
+    );
 };
 
 /**
@@ -46,6 +45,6 @@ export const getCompanyActivityById = async (id: string) => {
     .select()
     .from(CompanyActivityTable)
     .where(eq(CompanyActivityTable.id, id))
-    .execute()
+
     .then(res => res.pop() ?? null);
 };

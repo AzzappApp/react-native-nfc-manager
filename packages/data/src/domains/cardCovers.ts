@@ -37,7 +37,7 @@ export const CardCoverTable = mysqlTable('CardCover', {
   subTitleStyle: json('subTitleStyle'),
   textPreviewMediaId: varchar('textPreviewMediaId', {
     length: DEFAULT_VARCHAR_LENGTH,
-  }).notNull(),
+  }),
   titleStyle: json('titleStyle'),
   updatedAt: datetime('updatedAt', {
     mode: 'date',
@@ -64,8 +64,7 @@ export const getCardCoversByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(CardCoverTable)
-      .where(inArray(CardCoverTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(CardCoverTable.id, ids as string[])),
   );
 
 /**
@@ -83,7 +82,7 @@ export const createCardCover = async (
     ...values,
     id: createId(),
   };
-  await tx.insert(CardCoverTable).values(addedCardCover).execute();
+  await tx.insert(CardCoverTable).values(addedCardCover);
 
   // TODO should we return the cardCover from the database instead? createdAt might be different
   return {
@@ -127,6 +126,5 @@ export const updateCardCover = async (
       ...updates,
       updatedAt: new Date(),
     })
-    .where(eq(CardCoverTable.id, id))
-    .execute();
+    .where(eq(CardCoverTable.id, id));
 };

@@ -1,18 +1,23 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getProfileId } from '@azzapp/auth/viewer';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  getMediaInfoByPublicIds,
+  type CloudinaryResource,
+} from '@azzapp/shared/cloudinaryHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import {
   createCard,
   createCardCover,
-  createMedia,
   createMedias,
   db,
+  getMediasByIds,
   removeMedias,
   updateCardCover,
 } from '#domains';
-import type { Card, CoverUpdates, Media, NewMedia } from '#domains';
+import type { Card, CoverUpdates, Media } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateCover: MutationResolvers['updateCover'] = async (
@@ -38,10 +43,10 @@ const updateCover: MutationResolvers['updateCover'] = async (
 
   if (
     !cover &&
-    (!input.media ||
-      !input.textPreviewMedia ||
+    (!input.mediaId ||
+      !input.textPreviewMediaId ||
       !input.title ||
-      !input.sourceMedia)
+      !input.sourceMediaId)
   ) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
@@ -50,27 +55,76 @@ const updateCover: MutationResolvers['updateCover'] = async (
     await db.transaction(async trx => {
       let coverId;
       if (!cover) {
-        // souceMedia can exist in `Media` table (business template + using business image)
-        const mediaExist =
-          (await mediaLoader.load(input.sourceMedia!.id)) != null;
-
-        const mediasToCreate = [input.media!, input.textPreviewMedia!].concat(
-          input.maskMedia ?? [],
+        if (!(input.sourceMediaId && input.mediaId)) {
+          //mandatory in case of create
+          throw new Error(ERRORS.INVALID_REQUEST);
+        }
+        //check if the media is from a template business(don't use mediaLoaderon purpose)
+        const [existingSourceMedia] = await getMediasByIds(
+          [input.sourceMediaId],
+          trx,
         );
-
-        if (!mediaExist) {
-          mediasToCreate.push(input.sourceMedia!);
+        const medias: Media[] = [];
+        let cloudinarySourceMedia: CloudinaryResource | undefined = undefined;
+        if (!existingSourceMedia) {
+          //find the media in cloudinary (image or video, we don't know. this is bad
+          [cloudinarySourceMedia] = await getMediaInfoByPublicIds([
+            { publicId: input.sourceMediaId, kind: 'image' },
+            { publicId: input.sourceMediaId, kind: 'video' },
+          ]);
+        }
+        console.log('existingSourceMedia', cloudinarySourceMedia);
+        if (cloudinarySourceMedia == null) {
+          throw new Error(ERRORS.INVALID_REQUEST);
+        }
+        medias.push({
+          id: cloudinarySourceMedia.public_id,
+          kind: cloudinarySourceMedia.resource_type,
+          width: cloudinarySourceMedia.width,
+          height: cloudinarySourceMedia.height,
+        });
+        //find the other media in cloudinary
+        const cloudinaryMedias = [
+          {
+            publicId: input.mediaId,
+            kind: cloudinarySourceMedia.resource_type,
+          },
+        ];
+        if (input.maskMediaId) {
+          cloudinaryMedias.push({
+            publicId: input.maskMediaId,
+            kind: cloudinarySourceMedia.resource_type,
+          });
+        }
+        if (input.textPreviewMediaId) {
+          cloudinaryMedias.push({
+            publicId: input.textPreviewMediaId,
+            kind: cloudinarySourceMedia.resource_type,
+          });
         }
 
-        await createMedias(mediasToCreate, trx);
+        (await getMediaInfoByPublicIds(cloudinaryMedias)).forEach(item => {
+          if (item) {
+            medias.push({
+              id: item.public_id,
+              kind: item.resource_type,
+              width: item.width,
+              height: item.height,
+            });
+          }
+        });
+
+        console.log('medias to create', medias);
+
+        await createMedias(medias, trx);
 
         const cover = await createCardCover(
           {
-            mediaId: input.media!.id,
+            mediaId: input.mediaId,
             mediaStyle: input.mediaStyle,
-            sourceMediaId: input.sourceMedia!.id,
-            textPreviewMediaId: input.textPreviewMedia!.id,
-            maskMediaId: input.maskMedia?.id ?? null,
+            sourceMediaId: input.sourceMediaId,
+            textPreviewMediaId: input.textPreviewMediaId ?? null,
+            maskMediaId: input.maskMediaId ?? null,
             backgroundId: input.backgroundId ?? null,
             backgroundStyle: input.backgroundStyle ?? null,
             foregroundId: input.foregroundId ?? null,
@@ -89,61 +143,15 @@ const updateCover: MutationResolvers['updateCover'] = async (
       } else {
         coverId = cover.id;
 
-        const mediasToCreate: NewMedia[] = [];
-        const mediasToDelete: string[] = [];
+        const mediasToCreate: CloudinaryResource[] = [];
+        const mediasToDelete: Array<string | null> = [];
 
         const updates: CoverUpdates = {};
-
         const entries = convertToNonNullArray(typedEntries(input));
-        entries.forEach(async ([key, value]) => {
+
+        //extract media mangement, await does not work well within the forEach
+        entries.forEach(([key, value]) => {
           switch (key) {
-            case 'media':
-              if (value) {
-                updates.mediaId = value.id;
-                replaceMedia(
-                  cover.mediaId,
-                  input.media,
-                  mediasToCreate,
-                  mediasToDelete,
-                );
-              }
-              break;
-            case 'sourceMedia':
-              if (value) {
-                updates.sourceMediaId = value.id;
-                //be sure the media does not exist already (from covertemplate)
-                if (
-                  input.sourceMedia &&
-                  (await mediaLoader.load(input.sourceMedia.id)) == null
-                ) {
-                  await createMedia(input.sourceMedia, trx);
-                }
-              }
-              break;
-            case 'maskMedia':
-              if (value) {
-                updates.maskMediaId = value.id;
-
-                replaceMedia(
-                  cover.maskMediaId,
-                  input.maskMedia,
-                  mediasToCreate,
-                  mediasToDelete,
-                );
-              }
-              break;
-            case 'textPreviewMedia':
-              if (value) {
-                updates.textPreviewMediaId = value.id;
-
-                replaceMedia(
-                  cover.textPreviewMediaId,
-                  input.textPreviewMedia,
-                  mediasToCreate,
-                  mediasToDelete,
-                );
-              }
-              break;
             case 'mediaStyle':
               updates.mediaStyle = value;
               break;
@@ -184,12 +192,74 @@ const updateCover: MutationResolvers['updateCover'] = async (
               break;
           }
         });
+        if (input.mediaId) {
+          const [media] = await getMediaInfoByPublicIds([
+            { publicId: input.mediaId, kind: 'image' },
+            { publicId: input.mediaId, kind: 'video' },
+          ]);
+          if (media) {
+            mediasToCreate.push(media);
+            mediasToDelete.push(cover.mediaId);
+            updates.mediaId = input.mediaId;
+          } else {
+            throw new Error(ERRORS.INVALID_REQUEST);
+          }
+        }
 
-        await Promise.all([
-          createMedias(mediasToCreate, trx),
-          removeMedias(mediasToDelete, trx),
-        ]);
-
+        if (input.sourceMediaId) {
+          const [sourceMedia] = await getMediaInfoByPublicIds([
+            { publicId: input.sourceMediaId, kind: 'image' },
+            { publicId: input.sourceMediaId, kind: 'video' },
+          ]);
+          if (sourceMedia) {
+            updates.sourceMediaId = input.sourceMediaId;
+            mediasToCreate.push(sourceMedia);
+            //TODO: check if media is not use in a coverTemplate before delete it
+          } else {
+            throw new Error(ERRORS.INVALID_REQUEST);
+          }
+        }
+        if (input.maskMediaId) {
+          const [maskMedia] = await getMediaInfoByPublicIds([
+            { publicId: input.maskMediaId, kind: 'image' },
+          ]);
+          if (maskMedia) {
+            mediasToCreate.push(maskMedia);
+            mediasToDelete.push(cover.maskMediaId);
+            updates.maskMediaId = input.maskMediaId;
+          }
+        }
+        if (input.textPreviewMediaId) {
+          const [textPreviewMedia] = await getMediaInfoByPublicIds([
+            { publicId: input.textPreviewMediaId, kind: 'image' },
+          ]);
+          if (textPreviewMedia) {
+            mediasToCreate.push(textPreviewMedia);
+            mediasToDelete.push(cover.textPreviewMediaId);
+            updates.textPreviewMediaId = input.textPreviewMediaId;
+          }
+        }
+        if (mediasToCreate.length > 0) {
+          await createMedias(
+            convertToNonNullArray(
+              mediasToCreate.map(item => {
+                if (item) {
+                  return {
+                    id: item.public_id,
+                    kind: item.resource_type,
+                    width: item.width,
+                    height: item.height,
+                  };
+                }
+                return null;
+              }),
+            ),
+            trx,
+          );
+        }
+        if (mediasToDelete.length > 0) {
+          await removeMedias(convertToNonNullArray(mediasToDelete), trx);
+        }
         await updateCardCover(coverId, updates, trx);
 
         coverLoader.clear(coverId);
@@ -217,8 +287,11 @@ const updateCover: MutationResolvers['updateCover'] = async (
   if (card?.coverId) {
     coverLoader.clear(card.coverId);
   }
-  if (input.sourceMedia?.id) {
-    mediaLoader.clear(input.sourceMedia.id);
+  if (input.mediaId) {
+    mediaLoader.clear(input.mediaId);
+  }
+  if (input.sourceMediaId) {
+    mediaLoader.clear(input.sourceMediaId);
   }
   const profile = await profileLoader.load(profileId);
 
@@ -226,22 +299,3 @@ const updateCover: MutationResolvers['updateCover'] = async (
 };
 
 export default updateCover;
-
-const replaceMedia = (
-  oldMediaId: string | null | undefined,
-  newMedia: Media | null | undefined,
-  mediasToCreate: NewMedia[],
-  mediasToDelete: string[],
-) => {
-  console.log({ oldMediaId, new: newMedia?.id });
-  if (oldMediaId === newMedia?.id) {
-    return;
-  }
-
-  if (oldMediaId) {
-    mediasToDelete.push(oldMediaId);
-  }
-  if (newMedia) {
-    mediasToCreate.push(newMedia);
-  }
-};

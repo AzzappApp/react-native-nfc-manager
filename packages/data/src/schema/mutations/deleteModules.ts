@@ -30,8 +30,7 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
     await db.transaction(async trx => {
       await trx
         .delete(CardModuleTable)
-        .where(inArray(CardModuleTable.id, modulesIds))
-        .execute();
+        .where(inArray(CardModuleTable.id, modulesIds));
 
       // TODO : We need to evaluate if this the performance of this query
       // is acceptable. If not, we can always find a better way to

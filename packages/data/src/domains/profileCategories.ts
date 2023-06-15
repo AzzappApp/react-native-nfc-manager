@@ -28,8 +28,7 @@ export const getProfileCategories = async () =>
     .select()
     .from(ProfileCategoryTable)
     .where(eq(ProfileCategoryTable.available, true))
-    .orderBy(asc(ProfileCategoryTable.order))
-    .execute();
+    .orderBy(asc(ProfileCategoryTable.order));
 
 /**
  * Retrieves a profile category by its id
@@ -41,5 +40,5 @@ export const getProfileCategoryById = async (id: string) =>
     .select()
     .from(ProfileCategoryTable)
     .where(eq(ProfileCategoryTable.id, id))
-    .execute()
+
     .then(res => res.pop() ?? null);

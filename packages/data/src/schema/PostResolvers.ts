@@ -78,7 +78,7 @@ export const Post: PostResolvers = {
   },
   relatedPosts: async (_post, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(post).execute(), args);
+    return connectionFromArray(await db.select().from(post), args);
   },
 };
 

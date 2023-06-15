@@ -29,8 +29,7 @@ const ProfileCategoryDataProviders: ResourceDataProvider<
           .from(CompanyActivityTable)
 
           .where(eq(CompanyActivityTable.profileCategoryId, category.id))
-          .orderBy(asc(CompanyActivityTable.order))
-          .execute(),
+          .orderBy(asc(CompanyActivityTable.order)),
       },
     };
   },
@@ -69,18 +68,14 @@ const ProfileCategoryDataProviders: ResourceDataProvider<
                     labels,
                     order: index,
                   })
-                  .where(eq(CompanyActivityTable.id, activityId))
-                  .execute();
+                  .where(eq(CompanyActivityTable.id, activityId));
               } else {
-                return trx
-                  .insert(CompanyActivityTable)
-                  .values({
-                    id: createId(),
-                    profileCategoryId: id,
-                    labels,
-                    order: index,
-                  })
-                  .execute();
+                return trx.insert(CompanyActivityTable).values({
+                  id: createId(),
+                  profileCategoryId: id,
+                  labels,
+                  order: index,
+                });
               }
             },
           ),
@@ -96,8 +91,7 @@ const ProfileCategoryDataProviders: ResourceDataProvider<
           medias: medias.map(({ id }) => id),
           order: data.order,
         })
-        .where(eq(ProfileCategoryTable.id, params.id as string))
-        .execute();
+        .where(eq(ProfileCategoryTable.id, params.id as string));
     });
     return ProfileCategoryDataProviders.getOne({ id });
   },
@@ -123,30 +117,24 @@ const ProfileCategoryDataProviders: ResourceDataProvider<
       if (data.activities) {
         await Promise.all(
           data.activities.map(({ labels }: any, index: number) =>
-            trx
-              .insert(CompanyActivityTable)
-              .values({
-                id: createId(),
-                profileCategoryId: id,
-                labels,
-                order: index,
-              })
-              .execute(),
+            trx.insert(CompanyActivityTable).values({
+              id: createId(),
+              profileCategoryId: id,
+              labels,
+              order: index,
+            }),
           ),
         );
       }
 
-      return trx
-        .insert(ProfileCategoryTable)
-        .values({
-          id,
-          available: params.data.available,
-          profileKind: params.data.profileKind,
-          labels: params.data.labels,
-          medias: medias.map(({ id }) => id),
-          order: params.data.order,
-        })
-        .execute();
+      return trx.insert(ProfileCategoryTable).values({
+        id,
+        available: params.data.available,
+        profileKind: params.data.profileKind,
+        labels: params.data.labels,
+        medias: medias.map(({ id }) => id),
+        order: params.data.order,
+      });
     });
     return ProfileCategoryDataProviders.getOne({ id });
   },

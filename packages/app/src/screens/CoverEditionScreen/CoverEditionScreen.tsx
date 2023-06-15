@@ -81,7 +81,6 @@ import type {
   CardCoverForegroundStyleInput,
   CardCoverTextStyleInput,
   CoverEditionScreenMutation,
-  MediaInput,
   UpdateCoverInput,
 } from '@azzapp/relay/artifacts/CoverEditionScreenMutation.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -92,7 +91,6 @@ export type CoverEditionScreenProps = {
    * The relay viewer reference
    */
   viewer: CoverEditionScreen_viewer$key | null;
-
   /**
    * style of the screen
    */
@@ -577,6 +575,8 @@ const CoverEditionScreen = ({
       : null;
 
     const sourceMediaId = sourceMedia?.id;
+    //we should recreate the media only fir the actual source media don't have an id (already saved)
+    // sourceMedia contains the savedValue or the updates value
     const shouldRecreateSourceMedia = updates.sourceMedia && !sourceMediaId;
 
     const mediaToUploads: Array<{
@@ -646,62 +646,70 @@ const CoverEditionScreen = ({
         ),
       );
     }
-    let mediaInput: MediaInput | undefined;
-    let textPreviewMediaInput: MediaInput | undefined;
-    let sourceMediaInput: MediaInput | undefined;
-    let maskMediaInput: MediaInput | undefined;
+    let mediaPublicId: string | undefined;
+    let textPreviewMediaPublicId: string | undefined;
+    let sourceMediaPublicId: string | undefined;
+    let maskMediaPublicId: string | undefined;
     try {
-      [mediaInput, textPreviewMediaInput, sourceMediaInput, maskMediaInput] =
-        await Promise.all(
-          uploads.map(upload =>
-            upload?.promise.then(uploadResult => ({
-              id: uploadResult.public_id as string,
-              width: uploadResult.width as number,
-              height: uploadResult.height as number,
-              kind: upload.kind,
-            })),
+      [
+        mediaPublicId,
+        textPreviewMediaPublicId,
+        sourceMediaPublicId,
+        maskMediaPublicId,
+      ] = await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(
+            uploadResult => uploadResult.public_id as string,
           ),
-        );
+        ),
+      );
     } catch (e) {
-      // TODO
       console.log(e);
       setSaving(false);
       setUploadProgress(null);
+      // TODO handle error
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage:
+            'Unknown error while uploading the cover. Please retry',
+          description: 'CoverEditionScreen Alert message unknown error',
+        }),
+      );
       return;
     }
 
     const input: UpdateCoverInput = {};
 
-    if (shouldRecreateMedia && mediaInput) {
-      input.media = mediaInput;
+    if (shouldRecreateMedia && mediaPublicId) {
+      input.mediaId = mediaPublicId;
     }
 
-    if (shouldRecreateTextPreview && textPreviewMediaInput) {
-      input.textPreviewMedia = textPreviewMediaInput;
+    if (shouldRecreateTextPreview && textPreviewMediaPublicId) {
+      input.textPreviewMediaId = textPreviewMediaPublicId;
     }
 
-    if (!cover && sourceMediaId) {
-      // Business case using the default image
-      input.sourceMedia = {
-        id: sourceMediaId,
-        height: sourceMedia.height,
-        width: sourceMedia.width,
-        kind: 'image',
-      };
-    } else if (sourceMediaInput) {
-      input.sourceMedia = sourceMediaInput;
-    } else if (sourceMediaId && sourceMediaId !== cover?.sourceMedia?.id) {
-      //this case handle the case when the user select a business template with a cover already existing
-      input.sourceMedia = {
-        id: sourceMediaId,
-        height: sourceMedia.height,
-        width: sourceMedia.width,
-        kind: 'image',
-      };
+    //TODO: review all case here, the server will handle the heavy load
+    if (sourceMediaPublicId) {
+      input.sourceMediaId = sourceMediaPublicId;
     }
 
-    if (maskMediaInput) {
-      input.maskMedia = maskMediaInput;
+    // if (!cover && sourceMediaId) {
+    //   // Business case using the default image
+    //   input.sourceMedia = sourceMediaPublicId;
+    // } else if (sourceMediaInput) {
+    //   input.sourceMedia = sourceMediaInput;
+    // } else if (sourceMediaId && sourceMediaId !== cover?.sourceMedia?.id) {
+    //   //this case handle the case when the user select a business template with a cover already existing
+    //   input.sourceMedia = {
+    //     id: sourceMediaId,
+    //     height: sourceMedia.height,
+    //     width: sourceMedia.width,
+    //     kind: 'image',
+    //   };
+    // }
+
+    if (maskMediaPublicId) {
+      input.maskMediaId = maskMediaPublicId;
     }
 
     const entries = typedEntries(updates);
@@ -757,14 +765,8 @@ const CoverEditionScreen = ({
       onCompleted() {
         setSaving(false);
         setUploadProgress(null);
-
-        if (mediaInput) {
-          const { id, kind } = mediaInput;
-          addLocalCachedMediaFile(
-            id,
-            kind as 'image' | 'video',
-            `file://${mediaPath!}`,
-          );
+        if (mediaPublicId && mediaPath) {
+          addLocalCachedMediaFile(mediaPublicId, kind, `file://${mediaPath}`);
         }
         if (isCreation) {
           router.replace({

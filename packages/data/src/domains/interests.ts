@@ -17,8 +17,7 @@ export type NewInterest = InferModel<typeof InterestTable, 'insert'>;
  * Retrieves a list of all interest
  * @returns A list of interest
  */
-export const getInterests = async () =>
-  db.select().from(InterestTable).execute();
+export const getInterests = async () => db.select().from(InterestTable);
 
 /**
  * Retrieves a interest by its id
@@ -30,6 +29,6 @@ export const getInterestById = async (tag: string) => {
     .select()
     .from(InterestTable)
     .where(eq(InterestTable.tag, tag))
-    .execute()
+
     .then(res => res.pop() ?? null);
 };

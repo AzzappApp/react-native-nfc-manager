@@ -49,7 +49,7 @@ export type NewUser = Omit<InferModel<typeof UserTable, 'insert'>, 'id'>;
  * @returns A list of user, where the order of the user matches the order of the ids
  */
 export const getUsersByIds = (ids: string[]): Promise<User[]> =>
-  db.select().from(UserTable).where(inArray(UserTable.id, ids)).execute();
+  db.select().from(UserTable).where(inArray(UserTable.id, ids));
 
 /**
  * Retrieve a user by their email
@@ -61,7 +61,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     .select()
     .from(UserTable)
     .where(eq(UserTable.email, email))
-    .execute()
+
     .then(user => user.pop() ?? null);
 };
 
@@ -77,7 +77,7 @@ export const getUserByPhoneNumber = async (
     .select()
     .from(UserTable)
     .where(eq(UserTable.phoneNumber, phoneNumber))
-    .execute()
+
     .then(user => user.pop() ?? null);
 };
 
@@ -91,7 +91,7 @@ export const createUser = async (data: NewUser): Promise<User> => {
     id: createId(),
     ...data,
   };
-  await db.insert(UserTable).values(addedUser).execute();
+  await db.insert(UserTable).values(addedUser);
 
   return {
     ...addedUser,
@@ -115,8 +115,7 @@ export const updateUser = async (
   const result = await db
     .update(UserTable)
     .set(updatedUser)
-    .where(eq(UserTable.id, userId))
-    .execute();
+    .where(eq(UserTable.id, userId));
   if (result.rowsAffected > 0) {
     return updatedUser;
   } else {

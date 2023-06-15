@@ -118,21 +118,15 @@ export const Viewer: ViewerResolvers = {
   },
   trendingProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db.select().from(ProfileTable).execute(),
-      args,
-    );
+    return connectionFromArray(await db.select().from(ProfileTable), args);
   },
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(post).execute(), args);
+    return connectionFromArray(await db.select().from(post), args);
   },
   recommendedProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db.select().from(ProfileTable).execute(),
-      args,
-    );
+    return connectionFromArray(await db.select().from(ProfileTable), args);
   },
   searchPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
@@ -140,8 +134,7 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(post)
-        .where(like(post.content, `%${args.search}%`))
-        .execute(),
+        .where(like(post.content, `%${args.search}%`)),
       args,
     );
   },
@@ -151,8 +144,7 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(ProfileTable)
-        .where(like(ProfileTable.userName, `%${args.search}%`))
-        .execute(),
+        .where(like(ProfileTable.userName, `%${args.search}%`)),
       args,
     );
   },

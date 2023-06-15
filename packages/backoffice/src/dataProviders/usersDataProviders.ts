@@ -32,8 +32,7 @@ const UserDataProviders: ResourceDataProvider<Omit<User, 'password'>> = {
     await db
       .update(UserTable)
       .set({ roles })
-      .where(eq(UserTable.id, id as string))
-      .execute();
+      .where(eq(UserTable.id, id as string));
     return UserDataProviders.getOne({ id: id as string });
   },
 };

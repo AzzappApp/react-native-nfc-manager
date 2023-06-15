@@ -999,6 +999,10 @@
     "defaultMessage": "Show password",
     "description": "Password text input - show password button accessibility label"
   },
+  "OHFGCg": {
+    "defaultMessage": "Unknown error while uploading the cover. Please retry",
+    "description": "CoverEditionScreen Alert message unknown error"
+  },
   "OKOTHE": {
     "defaultMessage": "Anyone can download your contact card from your profile.",
     "description": "Description of the display on my webcard toggle."

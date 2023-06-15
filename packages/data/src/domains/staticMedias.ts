@@ -41,17 +41,17 @@ export const getStaticMediasByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(StaticMediaTable)
-      .where(inArray(StaticMediaTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(StaticMediaTable.id, ids as string[])),
   );
 
 /**
  * Retrieves all cover foregrounds in the database.
  * @returns A list of cover foregrounds.
  */
-export const getStaticMediasByUsage = (usage: StaticMedia['usage']) =>
-  db
+export const getStaticMediasByUsage = async (usage: StaticMedia['usage']) => {
+  const res = await db
     .select()
     .from(StaticMediaTable)
-    .where(eq(StaticMediaTable.usage, usage))
-    .execute();
+    .where(eq(StaticMediaTable.usage, usage));
+  return res;
+};

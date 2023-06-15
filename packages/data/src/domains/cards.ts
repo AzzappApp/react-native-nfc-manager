@@ -59,8 +59,7 @@ export const getCardsByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(CardTable)
-      .where(inArray(CardTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(CardTable.id, ids as string[])),
   );
 
 /**
@@ -74,8 +73,7 @@ export const getUsersCards = async (profileIds: string[]) => {
     .from(CardTable)
     .where(
       and(inArray(CardTable.profileId, profileIds), eq(CardTable.isMain, true)),
-    )
-    .execute();
+    );
 };
 
 /**
@@ -91,7 +89,7 @@ export const createCard = async (values: NewCard, tx: DbTransaction = db) => {
     id: createId(),
   };
 
-  await tx.insert(CardTable).values(addedCard).execute();
+  await tx.insert(CardTable).values(addedCard);
   // TODO should we return the card from the database instead? createdAt might be different
   return {
     ...addedCard,
@@ -116,6 +114,5 @@ export const updateCard = async (
   await tx
     .update(CardTable)
     .set({ ...values, updatedAt: new Date() })
-    .where(eq(CardTable.id, id))
-    .execute();
+    .where(eq(CardTable.id, id));
 };

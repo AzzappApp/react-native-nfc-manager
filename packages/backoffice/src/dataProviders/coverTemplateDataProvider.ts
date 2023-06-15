@@ -41,11 +41,10 @@ const CoverTemplateDataProviders: ResourceDataProvider<
           .select()
           .from(MediaTable)
           .where(eq(MediaTable.id, dataTemplate.sourceMedia.id))
-          .execute()
           .then(res => res.pop() ?? null);
         if (existingMedia == null) {
           const media = dataTemplate.sourceMedia;
-          await trx.insert(MediaTable).values(media).execute();
+          await trx.insert(MediaTable).values(media);
           dataTemplate.sourceMediaId = media.id;
         }
       }
@@ -57,8 +56,7 @@ const CoverTemplateDataProviders: ResourceDataProvider<
       await trx
         .update(CoverTemplateTable)
         .set({ ...templateWithMedia })
-        .where(eq(CoverTemplateTable.id, id))
-        .execute();
+        .where(eq(CoverTemplateTable.id, id));
     });
     return CoverTemplateDataProviders.getOne({ id });
   },
@@ -74,20 +72,16 @@ const CoverTemplateDataProviders: ResourceDataProvider<
         await trx
           .insert(MediaTable)
           // eslint-disable-next-line @typescript-eslint/ban-types
-          .values(previewMediaId as unknown as Media)
-          .execute();
+          .values(previewMediaId as unknown as Media);
         createInput.previewMediaId = (previewMediaId as unknown as Media).id;
       }
 
       if (data.sourceMedia) {
-        await trx.insert(MediaTable).values(data.sourceMedia).execute();
+        await trx.insert(MediaTable).values(data.sourceMedia);
         data.sourceMediaId = data.sourceMedia.id;
       }
 
-      await trx
-        .insert(CoverTemplateTable)
-        .values({ id, ...createInput, data })
-        .execute();
+      await trx.insert(CoverTemplateTable).values({ id, ...createInput, data });
     });
 
     return CoverTemplateDataProviders.getOne({ id });

@@ -38,16 +38,18 @@ const CoverRenderer = async ({
             fluid
           />
         ))}
-      <h1 className={styles.coverMedia}>
-        <CloudinaryImage
-          mediaId={textPreviewMediaId}
-          alt={`${title} - ${subTitle}`}
-          className={styles.coverMedia}
-          sizes="100vw"
-          fill
-          priority
-        />
-      </h1>
+      {textPreviewMediaId && (
+        <h1 className={styles.coverMedia}>
+          <CloudinaryImage
+            mediaId={textPreviewMediaId}
+            alt={`${title} - ${subTitle}`}
+            className={styles.coverMedia}
+            sizes="100vw"
+            fill
+            priority
+          />
+        </h1>
+      )}
     </div>
   );
 };

@@ -15,6 +15,13 @@
       "when": 1686646324511,
       "tag": "0001_true_spectrum",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686842043096,
+      "tag": "0002_slippery_wolverine",
+      "breakpoints": false
     }
   ]
 }

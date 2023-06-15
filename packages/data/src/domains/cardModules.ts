@@ -114,11 +114,7 @@ type ModuleData = {
  * @returns A list of card modules, where the order of the card modules matches the order of the ids
  */
 export const getCardModulesByIds = (ids: string[]): Promise<CardModule[]> =>
-  db
-    .select()
-    .from(CardModuleTable)
-    .where(inArray(CardModuleTable.id, ids))
-    .execute();
+  db.select().from(CardModuleTable).where(inArray(CardModuleTable.id, ids));
 
 /**
 /**
@@ -138,8 +134,7 @@ export const getCardModules = async (cardId: string, includeHidden = false) => {
       ),
     )
     .where(eq(CardModuleTable.cardId, cardId))
-    .orderBy(asc(CardModuleTable.position))
-    .execute();
+    .orderBy(asc(CardModuleTable.position));
 };
 
 /**
@@ -155,7 +150,7 @@ export const getCardModuleCount = async (cardId: string) =>
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(CardModuleTable)
     .where(eq(CardModuleTable.cardId, cardId))
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -173,7 +168,7 @@ export const createCardModule = async (
     ...values,
     id: createId(),
   };
-  await tx.insert(CardModuleTable).values(addedCardModule).execute();
+  await tx.insert(CardModuleTable).values(addedCardModule);
   return { ...addedCardModule, visible: addedCardModule.visible ?? true };
 };
 
@@ -192,6 +187,5 @@ export const updateCardModule = async (
   await tx
     .update(CardModuleTable)
     .set(values)
-    .where(eq(CardModuleTable.id, id))
-    .execute();
+    .where(eq(CardModuleTable.id, id));
 };

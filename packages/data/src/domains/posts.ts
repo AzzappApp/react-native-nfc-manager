@@ -66,8 +66,7 @@ export const getPostsByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(post)
-      .where(inArray(post.id, ids as string[]))
-      .execute(),
+      .where(inArray(post.id, ids as string[])),
   );
 
 /**
@@ -78,19 +77,20 @@ export const getPostsByIds = async (ids: readonly string[]) =>
  * @param offset The offset of the first post to retrieve
  * @returns A list of post
  */
-export const getProfilesPosts = (
+export const getProfilesPosts = async (
   profileId: string,
   limit: number,
   offset: number,
-) =>
-  db
+) => {
+  const res = await db
     .select()
     .from(post)
     .where(eq(post.authorId, profileId))
     .orderBy(desc(post.createdAt))
     .limit(limit)
-    .offset(offset)
-    .execute();
+    .offset(offset);
+  return res;
+};
 
 /**
  * Retrieve the number of post a profile has.
@@ -102,7 +102,7 @@ export const getProfilesPostsCount = (profileId: string) =>
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(post)
     .where(eq(post.authorId, profileId))
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -118,8 +118,7 @@ export const getAllPosts = async (limit: number, after: Date | null = null) => {
     .from(post)
     .where(after ? lt(post.createdAt, after) : undefined)
     .orderBy(desc(post.createdAt))
-    .limit(limit)
-    .execute();
+    .limit(limit);
 };
 
 /**
@@ -150,7 +149,7 @@ export const getFollowedProfilesPosts = async (
     )
     .orderBy(desc(post.createdAt))
     .limit(limit)
-    .execute()
+
     .then(res => res.map(({ Post }) => Post));
 };
 
@@ -166,7 +165,7 @@ export const getFollowedProfilesPostsCount = async (profileId: string) =>
     .from(post)
     .innerJoin(FollowTable, eq(post.authorId, FollowTable.followingId))
     .where(eq(FollowTable.followerId, profileId))
-    .execute()
+
     .then(res => res[0].count);
 
 /**
@@ -181,7 +180,7 @@ export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
     ...values,
     id: createId(),
   };
-  await tx.insert(post).values(addedPost).execute();
+  await tx.insert(post).values(addedPost);
   // TODO should we return the post from the database instead? createdAt might be different
   return {
     ...addedPost,
@@ -207,6 +206,5 @@ export const updatePost = async (
   await db
     .update(post)
     .set({ ...data, updatedAt: new Date() })
-    .where(eq(post.id, postId))
-    .execute();
+    .where(eq(post.id, postId));
 };

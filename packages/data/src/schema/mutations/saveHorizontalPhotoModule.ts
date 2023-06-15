@@ -101,6 +101,7 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
 
       return { card };
     } catch (e) {
+      console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
   };

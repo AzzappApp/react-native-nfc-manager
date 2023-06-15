@@ -56,7 +56,7 @@ export const isFollowing = async (userId: string, targetId: string) =>
         eq(FollowTable.followingId, targetId),
       ),
     )
-    .execute()
+
     .then(res => Boolean(res.pop()));
 
 /**
@@ -72,7 +72,7 @@ export const follows = async (userId: string, targetId: string) =>
       followerId: userId,
       followingId: targetId,
     })
-    .execute()
+
     .then(() => void 0);
 
 /**
@@ -90,5 +90,5 @@ export const unfollows = (userId: string, targetId: string) =>
         eq(FollowTable.followingId, targetId),
       ),
     )
-    .execute()
+
     .then(() => void 0);

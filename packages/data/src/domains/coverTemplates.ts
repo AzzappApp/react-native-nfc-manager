@@ -73,19 +73,18 @@ export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
     await db
       .select()
       .from(CoverTemplateTable)
-      .where(inArray(CoverTemplateTable.id, ids as string[]))
-      .execute(),
+      .where(inArray(CoverTemplateTable.id, ids as string[])),
   );
 
 /**
  * It returns a promise that resolves to an array of cover templates for a given profile kind
  * @param {ProfileKind} kind - ProfileKind
  */
-export const getCoverTemplatesByKind = (
+export const getCoverTemplatesByKind = async (
   kind: CoverTemplate['kind'],
   segmented?: boolean | null,
 ) => {
-  return db
+  const res = await db
     .select()
     .from(CoverTemplateTable)
     .where(
@@ -97,8 +96,8 @@ export const getCoverTemplatesByKind = (
           ? eq(CoverTemplateTable.segmented, !!segmented)
           : undefined,
       ),
-    )
-    .execute();
+    );
+  return res;
 };
 
 /**
@@ -107,8 +106,10 @@ export const getCoverTemplatesByKind = (
  * @param {string} companyActivityId
  * @return {*}  {Promise<CoverTemplate[]>}
  */
-export const getCoverTemplatesSuggestion = (companyActivityId: string) => {
-  return db
+export const getCoverTemplatesSuggestion = async (
+  companyActivityId: string,
+) => {
+  const res = await db
     .select()
     .from(CoverTemplateTable)
     .where(
@@ -121,6 +122,6 @@ export const getCoverTemplatesSuggestion = (companyActivityId: string) => {
           inArray(CoverTemplateTable.companyActivityIds, [companyActivityId]),
         ),
       ),
-    )
-    .execute();
+    );
+  return res;
 };

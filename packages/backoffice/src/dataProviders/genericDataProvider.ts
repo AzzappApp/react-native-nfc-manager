@@ -94,8 +94,8 @@ export const getList = async <TType extends Resources>(
       .offset((params.pagination.page - 1) * params.pagination.perPage);
   }
 
-  const data = await query.execute();
-  const count = await countQuery.execute().then(res => res[0].count);
+  const data = await query;
+  const count = await countQuery.then(res => res[0].count);
   return {
     data: data as any,
     total: count,
@@ -110,7 +110,7 @@ export const getOne = async <TResource extends Resources>(
     .select()
     .from(getResource(resource))
     .where(eq(getResource(resource).id, params.id))
-    .execute()
+
     .then(res => {
       const result = res.pop();
       if (!result) throw new Error('Not found');
@@ -124,9 +124,7 @@ export const getMany = async <TResource extends Resources>(
   const records = await db
     .select()
     .from(getResource(resource))
-    .where(inArray(getResource(resource).id, params.ids as string[]))
-    .execute();
-
+    .where(inArray(getResource(resource).id, params.ids as string[]));
   const map = new Map(records.map((record: any) => [record.id, record]));
 
   const data = params.ids.map(id => map.get(id)).filter(Boolean);
@@ -142,8 +140,7 @@ export const update = async <TResource extends Resources>(
   await db
     .update(getResource(resource))
     .set(data)
-    .where(eq(getResource(resource).id, id as string))
-    .execute();
+    .where(eq(getResource(resource).id, id as string));
 
   return getOne(resource, params as any) as any;
 };
@@ -155,8 +152,7 @@ export const updateMany = async <TResource extends Resources>(
   await db
     .update(getResource(resource))
     .set(params.data)
-    .where(inArray(getResource(resource).id, params.ids as string[]))
-    .execute();
+    .where(inArray(getResource(resource).id, params.ids as string[]));
 
   return { data: params.ids as string[] };
 };
@@ -166,10 +162,7 @@ export const create = async <TResource extends Resources>(
   params: CreateParams<ResourcesToTypes<TResource>>,
 ): Promise<CreateResult<ResourcesToTypes<TResource>>> => {
   const id = params.data.id ?? createId();
-  await db
-    .insert(getResource(resource))
-    .values({ ...params.data, id })
-    .execute();
+  await db.insert(getResource(resource)).values({ ...params.data, id });
 
   return getOne(resource, { id });
 };
