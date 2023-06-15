@@ -83,8 +83,8 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
-          defaultMessage: 'Settings',
-          description: 'Title of the settings section in Line Divider edition',
+          defaultMessage: 'Image',
+          description: 'Title of the Image section in Line Divider edition',
         })}
       />
       <View style={styles.paramContainer}>

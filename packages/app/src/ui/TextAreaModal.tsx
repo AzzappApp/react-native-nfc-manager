@@ -61,6 +61,10 @@ const TextAreaModal = ({
 
   const [text, setText] = useState(value);
 
+  const onCancel = () => {
+    setText(value);
+    onClose();
+  };
   const onBlur = () => {
     if (closeOnBlur) {
       onClose();
@@ -82,7 +86,7 @@ const TextAreaModal = ({
                 description: 'Cancel button label in text edition modal',
               })}
               variant="secondary"
-              onPress={onClose}
+              onPress={onCancel}
             />
           }
           middleElement={intl.formatMessage({

@@ -127,10 +127,6 @@
     "defaultMessage": "Links",
     "description": "Title of the Links section in SocialLinks edition"
   },
-  "1j/CQs": {
-    "defaultMessage": "Settings",
-    "description": "Title of the settings section in Line Divider edition"
-  },
   "26s2Jf": {
     "defaultMessage": "No followers",
     "description": "Message displayed in the followers screen when the user has no followers"
@@ -1174,6 +1170,10 @@
   "TNL2or": {
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
     "description": "Account details - error message when password is not compliant with our rules"
+  },
+  "TOykA8": {
+    "defaultMessage": "Configuration",
+    "description": "Title of the settings section in Line Divider edition"
   },
   "TiTw6m": {
     "defaultMessage": "Border shape",
@@ -2366,6 +2366,10 @@
   "uQktw0": {
     "defaultMessage": "Left/Right margin",
     "description": "Label of the Left/Right margin slider in PhotoWithTextAndTitle edition"
+  },
+  "uaRWqJ": {
+    "defaultMessage": "Image",
+    "description": "Title of the Image section in Line Divider edition"
   },
   "ubZ5oK": {
     "defaultMessage": "Edit editor",
