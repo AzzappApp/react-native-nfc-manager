@@ -113,6 +113,7 @@ const SignInScreen = () => {
             onSubmit={onSubmit}
           >
             <TextInput
+              testID="credential-input"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Phone number or email address',
                 description:
@@ -136,6 +137,7 @@ const SignInScreen = () => {
 
             <SecuredTextInput
               ref={passwordRef}
+              testID="password-input"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',

@@ -13,6 +13,7 @@ const HomeHeader = ({ goToSettings, style, ...props }: HomeHeaderProps) => {
     <Header
       leftElement={
         <Image
+          testID="logo"
           source={
             colorScheme === 'dark'
               ? require('#assets/logo-full_white.png')

@@ -1,0 +1,15 @@
+appId: com.fadioit.azzapp
+---
+- launchApp
+- tapOn:
+    id: "credential-input"
+- inputText: "integration-tests@azzapp.com"
+- tapOn:
+    id: "password-input"
+- inputText: "Test-test1"
+- tapOn:
+    id: "submitButton"
+- extendedWaitUntil:
+    visible:
+      id: "logo"
+    timeout: 10000
