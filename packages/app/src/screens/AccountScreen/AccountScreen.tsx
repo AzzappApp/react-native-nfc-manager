@@ -122,7 +122,7 @@ const AccountScreen = ({
             >
               <View style={styles.bottomSheetOptionContainer}>
                 <View style={styles.bottomSheetOptionIconLabel}>
-                  <Icon icon="warning" style={styles.icon} />
+                  <Icon icon="information" style={styles.icon} />
                   <Text>
                     <FormattedMessage
                       defaultMessage="Account details"
