@@ -115,25 +115,31 @@ const PostsGrid = ({
 
     const pageSize = 1.75 * scrollViewHeight;
     const videosDistance = pageSize / maxVideos;
-    let canUseVideo = true;
+
     let lastVideoPosition = 0;
+
+    let videos: number[] = [];
     for (const post of posts) {
+      videos = videos.sort((a, b) => a - b);
+
       const isOnLeft = currentPositionLeft <= currentPositionRight;
       const height = itemWidth / post.media.aspectRatio;
 
       let isVideo = post.media.__typename === 'MediaVideo';
-      if (
-        !canUseVideo &&
-        currentPositionLeft - lastVideoPosition > videosDistance &&
-        currentPositionRight - lastVideoPosition > videosDistance
-      ) {
-        canUseVideo = true;
-      }
 
-      if (isVideo && canUseVideo) {
-        canUseVideo = false;
+      if (
+        isVideo &&
+        (videos.length < maxVideos ||
+          (currentPositionLeft - videos[0] > videosDistance &&
+            currentPositionRight - videos[0] > videosDistance))
+      ) {
         lastVideoPosition =
           (isOnLeft ? currentPositionLeft : currentPositionRight) + height;
+        if (videos.length === maxVideos) {
+          videos.shift();
+        }
+
+        videos.push(lastVideoPosition);
       } else {
         isVideo = false;
       }
