@@ -167,7 +167,10 @@ const EditImageStep = () => {
             <View style={styles.viewVideoDurationError}>
               {media.duration > maxVideoDuration && (
                 <View style={styles.viewIconDuration}>
-                  <Icon icon="missing" style={{ width: 17, height: 17 }} />
+                  <Icon
+                    icon="warning"
+                    style={{ width: 20, height: 20, tintColor: colors.white }}
+                  />
                 </View>
               )}
               <Text variant="medium">{formatDuration(media.duration)}</Text>
@@ -311,9 +314,9 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   viewIconDuration: {
-    width: 17,
-    height: 17,
-    borderRadius: 8.5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: colors.red400,
     marginRight: 7,
   },
