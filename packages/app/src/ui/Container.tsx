@@ -1,4 +1,3 @@
-import { createElement } from 'react';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -24,11 +23,7 @@ type ContainerProps = ViewProps & {
 const Container = ({ appearance, ...props }: ContainerProps) => {
   const styles = useStyleSheet(styleSheet, appearance);
 
-  return createElement(View, {
-    ...props,
-    style: [styles.view, props.style],
-    accessible: true,
-  });
+  return <View {...props} style={[styles.view, props.style]} />;
 };
 
 const styleSheet = createStyleSheet(appearance => ({

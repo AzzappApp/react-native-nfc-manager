@@ -98,6 +98,7 @@ const FooterBar = ({
     <Container
       style={[styles.container, { height }, style]}
       accessibilityRole="tablist"
+      accessible
     >
       {tabs.map(({ key, icon, IconComponent, tint, label }) => (
         <FooterBarItem
@@ -172,6 +173,7 @@ const FooterBarItem = ({
 
   return (
     <PressableNative
+      testID={tabKey}
       accessibilityRole="tab"
       accessibilityLabel={label}
       accessibilityState={{ selected: isSelected }}
