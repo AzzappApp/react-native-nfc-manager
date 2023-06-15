@@ -259,6 +259,10 @@
     "defaultMessage": "What best describe you?",
     "description": "NewProfileType User Type Screen - Title"
   },
+  "6AiFWY": {
+    "defaultMessage": "Configuration",
+    "description": "Configuration tab label in BlockText edition"
+  },
   "6EPGoU": {
     "defaultMessage": "Off",
     "description": "flash off accessibility value"
@@ -370,10 +374,6 @@
   "8oWzcI": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the verticalSpacing slider in BlockText edition"
-  },
-  "9+XQvm": {
-    "defaultMessage": "Settings color",
-    "description": "Settings color tab label in BlockText edition"
   },
   "9/DfwF": {
     "defaultMessage": "Forgot your password?",
@@ -2070,10 +2070,6 @@
   "noNWRA": {
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
-  },
-  "nwwOkD": {
-    "defaultMessage": "Settings Shape",
-    "description": "Settings Shape tab label in BlockText edition"
   },
   "nybB30": {
     "defaultMessage": "Text left/right margin",

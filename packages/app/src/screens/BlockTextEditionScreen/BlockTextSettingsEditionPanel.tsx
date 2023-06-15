@@ -1,8 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_MAX_FONT_SIZE,
@@ -10,12 +9,10 @@ import {
 import ProfileColorPicker, {
   ProfileColorDropDownPicker,
 } from '#components/ProfileColorPicker';
-
 import AlignmentButton from '#ui/AlignmentButton';
-import ColorPreview from '#ui/ColorPreview';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import TabsBar from '#ui/TabsBar';
+import TitleWithLine from '#ui/TitleWithLine';
 import type { BlockTextSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextSettingsEditionPanel_viewer.graphql';
 import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
@@ -107,33 +104,14 @@ const BlockTextSettingsEditionPanel = ({
     setCurrentTab('settings');
   }, [setCurrentTab]);
 
-  const tabs = useMemo(
-    () =>
-      convertToNonNullArray([
-        {
-          tabKey: 'settings',
-          label: intl.formatMessage({
-            defaultMessage: 'Settings Shape',
-            description: 'Settings Shape tab label in BlockText edition',
-          }),
-        },
-        {
-          tabKey: 'color',
-          label: intl.formatMessage({
-            defaultMessage: 'Settings color',
-            description: 'Settings color tab label in BlockText edition',
-          }),
-          rightElement: (
-            <ColorPreview color={fontColor} style={{ marginLeft: 5 }} />
-          ),
-        },
-      ]),
-    [fontColor, intl],
-  );
-
   return (
     <View style={[styles.root, style]} {...props}>
-      <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
+      <TitleWithLine
+        title={intl.formatMessage({
+          defaultMessage: 'Configuration',
+          description: 'Configuration tab label in BlockText edition',
+        })}
+      />
       <View style={styles.paramContainer}>
         <View style={styles.buttonContainer}>
           <FontDropDownPicker

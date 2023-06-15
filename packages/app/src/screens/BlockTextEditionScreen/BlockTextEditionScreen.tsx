@@ -410,14 +410,6 @@ const BlockTextEditionScreen = ({
           },
         ]}
       />
-      <BlockTextEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onCurrentTabChange}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
       <View
         style={{
           position: 'absolute',
@@ -445,6 +437,14 @@ const BlockTextEditionScreen = ({
           />
         </Suspense>
       </View>
+      <BlockTextEditionBottomMenu
+        currentTab={currentTab}
+        onItemPress={onCurrentTabChange}
+        style={[
+          styles.tabsBar,
+          { bottom: insetBottom, width: windowWidth - 20 },
+        ]}
+      />
       <TextAreaModal
         visible={showContentModal}
         value={text ?? ''}
@@ -453,7 +453,7 @@ const BlockTextEditionScreen = ({
           description:
             'Placeholder for text area in simple text edition screen',
         })}
-        maxLength={300}
+        maxLength={2200}
         onClose={onCloseContentModal}
         onChangeText={onTextChange}
       />
