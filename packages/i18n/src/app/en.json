@@ -363,6 +363,10 @@
     "defaultMessage": "Posts",
     "description": "SearchPage - Result - Global search posts title"
   },
+  "8d5Ym3": {
+    "defaultMessage": "All results",
+    "description": "Search screen tab label : all result"
+  },
   "8e13No": {
     "defaultMessage": "Select all",
     "description": "Select all button label in profile edition screen"
@@ -671,6 +675,10 @@
     "defaultMessage": "This phone number is already registered",
     "description": "Account Details Screen - Error This phone number is already registered "
   },
+  "FFlfr9": {
+    "defaultMessage": "Webcards",
+    "description": "Search screen tab label : webcard"
+  },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
@@ -694,6 +702,10 @@
   "FoeiuO": {
     "defaultMessage": "Top/Bottom Margin",
     "description": "Label of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition"
+  },
+  "G/hvQI": {
+    "defaultMessage": "Posts",
+    "description": "Search screen tab label : post"
   },
   "G3rkTV": {
     "defaultMessage": "Edit Margins",
