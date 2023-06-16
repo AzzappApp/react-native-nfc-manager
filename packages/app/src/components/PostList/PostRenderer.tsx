@@ -1,4 +1,11 @@
-import { Suspense, forwardRef, useImperativeHandle, useRef } from 'react';
+import {
+  Suspense,
+  forwardRef,
+  memo,
+  useContext,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -6,6 +13,8 @@ import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
+
+import { PostListContext } from './PostListsContext';
 import PostRendererBottomPanel, {
   PostRendererBottomPanelSkeleton,
 } from './PostRendererBottomPanel';
@@ -83,6 +92,7 @@ const PostRenderer = (
   const post = useFragment(
     graphql`
       fragment PostRendererFragment_post on Post {
+        id
         ...PostRendererBottomPanelFragment_post
         ...PostRendererMediaFragment_post
       }
@@ -132,10 +142,12 @@ const PostRenderer = (
     [],
   );
   const [showModal, toggleModal] = useToggle();
+  const context = useContext(PostListContext);
+  const shouldPlayVideo = context.visibleVideoPostIds.includes(post.id);
 
   return (
     <View {...props}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.headerView}>
         <AuthorCartouche
           author={author}
           style={styles.authorCartoucheStyle}
@@ -154,7 +166,7 @@ const PostRenderer = (
           post={post}
           width={width}
           muted={muted}
-          paused={paused}
+          paused={paused || !shouldPlayVideo}
           initialTime={initialTime}
           videoDisabled={videoDisabled}
         />
@@ -171,9 +183,10 @@ const PostRenderer = (
   );
 };
 
-export default forwardRef(PostRenderer);
+export default memo(forwardRef(PostRenderer));
 
 const styles = StyleSheet.create({
+  headerView: { flexDirection: 'row', alignItems: 'center', height: 56 },
   pressableLink: { flex: 1 },
   authorCartoucheStyle: { marginLeft: 10, flex: 1 },
 

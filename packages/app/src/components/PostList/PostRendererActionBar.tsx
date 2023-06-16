@@ -5,10 +5,10 @@ import { View, StyleSheet, Share } from 'react-native';
 import { useMutation, graphql, useFragment } from 'react-relay';
 
 import { useDebounce } from 'use-debounce';
+import { useRouter } from '#components/NativeRouter';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
-import { useRouter } from './NativeRouter';
 import type {
   PostRendererActionBar_post$key,
   ReactionKind,

@@ -40,8 +40,6 @@ const SocialIcon = ({ icon, ...props }: SocialIconProps) => {
     return null;
   }
   // TODO better alt text
-  console.log(icon);
-  console.log(socialIcons[icon]);
   return <Image {...props} src={socialIcons[icon]} alt={icon} />;
 };
 

@@ -15,7 +15,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
 import { AUTHOR_CARTOUCHE_HEIGHT } from '#components/AuthorCartouche';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
-import PostList from '#components/PostList';
+import PostList from '#components/PostList/PostList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -44,9 +44,6 @@ const postScreenQuery = graphql`
 const PostScreen = ({
   preloadedQuery,
   hasFocus,
-  route: {
-    params: { videoTime },
-  },
 }: RelayScreenProps<PostRoute, PostScreenQuery>) => {
   const router = useRouter();
   const intl = useIntl();
@@ -96,11 +93,6 @@ const PostScreen = ({
   );
   const styles = useStyleSheet(styleSheet);
 
-  const initialVideoTimes = useMemo(
-    () => (post ? { [post.id]: videoTime } : undefined),
-    [videoTime, post],
-  );
-
   if (!post) {
     return null;
   }
@@ -127,7 +119,6 @@ const PostScreen = ({
         canPlay={ready && hasFocus}
         posts={posts}
         onEndReached={onEndReached}
-        initialVideoTimes={initialVideoTimes}
         loading={loading}
       />
       <Suspense>

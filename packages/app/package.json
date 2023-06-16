@@ -30,6 +30,7 @@
     "@react-native-camera-roll/camera-roll": "^5.3.1",
     "@react-native-clipboard/clipboard": "^1.8.1",
     "@react-native-masked-view/masked-view": "^0.2.9",
+    "@shopify/flash-list": "^1.4.3",
     "appcenter": "^4.4.5",
     "appcenter-analytics": "^4.4.5",
     "appcenter-crashes": "^4.4.5",

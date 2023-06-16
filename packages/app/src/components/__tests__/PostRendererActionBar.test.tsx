@@ -5,9 +5,9 @@ import {
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
-import PostRendererActionBar from '../PostRendererActionBar';
-import type { PostRendererMediaProps } from '#components/PostRendererMedia';
-import type { PostRendererActionBarProps } from '../PostRendererActionBar';
+import PostRendererActionBar from '../PostList/PostRendererActionBar';
+import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
+import type { PostRendererActionBarProps } from '../PostList/PostRendererActionBar';
 import type { PostRendererActionBarTestQuery } from '@azzapp/relay/artifacts/PostRendererActionBarTestQuery.graphql';
 
 const mockRouter = {

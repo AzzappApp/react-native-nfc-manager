@@ -5,8 +5,8 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import PostRendererMedia from '#components/PostRendererMedia';
-import type { PostRendererMediaProps } from '#components/PostRendererMedia';
+import PostRendererMedia from '#components/PostList/PostRendererMedia';
+import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
 import type { PostRendererMediaTestQuery } from '@azzapp/relay/artifacts/PostRendererMediaTestQuery.graphql';
 
 const renderPost = (props?: Partial<PostRendererMediaProps>) => {

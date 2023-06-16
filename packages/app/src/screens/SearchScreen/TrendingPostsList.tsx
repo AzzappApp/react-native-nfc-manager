@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import PostsGrid from '#components/PostsGrid';
+import PostsGrid from '#components/PostList/PostsGrid';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { TrendingPostsList_viewer$key } from '@azzapp/relay/artifacts/TrendingPostsList_viewer.graphql';

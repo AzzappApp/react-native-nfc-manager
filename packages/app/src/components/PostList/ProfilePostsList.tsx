@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { useRouter } from '#components/NativeRouter';
-import PostList from '#components/PostList';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import PostList from './PostList';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { ProfilePostsListFragment_author$key } from '@azzapp/relay/artifacts/ProfilePostsListFragment_author.graphql';
 import type { ProfilePostsListFragment_posts$key } from '@azzapp/relay/artifacts/ProfilePostsListFragment_posts.graphql';
@@ -26,7 +27,7 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
         @refetchable(queryName: "ProfilePostsList_profile_posts_connection")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 10 }
+          first: { type: Int, defaultValue: 6 }
         ) {
           posts(after: $after, first: $first)
             @connection(key: "ProfilePostsList_profile_connection_posts") {
@@ -97,7 +98,7 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={styles.safeAreaView} edges={['top']}>
       <Header
         middleElement={
           authorProfile.isViewer
@@ -137,3 +138,7 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
 };
 
 export default ProfilePostsList;
+
+const styles = StyleSheet.create({
+  safeAreaView: { flex: 1, width: '100%' },
+});

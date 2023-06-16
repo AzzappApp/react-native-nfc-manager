@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import ProfilePostsList from '#components/ProfilePostsList';
+import ProfilePostsList from '#components/PostList/ProfilePostsList';
 import relayScreen from '#helpers/relayScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ProfilePostsRoute } from '#routes';

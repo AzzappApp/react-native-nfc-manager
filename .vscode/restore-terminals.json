@@ -14,26 +14,6 @@
     {
       "splitTerminals": [
         {
-          "name": "mobile definition",
-          "commands": ["cd packages/app", "yarn lib:definition:watch"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
-          "name": "mobile compile",
-          "commands": ["cd packages/app", "yarn lib:compile:watch"]
-        },
-        {
-          "name": "mobile assets",
-          "commands": ["cd packages/app", "yarn assets:watch"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
           "name": "auth",
           "commands": ["cd packages/auth", "yarn dev"]
         }
@@ -66,6 +46,10 @@
           "commands": [
             "yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
           ]
+        },
+        {
+          "name": "graphQL codegen",
+          "commands": ["yarn graphql-codegen  --watch"]
         }
       ]
     },

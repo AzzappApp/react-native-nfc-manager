@@ -5,7 +5,7 @@ import { usePaginationFragment, graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
-import PostsGrid from '#components/PostsGrid';
+import PostsGrid from '#components/PostList/PostsGrid';
 import SkeletonPlaceholder from '#components/Skeleton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import SearchResultGlobalListHeader, {

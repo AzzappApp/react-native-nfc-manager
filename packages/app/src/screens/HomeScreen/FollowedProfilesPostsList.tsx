@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import PostsGrid from '#components/PostsGrid';
+import PostsGrid from '#components/PostList/PostsGrid';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';

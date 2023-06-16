@@ -1,4 +1,4 @@
-import PostRendererFeed from '#components/PostRendererFeed';
+import PostRendererFeed from '#components/PostList/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Link from '../Link';
 import type { PostLinkProps } from './postLinkTypes';

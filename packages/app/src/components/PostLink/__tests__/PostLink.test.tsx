@@ -1,13 +1,15 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { View } from 'react-native';
 import PostLink from '../PostLink';
-
-import type { PostRendererHandle, PostRendererProps } from '../../PostRenderer';
+import type {
+  PostRendererHandle,
+  PostRendererProps,
+} from '#components/PostList/PostRenderer';
 import type { ForwardedRef } from 'react';
 
 let mockPostHandle: any = null;
 
-jest.mock('../../PostRendererFeed', () => {
+jest.mock('../../PostList/PostRendererFeed', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function PostRenderer(
