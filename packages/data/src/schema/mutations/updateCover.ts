@@ -257,8 +257,10 @@ const updateCover: MutationResolvers['updateCover'] = async (
             trx,
           );
         }
-        if (mediasToDelete.length > 0) {
-          await removeMedias(convertToNonNullArray(mediasToDelete), trx);
+
+        const deletedMedias = convertToNonNullArray(mediasToDelete);
+        if (deletedMedias.length > 0) {
+          await removeMedias(deletedMedias, trx);
         }
         await updateCardCover(coverId, updates, trx);
 

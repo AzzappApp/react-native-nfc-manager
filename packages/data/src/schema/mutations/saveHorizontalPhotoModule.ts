@@ -95,7 +95,7 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
       if (newImage) {
         mediaLoader.clear(input.image);
         if (module?.data?.image) {
-          await removeMedias([module?.data?.image]);
+          await removeMedias([module.data.image]);
         }
       }
 

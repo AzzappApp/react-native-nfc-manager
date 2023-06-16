@@ -131,7 +131,9 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
     await deleteMediaByPublicIds(
       mediasToDelete.map(publicId => ({ publicId, kind: 'image' })),
     );
-    await removeMedias(mediasToDelete);
+    if (mediasToDelete.length > 0) {
+      await removeMedias(mediasToDelete);
+    }
   } catch (e) {
     console.warn('Error deleting media', e);
   }
