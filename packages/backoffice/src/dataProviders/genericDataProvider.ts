@@ -84,9 +84,18 @@ export const getList = async <TType extends Resources>(
     });
   }
   if (params.sort) {
-    query = query.orderBy(
-      sql.raw(`${params.sort.field} ${params.sort.order.toLowerCase()}`),
-    );
+    if (params.sort.field.includes('.')) {
+      const [column, field] = params.sort.field.split('.');
+      query = query.orderBy(
+        sql.raw(
+          `\`${column}\`->'$.${field}' ${params.sort.order.toLowerCase()}`,
+        ),
+      );
+    } else {
+      query = query.orderBy(
+        sql.raw(`\`${params.sort.field}\` ${params.sort.order.toLowerCase()}`),
+      );
+    }
   }
   if (params.pagination) {
     query = query
