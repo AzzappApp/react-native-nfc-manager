@@ -60,7 +60,6 @@ const LineDividerMarginEditionPanel = ({
           min={0}
           max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top Margin size',
@@ -88,7 +87,6 @@ const LineDividerMarginEditionPanel = ({
           min={0}
           max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Bottom Margin size',

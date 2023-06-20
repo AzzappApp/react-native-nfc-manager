@@ -146,7 +146,6 @@ const CarouselImagesEditionPanel = ({
           min={20}
           max={600}
           step={5}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onImageHeightChange}
           style={styles.slider}
         />

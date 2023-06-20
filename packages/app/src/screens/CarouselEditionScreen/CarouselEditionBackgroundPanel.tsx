@@ -135,7 +135,6 @@ const CarouselEditionBackgroundPanel = ({
         min={0}
         max={100}
         step={5}
-        interval={Math.floor((windowWidth - 80) / 60)}
         onChange={onOpacityChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Background opacity',

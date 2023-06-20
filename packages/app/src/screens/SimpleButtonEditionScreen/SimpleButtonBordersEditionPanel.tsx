@@ -121,7 +121,6 @@ const SimpleButtonBordersEditionPanel = ({
           min={0}
           max={10}
           step={1}
-          interval={30}
           onChange={onBorderwidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border width',
@@ -150,7 +149,6 @@ const SimpleButtonBordersEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={15}
           onChange={onBorderradiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border Radius',

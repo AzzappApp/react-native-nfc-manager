@@ -149,11 +149,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             min={DEFAULT_COVER_MIN_FONT_SIZE}
             max={DEFAULT_COVER_MAX_FONT_SIZE}
             step={1}
-            interval={Math.floor(
-              (windowWidth - 80) /
-                (2 *
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-            )}
             onChange={onFontSizeChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Title size',
@@ -181,11 +176,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             min={DEFAULT_COVER_MIN_FONT_SIZE}
             max={DEFAULT_COVER_MAX_FONT_SIZE}
             step={1}
-            interval={Math.floor(
-              (windowWidth - 40) /
-                (2 *
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-            )}
             onChange={onTextSizeChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Text size',
@@ -214,7 +204,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
           min={0}
           max={20}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 15)}
           onChange={onVerticalSpacingChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',

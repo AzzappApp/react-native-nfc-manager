@@ -70,7 +70,6 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={50}
           step={1}
-          interval={10}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Left/Right margin',
@@ -98,7 +97,6 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={10}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top/Bottom Margin',
@@ -126,7 +124,6 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={10}
           onChange={onGapChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Image/Text Gap',

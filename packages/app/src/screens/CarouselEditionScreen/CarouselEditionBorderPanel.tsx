@@ -107,7 +107,6 @@ const CarouselEditionBorderPanel = ({
           min={0}
           max={50}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
@@ -131,7 +130,6 @@ const CarouselEditionBorderPanel = ({
           min={0}
           max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',

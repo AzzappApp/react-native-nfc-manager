@@ -144,10 +144,7 @@ const BlockTextSettingsEditionPanel = ({
           min={DEFAULT_COVER_MIN_FONT_SIZE}
           max={DEFAULT_COVER_MAX_FONT_SIZE}
           step={1}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-          )}
+         
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'FontSize',
@@ -173,7 +170,7 @@ const BlockTextSettingsEditionPanel = ({
           min={0}
           max={10}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 10)}
+         
           onChange={onVerticalSpacingChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',

@@ -126,7 +126,7 @@ const SimpleTextStyleEditionPanel = ({
         min={DEFAULT_COVER_MIN_FONT_SIZE}
         max={DEFAULT_COVER_MAX_FONT_SIZE}
         step={1}
-        interval={Math.floor((windowWidth - 80) / 60)}
+       
         onChange={onFontSizeChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Font size',
@@ -150,7 +150,7 @@ const SimpleTextStyleEditionPanel = ({
         min={DEFAULT_COVER_MIN_FONT_SIZE}
         max={DEFAULT_COVER_MAX_FONT_SIZE}
         step={1}
-        interval={Math.floor((windowWidth - 80) / 60)}
+       
         onChange={onVerticalSpacingChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Vertical Spacing',

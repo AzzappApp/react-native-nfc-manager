@@ -145,7 +145,6 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           min={0}
           max={50}
           step={1}
-          interval={15}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',
@@ -173,10 +172,6 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           min={0.5}
           max={16 / 9}
           step={0.01}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (2 * (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-          )}
           onChange={onAspectRatioChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Title size',

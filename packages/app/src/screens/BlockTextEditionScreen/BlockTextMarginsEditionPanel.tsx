@@ -80,7 +80,6 @@ const BlockTextMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={15}
           onChange={onTextMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Text top/bottom margin',
@@ -108,7 +107,6 @@ const BlockTextMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={15}
           onChange={onTextMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Text left/right margin',
@@ -143,7 +141,6 @@ const BlockTextMarginsEditionPanel = ({
             min={0}
             max={100}
             step={1}
-            interval={15}
             onChange={onMarginHorizontalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space top/bottom',
@@ -171,7 +168,6 @@ const BlockTextMarginsEditionPanel = ({
             min={0}
             max={100}
             step={1}
-            interval={15}
             onChange={onMarginVerticalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space left/right',

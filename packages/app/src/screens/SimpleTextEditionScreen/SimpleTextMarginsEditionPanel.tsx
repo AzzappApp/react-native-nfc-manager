@@ -60,7 +60,7 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
+         
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
@@ -86,7 +86,7 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
+         
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',

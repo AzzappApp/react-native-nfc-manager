@@ -50,7 +50,6 @@ const HorizontalPhotoSettingsEditionPanel = ({
           min={50}
           max={400}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Height size',

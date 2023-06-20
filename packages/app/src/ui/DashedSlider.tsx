@@ -1,7 +1,13 @@
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
-import { Animated, PanResponder, View, useColorScheme } from 'react-native';
+import {
+  Animated,
+  PanResponder,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
@@ -18,8 +24,6 @@ export type DashedSliderProps = ViewProps & {
   onChange: (value: number) => void;
 };
 
-const DEFAULT_INTERVAL = 6;
-
 const DashedSlider = ({
   variant = 'default',
   value,
@@ -27,7 +31,7 @@ const DashedSlider = ({
   max,
   step,
   onChange,
-  interval = DEFAULT_INTERVAL,
+  interval: chosenInterval,
   style,
   ...props
 }: DashedSliderProps) => {
@@ -36,6 +40,11 @@ const DashedSlider = ({
   useEffect(() => {
     pan.setValue(value);
   }, [pan, value]);
+
+  const windowWidth = useWindowDimensions().width;
+
+  const interval = chosenInterval ?? Math.floor((windowWidth - 80) / 60);
+
   const computedInterval = interval * (variant === 'small' ? 0.5 : 1);
 
   const isPaning = useRef(false);

@@ -70,7 +70,6 @@ const CarouselEditionMarginPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginVerticalChange}
           style={styles.slider}
         />
@@ -88,7 +87,6 @@ const CarouselEditionMarginPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginHorizontalChange}
           style={styles.slider}
         />
@@ -104,7 +102,6 @@ const CarouselEditionMarginPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onGapChange}
           style={styles.slider}
         />

@@ -80,7 +80,6 @@ const SimpleButtonMarginsEditionPanel = ({
         min={0}
         max={50}
         step={1}
-        interval={Math.floor((windowWidth - 80) / 60)}
         onChange={onMargintopChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Top margin',
@@ -106,7 +105,6 @@ const SimpleButtonMarginsEditionPanel = ({
         min={0}
         max={50}
         step={1}
-        interval={Math.floor((windowWidth - 80) / 60)}
         onChange={onMarginbottomChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Bottom margin',
@@ -141,7 +139,6 @@ const SimpleButtonMarginsEditionPanel = ({
           min={50}
           max={300}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Width',
@@ -167,7 +164,6 @@ const SimpleButtonMarginsEditionPanel = ({
           min={10}
           max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Height',

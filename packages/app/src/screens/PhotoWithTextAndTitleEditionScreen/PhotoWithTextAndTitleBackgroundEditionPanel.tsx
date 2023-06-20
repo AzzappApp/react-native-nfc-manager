@@ -135,7 +135,6 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
         min={0}
         max={100}
         step={1}
-        interval={Math.floor((windowWidth - 80) / 50)}
         onChange={onOpacityChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Background opacity',
