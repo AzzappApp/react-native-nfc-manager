@@ -49,20 +49,6 @@ const CoverTemplateListAside = () => {
             }}
           />
         </FilterList>
-        <FilterList label="Type" icon={undefined}>
-          <FilterListItem
-            label="Business"
-            value={{
-              kind: 'business',
-            }}
-          />
-          <FilterListItem
-            label="Personal"
-            value={{
-              kind: 'personal',
-            }}
-          />
-        </FilterList>
       </div>
     </div>
   );

@@ -171,12 +171,14 @@ const ProfileKindStep = ({
         const index = profileCategories.findIndex(
           category => category.id === profileCategoryId,
         );
-        categoryListRef.current?.scrollToIndex({
-          index,
-          animated: false,
-          viewPosition: 0.5,
-        });
-        setCategoryListReady(true);
+        if (index > -1 && index < profileCategories.length) {
+          categoryListRef.current?.scrollToIndex({
+            index,
+            animated: false,
+            viewPosition: 0.5,
+          });
+          setCategoryListReady(true);
+        }
       }, 10);
     }
     return () => clearTimeout(timeout);

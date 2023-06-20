@@ -15,7 +15,7 @@ import {
   getAllPosts,
   db,
   getStaticMediasByUsage,
-  getCoverTemplatesByKind,
+  getCoverTemplates,
   getCoverTemplatesSuggestion,
   ProfileTable,
   post,
@@ -151,13 +151,8 @@ export const Viewer: ViewerResolvers = {
   coverBackgrounds: async () => getStaticMediasByUsage('coverBackground'),
   coverForegrounds: async () => getStaticMediasByUsage('coverForeground'),
   moduleBackgrounds: async () => getStaticMediasByUsage('moduleBackground'),
-  coverTemplates: async (_, __, { auth, profileLoader }) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      return [];
-    }
-    const profile = await profileLoader.load(profileId);
-    return getCoverTemplatesByKind(profile?.profileKind ?? 'personal');
+  coverTemplates: async () => {
+    return getCoverTemplates();
   },
   coverTemplatesByCategory: async (
     _,
@@ -179,10 +174,7 @@ export const Viewer: ViewerResolvers = {
       }
     }
 
-    const templates = await getCoverTemplatesByKind(
-      profile?.profileKind ?? 'personal',
-      determinedSegmented,
-    );
+    const templates = await getCoverTemplates(determinedSegmented);
 
     const categories: Array<{ templates: CoverTemplate[]; category: string }> =
       [];

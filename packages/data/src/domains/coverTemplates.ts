@@ -1,10 +1,5 @@
 import { eq, inArray, and, isNull, or } from 'drizzle-orm';
-import {
-  mysqlEnum,
-  datetime,
-  varchar,
-  customType,
-} from 'drizzle-orm/mysql-core';
+import { datetime, varchar, customType } from 'drizzle-orm/mysql-core';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
@@ -48,7 +43,6 @@ export const CoverTemplateTable = mysqlTable('CoverTemplate', {
     fromDriver: value => value as { en: string },
     dataType: () => 'json',
   })('category'),
-  kind: mysqlEnum('kind', ['personal', 'business']).notNull(),
   previewMediaId: varchar('previewMediaId', { length: DEFAULT_VARCHAR_LENGTH }),
   suggested: customTinyInt('suggested').default(false).notNull(),
   companyActivityIds: varchar('companyActivityIds', {
@@ -63,8 +57,6 @@ export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
  * Retrireves a list of cover templates by their ids.
  *
  * @param {string[]} ids
- * @param {*} string
- * @param {*} []
  * @return {*}  {(Promise<Array<CoverTemplate>>)}
  */
 export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
@@ -78,19 +70,15 @@ export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
 
 /**
  * It returns a promise that resolves to an array of cover templates for a given profile kind
- * @param {ProfileKind} kind - ProfileKind
+ * @param {segmented}  boolean | null - segmented cover template
  */
-export const getCoverTemplatesByKind = async (
-  kind: CoverTemplate['kind'],
-  segmented?: boolean | null,
-) => {
+export const getCoverTemplates = async (segmented?: boolean | null) => {
   const res = await db
     .select()
     .from(CoverTemplateTable)
     .where(
       and(
         eq(CoverTemplateTable.enabled, true),
-        eq(CoverTemplateTable.kind, kind),
         eq(CoverTemplateTable.suggested, false),
         segmented != null
           ? eq(CoverTemplateTable.segmented, !!segmented)
@@ -115,7 +103,6 @@ export const getCoverTemplatesSuggestion = async (
     .where(
       and(
         eq(CoverTemplateTable.enabled, true),
-        eq(CoverTemplateTable.kind, 'business'),
         eq(CoverTemplateTable.suggested, true),
         or(
           isNull(CoverTemplateTable.companyActivityIds),

@@ -1,0 +1,1 @@
+ALTER TABLE `CoverTemplate` DROP COLUMN `kind`;

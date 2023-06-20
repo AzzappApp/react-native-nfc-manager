@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "9b7781fa-c4c9-4b99-a56f-104f9802132c",
+  "id": "88ee9a74-e76a-4811-aa6d-91b4a631173d",
   "prevId": "abdccbef-277d-4df6-a2ed-2e1b8a4a53db",
   "tables": {
     "CardCover": {
@@ -124,7 +124,7 @@
           "name": "textPreviewMediaId",
           "type": "varchar(191)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "titleStyle": {
@@ -390,13 +390,6 @@
           "type": "json",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "kind": {
-          "name": "kind",
-          "type": "enum('personal','business')",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false
         },
         "previewMediaId": {
