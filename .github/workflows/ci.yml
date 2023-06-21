@@ -6,6 +6,8 @@ on:
       - main
       - staging
       - production
+env:
+  pscale_base_directory: .pscale      
 jobs:
   continuous-integration :
     name: Validate and test and Build

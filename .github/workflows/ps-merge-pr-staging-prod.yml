@@ -2,7 +2,7 @@ name: PlanetScale Merge Deploy Request on GH PR merge
 on:
   pull_request:
     branches:
-      - main
+      - production
       - staging
     types: [closed]
    

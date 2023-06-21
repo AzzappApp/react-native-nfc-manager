@@ -3,7 +3,6 @@ function create-branch-connection-string {
     local BRANCH_NAME=$2
     local ORG_NAME=$3
     local CREDS=$4
-    local secretshare=$5
 
     # delete password if it already existed
     # first, list password if it exists
@@ -32,31 +31,17 @@ function create-branch-connection-string {
         echo "Failed to create credentials for database $DB_NAME branch $BRANCH_NAME: $raw_output"
         exit 1
     fi
-
+    echo $raw_output
     local DB_URL=`echo "$raw_output" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
-    local GENERAL_CONNECTION_STRING=`echo "$raw_output" |  jq -r ". | .connection_strings.general"`
+    # local DATABASE_USERNAME=`echo "$raw_output" |  jq -r ". | .username"`
 
-read -r -d '' SECRET_TEXT <<EOF
-DATABASE_URL: $DB_URL
-$GENERAL_CONNECTION_STRING
-EOF
-
-    # if not running in CI
-    if [ -z "$CI" ]; then
-        echo "In the next lines, you will see your secret, branch connection information: " 
-        echo "$SECRET_TEXT"
-    elif [ -n "$secretshare" ]; then
-        # store the DB URL in secret store
-        echo "::notice ::Please follow the link in the next line and click on 'Read the Secret!' to see the secret, branch specific connection string for various frameworks."
-        local link=`curl -s -X POST -d "plain&secret=$SECRET_TEXT" https://shared-secrets-planetscale.herokuapp.com/`
-        echo "$link"
-        echo "::set-output name=CONNECTION_STRING_LINK::${link}"
-    fi
-    echo
-    echo "Alternatively, you can connect to your new branch like this:"
-    echo "pscale shell \"$DB_NAME\" \"$BRANCH_NAME\" --org \"$ORG_NAME\""
-    echo "or, to create a local tunnel to the database:"
-    echo "pscale connect \"$DB_NAME\" \"$BRANCH_NAME\" --org \"$ORG_NAME\""
+    local DATABASE_USERNAME=`echo "$raw_output" | jq -r ".username"`
+    local DATABASE_PASSWORD=`echo "$raw_output" | jq -r ".plain_text"`
+    echo $DATABASE_USERNAME
+    echo $DATABASE_PASSWORD
+    # if not running in C
+    echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> $GITHUB_OUTPUT
+    echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> $GITHUB_OUTPUT
     echo "CONNECT_STRING=$DB_URL" >> $GITHUB_OUTPUT
     export MY_DB_URL=$DB_URL
 }

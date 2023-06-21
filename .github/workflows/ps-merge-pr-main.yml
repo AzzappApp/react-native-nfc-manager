@@ -1,0 +1,63 @@
+name: PlanetScale Merge Deploy Request on GH PR merge
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+   
+env:
+  pscale_base_directory: .pscale
+
+jobs:
+  merge_planetscale_pr:
+    if: github.event.pull_request.merged == true
+    name: Merge PR on planetscale
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check permissions and PR ref
+        id: prechecks
+        uses: actions/github-script@v6.3.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: | 
+           const pr = await github.rest.pulls.get(
+              {
+                ...context.repo,
+                pull_number: context.issue.number
+              }
+            )
+  
+            if (pr.status !== 200) {
+              message = 'Could not retrieve PR info: ${permissionRes.status}'
+              core.setOutput('error', message)
+              throw new Error(message)
+            }
+  
+            core.setOutput('ref', pr.data.head.ref)
+
+      - name: Get associated PlanetScale env
+        id: ps-env
+        env:
+          REF: ${{ steps.prechecks.outputs.ref }}
+        working-directory: ${{env.pscale_base_directory}}
+        run: env/ps-env-${REF}.sh || true
+    
+      
+      - name: Merging schema changes - if asked, please click on displayed link to authenticate
+        if: ${{ steps.ps-env.outputs.DEPLOY_REQUEST_NUMBER != ''}} && success()
+        id: merge-dr
+        timeout-minutes: 10
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
+          PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
+          GITHUB_USER: ${{github.actor}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          DB_NAME: ${{secrets.DB_NAME}}
+          DEPLOY_REQUEST_NUMBER: ${{ steps.ps-env.outputs.DEPLOY_REQUEST_NUMBER }}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
+        run: |
+          ./merge-deploy-request.sh $DEPLOY_REQUEST_NUMBER
