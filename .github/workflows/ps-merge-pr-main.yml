@@ -44,7 +44,7 @@ jobs:
         env:
           REF: ${{ steps.prechecks.outputs.ref }}
         working-directory: ${{env.pscale_base_directory}}
-        run: env/ps-env-${REF}.sh || true
+        run: env/ps-env-${REF}.sh || false
     
       
       - name: Merging schema changes - if asked, please click on displayed link to authenticate
