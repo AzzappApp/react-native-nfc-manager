@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   DEFAULT_COVER_MAX_FONT_SIZE,
   DEFAULT_COVER_MIN_FONT_SIZE,
@@ -84,7 +84,6 @@ const SimpleTextStyleEditionPanel = ({
   ...props
 }: SimpleTextStyleEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -126,7 +125,6 @@ const SimpleTextStyleEditionPanel = ({
         min={DEFAULT_COVER_MIN_FONT_SIZE}
         max={DEFAULT_COVER_MAX_FONT_SIZE}
         step={1}
-       
         onChange={onFontSizeChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Font size',
@@ -150,7 +148,6 @@ const SimpleTextStyleEditionPanel = ({
         min={DEFAULT_COVER_MIN_FONT_SIZE}
         max={DEFAULT_COVER_MAX_FONT_SIZE}
         step={1}
-       
         onChange={onVerticalSpacingChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Vertical Spacing',

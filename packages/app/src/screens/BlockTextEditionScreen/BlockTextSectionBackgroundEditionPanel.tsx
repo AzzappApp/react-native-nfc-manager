@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -101,7 +101,6 @@ const BlockTextSectionBackgroundEditionPanel = ({
     [backgroundColor, onBackgroundStyleChange, patternColor],
   );
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props}>
@@ -134,7 +133,6 @@ const BlockTextSectionBackgroundEditionPanel = ({
         min={0}
         max={100}
         step={1}
-       
         onChange={onOpacityChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Background opacity',

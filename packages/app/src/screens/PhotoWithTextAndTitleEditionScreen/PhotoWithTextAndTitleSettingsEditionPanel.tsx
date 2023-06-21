@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
@@ -95,7 +95,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
   ...props
 }: PhotoWithTextAndTitleSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   const { profile } = useFragment(
     graphql`

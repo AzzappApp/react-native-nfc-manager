@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
@@ -85,7 +85,6 @@ const BlockTextSettingsEditionPanel = ({
   ...props
 }: BlockTextSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
 
@@ -144,7 +143,6 @@ const BlockTextSettingsEditionPanel = ({
           min={DEFAULT_COVER_MIN_FONT_SIZE}
           max={DEFAULT_COVER_MAX_FONT_SIZE}
           step={1}
-         
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'FontSize',
@@ -170,7 +168,6 @@ const BlockTextSettingsEditionPanel = ({
           min={0}
           max={10}
           step={1}
-         
           onChange={onVerticalSpacingChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',

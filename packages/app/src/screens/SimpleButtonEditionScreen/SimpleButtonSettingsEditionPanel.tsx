@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -115,7 +115,6 @@ const SimpleButtonSettingsEditionPanel = ({
   ...props
 }: SimpleButtonSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
   const { profile } = useFragment(

@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
@@ -25,7 +25,7 @@ const HorizontalPhotoSettingsEditionPanel = ({
   ...props
 }: HorizontalPhotoSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const windowWidth = useWindowDimensions().width;
+
   return (
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine

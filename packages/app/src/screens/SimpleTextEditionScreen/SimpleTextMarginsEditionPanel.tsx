@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -35,7 +35,6 @@ const SimpleTextMarginEditionPanel = ({
   ...props
 }: SimpleTextMarginEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -60,7 +59,6 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-         
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
@@ -86,7 +84,6 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-         
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',

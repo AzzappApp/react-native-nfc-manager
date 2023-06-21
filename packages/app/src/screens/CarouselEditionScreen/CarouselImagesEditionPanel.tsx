@@ -1,11 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Image,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, View, ScrollView, Image } from 'react-native';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -71,8 +65,6 @@ const CarouselImagesEditionPanel = ({
   ...props
 }: CarouselImagesEditionPanelProps) => {
   const intl = useIntl();
-
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>

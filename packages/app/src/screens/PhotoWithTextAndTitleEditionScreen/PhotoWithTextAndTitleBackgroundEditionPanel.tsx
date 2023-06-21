@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
@@ -102,7 +102,6 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
     [backgroundColor, onBackgroundStyleChange, patternColor],
   );
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props}>

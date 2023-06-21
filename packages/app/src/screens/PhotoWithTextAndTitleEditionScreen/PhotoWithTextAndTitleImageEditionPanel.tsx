@@ -1,10 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-
-import {
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+import { StyleSheet, View } from 'react-native';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
@@ -77,7 +72,6 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
   ...props
 }: PhotoWithTextAndTitleImageEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -102,7 +102,6 @@ const SimpleTextEditionBackgroundPanel = ({
   );
 
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props}>
@@ -135,7 +134,6 @@ const SimpleTextEditionBackgroundPanel = ({
         min={0}
         max={100}
         step={5}
-       
         onChange={onOpacityChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Background opacity',

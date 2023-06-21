@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -88,8 +88,6 @@ const CarouselEditionBorderPanel = ({
     ],
     [borderColor, intl],
   );
-
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props} style={[styles.root, style]}>

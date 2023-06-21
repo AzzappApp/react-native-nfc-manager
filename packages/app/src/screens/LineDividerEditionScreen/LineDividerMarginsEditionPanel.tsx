@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -35,7 +35,6 @@ const LineDividerMarginEditionPanel = ({
   ...props
 }: LineDividerMarginEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
