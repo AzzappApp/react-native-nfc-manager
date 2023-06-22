@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Pressable,
@@ -8,6 +9,8 @@ import {
 } from 'react-native';
 import Animated, {
   Easing,
+  FadeIn,
+  FadeOut,
   interpolate,
   useAnimatedStyle,
   useDerivedValue,
@@ -16,18 +19,22 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
 import ContactCard from '#components/ContactCard';
+import ProfileColorPicker from '#components/ProfileColorPicker';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
+import ColorPreview from '#ui/ColorPreview';
 import Container from '#ui/Container';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
+import ContactCardExportVcf from './ContactCardExportVcf';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardRoute } from '#routes';
 import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
@@ -36,9 +43,20 @@ const contactCardMobileScreenQuery = graphql`
   query ContactCardScreenQuery {
     viewer {
       profile {
+        id
         userName
         ...AccountHeader_profile
-        ...ContactCard_card
+        ...ProfileColorPicker_profile
+        contactCard {
+          public
+          isDisplayedOnWebCard
+          backgroundStyle {
+            backgroundColor
+          }
+          ...ContactCard_card
+          ...ContactCardEditModal_card
+          ...ContactCardExportVcf_card
+        }
       }
     }
   }
@@ -52,9 +70,12 @@ const defaultTimingParam = {
 const ContactCardScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(contactCardMobileScreenQuery, preloadedQuery);
+  const contactCardData = usePreloadedQuery(
+    contactCardMobileScreenQuery,
+    preloadedQuery,
+  );
+
+  const profile = contactCardData.viewer?.profile;
   const intl = useIntl();
 
   const fullScreen = useSharedValue<boolean>(false);
@@ -117,6 +138,45 @@ const ContactCardScreen = ({
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
+  const [commit] = useMutation(
+    graphql`
+      mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
+        saveContactCard(input: $input) {
+          contactCard {
+            public
+            isDisplayedOnWebCard
+            backgroundStyle {
+              backgroundColor
+            }
+            ...ContactCardEditModal_card
+          }
+        }
+      }
+    `,
+  );
+
+  const [isPublicCard, setIsPublicCard] = useToggle(false);
+  const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(false);
+
+  const [colorPickerVisible, toggleColorPickerVisible] = useToggle(false);
+
+  const [debouncedPublic] = useDebounce(isPublicCard, 500);
+  const [debouncedDisplayedOnWebCard] = useDebounce(isDisplayedOnWebCard, 500);
+
+  useEffect(() => {
+    commit({
+      variables: {
+        input: {
+          public: debouncedPublic,
+          isDisplayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
+        },
+      },
+      onError: err => {
+        console.log(err);
+      },
+    });
+  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container style={styles.container}>
@@ -136,7 +196,7 @@ const ContactCardScreen = ({
             <Animated.View style={[styles.header, style]}>
               <ContactCard
                 userName={profile?.userName ?? ''}
-                profile={profile}
+                contactCard={profile.contactCard}
               />
             </Animated.View>
           </Pressable>
@@ -152,16 +212,65 @@ const ContactCardScreen = ({
 
           <Button
             variant="secondary"
-            style={{
-              borderRadius: 27,
-              height: 29,
-            }}
+            style={styles.editContactCardButton}
             label={intl.formatMessage({
               defaultMessage: 'Edit card details',
               description: 'Edit card details button label',
             })}
             onPress={toggleContactEditModal}
           />
+
+          <PressableNative
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Background color',
+              description: 'Label of the contact card background color button',
+            })}
+            accessibilityHint={intl.formatMessage({
+              defaultMessage: 'Tap to select a background color',
+              description: 'Hint of the color picker button',
+            })}
+            style={styles.cardColorPicker}
+            onPress={toggleColorPickerVisible}
+          >
+            <ColorPreview
+              color={
+                contactCardData.viewer?.profile?.contactCard?.backgroundStyle
+                  .backgroundColor ?? colors.black
+              }
+              colorSize={16}
+            />
+          </PressableNative>
+          {contactCardData.viewer.profile && (
+            <ProfileColorPicker
+              visible={colorPickerVisible}
+              height={400}
+              profile={contactCardData.viewer.profile}
+              title={intl.formatMessage({
+                defaultMessage: ' color',
+                description: ' color title in BlockText edition',
+              })}
+              selectedColor={
+                contactCardData.viewer?.profile?.contactCard?.backgroundStyle
+                  .backgroundColor ?? colors.black
+              }
+              onColorChange={color => {
+                commit({
+                  variables: {
+                    input: {
+                      backgroundStyle: {
+                        backgroundColor: color,
+                      },
+                    },
+                  },
+                  onError: err => {
+                    console.log(err);
+                  },
+                });
+              }}
+              onRequestClose={toggleColorPickerVisible}
+            />
+          )}
 
           <View style={{ width: '100%' }}>
             <View style={styles.publicOptions}>
@@ -171,7 +280,11 @@ const ContactCardScreen = ({
                   description="When true the contact card is public"
                 />
               </Text>
-              <Switch variant="large" />
+              <Switch
+                variant="large"
+                value={isPublicCard}
+                onValueChange={setIsPublicCard}
+              />
             </View>
             <Text variant="xsmall">
               <FormattedMessage
@@ -181,23 +294,33 @@ const ContactCardScreen = ({
             </Text>
           </View>
 
-          <View style={{ width: '100%' }}>
-            <View style={styles.publicOptions}>
-              <Text variant="large">
+          {isPublicCard && (
+            <Animated.View
+              style={{ width: '100%' }}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
+              <View style={styles.publicOptions}>
+                <Text variant="large">
+                  <FormattedMessage
+                    defaultMessage="Display on my webcard"
+                    description="When true the contact card is displayed on the webcard"
+                  />
+                </Text>
+                <Switch
+                  variant="large"
+                  value={isDisplayedOnWebCard}
+                  onValueChange={setIsDisplayedOnWebCard}
+                />
+              </View>
+              <Text variant="xsmall">
                 <FormattedMessage
-                  defaultMessage="Display on my webcard"
-                  description="When true the contact card is displayed on the webcard"
+                  defaultMessage="Anyone can download your contact card from your profile."
+                  description="Description of the display on my webcard toggle."
                 />
               </Text>
-              <Switch variant="large" />
-            </View>
-            <Text variant="xsmall">
-              <FormattedMessage
-                defaultMessage="Anyone can download your contact card from your profile."
-                description="Description of the display on my webcard toggle."
-              />
-            </Text>
-          </View>
+            </Animated.View>
+          )}
 
           <View style={styles.buttons}>
             <PressableNative style={styles.addToWalletButton}>
@@ -216,18 +339,22 @@ const ContactCardScreen = ({
                 />
               </Text>
             </PressableNative>
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Share',
-                description: 'Share button label',
-              })}
-            />
+            {profile && (
+              <ContactCardExportVcf
+                profileId={profile.id}
+                contactCard={profile?.contactCard}
+              />
+            )}
           </View>
         </Animated.View>
-        <ContactCardEditModal
-          visible={contactCardEditModal}
-          toggleBottomSheet={toggleContactEditModal}
-        />
+        {contactCardData.viewer.profile && (
+          <ContactCardEditModal
+            key={contactCardData.viewer.profile?.id ?? ''}
+            contactCard={contactCardData.viewer.profile.contactCard}
+            visible={contactCardEditModal}
+            toggleBottomSheet={toggleContactEditModal}
+          />
+        )}
       </Container>
     </SafeAreaView>
   );
@@ -244,6 +371,10 @@ const styles = StyleSheet.create({
   },
   header: {
     alignSelf: 'center',
+  },
+  editContactCardButton: {
+    borderRadius: 27,
+    height: 29,
   },
   contactCardDescriptionText: { maxWidth: 255, textAlign: 'center' },
   footer: {
@@ -267,5 +398,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  cardColorPicker: {
+    borderColor: colors.black,
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 6,
   },
 });

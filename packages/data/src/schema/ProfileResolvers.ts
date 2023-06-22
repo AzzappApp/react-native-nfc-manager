@@ -10,6 +10,7 @@ import {
   getProfilesPostsCount,
   isFollowing,
 } from '#domains';
+import { buildDefaultContactCard, getContactCard } from '#domains/contactCards';
 import { getLabel, idResolver } from './utils';
 import type { Media } from '#domains';
 import type {
@@ -69,6 +70,18 @@ export const Profile: ProfileResolvers = {
   },
   public: async (profile, _) => {
     return !!profile.public;
+  },
+  contactCard: async (profile, _, { userLoader }) => {
+    const contactCard = await getContactCard(profile.id);
+
+    if (contactCard) {
+      return contactCard;
+    } else {
+      //build default contact card based on user data
+      const user = await userLoader.load(profile.userId);
+
+      return buildDefaultContactCard(profile, user);
+    }
   },
 };
 

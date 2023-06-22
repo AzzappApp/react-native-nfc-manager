@@ -356,6 +356,8 @@ PODS:
   - React-jsinspector (0.71.5)
   - React-logger (0.71.5):
     - glog
+  - react-native-blob-util (0.18.3):
+    - React-Core
   - react-native-cameraroll (5.3.1):
     - React-Core
   - react-native-encrypted-storage (4.0.3):
@@ -501,6 +503,8 @@ PODS:
   - RNScreens (3.20.0):
     - React-Core
     - React-RCTImage
+  - RNShare (8.2.2):
+    - React-Core
   - RNSVG (13.9.0):
     - React-Core
   - SocketRocket (0.6.0)
@@ -563,6 +567,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
+  - react-native-blob-util (from `../../../node_modules/react-native-blob-util`)
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
   - react-native-mmkv (from `../../../node_modules/react-native-mmkv`)
@@ -591,6 +596,7 @@ DEPENDENCIES:
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
+  - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - VisionCamera (from `../../../node_modules/react-native-vision-camera`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -669,6 +675,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../../../node_modules/react-native/ReactCommon/logger"
+  react-native-blob-util:
+    :path: "../../../node_modules/react-native-blob-util"
   react-native-cameraroll:
     :path: "../../../node_modules/@react-native-camera-roll/camera-roll"
   react-native-encrypted-storage:
@@ -725,6 +733,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../../../node_modules/react-native-screens"
+  RNShare:
+    :path: "../../../node_modules/react-native-share"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   VisionCamera:
@@ -776,6 +786,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 1579bf3207afadc72ac3638a66a102d1bf5263e3
   React-jsinspector: 14a342151ab810862998dfc99e2720746734e9b3
   React-logger: 94ec392ae471683635e4bf874d4e82f675399d2d
+  react-native-blob-util: 2d36383bb52c15c5451be81cb7ddf22bc34a12a6
   react-native-cameraroll: f3050460fe1708378698c16686bfaa5f34099be2
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
   react-native-mmkv: 2e5bf67513cc8deed86fcffe87e12b8cc250dfab
@@ -804,6 +815,7 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: afa5bf2794aecbb2dba2525329253da0d66656df
   RNReanimated: d4f363f4987ae0ade3e36ff81c94e68261bf4b8d
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
+  RNShare: d82e10f6b7677f4b0048c23709bd04098d5aee6c
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   VisionCamera: c6356b309f7b8e185b7be2e703ec67bb35acf345

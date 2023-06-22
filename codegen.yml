@@ -38,6 +38,7 @@ generates:
         CardModulePhotoWithTextAndTitle: ../../domains#CardModule as CardModulePhotoWithTextAndTitleModel
         CardModuleSocialLinks:  ../../domains#CardModule as CardModuleSocialLinksModel
         CardModuleBlockText: ../../domains#CardModule as CardModuleBlockTextModel
+        ContactCard: ../../domains#ContactCard as ContactCardModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

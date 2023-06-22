@@ -37,6 +37,9 @@ type Mutation {
   saveSocialLinksModule(
     input: SaveSocialLinksModuleInput!
   ): SaveSocialLinksModulePayload
+  saveContactCard(
+    input: SaveContactCardInput!
+  ): SaveContactCardPayload
 }
 
 """

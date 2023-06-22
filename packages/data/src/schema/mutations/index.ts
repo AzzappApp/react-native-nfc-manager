@@ -6,6 +6,7 @@ import togglePostReaction from './postReaction';
 import removeFollower from './removeFollower';
 import saveBlockTextModule from './saveBlockTextModule';
 import saveCarouselModule from './saveCarouselModule';
+import saveContactCard from './saveContactCard';
 import saveHorizontalPhotoModule from './saveHorizontalPhotoModule';
 import saveLineDividerModule from './saveLineDividerModule';
 import savePhotoWithTextAndTitleModule from './savePhotoWithTextAndTitleModule';
@@ -94,4 +95,5 @@ export const Mutation: MutationResolvers = {
     updateModulesVisibility,
   ),
   createPostComment: createMutationWithClientMutationId(createPostComment),
+  saveContactCard: createMutationWithClientMutationId(saveContactCard),
 };

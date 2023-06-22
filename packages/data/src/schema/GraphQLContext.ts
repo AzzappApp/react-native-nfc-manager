@@ -10,6 +10,7 @@ import {
   getMediasByIds,
   getCoverTemplatesByIds,
   getStaticMediasByIds,
+  getUsersByIds,
 } from '#domains';
 import type {
   Card,
@@ -20,6 +21,7 @@ import type {
   CoverTemplate,
   StaticMedia,
   PostComment,
+  User,
 } from '#domains';
 import type { SessionData } from '@azzapp/auth/viewer';
 
@@ -35,6 +37,7 @@ export type GraphQLContext = {
   mediaLoader: DataLoader<string, Media | null>;
   staticMediaLoader: DataLoader<string, StaticMedia | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
+  userLoader: DataLoader<string, User | null>;
 };
 
 const dataloadersOptions = {
@@ -67,5 +70,11 @@ export const createGraphQLContext = (
       getCoverTemplatesByIds,
       dataloadersOptions,
     ),
+    userLoader: new DataLoader(async (ids: readonly string[]) => {
+      const users = await getUsersByIds(ids as string[]);
+      const usersMap = new Map(users.map(user => [user.id, user]));
+
+      return ids.map(id => usersMap.get(id) ?? null);
+    }, dataloadersOptions),
   };
 };

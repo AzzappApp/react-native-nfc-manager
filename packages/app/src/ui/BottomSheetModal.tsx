@@ -60,6 +60,13 @@ export type BottomSheetModalProps = Omit<
    * @see ModalProps#onRequestClose
    */
   onRequestClose: () => void;
+
+  /**
+   * disable the keyboard avoiding view
+   * @default false
+   * @see KeyboardAvoidingView
+   */
+  disableKeyboardAvoidingView?: boolean;
 };
 
 // TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
@@ -80,6 +87,7 @@ const BottomSheetModal = ({
   contentContainerStyle,
   showGestureIndicator = true,
   onRequestClose,
+  disableKeyboardAvoidingView,
   ...props
 }: BottomSheetModalProps) => {
   const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
@@ -209,6 +217,7 @@ const BottomSheetModal = ({
         style={styles.modalContainer}
         behavior="position"
         contentContainerStyle={styles.absoluteFill}
+        enabled={!disableKeyboardAvoidingView}
       >
         <Animated.View
           {...pan?.current.panHandlers}

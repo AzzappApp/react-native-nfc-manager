@@ -22,6 +22,13 @@
       "when": 1686912554970,
       "tag": "0002_chunky_hellfire_club",
       "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1687335022991,
+      "tag": "0003_narrow_colonel_america",
+      "breakpoints": false
     }
   ]
 }

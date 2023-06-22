@@ -107,6 +107,10 @@
     "defaultMessage": "Select a calling code, email or an URL link",
     "description": "Simplebutton - The accessibility label for the CountryCodeListWithOptions selector "
   },
+  "1Tr0xs": {
+    "defaultMessage": "Work",
+    "description": "\"Work\" value as type for an email in Contact Card edition"
+  },
   "1UGgMw": {
     "defaultMessage": "Sign Up",
     "description": "SigninScreen - Sign Up"
@@ -222,6 +226,10 @@
   "4cXY7m": {
     "defaultMessage": "Describe your post",
     "description": "Post creation screen textarea placeholder"
+  },
+  "4o9j+6": {
+    "defaultMessage": "Add phone",
+    "description": "Add phone number to the contact card"
   },
   "4uxpwv": {
     "defaultMessage": "Select your country",
@@ -446,6 +454,10 @@
   "AsCp0n": {
     "defaultMessage": "Validate",
     "description": "Validate button in Image edition screen"
+  },
+  "B1kCKb": {
+    "defaultMessage": "Other",
+    "description": "\"Other\" value as type for an email in Contact Card edition"
   },
   "B3wodk": {
     "defaultMessage": "Right",
@@ -679,6 +691,10 @@
     "defaultMessage": "Webcards",
     "description": "Search screen tab label : webcard"
   },
+  "FFxeql": {
+    "defaultMessage": "Other",
+    "description": "\"Other\" value as type for a phone number in Contact Card edition"
+  },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
@@ -735,6 +751,10 @@
     "defaultMessage": "Center",
     "description": "Label of the center alignment button"
   },
+  "GpcxYL": {
+    "defaultMessage": "Company name",
+    "description": "Company name field registered for the contact card"
+  },
   "GsE7SA": {
     "defaultMessage": "Welcome!",
     "description": "Signup Screen - Welcome title"
@@ -754,6 +774,10 @@
   "HLKVM1": {
     "defaultMessage": "New password",
     "description": "ChangePassword Screen - New password"
+  },
+  "HMByMw": {
+    "defaultMessage": "Mobile",
+    "description": "\"Mobile\" value as type for a phone number in Contact Card edition"
   },
   "HQ/owO": {
     "defaultMessage": "Slide to change the font size",
@@ -879,6 +903,10 @@
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in Line Divider edition"
   },
+  "L1sb4k": {
+    "defaultMessage": "Last name",
+    "description": "Last name field registered for the contact card"
+  },
   "L4n0w6": {
     "defaultMessage": "Add a new section",
     "description": "Module selection list modal header title"
@@ -970,6 +998,10 @@
   "MuonO2": {
     "defaultMessage": "Loading error",
     "description": "CoverEditionScreen alert message loading error title"
+  },
+  "N+GfRg": {
+    "defaultMessage": "Work",
+    "description": "\"Work\" value as type for a phone number in Contact Card edition"
   },
   "N+we9p": {
     "defaultMessage": "Text Image",
@@ -1259,6 +1291,10 @@
     "defaultMessage": "Press this button to select an image from your library",
     "description": "Accessibility hint of the image selection button"
   },
+  "Ul8FtB": {
+    "defaultMessage": "Phone number",
+    "description": "Section title for phone numbers"
+  },
   "Usqg+8": {
     "defaultMessage": "Slide to change the top margin size",
     "description": "Hint of the top margin slider in Line Divider edition"
@@ -1378,6 +1414,10 @@
   "XR2SgB": {
     "defaultMessage": "Following",
     "description": "Title of the screen listing followed profiles"
+  },
+  "XgIOQm": {
+    "defaultMessage": "Home",
+    "description": "\"Home\" value as type for a phone number in Contact Card edition"
   },
   "XmCDkN": {
     "defaultMessage": "Mobile",
@@ -1647,6 +1687,10 @@
     "defaultMessage": "Simple button",
     "description": "SimpleButton text screen title"
   },
+  "dl43Ag": {
+    "defaultMessage": "Add email address",
+    "description": "Add email address to the contact card"
+  },
   "dl8CRm": {
     "defaultMessage": "Posterize",
     "description": "Posterize photo filter name"
@@ -1710,6 +1754,10 @@
   "fF/vRd": {
     "defaultMessage": "Press this button to adjust the boundary of the selected image",
     "description": "Accessibility hint of the crop button"
+  },
+  "fIfKTw": {
+    "defaultMessage": "Tap to select a background color",
+    "description": "Hint of the color picker button"
   },
   "fKlLCN": {
     "defaultMessage": "{text}...less",
@@ -1783,6 +1831,10 @@
     "defaultMessage": "Tap to reset your passward",
     "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
   },
+  "gpeHlZ": {
+    "defaultMessage": "Main",
+    "description": "\"Main\" value as type for an email in Contact Card edition"
+  },
   "h7lmdC": {
     "defaultMessage": "This email address is already registered",
     "description": "Signup Screen - Error This email address is already registered "
@@ -1839,6 +1891,10 @@
     "defaultMessage": "Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number",
     "description": "Signup- The accessibility hint for the country selector"
   },
+  "i+tlfm": {
+    "defaultMessage": "Main",
+    "description": "\"Main\" value as type for a phone number in Contact Card edition"
+  },
   "i4akRg": {
     "defaultMessage": "Edit Margin",
     "description": "Carousel bottom menu label for margin tab"
@@ -1854,6 +1910,10 @@
   "iPwxyL": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in SimpleButton edition"
+  },
+  "iVjeq/": {
+    "defaultMessage": "Email",
+    "description": "Section title for emails"
   },
   "ibMqDh": {
     "defaultMessage": "Not following anyone",
@@ -1923,6 +1983,10 @@
     "defaultMessage": "Cancel",
     "description": "Edit email address modal cancel button label"
   },
+  "k9rXXs": {
+    "defaultMessage": "Title",
+    "description": "Job title field registered for the contact card"
+  },
   "kIhbvL": {
     "defaultMessage": "Height",
     "description": "Label of the height slider in Line Divider edition"
@@ -1950,6 +2014,10 @@
   "kf7mLc": {
     "defaultMessage": "Image",
     "description": "Module selection list modal horizontal photo module label"
+  },
+  "kqiCTV": {
+    "defaultMessage": "First name",
+    "description": "First name registered for the contact card"
   },
   "kuaFQc": {
     "defaultMessage": "Orientation",
@@ -2022,6 +2090,10 @@
   "mCXDhl": {
     "defaultMessage": "Warmth",
     "description": "Temperature/warmth image edition parameters name"
+  },
+  "mNSUj2": {
+    "defaultMessage": "Background color",
+    "description": "Label of the contact card background color button"
   },
   "mPVwE6": {
     "defaultMessage": "Cancel",
@@ -2275,6 +2347,10 @@
     "defaultMessage": "Username",
     "description": "Username field in the account details screen"
   },
+  "rtDbg1": {
+    "defaultMessage": "Home",
+    "description": "\"Home\" value as type for an email in Contact Card edition"
+  },
   "rzJ3iZ": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in image picker wizzard"
@@ -2407,6 +2483,10 @@
     "defaultMessage": "Normal",
     "description": "Name of the default filter (no filter applied) in image edition"
   },
+  "umUSQD": {
+    "defaultMessage": "Details",
+    "description": "Section title fro basic infos of the contact card (firstname, lastname ...)"
+  },
   "utIq6e": {
     "defaultMessage": "Your account details are linked to all your webcards.",
     "description": "Warning label displayed at the top on the screen to indicate that updates go through all profiles"
@@ -2439,6 +2519,10 @@
     "defaultMessage": "Sharpness",
     "description": "Sharpness image edition parameters name"
   },
+  "vKpWuS": {
+    "defaultMessage": "Delete",
+    "description": "Delete email or phone number"
+  },
   "varCCz": {
     "defaultMessage": "Background opacity",
     "description": "Label of the Photo Opacityslider in BlockText edition"
@@ -2446,6 +2530,10 @@
   "vpm4+X": {
     "defaultMessage": "Edit Settings",
     "description": "BlockText bottom menu label for Settings tab"
+  },
+  "vwP5P2": {
+    "defaultMessage": "Fax",
+    "description": "\"Fax\" value as type for a phone number in Contact Card edition"
   },
   "w+BjOj": {
     "defaultMessage": "Slide to change the Spacing",

@@ -46,7 +46,6 @@ export default function AccountScreenProfiles({
         profiles {
           id
           userName
-          ...ContactCard_card
           nbPosts
           nbFollowedProfiles
           nbFollowersProfiles
@@ -55,6 +54,9 @@ export default function AccountScreenProfiles({
             cover {
               ...CoverRenderer_cover
             }
+          }
+          contactCard {
+            ...ContactCard_card
           }
         }
       }
@@ -273,7 +275,7 @@ export default function AccountScreenProfiles({
               {currentProfile ? (
                 <ContactCard
                   userName={currentProfile.userName}
-                  profile={currentProfile}
+                  contactCard={currentProfile.contactCard}
                 />
               ) : null}
             </PressableNative>

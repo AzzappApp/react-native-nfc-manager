@@ -17,3 +17,4 @@ export * from './interests';
 export * from './profileCategories';
 export * from './postReactions';
 export * from './postComments';
+export * from './contactCards';

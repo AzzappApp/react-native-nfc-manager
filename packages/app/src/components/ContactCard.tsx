@@ -10,32 +10,31 @@ import type { ContactCard_card$key } from '@azzapp/relay/artifacts/ContactCard_c
 
 const ContactCard = ({
   userName,
-  profile,
+  contactCard: contactCardKey,
 }: {
   userName: string;
-  profile: ContactCard_card$key;
+  contactCard: ContactCard_card$key;
 }) => {
-  const card = useFragment(
+  const contactCard = useFragment(
     graphql`
-      fragment ContactCard_card on Profile {
-        profileKind
+      fragment ContactCard_card on ContactCard {
+        id
         firstName
         lastName
-        companyName
-        companyActivity {
-          label
+        title
+        company
+        backgroundStyle {
+          backgroundColor
         }
       }
     `,
-    profile,
+    contactCardKey,
   );
 
   const styles = useStyleSheet(styleSheet);
 
-  const isPersonal = card?.profileKind === 'personal';
-
   return (
-    <View style={styles.webCardContainer}>
+    <View style={[styles.webCardContainer, contactCard.backgroundStyle]}>
       <View style={{ flex: 1 }}>
         <Image
           source={require('#assets/logo-full_white.png')}
@@ -58,12 +57,18 @@ const ContactCard = ({
       <View style={styles.webCardContent}>
         <View style={styles.webCardInfos}>
           <Text variant="large" style={styles.webCardLabel} numberOfLines={1}>
-            {isPersonal
-              ? formatDisplayName(card?.firstName, card?.lastName)
-              : card?.companyName}
+            {formatDisplayName(contactCard?.firstName, contactCard?.lastName)}
           </Text>
           <Text variant="small" style={styles.webCardLabel}>
-            {isPersonal ? null : card?.companyActivity?.label}
+            {contactCard.title}
+          </Text>
+          <Text
+            style={[
+              styles.webCardLabel,
+              { fontSize: 10, fontStyle: 'italic', fontWeight: '400' },
+            ]}
+          >
+            {contactCard.company}
           </Text>
         </View>
         <QRCode
