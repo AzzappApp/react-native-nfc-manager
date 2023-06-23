@@ -108,7 +108,7 @@ const LineDividerEditionScreen = ({
       }
     `);
 
-  const canSave = dirty && !saving;
+  const canSave = (dirty || lineDivider == null) && !saving;
 
   const router = useRouter();
   const onSave = useCallback(() => {
