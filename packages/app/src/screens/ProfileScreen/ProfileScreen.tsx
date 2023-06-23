@@ -86,7 +86,7 @@ const ProfileScreen = ({
       transform: [
         { perspective: 900 },
         {
-          rotateY: `${flipVal}deg`,
+          rotateY: `-${flipVal}deg`,
         },
         {
           scale,
@@ -106,7 +106,7 @@ const ProfileScreen = ({
       overflow: 'hidden',
       transform: [
         { perspective: 900 },
-        { rotateY: `${flipVal}deg` },
+        { rotateY: `-${flipVal}deg` },
         {
           scale,
         },
