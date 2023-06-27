@@ -215,15 +215,22 @@ export default function AccountScreenProfiles({
         </View>
       </View>
       <View style={styles.countersContainer}>
-        <View style={styles.counterContainer}>
-          <Text variant="xlarge">{currentProfile?.nbPosts}</Text>
-          <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-            <FormattedMessage
-              defaultMessage="Posts"
-              description="Number of posts"
-            />
-          </Text>
-        </View>
+        <Link
+          route="PROFILE_POSTS"
+          params={{
+            userName: currentProfile?.userName ?? '',
+          }}
+        >
+          <PressableNative style={styles.counterContainer}>
+            <Text variant="xlarge">{currentProfile?.nbPosts}</Text>
+            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
+              <FormattedMessage
+                defaultMessage="Posts"
+                description="Number of posts"
+              />
+            </Text>
+          </PressableNative>
+        </Link>
         <Link route="FOLLOWERS">
           <PressableNative style={styles.counterContainer}>
             <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
