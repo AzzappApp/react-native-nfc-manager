@@ -153,6 +153,7 @@ const AccountDetailsEmailForm = ({
               isErrored={errors.email != null}
               onSubmitEditing={submit}
               returnKeyType="done"
+              autoFocus
             />
             {errors.email ? (
               <Text variant="error">

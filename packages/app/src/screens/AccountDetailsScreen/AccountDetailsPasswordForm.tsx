@@ -146,6 +146,7 @@ const AccountDetailsPasswordForm = ({
                   isErrored={errors.currentPassword != null}
                   onSubmitEditing={() => newPasswordRef.current?.focus()}
                   returnKeyType="next"
+                  autoFocus
                 />
               </View>
               {errors.currentPassword ? (

@@ -221,6 +221,7 @@ const AccountDetailsPhoneNumberForm = ({
                 style={{ flex: 1 }}
                 onSubmitEditing={submit}
                 returnKeyType="done"
+                autoFocus
               />
             </View>
           )}
