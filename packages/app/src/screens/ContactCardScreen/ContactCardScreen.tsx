@@ -101,7 +101,11 @@ const ContactCardScreen = ({
       width: 335,
       transform: [
         {
-          scale: interpolate(scaleValue.value, [0, 1], [0.73, 1.8]),
+          scale: interpolate(
+            scaleValue.value,
+            [0, 1],
+            [0.73, Math.min(1.8, (height - 150) / 335)],
+          ),
         },
         {
           rotate: `${interpolate(screenModeValue.value, [0, 1], [0, -90])}deg`,
