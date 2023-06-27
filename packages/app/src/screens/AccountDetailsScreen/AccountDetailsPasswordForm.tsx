@@ -105,7 +105,7 @@ const AccountDetailsPasswordForm = ({
             description: 'Edit password modal cancel button label',
           })}
           onPress={toggleBottomSheet}
-          variant="cancel"
+          variant="secondary"
           style={styles.headerButton}
         />
       }

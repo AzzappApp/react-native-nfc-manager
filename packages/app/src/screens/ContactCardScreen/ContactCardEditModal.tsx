@@ -179,7 +179,7 @@ const ContactCardEditModal = ({
             description: 'Edit contact card modal cancel button title',
           })}
           onPress={toggleBottomSheet}
-          variant="cancel"
+          variant="secondary"
           style={styles.headerButton}
         />
       }

@@ -14,7 +14,7 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
-  variant?: 'cancel' | 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
 };
@@ -135,20 +135,6 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       color: appearance === 'light' ? colors.grey200 : colors.grey900,
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
       backgroundColor: 'transparent',
-    },
-  },
-  cancel: {
-    root: {
-      backgroundColor: 'transparent',
-      borderColor: appearance === 'light' ? colors.grey200 : colors.grey400,
-      borderWidth: 1,
-    },
-    label: {
-      color: appearance === 'light' ? colors.grey200 : colors.grey400,
-    },
-    disabled: {
-      color: appearance === 'light' ? colors.grey100 : colors.grey400,
-      borderColor: appearance === 'light' ? colors.grey50 : colors.grey400,
     },
   },
 }));

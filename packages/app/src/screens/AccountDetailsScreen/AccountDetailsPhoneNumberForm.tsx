@@ -155,7 +155,7 @@ const AccountDetailsPhoneNumberForm = ({
             description: 'Edit phone number modal cancel button label',
           })}
           onPress={toggleBottomSheet}
-          variant="cancel"
+          variant="secondary"
           style={styles.headerButton}
         />
       }

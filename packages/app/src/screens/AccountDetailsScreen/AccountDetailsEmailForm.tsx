@@ -116,7 +116,7 @@ const AccountDetailsEmailForm = ({
             description: 'Edit email address modal cancel button label',
           })}
           onPress={toggleBottomSheet}
-          variant="cancel"
+          variant="secondary"
           style={styles.headerButton}
         />
       }

@@ -116,10 +116,6 @@ describe('Button component', () => {
     expect(screen.getByTestId('button_testId')).toHaveStyle({
       backgroundColor: 'transparent',
     });
-    rerender(<Button label={label} testID="button_testId" variant="cancel" />);
-    expect(screen.getByTestId('button_testId')).toHaveStyle({
-      backgroundColor: 'transparent',
-    });
   });
 
   test('should render with the correct label on android platform', () => {
