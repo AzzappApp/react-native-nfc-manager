@@ -3,8 +3,10 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import Animated, { FadeOutUp } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
+import Link from './Link';
 import type {
   ProfileList_users$data,
   ProfileList_users$key,
@@ -21,15 +23,22 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
 }) {
   return (
     <Animated.View style={styles.item} exiting={FadeOutUp}>
-      <CoverRenderer
-        cover={profile.card?.cover}
-        width={COVER_WIDTH}
-        userName={profile.userName}
-        videoEnabled={false}
-      />
-      <Text variant="large" numberOfLines={1}>
-        {profile.userName}
-      </Text>
+      <Link
+        route="PROFILE"
+        params={{ userName: profile.userName, profileID: profile.id }}
+      >
+        <PressableNative style={styles.profile}>
+          <CoverRenderer
+            cover={profile.card?.cover}
+            width={COVER_WIDTH}
+            userName={profile.userName}
+            videoEnabled={false}
+          />
+          <Text variant="large" numberOfLines={1}>
+            {profile.userName}
+          </Text>
+        </PressableNative>
+      </Link>
       {onToggleFollow ? (
         <IconButton
           icon="delete"
@@ -137,11 +146,17 @@ const styles = StyleSheet.create({
   },
   item: {
     paddingRight: 10,
-    paddingLeft: 20.5,
     columnGap: 15.5,
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+  },
+  profile: {
+    paddingLeft: 20.5,
+    columnGap: 15.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   deleteIcon: {
     marginLeft: 'auto',
