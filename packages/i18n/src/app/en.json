@@ -287,10 +287,6 @@
     "defaultMessage": "Tap to switch between front and back camera",
     "description": "camera flip button accessibility hint"
   },
-  "6To5Jx": {
-    "defaultMessage": "Anyone can download your contact card from your profile.",
-    "description": "Description of the public contact card toggle."
-  },
   "6V9XJr": {
     "defaultMessage": "Allow Azzapp to access your photos",
     "description": "Camera authorization screen title for photos permission"
@@ -1047,10 +1043,6 @@
     "defaultMessage": "Unknown error while uploading the cover. Please retry",
     "description": "CoverEditionScreen Alert message unknown error"
   },
-  "OKOTHE": {
-    "defaultMessage": "Anyone can download your contact card from your profile.",
-    "description": "Description of the display on my webcard toggle."
-  },
   "OPcjcW": {
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
@@ -1306,6 +1298,10 @@
   "V0juXX": {
     "defaultMessage": "Save",
     "description": "Save button label in Simple Button module screen"
+  },
+  "V44HPK": {
+    "defaultMessage": "Your contact card is not visible on your Webcard. Only you can share your contact card with other users.",
+    "description": "Description message when contact card is private."
   },
   "V6G3FX": {
     "defaultMessage": "Link URL",
@@ -1883,6 +1879,10 @@
     "defaultMessage": "Cancel",
     "description": "Cancel button label in Social Link module screen"
   },
+  "hsBiAq": {
+    "defaultMessage": "When users visite your Webcard, they are prompted to download your contact card.",
+    "description": "Description of the display on my webcard toggle."
+  },
   "hwL8A0": {
     "defaultMessage": "Follow",
     "description": "Follow button label in Profile Screen Button Bar"
@@ -2246,6 +2246,10 @@
   "pmqXBM": {
     "defaultMessage": "Edit Settings",
     "description": "SocialLinks bottom menu label for Settings tab"
+  },
+  "pned7/": {
+    "defaultMessage": "Anyone can download your contact card from your profile.",
+    "description": "Description message when contact card is public."
   },
   "pqxK1C": {
     "defaultMessage": "Contrast",

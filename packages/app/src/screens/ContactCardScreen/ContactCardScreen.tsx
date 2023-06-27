@@ -291,10 +291,17 @@ const ContactCardScreen = ({
               />
             </View>
             <Text variant="xsmall">
-              <FormattedMessage
-                defaultMessage="Anyone can download your contact card from your profile."
-                description="Description of the public contact card toggle."
-              />
+              {isPublicCard ? (
+                <FormattedMessage
+                  defaultMessage="Anyone can download your contact card from your profile."
+                  description="Description message when contact card is public."
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Your contact card is not visible on your Webcard. Only you can share your contact card with other users."
+                  description="Description message when contact card is private."
+                />
+              )}
             </Text>
           </View>
 
@@ -319,7 +326,7 @@ const ContactCardScreen = ({
               </View>
               <Text variant="xsmall">
                 <FormattedMessage
-                  defaultMessage="Anyone can download your contact card from your profile."
+                  defaultMessage="When users visite your Webcard, they are prompted to download your contact card."
                   description="Description of the display on my webcard toggle."
                 />
               </Text>
