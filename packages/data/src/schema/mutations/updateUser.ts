@@ -1,6 +1,10 @@
 import * as bcrypt from 'bcrypt-ts';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  formatPhoneNumber,
+  isInternationalPhoneNumber,
+} from '@azzapp/shared/stringHelpers';
+import {
   getUserByEmail,
   getUserByPhoneNumber,
   getUsersByIds,
@@ -32,12 +36,14 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     partialUser.email = email;
   }
 
-  if (phoneNumber) {
-    const existingUser = await getUserByPhoneNumber(phoneNumber);
+  if (phoneNumber && isInternationalPhoneNumber(phoneNumber)) {
+    const existingUser = await getUserByPhoneNumber(
+      formatPhoneNumber(phoneNumber),
+    );
     if (existingUser && existingUser.id !== userId) {
       throw new Error(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
-    partialUser.phoneNumber = phoneNumber;
+    partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
   }
 
   const [dbUser] = await getUsersByIds([userId]);
