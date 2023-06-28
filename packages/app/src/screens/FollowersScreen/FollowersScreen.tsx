@@ -16,7 +16,9 @@ const followersScreenQuery = graphql`
     viewer {
       profile {
         id
-        public
+        contactCard {
+          public
+        }
       }
       ...FollowersScreenList_viewer
     }
@@ -50,7 +52,7 @@ const FollowersScreen = ({
           })}
         />
         <FollowersScreenList
-          isPublic={viewer?.profile?.public ?? false}
+          isPublic={viewer?.profile?.contactCard.public ?? false}
           currentProfileId={viewer.profile?.id ?? ''}
           viewer={viewer}
         />

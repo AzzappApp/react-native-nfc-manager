@@ -31,7 +31,6 @@ type Profile implements Node {
   nbPosts: Int!
   nbFollowedProfiles: Int!
   nbFollowersProfiles: Int!
-  public: Boolean!
   contactCard: ContactCard!
 }
 

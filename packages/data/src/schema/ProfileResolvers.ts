@@ -68,9 +68,6 @@ export const Profile: ProfileResolvers = {
   nbFollowersProfiles: async (profile, _) => {
     return getFollowerProfilesCount(profile.id);
   },
-  public: async (profile, _) => {
-    return !!profile.public;
-  },
   contactCard: async (profile, _, { userLoader }) => {
     const contactCard = await getContactCard(profile.id);
 

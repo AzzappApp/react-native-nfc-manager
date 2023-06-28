@@ -25,7 +25,7 @@ import db, {
   mysqlTable,
 } from './db';
 import { FollowTable } from './follows';
-import { customTinyInt, sortEntitiesByIds } from './generic';
+import { sortEntitiesByIds } from './generic';
 import type { Profile } from '#schema/ProfileResolvers';
 import type { InferModel } from 'drizzle-orm';
 
@@ -61,7 +61,6 @@ export const ProfileTable = mysqlTable(
     companyActivityId: varchar('companyActivityId', {
       length: DEFAULT_VARCHAR_LENGTH,
     }),
-    public: customTinyInt('public').default(false).notNull(),
   },
   table => {
     return {
@@ -249,7 +248,6 @@ export const createProfile = async (data: NewProfile) => {
     profileCategoryId: data.profileCategoryId ?? null,
     interests: data.interests ?? null,
     companyActivityId: data.companyActivityId ?? null,
-    public: data.public ?? false,
   };
 };
 
