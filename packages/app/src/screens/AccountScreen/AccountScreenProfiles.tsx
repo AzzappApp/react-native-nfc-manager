@@ -279,12 +279,15 @@ export default function AccountScreenProfiles({
           </PressableNative>
           <Link route="CONTACT_CARD">
             <PressableNative>
-              {currentProfile ? (
-                <ContactCard
-                  userName={currentProfile.userName}
-                  contactCard={currentProfile.contactCard}
-                />
-              ) : null}
+              {
+                /* Contact card may be missing when profile is optimistically added in the cache. */
+                currentProfile?.contactCard ? (
+                  <ContactCard
+                    userName={currentProfile.userName}
+                    contactCard={currentProfile.contactCard}
+                  />
+                ) : null
+              }
             </PressableNative>
           </Link>
         </View>
