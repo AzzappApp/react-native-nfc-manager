@@ -405,8 +405,6 @@ PODS:
     - glog
   - react-native-blob-util (0.18.3):
     - React-Core
-  - react-native-cameraroll (5.3.1):
-    - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
   - react-native-mmkv (2.6.3):
@@ -637,7 +635,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - react-native-blob-util (from `../../../node_modules/react-native-blob-util`)
-  - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
   - react-native-mmkv (from `../../../node_modules/react-native-mmkv`)
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
@@ -776,8 +773,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/logger"
   react-native-blob-util:
     :path: "../../../node_modules/react-native-blob-util"
-  react-native-cameraroll:
-    :path: "../../../node_modules/@react-native-camera-roll/camera-roll"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
   react-native-mmkv:
@@ -901,7 +896,6 @@ SPEC CHECKSUMS:
   React-jsinspector: 14a342151ab810862998dfc99e2720746734e9b3
   React-logger: 94ec392ae471683635e4bf874d4e82f675399d2d
   react-native-blob-util: 2d36383bb52c15c5451be81cb7ddf22bc34a12a6
-  react-native-cameraroll: f3050460fe1708378698c16686bfaa5f34099be2
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
   react-native-mmkv: 2e5bf67513cc8deed86fcffe87e12b8cc250dfab
   react-native-pager-view: 0ccb8bf60e2ebd38b1f3669fa3650ecce81db2df
