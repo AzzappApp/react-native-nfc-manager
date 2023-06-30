@@ -297,17 +297,17 @@ const PostRendererBottomPanel = ({
           {!post.author.isViewer && (
             <PressableOpacity onPress={toggleFollow} style={styles.modalLine}>
               {author?.isFollowing ? (
-                <Text variant="medium">
-                  <FormattedMessage
-                    defaultMessage="Follow"
-                    description="PostItem Modal - Follows Label"
-                  />
-                </Text>
-              ) : (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
                     defaultMessage="Unfollow"
                     description="PostItem Modal - unfollow Label"
+                  />
+                </Text>
+              ) : (
+                <Text variant="medium">
+                  <FormattedMessage
+                    defaultMessage="Follow"
+                    description="PostItem Modal - Follows Label"
                   />
                 </Text>
               )}
