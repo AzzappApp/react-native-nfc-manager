@@ -32,6 +32,11 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
   ): ProfileConnection!
 
   """
@@ -47,6 +52,11 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
   ): ProfileConnection!
 
   """

@@ -1,7 +1,15 @@
 import { createId } from '@paralleldrive/cuid2';
 import { inArray, eq, asc, sql, and } from 'drizzle-orm';
-import { int, varchar, index, customType } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import {
+  int,
+  varchar,
+  index,
+  customType,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH } from './db';
 import { customTinyInt } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';

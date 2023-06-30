@@ -1,14 +1,7 @@
 import { connect } from '@planetscale/database';
 import { sql as sqlDrizzle } from 'drizzle-orm';
-
-import { mysqlTable as mysqlTableDrizzle } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import type { BuildColumns, SQL } from 'drizzle-orm';
-import type {
-  MySqlTableWithColumns,
-  AnyMySqlColumnBuilder,
-  MySqlTableExtraConfig,
-} from 'drizzle-orm/mysql-core';
+import type { SQL } from 'drizzle-orm';
 
 // see https://github.com/drizzle-team/drizzle-orm/issues/656
 const sql = <T>(strings: TemplateStringsArray, ...params: any[]): SQL<T> => {
@@ -36,35 +29,5 @@ export const DEFAULT_DATETIME_VALUE = sql`(CURRENT_TIMESTAMP(3))`;
 export type DbTransaction =
   | Parameters<Parameters<typeof db.transaction>[0]>[0]
   | typeof db;
-
-export type MysqlTableResult<
-  TName extends string,
-  TColumnsMap extends Record<string, AnyMySqlColumnBuilder>,
-> = MySqlTableWithColumns<{
-  name: TName;
-  schema: undefined;
-  columns: BuildColumns<TName, TColumnsMap>;
-}>;
-
-export type Table<
-  TableName extends string,
-  TConfigMap extends Record<string, AnyMySqlColumnBuilder>,
-> = MySqlTableWithColumns<{
-  name: TableName;
-  schema: undefined;
-  columns: BuildColumns<TableName, TConfigMap>;
-}>;
-
-export const mysqlTable = <
-  TableName extends string,
-  TConfigMap extends Record<string, AnyMySqlColumnBuilder>,
->(
-  table: TableName,
-  columns: TConfigMap,
-  extraConfig?: (
-    self: BuildColumns<TableName, TConfigMap>,
-  ) => MySqlTableExtraConfig,
-): Table<TableName, TConfigMap> =>
-  mysqlTableDrizzle(table, columns, extraConfig);
 
 export default db;

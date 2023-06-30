@@ -1,9 +1,10 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import Animated, { FadeOutUp } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
+import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import Link from './Link';
@@ -55,14 +56,10 @@ type ProfileListProps = {
   users: ProfileList_users$key;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
   onToggleFollow?: (id: string) => void;
-  ListHeaderComponent?:
-    | React.ComponentType<any>
-    | React.ReactElement
-    | null
-    | undefined;
   noProfileFoundLabel: string;
+  searchValue: string | undefined;
+  setSearchValue: (value: string | undefined) => void;
 };
 
 const COVER_WIDTH = 35;
@@ -82,10 +79,10 @@ const ProfileList = ({
   users: usersKey,
   onEndReached,
   style,
-  containerStyle,
-  ListHeaderComponent,
   onToggleFollow,
   noProfileFoundLabel,
+  searchValue,
+  setSearchValue,
 }: ProfileListProps) => {
   const users = useFragment(
     graphql`
@@ -102,34 +99,34 @@ const ProfileList = ({
     usersKey,
   );
 
+  const renderItem = useCallback(
+    ({ item }: { item: ArrayItemType<ProfileList_users$data> }) => (
+      <ProfileListItemMemoized profile={item} onToggleFollow={onToggleFollow} />
+    ),
+    [onToggleFollow],
+  );
+
   return (
     <FlatList
       testID="profile-list"
       accessibilityRole="list"
       data={users}
       keyExtractor={keyExtractor}
-      renderItem={({ item }) => (
-        <ProfileListItemMemoized
-          profile={item}
-          onToggleFollow={onToggleFollow}
-        />
-      )}
+      renderItem={renderItem}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
       directionalLockEnabled
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[styles.container, containerStyle]}
+      contentContainerStyle={styles.container}
       style={style}
       getItemLayout={getItemLayout}
-      ListHeaderComponent={ListHeaderComponent}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <SearchBar onChangeText={setSearchValue} value={searchValue} />
+        </View>
+      }
       ListEmptyComponent={
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <View style={styles.empty}>
           <Text variant="medium">{noProfileFoundLabel}</Text>
         </View>
       }
@@ -144,6 +141,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     rowGap: SEPARATOR_HEIGHT,
   },
+  header: { paddingHorizontal: 10 },
   item: {
     paddingRight: 10,
     columnGap: 15.5,
@@ -160,5 +158,10 @@ const styles = StyleSheet.create({
   },
   deleteIcon: {
     marginLeft: 'auto',
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

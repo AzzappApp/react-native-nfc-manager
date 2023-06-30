@@ -7,12 +7,14 @@ import {
   datetime,
   index,
   varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
-  mysqlTable,
 } from './db';
 import { FollowTable } from './follows';
 import { customTinyInt, sortEntitiesByIds } from './generic';

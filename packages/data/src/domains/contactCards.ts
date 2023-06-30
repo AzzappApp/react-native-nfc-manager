@@ -1,6 +1,13 @@
 import { eq, type InferModel } from 'drizzle-orm';
-import { customType, json, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import {
+  varchar,
+  customType,
+  json,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH } from './db';
 import { customTinyInt } from './generic';
 import type { Profile } from './profiles';
 import type { User } from './users';
@@ -17,42 +24,34 @@ type email = {
   selected: boolean;
 };
 
-export const ContactCardTable = mysqlTable(
-  'ContactCard',
-  {
-    firstName: varchar('firstName', { length: DEFAULT_VARCHAR_LENGTH }),
-    lastName: varchar('lastName', { length: DEFAULT_VARCHAR_LENGTH }),
-    title: varchar('title', { length: DEFAULT_VARCHAR_LENGTH }),
-    company: varchar('company', { length: DEFAULT_VARCHAR_LENGTH }),
-    emails: customType<{
-      data: email[] | null;
-    }>({
-      toDriver: value => JSON.stringify(value),
-      fromDriver: value => value as email[] | null,
-      dataType: () => 'json',
-    })('emails'),
-    phoneNumbers: customType<{ data: phoneNumber[] | null }>({
-      toDriver: value => JSON.stringify(value),
-      fromDriver: value => value as phoneNumber[] | null,
-      dataType: () => 'json',
-    })('phoneNumbers'),
-    profileId: varchar('profileId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }).notNull(),
-    public: customTinyInt('public').default(false),
-    isDisplayedOnWebCard: customTinyInt('isDisplayedOnWebCard').default(false),
-    backgroundStyle: json('backgroundStyle').default({
-      backgroundColor: '#000000',
-    }),
-  },
-  table => {
-    return {
-      profileIdIdx: uniqueIndex('ContactCard_profileId_idx').on(
-        table.profileId,
-      ),
-    };
-  },
-);
+export const ContactCardTable = mysqlTable('ContactCard', {
+  firstName: varchar('firstName', { length: DEFAULT_VARCHAR_LENGTH }),
+  lastName: varchar('lastName', { length: DEFAULT_VARCHAR_LENGTH }),
+  title: varchar('title', { length: DEFAULT_VARCHAR_LENGTH }),
+  company: varchar('company', { length: DEFAULT_VARCHAR_LENGTH }),
+  emails: customType<{
+    data: email[] | null;
+  }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as email[] | null,
+    dataType: () => 'json',
+  })('emails'),
+  phoneNumbers: customType<{ data: phoneNumber[] | null }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as phoneNumber[] | null,
+    dataType: () => 'json',
+  })('phoneNumbers'),
+  profileId: varchar('profileId', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  })
+    .primaryKey()
+    .notNull(),
+  public: customTinyInt('public').default(false),
+  isDisplayedOnWebCard: customTinyInt('isDisplayedOnWebCard').default(false),
+  backgroundStyle: json('backgroundStyle').default({
+    backgroundColor: '#000000',
+  }),
+});
 
 export type ContactCard = InferModel<typeof ContactCardTable>;
 export type NewContactCard = InferModel<typeof ContactCardTable, 'insert'>;

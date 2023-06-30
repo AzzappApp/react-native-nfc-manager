@@ -3,6 +3,9 @@ import 'dotenv/config';
 
 export default {
   schema: './src/domains/*',
-  connectionString: process.env.DATABASE_URL,
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL ?? '',
+  },
+  driver: 'mysql2',
   out: './drizzle',
 } satisfies Config;

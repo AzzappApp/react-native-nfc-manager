@@ -1,10 +1,16 @@
 import { eq, inArray, and, isNull, or } from 'drizzle-orm';
-import { datetime, varchar, customType } from 'drizzle-orm/mysql-core';
+import {
+  datetime,
+  varchar,
+  customType,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
-  mysqlTable,
 } from './db';
 import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { InferModel } from 'drizzle-orm';

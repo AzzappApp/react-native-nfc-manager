@@ -1,0 +1,69 @@
+diff --git a/node_modules/drizzle-kit/index.cjs b/node_modules/drizzle-kit/index.cjs
+index b75ca3b..0ddb15e 100755
+--- a/node_modules/drizzle-kit/index.cjs
++++ b/node_modules/drizzle-kit/index.cjs
+@@ -4561,6 +4561,7 @@ var init_mysqlSchema = __esm({
+       name: stringType(),
+       columns: stringType().array(),
+       isUnique: booleanType(),
++      isFulltext: booleanType().optional(),
+       using: enumType(["btree", "hash"]).optional(),
+       algorithm: enumType(["default", "inplace", "copy"]).optional(),
+       lock: enumType(["default", "none", "shared", "exclusive"]).optional()
+@@ -4668,14 +4669,15 @@ var init_mysqlSchema = __esm({
+     MySqlSquasher = {
+       squashIdx: (idx) => {
+         index.parse(idx);
+-        return `${idx.name};${idx.columns.join(",")};${idx.isUnique};${idx.using ?? ""};${idx.algorithm ?? ""};${idx.lock ?? ""}`;
++        return `${idx.name};${idx.columns.join(",")};${idx.isUnique};${idx.isFulltext};${idx.using ?? ""};${idx.algorithm ?? ""};${idx.lock ?? ""}`;
+       },
+       unsquashIdx: (input) => {
+-        const [name, columnsString, isUnique, using, algorithm, lock] = input.split(";");
++        const [name, columnsString, isUnique, isFulltext, using, algorithm, lock] = input.split(";");
+         const destructed = {
+           name,
+           columns: columnsString.split(","),
+           isUnique: isUnique === "true",
++          isFulltext: isFulltext === "true",
+           using: using ? using : void 0,
+           algorithm: algorithm ? algorithm : void 0,
+           lock: lock ? lock : void 0
+@@ -11455,6 +11457,7 @@ var init_mysqlSerializer = __esm({
+             name,
+             columns: indexColumns,
+             isUnique: value.config.unique ?? false,
++            isFulltext: value.config.fulltext ? value.config.fulltext : undefined,
+             using: value.config.using,
+             algorithm: value.config.algorythm,
+             lock: value.config.lock
+@@ -11651,6 +11654,7 @@ var init_mysqlSerializer = __esm({
+         const constraintName = idxRow["INDEX_NAME"];
+         const columnName = idxRow["COLUMN_NAME"];
+         const isUnique = idxRow["NON_UNIQUE"] === 0;
++        const isFulltext = idxRow["INDEX_TYPE"] === "FULLTEXT";
+         const tableInResult = result[tableName];
+         if (typeof tableInResult === "undefined")
+           continue;
+@@ -11666,7 +11670,8 @@ var init_mysqlSerializer = __esm({
+           tableInResult.indexes[constraintName] = {
+             name: constraintName,
+             columns: [columnName],
+-            isUnique
++            isUnique,
++            isFulltext
+           };
+         }
+       }
+@@ -15461,10 +15466,10 @@ ${BREAKPOINT}ALTER TABLE ${tableNameWithSchema} ADD CONSTRAINT ${statement.newCo
+         return statement.type === "create_index" && dialect6 === "mysql";
+       }
+       convert(statement) {
+-        const { name, columns, isUnique } = MySqlSquasher.unsquashIdx(
++        const { name, columns, isUnique, isFulltext } = MySqlSquasher.unsquashIdx(
+           statement.data
+         );
+-        const indexPart = isUnique ? "UNIQUE INDEX" : "INDEX";
++        const indexPart = isFulltext ? "FULLTEXT INDEX":  isUnique ? "UNIQUE INDEX" : "INDEX";
+         const value = columns.map((it) => `\`${it}\``).join(",");
+         return `CREATE ${indexPart} \`${name}\` ON \`${statement.tableName}\` (${value});`;
+       }

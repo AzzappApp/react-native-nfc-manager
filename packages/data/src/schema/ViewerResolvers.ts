@@ -62,7 +62,9 @@ export const Viewer: ViewerResolvers = {
       return connectionFromArray([], args);
     }
     // TODO should we use pagination in database query?
-    const followedProfiles = await getFollowedProfiles(profileId);
+    const followedProfiles = await getFollowedProfiles(profileId, {
+      userName: args.userName,
+    });
 
     return connectionFromArray(followedProfiles, args);
   },
@@ -75,11 +77,11 @@ export const Viewer: ViewerResolvers = {
     const first = args.first ?? 100;
     const offset = args.after ? cursorToDate(args.after) : null;
 
-    const followersProfiles = await getFollowerProfiles(
-      profileId,
-      first,
-      offset,
-    );
+    const followersProfiles = await getFollowerProfiles(profileId, {
+      limit: first,
+      after: offset,
+      userName: args.userName,
+    });
 
     return connectionFromDateSortedItems(
       followersProfiles.map(p => ({

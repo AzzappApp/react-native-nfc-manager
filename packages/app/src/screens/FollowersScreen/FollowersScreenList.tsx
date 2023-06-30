@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ProfileList from '#components/ProfileList';
 import type {
@@ -21,27 +22,29 @@ const FollowersScreenList = ({
   currentProfileId,
   viewer: viewerKey,
 }: FollowersListProps) => {
-  const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
-    graphql`
-      fragment FollowersScreenList_viewer on Viewer
-      @refetchable(queryName: "FollowersListScreenQuery")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 10 }
-      ) {
-        followers(after: $after, first: $first)
-          @connection(key: "Account_followers") {
-          __id
-          edges {
-            node {
-              ...ProfileList_users
+  const { data, loadNext, hasNext, isLoadingNext, refetch } =
+    usePaginationFragment(
+      graphql`
+        fragment FollowersScreenList_viewer on Viewer
+        @refetchable(queryName: "FollowersListScreenQuery")
+        @argumentDefinitions(
+          after: { type: String }
+          first: { type: Int, defaultValue: 10 }
+          userName: { type: String, defaultValue: "" }
+        ) {
+          followers(after: $after, first: $first, userName: $userName)
+            @connection(key: "Account_followers") {
+            __id
+            edges {
+              node {
+                ...ProfileList_users
+              }
             }
           }
         }
-      }
-    `,
-    viewerKey,
-  );
+      `,
+      viewerKey,
+    );
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
@@ -61,54 +64,74 @@ const FollowersScreenList = ({
       }
     `);
 
-  const removeFollower = (profileId: string) => {
-    // currentProfileId is undefined when user is anonymous so we can't follow
-    if (currentProfileId) {
-      const connectionID = data.followers.__id;
+  const removeFollower = useCallback(
+    (profileId: string) => {
+      // currentProfileId is undefined when user is anonymous so we can't follow
+      if (currentProfileId) {
+        const connectionID = data.followers.__id;
 
-      commit({
-        variables: {
-          input: {
-            profileId,
+        commit({
+          variables: {
+            input: {
+              profileId,
+            },
+            connections: [connectionID],
           },
-          connections: [connectionID],
-        },
-        optimisticResponse: {
-          removeFollower: {
-            removedFollowerId: profileId,
+          optimisticResponse: {
+            removeFollower: {
+              removedFollowerId: profileId,
+            },
           },
-        },
-        optimisticUpdater: store => updater(store, currentProfileId, profileId),
-        updater: store => updater(store, currentProfileId, profileId),
-        onError(error) {
-          // TODO: handle error
-          console.log(error);
-        },
-      });
-    }
-  };
+          optimisticUpdater: store =>
+            updater(store, currentProfileId, profileId),
+          updater: store => updater(store, currentProfileId, profileId),
+          onError(error) {
+            // TODO: handle error
+            console.log(error);
+          },
+        });
+      }
+    },
+    [commit, currentProfileId, data.followers.__id],
+  );
 
   const intl = useIntl();
 
+  const [searchValue, setSearchValue] = useState<string | undefined>('');
+
+  const [debouncedSearch] = useDebounce(searchValue, 300);
+
+  useEffect(() => {
+    const { dispose } = refetch(
+      { first: 10, userName: debouncedSearch, after: null },
+      {
+        fetchPolicy: 'store-and-network',
+      },
+    );
+    return dispose;
+  }, [debouncedSearch, refetch]);
+
+  const onToggleFollow = useMemo(
+    () =>
+      isPublic ? undefined : (profileId: string) => removeFollower(profileId),
+    [isPublic, removeFollower],
+  );
+
   return (
-    data.followers?.edges && (
-      <ProfileList
-        users={convertToNonNullArray(
-          data.followers.edges?.map(edge => edge?.node),
-        )}
-        onEndReached={onEndReached}
-        onToggleFollow={
-          isPublic
-            ? undefined
-            : (profileId: string) => removeFollower(profileId)
-        }
-        noProfileFoundLabel={intl.formatMessage({
-          defaultMessage: 'No followers',
-          description:
-            'Message displayed in the followers screen when the user has no followers',
-        })}
-      />
-    )
+    <ProfileList
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
+      users={convertToNonNullArray(
+        data.followers.edges?.map(edge => edge?.node) ?? [],
+      )}
+      onEndReached={onEndReached}
+      onToggleFollow={onToggleFollow}
+      noProfileFoundLabel={intl.formatMessage({
+        defaultMessage: 'No followers',
+        description:
+          'Message displayed in the followers screen when the user has no followers',
+      })}
+    />
   );
 };
 

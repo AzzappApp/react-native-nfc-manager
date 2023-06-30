@@ -16,13 +16,16 @@ import {
   index,
   uniqueIndex,
   varchar,
+  fulltextIndex,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import ERRORS from '@azzapp/shared/errors';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
-  mysqlTable,
 } from './db';
 import { FollowTable } from './follows';
 import { sortEntitiesByIds } from './generic';
@@ -66,6 +69,7 @@ export const ProfileTable = mysqlTable(
     return {
       userIdIdx: index('Profile_userId_idx').on(table.userId),
       userNameKey: uniqueIndex('Profile_userName_key').on(table.userName),
+      profileSearch: fulltextIndex('Profile_search').on(table.userName),
     };
   },
 );
@@ -161,16 +165,28 @@ export const getAllProfilesWithCardCount = async () =>
 /**
  * Retrieve the list of profile a profile is following
  * @param profileId - The id of the profile
+ * @param params - The parameters to filter the result
  * @returns A list of profile
  */
-export const getFollowedProfiles = async (profileId: string) =>
-  db
+export const getFollowedProfiles = async (
+  profileId: string,
+  params: { userName?: string | null },
+) => {
+  const result = await db
     .select({ Profile: ProfileTable })
     .from(ProfileTable)
     .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
-    .where(eq(FollowTable.followerId, profileId))
+    .where(
+      and(
+        eq(FollowTable.followerId, profileId),
+        params.userName
+          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${params.userName}*" IN BOOLEAN MODE)`
+          : undefined,
+      ),
+    );
 
-    .then(res => res.map(({ Profile }) => Profile));
+  return result.map(({ Profile }) => Profile);
+};
 
 /**
  * Retrieve the number of profile a profile is following
@@ -189,12 +205,20 @@ export const getFollowedProfilesCount = async (profileId: string) =>
 /**
  * Retrieve the list of profile a profile is being followed
  * @param profileId - The id of the profile
+ * @param params - The parameters to filter the result
  * @returns the list of profile a profile is being followed
  */
 export const getFollowerProfiles = async (
   profileId: string,
-  limit: number,
-  after: Date | null = null,
+  {
+    limit,
+    after = null,
+    userName,
+  }: {
+    limit: number;
+    after: Date | null;
+    userName?: string | null;
+  },
 ) =>
   db
     .select({
@@ -207,6 +231,9 @@ export const getFollowerProfiles = async (
       and(
         eq(FollowTable.followingId, profileId),
         after ? lt(FollowTable.createdAt, after) : undefined,
+        userName
+          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
+          : undefined,
       ),
     )
     .orderBy(desc(FollowTable.createdAt))

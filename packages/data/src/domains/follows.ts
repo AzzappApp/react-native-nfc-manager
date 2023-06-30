@@ -1,10 +1,17 @@
 import { eq, and } from 'drizzle-orm';
-import { index, primaryKey, datetime, varchar } from 'drizzle-orm/mysql-core';
+import {
+  index,
+  primaryKey,
+  datetime,
+  varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
-  mysqlTable,
 } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -26,8 +33,8 @@ export const FollowTable = mysqlTable(
   },
   table => {
     return {
-      followerIdIdx: index('Follow_followerId_idx').on(table.followerId),
       followingIdIdx: index('Follow_followingId_idx').on(table.followingId),
+      followerIdIdx: index('Follow_followerId_idx').on(table.followerId),
       followFollowerIdFollowingId: primaryKey(
         table.followerId,
         table.followingId,

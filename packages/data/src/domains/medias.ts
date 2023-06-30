@@ -1,6 +1,13 @@
 import { eq, inArray } from 'drizzle-orm';
-import { mysqlEnum, double, varchar } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH, mysqlTable } from './db';
+import {
+  mysqlEnum,
+  double,
+  varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
