@@ -43,6 +43,7 @@ jobs:
         id: ps-env
         env:
           REF: ${{ steps.prechecks.outputs.ref }}
+        if: exists('env/ps-env-${{ steps.prechecks.outputs.ref }}.sh')   
         working-directory: ${{env.pscale_base_directory}}
         run: env/ps-env-${REF}.sh || false
     
