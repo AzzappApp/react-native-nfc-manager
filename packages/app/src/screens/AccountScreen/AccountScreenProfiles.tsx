@@ -216,9 +216,10 @@ export default function AccountScreenProfiles({
       </View>
       <View style={styles.countersContainer}>
         <Link
-          route="PROFILE_POSTS"
+          route="PROFILE"
           params={{
             userName: currentProfile?.userName ?? '',
+            showPosts: true,
           }}
         >
           <PressableNative style={styles.counterContainer}>

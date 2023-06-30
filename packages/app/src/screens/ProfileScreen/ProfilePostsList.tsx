@@ -1,36 +1,39 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { useRouter } from '#components/NativeRouter';
+import PostList from '#components/PostList';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import PostList from './PostList';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
-import type { ProfilePostsListFragment_author$key } from '@azzapp/relay/artifacts/ProfilePostsListFragment_author.graphql';
-import type { ProfilePostsListFragment_posts$key } from '@azzapp/relay/artifacts/ProfilePostsListFragment_posts.graphql';
+import type { ProfilePostsList_profile$key } from '@azzapp/relay/artifacts/ProfilePostsList_profile.graphql';
 
-type ProfilePostListProps = {
-  profile: PostRendererFragment_author$key &
-    ProfilePostsListFragment_author$key &
-    ProfilePostsListFragment_posts$key;
+type ProfilePostsListProps = {
+  profile: PostRendererFragment_author$key & ProfilePostsList_profile$key;
+  isViewer: boolean;
   hasFocus: boolean;
+  userName: string;
 };
 
-const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
+const ProfilePostsList = ({
+  profile,
+  isViewer,
+  hasFocus,
+  userName,
+}: ProfilePostsListProps) => {
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment ProfilePostsListFragment_posts on Profile
-        @refetchable(queryName: "ProfilePostsList_profile_posts_connection")
+        fragment ProfilePostsList_profile on Profile
+        @refetchable(queryName: "ProfilePostsListprofile_posts_connection")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 6 }
+          first: { type: Int, defaultValue: 10 }
         ) {
           posts(after: $after, first: $first)
-            @connection(key: "ProfilePostsList_profile_connection_posts") {
+            @connection(key: "ProfilePostsListprofile_connection_posts") {
             edges {
               node {
                 id
@@ -40,19 +43,8 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
           }
         }
       `,
-      profile as ProfilePostsListFragment_posts$key,
+      profile as ProfilePostsList_profile$key,
     );
-
-  const authorProfile = useFragment(
-    graphql`
-      fragment ProfilePostsListFragment_author on Profile {
-        id
-        isViewer
-        userName
-      }
-    `,
-    profile as ProfilePostsListFragment_author$key,
-  );
 
   const intl = useIntl();
   const [refreshing, setRefreshing] = useState(false);
@@ -92,26 +84,21 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
         : [],
     [data.posts?.edges],
   );
-
-  if (!profile) {
-    return null;
-  }
-
   return (
-    <SafeAreaView style={styles.safeAreaView} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Header
         middleElement={
-          authorProfile.isViewer
+          isViewer
             ? intl.formatMessage({
                 defaultMessage: 'My posts',
                 description: 'ProfilePostScreen viewer user title Header',
               })
             : intl.formatMessage(
                 {
-                  defaultMessage: '{firstName} posts',
+                  defaultMessage: '{userName} posts',
                   description: 'ProfilePostScreen title Header',
                 },
-                { firstName: authorProfile.userName },
+                { userName },
               )
         }
         leftElement={
@@ -138,7 +125,3 @@ const ProfilePostsList = ({ profile, hasFocus }: ProfilePostListProps) => {
 };
 
 export default ProfilePostsList;
-
-const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, width: '100%' },
-});

@@ -1,24 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Dimensions, Platform, StyleSheet, View } from 'react-native';
-import Animated, {
-  Easing,
-  interpolate,
-  useAnimatedStyle,
-  useDerivedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Dimensions, Platform, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
-import { ProfilePostsList } from '#components/PostList';
+import {
+  useNativeNavigationEvent,
+  useRouter,
+  useScreenOptionsUpdater,
+} from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
+import CardFlipSwitch from './CardFlipSwitch';
+import ProfilePostsList from './ProfilePostsList';
 import ProfileScreenButtonBar from './ProfileScreenButtonBar';
 import ProfileScreenContent from './ProfileScreenContent';
+import { ProfileScreenTransitionsProvider } from './ProfileScreenTransitions';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ProfileRoute } from '#routes';
@@ -36,12 +34,12 @@ const ProfileScreen = ({
   ProfileRoute,
   ProfileScreenByIdQuery | ProfileScreenByUserNameQuery
 >) => {
-  const { bottom } = useSafeAreaInsets();
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
   const [ready, setReady] = useState(false);
   useNativeNavigationEvent('appear', () => {
     setReady(true);
   });
+
   const router = useRouter();
   const onHome = () => {
     router.backToTop();
@@ -65,152 +63,81 @@ const ProfileScreen = ({
     }
   }, [data, prefetchRoute]);
 
-  const [showPost, toggleFlip] = useToggle(false);
-  const transition = useDerivedValue(() => {
-    return withTiming(showPost ? 1 : 0, {
-      duration: 1300,
-      easing: Easing.out(Easing.back(1)),
+  const [showPost, toggleFlip] = useToggle(params.showPosts ?? false);
+  const [editing, toggleEditing] = useToggle(false);
+  const [selectionMode, toggleSelectionMode] = useToggle(false);
+
+  const [isAtTop, setIsAtTop] = useState(true);
+  const onContentPositionChange = useCallback((atTop: boolean) => {
+    setIsAtTop(atTop);
+  }, []);
+
+  const setOptions = useScreenOptionsUpdater();
+  useEffect(() => {
+    const animation: ScreenOptions =
+      showPost || !isAtTop
+        ? { stackAnimation: 'slide_from_bottom' }
+        : animatedTransitionFactory(params);
+    setOptions({
+      gestureEnabled: !editing && !showPost,
+      ...animation,
     });
-  });
-
-  const frontStyle = useAnimatedStyle(() => {
-    const flipVal = !showPost
-      ? interpolate(transition.value, [0, 1], [0, 180])
-      : interpolate(transition.value, [1, 0], [180, 360]);
-
-    const scale = interpolate(transition.value, [0, 0.5, 1], [1, 0.7, 1]);
-    return {
-      borderRadius: 40,
-      overflow: 'hidden',
-      opacity: interpolate(transition.value, [0, 1], [1, 0]),
-      transform: [
-        { perspective: 900 },
-        {
-          rotateY: `-${flipVal}deg`,
-        },
-        {
-          scale,
-        },
-      ],
-    };
-  }, [transition.value, showPost]);
-
-  const backStyle = useAnimatedStyle(() => {
-    const flipVal = !showPost
-      ? interpolate(transition.value, [0, 1], [180, 360])
-      : interpolate(transition.value, [1, 0], [0, 180]);
-    const scale = interpolate(transition.value, [0, 0.5, 1], [1, 0.7, 1]);
-    return {
-      opacity: interpolate(transition.value, [0, 1], [0, 1]),
-      borderRadius: 40,
-      overflow: 'hidden',
-      transform: [
-        { perspective: 900 },
-        { rotateY: `-${flipVal}deg` },
-        {
-          scale,
-        },
-      ],
-    };
-  }, [transition.value, showPost]);
-
-  const [editMode, toggleEditMode] = useToggle(false);
-  const editModeTransition = useDerivedValue(() => {
-    return withTiming(editMode ? 1 : 0, {
-      duration: 300,
-    });
-  });
-
-  const buttonBarStyle = useAnimatedStyle(() => {
-    return {
-      opacity: interpolate(
-        editModeTransition.value,
-        [0, 0.2, 0.8, 1],
-        [1, 0.1, 0.0, 0],
-      ),
-    };
-  }, [editModeTransition.value]);
+  }, [setOptions, showPost, editing, params, isAtTop]);
 
   const onToggleFollow = useToggleFollow(data.viewer?.profile?.id);
 
   if (!data.profile) {
     return null;
   }
+  const isViewer = data.profile.id === data.viewer.profile?.id;
 
   return (
-    <View style={{ flex: 1 }}>
-      <Animated.View
-        style={[styles.front, frontStyle]}
-        pointerEvents={showPost ? 'none' : 'box-none'}
-      >
-        <ProfileScreenContent
-          ready={ready}
-          profile={data.profile}
-          editMode={editMode}
-          toggleEditMode={toggleEditMode}
+    <ProfileScreenTransitionsProvider
+      editing={editing}
+      selectionMode={selectionMode}
+    >
+      <View style={{ flex: 1 }}>
+        <CardFlipSwitch
+          style={{ flex: 1 }}
+          flipped={showPost}
+          disabled={editing}
+          onFlip={toggleFlip}
+          front={
+            <ProfileScreenContent
+              ready={ready}
+              profile={data.profile}
+              editing={editing}
+              selectionMode={selectionMode}
+              onToggleEditing={toggleEditing}
+              onToggleSelectionMode={toggleSelectionMode}
+              onContentPositionChange={onContentPositionChange}
+            />
+          }
+          back={
+            <Suspense>
+              <ProfilePostsList
+                isViewer={data.profile.id === data.viewer.profile?.id}
+                profile={data.profile}
+                hasFocus={showPost && ready}
+                userName={data.profile.userName!}
+              />
+            </Suspense>
+          }
         />
-      </Animated.View>
-      <Animated.View
-        style={[styles.back, backStyle]}
-        pointerEvents={showPost ? 'box-none' : 'none'}
-      >
-        <ProfilePostsList hasFocus={showPost} profile={data.profile} />
-      </Animated.View>
-      <Animated.View
-        style={[styles.buttonBar, { bottom }, buttonBarStyle]}
-        pointerEvents={editMode ? 'none' : 'box-none'}
-      >
         <ProfileScreenButtonBar
-          userName={data.profile.userName!}
+          profile={data.profile}
+          isViewer={isViewer}
+          editing={editing}
           onHome={onHome}
           isWebCardDisplayed={!showPost}
-          onEdit={toggleEditMode}
+          onEdit={toggleEditing}
           onToggleFollow={follow => onToggleFollow(data.profile!.id, follow)}
           onFlip={toggleFlip}
         />
-      </Animated.View>
-    </View>
+      </View>
+    </ProfileScreenTransitionsProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  front: {
-    height: '100%',
-    width: '100%',
-    backgroundColor: '#D8D9CF',
-    borderRadius: 16,
-    position: 'absolute',
-    backfaceVisibility: 'hidden',
-  },
-  back: {
-    flex: 1,
-    backfaceVisibility: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonBar: {
-    position: 'absolute',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 50,
-    width: '100%',
-    paddingHorizontal: 15,
-    zIndex: 999,
-  },
-  mainButton: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  mainButtonFallback: {
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-  },
-  userPostsButton: {
-    marginLeft: 15,
-  },
-});
 
 const getQuery = (params: ProfileRoute['params']) =>
   params.profileID ? profileScreenByIdQuery : profileScreenByNameQuery;
@@ -220,18 +147,16 @@ const profileScreenByIdQuery = graphql`
     profile: node(id: $profileID) {
       id
       ... on Profile {
-        isViewer
         userName
       }
       ...ProfileScreenContent_profile
-      ...ProfilePostsListFragment_posts
+      ...ProfilePostsList_profile
       ...PostRendererFragment_author
-      ...ProfilePostsListFragment_author
+      ...ProfileScreenButtonBar_profile
     }
     viewer {
       profile {
         id
-        userName
       }
     }
   }
@@ -241,12 +166,11 @@ const profileScreenByNameQuery = graphql`
   query ProfileScreenByUserNameQuery($userName: String!) {
     profile(userName: $userName) {
       id
-      isViewer
       userName
       ...ProfileScreenContent_profile
-      ...ProfilePostsListFragment_posts
+      ...ProfilePostsList_profile
       ...PostRendererFragment_author
-      ...ProfilePostsListFragment_author
+      ...ProfileScreenButtonBar_profile
     }
     viewer {
       profile {
@@ -256,15 +180,12 @@ const profileScreenByNameQuery = graphql`
   }
 `;
 
-ProfileScreen.getScreenOptions = ({
+const animatedTransitionFactory = ({
   fromRectangle,
-}: ProfileRoute['params']): ScreenOptions | null => {
-  if (Platform.OS !== 'ios') {
-    // TODO make it works on android
-    return { stackAnimation: 'default' };
-  }
-  if (!fromRectangle) {
-    return null;
+  showPosts,
+}: ProfileRoute['params']): ScreenOptions => {
+  if (Platform.OS !== 'ios' || !fromRectangle || showPosts) {
+    return { stackAnimation: 'slide_from_bottom' };
   }
   const windowWidth = Dimensions.get('window').width;
   return {
@@ -286,6 +207,8 @@ ProfileScreen.getScreenOptions = ({
     gestureEnabled: true,
   };
 };
+
+ProfileScreen.getScreenOptions = animatedTransitionFactory;
 
 export default relayScreen(ProfileScreen, {
   query: getQuery,

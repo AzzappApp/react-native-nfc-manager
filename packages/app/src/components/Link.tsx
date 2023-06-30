@@ -5,7 +5,7 @@ import type { Route } from '#routes';
 import type { ReactElement } from 'react';
 import type { GestureResponderEvent } from 'react-native';
 
-type LinkProps = Route & {
+type LinkProps<T extends Route> = T & {
   /**
    * If true, the current screen will be replaced by the new one.
    */
@@ -37,14 +37,14 @@ type LinkProps = Route & {
  * </Link>
  * ```
  */
-const Link = ({
+const Link = <T extends Route>({
   route,
   params,
   replace,
   modal,
   prefetch,
   children,
-}: LinkProps) => {
+}: LinkProps<T>) => {
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
 

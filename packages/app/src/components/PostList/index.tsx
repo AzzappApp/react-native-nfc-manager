@@ -5,12 +5,10 @@ import PostRendererBottomPanel, {
 } from './PostRendererBottomPanel';
 
 import PostsGrid from './PostsGrid';
-import ProfilePostsList from './ProfilePostsList';
 
 export {
   PostRenderer,
   PostsGrid,
-  ProfilePostsList,
   PostRendererBottomPanel,
   PostRendererBottomPanelSkeleton,
 };

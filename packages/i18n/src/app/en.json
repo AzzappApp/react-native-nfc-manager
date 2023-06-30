@@ -155,10 +155,6 @@
     "defaultMessage": "Image & Text",
     "description": "PhotoWithTextAndTitle text screen title"
   },
-  "2nXZgd": {
-    "defaultMessage": "{firstName} posts",
-    "description": "ProfilePostScreen title Header"
-  },
   "2pxyFy": {
     "defaultMessage": "Color",
     "description": "Settings color tab label in SocialLinks edition"
@@ -2566,6 +2562,10 @@
   "wkQ0bm": {
     "defaultMessage": "video",
     "description": "Title of the photo view in image picker wizzard"
+  },
+  "woB0mm": {
+    "defaultMessage": "{userName} posts",
+    "description": "ProfilePostScreen title Header"
   },
   "wpEPD0": {
     "defaultMessage": "Edit Margin",

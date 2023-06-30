@@ -1,7 +1,12 @@
 import { Suspense, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { StyleSheet } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -9,18 +14,27 @@ import useToggle from '#hooks/useToggle';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Text from '#ui/Text';
-import type { ProfileScreenButtonBarQuery } from '@azzapp/relay/artifacts/ProfileScreenButtonBarQuery.graphql';
+import { useEditTransition } from './ProfileScreenTransitions';
+import type { ProfileScreenButtonBar_profile$key } from '@azzapp/relay/artifacts/ProfileScreenButtonBar_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type ProfileScreenButtonBarProps = ViewProps & {
   /**
-   * The user name of the current displayed profile
+   * The current displayed profile
    */
-  userName: string;
+  profile: ProfileScreenButtonBar_profile$key;
+  /**
+   * true if the profile is the current user
+   */
+  isViewer: boolean;
   /**
    *  true when the webcard is visible (as opposite of displaying the post list)
    */
   isWebCardDisplayed: boolean;
+  /**
+   * If the card is in editing mode
+   */
+  editing: boolean;
   /**
    * A callback called when the user press the edit button
    */
@@ -45,7 +59,9 @@ type ProfileScreenButtonBarProps = ViewProps & {
  * if the profile is not the current user, and the edit button if the profile is the current user
  */
 const ProfileScreenButtonBar = ({
-  userName,
+  profile,
+  editing,
+  isViewer,
   onEdit,
   onHome,
   onToggleFollow,
@@ -54,8 +70,25 @@ const ProfileScreenButtonBar = ({
   style,
   ...props
 }: ProfileScreenButtonBarProps) => {
+  const inset = useSafeAreaInsets();
+  const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
+  const editTransition = useEditTransition();
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        editTransition.value,
+        [0, 0.2, 0.8, 1],
+        [1, 0.1, 0.0, 0],
+      ),
+    };
+  }, [editTransition.value]);
+
   return (
-    <View style={[styles.buttonBar, style]} {...props}>
+    <Animated.View
+      style={[styles.buttonBar, animatedStyle, { bottom: bottomMargin }, style]}
+      {...props}
+      pointerEvents={editing ? 'none' : 'box-none'}
+    >
       <FloatingIconButton
         icon="azzapp"
         onPress={onHome}
@@ -65,11 +98,16 @@ const ProfileScreenButtonBar = ({
       />
       <Suspense
         fallback={
-          <View style={[styles.mainButton, styles.mainButtonFallback]} />
+          <FloatingButton
+            variant="grey"
+            style={styles.mainButton}
+            accessible={false}
+          />
         }
       >
         <ProfileScreenButtonActionButton
-          userName={userName}
+          profile={profile}
+          isViewer={isViewer}
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
           onToggleFollow={onToggleFollow}
@@ -83,28 +121,34 @@ const ProfileScreenButtonBar = ({
         style={styles.userPostsButton}
         onPress={onFlip}
       />
-    </View>
+    </Animated.View>
   );
 };
 
 export default ProfileScreenButtonBar;
 
+type ProfileScreenButtonActionButtonProps = {
+  profile: ProfileScreenButtonBar_profile$key;
+  isViewer: boolean;
+  isWebCardDisplayed: boolean;
+  onEdit: () => void;
+  onToggleFollow: (follow: boolean) => void;
+};
+
 const ProfileScreenButtonActionButton = ({
-  userName,
-  onEdit,
+  profile: profileKey,
+  isViewer,
   isWebCardDisplayed,
+  onEdit,
   onToggleFollow,
-}: Omit<ProfileScreenButtonBarProps, 'onFlip' | 'onHome'>) => {
-  const { profile } = useLazyLoadQuery<ProfileScreenButtonBarQuery>(
+}: ProfileScreenButtonActionButtonProps) => {
+  const profile = useFragment(
     graphql`
-      query ProfileScreenButtonBarQuery($userName: String!) {
-        profile(userName: $userName) {
-          isFollowing
-          isViewer
-        }
+      fragment ProfileScreenButtonBar_profile on Profile {
+        isFollowing
       }
     `,
-    { userName },
+    profileKey,
   );
 
   const [isFollowing, toggleFollowing] = useToggle(
@@ -126,7 +170,7 @@ const ProfileScreenButtonActionButton = ({
     router.push({ route: 'NEW_POST' });
   };
 
-  return profile?.isViewer ? (
+  return isViewer ? (
     isWebCardDisplayed ? (
       <FloatingButton
         onPress={onEdit}
@@ -190,20 +234,20 @@ const ProfileScreenButtonActionButton = ({
 };
 
 const styles = StyleSheet.create({
-  textButton: { color: colors.white },
   buttonBar: {
+    position: 'absolute',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    height: 50,
+    width: '100%',
+    paddingHorizontal: 15,
+    zIndex: 999,
   },
+  textButton: { color: colors.white },
   mainButton: {
     flex: 1,
     marginLeft: 15,
-  },
-  mainButtonFallback: {
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.8)',
   },
   userPostsButton: {
     marginLeft: 15,

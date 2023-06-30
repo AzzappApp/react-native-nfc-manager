@@ -53,7 +53,7 @@ const PostCreationScreen = ({
     profile?.id &&
     ConnectionHandler.getConnectionID(
       profile.id,
-      'ProfilePostsScreen_profile_connection_posts',
+      'ProfilePostsListprofile_connection_posts',
     );
 
   const router = useRouter();
@@ -150,9 +150,10 @@ const PostCreationScreen = ({
         );
         // TODO use fragment instead of response
         router.replace({
-          route: 'PROFILE_POSTS',
+          route: 'PROFILE',
           params: {
             userName: response.createPost?.post?.author.userName as string,
+            showPosts: true,
           },
         });
       },

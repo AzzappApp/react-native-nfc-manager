@@ -20,23 +20,52 @@ import type {
 } from './ProfileScreenBody';
 import type { ProfileScreenContent_profile$key } from '@azzapp/relay/artifacts/ProfileScreenContent_profile.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 type ProfileScreenProps = {
+  /**
+   * The profile to display.
+   */
   profile: ProfileScreenContent_profile$key;
-  ready?: boolean;
-  editMode?: boolean;
-  toggleEditMode: () => void;
+  /**
+   * If the native screen is ready to be displayed.
+   */
+  ready: boolean;
+  /**
+   * If the profile is in edit mode.
+   */
+  editing: boolean;
+  /**
+   * If the profile is in selection mode.
+   */
+  selectionMode: boolean;
+  /**
+   * A callback called when the user press the done button. in edit mode.
+   */
+  onToggleEditing: () => void;
+  /**
+   * A callback called when the use enter/exit selection mode.
+   */
+  onToggleSelectionMode: () => void;
+  /**
+   * A callback called when the user scroll the content.
+   * (only called when the user is at the top or is not at the top anymore)
+   * @param atTop true if the user is at the top of the content. false otherwise.
+   */
+  onContentPositionChange?: (atTop: boolean) => void;
 };
 
 /**
- * This component is the main component of the Profile screen.
- * render the content of the screen.
+ * This component render the content of the profile Web card.
  */
 const ProfileScreenContent = ({
   profile: profileKey,
-  ready = true,
-  editMode = false,
-  toggleEditMode,
+  ready,
+  editing,
+  selectionMode,
+  onToggleSelectionMode,
+  onToggleEditing: onToggleEditMode,
+  onContentPositionChange,
 }: ProfileScreenProps) => {
   // #region Data
   const profile = useFragment(
@@ -74,9 +103,9 @@ const ProfileScreenContent = ({
   >('mobile');
 
   const onDone = useCallback(() => {
-    toggleEditMode();
+    onToggleEditMode();
     setEditingDisplayMode('mobile');
-  }, [toggleEditMode]);
+  }, [onToggleEditMode]);
 
   // #endregion
 
@@ -170,7 +199,6 @@ const ProfileScreenContent = ({
     });
   }, [router]);
 
-  const [selectionMode, setSelectionMode] = useState(false);
   const [
     {
       nbSelectedModules,
@@ -183,14 +211,6 @@ const ProfileScreenContent = ({
     selectionContainsHiddenModules: false,
     selectionContainsAllModules: false,
   });
-
-  const onEnableSelectionMode = useCallback(() => {
-    setSelectionMode(true);
-  }, []);
-
-  const onCancelSelectionMode = useCallback(() => {
-    setSelectionMode(false);
-  }, []);
 
   const onSelectionStateChange = useCallback((info: ModuleSelectionInfos) => {
     setSelectionInfos(info);
@@ -208,16 +228,27 @@ const ProfileScreenContent = ({
 
   const onDeleteSelectedModules = useCallback(() => {
     profileBodyRef.current?.deleteSelectedModules();
-    setSelectionMode(false);
-  }, []);
+    onToggleSelectionMode();
+  }, [onToggleSelectionMode]);
 
-  const onToggleSelectedModulesVisibility = useCallback((visible: boolean) => {
-    profileBodyRef.current?.toggleSelectedModulesVisibility(visible);
-    setSelectionMode(false);
-  }, []);
+  const onToggleSelectedModulesVisibility = useCallback(
+    (visible: boolean) => {
+      profileBodyRef.current?.toggleSelectedModulesVisibility(visible);
+      onToggleSelectionMode();
+    },
+    [onToggleSelectionMode],
+  );
   // #endregion
 
-  // #endregion
+  const [modulesCount, setModulesCount] = useState(1);
+
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const atTop = event.nativeEvent.contentOffset.y < 5;
+      onContentPositionChange?.(atTop);
+    },
+    [onContentPositionChange],
+  );
 
   const intl = useIntl();
   const { width: windowSize } = useWindowDimensions();
@@ -226,22 +257,26 @@ const ProfileScreenContent = ({
     <>
       <View style={{ flex: 1, backgroundColor }}>
         <ProfileScreenHeader
-          editing={editMode}
-          ready={ready}
+          editing={editing}
           nbSelectedModules={nbSelectedModules}
           selectionMode={selectionMode}
           selectionContainsAllModules={selectionContainsAllModules}
           onDone={onDone}
           onClose={onClose}
-          onEditModules={onEnableSelectionMode}
-          onCancelEditModules={onCancelSelectionMode}
+          onEditModules={onToggleSelectionMode}
+          onCancelEditModules={onToggleSelectionMode}
           onSelectAllModules={onSelectAllModules}
           onUnSelectAllModules={onUnSelectAllModules}
         />
-        <ProfileScreenScrollView editing={editMode} ready={ready}>
+        <ProfileScreenScrollView
+          editing={editing}
+          ready={ready}
+          blocksCount={modulesCount + 1}
+          onScroll={onScroll}
+        >
           <ProfileBlockContainer
             backgroundColor={backgroundColor}
-            editing={editMode}
+            editing={editing}
             displayEditionButtons={false}
             onModulePress={onEditCover}
           >
@@ -258,18 +293,18 @@ const ProfileScreenContent = ({
               <ProfileScreenBody
                 ref={profileBodyRef}
                 card={profile.card}
-                editing={editMode}
+                editing={editing}
                 selectionMode={selectionMode}
                 backgroundColor={backgroundColor}
                 onEditModule={onEditModule}
                 onSelectionStateChange={onSelectionStateChange}
+                onModulesCountChange={setModulesCount}
               />
             )}
           </Suspense>
         </ProfileScreenScrollView>
         <ProfileScreenFooter
-          editing={editMode}
-          ready={ready}
+          editing={editing}
           currentEditionView={editingDisplayMode}
           selectionMode={selectionMode}
           hasSelectedModules={nbSelectedModules > 0}

@@ -50,7 +50,6 @@ import NewProfileScreen from '#screens/NewProfileScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
-import ProfilePostsScreen from '#screens/ProfilePostsScreen';
 import ProfileScreen from '#screens/ProfileScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
@@ -71,7 +70,6 @@ const screens = {
   CHAT: () => <View />,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
-  PROFILE_POSTS: ProfilePostsScreen,
   NEW_POST: PostCreationScreen,
   NEW_PROFILE: NewProfileScreen,
   CARD_MODULE_EDITION: CardModuleEditionMobileScreen,

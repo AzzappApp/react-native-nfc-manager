@@ -1,22 +1,18 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import ViewTransition from '#ui/ViewTransition';
-import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
+import { useEditTransition } from './ProfileScreenTransitions';
 
 export type ProfileScreenHeaderProps = {
   /**
    * Whether the profile is in edit mode
    */
   editing: boolean;
-  /**
-   * true when the profile is ready to be displayed (animation finished)
-   */
-  ready: boolean;
   /**
    * Whether the profile is in selection mode
    */
@@ -62,7 +58,6 @@ export type ProfileScreenHeaderProps = {
  */
 const ProfileScreenHeader = ({
   editing,
-  ready,
   selectionMode,
   nbSelectedModules,
   selectionContainsAllModules,
@@ -73,20 +68,23 @@ const ProfileScreenHeader = ({
   onSelectAllModules,
   onUnSelectAllModules,
 }: ProfileScreenHeaderProps) => {
+  const editTransition = useEditTransition();
   const inset = useSafeAreaInsets();
   const intl = useIntl();
+
+  const editHeaderStyle = useAnimatedStyle(() => ({
+    height: editTransition.value * HEADER_HEIGHT,
+    marginTop: editTransition.value * inset.top,
+    opacity: editTransition.value,
+  }));
+
+  const closeStyle = useAnimatedStyle(() => ({
+    opacity: 1 - editTransition.value,
+  }));
+
   return (
     <>
-      <ViewTransition
-        transitions={['height', 'marginTop', 'opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
-        style={{
-          height: editing ? HEADER_HEIGHT : 0,
-          marginTop: editing ? inset.top : 0,
-          opacity: editing ? 1 : 0,
-        }}
-        disableAnimation={!ready}
-      >
+      <Animated.View style={editHeaderStyle}>
         <Header
           middleElement={
             selectionMode
@@ -161,19 +159,10 @@ const ProfileScreenHeader = ({
           }
           style={{ backgroundColor: 'transparent' }}
         />
-      </ViewTransition>
-      <ViewTransition
-        transitions={['opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
-        style={[
-          styles.closeButton,
-          {
-            top: inset.top + 16,
-            opacity: editing ? 0 : 1,
-          },
-        ]}
+      </Animated.View>
+      <Animated.View
+        style={[styles.closeButton, { top: inset.top + 16 }, closeStyle]}
         pointerEvents={editing ? 'none' : 'auto'}
-        disableAnimation={!ready}
       >
         <FloatingIconButton
           icon="arrow_down"
@@ -182,7 +171,7 @@ const ProfileScreenHeader = ({
           variant="grey"
           iconStyle={{ tintColor: colors.white }}
         />
-      </ViewTransition>
+      </Animated.View>
     </>
   );
 };

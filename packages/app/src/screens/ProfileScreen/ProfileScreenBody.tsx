@@ -77,6 +77,10 @@ export type ProfileScreenBodyProps = {
    */
   backgroundColor: string;
   /**
+   * A callback called when the number of rendered modules change
+   */
+  onModulesCountChange: (count: number) => void;
+  /**
    * A callback called when the user press a module block in edit mode
    */
   onEditModule: (module: ModuleKind, moduleId: string) => void;
@@ -103,6 +107,7 @@ const ProfileScreenBody = (
     editing,
     selectionMode,
     backgroundColor,
+    onModulesCountChange,
     onEditModule,
     onSelectionStateChange,
   }: ProfileScreenBodyProps,
@@ -131,6 +136,10 @@ const ProfileScreenBody = (
     `,
     card,
   );
+
+  useEffect(() => {
+    onModulesCountChange(modules.length);
+  }, [modules.length, onModulesCountChange]);
 
   const [commitSwapModules, swapModulesActive] =
     useMutation<ProfileScreenBodySwapModulesMutation>(graphql`

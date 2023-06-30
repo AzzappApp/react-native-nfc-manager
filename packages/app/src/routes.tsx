@@ -55,12 +55,8 @@ export type ProfileRoute = {
     userName: string;
     profileID?: string;
     fromRectangle?: LayoutRectangle;
+    showPosts?: boolean;
   };
-};
-
-export type ProfilePostsRoute = {
-  route: 'PROFILE_POSTS';
-  params: { userName: string };
 };
 
 export type AlbumsRoute = {
@@ -129,7 +125,6 @@ export type Route =
   | ChatRoute
   | AccountRoute
   | ProfileRoute
-  | ProfilePostsRoute
   | PostRoute
   | PostCommentsRoute
   | NewPostRoute
