@@ -36,6 +36,11 @@
     "appcenter-crashes": "^4.4.5",
     "chroma-js": "^2.4.2",
     "events": "^3.3.0",
+    "expo": "^48.0.19",
+    "expo-image": "^1.2.3",
+    "expo-haptics": "^12.2.1",
+    "expo-media-library": "^15.2.3",
+    "expo-permissions": "^14.1.1",
     "graphql": "^16.6.0",
     "i18n-iso-countries": "^7.5.0",
     "libphonenumber-js": "^1.10.24",
@@ -86,6 +91,7 @@
     "react-native-monorepo-tools": "^1.2.1",
     "react-test-renderer": "^18.2.0",
     "relay-test-utils": "^14.1.0",
-    "rimraf": "^4.1.2"
+    "rimraf": "^4.1.2",
+    "jest-expo": "^48.0.2"
   }
 }

@@ -151,7 +151,6 @@ const ContactCardEditModal = ({
           toggleBottomSheet();
         },
         onError: () => {
-          console.log('error');
           toggleBottomSheet();
         },
       });

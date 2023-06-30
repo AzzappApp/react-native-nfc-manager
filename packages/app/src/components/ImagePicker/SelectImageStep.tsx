@@ -1,5 +1,4 @@
 import React, {
-  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -10,9 +9,9 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
+import useMediaLibraryPermission from '#hooks/useMediaLibraryPermission';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
-
 import CameraControlPanel from '../CameraControlPanel';
 import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
@@ -23,6 +22,7 @@ import { ImagePickerStep } from './ImagePickerWizardContainer';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
 import type { FooterBarItem } from '#ui/FooterBar';
 import type { CameraViewHandle, RecordSession } from '../CameraView';
+import type { Album } from 'expo-media-library';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
 export type SelectImageStepProps = {
@@ -64,22 +64,18 @@ const SelectImageStep = ({
     onAspectRatioChange(aspectRatio === 1 ? null : 1);
   };
 
-  const [album, setAlbum] = useState<string | null>(null);
-  // #endregion
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
 
   // #region permissions logic
   const { cameraPermission, microphonePermission } = useCameraPermissions();
-  const [hasGalleryPermission, setHasGalleryPermision] = useState(true);
+  const mediaLibraryPermission = useMediaLibraryPermission();
+
   const [permissionDenied, setPermissionDenied] = useState(false);
   const hasCameraPermission =
     cameraPermission === 'authorized' || cameraPermission === 'restricted';
   const hasMicrophonePermission =
     microphonePermission === 'authorized' ||
     microphonePermission === 'restricted';
-
-  const onGalleryPermissionFail = () => {
-    setHasGalleryPermision(false);
-  };
 
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {
@@ -93,10 +89,11 @@ const SelectImageStep = ({
   );
 
   const onCameraPermissionModalClose = () => {
-    if (hasGalleryPermission) {
+    if (mediaLibraryPermission?.granted) {
       onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
+      onBack();
       setPermissionDenied(true);
     }
   };
@@ -229,7 +226,9 @@ const SelectImageStep = ({
         stepId={SelectImageStep.STEP_ID}
         headerTitle={
           pickerMode === 'gallery' ? (
-            <AlbumPicker value={album} onChange={setAlbum} />
+            mediaLibraryPermission?.granted ? (
+              <AlbumPicker album={selectedAlbum} onChange={setSelectedAlbum} />
+            ) : null
           ) : pickerMode === 'photo' ? (
             intl.formatMessage({
               defaultMessage: 'Photo',
@@ -272,18 +271,18 @@ const SelectImageStep = ({
         }
         bottomPanel={({ insetBottom }) =>
           pickerMode === 'gallery' ? (
-            <PhotoGalleryMediaList
-              selectedMediaID={media?.galleryUri}
-              album={album}
-              onMediaSelected={onMediaChange}
-              onGalleryPermissionFail={onGalleryPermissionFail}
-              kind={kind}
-              style={{ flex: 1 }}
-              contentContainerStyle={{
-                paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-              }}
-              autoSelectFirstItem={media == null}
-            />
+            mediaLibraryPermission?.granted ? (
+              <PhotoGalleryMediaList
+                selectedMediaID={media?.galleryUri}
+                album={selectedAlbum}
+                onMediaSelected={onMediaChange}
+                kind={kind}
+                contentContainerStyle={{
+                  paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                }}
+                autoSelectFirstItem={media == null}
+              />
+            ) : null
           ) : (
             <CameraControlPanel
               captureMode={pickerMode}
@@ -307,9 +306,13 @@ const SelectImageStep = ({
       />
       <PermissionModal
         visible={
-          (pickerMode !== 'gallery' && !hasCameraPermission) ||
-          (pickerMode === 'video' && !hasMicrophonePermission) ||
-          (!hasGalleryPermission && !permissionDenied)
+          (pickerMode === 'gallery' &&
+            mediaLibraryPermission != null &&
+            !mediaLibraryPermission.granted) ||
+          (pickerMode === 'photo' && !hasCameraPermission) ||
+          (pickerMode === 'video' &&
+            !hasCameraPermission &&
+            !hasMicrophonePermission)
         }
         permissionsFor={pickerMode}
         onRequestClose={onCameraPermissionModalClose}

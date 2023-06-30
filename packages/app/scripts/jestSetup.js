@@ -62,3 +62,7 @@ jest.mock('@azzapp/relay/providers/isNative.relayprovider', () => ({
   },
 }));
 //#endregion
+
+//#region flashlist
+require('@shopify/flash-list/jestSetup');
+//#endregion

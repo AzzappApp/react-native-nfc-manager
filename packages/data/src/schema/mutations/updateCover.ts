@@ -73,7 +73,6 @@ const updateCover: MutationResolvers['updateCover'] = async (
             { publicId: input.sourceMediaId, kind: 'video' },
           ]);
         }
-        console.log('existingSourceMedia', cloudinarySourceMedia);
         if (cloudinarySourceMedia == null) {
           throw new Error(ERRORS.INVALID_REQUEST);
         }
@@ -113,8 +112,6 @@ const updateCover: MutationResolvers['updateCover'] = async (
             });
           }
         });
-
-        console.log('medias to create', medias);
 
         await createMedias(medias, trx);
 

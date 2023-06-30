@@ -1,4 +1,5 @@
 #import <React/RCTBundleURLProvider.h>
+#import <Expo/Expo.h>
 #import <React/RCTRootView.h>
 #import <React/RCTComponent.h>
 #import <React/RCTBridgeModule.h>

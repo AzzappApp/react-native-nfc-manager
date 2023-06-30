@@ -81,6 +81,12 @@ jest.mock('#helpers/mediaHelpers', () => ({
   getVideoSize: () => ({ width: 1080, height: 1920 }),
 }));
 
+jest.mock('#hooks/useMediaLibraryPermission', () =>
+  jest.fn().mockReturnValue({
+    granted: true,
+  }),
+);
+
 jest.mock('#hooks/useCameraPermissions', () =>
   jest.fn().mockReturnValue({
     cameraPermission: 'authorized',

@@ -5,13 +5,15 @@ const esModules = [
   'react-native-reanimated',
   'validator',
   'use-debounce',
+  'expo(nent)?',
+  '@expo(nent)?/.*',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   clearMocks: true,
   displayName: 'app',
-  preset: 'react-native',
+  preset: 'jest-expo',
   transform: {
     '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
   },

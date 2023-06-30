@@ -1,31 +1,40 @@
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { FlashList } from '@shopify/flash-list';
+import { Image } from 'expo-image';
+import { getAssetInfoAsync, getAssetsAsync } from 'expo-media-library';
 import { useCallback, useRef, useState, useEffect, memo } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  FlatList,
-  Image,
-  PermissionsAndroid,
-  Platform,
-  useWindowDimensions,
-  StyleSheet,
-} from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
+import { ScrollView, PanGestureHandler } from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   formatVideoTime,
   getImageSize,
-  getPHAssetPath,
   getVideoSize,
 } from '#helpers/mediaHelpers';
+import { HEADER_HEIGHT } from '#ui/Header';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { Media } from './imagePickerTypes';
-import type {
-  PhotoIdentifier,
-  PhotoIdentifiersPage,
-  GetPhotosParams,
-} from '@react-native-camera-roll/camera-roll';
-import type { ScrollViewProps, ListRenderItemInfo } from 'react-native';
 
-type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
+import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
+import type { Album, Asset } from 'expo-media-library';
+import type { LayoutChangeEvent } from 'react-native';
+import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+
+type PhotoGalleryMediaListProps = Omit<
+  FlashListProps<Asset>,
+  'children' | 'data' | 'onEndReached' | 'renderItem'
+> & {
   /**
    * The ID of the media that is currently selected.
    * this id is the uri of the media as in camera roll (phassets on ios).
@@ -38,20 +47,18 @@ type PhotoGalleryMediaListProps = Omit<ScrollViewProps, 'children'> & {
   /**
    * Allows the list to be filtered by album.
    */
-  album?: string | null;
+  album: Album | null;
   /**
    * Called when the user selects a media.
    * @param media The media that was selected.
    */
   onMediaSelected: (media: Media) => void;
-  /**
-   * Called when the user denies the gallery permission.
-   */
-  onGalleryPermissionFail: () => void;
-
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
 };
+
+const AnimatedFlashList =
+  Animated.createAnimatedComponent<FlashListProps<Asset>>(FlashList);
 
 /**
  * A component that displays a list of media from the camera roll
@@ -62,104 +69,103 @@ const PhotoGalleryMediaList = ({
   album,
   kind,
   onMediaSelected,
-  onGalleryPermissionFail,
   autoSelectFirstItem = true,
+  numColumns = 4,
+  contentContainerStyle,
   ...props
 }: PhotoGalleryMediaListProps) => {
-  const [medias, setMedias] = useState<Array<PhotoIdentifier['node']>>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { height: windowsHeight } = useWindowDimensions();
+  const scrollViewRef = useRef<FlashList<Asset>>(null);
+  const panRef = useRef();
+  const styles = useStyleSheet(styleSheet);
+  const [medias, setMedias] = useState<Asset[]>([]);
+  const isLoading = useRef(false);
   const [hasNext, setHasNext] = useState(false);
-  const endCursor = useRef<string | undefined>();
+  const nextCursor = useRef<string | undefined>();
+  const topPosition = useSafeAreaInsets().top + HEADER_HEIGHT;
 
-  const onGalleryPermissionFailRef = useRef(onGalleryPermissionFail);
-  onGalleryPermissionFailRef.current = onGalleryPermissionFail;
   const load = useCallback(
     async (refreshing = false) => {
-      setIsLoading(true);
-      let result: PhotoIdentifiersPage;
+      if (!isLoading.current) {
+        isLoading.current = true;
+        const previous = refreshing ? [] : [...medias];
+        try {
+          const result = await getAssetsAsync({
+            first: refreshing ? 16 : 60, //multiple of items per row
+            after: refreshing ? undefined : nextCursor.current,
+            mediaType:
+              kind === 'mixed'
+                ? ['photo', 'video']
+                : kind === 'image'
+                ? ['photo']
+                : ['video'],
+            sortBy: ['creationTime'],
+            album: album ?? undefined,
+          });
 
-      if (Platform.OS === 'android') {
-        const result = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: 'Permission Explanation',
-            message: 'Azzapp would like to access your pictures.',
-            buttonPositive: 'OK',
-          },
-        );
-        if (result !== 'granted') {
-          onGalleryPermissionFailRef.current?.();
+          const { assets, endCursor, hasNextPage } = result;
+          setMedias([...previous, ...assets]);
+          nextCursor.current = endCursor;
+          setHasNext(hasNextPage);
+        } catch (e) {
+          console.log(e);
           return;
+        } finally {
+          isLoading.current = false;
         }
       }
-
-      try {
-        const params: GetPhotosParams = {
-          first: 30,
-          assetType:
-            kind === 'mixed' ? 'All' : kind === 'video' ? 'Videos' : 'Photos',
-          after: endCursor.current,
-          include: ['imageSize', 'playableDuration'],
-        };
-        if (album) {
-          params.groupTypes = 'Album';
-          params.groupName = album;
-        }
-        result = await CameraRoll.getPhotos(params);
-      } catch (e) {
-        onGalleryPermissionFailRef.current?.();
-        return;
-      }
-
-      const {
-        edges,
-        page_info: { end_cursor, has_next_page },
-      } = result;
-
-      const newMedias = edges.map(({ node }) => node);
-      setMedias(refreshing ? newMedias : medias => medias.concat(newMedias));
-      endCursor.current = end_cursor;
-      setHasNext(has_next_page);
-      setIsLoading(false);
     },
-    [kind, album],
+    [album, kind, medias],
   );
+
+  useEffect(() => {
+    //force preload more data and inital render,
+    if (medias.length === 16 && hasNext) {
+      void load(false);
+    }
+  }, [hasNext, load, medias.length]);
+
+  useEffect(() => {
+    if (!isLoading.current) {
+      nextCursor.current = undefined;
+      setHasNext(false);
+      void load(true);
+    }
+  }, [album, load]);
 
   useEffect(() => {
     void load(true);
   }, [load]);
 
   const onMediaPress = useCallback(
-    async ({
-      image: { uri: galleryUri, height, width, playableDuration },
-      type,
-    }: PhotoIdentifier['node']) => {
-      let uri: string | null = galleryUri;
-      if (Platform.OS === 'ios') {
-        uri = await getPHAssetPath(galleryUri);
-      }
+    async (asset: Asset) => {
+      let uri: string | null = asset.uri;
+      const assets = await getAssetInfoAsync(asset.id);
+      uri = assets.localUri ?? uri;
+
       if (uri == null) {
         // TODO
         return;
       }
-      if (type.startsWith('video')) {
-        if (width == null || height == null) {
+      let { width, height } = asset;
+      if (asset.mediaType === 'video') {
+        if (asset.width == null || asset.height == null) {
           ({ width, height } = await getVideoSize(uri));
         }
         onMediaSelected({
-          galleryUri,
+          galleryUri: asset.uri,
           kind: 'video',
           uri,
           width,
           height,
-          duration: playableDuration,
+          duration: asset.duration,
         });
       } else {
         if (width == null || height == null) {
           ({ width, height } = await getImageSize(uri));
         }
         onMediaSelected({
-          galleryUri,
+          galleryUri: asset.uri,
           kind: 'image',
           uri,
           width,
@@ -171,26 +177,121 @@ const PhotoGalleryMediaList = ({
   );
 
   const onEndReached = useCallback(() => {
-    if (hasNext && !isLoading) {
+    if (hasNext && !isLoading.current) {
       void load();
     }
   }, [hasNext, isLoading, load]);
 
-  const { width: windowWidth } = useWindowDimensions();
+  const itemHeight =
+    (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
+    numColumns;
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<PhotoIdentifier['node']>) => (
+    ({ item }: ListRenderItemInfo<Asset>) => (
       <MemoPhotoGalleyMediaItem
         item={item}
-        index={index}
-        width={windowWidth / ITEM_PER_ROW}
-        selected={selectedMediaID === item.image.uri}
+        selected={selectedMediaID === item.id}
+        height={itemHeight}
         onMediaPress={onMediaPress}
       />
     ),
 
-    [onMediaPress, selectedMediaID, windowWidth],
+    [itemHeight, onMediaPress, selectedMediaID],
   );
+
+  const initialPosition = useRef(0);
+  const maxHeight = useRef(0);
+  const translateY = useSharedValue(0);
+
+  const onLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      if (initialPosition.current === 0) {
+        initialPosition.current =
+          windowsHeight - event.nativeEvent.layout.height;
+        maxHeight.current = event.nativeEvent.layout.height;
+      }
+    },
+    [windowsHeight],
+  );
+
+  const scrollY = useSharedValue(0);
+  const scrollTo = (offset: number) => {
+    scrollViewRef.current?.scrollToOffset({ offset, animated: false });
+  };
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  //determine the position, 0 for not translate, 1 for upper
+  const position = useSharedValue(0);
+  // pan handler for sheet
+  const eventHandler = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    {
+      startY: number;
+      panActive: boolean;
+      saveOffset: number;
+      startTranslationY: number;
+    }
+  >({
+    onStart: (event, ctx) => {
+      ctx.startY = event.y;
+      ctx.panActive = false;
+      ctx.startTranslationY = translateY.value;
+    },
+    onActive: (event, ctx) => {
+      if (position.value === 0) {
+        if (event.y < -30) {
+          ctx.panActive = true;
+          ctx.saveOffset = scrollY.value;
+        } else if (event.y > ctx.startY) {
+          ctx.panActive = false;
+        }
+        if (ctx.panActive) {
+          translateY.value = -event.translationY - ctx.startY - 30;
+          runOnJS(scrollTo)(ctx.saveOffset);
+        }
+      } else if (scrollY.value < 0 && translateY.value > 0) {
+        ctx.panActive = true;
+        runOnJS(scrollTo)(0);
+        translateY.value = Math.max(
+          0,
+          ctx.startTranslationY - event.translationY,
+        );
+      }
+    },
+    onEnd: (event, ctx) => {
+      if (ctx.panActive) {
+        if (
+          event.absoluteY <
+          (windowsHeight - initialPosition.current) / 2 + topPosition
+        ) {
+          translateY.value = withSpring(initialPosition.current - topPosition);
+          position.value = 1;
+        } else {
+          translateY.value = withSpring(0);
+          position.value = 0;
+        }
+      }
+    },
+  });
+
+  const animatedViewStyle = useAnimatedStyle(() => {
+    return {
+      //transformY: translateY.value,
+      transform: [{ translateY: -translateY.value }],
+      minHeight: maxHeight.current + translateY.value,
+    };
+  });
+
+  useEffect(() => {
+    translateY.value = withSpring(0);
+    position.value = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMediaID]);
 
   //should select the first media when the list if no media is selected
   useEffect(() => {
@@ -200,50 +301,74 @@ const PhotoGalleryMediaList = ({
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaID]);
 
   return (
-    <FlatList
-      numColumns={ITEM_PER_ROW}
-      data={medias}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      onEndReached={onEndReached}
-      style={[styles.flatListStyle]}
-      accessibilityRole="list"
-      {...props}
-    />
+    <PanGestureHandler onGestureEvent={eventHandler} ref={panRef}>
+      <Animated.View
+        onLayout={onLayout}
+        style={[
+          styles.container,
+          {
+            minHeight: maxHeight.current ?? 0,
+          },
+          animatedViewStyle,
+        ]}
+      >
+        <AnimatedFlashList
+          ref={scrollViewRef}
+          overrideProps={{
+            simultaneousHandlers: panRef,
+          }}
+          numColumns={numColumns}
+          data={medias}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          onEndReachedThreshold={medias.length <= 16 ? 0.1 : 1.5}
+          drawDistance={1200} //this value will need tweaking with android low end device
+          onEndReached={onEndReached}
+          accessibilityRole="list"
+          contentContainerStyle={contentContainerStyle}
+          ItemSeparatorComponent={() => (
+            <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
+          )}
+          {...props}
+          estimatedItemSize={itemHeight}
+          renderScrollComponent={ScrollView}
+          onScroll={onScroll}
+          testID="photo-gallery-list"
+        />
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 
-const keyExtractor = (item: PhotoIdentifier['node']) => item.image.uri;
+const keyExtractor = (item: Asset) => item.id;
 
 // This list can be a litle laggy (due to the library we use for image at the moment). Using the RN preconisation for this list to try to improve a bit
 type PhotoGalleyMediaItemProps = {
-  item: PhotoIdentifier['node'];
-  index: number;
-  width: number;
+  item: Asset;
+  height: number;
   selected: boolean;
-  onMediaPress: (media: PhotoIdentifier['node']) => void;
+  onMediaPress: (media: Asset) => void;
 };
 const PhotoGalleyMediaItem = ({
   item,
-  index,
-  width,
   selected,
+  height,
   onMediaPress,
 }: PhotoGalleyMediaItemProps) => {
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
-  const onPress = () => {
+  const onPress = useCallback(() => {
     onMediaPress(item);
-  };
+  }, [item, onMediaPress]);
+
   return (
     <PressableNative
       style={[
         {
-          width,
-          height: width,
-          borderRightWidth: index % ITEM_PER_ROW !== 3 ? 1 : 0,
-          borderBottomWidth: 1,
-          borderColor: 'transparent',
+          aspectRatio: 1,
+          height,
         },
         selected && {
           opacity: 0.5,
@@ -262,30 +387,32 @@ const PhotoGalleyMediaItem = ({
         accessibilityRole="image"
         accessibilityIgnoresInvertColors={true}
         style={{
-          flex: 1,
-          resizeMode: 'cover',
+          width: height,
+          height,
         }}
-        source={{ uri: item.image.uri }}
+        source={{ uri: item.uri, width: height, height }}
+        recyclingKey={item.id}
       />
-      {item.type.startsWith('video') && (
-        <Text
-          variant="button"
-          style={[
-            { position: 'absolute', bottom: 10, right: 10, color: 'white' },
-          ]}
-        >
-          {formatVideoTime(item.image.playableDuration)}
+      {item.mediaType === 'video' && (
+        <Text variant="button" style={styles.textDuration}>
+          {formatVideoTime(item.duration)}
         </Text>
       )}
     </PressableNative>
   );
 };
-const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
 
-const ITEM_PER_ROW = 4;
+const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
 
 export default PhotoGalleryMediaList;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
+  container: {
+    flex: 1,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+  textDuration: { position: 'absolute', bottom: 10, right: 10, color: 'white' },
   flatListStyle: { flex: 1 },
-});
+}));
+
+const SEPARATOR_WIDTH = 1;
