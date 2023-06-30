@@ -27,7 +27,6 @@
     "@formatjs/intl-relativetimeformat": "^11.2.4",
     "@formatjs/intl-pluralrules": "^5.2.4",
     "@react-native-async-storage/async-storage": "^1.18.1",
-    "@react-native-camera-roll/camera-roll": "^5.3.1",
     "@react-native-clipboard/clipboard": "^1.8.1",
     "@react-native-masked-view/masked-view": "^0.2.9",
     "@shopify/flash-list": "^1.4.3",
