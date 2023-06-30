@@ -68,9 +68,8 @@ const AccountDetailsPhoneNumberForm = ({
     defaultValues: {
       phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
       countryCode:
-        parsedPhoneNumber?.country ?? country in COUNTRY_FLAG
-          ? country
-          : COUNTRY_FLAG.AC,
+        parsedPhoneNumber?.country ??
+        (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
     },
   });
 
@@ -210,11 +209,12 @@ const AccountDetailsPhoneNumberForm = ({
           }) => (
             <View style={{ flex: 1 }}>
               <TextInput
+                testID="phoneNumberInput"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 autoCapitalize="none"
-                autoComplete="email"
+                autoComplete="off"
                 keyboardType="phone-pad"
                 autoCorrect={false}
                 isErrored={errors.phoneNumber != null}

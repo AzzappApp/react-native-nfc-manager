@@ -142,6 +142,7 @@ const AccountDetailsPasswordForm = ({
                 <SecuredTextInput
                   value={value}
                   onChangeText={onChange}
+                  testID="currentPasswordInput"
                   onBlur={onBlur}
                   isErrored={errors.currentPassword != null}
                   onSubmitEditing={() => newPasswordRef.current?.focus()}
@@ -177,6 +178,7 @@ const AccountDetailsPasswordForm = ({
                 </Text>
                 <SecuredTextInput
                   ref={newPasswordRef}
+                  testID="newPasswordInput"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
