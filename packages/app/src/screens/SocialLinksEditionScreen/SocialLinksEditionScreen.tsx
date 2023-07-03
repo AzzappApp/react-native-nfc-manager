@@ -72,7 +72,6 @@ const SocialLinksEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,

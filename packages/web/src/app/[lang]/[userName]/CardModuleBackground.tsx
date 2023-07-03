@@ -6,7 +6,6 @@ type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   backgroundId?: string | null;
   backgroundStyle?: {
     backgroundColor?: string | null;
-    backgroundOpacity?: number | null;
     patternColor?: string | null;
   } | null;
   containerStyle?: React.CSSProperties;

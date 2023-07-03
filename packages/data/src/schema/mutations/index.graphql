@@ -58,5 +58,10 @@ Style of the background of a module
 input ModuleBackgroundInputStyle {
   backgroundColor: String!
   patternColor: String!
+}
+
+input ModuleTextBackgroundInputStyle {
+  backgroundColor: String!
+  patternColor: String!
   opacity: Int!
 }

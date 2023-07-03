@@ -52,7 +52,6 @@ const SimpleButtonRenderer = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -127,7 +126,6 @@ export const SimpleButtonRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
       style={[

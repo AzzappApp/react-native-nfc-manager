@@ -23,10 +23,6 @@
     "defaultMessage": "Edit Borders",
     "description": "SimpleButton bottom menu label for Borders tab"
   },
-  "/HPC0X": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Photo Opacityslider in PhotoWithTextAndTitle edition"
-  },
   "/RQXwq": {
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in SocialLinks edition"
@@ -183,10 +179,6 @@
     "defaultMessage": "Title",
     "description": "Title placeholder in PhotoWithTextAndTitle module"
   },
-  "3dZY/8": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Photo Opacityslider in SocialLinks edition"
-  },
   "3pMfaY": {
     "defaultMessage": "Preview",
     "description": "Carousel  bottom menu label for Preview tab"
@@ -194,10 +186,6 @@
   "428m8h": {
     "defaultMessage": "Add a color",
     "description": "ColorPicker component title when adding a color"
-  },
-  "46wzuE": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Photo Opacityslider in SocialLinks edition"
   },
   "4CH1RT": {
     "defaultMessage": "Bottom margin",
@@ -563,10 +551,6 @@
     "defaultMessage": "Related Posts",
     "description": "Post screen header title"
   },
-  "DCMIvF": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Background opacity slider in carousel edition"
-  },
   "DLIvhH": {
     "defaultMessage": "Font Size : {size}",
     "description": "Font size message in cover edition"
@@ -727,10 +711,6 @@
     "defaultMessage": "RGB",
     "description": "ColorPicker Component - TextInput Label : RGB Title"
   },
-  "GU8tZS": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Photo Opacityslider in BlockText edition"
-  },
   "GXaNDm": {
     "defaultMessage": "Account details",
     "description": "Title of the account details screen where user can change their email, phone number ..."
@@ -786,10 +766,6 @@
   "HZP7u9": {
     "defaultMessage": "Back.",
     "description": "CoverEditionScreen bottom menu label for Background tab"
-  },
-  "HvYPaO": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Photo Opacityslider in PhotoWithTextAndTitle edition"
   },
   "IBgr9f": {
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
@@ -1002,10 +978,6 @@
   "N2/KC6": {
     "defaultMessage": "Title size",
     "description": "Label of the Title size slider in PhotoWithTextAndTitle edition"
-  },
-  "N3IPaT": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Photo Opacityslider in Horizontal photo edition"
   },
   "N9T08H": {
     "defaultMessage": "Images height : {size}",
@@ -1230,10 +1202,6 @@
   "Tx4u9Y": {
     "defaultMessage": "Simple text",
     "description": "Simple text screen title"
-  },
-  "TzpWh8": {
-    "defaultMessage": "Photo opacity : {opacity}",
-    "description": "Photo Opacity message in SocialLinks edition"
   },
   "U9U7gk": {
     "defaultMessage": "Hide",
@@ -1631,10 +1599,6 @@
     "defaultMessage": "Connect with phone number",
     "description": "Signup Form Connect with phone number section title in country selection list"
   },
-  "ckw6Kn": {
-    "defaultMessage": "Photo opacity : {opacity}",
-    "description": "Font size message in cover edition"
-  },
   "cp6916": {
     "defaultMessage": "Select a calling code",
     "description": "Account details - The accessibility label for the country selector"
@@ -1706,10 +1670,6 @@
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
-  },
-  "e9/dam": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Photo Opacityslider in Horizontal photo edition"
   },
   "e9NfAF": {
     "defaultMessage": "Check your emails or messages!",
@@ -2183,10 +2143,6 @@
     "defaultMessage": "Show",
     "description": "Show button in profile edition screen footer"
   },
-  "p/pmG9": {
-    "defaultMessage": "Photo opacity : {opacity}",
-    "description": "Photo Opacity message in PhotoWithTextAndTitle edition"
-  },
   "p0+sji": {
     "defaultMessage": "tap to select this media",
     "description": "accessibility hint for media selection buttons in photo gallery"
@@ -2407,10 +2363,6 @@
     "defaultMessage": "Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
   },
-  "svvJtX": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Background opacity slider in carousel edition"
-  },
   "tBKg6x": {
     "defaultMessage": "Left/Right margin : {size}",
     "description": "Left/Right message in PhotoWithTextAndTitle edition"
@@ -2523,10 +2475,6 @@
     "defaultMessage": "Delete",
     "description": "Delete email or phone number"
   },
-  "varCCz": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Photo Opacityslider in BlockText edition"
-  },
   "vpm4+X": {
     "defaultMessage": "Edit Settings",
     "description": "BlockText bottom menu label for Settings tab"
@@ -2607,14 +2555,6 @@
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in BlockText edition"
   },
-  "xdgLVe": {
-    "defaultMessage": "Background opacity",
-    "description": "Label of the Background opacity slider in simple text edition"
-  },
-  "xfDyjW": {
-    "defaultMessage": "Slide to change the background opacity",
-    "description": "Hint of the Background opacity slider in simple text edition"
-  },
   "xo15bY": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the margin size slider in cover edition"
@@ -2646,10 +2586,6 @@
   "yEREid": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in text edition modal"
-  },
-  "yKRJzZ": {
-    "defaultMessage": "Photo opacity : {opacity}",
-    "description": "Photo Opacity message in Horizontal photo edition"
   },
   "yR4YqE": {
     "defaultMessage": "Border color",

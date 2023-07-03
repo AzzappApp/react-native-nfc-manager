@@ -51,7 +51,6 @@ const CarouselRenderer = ({ module, ...props }: CarouselRendererProps) => {
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,
@@ -103,7 +102,6 @@ export const CarouselRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
       style={[{ height }, style]}

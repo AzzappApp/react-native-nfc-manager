@@ -14,7 +14,6 @@ export type HorizontalPhotoEditionValue = {
   backgroundStyle: Readonly<{
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   }> | null;
   color: string;
   tintColor: string;

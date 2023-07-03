@@ -74,7 +74,6 @@ const SimpleButtonEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,

@@ -80,7 +80,6 @@ const BlockTextEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,

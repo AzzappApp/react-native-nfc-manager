@@ -14,7 +14,6 @@ export type SocialLinksEditionValue = {
   backgroundStyle?: {
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   } | null;
 };
 

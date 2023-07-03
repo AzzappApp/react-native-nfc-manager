@@ -39,7 +39,6 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
         ... on CardModuleSimpleTitle {
@@ -57,7 +56,6 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -112,7 +110,6 @@ export const SimpleTextRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
       style={[

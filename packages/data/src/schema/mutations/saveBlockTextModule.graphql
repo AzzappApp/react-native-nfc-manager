@@ -14,7 +14,7 @@ input SaveBlockTextModuleInput {
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle
   textBackgroundId: ID
-  textBackgroundStyle: ModuleBackgroundInputStyle
+  textBackgroundStyle: ModuleTextBackgroundInputStyle
 }
 
 type SaveBlockTextModulePayload {

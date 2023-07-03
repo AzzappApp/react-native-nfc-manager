@@ -10,6 +10,9 @@ import type { ViewProps } from 'react-native';
 type BackgroundStyle = {
   backgroundColor: string;
   patternColor: string;
+};
+
+type TextBackgroundStyle = BackgroundStyle & {
   opacity: number;
 };
 
@@ -25,7 +28,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
   /**
    * The currently selected textBackground style
    */
-  textBackgroundStyle: BackgroundStyle | null | undefined;
+  textBackgroundStyle: TextBackgroundStyle | null | undefined;
   /**
    * A callback called when the user select a new textBackground
    * @param textBackgroundId The new textBackground id, or null if the user select the "none" option
@@ -34,7 +37,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the textBackground style
    */
-  onTextBackgroundStyleChange: (style: BackgroundStyle) => void;
+  onTextBackgroundStyleChange: (style: TextBackgroundStyle) => void;
   /**
    * The height of the bottom sheet
    */

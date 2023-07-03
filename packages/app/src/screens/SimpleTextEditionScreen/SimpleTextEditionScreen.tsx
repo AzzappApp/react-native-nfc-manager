@@ -74,7 +74,6 @@ const SimpleTextEditionScreen = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
         ... on CardModuleSimpleTitle {
@@ -93,7 +92,6 @@ const SimpleTextEditionScreen = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }

@@ -50,7 +50,6 @@ const HorizontalPhotoRenderer = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
           image {
             id
@@ -105,7 +104,6 @@ export const HorizontalPhotoRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
       style={style}

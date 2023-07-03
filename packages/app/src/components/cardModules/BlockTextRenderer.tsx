@@ -51,7 +51,6 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -107,7 +106,6 @@ export const BlockTextRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
     >

@@ -66,7 +66,6 @@ type ModuleData = {
   backgroundId?: string | null;
   backgroundStyle?: {
     backgroundColor?: string;
-    opacity?: number;
     patternColor?: string;
   } | null;
   backgroundImage?: string | null;

@@ -90,7 +90,6 @@ const CarouselEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,
@@ -611,6 +610,5 @@ type CarouseEditionValue = {
   backgroundStyle: Readonly<{
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   }> | null;
 };

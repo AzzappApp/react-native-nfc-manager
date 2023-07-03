@@ -1,4 +1,3 @@
-import chroma from 'chroma-js';
 import { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
@@ -73,7 +72,6 @@ const PhotoWithTextAndTitleRenderer = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -142,11 +140,6 @@ export const PhotoWithTextAndTitleRendererRaw = ({
     },
     [props],
   );
-  const backgroundColor = backgroundStyle
-    ? chroma(backgroundStyle.backgroundColor)
-        .alpha(backgroundStyle.opacity / 100)
-        .hex()
-    : colors.white;
 
   const os =
     viewMode === 'desktop'
@@ -175,7 +168,14 @@ export const PhotoWithTextAndTitleRendererRaw = ({
   const intl = useIntl();
 
   return (
-    <View {...props} style={[style, { backgroundColor }]} onLayout={onLayout}>
+    <View
+      {...props}
+      style={[
+        style,
+        { backgroundColor: backgroundStyle?.backgroundColor ?? colors.white },
+      ]}
+      onLayout={onLayout}
+    >
       {background && (
         <View style={styles.background} pointerEvents="none">
           <SvgUri
@@ -184,12 +184,6 @@ export const PhotoWithTextAndTitleRendererRaw = ({
             width={layout?.width ?? 0}
             height={layout?.height ?? 0}
             preserveAspectRatio="xMidYMid slice"
-            style={{
-              opacity:
-                backgroundStyle?.opacity != null
-                  ? backgroundStyle?.opacity / 100
-                  : 1,
-            }}
           />
         </View>
       )}

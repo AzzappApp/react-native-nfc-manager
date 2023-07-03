@@ -108,7 +108,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,

@@ -53,7 +53,6 @@ const SocialLinksRenderer = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -117,7 +116,6 @@ export const SocialLinksRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundOpacity={backgroundStyle?.opacity}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
       style={style}

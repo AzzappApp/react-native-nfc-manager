@@ -88,7 +88,6 @@ const HorizontalPhotoEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
         image {
           id

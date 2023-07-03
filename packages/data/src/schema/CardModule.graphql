@@ -93,6 +93,11 @@ Style of the background of a module
 type ModuleBackgroundStyle {
   backgroundColor: String!
   patternColor: String!
+}
+
+type ModuleTextBackgroundStyle {
+  backgroundColor: String!
+  patternColor: String!
   opacity: Int!
 }
 
@@ -399,7 +404,7 @@ type CardModuleBlockText implements CardModule {
   textMarginHorizontal: Int!
   marginHorizontal: Int!
   marginVertical: Int!
-  textBackgroundStyle: ModuleBackgroundStyle
+  textBackgroundStyle: ModuleTextBackgroundStyle
   textBackground: StaticMedia
   backgroundStyle: ModuleBackgroundStyle
   background: StaticMedia

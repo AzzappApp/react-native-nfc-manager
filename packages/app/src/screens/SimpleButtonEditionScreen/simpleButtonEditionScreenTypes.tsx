@@ -22,6 +22,5 @@ export type SimpleButtonEditionValue = {
   backgroundStyle?: {
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   } | null;
 };
