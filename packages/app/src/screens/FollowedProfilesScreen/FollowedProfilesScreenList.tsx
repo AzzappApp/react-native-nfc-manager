@@ -24,7 +24,7 @@ const FollowedProfilesScreenList = ({
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
-          userName: { type: String, defaultValue: null }
+          userName: { type: String, defaultValue: "" }
         ) {
           followedProfiles(after: $after, first: $first, userName: $userName)
             @connection(key: "Account_followedProfiles") {
@@ -45,13 +45,13 @@ const FollowedProfilesScreenList = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
-  const toggleFollow = useToggleFollow(currentProfileId);
-
   const intl = useIntl();
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
 
   const [debouncedSearch] = useDebounce(searchValue, 300);
+
+  const toggleFollow = useToggleFollow(currentProfileId, debouncedSearch);
 
   useEffect(() => {
     const { dispose } = refetch(
@@ -64,7 +64,9 @@ const FollowedProfilesScreenList = ({
   }, [debouncedSearch, refetch]);
 
   const onToggleFollow = useCallback(
-    (profileId: string) => toggleFollow(profileId, false),
+    (profileId: string) => {
+      toggleFollow(profileId, false);
+    },
     [toggleFollow],
   );
 

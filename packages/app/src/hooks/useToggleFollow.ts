@@ -32,6 +32,7 @@ const updater = (
   currentProfileId: string,
   profileId: string,
   follow: boolean,
+  userNameFilter?: string,
 ) => {
   const currentProfile = store.get(currentProfileId);
 
@@ -63,6 +64,9 @@ const updater = (
     const connectionRecord = ConnectionHandler.getConnection(
       viewer,
       'Account_followedProfiles',
+      {
+        userName: userNameFilter ?? '',
+      },
     );
 
     if (connectionRecord) {
@@ -100,7 +104,10 @@ const updater = (
   }
 };
 
-const useToggleFollow = (currentProfileId?: string) => {
+const useToggleFollow = (
+  currentProfileId?: string,
+  userNameFilter?: string,
+) => {
   const [commit, toggleFollowingActive] =
     useMutation<useToggleFollowMutation>(graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
@@ -137,8 +144,9 @@ const useToggleFollow = (currentProfileId?: string) => {
           },
         },
         optimisticUpdater: store =>
-          updater(store, currentProfileId, profileId, follow),
-        updater: store => updater(store, currentProfileId, profileId, follow),
+          updater(store, currentProfileId, profileId, follow, userNameFilter),
+        updater: store =>
+          updater(store, currentProfileId, profileId, follow, userNameFilter),
         onError(error) {
           // TODO: handle error
           console.log(error);
