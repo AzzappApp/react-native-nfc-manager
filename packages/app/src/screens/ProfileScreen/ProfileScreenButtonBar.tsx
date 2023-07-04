@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Animated, {
@@ -151,17 +151,31 @@ const ProfileScreenButtonActionButton = ({
     profileKey,
   );
 
-  const [isFollowing, toggleFollowing] = useToggle(
+  //we want to prevent debounced effect when following profiles is updated elsewhere
+  const isFollowingValue = useRef(Boolean(profile?.isFollowing));
+
+  const [isFollowing, toggleFollowing, setFollowing] = useToggle(
     Boolean(profile?.isFollowing),
   );
 
   const [debouncedIsFollowing] = useDebounce(isFollowing, 600);
 
   useEffect(() => {
-    if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
-      onToggleFollow(debouncedIsFollowing);
+    if (isFollowingValue.current === Boolean(profile?.isFollowing)) {
+      if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
+        onToggleFollow(debouncedIsFollowing);
+      }
+    } else {
+      isFollowingValue.current = Boolean(profile?.isFollowing);
+      setFollowing(Boolean(profile?.isFollowing));
     }
-  }, [debouncedIsFollowing, onToggleFollow, profile?.isFollowing]);
+  }, [
+    debouncedIsFollowing,
+    onToggleFollow,
+    profile?.isFollowing,
+    setFollowing,
+    toggleFollowing,
+  ]);
 
   const intl = useIntl();
 

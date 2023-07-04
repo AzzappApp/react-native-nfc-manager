@@ -1,10 +1,13 @@
 /* eslint-disable no-alert */
+import { toGlobalId } from 'graphql-relay';
 import { FormattedMessage, FormattedRelativeTime } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
+import useAuthState from '#hooks/useAuthState';
+import useToggleFollow from '#hooks/useToggleFollow';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -15,7 +18,6 @@ import PostRendererActionBar, {
 } from './PostRendererActionBar';
 import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
-import type { PostRendererBottomPanelToggleFollowMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelToggleFollowMutation.graphql';
 import type { PostRendererBottomPanelUpdatePostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
 
 type PostRendererBottomPanelProps = {
@@ -121,20 +123,6 @@ const PostRendererBottomPanel = ({
     toggleModal();
   };
 
-  const [commit, toggleFollowingActive] =
-    useMutation<PostRendererBottomPanelToggleFollowMutation>(graphql`
-      mutation PostRendererBottomPanelToggleFollowMutation(
-        $input: ToggleFollowingInput!
-      ) {
-        toggleFollowing(input: $input) {
-          profile {
-            id
-            isFollowing
-          }
-        }
-      }
-    `);
-
   const [commitUpdatePost] =
     useMutation<PostRendererBottomPanelUpdatePostMutation>(graphql`
       mutation PostRendererBottomPanelUpdatePostMutation(
@@ -166,26 +154,14 @@ const PostRendererBottomPanel = ({
     });
   };
 
-  const toggleFollow = () => {
-    if (toggleFollowingActive) {
-      return;
-    }
-    commit({
-      variables: {
-        input: {
-          profileId: author.id,
-          follow: !author.isFollowing,
-        },
-      },
-      optimisticResponse: {
-        toggleFollowing: {
-          profile: {
-            id: author.id,
-            isFollowing: !author.isFollowing,
-          },
-        },
-      },
-    });
+  const auth = useAuthState();
+
+  const currentProfileId = toGlobalId('Profile', auth.profileId ?? '');
+
+  const toggleFollow = useToggleFollow(currentProfileId);
+
+  const onToggleFollow = () => {
+    toggleFollow(author.id, !author.isFollowing);
   };
 
   return (
@@ -295,7 +271,7 @@ const PostRendererBottomPanel = ({
             </Text>
           </PressableOpacity>
           {!post.author.isViewer && (
-            <PressableOpacity onPress={toggleFollow} style={styles.modalLine}>
+            <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
               {author?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage

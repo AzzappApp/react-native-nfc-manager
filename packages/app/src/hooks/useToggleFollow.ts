@@ -139,7 +139,7 @@ const useToggleFollow = (
           toggleFollowing: {
             profile: {
               id: profileId,
-              isFollowing: false,
+              isFollowing: follow,
             },
           },
         },
