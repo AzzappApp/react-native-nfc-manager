@@ -1,0 +1,17 @@
+.links {
+  width: 100%;
+  justify-content: center;
+  position: relative
+}
+
+.linksInline {
+  overflow-x: auto;
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+}
+
+.linksBlock {
+  flex-wrap: wrap;
+  flex-direction: row;
+}

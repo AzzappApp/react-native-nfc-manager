@@ -2,7 +2,7 @@ import {
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../CardModuleBackground';
 import type { CardModule } from '@azzapp/data/domains';
 
 type SimpleTextRendererProps = Omit<
@@ -12,7 +12,7 @@ type SimpleTextRendererProps = Omit<
   module: CardModule;
 };
 
-export const SimpleTextRenderer = ({
+const SimpleTextRenderer = ({
   module,
   style,
   ...props
@@ -60,6 +60,7 @@ export const SimpleTextRenderer = ({
             fontSize && verticalSpacing
               ? `${fontSize * 1.2 + verticalSpacing}px`
               : undefined,
+          position: 'relative',
         }}
       >
         {text}
@@ -67,3 +68,5 @@ export const SimpleTextRenderer = ({
     </CardModuleBackground>
   );
 };
+
+export default SimpleTextRenderer;

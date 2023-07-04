@@ -47,8 +47,6 @@ const LineDividerRenderer = ({
           height,
           backgroundColor: colorTop,
           backgroundImage: `linear-gradient(${cssOrientation}, ${colorTop} 50%, ${colorBottom} 50%)`,
-          marginBottom: -1,
-          marginTop: -1,
         }}
       />
       {marginBottom > 0 && (

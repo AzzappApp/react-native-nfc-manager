@@ -1,5 +1,5 @@
 import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../CardModuleBackground';
 import type { CardModule } from '@azzapp/data/domains';
 
 export type BlockTextRendererProps = Omit<
@@ -54,6 +54,8 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
       >
         <p
           style={{
+            marginTop: 10,
+            marginBottom: 10,
             textAlign,
             color: fontColor,
             fontSize,

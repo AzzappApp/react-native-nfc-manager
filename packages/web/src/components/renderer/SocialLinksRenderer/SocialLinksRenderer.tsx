@@ -1,10 +1,11 @@
+import cn from 'classnames';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../../CardModuleBackground';
+import styles from './SocialLinksRenderer.module.css';
 import type { SocialIcons } from '#ui/SocialIcons/SocialIcon';
 import type { CardModule } from '@azzapp/data/domains';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-
 export type SocialLinksRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
   'children'
@@ -57,6 +58,7 @@ const SocialLinksRenderer = ({
           display: 'flex',
           width: iconSize,
           height: iconSize,
+          borderStyle: 'solid',
           borderWidth,
           borderRadius: iconSize / 2,
           borderColor: iconColor,
@@ -68,12 +70,7 @@ const SocialLinksRenderer = ({
           icon={id}
           width={iconSize - 22}
           height={iconSize - 22}
-          style={
-            {
-              // TODO unsupported prop
-              //  tintColor: iconColor,
-            }
-          }
+          color={iconColor}
         />
       </a>
     );
@@ -87,26 +84,19 @@ const SocialLinksRenderer = ({
     >
       {arrangement === 'inline' ? (
         <div
+          className={cn(styles.links, styles.linksInline)}
           style={{
             marginTop,
             marginBottom,
-            overflowX: 'auto',
             columnGap,
-            display: 'flex',
-            flexGrow: 1,
-            justifyContent: 'center',
-            width: '100%',
           }}
         >
           {linksOrdered.map(renderLink)}
         </div>
       ) : (
         <div
+          className={cn(styles.links, styles.linksBlock)}
           style={{
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
             marginTop,
             marginBottom,
             columnGap,

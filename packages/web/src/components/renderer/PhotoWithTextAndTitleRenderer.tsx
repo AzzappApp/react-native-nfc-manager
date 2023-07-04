@@ -1,6 +1,6 @@
 import { PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../CardModuleBackground';
 import type { CardModule } from '@azzapp/data/domains';
 
 export type PhotoWithTextAndTitleRendererProps = Omit<
@@ -55,14 +55,14 @@ const PhotoWithTextAndTitleRenderer = ({
             verticalArrangement === 'top' ? 'column-reverse' : 'column-reverse',
           rowGap: gap,
           columnGap: gap,
+          paddingLeft: imageMargin === 'width_full' ? 0 : marginHorizontal,
+          paddingRight: imageMargin === 'width_full' ? 0 : marginHorizontal,
         }}
       >
         {image && (
           <div
             style={{
               position: 'relative',
-              marginLeft: imageMargin === 'width_full' ? 0 : marginHorizontal,
-              marginRight: imageMargin === 'width_full' ? 0 : marginHorizontal,
               aspectRatio: `${aspectRatio}`,
             }}
           >

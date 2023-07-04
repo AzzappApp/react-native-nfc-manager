@@ -1,6 +1,6 @@
 import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../CardModuleBackground';
 import type { CardModule } from '@azzapp/data/domains';
 
 export type HorizontalPhotoRendererProps = Omit<

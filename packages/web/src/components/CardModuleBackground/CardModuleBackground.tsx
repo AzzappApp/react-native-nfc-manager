@@ -1,5 +1,6 @@
 import cx from 'classnames';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { convertHexToRGBA } from '#helpers';
 import styles from './CardModuleBackground.module.css';
 
 type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
@@ -7,6 +8,7 @@ type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   backgroundStyle?: {
     backgroundColor?: string | null;
     patternColor?: string | null;
+    opacity?: number;
   } | null;
   containerStyle?: React.CSSProperties;
   containerClassName?: string;
@@ -21,12 +23,17 @@ const CardModuleBackground = ({
   containerClassName,
   ...props
 }: CardModuleBackgroundProps) => {
-  const { backgroundColor, patternColor } = backgroundStyle ?? {};
+  const {
+    backgroundColor,
+    patternColor,
+    opacity = 100,
+  } = backgroundStyle ?? {};
+
   return (
     <div
       style={{
         ...style,
-        backgroundColor: backgroundColor ?? '#FFF',
+        backgroundColor: convertHexToRGBA(backgroundColor ?? '#FFF', opacity),
         position: 'relative',
       }}
       {...props}
@@ -34,7 +41,7 @@ const CardModuleBackground = ({
       {backgroundId && (
         <div
           style={{
-            backgroundColor: patternColor ?? '#000',
+            backgroundColor: convertHexToRGBA(patternColor ?? '#FFF', opacity),
             WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,
             maskImage: `url(${getImageURL(backgroundId)}.svg)`,
           }}

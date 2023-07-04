@@ -1,5 +1,6 @@
 import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../../CardModuleBackground';
+import styles from './SimpleButtonRenderer.module.css';
 import type { CardModule } from '@azzapp/data/domains';
 
 export type SimpleButtonRendererProps = Omit<
@@ -46,6 +47,7 @@ const SimpleButtonRenderer = ({
     default:
       href = actionLink;
   }
+
   return (
     <CardModuleBackground
       {...props}
@@ -60,22 +62,16 @@ const SimpleButtonRenderer = ({
       }}
     >
       <a
+        className={styles.link}
         style={{
           height,
           width,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           marginBottom,
           marginTop,
           backgroundColor: buttonColor,
-          borderStyle: 'solid',
           borderRadius,
           borderWidth,
           borderColor,
-          overflow: 'hidden',
-          textDecoration: 'none',
         }}
         href={href}
       >
@@ -84,11 +80,8 @@ const SimpleButtonRenderer = ({
             fontFamily,
             color: fontColor,
             fontSize,
-            flexWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
           }}
+          className={styles.label}
         >
           {buttonLabel}
         </span>

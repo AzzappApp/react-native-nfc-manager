@@ -2,7 +2,8 @@ import { getMediasByIds, type CardModule } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
-import CardModuleBackground from './CardModuleBackground';
+import CardModuleBackground from '../../CardModuleBackground';
+import styles from './CarouselRenderer.module.css';
 
 export type CarouselRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
@@ -33,7 +34,7 @@ const CarouselRenderer = async ({
     backgroundStyle,
   } = Object.assign({}, CAROUSEL_DEFAULT_VALUES, module.data);
 
-  const height = imageHeight + marginVertical * 2 + borderSize * 2;
+  const height = imageHeight + marginVertical * 2;
   const medias = images
     ? convertToNonNullArray(await getMediasByIds(images))
     : [];
@@ -55,7 +56,9 @@ const CarouselRenderer = async ({
           height: '100%',
           display: 'flex',
           flexDirection: 'row',
+          overflow: 'auto',
         }}
+        className={styles.content}
       >
         {medias.map(media => {
           const aspectRatio = media.width / media.height;
