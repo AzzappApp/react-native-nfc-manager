@@ -467,6 +467,10 @@
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
   },
+  "BRvlzl": {
+    "defaultMessage": "As the pixels come together, think about using transition effects to add dynamism to your webcard",
+    "description": "Progress loading modal message 7"
+  },
   "BcDGTQ": {
     "defaultMessage": "Button Options",
     "description": "Label of the action type selector in SimpleButton Settings edition"
@@ -939,6 +943,10 @@
     "defaultMessage": "Edit Top Color",
     "description": "Line Divider bottom menu label for top color tab"
   },
+  "MH8B1q": {
+    "defaultMessage": "Did you know you can customize each section of your webcard? Make it a unique experience!",
+    "description": "Progress loading modal message 3"
+  },
   "MMkG6l": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the Vertical Spacing slider in simple text edition"
@@ -1386,6 +1394,10 @@
   "Xu37wL": {
     "defaultMessage": "Slide to change the textBackground opacity",
     "description": "Hint of the Photo Opacityslider in BlockText edition"
+  },
+  "Y7007n": {
+    "defaultMessage": "Your webcard, your style. Don't forget to explore all the customization options available.",
+    "description": "Progress loading modal message 4"
   },
   "Y9Wn80": {
     "defaultMessage": "Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}",
@@ -1931,6 +1943,10 @@
     "defaultMessage": "Save",
     "description": "Save button label in image picker wizzard"
   },
+  "k+3Whl": {
+    "defaultMessage": "Did you know that videos are now supported for covers",
+    "description": "Progress loading modal message 2"
+  },
   "k2pUu2": {
     "defaultMessage": "Bottom to top",
     "description": "Label of the bottom to top orientation in cover edition"
@@ -1990,6 +2006,10 @@
   "lC1DXs": {
     "defaultMessage": "Retry",
     "description": "label of the button allowing  to retry loading cover image"
+  },
+  "lCn9Bz": {
+    "defaultMessage": "A little secret: Bright colors and attractive fonts grab your visitors' attention. Give them a try!",
+    "description": "Progress loading modal message 6"
   },
   "lHXS3v": {
     "defaultMessage": "Choose an username",
@@ -2067,6 +2087,10 @@
     "defaultMessage": "Background",
     "description": "Label of Background tab in cover edition"
   },
+  "mmDrOX": {
+    "defaultMessage": "The most beautiful things take time to come to life. Your webcard is taking shape.",
+    "description": "Progress loading modal message 8"
+  },
   "mvJfB5": {
     "defaultMessage": "Invite via email",
     "description": "Invite with an email"
@@ -2134,6 +2158,10 @@
   "oKWF+F": {
     "defaultMessage": "Border size",
     "description": "Label of the border size in carousel edition"
+  },
+  "ojo791": {
+    "defaultMessage": "Nothing better than a nice transition between the sections of your webcard",
+    "description": "Progress loading modal message 1"
   },
   "ok4cTE": {
     "defaultMessage": "Border color",
@@ -2314,6 +2342,10 @@
   "s/244i": {
     "defaultMessage": "Update your cover",
     "description": "Cover edition screen title"
+  },
+  "s1TQoZ": {
+    "defaultMessage": "Take a deep breath and envision your perfect webcard. It's coming soon!",
+    "description": "Progress loading modal message 5"
   },
   "s1m1n4": {
     "defaultMessage": "Enter your phone number",

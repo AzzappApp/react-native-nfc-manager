@@ -666,7 +666,7 @@ const CoverEditionScreen = ({
     } catch (e) {
       console.log(e);
       setSaving(false);
-      setUploadProgress(null);
+
       // TODO handle error
       Alert.alert(
         intl.formatMessage({
@@ -676,6 +676,8 @@ const CoverEditionScreen = ({
         }),
       );
       return;
+    } finally {
+      setUploadProgress(null);
     }
 
     const input: UpdateCoverInput = {};

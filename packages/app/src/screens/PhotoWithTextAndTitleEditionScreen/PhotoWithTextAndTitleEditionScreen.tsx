@@ -220,6 +220,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         mediaId = public_id;
       } catch (error) {
         console.log(error);
+      } finally {
+        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 

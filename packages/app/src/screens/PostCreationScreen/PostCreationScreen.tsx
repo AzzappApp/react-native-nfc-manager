@@ -127,6 +127,7 @@ const PostCreationScreen = ({
     );
     setUploadProgress(uploadProgress);
     const { public_id } = await uploadPromise;
+    setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
     commit({
       variables: {
         input: {

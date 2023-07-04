@@ -27,7 +27,6 @@ export function usePermissionMediaLibrary(): [boolean, boolean, () => void] {
 
   const ask = useCallback(async () => {
     if (permission != null && !permission?.canAskAgain) {
-      console.log('open settings');
       void Linking.openSettings();
     } else {
       const response = await MediaLibrary.requestPermissionsAsync();
