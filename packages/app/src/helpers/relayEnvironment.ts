@@ -2,6 +2,7 @@ import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
 import { addAuthStateListener } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
+import { clearActiveQueries } from './RelayQueryManager';
 import type { AuthState } from './authStore';
 import type { Environment } from 'relay-runtime';
 
@@ -23,6 +24,9 @@ const resetEnvironment = (state: AuthState) => {
     store.getRoot().getLinkedRecord('viewer')?.invalidateRecord();
     if (!state.authenticated) {
       store.getRoot().getLinkedRecord('currentUser')?.invalidateRecord();
+
+      //TODO remove this when we have a better way to manage active queries (see issues #612 and #591)
+      clearActiveQueries();
     }
   });
   listeners.forEach(listener => listener());

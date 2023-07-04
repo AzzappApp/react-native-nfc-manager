@@ -76,6 +76,10 @@ export const init = () => {
   });
 };
 
+export const clearActiveQueries = () => {
+  activeQueries.clear();
+};
+
 /**
  * Return the relay preloaded query associated with a given screen
  * @param screenId the screen id
