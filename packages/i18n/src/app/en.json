@@ -799,6 +799,10 @@
     "defaultMessage": "Border color",
     "description": "Border color tab label in HorizontalPhoto edition"
   },
+  "JL/E5a": {
+    "defaultMessage": "Retry",
+    "description": "Screen alert message loading error retry button"
+  },
   "JP/XFr": {
     "defaultMessage": "Border size: {size}",
     "description": "Border size message in Horizontal Photo edition"
@@ -1475,6 +1479,10 @@
     "defaultMessage": "Height : {size}",
     "description": "height message in SimpleButton edition"
   },
+  "ZfbjRk": {
+    "defaultMessage": "Cancel",
+    "description": "Screen alert message loading error cancel button"
+  },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
@@ -1602,6 +1610,10 @@
   "c1kXnW": {
     "defaultMessage": "Select an activity",
     "description": "NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity"
+  },
+  "c5LRD8": {
+    "defaultMessage": "Could not load the data",
+    "description": "Screen Alert message loading error"
   },
   "c6l117": {
     "defaultMessage": "Slide to change the Image/Text Gap",
@@ -2566,6 +2578,10 @@
   "x288ev": {
     "defaultMessage": "Unknown error - Please retry",
     "description": "Signup Screen - Error unkown"
+  },
+  "xFUH8n": {
+    "defaultMessage": "Loading error",
+    "description": "Screen alert message loading error title"
   },
   "xJBeUF": {
     "defaultMessage": "Save",
