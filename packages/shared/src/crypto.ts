@@ -38,3 +38,51 @@ export const unseal = async (
   });
   return sealed;
 };
+
+const DEFAULT_HMAC_OPTIONS = {
+  iterations: 1,
+  minPasswordlength: 8,
+  algorithm: 'sha256',
+} as const;
+
+export const hmacWithPassword = async (
+  password: Iron.Password,
+  data: string,
+  options?: Partial<Iron.GenerateKeyOptions>,
+): Promise<Iron.HMacResult> => {
+  const key = await Iron.generateKey(getCrypto(), password, {
+    ...DEFAULT_HMAC_OPTIONS,
+    ...options,
+    hmac: true,
+  });
+  const textBuffer = Iron.stringToBuffer(data);
+  const signed = await getCrypto().subtle.sign('hmac', key.key, textBuffer);
+
+  const digest = Iron.base64urlEncode(new Uint8Array(signed));
+
+  return { digest, salt: key.salt };
+};
+
+export const verifyHmacWithPassword = async (
+  password: Iron.Password,
+  signature: string,
+  data: string,
+  options?: Partial<Iron.GenerateKeyOptions>,
+): Promise<boolean> => {
+  const key = await Iron.generateKey(getCrypto(), password, {
+    ...DEFAULT_HMAC_OPTIONS,
+    ...options,
+    hmac: true,
+  });
+
+  const textBuffer = Iron.stringToBuffer(data);
+  const signatureBuffer = Iron.base64urlDecode(signature);
+  const verified = await getCrypto().subtle.verify(
+    'hmac',
+    key.key,
+    signatureBuffer,
+    textBuffer,
+  );
+
+  return verified;
+};

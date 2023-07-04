@@ -19,9 +19,9 @@ import {
   isNotFalsyString,
   isValidUserName,
 } from '@azzapp/shared/stringHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { createProfile } from '#helpers/MobileWebAPI';
-import { buildUserUrl } from '#helpers/urlHelpers';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';

@@ -77,3 +77,9 @@ export const uploadSign: typeof WebAPI.uploadSign = (params, init) =>
     ...init,
     fetchFunction: authenticatedFetch,
   });
+
+export const verifySign: typeof WebAPI.verifySign = (params, init) =>
+  WebAPI.verifySign(params, {
+    ...init,
+    fetchFunction: unauthenticatedFetch,
+  });

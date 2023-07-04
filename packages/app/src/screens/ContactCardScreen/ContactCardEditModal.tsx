@@ -87,6 +87,10 @@ const ContactCardEditModal = ({
           number
           selected
         }
+        serializedContactCard {
+          data
+          signature
+        }
       }
     `,
     contactCardKey,

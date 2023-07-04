@@ -19,6 +19,11 @@ type ContactCardBackgroundStyle {
   backgroundColor: String!
 }
 
+type SerializedContactCard{
+  data: String!
+  signature: String!
+}
+
 type ContactCard {
     id: ID!
     firstName: String
@@ -30,4 +35,5 @@ type ContactCard {
     backgroundStyle: ContactCardBackgroundStyle!
     public: Boolean!
     isDisplayedOnWebCard: Boolean!
+    serializedContactCard: SerializedContactCard!
 }

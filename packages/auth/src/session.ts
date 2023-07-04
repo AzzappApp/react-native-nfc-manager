@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { seal, unseal } from './crypto';
+import { seal, unseal } from '@azzapp/shared/crypto';
 import type { NextResponse } from 'next/server';
 import type { SessionData as UserSessionData } from 'viewer';
 

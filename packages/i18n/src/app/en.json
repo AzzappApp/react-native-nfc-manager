@@ -47,6 +47,10 @@
     "defaultMessage": "Please enter a valid phone number",
     "description": "Signup Screen - Error message for invalid phone number"
   },
+  "/kY/V9": {
+    "defaultMessage": "Add {name} to contacts?",
+    "description": "Alert title when adding a profile to contacts"
+  },
   "/lVuhj": {
     "defaultMessage": "Font Size : {size}",
     "description": "fontSize message in BlockText edition"
@@ -2458,6 +2462,10 @@
   "ufbGn8": {
     "defaultMessage": "Top margin : {size}",
     "description": "Top margin message in SocialLinks edition"
+  },
+  "ugQFge": {
+    "defaultMessage": "Add {name} to the contacts list of your phone",
+    "description": "Alert message when adding a profile to contacts"
   },
   "uisFlX": {
     "defaultMessage": "Slide to change the Bottom margin",

@@ -6,6 +6,7 @@ import {
   getUsersCards,
 } from '@azzapp/data/domains';
 import { CoverRenderer, ModuleRenderer } from '#components';
+import DownloadVCard from './DownloadVCard';
 
 type ProfilePageProps = {
   params: {
@@ -31,6 +32,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
           <ModuleRenderer module={module} key={module.id} />
         ))}
       </div>
+      <DownloadVCard profileId={profile.id} userName={userName} />
     </div>
   );
 };

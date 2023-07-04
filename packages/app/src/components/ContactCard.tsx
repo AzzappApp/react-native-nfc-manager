@@ -2,9 +2,9 @@ import { View, Image } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useFragment, graphql } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { buildUserUrl } from '#helpers/urlHelpers';
 import Text from '#ui/Text';
 import type { ContactCard_card$key } from '@azzapp/relay/artifacts/ContactCard_card.graphql';
 
@@ -26,12 +26,19 @@ const ContactCard = ({
         backgroundStyle {
           backgroundColor
         }
+        serializedContactCard {
+          data
+          signature
+        }
       }
     `,
     contactCardKey,
   );
 
   const styles = useStyleSheet(styleSheet);
+
+  // eslint-disable-next-line prettier/prettier
+  const contactCardUrl = `${buildUserUrl(userName)}?c=${encodeURIComponent(contactCard.serializedContactCard.data)}&s=${encodeURIComponent(contactCard.serializedContactCard.signature)}`;
 
   return (
     <View style={[styles.webCardContainer, contactCard.backgroundStyle]}>
@@ -72,13 +79,10 @@ const ContactCard = ({
           </Text>
         </View>
         <QRCode
-          value={buildUserUrl(userName)}
+          value={contactCardUrl}
           size={84}
           color={colors.white}
           backgroundColor={colors.black}
-          logoBackgroundColor={colors.black}
-          logo={require('#ui/Icon/assets/azzapp.png')}
-          logoSize={24}
         />
       </View>
       <View style={styles.webCardFooter}>

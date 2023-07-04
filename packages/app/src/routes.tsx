@@ -56,6 +56,7 @@ export type ProfileRoute = {
     profileID?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
+    contactData?: string | null;
   };
 };
 

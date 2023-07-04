@@ -1,7 +1,18 @@
+import {
+  getContactByIdAsync,
+  updateContactAsync,
+  presentFormAsync,
+  addContactAsync,
+  requestPermissionsAsync,
+} from 'expo-contacts';
+import { fromGlobalId } from 'graphql-relay';
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import { Dimensions, Platform, View } from 'react-native';
+import { useIntl } from 'react-intl';
+import { Alert, Dimensions, Platform, View } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
   useNativeNavigationEvent,
@@ -23,6 +34,11 @@ import type { ProfileRoute } from '#routes';
 import type { ProfileScreenByIdQuery } from '@azzapp/relay/artifacts/ProfileScreenByIdQuery.graphql';
 import type { ProfileScreenByUserNameQuery } from '@azzapp/relay/artifacts/ProfileScreenByUserNameQuery.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { Contact } from 'expo-contacts';
+
+export const storage = new MMKV({
+  id: 'contacts',
+});
 
 /**
  * Display a profile Web card.
@@ -86,6 +102,74 @@ const ProfileScreen = ({
 
   const onToggleFollow = useToggleFollow(data.viewer?.profile?.id);
 
+  const intl = useIntl();
+
+  useEffect(() => {
+    if (params.contactData && data.profile) {
+      if (params.contactData.startsWith(fromGlobalId(data.profile.id).id)) {
+        const contact = buildContact(params.contactData);
+        Alert.alert(
+          intl.formatMessage(
+            {
+              defaultMessage: 'Add {name} to contacts?',
+              description: 'Alert title when adding a profile to contacts',
+            },
+            {
+              name: `${data.profile.userName}`,
+            },
+          ),
+          intl.formatMessage(
+            {
+              defaultMessage: 'Add {name} to the contacts list of your phone',
+              description: 'Alert message when adding a profile to contacts',
+            },
+            {
+              name: `${contact.firstName} ${contact.lastName}`,
+            },
+          ),
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'OK',
+              onPress: async () => {
+                try {
+                  const { status } = await requestPermissionsAsync();
+                  if (status === 'granted') {
+                    let foundContact: Contact | undefined = undefined;
+                    if (contact.id && storage.contains(contact.id)) {
+                      const internalId = storage.getString(contact.id);
+                      if (internalId) {
+                        foundContact = await getContactByIdAsync(internalId);
+                      }
+                    }
+
+                    if (foundContact) {
+                      if (Platform.OS === 'ios') {
+                        await updateContactAsync({
+                          ...contact,
+                          id: foundContact.id,
+                        });
+                      } else {
+                        await presentFormAsync(foundContact.id, contact);
+                      }
+                    } else {
+                      const resultId = await addContactAsync(contact);
+                      if (contact.id) {
+                        storage.set(contact.id, resultId);
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.error(e);
+                }
+              },
+            },
+          ],
+        );
+      }
+    }
+  }, [data.profile, intl, params.contactData]);
+
   if (!data.profile) {
     return null;
   }
@@ -137,6 +221,48 @@ const ProfileScreen = ({
       </View>
     </ProfileScreenTransitionsProvider>
   );
+};
+
+const buildContact = (contactCardData: string) => {
+  const {
+    profileId,
+    firstName,
+    lastName,
+    company,
+    title,
+    phones,
+    emails,
+    urls,
+  } = parseContactCard(contactCardData);
+
+  const contact: Contact = {
+    id: profileId,
+    contactType: 'person',
+    firstName: firstName ?? '',
+    lastName: lastName ?? '',
+    name: `${firstName ?? ''} ${lastName ?? ''}`,
+    company: company ?? '',
+    jobTitle: title ?? '',
+    phoneNumbers: phones.map(phone => ({
+      label: phone.label,
+      number: phone.number,
+      isPrimary: phone.label === 'Main',
+      id: `${profileId}-${phone.number}`,
+    })),
+    emails: emails.map(email => ({
+      label: email.label,
+      email: email.email,
+      isPrimary: email.label === 'Main',
+      id: `${profileId}-${email.email}`,
+    })),
+    urlAddresses: urls.map(url => ({
+      label: url.label,
+      url: url.url,
+      id: `${profileId}-${url.url}`,
+    })),
+  };
+
+  return contact;
 };
 
 const getQuery = (params: ProfileRoute['params']) =>
