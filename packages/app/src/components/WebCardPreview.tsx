@@ -223,7 +223,7 @@ const WebCardPreview = ({
       case MODULE_KIND_SIMPLE_TITLE:
         return (
           <SimpleTextRendererRaw
-            data={editedModuleInfo.data}
+            data={{ ...editedModuleInfo.data, kind: editedModuleInfo.kind }}
             key={module.id}
             onLayout={onEditedModuleLayout}
           />
