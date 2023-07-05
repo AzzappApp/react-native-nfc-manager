@@ -3,18 +3,13 @@
   "version": "0.0.4",
   "scripts": {
     "test": "jest",
-    "build:ios": "bundle exec fastlane ios sign",
-    "build:ios:native": "SKIP_BUNDLING=true bundle exec fastlane ios build",
-    "build:ios:bundle": "./scripts/bundle-ios.sh",
-    "build:android": "bundle exec fastlane android build",
     "typecheck": "tsc --noEmit",
     "rn:watch": "react-native start",
     "run:android": "react-native run-android --no-packager",
     "run:ios": "react-native run-ios --no-packager",
-    "deploy:ios": "bundle exec fastlane ios deploy",
-    "deploy:android": "bundle exec fastlane android deploy",
     "pod-install": "cd ios && bundle exec pod install",
-    "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build  && cd android && ./gradlew clean"
+    "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build  && cd android && ./gradlew clean",
+    "postinstall": "(cd ../.. && yarn build-app-dependencies)"
   },
   "devScripts": [
     "rn:watch"

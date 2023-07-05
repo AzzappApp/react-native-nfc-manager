@@ -7,10 +7,6 @@
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
     "typecheck": {
       "dependsOn": ["//#relay:build", "^build"]
     }

@@ -1,0 +1,53 @@
+name: Test and Build javascript code on pull request
+on: 
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true  
+jobs:
+  continuous-integration :
+    name: Build and Test
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
+      TURBO_TEAM: azzapp
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+          
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"    
+        
+      - name: Cache yarn
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile  --immutable
+  
+
+      # Testing
+      - name: JavaScript build
+        run: yarn build
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test

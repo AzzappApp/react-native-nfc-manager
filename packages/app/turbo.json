@@ -2,38 +2,6 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "pipeline": {
-    "build:lib": {
-      "dependsOn": ["//#relay:build", "^build"],
-      "outputs": ["lib/**"],
-      "inputs": ["src/**"]
-    },
-    "build:ios": {
-      "dependsOn": ["build:ios:native", "build:ios:bundle"],
-      "cache": false
-    },
-    "build:ios:bundle": {
-      "dependsOn": ["//#relay:build", "^build", "build:ios:native"],
-      "cache": false
-    },
-    "build:ios:native": {
-      "inputs": [
-        "ios/azzapp/**",
-        "ios/azzapp.xcodeproj/project.pbxproj",
-        "ios/azzapp.xcworkspace/content.xcworkspacedata",
-        "ios/Podfile",
-        "ios/Podfile.lock",
-        "ios/azzapp-Bridging-Header.h"
-      ],
-      "outputs": ["fastlane/builds/azzapp.xcarchive/**"],
-      "dependsOn": ["pod-install"]
-    },
-    "pod-install": {
-      "cache": false
-    },
-    "build:android": {
-      "dependsOn": ["//#relay:build", "^build", "pod-install"],
-      "cache": false
-    },
     "typecheck": {
       "dependsOn": ["//#relay:build", "^build"],
       "inputs": ["src/**"]

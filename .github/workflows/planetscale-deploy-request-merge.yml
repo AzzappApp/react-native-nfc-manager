@@ -1,0 +1,44 @@
+name: Merge planetscale deploy request on PR merge
+on:
+  pull_request:
+    types: 
+      - closed
+jobs:
+  merge-planetscale-deploy-request:
+    name: Merge planetscale deploy request
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: find-ps-attach
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "/ps-attach"
+          direction: last
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find deploy request
+        if: steps.find-ps-attach.outputs.comment-id != 0
+        uses: actions/github-script@v6.3.0
+        id: find-deploy-request
+        env:
+          COMMENT_BODY: ${{ steps.find-ps-attach.outputs.comment-body }}
+        with:
+          script: |
+            const body = process.env.COMMENT_BODY;
+            const regex = /\/ps-attach\s+([0-9]+)/g;
+            const match = regex.exec(body);
+            const number = match && match[1];
+            return number || 0
+
+      - name: Deploy a deploy request
+        uses: planetscale/deploy-deploy-request-action@v3
+        if: steps.find-deploy-request.outputs.result != 0 
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          number: ${{ steps.find-deploy-request.outputs.result }}
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}

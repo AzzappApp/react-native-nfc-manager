@@ -1,0 +1,45 @@
+{
+  "cli": {
+    "version": ">= 3.14.0"
+  },
+  "build": {
+    "development": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Release",
+        "scheme": "azzapp-dev"
+      },
+      "env": {
+        "NEXT_PUBLIC_URL": "https://azzapp-dev.vercel.app/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api"
+      }
+    },
+    "staging": {
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Release",
+        "scheme": "azzapp-staging"
+      },
+      "env": {
+        "NEXT_PUBLIC_URL": "https://azzapp-staging.vercel.app/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api"
+      }
+    },
+    "production": {
+      "ios": {
+        "buildConfiguration": "Release",
+        "scheme": "azzapp"
+      },
+      "env": {
+        "NEXT_PUBLIC_URL": "https://azzapp.vercel.app/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
