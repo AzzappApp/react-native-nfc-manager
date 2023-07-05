@@ -173,7 +173,7 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
 
       ############################################
       #
@@ -209,7 +209,7 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
       
       ############################################
       #
