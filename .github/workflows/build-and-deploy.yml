@@ -173,16 +173,7 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
-          DEPLOYMENT_URL="$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}"
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
-            vercel promote --token=${{ secrets.VERCEL_TOKEN }} --prod $DEPLOYMENT_URL
-          else 
-            ALIAS_URL="azzapp-dev.vercel.app"
-            if [["${{github.ref}}" == "refs/heads/staging"]; then
-              ALIAS_URL="azzapp-staging.vercel.app"
-            fi
-            vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=azzapp set "$DEPLOYMENT_URL" "$ALIAS_URL"
-          fi
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}
 
       ############################################
       #
@@ -218,16 +209,7 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
-          DEPLOYMENT_URL="$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}"
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
-            vercel promote --token=${{ secrets.VERCEL_TOKEN }} --prod $DEPLOYMENT_URL
-          else 
-            ALIAS_URL="azzapp-backoffice-dev.vercel.app"
-            if [["${{github.ref}}" == "refs/heads/staging"]; then
-              ALIAS_URL="azzapp-backoffice-staging.vercel.app"
-            fi
-            vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=azzapp set "$DEPLOYMENT_URL" "$ALIAS_URL"
-          fi
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) --meta githubCommitRef=${{ github.ref_name }}
       
       ############################################
       #
