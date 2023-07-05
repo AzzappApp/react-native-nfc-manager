@@ -1,4 +1,4 @@
-name: Test and Build javascript code on pull request
+name: Pull Request - Test and Build JavaScript code
 on: 
   pull_request:
     branches:
@@ -19,7 +19,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'yarn'
           
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -33,7 +32,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
