@@ -10,7 +10,7 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { DEFAULT_VARCHAR_LENGTH } from './db';
-import { customTinyInt } from './generic';
+import { customTinyInt, sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -120,8 +120,14 @@ type ModuleData = {
  * @param ids - The ids of the card modules to retrieve
  * @returns A list of card modules, where the order of the card modules matches the order of the ids
  */
-export const getCardModulesByIds = (ids: string[]): Promise<CardModule[]> =>
-  db.select().from(CardModuleTable).where(inArray(CardModuleTable.id, ids));
+export const getCardModulesByIds = async (ids: string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(CardModuleTable)
+      .where(inArray(CardModuleTable.id, ids)),
+  );
 
 /**
 /**
