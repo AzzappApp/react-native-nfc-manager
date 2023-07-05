@@ -1203,6 +1203,10 @@
     "defaultMessage": "Configuration",
     "description": "Title of the settings section in Line Divider edition"
   },
+  "ThdVEq": {
+    "defaultMessage": "Error while creating post",
+    "description": "Toast Error message while creating post"
+  },
   "TiTw6m": {
     "defaultMessage": "Border shape",
     "description": "Border Shape tab label in SimpleButton edition"
@@ -2626,6 +2630,10 @@
   "xyV44Y": {
     "defaultMessage": "Cancel",
     "description": "Edit phone number modal cancel button label"
+  },
+  "y2qD+G": {
+    "defaultMessage": "Post created",
+    "description": "Toast Success message while creating post"
   },
   "y37Ei7": {
     "defaultMessage": "Select an album",

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import * as mime from 'react-native-mime-types';
+import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
@@ -45,6 +47,7 @@ const PostCreationScreen = ({
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
+  const intl = useIntl();
   const {
     viewer: { profile },
   } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
@@ -144,19 +147,45 @@ const PostCreationScreen = ({
         },
         connections: [connectionID!],
       },
-      onCompleted(response) {
-        addLocalCachedMediaFile(
-          public_id,
-          kind === 'video' ? 'video' : 'image',
-          `file://${exportedMedia.uri}`,
-        );
-        // TODO use fragment instead of response
-        router.replace({
-          route: 'PROFILE',
-          params: {
-            userName: response.createPost?.post?.author.userName as string,
-            showPosts: true,
-          },
+      onCompleted(response, error) {
+        if (error) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error while creating post',
+              description: 'Toast Error message while creating post',
+            }),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            text1: intl.formatMessage({
+              defaultMessage: 'Post created',
+              description: 'Toast Success message while creating post',
+            }),
+          });
+          addLocalCachedMediaFile(
+            public_id,
+            kind === 'video' ? 'video' : 'image',
+            `file://${exportedMedia.uri}`,
+          );
+          // TODO use fragment instead of response
+          router.replace({
+            route: 'PROFILE',
+            params: {
+              userName: response.createPost?.post?.author.userName as string,
+              showPosts: true,
+            },
+          });
+        }
+      },
+      onError() {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while creating post',
+            description: 'Toast Error message while creating post',
+          }),
         });
       },
     });

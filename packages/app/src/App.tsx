@@ -6,6 +6,7 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
+
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import {
@@ -21,6 +22,7 @@ import {
   ScreensRenderer,
   RouterProvider,
 } from '#components/NativeRouter';
+import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import {
   init as initLocaleHelpers,
@@ -223,6 +225,7 @@ const App = () => {
                 onFinishTransitioning={onFinishTransitioning}
               />
             </RouterProvider>
+            <Toast />
           </IntlProvider>
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
