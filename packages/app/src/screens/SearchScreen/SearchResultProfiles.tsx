@@ -39,7 +39,7 @@ const SearchResultProfiles = ({
       @refetchable(queryName: "SearchResultProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 10 }
+        first: { type: Int, defaultValue: 8 }
         search: { type: "String!" }
       ) {
         searchProfiles(
@@ -67,7 +67,7 @@ const SearchResultProfiles = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
-      loadNext(10);
+      loadNext(20);
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
@@ -79,7 +79,8 @@ const SearchResultProfiles = ({
       coverStyle={styles.coverStyle}
       horizontal={false}
       numColums={2}
-      style={{ marginTop: 6 }}
+      initialNumToRender={4}
+      style={{ marginTop: 6, flex: 1 }}
     />
   );
 };

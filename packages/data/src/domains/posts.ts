@@ -132,7 +132,7 @@ export const getAllPosts = async (limit: number, after: Date | null = null) => {
  * @param offset - the offset of the first post to retrieve (based on postDate)
  * @returns A list of post
  */
-export const getFollowedProfilesPosts = async (
+export const getFollowingsPosts = async (
   profileId: string,
   limit: number,
   after: Date | null = null,
@@ -161,7 +161,7 @@ export const getFollowedProfilesPosts = async (
  * @param profileId - The id of the profile
  * @returns The number of post from the profiles a profile is following
  */
-export const getFollowedProfilesPostsCount = async (profileId: string) =>
+export const getFollowingsPostsCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(post)

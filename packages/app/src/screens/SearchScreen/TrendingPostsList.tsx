@@ -28,7 +28,7 @@ const TrendingPostsList = ({
         @refetchable(queryName: "TrendingPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 20 }
+          first: { type: Int, defaultValue: 6 }
         ) {
           trendingPosts(after: $after, first: $first)
             @connection(key: "Viewer_trendingPosts") {

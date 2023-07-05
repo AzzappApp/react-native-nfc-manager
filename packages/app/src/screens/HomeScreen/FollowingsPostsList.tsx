@@ -5,13 +5,13 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { FollowedProfilesPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowedProfilesPostsList_viewer.graphql';
+import type { FollowingsPostsList_viewer$key } from '@azzapp/relay/artifacts/FollowingsPostsList_viewer.graphql';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 import type { ReactElement } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type FollowedProfilesPostsListProps = {
-  viewer: FollowedProfilesPostsList_viewer$key;
+type FollowingsPostsListProps = {
+  viewer: FollowingsPostsList_viewer$key;
   canPlay?: boolean;
   ListHeaderComponent?: ReactElement;
   stickyHeaderIndices?: number[] | undefined;
@@ -21,7 +21,7 @@ type FollowedProfilesPostsListProps = {
   onReady?: () => void;
 };
 
-const FollowedProfilesPostsList = ({
+const FollowingsPostsList = ({
   viewer,
   canPlay,
   stickyHeaderIndices,
@@ -30,19 +30,19 @@ const FollowedProfilesPostsList = ({
   postsContainerStyle,
   onScroll,
   onReady,
-}: FollowedProfilesPostsListProps) => {
+}: FollowingsPostsListProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment FollowedProfilesPostsList_viewer on Viewer
-        @refetchable(queryName: "FollowedProfilesPostsListQuery")
+        fragment FollowingsPostsList_viewer on Viewer
+        @refetchable(queryName: "FollowingsPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 20 }
+          first: { type: Int, defaultValue: 8 } #defaut value will impact the initial loading time
         ) {
-          followedProfilesPosts(after: $after, first: $first)
-            @connection(key: "Viewer_followedProfilesPosts") {
+          followingsPosts(after: $after, first: $first)
+            @connection(key: "Viewer_followingsPosts") {
             edges {
               node {
                 ...PostsGrid_posts
@@ -98,9 +98,9 @@ const FollowedProfilesPostsList = ({
   const posts: PostsGrid_posts$key = useMemo(
     () =>
       convertToNonNullArray(
-        data.followedProfilesPosts?.edges?.map(edge => edge?.node) ?? [],
+        data.followingsPosts?.edges?.map(edge => edge?.node) ?? [],
       ),
-    [data.followedProfilesPosts?.edges],
+    [data.followingsPosts?.edges],
   );
 
   return (
@@ -123,4 +123,4 @@ const FollowedProfilesPostsList = ({
   );
 };
 
-export default FollowedProfilesPostsList;
+export default FollowingsPostsList;

@@ -6,29 +6,26 @@ import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import FollowedProfilesScreenList from './FollowedProfilesScreenList';
+import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { FollowedProfilesRoute } from '#routes';
-import type { FollowedProfilesScreenQuery } from '@azzapp/relay/artifacts/FollowedProfilesScreenQuery.graphql';
+import type { FollowingsRoute } from '#routes';
+import type { FollowingsScreenQuery } from '@azzapp/relay/artifacts/FollowingsScreenQuery.graphql';
 
-const followedProfilesScreenQuery = graphql`
-  query FollowedProfilesScreenQuery {
+const followingsScreenQuery = graphql`
+  query FollowingsScreenQuery {
     viewer {
       profile {
         id
       }
-      ...FollowedProfilesScreenList_viewer
+      ...FollowingsScreenList_viewer
     }
   }
 `;
 
-const FollowedProfilesScreen = ({
+const FollowingsScreen = ({
   preloadedQuery,
-}: RelayScreenProps<FollowedProfilesRoute, FollowedProfilesScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(
-    followedProfilesScreenQuery,
-    preloadedQuery,
-  );
+}: RelayScreenProps<FollowingsRoute, FollowingsScreenQuery>) => {
+  const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
 
   const router = useRouter();
   const intl = useIntl();
@@ -50,7 +47,7 @@ const FollowedProfilesScreen = ({
             description: 'Title of the screen listing followed profiles',
           })}
         />
-        <FollowedProfilesScreenList
+        <FollowingsScreenList
           currentProfileId={viewer.profile?.id ?? ''}
           viewer={viewer}
         />
@@ -59,6 +56,6 @@ const FollowedProfilesScreen = ({
   );
 };
 
-export default relayScreen(FollowedProfilesScreen, {
-  query: followedProfilesScreenQuery,
+export default relayScreen(FollowingsScreen, {
+  query: followingsScreenQuery,
 });

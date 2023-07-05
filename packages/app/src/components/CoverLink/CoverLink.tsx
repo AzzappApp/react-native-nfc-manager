@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
@@ -28,4 +29,5 @@ const CoverLink = ({ style, coverStyle, ...props }: CoverLinkProps) => (
   </Link>
 );
 
-export default CoverLink;
+// memo is recommanded as coverlink is used in FlatList
+export default memo(CoverLink);

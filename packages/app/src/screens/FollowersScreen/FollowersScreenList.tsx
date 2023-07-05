@@ -142,18 +142,18 @@ const updater = (
 ) => {
   const currentProfile = store.get(currentProfileId);
 
-  const nbFollowers = currentProfile?.getValue('nbFollowersProfiles');
+  const nbFollowers = currentProfile?.getValue('nbFollowers');
 
   if (typeof nbFollowers === 'number') {
-    currentProfile?.setValue(nbFollowers - 1, 'nbFollowersProfiles');
+    currentProfile?.setValue(nbFollowers - 1, 'nbFollowers');
   }
 
   const profile = store.get(profileId);
 
-  const nbFollowings = profile?.getValue('nbFollowedProfiles');
+  const nbFollowings = profile?.getValue('nbFollowings');
 
   if (typeof nbFollowings === 'number') {
-    profile?.setValue(nbFollowings - 1, 'nbFollowedProfiles');
+    profile?.setValue(nbFollowings - 1, 'nbFollowings');
   }
 };
 

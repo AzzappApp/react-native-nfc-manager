@@ -67,14 +67,17 @@ export const Post: PostResolvers = {
 
     const offset = after ? cursorToDate(after) : null;
 
-    //fetch one more item to know if there is a next page (avoid counting all the items, that could be a probleme on huge tables)
     const postComments = await getPostComments(post.id, limit + 1, offset);
-    const hasNextPage = postComments.length > limit;
-    return connectionFromDateSortedItems(postComments.slice(0, -1), {
-      getDate: post => post.createdAt,
-      hasNextPage,
-      hasPreviousPage: offset !== null,
-    });
+    if (postComments?.length > 0) {
+      //sort should be done on request side, we will used updated at to have the last updated cover
+      const sizedComments = postComments.slice(0, limit);
+      return connectionFromDateSortedItems(sizedComments, {
+        getDate: post => post.createdAt,
+        hasNextPage: postComments.length > limit,
+        hasPreviousPage: offset !== null,
+      });
+    }
+    return connectionFromArray([], args);
   },
   relatedPosts: async (_post, args) => {
     // TODO dummy implementation just to test frontend

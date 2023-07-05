@@ -29,8 +29,8 @@ type Profile implements Node {
   isFollowing: Boolean!
   isViewer: Boolean!
   nbPosts: Int!
-  nbFollowedProfiles: Int!
-  nbFollowersProfiles: Int!
+  nbFollowings: Int!
+  nbFollowers: Int!
   contactCard: ContactCard!
 }
 

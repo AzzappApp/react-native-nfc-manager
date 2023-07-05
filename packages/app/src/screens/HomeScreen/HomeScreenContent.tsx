@@ -5,7 +5,7 @@ import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from '#ui/Container';
-import FollowedProfilesPostsList from './FollowedProfilesPostsList';
+import FollowingsPostsList from './FollowingsPostsList';
 import HomeHeader from './HomeHeader';
 import HomeProfilesList from './HomeProfilesList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -25,9 +25,10 @@ export const homeScreenQuery = graphql`
     viewer {
       profile {
         id
+        ...HomeProfilesList_profile
       }
       ...HomeProfilesList_viewer
-      ...FollowedProfilesPostsList_viewer
+      ...FollowingsPostsList_viewer
     }
   }
 `;
@@ -69,8 +70,12 @@ const HomeScreen = ({
   const insets = useSafeAreaInsets();
   const styles = useStyleSheet(styleSheet);
 
+  if (!viewer.profile) {
+    return null;
+  }
+
   return (
-    <FollowedProfilesPostsList
+    <FollowingsPostsList
       viewer={viewer}
       canPlay={hasFocus}
       ListHeaderComponent={
@@ -78,14 +83,15 @@ const HomeScreen = ({
           <HomeHeader goToSettings={goToSettings} />
           <HomeProfilesList
             viewer={viewer}
-            style={styles.followedProfilesList}
+            profile={viewer.profile}
+            style={styles.followingsList}
             onReady={onCoversReady}
           />
         </Container>
       }
       stickyHeaderIndices={[0]}
-      style={styles.followedProfilesPosts}
-      postsContainerStyle={styles.followedProfilesPostsListPostsContainerShadow}
+      style={styles.followingsPosts}
+      postsContainerStyle={styles.followingsPostsListPostsContainerShadow}
       onReady={onPostsReady}
     />
   );
@@ -94,16 +100,16 @@ const HomeScreen = ({
 export default HomeScreen;
 
 const styleSheet = createStyleSheet(appearance => ({
-  followedProfilesPosts: {
+  followingsPosts: {
     flex: 1,
   },
-  followedProfilesList: {
+  followingsList: {
     height: 200,
     marginTop: 10,
     marginBottom: 13,
     marginLeft: 10,
   },
-  followedProfilesPostsListPostsContainerShadow: [
+  followingsPostsListPostsContainerShadow: [
     {
       paddingVertical: 8,
       borderTopLeftRadius: 20,

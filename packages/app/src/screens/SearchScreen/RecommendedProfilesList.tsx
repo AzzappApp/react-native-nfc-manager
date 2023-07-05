@@ -20,7 +20,7 @@ const RecommendedProfilesList = ({ viewer }: RecommendedProfilesListProps) => {
       @refetchable(queryName: "RecommendedProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 10 }
+        first: { type: Int, defaultValue: 6 }
       ) {
         recommendedProfiles(after: $after, first: $first)
           @connection(key: "Viewer_recommendedProfiles") {
@@ -53,6 +53,7 @@ const RecommendedProfilesList = ({ viewer }: RecommendedProfilesListProps) => {
       onEndReached={onEndReached}
       coverStyle={styles.coverStyle}
       containerStyle={styles.containerStyle}
+      style={styles.trendingListStyle}
     />
   );
 };
@@ -62,4 +63,7 @@ export default RecommendedProfilesList;
 const styles = StyleSheet.create({
   coverStyle: { width: 80, marginLeft: 5, marginRight: 0 },
   containerStyle: { paddingLeft: 3 },
+  trendingListStyle: {
+    height: 128,
+  },
 });

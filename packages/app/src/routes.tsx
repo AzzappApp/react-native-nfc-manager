@@ -94,8 +94,8 @@ export type CardModuleEditionRoute = {
   };
 };
 
-export type FollowedProfilesRoute = {
-  route: 'FOLLOWED_PROFILES';
+export type FollowingsRoute = {
+  route: 'FOLLOWINGS';
   params?: never;
 };
 
@@ -135,7 +135,7 @@ export type Route =
   | SignUpRoute
   | ForgotPasswordRoute
   | CardModuleEditionRoute
-  | FollowedProfilesRoute
+  | FollowingsRoute
   | FollowersRoute
   | AccountDetailsRoute
   | InviteFriendsRoute

@@ -42,8 +42,8 @@ import AccountScreen from '#screens/AccountScreen';
 import CardModuleEditionMobileScreen from '#screens/CardModuleEditionMobileScreen';
 import ChangePasswordScreen from '#screens/ChangePasswordScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
-import FollowedProfilesScreen from '#screens/FollowedProfilesScreen';
 import FollowersScreen from '#screens/FollowersScreen';
+import FollowingsScreen from '#screens/FollowingsScreen';
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
@@ -75,7 +75,7 @@ const screens = {
   NEW_PROFILE: NewProfileScreen,
   CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
   PROFILE: ProfileScreen,
-  FOLLOWED_PROFILES: FollowedProfilesScreen,
+  FOLLOWINGS: FollowingsScreen,
   FOLLOWERS: FollowersScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   INVITE_FRIENDS: InviteFriendsScreen,

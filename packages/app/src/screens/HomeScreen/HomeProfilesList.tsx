@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, StyleSheet } from 'react-native';
-import { graphql, usePaginationFragment } from 'react-relay';
+import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -14,19 +14,21 @@ import QRCodeModal from '#components/CoverRenderer/QRCodeModal';
 import Link from '#components/Link';
 import PressableNative from '#ui/PressableNative';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import SuggestedProfilesList from './SuggestedProfilesList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
+import type { HomeProfilesList_profile$key } from '@azzapp/relay/artifacts/HomeProfilesList_profile.graphql';
 import type { HomeProfilesList_viewer$key } from '@azzapp/relay/artifacts/HomeProfilesList_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type HomeProfilesListProps = {
   viewer: HomeProfilesList_viewer$key;
+  profile: HomeProfilesList_profile$key;
   onReady?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
 const HomeProfilesList = ({
   viewer,
+  profile: profileKey,
   onReady,
   style,
 }: HomeProfilesListProps) => {
@@ -37,45 +39,51 @@ const HomeProfilesList = ({
       @refetchable(queryName: "HomeProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 10 }
+        first: { type: Int, defaultValue: 5 }
       ) {
-        followedProfiles(after: $after, first: $first)
-          @connection(key: "Viewer_followedProfiles") {
+        followings(after: $after, first: $first)
+          @connection(key: "Viewer_followings") {
           edges {
             node {
               ...CoverList_users
             }
           }
         }
-        profile {
-          id
-          userName
-          card {
-            id
-          }
-          ...CoverList_users
-        }
-        ...SuggestedProfilesList_viewer
       }
     `,
     viewer,
   );
 
-  const recommendedUsers = data.followedProfiles.edges
+  //Separate the profile from the recommended users avoid sending the request on pagination.
+  const profile = useFragment(
+    graphql`
+      fragment HomeProfilesList_profile on Profile {
+        id
+        userName
+        card {
+          id
+        }
+        ...CoverList_users
+      }
+    `,
+    profileKey,
+  );
+
+  const recommendedUsers = data.followings.edges
     ?.map(edge => edge?.node)
     .filter(item => !!item);
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.profile?.card?.id
-        ? [data.profile, ...(recommendedUsers ?? [])]
+      profile?.card?.id
+        ? [profile, ...(recommendedUsers ?? [])]
         : recommendedUsers ?? [],
     );
-  }, [recommendedUsers, data.profile]);
+  }, [recommendedUsers, profile]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {
-      loadNext(10);
+      loadNext(20);
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
@@ -86,7 +94,7 @@ const HomeProfilesList = ({
 
   // even if TemplateSelectorScreen, keeping it waiting this Nico/Robin design on the empty cover
   const ListHeaderComponent = useMemo(() => {
-    if (data.profile && !data.profile.card?.id) {
+    if (profile && !profile.card?.id) {
       return (
         <Link
           route="CARD_MODULE_EDITION"
@@ -114,7 +122,7 @@ const HomeProfilesList = ({
             {qrCodeVisible && (
               <QRCodeModal
                 onRequestClose={toggleQrcCode}
-                userName={data.profile?.userName}
+                userName={profile?.userName}
               />
             )}
           </PressableScaleHighlight>
@@ -123,21 +131,14 @@ const HomeProfilesList = ({
     } else {
       return null;
     }
-  }, [data.profile, intl, qrCodeVisible]);
+  }, [profile, intl, qrCodeVisible]);
 
-  return recommendedUsers?.length ? (
+  return (
     <CoverList
       users={users}
       onEndReached={onEndReached}
       style={style}
-      ListHeaderComponent={ListHeaderComponent}
-      onReady={onReady}
-    />
-  ) : (
-    <SuggestedProfilesList
-      style={style}
-      viewer={data}
-      profile={data.profile}
+      initialNumToRender={3}
       ListHeaderComponent={ListHeaderComponent}
       onReady={onReady}
     />

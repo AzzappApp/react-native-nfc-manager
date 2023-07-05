@@ -26,7 +26,7 @@ const SearchResultGlobalListHeader = ({
       @refetchable(queryName: "SearchGlobalProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 8 }
         search: { type: "String!" }
         useLocation: { type: "Boolean!" }
       ) {
@@ -73,6 +73,7 @@ const SearchResultGlobalListHeader = ({
         onEndReached={onEndReachedCover}
         containerStyle={styles.containerStyle}
         coverStyle={styles.coverStyle}
+        style={styles.coverListStyle}
       />
       <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
@@ -129,5 +130,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 2.5,
     backgroundColor: colors.grey50,
+  },
+  coverListStyle: {
+    height: 128,
   },
 });

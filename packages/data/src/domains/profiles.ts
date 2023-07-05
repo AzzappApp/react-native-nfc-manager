@@ -123,14 +123,14 @@ export const getProfileByUserName = async (profileName: string) => {
 /**
  * Retrieves all profile with a card
  * @param limit - The maximum number of profile to retrieve
- * @param offset - The number of profile to skip
+ * @param after - The offet date to retrieve the profile from
  * @param excludedprofileIds - The ids of the profile to exclude from the result
  * @returns A list of profile
  */
 export const getAllProfilesWithCard = async (
   limit: number,
-  offset: number,
   excludedprofileIds: string[] | null | undefined,
+  after: Date | null = null,
 ) => {
   return db
     .select()
@@ -141,10 +141,11 @@ export const getAllProfilesWithCard = async (
         excludedprofileIds?.length
           ? notInArray(ProfileTable.id, excludedprofileIds)
           : undefined,
+        after ? lt(ProfileTable.updatedAt, after) : undefined,
       ),
     )
-    .limit(limit)
-    .offset(offset);
+    .orderBy(desc(ProfileTable.updatedAt))
+    .limit(limit);
 };
 
 /**
@@ -168,7 +169,7 @@ export const getAllProfilesWithCardCount = async () =>
  * @param params - The parameters to filter the result
  * @returns A list of profile
  */
-export const getFollowedProfiles = async (
+export const getFollowings = async (
   profileId: string,
   params: { userName?: string | null },
 ) => {
@@ -188,12 +189,11 @@ export const getFollowedProfiles = async (
   return result.map(({ Profile }) => Profile);
 };
 
-/**
- * Retrieve the number of profile a profile is following
+/* Retrieve the number of profile a profile is following
  * @param profileId - The id of the profile
  * @returns the number of profile a profile is following
  */
-export const getFollowedProfilesCount = async (profileId: string) =>
+export const getFollowingsCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
@@ -252,6 +252,42 @@ export const getFollowerProfilesCount = async (profileId: string) =>
     .where(eq(FollowTable.followingId, profileId))
 
     .then(res => res[0].count);
+
+/**
+ * Retrieve the list of profile a profile is following
+ * @param profileId - The id of the profile
+ * @returns the list of profile a profileis following
+ */
+export const getFollowingsProfiles = async (
+  profileId: string,
+  {
+    limit,
+    after = null,
+    userName,
+  }: {
+    limit: number;
+    after: Date | null;
+    userName?: string | null;
+  },
+) =>
+  db
+    .select({
+      Profile: ProfileTable,
+      followCreatedAt: FollowTable.createdAt,
+    })
+    .from(ProfileTable)
+    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
+    .where(
+      and(
+        eq(FollowTable.followerId, profileId),
+        after ? lt(FollowTable.createdAt, after) : undefined,
+        userName
+          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
+          : undefined,
+      ),
+    )
+    .orderBy(desc(FollowTable.createdAt))
+    .limit(limit);
 
 /**
  * Create a new profile

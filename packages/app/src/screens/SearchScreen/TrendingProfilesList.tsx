@@ -21,7 +21,7 @@ const TrendingProfilesList = ({ viewer }: TrendingProfilesListProps) => {
       @refetchable(queryName: "TrendingProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 10 }
+        first: { type: Int, defaultValue: 6 }
       ) {
         trendingProfiles(after: $after, first: $first)
           @connection(key: "Viewer_trendingProfiles") {
@@ -54,6 +54,7 @@ const TrendingProfilesList = ({ viewer }: TrendingProfilesListProps) => {
       onEndReached={onEndReached}
       containerStyle={styles.containerStyle}
       coverStyle={styles.coverStyle}
+      style={styles.trendingListStyle}
     />
   );
 };
@@ -63,4 +64,7 @@ export default TrendingProfilesList;
 const styles = StyleSheet.create({
   containerStyle: { paddingLeft: 3 },
   coverStyle: { width: 80, marginLeft: 5, marginRight: 0 },
+  trendingListStyle: {
+    height: 128,
+  },
 });

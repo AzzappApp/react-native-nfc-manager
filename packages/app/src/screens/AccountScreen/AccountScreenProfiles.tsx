@@ -47,8 +47,8 @@ export default function AccountScreenProfiles({
           id
           userName
           nbPosts
-          nbFollowedProfiles
-          nbFollowersProfiles
+          nbFollowings
+          nbFollowers
           card {
             backgroundColor
             cover {
@@ -234,7 +234,7 @@ export default function AccountScreenProfiles({
         </Link>
         <Link route="FOLLOWERS">
           <PressableNative style={styles.counterContainer}>
-            <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
+            <Text variant="xlarge">{currentProfile?.nbFollowers}</Text>
             <Text variant="small" style={styles.counterValue} numberOfLines={1}>
               <FormattedMessage
                 defaultMessage="Followers"
@@ -243,9 +243,9 @@ export default function AccountScreenProfiles({
             </Text>
           </PressableNative>
         </Link>
-        <Link route="FOLLOWED_PROFILES">
+        <Link route="FOLLOWINGS">
           <PressableNative style={styles.counterContainer}>
-            <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>
+            <Text variant="xlarge">{currentProfile?.nbFollowings}</Text>
             <Text variant="small" style={styles.counterValue} numberOfLines={1}>
               <FormattedMessage
                 defaultMessage="Followings"

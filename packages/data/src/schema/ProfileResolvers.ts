@@ -3,7 +3,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   getCompanyActivities,
   getCompanyActivityById,
-  getFollowedProfilesCount,
+  getFollowingsCount,
   getFollowerProfilesCount,
   getProfileCategoryById,
   getProfilesPosts,
@@ -62,10 +62,10 @@ export const Profile: ProfileResolvers = {
   nbPosts: async (profile, _) => {
     return getProfilesPostsCount(profile.id);
   },
-  nbFollowedProfiles: async (profile, _) => {
-    return getFollowedProfilesCount(profile.id);
+  nbFollowings: async (profile, _) => {
+    return getFollowingsCount(profile.id);
   },
-  nbFollowersProfiles: async (profile, _) => {
+  nbFollowers: async (profile, _) => {
     return getFollowerProfilesCount(profile.id);
   },
   contactCard: async (profile, _, { userLoader }) => {

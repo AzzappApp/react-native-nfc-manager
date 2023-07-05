@@ -1,17 +1,10 @@
 import { like } from 'drizzle-orm';
+import { connectionFromArray } from 'graphql-relay';
 import {
-  connectionFromArray,
-  connectionFromArraySlice,
-  cursorToOffset,
-} from 'graphql-relay';
-import {
-  getFollowedProfilesCount,
   getAllProfilesWithCard,
-  getAllProfilesWithCardCount,
-  getFollowedProfiles,
   getFollowerProfiles,
-  getFollowedProfilesPostsCount,
-  getFollowedProfilesPosts,
+  getFollowingsPostsCount,
+  getFollowingsPosts,
   getAllPosts,
   db,
   getStaticMediasByUsage,
@@ -19,6 +12,7 @@ import {
   getCoverTemplatesSuggestion,
   ProfileTable,
   post,
+  getFollowingsProfiles,
 } from '#domains';
 import {
   cursorToDate,
@@ -30,43 +24,59 @@ import type { ViewerResolvers } from './__generated__/types';
 export const Viewer: ViewerResolvers = {
   profile: async (_root, _, { auth, profileLoader }) => {
     const profileId = auth.profileId;
-
     if (!profileId) {
       return null;
     }
 
     return profileLoader.load(profileId);
   },
-  suggestedProfiles: async (_root, args, { auth }) => {
+  followings: async (_root, args, { auth }) => {
     const profileId = auth.profileId;
 
-    if (!profileId || (await getFollowedProfilesCount(profileId)) > 0) {
-      return connectionFromArray([], args);
-    }
-    // TODO if we don't have any followed users, returns a list of recommended users ?
-    const { after, first } = args;
-    const limit = first ?? 100;
-    const offset = after ? cursorToOffset(after) : 0;
-    return connectionFromArraySlice(
-      await getAllProfilesWithCard(limit, offset, [profileId]),
-      args,
-      {
-        sliceStart: offset,
-        arrayLength: await getAllProfilesWithCardCount(),
-      },
-    );
-  },
-  followedProfiles: async (_root, args, { auth }) => {
-    const profileId = auth.profileId;
     if (!profileId) {
       return connectionFromArray([], args);
     }
-    // TODO should we use pagination in database query?
-    const followedProfiles = await getFollowedProfiles(profileId, {
+    const first = args.first ?? 50;
+    const offset = args.after ? cursorToDate(args.after) : null;
+
+    const followingsProfiles = await getFollowingsProfiles(profileId, {
+      limit: first + 1,
+      after: offset,
       userName: args.userName,
     });
 
-    return connectionFromArray(followedProfiles, args);
+    if (followingsProfiles?.length > 0) {
+      const sizedProfile = followingsProfiles.slice(0, first);
+      return connectionFromDateSortedItems(
+        sizedProfile.map(p => ({
+          ...p.Profile,
+          followCreatedAt: p.followCreatedAt,
+        })),
+        {
+          getDate: user => user.followCreatedAt,
+          // approximations that should be good enough, and avoid a query
+          hasNextPage: followingsProfiles.length > first,
+          hasPreviousPage: offset !== null,
+        },
+      );
+    }
+    //in this case, return suggested profile
+    const allprofile = await getAllProfilesWithCard(
+      first + 1,
+      [profileId],
+      offset,
+    );
+
+    if (allprofile?.length > 0) {
+      const sizedProfile = allprofile.slice(0, first);
+      return connectionFromDateSortedItems(sizedProfile, {
+        getDate: user => user.updatedAt,
+        // approximations that should be good enough, and avoid a query
+        hasNextPage: allprofile.length > first,
+        hasPreviousPage: offset !== null,
+      });
+    }
+    return connectionFromArray([], args);
   },
   followers: async (_root, args, { auth }) => {
     const profileId = auth.profileId;
@@ -74,11 +84,11 @@ export const Viewer: ViewerResolvers = {
       return connectionFromArray([], args);
     }
 
-    const first = args.first ?? 100;
+    const first = args.first ?? 50;
     const offset = args.after ? cursorToDate(args.after) : null;
 
     const followersProfiles = await getFollowerProfiles(profileId, {
-      limit: first,
+      limit: first + 1,
       after: offset,
       userName: args.userName,
     });
@@ -91,23 +101,23 @@ export const Viewer: ViewerResolvers = {
       {
         getDate: post => post.followCreatedAt,
         // approximations that should be good enough, and avoid a query
-        hasNextPage: followersProfiles.length > 0,
+        hasNextPage: followersProfiles.length > first,
         hasPreviousPage: offset !== null,
       },
     );
   },
-  followedProfilesPosts: async (_root, args, { auth }) => {
+  followingsPosts: async (_root, args, { auth }) => {
     const profileId = auth.profileId;
     if (!profileId) {
       return connectionFromArray([], args);
     }
-    const nbPosts = await getFollowedProfilesPostsCount(profileId);
+    const nbPosts = await getFollowingsPostsCount(profileId);
 
     const first = args.first ?? 100;
     const offset = args.after ? cursorToDate(args.after) : null;
 
     const posts = nbPosts
-      ? await getFollowedProfilesPosts(profileId, first, offset)
+      ? await getFollowingsPosts(profileId, first, offset)
       : // TODO instead of returning all posts, we should return a list of recommanded posts
         await getAllPosts(first, offset);
 
