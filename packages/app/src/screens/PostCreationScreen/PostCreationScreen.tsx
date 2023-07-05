@@ -81,6 +81,7 @@ const PostCreationScreen = ({
             width
             height
           }
+          createdAt
         }
       }
     }
