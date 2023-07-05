@@ -599,6 +599,10 @@
     "defaultMessage": "Vignette",
     "description": "Vignette image edition parameters name"
   },
+  "E2IhBa": {
+    "defaultMessage": "Go back to account screen",
+    "description": "Shortcut to go back to account screen"
+  },
   "E2sLo4": {
     "defaultMessage": "Tap to take a photo",
     "description": "Accessibility hint for the camera shutter button"

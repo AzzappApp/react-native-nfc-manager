@@ -1,6 +1,8 @@
+import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import { useRouter } from './NativeRouter';
@@ -32,6 +34,9 @@ const AccountHeader = ({
   );
 
   const router = useRouter();
+
+  const intl = useIntl();
+
   return (
     <Header
       leftElement={
@@ -45,16 +50,25 @@ const AccountHeader = ({
       middleElement={<Text variant="large">{title}</Text>}
       rightElement={
         profile && (
-          <CoverRenderer
-            width={COVER_WIDTH}
-            userName={userName ?? ''}
-            cover={profile.card?.cover}
-            style={
-              profile.card?.backgroundColor != null && {
-                backgroundColor: profile.card?.backgroundColor,
+          <PressableNative
+            onPress={router.back}
+            accessibilityRole="link"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Go back to account screen',
+              description: 'Shortcut to go back to account screen',
+            })}
+          >
+            <CoverRenderer
+              width={COVER_WIDTH}
+              userName={userName ?? ''}
+              cover={profile.card?.cover}
+              style={
+                profile.card?.backgroundColor != null && {
+                  backgroundColor: profile.card?.backgroundColor,
+                }
               }
-            }
-          />
+            />
+          </PressableNative>
         )
       }
     />
