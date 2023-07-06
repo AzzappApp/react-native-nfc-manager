@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import Link from '#components/Link';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import Text from '#ui/Text';
 
@@ -41,7 +42,12 @@ const CommentItem = ({ item }: CommentItemProps) => {
       />
       <View style={{ flex: 1 }}>
         <Text variant="small">
-          <Text variant="smallbold">{postComment.author.userName} </Text>
+          <Link
+            route="PROFILE"
+            params={{ userName: postComment.author.userName }}
+          >
+            <Text variant="smallbold">{postComment.author.userName} </Text>
+          </Link>
           {postComment.comment}
         </Text>
         <Text variant="small" style={styles.relativeTime}>
