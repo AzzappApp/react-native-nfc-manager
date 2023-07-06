@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true  
 jobs:
   build-and-deploy:
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
     name: Build and Deploy Azzapp application
     runs-on: ubuntu-latest
     env:
