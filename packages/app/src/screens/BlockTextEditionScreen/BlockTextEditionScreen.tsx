@@ -139,6 +139,7 @@ const BlockTextEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...BlockTextEditionScreen_module
             }
           }

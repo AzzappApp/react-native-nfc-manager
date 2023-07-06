@@ -146,6 +146,7 @@ const HorizontalPhotoEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...HorizontalPhotoEditionScreen_module
             }
           }

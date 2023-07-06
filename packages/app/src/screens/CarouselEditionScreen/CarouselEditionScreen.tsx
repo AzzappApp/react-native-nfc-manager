@@ -149,6 +149,7 @@ const CarouselEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...CarouselEditionScreen_module
             }
           }

@@ -171,6 +171,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...PhotoWithTextAndTitleEditionScreen_module
             }
           }

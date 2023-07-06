@@ -154,6 +154,7 @@ const SimpleTextEditionScreen = ({
           card {
             id
             modules {
+              visible
               ...SimpleTextEditionScreen_module
             }
           }
