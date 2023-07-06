@@ -1,7 +1,6 @@
 import { like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import {
-  getAllProfilesWithCard,
   getFollowerProfiles,
   getFollowingsPostsCount,
   getFollowingsPosts,
@@ -45,38 +44,19 @@ export const Viewer: ViewerResolvers = {
       userName: args.userName,
     });
 
-    if (followingsProfiles?.length > 0) {
-      const sizedProfile = followingsProfiles.slice(0, first);
-      return connectionFromDateSortedItems(
-        sizedProfile.map(p => ({
-          ...p.Profile,
-          followCreatedAt: p.followCreatedAt,
-        })),
-        {
-          getDate: user => user.followCreatedAt,
-          // approximations that should be good enough, and avoid a query
-          hasNextPage: followingsProfiles.length > first,
-          hasPreviousPage: offset !== null,
-        },
-      );
-    }
-    //in this case, return suggested profile
-    const allprofile = await getAllProfilesWithCard(
-      first + 1,
-      [profileId],
-      offset,
-    );
-
-    if (allprofile?.length > 0) {
-      const sizedProfile = allprofile.slice(0, first);
-      return connectionFromDateSortedItems(sizedProfile, {
-        getDate: user => user.updatedAt,
+    const sizedProfile = followingsProfiles.slice(0, first);
+    return connectionFromDateSortedItems(
+      sizedProfile.map(p => ({
+        ...p.Profile,
+        followCreatedAt: p.followCreatedAt,
+      })),
+      {
+        getDate: user => user.followCreatedAt,
         // approximations that should be good enough, and avoid a query
-        hasNextPage: allprofile.length > first,
+        hasNextPage: followingsProfiles.length > first,
         hasPreviousPage: offset !== null,
-      });
-    }
-    return connectionFromArray([], args);
+      },
+    );
   },
   followers: async (_root, args, { auth }) => {
     const profileId = auth.profileId;

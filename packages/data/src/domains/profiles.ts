@@ -1,15 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import {
-  eq,
-  asc,
-  inArray,
-  exists,
-  sql,
-  notInArray,
-  and,
-  lt,
-  desc,
-} from 'drizzle-orm';
+import { eq, asc, inArray, sql, and, lt, desc } from 'drizzle-orm';
 import {
   mysqlEnum,
   datetime,
@@ -119,49 +109,6 @@ export const getProfileByUserName = async (profileName: string) => {
 
     .then(res => res.pop() ?? null);
 };
-
-/**
- * Retrieves all profile with a card
- * @param limit - The maximum number of profile to retrieve
- * @param after - The offet date to retrieve the profile from
- * @param excludedprofileIds - The ids of the profile to exclude from the result
- * @returns A list of profile
- */
-export const getAllProfilesWithCard = async (
-  limit: number,
-  excludedprofileIds: string[] | null | undefined,
-  after: Date | null = null,
-) => {
-  return db
-    .select()
-    .from(ProfileTable)
-    .where(
-      and(
-        exists(sql`select Card.id from Card where Profile.id = Card.profileId`),
-        excludedprofileIds?.length
-          ? notInArray(ProfileTable.id, excludedprofileIds)
-          : undefined,
-        after ? lt(ProfileTable.updatedAt, after) : undefined,
-      ),
-    )
-    .orderBy(desc(ProfileTable.updatedAt))
-    .limit(limit);
-};
-
-/**
- * Retrieves the number of profile with a card
- *
- * @returns The number of profile with a card
- */
-export const getAllProfilesWithCardCount = async () =>
-  db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(ProfileTable)
-    .where(
-      exists(sql`(select Card.id from Card where Profile.id = Card.profileId)`),
-    )
-
-    .then(res => res[0].count);
 
 /**
  * Retrieve the list of profile a profile is following
