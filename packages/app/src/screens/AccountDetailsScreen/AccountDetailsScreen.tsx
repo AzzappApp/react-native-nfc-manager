@@ -1,10 +1,11 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -49,6 +50,8 @@ const AccountDetailsScreen = ({
   const [passwordVisible, togglePasswordVisible] = useToggle(false);
 
   const intl = useIntl();
+
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -184,11 +187,11 @@ const AccountDetailsScreen = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   warningMessage: { width: 255, textAlign: 'center', alignSelf: 'center' },
   section: {
-    backgroundColor: colors.grey100,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
     height: 28,
     borderRadius: 12,
     justifyContent: 'center',
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
   sectionFieldPlaceholder: {
     color: colors.grey200,
   },
-});
+}));
 
 export default relayScreen(AccountDetailsScreen, {
   query: accountDetailsScreenQuery,

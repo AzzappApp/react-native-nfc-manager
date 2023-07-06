@@ -1,12 +1,6 @@
 import { useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Pressable,
-  View,
-  useWindowDimensions,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import { Pressable, View, useWindowDimensions, Image } from 'react-native';
 import Animated, {
   Easing,
   FadeIn,
@@ -25,6 +19,7 @@ import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
 import ContactCard from '#components/ContactCard';
 import ProfileColorPicker from '#components/ProfileColorPicker';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -180,6 +175,8 @@ const ContactCardScreen = ({
       },
     });
   }, [debouncedPublic, debouncedDisplayedOnWebCard, commit]);
+
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -343,7 +340,7 @@ const ContactCardScreen = ({
                   marginVertical: 'auto',
                 }}
               />
-              <Text variant="button" style={{ color: colors.white }}>
+              <Text variant="button" style={styles.addToWalletButtonText}>
                 <FormattedMessage
                   defaultMessage="Add to Apple Wallet"
                   description="Add to Apple Wallet button label"
@@ -375,7 +372,7 @@ export default relayScreen(ContactCardScreen, {
   query: contactCardMobileScreenQuery,
 });
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     position: 'relative',
@@ -406,9 +403,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 47,
     borderRadius: 12,
-    backgroundColor: colors.black,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  addToWalletButtonText: {
+    color: appearance === 'light' ? colors.white : colors.black,
   },
   cardColorPicker: {
     borderColor: colors.black,
@@ -416,4 +416,4 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 6,
   },
-});
+}));

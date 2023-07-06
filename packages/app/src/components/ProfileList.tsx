@@ -2,6 +2,7 @@ import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import Animated, { FadeOutUp } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
@@ -22,6 +23,8 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
   onToggleFollow?: (id: string) => void;
   profile: ArrayItemType<ProfileList_users$data>;
 }) {
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <Animated.View style={styles.item} exiting={FadeOutUp}>
       <Link
@@ -44,7 +47,8 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
         <IconButton
           icon="delete"
           size={35}
-          style={styles.deleteIcon}
+          style={styles.deleteIconButton}
+          iconStyle={styles.deleteIcon}
           onPress={() => onToggleFollow(profile.id)}
         />
       ) : null}
@@ -106,6 +110,8 @@ const ProfileList = ({
     [onToggleFollow],
   );
 
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <FlatList
       testID="profile-list"
@@ -136,32 +142,37 @@ const ProfileList = ({
 
 export default ProfileList;
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    rowGap: SEPARATOR_HEIGHT,
-  },
-  header: { paddingHorizontal: 10 },
-  item: {
-    paddingRight: 10,
-    columnGap: 15.5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-  },
-  profile: {
-    paddingLeft: 20.5,
-    columnGap: 15.5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  deleteIcon: {
-    marginLeft: 'auto',
-  },
-  empty: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styleSheet = createStyleSheet(appareance =>
+  StyleSheet.create({
+    container: {
+      flexGrow: 1,
+      rowGap: SEPARATOR_HEIGHT,
+    },
+    header: { paddingHorizontal: 10 },
+    item: {
+      paddingRight: 10,
+      columnGap: 15.5,
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+    },
+    profile: {
+      paddingLeft: 20.5,
+      columnGap: 15.5,
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    deleteIconButton: {
+      marginLeft: 'auto',
+    },
+    deleteIcon: {
+      tintColor: appareance === 'dark' ? '#fff' : '#000',
+    },
+    empty: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  }),
+);

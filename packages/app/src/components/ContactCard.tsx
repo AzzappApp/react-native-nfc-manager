@@ -52,7 +52,7 @@ const ContactCard = ({
       <View style={styles.webCardBackground}>
         <Image
           source={require('#assets/webcard/logo-substract.png')}
-          style={{ height: '100%', zIndex: 1 }}
+          style={styles.logo}
           resizeMode="contain"
         />
         <Image
@@ -112,9 +112,10 @@ export const styleSheet = createStyleSheet(appearance => ({
     },
     shadow(appearance),
   ],
+  logo: { height: '100%', zIndex: 1, left: -4 },
   webCardBackground: {
     position: 'absolute',
-    left: -8,
+    left: 0,
     right: 0,
     top: 0,
     overflow: 'hidden',
