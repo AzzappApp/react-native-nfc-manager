@@ -25,7 +25,8 @@ jobs:
       # Setup
       #
       ############################################
-      - run:
+      - name: "Check DATABASE URL"
+        run:
           if [[ -z "$DATABASE_URL" ]]; then
             echo "DATABASE_URL is not set"
           else
