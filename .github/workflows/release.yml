@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ secrets.ADGMIN_GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v3
         with:
@@ -33,7 +34,7 @@ jobs:
     
       - name: Git config
         run: |
-          git config user.name "azzapp-dev-bot"
+          git config user.name "Azzapp Dev Bot"
           git config user.email "azzapp-dev-bot@azzapp.com"
 
       - name: Release
