@@ -30,6 +30,11 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
+    
+      - name: Git config
+        run: |
+          git config user.name "azzapp-dev-bot"
+          git config user.email "azzapp-dev-bot@azzapp.com"
 
       - name: Release
         run: |
