@@ -161,7 +161,7 @@ jobs:
          
       - name: PlanetScale - Extract branch name
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        run: echo "branch=$(echo ci_${GITHUB_SHA})" >> $GITHUB_OUTPUT
+        run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
         id: extract_branch
         
       - name: PlanetScale - Create a branch
@@ -186,7 +186,7 @@ jobs:
           org_name: azzapp
           database_name: azzapp
           branch_name: ${{ steps.extract_branch.outputs.branch }}
-          name: 'pass_${{ steps.extract_branch.outputs.branch }}'
+          name: 'pass-${{ steps.extract_branch.outputs.branch }}'
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
@@ -195,11 +195,9 @@ jobs:
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         working-directory: packages/data
         run: |
-          HOST="${{ steps.create_password.outputs.hostname }}"
-          USER="${{ steps.create_password.outputs.username }}"
-          PASSWORD="${{ steps.create_password.outputs.hostname }}""
-          export DATABASE_URL="mysql://$USER:$PASSWORD@$HOST/azzapp?ssl={"rejectUnauthorized":true}"
+          export DATABASE_URL="mysql://${{ steps.create_password.outputs.username }}:${{ steps.create_password.outputs.password }}@${{ steps.create_password.outputs.hostname }}/azzapp?ssl={\"rejectUnauthorized\":true}"
           yarn push-migration
+            
 
       - name: PlanetScale - Create a deploy request
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
