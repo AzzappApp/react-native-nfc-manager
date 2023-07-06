@@ -94,11 +94,6 @@ const updater = (
 
     ConnectionHandler.getConnection(
       viewer,
-      'SuggestedProfilesList_suggestedProfiles',
-    )?.invalidateRecord();
-
-    ConnectionHandler.getConnection(
-      viewer,
       'Viewer_followingsPosts',
     )?.invalidateRecord();
   }

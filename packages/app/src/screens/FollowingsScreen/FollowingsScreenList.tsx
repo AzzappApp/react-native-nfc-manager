@@ -24,8 +24,9 @@ const FollowingsScreenList = ({
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
+          userName: { type: String, defaultValue: "" }
         ) {
-          followings(after: $after, first: $first)
+          followings(after: $after, first: $first, userName: $userName)
             @connection(key: "Account_followings") {
             edges {
               node {
