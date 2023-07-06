@@ -26,6 +26,7 @@ import type {
 import type { SessionData } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
+  cardUpdateListener: (username: string) => void;
   auth: SessionData;
   locale: string;
   profileLoader: DataLoader<string, Profile | null>;
@@ -45,6 +46,7 @@ const dataloadersOptions = {
 };
 
 export const createGraphQLContext = (
+  cardUpdateListener: (username: string) => void,
   userInfos?: SessionData,
   locale: string = DEFAULT_LOCALE,
 ): GraphQLContext => {
@@ -53,6 +55,7 @@ export const createGraphQLContext = (
   return {
     auth: userInfos,
     locale,
+    cardUpdateListener,
     profileLoader: new DataLoader(getProfilesByIds, dataloadersOptions),
     cardByProfileLoader: new DataLoader(async (ids: readonly string[]) => {
       const cards = await getUsersCards(ids as string[]);

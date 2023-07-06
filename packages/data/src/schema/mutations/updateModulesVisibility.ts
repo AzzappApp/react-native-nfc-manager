@@ -5,7 +5,11 @@ import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
-  async (_source, args, { auth, cardByProfileLoader }) => {
+  async (
+    _source,
+    args,
+    { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  ) => {
     const { modulesIds, visible } = args.input;
 
     const profileId = getProfileId(auth);
@@ -34,6 +38,10 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
       console.error(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const profile = await profileLoader.load(profileId);
+    cardUpdateListener(profile!.userName);
+
     return { card };
   };
 

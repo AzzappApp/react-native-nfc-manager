@@ -21,7 +21,17 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
 const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTitleModule'] =
-  async (_, { input }, { auth, cardByProfileLoader, mediaLoader }) => {
+  async (
+    _,
+    { input },
+    {
+      auth,
+      cardByProfileLoader,
+      mediaLoader,
+      profileLoader,
+      cardUpdateListener,
+    },
+  ) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -102,6 +112,9 @@ const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTi
           await removeMedias([module.data.image]);
         }
       }
+
+      const profile = await profileLoader.load(profileId);
+      cardUpdateListener(profile!.userName);
 
       return { card };
     } catch (e) {

@@ -23,7 +23,14 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const updateCover: MutationResolvers['updateCover'] = async (
   _,
   { input },
-  { auth, cardByProfileLoader, profileLoader, coverLoader, mediaLoader },
+  {
+    auth,
+    cardByProfileLoader,
+    profileLoader,
+    coverLoader,
+    mediaLoader,
+    cardUpdateListener,
+  },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -293,6 +300,8 @@ const updateCover: MutationResolvers['updateCover'] = async (
     mediaLoader.clear(input.sourceMediaId);
   }
   const profile = await profileLoader.load(profileId);
+
+  cardUpdateListener(profile!.userName);
 
   return { profile };
 };

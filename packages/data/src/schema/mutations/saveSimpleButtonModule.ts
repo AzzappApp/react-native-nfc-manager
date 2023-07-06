@@ -16,7 +16,11 @@ import type { Card, CardModule } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveSimpleButtonModule: MutationResolvers['saveSimpleButtonModule'] =
-  async (_, { input }, { auth, cardByProfileLoader }) => {
+  async (
+    _,
+    { input },
+    { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  ) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -66,6 +70,9 @@ const saveSimpleButtonModule: MutationResolvers['saveSimpleButtonModule'] =
       console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const profile = await profileLoader.load(profileId);
+    cardUpdateListener(profile!.userName);
 
     return { card };
   };

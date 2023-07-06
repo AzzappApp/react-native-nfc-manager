@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import {
   getCardCoversByIds,
@@ -15,14 +16,22 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const profile = await getProfileByUserName(userName);
-  const [card] = profile ? await getUsersCards([profile.id]) : [];
-  const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
+  const { profile, card, cover, modules } = await unstable_cache(
+    async () => {
+      const profile = await getProfileByUserName(userName);
+      const [card] = profile ? await getUsersCards([profile.id]) : [];
+      const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
+      const modules = card ? await getCardModules(card.id) : [];
+
+      return { profile, card, cover, modules };
+    },
+    [userName],
+    { tags: [userName] },
+  )();
+
   if (!profile || !card || !cover) {
     return notFound();
   }
-
-  const modules = await getCardModules(card.id);
 
   return (
     <div style={{ backgroundColor: card.backgroundColor ?? '#FFF' }}>
@@ -39,4 +48,4 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
 
 export default ProfilePage;
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';

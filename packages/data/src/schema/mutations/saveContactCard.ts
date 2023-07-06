@@ -11,7 +11,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
   { input },
-  { auth, profileLoader, userLoader },
+  { auth, profileLoader, userLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
 
@@ -60,6 +60,8 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     };
 
     await createContactCard(newCardWithDefaultValues);
+
+    cardUpdateListener(profile.userName);
 
     return { contactCard: newCardWithDefaultValues };
   }

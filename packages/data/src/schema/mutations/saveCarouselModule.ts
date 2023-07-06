@@ -26,7 +26,7 @@ import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   _,
   { input },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -137,6 +137,9 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   } catch (e) {
     console.warn('Error deleting media', e);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
 
   return { card };
 };

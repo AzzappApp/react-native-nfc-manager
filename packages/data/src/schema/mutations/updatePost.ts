@@ -10,7 +10,7 @@ import type { GraphQLContext } from '../GraphQLContext';
 const updatePostMutation: MutationResolvers['updatePost'] = async (
   _,
   { input },
-  { auth, postLoader }: GraphQLContext,
+  { auth, postLoader, profileLoader, cardUpdateListener }: GraphQLContext,
 ) => {
   const profileId = getProfileId(auth);
 
@@ -33,6 +33,9 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
 
   try {
     await updatePost(post.id, partialPost);
+
+    const profile = await profileLoader.load(profileId);
+    cardUpdateListener(profile!.userName);
 
     return {
       post: { ...post, ...partialPost },

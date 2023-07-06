@@ -14,7 +14,7 @@ const connection = connect({
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    return fetch(input, { ...init, cache: 'no-store' });
+    return fetch(input, init);
   },
 });
 

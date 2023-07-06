@@ -6,7 +6,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const swapModules: MutationResolvers['swapModules'] = async (
   _,
   { input: { moduleAId, moduleBId } },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -35,6 +35,9 @@ const swapModules: MutationResolvers['swapModules'] = async (
     console.error(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
 
   return { card };
 };

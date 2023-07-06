@@ -18,7 +18,17 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
 const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] =
-  async (_, { input }, { auth, cardByProfileLoader, mediaLoader }) => {
+  async (
+    _,
+    { input },
+    {
+      auth,
+      cardByProfileLoader,
+      mediaLoader,
+      profileLoader,
+      cardUpdateListener,
+    },
+  ) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -98,6 +108,8 @@ const saveHorizontalPhotoModule: MutationResolvers['saveHorizontalPhotoModule'] 
           await removeMedias([module.data.image]);
         }
       }
+      const profile = await profileLoader.load(profileId);
+      cardUpdateListener(profile!.userName);
 
       return { card };
     } catch (e) {

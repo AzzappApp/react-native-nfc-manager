@@ -20,7 +20,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const saveSimpleTextModule: MutationResolvers['saveSimpleTextModule'] = async (
   _,
   { input },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -84,6 +84,9 @@ const saveSimpleTextModule: MutationResolvers['saveSimpleTextModule'] = async (
     console.log(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
 
   return { card };
 };
