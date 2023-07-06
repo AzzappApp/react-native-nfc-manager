@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "relay-runtime": "^14.1.0",
-    "@azzapp/shared": "*"
+    "@azzapp/shared": "0.1.1-canary.0"
   }
 }

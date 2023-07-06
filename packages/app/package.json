@@ -15,9 +15,9 @@
     "rn:watch"
   ],
   "dependencies": {
-    "@azzapp/i18n": "*",
-    "@azzapp/relay": "*",
-    "@azzapp/shared": "*",
+    "@azzapp/i18n": "0.1.1-canary.0",
+    "@azzapp/relay": "0.1.1-canary.0",
+    "@azzapp/shared": "0.1.1-canary.0",
     "@formatjs/intl-locale": "^3.3.2",
     "@formatjs/intl-relativetimeformat": "^11.2.4",
     "@formatjs/intl-pluralrules": "^5.2.4",

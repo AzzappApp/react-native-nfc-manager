@@ -18,6 +18,6 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/shared": "*"
+    "@azzapp/shared": "0.1.1-canary.0"
   }
 }
