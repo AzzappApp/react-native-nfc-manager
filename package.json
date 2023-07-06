@@ -30,7 +30,7 @@
     "run:android": "yarn workspace @azzapp/app run:android",
     "update-graphql-schema": "yarn graphql-codegen",
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo",
-    "relase": "release-it"
+    "release": "release-it"
   },
   "devScripts": [
     "relay:watch",
