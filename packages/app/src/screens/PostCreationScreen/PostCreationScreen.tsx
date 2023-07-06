@@ -8,6 +8,10 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
+import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
+import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
+import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
+import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -43,6 +47,7 @@ const postCreationcreenQuery = graphql`
 
 const PostCreationScreen = ({
   preloadedQuery,
+  route: { params },
 }: RelayScreenProps<NewPostRoute, PostCreationScreenQuery>) => {
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
@@ -68,6 +73,11 @@ const PostCreationScreen = ({
     mutation PostCreationScreenMutation(
       $connections: [ID!]!
       $input: CreatePostInput!
+      $isNative: Boolean!
+      $screenWidth: Float!
+      $postWith: Float!
+      $cappedPixelRatio: Float!
+      $pixelRatio: Float!
     ) {
       createPost(input: $input) {
         post @prependNode(connections: $connections, edgeTypeName: "PostEdge") {
@@ -83,6 +93,21 @@ const PostCreationScreen = ({
             id
             width
             height
+            aspectRatio
+            largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              @include(if: $isNative)
+            smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
+              @include(if: $isNative)
+            ... on MediaVideo {
+              largeThumbnail: thumbnail(
+                width: $screenWidth
+                pixelRatio: $pixelRatio
+              ) @include(if: $isNative)
+              smallThumbnail: thumbnail(
+                width: $postWith
+                pixelRatio: $cappedPixelRatio
+              ) @include(if: $isNative)
+            }
           }
           createdAt
         }
@@ -145,6 +170,11 @@ const PostCreationScreen = ({
           allowLikes,
           content,
         },
+        isNative: true,
+        screenWidth: ScreenWidth(),
+        postWith: PostWidth(),
+        cappedPixelRatio: CappedPixelRatio(),
+        pixelRatio: PixelRatio(),
         connections: [connectionID!],
       },
       onCompleted(response, error) {
@@ -170,13 +200,17 @@ const PostCreationScreen = ({
             `file://${exportedMedia.uri}`,
           );
           // TODO use fragment instead of response
-          router.replace({
-            route: 'PROFILE',
-            params: {
-              userName: response.createPost?.post?.author.userName as string,
-              showPosts: true,
-            },
-          });
+          if (params?.fromProfile) {
+            router.back();
+          } else {
+            router.replace({
+              route: 'PROFILE',
+              params: {
+                userName: response.createPost?.post?.author.userName as string,
+                showPosts: true,
+              },
+            });
+          }
         }
       },
       onError() {

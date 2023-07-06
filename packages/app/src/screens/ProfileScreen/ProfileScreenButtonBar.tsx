@@ -181,7 +181,7 @@ const ProfileScreenButtonActionButton = ({
 
   const router = useRouter();
   const onCreateNewPost = () => {
-    router.push({ route: 'NEW_POST' });
+    router.push({ route: 'NEW_POST', params: { fromProfile: true } });
   };
 
   return isViewer ? (

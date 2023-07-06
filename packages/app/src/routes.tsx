@@ -82,7 +82,7 @@ export type PostCommentsRoute = {
 
 export type NewPostRoute = {
   route: 'NEW_POST';
-  params?: never;
+  params?: { fromProfile: boolean };
 };
 
 export type CardModuleEditionRoute = {
