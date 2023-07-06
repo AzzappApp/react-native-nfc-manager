@@ -123,12 +123,12 @@ const TextAreaModal = ({
               variant="smallbold"
               style={[
                 styles.counter,
-                value.length >= maxLength && {
+                text.length >= maxLength && {
                   color: colors.red400,
                 },
               ]}
             >
-              {value?.length ?? 0} / {maxLength}
+              {text?.length ?? 0} / {maxLength}
             </Text>
           )}
         </KeyboardAvoidingView>
