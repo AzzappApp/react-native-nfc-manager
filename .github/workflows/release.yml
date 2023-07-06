@@ -44,7 +44,7 @@ jobs:
             yarn release
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
       - name: Merge staging into stable
         if: github.ref == 'refs/heads/staging'
@@ -52,7 +52,7 @@ jobs:
         with:
           type: now
           target_branch: stable
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
       - name: Merge main into staging
         if: github.ref == 'refs/heads/main'
@@ -60,7 +60,7 @@ jobs:
         with:
           type: now
           target_branch: staging
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
       - name: Bump development version
         if: github.ref == 'refs/heads/main'
