@@ -33,7 +33,7 @@ jobs:
             echo "DATABASE_URL is set"
           fi
         env:
-          DATABASE_URL: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - uses: actions/checkout@v3
 
