@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "relay-runtime": "^14.1.0",
-    "@azzapp/shared": "0.1.0-rc.0"
+    "@azzapp/shared": "*"
   }
 }

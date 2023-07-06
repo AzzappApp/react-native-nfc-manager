@@ -34,10 +34,10 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/auth": "0.1.0-rc.0",
-    "@azzapp/i18n": "0.1.0-rc.0",
-    "@azzapp/relay": "0.1.0-rc.0",
-    "@azzapp/shared": "0.1.0-rc.0",
+    "@azzapp/auth": "*",
+    "@azzapp/i18n": "*",
+    "@azzapp/relay": "*",
+    "@azzapp/shared": "*",
     "@graphql-tools/schema": "^7.0.0",
     "@paralleldrive/cuid2": "^2.2.0",
     "@planetscale/database": "^1.6.0",
