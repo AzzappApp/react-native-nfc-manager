@@ -1,1 +1,0 @@
-ALTER TABLE `CardCover` MODIFY COLUMN `textPreviewMediaId` varchar(191);

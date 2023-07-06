@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -138,6 +138,91 @@ jobs:
               repo: "azzapp-precompiled-queries",
               pull_number,
             });
+
+      ############################################
+      #
+      # PlanetScale schema migration
+      #
+      ############################################
+      - name: PlanetScale - Check if migration is needed
+        id: planetscale_migration_needed
+        working-directory: packages/data
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          yarn introspect
+          yarn generate-migration
+          HAS_CHANGE="false"
+          if compgen -G "drizzle/0001*" > /dev/null; then
+              HAS_CHANGE="true"
+          fi
+          echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+         
+      - name: PlanetScale - Extract branch name
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        run: echo "branch=$(echo ci_${GITHUB_SHA})" >> $GITHUB_OUTPUT
+        id: extract_branch
+        
+      - name: PlanetScale - Create a branch
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-branch-action@v1
+        id: create_branch
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          from: ${{ github.ref_name }}
+          wait: true
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      
+      - name: PlanetScale - Create a password
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-branch-password-action@v1
+        id: create_password
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          name: 'pass_${{ steps.extract_branch.outputs.branch }}'
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+
+      - name: PlanetScale - Apply drizzle changes
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        working-directory: packages/data
+        run: |
+          HOST="${{ steps.create_password.outputs.hostname }}"
+          USER="${{ steps.create_password.outputs.username }}"
+          PASSWORD="${{ steps.create_password.outputs.hostname }}""
+          export DATABASE_URL="mysql://$USER:$PASSWORD@$HOST/azzapp?ssl={"rejectUnauthorized":true}"
+          yarn push-migration
+
+      - name: PlanetScale - Create a deploy request
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-deploy-request-action@v1
+        id: create_deploy_request
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+            
+      - name: PlanetScale - Deploy the changes
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/deploy-deploy-request-action@v1
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          number: ${{ steps.create_deploy_request.outputs.number }}
+          wait: true
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
 
       ############################################
       #
