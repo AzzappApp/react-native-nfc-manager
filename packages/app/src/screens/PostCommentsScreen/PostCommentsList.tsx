@@ -140,6 +140,16 @@ const PostCommentsList = ({
           setSubmitting(false);
           setComment('');
         },
+        updater: store => {
+          const post = store.get<{ counterComments: number }>(postId);
+          if (post) {
+            const counterComments = post?.getValue('counterComments');
+
+            if (typeof counterComments === 'number') {
+              post?.setValue(counterComments + 1, 'counterComments');
+            }
+          }
+        },
       });
     }
   };
