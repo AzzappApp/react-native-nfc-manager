@@ -527,10 +527,6 @@
     "defaultMessage": "Add an email address",
     "description": "placeholder in account details screen when no email address is registered"
   },
-  "CM2v8u": {
-    "defaultMessage": "Username can’t contain space or special caracters",
-    "description": "NewProfileScreen - Username Error"
-  },
   "CVzXRv": {
     "defaultMessage": "Share",
     "description": "Share button label"
@@ -1354,6 +1350,10 @@
   "WO7pDf": {
     "defaultMessage": "Enter your password",
     "description": "SignIn Screen - Accessibility TextInput email address "
+  },
+  "WSU4SO": {
+    "defaultMessage": "Username can’t contain space or special characters",
+    "description": "NewProfileScreen - Username Error"
   },
   "Wa87wW": {
     "defaultMessage": "Configuration",

@@ -1,6 +1,6 @@
 import { range } from 'lodash';
 import { Suspense } from 'react';
-import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
+import * as ReactRelay from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
 import NewProfileScreenQueryNode from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import ERRORS from '@azzapp/shared/errors';
@@ -31,11 +31,17 @@ jest.mock('#components/NativeRouter', () => ({
   },
 }));
 
+jest.mock('react-relay', () => ({
+  ...jest.requireActual('react-relay'),
+  fetchQuery: jest.fn(),
+}));
+
 describe('NewProfileScreen', () => {
   let environment: RelayMockEnvironment;
 
   const renderNewProfileScreen = () => {
     environment = createMockEnvironment();
+
     environment.mock.queueOperationResolver(operation =>
       MockPayloadGenerator.generate(operation, {
         Query: () => ({
@@ -64,7 +70,7 @@ describe('NewProfileScreen', () => {
     );
     environment.mock.queuePendingOperation(NewProfileScreenQueryNode, {});
 
-    const preloadedQuery = loadQuery<NewProfileScreenQuery>(
+    const preloadedQuery = ReactRelay.loadQuery<NewProfileScreenQuery>(
       environment,
       NewProfileScreenQueryNode,
       {},
@@ -86,9 +92,9 @@ describe('NewProfileScreen', () => {
     };
 
     return render(
-      <RelayEnvironmentProvider environment={environment}>
+      <ReactRelay.RelayEnvironmentProvider environment={environment}>
         <TestRenderer />
-      </RelayEnvironmentProvider>,
+      </ReactRelay.RelayEnvironmentProvider>,
     );
   };
 
@@ -180,16 +186,10 @@ describe('NewProfileScreen', () => {
           screen.getByPlaceholderText('Enter your first name'),
           'John',
         );
-      });
-
-      act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Enter your last name'),
           'Doe',
         );
-      });
-
-      act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Choose an username'),
           'johndoe',
@@ -205,6 +205,9 @@ describe('NewProfileScreen', () => {
       act(() => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
+
+      await act(flushPromises);
+
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
           firstName: 'John',
@@ -214,8 +217,6 @@ describe('NewProfileScreen', () => {
           profileKind: 'personal',
         }),
       );
-
-      await act(flushPromises);
 
       expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
         type: 'PROFILE_CHANGE',
@@ -275,7 +276,7 @@ describe('NewProfileScreen', () => {
       );
     });
 
-    test('should display an error message if the username is invalid', () => {
+    test('should display an error message if the username is invalid', async () => {
       renderToProfileForm('personal');
 
       act(() => {
@@ -292,22 +293,36 @@ describe('NewProfileScreen', () => {
         );
       });
 
+      act(() => {
+        fireEvent.press(screen.getByTestId('submit-button'));
+      });
+
+      await act(flushPromises);
+
       expect(
-        screen.queryByText('Username can’t contain space or special caracters'),
+        screen.queryByText(
+          'Username can’t contain space or special characters',
+        ),
       ).not.toBeTruthy();
+
       act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Choose an username'),
           'ddssd$$$',
         );
       });
-      expect(
-        screen.queryByText('Username can’t contain space or special caracters'),
-      ).toBeTruthy();
 
       act(() => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
+
+      await act(flushPromises);
+
+      expect(
+        screen.queryByText(
+          'Username can’t contain space or special characters',
+        ),
+      ).toBeTruthy();
 
       expect(createProfileMock).not.toHaveBeenCalled();
     });
@@ -337,13 +352,18 @@ describe('NewProfileScreen', () => {
         );
       });
 
+      act(() => {
+        fireEvent.press(screen.getByTestId('submit-button'));
+      });
+
       createProfileMock.mockRejectedValueOnce(
         new Error(ERRORS.USERNAME_ALREADY_EXISTS),
       );
 
-      act(() => {
-        fireEvent.press(screen.getByTestId('submit-button'));
-      });
+      expect(
+        screen.queryByText('This username is already used by someone else'),
+      ).not.toBeTruthy();
+      await act(flushPromises);
 
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -355,10 +375,6 @@ describe('NewProfileScreen', () => {
         }),
       );
 
-      expect(
-        screen.queryByText('This username is already used by someone else'),
-      ).not.toBeTruthy();
-      await act(flushPromises);
       expect(
         screen.queryByText('This username is already used by someone else'),
       ).toBeTruthy();

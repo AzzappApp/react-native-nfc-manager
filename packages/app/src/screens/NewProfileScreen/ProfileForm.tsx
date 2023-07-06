@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   StyleSheet,
@@ -14,6 +15,7 @@ import {
   useRelayEnvironment,
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
+import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -39,7 +41,7 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as RNTextInput } from 'react-native';
 
-type ProfileForm = {
+type ProfileFormProps = {
   profileKind: string;
   profileCategory: ProfileForm_profileCategory$key;
   onBack: () => void;
@@ -51,12 +53,24 @@ type ProfileForm = {
   }) => void;
 };
 
+const profileFormSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  companyName: z.string(),
+  companyActivityId: z.string(),
+  userName: z.string().refine(userName => isValidUserName(userName), {
+    message: 'Username can’t contain space or special caracters',
+  }),
+});
+
+type ProfileForm = z.infer<typeof profileFormSchema>;
+
 const ProfileForm = ({
   profileKind,
   profileCategory,
   onProfileCreated,
   onBack,
-}: ProfileForm) => {
+}: ProfileFormProps) => {
   const { id: profileCategoryId, companyActivities } = useFragment(
     graphql`
       fragment ProfileForm_profileCategory on ProfileCategory {
@@ -70,36 +84,100 @@ const ProfileForm = ({
     profileCategory,
   );
 
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
-  const [companyName, setCompanyName] = useState<string | null>(null);
-  const [companyActivityId, setCompanyActivityId] = useState<string | null>(
-    null,
-  );
-  const [userName, setUserName] = useState('');
-  const [userNameAlreadyExists, setUserNameAlreadyExists] = useState<
-    string | null
-  >(null);
+  const intl = useIntl();
 
-  const onActivitySelected = useCallback(
-    (item: CompanyActivity) => {
-      setCompanyActivityId(item.id);
+  const userNameAlreadyExistsError = intl.formatMessage({
+    defaultMessage: 'This username is already used by someone else',
+    description: 'NewProfileScreen - Username already taken error',
+  });
+
+  const userNameInvalidError = intl.formatMessage({
+    defaultMessage: 'Username can’t contain space or special characters',
+    description: 'NewProfileScreen - Username Error',
+  });
+
+  const environment = useRelayEnvironment();
+
+  const {
+    control,
+    trigger,
+    handleSubmit,
+    setError,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<ProfileForm>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      companyActivityId: '',
+      userName: '',
     },
-    [setCompanyActivityId],
-  );
-  const onChangeUsername = useCallback((text: string) => {
-    setUserName(text.toLowerCase());
-  }, []);
-  const userNameIsValid = isValidUserName(userName);
-  const userNameIsNotEmpty = isNotFalsyString(userName);
+    mode: 'onSubmit',
+    resolver: async data => {
+      const result = profileFormSchema.safeParse(data);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const onSubmit = async () => {
-    if (!userNameIsValid || !userNameIsNotEmpty) {
+      if (result.success) {
+        if (data.userName) {
+          try {
+            const res = await fetchQuery<ProfileFormQuery>(
+              environment,
+              graphql`
+                query ProfileFormQuery($userName: String!) {
+                  profile(userName: $userName) {
+                    id
+                    userName
+                  }
+                }
+              `,
+              { userName: data.userName },
+            ).toPromise();
+
+            if (res?.profile?.userName === data.userName) {
+              const { userName, ...values } = data;
+
+              return {
+                values,
+                errors: {
+                  userName: {
+                    type: 'validation',
+                    message: userNameAlreadyExistsError,
+                  },
+                },
+              };
+            }
+          } catch (e) {
+            //waiting for submit
+          }
+        }
+
+        return {
+          values: data,
+          errors: {},
+        };
+      } else {
+        return {
+          values: {},
+          errors: Object.entries(result.error.formErrors.fieldErrors).reduce(
+            (allErrors, [path, message]) => ({
+              ...allErrors,
+              [path]: {
+                type: 'validation',
+                message: path === 'userName' ? userNameInvalidError : message,
+              },
+            }),
+            {},
+          ),
+        };
+      }
+    },
+  });
+
+  const onSubmit = handleSubmit(async data => {
+    if (!data.userName) {
       return;
     }
 
-    setIsSubmitting(true);
     let response: {
       token: string;
       refreshToken: string;
@@ -107,68 +185,39 @@ const ProfileForm = ({
     };
 
     const newProfile = {
-      companyName,
-      companyActivityId,
-      firstName,
-      lastName,
+      ...data,
       profileKind,
       profileCategoryId,
-      userName,
     };
+
     try {
       response = await createProfile(newProfile);
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.USERNAME_ALREADY_EXISTS) {
-        setUserNameAlreadyExists(userName);
+        setError('userName', {
+          type: 'validation',
+          message: userNameAlreadyExistsError,
+        });
       }
-      setIsSubmitting(false);
+
       // TODO
       return;
     }
+
     onProfileCreated({
       ...response,
       profileData: newProfile,
     });
-    setIsSubmitting(false);
-  };
+  });
 
+  const userName = watch('userName');
   const [debouncedUserName] = useDebounce(userName, 200);
 
-  const environment = useRelayEnvironment();
   useEffect(() => {
-    let subscription: { unsubscribe: () => void } | null = null;
-    if (
-      isNotFalsyString(debouncedUserName) &&
-      isValidUserName(debouncedUserName) &&
-      !isSubmitting
-    ) {
-      subscription = fetchQuery<ProfileFormQuery>(
-        environment,
-        graphql`
-          query ProfileFormQuery($userName: String!) {
-            profile(userName: $userName) {
-              id
-              userName
-            }
-          }
-        `,
-        { userName: debouncedUserName },
-      ).subscribe({
-        next(data) {
-          if (data.profile?.userName === debouncedUserName) {
-            setUserNameAlreadyExists(debouncedUserName);
-          }
-        },
-        error(e: any) {
-          // TODO
-          console.log(e);
-        },
-      });
+    if (debouncedUserName) {
+      void trigger('userName');
     }
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [debouncedUserName, environment, isSubmitting]);
+  }, [debouncedUserName, trigger]);
 
   const lastNameInputRef = useRef<RNTextInput>(null);
   const userNameInputRef = useRef<RNTextInput>(null);
@@ -181,26 +230,8 @@ const ProfileForm = ({
     userNameInputRef.current?.focus();
   };
 
-  const intl = useIntl();
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-
-  const userNameInvalidError = intl.formatMessage({
-    defaultMessage: 'Username can’t contain space or special caracters',
-    description: 'NewProfileScreen - Username Error',
-  });
-
-  const userNameAlreadyExistsError = intl.formatMessage({
-    defaultMessage: 'This username is already used by someone else',
-    description: 'NewProfileScreen - Username already taken error',
-  });
-
-  const userNameError =
-    userNameIsNotEmpty && !userNameIsValid
-      ? userNameInvalidError
-      : userNameAlreadyExists === userName
-      ? userNameAlreadyExistsError
-      : undefined;
 
   const companyActivityKeyExtractor = useCallback(
     (item: CompanyActivity) => item.id,
@@ -238,20 +269,27 @@ const ProfileForm = ({
               labelID="firstNameLabel"
               style={styles.formElement}
             >
-              <TextInput
-                nativeID="firstName"
-                accessibilityLabelledBy="firstNameLabel"
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Enter your first name',
-                  description: 'ProfileForm first name textinput placeholder',
-                })}
-                value={firstName ?? ''}
-                onChangeText={isSubmitting ? undefined : setFirstName}
-                autoCapitalize="words"
-                autoComplete="name"
-                autoCorrect={false}
-                returnKeyType="next"
-                onSubmitEditing={focusLastName}
+              <Controller
+                control={control}
+                name="firstName"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    nativeID="firstName"
+                    accessibilityLabelledBy="firstNameLabel"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter your first name',
+                      description:
+                        'ProfileForm first name textinput placeholder',
+                    })}
+                    value={value}
+                    onChangeText={onChange}
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    onSubmitEditing={focusLastName}
+                  />
+                )}
               />
             </Label>
             <Label
@@ -262,21 +300,28 @@ const ProfileForm = ({
               labelID="lastNameLabel"
               style={styles.formElement}
             >
-              <TextInput
-                nativeID="lastName"
-                ref={lastNameInputRef}
-                accessibilityLabelledBy="lastNameLabel"
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Enter your last name',
-                  description: 'ProfileForm last name textinput placeholder',
-                })}
-                value={lastName ?? ''}
-                onChangeText={isSubmitting ? undefined : setLastName}
-                autoCapitalize="words"
-                autoComplete="name-family"
-                autoCorrect={false}
-                returnKeyType="next"
-                onSubmitEditing={focusUserName}
+              <Controller
+                control={control}
+                name="lastName"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    nativeID="lastName"
+                    ref={lastNameInputRef}
+                    accessibilityLabelledBy="lastNameLabel"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter your last name',
+                      description:
+                        'ProfileForm last name textinput placeholder',
+                    })}
+                    value={value}
+                    onChangeText={onChange}
+                    autoCapitalize="words"
+                    autoComplete="name-family"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    onSubmitEditing={focusUserName}
+                  />
+                )}
               />
             </Label>
           </>
@@ -290,19 +335,26 @@ const ProfileForm = ({
               })}
               style={styles.formElement}
             >
-              <TextInput
-                nativeID="name"
-                accessibilityLabelledBy="nameLabel"
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Enter your name',
-                  description: 'ProfileForm company name textinput placeholder',
-                })}
-                value={companyName ?? ''}
-                onChangeText={isSubmitting ? undefined : setCompanyName}
-                autoCapitalize="words"
-                autoComplete="name"
-                autoCorrect={false}
-                returnKeyType="next"
+              <Controller
+                control={control}
+                name="companyName"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    nativeID="name"
+                    accessibilityLabelledBy="nameLabel"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter your name',
+                      description:
+                        'ProfileForm company name textinput placeholder',
+                    })}
+                    value={value}
+                    onChangeText={onChange}
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                  />
+                )}
               />
             </Label>
             {!!companyActivities.length && (
@@ -315,84 +367,99 @@ const ProfileForm = ({
                 })}
                 style={styles.formElement}
               >
-                <Select
-                  nativeID="activities"
-                  accessibilityLabelledBy="activitiesLabel"
-                  data={companyActivities}
-                  selectedItemKey={companyActivityId}
-                  keyExtractor={companyActivityKeyExtractor}
-                  bottomSheetHeight={windowHeight - 90 - insets.top}
-                  onItemSelected={onActivitySelected}
-                  bottomSheetTitle={intl.formatMessage({
-                    defaultMessage: 'Select an activity',
-                    description: 'ProfileForm - Activity BottomSheet - Title',
-                  })}
-                  placeHolder={intl.formatMessage({
-                    defaultMessage: 'Select an activity',
-                    description:
-                      'NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
-                  })}
-                  itemContainerStyle={styles.selectItemContainerStyle}
+                <Controller
+                  control={control}
+                  name="companyActivityId"
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      nativeID="activities"
+                      accessibilityLabelledBy="activitiesLabel"
+                      data={companyActivities}
+                      selectedItemKey={value}
+                      keyExtractor={companyActivityKeyExtractor}
+                      bottomSheetHeight={windowHeight - 90 - insets.top}
+                      onItemSelected={item => onChange(item.id)}
+                      bottomSheetTitle={intl.formatMessage({
+                        defaultMessage: 'Select an activity',
+                        description:
+                          'ProfileForm - Activity BottomSheet - Title',
+                      })}
+                      placeHolder={intl.formatMessage({
+                        defaultMessage: 'Select an activity',
+                        description:
+                          'NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
+                      })}
+                      itemContainerStyle={styles.selectItemContainerStyle}
+                    />
+                  )}
                 />
               </Label>
             )}
           </>
         )}
-        <Label
-          labelID="userNameLabel"
-          label={intl.formatMessage({
-            defaultMessage: 'Username*',
-            description: 'ProfileForm username textinput label',
-          })}
-          error={userNameError}
-          style={styles.formElement}
-          errorStyle={{ minHeight: 25 }}
-        >
-          <TextInput
-            nativeID="userName"
-            accessibilityLabelledBy="userNameLabel"
-            ref={userNameInputRef}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Choose an username',
-              description: 'ProfileForm username textinput placeholder',
-            })}
-            isErrored={userNameError != null}
-            value={userName}
-            onChangeText={isSubmitting ? undefined : onChangeUsername}
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect={false}
-            returnKeyType="send"
-            onSubmitEditing={onSubmit}
-          />
-        </Label>
-        <View style={styles.urlContainer}>
-          {userNameIsNotEmpty && (
+        <Controller
+          name="userName"
+          control={control}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
             <>
-              <Icon
-                icon={userNameError ? 'closeFull' : 'missing'}
-                style={{
-                  tintColor: userNameError ? colors.red400 : colors.green,
-                }}
-              />
-
-              <Text
-                variant="large"
-                style={[
-                  styles.urlText,
-                  userNameError != null && { color: colors.red400 },
-                ]}
+              <Label
+                labelID="userNameLabel"
+                label={intl.formatMessage({
+                  defaultMessage: 'Username*',
+                  description: 'ProfileForm username textinput label',
+                })}
+                error={error?.message}
+                style={styles.formElement}
+                errorStyle={{ minHeight: 25 }}
               >
-                {buildUserUrl(userName)}
-              </Text>
+                <TextInput
+                  nativeID="userName"
+                  accessibilityLabelledBy="userNameLabel"
+                  ref={userNameInputRef}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Choose an username',
+                    description: 'ProfileForm username textinput placeholder',
+                  })}
+                  isErrored={Boolean(error)}
+                  value={userName}
+                  onChangeText={text => onChange(text.toLowerCase())}
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect={false}
+                  returnKeyType="send"
+                  onSubmitEditing={onSubmit}
+                />
+              </Label>
+              <View style={styles.urlContainer}>
+                {Boolean(value) && (
+                  <>
+                    <Icon
+                      icon={error ? 'closeFull' : 'missing'}
+                      style={{
+                        tintColor: error ? colors.red400 : colors.green,
+                      }}
+                    />
+
+                    <Text
+                      variant="large"
+                      style={[
+                        styles.urlText,
+                        error && { color: colors.red400 },
+                      ]}
+                    >
+                      {buildUserUrl(userName)}
+                    </Text>
+                  </>
+                )}
+              </View>
             </>
           )}
-        </View>
+        />
         <View style={{ flex: 1 }} />
         <Submit>
           <ContinueButton
             testID="submit-button"
-            disabled={!userNameIsNotEmpty || isSubmitting}
+            disabled={!isNotFalsyString(userName) || isSubmitting}
             loading={isSubmitting}
           />
         </Submit>
