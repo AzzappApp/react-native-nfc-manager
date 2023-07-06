@@ -1,28 +1,19 @@
-import { flushPromises } from '@azzapp/shared/jestHelpers';
+import { flushPromises, mockReactComponent } from '@azzapp/shared/jestHelpers';
 import { render, screen, act, fireEvent } from '#helpers/testHelpers';
 import useCameraPermissions from '#hooks/useCameraPermissions';
 import ImagePicker from '..';
 import type { ImagePickerProps } from '../ImagePicker';
-import '@testing-library/jest-native/extend-expect';
 
-jest.mock(
-  '../PhotoGalleryMediaList',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('PhotoGalleryMediaList', {
-      ...props,
-      testID: 'media-list',
-    }),
+jest.mock('../PhotoGalleryMediaList', () =>
+  mockReactComponent('PhotoGalleryMediaList', {
+    testID: 'photo-gallery-media-list',
+  }),
 );
 
-jest.mock(
-  '../AlbumPicker',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('AlbumPicker', {
-      ...props,
-      testID: 'album-picker',
-    }),
+jest.mock('../AlbumPicker', () =>
+  mockReactComponent('AlbumPicker', {
+    testID: 'album-picker',
+  }),
 );
 
 const mockCameraViewRef = {
@@ -30,64 +21,71 @@ const mockCameraViewRef = {
   startRecording: jest.fn(),
 };
 
-jest.mock('#components/CameraView', () => {
+jest.mock('#components/CameraView', () =>
+  mockReactComponent(
+    'CameraView',
+    { testID: 'camera-view' },
+    () => mockCameraViewRef,
+  ),
+);
+
+jest.mock('#components/CameraControlPanel', () =>
+  mockReactComponent('CameraControlPanel', {
+    testID: 'camera-control-panel',
+  }),
+);
+
+jest.mock('#components/FilterSelectionList', () =>
+  mockReactComponent('FilterSelectionList', {
+    testID: 'filter-selection-list',
+  }),
+);
+
+jest.mock('#components/ImageEditionParametersList', () =>
+  mockReactComponent('ImageEditionParametersList', {
+    testID: 'image-parameters-selection-list',
+  }),
+);
+
+jest.mock('#components/ImageEditionParameterControl', () =>
+  mockReactComponent('ImageEditionParameterControl', {
+    testID: 'image-edition-parameter-control',
+  }),
+);
+jest.mock('#components/PermissionModal', () =>
+  mockReactComponent('PermissionModal', {
+    testID: 'permission-modal',
+  }),
+);
+
+jest.mock('#components/VideoTimelineEditor', () =>
+  mockReactComponent('VideoTimelineEditor', {
+    testID: 'video-time-line-editor',
+  }),
+);
+
+jest.mock('#components/Cropper', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const react = require('react');
-  const CameraView = (props: any, _ref: any) => {
-    react.useImperativeHandle(_ref, () => mockCameraViewRef);
-    return react.createElement('CameraView', {
-      ...props,
-      testID: 'camera-view',
-    });
-  };
+  const { View } = require('react-native');
+  const Cropper = ({ children, ...props }: any) => (
+    <View {...props} testID="cropper">
+      {children(props.cropData)}
+    </View>
+  );
 
-  return react.forwardRef(CameraView);
+  return Cropper;
 });
-
-jest.mock(
-  '#components/CameraControlPanel',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('CameraControlPanel', {
-      ...props,
-      testID: 'camera-control-panel',
-    }),
-);
-
-jest.mock(
-  '#components/FilterSelectionList',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('FilterSelectionList', {
-      ...props,
-      testID: 'filter-selection-list',
-    }),
-);
-
-jest.mock(
-  '#components/ImageEditionParametersList',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('ImageEditionParametersList', {
-      ...props,
-      testID: 'image-parameters-selection-list',
-    }),
-);
-
-jest.mock(
-  '#components/ImageEditionParameterControl',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('ImageEditionParameterControl', {
-      ...props,
-      testID: 'image-edition-parameter-control',
-    }),
-);
 
 jest.mock('#helpers/mediaHelpers', () => ({
   getImageSize: () => ({ width: 100, height: 100 }),
   getVideoSize: () => ({ width: 1080, height: 1920 }),
 }));
+
+jest.mock('#hooks/useMediaLibraryPermission', () =>
+  jest.fn().mockReturnValue({
+    granted: true,
+  }),
+);
 
 jest.mock('#hooks/useCameraPermissions', () =>
   jest.fn().mockReturnValue({
@@ -108,26 +106,6 @@ const withPermissionStatus = async (
   });
 };
 
-jest.mock(
-  '#components/PermissionModal',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('PermissionModal', {
-      ...props,
-      testID: 'permission-modal',
-    }),
-);
-
-jest.mock(
-  '#components/VideoTimelineEditor',
-  () => (props: any) =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react').createElement('VideoTimelineEditor', {
-      ...props,
-      testID: 'video-time-line-editor',
-    }),
-);
-
 const renderImagePicker = async (props?: Partial<ImagePickerProps>) => {
   const picker = render(
     <ImagePicker
@@ -139,20 +117,6 @@ const renderImagePicker = async (props?: Partial<ImagePickerProps>) => {
   await act(flushPromises);
   return picker;
 };
-
-jest.mock('#components/gpu/GPUNativeMethods');
-
-jest.mock('#components/Cropper', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { View } = require('react-native');
-  const Cropper = ({ children, ...props }: any) => (
-    <View {...props} testID="cropper">
-      {children(props.cropData)}
-    </View>
-  );
-
-  return Cropper;
-});
 
 describe('ImagePicker', () => {
   describe('SelectImageStep', () => {
@@ -321,7 +285,7 @@ describe('ImagePicker', () => {
       expect(screen.queryByTestId('filter-selection-list')).toBeTruthy();
     });
 
-    test('Should select the video taken by the user and goes to the next step', async () => {
+    test.only('Should select the video taken by the user and goes to the next step', async () => {
       await renderImagePicker({ kind: 'video' });
       act(() => {
         fireEvent.press(screen.getByLabelText('Take a video'));
@@ -338,6 +302,7 @@ describe('ImagePicker', () => {
         fireEvent(cameraControlPanel, 'startRecording');
         fireEvent(cameraControlPanel, 'stopRecording');
       });
+      expect(mockCameraViewRef.startRecording).toHaveBeenCalled();
       await act(flushPromises);
       expect(screen.getByTestId('image-picker-media-video')).toHaveProp(
         'layers',

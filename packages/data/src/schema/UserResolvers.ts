@@ -1,35 +1,30 @@
-import { getUserProfiles, getUsersByIds } from '#domains';
+import { getUserProfiles } from '#domains';
 import type { UserResolvers } from './__generated__/types';
 
 export const User: UserResolvers = {
-  email: async (_root, _args, context) => {
-    const user = context.auth;
-    if (user.isAnonymous) {
+  email: async (_root, _args, { auth, userLoader }) => {
+    if (auth.isAnonymous) {
       return null;
     }
 
-    const userId = user.userId;
-    const [dbUser] = await getUsersByIds([userId]);
+    const user = await userLoader.load(auth.userId);
 
-    return dbUser?.email ?? null;
+    return user?.email ?? null;
   },
-  phoneNumber: async (_root, _args, context) => {
-    const user = context.auth;
-    if (user.isAnonymous) {
+  phoneNumber: async (_root, _args, { auth, userLoader }) => {
+    if (auth.isAnonymous) {
       return null;
     }
 
-    const userId = user.userId;
-    const [dbUser] = await getUsersByIds([userId]);
+    const user = await userLoader.load(auth.userId);
 
-    return dbUser?.phoneNumber ?? null;
+    return user?.phoneNumber ?? null;
   },
-  profiles: async (_root, _args, context) => {
-    const user = context.auth;
-    if (user.isAnonymous) {
+  profiles: async (_root, _args, { auth }) => {
+    if (auth.isAnonymous) {
       return null;
     }
 
-    return getUserProfiles(user.userId);
+    return getUserProfiles(auth.userId);
   },
 };

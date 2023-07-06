@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import {
   MODULE_KIND_CAROUSEL,
@@ -11,36 +11,43 @@ import {
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
-import useViewportSize, { VW100 } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
-import CarouselRenderer, { CarouselRendererRaw } from './CarouselRenderer';
-import CoverRenderer from './CoverRenderer';
+import TitleWithLine from '#ui/TitleWithLine';
+import BlockTextRenderer, {
+  BlockTextRendererRaw,
+} from './cardModules/BlockTextRenderer';
+import CarouselRenderer, {
+  CarouselRendererRaw,
+} from './cardModules/CarouselRenderer';
 import HorizontalPhotoRenderer, {
   HorizontalPhotoRendererRaw,
-} from './HorizontalPhotoRenderer';
+} from './cardModules/HorizontalPhotoRenderer';
 import LineDividerRenderer, {
   LineDividerRendererRaw,
-} from './LineDividerRenderer';
+} from './cardModules/LineDividerRenderer';
 import PhotoWithTextAndTitleRenderer, {
   PhotoWithTextAndTitleRendererRaw,
-} from './PhotoWithTextAndTitleRenderer';
+} from './cardModules/PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer, {
   SimpleButtonRendererRaw,
-} from './SimpleButtonRenderer';
+} from './cardModules/SimpleButtonRenderer';
 import SimpleTextRenderer, {
   SimpleTextRendererRaw,
-} from './SimpleTextRenderer';
+} from './cardModules/SimpleTextRenderer';
 import SocialLinksRenderer, {
   SocialLinksRendererRaw,
-} from './SocialLinksRenderer';
+} from './cardModules/SocialLinksRenderer';
+import CoverRenderer from './CoverRenderer';
 import SwitchToggle from './SwitchToggle';
-import type { CarouselRawData } from './CarouselRenderer';
-import type { HorizontalPhotoRawData } from './HorizontalPhotoRenderer';
-import type { LineDividerRawData } from './LineDividerRenderer';
-import type { PhotoWithTextAndTitleRawData } from './PhotoWithTextAndTitleRenderer';
-import type { SimpleButtonRawData } from './SimpleButtonRenderer';
-import type { SimpleTextRawData } from './SimpleTextRenderer';
+import type { BlockTextRawData } from './cardModules/BlockTextRenderer';
+import type { CarouselRawData } from './cardModules/CarouselRenderer';
+import type { HorizontalPhotoRawData } from './cardModules/HorizontalPhotoRenderer';
+import type { LineDividerRawData } from './cardModules/LineDividerRenderer';
+import type { PhotoWithTextAndTitleRawData } from './cardModules/PhotoWithTextAndTitleRenderer';
+import type { SimpleButtonRawData } from './cardModules/SimpleButtonRenderer';
+import type { SimpleTextRawData } from './cardModules/SimpleTextRenderer';
 import type { WebCardPreviewQuery } from '@azzapp/relay/artifacts/WebCardPreviewQuery.graphql';
 import type {
   LayoutChangeEvent,
@@ -90,7 +97,13 @@ type SocialLinksModuleInfo = {
   data: PhotoWithTextAndTitleRawData;
 };
 
+type BlockTextModuleInfo = {
+  kind: typeof MODULE_KIND_BLOCK_TEXT;
+  data: BlockTextRawData;
+};
+
 type ModuleInfo =
+  | BlockTextModuleInfo
   | CarouselModuleInfo
   | HorizontalPhotoModuleInfo
   | LineDividerModuleInfo
@@ -132,6 +145,7 @@ const WebCardPreview = ({
                 ...SimpleButtonRenderer_module
                 ...PhotoWithTextAndTitleRenderer_module
                 ...SocialLinksRenderer_module
+                ...BlockTextRenderer_module
               }
             }
             ...ProfileColorPicker_profile
@@ -188,10 +202,11 @@ const WebCardPreview = ({
     }
   }, [visible]);
 
-  const vp = useViewportSize();
   const intl = useIntl();
 
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
+
+  const { width: screenWidth } = useWindowDimensions();
 
   if (!profile?.card) {
     return null;
@@ -208,7 +223,7 @@ const WebCardPreview = ({
       case MODULE_KIND_SIMPLE_TITLE:
         return (
           <SimpleTextRendererRaw
-            data={editedModuleInfo.data}
+            data={{ ...editedModuleInfo.data, kind: editedModuleInfo.kind }}
             key={module.id}
             onLayout={onEditedModuleLayout}
           />
@@ -262,6 +277,14 @@ const WebCardPreview = ({
             onLayout={onEditedModuleLayout}
           />
         );
+      case MODULE_KIND_BLOCK_TEXT:
+        return (
+          <BlockTextRendererRaw
+            data={editedModuleInfo.data}
+            key={module.id}
+            onLayout={onEditedModuleLayout}
+          />
+        );
       default:
         return null;
     }
@@ -270,6 +293,13 @@ const WebCardPreview = ({
   return (
     <View {...props} style={[{ flex: 1 }, style]}>
       <Container style={{ padding: 8 }}>
+        <TitleWithLine
+          style={{ backgroundColor: 'transparent' }}
+          title={intl.formatMessage({
+            defaultMessage: 'Preview',
+            description: 'Webcard preview - Preview title',
+          })}
+        />
         <SwitchToggle
           value={viewMode}
           onChange={setViewMode}
@@ -300,7 +330,7 @@ const WebCardPreview = ({
         <CoverRenderer
           cover={cover}
           userName={userName}
-          width={vp`${VW100}`}
+          width={screenWidth}
           hideBorderRadius
         />
         {modules.map(module => {
@@ -330,6 +360,8 @@ const WebCardPreview = ({
               );
             case MODULE_KIND_SOCIAL_LINKS:
               return <SocialLinksRenderer module={module} key={module.id} />;
+            case MODULE_KIND_BLOCK_TEXT:
+              return <BlockTextRenderer module={module} key={module.id} />;
             default:
               return null;
           }

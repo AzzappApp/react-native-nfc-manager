@@ -4,9 +4,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ImageProps } from 'react-native';
 
 const socialIcons = {
-  get apple() {
-    return require('./assets/social/apple.png');
-  },
   get behance() {
     return require('./assets/social/behance.png');
   },

@@ -90,7 +90,7 @@ const CoverTemplateCreate = () => {
       if (suggested && companyActivities && companyActivities.length > 0) {
         rest.companyActivityIds = companyActivities.join(',');
       }
-      rest.category = JSON.stringify(category);
+      rest.category = category;
       //add merged and segmented also in data for simplification in frontend
       data.merged = dataForm.merged;
       data.segmented = dataForm.segmented;

@@ -112,6 +112,21 @@ android {
             include (*reactNativeArchitectures())
         }
     }
+    flavorDimensions "env"
+    productFlavors {
+        production {
+            dimension "env"
+            applicationId 'com.azzapp.azzapp'
+        }
+        staging {
+            dimension "env"
+            applicationId 'com.azzapp.azzapp_staging'
+        }
+        development {
+            dimension "env"
+            applicationId 'com.azzapp.azzapp_dev'
+        }
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')

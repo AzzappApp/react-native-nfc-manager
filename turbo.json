@@ -5,7 +5,7 @@
       "dependsOn": ["//#relay:build"]
     },
     "//#relay:build": {
-      "dependsOn": ["relay:prepare"],
+      "dependsOn": ["relay:prepare", "graphql-codegen"],
       "inputs": ["packages/**/*.{js,jsx,ts,tsx}", "schema.graphql"],
       "outputs": [
         "packages/relay/artifacts/**",
@@ -13,19 +13,14 @@
       ]
     },
     "//#relay:prepare": {
-      "dependsOn": ["graphql-codegen"],
-      "inputs": []
+      "dependsOn": [],
+      "inputs": [],
+      "cache": false
     },
     "//#graphql-codegen": {
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
       "cache": false
-    },
-    "lint": {},
-    "test": {},
-    "test:watch": {
-      "cache": false,
-      "persistent": true
     }
   },
   "globalDependencies": ["patches/*.patch"]

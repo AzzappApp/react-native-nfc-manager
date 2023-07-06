@@ -13,6 +13,15 @@ const icons = {
   get account() {
     return require('./assets/account.png');
   },
+  get action_alpha() {
+    return require('./assets/action_alpha.png');
+  },
+  get action_filled() {
+    return require('./assets/action_filled.png');
+  },
+  get action_stroke() {
+    return require('./assets/action_stroke.png');
+  },
   get add_circle() {
     return require('./assets/add_circle.png');
   },
@@ -64,6 +73,9 @@ const icons = {
   get brightness() {
     return require('./assets/brightness.png');
   },
+  get calendar() {
+    return require('./assets/calendar.png');
+  },
   get camera() {
     return require('./assets/camera.png');
   },
@@ -82,6 +94,9 @@ const icons = {
   get check() {
     return require('./assets/check.png');
   },
+  get check_round() {
+    return require('./assets/check_round.png');
+  },
   get chrono() {
     return require('./assets/chrono.png');
   },
@@ -99,6 +114,9 @@ const icons = {
   },
   get comment() {
     return require('./assets/comment.png');
+  },
+  get comment_filled() {
+    return require('./assets/comment_filled.png');
   },
   get contact() {
     return require('./assets/contact.png');
@@ -121,6 +139,12 @@ const icons = {
   get display() {
     return require('./assets/display.png');
   },
+  get down() {
+    return require('./assets/down.png');
+  },
+  get edit() {
+    return require('./assets/edit.png');
+  },
   get expand() {
     return require('./assets/expand.png');
   },
@@ -129,6 +153,12 @@ const icons = {
   },
   get filters() {
     return require('./assets/filters.png');
+  },
+  get fixed_ratio() {
+    return require('./assets/fixed_ratio.png');
+  },
+  get fixed_height() {
+    return require('./assets/fixed_height.png');
   },
   get flash_auto() {
     return require('./assets/flash_auto.png');
@@ -184,6 +214,9 @@ const icons = {
   get image_bottom() {
     return require('./assets/image_bottom.png');
   },
+  get image_video() {
+    return require('./assets/image_video.png');
+  },
   get information() {
     return require('./assets/information.png');
   },
@@ -223,6 +256,9 @@ const icons = {
   get margins() {
     return require('./assets/margins.png');
   },
+  get media() {
+    return require('./assets/media.png');
+  },
   get menu() {
     return require('./assets/menu.png');
   },
@@ -238,11 +274,23 @@ const icons = {
   get notification() {
     return require('./assets/notification.png');
   },
+  get palette() {
+    return require('./assets/palette.png');
+  },
   get preview() {
     return require('./assets/preview.png');
   },
+  get phone() {
+    return require('./assets/phone.png');
+  },
   get reduce() {
     return require('./assets/reduce.png');
+  },
+  get refresh() {
+    return require('./assets/refresh.png');
+  },
+  get reload() {
+    return require('./assets/reload.png');
   },
   get revert() {
     return require('./assets/revert.png');
@@ -267,6 +315,9 @@ const icons = {
   },
   get scroll() {
     return require('./assets/scroll.png');
+  },
+  get silhouette() {
+    return require('./assets/silhouette.png');
   },
   get shadow() {
     return require('./assets/shadow.png');
@@ -330,6 +381,9 @@ const icons = {
   },
   get warning() {
     return require('./assets/warning.png');
+  },
+  get wall() {
+    return require('./assets/wall.png');
   },
   get whatsapp() {
     return require('./assets/whatsapp.png');

@@ -8,7 +8,7 @@ describe('ScreenPrefetcher', () => {
       prefetch: jest.fn(),
       getRoutesToPrefetch: jest.fn(),
     },
-    PROFILE_POSTS: {
+    POST_COMMENTS: {
       prefetch: jest.fn(),
     },
   };
@@ -20,7 +20,7 @@ describe('ScreenPrefetcher', () => {
   describe('prefetchRoute', () => {
     test('should prefetch the screen if it does have a `prefetch` options', () => {
       jest.useFakeTimers();
-      screens.PROFILE_POSTS.prefetch.mockReturnValueOnce(
+      screens.POST_COMMENTS.prefetch.mockReturnValueOnce(
         Observable.create(sink => {
           setTimeout(() => sink.complete());
         }),
@@ -32,11 +32,11 @@ describe('ScreenPrefetcher', () => {
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
 
       screenPrefetcher.prefetchRoute(screenId, {
-        route: 'PROFILE_POSTS',
-        params: { userName: 'fake-user-name' },
+        route: 'POST_COMMENTS',
+        params: { postId: 'fake-post-id' },
       });
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(1);
-      expect(screens.PROFILE_POSTS.prefetch).toHaveBeenCalledTimes(1);
+      expect(screens.POST_COMMENTS.prefetch).toHaveBeenCalledTimes(1);
 
       jest.runAllTimers();
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
@@ -61,11 +61,11 @@ describe('ScreenPrefetcher', () => {
       const screenId = 'fake-id';
       const screenPrefetcher = createScreenPrefetcher(screens as any);
       screens.PROFILE.getRoutesToPrefetch.mockReturnValueOnce([
-        { route: 'PROFILE_POSTS', params: { userName: 'fake-user-name' } },
-        { route: 'PROFILE_POSTS', params: { userName: 'fake-user-name2' } },
+        { route: 'POST_COMMENTS', params: { userName: 'fake-user-name' } },
+        { route: 'POST_COMMENTS', params: { userName: 'fake-user-name2' } },
         { route: 'HOME' },
       ]);
-      screens.PROFILE_POSTS.prefetch.mockReturnValue(
+      screens.POST_COMMENTS.prefetch.mockReturnValue(
         Observable.create(sink => {
           setTimeout(() => sink.complete());
         }),
@@ -77,15 +77,15 @@ describe('ScreenPrefetcher', () => {
         params: { userName: 'fake-user-name' },
       });
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(2);
-      expect(screens.PROFILE_POSTS.prefetch).toHaveBeenCalledTimes(2);
-      expect(screens.PROFILE_POSTS.prefetch).toHaveBeenNthCalledWith(1, {
-        route: 'PROFILE_POSTS',
+      expect(screens.POST_COMMENTS.prefetch).toHaveBeenCalledTimes(2);
+      expect(screens.POST_COMMENTS.prefetch).toHaveBeenNthCalledWith(1, {
+        route: 'POST_COMMENTS',
         params: {
           userName: 'fake-user-name',
         },
       });
-      expect(screens.PROFILE_POSTS.prefetch).toHaveBeenNthCalledWith(2, {
-        route: 'PROFILE_POSTS',
+      expect(screens.POST_COMMENTS.prefetch).toHaveBeenNthCalledWith(2, {
+        route: 'POST_COMMENTS',
         params: {
           userName: 'fake-user-name2',
         },
@@ -100,11 +100,11 @@ describe('ScreenPrefetcher', () => {
       const screenId = 'fake-id';
       const screenPrefetcher = createScreenPrefetcher(screens as any);
       screens.PROFILE.getRoutesToPrefetch.mockReturnValueOnce([
-        { route: 'PROFILE_POSTS', params: { userName: 'fake-user-name' } },
-        { route: 'PROFILE_POSTS', params: { userName: 'fake-user-name2' } },
+        { route: 'POST_COMMENTS', params: { userName: 'fake-user-name' } },
+        { route: 'POST_COMMENTS', params: { userName: 'fake-user-name2' } },
         { route: 'HOME' },
       ]);
-      screens.PROFILE_POSTS.prefetch.mockReturnValue(
+      screens.POST_COMMENTS.prefetch.mockReturnValue(
         Observable.create(sink => {
           setTimeout(() => sink.complete());
         }),

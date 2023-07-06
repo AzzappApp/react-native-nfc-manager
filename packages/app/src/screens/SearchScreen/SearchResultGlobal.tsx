@@ -5,7 +5,7 @@ import { usePaginationFragment, graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
-import PostsGrid from '#components/PostsGrid';
+import PostsGrid from '#components/PostList/PostsGrid';
 import SkeletonPlaceholder from '#components/Skeleton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import SearchResultGlobalListHeader, {
@@ -52,7 +52,7 @@ const SearchResultGlobal = ({
         @refetchable(queryName: "SearchGlobalPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 20 }
+          first: { type: Int, defaultValue: 10 }
           search: { type: "String!" }
           useLocation: { type: "Boolean!" }
         ) {
@@ -123,7 +123,6 @@ const SearchResultGlobal = ({
       }
       onRefresh={onRefresh}
       onEndReached={onEndReached}
-      useWindowScroll
     />
   );
 };

@@ -1,5 +1,48 @@
-import db from './db';
-import type { PostReaction, ReactionKind } from '#domains';
+import { eq, and, sql } from 'drizzle-orm';
+import {
+  index,
+  primaryKey,
+  mysqlEnum,
+  datetime,
+  varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+} from './db';
+import { post } from './posts';
+import type { InferModel } from 'drizzle-orm';
+
+export const PostReactionTable = mysqlTable(
+  'PostReaction',
+  {
+    profileId: varchar('profileId', {
+      length: DEFAULT_VARCHAR_LENGTH,
+    }).notNull(),
+    postId: varchar('postId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
+    createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+  },
+  table => {
+    return {
+      postIdIdx: index('PostReaction_postId_idx').on(table.postId),
+      profileIdIdx: index('PostReaction_profileId_idx').on(table.profileId),
+      postReactionPostIdProfileId: primaryKey(table.postId, table.profileId),
+    };
+  },
+);
+
+export type PostReaction = InferModel<typeof PostReactionTable>;
+export type NewPostReaction = InferModel<typeof PostReactionTable, 'insert'>;
 
 /**
  * insert a post reaction
@@ -12,25 +55,21 @@ import type { PostReaction, ReactionKind } from '#domains';
 export const insertPostReaction = async (
   profileId: string,
   postId: string,
-  reactionKind: ReactionKind,
-): Promise<void> =>
-  db.transaction().execute(async trx => {
-    await trx
-      .insertInto('PostReaction')
-      .values({
-        profileId,
-        postId,
-        reactionKind,
-      })
-      .execute();
+  reactionKind: PostReaction['reactionKind'],
+) =>
+  db.transaction(async trx => {
+    await trx.insert(PostReactionTable).values({
+      profileId,
+      postId,
+      reactionKind,
+    });
 
     await trx
-      .updateTable('Post')
-      .where('id', '=', postId)
-      .set(eb => ({
-        counterReactions: eb.bxp('counterReactions', '+', 1),
-      }))
-      .execute();
+      .update(post)
+      .set({
+        counterReactions: sql`${post.counterReactions} + 1`,
+      })
+      .where(eq(post.id, postId));
   });
 
 /**
@@ -40,24 +79,23 @@ export const insertPostReaction = async (
  * @param {string} postId
  * @return {*}  {Promise<void>}
  */
-export const deletePostReaction = async (
-  profileId: string,
-  postId: string,
-): Promise<void> =>
-  db.transaction().execute(async trx => {
+export const deletePostReaction = async (profileId: string, postId: string) =>
+  db.transaction(async trx => {
     await trx
-      .deleteFrom('PostReaction')
-      .where('profileId', '=', profileId)
-      .where('postId', '=', postId)
-      .execute();
+      .delete(PostReactionTable)
+      .where(
+        and(
+          eq(PostReactionTable.profileId, profileId),
+          eq(PostReactionTable.postId, postId),
+        ),
+      );
 
     await trx
-      .updateTable('Post')
-      .where('id', '=', postId)
-      .set(eb => ({
-        counterReactions: eb.bxp('counterReactions', '-', 1),
-      }))
-      .execute();
+      .update(post)
+      .set({
+        counterReactions: sql`${post.counterReactions} - 1`,
+      })
+      .where(eq(post.id, postId));
   });
 
 /**
@@ -67,15 +105,15 @@ export const deletePostReaction = async (
  * @param {string} postId
  * @return {*}  {(Promise<PostReaction | null>)}
  */
-export const getPostReaction = async (
-  profileId: string,
-  postId: string,
-): Promise<PostReaction | null> => {
-  const res = await db
-    .selectFrom('PostReaction')
-    .selectAll()
-    .where('profileId', '=', profileId)
-    .where('postId', '=', postId)
-    .executeTakeFirst();
-  return res ?? null;
-};
+export const getPostReaction = async (profileId: string, postId: string) =>
+  db
+    .select()
+    .from(PostReactionTable)
+    .where(
+      and(
+        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.postId, postId),
+      ),
+    )
+
+    .then(res => res.pop() ?? null);

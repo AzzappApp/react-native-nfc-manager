@@ -1,6 +1,6 @@
+import { PhotoWithTextAndTitleRendererRaw } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { PhotoWithTextAndTitleRendererRaw } from '#components/PhotoWithTextAndTitleRenderer';
-import type { PhotoWithTextAndTitleRawData } from '#components/PhotoWithTextAndTitleRenderer';
+import type { PhotoWithTextAndTitleRawData } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type PhotoWithTextAndTitlePreviewProps = ViewProps & {

@@ -7,13 +7,14 @@ import {
   MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { CameraButton } from '#screens/CoverEditionScreen/CoverEditionScreensButtons';
@@ -87,7 +88,6 @@ const HorizontalPhotoEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
         image {
           id
@@ -156,7 +156,6 @@ const HorizontalPhotoEditionScreen = ({
   const isValid = image?.id ?? image?.uri;
   const canSave = dirty && isValid && !saving;
 
-  const WebAPI = useWebAPI();
   const router = useRouter();
 
   const onSave = useCallback(async () => {
@@ -172,7 +171,7 @@ const HorizontalPhotoEditionScreen = ({
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
       //we need to save the media first
-      const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
+      const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
         target: 'cover',
       });
@@ -183,14 +182,19 @@ const HorizontalPhotoEditionScreen = ({
         type: 'image/jpeg',
       };
 
-      const { progress: uploadProgress, promise: uploadPromise } =
-        WebAPI.uploadMedia(file, uploadURL, uploadParameters);
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
         mediaId = public_id;
       } catch (error) {
         console.log(error);
+      } finally {
+        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 
@@ -226,7 +230,6 @@ const HorizontalPhotoEditionScreen = ({
     horizontalPhoto?.background?.id,
     data?.image?.id,
     commit,
-    WebAPI,
     router,
   ]);
 
@@ -333,7 +336,7 @@ const HorizontalPhotoEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Horizontal Photo',
+          defaultMessage: 'Horizontal Image',
           description: 'HorizontalPhoto text screen title',
         })}
         leftElement={
@@ -342,7 +345,8 @@ const HorizontalPhotoEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description:
+                'Cancel button label in Horizontal Photo module screen',
             })}
           />
         }
@@ -352,7 +356,8 @@ const HorizontalPhotoEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description:
+                'Save button label in Horizontal Photo module screen',
             })}
           />
         }

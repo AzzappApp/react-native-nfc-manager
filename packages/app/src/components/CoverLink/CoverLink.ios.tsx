@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { useRouter } from '#PlatformEnvironment';
 import CoverRenderer from '#components/CoverRenderer';
+import { useRouter } from '#components/NativeRouter';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { CoverLinkProps } from './coverLinkTypes';
 import type { View } from 'react-native';

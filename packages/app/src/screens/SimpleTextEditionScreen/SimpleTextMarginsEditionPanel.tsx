@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -35,7 +35,6 @@ const SimpleTextMarginEditionPanel = ({
   ...props
 }: SimpleTextMarginEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -60,15 +59,14 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
-            description: 'Label of the font size slider in cover edition',
+            description: 'Label of the margin size slider in cover edition',
           })}
           accessibilityHint={intl.formatMessage({
             defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
+            description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
         />
@@ -76,7 +74,7 @@ const SimpleTextMarginEditionPanel = ({
           label={
             <FormattedMessage
               defaultMessage="Margin left/right : {size}"
-              description="Font size message in cover edition"
+              description="margin size message in cover edition"
               values={{
                 size: marginHorizontal,
               }}
@@ -86,15 +84,14 @@ const SimpleTextMarginEditionPanel = ({
           min={0}
           max={60}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
-            description: 'Label of the font size slider in cover edition',
+            description: 'Label of the margin size slider in cover edition',
           })}
           accessibilityHint={intl.formatMessage({
             defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
+            description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
         />

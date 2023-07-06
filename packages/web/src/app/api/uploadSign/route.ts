@@ -1,8 +1,8 @@
 /* eslint-disable no-bitwise */
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
-import { getCrypto } from '@azzapp/auth/crypto';
 import { getSessionData } from '@azzapp/auth/viewer';
+import { getCrypto } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import cors from '#helpers/cors';
 import type { SessionData } from '@azzapp/auth/viewer';

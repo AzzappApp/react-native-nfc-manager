@@ -24,8 +24,87 @@ import {
   EDIT_TRANSITION_DURATION,
   useProfileEditScale,
 } from './profileScreenHelpers';
-import type { ProfileBlockContainerProps } from './profileScreenTypes';
+import {
+  useEditTransition,
+  useSelectionModeTransition,
+} from './ProfileScreenTransitions';
 import type { LayoutChangeEvent } from 'react-native';
+
+export type ProfileBlockContainerProps = {
+  /**
+   * The children of the container
+   */
+  children: React.ReactNode;
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+  /**
+   * when true, the animation are disabled
+   */
+  disableAnimation?: boolean;
+  /**
+   * If false, the edition buttons are not displayed
+   *
+   * @default true
+   */
+  displayEditionButtons?: boolean;
+  /**
+   * Whether the block is visible in the webcard
+   * @default true
+   */
+  visible?: boolean;
+  /**
+   * Whether the block is selected in the webcard
+   * @default true
+   */
+  selected?: boolean;
+  /**
+   * Whether the block is the first one (used to hide the move up button)
+   */
+  isFirst?: boolean;
+  /**
+   * Whether the block is the last one (used to hide the move down button)
+   */
+  isLast?: boolean;
+  /**
+   * If true, the swipeable actions are displayed
+   */
+  selectionMode?: boolean;
+  /**
+   * The background color of the card
+   */
+  backgroundColor: string;
+  /**
+   * Called when the user press a module, only enabled in edit mode
+   */
+  onModulePress: () => void;
+  /**
+   * Called when the user press the move up button
+   */
+  onMoveUp?: () => void;
+
+  /**
+   * Called when the user press the move down button
+   */
+  onMoveDown?: () => void;
+  /**
+   * Called when the user press the remove button
+   */
+  onRemove?: () => void;
+  /**
+   * Called when the user press the duplicate button
+   */
+  onDuplicate?: () => void;
+  /**
+   * Called when the user press the toggle visibility button
+   */
+  onToggleVisibility?: (visible: boolean) => void;
+  /**
+   * Called when the user select the block
+   */
+  onSelect?: (selected: boolean) => void;
+};
 
 /**
  * A simple wrapper for the webcard cover and modules that handles the edit transition
@@ -67,12 +146,7 @@ const ProfileBlockContainer = ({
   const height =
     editing && measuredHeight < buttonSize ? buttonSize : measuredHeight;
 
-  const editingSharedValue = useSharedValue(editing ? 1 : 0);
-  useEffect(() => {
-    editingSharedValue.value = withTiming(editing ? 1 : 0, {
-      duration: EDIT_TRANSITION_DURATION,
-    });
-  }, [editing, editingSharedValue]);
+  const editingTransition = useEditTransition();
 
   const dragX = useSharedValue(0);
   const dragRightLimit = (windowWith * (1 - editScale)) / 2;
@@ -90,12 +164,7 @@ const ProfileBlockContainer = ({
     }
   }, [dragRightLimit, dragX, editing, selectionMode]);
 
-  const selectionModeSharedValue = useSharedValue(selectionMode ? 1 : 0);
-  useEffect(() => {
-    selectionModeSharedValue.value = withTiming(selectionMode ? 1 : 0, {
-      duration: EDIT_TRANSITION_DURATION,
-    });
-  }, [selectionMode, selectionModeSharedValue]);
+  const selectionModeTransition = useSelectionModeTransition();
 
   const [activeSection, setActiveSection] = useState<'left' | 'none' | 'right'>(
     'none',
@@ -157,18 +226,18 @@ const ProfileBlockContainer = ({
 
   // gap doesn't work on reanimated 2
   const blockStyle = useAnimatedStyle(() => ({
-    marginVertical: editingSharedValue.value * 20,
+    marginVertical: editingTransition.value * 20,
   }));
 
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
-    borderRadius: editingSharedValue.value * COVER_CARD_RADIUS * windowWith,
+    borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
 
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
-    borderRadius: editingSharedValue.value * COVER_CARD_RADIUS * windowWith,
+    borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
     overflow: 'hidden',
   }));
 
@@ -183,19 +252,19 @@ const ProfileBlockContainer = ({
   const moveButtonStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      editingSharedValue.value - Math.abs(dragX.value) / dragRightLimit,
+      editingTransition.value - Math.abs(dragX.value) / dragRightLimit,
     ),
   }));
 
   const leftSectionStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      dragX.value / dragRightLimit - selectionModeSharedValue.value,
+      dragX.value / dragRightLimit - selectionModeTransition.value,
     ),
   }));
 
   const selectionSectionStyle = useAnimatedStyle(() => ({
-    opacity: selectionModeSharedValue.value,
+    opacity: selectionModeTransition.value,
   }));
 
   const rightSectionStyle = useAnimatedStyle(() => ({
@@ -222,7 +291,7 @@ const ProfileBlockContainer = ({
           style={[moduleContainerStyle, editing && shadow(appearance)]}
           onLayout={onLayout}
         >
-          {/** this ViewTransition is only here because ios bug with shadow and overlow hidden */}
+          {/** this View is only here because ios bug with shadow and overlow hidden */}
           <Animated.View style={moduleInnerContainerStyle}>
             <PressableNative
               onPress={editing ? onModulePress : undefined}

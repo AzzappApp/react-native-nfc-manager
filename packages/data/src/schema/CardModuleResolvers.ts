@@ -10,6 +10,7 @@ import type {
   CardModuleSimpleTitleResolvers,
   CardModulePhotoWithTextAndTitleResolvers,
   CardModuleSocialLinksResolvers,
+  CardModuleBlockTextResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -47,18 +48,13 @@ const background = (
 };
 
 function getData<TResult, B>(
-  key: string,
+  key: keyof CardModuleModel['data'],
   optional?: B,
 ): (cardModule: CardModuleModel) => B extends true ? TResult | null : TResult;
-function getData<TResult>(key: string, optional: true) {
+function getData<TResult>(key: keyof CardModuleModel['data'], optional: true) {
   return (cardModule: CardModuleModel): TResult | null => {
     const { data } = cardModule;
-    if (
-      data &&
-      typeof data === 'object' &&
-      key in data &&
-      !Array.isArray(data)
-    ) {
+    if (data && key in data) {
       return data[key] as TResult;
     }
     if (optional) {
@@ -81,11 +77,8 @@ export const CardModuleCarousel: CardModuleCarouselResolvers = {
   squareRatio: getData('squareRatio'),
   images: async (cardModule, _, { mediaLoader }) => {
     const { data } = cardModule;
-    return data &&
-      typeof data === 'object' &&
-      'images' in data &&
-      Array.isArray(data.images)
-      ? ((await mediaLoader.loadMany(data.images as string[])).filter(
+    return data?.images
+      ? ((await mediaLoader.loadMany(data.images)).filter(
           m => m && !(m instanceof Error),
         ) as Media[])
       : [];
@@ -204,4 +197,31 @@ export const CardModuleSocialLinks: CardModuleSocialLinksResolvers = {
   marginBottom: getData('marginBottom'),
   backgroundStyle: getData('backgroundStyle', true),
   background,
+};
+
+const textBackground = (
+  cardModule: CardModuleModel,
+  _: unknown,
+  { staticMediaLoader }: GraphQLContext,
+) => {
+  const { data } = cardModule;
+  return data.textBackgroundId
+    ? staticMediaLoader.load(data.textBackgroundId)
+    : null;
+};
+
+export const CardModuleBlockText: CardModuleBlockTextResolvers = {
+  fontFamily: getData('fontFamily'),
+  fontColor: getData('fontColor'),
+  textAlign: getData('textAlign'),
+  fontSize: getData('fontSize'),
+  verticalSpacing: getData('verticalSpacing'),
+  textMarginVertical: getData('textMarginVertical'),
+  textMarginHorizontal: getData('textMarginHorizontal'),
+  marginHorizontal: getData('marginHorizontal'),
+  marginVertical: getData('marginVertical'),
+  backgroundStyle: getData('backgroundStyle', true),
+  textBackgroundStyle: getData('textBackgroundStyle', true),
+  background,
+  textBackground,
 };

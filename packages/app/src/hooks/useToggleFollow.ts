@@ -32,15 +32,16 @@ const updater = (
   currentProfileId: string,
   profileId: string,
   follow: boolean,
+  userNameFilter?: string,
 ) => {
   const currentProfile = store.get(currentProfileId);
 
-  const nbFollowedProfiles = currentProfile?.getValue('nbFollowedProfiles');
+  const nbFollowings = currentProfile?.getValue('nbFollowings');
 
-  if (typeof nbFollowedProfiles === 'number') {
+  if (typeof nbFollowings === 'number') {
     currentProfile?.setValue(
-      follow ? nbFollowedProfiles + 1 : nbFollowedProfiles - 1,
-      'nbFollowedProfiles',
+      follow ? nbFollowings + 1 : nbFollowings - 1,
+      'nbFollowings',
     );
   }
 
@@ -48,12 +49,12 @@ const updater = (
 
   profile?.setValue(follow, 'isFollowing');
 
-  const nbFollowers = profile?.getValue('nbFollowersProfiles');
+  const nbFollowers = profile?.getValue('nbFollowers');
 
   if (typeof nbFollowers === 'number') {
     profile?.setValue(
       follow ? nbFollowers + 1 : nbFollowers - 1,
-      'nbFollowersProfiles',
+      'nbFollowers',
     );
   }
 
@@ -62,7 +63,10 @@ const updater = (
   if (viewer) {
     const connectionRecord = ConnectionHandler.getConnection(
       viewer,
-      'Account_followedProfiles',
+      'Account_followings',
+      {
+        userName: userNameFilter ?? '',
+      },
     );
 
     if (connectionRecord) {
@@ -76,7 +80,7 @@ const updater = (
 
     const connectionRecordHome = ConnectionHandler.getConnection(
       viewer,
-      'Viewer_followedProfiles',
+      'Viewer_followings',
     );
 
     if (connectionRecordHome) {
@@ -90,17 +94,15 @@ const updater = (
 
     ConnectionHandler.getConnection(
       viewer,
-      'SuggestedProfilesList_suggestedProfiles',
-    )?.invalidateRecord();
-
-    ConnectionHandler.getConnection(
-      viewer,
-      'Viewer_followedProfilesPosts',
+      'Viewer_followingsPosts',
     )?.invalidateRecord();
   }
 };
 
-const useToggleFollow = (currentProfileId?: string) => {
+const useToggleFollow = (
+  currentProfileId?: string,
+  userNameFilter?: string,
+) => {
   const [commit, toggleFollowingActive] =
     useMutation<useToggleFollowMutation>(graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
@@ -132,13 +134,14 @@ const useToggleFollow = (currentProfileId?: string) => {
           toggleFollowing: {
             profile: {
               id: profileId,
-              isFollowing: false,
+              isFollowing: follow,
             },
           },
         },
         optimisticUpdater: store =>
-          updater(store, currentProfileId, profileId, follow),
-        updater: store => updater(store, currentProfileId, profileId, follow),
+          updater(store, currentProfileId, profileId, follow, userNameFilter),
+        updater: store =>
+          updater(store, currentProfileId, profileId, follow, userNameFilter),
         onError(error) {
           // TODO: handle error
           console.log(error);

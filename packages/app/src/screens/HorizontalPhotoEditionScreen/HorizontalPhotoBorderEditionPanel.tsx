@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
@@ -63,7 +63,6 @@ const HorizontalPhotoBorderEditionPanel = ({
   ...props
 }: HorizontalPhotoBorderEditionPanelProps) => {
   const intl = useIntl();
-  const windowWidth = useWindowDimensions().width;
 
   const [currentTab, setCurrentTab] = useState<string>('border');
   const { profile } = useFragment(
@@ -123,7 +122,6 @@ const HorizontalPhotoBorderEditionPanel = ({
           min={0}
           max={10}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 7)}
           onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
@@ -151,7 +149,6 @@ const HorizontalPhotoBorderEditionPanel = ({
           min={0}
           max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 50)}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Image border radius size',

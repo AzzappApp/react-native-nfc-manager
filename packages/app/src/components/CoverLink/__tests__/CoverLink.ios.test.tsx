@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
 import { View } from 'react-native';
 import CoverLink from '../CoverLink.ios';
 import type { CoverRendererProps } from '#components/CoverRenderer';
@@ -9,7 +8,8 @@ jest.mock('#components/CoverRenderer', () => 'CoverRenderer');
 const mockRouter = {
   push: jest.fn(),
 };
-jest.mock('#PlatformEnvironment', () => ({
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
   useRouter() {
     return mockRouter;
   },

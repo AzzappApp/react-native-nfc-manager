@@ -1,62 +1,33 @@
-import { Kysely } from 'kysely';
-import { PlanetScaleDialect } from 'kysely-planetscale';
-import type {
-  WithCreatedAt,
-  WithoutJSONFields,
-  WithTimeStamps,
-} from './generic';
-import type {
-  Card,
-  CardCover,
-  StaticMedia,
-  CoverTemplate,
-  CardModule,
-  Follow,
-  Media,
-  Profile,
-  Post,
-  PostComment,
-  PostReaction,
-  User,
-  ProfileCategory,
-  CompanyActivity,
-  Interest,
-} from '@prisma/client';
+import { connect } from '@planetscale/database';
+import { sql as sqlDrizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import type { SQL } from 'drizzle-orm';
 
-export type Database = {
-  Card: WithTimeStamps<Card>;
-  CardCover: WithoutJSONFields<
-    WithTimeStamps<CardCover>,
-    | 'backgroundStyle'
-    | 'foregroundStyle'
-    | 'mediaStyle'
-    | 'subTitleStyle'
-    | 'titleStyle'
-  >;
-  CardModule: CardModule;
-  CompanyActivity: CompanyActivity;
-  CoverTemplate: CoverTemplate;
-  StaticMedia: WithCreatedAt<StaticMedia>;
-  Follow: WithCreatedAt<Follow>;
-  Media: Media;
-  Profile: WithTimeStamps<Profile>;
-  ProfileCategory: ProfileCategory;
-  Post: WithoutJSONFields<WithCreatedAt<Post>, 'medias'>;
-  PostComment: WithCreatedAt<PostComment>;
-  PostReaction: WithCreatedAt<PostReaction>;
-  User: WithTimeStamps<User>;
-  Interest: Interest;
+// see https://github.com/drizzle-team/drizzle-orm/issues/656
+const sql = <T>(strings: TemplateStringsArray, ...params: any[]): SQL<T> => {
+  return sqlDrizzle(strings, ...params);
 };
 
-const db = new Kysely<Database>({
-  dialect: new PlanetScaleDialect({
-    host: process.env.DATABASE_HOST,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    fetch(input, init) {
-      return fetch(input, { ...init, cache: 'no-store' });
-    },
-  }),
+// create the connection
+const connection = connect({
+  host: process.env.DATABASE_HOST,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
+    return fetch(input, init);
+  },
 });
+
+const db = drizzle(connection);
+
+export const DEFAULT_VARCHAR_LENGTH = 191;
+
+export const DEFAULT_DATETIME_PRECISION = 3;
+
+export const DEFAULT_DATETIME_VALUE = sql`(CURRENT_TIMESTAMP(3))`;
+
+export type DbTransaction =
+  | Parameters<Parameters<typeof db.transaction>[0]>[0]
+  | typeof db;
 
 export default db;

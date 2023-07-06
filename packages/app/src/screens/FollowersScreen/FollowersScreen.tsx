@@ -1,56 +1,63 @@
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { useRouter } from '#PlatformEnvironment';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { useRouter } from '#components/NativeRouter';
+import relayScreen from '#helpers/relayScreen';
+import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowersScreenList from './FollowersScreenList';
-import type { FollowersScreen_viewer$key } from '@azzapp/relay/artifacts/FollowersScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowersRoute } from '#routes';
+import type { FollowersScreenQuery } from '@azzapp/relay/artifacts/FollowersScreenQuery.graphql';
 
-type FollowersScreenProps = {
-  viewer: FollowersScreen_viewer$key;
-};
-
-const FollowersScreen = ({ viewer: viewerKey }: FollowersScreenProps) => {
-  const intl = useIntl();
-
-  const viewer = useFragment(
-    graphql`
-      fragment FollowersScreen_viewer on Viewer {
-        profile {
-          id
+const followersScreenQuery = graphql`
+  query FollowersScreenQuery {
+    viewer {
+      profile {
+        id
+        contactCard {
           public
         }
-        ...FollowersScreenList_viewer
       }
-    `,
-    viewerKey,
-  );
+      ...FollowersScreenList_viewer
+    }
+  }
+`;
+
+const FollowersScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<FollowersRoute, FollowersScreenQuery>) => {
+  const intl = useIntl();
+
+  const { viewer } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
 
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
-      <Header
-        leftElement={
-          <IconButton
-            icon="arrow_left"
-            iconSize={28}
-            onPress={router.back}
-            style={styles.back}
-          />
-        }
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Followers',
-          description: 'Title of the screen listing followers',
-        })}
-      />
-      <FollowersScreenList
-        isPublic={viewer?.profile?.public ?? false}
-        currentProfileId={viewer.profile?.id ?? ''}
-        viewer={viewer}
-      />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Container style={{ flex: 1 }}>
+        <Header
+          leftElement={
+            <IconButton
+              icon="arrow_left"
+              iconSize={28}
+              onPress={router.back}
+              style={styles.back}
+            />
+          }
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Followers',
+            description: 'Title of the screen listing followers',
+          })}
+        />
+        <FollowersScreenList
+          isPublic={viewer?.profile?.contactCard.public ?? false}
+          currentProfileId={viewer.profile?.id ?? ''}
+          viewer={viewer}
+        />
+      </Container>
+    </SafeAreaView>
   );
 };
 
@@ -60,4 +67,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FollowersScreen;
+export default relayScreen(FollowersScreen, {
+  query: followersScreenQuery,
+});

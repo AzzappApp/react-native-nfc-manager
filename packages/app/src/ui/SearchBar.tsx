@@ -17,6 +17,7 @@ import type {
   GestureResponderEvent,
   TextStyle,
   LayoutChangeEvent,
+  ImageStyle,
 } from 'react-native';
 
 type SearchBarProps = {
@@ -45,6 +46,9 @@ const SearchBar = ({
   const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
   const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
+  const [lensFocusedStyle, setLensFocusedStyle] = useState<
+    StyleProp<ImageStyle>
+  >({});
 
   useEffect(() => {
     setSearchValue(value);
@@ -93,14 +97,17 @@ const SearchBar = ({
       width: containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
       ...styles.focused,
     });
+    setLensFocusedStyle({
+      tintColor: colors.black,
+    });
     onFocus?.(e);
   };
 
   const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setFocusedStyle({
       width: containerWidth,
-      ...styles.focused,
     });
+    setLensFocusedStyle({});
     if (onBlur) {
       onBlur(e);
     }
@@ -129,7 +136,10 @@ const SearchBar = ({
                 transitions={['width', 'borderColor']}
                 onTouchStart={focus}
               >
-                <Icon icon="search" style={styles.lensIcon} />
+                <Icon
+                  icon="search"
+                  style={[styles.lensIcon, lensFocusedStyle]}
+                />
                 <TextInput
                   testID="azzapp__searchbar__textInput"
                   accessibilityLabel={intl.formatMessage({
@@ -158,7 +168,7 @@ const SearchBar = ({
                     testID="azzapp__SearchBar__clear-button"
                     style={styles.cancelPressable}
                   >
-                    <Icon icon="search" style={styles.lensIcon} />
+                    <Icon icon="closeFull" style={styles.cancelIcon} />
                   </PressableNative>
                 )}
               </ViewTransition>
@@ -169,7 +179,7 @@ const SearchBar = ({
                   description: 'SearchBar accessibilityLabel Cancel Button',
                 })}
                 testID="azzapp__SearchBar__cancel-button"
-                style={styles.cancelButton}
+                variant="secondary"
                 onLayout={onButtonLayout}
                 onPress={onPressCancel}
                 label={intl.formatMessage({
@@ -197,10 +207,10 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 12,
     fontSize: 16,
     color: appearance === 'light' ? colors.black : colors.grey400,
-    borderWidth: 1,
   },
   focused: {
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
+    borderWidth: 1,
   },
   input: {
     flex: 1,
@@ -211,6 +221,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     overflow: 'hidden',
+    columnGap: 10,
   },
   container: {
     overflow: 'hidden',
@@ -228,26 +239,14 @@ const styleSheet = createStyleSheet(appearance => ({
   lensIcon: {
     marginLeft: 16,
     marginRight: 11,
+    tintColor: colors.grey200,
   },
   cancelPressable: {
     paddingRight: 10,
     marginLeft: 10,
   },
   cancelIcon: {
-    width: 15,
-    height: 15,
     padding: 1,
-  },
-  cancelButton: {
-    height: 46,
-    marginLeft: MARGIN_LEFT_BUTTON,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderWidth: 1,
-    borderColor: colors.black,
-    borderRadius: 12,
-    backgroundColor: colors.grey50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    tintColor: colors.grey200,
   },
 }));

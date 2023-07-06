@@ -1,6 +1,6 @@
 input SaveSocialLinksModuleInput {
   moduleId: ID
-  links: [SocialLinkInput]!
+  links: [SocialLinkInput!]
   iconColor: String
   arrangement: CardModuleSocialLinksArrangement
   iconSize: Int
@@ -19,7 +19,7 @@ type SaveSocialLinksModulePayload {
 }
 
 input SocialLinkInput {
-  socialId: String
-  link: String
-  position: Int
+  socialId: String!
+  link: String!
+  position: Int!
 }

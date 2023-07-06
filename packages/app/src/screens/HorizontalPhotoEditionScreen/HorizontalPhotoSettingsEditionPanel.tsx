@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
@@ -25,12 +25,12 @@ const HorizontalPhotoSettingsEditionPanel = ({
   ...props
 }: HorizontalPhotoSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const windowWidth = useWindowDimensions().width;
+
   return (
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
-          defaultMessage: 'Settings',
+          defaultMessage: 'Configuration',
           description:
             'Title of the settings section in HorizontalPhoto edition',
         })}
@@ -50,7 +50,6 @@ const HorizontalPhotoSettingsEditionPanel = ({
           min={50}
           max={400}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Height size',

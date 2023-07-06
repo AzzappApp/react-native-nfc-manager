@@ -1,17 +1,15 @@
 import { useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
 
-import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import type { HorizontalPhotoBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type BackgroundStyle = {
   backgroundColor: string;
   patternColor: string;
-  opacity: number;
 };
 
 type HorizontalPhotoBackgroundEditionPanelProps = ViewProps & {
@@ -70,7 +68,6 @@ const HorizontalPhotoBackgroundEditionPanel = ({
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
   const patternColor = backgroundStyle?.patternColor ?? '#000000';
-  const opacity = backgroundStyle?.opacity ?? 100;
 
   const onColorChange = useCallback(
     (color: 'backgroundColor' | 'tintColor', value: string) => {
@@ -78,32 +75,18 @@ const HorizontalPhotoBackgroundEditionPanel = ({
         onBackgroundStyleChange({
           backgroundColor: value,
           patternColor,
-          opacity,
         });
       } else {
         onBackgroundStyleChange({
           backgroundColor,
           patternColor: value,
-          opacity,
         });
       }
-    },
-    [backgroundColor, onBackgroundStyleChange, opacity, patternColor],
-  );
-
-  const onOpacityChange = useCallback(
-    (value: number) => {
-      onBackgroundStyleChange({
-        backgroundColor,
-        patternColor,
-        opacity: value,
-      });
     },
     [backgroundColor, onBackgroundStyleChange, patternColor],
   );
 
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props}>
@@ -123,32 +106,6 @@ const HorizontalPhotoBackgroundEditionPanel = ({
         svgMode
         imageRatio={1}
         style={styles.mediaSelector}
-      />
-      <LabeledDashedSlider
-        label={
-          <FormattedMessage
-            defaultMessage="Photo opacity : {opacity}"
-            description="Photo Opacity message in Horizontal photo edition"
-            values={{ opacity }}
-          />
-        }
-        value={opacity}
-        min={0}
-        max={100}
-        step={1}
-        interval={Math.floor((windowWidth - 80) / 50)}
-        onChange={onOpacityChange}
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Background opacity',
-          description:
-            'Label of the Photo Opacityslider in Horizontal photo edition',
-        })}
-        accessibilityHint={intl.formatMessage({
-          defaultMessage: 'Slide to change the background opacity',
-          description:
-            'Hint of the Photo Opacityslider in Horizontal photo edition',
-        })}
-        style={styles.slider}
       />
     </View>
   );

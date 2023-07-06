@@ -110,7 +110,7 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border width : {size}"
+              defaultMessage="Border size : {size}"
               description="borderWidth message in SimpleButton edition"
               values={{
                 size: borderWidth,
@@ -121,7 +121,6 @@ const SimpleButtonBordersEditionPanel = ({
           min={0}
           max={10}
           step={1}
-          interval={30}
           onChange={onBorderwidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border width',
@@ -150,7 +149,6 @@ const SimpleButtonBordersEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={15}
           onChange={onBorderradiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border Radius',

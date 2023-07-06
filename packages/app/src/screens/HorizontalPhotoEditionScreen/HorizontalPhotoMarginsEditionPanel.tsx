@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -36,7 +36,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
   ...props
 }: HorizontalPhotoMarginsEditionPanelProps) => {
   const intl = useIntl();
-  const windowWidth = useWindowDimensions().width;
+
   return (
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
@@ -61,7 +61,6 @@ const HorizontalPhotoMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top/bottom margin size',
@@ -89,7 +88,6 @@ const HorizontalPhotoMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Left/right margin size',

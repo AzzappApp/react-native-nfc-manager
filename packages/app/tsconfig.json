@@ -17,6 +17,7 @@
     "fastlane",
     "ios",
     "node_modules",
-    "vendor"
+    "vendor",
+    "tsconfig.json"
   ]
 }

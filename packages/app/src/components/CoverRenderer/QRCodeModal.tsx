@@ -5,7 +5,7 @@ import {
   View,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { buildUserUrl } from '#helpers/urlHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 
 type QRCodeModalProps = {
   onRequestClose(): void;

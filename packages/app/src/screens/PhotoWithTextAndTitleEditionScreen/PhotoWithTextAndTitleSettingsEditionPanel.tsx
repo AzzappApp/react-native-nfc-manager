@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
@@ -95,7 +95,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
   ...props
 }: PhotoWithTextAndTitleSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   const { profile } = useFragment(
     graphql`
@@ -112,7 +111,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
-          defaultMessage: 'Settings',
+          defaultMessage: 'Configuration',
           description: 'Title of the settings section in Line Divider edition',
         })}
       />
@@ -149,11 +148,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             min={DEFAULT_COVER_MIN_FONT_SIZE}
             max={DEFAULT_COVER_MAX_FONT_SIZE}
             step={1}
-            interval={Math.floor(
-              (windowWidth - 80) /
-                (2 *
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-            )}
             onChange={onFontSizeChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Title size',
@@ -181,11 +175,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             min={DEFAULT_COVER_MIN_FONT_SIZE}
             max={DEFAULT_COVER_MAX_FONT_SIZE}
             step={1}
-            interval={Math.floor(
-              (windowWidth - 40) /
-                (2 *
-                  (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-            )}
             onChange={onTextSizeChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Text size',
@@ -214,7 +203,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
           min={0}
           max={20}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 15)}
           onChange={onVerticalSpacingChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',

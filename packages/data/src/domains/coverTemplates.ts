@@ -1,38 +1,97 @@
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { CoverTemplate, ProfileKind } from '@prisma/client';
+import { eq, inArray, and, isNull, or } from 'drizzle-orm';
+import {
+  datetime,
+  varchar,
+  customType,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+} from './db';
+import { customTinyInt, sortEntitiesByIds } from './generic';
+import type { InferModel } from 'drizzle-orm';
+
+type CoverTemplateData = {
+  sourceMediaId?: string;
+};
+
+export const CoverTemplateTable = mysqlTable('CoverTemplate', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  name: varchar('name', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+  colorPalette: varchar('colorPalette', { length: DEFAULT_VARCHAR_LENGTH }),
+  enabled: customTinyInt('enabled').default(true).notNull(),
+  createdAt: datetime('createdAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+  updatedAt: datetime('updatedAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
+  data: customType<{ data: CoverTemplateData }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as CoverTemplateData,
+    dataType: () => 'json',
+  })('data').notNull(),
+  merged: customTinyInt('merged').notNull(),
+  segmented: customTinyInt('segmented').notNull(),
+  tags: varchar('tags', { length: DEFAULT_VARCHAR_LENGTH }),
+  category: customType<{ data: { en?: string } }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as { en: string },
+    dataType: () => 'json',
+  })('category'),
+  previewMediaId: varchar('previewMediaId', { length: DEFAULT_VARCHAR_LENGTH }),
+  suggested: customTinyInt('suggested').default(false).notNull(),
+  companyActivityIds: varchar('companyActivityIds', {
+    length: DEFAULT_VARCHAR_LENGTH,
+  }),
+});
+
+export type CoverTemplate = InferModel<typeof CoverTemplateTable>;
+export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
+
 /**
  * Retrireves a list of cover templates by their ids.
  *
- * @param {readonly} ids
- * @param {*} string
- * @param {*} []
- * @return {*}  {(Promise<Array<CoverTemplate | null>>)}
+ * @param {string[]} ids
+ * @return {*}  {(Promise<Array<CoverTemplate>>)}
  */
-export const getCoverTemplatesByIds = (
-  ids: readonly string[],
-): Promise<Array<CoverTemplate | null>> => {
-  return getEntitiesByIds('CoverTemplate', ids, 'id');
-};
+export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
+  sortEntitiesByIds(
+    ids,
+    await db
+      .select()
+      .from(CoverTemplateTable)
+      .where(inArray(CoverTemplateTable.id, ids as string[])),
+  );
 
 /**
  * It returns a promise that resolves to an array of cover templates for a given profile kind
- * @param {ProfileKind} kind - ProfileKind
+ * @param {segmented}  boolean | null - segmented cover template
  */
-export const getCoverTemplatesByKind = (
-  kind: ProfileKind,
-  segmented?: boolean | null,
-): Promise<CoverTemplate[]> => {
-  let request = db
-    .selectFrom('CoverTemplate')
-    .selectAll()
-    .where('enabled', '=', true)
-    .where('suggested', '=', false)
-    .where('kind', '=', kind);
-  if (segmented != null) {
-    request = request.where('segmented', '=', segmented);
-  }
-  return request.execute();
+export const getCoverTemplates = async (segmented?: boolean | null) => {
+  const res = await db
+    .select()
+    .from(CoverTemplateTable)
+    .where(
+      and(
+        eq(CoverTemplateTable.enabled, true),
+        eq(CoverTemplateTable.suggested, false),
+        segmented != null
+          ? eq(CoverTemplateTable.segmented, !!segmented)
+          : undefined,
+      ),
+    );
+  return res;
 };
 
 /**
@@ -41,20 +100,21 @@ export const getCoverTemplatesByKind = (
  * @param {string} companyActivityId
  * @return {*}  {Promise<CoverTemplate[]>}
  */
-export const getCoverTemplatesSuggestion = (
+export const getCoverTemplatesSuggestion = async (
   companyActivityId: string,
-): Promise<CoverTemplate[]> => {
-  return db
-    .selectFrom('CoverTemplate')
-    .selectAll()
-    .where('enabled', '=', true)
-    .where('suggested', '=', true)
-    .where('kind', '=', 'business')
-    .where(({ or, cmpr }) =>
-      or([
-        cmpr('companyActivityIds', 'in', [companyActivityId]),
-        cmpr('companyActivityIds', 'is', null),
-      ]),
-    )
-    .execute();
+) => {
+  const res = await db
+    .select()
+    .from(CoverTemplateTable)
+    .where(
+      and(
+        eq(CoverTemplateTable.enabled, true),
+        eq(CoverTemplateTable.suggested, true),
+        or(
+          isNull(CoverTemplateTable.companyActivityIds),
+          inArray(CoverTemplateTable.companyActivityIds, [companyActivityId]),
+        ),
+      ),
+    );
+  return res;
 };

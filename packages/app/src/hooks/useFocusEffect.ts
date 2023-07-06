@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { useCurrentRoute, useRouter } from '#PlatformEnvironment';
-import { useScreenHasFocus } from '#components/NativeRouter';
+import {
+  useCurrentRoute,
+  useRouter,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 type EffectCallback = () => (() => void) | undefined | void;

@@ -1,4 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
 import { createRef } from 'react';
 import { AppState } from 'react-native';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
@@ -34,16 +33,6 @@ jest.mock('react-native-vision-camera', () => {
   };
 });
 const useCameraDevicesMock = useCameraDevices as jest.Mock;
-
-jest.mock('react-native-reanimated', () => {
-  return {
-    useSharedValue: jest.fn(),
-    useAnimatedStyle: jest.fn(),
-    withTiming: jest.fn(),
-    runOnJS: jest.fn(),
-    View: 'AnimatedView',
-  };
-});
 
 jest.mock('#hooks/useCameraPermissions', () => () => ({
   cameraPermission: 'authorized',

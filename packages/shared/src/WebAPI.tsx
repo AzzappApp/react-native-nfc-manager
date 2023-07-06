@@ -165,3 +165,13 @@ export const uploadMedia = (
 
   return postFormData(uploadURL, formData, 'json', signal);
 };
+
+export const verifySign: APIMethod<
+  { signature: string; data: string; salt: string },
+  { message: string }
+> = async ({ signature, data, salt }, init) =>
+  apiFetch(`${API_ENDPOINT}/verifySign`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify({ signature, data, salt }),
+  });

@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, Animated, Easing } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ToggleButton from '#ui/ToggleButton';
@@ -36,8 +36,6 @@ const InterestPicker = ({
 
   const [selectedInterests, setSelectedInterests] = useState(new Set<string>());
 
-  const vp = useViewportSize();
-  const intl = useIntl();
   const onSelectInterest = useCallback((tag: string) => {
     setSelectedInterests(prev => {
       const newSet = new Set(prev);
@@ -110,16 +108,11 @@ const InterestPicker = ({
     [ready],
   );
 
+  const intl = useIntl();
+  const insets = useSafeAreaInsets();
+
   return (
-    <View
-      style={[
-        {
-          paddingTop: vp`50`,
-          flex: 1,
-          justifyContent: 'center',
-        },
-      ]}
-    >
+    <View style={styles.root}>
       <NewProfileScreenPageHeader
         activeIndex={2}
         title={
@@ -189,7 +182,7 @@ const InterestPicker = ({
       />
       <View
         style={{
-          marginBottom: vp`${insetBottom} `,
+          marginBottom: insets.bottom,
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
@@ -216,6 +209,11 @@ const InterestPicker = ({
 export default InterestPicker;
 
 const styles = StyleSheet.create({
+  root: {
+    paddingTop: 50,
+    flex: 1,
+    justifyContent: 'center',
+  },
   subtitleText: {
     fontSize: 14,
     marginLeft: 33,

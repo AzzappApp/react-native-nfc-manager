@@ -72,7 +72,6 @@ const LineDividerSettingsEditionPanel = ({
         min={20}
         max={400}
         step={1}
-        interval={5}
         onChange={onHeightChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Height',

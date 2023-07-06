@@ -1,6 +1,6 @@
 import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, Platform, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   COVER_BASE_WIDTH,
@@ -29,7 +29,7 @@ export type CoverRendererProps = {
    * The width of the displayed cover
    * Must be a number on native, vw unit are supported on web
    */
-  width?: number | `${number}vw`;
+  width?: number;
   /**
    * if true, the cover will not have rounded corners
    * @default false
@@ -172,12 +172,7 @@ const CoverRenderer = (
   //#endregion
 
   //#region Styles
-  const borderRadius: number = hideBorderRadius
-    ? 0
-    : Platform.select({
-        web: '12.8%' as any,
-        default: COVER_CARD_RADIUS * (width as number),
-      });
+  const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
 
   const { media, textPreviewMedia, title, subTitle } = cover ?? {};
 
@@ -208,7 +203,7 @@ const CoverRenderer = (
       {media ? (
         <>
           <MediaRenderer
-            testID="cover-renderer-media"
+            testID="CoverRenderer_media"
             source={media.id}
             uri={mediaUri}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
@@ -226,7 +221,7 @@ const CoverRenderer = (
           />
           {textPreviewMedia && (
             <MediaImageRenderer
-              testID="cover-renderer-text"
+              testID="CoverRenderer_text"
               source={textPreviewMedia.id}
               uri={
                 width === COVER_BASE_WIDTH

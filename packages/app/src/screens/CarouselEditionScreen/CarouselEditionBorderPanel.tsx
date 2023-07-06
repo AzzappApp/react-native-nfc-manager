@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -89,8 +89,6 @@ const CarouselEditionBorderPanel = ({
     [borderColor, intl],
   );
 
-  const { width: windowWidth } = useWindowDimensions();
-
   return (
     <View {...props} style={[styles.root, style]}>
       <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
@@ -105,9 +103,8 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderSize}
           min={0}
-          max={10}
+          max={50}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
@@ -129,9 +126,8 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={120}
+          max={200}
           step={1}
-          interval={Math.floor((windowWidth - 80) / 60)}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',

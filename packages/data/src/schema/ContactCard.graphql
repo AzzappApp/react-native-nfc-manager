@@ -1,0 +1,39 @@
+
+
+type ContactCardEmail {
+   address: String!
+   label: String!
+   selected: Boolean!
+}
+
+type ContactCardPhoneNumber {
+    number: String!
+    label: String!
+    selected: Boolean!
+}
+
+"""
+Style of the background of a contact card
+"""
+type ContactCardBackgroundStyle {
+  backgroundColor: String!
+}
+
+type SerializedContactCard{
+  data: String!
+  signature: String!
+}
+
+type ContactCard {
+    id: ID!
+    firstName: String
+    lastName: String
+    title: String
+    company: String
+    emails: [ContactCardEmail!]
+    phoneNumbers: [ContactCardPhoneNumber!]
+    backgroundStyle: ContactCardBackgroundStyle!
+    public: Boolean!
+    isDisplayedOnWebCard: Boolean!
+    serializedContactCard: SerializedContactCard!
+}

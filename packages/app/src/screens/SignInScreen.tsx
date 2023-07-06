@@ -9,32 +9,30 @@ import {
   StyleSheet,
   Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { mainRoutes, newProfileRoute } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
+import { signin } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { SignInParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as NativeTextInput } from 'react-native';
 
-type SignInScreenProps = {
-  signin: (params: SignInParams) => Promise<void>;
-};
-
-const SignInScreen = ({ signin }: SignInScreenProps) => {
+const SignInScreen = () => {
   const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
   const [signinError, setSigninError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const intl = useIntl();
-
+  const route = useRouter();
   const onSubmit = useCallback(async () => {
     if (!isNotFalsyString(credential) || !isNotFalsyString(password)) {
       return;
@@ -45,22 +43,40 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
       locales[0]?.countryCode,
     );
 
+    let token: string;
+    let refreshToken: string;
+    let profileId: string | undefined;
     try {
       setIsSubmitting(true);
-      await signin({ credential: intlPhoneNumber ?? credential, password });
+      ({ token, refreshToken, profileId } = await signin({
+        credential: intlPhoneNumber ?? credential,
+        password,
+      }));
     } catch (error) {
       //TODO handle more error cases ?
       setSigninError(true);
+      setIsSubmitting(false);
+      return;
     }
-    setIsSubmitting(false);
-  }, [signin, credential, password]);
+    await dispatchGlobalEvent({
+      type: 'SIGN_IN',
+      payload: { authTokens: { token, refreshToken }, profileId },
+    });
+
+    if (profileId) {
+      route.replaceAll(mainRoutes);
+    } else {
+      route.replaceAll(newProfileRoute);
+    }
+  }, [credential, password, route]);
 
   const passwordRef = useRef<NativeTextInput>(null);
   const focusPassword = () => {
     passwordRef?.current?.focus();
   };
 
-  const vp = useViewportSize();
+  const intl = useIntl();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.root}>
@@ -72,7 +88,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={-vp`${insetBottom}`}
+        keyboardVerticalOffset={-insets.bottom}
         style={styles.keyboardVAvoidingiew}
         pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
@@ -93,10 +109,11 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
             </Text>
           </View>
           <Form
-            style={[styles.form, { marginBottom: vp`${insetBottom}` }]}
+            style={[styles.form, { marginBottom: insets.bottom }]}
             onSubmit={onSubmit}
           >
             <TextInput
+              testID="credential-input"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Phone number or email address',
                 description:
@@ -120,6 +137,7 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
 
             <SecuredTextInput
               ref={passwordRef}
+              testID="password-input"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',
@@ -206,6 +224,10 @@ const SignInScreen = ({ signin }: SignInScreenProps) => {
 };
 
 export default SignInScreen;
+
+SignInScreen.options = {
+  replaceAnimation: 'push',
+};
 
 function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {
   try {

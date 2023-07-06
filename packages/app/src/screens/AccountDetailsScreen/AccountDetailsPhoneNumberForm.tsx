@@ -3,14 +3,16 @@ import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { getCountry } from 'react-native-localize';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
+import COUNTRY_FLAG from '#ui/CountrySelector/CountryFlag';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { GraphQLError } from 'graphql';
@@ -54,6 +56,8 @@ const AccountDetailsPhoneNumberForm = ({
       ? parsePhoneNumber(currentUser.phoneNumber)
       : null;
 
+  const country = getCountry();
+
   const {
     control,
     handleSubmit,
@@ -63,13 +67,15 @@ const AccountDetailsPhoneNumberForm = ({
     resolver: zodResolver(phoneNumberFormSchema),
     defaultValues: {
       phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
-      countryCode: parsedPhoneNumber?.country ?? '',
+      countryCode:
+        parsedPhoneNumber?.country ??
+        (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
     },
   });
 
   const intl = useIntl();
 
-  const vp = useViewportSize();
+  const insets = useSafeAreaInsets();
 
   const [commitMutation] = useUpdateUser();
 
@@ -134,7 +140,7 @@ const AccountDetailsPhoneNumberForm = ({
   return (
     <BottomSheetModal
       visible={visible}
-      height={vp`${insetBottom}  + ${160}`}
+      height={insets.bottom + 160}
       onRequestClose={toggleBottomSheet}
       headerTitle={intl.formatMessage({
         defaultMessage: 'Edit phone number',
@@ -148,7 +154,7 @@ const AccountDetailsPhoneNumberForm = ({
             description: 'Edit phone number modal cancel button label',
           })}
           onPress={toggleBottomSheet}
-          variant="cancel"
+          variant="secondary"
           style={styles.headerButton}
         />
       }
@@ -203,17 +209,19 @@ const AccountDetailsPhoneNumberForm = ({
           }) => (
             <View style={{ flex: 1 }}>
               <TextInput
+                testID="phoneNumberInput"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 autoCapitalize="none"
-                autoComplete="email"
+                autoComplete="off"
                 keyboardType="phone-pad"
                 autoCorrect={false}
                 isErrored={errors.phoneNumber != null}
                 style={{ flex: 1 }}
                 onSubmitEditing={submit}
                 returnKeyType="done"
+                autoFocus
               />
             </View>
           )}

@@ -1,8 +1,9 @@
 import { createId } from '@paralleldrive/cuid2';
-import { db } from '@azzapp/data/domains';
+import { eq } from 'drizzle-orm';
+import { CoverTemplateTable, db, MediaTable } from '@azzapp/data/domains';
 import { getList, getMany, getOne } from './genericDataProvider';
 import type { ResourceDataProvider } from './resourceDataProviders';
-import type { CoverTemplate, Media } from '@azzapp/data/domains';
+import type { CoverTemplate, Media, NewMedia } from '@azzapp/data/domains';
 
 export type CoverTemplateWithCompanyActivities = CoverTemplate & {
   companyActivities: Array<string | null>;
@@ -29,61 +30,58 @@ const CoverTemplateDataProviders: ResourceDataProvider<
     delete data.updatedAt;
     delete data.createdAt;
 
-    await db.transaction().execute(async trx => {
-      const dataTemplate = data.data as any;
+    await db.transaction(async trx => {
+      const dataTemplate = data.data as CoverTemplate['data'] & {
+        sourceMedia?: NewMedia;
+      };
       // dataTempalte is a stringified json, so I need to have ALL the informations.
       // issue with the media, get the actual media to check is already in Media ressrouce
-      if (dataTemplate.sourceMedia?.id) {
+      if (dataTemplate?.sourceMedia?.id) {
         const existingMedia = await trx
-          .selectFrom('Media')
-          .selectAll()
-          .where('id', '=', dataTemplate.sourceMedia.id)
-          .executeTakeFirst();
+          .select()
+          .from(MediaTable)
+          .where(eq(MediaTable.id, dataTemplate.sourceMedia.id))
+          .then(res => res.pop() ?? null);
         if (existingMedia == null) {
           const media = dataTemplate.sourceMedia;
-          await trx.insertInto('Media').values(media).execute();
+          await trx.insert(MediaTable).values(media);
           dataTemplate.sourceMediaId = media.id;
         }
       }
       const templateWithMedia = {
         ...data,
-        data: JSON.stringify(dataTemplate),
+        data: dataTemplate,
       };
 
       await trx
-        .updateTable('CoverTemplate')
+        .update(CoverTemplateTable)
         .set({ ...templateWithMedia })
-        .where('id', '=', id)
-        .executeTakeFirstOrThrow();
+        .where(eq(CoverTemplateTable.id, id));
     });
     return CoverTemplateDataProviders.getOne({ id });
   },
   create: async params => {
-    const { id: maybeId, ...coverTemplate } = params.data;
-    const data = coverTemplate.data as any;
+    const { id: maybeId, ...coverTemplateData } = params.data;
+    const data = coverTemplateData.data as any;
 
-    const previewMediaId = coverTemplate.previewMediaId;
+    const previewMediaId = coverTemplateData.previewMediaId;
     const id = maybeId ?? createId();
-    await db.transaction().execute(async trx => {
-      const createInput = { ...coverTemplate };
+    await db.transaction(async trx => {
+      const createInput = { ...coverTemplateData };
       if (previewMediaId) {
         await trx
-          .insertInto('Media')
+          .insert(MediaTable)
           // eslint-disable-next-line @typescript-eslint/ban-types
-          .values(previewMediaId as unknown as Media)
-          .execute();
+          .values(previewMediaId as unknown as Media);
         createInput.previewMediaId = (previewMediaId as unknown as Media).id;
       }
 
       if (data.sourceMedia) {
-        await trx.insertInto('Media').values(data.sourceMedia).execute();
+        await trx.insert(MediaTable).values(data.sourceMedia);
         data.sourceMediaId = data.sourceMedia.id;
       }
 
-      await trx
-        .insertInto('CoverTemplate')
-        .values({ id, ...createInput, data: JSON.stringify(data) })
-        .executeTakeFirstOrThrow();
+      await trx.insert(CoverTemplateTable).values({ id, ...createInput, data });
     });
 
     return CoverTemplateDataProviders.getOne({ id });

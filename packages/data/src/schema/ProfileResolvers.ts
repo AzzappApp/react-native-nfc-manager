@@ -3,13 +3,14 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   getCompanyActivities,
   getCompanyActivityById,
-  getFollowedProfilesCount,
+  getFollowingsCount,
   getFollowerProfilesCount,
   getProfileCategoryById,
   getProfilesPosts,
   getProfilesPostsCount,
   isFollowing,
 } from '#domains';
+import { buildDefaultContactCard, getContactCard } from '#domains/contactCards';
 import { getLabel, idResolver } from './utils';
 import type { Media } from '#domains';
 import type {
@@ -55,17 +56,29 @@ export const Profile: ProfileResolvers = {
   isFollowing: async (profile, _, { auth }) => {
     return auth.profileId ? isFollowing(auth.profileId, profile.id) : false;
   },
+  isViewer: async (profile, _, { auth }) => {
+    return auth.profileId === profile.id;
+  },
   nbPosts: async (profile, _) => {
     return getProfilesPostsCount(profile.id);
   },
-  nbFollowedProfiles: async (profile, _) => {
-    return getFollowedProfilesCount(profile.id);
+  nbFollowings: async (profile, _) => {
+    return getFollowingsCount(profile.id);
   },
-  nbFollowersProfiles: async (profile, _) => {
+  nbFollowers: async (profile, _) => {
     return getFollowerProfilesCount(profile.id);
   },
-  public: async (profile, _) => {
-    return profile.public ?? false;
+  contactCard: async (profile, _, { userLoader }) => {
+    const contactCard = await getContactCard(profile.id);
+
+    if (contactCard) {
+      return contactCard;
+    } else {
+      //build default contact card based on user data
+      const user = await userLoader.load(profile.userId);
+
+      return buildDefaultContactCard(profile, user);
+    }
   },
 };
 

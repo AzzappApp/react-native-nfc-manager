@@ -9,7 +9,7 @@ import {
   SIMPLE_TITLE_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -74,7 +74,6 @@ const SimpleTextEditionScreen = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
         ... on CardModuleSimpleTitle {
@@ -93,7 +92,6 @@ const SimpleTextEditionScreen = ({
           backgroundStyle {
             backgroundColor
             patternColor
-            opacity
           }
         }
       }
@@ -310,7 +308,7 @@ const SimpleTextEditionScreen = ({
       />
       <SimpleTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data}
+        data={{ ...data, kind: moduleKind }}
         onPreviewPress={onPreviewPress}
       />
       <TabView

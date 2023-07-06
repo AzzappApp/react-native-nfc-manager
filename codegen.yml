@@ -16,29 +16,31 @@ generates:
       enumsAsTypes: true
       useImplementingTypes: true
       mappers:
-        Profile: \@prisma/client#Profile as ProfileModel
-        StaticMedia: \@prisma/client#StaticMedia as StaticMediaModel
-        CoverTemplate: \@prisma/client#CoverTemplate as CoverTemplateModel
-        ProfileCategory: \@prisma/client#ProfileCategory as ProfileCategoryModel
-        Card: \@prisma/client#Card as CardModel
-        MediaImage: \@prisma/client#Media as MediaModel
-        MediaVideo: \@prisma/client#Media as MediaModel
-        CompanyActivity: \@prisma/client#CompanyActivity as CompanyActivityModel
-        Post: \@prisma/client#Post as PostModel
-        PostComment: \@prisma/client#PostComment as PostCommentModel
-        Interest: \@prisma/client#Interest as InterestModel
+        Profile: ../../domains#Profile as ProfileModel
+        StaticMedia: ../../domains#StaticMedia as StaticMediaModel
+        CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
+        ProfileCategory: ../../domains#ProfileCategory as ProfileCategoryModel
+        Card: ../../domains#Card as CardModel
+        MediaImage: ../../domains#Media as MediaModel
+        MediaVideo: ../../domains#Media as MediaModel
+        CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
+        Post: ../../domains#Post as PostModel
+        PostComment: ../../domains#PostComment as PostCommentModel
+        Interest: ../../domains#Interest as InterestModel
         CardCoverTemplate: Record<string, any>
-        CardCover: \@prisma/client#CardCover as CardCoverModel
-        CardModule: \@prisma/client#CardModule as CardModuleModel
-        CardModuleCarousel: \@prisma/client#CardModule as CardModuleCarouselModel
-        CardModuleHorizontalPhoto: \@prisma/client#CardModule as CardModuleHorizontalPhotoModel
-        CardModuleSimpleText: \@prisma/client#CardModule as CardModuleSimpleTextModel
-        CardModuleSimpleTitle: \@prisma/client#CardModule as CardModuleSimpleTitleModel
-        CardModuleSimpleButton: \@prisma/client#CardModule as CardModuleSimpleButtonModel
-        CardModulePhotoWithTextAndTitle: \@prisma/client#CardModule as CardModulePhotoWithTextAndTitleModel
-        CardModuleSocialLinks: \@prisma/client#CardModule as CardModuleSocialLinksModel
-      defaultMapper: "Partial<{T}>"
-      maybeValue: "T extends PromiseLike<infer U> ? Promise<U | null> : T | null"
+        CardCover: ../../domains#CardCover as CardCoverModel
+        CardModule: ../../domains#CardModule as CardModuleModel
+        CardModuleCarousel: ../../domains#CardModule as CardModuleCarouselModel
+        CardModuleHorizontalPhoto: ../../domains#CardModule as CardModuleHorizontalPhotoModel
+        CardModuleSimpleText: ../../domains#CardModule as CardModuleSimpleTextModel
+        CardModuleSimpleTitle: ../../domains#CardModule as CardModuleSimpleTitleModel
+        CardModuleSimpleButton: ../../domains#CardModule as CardModuleSimpleButtonModel
+        CardModulePhotoWithTextAndTitle: ../../domains#CardModule as CardModulePhotoWithTextAndTitleModel
+        CardModuleSocialLinks:  ../../domains#CardModule as CardModuleSocialLinksModel
+        CardModuleBlockText: ../../domains#CardModule as CardModuleBlockTextModel
+        ContactCard: ../../domains#ContactCard as ContactCardModel
+      defaultMapper: 'Partial<{T}>'
+      maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:
         JSON: Record<string, unknown>
         ID: string

@@ -1,5 +1,5 @@
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
-import isEmail from 'validator/es/lib/isEmail';
+import isEmail from 'validator/lib/isEmail';
 import type { CountryCode } from 'libphonenumber-js';
 export const isValidEmail: (email?: string) => boolean = email => {
   if (isNotFalsyString(email)) {

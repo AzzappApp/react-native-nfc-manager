@@ -6,6 +6,7 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
+
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import {
@@ -15,68 +16,72 @@ import {
   signUpRoutes,
 } from '#mobileRoutes';
 import { colors } from '#theme';
+import MainTabBar from '#components/MainTabBar';
 import {
-  ScreenPrefetcherProvider,
-  createScreenPrefetcher,
-} from '#helpers/ScreenPrefetcher';
-import useAuthState from '#hooks/useAuthState';
-import AccountDetailsMobileScreen from '#mobileScreens/AccountDetailsMobileScreen';
-import FollowedProfilesMobileScreen from '#mobileScreens/FollowedProfilesMobileScreen';
-import FollowersMobileScreen from '#mobileScreens/FollowersMobileScreen';
-import InviteFriendsMobileScreen from '#mobileScreens/InviteFriendsMobileScreen';
-import PostCommentsMobileScreen from '#mobileScreens/PostCommentsMobileScreen';
-import MainTabBar from './components/MainTabBar';
-import { useNativeRouter, ScreensRenderer } from './components/NativeRouter';
-import { getAuthState, init as initAuthStore } from './helpers/authStore';
-import createPlatformEnvironment from './helpers/createPlatformEnvironment';
+  useNativeRouter,
+  ScreensRenderer,
+  RouterProvider,
+} from '#components/NativeRouter';
+import Toast from '#components/Toast';
+import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import {
   init as initLocaleHelpers,
   messages,
   useCurrentLocale,
-} from './helpers/localeHelpers';
-import { getRelayEnvironment } from './helpers/relayEnvironment';
-import * as RelayQueryManager from './helpers/RelayQueryManager';
-import { isRelayScreen } from './helpers/relayScreen';
-import waitFor from './helpers/waitFor';
-import AccountMobileScreen from './mobileScreens/AccountMobileScreen';
-import CardModuleEditionMobileScreen from './mobileScreens/CardModuleEditionMobileScreen';
-import ChangePasswordMobileScreen from './mobileScreens/ChangePasswordMobileScreen';
-import ForgotPasswordMobileScreen from './mobileScreens/ForgotPasswordMobileScreen';
-import HomeMobileScreen from './mobileScreens/HomeMobileScreen';
-import NewProfileMobileScreen from './mobileScreens/NewProfileMobileScreen';
-import PostCreationMobileScreen from './mobileScreens/PostCreationMobileScreen';
-import PostMobileScreen from './mobileScreens/PostMobileScreen';
-import ProfileMobileScreen from './mobileScreens/ProfileMobileScreen';
-import ProfilePostsMobileScreen from './mobileScreens/ProfilePostsMobileScreen';
-import SearchMobileScreen from './mobileScreens/SearchMobileScreen';
-import SignInMobileScreen from './mobileScreens/SignInMobileScreen';
-import SignUpMobileScreen from './mobileScreens/SignUpMobileScreen';
-import { PlatformEnvironmentProvider } from './PlatformEnvironment';
+} from '#helpers/localeHelpers';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import * as RelayQueryManager from '#helpers/RelayQueryManager';
+import { isRelayScreen } from '#helpers/relayScreen';
+import {
+  ScreenPrefetcherProvider,
+  createScreenPrefetcher,
+} from '#helpers/ScreenPrefetcher';
+import waitFor from '#helpers/waitFor';
+import useAuthState from '#hooks/useAuthState';
+import { useDeepLink } from '#hooks/useDeepLink';
+import AccountDetailsScreen from '#screens/AccountDetailsScreen';
+import AccountScreen from '#screens/AccountScreen';
+import CardModuleEditionMobileScreen from '#screens/CardModuleEditionMobileScreen';
+import ChangePasswordScreen from '#screens/ChangePasswordScreen';
+import ContactCardScreen from '#screens/ContactCardScreen';
+import FollowersScreen from '#screens/FollowersScreen';
+import FollowingsScreen from '#screens/FollowingsScreen';
+import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
+import HomeScreen from '#screens/HomeScreen';
+import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import NewProfileScreen from '#screens/NewProfileScreen';
+import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
+import PostCreationScreen from '#screens/PostCreationScreen';
+import PostScreen from '#screens/PostScreen';
+import ProfileScreen from '#screens/ProfileScreen';
+import SearchScreen from '#screens/SearchScreen';
+import SignInScreen from '#screens/SignInScreen';
+import SignupScreen from '#screens/SignUpScreen';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
 
 // #region Routing Definitions
 const screens = {
-  SIGN_IN: SignInMobileScreen,
-  SIGN_UP: SignUpMobileScreen,
-  FORGOT_PASSWORD: ForgotPasswordMobileScreen,
-  CHANGE_PASSWORD: ChangePasswordMobileScreen,
-  HOME: HomeMobileScreen,
-  SEARCH: SearchMobileScreen,
-  ACCOUNT: AccountMobileScreen,
+  SIGN_IN: SignInScreen,
+  SIGN_UP: SignupScreen,
+  FORGOT_PASSWORD: ForgotPasswordScreen,
+  CHANGE_PASSWORD: ChangePasswordScreen,
+  HOME: HomeScreen,
+  SEARCH: SearchScreen,
+  ACCOUNT: AccountScreen,
   ALBUMS: () => <View />,
   CHAT: () => <View />,
-  POST: PostMobileScreen,
+  POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
-  PROFILE_POSTS: ProfilePostsMobileScreen,
-  NEW_POST: PostCreationMobileScreen,
-  NEW_PROFILE: NewProfileMobileScreen,
+  NEW_POST: PostCreationScreen,
+  NEW_PROFILE: NewProfileScreen,
   CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
-  PROFILE: ProfileMobileScreen,
-  FOLLOWED_PROFILES: FollowedProfilesMobileScreen,
-  FOLLOWERS: FollowersMobileScreen,
-  ACCOUNT_DETAILS: AccountDetailsMobileScreen,
-  INVITE_FRIENDS: InviteFriendsMobileScreen,
+  PROFILE: ProfileScreen,
+  FOLLOWINGS: FollowingsScreen,
+  FOLLOWERS: FollowersScreen,
+  ACCOUNT_DETAILS: AccountDetailsScreen,
+  INVITE_FRIENDS: InviteFriendsScreen,
+  CONTACT_CARD: ContactCardScreen,
 };
 
 const tabs = {
@@ -149,6 +154,8 @@ const App = () => {
     });
   }, [router, screenIdToDispose, screenPrefetcher]);
 
+  useDeepLink(router);
+
   const onScreenDismissed = useCallback(
     (id: string) => {
       router.screenDismissed(id);
@@ -188,10 +195,6 @@ const App = () => {
 
   // #endregion
 
-  const platformEnvironment = useMemo(() => {
-    return createPlatformEnvironment(router);
-  }, [router]);
-
   const colorScheme = useColorScheme();
 
   const safeAreaBackgroundStyle = useMemo(() => {
@@ -213,7 +216,7 @@ const App = () => {
             messages={langMessages}
             onError={onIntlError}
           >
-            <PlatformEnvironmentProvider value={platformEnvironment}>
+            <RouterProvider value={router}>
               <ScreensRenderer
                 routerState={routerState}
                 screens={screens}
@@ -221,7 +224,8 @@ const App = () => {
                 onScreenDismissed={onScreenDismissed}
                 onFinishTransitioning={onFinishTransitioning}
               />
-            </PlatformEnvironmentProvider>
+            </RouterProvider>
+            <Toast />
           </IntlProvider>
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>

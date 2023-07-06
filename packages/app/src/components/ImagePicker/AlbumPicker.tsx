@@ -1,29 +1,28 @@
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Image } from 'expo-image';
+import { getAlbumsAsync, getAssetsAsync } from 'expo-media-library';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, Image, Modal, StyleSheet, View } from 'react-native';
+import { FlatList, Modal, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableBackground from '#ui/PressableBackground';
 import PressableNative from '#ui/PressableNative';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { Album } from '@react-native-camera-roll/camera-roll';
+import type { Album } from 'expo-media-library';
 import type { IntlShape } from 'react-intl';
 import type { ViewProps, ListRenderItemInfo } from 'react-native';
 
 type AlbumPickerProps = ViewProps & {
-  value: string | null;
-  onChange(album: string): void;
+  album: Album | null;
+  onChange(album: Album | null): void;
 };
 
-// TODO this is barely working we need this feature:
-// https://github.com/react-native-cameraroll/react-native-cameraroll/pull/324
 const AlbumPicker = ({
-  value,
+  album,
   onChange,
   style,
   ...props
@@ -36,7 +35,7 @@ const AlbumPicker = ({
   const onModalClose = () => {
     setShowModal(false);
   };
-  const onSelectAlbum = (album: string) => {
+  const onSelectAlbum = (album: Album | null) => {
     setShowModal(false);
     onChange(album);
   };
@@ -54,7 +53,7 @@ const AlbumPicker = ({
         {...props}
       >
         <Text variant="large" style={styles.title}>
-          {value ?? latestAlbumTitme(intl)}
+          {album?.title ?? latestAlbumTitme(intl)}
         </Text>
         <Icon icon="arrow_down" style={styles.arrowIcon} />
       </PressableNative>
@@ -78,15 +77,35 @@ const AlbumPickerScreen = ({
   onSelectAlbum,
   onClose,
 }: {
-  onSelectAlbum(album: string | null): void;
+  onSelectAlbum(album: Album | null): void;
   onClose(): void;
 }) => {
   const intl = useIntl();
-  const [albums, setAlbums] = useState<Album[] | null>(null);
+  const [albums, setAlbums] = useState<Array<Album | null> | null>(null);
   useEffect(() => {
-    CameraRoll.getAlbums().then(
+    getAlbumsAsync({ includeSmartAlbums: true }).then(
       albums => {
-        setAlbums(albums);
+        const sortedAlbums = albums
+          .filter(a => a.assetCount > 0)
+          .sort((a, b) => {
+            if (a.title?.toLowerCase() === 'recents') {
+              return -1;
+            } else if (b.title?.toLowerCase() === 'recents') {
+              return 1;
+            } else if (a.type === 'smartAlbum' && b.type !== 'smartAlbum') {
+              return 1;
+            } else if (a.type !== 'smartAlbum' && b.type === 'smartAlbum') {
+              return -1;
+            } else {
+              return (
+                a.title?.localeCompare(b.title, undefined, {
+                  sensitivity: 'base',
+                }) ?? 0
+              );
+            }
+          });
+        //TODO test on android if recents album exist or add null
+        setAlbums(sortedAlbums);
       },
       e => {
         // TODO
@@ -101,15 +120,10 @@ const AlbumPickerScreen = ({
   );
   const renderAlbum = useCallback(
     ({ item }: ListRenderItemInfo<Album | null>) => (
-      <AlbumRenderer
-        album={item}
-        onPress={() => onSelectAlbum(item?.title ?? null)}
-      />
+      <AlbumRendererMemo album={item} onSelectAlbum={onSelectAlbum} />
     ),
     [onSelectAlbum],
   );
-
-  const data = useMemo(() => (albums ? [null, ...albums] : null), [albums]);
 
   const { top, bottom } = useSafeAreaInsets();
   return (
@@ -122,7 +136,7 @@ const AlbumPickerScreen = ({
         })}
       />
       <FlatList
-        data={data}
+        data={albums}
         keyExtractor={getAlbumKey}
         renderItem={renderAlbum}
         contentContainerStyle={{ marginBottom: bottom }}
@@ -139,22 +153,22 @@ const latestAlbumTitme = (intl: IntlShape) =>
 
 const AlbumRenderer = ({
   album,
-  onPress,
+  onSelectAlbum,
 }: {
   album: Album | null;
-  onPress(): void;
+  onSelectAlbum(album: Album | null): void;
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const intl = useIntl();
 
   useEffect(() => {
-    CameraRoll.getPhotos(
-      album
-        ? { first: 1, groupTypes: 'Album', groupName: album.title }
-        : { first: 1 },
-    ).then(
+    getAssetsAsync({
+      first: 1,
+      mediaType: ['photo', 'video'],
+      album: album?.id,
+    }).then(
       result => {
-        setImageUri(result.edges[0]?.node.image.uri ?? null);
+        setImageUri(result.assets[0].uri);
       },
       e => {
         // TODO
@@ -162,8 +176,13 @@ const AlbumRenderer = ({
       },
     );
   }, [album]);
+
+  const onPress = useCallback(() => {
+    onSelectAlbum(album);
+  }, [album, onSelectAlbum]);
+
   return (
-    <PressableBackground onPress={onPress} style={styles.albumRow}>
+    <PressableOpacity onPress={onPress} style={styles.albumRow}>
       <Image
         accessibilityRole="image"
         accessibilityIgnoresInvertColors={true}
@@ -179,12 +198,13 @@ const AlbumRenderer = ({
         <Text variant="medium">
           {album ? album.title : latestAlbumTitme(intl)}
         </Text>
-        <Text variant="small">{album ? album.count : 'all'}</Text>
+        <Text variant="small">{album ? album.assetCount : 'all'}</Text>
       </View>
-    </PressableBackground>
+    </PressableOpacity>
   );
 };
 
+const AlbumRendererMemo = memo(AlbumRenderer);
 const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',

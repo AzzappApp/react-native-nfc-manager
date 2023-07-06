@@ -1,6 +1,9 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useCallback, useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import { Alert, Appearance } from 'react-native';
+import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import ErrorBoundaryWithRetry from './ErrorBoundaryWithRetry';
 import { loadQueryFor, useManagedQuery } from './RelayQueryManager';
-import type { NativeScreenProps } from '#components/NativeRouter';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ComponentType } from 'react';
@@ -60,12 +63,63 @@ function relayScreen<T extends RelayScreenProps<any, any>>(
         loadQueryFor(screenId, options, params);
       }
     }, [screenId, params, preloadedQuery]);
+
+    const intl = useIntl();
+    const router = useRouter();
+    const onError = useCallback(
+      ({ retry }: { retry: () => void }) => {
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Loading error',
+            description: 'Screen alert message loading error title',
+          }),
+          intl.formatMessage({
+            defaultMessage: 'Could not load the data',
+            description: 'Screen Alert message loading error',
+          }),
+          [
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Screen alert message loading error cancel button',
+              }),
+              onPress: () => {
+                router.back();
+              },
+              style: 'cancel',
+            },
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Retry',
+                description: 'Screen alert message loading error retry button',
+              }),
+              onPress: () => retry(),
+            },
+          ],
+          {
+            userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
+          },
+        );
+      },
+      [intl, router],
+    );
+
+    const onRetry = useCallback(() => {
+      loadQueryFor(screenId, options, params);
+    }, [params, screenId]);
+
     return (
-      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-        {preloadedQuery && (
-          <Component {...props} preloadedQuery={preloadedQuery} />
-        )}
-      </Suspense>
+      <ErrorBoundaryWithRetry
+        onRetry={onRetry}
+        fallback={onError}
+        screenId={screenId}
+      >
+        <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
+          {preloadedQuery && (
+            <Component {...props} preloadedQuery={preloadedQuery} />
+          )}
+        </Suspense>
+      </ErrorBoundaryWithRetry>
     );
   };
 

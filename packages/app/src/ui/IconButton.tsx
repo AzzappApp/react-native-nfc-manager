@@ -90,7 +90,7 @@ const IconButton = ({
 
 export default IconButton;
 
-const computedStyle = createVariantsStyleSheet(() => ({
+const computedStyle = createVariantsStyleSheet(appearance => ({
   default: {
     image: {
       resizeMode: 'contain',
@@ -104,6 +104,7 @@ const computedStyle = createVariantsStyleSheet(() => ({
   border: {
     button: {
       borderWidth: 1,
+      borderColor: appearance === 'light' ? '#000000' : '#ffffff',
     },
   },
 }));

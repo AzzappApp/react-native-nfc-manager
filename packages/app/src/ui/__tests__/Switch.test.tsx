@@ -1,5 +1,4 @@
 import { act, fireEvent, render } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
 
 import { colors } from '#theme';
 import Switch from '../Switch';

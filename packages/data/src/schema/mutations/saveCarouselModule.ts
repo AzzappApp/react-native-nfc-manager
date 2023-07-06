@@ -26,7 +26,7 @@ import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   _,
   { input },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -64,7 +64,7 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   let mediasToCreates: Array<CloudinaryResource | undefined> = [];
   let mediasToDelete: string[] = [];
   if (input.images?.length) {
-    const oldMedias = ((module?.data as any)?.images as string[]) ?? [];
+    const oldMedias = module?.data?.images ?? [];
     const newMedias = input.images.filter(image => !oldMedias.includes(image));
     mediasToDelete = oldMedias.filter(image => !input.images?.includes(image));
     mediasToCreates = await getMediaInfoByPublicIds(
@@ -78,7 +78,7 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
   const modulesData = omit(input, ['moduleId']);
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await Promise.all(
         mediasToCreates.map(resource => {
           if (!resource) {
@@ -131,10 +131,15 @@ const saveCarouselModule: MutationResolvers['saveCarouselModule'] = async (
     await deleteMediaByPublicIds(
       mediasToDelete.map(publicId => ({ publicId, kind: 'image' })),
     );
-    await removeMedias(mediasToDelete);
+    if (mediasToDelete.length > 0) {
+      await removeMedias(mediasToDelete);
+    }
   } catch (e) {
     console.warn('Error deleting media', e);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
 
   return { card };
 };

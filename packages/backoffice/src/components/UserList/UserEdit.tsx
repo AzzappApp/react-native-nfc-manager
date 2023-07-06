@@ -10,7 +10,7 @@ import {
 import RoleInput from './RoleInput';
 
 const transform = (data: Record<string, string>) => {
-  return { id: data.id, roles: JSON.stringify(data.roles) };
+  return { id: data.id, roles: data.roles };
 };
 
 const UserEdit = () => {

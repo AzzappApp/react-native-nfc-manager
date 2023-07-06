@@ -1,4 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SearchBar from '../SearchBar';
 

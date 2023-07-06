@@ -7,7 +7,7 @@ import {
   MODULE_KIND_LINE_DIVIDER,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';
@@ -108,7 +108,7 @@ const LineDividerEditionScreen = ({
       }
     `);
 
-  const canSave = dirty && !saving;
+  const canSave = (dirty || lineDivider == null) && !saving;
 
   const router = useRouter();
   const onSave = useCallback(() => {
@@ -209,7 +209,7 @@ const LineDividerEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description: 'Cancel button label in Line Divider module screen',
             })}
           />
         }
@@ -219,7 +219,7 @@ const LineDividerEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description: 'Save button label in  Line Divider module screen',
             })}
           />
         }

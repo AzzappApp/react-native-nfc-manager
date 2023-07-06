@@ -7,13 +7,14 @@ import {
   Platform,
   StyleSheet,
   View,
+  useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
-
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import { getLocales } from '#helpers/localeHelpers';
-import useViewportSize, { insetBottom, VW100 } from '#hooks/useViewportSize';
+import { forgotPassword } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
@@ -21,16 +22,9 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ViewTransition from '#ui/ViewTransition';
-import type { ForgotPasswordParams } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 
-type ForgotPasswordScreenProps = {
-  forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
-};
-const ForgotPasswordScreen = ({
-  forgotPassword,
-}: ForgotPasswordScreenProps) => {
-  const vp = useViewportSize();
+const ForgotPasswordScreen = () => {
   const router = useRouter();
   const intl = useIntl();
 
@@ -64,6 +58,9 @@ const ForgotPasswordScreen = ({
     router.back();
   };
 
+  const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
   return (
     <Container style={styles.flex}>
       <KeyboardAvoidingView
@@ -76,7 +73,7 @@ const ForgotPasswordScreen = ({
               testID="azzapp__ForgotPasswordScreen__ViewTransition-confirm"
               style={[
                 styles.viewtransition,
-                { width: vp`${VW100}`, opacity: isSubmitted ? 1 : 0 },
+                { width: screenWidth, opacity: isSubmitted ? 1 : 0 },
               ]}
               transitionDuration={300}
               transitions={['opacity']}
@@ -108,7 +105,7 @@ const ForgotPasswordScreen = ({
               testID="azzapp__ForgotPasswordScreen__ViewTransition-email"
               style={[
                 styles.viewtransition,
-                { width: vp`${VW100}`, opacity: isSubmitted ? 0 : 1 },
+                { width: screenWidth, opacity: isSubmitted ? 0 : 1 },
               ]}
               transitionDuration={300}
               transitions={['opacity']}
@@ -171,7 +168,7 @@ const ForgotPasswordScreen = ({
       </KeyboardAvoidingView>
       <View
         style={{
-          bottom: vp`${insetBottom} + ${35}`,
+          bottom: insets.bottom,
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',

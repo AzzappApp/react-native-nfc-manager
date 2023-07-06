@@ -2,26 +2,26 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { toGlobalId } from 'graphql-relay';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Image, ScrollView } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
+import { View, ScrollView } from 'react-native';
 import {
   runOnJS,
   useAnimatedReaction,
   useSharedValue,
 } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
+import ContactCard from '#components/ContactCard';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { buildUserUrl } from '#helpers/urlHelpers';
+import { switchProfile } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -46,21 +46,17 @@ export default function AccountScreenProfiles({
         profiles {
           id
           userName
-          firstName
-          lastName
-          profileKind
-          companyActivity {
-            label
-          }
-          companyName
           nbPosts
-          nbFollowedProfiles
-          nbFollowersProfiles
+          nbFollowings
+          nbFollowers
           card {
             backgroundColor
             cover {
               ...CoverRenderer_cover
             }
+          }
+          contactCard {
+            ...ContactCard_card
           }
         }
       }
@@ -97,8 +93,6 @@ export default function AccountScreenProfiles({
     [],
   );
 
-  const webAPI = useWebAPI();
-
   const currentProfile = userProfiles?.[index];
 
   const [debouncedCurrentProfileId] = useDebounce(currentProfile?.id, 800);
@@ -109,8 +103,7 @@ export default function AccountScreenProfiles({
       authId !== debouncedCurrentProfileId &&
       authId === currentAuthId.current
     ) {
-      webAPI
-        .switchProfile({ profileId: debouncedCurrentProfileId })
+      switchProfile({ profileId: debouncedCurrentProfileId })
         .then(response => {
           currentAuthId.current = toGlobalId('Profile', response.profileId);
           return dispatchGlobalEvent({
@@ -129,7 +122,7 @@ export default function AccountScreenProfiles({
           console.error('error while switching profile', err);
         });
     }
-  }, [authId, debouncedCurrentProfileId, webAPI]);
+  }, [authId, debouncedCurrentProfileId]);
 
   useEffect(() => {
     if (authId !== currentAuthId.current) {
@@ -147,15 +140,10 @@ export default function AccountScreenProfiles({
     }
   }, [authId, userProfiles]);
 
-  const styles = useStyleSheet(styleSheet);
-
-  const vp = useViewportSize();
-
-  const intl = useIntl();
-
   const router = useRouter();
-
-  const isPersonal = currentProfile?.profileKind === 'personal';
+  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={{ alignItems: 'center' }}>
@@ -169,6 +157,7 @@ export default function AccountScreenProfiles({
               width: COVER_WIDTH * 3,
               justifyContent: 'center',
               height: 235,
+              overflow: 'visible',
             }}
             mode="parallax"
             windowSize={4}
@@ -183,7 +172,7 @@ export default function AccountScreenProfiles({
             onProgressChange={(_, absoluteProgress) => {
               progressValue.value = absoluteProgress;
             }}
-            defaultIndex={index + 1}
+            defaultIndex={Math.min(index + 1, profiles.length - 1)}
             renderItem={({ item }) =>
               typeof item === 'string' ? (
                 <PressableNative
@@ -226,18 +215,26 @@ export default function AccountScreenProfiles({
         </View>
       </View>
       <View style={styles.countersContainer}>
-        <View style={styles.counterContainer}>
-          <Text variant="xlarge">{currentProfile?.nbPosts}</Text>
-          <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-            <FormattedMessage
-              defaultMessage="Posts"
-              description="Number of posts"
-            />
-          </Text>
-        </View>
+        <Link
+          route="PROFILE"
+          params={{
+            userName: currentProfile?.userName ?? '',
+            showPosts: true,
+          }}
+        >
+          <PressableNative style={styles.counterContainer}>
+            <Text variant="xlarge">{currentProfile?.nbPosts}</Text>
+            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
+              <FormattedMessage
+                defaultMessage="Posts"
+                description="Number of posts"
+              />
+            </Text>
+          </PressableNative>
+        </Link>
         <Link route="FOLLOWERS">
           <PressableNative style={styles.counterContainer}>
-            <Text variant="xlarge">{currentProfile?.nbFollowersProfiles}</Text>
+            <Text variant="xlarge">{currentProfile?.nbFollowers}</Text>
             <Text variant="small" style={styles.counterValue} numberOfLines={1}>
               <FormattedMessage
                 defaultMessage="Followers"
@@ -246,9 +243,9 @@ export default function AccountScreenProfiles({
             </Text>
           </PressableNative>
         </Link>
-        <Link route="FOLLOWED_PROFILES">
+        <Link route="FOLLOWINGS">
           <PressableNative style={styles.counterContainer}>
-            <Text variant="xlarge">{currentProfile?.nbFollowedProfiles}</Text>
+            <Text variant="xlarge">{currentProfile?.nbFollowings}</Text>
             <Text variant="small" style={styles.counterValue} numberOfLines={1}>
               <FormattedMessage
                 defaultMessage="Followings"
@@ -262,7 +259,7 @@ export default function AccountScreenProfiles({
         <View
           style={[
             styles.profileDataContainer,
-            { paddingBottom: vp`${insetBottom}  + ${700}` },
+            { paddingBottom: insets.bottom + 700 },
           ]}
         >
           <PressableNative
@@ -281,58 +278,19 @@ export default function AccountScreenProfiles({
               </Text>
             </View>
           </PressableNative>
-
-          <View style={styles.webCardContainer}>
-            <View style={{ flex: 1 }}>
-              <Image
-                source={require('#assets/logo-full_white.png')}
-                resizeMode="contain"
-                style={{ width: 85 }}
-              />
-            </View>
-            <View style={styles.webCardBackground}>
-              <Image source={require('#assets/webcard/logo-substract.png')} />
-              <Image
-                source={require('#assets/webcard/background.png')}
-                style={styles.webCardBackgroundImage}
-              />
-            </View>
-            <View style={styles.webCardContent}>
-              <View style={styles.webCardInfos}>
-                <Text
-                  variant="large"
-                  style={styles.webCardLabel}
-                  numberOfLines={1}
-                >
-                  {isPersonal
-                    ? formatDisplayName(
-                        currentProfile?.firstName,
-                        currentProfile?.lastName,
-                      )
-                    : currentProfile?.companyName}
-                </Text>
-                <Text variant="small" style={styles.webCardLabel}>
-                  {isPersonal ? null : currentProfile?.companyActivity?.label}
-                </Text>
-              </View>
-              <QRCode
-                value={buildUserUrl(currentProfile?.userName ?? '')}
-                size={86.85}
-                color={colors.white}
-                backgroundColor={colors.black}
-                logoBackgroundColor={colors.black}
-                logo={require('#ui/Icon/assets/azzapp.png')}
-              />
-            </View>
-            <View style={styles.webCardFooter}>
-              <Text
-                variant="xsmall"
-                style={[styles.webCardLabel, { opacity: 0.5 }]}
-              >
-                {buildUserUrl(currentProfile?.userName ?? '')}
-              </Text>
-            </View>
-          </View>
+          <Link route="CONTACT_CARD">
+            <PressableNative>
+              {
+                /* Contact card may be missing when profile is optimistically added in the cache. */
+                currentProfile?.contactCard ? (
+                  <ContactCard
+                    userName={currentProfile.userName}
+                    contactCard={currentProfile.contactCard}
+                  />
+                ) : null
+              }
+            </PressableNative>
+          </Link>
         </View>
       </ScrollView>
     </View>

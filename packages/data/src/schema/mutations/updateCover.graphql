@@ -1,9 +1,9 @@
 input UpdateCoverInput {
-  media: MediaInput
+  mediaId: String
   mediaStyle: JSON
-  sourceMedia: MediaInput
-  textPreviewMedia: MediaInput
-  maskMedia: MediaInput
+  sourceMediaId: String
+  textPreviewMediaId: String
+  maskMediaId: String
   backgroundId: String
   backgroundStyle: CardCoverBackgroundStyleInput
   foregroundId: String

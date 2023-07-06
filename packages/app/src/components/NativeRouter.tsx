@@ -6,18 +6,15 @@ import React, {
   useState,
   useEffect,
   useContext,
+  createContext,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
 import { createId } from '#helpers/idHelpers';
-import type {
-  Router as PlatformRouter,
-  RouteListener,
-} from '#PlatformEnvironment';
 import type { Route, ROUTES } from '#routes';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType, ReactNode, Provider } from 'react';
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native';
 import type { ScreenProps } from 'react-native-screens';
 
@@ -242,7 +239,20 @@ const routerReducer = (
 
 type ScreenListener = (args: { id: string; route: Route }) => void;
 
-export type NativeRouter = PlatformRouter & {
+export type RouteListener = (route: Route) => void;
+
+export type NativeRouter = {
+  push<T extends Route>(route: T): void;
+  replace(route: Route): void;
+  showModal(route: Route): void;
+  back(): void;
+  getCurrentRoute(): Route;
+  addRouteWillChangeListener: (listener: RouteListener) => {
+    dispose(): void;
+  };
+  addRouteDidChangeListener: (listener: RouteListener) => {
+    dispose(): void;
+  };
   replaceAll(routes: NativeRouterInit): void;
   backToTop(): void;
   screenDismissed(id: string): void;
@@ -550,6 +560,44 @@ type ScreensRendererProps = {
   defaultScreenOptions?: ScreenOptions;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
+};
+
+const RouterContext = createContext<NativeRouter | null>(null);
+
+export const RouterProvider = RouterContext.Provider as Provider<NativeRouter>;
+
+export const useRouter = () => {
+  const router = useContext(RouterContext);
+  if (!router) {
+    throw new Error('Missing router context');
+  }
+  return router;
+};
+
+export const useCurrentRoute = (
+  usedEvent: 'didChange' | 'willChange' = 'willChange',
+) => {
+  const router = useRouter();
+  const [currentRoute, setCurrentRoute] = useState(router.getCurrentRoute());
+  useEffect(() => {
+    let subscription: { dispose(): void };
+
+    if (usedEvent === 'willChange') {
+      subscription = router.addRouteWillChangeListener(route => {
+        setCurrentRoute(route);
+      });
+    } else {
+      subscription = router.addRouteDidChangeListener(route => {
+        setCurrentRoute(route);
+      });
+    }
+
+    return () => {
+      subscription?.dispose();
+    };
+  }, [router, usedEvent]);
+
+  return currentRoute;
 };
 
 export const ScreensRenderer = ({

@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Image, View } from 'react-native';
+import { Image, View, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useViewportSize, { VH100 } from '#hooks/useViewportSize';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import CountrySelector from './CountrySelector';
@@ -43,7 +42,6 @@ const CountryCodeListWithOptions = <T extends string>({
     onChange(value);
     setShowDropdown(false);
   };
-  const vp = useViewportSize();
   const styles = useStyleSheet(styleSheet);
 
   const isSelectorType = () => {
@@ -53,6 +51,8 @@ const CountryCodeListWithOptions = <T extends string>({
   const selectorIcon = () => {
     return options.find(option => option.type === value)?.icon;
   };
+
+  const { height: windowHeight } = useWindowDimensions();
   return (
     <>
       <PressableNative
@@ -73,7 +73,7 @@ const CountryCodeListWithOptions = <T extends string>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropdown}
-        height={vp`${VH100} -${120}`}
+        height={windowHeight - 120}
         contentContainerStyle={styles.bottomSheetContainer}
         onRequestClose={() => setShowDropdown(false)}
       >

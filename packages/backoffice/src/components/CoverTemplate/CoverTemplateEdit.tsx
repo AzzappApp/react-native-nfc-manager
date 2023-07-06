@@ -83,7 +83,7 @@ const CoverTemplateEdit = () => {
       } else {
         rest.companyActivityIds = null;
       }
-      rest.category = JSON.stringify(category);
+      rest.category = category;
 
       data.merged = dataForm.merged;
       data.segmented = dataForm.segmented;

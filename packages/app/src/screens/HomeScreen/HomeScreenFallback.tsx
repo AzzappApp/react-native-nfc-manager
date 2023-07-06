@@ -1,6 +1,7 @@
 import { range } from 'lodash';
 import { useCallback } from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
@@ -9,7 +10,6 @@ import {
 import { colors, shadow } from '#theme';
 import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useViewportSize, { insetTop } from '#hooks/useViewportSize';
 import Container from '#ui/Container';
 import HomeHeader from './HomeHeader';
 import type { ViewProps } from 'react-native';
@@ -25,7 +25,7 @@ const HomeScreenFallback = ({ style, ...props }: ViewProps) => {
   ];
 
   const styles = useStyleSheet(styleSheet);
-  const vp = useViewportSize();
+  const insets = useSafeAreaInsets();
 
   const renderFakePosts = useCallback(
     (ratio: number, key: number) => (
@@ -35,7 +35,7 @@ const HomeScreenFallback = ({ style, ...props }: ViewProps) => {
   );
 
   return (
-    <Container {...props} style={[{ paddingTop: vp`${insetTop}` }, style]}>
+    <Container {...props} style={[{ paddingTop: insets.top }, style]}>
       <HomeHeader goToSettings={noop} />
       <View style={styles.skeletonCoverContainer}>
         {range(0, 3).map(i => (

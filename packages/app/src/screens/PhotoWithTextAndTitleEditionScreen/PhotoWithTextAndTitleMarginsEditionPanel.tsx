@@ -13,7 +13,7 @@ type PhotoWithTextAndTitleMarginsEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the marginHorizontal
    */
-  onHorizontalMarginChange: (marginHorizontal: number) => void;
+  onMarginHorizontalChange: (marginHorizontal: number) => void;
   /**
    * The marginVertical currently set on the module
    */
@@ -21,7 +21,7 @@ type PhotoWithTextAndTitleMarginsEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the marginVertical
    */
-  onVerticalMarginChange: (marginVertical: number) => void;
+  onMarginVerticalChange: (marginVertical: number) => void;
   /**
    * The gap currently set on the module
    */
@@ -39,9 +39,9 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
   gap,
   onGapChange,
   marginHorizontal,
-  onHorizontalMarginChange,
+  onMarginHorizontalChange,
   marginVertical,
-  onVerticalMarginChange,
+  onMarginVerticalChange,
   style,
   ...props
 }: PhotoWithTextAndTitleMarginsEditionPanelProps) => {
@@ -70,8 +70,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={50}
           step={1}
-          interval={10}
-          onChange={onHorizontalMarginChange}
+          onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Left/Right margin',
             description:
@@ -98,8 +97,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={10}
-          onChange={onVerticalMarginChange}
+          onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top/Bottom Margin',
             description:
@@ -126,7 +124,6 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           min={0}
           max={100}
           step={1}
-          interval={10}
           onChange={onGapChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Image/Text Gap',

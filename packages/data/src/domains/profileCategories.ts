@@ -1,30 +1,52 @@
-import db from './db';
-import type { ProfileCategory } from '@prisma/client';
+import { eq, asc } from 'drizzle-orm';
+import {
+  json,
+  int,
+  mysqlEnum,
+  varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, { DEFAULT_VARCHAR_LENGTH } from './db';
+import { customLabels, customTinyInt } from './generic';
+import type { InferModel } from 'drizzle-orm';
+
+export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
+  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
+  labels: customLabels('labels'),
+  medias: json('medias').notNull(),
+  available: customTinyInt('available').default(true).notNull(),
+  order: int('order').notNull(),
+});
+
+export type ProfileCategory = InferModel<typeof ProfileCategoryTable>;
+export type NewProfileCategory = InferModel<
+  typeof ProfileCategoryTable,
+  'insert'
+>;
 
 /**
  * Retrieves a list of all profile categories
  * @returns A list of profile categories
  */
-export const getProfileCategories = async (): Promise<ProfileCategory[]> =>
+export const getProfileCategories = async () =>
   db
-    .selectFrom('ProfileCategory')
-    .selectAll()
-    .where('available', '=', true)
-    .orderBy('order', 'asc')
-    .execute();
+    .select()
+    .from(ProfileCategoryTable)
+    .where(eq(ProfileCategoryTable.available, true))
+    .orderBy(asc(ProfileCategoryTable.order));
 
 /**
  * Retrieves a profile category by its id
  * @param id - The id of the profile category to retrieve
  * @returns The profile category if found, otherwise null
  */
-export const getProfileCategoryById = async (
-  id: string,
-): Promise<ProfileCategory | null> => {
-  const result = await db
-    .selectFrom('ProfileCategory')
-    .selectAll()
-    .where('id', '=', id)
-    .executeTakeFirst();
-  return result ?? null;
-};
+export const getProfileCategoryById = async (id: string) =>
+  db
+    .select()
+    .from(ProfileCategoryTable)
+    .where(eq(ProfileCategoryTable.id, id))
+
+    .then(res => res.pop() ?? null);

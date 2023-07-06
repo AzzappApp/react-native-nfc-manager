@@ -1,4 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
 import { render, act, fireEvent, screen } from '#helpers/testHelpers';
 import RGBHexColorPicker from '#ui/ColorPicker/RGBHexColorPicker';
 

@@ -7,7 +7,7 @@ import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
-import { useRouter } from '#PlatformEnvironment';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -74,7 +74,6 @@ const SimpleButtonEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,
@@ -268,7 +267,7 @@ const SimpleButtonEditionScreen = ({
             onPress={onCancel}
             label={intl.formatMessage({
               defaultMessage: 'Cancel',
-              description: 'Cancel button label in Line Divier module screen',
+              description: 'Cancel button label in Simple Button module screen',
             })}
           />
         }
@@ -278,7 +277,7 @@ const SimpleButtonEditionScreen = ({
             onPress={onSave}
             label={intl.formatMessage({
               defaultMessage: 'Save',
-              description: 'Save button label in  Line Divier module screen',
+              description: 'Save button label in Simple Button module screen',
             })}
           />
         }

@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
+import { fireEvent, render, screen } from '#helpers/testHelpers';
 
 import ProgressBar from '../ProgressBar';
 
@@ -18,13 +17,24 @@ describe('ProgressBar component', () => {
     });
   });
 
-  test('should `progress` props size the bar correctly', () => {
+  //could not make it work using reanimated mock
+  test('should `progress` props size the bar correctly', async () => {
+    jest.useFakeTimers();
     render(
       <ProgressBar
         style={{ backgroundColor: 'red', width: 345 }}
         progress={0.49}
       />,
     );
-    expect(screen.getByRole('progressbar')).toHaveStyle({ width: '49%' });
+    // there is a bug coupliing onLayout and useAnimatedStyle (force the default value in code)
+    fireEvent(screen.getByTestId('progress-bar-container'), 'layout', {
+      nativeEvent: { layout: { width: 300, height: 3 } },
+    });
+
+    jest.runAllTimers();
+
+    expect(screen.getByTestId('progressbar')).toHaveStyle({
+      width: 147,
+    });
   });
 });

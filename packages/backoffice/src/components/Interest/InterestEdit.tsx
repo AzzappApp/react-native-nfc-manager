@@ -9,7 +9,7 @@ const InterestEdit = () => {
     return {
       id,
       tag,
-      labels: JSON.stringify(labels),
+      labels,
     };
   };
 

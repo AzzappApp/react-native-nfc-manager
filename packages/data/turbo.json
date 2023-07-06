@@ -3,16 +3,13 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "generate-db-type"],
+      "dependsOn": ["^build"],
       "outputs": ["lib/**"],
       "inputs": ["src/**"]
     },
     "typecheck": {
-      "dependsOn": ["^build", "generate-db-type"],
+      "dependsOn": ["^build"],
       "inputs": ["src/**"]
-    },
-    "generate-db-type": {
-      "inputs": ["prisma/schema.prisma"]
     }
   }
 }

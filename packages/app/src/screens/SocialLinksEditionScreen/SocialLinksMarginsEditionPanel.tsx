@@ -64,7 +64,6 @@ const SocialLinksMarginsEditionPanel = ({
           min={10}
           max={100}
           step={1}
-          interval={15}
           onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top margin',
@@ -91,7 +90,6 @@ const SocialLinksMarginsEditionPanel = ({
           min={10}
           max={100}
           step={1}
-          interval={15}
           onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Bottom margin',

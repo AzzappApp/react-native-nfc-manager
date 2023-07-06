@@ -1,37 +1,47 @@
 import { range } from 'lodash';
-import {
-  RelayEnvironmentProvider,
-  graphql,
-  useLazyLoadQuery,
-} from 'react-relay';
+import { Suspense } from 'react';
+import * as ReactRelay from 'react-relay';
 import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
+import NewProfileScreenQueryNode from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
-import { createProfile } from '@azzapp/shared/WebAPI';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { createProfile } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
-import NewProfileScreen from '..';
-import type { NewProfileScreenTestQuery } from '@azzapp/relay/artifacts/NewProfileScreenTestQuery.graphql';
+import { NewProfileScreen } from '../NewProfileScreen';
+import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
-jest.mock('@azzapp/shared/WebAPI', () => ({
-  createProfile: jest.fn(),
-}));
 jest.mock('#ui/FadeSwitch', () => 'FadeSwitch');
 
 jest.mock('#components/medias/NativeMediaImageRenderer');
 jest.mock('#components/medias/NativeMediaVideoRenderer');
+jest.mock('#helpers/MobileWebAPI');
+jest.mock('#helpers/globalEvents');
+
+const mockRouter = {
+  back: jest.fn(),
+  replaceAll: jest.fn(),
+};
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
+  useRouter() {
+    return mockRouter;
+  },
+}));
+
+jest.mock('react-relay', () => ({
+  ...jest.requireActual('react-relay'),
+  fetchQuery: jest.fn(),
+}));
 
 describe('NewProfileScreen', () => {
   let environment: RelayMockEnvironment;
 
-  const onClose = jest.fn();
-  const onProfileCreated = jest.fn();
-
   const renderNewProfileScreen = () => {
     environment = createMockEnvironment();
+
     environment.mock.queueOperationResolver(operation =>
       MockPayloadGenerator.generate(operation, {
         Query: () => ({
@@ -58,30 +68,33 @@ describe('NewProfileScreen', () => {
         }),
       }),
     );
+    environment.mock.queuePendingOperation(NewProfileScreenQueryNode, {});
 
+    const preloadedQuery = ReactRelay.loadQuery<NewProfileScreenQuery>(
+      environment,
+      NewProfileScreenQueryNode,
+      {},
+    );
     const TestRenderer = () => {
-      const data = useLazyLoadQuery<NewProfileScreenTestQuery>(
-        graphql`
-          query NewProfileScreenTestQuery @relay_test_operation {
-            ...NewProfileScreen_query
-          }
-        `,
-        {},
-      );
       return (
-        <NewProfileScreen
-          params={undefined}
-          data={data}
-          onClose={onClose}
-          onProfileCreated={onProfileCreated}
-        />
+        <Suspense>
+          <NewProfileScreen
+            screenId="NEW_PROFILE"
+            hasFocus
+            route={{
+              route: 'NEW_PROFILE',
+              params: { goBack: false },
+            }}
+            preloadedQuery={preloadedQuery}
+          />
+        </Suspense>
       );
     };
 
     return render(
-      <RelayEnvironmentProvider environment={environment}>
+      <ReactRelay.RelayEnvironmentProvider environment={environment}>
         <TestRenderer />
-      </RelayEnvironmentProvider>,
+      </ReactRelay.RelayEnvironmentProvider>,
     );
   };
 
@@ -89,9 +102,8 @@ describe('NewProfileScreen', () => {
     jest.clearAllMocks();
   });
 
-  const createProfileMock = createProfile as jest.MockedFunction<
-    typeof createProfile
-  >;
+  const createProfileMock = jest.mocked(createProfile);
+  const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
 
   describe('ProfileKindStep', () => {
     test('should allows the user to choose which kind of profile', () => {
@@ -102,11 +114,10 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
-        mediaID: 'media-0-0',
-        requestedSize: 300,
-        uri: 'https://fakeMedia.com/0-0.jpg',
-      });
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp(
+        'source',
+        'media-0-0',
+      );
 
       act(() => {
         fireEvent.press(profileKindButtons[1]);
@@ -120,11 +131,10 @@ describe('NewProfileScreen', () => {
         expect.objectContaining({ checked: true }),
       );
 
-      expect(screen.getAllByTestId('category-image')[0]).toHaveProp('source', {
-        mediaID: 'media-1-0',
-        requestedSize: 300,
-        uri: 'https://fakeMedia.com/1-0.jpg',
-      });
+      expect(screen.getAllByTestId('category-image')[0]).toHaveProp(
+        'source',
+        'media-1-0',
+      );
     });
 
     test('should display the personal profile form when user choose a personal profile', () => {
@@ -176,16 +186,10 @@ describe('NewProfileScreen', () => {
           screen.getByPlaceholderText('Enter your first name'),
           'John',
         );
-      });
-
-      act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Enter your last name'),
           'Doe',
         );
-      });
-
-      act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Choose an username'),
           'johndoe',
@@ -202,6 +206,8 @@ describe('NewProfileScreen', () => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
 
+      await act(flushPromises);
+
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
           firstName: 'John',
@@ -210,24 +216,19 @@ describe('NewProfileScreen', () => {
           profileCategoryId: 'profileCategory-0',
           profileKind: 'personal',
         }),
-        expect.anything(),
       );
 
-      await act(flushPromises);
-      expect(onProfileCreated).toHaveBeenCalledWith({
-        profileData: {
-          companyActivityId: null,
-          companyName: null,
-          firstName: 'John',
-          lastName: 'Doe',
-          profileCategoryId: 'profileCategory-0',
-          profileKind: 'personal',
-          userName: 'johndoe',
+      expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
+        type: 'PROFILE_CHANGE',
+        payload: {
+          authTokens: {
+            token: 'fakeToken',
+            refreshToken: 'fakeRefreshToken',
+          },
+          profileId: 'profile-0',
         },
-        profileId: 'profile-0',
-        token: 'fakeToken',
-        refreshToken: 'fakeRefreshToken',
       });
+      await act(flushPromises);
     });
 
     test('should allows the user to fill the form for business', async () => {
@@ -272,11 +273,10 @@ describe('NewProfileScreen', () => {
           companyActivityId: 'companyActivity-1-4',
           profileKind: 'business',
         }),
-        expect.anything(),
       );
     });
 
-    test('should display an error message if the username is invalid', () => {
+    test('should display an error message if the username is invalid', async () => {
       renderToProfileForm('personal');
 
       act(() => {
@@ -293,25 +293,38 @@ describe('NewProfileScreen', () => {
         );
       });
 
+      act(() => {
+        fireEvent.press(screen.getByTestId('submit-button'));
+      });
+
+      await act(flushPromises);
+
       expect(
-        screen.queryByText('Username can’t contain space or special caracters'),
+        screen.queryByText(
+          'Username can’t contain space or special characters',
+        ),
       ).not.toBeTruthy();
+
       act(() => {
         fireEvent.changeText(
           screen.getByPlaceholderText('Choose an username'),
           'ddssd$$$',
         );
       });
-      expect(
-        screen.queryByText('Username can’t contain space or special caracters'),
-      ).toBeTruthy();
 
       act(() => {
         fireEvent.press(screen.getByTestId('submit-button'));
       });
 
+      await act(flushPromises);
+
+      expect(
+        screen.queryByText(
+          'Username can’t contain space or special characters',
+        ),
+      ).toBeTruthy();
+
       expect(createProfileMock).not.toHaveBeenCalled();
-      expect(onProfileCreated);
     });
 
     test('should display an error message when the user name is already taken', async () => {
@@ -339,13 +352,18 @@ describe('NewProfileScreen', () => {
         );
       });
 
+      act(() => {
+        fireEvent.press(screen.getByTestId('submit-button'));
+      });
+
       createProfileMock.mockRejectedValueOnce(
         new Error(ERRORS.USERNAME_ALREADY_EXISTS),
       );
 
-      act(() => {
-        fireEvent.press(screen.getByTestId('submit-button'));
-      });
+      expect(
+        screen.queryByText('This username is already used by someone else'),
+      ).not.toBeTruthy();
+      await act(flushPromises);
 
       expect(createProfileMock).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -355,13 +373,8 @@ describe('NewProfileScreen', () => {
           profileCategoryId: 'profileCategory-0',
           profileKind: 'personal',
         }),
-        expect.anything(),
       );
 
-      expect(
-        screen.queryByText('This username is already used by someone else'),
-      ).not.toBeTruthy();
-      await act(flushPromises);
       expect(
         screen.queryByText('This username is already used by someone else'),
       ).toBeTruthy();
@@ -425,7 +438,7 @@ describe('NewProfileScreen', () => {
       });
       await act(flushPromises);
 
-      expect(onClose).toHaveBeenCalled();
+      expect(mockRouter.replaceAll).toHaveBeenCalled();
     });
 
     test('should allows the user to skip an interest', async () => {
@@ -433,7 +446,7 @@ describe('NewProfileScreen', () => {
       act(() => {
         fireEvent.press(screen.getByTestId('skip-button'));
       });
-      expect(onClose).toHaveBeenCalled();
+      expect(mockRouter.replaceAll).toHaveBeenCalled();
     });
   });
 });

@@ -1,17 +1,62 @@
 import { createId } from '@paralleldrive/cuid2';
+import { eq, inArray } from 'drizzle-orm';
+import {
+  datetime,
+  json,
+  uniqueIndex,
+  varchar,
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
 import ERRORS from '@azzapp/shared/errors';
-import db from './db';
-import { getEntitiesByIds } from './generic';
-import type { User } from '@prisma/client';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+} from './db';
+import type { InferModel } from 'drizzle-orm';
+
+export const UserTable = mysqlTable(
+  'User',
+  {
+    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
+      .primaryKey()
+      .notNull(),
+    email: varchar('email', { length: DEFAULT_VARCHAR_LENGTH }),
+    password: varchar('password', { length: DEFAULT_VARCHAR_LENGTH }),
+    phoneNumber: varchar('phoneNumber', { length: DEFAULT_VARCHAR_LENGTH }),
+    createdAt: datetime('createdAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    updatedAt: datetime('updatedAt', {
+      mode: 'date',
+      fsp: DEFAULT_DATETIME_PRECISION,
+    })
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
+    roles: json('roles'),
+  },
+  table => {
+    return {
+      emailKey: uniqueIndex('User_email_key').on(table.email),
+      phoneNumberKey: uniqueIndex('User_phoneNumber_key').on(table.phoneNumber),
+    };
+  },
+);
+export type User = InferModel<typeof UserTable>;
+export type NewUser = Omit<InferModel<typeof UserTable, 'insert'>, 'id'>;
 
 /**
- * Retrieve a list of users by their ids
- * @param ids - The ids of the users to retrieve
- * @returns A list of users, where the order of the users matches the order of the ids
+ * Retrieve a list of user by their ids
+ * @param ids - The ids of the user to retrieve
+ * @returns A list of user, where the order of the user matches the order of the ids
  */
-export const getUsersByIds = (
-  ids: readonly string[],
-): Promise<Array<User | null>> => getEntitiesByIds('User', ids);
+export const getUsersByIds = (ids: string[]): Promise<User[]> =>
+  db.select().from(UserTable).where(inArray(UserTable.id, ids));
 
 /**
  * Retrieve a user by their email
@@ -19,12 +64,12 @@ export const getUsersByIds = (
  * @returns The user if found, otherwise null
  */
 export const getUserByEmail = async (email: string): Promise<User | null> => {
-  const user = await db
-    .selectFrom('User')
-    .selectAll()
-    .where('email', '=', email)
-    .executeTakeFirst();
-  return user ?? null;
+  return db
+    .select()
+    .from(UserTable)
+    .where(eq(UserTable.email, email))
+
+    .then(user => user.pop() ?? null);
 };
 
 /**
@@ -35,46 +80,51 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 export const getUserByPhoneNumber = async (
   phoneNumber: string,
 ): Promise<User | null> => {
-  const user = await db
-    .selectFrom('User')
-    .selectAll()
-    .where('phoneNumber', '=', phoneNumber)
-    .executeTakeFirst();
-  return user ?? null;
+  return db
+    .select()
+    .from(UserTable)
+    .where(eq(UserTable.phoneNumber, phoneNumber))
+
+    .then(user => user.pop() ?? null);
 };
 
 /**
  * Create a new user
- * @param data - The users fields, excluding the id
+ * @param data - The user fields, excluding the id
  * @returns The newly created user
  */
-export const createUser = async (
-  data: Omit<User, 'createdAt' | 'id' | 'updatedAt'>,
-): Promise<User> => {
-  const user = {
+export const createUser = async (data: NewUser): Promise<User> => {
+  const addedUser = {
     id: createId(),
-    updatedAt: new Date(),
     ...data,
   };
-  await db.insertInto('User').values(user).execute();
-  return { ...user, createdAt: new Date() };
+  await db.insert(UserTable).values(addedUser);
+
+  return {
+    ...addedUser,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    email: addedUser.email ?? null,
+    phoneNumber: addedUser.phoneNumber ?? null,
+    password: addedUser.password ?? null,
+    roles: UserTable.roles ?? null,
+  };
 };
 
 export const updateUser = async (
   userId: string,
-  data: Partial<Omit<User, 'createdAt' | 'id' | 'updatedAt'>>,
+  data: Partial<User>,
 ): Promise<Partial<User>> => {
-  const user = {
+  const updatedUser = {
     updatedAt: new Date(),
     ...data,
   };
   const result = await db
-    .updateTable('User')
-    .set(user)
-    .where('id', '=', userId)
-    .execute();
-  if (result.length > 0) {
-    return user;
+    .update(UserTable)
+    .set(updatedUser)
+    .where(eq(UserTable.id, userId));
+  if (result.rowsAffected > 0) {
+    return updatedUser;
   } else {
     throw new Error(ERRORS.USER_NOT_FOUND);
   }

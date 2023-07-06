@@ -1,53 +1,68 @@
 import { useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import * as mime from 'react-native-mime-types';
+import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
-  useFragment,
   useMutation,
+  usePreloadedQuery,
 } from 'react-relay';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
+import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
+import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
+import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
+import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
 } from '#components/ImagePicker';
 import { addLocalCachedMediaFile } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import relayScreen from '#helpers/relayScreen';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { PostCreationScreen_viewer$key } from '@azzapp/relay/artifacts/PostCreationScreen_viewer.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { NewPostRoute } from '#routes';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
+import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
 import type { Observable } from 'relay-runtime';
 
 const POST_MAX_DURATION = 15;
 
-type PostCreationScreenProps = {
-  viewer: PostCreationScreen_viewer$key;
-};
+const postCreationcreenQuery = graphql`
+  query PostCreationScreenQuery {
+    viewer {
+      profile {
+        id
+        ...AuthorCartoucheFragment_profile
+      }
+    }
+  }
+`;
 
-const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
+const PostCreationScreen = ({
+  preloadedQuery,
+  route: { params },
+}: RelayScreenProps<NewPostRoute, PostCreationScreenQuery>) => {
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
+  const intl = useIntl();
+  const {
+    viewer: { profile },
+  } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
 
-  const { profile } = useFragment(
-    graphql`
-      fragment PostCreationScreen_viewer on Viewer {
-        profile {
-          id
-          ...AuthorCartoucheFragment_profile
-        }
-      }
-    `,
-    viewerKey,
-  );
-  const connectionID = ConnectionHandler.getConnectionID(
-    profile!.id,
-    'ProfilePostsScreen_profile_connection_posts',
-  );
+  const connectionID =
+    profile?.id &&
+    ConnectionHandler.getConnectionID(
+      profile.id,
+      'ProfilePostsListprofile_connection_posts',
+    );
 
   const router = useRouter();
   const onCancel = () => {
@@ -58,6 +73,11 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
     mutation PostCreationScreenMutation(
       $connections: [ID!]!
       $input: CreatePostInput!
+      $isNative: Boolean!
+      $screenWidth: Float!
+      $postWith: Float!
+      $cappedPixelRatio: Float!
+      $pixelRatio: Float!
     ) {
       createPost(input: $input) {
         post @prependNode(connections: $connections, edgeTypeName: "PostEdge") {
@@ -73,13 +93,28 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
             id
             width
             height
+            aspectRatio
+            largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              @include(if: $isNative)
+            smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
+              @include(if: $isNative)
+            ... on MediaVideo {
+              largeThumbnail: thumbnail(
+                width: $screenWidth
+                pixelRatio: $pixelRatio
+              ) @include(if: $isNative)
+              smallThumbnail: thumbnail(
+                width: $postWith
+                pixelRatio: $cappedPixelRatio
+              ) @include(if: $isNative)
+            }
           }
+          createdAt
         }
       }
     }
   `);
 
-  const WebAPI = useWebAPI();
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -102,7 +137,7 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
       ...timeRange,
     });
 
-    const { uploadURL, uploadParameters } = await WebAPI.uploadSign({
+    const { uploadURL, uploadParameters } = await uploadSign({
       kind: kind === 'video' ? 'video' : 'image',
       target: 'post',
     });
@@ -114,10 +149,14 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
         mime.lookup(fileName) ||
         (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
     };
-    const { progress: uploadProgress, promise: uploadPromise } =
-      WebAPI.uploadMedia(file, uploadURL, uploadParameters);
+    const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+      file,
+      uploadURL,
+      uploadParameters,
+    );
     setUploadProgress(uploadProgress);
     const { public_id } = await uploadPromise;
+    setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
     commit({
       variables: {
         input: {
@@ -131,21 +170,70 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
           allowLikes,
           content,
         },
-        connections: [connectionID],
+        isNative: true,
+        screenWidth: ScreenWidth(),
+        postWith: PostWidth(),
+        cappedPixelRatio: CappedPixelRatio(),
+        pixelRatio: PixelRatio(),
+        connections: [connectionID!],
       },
-      onCompleted(response) {
-        addLocalCachedMediaFile(
-          public_id,
-          kind === 'video' ? 'video' : 'image',
-          `file://${exportedMedia.uri}`,
-        );
-        // TODO use fragment instead of response
-        router.replace({
-          route: 'PROFILE_POSTS',
-          params: {
-            userName: response.createPost?.post?.author.userName as string,
-          },
+      onCompleted(response, error) {
+        if (error) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error while creating post',
+              description: 'Toast Error message while creating post',
+            }),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            text1: intl.formatMessage({
+              defaultMessage: 'Post created',
+              description: 'Toast Success message while creating post',
+            }),
+          });
+          addLocalCachedMediaFile(
+            public_id,
+            kind === 'video' ? 'video' : 'image',
+            `file://${exportedMedia.uri}`,
+          );
+          // TODO use fragment instead of response
+          if (params?.fromProfile) {
+            router.back();
+          } else {
+            router.replace({
+              route: 'PROFILE',
+              params: {
+                userName: response.createPost?.post?.author.userName as string,
+                showPosts: true,
+              },
+            });
+          }
+        }
+      },
+      onError() {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while creating post',
+            description: 'Toast Error message while creating post',
+          }),
         });
+      },
+      updater: store => {
+        if (profile?.id) {
+          const currentProfile = store.get(profile.id);
+
+          if (currentProfile) {
+            const nbPosts = currentProfile?.getValue('nbPosts');
+
+            if (typeof nbPosts === 'number') {
+              currentProfile.setValue(nbPosts + 1, 'nbPosts');
+            }
+          }
+        }
       },
     });
   };
@@ -187,4 +275,10 @@ const PostCreationScreen = ({ viewer: viewerKey }: PostCreationScreenProps) => {
   );
 };
 
-export default PostCreationScreen;
+PostCreationScreen.options = {
+  stackAnimation: 'slide_from_bottom',
+};
+
+export default relayScreen(PostCreationScreen, {
+  query: postCreationcreenQuery,
+});

@@ -4,7 +4,9 @@ import deleteModules from './deleteModules';
 import duplicateModule from './duplicateModule';
 import togglePostReaction from './postReaction';
 import removeFollower from './removeFollower';
+import saveBlockTextModule from './saveBlockTextModule';
 import saveCarouselModule from './saveCarouselModule';
+import saveContactCard from './saveContactCard';
 import saveHorizontalPhotoModule from './saveHorizontalPhotoModule';
 import saveLineDividerModule from './saveLineDividerModule';
 import savePhotoWithTextAndTitleModule from './savePhotoWithTextAndTitleModule';
@@ -16,6 +18,7 @@ import toggleFollowing from './toggleFollowing';
 import updateCard from './updateCard';
 import updateCover from './updateCover';
 import updateModulesVisibility from './updateModulesVisibility';
+import updatePost from './updatePost';
 import updateProfile from './updateProfile';
 import updateUser from './updateUser';
 import type {
@@ -60,7 +63,9 @@ export const Mutation: MutationResolvers = {
   updateProfile: createMutationWithClientMutationId(updateProfile),
   updateUser: createMutationWithClientMutationId(updateUser),
   updateCover: createMutationWithClientMutationId(updateCover),
+  updateCard: createMutationWithClientMutationId(updateCard),
   createPost: createMutationWithClientMutationId(createPost),
+  updatePost: createMutationWithClientMutationId(updatePost),
   toggleFollowing: createMutationWithClientMutationId(toggleFollowing),
   removeFollower: createMutationWithClientMutationId(removeFollower),
   togglePostReaction: createMutationWithClientMutationId(togglePostReaction),
@@ -76,13 +81,13 @@ export const Mutation: MutationResolvers = {
   savePhotoWithTextAndTitleModule: createMutationWithClientMutationId(
     savePhotoWithTextAndTitleModule,
   ),
-  updateCard: createMutationWithClientMutationId(updateCard),
   saveSimpleButtonModule: createMutationWithClientMutationId(
     saveSimpleButtonModule,
   ),
   saveSocialLinksModule: createMutationWithClientMutationId(
     saveSocialLinksModule,
   ),
+  saveBlockTextModule: createMutationWithClientMutationId(saveBlockTextModule),
   swapModules: createMutationWithClientMutationId(swapModules),
   deleteModules: createMutationWithClientMutationId(deleteModules),
   duplicateModule: createMutationWithClientMutationId(duplicateModule),
@@ -90,4 +95,5 @@ export const Mutation: MutationResolvers = {
     updateModulesVisibility,
   ),
   createPostComment: createMutationWithClientMutationId(createPostComment),
+  saveContactCard: createMutationWithClientMutationId(saveContactCard),
 };

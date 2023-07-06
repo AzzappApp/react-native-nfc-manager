@@ -1,6 +1,6 @@
+import { SocialLinksRendererRaw } from '#components/cardModules/SocialLinksRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { SocialLinksRendererRaw } from '#components/SocialLinksRenderer';
-import type { SocialLinksRawData } from '#components/SocialLinksRenderer';
+import type { SocialLinksRawData } from '#components/cardModules/SocialLinksRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SocialLinksPreviewProps = ViewProps & {

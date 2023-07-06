@@ -56,7 +56,6 @@ const CoverTemplate = ({
       defaultValues={{
         enabled: true,
         colorPalette: DEFAULT_PALETTE_COLOR.join(','),
-        kind: 'personal',
         data: {
           backgroundStyle: {
             backgroundColor: '#FFFFFF',
@@ -109,14 +108,6 @@ const CoverTemplate = ({
           source="name"
           validate={required()}
           helperText="A name for search purpose on Admin panel - Internal use only"
-        />
-        <RadioButtonGroupInput
-          source="kind"
-          label=""
-          choices={[
-            { id: 'personal', name: 'Personal' },
-            { id: 'business', name: 'Business' },
-          ]}
         />
         <TextInput
           fullWidth
@@ -339,7 +330,7 @@ const CoverTemplate = ({
             }}
           />
         </ImageInput>
-        <SectionTitle label="Associated Compnay Activity. If empty, available for all business" />
+        <SectionTitle label="Associated Company Activity. If empty, available for all business" />
         <ReferenceArrayInput
           source="companyActivities"
           label="Company Activity"

@@ -1,6 +1,6 @@
+import { SimpleButtonRendererRaw } from '#components/cardModules/SimpleButtonRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { SimpleButtonRendererRaw } from '#components/SimpleButtonRenderer';
-import type { SimpleButtonRawData } from '#components/SimpleButtonRenderer';
+import type { SimpleButtonRawData } from '#components/cardModules/SimpleButtonRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleButtonPreviewProps = ViewProps & {

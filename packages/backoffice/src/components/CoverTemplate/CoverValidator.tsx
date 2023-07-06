@@ -14,11 +14,6 @@ export const validateFormCover = async (
 
   const isPreviewMediaNull = values.previewMediaId == null;
 
-  // Suggested template should be business only
-  if (values.suggested && values.kind !== 'business') {
-    errors.kind = 'A suggested template should be business only';
-  }
-
   // Not Suggested template should not have sourceMedia
   if (!values.suggested && !isSourceMediaNull) {
     errors.data.sourceMedia = {

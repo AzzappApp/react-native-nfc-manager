@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import MediaVideoRenderer from '../MediaVideoRenderer';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('../NativeMediaVideoRenderer', () => 'NativeMediaVideoRenderer');
 jest.mock('../NativeMediaImageRenderer', () => 'NativeMediaImageRenderer');

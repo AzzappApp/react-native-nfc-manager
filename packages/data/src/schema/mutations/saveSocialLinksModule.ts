@@ -16,7 +16,11 @@ import type { Card, CardModule } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveSocialLinksModule: MutationResolvers['saveSocialLinksModule'] =
-  async (_, { input }, { auth, cardByProfileLoader }) => {
+  async (
+    _,
+    { input },
+    { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  ) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -48,7 +52,7 @@ const saveSocialLinksModule: MutationResolvers['saveSocialLinksModule'] =
     try {
       if (module) {
         await updateCardModule(module.id, {
-          data: { ...(module.data as object), ...omit(input, 'moduleId') },
+          data: { ...module.data, ...omit(input, 'moduleId') },
         });
       } else {
         await createCardModule({
@@ -66,6 +70,9 @@ const saveSocialLinksModule: MutationResolvers['saveSocialLinksModule'] =
       console.log(e);
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const profile = await profileLoader.load(profileId);
+    cardUpdateListener(profile!.userName);
 
     return { card };
   };

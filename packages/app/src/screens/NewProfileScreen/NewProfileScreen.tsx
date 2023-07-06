@@ -1,53 +1,55 @@
 import { toGlobalId } from 'graphql-relay';
 import { useState, useCallback } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
-import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
+import { View, StyleSheet, SafeAreaView, PixelRatio } from 'react-native';
+import {
+  fetchQuery,
+  graphql,
+  usePreloadedQuery,
+  useRelayEnvironment,
+} from 'react-relay';
+import { Observable } from 'relay-runtime';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
-import { useRouter } from '#PlatformEnvironment';
+import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { mainRoutes } from '#mobileRoutes';
+import { prefetchImage } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
 import InterestPicker from './InterestPicker';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
-import type { NewProfileScreen_query$key } from '@azzapp/relay/artifacts/NewProfileScreen_query.graphql';
+import type { NewProfileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileScreenPreloadQuery.graphql';
+import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 
-type NewProfileScreenProps = {
-  data: NewProfileScreen_query$key;
-  onClose(): void;
-  onProfileCreated(tokenResponse: {
-    token: string;
-    refreshToken: string;
-    profileId: string;
-    profileData: Omit<CreateProfileParams, 'authMethod'>;
-  }): void;
-  params: NewProfileRoute['params'];
-};
+const newProfileScreenQuery = graphql`
+  query NewProfileScreenQuery {
+    profileCategories {
+      id
+      profileKind
+      ...ProfileKindStep_profileCategories
+      ...ProfileForm_profileCategory
+    }
+    interests {
+      ...InterestPicker_interests
+    }
+  }
+`;
 
-const NewProfileScreen = ({
-  data,
-  onClose,
-  onProfileCreated,
-  params,
-}: NewProfileScreenProps) => {
-  const { profileCategories, interests } = useFragment(
-    graphql`
-      fragment NewProfileScreen_query on Query {
-        profileCategories {
-          id
-          profileKind
-          ...ProfileKindStep_profileCategories
-          ...ProfileForm_profileCategory
-        }
-        interests {
-          ...InterestPicker_interests
-        }
-      }
-    `,
-    data,
+export const NewProfileScreen = ({
+  preloadedQuery,
+  route: { params },
+}: RelayScreenProps<NewProfileRoute, NewProfileScreenQuery>) => {
+  const { profileCategories, interests } = usePreloadedQuery(
+    newProfileScreenQuery,
+    preloadedQuery,
   );
-
   const [currentPage, setPage] = useState(0);
 
   const next = useCallback(() => {
@@ -60,13 +62,13 @@ const NewProfileScreen = ({
 
   const environment = useRelayEnvironment();
 
-  const onProfileCreatedInner = (tokenResponse: {
+  const onProfileCreated = (response: {
     token: string;
     refreshToken: string;
     profileId: string;
     profileData: Omit<CreateProfileParams, 'authMethod'>;
   }) => {
-    const { profileData, profileId } = tokenResponse;
+    const { profileData, profileId, token, refreshToken } = response;
     environment.commitUpdate(updater => {
       const root = updater.getRoot();
       const user = root.getLinkedRecord('currentUser');
@@ -98,7 +100,16 @@ const NewProfileScreen = ({
       root.setLinkedRecord(user, 'currentUser');
     });
 
-    onProfileCreated(tokenResponse);
+    void dispatchGlobalEvent({
+      type: 'PROFILE_CHANGE',
+      payload: {
+        authTokens: {
+          token,
+          refreshToken,
+        },
+        profileId,
+      },
+    });
     next();
   };
 
@@ -116,6 +127,13 @@ const NewProfileScreen = ({
   const profileKind = profileCategory?.profileKind;
 
   const router = useRouter();
+  const onClose = useCallback(() => {
+    if (params?.goBack) {
+      router.back();
+    } else {
+      router.replaceAll(mainRoutes);
+    }
+  }, [router, params?.goBack]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,7 +156,7 @@ const NewProfileScreen = ({
               <ProfileForm
                 profileKind={profileKind!}
                 profileCategory={profileCategory!}
-                onProfileCreated={onProfileCreatedInner}
+                onProfileCreated={onProfileCreated}
                 onBack={prev}
               />
             </View>
@@ -159,7 +177,48 @@ const NewProfileScreen = ({
   );
 };
 
-export default NewProfileScreen;
+NewProfileScreen.prefetch = () => {
+  const pixelRatio = Math.min(2, PixelRatio.get());
+  const environment = getRelayEnvironment();
+  return fetchQuery<NewProfileScreenPreloadQuery>(
+    environment,
+    graphql`
+      query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
+        profileCategories {
+          id
+          profileKind
+          ...ProfileKindStep_profileCategories
+          ...ProfileForm_profileCategory
+          medias {
+            preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
+          }
+        }
+        interests {
+          ...InterestPicker_interests
+        }
+      }
+    `,
+    { pixelRatio },
+  ).mergeMap(({ profileCategories }) => {
+    const observables = convertToNonNullArray(
+      profileCategories.flatMap(category =>
+        category.medias?.map(media => prefetchImage(media.preloadURI)),
+      ),
+    );
+    if (observables.length === 0) {
+      return Observable.from(null);
+    }
+    return combineLatest(observables);
+  });
+};
+
+NewProfileScreen.options = {
+  replaceAnimation: 'push',
+};
+
+export default relayScreen(NewProfileScreen, {
+  query: newProfileScreenQuery,
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

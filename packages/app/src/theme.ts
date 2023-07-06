@@ -1,5 +1,4 @@
-import { Platform, StyleSheet } from 'react-native';
-import type { TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 // color from style guide
 export const colors = {
@@ -37,27 +36,12 @@ export const colors = {
   green: '#0FD59E',
 };
 export const fontFamilies = {
-  extrabold: Platform.select({
-    default: { fontFamily: 'PlusJakartaSans-ExtraBold', fontWeight: '800' },
-    web: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800' },
-  }) as TextStyle,
-  bold: Platform.select({
-    default: { fontFamily: 'PlusJakartaSans-Bold', fontWeight: '700' },
-    web: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700' },
-  }) as TextStyle,
-  semibold: Platform.select({
-    default: { fontFamily: 'PlusJakartaSans-SemiBold', fontWeight: '600' },
-    web: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600' },
-  }) as TextStyle,
-  medium: Platform.select({
-    default: { fontFamily: 'PlusJakartaSans-Medium', fontWeight: '500' },
-    web: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500' },
-  }) as TextStyle,
-  regular: Platform.select({
-    default: { fontFamily: 'PlusJakartaSans-Regular', fontWeight: '400' },
-    web: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400' },
-  }) as TextStyle,
-};
+  extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold', fontWeight: '800' },
+  bold: { fontFamily: 'PlusJakartaSans-Bold', fontWeight: '700' },
+  semibold: { fontFamily: 'PlusJakartaSans-SemiBold', fontWeight: '600' },
+  medium: { fontFamily: 'PlusJakartaSans-Medium', fontWeight: '500' },
+  regular: { fontFamily: 'PlusJakartaSans-Regular', fontWeight: '400' },
+} as const;
 
 export const textStyles = StyleSheet.create({
   xlarge: {

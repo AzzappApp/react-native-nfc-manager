@@ -1,13 +1,13 @@
-import { sql } from 'kysely';
+import { inArray, sql } from 'drizzle-orm';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, getCardModulesByIds } from '#domains';
+import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
   { input: { modulesIds } },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -27,11 +27,10 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   }
 
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await trx
-        .deleteFrom('CardModule')
-        .where('id', 'in', modulesIds)
-        .execute();
+        .delete(CardModuleTable)
+        .where(inArray(CardModuleTable.id, modulesIds));
 
       // TODO : We need to evaluate if this the performance of this query
       // is acceptable. If not, we can always find a better way to
@@ -49,12 +48,16 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
         SET CardModule.position = NewPos.position - 1
         WHERE CardModule.cardId = ${card.id}
       `;
-      await trx.executeQuery(updatePosQuery.compile(trx));
+      await trx.execute(updatePosQuery);
     });
   } catch (e) {
     console.error(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
+
   return { card };
 };
 

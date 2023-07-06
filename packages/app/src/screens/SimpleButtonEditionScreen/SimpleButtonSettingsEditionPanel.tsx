@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -115,7 +115,6 @@ const SimpleButtonSettingsEditionPanel = ({
   ...props
 }: SimpleButtonSettingsEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
   const { profile } = useFragment(
@@ -267,7 +266,7 @@ const SimpleButtonSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Fontsize : {size}"
+              defaultMessage="Font size : {size}"
               description="fontSize message in SimpleButton edition"
               values={{
                 size: fontSize,
@@ -278,10 +277,6 @@ const SimpleButtonSettingsEditionPanel = ({
           min={DEFAULT_COVER_MIN_FONT_SIZE}
           max={DEFAULT_COVER_MAX_FONT_SIZE}
           step={1}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-          )}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Font size',

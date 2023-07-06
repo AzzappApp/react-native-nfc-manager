@@ -1,6 +1,6 @@
+import { SimpleTextRendererRaw } from '#components/cardModules/SimpleTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { SimpleTextRendererRaw } from '#components/SimpleTextRenderer';
-import type { SimpleTextRawData } from '#components/SimpleTextRenderer';
+import type { SimpleTextRawData } from '#components/cardModules/SimpleTextRenderer';
 import type { ViewProps } from 'react-native';
 
 type SimpleTextPreviewProps = ViewProps & {
@@ -23,11 +23,7 @@ const SimpleTextPreview = ({
   ...props
 }: SimpleTextPreviewProps) => {
   return (
-    <EditorScaledPreview
-      onPreviewPress={onPreviewPress}
-      moduleContainerStyle={!data.text && { height: '50%' }}
-      {...props}
-    >
+    <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <SimpleTextRendererRaw data={data} />
     </EditorScaledPreview>
   );

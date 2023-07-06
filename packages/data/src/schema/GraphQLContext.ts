@@ -10,6 +10,7 @@ import {
   getMediasByIds,
   getCoverTemplatesByIds,
   getStaticMediasByIds,
+  getUsersByIds,
 } from '#domains';
 import type {
   Card,
@@ -20,10 +21,12 @@ import type {
   CoverTemplate,
   StaticMedia,
   PostComment,
+  User,
 } from '#domains';
 import type { SessionData } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
+  cardUpdateListener: (username: string) => void;
   auth: SessionData;
   locale: string;
   profileLoader: DataLoader<string, Profile | null>;
@@ -35,6 +38,7 @@ export type GraphQLContext = {
   mediaLoader: DataLoader<string, Media | null>;
   staticMediaLoader: DataLoader<string, StaticMedia | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
+  userLoader: DataLoader<string, User | null>;
 };
 
 const dataloadersOptions = {
@@ -42,6 +46,7 @@ const dataloadersOptions = {
 };
 
 export const createGraphQLContext = (
+  cardUpdateListener: (username: string) => void,
   userInfos?: SessionData,
   locale: string = DEFAULT_LOCALE,
 ): GraphQLContext => {
@@ -50,8 +55,14 @@ export const createGraphQLContext = (
   return {
     auth: userInfos,
     locale,
+    cardUpdateListener,
     profileLoader: new DataLoader(getProfilesByIds, dataloadersOptions),
-    cardByProfileLoader: new DataLoader(getUsersCards, dataloadersOptions),
+    cardByProfileLoader: new DataLoader(async (ids: readonly string[]) => {
+      const cards = await getUsersCards(ids as string[]);
+      const cardsMap = new Map(cards.map(card => [card.profileId, card]));
+
+      return ids.map(id => cardsMap.get(id) ?? null);
+    }, dataloadersOptions),
     cardLoader: new DataLoader(getCardsByIds, dataloadersOptions),
     coverLoader: new DataLoader(getCardCoversByIds, dataloadersOptions),
     postLoader: new DataLoader(getPostsByIds, dataloadersOptions),
@@ -62,5 +73,11 @@ export const createGraphQLContext = (
       getCoverTemplatesByIds,
       dataloadersOptions,
     ),
+    userLoader: new DataLoader(async (ids: readonly string[]) => {
+      const users = await getUsersByIds(ids as string[]);
+      const usersMap = new Map(users.map(user => [user.id, user]));
+
+      return ids.map(id => usersMap.get(id) ?? null);
+    }, dataloadersOptions),
   };
 };

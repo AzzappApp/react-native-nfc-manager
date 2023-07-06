@@ -29,3 +29,7 @@ export function middleware(request: NextRequest) {
 
   return NextResponse.rewrite(url);
 }
+
+export const config = {
+  matcher: ['/((?!_next).*)'],
+};

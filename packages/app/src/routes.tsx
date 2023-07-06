@@ -55,12 +55,9 @@ export type ProfileRoute = {
     userName: string;
     profileID?: string;
     fromRectangle?: LayoutRectangle;
+    showPosts?: boolean;
+    contactData?: string | null;
   };
-};
-
-export type ProfilePostsRoute = {
-  route: 'PROFILE_POSTS';
-  params: { userName: string };
 };
 
 export type AlbumsRoute = {
@@ -72,7 +69,6 @@ export type PostRoute = {
   route: 'POST';
   params: {
     postId: string;
-    videoTime?: number | null;
     fromRectangle?: LayoutRectangle;
   };
 };
@@ -86,7 +82,7 @@ export type PostCommentsRoute = {
 
 export type NewPostRoute = {
   route: 'NEW_POST';
-  params?: never;
+  params?: { fromProfile: boolean };
 };
 
 export type CardModuleEditionRoute = {
@@ -98,8 +94,8 @@ export type CardModuleEditionRoute = {
   };
 };
 
-export type FollowedProfilesRoute = {
-  route: 'FOLLOWED_PROFILES';
+export type FollowingsRoute = {
+  route: 'FOLLOWINGS';
   params?: never;
 };
 
@@ -118,6 +114,11 @@ export type InviteFriendsRoute = {
   params?: never;
 };
 
+export type ContactCardRoute = {
+  route: 'CONTACT_CARD';
+  params?: never;
+};
+
 export type Route =
   | AlbumsRoute
   | HomeRoute
@@ -125,7 +126,6 @@ export type Route =
   | ChatRoute
   | AccountRoute
   | ProfileRoute
-  | ProfilePostsRoute
   | PostRoute
   | PostCommentsRoute
   | NewPostRoute
@@ -135,9 +135,10 @@ export type Route =
   | SignUpRoute
   | ForgotPasswordRoute
   | CardModuleEditionRoute
-  | FollowedProfilesRoute
+  | FollowingsRoute
   | FollowersRoute
   | AccountDetailsRoute
-  | InviteFriendsRoute;
+  | InviteFriendsRoute
+  | ContactCardRoute;
 
 export type ROUTES = Route['route'];

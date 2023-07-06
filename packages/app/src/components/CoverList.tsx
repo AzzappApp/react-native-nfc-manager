@@ -73,10 +73,13 @@ const CoverList = ({
   const coversReady = useRef(0);
   const onCoverReady = useCallback(() => {
     coversReady.current++;
-    if (coversReady.current >= initialNumToRender) {
+    if (
+      coversReady.current >= initialNumToRender ||
+      coversReady.current === users.length
+    ) {
       onReady?.();
     }
-  }, [initialNumToRender, onReady]);
+  }, [initialNumToRender, onReady, users.length]);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (

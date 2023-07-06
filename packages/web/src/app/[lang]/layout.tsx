@@ -1,8 +1,14 @@
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
 import ClientWrapper from './ClientWrapper';
 import './styles.css';
+
+const plusJakarta = Plus_Jakarta_Sans({
+  display: 'swap',
+  preload: false,
+});
 
 const RootLayout = ({
   children,
@@ -16,7 +22,7 @@ const RootLayout = ({
   const messages = getTranslationMessages(lang);
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className={plusJakarta.className}>
       <head>
         <meta
           name="viewport"
@@ -45,12 +51,6 @@ const RootLayout = ({
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        {/** TODO use next/font once we are able to use swc instead of babel */}
-        {/** TODO causes hydratation error */}
-        {/* <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
-          rel="stylesheet"
-        /> */}
       </head>
       <body>
         <ClientWrapper locale={lang} messages={messages}>

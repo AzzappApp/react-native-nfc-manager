@@ -136,7 +136,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 - [React](https://reactjs.org/) Main client framework
 - [React Native](https://reactnative.dev/) main mobile application framework
 - [ReactRelay](https://relay.dev/) client data layer
-- [React Native Web](https://necolas.github.io/react-native-web/) used to render react native components on the web application
 
 ### Code Quality
 

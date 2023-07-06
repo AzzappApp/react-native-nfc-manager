@@ -1,14 +1,15 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
 import { View } from 'react-native';
 import PostLink from '../PostLink';
-
-import type { PostRendererHandle, PostRendererProps } from '../../PostRenderer';
+import type {
+  PostRendererHandle,
+  PostRendererProps,
+} from '#components/PostList/PostRenderer';
 import type { ForwardedRef } from 'react';
 
 let mockPostHandle: any = null;
 
-jest.mock('../../PostRendererFeed', () => {
+jest.mock('../../PostList/PostRendererFeed', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function PostRenderer(
@@ -28,7 +29,8 @@ jest.mock('../../PostRendererFeed', () => {
 const mockRouter = {
   push: jest.fn(),
 };
-jest.mock('#PlatformEnvironment', () => ({
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
   useRouter() {
     return mockRouter;
   },

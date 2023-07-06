@@ -108,7 +108,7 @@ export const editionParametersSettings: ParametersInfo<{
   min: number;
   max: number;
   step: number;
-  interval: number;
+  interval?: number;
   displayOriginalValue?: boolean;
 }> = {
   brightness: {
@@ -116,31 +116,28 @@ export const editionParametersSettings: ParametersInfo<{
     min: -0.5,
     max: 0.5,
     step: 0.025,
-    interval: 10,
   },
-  contrast: { defaultValue: 1, min: 0.5, max: 1.5, step: 0.025, interval: 10 },
-  highlights: { defaultValue: 1, min: 0, max: 1, step: 0.05, interval: 10 },
-  saturation: { defaultValue: 1, min: 0, max: 2, step: 0.05, interval: 10 },
-  shadow: { defaultValue: 0, min: 0, max: 1, step: 0.05, interval: 10 },
-  sharpness: { defaultValue: 0, min: -2, max: 2, step: 0.05, interval: 10 },
-  structure: { defaultValue: 0, min: -2, max: 2, step: 0.05, interval: 10 },
+  contrast: { defaultValue: 1, min: 0.5, max: 1.5, step: 0.025 },
+  highlights: { defaultValue: 1, min: 0, max: 1, step: 0.05 },
+  saturation: { defaultValue: 1, min: 0, max: 2, step: 0.05 },
+  shadow: { defaultValue: 0, min: 0, max: 1, step: 0.05 },
+  sharpness: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
+  structure: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   temperature: {
     defaultValue: 6500,
     min: 3500,
     max: 12500,
     step: 50,
-    interval: 10,
     displayOriginalValue: true,
   },
-  tint: { defaultValue: 0, min: -150, max: 150, step: 5, interval: 10 },
-  vibrance: { defaultValue: 0, min: -1, max: 1, step: 0.05, interval: 10 },
-  vignetting: { defaultValue: 0, min: -2, max: 2, step: 0.05, interval: 10 },
+  tint: { defaultValue: 0, min: -150, max: 150, step: 5 },
+  vibrance: { defaultValue: 0, min: -1, max: 1, step: 0.05 },
+  vignetting: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   roll: {
     defaultValue: 0,
     min: -20,
     max: 20,
     step: 1,
-    interval: 10,
     displayOriginalValue: true,
   },
 };

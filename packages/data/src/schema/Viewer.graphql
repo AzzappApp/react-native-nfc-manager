@@ -22,7 +22,7 @@ type Viewer {
   """
   Return a list of Profiles that the current user is following
   """
-  followedProfiles(
+  followings(
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -32,6 +32,11 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
   ): ProfileConnection!
 
   """
@@ -47,12 +52,17 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
   ): ProfileConnection!
 
   """
   Return a list of Post that the current user is following author
   """
-  followedProfilesPosts(
+  followingsPosts(
     """
     Returns the items in the list that come after the specified cursor.
     """

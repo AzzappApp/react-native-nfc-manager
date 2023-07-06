@@ -160,7 +160,6 @@ const SocialLinksSettingsEditionPanel = ({
           min={10}
           max={100}
           step={1}
-          interval={10}
           onChange={onIconSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Icon Size',
@@ -186,7 +185,6 @@ const SocialLinksSettingsEditionPanel = ({
           min={0}
           max={10}
           step={1}
-          interval={20}
           onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
@@ -214,7 +212,6 @@ const SocialLinksSettingsEditionPanel = ({
           min={1}
           max={50}
           step={1}
-          interval={10}
           onChange={onColumnGapChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Spacing',

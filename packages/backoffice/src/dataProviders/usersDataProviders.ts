@@ -1,4 +1,5 @@
-import { db } from '@azzapp/data/domains';
+import { eq } from 'drizzle-orm';
+import { db, UserTable } from '@azzapp/data/domains';
 import { getList, getMany, getOne } from './genericDataProvider';
 import type { ResourceDataProvider } from './resourceDataProviders';
 import type { User } from '@azzapp/data/domains';
@@ -23,17 +24,15 @@ const UserDataProviders: ResourceDataProvider<Omit<User, 'password'>> = {
         return rest;
       }),
     })),
-
   update: async params => {
     const {
       id,
       data: { roles },
     } = params;
     await db
-      .updateTable('User')
+      .update(UserTable)
       .set({ roles })
-      .where('id', '=', id as string)
-      .executeTakeFirstOrThrow();
+      .where(eq(UserTable.id, id as string));
     return UserDataProviders.getOne({ id: id as string });
   },
 };

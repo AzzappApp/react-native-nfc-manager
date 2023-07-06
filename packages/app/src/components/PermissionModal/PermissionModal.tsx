@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, Modal, SafeAreaView, Linking } from 'react-native';
+import { StyleSheet, View, Modal, SafeAreaView } from 'react-native';
 import useCameraPermissions, {
   requestCameraPermission,
   requestMicrophonePermission,
 } from '#hooks/useCameraPermissions';
+import { requestMediaLibraryPermission } from '#hooks/useMediaLibraryPermission';
 import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
 import Header from '#ui/Header';
@@ -34,7 +35,9 @@ const PermissionModal = ({
   visible,
   onRequestClose,
 }: CameraModalProps) => {
+  const intl = useIntl();
   const { cameraPermission } = useCameraPermissions();
+
   const currentPermission = useMemo(() => {
     switch (permissionsFor) {
       case 'gallery':
@@ -54,6 +57,7 @@ const PermissionModal = ({
 
   const onAllowsCamera = async () => {
     const permission = await requestCameraPermission();
+
     if (permission === 'denied') {
       return;
     }
@@ -67,11 +71,8 @@ const PermissionModal = ({
   };
 
   const onAllowsGallery = async () => {
-    await Linking.openSettings();
-    return;
+    void requestMediaLibraryPermission();
   };
-
-  const intl = useIntl();
 
   return (
     <Modal

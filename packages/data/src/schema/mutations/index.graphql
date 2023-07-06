@@ -2,7 +2,9 @@ type Mutation {
   updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
   updateCover(input: UpdateCoverInput!): UpdateCoverPayload
+  updateCard(input: UpdateCardInput!): UpdateCardPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
   toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload
   removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload
   togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload
@@ -16,10 +18,12 @@ type Mutation {
     input: SaveHorizontalPhotoModuleInput!
   ): SaveHorizontalPhotoModulePayload
   saveCarouselModule(input: SaveCarouselModuleInput!): SaveCarouselModulePayload
-  updateCard(input: UpdateCardInput!): UpdateCardPayload
   saveSimpleButtonModule(
     input: SaveSimpleButtonModuleInput!
   ): SaveSimpleButtonModulePayload
+  saveBlockTextModule(
+    input: SaveBlockTextModuleInput!
+  ): SaveBlockTextModulePayload
   swapModules(input: SwapModulesInput!): SwapModulesPayload
   deleteModules(input: DeleteModulesInput!): DeleteModulesPayload
   duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload
@@ -33,6 +37,9 @@ type Mutation {
   saveSocialLinksModule(
     input: SaveSocialLinksModuleInput!
   ): SaveSocialLinksModulePayload
+  saveContactCard(
+    input: SaveContactCardInput!
+  ): SaveContactCardPayload
 }
 
 """
@@ -49,6 +56,11 @@ input MediaInput {
 Style of the background of a module
 """
 input ModuleBackgroundInputStyle {
+  backgroundColor: String!
+  patternColor: String!
+}
+
+input ModuleTextBackgroundInputStyle {
   backgroundColor: String!
   patternColor: String!
   opacity: Int!

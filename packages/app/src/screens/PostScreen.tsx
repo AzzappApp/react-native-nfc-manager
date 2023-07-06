@@ -9,50 +9,54 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView } from 'react-native';
-import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { Dimensions, Platform, SafeAreaView } from 'react-native';
+import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import PostList from '#components/PostList';
+import { AUTHOR_CARTOUCHE_HEIGHT } from '#components/AuthorCartouche';
+import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import PostList from '#components/PostList/PostList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import Header from '#ui/Header';
+import relayScreen from '#helpers/relayScreen';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { PostScreenFragment_post$key } from '@azzapp/relay/artifacts/PostScreenFragment_post.graphql';
+import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { PostRoute } from '#routes';
 import type {
   PostScreenFragment_relatedPosts$data,
   PostScreenFragment_relatedPosts$key,
 } from '@azzapp/relay/artifacts/PostScreenFragment_relatedPosts.graphql';
+import type { PostScreenQuery } from '@azzapp/relay/artifacts/PostScreenQuery.graphql';
 import type { ForwardedRef } from 'react';
+import type { EdgeInsets } from 'react-native-safe-area-context';
 
-type PostScreenProps = {
-  post: PostScreenFragment_post$key & PostScreenFragment_relatedPosts$key;
-  ready?: boolean;
-  hasFocus?: boolean;
-  initialVideoTime?: number | null;
-};
+const postScreenQuery = graphql`
+  query PostScreenQuery($postId: ID!) {
+    node(id: $postId) {
+      id
+      ...PostList_posts @arguments(includeAuthor: true)
+      ...PostScreenFragment_relatedPosts
+    }
+  }
+`;
 
 const PostScreen = ({
-  post: postKey,
-  ready = true,
-  hasFocus = true,
-  initialVideoTime,
-}: PostScreenProps) => {
+  preloadedQuery,
+  hasFocus,
+}: RelayScreenProps<PostRoute, PostScreenQuery>) => {
   const router = useRouter();
   const intl = useIntl();
   const onClose = () => {
     router.back();
   };
 
-  const post = useFragment(
-    graphql`
-      fragment PostScreenFragment_post on Post {
-        id
-        ...PostList_posts @arguments(includeAuthor: true)
-      }
-    `,
-    postKey as PostScreenFragment_post$key,
-  );
+  const { node: post } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const [ready, setReady] = useState(false);
+
+  useNativeNavigationEvent('appear', () => {
+    setReady(true);
+  });
 
   const [relatedPosts, setRelatedPosts] = useState<
     PostScreenFragment_relatedPosts$data['relatedPosts'] | null
@@ -79,21 +83,20 @@ const PostScreen = ({
     () =>
       relatedPosts?.edges
         ? [
-            post,
+            post!,
             ...convertToNonNullArray(
               relatedPosts?.edges.map(edge => edge?.node ?? null),
             ),
           ]
-        : [post],
+        : [post!],
     [post, relatedPosts],
   );
-
-  const initialVideoTimes = useMemo(
-    () => ({ [post.id]: initialVideoTime }),
-    [initialVideoTime, post.id],
-  );
-
   const styles = useStyleSheet(styleSheet);
+
+  if (!post) {
+    return null;
+  }
+
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <Header
@@ -116,13 +119,12 @@ const PostScreen = ({
         canPlay={ready && hasFocus}
         posts={posts}
         onEndReached={onEndReached}
-        initialVideoTimes={initialVideoTimes}
         loading={loading}
       />
       <Suspense>
         <RelatedPostLoader
           ref={relatedPostLoaderRef}
-          post={postKey}
+          post={post}
           onRelatedPostChange={onRelatedPostLoaded}
         />
       </Suspense>
@@ -130,7 +132,42 @@ const PostScreen = ({
   );
 };
 
-export default PostScreen;
+PostScreen.getScreenOptions = (
+  { fromRectangle }: PostRoute['params'],
+  safeArea: EdgeInsets,
+): ScreenOptions | null => {
+  if (Platform.OS !== 'ios') {
+    // TODO make it works on android
+    return { stackAnimation: 'default' };
+  }
+  if (!fromRectangle) {
+    return null;
+  }
+  const windowWidth = Dimensions.get('window').width;
+  return {
+    stackAnimation: 'custom',
+    stackAnimationOptions: {
+      animator: 'reveal',
+      fromRectangle,
+      toRectangle: {
+        x: 0,
+        y: safeArea.top + HEADER_HEIGHT + AUTHOR_CARTOUCHE_HEIGHT,
+        width: windowWidth,
+        height: (windowWidth * fromRectangle.height) / fromRectangle.width,
+      },
+      fromRadius: (16 / fromRectangle.width) * windowWidth,
+      toRadius: 0,
+    },
+    transitionDuration: 220,
+    customAnimationOnSwipe: true,
+    gestureEnabled: true,
+  };
+};
+
+export default relayScreen(PostScreen, {
+  query: postScreenQuery,
+  getVariables: ({ postId }) => ({ postId }),
+});
 
 type RelatedPostLoaderHandle = { onEndReached(): void };
 
@@ -155,7 +192,7 @@ const RelatedPostLoaderInner = (
   } = usePaginationFragment(
     graphql`
       fragment PostScreenFragment_relatedPosts on Post
-      @refetchable(queryName: "PostScreenQuery")
+      @refetchable(queryName: "RelatedPostScreenQuery")
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 10 }

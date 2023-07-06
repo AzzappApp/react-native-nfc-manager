@@ -6,10 +6,14 @@ import Text from '#ui/Text';
 import RecommendedProfilesList from './RecommendedProfilesList';
 import TrendingPostsList from './TrendingPostsList';
 import TrendingProfilesList from './TrendingProfilesList';
-import type { SearchScreen_viewer$data } from '@azzapp/relay/artifacts/SearchScreen_viewer.graphql';
+import type { RecommendedProfilesList_viewer$key } from '@azzapp/relay/artifacts/RecommendedProfilesList_viewer.graphql';
+import type { TrendingPostsList_viewer$key } from '@azzapp/relay/artifacts/TrendingPostsList_viewer.graphql';
+import type { TrendingProfilesList_viewer$key } from '@azzapp/relay/artifacts/TrendingProfilesList_viewer.graphql';
 
 type WallRecommendationProps = {
-  viewer: SearchScreen_viewer$data;
+  viewer: RecommendedProfilesList_viewer$key &
+    TrendingPostsList_viewer$key &
+    TrendingProfilesList_viewer$key;
   hasFocus: boolean;
 };
 const WallRecommendation = ({ viewer, hasFocus }: WallRecommendationProps) => {

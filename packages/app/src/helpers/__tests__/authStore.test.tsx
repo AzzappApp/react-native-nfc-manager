@@ -11,9 +11,9 @@ jest.mock('react-native-encrypted-storage', () => ({
   clear: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/getRuntimeEnvironment', () =>
-  jest.fn().mockReturnValue('react-native'),
-);
+// jest.mock('@azzapp/shared/getRuntimeEnvironment', () =>
+//   jest.fn().mockReturnValue('react-native'),
+// );
 
 const mockMMKVValues = new Map<string, any>();
 const mockMMKV = {

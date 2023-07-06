@@ -1,6 +1,6 @@
+import { HorizontalPhotoRendererRaw } from '#components/cardModules/HorizontalPhotoRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import { HorizontalPhotoRendererRaw } from '#components/HorizontalPhotoRenderer';
-import type { HorizontalPhotoRawData } from '#components/HorizontalPhotoRenderer';
+import type { HorizontalPhotoRawData } from '#components/cardModules/HorizontalPhotoRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HorizontalPhotoPreviewProps = ViewProps & {

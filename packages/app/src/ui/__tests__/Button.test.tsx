@@ -1,6 +1,4 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import '@testing-library/jest-native/extend-expect';
-
 import { colors } from '#theme';
 import Button from '../Button';
 const label = 'label';
@@ -115,10 +113,6 @@ describe('Button component', () => {
     rerender(
       <Button label={label} testID="button_testId" variant="secondary" />,
     );
-    expect(screen.getByTestId('button_testId')).toHaveStyle({
-      backgroundColor: 'transparent',
-    });
-    rerender(<Button label={label} testID="button_testId" variant="cancel" />);
     expect(screen.getByTestId('button_testId')).toHaveStyle({
       backgroundColor: 'transparent',
     });

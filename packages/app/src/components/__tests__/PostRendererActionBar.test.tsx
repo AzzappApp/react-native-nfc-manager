@@ -4,12 +4,31 @@ import {
   RelayEnvironmentProvider,
 } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import '@testing-library/jest-native/extend-expect';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
-import PostRendererActionBar from '../PostRendererActionBar';
-import type { PostRendererMediaProps } from '#components/PostRendererMedia';
-import type { PostRendererActionBarProps } from '../PostRendererActionBar';
+import PostRendererActionBar from '../PostList/PostRendererActionBar';
+import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
+import type { PostRendererActionBarProps } from '../PostList/PostRendererActionBar';
 import type { PostRendererActionBarTestQuery } from '@azzapp/relay/artifacts/PostRendererActionBarTestQuery.graphql';
+
+const mockRouter = {
+  push: jest.fn(),
+  replace: jest.fn(),
+  back: jest.fn(),
+};
+
+jest.mock('#components/NativeRouter', () => {
+  return {
+    ...jest.requireActual('#components/NativeRouter'),
+    useRouter() {
+      return mockRouter;
+    },
+  };
+});
+
+const mockShare = jest.fn();
+jest.mock('react-native/Libraries/Share/Share', () => ({
+  share: mockShare,
+}));
 
 const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
   const environement = createMockEnvironment();
@@ -57,42 +76,6 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
     },
   };
 };
-const mockShare = jest.fn();
-const mockRouter = {
-  push: jest.fn(),
-  replace: jest.fn(),
-  back: jest.fn(),
-};
-
-const mockWebAPI = {
-  uploadSign: jest.fn(),
-  uploadMedia: jest.fn(),
-};
-
-jest.mock('#PlatformEnvironment', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const React = require('react');
-  return {
-    useRouter() {
-      return mockRouter;
-    },
-    useWebAPI() {
-      return mockWebAPI;
-    },
-
-    PlatformEnvironmentProvider: ({
-      children,
-    }: {
-      children: React.ReactNode;
-    }) => {
-      return <>{children}</>;
-    },
-  };
-});
-
-jest.mock('react-native/Libraries/Share/Share', () => ({
-  share: mockShare,
-}));
 
 describe('PostRendererActionBar', () => {
   afterEach(() => mockRouter.push.mockReset());

@@ -6,7 +6,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const createPostMutation: MutationResolvers['createPost'] = async (
   _,
   { input: { media, content, allowComments, allowLikes } },
-  { auth },
+  { auth, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -14,7 +14,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
   }
 
   try {
-    const post = await db.transaction().execute(async trx => {
+    const post = await db.transaction(async trx => {
       await createMedia(media, trx);
       const post = await createPost(
         {
@@ -31,6 +31,11 @@ const createPostMutation: MutationResolvers['createPost'] = async (
 
       return post;
     });
+
+    const profile = await profileLoader.load(profileId);
+
+    cardUpdateListener(profile!.userName);
+
     return { post };
   } catch {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

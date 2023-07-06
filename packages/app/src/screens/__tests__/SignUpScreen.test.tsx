@@ -1,8 +1,9 @@
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { signup } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignUpScreen from '../SignUpScreen';
-import '@testing-library/jest-native/extend-expect';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('#helpers/localeHelpers', () => ({
@@ -18,14 +19,29 @@ jest.mock('#helpers/localeHelpers', () => ({
   useCurrentLocale: () => 'en',
 }));
 
+jest.mock('#helpers/MobileWebAPI');
+jest.mock('#helpers/globalEvents');
+
+const mockRouter = {
+  replace: jest.fn(),
+};
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
+  useRouter() {
+    return mockRouter;
+  },
+}));
+
 describe('SignUpScreen', () => {
-  const signup = jest.fn();
+  const signupMock = jest.mocked(signup);
+  const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
   beforeEach(() => {
-    signup.mockReset();
+    signupMock.mockReset();
+    dispatchGlobalEventMock.mockReset();
   });
 
   test('submit button should be disabled if fields are empty', () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -48,7 +64,13 @@ describe('SignUpScreen', () => {
   });
 
   test('should call the `signup` callback if form is valid', async () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+    signupMock.mockResolvedValueOnce({
+      token: 'fake-token',
+      refreshToken: 'fake-refreshToken',
+    });
+    dispatchGlobalEventMock.mockResolvedValueOnce(void 0);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -60,15 +82,34 @@ describe('SignUpScreen', () => {
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
 
-    expect(signup).toHaveBeenCalledWith({
+    expect(signupMock).toHaveBeenCalledWith({
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
     });
+    expect(submitButton).toHaveAccessibilityState({ busy: true });
+
     await act(flushPromises);
+    expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
+      type: 'SIGN_UP',
+      payload: {
+        authTokens: {
+          token: 'fake-token',
+          refreshToken: 'fake-refreshToken',
+        },
+      },
+    });
+    expect(mockRouter.replace).toHaveBeenCalledWith({
+      route: 'NEW_PROFILE',
+    });
   });
 
   test('should call the `signup` callback if form is filled with a valid phone number', async () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+    signupMock.mockResolvedValueOnce({
+      token: 'fake-token',
+      refreshToken: 'fake-refreshToken',
+    });
+
     const emailOrCountryButton = screen.getByLabelText(
       'Select a calling code or email',
     );
@@ -90,15 +131,30 @@ describe('SignUpScreen', () => {
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
 
-    expect(signup).toHaveBeenCalledWith({
+    expect(signupMock).toHaveBeenCalledWith({
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
     });
+
+    expect(submitButton).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
+    expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
+      type: 'SIGN_UP',
+      payload: {
+        authTokens: {
+          token: 'fake-token',
+          refreshToken: 'fake-refreshToken',
+        },
+      },
+    });
+    expect(mockRouter.replace).toHaveBeenCalledWith({
+      route: 'NEW_PROFILE',
+    });
   });
 
   test('should not call the `signup` callback if phone number is not valid', () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailOrCountryButton = screen.getByLabelText(
       'Select a calling code or email',
     );
@@ -123,14 +179,15 @@ describe('SignUpScreen', () => {
     ).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));
-    expect(signup).not.toHaveBeenCalled();
+    expect(signupMock).not.toHaveBeenCalled();
     expect(
       screen.queryByText('Please enter a valid phone number'),
     ).toBeTruthy();
   });
 
   test('should not call the `signup` callback if email is not valid', () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -146,14 +203,15 @@ describe('SignUpScreen', () => {
     ).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));
-    expect(signup).not.toHaveBeenCalled();
+    expect(signupMock).not.toHaveBeenCalled();
     expect(
       screen.queryByText('Please enter a valid email address'),
     ).toBeTruthy();
   });
 
   test('should not call the `signup` callback if password is not valid', () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -169,12 +227,13 @@ describe('SignUpScreen', () => {
     expect(screen.queryByText(passwordError)).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));
-    expect(signup).not.toHaveBeenCalled();
+    expect(signupMock).not.toHaveBeenCalled();
     expect(screen.queryByText(passwordError)).toBeTruthy();
   });
 
   test('should not call the `signup` callback if the checkbox are not checked', async () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
@@ -188,30 +247,31 @@ describe('SignUpScreen', () => {
     expect(screen.queryByText(tosError)).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));
-    expect(signup).not.toHaveBeenCalled();
+    expect(signupMock).not.toHaveBeenCalled();
     expect(screen.queryByText(tosError)).toBeTruthy();
 
     act(() => fireEvent(checkboxes[0], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
-    expect(signup).not.toHaveBeenCalled();
+    expect(signupMock).not.toHaveBeenCalled();
     expect(screen.queryByText(tosError)).toBeTruthy();
 
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
 
     expect(screen.queryByText(tosError)).not.toBeTruthy();
-    expect(signup).toHaveBeenCalled();
+    expect(signupMock).toHaveBeenCalled();
     await act(flushPromises);
   });
 
   test('should display the already registered error message if signup return the error', async () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
     const checkboxes = screen.queryAllByRole('checkbox');
 
-    signup.mockRejectedValueOnce(new Error(ERRORS.EMAIL_ALREADY_EXISTS));
+    signupMock.mockRejectedValueOnce(new Error(ERRORS.EMAIL_ALREADY_EXISTS));
 
     act(() => fireEvent(emailInput, 'onChangeText', 'test@azzaap.com'));
     act(() => fireEvent(passwordInput, 'onChangeText', 'AZEqsd81'));
@@ -227,13 +287,14 @@ describe('SignUpScreen', () => {
   });
 
   test('should display unknown error in case of unknown error ;)', async () => {
-    render(<SignUpScreen signup={signup} />);
+    render(<SignUpScreen />);
+
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByTestId('submit');
     const checkboxes = screen.queryAllByRole('checkbox');
 
-    signup.mockRejectedValueOnce(new Error("I don't know what happened"));
+    signupMock.mockRejectedValueOnce(new Error("I don't know what happened"));
 
     act(() => fireEvent(emailInput, 'onChangeText', 'test@azzaap.com'));
     act(() => fireEvent(passwordInput, 'onChangeText', 'AZEqsd81'));

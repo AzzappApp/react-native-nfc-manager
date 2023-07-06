@@ -1,0 +1,74 @@
+name: Release
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"    
+        
+      - name: Cache yarn
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile  --immutable
+    
+      - name: Git config
+        run: |
+          git config user.name "Azzapp Dev Bot"
+          git config user.email "azzapp-dev-bot@azzapp.com"
+
+      - name: Release
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            yarn release --preRelease=rc
+          else
+            yarn release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - name: Merge staging into stable
+        if: github.ref == 'refs/heads/staging'
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: stable
+          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - name: Merge main into staging
+        if: github.ref == 'refs/heads/main'
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: staging
+          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - name: Bump development version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npm version prepatch --no-git-tag-version --preid canary --workspaces --include-workspace-root --no-workspaces-update 
+          git add .
+          git commit -m "chore: Bump version"
+    
+   

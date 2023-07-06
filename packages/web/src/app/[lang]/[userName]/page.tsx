@@ -1,35 +1,51 @@
+import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
-import ProfileWebSCreenQueryNode from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
-import preloadServerQuery from '#helpers/preloadServerQuery';
-import UserWebScreen from './ProfileWebScreen';
-import type { ProfileWebScreenQuery } from '@azzapp/relay/artifacts/ProfileWebScreenQuery.graphql';
+import {
+  getCardCoversByIds,
+  getCardModules,
+  getProfileByUserName,
+  getUsersCards,
+} from '@azzapp/data/domains';
+import { CoverRenderer, ModuleRenderer } from '#components';
+import DownloadVCard from './DownloadVCard';
 
-export type UserPageProps = {
-  params: { userName: string };
+type ProfilePageProps = {
+  params: {
+    userName: string;
+  };
 };
 
-const ProfilePage = async ({ params: { userName } }: UserPageProps) => {
-  const serverQuery = await preloadServerQuery<ProfileWebScreenQuery>(
-    ProfileWebSCreenQueryNode,
-    { userName },
-  );
+const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
+  const { profile, card, cover, modules } = await unstable_cache(
+    async () => {
+      const profile = await getProfileByUserName(userName);
+      const [card] = profile ? await getUsersCards([profile.id]) : [];
+      const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
+      const modules = card ? await getCardModules(card.id) : [];
 
-  if (!serverQuery.response.profile) {
+      return { profile, card, cover, modules };
+    },
+    [userName],
+    { tags: [userName] },
+  )();
+
+  if (!profile || !card || !cover) {
     return notFound();
   }
 
-  return <UserWebScreen serverQuery={serverQuery} />;
+  return (
+    <div style={{ backgroundColor: card.backgroundColor ?? '#FFF' }}>
+      <CoverRenderer cover={cover} />
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw' }}>
+        {modules.map(module => (
+          <ModuleRenderer module={module} key={module.id} />
+        ))}
+      </div>
+      <DownloadVCard profileId={profile.id} userName={userName} />
+    </div>
+  );
 };
 
 export default ProfilePage;
 
-export const generateMetadata = ({ params: { userName } }: UserPageProps) => ({
-  title: `${userName}`,
-});
-
-// TODO there seems to be a bug with static params and regeneration, for the moment we force dynamic
-export const dynamic = 'force-dynamic';
-
-export const generateStaticParams = () => [];
-
-export const dynamicParams = true;
+export const dynamic = 'force-static';

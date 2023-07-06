@@ -8,13 +8,14 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   isNotFalsyString,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
-import { useRouter } from '#PlatformEnvironment';
 import { colors } from '#theme';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
+import { useRouter } from '#components/NativeRouter';
+import { changePassword } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
@@ -23,14 +24,7 @@ import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 
-type ChangePasswordScreenProps = {
-  changePassword: (token: string, password: string) => Promise<void>;
-};
-
-const ChangePasswordScreen = ({
-  changePassword,
-}: ChangePasswordScreenProps) => {
-  const vp = useViewportSize();
+const ChangePasswordScreen = () => {
   const router = useRouter();
   const intl = useIntl();
 
@@ -56,7 +50,8 @@ const ChangePasswordScreen = ({
       setConfirmError(false);
     }
     if (canCallApi) {
-      await changePassword('token', password);
+      // TODO: call api
+      await changePassword({} as any);
       router.replace({ route: 'SIGN_IN' });
     }
   };
@@ -65,6 +60,7 @@ const ChangePasswordScreen = ({
     router.replace({ route: 'SIGN_IN' });
   };
 
+  const insets = useSafeAreaInsets();
   return (
     <Container style={styles.mainContainer}>
       <KeyboardAvoidingView
@@ -162,7 +158,7 @@ const ChangePasswordScreen = ({
       </KeyboardAvoidingView>
       <View
         style={{
-          marginBottom: vp`${insetBottom}` + 30,
+          marginBottom: insets.bottom + 30,
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',

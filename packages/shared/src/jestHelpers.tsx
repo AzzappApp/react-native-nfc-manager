@@ -22,3 +22,20 @@ export const isFakeTimersEnabled = () => {
     typeof clock.Date === 'function'
   );
 };
+
+export const mockReactComponent = (
+  name: string,
+  additionalProps: any,
+  mockRef?: () => any,
+) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const react = require('react');
+  const Component = (props: any, ref: any) => {
+    if (mockRef) {
+      react.useImperativeHandle(ref, () => mockRef(), []);
+    }
+    return react.createElement(name, { ...props, ...additionalProps, ref });
+  };
+  Component.displayName = name;
+  return react.forwardRef(Component);
+};

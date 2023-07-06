@@ -1,12 +1,16 @@
 import { useReducer } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { useLogout } from '#hooks/useLogout';
-import useViewportSize, { insetBottom } from '#hooks/useViewportSize';
+import { logout } from '#helpers/MobileWebAPI';
+import relayScreen from '#helpers/relayScreen';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -15,7 +19,9 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import AccountScreenMiddleHeader from './AccountScreenMiddleHeader';
 import AccountScreenProfiles from './AccountScreenProfiles';
-import type { AccountScreen_user$key } from '@azzapp/relay/artifacts/AccountScreen_user.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { AccountRoute } from '#routes';
+import type { AccountScreenQuery } from '@azzapp/relay/artifacts/AccountScreenQuery.graphql';
 
 const reducer = (
   state: { showDropdown: boolean; requestedLogout: boolean },
@@ -44,39 +50,38 @@ const reducer = (
   }
 };
 
-type AccountScreenProps = {
-  user: AccountScreen_user$key;
-};
+const accountScreenQuery = graphql`
+  query AccountScreenQuery {
+    currentUser {
+      email
+      phoneNumber
+      ...AccountScreenProfiles_userProfiles
+    }
+  }
+`;
 
-const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
+const AccountScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<AccountRoute, AccountScreenQuery>) => {
   const [{ showDropdown, requestedLogout }, dispatch] = useReducer(reducer, {
     showDropdown: false,
     requestedLogout: false,
   });
 
-  const { email, phoneNumber, ...userProfiles } = useFragment(
-    graphql`
-      fragment AccountScreen_user on User {
-        email
-        phoneNumber
-        ...AccountScreenProfiles_userProfiles
-      }
-    `,
-    userKey,
-  );
-
-  const logout = useLogout();
+  const {
+    currentUser: { email, phoneNumber, ...userProfiles },
+  } = usePreloadedQuery(accountScreenQuery, preloadedQuery);
 
   const intl = useIntl();
-  const vp = useViewportSize();
   const styles = useStyleSheet(styleSheet);
+  const insets = useSafeAreaInsets();
 
   const close = () => {
     dispatch({ type: 'CLOSE_DROPDOWN' });
   };
 
   return (
-    <View>
+    <SafeAreaView style={{ flex: 1 }}>
       <Header
         middleElement={
           <AccountScreenMiddleHeader
@@ -100,11 +105,11 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
       <AccountScreenProfiles userProfiles={userProfiles} />
       <BottomSheetModal
         visible={showDropdown}
-        height={vp`${insetBottom}  + ${440}`}
+        height={insets.bottom + 440}
         contentContainerStyle={styles.bottomSheetContainer}
         onDismiss={() => {
           if (requestedLogout) {
-            logout();
+            void logout();
           }
         }}
         onRequestClose={close}
@@ -117,7 +122,7 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
             >
               <View style={styles.bottomSheetOptionContainer}>
                 <View style={styles.bottomSheetOptionIconLabel}>
-                  <Icon icon="warning" style={styles.icon} />
+                  <Icon icon="information" style={styles.icon} />
                   <Text>
                     <FormattedMessage
                       defaultMessage="Account details"
@@ -169,9 +174,13 @@ const AccountScreen = ({ user: userKey }: AccountScreenProps) => {
           </PressableNative>
         </View>
       </BottomSheetModal>
-    </View>
+    </SafeAreaView>
   );
 };
+
+export default relayScreen(AccountScreen, {
+  query: accountScreenQuery,
+});
 
 const styleSheet = createStyleSheet(appearance => ({
   icon: {
@@ -201,5 +210,3 @@ const styleSheet = createStyleSheet(appearance => ({
     columnGap: 10,
   },
 }));
-
-export default AccountScreen;

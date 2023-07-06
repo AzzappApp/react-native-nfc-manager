@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
@@ -154,8 +154,6 @@ const CoverTitleEditionPanel = ({
   const placementsLabels = usePlacementsLabels();
   const orientationsLabel = useOrientationsLabels();
 
-  const { width: windowWidth } = useWindowDimensions();
-
   return (
     <View style={[styles.root, style]}>
       <TabsBar
@@ -267,10 +265,6 @@ const CoverTitleEditionPanel = ({
           min={DEFAULT_COVER_MIN_FONT_SIZE}
           max={DEFAULT_COVER_MAX_FONT_SIZE}
           step={1}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE),
-          )}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Font size',

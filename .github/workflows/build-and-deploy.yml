@@ -1,0 +1,320 @@
+name: Build and Deploy Azzapp application
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - staging
+      - stable
+      
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  
+jobs:
+  build-and-deploy:
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
+    name: Build and Deploy Azzapp application
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
+      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      TURBO_TEAM: "azzapp"
+    steps:
+      ############################################
+      #
+      # Setup
+      #
+      ############################################
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"    
+        
+      - name: Cache yarn
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile  --immutable
+
+      ############################################
+      #
+      # JavaScript build and tests
+      #
+      ############################################
+      - name: JavaScript build
+        run: yarn build
+
+      - name: Lint
+        run: yarn lint
+      
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+        
+      ############################################
+      #
+      # Precompiled Queries merging
+      #
+      ############################################
+      - name: Fetch the previous query-map.json file from AzzappApp/azzapp-precompiled-queries repository
+        uses: actions/checkout@v3
+        with: 
+          repository: 'AzzappApp/azzapp-precompiled-queries'
+          path: 'azzapp-precompiled-queries'
+          token: ${{ secrets.QUERY_MAP_PAT }}
+          ref: 'main'
+
+      - name: Copy the the previous query-map.json file
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
+        run: cp -R azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json packages/relay  
+
+      # use manual command instead of build command for passing --repersist option to relay
+      - name: Force rebuild the query-map.json
+        run: yarn relay:build --repersist
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
+        env:
+          CI: true  
+
+      - name: Check if there is difference between 2 precompiled query map
+        id: query-map-updated
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
+        run: |
+          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json" "packages/relay/query-map.json"
+          then
+              echo "QUERY_MAP_UPDATED=false" >> $GITHUB_OUTPUT
+          else
+              echo "QUERY_MAP_UPDATED=true" >> $GITHUB_OUTPUT
+          fi  
+
+      - name: Copy the file back to azzapp-precompiled-queries repository
+        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        run: cp -r packages/relay/query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
+        env:
+          CI: true
+
+      # was not able to make a push and commit working on another repo. it was creating a submodule ...
+      - name: 'Create Pull Request on query map repository'
+        uses: peter-evans/create-pull-request@v4
+        id: cpr
+        if:  ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        with:
+          token: ${{ secrets.QUERY_MAP_PAT }}
+          commit-message: 'Update query-map.json'
+          title: '[Update] Precompiled Queries on ${{ github.ref_name }}'
+          branch: '${{ github.ref_name }}-precompiled-queries'
+          base: 'main'
+          delete-branch: true 
+          labels: 'precompiled-queries'
+          reviewers: '@fdecompredon,@batical'
+          draft: false
+          path: 'azzapp-precompiled-queries'
+          branch-suffix: timestamp  # the branch is using a prefix timestamp to avoid issue creating a PR already done before
+
+      # a github action on azzapp-precompiled-queries will delete the branch
+      - name: Merging the PR on query map repository
+        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
+        uses: actions/github-script@v6.4.0
+        env:
+          pull_number: ${{ steps.cpr.outputs.pull-request-number}}
+        with:
+          github-token: ${{ secrets.QUERY_MAP_PAT }}
+          script: |
+            const { pull_number} = process.env;
+            await github.rest.pulls.merge({
+              owner: "AzzappApp",
+              repo: "azzapp-precompiled-queries",
+              pull_number,
+            });
+
+      ############################################
+      #
+      # PlanetScale schema migration
+      #
+      ############################################
+      - name: PlanetScale - Check if migration is needed
+        id: planetscale_migration_needed
+        working-directory: packages/data
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          yarn introspect
+          yarn generate-migration
+          HAS_CHANGE="false"
+          if compgen -G "drizzle/0001*" > /dev/null; then
+              HAS_CHANGE="true"
+          fi
+          echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+         
+      - name: PlanetScale - Extract branch name
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        run: echo "branch=$(echo ci_${GITHUB_SHA})" >> $GITHUB_OUTPUT
+        id: extract_branch
+        
+      - name: PlanetScale - Create a branch
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-branch-action@v1
+        id: create_branch
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          from: ${{ github.ref_name }}
+          wait: true
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      
+      - name: PlanetScale - Create a password
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-branch-password-action@v1
+        id: create_password
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          name: 'pass_${{ steps.extract_branch.outputs.branch }}'
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+
+      - name: PlanetScale - Apply drizzle changes
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        working-directory: packages/data
+        run: |
+          HOST="${{ steps.create_password.outputs.hostname }}"
+          USER="${{ steps.create_password.outputs.username }}"
+          PASSWORD="${{ steps.create_password.outputs.hostname }}""
+          export DATABASE_URL="mysql://$USER:$PASSWORD@$HOST/azzapp?ssl={"rejectUnauthorized":true}"
+          yarn push-migration
+
+      - name: PlanetScale - Create a deploy request
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/create-deploy-request-action@v1
+        id: create_deploy_request
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+            
+      - name: PlanetScale - Deploy the changes
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
+        uses: planetscale/deploy-deploy-request-action@v1
+        with:
+          org_name: azzapp
+          database_name: azzapp
+          number: ${{ steps.create_deploy_request.outputs.number }}
+          wait: true
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+
+      ############################################
+      #
+      # Deploy the web app to Vercel 
+      #
+      ############################################
+      - name: Install Vercel CLI
+        run: yarn global add vercel@latest
+
+      - name: Azzapp Web - Pull Vercel configuration 
+        env:
+          VERCEL_PROJECT_ID: "azzapp"
+        run: |
+          ENVIRONMENT="development"
+          if [["${{github.ref}}" == "refs/heads/stable"]; then
+            ENVIRONMENT="production"
+          elif [["${{github.ref}}" == "refs/heads/staging"]; then
+            ENVIRONMENT="staging"
+          fi
+          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Azzapp Web - Vercel build
+        env:
+          VERCEL_PROJECT_ID: "azzapp"
+        run: |
+          ADDITIONAL_ARGS=""
+          if [["${{github.ref}}" == "refs/heads/stable"]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+
+      - name: Azzapp Web - Vercel deployment
+        env:
+          VERCEL_PROJECT_ID: "azzapp"
+        run: |
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
+
+      ############################################
+      #
+      # Deploy the backoffice to Vercel 
+      #
+      ############################################
+
+      # Vercel already installed in web app deployment
+
+      - name: Azzapp Backoffice - Pull Vercel configuration 
+        env:
+          VERCEL_PROJECT_ID: "azzapp-backoffice"
+        run: |
+          ENVIRONMENT="development"
+          if [["${{github.ref}}" == "refs/heads/stable"]; then
+            ENVIRONMENT="production"
+          elif [["${{github.ref}}" == "refs/heads/staging"]; then
+            ENVIRONMENT="staging"
+          fi
+          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Azzapp Backoffice - Vercel build
+        env:
+          VERCEL_PROJECT_ID: "azzapp-backoffice"
+        run: |
+          ADDITIONAL_ARGS=""
+          if [["${{github.ref}}" == "refs/heads/stable"]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+
+      - name: Azzapp Backoffice - Vercel deployment
+        env:
+          VERCEL_PROJECT_ID: "azzapp-backoffice"
+        run: |
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
+      
+      ############################################
+      #
+      # EAS Native application Build
+      #
+      ############################################
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Build on EAS
+        working-directory: ./packages/app
+        run: |
+          PROFILE="development"
+          if [["${{github.ref}}" == "refs/heads/stable"]; then
+            PROFILE="production"
+          elif [["${{github.ref}}" == "refs/heads/staging"]; then
+            PROFILE="staging"
+          fi
+          eas build --platform all --profile $PROFILE --non-interactive --no-wait

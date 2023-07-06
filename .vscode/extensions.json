@@ -2,7 +2,6 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "meta.relay",
-    "Prisma.prisma"
+    "meta.relay"
   ]
 }

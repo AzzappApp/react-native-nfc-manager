@@ -1,8 +1,8 @@
 import { useRef } from 'react';
-import { useRouter } from '#PlatformEnvironment';
-import PostRendererFeed from '#components/PostRendererFeed';
+import { useRouter } from '#components/NativeRouter';
+import PostRendererFeed from '#components/PostList/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import type { PostRendererFeedHandle } from '#components/PostRendererFeed';
+import type { PostRendererFeedHandle } from '#components/PostList/PostRendererFeed';
 import type { PostLinkProps } from './postLinkTypes';
 import type { View, NativeMethods } from 'react-native';
 

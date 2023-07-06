@@ -1,10 +1,11 @@
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { useColorScheme } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
-import { colors, shadow, textStyles } from '#theme';
+import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import Icon from '#ui/Icon';
+import Text from '#ui/Text';
 import SearchResultGlobal, {
   SearchResultGlobalPlaceHolder,
   searchResultGlobalQuery,
@@ -17,7 +18,6 @@ import SearchResultProfiles, {
   SearchResultProfilesPlaceHolder,
   searchResultProfilesQuery,
 } from './SearchResultProfiles';
-import type { Icons } from '#ui/Icon';
 import type { SearchResultGlobalQuery } from '@azzapp/relay/artifacts/SearchResultGlobalQuery.graphql';
 import type { SearchResultPostsQuery } from '@azzapp/relay/artifacts/SearchResultPostsQuery.graphql';
 import type { SearchResultProfilesQuery } from '@azzapp/relay/artifacts/SearchResultProfilesQuery.graphql';
@@ -40,18 +40,48 @@ const SearchTabContainer = ({
     searchGlobal: undefined,
     searchProfiles: undefined,
     searchPosts: undefined,
-    searchGlobalhWithLocation: undefined,
   });
   const [pageIndexSelected, setPageindexSelected] = useState(0);
   const environnement = useRelayEnvironment();
   const styles = useStyleSheet(styleSheet);
+
+  const intl = useIntl();
+  const routes = useMemo(
+    () => [
+      {
+        key: 'searchGlobal',
+        label: intl.formatMessage({
+          defaultMessage: 'All results',
+          description: 'Search screen tab label : all result',
+        }),
+        query: searchResultGlobalQuery,
+      },
+      {
+        key: 'searchProfiles',
+        label: intl.formatMessage({
+          defaultMessage: 'Webcards',
+          description: 'Search screen tab label : webcard',
+        }),
+        query: searchResultProfilesQuery,
+      },
+      {
+        key: 'searchPosts',
+        label: intl.formatMessage({
+          defaultMessage: 'Posts',
+          description: 'Search screen tab label : post',
+        }),
+        query: searchResultPostsQuery,
+      },
+    ],
+    [intl],
+  );
 
   useEffect(() => {
     if (searchValue && environnement) {
       const queryReference = loadQuery(
         environnement,
         routes[pageIndexSelected].query,
-        { search: searchValue, useLocation: pageIndexSelected === 3 },
+        { search: searchValue, useLocation: false },
         { fetchPolicy: 'store-or-network' },
       );
       setTabPreloadedQuery(prevState => {
@@ -61,7 +91,7 @@ const SearchTabContainer = ({
         };
       });
     }
-  }, [environnement, pageIndexSelected, searchValue]);
+  }, [environnement, pageIndexSelected, routes, searchValue]);
 
   //TODO: inquiry this because warning are shown that query are disposed and should not
   useEffect(() => {
@@ -118,19 +148,6 @@ const SearchTabContainer = ({
               )}
             </Suspense>
           );
-        case 'searchGlobalhWithLocation':
-          return (
-            <Suspense fallback={<SearchResultGlobalPlaceHolder />}>
-              {tabQueryReference['searchGlobalhWithLocation'] && (
-                <SearchResultGlobal
-                  queryReference={
-                    tabQueryReference['searchGlobalhWithLocation']
-                  }
-                  hasFocus={hasFocus}
-                />
-              )}
-            </Suspense>
-          );
       }
     },
     [hasFocus, tabQueryReference],
@@ -152,7 +169,7 @@ const TabBarSearch = (
   props: SceneRendererProps & {
     navigationState: NavigationState<{
       key: string;
-      icon: string;
+      label: string;
     }>;
   },
 ) => {
@@ -167,23 +184,17 @@ const TabBarSearch = (
       indicatorStyle={[
         styles.indicatorStyle,
         {
-          width: props.layout.width / 4 - 18,
+          width: props.layout.width / 3 - 18,
         },
       ]}
-      labelStyle={styles.label}
       inactiveColor={colorScheme === 'light' ? colors.grey50 : colors.grey900}
       activeColor={colorScheme === 'light' ? colors.black : colors.white}
       renderLabel={({ route }) => (
-        <Icon
-          icon={route.icon as Icons}
-          style={[styles.image /*{ tintColor: color }*/]} //TODO: waiting for design spec, removing tintColor to display missing icon properly
-        />
+        <Text variant="smallbold">{route.label}</Text>
       )}
     />
   );
 };
-
-const IMAGE_SIZE = 24;
 
 const styleSheet = createStyleSheet(appearance => ({
   tabBarStyle: [
@@ -199,44 +210,15 @@ const styleSheet = createStyleSheet(appearance => ({
     marginLeft: 9,
     marginRight: 9,
   },
-  label: {
-    ...textStyles.medium,
-    color: appearance === 'light' ? colors.black : colors.white,
-  },
   tabViewstyle: {
     position: 'absolute',
     height: '100%',
     width: '100%',
   },
-  image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-  },
-  imageActive: {
-    //tintColor: colors.black, TODO: waiting for specification
-  },
 }));
-
-const routes = [
-  { key: 'searchGlobal', icon: 'missing', query: searchResultGlobalQuery },
-  {
-    key: 'searchProfiles',
-    icon: 'missing',
-    query: searchResultProfilesQuery,
-  },
-  { key: 'searchPosts', icon: 'missing', query: searchResultPostsQuery },
-  {
-    key: 'searchGlobalhWithLocation',
-    icon: 'missing',
-    query: searchResultGlobalQuery,
-  },
-];
 
 type TabQueries = {
   searchGlobal: PreloadedQuery<SearchResultGlobalQuery> | undefined;
   searchProfiles: PreloadedQuery<SearchResultProfilesQuery> | undefined;
   searchPosts: PreloadedQuery<SearchResultPostsQuery> | undefined;
-  searchGlobalhWithLocation:
-    | PreloadedQuery<SearchResultGlobalQuery>
-    | undefined;
 };

@@ -10,11 +10,12 @@ import {
   MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { useRouter, useWebAPI } from '#PlatformEnvironment';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
+import { useRouter } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -89,7 +90,6 @@ const CarouselEditionScreen = ({
         backgroundStyle {
           backgroundColor
           patternColor
-          opacity
         }
       }
     `,
@@ -160,7 +160,6 @@ const CarouselEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
-  const { uploadMedia, uploadSign } = useWebAPI();
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
 
@@ -260,7 +259,7 @@ const CarouselEditionScreen = ({
         }
       },
     });
-  }, [canSave, updates, commit, carousel?.id, uploadSign, uploadMedia, router]);
+  }, [canSave, updates, commit, carousel?.id, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -409,8 +408,8 @@ const CarouselEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Photo carousel',
-          description: 'Photo carousel screen title',
+          defaultMessage: 'Image carousel',
+          description: 'Image carousel screen title',
         })}
         leftElement={
           <HeaderButton
@@ -451,6 +450,8 @@ const CarouselEditionScreen = ({
                 onAddImage={onShowImagePicker}
                 onRemoveImage={onRemoveImage}
                 onSquareRatioChange={onSquareRatioChange}
+                imageHeight={imageHeight}
+                onImageHeightChange={onImageHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -484,11 +485,9 @@ const CarouselEditionScreen = ({
                 marginVertical={marginVertical}
                 marginHorizontal={marginHorizontal}
                 gap={gap}
-                imageHeight={imageHeight}
                 onMarginVerticalChange={onMarginVerticalChange}
                 onMarginHorizontalChange={onMarginHorizontalChange}
                 onGapChange={onGapChange}
-                onImageHeightChange={onImageHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -611,6 +610,5 @@ type CarouseEditionValue = {
   backgroundStyle: Readonly<{
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   }> | null;
 };

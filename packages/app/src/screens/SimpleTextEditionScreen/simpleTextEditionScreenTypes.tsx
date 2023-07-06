@@ -16,6 +16,5 @@ export type SimpleTextEditionValue = {
   backgroundStyle?: {
     backgroundColor: string;
     patternColor: string;
-    opacity: number;
   } | null;
 };

@@ -1,5 +1,3 @@
-import '@testing-library/jest-native/extend-expect';
-
 import {
   graphql,
   RelayEnvironmentProvider,
@@ -10,7 +8,7 @@ import { act, fireEvent, render, screen, waitFor } from '#helpers/testHelpers';
 
 import TrendingPostsList from '../TrendingPostsList';
 
-import type { PostRendererProps } from '#components/PostRenderer';
+import type { PostRendererProps } from '#components/PostList/PostRenderer';
 import type { TrendingPostsListTestQuery } from '@azzapp/relay/artifacts/TrendingPostsListTestQuery.graphql';
 
 jest.mock('#ui/ViewTransition', () => 'ViewTransition');

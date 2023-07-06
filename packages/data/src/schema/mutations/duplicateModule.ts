@@ -1,13 +1,19 @@
+import { and, eq, gt, sql } from 'drizzle-orm';
 import omit from 'lodash/omit';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, createCardModule, getCardModulesByIds } from '#domains';
+import {
+  db,
+  createCardModule,
+  getCardModulesByIds,
+  CardModuleTable,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
   _,
   { input: { moduleId } },
-  { auth, cardByProfileLoader },
+  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
 ) => {
   const profileId = getProfileId(auth);
   if (!profileId) {
@@ -24,15 +30,18 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 
   let createdModuleId: string | null = null;
   try {
-    await db.transaction().execute(async trx => {
+    await db.transaction(async trx => {
       await trx
-        .updateTable('CardModule')
-        .set(({ bxp }) => ({
-          position: bxp('position', '+', 1),
-        }))
-        .where('position', '>', module.position)
-        .where('cardId', '=', card.id)
-        .execute();
+        .update(CardModuleTable)
+        .set({
+          position: sql`${CardModuleTable.position} + 1`,
+        })
+        .where(
+          and(
+            gt(CardModuleTable.position, module.position),
+            eq(CardModuleTable.cardId, card.id),
+          ),
+        );
 
       const newModule = await createCardModule(
         { ...omit(module, 'id'), position: module.position + 1 },
@@ -47,6 +56,10 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
   if (!createdModuleId) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  const profile = await profileLoader.load(profileId);
+  cardUpdateListener(profile!.userName);
+
   return { card, createdModuleId };
 };
 

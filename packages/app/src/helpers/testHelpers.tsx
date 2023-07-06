@@ -1,11 +1,9 @@
 import { render } from '@testing-library/react-native';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 
 import { Text } from 'react-native';
-import { PlatformEnvironmentProvider } from '#PlatformEnvironment';
-import { useNativeRouter } from '#components/NativeRouter';
-import createPlatformEnvironment from '#helpers/createPlatformEnvironment';
+import { RouterProvider, useNativeRouter } from '#components/NativeRouter';
 import type { NativeRouterInit } from '#components/NativeRouter';
 import type { RenderResult } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
@@ -37,13 +35,9 @@ jest.mock('react-intl', () => {
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const { router } = useNativeRouter(initialRoutes);
-  const platformEnvironment = useMemo(
-    () => createPlatformEnvironment(router),
-    [router],
-  );
 
   return (
-    <PlatformEnvironmentProvider value={platformEnvironment}>
+    <RouterProvider value={router}>
       <IntlProvider
         textComponent={Text}
         locale="fr"
@@ -52,7 +46,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
       >
         {children}
       </IntlProvider>
-    </PlatformEnvironmentProvider>
+    </RouterProvider>
   );
 };
 

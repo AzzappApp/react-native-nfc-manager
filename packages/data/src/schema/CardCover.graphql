@@ -21,7 +21,7 @@ type CardCover {
   """
   The text of the cover renderered as an image to avoid font loading issues
   """
-  textPreviewMedia: MediaImage!
+  textPreviewMedia: MediaImage
   background: StaticMedia
   backgroundStyle: CardCoverBackgroundStyle
   foreground: StaticMedia

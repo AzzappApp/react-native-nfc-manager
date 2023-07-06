@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -7,24 +8,66 @@ import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ColorPreview from '#ui/ColorPreview';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ViewTransition from '#ui/ViewTransition';
-import ProfileScreenButtonBar from './ProfileScreenButtonBar';
-import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
+import {
+  useEditTransition,
+  useSelectionModeTransition,
+} from './ProfileScreenTransitions';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { ProfileScreenFooterProps } from './profileScreenTypes';
+
+export type ProfileScreenFooterProps = {
+  /**
+   * Whether the profile is in edit mode
+   */
+  editing: boolean;
+  /**
+   * Whether the profile is in selection mode
+   */
+  selectionMode: boolean;
+  /**
+   * True when the user select some modules
+   */
+  hasSelectedModules: boolean;
+  /**
+   * True when selection contains hidden modules
+   */
+  selectionContainsHiddenModules: boolean;
+  /**
+   * edit mode display mode
+   */
+  currentEditionView: 'desktop' | 'mobile' | 'preview';
+  /**
+   * the background color of the profile
+   */
+  backgroundColor: string;
+  /**
+   * A callback called when the user switch the edit mode display mode
+   */
+  onEditingDisplayModeChange: (view: 'desktop' | 'mobile') => void;
+  /**
+   * A callback called when the user press the add module button
+   */
+  onRequestNewModule: () => void;
+  /**
+   * A callback called when the user press the color picker button
+   */
+  onRequestColorPicker: () => void;
+  /**
+   * Called when the user press the hide button in edit selection mode
+   */
+  onToggleVisibility: (visible: boolean) => void;
+  /**
+   * Called when the user press the delete button in edit selection mode
+   */
+  onDelete: () => void;
+};
 
 const ProfileScreenFooter = ({
   editing,
-  ready,
-  userName,
   currentEditionView,
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
   backgroundColor,
-  onHome,
-  onEdit,
-  onToggleFollow,
   onEditingDisplayModeChange,
   onRequestNewModule,
   onRequestColorPicker,
@@ -101,66 +144,49 @@ const ProfileScreenFooter = ({
     [backgroundColor, intl, styles.colorPreview],
   );
 
+  const editTransition = useEditTransition();
+  const selectionModeTransition = useSelectionModeTransition();
+
   // TODO factorize this with editorLayout
   const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
+
+  const bottomMenuStyle = useAnimatedStyle(() => ({
+    opacity: editTransition.value - selectionModeTransition.value,
+  }));
+  const selectionMenuStyle = useAnimatedStyle(() => ({
+    opacity: editing ? selectionModeTransition.value : 0,
+  }));
   return (
     <>
-      <ViewTransition
-        transitions={['opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
-        style={[
-          styles.buttonBar,
-          {
-            bottom: bottomMargin,
-            opacity: editing ? 0 : 1,
-          },
-        ]}
-        pointerEvents={editing ? 'none' : 'auto'}
-        disableAnimation={!ready}
-      >
-        <ProfileScreenButtonBar
-          userName={userName}
-          onHome={onHome}
-          onEdit={onEdit}
-          onToggleFollow={onToggleFollow}
-        />
-      </ViewTransition>
-
-      <ViewTransition
-        transitions={['opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
+      <Animated.View
         style={[
           {
             position: 'absolute',
             left: '5%',
             width: '90%',
             bottom: bottomMargin,
-            opacity: editing && !selectionMode ? 1 : 0,
           },
+          bottomMenuStyle,
         ]}
         pointerEvents={editing ? 'auto' : 'none'}
-        disableAnimation={!ready}
       >
         <BottomMenu
           tabs={tabs}
           currentTab={currentEditionView}
           onItemPress={onItemPress}
         />
-      </ViewTransition>
+      </Animated.View>
 
-      <ViewTransition
-        transitions={['opacity']}
-        transitionDuration={EDIT_TRANSITION_DURATION}
+      <Animated.View
         style={[
           styles.selectionFooter,
           {
             paddingBottom: bottomMargin,
             height: BOTTOM_MENU_HEIGHT + bottomMargin,
-            opacity: editing && selectionMode ? 1 : 0,
           },
+          selectionMenuStyle,
         ]}
         pointerEvents={editing && selectionMode ? 'auto' : 'none'}
-        disableAnimation={!ready}
       >
         <PressableNative
           accessibilityRole="button"
@@ -202,7 +228,7 @@ const ProfileScreenFooter = ({
             />
           </Text>
         </PressableNative>
-      </ViewTransition>
+      </Animated.View>
     </>
   );
 };

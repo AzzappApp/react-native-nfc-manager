@@ -93,6 +93,11 @@ Style of the background of a module
 type ModuleBackgroundStyle {
   backgroundColor: String!
   patternColor: String!
+}
+
+type ModuleTextBackgroundStyle {
+  backgroundColor: String!
+  patternColor: String!
   opacity: Int!
 }
 
@@ -380,4 +385,34 @@ enum HorizontalArrangement {
 enum VerticalArrangement {
   top
   bottom
+}
+
+"""
+User Card module : BlockText
+"""
+type CardModuleBlockText implements CardModule {
+  """
+  The Media image of the BlockText module, cannot be null
+  """
+  text: String!
+  fontFamily: String!
+  fontColor: String!
+  textAlign: TextAlignment!
+  fontSize: Int!
+  verticalSpacing: Int!
+  textMarginVertical: Int!
+  textMarginHorizontal: Int!
+  marginHorizontal: Int!
+  marginVertical: Int!
+  textBackgroundStyle: ModuleTextBackgroundStyle
+  textBackground: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+  background: StaticMedia
+
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  visible: Boolean!
 }

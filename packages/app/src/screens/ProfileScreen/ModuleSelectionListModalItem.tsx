@@ -3,7 +3,8 @@ import { FormattedMessage } from 'react-intl';
 import { Image, View, useColorScheme } from 'react-native';
 import { colors, shadow } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
-import IconButton from '#ui/IconButton';
+import Icon from '#ui/Icon';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
@@ -42,50 +43,46 @@ const ModuleSelectionListModalItem = ({
     }
   }, [module.moduleKind, module.ready, onSelect]);
   return (
-    <View style={styles.root}>
-      <View style={styles.moduleContainer}>
-        <Image
-          style={styles.image}
-          source={
-            colorScheme === 'light' ? module.image_light : module.image_dark
-          }
-        />
-      </View>
-      <Text
-        variant="button"
-        style={{ paddingTop: 10, paddingBottom: 10 }}
-        adjustsFontSizeToFit
-        numberOfLines={1}
-      >
-        {module.label}
-      </Text>
-      <View
-        style={{
-          marginBottom: 18,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <View style={styles.freeTextView}>
-          <Text variant="xsmall">
-            <FormattedMessage
-              defaultMessage="Free"
-              description="Module Selection List - Free label for module"
-            />
-          </Text>
+    <PressableOpacity style={styles.root} onPress={onPress}>
+      <View>
+        <View style={styles.moduleContainer}>
+          <Image
+            style={styles.image}
+            source={
+              colorScheme === 'light' ? module.image_light : module.image_dark
+            }
+          />
         </View>
-        <IconButton
-          icon="add"
-          iconSize={16}
-          size={26}
-          variant="icon"
-          style={styles.addIconButtonStyle}
-          iconStyle={styles.addIconStyle}
-          onPress={onPress}
-        />
+        <Text
+          variant="button"
+          style={{ paddingTop: 10, paddingBottom: 10 }}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          {module.label}
+        </Text>
+        <View
+          style={{
+            marginBottom: 18,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <View style={styles.freeTextView}>
+            <Text variant="xsmall">
+              <FormattedMessage
+                defaultMessage="Free"
+                description="Module Selection List - Free label for module"
+              />
+            </Text>
+          </View>
+          <View style={styles.addIconButtonStyle}>
+            <Icon icon="add" style={styles.addIconStyle} />
+          </View>
+        </View>
       </View>
-    </View>
+    </PressableOpacity>
   );
 };
 
@@ -120,6 +117,11 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   addIconButtonStyle: {
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addIconStyle: {
     tintColor: appearance === 'light' ? colors.white : colors.black,

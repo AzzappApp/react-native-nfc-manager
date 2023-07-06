@@ -10,4 +10,5 @@ module.exports = {
       },
     ],
   ],
+  ignore: ['**/__mocks__/*', '**/__tests__/*'],
 };

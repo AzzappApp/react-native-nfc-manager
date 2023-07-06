@@ -21,7 +21,17 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 import type { CloudinaryResource } from '@azzapp/shared/cloudinaryHelpers';
 
 const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTitleModule'] =
-  async (_, { input }, { auth, cardByProfileLoader, mediaLoader }) => {
+  async (
+    _,
+    { input },
+    {
+      auth,
+      cardByProfileLoader,
+      mediaLoader,
+      profileLoader,
+      cardUpdateListener,
+    },
+  ) => {
     const profileId = getProfileId(auth);
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -50,7 +60,7 @@ const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTi
       }
     }
     let newImage: CloudinaryResource | undefined = undefined;
-    if (input.image && input.image !== (module?.data as any)?.image) {
+    if (input.image && input.image !== module?.data?.image) {
       newImage = (
         await getMediaInfoByPublicIds([
           { publicId: input.image, kind: 'image' },
@@ -59,7 +69,7 @@ const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTi
     }
 
     try {
-      await db.transaction().execute(async trx => {
+      await db.transaction(async trx => {
         if (newImage) {
           await createMedia(
             {
@@ -98,8 +108,13 @@ const savePhotoWithTextAndTitleModule: MutationResolvers['savePhotoWithTextAndTi
       //this is mandatory or the media return will be null
       if (newImage) {
         mediaLoader.clear(input.image);
-        await removeMedias([(module?.data as any)?.image]);
+        if (module?.data?.image) {
+          await removeMedias([module.data.image]);
+        }
       }
+
+      const profile = await profileLoader.load(profileId);
+      cardUpdateListener(profile!.userName);
 
       return { card };
     } catch (e) {

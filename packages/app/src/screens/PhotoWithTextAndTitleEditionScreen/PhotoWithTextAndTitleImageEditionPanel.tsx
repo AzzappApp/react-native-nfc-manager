@@ -1,10 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-
-import {
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+import { StyleSheet, View } from 'react-native';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
@@ -77,14 +72,13 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
   ...props
 }: PhotoWithTextAndTitleImageEditionPanelProps) => {
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
-          defaultMessage: 'Settings',
-          description: 'Title of the settings section in Line Divider edition',
+          defaultMessage: 'Image',
+          description: 'Title of the Image section in Line Divider edition',
         })}
       />
       <View style={styles.paramContainer}>
@@ -145,7 +139,6 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           min={0}
           max={50}
           step={1}
-          interval={15}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',
@@ -173,10 +166,6 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           min={0.5}
           max={16 / 9}
           step={0.01}
-          interval={Math.floor(
-            (windowWidth - 80) /
-              (2 * (DEFAULT_COVER_MAX_FONT_SIZE - DEFAULT_COVER_MIN_FONT_SIZE)),
-          )}
           onChange={onAspectRatioChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Title size',

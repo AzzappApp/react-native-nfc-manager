@@ -1,16 +1,14 @@
 import { useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
-import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import type { CarouselEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionBackgroundPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
   backgroundColor: string;
   patternColor: string;
-  opacity: number;
 };
 
 export type CarouselBackgroundPanelProps = ViewProps & {
@@ -69,7 +67,6 @@ const CarouselEditionBackgroundPanel = ({
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
   const patternColor = backgroundStyle?.patternColor ?? '#000000';
-  const opacity = backgroundStyle?.opacity ?? 100;
 
   const onColorChange = useCallback(
     (color: 'backgroundColor' | 'tintColor', value: string) => {
@@ -77,32 +74,18 @@ const CarouselEditionBackgroundPanel = ({
         onBackgroundStyleChange({
           backgroundColor: value,
           patternColor,
-          opacity,
         });
       } else {
         onBackgroundStyleChange({
           backgroundColor,
           patternColor: value,
-          opacity,
         });
       }
-    },
-    [backgroundColor, onBackgroundStyleChange, opacity, patternColor],
-  );
-
-  const onOpacityChange = useCallback(
-    (value: number) => {
-      onBackgroundStyleChange({
-        backgroundColor,
-        patternColor,
-        opacity: value,
-      });
     },
     [backgroundColor, onBackgroundStyleChange, patternColor],
   );
 
   const intl = useIntl();
-  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View {...props}>
@@ -122,32 +105,6 @@ const CarouselEditionBackgroundPanel = ({
         svgMode
         imageRatio={1}
         style={styles.mediaSelector}
-      />
-      <LabeledDashedSlider
-        label={
-          <FormattedMessage
-            defaultMessage="Photo opacity : {opacity}"
-            description="Font size message in cover edition"
-            values={{ opacity }}
-          />
-        }
-        value={opacity}
-        min={0}
-        max={100}
-        step={5}
-        interval={Math.floor((windowWidth - 80) / 60)}
-        onChange={onOpacityChange}
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Background opacity',
-          description:
-            'Label of the Background opacity slider in carousel edition',
-        })}
-        accessibilityHint={intl.formatMessage({
-          defaultMessage: 'Slide to change the background opacity',
-          description:
-            'Hint of the Background opacity slider in carousel edition',
-        })}
-        style={styles.slider}
       />
     </View>
   );

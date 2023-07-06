@@ -93,10 +93,10 @@ export const CAROUSEL_DEFAULT_VALUES = {
   borderSize: 0,
   borderColor: '#000000',
   borderRadius: 0,
-  marginVertical: 20,
-  marginHorizontal: 20,
+  marginVertical: 0,
+  marginHorizontal: 0,
   gap: 10,
-  imageHeight: 140,
+  imageHeight: 400,
   squareRatio: false,
 } as const;
 
@@ -147,4 +147,17 @@ export const SOCIAL_LINKS_DEFAULT_VALUES = {
   columnGap: 15,
   marginTop: 20,
   marginBottom: 20,
+} as const;
+
+export const BLOCK_TEXT_DEFAULT_VALUES = {
+  fontFamily: 'Arial',
+  fontColor: '#000000',
+  textAlign: 'left',
+  fontSize: 14,
+  verticalSpacing: 1,
+  textMarginHorizontal: 20,
+  textMarginVertical: 20,
+  marginHorizontal: 20,
+  marginVertical: 20,
+  text: '',
 } as const;
