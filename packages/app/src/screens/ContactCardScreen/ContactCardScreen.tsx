@@ -349,7 +349,7 @@ const ContactCardScreen = ({
             </PressableNative>
             {profile && (
               <ContactCardExportVcf
-                profileId={profile.id}
+                userName={profile.userName}
                 contactCard={profile?.contactCard}
               />
             )}
