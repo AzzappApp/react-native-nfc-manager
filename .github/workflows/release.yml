@@ -68,7 +68,9 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           npm version prepatch --no-git-tag-version --preid canary --workspaces --include-workspace-root --no-workspaces-update 
+          yarn react-native-version -A -r --generate-build --skip-tag packages/app
           git add .
           git commit -m "chore: Bump version"
+          git push origin main
     
    
