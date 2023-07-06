@@ -188,6 +188,19 @@ const PostCreationScreen = ({
           }),
         });
       },
+      updater: store => {
+        if (profile?.id) {
+          const currentProfile = store.get(profile.id);
+
+          if (currentProfile) {
+            const nbPosts = currentProfile?.getValue('nbPosts');
+
+            if (typeof nbPosts === 'number') {
+              currentProfile.setValue(nbPosts + 1, 'nbPosts');
+            }
+          }
+        }
+      },
     });
   };
 
