@@ -1,5 +1,5 @@
 diff --git a/node_modules/drizzle-kit/index.cjs b/node_modules/drizzle-kit/index.cjs
-index b75ca3b..0ddb15e 100755
+index b75ca3b..4832251 100755
 --- a/node_modules/drizzle-kit/index.cjs
 +++ b/node_modules/drizzle-kit/index.cjs
 @@ -4561,6 +4561,7 @@ var init_mysqlSchema = __esm({
@@ -40,7 +40,7 @@ index b75ca3b..0ddb15e 100755
          const constraintName = idxRow["INDEX_NAME"];
          const columnName = idxRow["COLUMN_NAME"];
          const isUnique = idxRow["NON_UNIQUE"] === 0;
-+        const isFulltext = idxRow["INDEX_TYPE"] === "FULLTEXT";
++        const isFulltext = idxRow["INDEX_TYPE"] === "FULLTEXT" ? true : undefined;
          const tableInResult = result[tableName];
          if (typeof tableInResult === "undefined")
            continue;
@@ -67,3 +67,21 @@ index b75ca3b..0ddb15e 100755
          const value = columns.map((it) => `\`${it}\``).join(",");
          return `CREATE ${indexPart} \`${name}\` ON \`${statement.tableName}\` (${value});`;
        }
+@@ -15983,7 +15988,7 @@ var init_jsonStatements = __esm({
+             schema: schema4
+           });
+         }
+-        if (((_d = column7.type) == null ? void 0 : _d.type) === "changed") {
++        if (((_d = column7.type) == null ? void 0 : _d.type) === "changed" && (column7.type.old !== "tinyint" && column7.type.new !== "tinyint(1)" )) {
+           statements.push({
+             type: "alter_table_alter_column_set_type",
+             tableName,
+@@ -16020,7 +16025,7 @@ var init_jsonStatements = __esm({
+             columnPk
+           });
+         }
+-        if (((_h = column7.default) == null ? void 0 : _h.type) === "changed") {
++        if (((_h = column7.default) == null ? void 0 : _h.type) === "changed" && (!column7.type.new.startsWith('tinyint') || column7.default.new != column7.default.old)) {
+           statements.push({
+             type: "alter_table_alter_column_set_default",
+             tableName,
