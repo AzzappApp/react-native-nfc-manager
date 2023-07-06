@@ -1,4 +1,4 @@
-name: Build and Deploy Azzapp
+name: Release
 on:
   workflow_dispatch:
 jobs:
