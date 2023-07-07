@@ -319,10 +319,6 @@
     "defaultMessage": "Button color",
     "description": "Button color title in SimpleButton edition"
   },
-  "7D3W/p": {
-    "defaultMessage": "Get started",
-    "description": "Interests pickers - Get started Button"
-  },
   "7HPaV3": {
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
@@ -338,10 +334,6 @@
   "7kcyZE": {
     "defaultMessage": "Report this post",
     "description": "PostItem Modal - Likes Label"
-  },
-  "7rGmW+": {
-    "defaultMessage": "Tell us more about your company",
-    "description": "NewProfileType Interest Picker Screen - Title"
   },
   "87390w": {
     "defaultMessage": "Let's get started with Azzapp!",
@@ -790,10 +782,6 @@
   "J6PIIv": {
     "defaultMessage": "Save",
     "description": "Edit password modal save button label"
-  },
-  "JGmlYS": {
-    "defaultMessage": "Skip",
-    "description": "NewProfile About Screen - Skip process"
   },
   "JGsXLB": {
     "defaultMessage": "Border color",
@@ -1310,10 +1298,6 @@
   "VS1eqO": {
     "defaultMessage": "This username is already used by someone else",
     "description": "NewProfileScreen - Username already taken error"
-  },
-  "VaUk5U": {
-    "defaultMessage": "Pick some topics you like.",
-    "description": "NewProfile About User Screen - SubTitle Pick some topics you like."
   },
   "Vh3DQb": {
     "defaultMessage": "Saturation",
@@ -1994,10 +1978,6 @@
   "kKfpW5": {
     "defaultMessage": "Please enter a valid email address",
     "description": "Signup Screen - Error message for invalid email address"
-  },
-  "kWx3ez": {
-    "defaultMessage": "Tell us more about you",
-    "description": "NewProfileType Interest Picker Screen - Title for personal profile"
   },
   "kcISgN": {
     "defaultMessage": "Slide to change the Top margin",

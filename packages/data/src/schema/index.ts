@@ -3,7 +3,6 @@ import * as CardModuleResolvers from './CardModuleResolvers';
 import * as CardResolvers from './CardResolvers';
 import * as ContactCardResolvers from './ContactCardResolvers';
 import * as CoverTemplateResolvers from './CoverTemplateResolvers';
-import * as InterestResolvers from './InterestResolvers';
 import * as MediaResolvers from './MediaResolvers';
 import * as MutationResolvers from './mutations';
 import { Node } from './NodeResolvers';
@@ -26,7 +25,6 @@ const resolvers: Resolvers = {
   ...QueryResolvers,
   ...UserResolvers,
   ...ViewerResolvers,
-  ...InterestResolvers,
   ...ContactCardResolvers,
   Node,
 };

@@ -4,7 +4,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { refreshTokens, signin } from '@azzapp/shared/WebAPI';
 import coverTemplateList from '#components/CoverTemplate';
-import interest from '#components/Interest';
 import profileCatgoryList from '#components/ProfileCategory';
 import staticMediaList from '#components/StaticMedia';
 import userList from '#components/UserList';
@@ -113,7 +112,6 @@ const App = () => {
       <Resource {...staticMediaList} />
       <Resource {...coverTemplateList} />
       <Resource {...profileCatgoryList} />
-      <Resource {...interest} />
     </Admin>
   );
 };

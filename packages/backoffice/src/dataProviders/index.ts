@@ -1,6 +1,5 @@
 import CompanyActivityProviders from './companyActivityProvider';
 import CoverTemplateDataProviders from './coverTemplateDataProvider';
-import InterestDataProviders from './interestsDataProvider';
 import ProfileCategoryDataProviders from './profileCategoryDataProvider';
 import {
   executeCommand,
@@ -38,12 +37,5 @@ registerResourceDataProvider(
 );
 
 registerResourceDataProvider('User', UserDataProviders, ['admin'], ['admin']);
-
-registerResourceDataProvider(
-  'Interest',
-  InterestDataProviders,
-  ['admin'],
-  ['admin'],
-);
 
 export { executeCommand };

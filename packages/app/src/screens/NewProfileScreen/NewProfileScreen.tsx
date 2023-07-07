@@ -19,7 +19,6 @@ import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import FadeSwitch from '#ui/FadeSwitch';
-import InterestPicker from './InterestPicker';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -36,9 +35,6 @@ const newProfileScreenQuery = graphql`
       ...ProfileKindStep_profileCategories
       ...ProfileForm_profileCategory
     }
-    interests {
-      ...InterestPicker_interests
-    }
   }
 `;
 
@@ -46,7 +42,7 @@ export const NewProfileScreen = ({
   preloadedQuery,
   route: { params },
 }: RelayScreenProps<NewProfileRoute, NewProfileScreenQuery>) => {
-  const { profileCategories, interests } = usePreloadedQuery(
+  const { profileCategories } = usePreloadedQuery(
     newProfileScreenQuery,
     preloadedQuery,
   );
@@ -110,7 +106,11 @@ export const NewProfileScreen = ({
         profileId,
       },
     });
-    next();
+    if (params?.goBack) {
+      router.back();
+    } else {
+      router.replaceAll(mainRoutes);
+    }
   };
 
   const [profileCategoryId, setProfileCategoryId] = useState<string | null>(
@@ -127,13 +127,6 @@ export const NewProfileScreen = ({
   const profileKind = profileCategory?.profileKind;
 
   const router = useRouter();
-  const onClose = useCallback(() => {
-    if (params?.goBack) {
-      router.back();
-    } else {
-      router.replaceAll(mainRoutes);
-    }
-  }, [router, params?.goBack]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -161,16 +154,6 @@ export const NewProfileScreen = ({
               />
             </View>
           )}
-
-          {currentPage === 2 && (
-            <View key="2" style={styles.page} collapsable={false}>
-              <InterestPicker
-                interests={interests}
-                onClose={onClose}
-                profileKind={profileKind!}
-              />
-            </View>
-          )}
         </FadeSwitch>
       </Container>
     </SafeAreaView>
@@ -192,9 +175,6 @@ NewProfileScreen.prefetch = () => {
           medias {
             preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
           }
-        }
-        interests {
-          ...InterestPicker_interests
         }
       }
     `,

@@ -50,7 +50,6 @@ export const ProfileTable = mysqlTable(
     profileCategoryId: varchar('profileCategoryId', {
       length: DEFAULT_VARCHAR_LENGTH,
     }),
-    interests: varchar('interests', { length: DEFAULT_VARCHAR_LENGTH }),
     companyActivityId: varchar('companyActivityId', {
       length: DEFAULT_VARCHAR_LENGTH,
     }),
@@ -256,7 +255,6 @@ export const createProfile = async (data: NewProfile) => {
     companyName: data.companyName ?? '',
     colorPalette: data.colorPalette ?? '',
     profileCategoryId: data.profileCategoryId ?? null,
-    interests: data.interests ?? null,
     companyActivityId: data.companyActivityId ?? null,
   };
 };

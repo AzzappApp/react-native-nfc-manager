@@ -26,7 +26,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { colorPalette, interests, ...profileUpdates } = args.input;
+  const { colorPalette, ...profileUpdates } = args.input;
 
   const partialProfile: Partial<
     Omit<Profile, 'createdAt' | 'id' | 'profileKind' | 'updatedAt'>
@@ -35,9 +35,6 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   };
   if (colorPalette) {
     partialProfile.colorPalette = colorPalette.join(',');
-  }
-  if (interests) {
-    partialProfile.interests = interests.join(',');
   }
 
   try {

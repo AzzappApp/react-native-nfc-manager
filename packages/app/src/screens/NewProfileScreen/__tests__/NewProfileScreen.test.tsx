@@ -61,10 +61,6 @@ describe('NewProfileScreen', () => {
                     label: `Company Activity ${i}-${j}`,
                   })),
           })),
-          interests: range(0, 15).map(i => ({
-            tag: `interest-${i}`,
-            label: `Interest ${i}`,
-          })),
         }),
       }),
     );
@@ -378,75 +374,6 @@ describe('NewProfileScreen', () => {
       expect(
         screen.queryByText('This username is already used by someone else'),
       ).toBeTruthy();
-    });
-  });
-
-  const renderToInterestPicker = async () => {
-    renderToProfileForm('business');
-    createProfileMock.mockResolvedValue({
-      profileId: 'profile-1',
-      token: 'fakeToken',
-      refreshToken: 'fakeRefreshToken',
-    });
-    act(() => {
-      fireEvent.changeText(
-        screen.getByPlaceholderText('Choose an username'),
-        'johndoe',
-      );
-    });
-
-    act(() => {
-      fireEvent.press(screen.getByTestId('submit-button'));
-    });
-    await act(flushPromises);
-  };
-
-  describe('InterestPicker', () => {
-    test('should display the list of interests', async () => {
-      await renderToInterestPicker();
-      expect(screen.getAllByRole('togglebutton')).toHaveLength(15);
-    });
-
-    test('should allows the user to select an interest', async () => {
-      await renderToInterestPicker();
-
-      const interestButtons = screen.getAllByRole('togglebutton');
-      act(() => {
-        fireEvent.press(interestButtons[2]);
-        fireEvent.press(interestButtons[6]);
-      });
-
-      act(() => {
-        fireEvent.press(screen.getByTestId('get-started-button'));
-      });
-
-      const operation = environment.mock.getMostRecentOperation();
-
-      expect(operation.request.node.operation.name).toBe(
-        'InterestPickerMutation',
-      );
-
-      expect(operation.request.variables.input).toEqual({
-        // Order differ because of the way the list is rendered
-        interests: ['interest-14', 'interest-12'],
-      });
-      act(() => {
-        environment.mock.resolve(
-          operation,
-          MockPayloadGenerator.generate(operation),
-        );
-      });
-      await act(flushPromises);
-
-      expect(mockRouter.replaceAll).toHaveBeenCalled();
-    });
-
-    test('should allows the user to skip an interest', async () => {
-      await renderToInterestPicker();
-      act(() => {
-        fireEvent.press(screen.getByTestId('skip-button'));
-      });
-      expect(mockRouter.replaceAll).toHaveBeenCalled();
     });
   });
 });
