@@ -7,10 +7,6 @@ import type {
 
 export type MediaImageRendererProps = {
   /**
-   * The media URI to display
-   */
-  uri?: string;
-  /**
    * if true, the MediaImageRenderer will display the first frame of the video
    */
   isVideo?: boolean;
@@ -19,17 +15,17 @@ export type MediaImageRendererProps = {
    */
   alt: string;
   /**
-   * The source id of the media, used for caching
+   * The source containing the uri of the media, the cacheId and the requestedSize
    */
-  source: string;
-  /**
-   * The media width, should be a number on native, the web version supports vw unit
-   */
-  width: number | `${number}vw`;
+  source: { uri: string; mediaId: string; requestedSize: number };
   /**
    * The media aspect ratio
    */
   aspectRatio: number;
+  /**
+   * The media tintColor
+   */
+  tintColor?: string | null;
   /**
    * A callback called when the media is loaded
    */
@@ -55,10 +51,6 @@ export type MediaImageRendererProps = {
 
 export type MediaVideoRendererProps = {
   /**
-   * The URI of the video to display
-   */
-  uri?: string;
-  /**
    * The video alt text
    */
   alt: string;
@@ -67,13 +59,9 @@ export type MediaVideoRendererProps = {
    */
   thumbnailURI?: string;
   /**
-   * The source id of the video, used for caching
+   * The source containing the uri of the media, the cacheId and the requestedSize
    */
-  source: string;
-  /**
-   * The media width, should be a number on native, the web version supports vw unit
-   */
-  width: number | `${number}vw`;
+  source: { uri: string; mediaId: string; requestedSize: number };
   /**
    * The media aspect ratio
    */

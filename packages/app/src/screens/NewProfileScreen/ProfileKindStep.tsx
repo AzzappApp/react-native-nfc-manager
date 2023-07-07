@@ -113,10 +113,8 @@ const ProfileKindStep = ({
             defaultMessage: 'Category image',
             description: 'ProfileKindStep - Category image alt',
           })}
-          width={300}
           aspectRatio={COVER_RATIO}
-          source={media.id}
-          uri={media.uri}
+          source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
           style={[styles.mediaImage, { width: cardWidth, borderRadius }]}
         />
       </View>

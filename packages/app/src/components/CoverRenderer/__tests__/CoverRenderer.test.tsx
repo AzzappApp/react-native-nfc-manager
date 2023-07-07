@@ -102,50 +102,29 @@ describe('CoverRenderer', () => {
       'if width is the cover base width, and the large version otherwise',
     () => {
       const { rerender } = renderCover();
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'source',
-        'media_id',
-      );
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'width',
-        125,
-      );
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'uri',
-        'media_small_uri',
-      );
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
-        'source',
-        'text_preview_media_id',
-      );
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('width', 125);
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
-        'uri',
-        'text_preview_small_uri',
-      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp('source', {
+        mediaId: 'media_id',
+        requestedSize: 125,
+        uri: 'media_small_uri',
+      });
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('source', {
+        mediaId: 'text_preview_media_id',
+        requestedSize: 125,
+        uri: 'text_preview_small_uri',
+      });
 
       rerender({ width: COVER_BASE_WIDTH * 2 });
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'source',
-        'media_id',
-      );
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'width',
-        250,
-      );
-      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp(
-        'uri',
-        'media_large_uri',
-      );
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
-        'source',
-        'text_preview_media_id',
-      );
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('width', 250);
-      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp(
-        'uri',
-        'text_preview_large_uri',
-      );
+      expect(screen.getByTestId('CoverRenderer_media')).toHaveProp('source', {
+        mediaId: 'media_id',
+        requestedSize: 250,
+        uri: 'media_large_uri',
+      });
+
+      expect(screen.getByTestId('CoverRenderer_text')).toHaveProp('source', {
+        mediaId: 'text_preview_media_id',
+        requestedSize: 250,
+        uri: 'text_preview_large_uri',
+      });
     },
   );
 
@@ -160,6 +139,13 @@ describe('CoverRenderer', () => {
     expect(onReadyForDisplayMock).not.toHaveBeenCalled();
     act(() => {
       fireEvent(screen.getByTestId('CoverRenderer_text'), 'onReadyForDisplay');
+    });
+    expect(onReadyForDisplayMock).not.toHaveBeenCalled();
+    act(() => {
+      fireEvent(
+        screen.getByTestId('CoverRenderer_foreground'),
+        'onReadyForDisplay',
+      );
     });
     expect(onReadyForDisplayMock).toHaveBeenCalledTimes(1);
 

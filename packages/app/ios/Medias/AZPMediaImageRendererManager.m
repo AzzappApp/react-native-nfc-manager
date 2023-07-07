@@ -6,6 +6,7 @@
 @interface RCT_EXTERN_MODULE(AZPMediaImageRendererManager, RCTViewManager)
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary *)
+RCT_REMAP_VIEW_PROPERTY(tintColor, imageColor, UIColor)
 RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onPlaceHolderImageLoad, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
@@ -27,7 +28,7 @@ RCT_EXTERN_METHOD(
 )
 
 RCT_EXTERN_METHOD(
-  addLocalCachedFile:(NSString *)mediaID
+  addLocalCachedFile:(NSString *)mediaId
   url:(NSURL *)url
 )
 

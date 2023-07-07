@@ -85,37 +85,33 @@ const CoverRenderer = (
           type: "Float!"
           provider: "../providers/CappedPixelRatio.relayprovider"
         }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
       ) {
         media {
           id
           __typename
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            @include(if: $isNative)
           ... on MediaVideo {
             thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-              @include(if: $isNative)
           }
           ... on MediaImage {
             smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-              @include(if: $isNative)
           }
           ... on MediaVideo {
-            smallThumbnail: thumbnail(
-              width: 125
-              pixelRatio: $cappedPixelRatio
-            ) @include(if: $isNative)
+            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
           }
         }
         textPreviewMedia {
           id
           largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            @include(if: $isNative)
           smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            @include(if: $isNative)
+        }
+        foreground {
+          id
+          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+        }
+        foregroundStyle {
+          color
         }
         title
         subTitle
@@ -129,11 +125,12 @@ const CoverRenderer = (
   // We need to wait for both the media and the text to be ready for display
   // before calling the onReadyForDisplay callback, however, we need to
   // redispatch it when the cover changes
-  const readyStates = useRef({ text: false, media: false });
+  const readyStates = useRef({ text: false, media: false, foreground: false });
 
   const sources = useRef({
     media: cover?.media?.id,
     text: cover?.textPreviewMedia?.id,
+    foreground: cover?.foreground?.id,
   });
 
   if (sources.current.media !== cover?.media?.id) {
@@ -146,16 +143,30 @@ const CoverRenderer = (
     sources.current.text = cover?.textPreviewMedia?.id;
   }
 
+  if (!sources.current.foreground) {
+    readyStates.current.foreground = true;
+  } else if (sources.current.foreground !== cover?.foreground?.id) {
+    readyStates.current.foreground = false;
+    sources.current.foreground = cover?.foreground?.id;
+  }
+
   const onMediaReadyForDisplay = () => {
     readyStates.current.media = true;
-    if (readyStates.current.text) {
+    if (readyStates.current.text && readyStates.current.foreground) {
       onReadyForDisplay?.();
     }
   };
 
   const onTextReadyForDisplay = () => {
     readyStates.current.text = true;
-    if (readyStates.current.media) {
+    if (readyStates.current.media && readyStates.current.foreground) {
+      onReadyForDisplay?.();
+    }
+  };
+
+  const onForegroundReadyForDisplay = () => {
+    readyStates.current.foreground = true;
+    if (readyStates.current.media && readyStates.current.text) {
       onReadyForDisplay?.();
     }
   };
@@ -174,7 +185,14 @@ const CoverRenderer = (
   //#region Styles
   const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
 
-  const { media, textPreviewMedia, title, subTitle } = cover ?? {};
+  const {
+    media,
+    textPreviewMedia,
+    title,
+    subTitle,
+    foreground,
+    foregroundStyle,
+  } = cover ?? {};
 
   const intl = useIntl();
   //#endregion
@@ -204,10 +222,8 @@ const CoverRenderer = (
         <>
           <MediaRenderer
             testID="CoverRenderer_media"
-            source={media.id}
-            uri={mediaUri}
+            source={{ uri: mediaUri!, requestedSize: width, mediaId: media.id }}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-            width={width}
             aspectRatio={COVER_RATIO}
             alt={intl.formatMessage(
               {
@@ -222,16 +238,35 @@ const CoverRenderer = (
           {textPreviewMedia && (
             <MediaImageRenderer
               testID="CoverRenderer_text"
-              source={textPreviewMedia.id}
-              uri={
-                width === COVER_BASE_WIDTH
-                  ? textPreviewMedia.smallURI
-                  : textPreviewMedia.largeURI
-              }
-              width={width}
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? textPreviewMedia.smallURI
+                    : textPreviewMedia.largeURI,
+                mediaId: textPreviewMedia.id,
+                requestedSize: width,
+              }}
               aspectRatio={COVER_RATIO}
               alt={`${title} - ${subTitle}`}
               onReadyForDisplay={onTextReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
+          {foreground && (
+            <MediaImageRenderer
+              testID="CoverRenderer_foreground"
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? foreground.smallURI
+                    : foreground.largeURI,
+                mediaId: foreground.id,
+                requestedSize: width,
+              }}
+              tintColor={foregroundStyle?.color}
+              aspectRatio={COVER_RATIO}
+              alt={`${title} - ${subTitle}`}
+              onReadyForDisplay={onForegroundReadyForDisplay}
               style={styles.layer}
             />
           )}

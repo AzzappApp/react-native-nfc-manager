@@ -9,10 +9,12 @@ describe('MediaVideoRenderer', () => {
   it('should render a NativeMediaVideoRenderer with correct role and label', () => {
     render(
       <MediaVideoRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.mp4',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.mp4"
         alt="A video"
       />,
     );
@@ -22,10 +24,12 @@ describe('MediaVideoRenderer', () => {
   it('should render the thumbnail URI while the video load', () => {
     render(
       <MediaVideoRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.mp4',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.mp4"
         thumbnailURI="https://fake-uri.com/id-1.jpg"
         alt="A video"
       />,
@@ -40,10 +44,12 @@ describe('MediaVideoRenderer', () => {
     const onReadyForDisplay = jest.fn();
     render(
       <MediaVideoRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.mp4',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.mp4"
         thumbnailURI="https://fake-uri.com/id-1.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -61,10 +67,12 @@ describe('MediaVideoRenderer', () => {
     const onReadyForDisplay = jest.fn();
     const element = render(
       <MediaVideoRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.mp4',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.mp4"
         thumbnailURI="https://fake-uri.com/id-1.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -84,10 +92,12 @@ describe('MediaVideoRenderer', () => {
 
     element.update(
       <MediaVideoRenderer
-        source="id-2"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-2.mp4',
+          mediaId: 'id-2',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-2.mp4"
         thumbnailURI="https://fake-uri.com/id-2.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -100,10 +110,12 @@ describe('MediaVideoRenderer', () => {
 
     element.update(
       <MediaVideoRenderer
-        source="id-3"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-3.mp4',
+          mediaId: 'id-3',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-3.mp4"
         thumbnailURI="https://fake-uri.com/id-3.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -120,10 +132,12 @@ describe('MediaVideoRenderer', () => {
 
     element.update(
       <MediaVideoRenderer
-        source="id-3"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-3.mp4',
+          mediaId: 'id-3',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-3.mp4"
         thumbnailURI="https://fake-uri.com/id-3.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}

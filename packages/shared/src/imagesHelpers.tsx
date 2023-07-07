@@ -27,7 +27,11 @@ export const getImageURLForSize = (
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
   }
-  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
+  const transforms = resizeTransforms(
+    Math.floor(width),
+    height ? Math.floor(height) : null,
+    pixelRatio ?? 1,
+  );
   return `${CLOUDINARY_BASE_URL}/image/upload/${transforms}/${id}`;
 };
 

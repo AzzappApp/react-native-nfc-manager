@@ -45,7 +45,7 @@ RCT_EXTERN_METHOD(
 )
 
 RCT_EXTERN_METHOD(
-  addLocalCachedFile:(NSString *)mediaID
+  addLocalCachedFile:(NSString *)mediaId
   url:(NSURL *)url
 )
 

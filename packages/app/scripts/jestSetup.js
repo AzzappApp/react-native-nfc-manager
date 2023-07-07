@@ -55,14 +55,6 @@ jest.mock('#components/medias');
 jest.mock('#components/gpu/GPUNativeMethods');
 //#endregion
 
-//#region Relay Provider Mock
-jest.mock('@azzapp/relay/providers/isNative.relayprovider', () => ({
-  get() {
-    return true;
-  },
-}));
-//#endregion
-
 //#region flashlist
 require('@shopify/flash-list/jestSetup');
 //#endregion

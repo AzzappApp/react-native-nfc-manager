@@ -73,7 +73,6 @@ const PostCreationScreen = ({
     mutation PostCreationScreenMutation(
       $connections: [ID!]!
       $input: CreatePostInput!
-      $isNative: Boolean!
       $screenWidth: Float!
       $postWith: Float!
       $cappedPixelRatio: Float!
@@ -95,18 +94,16 @@ const PostCreationScreen = ({
             height
             aspectRatio
             largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-              @include(if: $isNative)
             smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
-              @include(if: $isNative)
             ... on MediaVideo {
               largeThumbnail: thumbnail(
                 width: $screenWidth
                 pixelRatio: $pixelRatio
-              ) @include(if: $isNative)
+              )
               smallThumbnail: thumbnail(
                 width: $postWith
                 pixelRatio: $cappedPixelRatio
-              ) @include(if: $isNative)
+              )
             }
           }
           createdAt
@@ -170,7 +167,6 @@ const PostCreationScreen = ({
           allowLikes,
           content,
         },
-        isNative: true,
         screenWidth: ScreenWidth(),
         postWith: PostWidth(),
         cappedPixelRatio: CappedPixelRatio(),

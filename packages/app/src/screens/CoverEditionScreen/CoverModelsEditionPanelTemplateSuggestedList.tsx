@@ -247,10 +247,6 @@ const TemplateSuggestionItem = ({
           type: "Float!"
           provider: "../providers/CappedPixelRatio.relayprovider"
         }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
       ) {
         id
         colorPalette
@@ -260,7 +256,6 @@ const TemplateSuggestionItem = ({
           height
           id
           smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            @include(if: $isNative)
           width
         }
         data {
@@ -357,11 +352,13 @@ const TemplateSuggestionItem = ({
           }}
         >
           <MediaImageRenderer
-            uri={previewMedia?.smallURI}
             alt={`This is an image template suggested by the app`}
-            width={125}
             aspectRatio={COVER_RATIO}
-            source={previewMedia?.id}
+            source={{
+              mediaId: previewMedia?.id,
+              requestedSize: 125,
+              uri: previewMedia?.smallURI,
+            }}
             style={[
               {
                 width: coverWidth,

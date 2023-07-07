@@ -21,11 +21,9 @@ import type { ForwardedRef } from 'react';
  */
 const MediaVideoRenderer = (
   {
-    uri,
     alt,
     thumbnailURI,
     source,
-    width,
     aspectRatio,
     muted = false,
     paused = false,
@@ -38,11 +36,6 @@ const MediaVideoRenderer = (
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
 ) => {
-  if (typeof width === 'string') {
-    console.error('Invalide `vw` size used on native media renderer');
-    width = parseFloat(width.replace(/vw/g, ''));
-  }
-
   const isReadyForDisplay = useRef(false);
   const [videoReady, setVideoReady] = useState(false);
   const [seeking, setSeeking] = useState(false);
@@ -61,7 +54,7 @@ const MediaVideoRenderer = (
   };
 
   const cleanSnapshots = () => {
-    _videoSnapshots.delete(source);
+    _videoSnapshots.delete(source.mediaId);
   };
 
   const onVideoReadyForDisplay = () => {
@@ -75,12 +68,12 @@ const MediaVideoRenderer = (
     setSeeking(false);
   };
 
-  const sourceRef = useRef(source);
+  const sourceRef = useRef(source.mediaId);
   // we need to clean the state to start loading
   // the placeholder
-  if (sourceRef.current !== source) {
+  if (sourceRef.current !== source.mediaId) {
     setVideoReady(false);
-    sourceRef.current = source;
+    sourceRef.current = source.mediaId;
     isReadyForDisplay.current = false;
   }
 
@@ -115,17 +108,20 @@ const MediaVideoRenderer = (
     [],
   );
 
-  const snapshotID = _videoSnapshots.get(source);
+  const snapshotID = _videoSnapshots.get(source.mediaId);
 
   return (
     <View
-      style={[style, { width, aspectRatio, overflow: 'hidden' }]}
+      style={[
+        style,
+        { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
+      ]}
       ref={containerRef}
       testID={testID}
     >
       <NativeMediaVideoRenderer
         ref={videoRef}
-        source={{ uri, mediaID: source }}
+        source={source}
         muted={muted}
         paused={paused}
         currentTime={currentTime}
@@ -140,11 +136,13 @@ const MediaVideoRenderer = (
       {!videoReady && thumbnailURI && !currentTime && (
         <MediaImageRenderer
           testID="thumbnail"
-          source={source}
+          source={{
+            uri: thumbnailURI,
+            mediaId: source.mediaId,
+            requestedSize: source.requestedSize,
+          }}
           alt={alt}
           aspectRatio={aspectRatio}
-          width={width}
-          uri={thumbnailURI}
           onReadyForDisplay={dispatchReady}
           style={[StyleSheet.absoluteFill, { backgroundColor: 'transparent' }]}
         />

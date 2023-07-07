@@ -76,10 +76,6 @@ const PostRendererMedia = (
     graphql`
       fragment PostRendererMediaFragment_post on Post
       @argumentDefinitions(
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
         screenWidth: {
           type: "Float!"
           provider: "../providers/ScreenWidth.relayprovider"
@@ -102,18 +98,16 @@ const PostRendererMedia = (
           id
           aspectRatio
           largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            @include(if: $isNative)
           smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
-            @include(if: $isNative)
           ... on MediaVideo {
             largeThumbnail: thumbnail(
               width: $screenWidth
               pixelRatio: $pixelRatio
-            ) @include(if: $isNative)
+            )
             smallThumbnail: thumbnail(
               width: $postWith
               pixelRatio: $cappedPixelRatio
-            ) @include(if: $isNative)
+            )
           }
         }
       }
@@ -140,13 +134,15 @@ const PostRendererMedia = (
           <>
             <MediaImageRenderer
               ref={forwardedRef as any}
-              source={id}
+              source={{
+                uri: small ? smallThumbnail! : largeThumbnail!,
+                mediaId: id,
+                requestedSize: width,
+              }}
               isVideo
               // TODO alt generation by cloudinary AI ? include text in small format ?
               alt={`This is an image posted`}
-              uri={small ? smallThumbnail : largeThumbnail}
               aspectRatio={aspectRatio}
-              width={width}
               onReadyForDisplay={onReady}
               testID="PostRendererMedia_media"
             />
@@ -156,13 +152,15 @@ const PostRendererMedia = (
         ) : (
           <MediaVideoRenderer
             ref={forwardedRef as any}
-            source={id}
+            source={{
+              uri: small ? smallURI : largeURI,
+              mediaId: id,
+              requestedSize: width,
+            }}
             // TODO alt generation by cloudinary AI ? include text in small format ?
             alt={`This is a video posted`}
             thumbnailURI={small ? smallThumbnail : largeThumbnail}
-            uri={small ? smallURI : largeURI}
             aspectRatio={aspectRatio}
-            width={width}
             muted={muted}
             paused={paused}
             currentTime={initialTime}
@@ -173,12 +171,14 @@ const PostRendererMedia = (
       ) : (
         <MediaImageRenderer
           ref={forwardedRef as any}
-          source={id}
+          source={{
+            uri: small ? smallURI : largeURI,
+            mediaId: id,
+            requestedSize: width,
+          }}
           // TODO alt generation by cloudinary AI ? include text in small format ?
           alt={`This is an image posted`}
-          uri={small ? smallURI : largeURI}
           aspectRatio={aspectRatio}
-          width={width}
           onReadyForDisplay={onReady}
           testID="PostRendererMedia_media"
         />

@@ -40,9 +40,9 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
   backgroundColor?: string;
   /**
    * Callback called when the user selects a media.
-   * @param mediaID the id of the selected media.
+   * @param mediaId the id of the selected media.
    */
-  onMediaChange: (mediaID: string | null) => void;
+  onMediaChange: (mediaId: string | null) => void;
   /**
    * Callback called when the user changes the tint or background color.
    *

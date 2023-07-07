@@ -551,8 +551,6 @@ const CoverEditionScreen = ({
       updates.mediaStyle != null ||
       cover?.background?.id !== updates.backgroundId ||
       updates.backgroundStyle != null ||
-      cover?.foreground?.id !== updates.foregroundId ||
-      updates.foregroundStyle != null ||
       updates.segmented != null ||
       updates.merged != null;
 
@@ -694,21 +692,6 @@ const CoverEditionScreen = ({
     if (sourceMediaPublicId) {
       input.sourceMediaId = sourceMediaPublicId;
     }
-
-    // if (!cover && sourceMediaId) {
-    //   // Business case using the default image
-    //   input.sourceMedia = sourceMediaPublicId;
-    // } else if (sourceMediaInput) {
-    //   input.sourceMedia = sourceMediaInput;
-    // } else if (sourceMediaId && sourceMediaId !== cover?.sourceMedia?.id) {
-    //   //this case handle the case when the user select a business template with a cover already existing
-    //   input.sourceMedia = {
-    //     id: sourceMediaId,
-    //     height: sourceMedia.height,
-    //     width: sourceMedia.width,
-    //     kind: 'image',
-    //   };
-    // }
 
     if (maskMediaPublicId) {
       input.maskMediaId = maskMediaPublicId;
@@ -1235,6 +1218,7 @@ const CoverEditionScreen = ({
               uri={uri}
               maskUri={maskUri}
               mediaSize={mediaSize}
+              foregroundId={foregroundId}
               foregroundImageUri={foregroundUri}
               foregroundImageTintColor={
                 cropEditionMode

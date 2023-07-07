@@ -13,6 +13,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Delay from '#ui/Delay';
 import Text from '#ui/Text';
+import CoverForegroundPreview from './CoverForegroundPreview';
 import CoverMediaPreview from './CoverMediaPreview';
 import CoverTextPreview from './CoverTextPreview';
 import type {
@@ -36,6 +37,18 @@ type CoverPreviewRendererProps = CoverTextPreviewProps &
      * the source media uri
      */
     uri?: string | null;
+    /**
+     * The foreground image id
+     */
+    foregroundId?: string | null;
+    /**
+     * the foreground image uri
+     */
+    foregroundImageUri?: string | null;
+    /**
+     * The tint color of the foreground image
+     */
+    foregroundImageTintColor?: string | null;
     /**
      * The size of the source media
      */
@@ -93,6 +106,7 @@ const CoverPreviewRenderer = (
     maskUri,
     backgroundImageUri,
     backgroundImageTintColor,
+    foregroundId,
     foregroundImageUri,
     foregroundImageTintColor,
     backgroundMultiply,
@@ -225,8 +239,6 @@ const CoverPreviewRenderer = (
                     maskUri={maskUri}
                     backgroundImageUri={backgroundImageUri}
                     backgroundImageTintColor={backgroundImageTintColor}
-                    foregroundImageUri={foregroundImageUri}
-                    foregroundImageTintColor={foregroundImageTintColor}
                     backgroundMultiply={backgroundMultiply}
                     filter={filter}
                     editionParameters={{
@@ -242,7 +254,15 @@ const CoverPreviewRenderer = (
                 )}
               </Cropper>
             )}
-
+            {foregroundImageUri && foregroundId && (
+              <CoverForegroundPreview
+                height={height}
+                pointerEvents="none"
+                foregroundId={foregroundId}
+                foregroundImageUri={foregroundImageUri}
+                foregroundImageTintColor={foregroundImageTintColor}
+              />
+            )}
             <CoverTextPreview
               title={title}
               subTitle={subTitle}
@@ -254,6 +274,7 @@ const CoverPreviewRenderer = (
               style={styles.titleOverlayContainer}
               height={height}
             />
+
             <Image
               testID="cover-renderer-qrcode"
               accessibilityRole="image"

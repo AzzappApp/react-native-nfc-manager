@@ -1,4 +1,3 @@
-import UIKit
 import Nuke
 
 
@@ -9,7 +8,7 @@ class MediaImageRendererManager: RCTViewManager {
   }
   
   @objc override static func requiresMainQueueSetup() -> Bool {
-    return true
+    return false
   }
   
   override func view() -> UIView! {
@@ -88,17 +87,17 @@ class MediaImageRendererManager: RCTViewManager {
   
   @objc
   func addLocalCachedFile(_ mediaId: NSString, url: NSURL) {
-    MediaURICache.imageCache.addLocaleFileCacheEntry(mediaID: mediaId, uri: url as URL)
+    MediaURICache.imageCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
   }
 }
 
 struct MediaImageRendererSource {
   var uri: URL;
-  var mediaID: NSString;
+  var mediaId: NSString;
   var requestedSize: NSNumber
   
   static func == (lhs: MediaImageRendererSource, rhs: MediaImageRendererSource) -> Bool {
-    return lhs.uri == rhs.uri && lhs.mediaID == rhs.mediaID && lhs.requestedSize == rhs.requestedSize
+    return lhs.uri == rhs.uri && lhs.mediaId == rhs.mediaId && lhs.requestedSize == rhs.requestedSize
   }
 }
 
@@ -119,7 +118,7 @@ class MediaImageRenderer: UIImageView {
       guard
         let uriString = json.object(forKey: "uri") as? NSString,
         let uri =  URL(string: uriString as String),
-        let mediaId = json.object(forKey: "mediaID") as? NSString,
+        let mediaId = json.object(forKey: "mediaId") as? NSString,
         let requestedSize = json.object(forKey: "requestedSize") as? NSNumber
       else {
         NSLog("invalid source provided %@", json);
@@ -129,7 +128,7 @@ class MediaImageRenderer: UIImageView {
       }
       let newSource = MediaImageRendererSource(
         uri: uri,
-        mediaID: mediaId,
+        mediaId: mediaId,
         requestedSize: requestedSize
       )
       if let source = _source {
@@ -142,13 +141,20 @@ class MediaImageRenderer: UIImageView {
       self.loadSource()
     }
   }
-
+  
   @objc
   var onLoad: RCTDirectEventBlock?
   @objc
   var onPlaceHolderImageLoad: RCTDirectEventBlock?
   @objc
   var onError: RCTDirectEventBlock?
+  
+  @objc
+  var imageColor: UIColor?{
+    didSet{
+      loadSource()
+    }
+  }
   
   deinit {
     reset()
@@ -169,9 +175,13 @@ class MediaImageRenderer: UIImageView {
     let pipeline = MediaPipeline.pipeline;
     
     if let imageContainer = pipeline.cache.cachedImage(for: request) {
-      self.image = imageContainer.image;
+      if let tintColor = self.imageColor {
+        self.image = imageContainer.image.withTintColor(tintColor)
+      } else {
+        self.image = imageContainer.image
+      }
       MediaURICache.imageCache.addCacheEntry(
-        mediaID: source.mediaID,
+        mediaId: source.mediaId,
         size: source.requestedSize,
         uri: source.uri
       )
@@ -181,6 +191,7 @@ class MediaImageRenderer: UIImageView {
       return
     }
     
+    
     _imageTask = pipeline.loadImage(
       with: request,
       queue: .main,
@@ -188,9 +199,13 @@ class MediaImageRenderer: UIImageView {
       completion: { [weak self] result in
         switch(result) {
           case let .success(response):
-            self?.image = response.image
+            if let tintColor = self?.imageColor {
+              self?.image = response.image.withTintColor(tintColor)
+            } else {
+              self?.image = response.image
+            }
             MediaURICache.imageCache.addCacheEntry(
-              mediaID: source.mediaID,
+              mediaId: source.mediaId,
               size: source.requestedSize,
               uri: source.uri
             )
@@ -204,7 +219,7 @@ class MediaImageRenderer: UIImageView {
     while true {
       // we find the most approriate size in cache
       guard let (placeholderURI, placeholderSize) = MediaURICache.imageCache.queryCache(
-              mediaID: source.mediaID,
+              mediaId: source.mediaId,
               size: source.requestedSize
       ) else { return }
       
@@ -226,7 +241,7 @@ class MediaImageRenderer: UIImageView {
       
       // either the file is not in image cache anymore, or the local file has been deleted
       // we remove it from cache
-      MediaURICache.imageCache.removeCacheEntry(mediaID: source.mediaID , size: placeholderSize)
+      MediaURICache.imageCache.removeCacheEntry(mediaId: source.mediaId , size: placeholderSize)
     }
   }
 }

@@ -15,7 +15,7 @@ class MediaVideoRendererManager: RCTViewManager  {
   }
   
   @objc override static func requiresMainQueueSetup() -> Bool {
-    return true
+    return false
   }
   
   override func view() -> UIView! {
@@ -81,17 +81,17 @@ class MediaVideoRendererManager: RCTViewManager  {
   
   @objc
   func addLocalCachedFile(_ mediaId: NSString, url: NSURL) {
-    MediaURICache.videoCache.addLocaleFileCacheEntry(mediaID: mediaId, uri: url as URL)
+    MediaURICache.videoCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
   }
 }
 
 
 struct MediaVideoRendererSource {
   var uri: URL;
-  var mediaID: NSString;
+  var mediaId: NSString;
   
   static func == (lhs: MediaVideoRendererSource, rhs: MediaVideoRendererSource) -> Bool {
-    return lhs.uri == rhs.uri && lhs.mediaID == rhs.mediaID
+    return lhs.uri == rhs.uri && lhs.mediaId == rhs.mediaId
   }
 }
 
@@ -111,7 +111,7 @@ class MediaVideoRenderer: UIView {
       guard
         let uriString = json.object(forKey: "uri") as? NSString,
         let uri =  URL(string: uriString as String),
-        let mediaId = json.object(forKey: "mediaID") as? NSString
+        let mediaId = json.object(forKey: "mediaId") as? NSString
       else {
         NSLog("invalid source provided %@", json);
         self._source = nil;
@@ -120,7 +120,7 @@ class MediaVideoRenderer: UIView {
       }
       let newSource = MediaVideoRendererSource(
         uri: uri,
-        mediaID: mediaId
+        mediaId: mediaId
       )
       if let source = _source, newSource == source {
         return;
@@ -230,7 +230,7 @@ class MediaVideoRenderer: UIView {
       return
     }
     var asset: AVURLAsset
-    if let localUri = MediaURICache.videoCache.getLocaleURI(for: source.mediaID) {
+    if let localUri = MediaURICache.videoCache.getLocaleURI(for: source.mediaId) {
       asset = AVURLAsset(url: localUri)
     } else {
       asset = AVAssetCache.shared.avAsset(for: source.uri) ?? AVURLAsset(url: source.uri)

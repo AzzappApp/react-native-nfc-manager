@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
+import CoverForegroundPreview from './CoverForegroundPreview';
 import CoverMediaPreview from './CoverMediaPreview';
 import CoverTextPreview from './CoverTextPreview';
 import type { EditionParameters } from '#components/gpu';
@@ -156,8 +157,6 @@ const CoveTemplateRenderer = ({
         maskUri={segmented ? maskUri : null}
         backgroundImageUri={background?.uri}
         backgroundImageTintColor={backgroundStyle?.patternColor}
-        foregroundImageUri={foreground?.uri}
-        foregroundImageTintColor={foregroundStyle?.color}
         backgroundMultiply={merged}
         filter={filter}
         editionParameters={editionParametersMerged}
@@ -165,6 +164,15 @@ const CoveTemplateRenderer = ({
         onLoadingEnd={onReady}
         onLoadingError={onError}
       />
+      {foreground && (
+        <CoverForegroundPreview
+          height={height}
+          pointerEvents="none"
+          foregroundId={foreground.id}
+          foregroundImageUri={foreground.uri}
+          foregroundImageTintColor={foregroundStyle?.color}
+        />
+      )}
       <CoverTextPreview
         title={title}
         subTitle={subTitle}

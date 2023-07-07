@@ -449,11 +449,6 @@ describe('CoverEditionScreen', () => {
         }),
         filters: ['corail'],
       }),
-      expect.objectContaining({
-        kind: 'image',
-        uri: 'https://example.com/coverForeground3.png',
-        tintColor: '#0000FF',
-      }),
     ]);
 
     const title = screen.getByText('fake-title');
@@ -766,14 +761,15 @@ describe('CoverEditionScreen', () => {
     const foregroundsButtons = within(foregroundPanel).getAllByRole('button');
 
     expect(foregroundsButtons).toHaveLength(10);
-
-    expect(getLayer(2).uri).not.toBe(
-      'https://example.com/coverForeground7.png',
-    );
+    const forPreview = screen.getByTestId('cover-foreground-preview');
+    expect(forPreview).toHaveProp('source', {
+      mediaId: 'coverForegroundId3',
+      requestedSize: 353.125,
+      uri: 'https://example.com/coverForeground3.png',
+    });
     act(() => {
       fireEvent.press(foregroundsButtons[8]);
     });
-    expect(getLayer(2).uri).toBe('https://example.com/coverForeground7.png');
 
     act(() => {
       fireEvent.press(screen.getAllByLabelText('Color')[0]);
@@ -786,7 +782,7 @@ describe('CoverEditionScreen', () => {
         '#123456',
       );
     });
-    expect(getLayer(2).tintColor).toBe('#123456');
+    expect(forPreview).toHaveProp('tintColor', '#123456');
   });
 
   test('Should update the background image when the user select a new one', () => {

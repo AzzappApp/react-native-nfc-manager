@@ -52,14 +52,6 @@ export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
    */
   backgroundImageTintColor?: string | null;
   /**
-   * the foreground image uri
-   */
-  foregroundImageUri?: string | null;
-  /**
-   * The tint color of the foreground image
-   */
-  foregroundImageTintColor?: string | null;
-  /**
    * Should the main image be multiplied by the background image
    */
   backgroundMultiply?: boolean | null;
@@ -103,8 +95,6 @@ const CoverMediaPreview = (
     maskUri,
     backgroundImageUri,
     backgroundImageTintColor,
-    foregroundImageUri,
-    foregroundImageTintColor,
     backgroundMultiply,
     editionParameters,
     filter,
@@ -142,11 +132,11 @@ const CoverMediaPreview = (
 
   const onPlayerReady = useCallback(() => {
     videoViewReadyState.current.playerReady = true;
-    const hasImages = !!backgroundImageUri || !!foregroundImageUri || !!maskUri;
+    const hasImages = !!backgroundImageUri || !!maskUri;
     if (videoViewReadyState.current.imagesLoaded || !hasImages) {
       onLoadingEnd?.();
     }
-  }, [backgroundImageUri, foregroundImageUri, maskUri, onLoadingEnd]);
+  }, [backgroundImageUri, maskUri, onLoadingEnd]);
 
   const loadingHandlers =
     kind === 'video'
@@ -191,9 +181,6 @@ const CoverMediaPreview = (
         <VideoFrame {...mainGPULayerProps} time={time} />
       ) : (
         <Image {...mainGPULayerProps} />
-      )}
-      {foregroundImageUri && (
-        <Image uri={foregroundImageUri} tintColor={foregroundImageTintColor} />
       )}
     </GPUView>
   );
