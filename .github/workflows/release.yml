@@ -41,7 +41,7 @@ jobs:
       - name: Release
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            yarn release --preRelease=rc
+            yarn release --prerelease
           else
             yarn release
           fi
@@ -55,6 +55,7 @@ jobs:
           type: now
           target_branch: stable
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          label_name: 'chore: merge release'
 
       - name: Merge main into staging
         if: github.ref == 'refs/heads/main'
@@ -63,12 +64,14 @@ jobs:
           type: now
           target_branch: staging
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          label_name: 'chore: merge release'
 
       - name: Bump development version
         if: github.ref == 'refs/heads/main'
         run: |
-          npm version prepatch --no-git-tag-version --preid canary --workspaces --include-workspace-root --no-workspaces-update 
+          yarn bump-version
           git add .
-          git commit -m "chore: Bump version"
+          git commit -m "chore: bump version"
+          git push origin main
     
    

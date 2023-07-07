@@ -126,6 +126,7 @@ const SocialLinksEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...SocialLinksEditionScreen_module
             }
           }

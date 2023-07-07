@@ -8,10 +8,10 @@ import Button from '#ui/Button';
 import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/ContactCardExportVcf_card.graphql';
 
 const ContactCardExportVcf = ({
-  profileId,
+  userName,
   contactCard: contactCardKey,
 }: {
-  profileId: string;
+  userName: string;
   contactCard: ContactCardExportVcf_card$key;
 }) => {
   const contactCard = useFragment(
@@ -52,7 +52,7 @@ const ContactCardExportVcf = ({
         const vCard = buildVCard(contactCard.serializedContactCard.data);
 
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
-        const filePath = `${docPath}/${profileId}.vcf`;
+        const filePath = `${docPath}/${userName}.vcf`;
         try {
           await ReactNativeBlobUtil.fs.writeFile(
             filePath,

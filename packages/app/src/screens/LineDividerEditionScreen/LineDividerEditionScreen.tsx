@@ -101,6 +101,7 @@ const LineDividerEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...LineDividerEditionScreen_module
             }
           }

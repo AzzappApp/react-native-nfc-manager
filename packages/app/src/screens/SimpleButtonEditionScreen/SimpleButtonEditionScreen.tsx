@@ -135,6 +135,7 @@ const SimpleButtonEditionScreen = ({
             id
             modules {
               kind
+              visible
               ...SimpleButtonEditionScreen_module
             }
           }
