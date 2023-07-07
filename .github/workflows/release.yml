@@ -41,7 +41,7 @@ jobs:
       - name: Release
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            yarn release --preRelease=rc
+            yarn release --prerelease
           else
             yarn release
           fi
@@ -69,10 +69,9 @@ jobs:
       - name: Bump development version
         if: github.ref == 'refs/heads/main'
         run: |
-          npm version prepatch --no-git-tag-version --preid canary --workspaces --include-workspace-root --no-workspaces-update 
-          yarn react-native-version -A -r --generate-build --skip-tag packages/app
+          yarn bump-version
           git add .
-          git commit -m "chore: Bump version"
+          git commit -m "chore: bump version"
           git push origin main
     
    
