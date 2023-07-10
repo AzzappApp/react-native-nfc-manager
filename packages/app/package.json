@@ -9,7 +9,7 @@
     "run:ios": "react-native run-ios --no-packager",
     "pod-install": "cd ios && bundle exec pod install",
     "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build  && cd android && ./gradlew clean",
-    "postinstall": "(cd ../.. && yarn build-app-dependencies)"
+    "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)"
   },
   "devScripts": [
     "rn:watch"
