@@ -43,13 +43,12 @@ const handleBuildEvent = async (body: any) => {
   });
 };
 
-function buffer(readable: Readable) {
-  return new Promise<Buffer>((resolve, reject) => {
-    const chunks: any[] = [];
-    readable.on('data', chunk => chunks.push(Buffer.from(chunk)));
-    readable.on('error', err => reject(err));
-    readable.on('end', () => resolve(Buffer.concat(chunks)));
-  });
+async function buffer(readable: Readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
 }
 
 const webhook = async (req: VercelRequest, res: VercelResponse) => {
@@ -69,6 +68,8 @@ const webhook = async (req: VercelRequest, res: VercelResponse) => {
       console.error(e);
       console.log('body');
       console.log(body);
+      console.log('typeof body');
+      console.log(typeof body);
       console.log('req.body');
       console.log(req.body);
       res.status(500).send('Error!');
