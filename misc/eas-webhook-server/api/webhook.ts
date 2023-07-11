@@ -9,6 +9,42 @@ const REPO = 'azzapp';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const EAS_BUILD_WEBHOOK_SECRET = process.env.EAS_BUILD_WEBHOOK_SECRET;
 
+export default async (req: VercelRequest, res: VercelResponse) => {
+  if (req.method === 'POST') {
+    await handlePostRequest(req, res);
+  } else {
+    res.setHeader('Allow', 'POST');
+    res.status(405).end('Method Not Allowed');
+  }
+};
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const handlePostRequest = async (req: VercelRequest, res: VercelResponse) => {
+  const expoSignature = req.headers['expo-signature'] as string;
+  const buf = await buffer(req);
+  const body = buf.toString('utf8');
+  const hmac = crypto.createHmac('sha1', EAS_BUILD_WEBHOOK_SECRET!);
+  hmac.update(body);
+  const hash = `sha1=${hmac.digest('hex')}`;
+  if (!safeCompare(expoSignature, hash)) {
+    res.status(500).send("Signatures didn't match!");
+  } else {
+    try {
+      const data = JSON.parse(body);
+      await handleBuildEvent(data);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send('Error!');
+    }
+    res.send('OK!');
+  }
+};
+
 const handleBuildEvent = async (body: any) => {
   const {
     status,
@@ -50,38 +86,3 @@ async function buffer(readable: Readable) {
   }
   return Buffer.concat(chunks);
 }
-
-const webhook = async (req: VercelRequest, res: VercelResponse) => {
-  const expoSignature = req.headers['expo-signature'] as string;
-  const buf = await buffer(req);
-  const body = buf.toString('utf8');
-  const hmac = crypto.createHmac('sha1', EAS_BUILD_WEBHOOK_SECRET!);
-  hmac.update(body);
-  const hash = `sha1=${hmac.digest('hex')}`;
-  if (!safeCompare(expoSignature, hash)) {
-    res.status(500).send("Signatures didn't match!");
-  } else {
-    try {
-      const data = JSON.parse(req.body);
-      await handleBuildEvent(data);
-    } catch (e) {
-      console.error(e);
-      console.log('body');
-      console.log(body);
-      console.log('typeof body');
-      console.log(typeof body);
-      console.log('req.body');
-      console.log(req.body);
-      res.status(500).send('Error!');
-    }
-    res.send('OK!');
-  }
-};
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default webhook;
