@@ -315,4 +315,4 @@ jobs:
           elif [["${{github.ref}}" == "refs/heads/staging"]; then
             PROFILE="staging"
           fi
-          eas build --platform all --profile $PROFILE --message=${{ github.sha }} --non-interactive --no-wait
+          eas build --platform all --profile $PROFILE --non-interactive --no-wait

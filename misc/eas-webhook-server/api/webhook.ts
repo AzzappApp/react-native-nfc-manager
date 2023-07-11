@@ -2,21 +2,24 @@ import crypto from 'crypto';
 import { Octokit } from '@octokit/rest';
 import safeCompare from 'safe-compare';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Readable } from 'node:stream';
 
 const OWNER = 'AzzappApp';
 const REPO = 'azzapp';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const EAS_BUILD_WEBHOOK_SECRET = process.env.EAS_BUILD_WEBHOOK_SECRET;
 
 const handleBuildEvent = async (body: any) => {
   const {
     status,
     buildDetailsPageUrl,
-    metadata: { message },
+    metadata: { gitCommitHash },
     platform,
   } = body as {
     status: 'canceled' | 'errored' | 'finished';
     buildDetailsPageUrl: string;
     metadata: {
-      message: string;
+      gitCommitHash: string;
     };
     platform: 'android' | 'ios';
   };
@@ -26,12 +29,13 @@ const handleBuildEvent = async (body: any) => {
   }
 
   const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
+    auth: GITHUB_TOKEN,
   });
+
   await octokit.repos.createCommitStatus({
     owner: OWNER,
     repo: REPO,
-    sha: message,
+    sha: gitCommitHash,
     state: status === 'errored' ? 'error' : 'success',
     context: `Eas build ${platform}`,
     description: `EAS build - ${platform}`,
@@ -39,11 +43,20 @@ const handleBuildEvent = async (body: any) => {
   });
 };
 
+async function buffer(readable: Readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 const webhook = async (req: VercelRequest, res: VercelResponse) => {
   const expoSignature = req.headers['expo-signature'] as string;
-  // process.env.SECRET_WEBHOOK_KEY has to match SECRET value set with `eas webhook:create` command
-  const hmac = crypto.createHmac('sha1', process.env.EAS_BUILD_WEBHOOK_SECRET!);
-  hmac.update(req.body);
+  const buf = await buffer(req.body);
+  const body = buf.toString('utf8');
+  const hmac = crypto.createHmac('sha1', EAS_BUILD_WEBHOOK_SECRET!);
+  hmac.update(body);
   const hash = `sha1=${hmac.digest('hex')}`;
   if (!safeCompare(expoSignature, hash)) {
     res.status(500).send("Signatures didn't match!");
@@ -57,6 +70,12 @@ const webhook = async (req: VercelRequest, res: VercelResponse) => {
     }
     res.send('OK!');
   }
+};
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
 };
 
 export default webhook;
