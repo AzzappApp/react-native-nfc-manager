@@ -27,7 +27,8 @@
     "definition:watch": "yarn definition --watch",
     "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
     "compile:watch": "yarn compile --watch",
-    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
+    "studio": "drizzle-kit studio --config ./src/drizzle.config.ts"
   },
   "devScripts": [
     "compile:watch",
@@ -51,6 +52,6 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.192",
-    "drizzle-kit": "^0.19.2"
+    "drizzle-kit": "^0.19.3"
   }
 }

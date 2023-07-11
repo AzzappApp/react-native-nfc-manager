@@ -1,5 +1,5 @@
 diff --git a/node_modules/drizzle-kit/index.cjs b/node_modules/drizzle-kit/index.cjs
-index b75ca3b..5a8a0ba 100755
+index 7474eda..107bcb7 100755
 --- a/node_modules/drizzle-kit/index.cjs
 +++ b/node_modules/drizzle-kit/index.cjs
 @@ -4561,6 +4561,7 @@ var init_mysqlSchema = __esm({
@@ -54,7 +54,7 @@ index b75ca3b..5a8a0ba 100755
            };
          }
        }
-@@ -15461,10 +15466,10 @@ ${BREAKPOINT}ALTER TABLE ${tableNameWithSchema} ADD CONSTRAINT ${statement.newCo
+@@ -15474,10 +15479,10 @@ ${BREAKPOINT}ALTER TABLE ${tableNameWithSchema} ADD CONSTRAINT ${statement.newCo
          return statement.type === "create_index" && dialect6 === "mysql";
        }
        convert(statement) {
@@ -67,7 +67,7 @@ index b75ca3b..5a8a0ba 100755
          const value = columns.map((it) => `\`${it}\``).join(",");
          return `CREATE ${indexPart} \`${name}\` ON \`${statement.tableName}\` (${value});`;
        }
-@@ -15983,7 +15988,7 @@ var init_jsonStatements = __esm({
+@@ -15996,7 +16001,7 @@ var init_jsonStatements = __esm({
              schema: schema4
            });
          }
@@ -76,7 +76,7 @@ index b75ca3b..5a8a0ba 100755
            statements.push({
              type: "alter_table_alter_column_set_type",
              tableName,
-@@ -16020,7 +16025,7 @@ var init_jsonStatements = __esm({
+@@ -16033,7 +16038,7 @@ var init_jsonStatements = __esm({
              columnPk
            });
          }
@@ -85,7 +85,7 @@ index b75ca3b..5a8a0ba 100755
            statements.push({
              type: "alter_table_alter_column_set_default",
              tableName,
-@@ -16481,7 +16486,7 @@ var init_snapshotsDiffer = __esm({
+@@ -16496,7 +16501,7 @@ var init_snapshotsDiffer = __esm({
        const jsonCreateIndexesForCreatedTables = created.map((it) => {
          return prepareCreateIndexesJson(it.name, it.schema, it.indexes);
        }).flat();
