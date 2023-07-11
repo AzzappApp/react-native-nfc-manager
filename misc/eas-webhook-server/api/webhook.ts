@@ -67,6 +67,10 @@ const webhook = async (req: VercelRequest, res: VercelResponse) => {
       await handleBuildEvent(data);
     } catch (e) {
       console.error(e);
+      console.log('body');
+      console.log(body);
+      console.log('req.body');
+      console.log(req.body);
       res.status(500).send('Error!');
     }
     res.send('OK!');
