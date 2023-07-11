@@ -43,17 +43,18 @@ const handleBuildEvent = async (body: any) => {
   });
 };
 
-async function buffer(readable: Readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
+function buffer(readable: Readable) {
+  return new Promise<Buffer>((resolve, reject) => {
+    const chunks: any[] = [];
+    readable.on('data', chunk => chunks.push(Buffer.from(chunk)));
+    readable.on('error', err => reject(err));
+    readable.on('end', () => resolve(Buffer.concat(chunks)));
+  });
 }
 
 const webhook = async (req: VercelRequest, res: VercelResponse) => {
   const expoSignature = req.headers['expo-signature'] as string;
-  const buf = await buffer(req.body);
+  const buf = await buffer(req);
   const body = buf.toString('utf8');
   const hmac = crypto.createHmac('sha1', EAS_BUILD_WEBHOOK_SECRET!);
   hmac.update(body);
