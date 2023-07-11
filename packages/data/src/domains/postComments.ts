@@ -15,7 +15,8 @@ import db, {
   DEFAULT_VARCHAR_LENGTH,
 } from './db';
 import { sortEntitiesByIds } from './generic';
-import { post } from './posts';
+import { PostTable } from './posts';
+import { ProfileTable } from './profiles';
 import type { InferModel } from 'drizzle-orm';
 
 export const PostCommentTable = mysqlTable(
@@ -70,11 +71,11 @@ export const insertPostComment = async (
     await trx.insert(PostCommentTable).values(addedPostComment);
 
     await trx
-      .update(post)
+      .update(PostTable)
       .set({
-        counterComments: sql`${post.counterComments} + 1`,
+        counterComments: sql`${PostTable.counterComments} + 1`,
       })
-      .where(eq(post.id, postId));
+      .where(eq(PostTable.id, postId));
 
     return { ...addedPostComment, createdAt: new Date() };
   });
@@ -101,6 +102,42 @@ export const getPostComments = async (
     )
     .orderBy(desc(PostCommentTable.createdAt))
     .limit(limit);
+};
+
+/**
+ * Retrieves posts comments ordered by createdAt date
+ * @param limit - The maximum number of profiles to retrieve
+ * @param offset - The number of profiles to skip
+ * @returns A list of PostComment
+ */
+export const getTopPostsComment = async (postId: string[]) => {
+  const comments = await db
+    .select({
+      postsId: PostCommentTable.postId,
+      createdAt: sql<string>`max(createdAt)`,
+    })
+    .from(PostCommentTable)
+    .where(inArray(PostCommentTable.postId, postId))
+    .groupBy(PostCommentTable.postId);
+
+  if (comments.length === 0) return [];
+
+  return db
+    .select()
+    .from(PostCommentTable)
+    .where(
+      inArray(
+        PostCommentTable.postId,
+        comments.map(comment => comment.postsId),
+      ),
+    )
+    .innerJoin(ProfileTable, eq(PostCommentTable.profileId, ProfileTable.id))
+    .then(res =>
+      res.map(({ PostComment, Profile }) => ({
+        ...PostComment,
+        author: Profile,
+      })),
+    );
 };
 
 /**

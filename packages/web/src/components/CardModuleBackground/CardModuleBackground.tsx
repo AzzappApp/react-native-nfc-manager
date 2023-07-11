@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import { convertHexToRGBA } from '#helpers';
-import styles from './CardModuleBackground.module.css';
+import styles from './CardModuleBackground.css';
 
 type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   backgroundId?: string | null;

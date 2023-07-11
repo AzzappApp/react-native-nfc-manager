@@ -1,9 +1,10 @@
+import 'server-only';
 import { getMediasByIds, type CardModule } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles from './CarouselRenderer.module.css';
+import styles from './CarouselRenderer.css';
 
 export type CarouselRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
@@ -43,6 +44,7 @@ const CarouselRenderer = async ({
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      containerStyle={{ display: 'inline-grid' }}
       style={{ ...style, height }}
     >
       <div

@@ -1,0 +1,42 @@
+'use client';
+import cn from 'classnames';
+import styles from './Button.css';
+import LinkButton from './LinkButton';
+import type { MouseEventHandler } from 'react';
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  type?: 'primary' | 'secondary';
+  size?: 'large' | 'medium' | 'small';
+  disabled?: boolean;
+  loading?: boolean;
+};
+
+const Button = (props: ButtonProps) => {
+  const {
+    className,
+    type = 'primary',
+    size = 'medium',
+    disabled,
+    loading,
+    onClick,
+    ...others
+  } = props;
+
+  const classnames = cn(styles.button, className, {
+    [styles.primary]: type === 'primary',
+    [styles.primaryDisabled]: type === 'primary' && disabled,
+    [styles.small]: size === 'small',
+    [styles.medium]: size === 'medium',
+    [styles.large]: size === 'large',
+  });
+
+  const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
+    if (!disabled && !loading) onClick?.(event);
+  };
+
+  return <button {...others} onClick={handleClick} className={classnames} />;
+};
+
+Button.Link = LinkButton;
+
+export default Button;

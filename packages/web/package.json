@@ -29,11 +29,13 @@
     "react-dom": "^18.2.0",
     "react-intl": "^6.4.4",
     "react-relay": "^14.1.0",
-    "sharp": "0.32.1"
+    "sharp": "0.32.1",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
     "@types/react": "18.2.12",
-    "@types/react-dom": "^18.2.5"
+    "@types/react-dom": "^18.2.5",
+    "@vanilla-extract/next-plugin": "^2.1.3"
   }
 }

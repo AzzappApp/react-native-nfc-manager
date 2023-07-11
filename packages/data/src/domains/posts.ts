@@ -18,10 +18,13 @@ import db, {
 } from './db';
 import { FollowTable } from './follows';
 import { customTinyInt, sortEntitiesByIds } from './generic';
+import { getTopPostsComment } from './postComments';
 import type { DbTransaction } from './db';
+import type { PostComment } from './postComments';
+import type { Profile } from './profiles';
 import type { InferModel } from 'drizzle-orm';
 
-export const post = mysqlTable(
+export const PostTable = mysqlTable(
   'Post',
   {
     id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
@@ -54,8 +57,11 @@ export const post = mysqlTable(
   },
 );
 
-export type Post = InferModel<typeof post>;
-export type NewPost = Omit<InferModel<typeof post, 'insert'>, 'id'>;
+export type Post = InferModel<typeof PostTable>;
+export type NewPost = Omit<InferModel<typeof PostTable, 'insert'>, 'id'>;
+export type PostWithCommentAndAuthor = Post & {
+  comment: (PostComment & { author: Profile }) | null;
+};
 
 /**
  * Retrieve a list of post by their ids.
@@ -67,8 +73,8 @@ export const getPostsByIds = async (ids: readonly string[]) =>
     ids,
     await db
       .select()
-      .from(post)
-      .where(inArray(post.id, ids as string[])),
+      .from(PostTable)
+      .where(inArray(PostTable.id, ids as string[])),
   );
 
 /**
@@ -86,12 +92,43 @@ export const getProfilesPosts = async (
 ) => {
   const res = await db
     .select()
-    .from(post)
-    .where(eq(post.authorId, profileId))
-    .orderBy(desc(post.createdAt))
+    .from(PostTable)
+    .where(eq(PostTable.authorId, profileId))
+    .orderBy(desc(PostTable.createdAt))
     .limit(limit)
     .offset(offset);
   return res;
+};
+
+/**
+ * Retrieve a profile's post, ordered by date, with pagination.
+ *
+ * @param profileId  The id of the profile
+ * @param limit The maximum number of post to retrieve
+ * @param offset The offset of the first post to retrieve
+ * @returns A list of post
+ */
+export const getProfilesPostsWithTopComment = async (
+  profileId: string,
+  limit: number,
+  offset: number,
+) => {
+  const posts = await db
+    .select()
+    .from(PostTable)
+    .where(eq(PostTable.authorId, profileId))
+    .orderBy(desc(PostTable.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  if (posts.length === 0) return [];
+
+  const comments = await getTopPostsComment(posts.map(post => post.id));
+
+  return posts.map(post => ({
+    ...post,
+    comment: comments.find(comment => comment.postId === post.id) ?? null,
+  })) satisfies PostWithCommentAndAuthor[];
 };
 
 /**
@@ -102,8 +139,8 @@ export const getProfilesPosts = async (
 export const getProfilesPostsCount = (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(post)
-    .where(eq(post.authorId, profileId))
+    .from(PostTable)
+    .where(eq(PostTable.authorId, profileId))
 
     .then(res => res[0].count);
 
@@ -117,9 +154,9 @@ export const getProfilesPostsCount = (profileId: string) =>
 export const getAllPosts = async (limit: number, after: Date | null = null) => {
   return db
     .select()
-    .from(post)
-    .where(after ? lt(post.createdAt, after) : undefined)
-    .orderBy(desc(post.createdAt))
+    .from(PostTable)
+    .where(after ? lt(PostTable.createdAt, after) : undefined)
+    .orderBy(desc(PostTable.createdAt))
     .limit(limit);
 };
 
@@ -139,17 +176,17 @@ export const getFollowingsPosts = async (
 ) => {
   return db
     .select({
-      Post: post,
+      Post: PostTable,
     })
-    .from(post)
-    .innerJoin(FollowTable, eq(post.authorId, FollowTable.followingId))
+    .from(PostTable)
+    .innerJoin(FollowTable, eq(PostTable.authorId, FollowTable.followingId))
     .where(
       and(
         eq(FollowTable.followerId, profileId),
-        after ? lt(post.createdAt, after) : undefined,
+        after ? lt(PostTable.createdAt, after) : undefined,
       ),
     )
-    .orderBy(desc(post.createdAt))
+    .orderBy(desc(PostTable.createdAt))
     .limit(limit)
 
     .then(res => res.map(({ Post }) => Post));
@@ -164,8 +201,8 @@ export const getFollowingsPosts = async (
 export const getFollowingsPostsCount = async (profileId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(post)
-    .innerJoin(FollowTable, eq(post.authorId, FollowTable.followingId))
+    .from(PostTable)
+    .innerJoin(FollowTable, eq(PostTable.authorId, FollowTable.followingId))
     .where(eq(FollowTable.followerId, profileId))
 
     .then(res => res[0].count);
@@ -182,7 +219,7 @@ export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
     ...values,
     id: createId(),
   };
-  await tx.insert(post).values(addedPost);
+  await tx.insert(PostTable).values(addedPost);
   // TODO should we return the post from the database instead? createdAt might be different
   return {
     ...addedPost,
@@ -206,7 +243,7 @@ export const updatePost = async (
   data: Partial<Omit<Post, 'createdAt' | 'id' | 'media'>>,
 ) => {
   await db
-    .update(post)
+    .update(PostTable)
     .set({ ...data, updatedAt: new Date() })
-    .where(eq(post.id, postId));
+    .where(eq(PostTable.id, postId));
 };

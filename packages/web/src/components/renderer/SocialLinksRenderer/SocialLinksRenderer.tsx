@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles from './SocialLinksRenderer.module.css';
+import styles from './SocialLinksRenderer.css';
 import type { SocialIcons } from '#ui/SocialIcons/SocialIcon';
 import type { CardModule } from '@azzapp/data/domains';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';

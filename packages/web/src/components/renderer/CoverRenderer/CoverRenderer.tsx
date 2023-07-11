@@ -1,8 +1,9 @@
+import 'server-only';
 import { getMediasByIds } from '@azzapp/data/domains';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
-import styles from './CoverRenderer.module.css';
+import styles from './CoverRenderer.css';
 import CoverRendererBackground from './CoverRendererBackground';
 import type { CardCover } from '@azzapp/data/domains';
 

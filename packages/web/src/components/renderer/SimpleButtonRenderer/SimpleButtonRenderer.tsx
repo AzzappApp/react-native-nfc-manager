@@ -1,6 +1,6 @@
 import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles from './SimpleButtonRenderer.module.css';
+import styles from './SimpleButtonRenderer.css';
 import type { CardModule } from '@azzapp/data/domains';
 
 export type SimpleButtonRendererProps = Omit<

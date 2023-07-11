@@ -10,7 +10,7 @@ import {
   getCoverTemplates,
   getCoverTemplatesSuggestion,
   ProfileTable,
-  post,
+  PostTable,
   getFollowingsProfiles,
 } from '#domains';
 import {
@@ -114,7 +114,7 @@ export const Viewer: ViewerResolvers = {
   },
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(post), args);
+    return connectionFromArray(await db.select().from(PostTable), args);
   },
   recommendedProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
@@ -125,8 +125,8 @@ export const Viewer: ViewerResolvers = {
     return connectionFromArray(
       await db
         .select()
-        .from(post)
-        .where(like(post.content, `%${args.search}%`)),
+        .from(PostTable)
+        .where(like(PostTable.content, `%${args.search}%`)),
       args,
     );
   },

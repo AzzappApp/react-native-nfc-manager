@@ -1,11 +1,14 @@
 const path = require('path');
+const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
 const relayArtifactDirectory = path.join(
   path.dirname(require.resolve('@azzapp/relay/package.json')),
   'artifacts',
 );
 
+const withVanillaExtract = createVanillaExtractPlugin();
+
 /** @type {import('next').NextConfig} */
-module.exports = {
+const config = {
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -40,6 +43,9 @@ module.exports = {
     //     },
     //   ],
     // ],
+    serverActions: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
 };
+
+module.exports = withVanillaExtract(config);

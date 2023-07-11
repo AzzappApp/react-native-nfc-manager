@@ -10,12 +10,14 @@ body,
   padding: 0;
 }
 body {
-  color: #0E1216;
+  color: var(--colorsblack);
 }
 .root {
   display: flex;
   flex-direction: column;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }

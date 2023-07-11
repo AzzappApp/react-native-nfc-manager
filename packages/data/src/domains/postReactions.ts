@@ -14,7 +14,7 @@ import db, {
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
 } from './db';
-import { post } from './posts';
+import { PostTable } from './posts';
 import type { InferModel } from 'drizzle-orm';
 
 export const PostReactionTable = mysqlTable(
@@ -65,11 +65,11 @@ export const insertPostReaction = async (
     });
 
     await trx
-      .update(post)
+      .update(PostTable)
       .set({
-        counterReactions: sql`${post.counterReactions} + 1`,
+        counterReactions: sql`${PostTable.counterReactions} + 1`,
       })
-      .where(eq(post.id, postId));
+      .where(eq(PostTable.id, postId));
   });
 
 /**
@@ -91,11 +91,11 @@ export const deletePostReaction = async (profileId: string, postId: string) =>
       );
 
     await trx
-      .update(post)
+      .update(PostTable)
       .set({
-        counterReactions: sql`${post.counterReactions} - 1`,
+        counterReactions: sql`${PostTable.counterReactions} - 1`,
       })
-      .where(eq(post.id, postId));
+      .where(eq(PostTable.id, postId));
   });
 
 /**

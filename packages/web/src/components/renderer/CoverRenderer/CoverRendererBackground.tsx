@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
-import styles from './CoverRenderer.module.css';
+import styles from './CoverRenderer.css';
 import type { Media } from '@azzapp/data/domains';
 
 type CoverRendererBackgroundProps = {

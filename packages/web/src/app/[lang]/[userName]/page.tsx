@@ -3,11 +3,14 @@ import { notFound } from 'next/navigation';
 import {
   getCardCoversByIds,
   getCardModules,
+  getMediasByIds,
   getProfileByUserName,
+  getProfilesPostsWithTopComment,
   getUsersCards,
+  getProfilesPostsCount,
 } from '@azzapp/data/domains';
 import { CoverRenderer, ModuleRenderer } from '#components';
-import DownloadVCard from './DownloadVCard';
+import ProfilePageLayout from './ProfilePageLayout';
 
 type ProfilePageProps = {
   params: {
@@ -16,36 +19,80 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { profile, card, cover, modules } = await unstable_cache(
-    async () => {
-      const profile = await getProfileByUserName(userName);
-      const [card] = profile ? await getUsersCards([profile.id]) : [];
-      const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
-      const modules = card ? await getCardModules(card.id) : [];
+  const { profile, card, cover, modules, media, posts, postsCount } =
+    await unstable_cache(
+      async () => {
+        const profile = await getProfileByUserName(userName);
 
-      return { profile, card, cover, modules };
-    },
-    [userName],
-    { tags: [userName] },
-  )();
+        try {
+          if (profile) {
+            const [[card], posts, postsCount] = await Promise.all([
+              getUsersCards([profile.id]),
+              getProfilesPostsWithTopComment(profile.id, 5, 0),
+              getProfilesPostsCount(profile.id),
+            ]);
 
-  if (!profile || !card || !cover) {
+            if (card) {
+              const [[cover], modules] = await Promise.all([
+                getCardCoversByIds([card.coverId]),
+                getCardModules(card.id),
+              ]);
+
+              if (cover) {
+                const [media] = await getMediasByIds([cover.mediaId]);
+                return {
+                  profile,
+                  card,
+                  cover,
+                  modules,
+                  media,
+                  posts,
+                  postsCount,
+                };
+              }
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        return {
+          profile,
+          card: undefined,
+          cover: undefined,
+          modules: [],
+          media: undefined,
+          posts: [],
+          postsCount: 0,
+        };
+      },
+      [userName],
+      { tags: [userName] },
+    )();
+
+  if (!profile || !card || !cover || !media) {
     return notFound();
   }
 
   return (
-    <div style={{ backgroundColor: card.backgroundColor ?? '#FFF' }}>
-      <CoverRenderer cover={cover} />
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw' }}>
-        {modules.map(module => (
-          <ModuleRenderer module={module} key={module.id} />
-        ))}
-      </div>
-      <DownloadVCard profileId={profile.id} userName={userName} />
-    </div>
+    <ProfilePageLayout
+      card={card}
+      profile={profile}
+      modules={
+        <>
+          {modules.map(module => (
+            <ModuleRenderer module={module} key={module.id} />
+          ))}
+        </>
+      }
+      posts={posts}
+      postsCount={postsCount}
+      media={media}
+      cover={<CoverRenderer cover={cover} />}
+    />
   );
 };
 
 export default ProfilePage;
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
