@@ -58,14 +58,20 @@ const loadCommits = rev => {
   });
 };
 
+const formatCommitMessage = message =>
+  message.replace(
+    /#(\d+)/g,
+    '[#$1](https://github.com/AzzappApp/azzapp/pull/$1)',
+  );
+
 const formatGroupedCommit = ({ scope, message }) => {
-  return `* ${scope ? `**${scope}:** ` : ''}${message}`;
+  return `* ${scope ? `**${scope}:** ` : ''}${formatCommitMessage(message)}`;
 };
 
 const formatCommit = ({ scope, message, type }) => {
   return `* ${type ? `**${type}:** ` : ''} - ${
     scope ? `**${scope}:** ` : ''
-  }${message}`;
+  }${formatCommitMessage(message)}`;
 };
 
 const BREAKING_CHANGE_PATTERN = /BREAKING CHANGE/g;
