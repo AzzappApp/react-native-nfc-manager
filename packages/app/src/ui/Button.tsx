@@ -78,7 +78,7 @@ const Button = (
   } else if (variant === 'primary') {
     return (
       <PressableBackground
-        highlightColor={highlightColor}
+        highlightColor={highlightColor!}
         style={[variantStyles.root, style, disabled && variantStyles.disabled]}
         {...buttonProps}
       />

@@ -7,10 +7,14 @@ import {
   ScrollView,
   useColorScheme,
 } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
+import useAnimatedState from '#hooks/useAnimatedState';
 import Icon from '#ui/Icon/Icon';
 import PressableNative from '#ui/PressableNative';
-import ViewTransition from '#ui/ViewTransition/ViewTransition';
 
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
@@ -36,6 +40,7 @@ const ColorPalette = ({
   style,
 }: ColorPaletteProps) => {
   const [itemWidth, setItemWidth] = useState(0);
+
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     // calculate the average width of the items for perfect fitting
     const { width } = event.nativeEvent.layout;
@@ -124,8 +129,36 @@ const ColorPaletteItem = ({
   const ITEM_CALCUL = itemWidth - ITEM_MARGIN;
   const colorScheme = useColorScheme();
   const closeColor = chroma(color).darken(0.8).hex();
+
+  const opacity = useAnimatedState(selected, { duration: 280 });
+  const viewBorderStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      opacity.value,
+      [0, 1],
+      [
+        colorScheme === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)',
+        colorScheme === 'light' ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)',
+      ],
+    );
+    return {
+      borderColor: color,
+    };
+  }, [opacity]);
+
+  const edit = useAnimatedState(editMode, { duration: 300 });
+  const iconStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: interpolateColor(
+        edit.value,
+        [0, 1],
+        [color, 'rgba(255, 255, 255, 0.5)'],
+      ),
+      opacity: edit.value,
+    };
+  }, [opacity]);
+
   return (
-    <ViewTransition
+    <Animated.View
       pointerEvents="box-none"
       style={[
         styles.itemContainer,
@@ -133,14 +166,9 @@ const ColorPaletteItem = ({
           width: ITEM_CALCUL,
           height: ITEM_CALCUL,
           borderRadius: itemWidth / 2,
-          borderColor:
-            colorScheme === 'light'
-              ? `rgba(0,0,0,${selected ? 1 : 0})`
-              : `rgba(255,255,255,${selected ? 1 : 0})`,
         },
+        viewBorderStyle,
       ]}
-      transitions={['borderColor']}
-      transitionDuration={280}
     >
       <Pressable
         onPress={onPressColor}
@@ -155,23 +183,21 @@ const ColorPaletteItem = ({
           alignItems: 'center',
         }}
       >
-        <ViewTransition
-          style={{
-            width: ITEM_CALCUL - 19,
-            height: ITEM_CALCUL - 19,
-            borderRadius: (ITEM_CALCUL - 9) / 2,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: editMode ? 'rgba(255, 255, 255, 0.5)' : color, //don't use transparent, it will cause a small blinking
-            opacity: editMode ? 1 : 0,
-          }}
-          transitions={['backgroundColor', 'opacity']}
-          transitionDuration={300}
+        <Animated.View
+          style={[
+            styles.iconContainer,
+            {
+              width: ITEM_CALCUL - 19,
+              height: ITEM_CALCUL - 19,
+              borderRadius: (ITEM_CALCUL - 9) / 2,
+            },
+            iconStyle,
+          ]}
         >
           <Icon icon="close" />
-        </ViewTransition>
+        </Animated.View>
       </Pressable>
-    </ViewTransition>
+    </Animated.View>
   );
 };
 
@@ -184,6 +210,10 @@ const ITEM_MARGIN = 10;
 const BORDER_WIDTH = 2;
 
 const styles = StyleSheet.create({
+  iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: { flex: 1 },
   centerAlign: { justifyContent: 'center', alignItems: 'center' },
 

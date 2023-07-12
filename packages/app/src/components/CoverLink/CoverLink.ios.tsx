@@ -18,7 +18,6 @@ const CoverLink = ({
   ...props
 }: CoverLinkProps) => {
   const ref = useRef<View | null>(null);
-
   const router = useRouter();
   const onPress = () => {
     const container = ref.current;

@@ -13,7 +13,6 @@ import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileSc
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('#ui/FadeSwitch', () => 'FadeSwitch');
 
 jest.mock('#components/medias/NativeMediaImageRenderer');
 jest.mock('#components/medias/NativeMediaVideoRenderer');

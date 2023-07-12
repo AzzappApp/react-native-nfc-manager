@@ -7,7 +7,6 @@ import useCameraPermissions, {
 } from '#hooks/useCameraPermissions';
 import { requestMediaLibraryPermission } from '#hooks/useMediaLibraryPermission';
 import Container from '#ui/Container';
-import FadeSwitch from '#ui/FadeSwitch';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import PermissionScreen from './PermissionScreen';
@@ -91,63 +90,61 @@ const PermissionModal = ({
               />
             }
           />
-          <FadeSwitch currentKey={currentPermission} transitionDuration={220}>
-            {currentPermission === 'camera' && (
-              <View style={styles.content}>
-                <PermissionScreen
-                  title={intl.formatMessage({
-                    defaultMessage:
-                      'Allow Azzapp to access your camera and your microphone',
-                    description:
-                      'Camera authorization screen title for camera permission',
-                  })}
-                  content={intl.formatMessage({
-                    defaultMessage:
-                      'Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.',
-                    description:
-                      'Camera authorization screen content for camera permission',
-                  })}
-                  onNext={onAllowsCamera}
-                />
-              </View>
-            )}
-            {currentPermission === 'microphone' && (
-              <View style={styles.content}>
-                <PermissionScreen
-                  title={intl.formatMessage({
-                    defaultMessage: 'Allow Azzapp to access your microphone',
-                    description:
-                      'Camera authorization screen title for microphobe permission',
-                  })}
-                  content={intl.formatMessage({
-                    defaultMessage:
-                      'Access to the microphone allows you to record videos.',
-                    description:
-                      'Camera authorization screen content for microphone permission',
-                  })}
-                  onNext={onAllowsMicrophone}
-                />
-              </View>
-            )}
-            {currentPermission === 'gallery' && (
-              <View style={styles.content}>
-                <PermissionScreen
-                  title={intl.formatMessage({
-                    defaultMessage: 'Allow Azzapp to access your photos',
-                    description:
-                      'Camera authorization screen title for photos permission',
-                  })}
-                  content={intl.formatMessage({
-                    defaultMessage:
-                      'Access to the photos allows you to create publications.',
-                    description:
-                      'Camera authorization screen content for photos permission',
-                  })}
-                  onNext={onAllowsGallery}
-                />
-              </View>
-            )}
-          </FadeSwitch>
+          {currentPermission === 'camera' && (
+            <View style={styles.content}>
+              <PermissionScreen
+                title={intl.formatMessage({
+                  defaultMessage:
+                    'Allow Azzapp to access your camera and your microphone',
+                  description:
+                    'Camera authorization screen title for camera permission',
+                })}
+                content={intl.formatMessage({
+                  defaultMessage:
+                    'Access to your camera allows you to take photos and record videos. Access to the microphone allows you to record videos.',
+                  description:
+                    'Camera authorization screen content for camera permission',
+                })}
+                onNext={onAllowsCamera}
+              />
+            </View>
+          )}
+          {currentPermission === 'microphone' && (
+            <View style={styles.content}>
+              <PermissionScreen
+                title={intl.formatMessage({
+                  defaultMessage: 'Allow Azzapp to access your microphone',
+                  description:
+                    'Camera authorization screen title for microphobe permission',
+                })}
+                content={intl.formatMessage({
+                  defaultMessage:
+                    'Access to the microphone allows you to record videos.',
+                  description:
+                    'Camera authorization screen content for microphone permission',
+                })}
+                onNext={onAllowsMicrophone}
+              />
+            </View>
+          )}
+          {currentPermission === 'gallery' && (
+            <View style={styles.content}>
+              <PermissionScreen
+                title={intl.formatMessage({
+                  defaultMessage: 'Allow Azzapp to access your photos',
+                  description:
+                    'Camera authorization screen title for photos permission',
+                })}
+                content={intl.formatMessage({
+                  defaultMessage:
+                    'Access to the photos allows you to create publications.',
+                  description:
+                    'Camera authorization screen content for photos permission',
+                })}
+                onNext={onAllowsGallery}
+              />
+            </View>
+          )}
         </SafeAreaView>
       </Container>
     </Modal>

@@ -5,8 +5,6 @@ import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import { SearchScreen } from '../SearchScreen';
 import type { SearchScreenQuery } from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 
-jest.mock('#ui/ViewTransition', () => 'ViewTransition');
-
 jest.mock('../SearchTabContainer', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createElement } = require('react');

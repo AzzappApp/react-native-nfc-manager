@@ -760,7 +760,7 @@ describe('CoverEditionScreen', () => {
     const foregroundPanel = screen.getByTestId('cover-foreground-panel');
     const foregroundsButtons = within(foregroundPanel).getAllByRole('button');
 
-    expect(foregroundsButtons).toHaveLength(10);
+    expect(foregroundsButtons).toHaveLength(9);
     const forPreview = screen.getByTestId('cover-foreground-preview');
     expect(forPreview).toHaveProp('source', {
       mediaId: 'coverForegroundId3',
@@ -796,15 +796,15 @@ describe('CoverEditionScreen', () => {
     const backgroundPanel = screen.getByTestId('cover-background-panel');
     const backgroundsButtons = within(backgroundPanel).getAllByRole('button');
 
-    expect(backgroundsButtons).toHaveLength(10);
+    expect(backgroundsButtons).toHaveLength(9);
 
     expect(getLayer(0).uri).not.toBe(
-      'https://example.com/coverBackground4.png',
+      'https://example.com/coverBackground5.png',
     );
     act(() => {
       fireEvent.press(backgroundsButtons[5]);
     });
-    expect(getLayer(0).uri).toBe('https://example.com/coverBackground4.png');
+    expect(getLayer(0).uri).toBe('https://example.com/coverBackground5.png');
 
     act(() => {
       fireEvent.press(screen.getByLabelText('Color #2'));

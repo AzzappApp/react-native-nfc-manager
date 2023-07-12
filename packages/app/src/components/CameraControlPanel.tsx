@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
 import { formatVideoTime } from '#helpers/mediaHelpers';
+import useAnimatedState from '#hooks/useAnimatedState';
 import useInterval from '#hooks/useInterval';
 import PressableBackground from '#ui/PressableBackground';
 import ProgressBar from '#ui/ProgressBar';
 import Text from '#ui/Text';
-import ViewTransition from '#ui/ViewTransition';
 import type { ViewProps } from 'react-native';
 
 type CameraControlPanelProps = ViewProps & {
@@ -157,33 +162,56 @@ const CameraControlPanel = ({
           }
         >
           {({ pressed }) => (
-            <ViewTransition
-              transitionDuration={120}
-              transitions={[
-                'transform',
-                'borderRadius',
-                'backgroundColor',
-                'width',
-                'height',
-              ]}
-              style={
-                !isRecording
-                  ? [
-                      styles.videoButton,
-                      pressed && styles.videoButtonPressed,
-                      !ready && styles.photoButtonDisabled,
-                    ]
-                  : [
-                      styles.stopButton,
-                      pressed && styles.stopButtonPressed,
-                      !ready && styles.photoButtonDisabled,
-                    ]
-              }
+            <RecordingButton
+              isRecording={isRecording}
+              pressed={pressed}
+              ready={ready}
             />
           )}
         </Pressable>
       )}
     </View>
+  );
+};
+type RecordingButtonProps = {
+  isRecording: boolean;
+  pressed: boolean;
+  ready: boolean;
+};
+const RecordingButton = ({
+  isRecording,
+  pressed,
+  ready,
+}: RecordingButtonProps) => {
+  const isRecordingTiming = useAnimatedState(isRecording, { duration: 120 });
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      width: interpolate(isRecordingTiming.value, [0, 1], [60, 38]),
+      height: interpolate(isRecordingTiming.value, [0, 1], [60, 38]),
+      borderRadius: interpolate(isRecordingTiming.value, [0, 1], [30, 8]),
+      backgroundColor: interpolateColor(
+        isRecordingTiming.value,
+        [0, 1],
+        [colors.red400, colors.black],
+      ),
+    };
+  }, []);
+
+  const pressTiming = useAnimatedState(pressed, { duration: 120 });
+  const pressedAnimationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: interpolate(pressTiming.value, [0, 1], [1, 1.1]) }],
+    };
+  }, [pressTiming]);
+
+  return (
+    <Animated.View
+      style={[
+        !ready && styles.photoButtonDisabled,
+        pressedAnimationStyle,
+        animatedStyle,
+      ]}
+    />
   );
 };
 
@@ -215,22 +243,13 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: colors.red400,
-    transform: [{ scale: 1 }],
   },
-  videoButtonPressed: {
-    transform: [{ scale: 1.1 }],
-  },
-  videoButtonDisabled: {
-    opacity: 0.5,
-  },
+
   stopButton: {
     width: 38,
     height: 38,
     borderRadius: 8,
     backgroundColor: colors.black,
     transform: [{ scale: 1 }],
-  },
-  stopButtonPressed: {
-    transform: [{ scale: 1.1 }],
   },
 });

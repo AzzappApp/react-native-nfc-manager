@@ -1,77 +1,109 @@
-import { forwardRef, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { forwardRef, useCallback, useMemo } from 'react';
+import { StyleSheet, useColorScheme } from 'react-native';
+import {
+  Easing,
+  useAnimatedStyle,
+  type EasingFunctionFactory,
+  interpolateColor,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
-import { getPressableStyle } from '#helpers/gestureHelpers';
-import PressableTransition from './PressableTransition';
-import type { Easing } from './ViewTransition';
-import type { ForwardedRef } from 'react';
-import type {
-  PressableProps,
-  View,
-  PressableStateCallbackType,
-  ColorValue,
-} from 'react-native';
 
-type PressableBackgroundProps = PressableProps & {
-  highlightColor?: ColorValue;
+import PressableAnimated from './PressableAnimated';
+import type { PressableAnimatedProps } from './PressableAnimated';
+import type { ForwardedRef } from 'react';
+import type { View, EasingFunction, StyleProp, ViewStyle } from 'react-native';
+
+type PressableOpacityProps = Omit<PressableAnimatedProps, 'style'> & {
+  highlightColor: string;
+  backgroundColor?: string;
+  disabledOpacity?: number;
   animationDuration?: number;
-  easing?: Easing;
+  easing?: EasingFunction | EasingFunctionFactory;
+  style: StyleProp<ViewStyle>;
 };
 
 const PressableBackground = (
   {
-    highlightColor = colors.grey100,
+    highlightColor,
+    backgroundColor,
     animationDuration = 150,
-    easing = 'ease-in-out',
+    disabledOpacity = 0.3,
+    easing = Easing.inOut(Easing.ease),
     style,
     disabled,
+    id,
     ...props
-  }: PressableBackgroundProps,
+  }: PressableOpacityProps,
   ref: ForwardedRef<View>,
 ) => {
-  const styleFunc = useCallback(
-    (state: PressableStateCallbackType) => {
-      const styleObj = getPressableStyle(style, { pressed: false });
-      const defaultBackground = StyleSheet.flatten(styleObj)?.backgroundColor;
+  const colorScheme = useColorScheme();
 
-      if (!defaultBackground) {
-        console.warn(
-          'PressableBackground animation might have undesired behavior if no background color is provided',
-        );
-      }
+  const highColor = useMemo(() => {
+    if (highlightColor) {
+      return highlightColor;
+    }
+    if (colorScheme === 'dark') {
+      return 'rgba(255,255,255,0.2)';
+    } else {
+      return 'rgba(0,0,0,0.2)';
+    }
+  }, [colorScheme, highlightColor]);
 
-      return [
-        getPressableStyle(style, state),
-        {
-          backgroundColor: state.pressed
-            ? highlightColor
-            : defaultBackground ?? 'rgba(0,0,0,0)',
-        },
-      ];
-    },
-    [highlightColor, style],
-  );
+  const bgColor = useMemo(() => {
+    if (backgroundColor) {
+      return backgroundColor;
+    } else if (StyleSheet.flatten(style)?.backgroundColor) {
+      return StyleSheet.flatten(style)?.backgroundColor as string;
+    }
+    if (colorScheme === 'dark') {
+      return colors.white;
+    } else {
+      return colors.black;
+    }
+  }, [backgroundColor, colorScheme, style]);
+
+  const pressed = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: interpolateColor(
+        pressed.value,
+        [0, 1],
+        [bgColor, highColor],
+      ),
+    };
+  }, [pressed, bgColor]);
+
+  const onPressIn = useCallback(() => {
+    pressed.value = withTiming(1, {
+      duration: animationDuration,
+      easing,
+    });
+  }, [animationDuration, pressed, easing]);
+
+  const onPressOut = useCallback(() => {
+    pressed.value = withTiming(0, {
+      duration: animationDuration,
+      easing,
+    });
+  }, [animationDuration, pressed, easing]);
 
   return (
-    <PressableTransition
+    <PressableAnimated
       ref={ref}
-      style={styleFunc}
-      transitions={backgroundTransitions}
-      transitionDuration={animationDuration}
-      easing={easing}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: disabled ?? false }}
-      android_ripple={{
-        borderless: false,
-        color: highlightColor,
-        foreground: true,
-      }}
       {...props}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      disabled={disabled}
+      style={[
+        style,
+        { opacity: disabled ? disabledOpacity : 1 },
+        animatedStyle,
+      ]}
     />
   );
 };
 
 export default forwardRef(PressableBackground);
-
-const backgroundTransitions = ['backgroundColor'] as const;

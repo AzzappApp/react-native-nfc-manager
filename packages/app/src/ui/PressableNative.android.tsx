@@ -1,7 +1,6 @@
 import { forwardRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { colors } from '#theme';
-import type { Easing } from './ViewTransition';
 import type { ForwardedRef } from 'react';
 import type {
   PressableProps,
@@ -14,7 +13,6 @@ type PressableNativeProps = PressableProps & {
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;
-  easing?: Easing;
   ripple?: PressableAndroidRippleConfig;
 };
 

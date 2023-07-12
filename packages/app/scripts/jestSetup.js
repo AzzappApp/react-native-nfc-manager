@@ -13,8 +13,7 @@ require('appcenter-crashes/test/AppCenterCrashesMock');
 // Reanimated Mock
 require('react-native-reanimated/lib/reanimated2/jestUtils').setUpTests();
 global.ReanimatedDataMock = {
-  //fix a bug since 2.5.0
-  now: () => 0,
+  now: () => Date.now(),
 };
 
 // RNGestureHandler Mock

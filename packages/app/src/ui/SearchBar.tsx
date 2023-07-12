@@ -1,23 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, useColorScheme } from 'react-native';
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAnimatedState from '#hooks/useAnimatedState';
 import Button from './Button';
 import Container from './Container';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
-import ViewTransition from './ViewTransition';
 import type {
   StyleProp,
   ViewStyle,
   NativeSyntheticEvent,
   TextInputFocusEventData,
   GestureResponderEvent,
-  TextStyle,
   LayoutChangeEvent,
-  ImageStyle,
 } from 'react-native';
 
 type SearchBarProps = {
@@ -45,10 +48,6 @@ const SearchBar = ({
 }: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
-  const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
-  const [lensFocusedStyle, setLensFocusedStyle] = useState<
-    StyleProp<ImageStyle>
-  >({});
 
   useEffect(() => {
     setSearchValue(value);
@@ -92,28 +91,45 @@ const SearchBar = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const [isFocused, setIsFocused] = useState(false);
+  const timing = useAnimatedState(isFocused, { duration: animationDuration });
+
   const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setFocusedStyle({
-      width: containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
-      ...styles.focused,
-    });
-    setLensFocusedStyle({
-      tintColor: colors.black,
-    });
+    setIsFocused(true);
     onFocus?.(e);
   };
 
   const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setFocusedStyle({
-      width: containerWidth,
-    });
-    setLensFocusedStyle({});
+    setIsFocused(false);
     if (onBlur) {
       onBlur(e);
     }
   };
 
   const intl = useIntl();
+  const colorScheme = useColorScheme();
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      width: interpolate(
+        timing.value,
+        [0, 1],
+        [
+          containerWidth,
+          containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
+        ],
+      ),
+
+      borderWidth: timing.value,
+      borderColor: interpolateColor(
+        timing.value,
+        [0, 1],
+        [
+          colorScheme === 'light' ? colors.grey50 : colors.grey1000,
+          colorScheme === 'light' ? colors.grey900 : colors.grey400,
+        ],
+      ),
+    };
+  }, [containerWidth, cancelButtonWidth]);
 
   return (
     <Container style={containerStyle}>
@@ -125,20 +141,21 @@ const SearchBar = ({
         <View style={styles.wrapper}>
           {containerWidth > 0 && (
             <>
-              <ViewTransition
+              <Animated.View
                 testID="azzapp__SearchBar__view-inputcontainer"
                 style={[
                   styles.innerSearchBarView,
                   { width: containerWidth },
-                  focusedStyle,
+                  animatedStyle,
                 ]}
-                transitionDuration={animationDuration}
-                transitions={['width', 'borderColor']}
                 onTouchStart={focus}
               >
                 <Icon
                   icon="search"
-                  style={[styles.lensIcon, lensFocusedStyle]}
+                  style={[
+                    styles.lensIcon,
+                    isFocused ? { tintColor: colors.black } : {},
+                  ]}
                 />
                 <TextInput
                   testID="azzapp__searchbar__textInput"
@@ -171,7 +188,7 @@ const SearchBar = ({
                     <Icon icon="closeFull" style={styles.cancelIcon} />
                   </PressableNative>
                 )}
-              </ViewTransition>
+              </Animated.View>
               <Button
                 accessibilityRole="button"
                 accessibilityLabel={intl.formatMessage({
@@ -203,14 +220,9 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
     fontSize: 16,
     color: appearance === 'light' ? colors.black : colors.grey400,
-  },
-  focused: {
-    borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
-    borderWidth: 1,
   },
   input: {
     flex: 1,

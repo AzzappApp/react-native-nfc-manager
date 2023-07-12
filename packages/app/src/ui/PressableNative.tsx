@@ -1,14 +1,10 @@
 import { forwardRef } from 'react';
 import PressableOpacity from './PressableOpacity';
-import type { Easing } from './ViewTransition';
+import type { PressableOpacityProps } from './PressableOpacity';
 import type { ForwardedRef } from 'react';
-import type {
-  PressableProps,
-  PressableAndroidRippleConfig,
-  View,
-} from 'react-native';
+import type { Easing, PressableAndroidRippleConfig, View } from 'react-native';
 
-type PressableNativeProps = PressableProps & {
+type PressableNativeProps = PressableOpacityProps & {
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;

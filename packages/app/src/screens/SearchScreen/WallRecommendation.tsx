@@ -63,6 +63,7 @@ const SeeAll = () => {
   return (
     <View style={styles.viewSeeAll} pointerEvents="box-none">
       <PressableBackground
+        highlightColor={colors.grey400}
         style={styles.pressableSeeAll}
         // eslint-disable-next-line no-alert
         onPress={() => alert('todo')}

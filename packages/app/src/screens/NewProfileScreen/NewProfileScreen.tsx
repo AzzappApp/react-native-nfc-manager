@@ -18,7 +18,6 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
-import FadeSwitch from '#ui/FadeSwitch';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -131,30 +130,28 @@ export const NewProfileScreen = ({
   return (
     <SafeAreaView style={styles.container}>
       <Container style={styles.container}>
-        <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
-          {currentPage === 0 && (
-            <View key="0" style={styles.page} collapsable={false}>
-              <ProfileKindStep
-                onBack={params?.goBack ? router.back : null}
-                profileCategories={profileCategories}
-                profileCategoryId={profileCategoryId!}
-                onNext={next}
-                onProfileCategoryChange={onProfileCategoryChange}
-              />
-            </View>
-          )}
+        {currentPage === 0 && (
+          <View key="0" style={styles.page} collapsable={false}>
+            <ProfileKindStep
+              onBack={params?.goBack ? router.back : null}
+              profileCategories={profileCategories}
+              profileCategoryId={profileCategoryId!}
+              onNext={next}
+              onProfileCategoryChange={onProfileCategoryChange}
+            />
+          </View>
+        )}
 
-          {currentPage === 1 && (
-            <View key="1" style={styles.page} collapsable={false}>
-              <ProfileForm
-                profileKind={profileKind!}
-                profileCategory={profileCategory!}
-                onProfileCreated={onProfileCreated}
-                onBack={prev}
-              />
-            </View>
-          )}
-        </FadeSwitch>
+        {currentPage === 1 && (
+          <View key="1" style={styles.page} collapsable={false}>
+            <ProfileForm
+              profileKind={profileKind!}
+              profileCategory={profileCategory!}
+              onProfileCreated={onProfileCreated}
+              onBack={prev}
+            />
+          </View>
+        )}
       </Container>
     </SafeAreaView>
   );

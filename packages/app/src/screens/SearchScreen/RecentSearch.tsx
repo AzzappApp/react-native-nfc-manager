@@ -99,6 +99,7 @@ const SearchRecentItem = ({
     <PressableBackground
       style={styles.pressableRecentRow}
       onPress={onSearch}
+      highlightColor={colors.grey400}
       accessibilityRole="link"
       accessibilityLabel={intl.formatMessage(
         {

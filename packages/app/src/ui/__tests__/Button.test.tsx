@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { colors } from '#theme';
 import Button from '../Button';
 const label = 'label';
 
@@ -12,6 +11,7 @@ jest.mock('react-native/Libraries/Utilities/useColorScheme', () => {
 });
 
 describe('Button component', () => {
+  jest.useFakeTimers();
   test('should render with the correct label', () => {
     render(<Button label={label} testID="button_testId" />);
     expect(screen.getByTestId('button_testId')).not.toBeNull();
@@ -38,7 +38,11 @@ describe('Button component', () => {
   });
 
   test('props `style` backgroundColor should apply correctly to the pressable component', () => {
-    const style = { width: 200, height: 10, backgroundColor: 'red' };
+    const style = {
+      width: 200,
+      height: 10,
+      backgroundColor: 'rgba(255, 0, 0, 1)',
+    };
     render(
       <Button
         label={label}
@@ -47,7 +51,8 @@ describe('Button component', () => {
         testID="button_testId"
       />,
     );
-    expect(screen.getByTestId('button_testId')).toHaveStyle(style);
+    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+    expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle(style);
   });
 
   test('props `style` backgroundColor should not apply when button is disabled', () => {
@@ -72,8 +77,13 @@ describe('Button component', () => {
     render(
       <Button label={label} testOnly_pressed={true} testID="button_testId" />,
     );
-    expect(screen.getByTestId('button_testId')).toHaveStyle({
-      backgroundColor: colors.grey900,
+    act(() => {
+      fireEvent(screen.getByTestId('button_testId'), 'pressIn');
+    });
+    jest.advanceTimersByTime(2000);
+    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+    expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
+      backgroundColor: 'rgba(69, 68, 76, 1)', //colors.grey900,
     });
   });
 
@@ -107,13 +117,15 @@ describe('Button component', () => {
     const { rerender } = render(
       <Button label={label} testID="button_testId" />,
     );
-    expect(screen.getByTestId('button_testId')).toHaveStyle({
-      backgroundColor: colors.white,
+    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+    expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
+      backgroundColor: 'rgba(255, 255, 255, 1)',
     });
     rerender(
       <Button label={label} testID="button_testId" variant="secondary" />,
     );
-    expect(screen.getByTestId('button_testId')).toHaveStyle({
+    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+    expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
       backgroundColor: 'transparent',
     });
   });

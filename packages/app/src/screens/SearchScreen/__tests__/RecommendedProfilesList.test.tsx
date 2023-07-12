@@ -10,8 +10,6 @@ import RecommendedProfilesList from '../RecommendedProfilesList';
 import type { CoverRendererProps } from '#components/CoverRenderer';
 import type { RecommendedProfilesListTestQuery } from '@azzapp/relay/artifacts/RecommendedProfilesListTestQuery.graphql';
 
-jest.mock('#ui/ViewTransition', () => 'ViewTransition');
-
 jest.mock('#components/CoverLink', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createElement } = require('react');

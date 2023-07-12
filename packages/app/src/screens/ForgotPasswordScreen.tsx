@@ -9,19 +9,23 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getLocales } from '#helpers/localeHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
+import useAnimatedState from '#hooks/useAnimatedState';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import ViewTransition from '#ui/ViewTransition';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ForgotPasswordScreen = () => {
@@ -48,9 +52,13 @@ const ForgotPasswordScreen = () => {
   const onSubmit = async () => {
     if (isValidMailOrPhone) {
       if (!isSubmitted) {
-        await forgotPassword({ credential: emailOrPhone });
+        try {
+          setIsSubmitted(true);
+          await forgotPassword({ credential: emailOrPhone });
+        } catch (err) {
+          console.log(err);
+        }
       }
-      setIsSubmitted(true);
     }
   };
 
@@ -61,6 +69,22 @@ const ForgotPasswordScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
+  const timing = useAnimatedState(isSubmitted, { duration: 300 });
+
+  const checkEmailAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: timing.value,
+      width: screenWidth,
+    };
+  }, [screenWidth, timing]);
+
+  const formEmailAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(timing.value, [0, 1], [1, 0]),
+      width: screenWidth,
+    };
+  }, [screenWidth, timing]);
+
   return (
     <Container style={styles.flex}>
       <KeyboardAvoidingView
@@ -69,14 +93,9 @@ const ForgotPasswordScreen = () => {
       >
         <View onTouchStart={Keyboard.dismiss} style={[styles.container]}>
           <Form style={styles.inner} onSubmit={onSubmit}>
-            <ViewTransition
+            <Animated.View
               testID="azzapp__ForgotPasswordScreen__ViewTransition-confirm"
-              style={[
-                styles.viewtransition,
-                { width: screenWidth, opacity: isSubmitted ? 1 : 0 },
-              ]}
-              transitionDuration={300}
-              transitions={['opacity']}
+              style={[styles.viewtransition, checkEmailAnimatedStyle]}
               pointerEvents="none"
             >
               <View style={styles.logoContainer}>
@@ -100,15 +119,10 @@ const ForgotPasswordScreen = () => {
                   />
                 </Text>
               </View>
-            </ViewTransition>
-            <ViewTransition
+            </Animated.View>
+            <Animated.View
               testID="azzapp__ForgotPasswordScreen__ViewTransition-email"
-              style={[
-                styles.viewtransition,
-                { width: screenWidth, opacity: isSubmitted ? 0 : 1 },
-              ]}
-              transitionDuration={300}
-              transitions={['opacity']}
+              style={[styles.viewtransition, formEmailAnimatedStyle]}
             >
               <View style={styles.logoContainer}>
                 <Image
@@ -162,7 +176,7 @@ const ForgotPasswordScreen = () => {
                   disabled={!isValidMailOrPhone}
                 />
               </Submit>
-            </ViewTransition>
+            </Animated.View>
           </Form>
         </View>
       </KeyboardAvoidingView>

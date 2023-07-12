@@ -14,6 +14,14 @@
     {
       "splitTerminals": [
         {
+          "name": "rn watch",
+          "commands": ["cd packages/app", "yarn typecheck --watch"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
           "name": "auth",
           "commands": ["cd packages/auth", "yarn dev"]
         }

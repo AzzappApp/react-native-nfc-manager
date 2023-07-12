@@ -45,4 +45,5 @@ export default relayScreen(HomeScreen, {
   fallback: HomeScreenFallback,
 });
 
+//7 second was really to long, we need a timeout that the user can't feel
 const READY_TIMEOUT = 1000;

@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '#helpers/relayScreen';
+import useAnimatedState from '#hooks/useAnimatedState';
 import Container from '#ui/Container';
 import SearchBar from '#ui/SearchBar';
-import ViewTransition from '#ui/ViewTransition';
 import RecentSearch from './RecentSearch';
 import SearchTabContainer from './SearchTabContainer';
 import useRecentSearch from './useRecentSearch';
@@ -76,6 +80,22 @@ export const SearchScreen = ({
 
   const insets = useSafeAreaInsets();
 
+  const timer = useAnimatedState(searchBarHasFocus, {
+    duration: ANIMATION_DURATION,
+  });
+
+  const searchBarAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(timer.value, [0, 1], [1, 0]),
+    };
+  }, [timer]);
+
+  const recentBarAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: timer.value,
+    };
+  }, [timer]);
+
   return (
     <Container style={[styles.flexOne, { paddingTop: insets.top }]}>
       <SearchBar
@@ -94,26 +114,14 @@ export const SearchScreen = ({
       />
       <View style={styles.flexOne}>
         {showWall && (
-          <ViewTransition
-            transitionDuration={ANIMATION_DURATION}
-            transitions={['opacity']}
-            style={[
-              styles.wallViewTransition,
-              {
-                opacity: searchBarHasFocus ? 0 : 1,
-              },
-            ]}
+          <Animated.View
+            style={[styles.wallViewTransition, searchBarAnimatedStyle]}
           >
             <WallRecommendation viewer={viewer} hasFocus={hasFocus} />
-          </ViewTransition>
+          </Animated.View>
         )}
-        <ViewTransition
-          transitionDuration={ANIMATION_DURATION}
-          transitions={['opacity']}
-          style={[
-            styles.viewTransitionRecent,
-            { opacity: searchBarHasFocus ? 1 : 0 },
-          ]}
+        <Animated.View
+          style={[styles.viewTransitionRecent, recentBarAnimatedStyle]}
           pointerEvents={searchBarHasFocus ? 'auto' : 'none'}
           testID="azzaap_searchScreeb-RecentSearch_viewTransition"
         >
@@ -123,7 +131,7 @@ export const SearchScreen = ({
             removeSearch={removeRecentSearchItem}
             search={onSubmittedSearch}
           />
-        </ViewTransition>
+        </Animated.View>
         {showTabView && (
           <SearchTabContainer
             searchValue={searchValueSubmitted}

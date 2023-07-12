@@ -11,8 +11,6 @@ import TrendingPostsList from '../TrendingPostsList';
 import type { PostRendererProps } from '#components/PostList/PostRenderer';
 import type { TrendingPostsListTestQuery } from '@azzapp/relay/artifacts/TrendingPostsListTestQuery.graphql';
 
-jest.mock('#ui/ViewTransition', () => 'ViewTransition');
-
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
 
 jest.mock('react-native', () => {

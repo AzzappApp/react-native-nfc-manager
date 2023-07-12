@@ -1,27 +1,37 @@
-import { forwardRef } from 'react';
-import { Platform } from 'react-native';
+import { forwardRef, useCallback, useMemo } from 'react';
+import { Platform, StyleSheet } from 'react-native';
+import {
+  Easing,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
-import { getPressableStyle } from '#helpers/gestureHelpers';
-import PressableTransition from './PressableTransition';
-import ViewTransition from './ViewTransition';
-import type { Easing } from './ViewTransition';
+import PressableAnimated from './PressableAnimated';
+
+import type { PressableAnimatedProps } from './PressableAnimated';
 import type { ForwardedRef } from 'react';
 import type {
-  ColorValue,
-  PressableProps,
   View,
+  EasingFunction,
   PressableStateCallbackType,
+  ViewStyle,
+  StyleProp,
 } from 'react-native';
+import type { EasingFunctionFactory } from 'react-native-reanimated';
 
-type PressableScaleHighlight = PressableProps & {
-  highlightColor?: ColorValue;
+type PressableScaleHighlight = Omit<PressableAnimatedProps, 'style'> & {
+  highlightColor?: string;
   activeScale?: number;
   scale?: number;
   opacity?: number;
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;
-  easing?: Easing;
+  easing?: EasingFunction | EasingFunctionFactory;
+  style: StyleProp<ViewStyle>;
 };
 
 const PressableScaleHighlight = (
@@ -33,62 +43,70 @@ const PressableScaleHighlight = (
     activeOpacity = 0.5,
     disabledOpacity = 0.5,
     animationDuration = 150,
-    easing = 'ease-in-out',
+    easing = Easing.inOut(Easing.ease),
     disabled,
     children,
     style,
     ...props
   }: PressableScaleHighlight,
   ref: ForwardedRef<View>,
-) => (
-  <PressableTransition
-    style={state => [
-      getPressableStyle(style, state),
-      { transform: [{ scale: state.pressed ? activeScale : scale }] },
-    ]}
-    ref={ref}
-    disabled={disabled}
-    transitionDuration={animationDuration}
-    transitions={['transform']}
-    easing={easing}
-    {...props}
-  >
-    {(state: PressableStateCallbackType) => {
-      return (
-        <>
-          <ViewTransition
-            transitionDuration={animationDuration / 2}
-            transitions={['backgroundColor']}
-            easing={easing}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              zIndex: -1,
-              backgroundColor: state.pressed
-                ? highlightColor
-                : 'rgba(255,255,255,0)',
-            }}
-          />
-          <ViewTransition
-            transitionDuration={animationDuration}
-            transitions={['opacity']}
-            easing={easing}
-            style={{
-              flex: 1,
-              opacity: disabled
-                ? disabledOpacity
-                : state.pressed && Platform.OS !== 'android'
-                ? activeOpacity
-                : opacity,
-            }}
-          >
-            {typeof children === 'function' ? children(state) : children}
-          </ViewTransition>
-        </>
-      );
-    }}
-  </PressableTransition>
-);
+) => {
+  const bgColor = useMemo(() => {
+    const forcedStyle = StyleSheet.flatten(style) as Omit<ViewStyle, 'false'>; //don't manage other way
+    if (forcedStyle?.backgroundColor) {
+      return forcedStyle?.backgroundColor;
+    }
+    return 'rgba(255,255,255,0)';
+  }, [style]);
+
+  const pressed = useSharedValue(0);
+
+  const onPressIn = useCallback(() => {
+    pressed.value = withTiming(1, { duration: animationDuration, easing });
+  }, [animationDuration, easing, pressed]);
+
+  const onPressOut = useCallback(() => {
+    pressed.value = withTiming(0, { duration: animationDuration, easing });
+  }, [animationDuration, easing, pressed]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor:
+        Platform.OS === 'ios'
+          ? interpolateColor(
+              pressed.value,
+              [0, 1],
+              [bgColor as string, highlightColor],
+            )
+          : bgColor,
+      opacity: disabled
+        ? disabledOpacity
+        : interpolate(pressed.value, [0, 1], [opacity, activeOpacity]),
+      transform: [
+        { scale: interpolate(pressed.value, [0, 1], [scale, activeScale]) },
+      ],
+    };
+  }, [pressed, highlightColor, scale, activeScale, opacity, activeOpacity]);
+
+  return (
+    <PressableAnimated
+      ref={ref}
+      disabled={disabled}
+      {...props}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      style={[style, animatedStyle]}
+      android_ripple={{
+        foreground: true,
+        borderless: false,
+        color: highlightColor,
+      }}
+    >
+      {(state: PressableStateCallbackType) => {
+        return typeof children === 'function' ? children(state) : children;
+      }}
+    </PressableAnimated>
+  );
+};
 
 export default forwardRef(PressableScaleHighlight);

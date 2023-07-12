@@ -91,6 +91,7 @@ const CountryCodeListWithOptions = <T extends string>({
                 return (
                   <PressableBackground
                     key={type}
+                    highlightColor={colors.grey400}
                     onPress={() => onSelect(type)}
                     style={[
                       styles.emailItem,

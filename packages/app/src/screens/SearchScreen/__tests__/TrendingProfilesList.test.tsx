@@ -10,8 +10,6 @@ import TrendingProfilesList from '../TrendingProfilesList';
 import type { CoverRendererProps } from '#components/CoverRenderer';
 import type { TrendingProfilesListTestQuery } from '@azzapp/relay/artifacts/TrendingProfilesListTestQuery.graphql';
 
-jest.mock('#ui/ViewTransition', () => 'ViewTransition');
-
 jest.mock('#components/CoverLink', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createElement } = require('react');
@@ -43,6 +41,13 @@ const CARD = {
       id: 'text_preview_media_id',
       largeURI: 'text_preview_large_uri',
       smallURI: 'text_preview_small_uri',
+    },
+    foreground: {
+      largeURI: 'foreground_large_uri',
+      smallURI: 'foreground_small_uri',
+    },
+    foregroundStyle: {
+      color: '#343434',
     },
     title: 'User card title',
     subTitle: 'User card subtitle',
