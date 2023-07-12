@@ -77,7 +77,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           yarn bump-version canary
-          yarn write-changelog
+          yarn write-dev-changelog
           git add .
           git commit -m "chore: bump version [skip ci]"
           git push origin main
