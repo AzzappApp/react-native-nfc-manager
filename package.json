@@ -31,7 +31,7 @@
     "update-graphql-schema": "yarn graphql-codegen",
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo",
     "release": "node ./scripts/release.js",
-    "bump-version": "node ./scripts/bump-version.js",
+    "bump-version": "node ./scripts/bumpVersion.js",
     "write-dev-changelog": "node ./scripts/writeDevChangeLog.js"
   },
   "devScripts": [
