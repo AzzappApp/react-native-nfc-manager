@@ -6,6 +6,7 @@ import {
   createUser,
   getUserByEmail,
   getUserByPhoneNumber,
+  getUserProfiles,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -13,6 +14,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { handleSigninAuthMethod } from '#helpers/auth';
 
 type SignupBody = {
   email?: string | null;
@@ -41,7 +43,23 @@ export const POST = async (req: Request) => {
           { status: 400 },
         );
       }
-      if (await getUserByEmail(email)) {
+      const user = await getUserByEmail(email);
+      if (user != null) {
+        //try to login the user
+        try {
+          //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+          // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
+          if (user?.password && bcrypt.compareSync(password, user.password)) {
+            // we can log the user
+            const [profile] = await getUserProfiles(user.id);
+            return await handleSigninAuthMethod(authMethod, user, profile);
+          }
+        } catch (error) {
+          return NextResponse.json(
+            { message: ERRORS.EMAIL_ALREADY_EXISTS },
+            { status: 400 },
+          );
+        }
         return NextResponse.json(
           { message: ERRORS.EMAIL_ALREADY_EXISTS },
           { status: 400 },
@@ -50,7 +68,23 @@ export const POST = async (req: Request) => {
     }
 
     if (isInternationalPhoneNumber(phoneNumber)) {
-      if (await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!))) {
+      const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!));
+      if (user != null) {
+        //try to login the user
+        try {
+          //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+          // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
+          if (user?.password && bcrypt.compareSync(password, user.password)) {
+            // we can log the user
+            const [profile] = await getUserProfiles(user.id);
+            await handleSigninAuthMethod(authMethod, user, profile);
+          }
+        } catch (error) {
+          return NextResponse.json(
+            { message: ERRORS.PHONENUMBER_ALREADY_EXISTS },
+            { status: 400 },
+          );
+        }
         return NextResponse.json(
           { message: ERRORS.PHONENUMBER_ALREADY_EXISTS },
           { status: 400 },

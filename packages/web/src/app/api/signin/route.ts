@@ -1,7 +1,5 @@
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { destroySession, setSession } from '@azzapp/auth/session';
-import { generateTokens } from '@azzapp/auth/tokens';
 import {
   getProfileByUserName,
   getUserByEmail,
@@ -15,6 +13,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { handleSigninAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import type { Profile, User } from '@azzapp/data/domains';
 
@@ -61,35 +60,17 @@ const signin = async (req: Request) => {
       );
     }
 
+    //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+    // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (!bcrypt.compareSync(password, user.password)) {
       return NextResponse.json(
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
       );
     }
-
-    if (authMethod === 'token') {
-      const { token, refreshToken } = await generateTokens({
-        userId: user.id,
-        profileId: profile?.id,
-      });
-      return destroySession(
-        NextResponse.json({
-          ok: true,
-          profileId: profile?.id,
-          token,
-          refreshToken,
-        }),
-      );
-    } else {
-      return setSession(NextResponse.json({ profileId: profile?.id }), {
-        userId: user.id,
-        profileId: profile?.id,
-        isAnonymous: false,
-      });
-    }
+    return await handleSigninAuthMethod(authMethod, user, profile);
   } catch (error) {
-    console.error('Singin error');
+    console.error('Signin error');
     console.error(typeof error);
     console.error(error);
     return NextResponse.json(

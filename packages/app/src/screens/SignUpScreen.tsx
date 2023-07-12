@@ -12,10 +12,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  isNotFalsyString,
   isPhoneNumber,
   isValidEmail,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
+import { mainRoutes, newProfileRoute } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { useRouter } from '#components/NativeRouter';
@@ -112,7 +114,7 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
-      let tokens: TokensResponse;
+      let tokens: TokensResponse & { profileId?: string; userId?: string };
       try {
         setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
@@ -125,6 +127,39 @@ const SignupScreen = () => {
             ).formatInternational(),
             password,
           });
+        }
+        if (isNotFalsyString(tokens.userId)) {
+          // Signin process
+          const profileId = tokens.profileId;
+          await dispatchGlobalEvent({
+            type: 'SIGN_IN',
+            payload: {
+              authTokens: {
+                token: tokens.token,
+                refreshToken: tokens.refreshToken,
+              },
+              profileId,
+            },
+          });
+          if (profileId) {
+            router.replaceAll(mainRoutes);
+          } else {
+            router.replaceAll(newProfileRoute);
+          }
+          return;
+        } else {
+          await dispatchGlobalEvent({
+            type: 'SIGN_UP',
+            payload: {
+              authTokens: {
+                token: tokens.token,
+                refreshToken: tokens.refreshToken,
+              },
+            },
+          });
+          router.replace({ route: 'NEW_PROFILE' });
+          setIsSubmitting(false);
+          return;
         }
       } catch (error: any) {
         if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
@@ -154,12 +189,6 @@ const SignupScreen = () => {
         setIsSubmitting(false);
         return;
       }
-
-      await dispatchGlobalEvent({
-        type: 'SIGN_UP',
-        payload: { authTokens: tokens },
-      });
-      router.replace({ route: 'NEW_PROFILE' });
     }
   }, [
     checkedPrivacy,
