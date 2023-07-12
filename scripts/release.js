@@ -1,70 +1,7 @@
 const { execSync } = require('child_process');
-const path = require('path');
 const { Octokit: GitHubAPI } = require('@octokit/rest');
-const gitStream = require('git-spawned-stream');
-
-const semVer = require('semver');
-const taggedVersions = require('tagged-versions');
-
-const loadCommits = rev => {
-  const repoPath = path.join(process.cwd(), '.git');
-  const inner = Date.now();
-  const outer = inner - 1;
-
-  // How the output shoud look like
-  const spec = ['s', 'n', 'ae', 'b'];
-  const format = `${inner}%${spec.join(`${inner}%`)}${outer}`;
-
-  return new Promise(resolve => {
-    const stream = gitStream(repoPath, [
-      'rev-list',
-      `--pretty=format:${format}`,
-      '--header',
-      rev || 'HEAD',
-    ]);
-
-    let commits = [];
-
-    stream.on('data', data => {
-      const parts = data
-        .toString('utf8')
-        .split(outer)
-        .map(item => {
-          const trimmed = item.trim();
-
-          if (trimmed.length === 0) {
-            return null;
-          }
-
-          const splitted = trimmed.split(inner);
-          const details = splitted.map(i => i.trim()).filter(i => i);
-
-          return {
-            hash: details[0].split(' ')[1],
-            title: details[1] || '',
-            description: details[3] || '',
-            author: details[2],
-          };
-        })
-        .filter(i => i);
-
-      commits = commits.concat(parts);
-    });
-
-    stream.on('error', () => {
-      console.error('Failed to load commits');
-      process.exit(1);
-    });
-
-    stream.on('end', () => resolve(commits));
-  });
-};
-
-const formatCommit = ({ scope, message }) => {
-  return `* ${scope ? `**${scope}:** ` : ''}${message}`;
-};
-
-const BREAKING_CHANGE_PATTERN = /BREAKING CHANGE/g;
+const buildChangeLog = require('./buildChangeLog');
+const setWorkspaceVersions = require('./setWorkspaceVersions');
 
 const main = async () => {
   const args = process.argv.slice(2);
@@ -96,84 +33,10 @@ const main = async () => {
     }
   });
 
-  const currentVersion = require('../package.json').version;
-  console.log('Checking previous versions...');
-  const tags = (await taggedVersions.getList())
-    .filter(
-      tag =>
-        (prerelease || !semVer.prerelease(tag.version)) &&
-        semVer.lt(tag.version, currentVersion),
-    )
-    .sort((a, b) => semVer.rcompare(a.version, b.version));
-
-  const lastTag = tags?.[0];
-
-  console.log('Retriving commits...');
-  const commits = await loadCommits(lastTag ? `${lastTag.hash}..HEAD` : null);
-
-  console.log('Determining version and building change log...');
-  const increment = majorInc
-    ? 'major'
-    : commits.some(c =>
-        BREAKING_CHANGE_PATTERN.test(c.title) ||
-        BREAKING_CHANGE_PATTERN.test(c.description)
-          ? 'minor'
-          : 'patch',
-      );
-
-  const lastReleasedVersion = lastTag ? lastTag.version : currentVersion;
-  const [major, minor, patch] = lastReleasedVersion.split('-')[0].split('.');
-
-  let nextVersion = '';
-  switch (increment) {
-    case 'major':
-      nextVersion = `${Number(major) + 1}.0.0`;
-      break;
-    case 'minor':
-      nextVersion = `${major}.${Number(minor) + 1}.0`;
-      break;
-    default:
-      nextVersion = `${major}.${minor}.${Number(patch) + 1}`;
-      break;
-  }
-  if (prerelease) {
-    nextVersion = `${nextVersion}-rc.0`;
-  }
-
-  const commitPattern = /^(\w+)(?:\(([\w\s]+)\))?: (.+)$/;
-  const commitsByTypes = commits.reduce((acc, commit) => {
-    const match = commit.title.match(commitPattern);
-    if (!match) {
-      return acc;
-    }
-    const [, type, scope, message] = commit.title.match(commitPattern);
-
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push({
-      scope,
-      message,
-      description: commit.description,
-    });
-    return acc;
-  }, {});
-
-  const features = commitsByTypes['feat']?.map(formatCommit).join('\n');
-  const fixes = commitsByTypes['fix']?.map(formatCommit).join('\n');
-  const changeLog = [
-    `## ${nextVersion}`,
-    features ? ['### Features', features] : [],
-    fixes ? ['### Fixes', fixes] : [],
-  ]
-    .flat(Infinity)
-    .join('\n\n');
+  const { nextVersion, changeLog } = await buildChangeLog(prerelease, majorInc);
 
   console.log('Updating worskpace version...');
-  execSync(`node scripts/setWorkspaceVersions.js ${nextVersion}`);
-  execSync(
-    `yarn react-native-version -A -r --generate-build --skip-tag packages/app`,
-  );
+  setWorkspaceVersions(nextVersion);
 
   console.log('Commiting changes...');
   execSync(`git add .`);

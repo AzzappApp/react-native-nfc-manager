@@ -31,7 +31,8 @@
     "update-graphql-schema": "yarn graphql-codegen",
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo",
     "release": "node ./scripts/release.js",
-    "bump-version": "(node ./scripts/setWorkspaceVersions.js $(node ./scripts/getNextVersion.js canary)) && yarn react-native-version -A -r --generate-build --skip-tag packages/app"
+    "bump-version": "node ./scripts/bump-version.js",
+    "write-dev-changelog": "node ./scripts/writeDevChangeLog.js"
   },
   "devScripts": [
     "relay:watch",
