@@ -1,5 +1,6 @@
-## 0.1.3-canary.3
+## 0.1.3-canary.4
 
+* **feat:**  - **contactCard:** [#556](https://github.com/AzzappApp/azzapp/pull/556) add pass to apple wallet ([#655](https://github.com/AzzappApp/azzapp/pull/655))
 * **feat:**  - remove ViewTransition ([#661](https://github.com/AzzappApp/azzapp/pull/661))
 * **feat:**  - Sign the user is when trying the create an account wiht right c… ([#663](https://github.com/AzzappApp/azzapp/pull/663))
 * **build:**  - add drizzle studio command ([#664](https://github.com/AzzappApp/azzapp/pull/664))
