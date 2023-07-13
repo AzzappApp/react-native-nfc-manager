@@ -3,24 +3,28 @@
  */
 import { fromGlobalId } from 'graphql-relay';
 import { fetchJSON, postFormData } from './networkHelpers';
+import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
 
-type FetchFunction = (input: RequestInfo, init: RequestInit) => Promise<any>;
-
 type APIMethod<Params, ReturnType> = (
   params: Params,
-  init?: RequestInit & { fetchFunction?: typeof fetchJSON },
+  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
+) => Promise<ReturnType>;
+
+type APIMethodWithOptionalInit<Params, ReturnType> = (
+  params: Params,
+  init?: RequestInit,
 ) => Promise<ReturnType>;
 
 type APIMethodWithoutParams<ReturnType> = (
-  init?: RequestInit & { fetchFunction?: typeof fetchJSON },
+  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
 ) => Promise<ReturnType>;
 
-const apiFetch = (
+const apiFetch = <ReturnType>(
   input: RequestInfo,
-  init: RequestInit & { fetchFunction?: FetchFunction },
-) => (init.fetchFunction ?? fetchJSON)(input, init);
+  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
+): Promise<ReturnType> => init.fetchFunction(input, init);
 
 export type SignUpParams = {
   password: string;
@@ -125,21 +129,23 @@ export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
     body: JSON.stringify(data),
   });
 
-export const refreshTokens: APIMethod<string, TokensResponse> = (
-  refreshToken,
-  init,
-) =>
+export const refreshTokens: APIMethodWithOptionalInit<
+  string,
+  TokensResponse
+> = (refreshToken, init) =>
   apiFetch(`${API_ENDPOINT}/refreshTokens`, {
     ...init,
+    fetchFunction: fetchJSON as FetchFunction<TokensResponse>,
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
 
-export const logout: APIMethodWithoutParams<void> = init =>
-  apiFetch(`${API_ENDPOINT}/logout`, {
+export const logout: APIMethodWithoutParams<void> = async init => {
+  await apiFetch(`${API_ENDPOINT}/logout`, {
     ...init,
     method: 'POST',
   });
+};
 
 export const uploadSign: APIMethod<
   { kind: 'image' | 'video'; target: 'cover' | 'post' },
@@ -174,4 +180,22 @@ export const verifySign: APIMethod<
     ...init,
     method: 'POST',
     body: JSON.stringify({ signature, data, salt }),
+  });
+
+export const getAppleWalletPass = (
+  { locale }: { locale: string },
+  init: RequestInit & { fetchFunction: typeof fetchBlob },
+) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple`, {
+    ...init,
+    method: 'GET',
+  });
+
+export const getGoogleWalletPass: APIMethod<
+  { locale: string },
+  { token: string }
+> = ({ locale }: { locale: string }, init) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google`, {
+    ...init,
+    method: 'GET',
   });

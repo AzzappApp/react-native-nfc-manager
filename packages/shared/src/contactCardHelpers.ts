@@ -1,25 +1,24 @@
 import { buildUserUrl } from './urlHelpers';
 
-export const serializeContactCard = (
-  username: string,
-  card: {
-    profileId: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    company?: string | null;
-    title?: string | null;
-    phoneNumbers?: Array<{
-      label: string;
-      number: string;
-      selected: boolean;
-    }> | null;
-    emails?: Array<{
-      label: string;
-      address: string;
-      selected: boolean;
-    }> | null;
-  },
-) => {
+export type ContactCard = {
+  profileId: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  company?: string | null;
+  title?: string | null;
+  phoneNumbers?: Array<{
+    label: string;
+    number: string;
+    selected: boolean;
+  }> | null;
+  emails?: Array<{
+    label: string;
+    address: string;
+    selected: boolean;
+  }> | null;
+};
+
+export const serializeContactCard = (username: string, card: ContactCard) => {
   const serializedContactCard = [
     card.profileId,
     card.firstName ?? '',

@@ -55,6 +55,10 @@
     "defaultMessage": "Font Size : {size}",
     "description": "fontSize message in BlockText edition"
   },
+  "/qoajU": {
+    "defaultMessage": "Error",
+    "description": "Error toast title"
+  },
   "/u5+bX": {
     "defaultMessage": "Press to edit this section of your profile",
     "description": "Accessibility hint for the profile block container"
@@ -902,6 +906,10 @@
   "LOvPdv": {
     "defaultMessage": "Crop",
     "description": "Crop image edition parameters name"
+  },
+  "LQZFWU": {
+    "defaultMessage": "Could not add pass to Apple Wallet",
+    "description": "Error toast message"
   },
   "LV5peF": {
     "defaultMessage": "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
@@ -2250,6 +2258,10 @@
   "q/ZByJ": {
     "defaultMessage": "Thermal",
     "description": "Thermal photo filter name"
+  },
+  "q14jQ4": {
+    "defaultMessage": "Add to Google Wallet",
+    "description": "Add to Google Wallet button label"
   },
   "q3qdLJ": {
     "defaultMessage": "Delete this post",

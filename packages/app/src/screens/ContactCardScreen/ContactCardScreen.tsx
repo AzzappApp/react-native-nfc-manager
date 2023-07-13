@@ -1,6 +1,16 @@
-import { useEffect } from 'react';
+import { addPass, addPassJWT } from '@reeq/react-native-passkit';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View, useWindowDimensions, Image } from 'react-native';
+import {
+  Pressable,
+  View,
+  useWindowDimensions,
+  Image,
+  useColorScheme,
+  Platform,
+} from 'react-native';
+import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
+import { fromByteArray } from 'react-native-quick-base64';
 import Animated, {
   Easing,
   FadeIn,
@@ -13,6 +23,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
@@ -20,8 +31,10 @@ import AccountHeader from '#components/AccountHeader';
 import ContactCard from '#components/ContactCard';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import ColorPreview from '#ui/ColorPreview';
 import Container from '#ui/Container';
@@ -178,6 +191,10 @@ const ContactCardScreen = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const [loadingPass, setLoadingPass] = useState(false);
+
+  const colorScheme = useColorScheme();
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container style={styles.container}>
@@ -331,22 +348,73 @@ const ContactCardScreen = ({
           )}
 
           <View style={styles.buttons}>
-            <PressableNative style={styles.addToWalletButton}>
-              <Image
-                source={require('#assets/wallet.png')}
-                style={{
-                  position: 'absolute',
-                  left: 4,
-                  marginVertical: 'auto',
-                }}
-              />
-              <Text variant="button" style={styles.addToWalletButtonText}>
-                <FormattedMessage
-                  defaultMessage="Add to Apple Wallet"
-                  description="Add to Apple Wallet button label"
+            <PressableNative
+              disabled={loadingPass}
+              style={styles.addToWalletButton}
+              onPress={async () => {
+                try {
+                  setLoadingPass(true);
+                  if (Platform.OS === 'ios') {
+                    const pass = await getAppleWalletPass({
+                      locale: intl.locale,
+                    });
+
+                    const base64Pass = fromByteArray(
+                      getArrayBufferForBlob(pass),
+                    );
+
+                    await addPass(base64Pass);
+                  } else if (Platform.OS === 'android') {
+                    const pass = await getGoogleWalletPass({
+                      locale: intl.locale,
+                    });
+
+                    await addPassJWT(pass.token);
+                  }
+                } catch (e) {
+                  console.log({ e });
+                  Toast.show({
+                    text1: intl.formatMessage({
+                      defaultMessage: 'Error',
+                      description: 'Error toast title',
+                    }),
+                    text2: intl.formatMessage({
+                      defaultMessage: 'Could not add pass to Apple Wallet',
+                      description: 'Error toast message',
+                    }),
+                    type: 'error',
+                  });
+                } finally {
+                  setLoadingPass(false);
+                }
+              }}
+            >
+              {loadingPass ? (
+                <ActivityIndicator
+                  color={colorScheme === 'dark' ? 'black' : 'white'}
+                  style={styles.addToWalletIcon}
                 />
+              ) : (
+                <Image
+                  source={require('#assets/wallet.png')}
+                  style={styles.addToWalletIcon}
+                />
+              )}
+              <Text variant="button" style={styles.addToWalletButtonText}>
+                {Platform.OS === 'ios' ? (
+                  <FormattedMessage
+                    defaultMessage="Add to Apple Wallet"
+                    description="Add to Apple Wallet button label"
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Add to Google Wallet"
+                    description="Add to Google Wallet button label"
+                  />
+                )}
               </Text>
             </PressableNative>
+
             {profile && (
               <ContactCardExportVcf
                 userName={profile.userName}
@@ -384,7 +452,11 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 27,
     height: 29,
   },
-  contactCardDescriptionText: { maxWidth: 255, textAlign: 'center' },
+  contactCardDescriptionText: {
+    maxWidth: 255,
+    textAlign: 'center',
+    color: appearance === 'light' ? colors.black : colors.white,
+  },
   footer: {
     alignItems: 'center',
     rowGap: 20,
@@ -399,6 +471,11 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'space-between',
   },
   buttons: { rowGap: 10, width: '100%' },
+  addToWalletIcon: {
+    position: 'absolute',
+    left: 4,
+    marginVertical: 'auto',
+  },
   addToWalletButton: {
     width: '100%',
     height: 47,

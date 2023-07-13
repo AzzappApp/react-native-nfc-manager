@@ -11,7 +11,7 @@ input ContactCardPhoneNumberInput {
 }
 
 input ContactCardStyleInput {
-  backgroundColor: String
+  backgroundColor: String!
 }
 
 input SaveContactCardInput {

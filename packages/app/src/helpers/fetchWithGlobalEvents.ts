@@ -1,5 +1,5 @@
 import { dispatchGlobalEvent } from './globalEvents';
-import type { fetchJSON } from '@azzapp/shared/networkHelpers';
+import type { FetchFunction } from '@azzapp/shared/networkHelpers';
 
 /**
  * An higher order function that wraps the fetch function and dispatches global events
@@ -9,11 +9,11 @@ import type { fetchJSON } from '@azzapp/shared/networkHelpers';
  * @returns A function that wraps the fetch function and dispatches global events
  */
 const fetchWithGlobalEvents =
-  (fetchFunction: typeof fetchJSON) =>
-  async <JSON = unknown>(
+  <ReturnType>(fetchFunction: FetchFunction<ReturnType>) =>
+  async <ReturnType = unknown>(
     input: RequestInfo,
     init?: RequestInit & { timeout?: number; retries?: number[] },
-  ): Promise<JSON> => {
+  ): Promise<ReturnType> => {
     let result: any;
     try {
       result = await fetchFunction(input, init);

@@ -2,7 +2,10 @@ import { View, Image } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useFragment, graphql } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import {
+  buildUserUrl,
+  buildUserUrlWithContactCard,
+} from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -37,8 +40,11 @@ const ContactCard = ({
 
   const styles = useStyleSheet(styleSheet);
 
-  // eslint-disable-next-line prettier/prettier
-  const contactCardUrl = `${buildUserUrl(userName)}?c=${encodeURIComponent(contactCard.serializedContactCard.data)}&s=${encodeURIComponent(contactCard.serializedContactCard.signature)}`;
+  const contactCardUrl = buildUserUrlWithContactCard(
+    userName,
+    contactCard.serializedContactCard.data,
+    contactCard.serializedContactCard.signature,
+  );
 
   return (
     <View style={[styles.webCardContainer, contactCard.backgroundStyle]}>

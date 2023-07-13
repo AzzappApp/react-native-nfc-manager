@@ -20,7 +20,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   const existingCard = await getContactCard(profileId);
 
   if (existingCard) {
-    const updatedCard = { ...existingCard, ...input };
+    const updatedCard = { ...existingCard, ...input, updatedAt: new Date() };
 
     await updateContactCard(updatedCard);
 

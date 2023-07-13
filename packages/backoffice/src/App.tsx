@@ -73,11 +73,16 @@ const App = () => {
   const authProvider = useMemo<AuthProvider>(
     () => ({
       login: async ({ username, password }) => {
-        await signin({
-          credential: username,
-          password,
-          authMethod: 'token',
-        }).then(tokens => {
+        await signin(
+          {
+            credential: username,
+            password,
+            authMethod: 'token',
+          },
+          {
+            fetchFunction: fetchJSON,
+          },
+        ).then(tokens => {
           setTokens(tokens);
         });
       },
@@ -123,4 +128,5 @@ export const injectToken = (token?: string, init?: RequestInit) => ({
   headers: token
     ? { ...init?.headers, Authorization: `Bearer ${token}` }
     : init?.headers,
+  fetchFunction: fetchJSON,
 });

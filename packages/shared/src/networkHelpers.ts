@@ -6,6 +6,11 @@ import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_RETRIES = [1000, 3000];
 
+export type FetchFunction<ReturnType> = (
+  input: RequestInfo,
+  init?: RequestInit,
+) => Promise<ReturnType>;
+
 /**
  * A function used to handle JSON request with parametrable timeout
  *
@@ -16,7 +21,7 @@ const DEFAULT_RETRIES = [1000, 3000];
  * added to the request - default true
  * @returns
  */
-export const fetchJSON = async <JSON = unknown>(
+export const fetchJSON = async <JSON>(
   input: RequestInfo,
   init?: RequestInit & { timeout?: number; retries?: number[] },
 ): Promise<JSON> => {
@@ -29,7 +34,7 @@ export const fetchJSON = async <JSON = unknown>(
     },
   };
 
-  const response: Response = await fetchWithRetries(input, init);
+  const response = await fetchWithRetries(input, init);
 
   if (response.ok) {
     try {
@@ -48,6 +53,31 @@ export const fetchJSON = async <JSON = unknown>(
     message: data.message ?? response.statusText,
     response,
     data,
+  });
+};
+
+export const fetchBlob = async (
+  input: RequestInfo,
+  init?: RequestInit & { timeout?: number; retries?: number[] },
+) => {
+  const response = await fetchWithRetries(input, init);
+
+  if (response.ok) {
+    try {
+      return response.blob();
+    } catch (e) {
+      throw new FetchError({
+        message: ERRORS.BLOB_DECODING_ERROR,
+        response,
+        data: { error: ERRORS.BLOB_DECODING_ERROR },
+      });
+    }
+  }
+  const data = await response.json().catch(() => ({}));
+
+  throw new FetchError({
+    message: data.message ?? response.statusText,
+    response,
   });
 };
 

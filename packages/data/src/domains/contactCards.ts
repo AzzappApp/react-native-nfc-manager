@@ -2,12 +2,16 @@ import { eq, type InferModel } from 'drizzle-orm';
 import {
   varchar,
   customType,
-  json,
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
+  datetime,
 } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH } from './db';
+import db, {
+  DEFAULT_DATETIME_PRECISION,
+  DEFAULT_DATETIME_VALUE,
+  DEFAULT_VARCHAR_LENGTH,
+} from './db';
 import { customTinyInt } from './generic';
 import type { Profile } from './profiles';
 import type { User } from './users';
@@ -48,9 +52,19 @@ export const ContactCardTable = mysqlTable('ContactCard', {
     .notNull(),
   public: customTinyInt('public').default(false),
   isDisplayedOnWebCard: customTinyInt('isDisplayedOnWebCard').default(false),
-  backgroundStyle: json('backgroundStyle').default({
+  backgroundStyle: customType<{ data: { backgroundColor?: string } }>({
+    toDriver: value => JSON.stringify(value),
+    fromDriver: value => value as { backgroundColor?: string },
+    dataType: () => 'json',
+  })('backgroundStyle').default({
     backgroundColor: '#000000',
   }),
+  updatedAt: datetime('updatedAt', {
+    mode: 'date',
+    fsp: DEFAULT_DATETIME_PRECISION,
+  })
+    .default(DEFAULT_DATETIME_VALUE)
+    .notNull(),
 });
 
 export type ContactCard = InferModel<typeof ContactCardTable>;
@@ -118,5 +132,6 @@ export const buildDefaultContactCard = (
     backgroundStyle: {
       backgroundColor: '#000000',
     },
+    updatedAt: profile.updatedAt,
   };
 };

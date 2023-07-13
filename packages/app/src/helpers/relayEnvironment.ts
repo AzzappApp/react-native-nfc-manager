@@ -1,4 +1,5 @@
 import createRelayEnvironment from '@azzapp/shared/createRelayEnvironment';
+import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { addAuthStateListener } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
@@ -12,7 +13,7 @@ const listeners: Array<() => void> = [];
 export const getRelayEnvironment = () => {
   if (!environment) {
     environment = createRelayEnvironment({
-      fetchFunction: fetchWithGlobalEvents(fetchWithAuthTokens),
+      fetchFunction: fetchWithGlobalEvents(fetchWithAuthTokens(fetchJSON)),
     });
     addAuthStateListener(resetEnvironment);
   }
