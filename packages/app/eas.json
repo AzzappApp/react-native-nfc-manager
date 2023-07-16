@@ -3,7 +3,11 @@
     "version": ">= 3.14.0"
   },
   "build": {
+    "base": {
+      "node": "18.12.0"
+    },
     "development": {
+      "extends": "base",
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleDebug"
@@ -18,6 +22,7 @@
       }
     },
     "staging": {
+      "extends": "base",
       "distribution": "internal",
       "ios": {
         "buildConfiguration": "Release",
@@ -29,6 +34,7 @@
       }
     },
     "production": {
+      "extends": "base",
       "ios": {
         "buildConfiguration": "Release",
         "scheme": "azzapp"
