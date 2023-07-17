@@ -1,5 +1,6 @@
-## 0.1.3-canary.5
+## 0.1.3-canary.6
 
+* **fix:**  - ContactCard background color is optional ([#678](https://github.com/AzzappApp/azzapp/pull/678))
 * **build:**  - use node 18 ([#676](https://github.com/AzzappApp/azzapp/pull/676))
 * **feat:**  - **contactCard:** [#556](https://github.com/AzzappApp/azzapp/pull/556) add pass to apple wallet ([#655](https://github.com/AzzappApp/azzapp/pull/655))
 * **feat:**  - remove ViewTransition ([#661](https://github.com/AzzappApp/azzapp/pull/661))
