@@ -30,7 +30,9 @@ import CarouselEditionBottomMenu from './CarouselEditionBottomMenu';
 import CarouselEditionMarginPanel from './CarouselEditionMarginPanel';
 import CarouselImagesEditionPanel from './CarouselImagesEditionPanel';
 import CarouselPreview from './CarouselPreview';
+import type { CarouselRawData } from '#components/cardModules/CarouselRenderer';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { StaticMediaResizeMode } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
 import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_module.graphql';
 import type { CarouselEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_viewer.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
@@ -86,6 +88,7 @@ const CarouselEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -105,6 +108,7 @@ const CarouselEditionScreen = ({
         }
         moduleBackgrounds {
           id
+          resizeMode
           uri
         }
       }
@@ -360,27 +364,28 @@ const CarouselEditionScreen = ({
 
   // #endregion
   const previewData = useMemo(
-    () => ({
-      images: images.map(image =>
-        'local' in image
-          ? {
-              id: image.uri,
-              uri: image.uri,
-              aspectRatio: image.width / image.height,
-            }
-          : image,
-      ),
-      squareRatio,
-      borderSize,
-      borderColor,
-      borderRadius,
-      marginVertical,
-      marginHorizontal,
-      imageHeight,
-      gap,
-      background,
-      backgroundStyle,
-    }),
+    () =>
+      ({
+        images: images.map(image =>
+          'local' in image
+            ? {
+                id: image.uri,
+                uri: image.uri,
+                aspectRatio: image.width / image.height,
+              }
+            : image,
+        ),
+        squareRatio,
+        borderSize,
+        borderColor,
+        borderRadius,
+        marginVertical,
+        marginHorizontal,
+        imageHeight,
+        gap,
+        background,
+        backgroundStyle,
+      } satisfies CarouselRawData),
     [
       background,
       backgroundStyle,
@@ -606,6 +611,7 @@ type CarouseEditionValue = {
   gap: number;
   background: Readonly<{
     id: string;
+    resizeMode: StaticMediaResizeMode;
     uri: string;
   }> | null;
   backgroundStyle: Readonly<{

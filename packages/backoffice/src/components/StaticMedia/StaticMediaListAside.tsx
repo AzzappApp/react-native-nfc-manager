@@ -61,6 +61,32 @@ const StaticMediaListAside = () => {
             }}
           />
         </FilterList>
+        <FilterList label="Resize Mode" icon={undefined}>
+          <FilterListItem
+            label="Cover"
+            value={{
+              resizemode: 'cover',
+            }}
+          />
+          <FilterListItem
+            label="Contain"
+            value={{
+              resizeMode: 'contain',
+            }}
+          />
+          <FilterListItem
+            label="Center"
+            value={{
+              resizeMode: 'center',
+            }}
+          />
+          <FilterListItem
+            label="Repeat"
+            value={{
+              resizeMode: 'repeat',
+            }}
+          />
+        </FilterList>
       </div>
     </div>
   );

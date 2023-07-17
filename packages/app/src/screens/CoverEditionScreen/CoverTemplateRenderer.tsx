@@ -86,6 +86,7 @@ const CoveTemplateRenderer = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

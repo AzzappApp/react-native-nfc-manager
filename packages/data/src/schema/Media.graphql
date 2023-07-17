@@ -42,6 +42,7 @@ type StaticMedia {
   uri(width: Float, pixelRatio: Float): String!
   name: String
   usage: StaticMediaUsage!
+  resizeMode: StaticMediaResizeMode!
   tags: [String!]!
 }
 
@@ -49,6 +50,13 @@ enum StaticMediaUsage {
   coverBackground
   coverForeground
   moduleBackground
+}
+
+enum StaticMediaResizeMode {
+  cover
+  contain
+  center
+  repeat
 }
 
 enum MediaKind {

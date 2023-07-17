@@ -1,14 +1,10 @@
 import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './SimpleButtonRenderer.css';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from '../ModuleRenderer';
 
-export type SimpleButtonRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type SimpleButtonRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 /**
  * Render a SimpleButton module
  */

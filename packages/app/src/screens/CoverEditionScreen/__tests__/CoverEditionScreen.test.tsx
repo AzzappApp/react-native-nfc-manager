@@ -330,6 +330,7 @@ describe('CoverEditionScreen', () => {
     data: {
       background: {
         id: 'coverBackgroundIdTemplate',
+        resizeMode: 'cover',
       },
       backgroundStyle: {
         backgroundColor: '#FFFF00',
@@ -378,6 +379,7 @@ describe('CoverEditionScreen', () => {
     background: {
       id: 'coverBackgroundId2',
       uri: 'https://example.com/coverBackground2.png',
+      resizeMode: 'cover',
     },
     backgroundStyle: {
       backgroundColor: '#FF0000',

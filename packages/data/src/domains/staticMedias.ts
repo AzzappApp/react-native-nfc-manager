@@ -23,6 +23,12 @@ export const StaticMediaTable = mysqlTable('StaticMedia', {
     'moduleBackground',
   ]).notNull(),
   name: varchar('name', { length: DEFAULT_VARCHAR_LENGTH }),
+  resizeMode: mysqlEnum('resizeMode', [
+    'cover',
+    'contain',
+    'center',
+    'repeat',
+  ]).default('cover'),
   available: customTinyInt('available').default(true).notNull(),
   createdAt: datetime('createdAt', {
     mode: 'date',

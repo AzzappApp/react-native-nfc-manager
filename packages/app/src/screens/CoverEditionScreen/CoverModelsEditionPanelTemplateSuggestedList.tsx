@@ -266,6 +266,7 @@ const TemplateSuggestionItem = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

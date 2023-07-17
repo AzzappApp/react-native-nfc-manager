@@ -70,6 +70,7 @@ const StaticMediaList = () => {
         />
 
         <FunctionField label="Type" render={renderType} />
+        <TextField label="Resize Mode" source="resizeMode" />
         <TextField label="Name" source="name" />
         <DateField label="Creation Date" source="createdAt" />
       </Datagrid>

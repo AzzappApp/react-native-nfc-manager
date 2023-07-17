@@ -18,6 +18,10 @@ const validateForm = (values: Record<string, any>): Record<string, any> => {
     errors.name = 'Name is required';
   }
 
+  if (!values.resizeMode) {
+    errors.resizeMode = 'Resize Mode is required';
+  }
+
   return errors;
 };
 
@@ -80,6 +84,19 @@ const StaticMediaEdit = () => {
               { id: 'coverForeground', name: 'Cover Foreground' },
               { id: 'coverBackground', name: 'Cover Background' },
               { id: 'moduleBackground', name: 'Module Background' },
+            ]}
+          />
+        </div>
+        <SectionTitle label="Resize Mode" />
+        <div style={{ marginBottom: 20 }}>
+          <RadioButtonGroupInput
+            source="resizeMode"
+            label=""
+            choices={[
+              { id: 'cover', name: 'Cover' },
+              { id: 'contain', name: 'Contain' },
+              { id: 'center', name: 'Center' },
+              { id: 'repeat', name: 'Repeat' },
             ]}
           />
         </div>

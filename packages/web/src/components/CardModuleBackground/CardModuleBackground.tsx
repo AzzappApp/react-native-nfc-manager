@@ -12,6 +12,7 @@ type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   } | null;
   containerStyle?: React.CSSProperties;
   containerClassName?: string;
+  resizeModes?: Map<string, string>;
 };
 
 const CardModuleBackground = ({
@@ -21,6 +22,7 @@ const CardModuleBackground = ({
   style,
   containerStyle,
   containerClassName,
+  resizeModes,
   ...props
 }: CardModuleBackgroundProps) => {
   const {
@@ -28,6 +30,18 @@ const CardModuleBackground = ({
     patternColor,
     opacity = 100,
   } = backgroundStyle ?? {};
+
+  const resizeMode =
+    backgroundId && resizeModes?.get
+      ? resizeModes?.get?.(backgroundId)
+      : 'cover';
+
+  const classnames = cx(styles.background, {
+    [styles.backgroundCover]: resizeMode === 'cover',
+    [styles.backgroundContain]: resizeMode === 'contain',
+    [styles.backgroundCenter]: resizeMode === 'center',
+    [styles.backgroundRepeat]: resizeMode === 'repeat',
+  });
 
   return (
     <div
@@ -41,11 +55,14 @@ const CardModuleBackground = ({
       {backgroundId && (
         <div
           style={{
-            backgroundColor: convertHexToRGBA(patternColor ?? '#FFF', opacity),
+            backgroundColor: convertHexToRGBA(
+              patternColor ?? '#ff0000',
+              opacity,
+            ),
             WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,
             maskImage: `url(${getImageURL(backgroundId)}.svg)`,
           }}
-          className={styles.background}
+          className={classnames}
         />
       )}
       <div

@@ -1,12 +1,8 @@
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
 
-export type LineDividerRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type LineDividerRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a line divider module

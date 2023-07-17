@@ -1,17 +1,14 @@
 import 'server-only';
-import { getMediasByIds, type CardModule } from '@azzapp/data/domains';
+import { getMediasByIds } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './CarouselRenderer.css';
+import type { ModuleRendererProps } from '../ModuleRenderer';
 
-export type CarouselRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type CarouselRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a carousel module

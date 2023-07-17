@@ -48,6 +48,7 @@ const SimpleButtonRenderer = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

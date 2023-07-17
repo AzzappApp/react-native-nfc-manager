@@ -8,7 +8,9 @@ import {
   getProfilesPostsWithTopComment,
   getUsersCards,
   getProfilesPostsCount,
+  getStaticMediasByIds,
 } from '@azzapp/data/domains';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
 import ProfilePageLayout from './ProfilePageLayout';
 
@@ -19,60 +21,80 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { profile, card, cover, modules, media, posts, postsCount } =
-    await unstable_cache(
-      async () => {
-        const profile = await getProfileByUserName(userName);
+  const {
+    profile,
+    card,
+    cover,
+    modules,
+    media,
+    posts,
+    postsCount,
+    backgrounds,
+  } = await unstable_cache(
+    async () => {
+      const profile = await getProfileByUserName(userName);
 
-        try {
-          if (profile) {
-            const [[card], posts, postsCount] = await Promise.all([
-              getUsersCards([profile.id]),
-              getProfilesPostsWithTopComment(profile.id, 5, 0),
-              getProfilesPostsCount(profile.id),
+      try {
+        if (profile) {
+          const [[card], posts, postsCount] = await Promise.all([
+            getUsersCards([profile.id]),
+            getProfilesPostsWithTopComment(profile.id, 5, 0),
+            getProfilesPostsCount(profile.id),
+          ]);
+
+          if (card) {
+            const [[cover], modules] = await Promise.all([
+              getCardCoversByIds([card.coverId]),
+              getCardModules(card.id),
             ]);
 
-            if (card) {
-              const [[cover], modules] = await Promise.all([
-                getCardCoversByIds([card.coverId]),
-                getCardModules(card.id),
-              ]);
+            if (cover) {
+              const [media] = await getMediasByIds([cover.mediaId]);
+              const backgrounds = await getStaticMediasByIds(
+                convertToNonNullArray(
+                  modules.map(module => module.data.backgroundId),
+                ),
+              );
 
-              if (cover) {
-                const [media] = await getMediasByIds([cover.mediaId]);
-                return {
-                  profile,
-                  card,
-                  cover,
-                  modules,
-                  media,
-                  posts,
-                  postsCount,
-                };
-              }
+              return {
+                profile,
+                card,
+                cover,
+                modules,
+                media,
+                posts,
+                postsCount,
+                backgrounds,
+              };
             }
           }
-        } catch (e) {
-          console.error(e);
         }
+      } catch (e) {
+        console.error(e);
+      }
 
-        return {
-          profile,
-          card: undefined,
-          cover: undefined,
-          modules: [],
-          media: undefined,
-          posts: [],
-          postsCount: 0,
-        };
-      },
-      [userName],
-      { tags: [userName] },
-    )();
+      return {
+        profile,
+        card: undefined,
+        cover: undefined,
+        modules: [],
+        media: undefined,
+        posts: [],
+        postsCount: 0,
+        backgrounds: [],
+      };
+    },
+    [userName],
+    { tags: [userName] },
+  )();
 
   if (!profile || !card || !cover || !media) {
     return notFound();
   }
+
+  const resizeModes = new Map(
+    convertToNonNullArray(backgrounds).map(b => [b.id, b.resizeMode!]),
+  );
 
   return (
     <ProfilePageLayout
@@ -81,7 +103,11 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
       modules={
         <>
           {modules.map(module => (
-            <ModuleRenderer module={module} key={module.id} />
+            <ModuleRenderer
+              resizeModes={resizeModes}
+              module={module}
+              key={module.id}
+            />
           ))}
         </>
       }

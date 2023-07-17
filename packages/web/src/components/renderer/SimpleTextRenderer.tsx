@@ -3,14 +3,10 @@ import {
   SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../CardModuleBackground';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
 
-type SimpleTextRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+type SimpleTextRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 const SimpleTextRenderer = ({
   module,

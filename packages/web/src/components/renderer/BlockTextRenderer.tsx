@@ -1,13 +1,9 @@
 import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../CardModuleBackground';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
 
-export type BlockTextRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type BlockTextRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a BlockText module

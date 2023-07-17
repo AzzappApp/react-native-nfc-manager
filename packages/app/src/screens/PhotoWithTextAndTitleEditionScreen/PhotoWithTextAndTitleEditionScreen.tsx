@@ -104,6 +104,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -122,6 +123,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

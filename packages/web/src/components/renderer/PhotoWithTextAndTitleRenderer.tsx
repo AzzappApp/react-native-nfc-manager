@@ -1,14 +1,10 @@
 import { PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../CardModuleBackground';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
 
-export type PhotoWithTextAndTitleRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type PhotoWithTextAndTitleRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a PhotoWithTextAndTitle module

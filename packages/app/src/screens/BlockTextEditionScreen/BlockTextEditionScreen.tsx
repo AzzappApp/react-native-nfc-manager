@@ -76,6 +76,7 @@ const BlockTextEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -95,6 +96,7 @@ const BlockTextEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

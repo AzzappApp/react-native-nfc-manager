@@ -35,6 +35,7 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
           marginVertical
           background {
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
@@ -52,6 +53,7 @@ const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
           marginVertical
           background {
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
@@ -112,6 +114,7 @@ export const SimpleTextRendererRaw = ({
       backgroundUri={background?.uri}
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
+      resizeMode={background?.resizeMode}
       style={[
         style,
         {

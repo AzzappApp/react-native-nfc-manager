@@ -46,6 +46,7 @@ const HorizontalPhotoRenderer = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

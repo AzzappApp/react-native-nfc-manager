@@ -70,6 +70,7 @@ const SimpleTextEditionScreen = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
@@ -88,6 +89,7 @@ const SimpleTextEditionScreen = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
@@ -113,6 +115,7 @@ const SimpleTextEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

@@ -4,14 +4,11 @@ import SocialIcon from '#ui/SocialIcons/SocialIcon';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './SocialLinksRenderer.css';
 import type { SocialIcons } from '#ui/SocialIcons/SocialIcon';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-export type SocialLinksRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+
+export type SocialLinksRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a SocialLinks module

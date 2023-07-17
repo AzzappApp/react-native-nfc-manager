@@ -49,6 +49,7 @@ const SocialLinksRenderer = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

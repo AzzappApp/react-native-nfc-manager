@@ -84,6 +84,7 @@ const HorizontalPhotoEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -108,6 +109,7 @@ const HorizontalPhotoEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

@@ -196,6 +196,7 @@ const CoverEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         foreground {
           id
@@ -1488,6 +1489,7 @@ const templateDataFragment = graphql`
       mediaStyle
       background {
         id
+        resizeMode
       }
       backgroundStyle {
         backgroundColor

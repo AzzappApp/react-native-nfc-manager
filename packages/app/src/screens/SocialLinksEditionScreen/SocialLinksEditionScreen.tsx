@@ -68,6 +68,7 @@ const SocialLinksEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -86,6 +87,7 @@ const SocialLinksEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

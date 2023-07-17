@@ -47,6 +47,7 @@ const CarouselRenderer = ({ module, ...props }: CarouselRendererProps) => {
         gap
         background {
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor

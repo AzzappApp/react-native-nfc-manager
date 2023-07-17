@@ -1,14 +1,10 @@
 import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../CardModuleBackground';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
 
-export type HorizontalPhotoRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type HorizontalPhotoRendererProps = ModuleRendererProps &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a HorizontalPhoto module

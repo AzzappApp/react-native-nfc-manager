@@ -47,6 +47,7 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor

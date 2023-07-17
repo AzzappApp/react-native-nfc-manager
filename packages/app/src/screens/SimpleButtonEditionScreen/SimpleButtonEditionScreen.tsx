@@ -70,6 +70,7 @@ const SimpleButtonEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -89,6 +90,7 @@ const SimpleButtonEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,

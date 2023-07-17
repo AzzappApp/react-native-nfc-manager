@@ -9,17 +9,18 @@ import SocialLinksRenderer from './SocialLinksRenderer';
 import type { CardModule } from '@azzapp/data/domains';
 import type { ComponentType } from 'react';
 
-type ModuleRendererProps = {
+export type ModuleRendererProps = {
   module: CardModule;
+  resizeModes: Map<string, string>;
 };
 
 const ModuleRenderer = (props: ModuleRendererProps) => {
-  const { module } = props;
+  const { module, resizeModes } = props;
 
   const Renderer = renderers[module.kind];
   if (!Renderer) return null;
 
-  return <Renderer module={module} />;
+  return <Renderer module={module} resizeModes={resizeModes} />;
 };
 
 const renderers = {
