@@ -254,7 +254,7 @@ const ContactCardScreen = ({
             <ColorPreview
               color={
                 contactCardData.viewer?.profile?.contactCard?.backgroundStyle
-                  .backgroundColor ?? colors.black
+                  ?.backgroundColor ?? colors.black
               }
               colorSize={16}
             />
@@ -270,7 +270,7 @@ const ContactCardScreen = ({
               })}
               selectedColor={
                 contactCardData.viewer?.profile?.contactCard?.backgroundStyle
-                  .backgroundColor ?? colors.black
+                  ?.backgroundColor ?? colors.black
               }
               onColorChange={color => {
                 commit({
