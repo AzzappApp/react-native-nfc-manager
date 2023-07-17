@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.1.3-canary.6",
+  "version": "0.1.3-canary.7",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,9 +13,9 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/auth": "0.1.3-canary.6",
-    "@azzapp/data": "0.1.3-canary.6",
-    "@azzapp/shared": "0.1.3-canary.6",
+    "@azzapp/auth": "0.1.3-canary.7",
+    "@azzapp/data": "0.1.3-canary.7",
+    "@azzapp/shared": "0.1.3-canary.7",
     "lodash": "^4.17.21",
     "next": "^13.4.8",
     "react": "^18.2.0",
