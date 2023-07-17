@@ -58,7 +58,6 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
         >
           {modules}
         </div>
-        <DownloadVCard profileId={profile.id} userName={profile.userName} />
       </main>
       {hasPosts && (
         <aside
@@ -89,6 +88,11 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
             prevDisplay === 'card' ? 'posts' : 'card',
           );
         }}
+      />
+      <DownloadVCard
+        profileId={profile.id}
+        userName={profile.userName}
+        profile={profile}
       />
     </div>
   );
