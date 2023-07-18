@@ -1,5 +1,6 @@
-## 0.1.3-canary.8
+## 0.1.3-canary.9
 
+* **fix:**  - remove typescript satisfies
 * **feat:**  - card background centered ([#679](https://github.com/AzzappApp/azzapp/pull/679))
 * **feat:**  - [#554](https://github.com/AzzappApp/azzapp/pull/554) add download vcard bottom sheet from web ([#677](https://github.com/AzzappApp/azzapp/pull/677))
 * **fix:**  - ContactCard background color is optional ([#678](https://github.com/AzzappApp/azzapp/pull/678))
