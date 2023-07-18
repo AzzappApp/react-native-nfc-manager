@@ -385,7 +385,7 @@ const CarouselEditionScreen = ({
         gap,
         background,
         backgroundStyle,
-      } satisfies CarouselRawData),
+      } as CarouselRawData),
     [
       background,
       backgroundStyle,
