@@ -1,7 +1,7 @@
 export const generateShareProfileLink = (username: string) => {
-  return `azzapp.com/${username}`;
+  return `${process.env.NEXT_PUBLIC_URL}${username}`;
 };
 
 export const generateSharePostLink = (username: string, postId: string) => {
-  return `azzapp.com/${username}/${postId}`;
+  return `${process.env.NEXT_PUBLIC_URL}${username}/${postId}`;
 };
