@@ -187,6 +187,10 @@
     "defaultMessage": "Title",
     "description": "Title placeholder in PhotoWithTextAndTitle module"
   },
+  "3oA9Rr": {
+    "defaultMessage": "You can type the code below",
+    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
+  },
   "3pMfaY": {
     "defaultMessage": "Preview",
     "description": "Carousel  bottom menu label for Preview tab"
@@ -290,10 +294,6 @@
   "6j49Wn": {
     "defaultMessage": "Negative",
     "description": "Negative photo filter name"
-  },
-  "6k4Jyd": {
-    "defaultMessage": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter",
-    "description": "ChangePasswordS Screen - Accessibility error message password rules"
   },
   "6nn94+": {
     "defaultMessage": "Done",
@@ -507,10 +507,6 @@
     "defaultMessage": "Enter your last name",
     "description": "ProfileForm last name textinput placeholder"
   },
-  "CCNK+L": {
-    "defaultMessage": "Confirm password",
-    "description": "ChangePassword Screen - Confirm password"
-  },
   "CCbp9S": {
     "defaultMessage": "Trending profiles",
     "description": "SearchPage - Trending profile title"
@@ -538,6 +534,10 @@
   "CzmHsY": {
     "defaultMessage": "Public contact card",
     "description": "When true the contact card is public"
+  },
+  "D/FBJk": {
+    "defaultMessage": "Passwords do not match",
+    "description": "Reset password Screen - error message when password and confirm password do not match"
   },
   "D1GdDl": {
     "defaultMessage": "Cancel",
@@ -683,6 +683,10 @@
     "defaultMessage": "Slide to change the Text top/bottom margin",
     "description": "Hint of the Text top/bottom margin slider in BlockText edition"
   },
+  "Fblxe/": {
+    "defaultMessage": "Create new password",
+    "description": "Create new password screen title"
+  },
   "Fd2baV": {
     "defaultMessage": "Log in",
     "description": "Signin Screen - Log in title"
@@ -747,10 +751,6 @@
     "defaultMessage": "Social platforms",
     "description": "SocialLinks text screen title"
   },
-  "HLKVM1": {
-    "defaultMessage": "New password",
-    "description": "ChangePassword Screen - New password"
-  },
   "HMByMw": {
     "defaultMessage": "Mobile",
     "description": "\"Mobile\" value as type for a phone number in Contact Card edition"
@@ -786,6 +786,10 @@
   "J6PIIv": {
     "defaultMessage": "Save",
     "description": "Edit password modal save button label"
+  },
+  "JGlype": {
+    "defaultMessage": "Confirm password",
+    "description": "Confirm password input placeholder"
   },
   "JGsXLB": {
     "defaultMessage": "Border color",
@@ -859,6 +863,10 @@
     "defaultMessage": "Border size : {size}",
     "description": "Border size message in carousel edition"
   },
+  "KhsZNM": {
+    "defaultMessage": "Password changed successfully",
+    "description": "Toast success message when resetting password"
+  },
   "KimbRe": {
     "defaultMessage": "Provide more details",
     "description": "Company profile form - Title"
@@ -890,10 +898,6 @@
   "LDSGS1": {
     "defaultMessage": "Free",
     "description": "Module Selection List - Free label for module"
-  },
-  "LGAptw": {
-    "defaultMessage": "Phone number or email address",
-    "description": "ForgotpasswordScreen - Phone number or email address placeholder"
   },
   "LLt2DI": {
     "defaultMessage": "Email address",
@@ -934,6 +938,10 @@
   "Lp4WhG": {
     "defaultMessage": "Top margin",
     "description": "Label of the marginTop slider in SimpleButton edition"
+  },
+  "M/5pen": {
+    "defaultMessage": "Error while changing your password.",
+    "description": "Toast Error message when resetting password fails"
   },
   "M/YmS/": {
     "defaultMessage": "Border shape",
@@ -1239,10 +1247,6 @@
     "defaultMessage": "Image/Text Gap",
     "description": "Label of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
   },
-  "UPw9Sj": {
-    "defaultMessage": "Create new password",
-    "description": "ChangePasswordScreen - Create new password"
-  },
   "UQaIdM": {
     "defaultMessage": "See {counterComments} comments",
     "description": "PostRendererBottomPanel - Comment Counter"
@@ -1266,6 +1270,10 @@
   "Ul8FtB": {
     "defaultMessage": "Phone number",
     "description": "Section title for phone numbers"
+  },
+  "UnFj39": {
+    "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
+    "description": "Reset password Screen - error message when password is not compliant with our rules"
   },
   "Usqg+8": {
     "defaultMessage": "Slide to change the top margin size",
@@ -1403,6 +1411,10 @@
     "defaultMessage": "Slide to change the textBackground opacity",
     "description": "Hint of the Photo Opacityslider in BlockText edition"
   },
+  "Y4pUO0": {
+    "defaultMessage": "Please retry the whole process.",
+    "description": "Toast Error message when resetting password fails"
+  },
   "Y7007n": {
     "defaultMessage": "Your webcard, your style. Don't forget to explore all the customization options available.",
     "description": "Progress loading modal message 4"
@@ -1426,10 +1438,6 @@
   "YZLFbx": {
     "defaultMessage": "Top Margin size",
     "description": "Label of the top margin size slider in Line Divider edition"
-  },
-  "YgcSzd": {
-    "defaultMessage": "Create a new password",
-    "description": "ChangePasswordScreen - create a new password  title"
   },
   "YkLUxp": {
     "defaultMessage": "Images",
@@ -1519,10 +1527,6 @@
     "defaultMessage": "Left margin : {size}",
     "description": "Margin horizontal label in carousel edition"
   },
-  "aGgFjV": {
-    "defaultMessage": "Tap to reset your passward",
-    "description": "ChangePassword Screen - AccessibilityLabel Reset password button"
-  },
   "aOpC4m": {
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Privacy Policy"
@@ -1562,6 +1566,10 @@
   "aptKIZ": {
     "defaultMessage": "Bottom margin : {size}",
     "description": "Bottom margin message in SocialLinks edition"
+  },
+  "awZsgE": {
+    "defaultMessage": "We just send you a link to create a new password or you can type the code below",
+    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
   },
   "b/ugZW": {
     "defaultMessage": "Followings",
@@ -1618,6 +1626,10 @@
   "c6l117": {
     "defaultMessage": "Slide to change the Image/Text Gap",
     "description": "Hint of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
+  },
+  "cDfk8A": {
+    "defaultMessage": "Tap to reset your password",
+    "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
   },
   "cSQSLt": {
     "defaultMessage": "Text left/right margin : {size}",
@@ -1691,6 +1703,10 @@
     "defaultMessage": "Cancel",
     "description": "Edit contact card modal cancel button title"
   },
+  "dxORjc": {
+    "defaultMessage": "Check your messages!",
+    "description": "ForgotPasswordScreen - Check your messages!"
+  },
   "dzmRcf": {
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
@@ -1698,10 +1714,6 @@
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
-  },
-  "e9NfAF": {
-    "defaultMessage": "Check your emails or messages!",
-    "description": "ForgotPasswordScreen - Check your emails or messages!"
   },
   "eLqeU7": {
     "defaultMessage": "Moves the module down",
@@ -1726,10 +1738,6 @@
   "f2KYUh": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle tab in cover edition"
-  },
-  "fCYBEv": {
-    "defaultMessage": "We just send you a link to create a new password",
-    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
   },
   "fF/vRd": {
     "defaultMessage": "Press this button to adjust the boundary of the selected image",
@@ -1891,6 +1899,10 @@
     "defaultMessage": "Edit Background",
     "description": "SocialLinks bottom menu label for Background tab"
   },
+  "iNbvJN": {
+    "defaultMessage": "Check your emails!",
+    "description": "ForgotPasswordScreen - Check your emails or messages!"
+  },
   "iPwxyL": {
     "defaultMessage": "Slide to change the height",
     "description": "Hint of the height slider in SimpleButton edition"
@@ -2006,6 +2018,10 @@
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
+  },
+  "l0IaD6": {
+    "defaultMessage": "Tap to create new password",
+    "description": "Create new password Screen - AccessibilityLabel Create New Password button"
   },
   "l8fBNE": {
     "defaultMessage": "Edit Palette",
@@ -2247,6 +2263,10 @@
     "defaultMessage": "Contrast",
     "description": "Contrast image edition parameters name"
   },
+  "pr7gRe": {
+    "defaultMessage": "Invalid email/phone number or no account found",
+    "description": "ForgotpasswordScreen - Invalid email or phone number error"
+  },
   "q/LbR5": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in simple text edition"
@@ -2407,8 +2427,8 @@
     "defaultMessage": "Email address",
     "description": "The email address option in the country selector for simple button module"
   },
-  "sqy+v3": {
-    "defaultMessage": "Log In",
+  "smeqjF": {
+    "defaultMessage": "Back to Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
   },
   "tBKg6x": {
@@ -2422,6 +2442,10 @@
   "tOY0CE": {
     "defaultMessage": "Desktop",
     "description": "Desktop view mode title in web card preview"
+  },
+  "tU7Ls5": {
+    "defaultMessage": "Create new password",
+    "description": "Create new password screen button label"
   },
   "tuDqJ+": {
     "defaultMessage": "Color #2",
@@ -2543,10 +2567,6 @@
     "defaultMessage": "Button Label",
     "description": "Label of the buttonLabel input in SimpleButton Settings edition"
   },
-  "w96WJ0": {
-    "defaultMessage": "Password doesn't match",
-    "description": "ChangePasswordScreen Screen - error passwords doesn't match"
-  },
   "wWS00d": {
     "defaultMessage": "Icon Size : {size}",
     "description": "Icon Size message in SocialLinks edition"
@@ -2598,6 +2618,10 @@
   "xTEIZX": {
     "defaultMessage": "Border width",
     "description": "Label of the border Width slider in SimpleButton edition"
+  },
+  "xUVkUh": {
+    "defaultMessage": "New password",
+    "description": "New password input placeholder"
   },
   "xV6Ifc": {
     "defaultMessage": "Save",

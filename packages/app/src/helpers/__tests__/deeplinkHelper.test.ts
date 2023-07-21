@@ -71,4 +71,18 @@ describe('deeplinkHelpers', () => {
       },
     });
   });
+
+  test('should redirect to reset password with token', async () => {
+    const res = await matchUrlWithRoute(
+      'https://fake-azzapp.com/reset-password/?token=123&issuer=azzapp',
+    );
+
+    expect(res).toEqual({
+      route: 'RESET_PASSWORD',
+      params: {
+        token: '123',
+        issuer: 'azzapp',
+      },
+    });
+  });
 });

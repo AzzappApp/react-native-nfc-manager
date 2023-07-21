@@ -100,13 +100,14 @@ export const switchProfile: APIMethod<
 
 export type ForgotPasswordParams = {
   credential: string;
+  locale: string;
 };
 
 //TODO: check if  forgotPassword method exist on server
-export const forgotPassword: APIMethod<ForgotPasswordParams, TokensResponse> = (
-  data,
-  init,
-) =>
+export const forgotPassword: APIMethod<
+  ForgotPasswordParams,
+  { issuer: string }
+> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/forgotPassword`, {
     ...init,
     method: 'POST',
@@ -115,8 +116,8 @@ export const forgotPassword: APIMethod<ForgotPasswordParams, TokensResponse> = (
 
 export type ChangePasswordParams = {
   password: string;
-  credential: string;
   token: string;
+  issuer: string;
 };
 
 export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (

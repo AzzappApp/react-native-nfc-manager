@@ -42,10 +42,10 @@ import { useDeepLink } from '#hooks/useDeepLink';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import AccountScreen from '#screens/AccountScreen';
 import CardModuleEditionMobileScreen from '#screens/CardModuleEditionMobileScreen';
-import ChangePasswordScreen from '#screens/ChangePasswordScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import FollowersScreen from '#screens/FollowersScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
+import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmationScreen';
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
@@ -54,6 +54,7 @@ import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
 import ProfileScreen from '#screens/ProfileScreen';
+import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
@@ -65,7 +66,8 @@ const screens = {
   SIGN_IN: SignInScreen,
   SIGN_UP: SignupScreen,
   FORGOT_PASSWORD: ForgotPasswordScreen,
-  CHANGE_PASSWORD: ChangePasswordScreen,
+  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
+  RESET_PASSWORD: ResetPasswordScreen,
   HOME: HomeScreen,
   SEARCH: SearchScreen,
   ACCOUNT: AccountScreen,

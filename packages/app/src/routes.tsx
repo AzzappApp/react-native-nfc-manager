@@ -37,9 +37,11 @@ export type ForgotPasswordRoute = {
   params?: never;
 };
 
-export type ChangePasswordRoute = {
-  route: 'CHANGE_PASSWORD';
-  params?: never; //TODO this should coutain a reset token ?
+export type ForgotPasswordConfirmationRoute = {
+  route: 'FORGOT_PASSWORD_CONFIRMATION';
+  params: {
+    issuer: string;
+  };
 };
 
 export type NewProfileRoute = {
@@ -119,6 +121,14 @@ export type ContactCardRoute = {
   params?: never;
 };
 
+export type ResetPasswordRoute = {
+  route: 'RESET_PASSWORD';
+  params: {
+    token: string;
+    issuer: string;
+  };
+};
+
 export type Route =
   | AlbumsRoute
   | HomeRoute
@@ -130,7 +140,6 @@ export type Route =
   | PostCommentsRoute
   | NewPostRoute
   | NewProfileRoute
-  | ChangePasswordRoute
   | SignInRoute
   | SignUpRoute
   | ForgotPasswordRoute
@@ -139,6 +148,8 @@ export type Route =
   | FollowersRoute
   | AccountDetailsRoute
   | InviteFriendsRoute
-  | ContactCardRoute;
+  | ContactCardRoute
+  | ResetPasswordRoute
+  | ForgotPasswordConfirmationRoute;
 
 export type ROUTES = Route['route'];
