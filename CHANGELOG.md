@@ -1,4 +1,4 @@
-## 0.1.3-canary.1
+## 0.1.3-canary.2
 
 * **fix:**  - share url domain ([#697](https://github.com/AzzappApp/azzapp/pull/697))
 * **fix:**  - remove typescript satisfies
