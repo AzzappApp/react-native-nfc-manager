@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmall, vars } from '#app/theme.css';
+import { MediaQuery, textSmall, vars } from '#app/theme.css';
 
 const wrapper = style({
   width: '100%',
@@ -23,7 +23,7 @@ const header = style({
 
 const close = style({
   '@media': {
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       visibility: 'hidden',
     },
   },

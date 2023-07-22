@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { MediaQuery } from '#app/theme.css';
 
 const wrapper = style({
   display: 'flex',
@@ -9,12 +10,12 @@ const modules = style({
   height: '100vh',
   transitionTimingFunction: 'ease-out',
   '@media': {
-    'screen and (min-width: 750px)': {
+    [MediaQuery.Desktop]: {
       transition: 'margin-right 0.3s',
       overflowX: 'hidden',
       flex: 1,
     },
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       transformStyle: 'preserve-3d',
       zIndex: 2,
       width: '100%',
@@ -33,13 +34,13 @@ const posts = style({
   transitionTimingFunction: 'ease-out',
   height: '100vh',
   '@media': {
-    'screen and (min-width: 750px)': {
+    [MediaQuery.Desktop]: {
       transition: 'width 0.3s',
       width: '300px',
       position: 'fixed',
       right: 0,
     },
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       transition: 'transform 1s ease',
       position: 'absolute',
       transform: 'perspective(1000px) rotateY(0deg) rotateX(0deg)',
@@ -53,7 +54,7 @@ const posts = style({
 
 const postsClosed = style({
   '@media': {
-    'screen and (min-width: 750px)': {
+    [MediaQuery.Desktop]: {
       width: 0,
     },
   },
@@ -61,7 +62,7 @@ const postsClosed = style({
 
 const modulesWithPosts = style({
   '@media': {
-    'screen and (min-width: 750px)': {
+    [MediaQuery.Desktop]: {
       marginRight: '300px',
     },
   },
@@ -69,7 +70,7 @@ const modulesWithPosts = style({
 
 const modulesBehind = style({
   '@media': {
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       transform: 'perspective(1000px) rotateY(179.9deg)',
     },
   },
@@ -77,7 +78,7 @@ const modulesBehind = style({
 
 const postsBehind = style({
   '@media': {
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       transform: 'perspective(1000px) rotateY(-179.9deg)',
       zIndex: 1,
     },
@@ -93,7 +94,7 @@ const switchContent = style({
   borderRadius: '200px',
   zIndex: 999,
   '@media': {
-    'screen and (min-width: 750px)': {
+    [MediaQuery.Desktop]: {
       display: 'none',
     },
   },
@@ -106,7 +107,7 @@ const postNavigation = style({
   top: '20px',
   right: '20px',
   '@media': {
-    'screen and (max-width: 749.9px)': {
+    [MediaQuery.Mobile]: {
       visibility: 'hidden',
     },
   },

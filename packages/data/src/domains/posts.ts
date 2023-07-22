@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, inArray, desc, sql, and, lt } from 'drizzle-orm';
+import { eq, inArray, desc, sql, and, lt, notInArray } from 'drizzle-orm';
 import {
   json,
   text,
@@ -11,6 +11,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
@@ -18,11 +19,13 @@ import db, {
 } from './db';
 import { FollowTable } from './follows';
 import { customTinyInt, sortEntitiesByIds } from './generic';
+import { getMediasByIds } from './medias';
 import { getTopPostsComment } from './postComments';
 import type { DbTransaction } from './db';
+import type { Media } from './medias';
 import type { PostComment } from './postComments';
 import type { Profile } from './profiles';
-import type { InferModel } from 'drizzle-orm';
+import type { InferModel, SQL } from 'drizzle-orm';
 
 export const PostTable = mysqlTable(
   'Post',
@@ -46,7 +49,7 @@ export const PostTable = mysqlTable(
     })
       .default(DEFAULT_DATETIME_VALUE)
       .notNull(),
-    medias: json('medias').notNull(),
+    medias: json('medias').notNull().$type<string[]>(),
     counterReactions: int('counterReactions').default(0).notNull(),
     counterComments: int('counterComments').default(0).notNull(),
   },
@@ -59,7 +62,8 @@ export const PostTable = mysqlTable(
 
 export type Post = InferModel<typeof PostTable>;
 export type NewPost = Omit<InferModel<typeof PostTable, 'insert'>, 'id'>;
-export type PostWithCommentAndAuthor = Post & {
+export type PostWithMedias = Omit<Post, 'medias'> & { medias: Media[] };
+export type PostWithCommentAndAuthor = PostWithMedias & {
   comment: (PostComment & { author: Profile }) | null;
 };
 
@@ -76,6 +80,68 @@ export const getPostsByIds = async (ids: readonly string[]) =>
       .from(PostTable)
       .where(inArray(PostTable.id, ids as string[])),
   );
+
+/**
+ * Retrieve a post by its ids.
+ * @param id - The id of the post to retrieve
+ * @param profileId - The id of the attached profile
+ * @returns A post and its medias
+ */
+export const getPostByIdWithMedia = async (id: string) => {
+  const res = await db.select().from(PostTable).where(eq(PostTable.id, id));
+
+  if (res.length === 0) return null;
+  const post = res[0];
+  const medias = convertToNonNullArray(await getMediasByIds(post.medias));
+
+  return { ...post, medias };
+};
+
+/**
+ * Retrieve a profile's post, ordered by date, with pagination.
+ *
+ * @param profileId  The id of the profile
+ * @param limit The maximum number of post to retrieve
+ * @param offset The offset of the first post to retrieve
+ * @param excludedId The id of a post to exclude from the search
+ * @returns A list of post
+ */
+export const getProfilesPostsWithMedias = async (
+  profileId: string,
+  limit: number,
+  offset: number,
+  excludedId?: string,
+) => {
+  const conditions: SQL[] = [eq(PostTable.authorId, profileId)];
+
+  if (excludedId) {
+    conditions.push(notInArray(PostTable.id, [excludedId]));
+  }
+
+  const posts = await db
+    .select()
+    .from(PostTable)
+    .where(and(...conditions))
+    .orderBy(desc(PostTable.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
+    return [...mediasIds, ...post.medias];
+  }, []);
+
+  const medias =
+    mediasIds.length > 0
+      ? convertToNonNullArray(await getMediasByIds(mediasIds))
+      : [];
+
+  return posts.map(post => ({
+    ...post,
+    medias: medias.filter(media =>
+      post.medias.find(postMedia => media.id === postMedia),
+    ),
+  }));
+};
 
 /**
  * Retrieve a profile's post, ordered by date, with pagination.
@@ -111,7 +177,7 @@ export const getProfilesPosts = async (
 export const getProfilesPostsWithTopComment = async (
   profileId: string,
   limit: number,
-  offset: number,
+  offset = 0,
 ) => {
   const posts = await db
     .select()
@@ -125,9 +191,18 @@ export const getProfilesPostsWithTopComment = async (
 
   const comments = await getTopPostsComment(posts.map(post => post.id));
 
+  const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
+    return [...mediasIds, ...post.medias];
+  }, []);
+
+  const medias = convertToNonNullArray(await getMediasByIds(mediasIds));
+
   return posts.map(post => ({
     ...post,
     comment: comments.find(comment => comment.postId === post.id) ?? null,
+    medias: medias.filter(media =>
+      post.medias.find(postMedia => media.id === postMedia),
+    ),
   })) satisfies PostWithCommentAndAuthor[];
 };
 

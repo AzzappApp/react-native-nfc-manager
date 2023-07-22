@@ -1,6 +1,7 @@
 'use client';
 import cn from 'classnames';
 import styles from './Button.css';
+import EmptyButton from './EmptyButton';
 import LinkButton from './LinkButton';
 import type { MouseEventHandler } from 'react';
 
@@ -38,5 +39,6 @@ const Button = (props: ButtonProps) => {
 };
 
 Button.Link = LinkButton;
+Button.Empty = EmptyButton;
 
 export default Button;

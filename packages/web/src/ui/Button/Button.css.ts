@@ -1,7 +1,15 @@
 import { style } from '@vanilla-extract/css';
 import { textSmallBold, vars } from '#app/theme.css';
 
+const empty = style({
+  cursor: 'pointer',
+  textDecoration: 'none',
+  border: 'none',
+  backgroundColor: 'transparent',
+});
+
 const button = style([
+  empty,
   textSmallBold,
   {
     display: 'inline-flex',
@@ -43,6 +51,7 @@ const large = style({
 });
 
 const styles = {
+  empty,
   button,
   primary,
   primaryDisabled,

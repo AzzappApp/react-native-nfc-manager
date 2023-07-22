@@ -1,7 +1,12 @@
 import { connectionFromArray } from 'graphql-relay';
 import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { db, getPostComments, getPostReaction, PostTable } from '#domains';
+import {
+  db,
+  getPostCommentsByDate,
+  getPostReaction,
+  PostTable,
+} from '#domains';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
@@ -24,7 +29,7 @@ export const Post: PostResolvers = {
   },
   media: async (post, _, { mediaLoader }) => {
     return mediaLoader
-      .loadMany(post.medias as string[])
+      .loadMany(post.medias)
       .then(
         medias =>
           (
@@ -55,7 +60,7 @@ export const Post: PostResolvers = {
     return null;
   },
   previewComment: async (post, _) => {
-    const comments = await getPostComments(post.id, 1);
+    const comments = await getPostCommentsByDate(post.id, 1);
     if (comments.length > 0) {
       return comments[0];
     }
@@ -67,7 +72,11 @@ export const Post: PostResolvers = {
 
     const offset = after ? cursorToDate(after) : null;
 
-    const postComments = await getPostComments(post.id, limit + 1, offset);
+    const postComments = await getPostCommentsByDate(
+      post.id,
+      limit + 1,
+      offset,
+    );
     if (postComments?.length > 0) {
       //sort should be done on request side, we will used updated at to have the last updated cover
       const sizedComments = postComments.slice(0, limit);

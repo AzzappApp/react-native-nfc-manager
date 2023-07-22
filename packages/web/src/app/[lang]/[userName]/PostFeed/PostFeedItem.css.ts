@@ -18,7 +18,6 @@ const postHeader = style({
 const postMedias = style({
   position: 'relative',
   width: '100%',
-  aspectRatio: '1',
 });
 
 const postFooter = style({

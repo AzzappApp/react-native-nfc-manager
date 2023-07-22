@@ -1,13 +1,12 @@
 'use client';
-import { useState, useTransition, useRef } from 'react';
-import { CloseIcon, ShareIcon } from '#assets';
+import { useState, useTransition, useRef, useEffect } from 'react';
 import { generateShareProfileLink } from '#helpers';
-import { Button, ButtonIcon } from '#ui';
 import { ProfileActions } from '#app/actions';
 import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
 import useScrollEnd from '#hooks/useScrollEnd';
 import styles from './PostFeed.css';
+import PostFeedHeader from './PostFeedHeader';
 import PostFeedItem from './PostFeedItem';
 import type { ModalActions } from '#ui/Modal';
 import type {
@@ -38,7 +37,7 @@ const PostFeed = (props: PostFeedProps) => {
 
       const newPosts = await ProfileActions.loadProfilePostsWithTopComment(
         profile.id,
-        5,
+        COUNT_POSTS_TO_FETCH,
         posts.length,
       );
 
@@ -46,33 +45,26 @@ const PostFeed = (props: PostFeedProps) => {
     });
   }, [isPending, posts.length, profile.id]);
 
+  useEffect(() => {
+    startTransition(async () => {
+      const refreshed = await ProfileActions.loadProfilePostsWithTopComment(
+        profile.id,
+        COUNT_POSTS_TO_FETCH,
+      );
+
+      setPosts(refreshed);
+    });
+  }, [profile.id]);
+
   return (
     <>
       <div className={styles.wrapper} ref={ref}>
-        <div className={styles.header}>
-          <ButtonIcon
-            Icon={CloseIcon}
-            onClick={onClose}
-            className={styles.close}
-          />
-          <div className={styles.headerData}>
-            <span className={styles.headerName}>{profile.userName}</span>
-            <span className={styles.headerPostsCount}>{postsCount} posts</span>
-            <Button
-              onClick={() => download.current?.open()}
-              size="small"
-              className={styles.headerButton}
-            >
-              Follow
-            </Button>
-          </div>
-          <span>
-            <ButtonIcon
-              Icon={ShareIcon}
-              onClick={() => share.current?.open()}
-            />
-          </span>
-        </div>
+        <PostFeedHeader
+          profile={profile}
+          postsCount={postsCount}
+          media={media}
+          onClose={onClose}
+        />
         {posts.map((post, i) => (
           <PostFeedItem
             key={`${post.id}-${i}`}
@@ -83,7 +75,7 @@ const PostFeed = (props: PostFeedProps) => {
           />
         ))}
       </div>
-      <DownloadAppModal ref={download} profileId={profile.id} media={media} />
+      <DownloadAppModal ref={download} profile={profile} media={media} />
       <ShareModal
         ref={share}
         link={generateShareProfileLink(profile.userName)}
@@ -91,5 +83,7 @@ const PostFeed = (props: PostFeedProps) => {
     </>
   );
 };
+
+const COUNT_POSTS_TO_FETCH = 5;
 
 export default PostFeed;

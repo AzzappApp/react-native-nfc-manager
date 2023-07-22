@@ -9,14 +9,19 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
+import { CardCoverTable } from './cardCovers';
+import { CardTable } from './cards';
 import db, {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_DATETIME_VALUE,
   DEFAULT_VARCHAR_LENGTH,
 } from './db';
 import { sortEntitiesByIds } from './generic';
+import { MediaTable } from './medias';
 import { PostTable } from './posts';
 import { ProfileTable } from './profiles';
+import type { Media } from './medias';
+import type { Profile } from './profiles';
 import type { InferModel } from 'drizzle-orm';
 
 export const PostCommentTable = mysqlTable(
@@ -46,6 +51,8 @@ export const PostCommentTable = mysqlTable(
 
 export type PostComment = InferModel<typeof PostCommentTable>;
 export type NewPostComment = InferModel<typeof PostCommentTable, 'insert'>;
+export type PostCommentWithProfile = Pick<Profile, 'firstName' | 'lastName'> &
+  PostComment & { media: Media };
 
 /**
  * insert a post reaction
@@ -81,12 +88,48 @@ export const insertPostComment = async (
   });
 
 /**
- * Retrieves posts comments ordered by createdAt date
- * @param limit - The maximum number of profiles to retrieve
- * @param offset - The number of profiles to skip
+ * Retrieves posts comments ordered by date
+ * @param limit - The maximum number of comments to retrieve
+ * @param before - The maximum date of creation for the comments to retrieve
  * @returns A list of PostComment
  */
-export const getPostComments = async (
+export const getPostCommentsWithProfile = async (
+  postId: string,
+  limit: number,
+  before?: Date,
+) => {
+  const res = await db
+    .select()
+    .from(PostCommentTable)
+    .where(
+      and(
+        eq(PostCommentTable.postId, postId),
+        before ? sql`${PostCommentTable.createdAt} < ${before}` : undefined,
+      ),
+    )
+    .innerJoin(ProfileTable, eq(ProfileTable.id, PostCommentTable.profileId))
+    .innerJoin(CardTable, eq(CardTable.profileId, ProfileTable.id))
+    .innerJoin(CardCoverTable, eq(CardCoverTable.id, CardTable.coverId))
+    .innerJoin(MediaTable, eq(MediaTable.id, CardCoverTable.mediaId))
+    .orderBy(desc(PostCommentTable.createdAt))
+    .limit(limit);
+
+  return res.map(({ PostComment, Profile, Media }) => ({
+    ...PostComment,
+    firstName: Profile.firstName,
+    lastName: Profile.lastName,
+    media: Media,
+  })) satisfies PostCommentWithProfile[];
+};
+
+/**
+ * Retrieves posts comments ordered by createdAt date
+ * @param postId - The id of the post to retrieve comments for
+ * @param limit - The maximum number of comments to retrieve
+ * @param after - The date to fetch comments after
+ * @returns A list of PostComment
+ */
+export const getPostCommentsByDate = async (
   postId: string,
   limit: number,
   after: Date | null = null,

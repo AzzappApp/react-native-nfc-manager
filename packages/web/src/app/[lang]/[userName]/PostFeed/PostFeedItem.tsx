@@ -26,7 +26,7 @@ const PostFeedItem = (props: PostFeedItemProps) => {
   const share = useRef<ModalActions>(null);
 
   const elapsedTime = getElapsedTime(new Date(post.createdAt).getTime());
-  const [postMedia] = post.medias as string[];
+  const [postMedia] = post.medias;
 
   return (
     <>
@@ -49,9 +49,12 @@ const PostFeedItem = (props: PostFeedItemProps) => {
           <span>{profile.userName}</span>
         </div>
         {postMedia && (
-          <div className={styles.postMedias}>
+          <div
+            className={styles.postMedias}
+            style={{ aspectRatio: `${postMedia.width / postMedia.height}` }}
+          >
             <CloudinaryImage
-              mediaId={postMedia}
+              mediaId={postMedia.id}
               alt="cover"
               fill
               style={{
@@ -77,12 +80,15 @@ const PostFeedItem = (props: PostFeedItemProps) => {
           {post.comment && (
             <p className={styles.postComment}>
               <span className={styles.postCommentName}>
-                {post.comment.author.firstName} {post.comment.author.lastName}
+                {post.comment.author.userName}
               </span>{' '}
               {post.comment.comment}
             </p>
           )}
-          <Link className={styles.postSeeMore} href={`/post/${post.id}`}>
+          <Link
+            className={styles.postSeeMore}
+            href={`/${profile.userName}/${post.id}`}
+          >
             See more
           </Link>
           <span className={styles.postElapsedTime}>

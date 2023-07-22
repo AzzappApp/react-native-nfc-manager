@@ -39,7 +39,7 @@ export const textField = style({
 });
 
 export const textButton = style({
-  fontWeight: vars.fontWeight.regular,
+  fontWeight: vars.fontWeight.semiBold,
   fontSize: '14px',
   lineHeight: '17px',
 });
@@ -80,6 +80,11 @@ export const textHyperLink = style({
   lineHeight: '15px',
   textDecoration: 'underline',
 });
+
+export enum MediaQuery {
+  Desktop = 'screen and (min-width: 750px)',
+  Mobile = 'screen and (max-width: 749.9px)',
+}
 
 globalStyle('html', {
   height: 'calc(var(--vh, 1vh) * 100)',

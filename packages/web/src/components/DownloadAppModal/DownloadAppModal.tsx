@@ -10,12 +10,12 @@ import {
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media } from '@azzapp/data/domains';
+import type { Media, Profile } from '@azzapp/data/domains';
 import type { ForwardedRef } from 'react';
 
 type DownloadAppModalProps = Omit<ModalProps, 'children'> & {
   media: Media;
-  profileId: string;
+  profile: Profile;
 };
 
 type Stats = {
@@ -27,22 +27,22 @@ type Stats = {
 // eslint-disable-next-line react/display-name
 const DownloadAppModal = forwardRef(
   (props: DownloadAppModalProps, ref: ForwardedRef<ModalActions>) => {
-    const { media, profileId, ...others } = props;
+    const { media, profile, ...others } = props;
 
     const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
       async function loadStats() {
         const [posts, followers, following] = await Promise.all([
-          loadProfilesPostsCount(profileId),
-          loadFollowerProfilesCount(profileId),
-          loadFollowingCount(profileId),
+          loadProfilesPostsCount(profile.id),
+          loadFollowerProfilesCount(profile.id),
+          loadFollowingCount(profile.id),
         ]);
         setStats({ posts, followers, following });
       }
 
       void loadStats();
-    }, [profileId]);
+    }, [profile.id]);
 
     return (
       <Modal ref={ref} {...others}>
@@ -70,7 +70,9 @@ const DownloadAppModal = forwardRef(
           </div>
         </div>
         <div className={styles.footer}>
-          <span className={styles.footerTitle}>Stay connected to Chris</span>
+          <span className={styles.footerTitle}>
+            Stay connected to {profile.userName}
+          </span>
           <span className={styles.footerText}>
             Access digital profile, albums, posts...
           </span>

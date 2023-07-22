@@ -105,7 +105,6 @@ export const getProfileByUserName = async (profileName: string) => {
     .select()
     .from(ProfileTable)
     .where(eq(ProfileTable.userName, profileName))
-
     .then(res => res.pop() ?? null);
 };
 
