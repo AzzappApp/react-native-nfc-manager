@@ -22,7 +22,7 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
   const download = useRef<ModalActions>(null);
 
   return (
-    <>
+    <div style={{ position: 'relative' }}>
       <div className={styles.header}>
         <ButtonIcon
           Icon={CloseIcon}
@@ -47,7 +47,7 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
         ref={share}
         link={generateShareProfileLink(profile.userName)}
       />
-    </>
+    </div>
   );
 };
 

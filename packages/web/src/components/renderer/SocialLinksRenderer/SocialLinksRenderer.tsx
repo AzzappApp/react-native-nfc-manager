@@ -48,28 +48,34 @@ const SocialLinksRenderer = ({
     const id = link.socialId;
     const mask = SOCIAL_LINKS_URL_MAP.get(id)!;
     return (
-      <a
-        key={index}
-        href={`https://${mask}${link.link}`}
+      <div
         style={{
-          display: 'flex',
-          width: iconSize,
-          height: iconSize,
-          borderStyle: 'solid',
-          borderWidth,
-          borderRadius: iconSize / 2,
-          borderColor: iconColor,
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'inline-flex',
         }}
       >
-        <SocialIcon
-          icon={id}
-          width={iconSize - 22}
-          height={iconSize - 22}
-          color={iconColor}
-        />
-      </a>
+        <a
+          key={index}
+          href={`https://${mask}${link.link}`}
+          style={{
+            display: 'flex',
+            width: iconSize,
+            height: iconSize,
+            borderStyle: 'solid',
+            borderWidth,
+            borderRadius: iconSize / 2,
+            borderColor: iconColor,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <SocialIcon
+            icon={id}
+            width={iconSize - 22}
+            height={iconSize - 22}
+            color={iconColor}
+          />
+        </a>
+      </div>
     );
   };
 
@@ -81,14 +87,21 @@ const SocialLinksRenderer = ({
     >
       {arrangement === 'inline' ? (
         <div
-          className={cn(styles.links, styles.linksInline)}
           style={{
-            marginTop,
-            marginBottom,
-            columnGap,
+            width: '100%',
+            overflowX: 'scroll',
           }}
         >
-          {linksOrdered.map(renderLink)}
+          <div
+            className={cn(styles.links, styles.linksInline)}
+            style={{
+              marginTop,
+              marginBottom,
+              columnGap,
+            }}
+          >
+            {linksOrdered.map(renderLink)}
+          </div>
         </div>
       ) : (
         <div
@@ -98,6 +111,9 @@ const SocialLinksRenderer = ({
             marginBottom,
             columnGap,
             rowGap: columnGap,
+            maxWidth: 800,
+            marginLeft: 'auto',
+            marginRight: 'auto',
           }}
         >
           {linksOrdered.map(renderLink)}

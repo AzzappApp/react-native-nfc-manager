@@ -1,4 +1,5 @@
 import { useIntl } from 'react-intl';
+import { type ViewProps, type ColorValue, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import Text from '#ui/Text';
@@ -7,7 +8,6 @@ import type {
   BlockTextRenderer_module$data,
   BlockTextRenderer_module$key,
 } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
-import type { ViewProps, ColorValue } from 'react-native';
 
 export type BlockTextRendererProps = ViewProps & {
   /**
@@ -110,39 +110,42 @@ export const BlockTextRendererRaw = ({
       backgroundColor={backgroundStyle?.backgroundColor}
       patternColor={backgroundStyle?.patternColor}
     >
-      <CardModuleBackground
-        {...props}
-        backgroundUri={textBackground?.uri}
-        backgroundOpacity={textBackgroundStyle?.opacity}
-        backgroundColor={textBackgroundStyle?.backgroundColor}
-        patternColor={textBackgroundStyle?.patternColor}
+      <View
         style={{
           marginVertical: 2 * marginVertical,
           marginHorizontal: 2 * marginHorizontal,
         }}
       >
-        <Text
-          style={{
-            paddingHorizontal: 2 * textMarginHorizontal,
-            paddingVertical: 2 * textMarginVertical,
-            textAlign,
-            color: fontColor as ColorValue,
-            fontSize,
-            fontFamily,
-            lineHeight:
-              fontSize && verticalSpacing
-                ? fontSize * 1.2 + verticalSpacing
-                : undefined,
-          }}
+        <CardModuleBackground
+          {...props}
+          backgroundUri={textBackground?.uri}
+          backgroundOpacity={textBackgroundStyle?.opacity}
+          backgroundColor={textBackgroundStyle?.backgroundColor}
+          patternColor={textBackgroundStyle?.patternColor}
         >
-          {text ||
-            intl.formatMessage({
-              defaultMessage:
-                "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
-              description: 'Default text for the BlockText module',
-            })}
-        </Text>
-      </CardModuleBackground>
+          <Text
+            style={{
+              paddingHorizontal: 2 * textMarginHorizontal,
+              paddingVertical: 2 * textMarginVertical,
+              textAlign,
+              color: fontColor as ColorValue,
+              fontSize,
+              fontFamily,
+              lineHeight:
+                fontSize && verticalSpacing
+                  ? fontSize * 1.2 + verticalSpacing
+                  : undefined,
+            }}
+          >
+            {text ||
+              intl.formatMessage({
+                defaultMessage:
+                  "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
+                description: 'Default text for the BlockText module',
+              })}
+          </Text>
+        </CardModuleBackground>
+      </View>
     </CardModuleBackground>
   );
 };

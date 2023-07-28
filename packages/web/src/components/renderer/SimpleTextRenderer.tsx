@@ -39,27 +39,29 @@ const SimpleTextRenderer = ({
       backgroundStyle={backgroundStyle}
       style={{
         ...style,
-        paddingLeft: marginHorizontal,
-        paddingRight: marginHorizontal,
-        paddingTop: marginVertical,
-        paddingBottom: marginVertical,
-        flexShrink: 0,
       }}
     >
-      <div
-        style={{
-          textAlign,
-          color,
-          fontSize,
-          fontFamily,
-          lineHeight:
-            fontSize && verticalSpacing
-              ? `${fontSize * 1.2 + verticalSpacing}px`
-              : undefined,
-          position: 'relative',
-        }}
-      >
-        {text}
+      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+        <div
+          style={{
+            textAlign,
+            color,
+            fontSize,
+            fontFamily,
+            lineHeight:
+              fontSize && verticalSpacing
+                ? `${fontSize * 1.2 + verticalSpacing}px`
+                : undefined,
+            position: 'relative',
+            paddingLeft: marginHorizontal,
+            paddingRight: marginHorizontal,
+            paddingTop: marginVertical,
+            paddingBottom: marginVertical,
+            flexShrink: 0,
+          }}
+        >
+          {text}
+        </div>
       </div>
     </CardModuleBackground>
   );

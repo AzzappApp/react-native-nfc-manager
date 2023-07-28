@@ -48,22 +48,24 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
           paddingBottom: textMarginVertical,
         }}
       >
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 10,
-            textAlign,
-            color: fontColor,
-            fontSize,
-            fontFamily,
-            lineHeight:
-              fontSize && verticalSpacing
-                ? `${fontSize * 1.2 + verticalSpacing}px`
-                : undefined,
-          }}
-        >
-          {text}
-        </p>
+        <div style={{ maxWidth: '800px', margin: 'auto' }}>
+          <p
+            style={{
+              marginTop: 10,
+              marginBottom: 10,
+              textAlign,
+              color: fontColor,
+              fontSize,
+              fontFamily,
+              lineHeight:
+                fontSize && verticalSpacing
+                  ? `${fontSize * 1.2 + verticalSpacing}px`
+                  : undefined,
+            }}
+          >
+            {text}
+          </p>
+        </div>
       </CardModuleBackground>
     </CardModuleBackground>
   );

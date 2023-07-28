@@ -1,21 +1,21 @@
 import { style } from '@vanilla-extract/css';
 
 const links = style({
-  width: '100%',
   justifyContent: 'center',
   position: 'relative',
 });
 
 const linksInline = style({
-  overflowX: 'auto',
+  width: 'max-content',
   display: 'flex',
   flexGrow: '1',
-  flexWrap: 'wrap',
 });
 
 const linksBlock = style({
+  display: 'flex',
   flexWrap: 'wrap',
   flexDirection: 'row',
+  width: '100%',
 });
 
 const styles = {

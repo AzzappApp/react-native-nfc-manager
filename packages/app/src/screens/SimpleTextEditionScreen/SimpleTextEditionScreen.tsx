@@ -323,6 +323,7 @@ const SimpleTextEditionScreen = ({
             id: 'style',
             element: (
               <SimpleTextStyleEditionPanel
+                moduleKind={moduleKind}
                 profile={viewer.profile!}
                 color={color ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}

@@ -85,3 +85,5 @@ export const DEFAULT_PALETTE_COLOR = [
 export const DEFAULT_COVER_MIN_FONT_SIZE = 10;
 
 export const DEFAULT_COVER_MAX_FONT_SIZE = 24;
+
+export const TITLE_MAX_FONT_SIZE = 72;

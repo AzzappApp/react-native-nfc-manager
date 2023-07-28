@@ -4,6 +4,7 @@ import { useFragment, graphql } from 'react-relay';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_MAX_FONT_SIZE,
+  TITLE_MAX_FONT_SIZE,
 } from '@azzapp/shared/coverHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
@@ -146,7 +147,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             }
             value={fontSize}
             min={DEFAULT_COVER_MIN_FONT_SIZE}
-            max={DEFAULT_COVER_MAX_FONT_SIZE}
+            max={TITLE_MAX_FONT_SIZE}
             step={1}
             onChange={onFontSizeChange}
             accessibilityLabel={intl.formatMessage({

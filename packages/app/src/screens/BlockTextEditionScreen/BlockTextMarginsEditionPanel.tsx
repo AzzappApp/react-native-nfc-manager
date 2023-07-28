@@ -133,15 +133,15 @@ const BlockTextMarginsEditionPanel = ({
                 defaultMessage="Space top/bottom : {size}"
                 description="Space top/bottom message in BlockText edition"
                 values={{
-                  size: marginHorizontal,
+                  size: marginVertical,
                 }}
               />
             }
-            value={marginHorizontal}
+            value={marginVertical}
             min={0}
             max={100}
             step={1}
-            onChange={onMarginHorizontalChange}
+            onChange={onMarginVerticalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space top/bottom',
               description:
@@ -160,15 +160,15 @@ const BlockTextMarginsEditionPanel = ({
                 defaultMessage="Space left/right : {size}"
                 description="Space left/right message in BlockText edition"
                 values={{
-                  size: marginVertical,
+                  size: marginHorizontal,
                 }}
               />
             }
-            value={marginVertical}
+            value={marginHorizontal}
             min={0}
             max={100}
             step={1}
-            onChange={onMarginVerticalChange}
+            onChange={onMarginHorizontalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space left/right',
               description:

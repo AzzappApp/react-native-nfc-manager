@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import {
   DEFAULT_COVER_MAX_FONT_SIZE,
   DEFAULT_COVER_MIN_FONT_SIZE,
+  TITLE_MAX_FONT_SIZE,
 } from '@azzapp/shared/coverHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
@@ -43,6 +44,10 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
    */
   textAlignment: TextAlignment;
   /**
+   * The maximum allowed font size of the text
+   */
+  moduleKind: 'simpleText' | 'simpleTitle';
+  /**
    * A callback called when the user update the font family
    */
   onFontFamilyChange: (fontFamily: string) => void;
@@ -81,6 +86,7 @@ const SimpleTextStyleEditionPanel = ({
   onVerticalSpacingChange,
   onTextAlignmentChange,
   style,
+  moduleKind,
   ...props
 }: SimpleTextStyleEditionPanelProps) => {
   const intl = useIntl();
@@ -123,7 +129,11 @@ const SimpleTextStyleEditionPanel = ({
         }
         value={fontSize}
         min={DEFAULT_COVER_MIN_FONT_SIZE}
-        max={DEFAULT_COVER_MAX_FONT_SIZE}
+        max={
+          moduleKind === 'simpleTitle'
+            ? TITLE_MAX_FONT_SIZE
+            : DEFAULT_COVER_MAX_FONT_SIZE
+        }
         step={1}
         onChange={onFontSizeChange}
         accessibilityLabel={intl.formatMessage({

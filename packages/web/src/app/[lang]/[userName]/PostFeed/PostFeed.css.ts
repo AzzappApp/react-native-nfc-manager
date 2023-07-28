@@ -11,6 +11,8 @@ const wrapper = style({
     width: '0 !important',
   },
   scrollbarWidth: 'none',
+  position: 'relative',
+  paddingTop: '96px',
 });
 
 const header = style({
@@ -19,6 +21,19 @@ const header = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '10px',
+  position: 'fixed',
+  top: 0,
+  height: '96px',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      width: '300px',
+    },
+    [MediaQuery.Mobile]: {
+      width: '100%',
+    },
+  },
+  zIndex: 1,
+  backgroundColor: vars.color.white,
 });
 
 const close = style({

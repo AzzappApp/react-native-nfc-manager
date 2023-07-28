@@ -35,30 +35,37 @@ const HorizontalPhotoRenderer = async ({
     >
       <div
         style={{
-          ...style,
-          height,
-          borderWidth,
-          borderRadius,
-          borderStyle: 'solid',
-          marginRight: marginHorizontal,
-          marginLeft: marginHorizontal,
-          marginTop: marginVertical,
-          marginBottom: marginVertical,
-          borderColor,
-          overflow: 'hidden',
-          position: 'relative',
+          maxWidth: marginHorizontal || marginVertical ? 800 : '100%',
+          margin: 'auto',
         }}
       >
-        {image && (
-          <CloudinaryImage
-            mediaId={image}
-            fill
-            alt="TODO"
-            style={{
-              objectFit: 'cover',
-            }}
-          />
-        )}
+        <div
+          style={{
+            ...style,
+            height,
+            borderWidth,
+            borderRadius,
+            borderStyle: 'solid',
+            marginRight: marginHorizontal,
+            marginLeft: marginHorizontal,
+            marginTop: marginVertical,
+            marginBottom: marginVertical,
+            borderColor,
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          {image && (
+            <CloudinaryImage
+              mediaId={image}
+              fill
+              alt="TODO"
+              style={{
+                objectFit: 'cover',
+              }}
+            />
+          )}
+        </div>
       </div>
     </CardModuleBackground>
   );
