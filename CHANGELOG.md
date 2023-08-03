@@ -1,5 +1,6 @@
-## 0.1.3-canary.2
+## 0.1.3-canary.3
 
+* **fix:**  - webcard responsive ([#699](https://github.com/AzzappApp/azzapp/pull/699))
 * **fix:**  - share url domain ([#697](https://github.com/AzzappApp/azzapp/pull/697))
 * **fix:**  - remove typescript satisfies
 * **feat:**  - card background centered ([#679](https://github.com/AzzappApp/azzapp/pull/679))

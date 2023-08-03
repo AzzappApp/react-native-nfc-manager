@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/auth",
-  "version": "0.1.3-canary.2",
+  "version": "0.1.3-canary.3",
   "private": true,
   "exports": {
     "./*": {
@@ -18,6 +18,6 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/shared": "0.1.3-canary.2"
+    "@azzapp/shared": "0.1.3-canary.3"
   }
 }
