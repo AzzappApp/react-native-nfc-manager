@@ -1,7 +1,11 @@
+import { useRef } from 'react';
 import { Image, ScrollView } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import CardModuleBackground from './CardModuleBackground';
+import PressableNative from '#ui/PressableNative';
+import CardModuleBackground from '../CardModuleBackground';
+import CarouselFullscreen from './CarouselFullscreen';
+import type { CarouselFullscrenActions } from './CarouselFullscreen';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
@@ -99,6 +103,8 @@ export const CarouselRendererRaw = ({
   } = Object.assign({}, CAROUSEL_DEFAULT_VALUES, data);
 
   const height = imageHeight + marginVertical * 2 + borderSize * 2;
+  const modal = useRef<CarouselFullscrenActions>(null);
+
   return (
     <CardModuleBackground
       {...props}
@@ -118,21 +124,36 @@ export const CarouselRendererRaw = ({
           height: '100%',
         }}
       >
-        {images?.map(image => (
-          <Image
+        {images?.map((image, i) => (
+          <PressableNative
             key={image.id}
-            source={{ uri: image.uri }}
-            style={{
-              height: imageHeight + borderSize * 2,
-              borderRadius,
-              borderColor,
-              borderWidth: borderSize,
-              aspectRatio: squareRatio ? 1 : image.aspectRatio,
-              resizeMode: 'cover',
-            }}
-          />
+            // style={[styles.root, style]}
+            onPress={() => modal.current?.open(i)}
+            accessibilityRole="alert"
+          >
+            <Image
+              key={image.id}
+              source={{ uri: image.uri }}
+              style={{
+                height: imageHeight + borderSize * 2,
+                borderRadius,
+                borderColor,
+                borderWidth: borderSize,
+                aspectRatio: squareRatio ? 1 : image.aspectRatio,
+                resizeMode: 'cover',
+              }}
+            />
+          </PressableNative>
         ))}
       </ScrollView>
+      <CarouselFullscreen
+        ref={modal}
+        images={images}
+        borderColor={borderColor}
+        borderRadius={borderRadius}
+        borderSize={borderSize}
+        squareRatio={squareRatio}
+      />
     </CardModuleBackground>
   );
 };
