@@ -23,6 +23,14 @@ type SocialLinksMarginsEditionPanelProps = ViewProps & {
    */
   onMarginBottomChange: (marginBottom: number) => void;
   /**
+   * The marginHorizontal currently set on the module
+   */
+  marginHorizontal: number;
+  /**
+   * A callback called when the user update the marginHorizontal
+   */
+  onMarginHorizontalChange: (marginRight: number) => void;
+  /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
@@ -36,6 +44,8 @@ const SocialLinksMarginsEditionPanel = ({
   onMarginTopChange,
   marginBottom,
   onMarginBottomChange,
+  marginHorizontal,
+  onMarginHorizontalChange,
   style,
   ...props
 }: SocialLinksMarginsEditionPanelProps) => {
@@ -100,6 +110,33 @@ const SocialLinksMarginsEditionPanel = ({
             defaultMessage: 'Slide to change the Bottom margin',
             description:
               'Hint of the Bottom margin slider in SocialLinks edition',
+          })}
+          style={styles.slider}
+        />
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Horizontal margin : {size}"
+              description="Horizontal margin message in SocialLinks edition"
+              values={{
+                size: marginHorizontal,
+              }}
+            />
+          }
+          value={marginHorizontal}
+          min={10}
+          max={100}
+          step={1}
+          onChange={onMarginHorizontalChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Horizontal margin',
+            description:
+              'Label of the horizontal margin slider in SocialLinks edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the horizontal margin',
+            description:
+              'Hint of the horizontal margin slider in SocialLinks edition',
           })}
           style={styles.slider}
         />

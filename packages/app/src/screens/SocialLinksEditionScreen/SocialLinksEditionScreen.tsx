@@ -65,6 +65,7 @@ const SocialLinksEditionScreen = ({
         columnGap
         marginTop
         marginBottom
+        marginHorizontal
         background {
           id
           uri
@@ -112,6 +113,7 @@ const SocialLinksEditionScreen = ({
     marginTop,
     iconSize,
     marginBottom,
+    marginHorizontal,
     background,
     backgroundStyle,
   } = data;
@@ -212,6 +214,8 @@ const SocialLinksEditionScreen = ({
   const onMarginTopChange = fieldUpdateHandler('marginTop');
 
   const onMarginBottomChange = fieldUpdateHandler('marginBottom');
+
+  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
 
   const onBackgroundChange = useCallback(
     (backgroundId: string | null) => {
@@ -333,6 +337,8 @@ const SocialLinksEditionScreen = ({
                   onMarginTopChange={onMarginTopChange}
                   marginBottom={marginBottom}
                   onMarginBottomChange={onMarginBottomChange}
+                  onMarginHorizontalChange={onMarginHorizontalChange}
+                  marginHorizontal={marginHorizontal ?? 0}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

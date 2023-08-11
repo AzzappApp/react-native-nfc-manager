@@ -146,7 +146,6 @@ export const getCardModules = async (cardId: string, includeHidden = false) => {
         includeHidden ? undefined : eq(CardModuleTable.visible, true),
       ),
     )
-    .where(eq(CardModuleTable.cardId, cardId))
     .orderBy(asc(CardModuleTable.position));
 };
 

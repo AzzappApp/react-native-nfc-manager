@@ -7,6 +7,7 @@ export type SocialLinksEditionValue = {
   columnGap?: number;
   marginTop?: number;
   marginBottom?: number;
+  marginHorizontal?: number;
   background?: {
     id: string;
     uri: string;

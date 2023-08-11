@@ -38,17 +38,17 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
         paddingBottom: marginVertical,
       }}
     >
-      <CardModuleBackground
-        backgroundId={textBackgroundId}
-        backgroundStyle={textBackgroundStyle}
-        style={{
-          paddingLeft: textMarginHorizontal,
-          paddingRight: textMarginHorizontal,
-          paddingTop: textMarginVertical,
-          paddingBottom: textMarginVertical,
-        }}
-      >
-        <div style={{ maxWidth: '800px', margin: 'auto' }}>
+      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+        <CardModuleBackground
+          backgroundId={textBackgroundId}
+          backgroundStyle={textBackgroundStyle}
+          style={{
+            paddingLeft: textMarginHorizontal,
+            paddingRight: textMarginHorizontal,
+            paddingTop: textMarginVertical,
+            paddingBottom: textMarginVertical,
+          }}
+        >
           <p
             style={{
               marginTop: 10,
@@ -61,12 +61,13 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
                 fontSize && verticalSpacing
                   ? `${fontSize * 1.2 + verticalSpacing}px`
                   : undefined,
+              whiteSpace: 'pre-line',
             }}
           >
             {text}
           </p>
-        </div>
-      </CardModuleBackground>
+        </CardModuleBackground>
+      </div>
     </CardModuleBackground>
   );
 };

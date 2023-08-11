@@ -298,6 +298,10 @@ const BlockTextEditionScreen = ({
   } = useEditorLayout();
   const intl = useIntl();
 
+  const onPreviewPress = useCallback(() => {
+    setShowContentModal(true);
+  }, []);
+
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
@@ -329,6 +333,7 @@ const BlockTextEditionScreen = ({
       <BlockTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={data}
+        onPreviewPress={onPreviewPress}
       />
       <TabView
         style={{ height: bottomPanelHeight }}

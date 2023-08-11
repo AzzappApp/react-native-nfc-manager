@@ -8,6 +8,7 @@ input SaveSocialLinksModuleInput {
   columnGap: Int
   marginTop: Int
   marginBottom: Int
+  marginHorizontal: Int
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle
   clientMutationId: String

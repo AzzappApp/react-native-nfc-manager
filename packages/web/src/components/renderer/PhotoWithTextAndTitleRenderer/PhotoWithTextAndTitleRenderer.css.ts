@@ -73,8 +73,15 @@ const sectionText = style({
       display: 'flex',
       flexDirection: 'row',
       width: '50%',
-      justifyContent: 'flex-end',
       alignItems: 'center',
+      selectors: {
+        [`${wrapperArrangmentLeft} &`]: {
+          justifyContent: 'flex-start',
+        },
+        [`${wrapperArrangmentRight} &`]: {
+          justifyContent: 'flex-end',
+        },
+      },
     },
     [MediaQuery.BelowSmallMobile]: {
       maxWidth: '100%',

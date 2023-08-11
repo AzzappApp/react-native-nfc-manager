@@ -58,6 +58,7 @@ const SimpleTextRenderer = ({
             paddingTop: marginVertical,
             paddingBottom: marginVertical,
             flexShrink: 0,
+            whiteSpace: 'pre-line',
           }}
         >
           {text}

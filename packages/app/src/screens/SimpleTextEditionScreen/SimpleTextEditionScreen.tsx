@@ -282,13 +282,21 @@ const SimpleTextEditionScreen = ({
   } = useEditorLayout();
   const intl = useIntl();
 
+  const middleElement =
+    moduleKind === 'simpleText'
+      ? intl.formatMessage({
+          defaultMessage: 'Simple text',
+          description: 'Simple text screen title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Simple title',
+          description: 'Simple title screen title',
+        });
+
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Simple text',
-          description: 'Simple text screen title',
-        })}
+        middleElement={middleElement}
         leftElement={
           <HeaderButton
             variant="secondary"

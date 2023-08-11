@@ -128,7 +128,7 @@ const PhotoWithTextAndTitleRenderer = ({
                   fontSize && verticalSpacing
                     ? `${fontSize * 1.2 + verticalSpacing}px`
                     : undefined,
-                whiteSpace: 'pre-wrap',
+                whiteSpace: 'pre-line',
               }}
             >
               {text}

@@ -195,6 +195,7 @@ export const CardModuleSocialLinks: CardModuleSocialLinksResolvers = {
   columnGap: getData('columnGap'),
   marginTop: getData('marginTop'),
   marginBottom: getData('marginBottom'),
+  marginHorizontal: getData('marginHorizontal'),
   backgroundStyle: getData('backgroundStyle', true),
   background,
 };

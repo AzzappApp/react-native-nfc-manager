@@ -4,6 +4,7 @@ import {
   DEFAULT_COVER_MAX_FONT_SIZE,
   DEFAULT_COVER_MIN_FONT_SIZE,
   TITLE_MAX_FONT_SIZE,
+  TITLE_MIN_VERTICAL_SPACING,
 } from '@azzapp/shared/coverHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
@@ -155,7 +156,7 @@ const SimpleTextStyleEditionPanel = ({
           />
         }
         value={verticalSpacing}
-        min={DEFAULT_COVER_MIN_FONT_SIZE}
+        min={TITLE_MIN_VERTICAL_SPACING}
         max={DEFAULT_COVER_MAX_FONT_SIZE}
         step={1}
         onChange={onVerticalSpacingChange}

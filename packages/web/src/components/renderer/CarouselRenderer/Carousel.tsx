@@ -3,9 +3,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { ArrowRightIcon } from '#assets';
 import { useMediaCarousel } from '#hooks';
-import { Button, ButtonIcon } from '#ui';
-import CloudinaryImage from '#ui/CloudinaryImage';
+import { ButtonIcon } from '#ui';
 import CarouselFullScreen from './CarouselFullScreen';
+import CarouselMedia from './CarouselMedia';
 import styles from './CarouselRenderer.css';
 import type { CarouselFullScreenActions } from './CarouselFullScreen';
 import type { Media } from '@azzapp/data/domains';
@@ -129,34 +129,18 @@ const Carousel = (props: CarouselProps) => {
             />
           </>
         )}
-        {medias.map((media, i) => {
-          const aspectRatio = media.width / media.height;
-          const width = imageHeight * (squareRatio ? 1 : aspectRatio);
-          return (
-            <Button.Empty
-              key={media.id}
-              onClick={() => {
-                modal.current?.open(i);
-              }}
-            >
-              <CloudinaryImage
-                draggable={false}
-                key={media.id}
-                mediaId={media.id}
-                width={width}
-                height={imageHeight}
-                alt="todo"
-                style={{
-                  borderRadius,
-                  borderColor,
-                  borderWidth: borderSize,
-                  borderStyle: 'solid',
-                  objectFit: 'cover',
-                }}
-              />
-            </Button.Empty>
-          );
-        })}
+        {medias.map((media, i) => (
+          <CarouselMedia
+            key={media.id}
+            media={media}
+            borderColor={borderColor}
+            borderRadius={borderRadius}
+            borderSize={borderSize}
+            imageHeight={imageHeight}
+            squareRatio={squareRatio}
+            onClick={() => modal.current?.open(i)}
+          />
+        ))}
       </div>
       <CarouselFullScreen
         ref={modal}

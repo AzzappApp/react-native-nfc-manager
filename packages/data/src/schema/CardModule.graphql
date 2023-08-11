@@ -353,6 +353,7 @@ type CardModuleSocialLinks implements CardModule {
   columnGap: Int!
   marginTop: Int!
   marginBottom: Int!
+  marginHorizontal: Int!
   background: StaticMedia
   backgroundStyle: ModuleBackgroundStyle
 

@@ -87,3 +87,5 @@ export const DEFAULT_COVER_MIN_FONT_SIZE = 10;
 export const DEFAULT_COVER_MAX_FONT_SIZE = 24;
 
 export const TITLE_MAX_FONT_SIZE = 72;
+
+export const TITLE_MIN_VERTICAL_SPACING = 0;

@@ -46,6 +46,7 @@ const SocialLinksRenderer = ({
           columnGap
           marginTop
           marginBottom
+          marginHorizontal
           background {
             id
             uri
@@ -96,6 +97,7 @@ export const SocialLinksRendererRaw = ({
     columnGap,
     marginTop,
     marginBottom,
+    marginHorizontal,
     background,
     backgroundStyle,
   } = Object.assign(
@@ -127,6 +129,8 @@ export const SocialLinksRendererRaw = ({
           style={{
             marginTop,
             marginBottom,
+            paddingLeft: marginHorizontal,
+            paddingRight: marginHorizontal,
           }}
           contentContainerStyle={{
             columnGap,
@@ -169,6 +173,8 @@ export const SocialLinksRendererRaw = ({
             flexWrap: 'wrap',
             marginTop,
             marginBottom,
+            paddingLeft: marginHorizontal,
+            paddingRight: marginHorizontal,
             columnGap,
             rowGap: columnGap,
           }}

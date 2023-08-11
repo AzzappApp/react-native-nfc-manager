@@ -95,6 +95,10 @@
     "defaultMessage": "Save",
     "description": "Edit email address modal save button label"
   },
+  "0alrwe": {
+    "defaultMessage": "Horizontal margin",
+    "description": "Label of the horizontal margin slider in SocialLinks edition"
+  },
   "106q2H": {
     "defaultMessage": "Background",
     "description": "Carousel  bottom menu label for Background tab"
@@ -759,6 +763,10 @@
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
   },
+  "HTkAAL": {
+    "defaultMessage": "Slide to change the horizontal margin",
+    "description": "Hint of the horizontal margin slider in SocialLinks edition"
+  },
   "HXeYa9": {
     "defaultMessage": "Edit TextBackground",
     "description": "BlockText bottom menu label for TextBackground tab"
@@ -1206,6 +1214,10 @@
   "ThdVEq": {
     "defaultMessage": "Error while creating post",
     "description": "Toast Error message while creating post"
+  },
+  "ThwDNw": {
+    "defaultMessage": "Horizontal margin : {size}",
+    "description": "Horizontal margin message in SocialLinks edition"
   },
   "TiTw6m": {
     "defaultMessage": "Border shape",
@@ -2466,6 +2478,10 @@
   "uAudXH": {
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in PhotoWithTextAndTitle edition"
+  },
+  "uExyDe": {
+    "defaultMessage": "Simple title",
+    "description": "Simple title screen title"
   },
   "uHQfNw": {
     "defaultMessage": "Video Shutter",

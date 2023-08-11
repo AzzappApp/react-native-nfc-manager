@@ -147,6 +147,7 @@ export const SOCIAL_LINKS_DEFAULT_VALUES = {
   columnGap: 15,
   marginTop: 20,
   marginBottom: 20,
+  marginHorizontal: 20,
 } as const;
 
 export const BLOCK_TEXT_DEFAULT_VALUES = {
