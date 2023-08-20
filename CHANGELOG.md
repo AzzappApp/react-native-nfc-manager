@@ -1,5 +1,8 @@
-## 0.1.3-canary.8
+## 0.1.3-canary.9
 
+* **feat:**  - **WebCard:** new cover system ([#680](https://github.com/AzzappApp/azzapp/pull/680))
+* **fix:**  - 🐛 improve card modules ([#733](https://github.com/AzzappApp/azzapp/pull/733))
+* **feat:**  - 🎸 add carousel interaction & transition for web & mobile ([#707](https://github.com/AzzappApp/azzapp/pull/707))
 * **fix:**  - webcard responsive ([#699](https://github.com/AzzappApp/azzapp/pull/699))
 * **fix:**  - share url domain ([#697](https://github.com/AzzappApp/azzapp/pull/697))
 * **fix:**  - remove typescript satisfies
