@@ -1,14 +1,25 @@
-import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  BLOCK_TEXT_DEFAULT_VALUES,
+  BLOCK_TEXT_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
+import type { CardModuleBlockText } from '@azzapp/data/domains';
 
-export type BlockTextRendererProps = ModuleRendererProps &
+export type BlockTextRendererProps = ModuleRendererProps<CardModuleBlockText> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a BlockText module
  */
-const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
+const BlockTextRenderer = ({
+  module,
+  colorPalette,
+  cardStyle,
+  ...props
+}: BlockTextRendererProps) => {
   const {
     text,
     fontFamily,
@@ -24,13 +35,19 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
     textBackgroundStyle,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, BLOCK_TEXT_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={{
         paddingLeft: marginHorizontal,
         paddingRight: marginHorizontal,
@@ -42,6 +59,7 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
         <CardModuleBackground
           backgroundId={textBackgroundId}
           backgroundStyle={textBackgroundStyle}
+          colorPalette={colorPalette}
           style={{
             paddingLeft: textMarginHorizontal,
             paddingRight: textMarginHorizontal,
@@ -54,7 +72,7 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
               marginTop: 10,
               marginBottom: 10,
               textAlign,
-              color: fontColor,
+              color: swapColor(fontColor, colorPalette),
               fontSize,
               fontFamily,
               lineHeight:

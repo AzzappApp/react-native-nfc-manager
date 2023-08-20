@@ -7,18 +7,13 @@ export type HomeRoute = {
   params?: never;
 };
 
+export type MediaRoute = {
+  route: 'MEDIA';
+  params?: never;
+};
+
 export type SearchRoute = {
   route: 'SEARCH';
-  params?: never;
-};
-
-export type ChatRoute = {
-  route: 'CHAT';
-  params?: never;
-};
-
-export type AccountRoute = {
-  route: 'ACCOUNT';
   params?: never;
 };
 
@@ -46,27 +41,20 @@ export type ForgotPasswordConfirmationRoute = {
 
 export type NewProfileRoute = {
   route: 'NEW_PROFILE';
-  params?: {
-    goBack: boolean;
-  };
+  params?: never;
 };
 
 export type ProfileRoute = {
   route: 'PROFILE';
   params: {
     userName: string;
-    profileID?: string;
+    profileId?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
+    editing?: boolean;
   };
 };
-
-export type AlbumsRoute = {
-  route: 'ALBUMS';
-  params?: never;
-};
-
 export type PostRoute = {
   route: 'POST';
   params: {
@@ -87,10 +75,15 @@ export type NewPostRoute = {
   params?: { fromProfile: boolean };
 };
 
+export type CoverEditionRoute = {
+  route: 'COVER_EDITION';
+  params?: { isCreation?: boolean; coverKind?: 'people' | 'video' | 'others' };
+};
+
 export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
   params: {
-    module: ModuleKind | 'cover';
+    module: ModuleKind;
     moduleId?: string;
     isNew?: boolean;
   };
@@ -98,6 +91,11 @@ export type CardModuleEditionRoute = {
 
 export type FollowingsRoute = {
   route: 'FOLLOWINGS';
+  params?: never;
+};
+
+export type FollowingsMosaicRoute = {
+  route: 'FOLLOWINGS_MOSAIC';
   params?: never;
 };
 
@@ -130,11 +128,9 @@ export type ResetPasswordRoute = {
 };
 
 export type Route =
-  | AlbumsRoute
   | HomeRoute
+  | MediaRoute
   | SearchRoute
-  | ChatRoute
-  | AccountRoute
   | ProfileRoute
   | PostRoute
   | PostCommentsRoute
@@ -144,7 +140,9 @@ export type Route =
   | SignUpRoute
   | ForgotPasswordRoute
   | CardModuleEditionRoute
+  | CoverEditionRoute
   | FollowingsRoute
+  | FollowingsMosaicRoute
   | FollowersRoute
   | AccountDetailsRoute
   | InviteFriendsRoute

@@ -73,7 +73,6 @@ const InviteFriendsScreen = ({
         }}
       >
         <AccountHeader
-          userName={profile?.userName}
           profile={profile}
           title={intl.formatMessage({
             defaultMessage: 'Invite Friends',

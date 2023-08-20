@@ -35,7 +35,6 @@ export const POST = async (req: Request) => {
     let issuer: string | undefined;
     if (isValidEmail(credential)) {
       user = await getUserByEmail(credential);
-      console.log(user);
 
       if (user?.email) {
         const existingToken = await getToken(user.id);

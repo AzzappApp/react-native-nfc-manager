@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import clamp from 'lodash/clamp';
 import range from 'lodash/range';
 import { useEffect, useRef } from 'react';
@@ -8,7 +9,6 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import { getPrecision } from '@azzapp/shared/numberHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';

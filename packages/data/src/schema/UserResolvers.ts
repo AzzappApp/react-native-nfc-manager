@@ -3,7 +3,7 @@ import type { UserResolvers } from './__generated__/types';
 
 export const User: UserResolvers = {
   email: async (_root, _args, { auth, userLoader }) => {
-    if (auth.isAnonymous) {
+    if (!auth.userId) {
       return null;
     }
 
@@ -12,7 +12,7 @@ export const User: UserResolvers = {
     return user?.email ?? null;
   },
   phoneNumber: async (_root, _args, { auth, userLoader }) => {
-    if (auth.isAnonymous) {
+    if (!auth.userId) {
       return null;
     }
 
@@ -21,7 +21,7 @@ export const User: UserResolvers = {
     return user?.phoneNumber ?? null;
   },
   profiles: async (_root, _args, { auth }) => {
-    if (auth.isAnonymous) {
+    if (!auth.userId) {
       return null;
     }
 

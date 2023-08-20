@@ -1,18 +1,20 @@
 import { Linking, ScrollView, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  SOCIAL_LINKS_DEFAULT_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
-import type {
-  SocialLink,
-  SocialLinksEditionValue,
-} from '#screens/SocialLinksEditionScreen/SocialLinksEditionScreenTypes';
 import type { SocialIcons } from '#ui/Icon';
 import type {
   SocialLinksRenderer_module$data,
   SocialLinksRenderer_module$key,
 } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
 export type SocialLinksRendererProps = ViewProps & {
@@ -20,6 +22,14 @@ export type SocialLinksRendererProps = ViewProps & {
    * A relay fragment reference for a SocialLinks module
    */
   module: SocialLinksRenderer_module$key;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -31,31 +41,28 @@ const SocialLinksRenderer = ({
 }: SocialLinksRendererProps) => {
   const data = useFragment(
     graphql`
-      fragment SocialLinksRenderer_module on CardModule {
-        id
-        ... on CardModuleSocialLinks {
-          links {
-            socialId
-            link
-            position
-          }
-          iconColor
-          iconSize
-          arrangement
-          borderWidth
-          columnGap
-          marginTop
-          marginBottom
-          marginHorizontal
-          background {
-            id
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
+      fragment SocialLinksRenderer_module on CardModuleSocialLinks {
+        links {
+          socialId
+          link
+          position
+        }
+        iconColor
+        iconSize
+        arrangement
+        borderWidth
+        columnGap
+        marginTop
+        marginBottom
+        marginHorizontal
+        background {
+          id
+          uri
+          resizeMode
+        }
+        backgroundStyle {
+          backgroundColor
+          patternColor
         }
       }
     `,
@@ -66,9 +73,8 @@ const SocialLinksRenderer = ({
 
 export default SocialLinksRenderer;
 
-export type SocialLinksRawData = Omit<
-  SocialLinksRenderer_module$data,
-  ' $fragmentType'
+export type SocialLinksRawData = NullableFields<
+  Omit<SocialLinksRenderer_module$data, ' $fragmentType'>
 >;
 
 type SocialLinksRendererRawProps = ViewProps & {
@@ -76,6 +82,14 @@ type SocialLinksRendererRawProps = ViewProps & {
    * The data for the SocialLinks module
    */
   data: SocialLinksRawData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -85,6 +99,8 @@ type SocialLinksRendererRawProps = ViewProps & {
  */
 export const SocialLinksRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   ...props
 }: SocialLinksRendererRawProps) => {
@@ -100,17 +116,22 @@ export const SocialLinksRendererRaw = ({
     marginHorizontal,
     background,
     backgroundStyle,
-  } = Object.assign(
-    {},
-    SOCIAL_LINKS_DEFAULT_VALUES,
+  } = getModuleDataValues({
     data,
-  ) as unknown as SocialLinksEditionValue;
+    cardStyle,
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+    styleValuesMap: null,
+  });
 
   const linksOrdered = [...(links ?? [])].sort(
     (a, b) => a.position - b.position,
   );
 
-  const onPressSocialLink = async (link: SocialLink) => {
+  const onPressSocialLink = async (link: {
+    readonly link: string;
+    readonly position: number;
+    readonly socialId: string;
+  }) => {
     const url = SOCIAL_LINKS.find(l => l.id === link.socialId)?.mask;
     await Linking.openURL(`http://${url}${link.link}`);
   };
@@ -119,8 +140,11 @@ export const SocialLinksRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       style={style}
     >
       {arrangement === 'inline' ? (
@@ -147,7 +171,7 @@ export const SocialLinksRendererRaw = ({
                 height: iconSize,
                 borderWidth,
                 borderRadius: iconSize / 2,
-                borderColor: iconColor,
+                borderColor: swapColor(iconColor, colorPalette),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -158,7 +182,7 @@ export const SocialLinksRendererRaw = ({
                 style={{
                   width: iconSize - 22,
                   height: iconSize - 22,
-                  tintColor: iconColor,
+                  tintColor: swapColor(iconColor, colorPalette),
                 }}
               />
             </PressableOpacity>
@@ -187,7 +211,7 @@ export const SocialLinksRendererRaw = ({
                 height: iconSize,
                 borderWidth,
                 borderRadius: iconSize / 2,
-                borderColor: iconColor,
+                borderColor: swapColor(iconColor, colorPalette),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -198,7 +222,7 @@ export const SocialLinksRendererRaw = ({
                 style={{
                   width: iconSize - 22,
                   height: iconSize - 22,
-                  tintColor: iconColor,
+                  tintColor: swapColor(iconColor, colorPalette),
                 }}
               />
             </PressableOpacity>

@@ -1,5 +1,4 @@
 import { fromGlobalId } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { follows, unfollows } from '#domains';
 import type { Profile } from '#domains';
@@ -10,10 +9,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   { input },
   { auth, profileLoader },
 ) => {
-  if (auth.isAnonymous) {
-    throw new Error(ERRORS.UNAUTORIZED);
-  }
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }

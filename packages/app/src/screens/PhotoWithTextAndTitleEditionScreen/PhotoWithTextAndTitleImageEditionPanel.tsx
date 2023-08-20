@@ -5,8 +5,8 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { Icons } from '#ui/Icon';
 import type {
+  CardModulePhotoWithTextAndTitleImageMargin,
   HorizontalArrangement,
-  ItemMargin,
   VerticalArrangement,
 } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
@@ -23,7 +23,7 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The imageMargin currently set on the module
    */
-  imageMargin: ItemMargin;
+  imageMargin: CardModulePhotoWithTextAndTitleImageMargin;
   /**
    * A callback called when the user update the imageMargin
    */

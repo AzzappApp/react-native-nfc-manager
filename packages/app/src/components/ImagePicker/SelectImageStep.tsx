@@ -323,6 +323,12 @@ const SelectImageStep = ({
 
 SelectImageStep.STEP_ID = 'SELECT_IMAGE';
 
+export const SelectImageStepWithFrontCameraByDefault = (
+  props: SelectImageStepProps,
+) => {
+  return <SelectImageStep {...props} initialCameraPosition="front" />;
+};
+
 export default SelectImageStep;
 
 const styles = StyleSheet.create({

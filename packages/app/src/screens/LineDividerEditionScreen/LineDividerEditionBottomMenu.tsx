@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import BottomMenu from '#ui/BottomMenu';
 import ColorPreview from '#ui/ColorPreview';
 import type { BottomMenuProps } from '#ui/BottomMenu';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 type LineDividerEditionBottomMenuProps = Omit<
   BottomMenuProps,
@@ -12,6 +14,7 @@ type LineDividerEditionBottomMenuProps = Omit<
 > & {
   colorTop: string;
   colorBottom: string;
+  colorPalette?: ColorPalette | null;
 };
 /**
  * The bottom menu of the Line Divider edition screen
@@ -19,6 +22,7 @@ type LineDividerEditionBottomMenuProps = Omit<
 const LineDividerEditionBottomMenu = ({
   colorTop,
   colorBottom,
+  colorPalette,
   ...props
 }: LineDividerEditionBottomMenuProps) => {
   const intl = useIntl();
@@ -40,7 +44,7 @@ const LineDividerEditionBottomMenu = ({
             IconComponent: (
               <View>
                 <ColorPreview
-                  color={colorTop}
+                  color={swapColor(colorTop, colorPalette)}
                   style={styles.colorPreview}
                   colorSize={16}
                 />
@@ -64,7 +68,7 @@ const LineDividerEditionBottomMenu = ({
             IconComponent: (
               <View>
                 <ColorPreview
-                  color={colorBottom}
+                  color={swapColor(colorBottom, colorPalette)}
                   style={styles.colorPreview}
                   colorSize={16}
                 />
@@ -85,7 +89,7 @@ const LineDividerEditionBottomMenu = ({
             }),
           },
         ],
-        [colorBottom, colorTop, intl],
+        [colorBottom, colorTop, intl, colorPalette],
       )}
       showLabel={false}
       {...props}

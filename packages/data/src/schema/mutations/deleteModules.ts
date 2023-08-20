@@ -1,5 +1,4 @@
 import { inArray, sql } from 'drizzle-orm';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -7,9 +6,9 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
   { input: { modulesIds } },
-  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  { auth, profileLoader, cardUpdateListener },
 ) => {
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
@@ -17,12 +16,10 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
-  const card = await cardByProfileLoader.load(profileId);
-  if (!card) {
-    throw new Error(ERRORS.INVALID_REQUEST);
-  }
   const modules = await getCardModulesByIds(modulesIds);
-  if (!modules.every(module => module != null && module.cardId === card.id)) {
+  if (
+    !modules.every(module => module != null && module.profileId === profileId)
+  ) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
@@ -42,11 +39,11 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
             id, 
             ROW_NUMBER() OVER (PARTITION BY cardId ORDER BY position) position
           FROM CardModule
-          WHERE cardId = ${card.id}
+          WHERE profileId = ${profileId}
         ) AS NewPos
         ON CardModule.id = NewPos.id
         SET CardModule.position = NewPos.position - 1
-        WHERE CardModule.cardId = ${card.id}
+        WHERE CardModule.profileId = ${profileId}
       `;
       await trx.execute(updatePosQuery);
     });
@@ -55,10 +52,10 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const profile = await profileLoader.load(profileId);
-  cardUpdateListener(profile!.userName);
+  const profile = (await profileLoader.load(profileId))!;
+  cardUpdateListener(profile.userName);
 
-  return { card };
+  return { profile };
 };
 
 export default deleteModules;

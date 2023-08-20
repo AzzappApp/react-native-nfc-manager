@@ -25,7 +25,7 @@ type SignInBody = {
 
 const signin = async (req: Request) => {
   const bod = await req.json();
-  const { credential, password, authMethod } = <SignInBody>bod || {};
+  const { credential, password } = <SignInBody>bod || {};
 
   if (!credential || !password) {
     return NextResponse.json(
@@ -68,10 +68,8 @@ const signin = async (req: Request) => {
         { status: 401 },
       );
     }
-    return await handleSigninAuthMethod(authMethod, user, profile);
+    return await handleSigninAuthMethod(user, profile);
   } catch (error) {
-    console.error('Signin error');
-    console.error(typeof error);
     console.error(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },

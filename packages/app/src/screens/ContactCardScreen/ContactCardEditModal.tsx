@@ -105,8 +105,10 @@ const ContactCardEditModal = ({
     graphql`
       mutation ContactCardEditModalMutation($input: SaveContactCardInput!) {
         saveContactCard(input: $input) {
-          contactCard {
-            ...ContactCardEditModal_card
+          profile {
+            contactCard {
+              ...ContactCardEditModal_card
+            }
           }
         }
       }

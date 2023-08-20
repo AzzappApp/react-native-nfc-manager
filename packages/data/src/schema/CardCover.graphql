@@ -1,77 +1,115 @@
 """
-Card cover display informations
+Web Card Cover
 """
 type CardCover {
   """
-  The main media of the cover
+  The title of the card
   """
-  media: Media!
-  mediaStyle: JSON
-
+  title: String
   """
-  The source of the media used by the cover
+  The style of the title text
   """
-  sourceMedia: Media!
-
+  titleStyle: CardCoverTextStyle
   """
-  The mask media of the cover
+  The subtitle of the card
+  """
+  subTitle: String
+  """
+  The style of the subtitle text
+  """
+  subTitleStyle: CardCoverTextStyle
+  """
+  The position of the text in the card cover
+  """
+  textOrientation: CardCoverTextOrientation
+  """
+  The position of the text in the card cover
+  """
+  textPosition: CardCoverTextPosition
+  """
+  The media of the card cover generated from the source media
+  """
+  media: Media
+  """
+  The source media of the cover, used to generate the media
+  """
+  sourceMedia: Media
+  """
+  The mask media of the cover, used to generate the media
   """
   maskMedia: MediaImage
-
+  """
+  The filter applied to the source media to generate the media
+  """
+  mediaFilter: String
+  """
+  The transform applied to the source media to generate the media
+  """
+  mediaParameters: JSON
   """
   The text of the cover renderered as an image to avoid font loading issues
   """
   textPreviewMedia: MediaImage
+  """
+  The background image of the card cover
+  """
   background: StaticMedia
-  backgroundStyle: CardCoverBackgroundStyle
-  foreground: StaticMedia
-  foregroundStyle: CardCoverForegroundStyle
-  segmented: Boolean!
-  merged: Boolean!
-  title: String!
-  titleStyle: CardCoverTextStyle
-  subTitle: String
-  subTitleStyle: CardCoverTextStyle
-  contentStyle: CardCoverContentStyle
-}
-
-"""
-Style of the background of a card cover
-"""
-type CardCoverBackgroundStyle {
+  """
+  The background color of the card cover
+  """
   backgroundColor: String
-  patternColor: String
+  """
+  A color used to tint the background image
+  """
+  backgroundPatternColor: String
+  """
+  The foreground image of the card cover
+  """
+  foreground: StaticMedia
+  """
+  A color used to tint the foreground image
+  """
+  foregroundColor: String
+  """
+  if true, the card cover media use selfie segmentation
+  """
+  segmented: Boolean!
+  """
+  if true, the card cover media is merged with the background using multiply blending
+  """
+  merged: Boolean!
 }
 
-"""
-Style of the foreground of a card cover
-"""
-type CardCoverForegroundStyle {
-  color: String
-}
 
 """
-Style of the text in a  a card cover
+Style of the text in a card cover
 """
 type CardCoverTextStyle {
-  color: String
-  fontSize: Int
-  fontFamily: String
+  color: String!
+  fontSize: Int!
+  fontFamily: String!
 }
 
 """
-Style of the content of a card cover
+Orientation of the card cover text
 """
-type CardCoverContentStyle {
-  orientation: CardCoverTitleOrientation
-  placement: String
-}
-
-"""
-Orientation of the title of a card cover
-"""
-enum CardCoverTitleOrientation {
+enum CardCoverTextOrientation {
   horizontal
   topToBottom
   bottomToTop
+}
+
+"""
+Placement of the card cover text in the card cover 
+"""
+enum CardCoverTextPosition {
+  bottomCenter
+  bottomLeft
+  bottomRight
+  middleCenter
+  middleLeft
+  middleRight
+  topCenter
+  topLeft
+  topRight
 }

@@ -101,12 +101,13 @@ module.exports = async function buildChangeLog(
     console.log('Determining version and building change log...');
     const increment = majorInc
       ? 'major'
-      : commits.some(c =>
-          BREAKING_CHANGE_PATTERN.test(c.title) ||
-          BREAKING_CHANGE_PATTERN.test(c.description)
-            ? 'minor'
-            : 'patch',
-        );
+      : commits.some(
+          c =>
+            BREAKING_CHANGE_PATTERN.test(c.title) ||
+            BREAKING_CHANGE_PATTERN.test(c.description),
+        )
+      ? 'minor'
+      : 'patch';
 
     const lastReleasedVersion = lastTag ? lastTag.version : currentVersion;
     const [major, minor, patch] = lastReleasedVersion.split('-')[0].split('.');

@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   DEFAULT_COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_MAX_FONT_SIZE,
@@ -122,6 +123,11 @@ const SimpleButtonSettingsEditionPanel = ({
       fragment SimpleButtonSettingsEditionPanel_viewer on Viewer {
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            dark
+            light
+          }
         }
       }
     `,
@@ -149,11 +155,14 @@ const SimpleButtonSettingsEditionPanel = ({
             description: 'Button color tab label in SimpleButton edition',
           }),
           rightElement: (
-            <ColorPreview color={buttonColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(buttonColor, profile?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [buttonColor, intl],
+    [buttonColor, intl, profile?.cardColors],
   );
 
   const SELECTORS: Array<CountryCodeListOption<'email' | 'link'>> = [

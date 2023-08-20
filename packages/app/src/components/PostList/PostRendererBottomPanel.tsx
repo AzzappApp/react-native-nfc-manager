@@ -16,6 +16,7 @@ import Text from '#ui/Text';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
+import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
 import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelUpdatePostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
@@ -42,9 +43,10 @@ type PostRendererBottomPanelProps = {
   /**
    * The post to display
    *
-   * @type {PostRendererBottomPanelFragment_post$key}
+   * @type { PostRendererActionBar_post$key & PostRendererBottomPanelFragment_post$key}
    */
-  post: PostRendererBottomPanelFragment_post$key;
+  post: PostRendererActionBar_post$key &
+    PostRendererBottomPanelFragment_post$key;
 };
 
 const PostRendererBottomPanel = ({
@@ -57,7 +59,6 @@ const PostRendererBottomPanel = ({
   const post = useFragment(
     graphql`
       fragment PostRendererBottomPanelFragment_post on Post {
-        ...PostRendererActionBar_post
         id
         content
         counterComments
@@ -72,12 +73,12 @@ const PostRendererBottomPanel = ({
         }
         author {
           id
-          isViewer
+          # isViewer
         }
         createdAt
       }
     `,
-    postKey,
+    postKey as PostRendererBottomPanelFragment_post$key,
   );
 
   const author = useFragment(
@@ -157,6 +158,7 @@ const PostRendererBottomPanel = ({
   const auth = useAuthState();
 
   const currentProfileId = toGlobalId('Profile', auth.profileId ?? '');
+  const isViewer = author.id === currentProfileId;
 
   const toggleFollow = useToggleFollow(currentProfileId);
 
@@ -167,7 +169,7 @@ const PostRendererBottomPanel = ({
   return (
     <>
       <View style={styles.bottomContainerPost}>
-        <PostRendererActionBar style={{ marginTop: 10 }} postKey={post} />
+        <PostRendererActionBar style={{ marginTop: 10 }} postKey={postKey} />
         {!!post.content && (
           <ExpendableText
             style={styles.content}
@@ -215,7 +217,7 @@ const PostRendererBottomPanel = ({
         onRequestClose={toggleModal}
       >
         <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
-          {post.author.isViewer && (
+          {isViewer && (
             <View style={styles.modalLine}>
               <Text variant="medium">
                 <FormattedMessage
@@ -230,7 +232,7 @@ const PostRendererBottomPanel = ({
               />
             </View>
           )}
-          {post.author.isViewer && (
+          {isViewer && (
             <View style={styles.modalLine}>
               <Text variant="medium">
                 <FormattedMessage
@@ -270,7 +272,7 @@ const PostRendererBottomPanel = ({
               />
             </Text>
           </PressableOpacity>
-          {!post.author.isViewer && (
+          {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
               {author?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
@@ -289,7 +291,7 @@ const PostRendererBottomPanel = ({
               )}
             </PressableOpacity>
           )}
-          {!post.author.isViewer && (
+          {!isViewer && (
             <PressableOpacity
               onPress={report}
               style={[styles.modalLine, styles.errorModalLine]}
@@ -302,7 +304,7 @@ const PostRendererBottomPanel = ({
               </Text>
             </PressableOpacity>
           )}
-          {post.author.isViewer && (
+          {isViewer && (
             <PressableOpacity
               onPress={report}
               style={[styles.modalLine, styles.errorModalLine]}

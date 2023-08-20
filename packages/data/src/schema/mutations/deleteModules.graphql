@@ -1,9 +1,11 @@
+extend type Mutation {
+  deleteModules(input: DeleteModulesInput!): DeleteModulesPayload!
+}
+
 input DeleteModulesInput {
   modulesIds: [ID!]!
-  clientMutationId: String
 }
 
 type DeleteModulesPayload {
-  card: Card!
-  clientMutationId: String
+  profile: Profile!
 }

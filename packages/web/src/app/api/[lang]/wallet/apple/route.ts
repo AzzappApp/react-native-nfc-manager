@@ -1,18 +1,25 @@
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@azzapp/auth/viewer';
+import { getProfileById } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
-import type { SessionData } from '@azzapp/auth/viewer';
+import { getSessionData } from '#helpers/tokens';
 
+// TODO check if auth token is sent in request
 const createPass = async (
   _: Request,
-  { params }: { params: { lang: string } },
+  {
+    params,
+    searchParams,
+  }: {
+    params: { lang: string };
+    searchParams: { profileId: string };
+  },
 ) => {
-  let viewer: SessionData;
+  const profileId = searchParams.profileId;
   try {
-    viewer = await getSessionData();
-
-    if (viewer.isAnonymous || !viewer.profileId) {
+    const { userId } = (await getSessionData()) ?? {};
+    const profile = await getProfileById(profileId);
+    if (!profile || profile.userId !== userId) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },
         { status: 401 },
@@ -28,7 +35,7 @@ const createPass = async (
     );
   }
 
-  const pass = await buildApplePass(viewer.profileId, params.lang);
+  const pass = await buildApplePass(profileId, params.lang);
 
   if (pass) {
     return new Response(pass.getAsBuffer(), {

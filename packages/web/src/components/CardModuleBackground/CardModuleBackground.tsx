@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import { convertHexToRGBA } from '#helpers';
 import styles from './CardModuleBackground.css';
@@ -12,6 +13,7 @@ type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   } | null;
   containerStyle?: React.CSSProperties;
   containerClassName?: string;
+  colorPalette: ColorPalette;
   resizeModes?: Map<string, string>;
 };
 
@@ -22,6 +24,7 @@ const CardModuleBackground = ({
   style,
   containerStyle,
   containerClassName,
+  colorPalette,
   resizeModes,
   ...props
 }: CardModuleBackgroundProps) => {
@@ -47,7 +50,10 @@ const CardModuleBackground = ({
     <div
       style={{
         ...style,
-        backgroundColor: convertHexToRGBA(backgroundColor ?? '#FFF', opacity),
+        backgroundColor: convertHexToRGBA(
+          swapColor(backgroundColor, colorPalette) ?? '#FFF',
+          opacity,
+        ),
         position: 'relative',
       }}
       {...props}
@@ -56,7 +62,7 @@ const CardModuleBackground = ({
         <div
           style={{
             backgroundColor: convertHexToRGBA(
-              patternColor ?? '#ff0000',
+              swapColor(patternColor, colorPalette) ?? '#FFF',
               opacity,
             ),
             WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,

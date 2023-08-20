@@ -11,7 +11,7 @@ type CarouselMediaProps = {
   squareRatio: boolean;
   borderRadius: number;
   borderColor: string;
-  borderSize: number;
+  borderWidth: number;
   onClick: () => void;
 };
 
@@ -22,7 +22,7 @@ const CarouselMedia = (props: CarouselMediaProps) => {
     squareRatio,
     borderRadius,
     borderColor,
-    borderSize,
+    borderWidth,
     onClick,
   } = props;
 
@@ -46,7 +46,7 @@ const CarouselMedia = (props: CarouselMediaProps) => {
           minHeight: imageHeight,
           borderRadius,
           borderColor,
-          borderWidth: borderSize,
+          borderWidth,
           borderStyle: 'solid',
           objectFit: 'cover',
         }}

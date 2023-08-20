@@ -1,15 +1,22 @@
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
+  SIMPLE_TITLE_STYLE_VALUES,
+  getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
+import type { CardModuleSimpleText } from '@azzapp/data/domains';
 
-type SimpleTextRendererProps = ModuleRendererProps &
+type SimpleTextRendererProps = ModuleRendererProps<CardModuleSimpleText> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 const SimpleTextRenderer = ({
   module,
+  cardStyle,
+  colorPalette,
   style,
   ...props
 }: SimpleTextRendererProps) => {
@@ -18,34 +25,38 @@ const SimpleTextRenderer = ({
     fontFamily,
     fontSize,
     textAlign,
-    color,
+    fontColor,
     verticalSpacing,
     marginHorizontal,
     marginVertical,
     backgroundId,
     backgroundStyle,
-  } = Object.assign(
-    {},
-    module.kind === 'simpleText'
-      ? SIMPLE_TEXT_DEFAULT_VALUES
-      : SIMPLE_TITLE_DEFAULT_VALUES,
-    module.data,
-  );
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap:
+      module.kind === 'simpleText'
+        ? SIMPLE_TEXT_STYLE_VALUES
+        : SIMPLE_TITLE_STYLE_VALUES,
+    defaultValues:
+      module.kind === 'simpleText'
+        ? SIMPLE_TEXT_DEFAULT_VALUES
+        : SIMPLE_TITLE_DEFAULT_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
-      style={{
-        ...style,
-      }}
+      colorPalette={colorPalette}
+      style={style}
     >
       <div style={{ maxWidth: '800px', margin: 'auto' }}>
         <div
           style={{
             textAlign,
-            color,
+            color: swapColor(fontColor, colorPalette),
             fontSize,
             fontFamily,
             lineHeight:

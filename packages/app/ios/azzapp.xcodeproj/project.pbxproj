@@ -21,6 +21,7 @@
 		96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
 		96678DE529D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */; };
 		96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */; };
+		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		BF3ACC82966C507CA7D87A04 /* libPods-common-azzapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA026B00F3848AA15FD79C9E /* libPods-common-azzapp.a */; };
 		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
 		D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */; };
@@ -237,6 +238,7 @@
 		A05F2FC0F6978150EDB5CEDC /* Pods-azzapp-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-azzapp-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-azzapp-azzappTests/Pods-azzapp-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A45AB622A60E4FA1225BE12C /* libPods-common-azzapp-dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6ADC0198955819309228FBD /* Pods-common-azzapp-staging.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.debug.xcconfig"; sourceTree = "<group>"; };
+		BCEB3A032A74063A0010EEEE /* Azzapp.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Azzapp.ttf; path = ../../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		C760EC6F6E4C3A84D4886FFA /* Pods-common-azzapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.debug.xcconfig"; sourceTree = "<group>"; };
 		CA026B00F3848AA15FD79C9E /* libPods-common-azzapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -540,6 +542,7 @@
 		FDFDBA6F2841006200621C0F /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				BCEB3A032A74063A0010EEEE /* Azzapp.ttf */,
 				96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */,
 				96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */,
 				96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */,
@@ -697,6 +700,7 @@
 				96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				FD55E4BB28B53F8400321128 /* AppCenter-Config.plist in Resources */,
 				96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */,
+				BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */,
 				96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				96678DE529D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf in Resources */,

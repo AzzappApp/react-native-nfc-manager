@@ -52,7 +52,7 @@ const FollowersScreen = ({
           })}
         />
         <FollowersScreenList
-          isPublic={viewer?.profile?.contactCard.public ?? false}
+          isPublic={viewer?.profile?.contactCard?.public ?? false}
           currentProfileId={viewer.profile?.id ?? ''}
           viewer={viewer}
         />

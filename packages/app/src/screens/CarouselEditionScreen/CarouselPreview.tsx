@@ -3,6 +3,7 @@ import { colors, shadow } from '#theme';
 import { CarouselRendererRaw } from '#components/cardModules/CarouselRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { CarouselRawData } from '#components/cardModules/CarouselRenderer';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
 
 type CarouselPreviewProps = ViewProps & {
@@ -14,14 +15,29 @@ type CarouselPreviewProps = ViewProps & {
    * height of the preview
    */
   height: number;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the color palette
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
  * Preview of the carousel module.
  */
-const CarouselPreview = ({ data, height, ...props }: CarouselPreviewProps) => {
-  const { imageHeight, marginVertical, borderSize } = data;
-  const moduleHeight = imageHeight + marginVertical * 2 + borderSize * 2;
+const CarouselPreview = ({
+  data,
+  colorPalette,
+  cardStyle,
+  height,
+  ...props
+}: CarouselPreviewProps) => {
+  const { imageHeight, marginVertical, borderWidth } = data;
+  const moduleHeight =
+    (imageHeight ?? 200) + (marginVertical ?? 20) * 2 + (borderWidth ?? 0) * 2;
   const scale = Math.min(height / moduleHeight, 1);
 
   const styles = useStyleSheet(styleSheet);
@@ -41,7 +57,12 @@ const CarouselPreview = ({ data, height, ...props }: CarouselPreviewProps) => {
           justifyContent: 'center',
         }}
       >
-        <CarouselRendererRaw data={data} style={styles.module} />
+        <CarouselRendererRaw
+          data={data}
+          colorPalette={colorPalette}
+          cardStyle={cardStyle}
+          style={styles.module}
+        />
       </View>
     </View>
   );

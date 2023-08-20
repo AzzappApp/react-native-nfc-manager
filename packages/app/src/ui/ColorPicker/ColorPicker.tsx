@@ -1,10 +1,13 @@
+import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from './ColorChooser';
-import ColorPalette from './ColorPalette';
+import ColorList from './ColorsList';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 export type ColorPickerProps = {
   /**
@@ -12,14 +15,46 @@ export type ColorPickerProps = {
    */
   visible: boolean;
   /**
-   * The height of the bottomsheet @default 200
+   * The title of the bottomsheet
    */
   title: string;
+  /**
+   * The height of the bottomsheet @default 200
+   */
   height?: number;
+  /**
+   * The selected color
+   */
   selectedColor: string;
+  /**
+   * The color palette of the user
+   */
+  colorPalette: ColorPalette;
+  /**
+   * The other colors of the user
+   */
   colorList: readonly string[] | null;
+  /**
+   * Whether the user can edit the palette or not
+   */
+  canEditPalette?: boolean;
+  /**
+   * Called when the user select a color
+   */
   onColorChange: (color: string) => void;
+
+  /**
+   * Called when the user update the color palette
+   */
+  onUpdateColorPalette: (colorPalette: ColorPalette) => void;
+  /**
+   * Called when the user update the color list
+   */
   onUpdateColorList: (color: string[]) => void;
+
+  /**
+   * Called when the user close the bottomsheet
+   */
   onRequestClose: () => void;
 };
 
@@ -28,76 +63,89 @@ const ColorPicker = ({
   height,
   title,
   selectedColor,
+  colorPalette,
   colorList,
+  canEditPalette = false,
   onRequestClose,
   onColorChange,
+  onUpdateColorPalette,
   onUpdateColorList,
 }: ColorPickerProps) => {
   const [state, setState] = useState<
-    'addingColor' | 'colorChooser' | 'editingPalette'
+    'colorChooser' | 'colorEdition' | 'editing'
   >('colorChooser');
 
-  const onClose = () => {
+  const onClose = useCallback(() => {
     if (state === 'colorChooser') {
       onRequestClose();
       return;
     }
     // TODO blink edition button to show that the user can't close the modal
-  };
+  }, [onRequestClose, state]);
 
-  // #region Adding a color
   const previouslySelectedColor = useRef<string | null>(selectedColor);
-
-  // #region COLOR PALETTE ACTIONS
-  const onSelectColor = (color: string) => onColorChange(color);
-
   const onValidateColor = useCallback(() => {
     previouslySelectedColor.current = selectedColor;
     onRequestClose();
   }, [onRequestClose, selectedColor]);
 
-  // #endregion
-
-  // #region EDIT PALETTE MODE
-  const onEditPalette = useCallback(() => {
-    setState('editingPalette');
+  const onEdit = useCallback(() => {
+    setState('editing');
   }, []);
 
-  const onCancelEditPalette = useCallback(() => {
+  const onCancelEdit = useCallback(() => {
     setColorsToRemove(new Set());
     setState('colorChooser');
   }, []);
-  // #endregion
-  // #region EDIT PALETTE ACTION
+
   const onRequestNewColor = () => {
     previouslySelectedColor.current = selectedColor;
-    setState('addingColor');
+    setState('colorEdition');
   };
 
-  const onCancelNewColor = useCallback(() => {
+  const editedColorPaletteProperty = useRef<
+    'dark' | 'light' | 'primary' | null
+  >(null);
+  const onEditPaletteColor = useCallback(
+    (color: 'dark' | 'light' | 'primary') => {
+      previouslySelectedColor.current = selectedColor;
+      editedColorPaletteProperty.current = color;
+      setState('colorEdition');
+    },
+    [selectedColor],
+  );
+
+  const onCancelColorEdition = useCallback(() => {
     const previousColor = previouslySelectedColor.current ?? selectedColor;
     onColorChange(previousColor);
+    editedColorPaletteProperty.current = null;
     previouslySelectedColor.current = null;
     setState('colorChooser');
   }, [onColorChange, selectedColor]);
 
-  const onSaveNewColor = useCallback(() => {
+  const onSaveEditedColor = useCallback(() => {
     previouslySelectedColor.current = null;
-    //be sure color is uniq (no duplicate)
-    if (
-      colorList == null ||
-      colorList?.findIndex(c => c === selectedColor) === -1
-    ) {
+    if (editedColorPaletteProperty.current) {
+      onUpdateColorPalette({
+        ...colorPalette,
+        [editedColorPaletteProperty.current]: selectedColor,
+      });
+      editedColorPaletteProperty.current = null;
+    } else {
       onUpdateColorList(
-        colorList ? [...colorList, selectedColor] : [selectedColor],
+        uniq(colorList ? [...colorList, selectedColor] : [selectedColor]),
       );
     }
     setState('colorChooser');
-  }, [colorList, onUpdateColorList, selectedColor]);
+  }, [
+    colorList,
+    colorPalette,
+    onUpdateColorList,
+    onUpdateColorPalette,
+    selectedColor,
+  ]);
 
-  // #region Editing palette
   const [colorsToRemove, setColorsToRemove] = useState(new Set<string>());
-
   const onRemoveColor = useCallback((color: string) => {
     setColorsToRemove(colorsToRemove => {
       const newColorsToRemove = new Set(colorsToRemove);
@@ -106,15 +154,16 @@ const ColorPicker = ({
     });
   }, []);
 
-  const onSavePaletteEdition = useCallback(() => {
+  const onSaveEditedColorList = useCallback(() => {
     onUpdateColorList((colorList ?? []).filter(c => !colorsToRemove.has(c)));
     setColorsToRemove(new Set());
     setState('colorChooser');
   }, [colorList, colorsToRemove, onUpdateColorList]);
-  // #endregion
 
   const intl = useIntl();
   const { bottom } = useSafeAreaInsets();
+
+  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <BottomSheetModal
@@ -123,7 +172,7 @@ const ColorPicker = ({
       headerTitle={
         state === 'colorChooser'
           ? title
-          : state === 'editingPalette'
+          : state === 'editing'
           ? intl.formatMessage({
               defaultMessage: 'Edit Palette',
               description: 'ColorPicker component button Edit Palette',
@@ -148,10 +197,10 @@ const ColorPicker = ({
           }
           onPress={
             state === 'colorChooser'
-              ? onEditPalette
-              : state === 'addingColor'
-              ? onCancelNewColor
-              : onCancelEditPalette
+              ? onEdit
+              : state === 'colorEdition'
+              ? onCancelColorEdition
+              : onCancelEdit
           }
           variant="secondary"
         />
@@ -172,9 +221,9 @@ const ColorPicker = ({
           onPress={
             state === 'colorChooser'
               ? onValidateColor
-              : state === 'addingColor'
-              ? onSaveNewColor
-              : onSavePaletteEdition
+              : state === 'colorEdition'
+              ? onSaveEditedColor
+              : onSaveEditedColorList
           }
           variant="primary"
         />
@@ -183,15 +232,19 @@ const ColorPicker = ({
       showGestureIndicator={false}
       onRequestClose={onClose}
     >
-      {state !== 'addingColor' ? (
-        <ColorPalette
+      {state !== 'colorEdition' ? (
+        <ColorList
           selectedColor={selectedColor}
           colorList={colorList?.filter(c => !colorsToRemove.has(c)) ?? []}
-          onSelectColor={onSelectColor}
+          onSelectColor={onColorChange}
+          editMode={state === 'editing'}
+          canEditPalette={canEditPalette}
+          colorPalette={colorPalette}
+          style={{ marginBottom: bottom }}
           onRequestNewColor={onRequestNewColor}
           onRemoveColor={onRemoveColor}
-          editMode={state === 'editingPalette'}
-          style={{ marginBottom: bottom }}
+          onEditColor={onEditPaletteColor}
+          width={windowWidth - 40}
         />
       ) : (
         <ColorChooser value={selectedColor} onColorChange={onColorChange} />

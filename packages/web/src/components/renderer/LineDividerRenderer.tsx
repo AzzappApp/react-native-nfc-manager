@@ -1,14 +1,23 @@
-import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  LINE_DIVIDER_DEFAULT_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { ModuleRendererProps } from './ModuleRenderer';
+import type { CardModuleLineDivider } from '@azzapp/data/domains';
 
-export type LineDividerRendererProps = ModuleRendererProps &
-  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
+export type LineDividerRendererProps =
+  ModuleRendererProps<CardModuleLineDivider> &
+    Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a line divider module
  */
 const LineDividerRenderer = ({
   module,
+  cardStyle,
+  colorPalette,
+  resizeModes: _,
   style,
   ...props
 }: LineDividerRendererProps) => {
@@ -17,9 +26,17 @@ const LineDividerRenderer = ({
     marginBottom,
     marginTop,
     height,
-    colorTop,
-    colorBottom,
-  } = Object.assign({}, LINE_DIVIDER_DEFAULT_VALUES, module.data);
+    colorTop: rawColorTop,
+    colorBottom: rawColorBottom,
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: {},
+    defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
+  });
+
+  const colorTop = swapColor(rawColorTop, colorPalette);
+  const colorBottom = swapColor(rawColorBottom, colorPalette);
 
   const cssOrientation =
     orientation === 'bottomRight' ? 'to bottom right' : 'to bottom left';

@@ -20,7 +20,7 @@ const propagateFollowUpdateInProfileList = (
         followed,
         'ProfileEdge',
       );
-      ConnectionHandler.insertEdgeAfter(connection, edge);
+      ConnectionHandler.insertEdgeBefore(connection, edge);
     }
   } else {
     ConnectionHandler.deleteNode(connection, profileId);
@@ -92,6 +92,15 @@ const updater = (
       );
     }
 
+    const connectionRecordSuggestions = ConnectionHandler.getConnection(
+      viewer,
+      'Viewer_recommendedProfiles',
+    );
+
+    if (follow && connectionRecordSuggestions) {
+      ConnectionHandler.deleteNode(connectionRecordSuggestions, profileId);
+    }
+
     ConnectionHandler.getConnection(
       viewer,
       'Viewer_followingsPosts',
@@ -100,7 +109,7 @@ const updater = (
 };
 
 const useToggleFollow = (
-  currentProfileId?: string,
+  currentProfileId?: string | null,
   userNameFilter?: string,
 ) => {
   const [commit, toggleFollowingActive] =

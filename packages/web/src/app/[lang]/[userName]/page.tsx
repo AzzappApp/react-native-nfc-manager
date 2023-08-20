@@ -1,16 +1,18 @@
 import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import {
-  getCardCoversByIds,
   getCardModules,
   getMediasByIds,
   getProfileByUserName,
   getProfilesPostsWithTopComment,
-  getUsersCards,
   getProfilesPostsCount,
   getStaticMediasByIds,
 } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  DEFAULT_CARD_STYLE,
+  DEFAULT_COLOR_PALETTE,
+} from '@azzapp/shared/cardHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
 import ProfilePageLayout from './ProfilePageLayout';
 
@@ -21,74 +23,61 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const {
-    profile,
-    card,
-    cover,
-    modules,
-    media,
-    posts,
-    postsCount,
-    backgrounds,
-  } = await unstable_cache(
-    async () => {
-      const profile = await getProfileByUserName(userName);
+  const { profile, modules, media, posts, postsCount, backgrounds } =
+    await unstable_cache(
+      async () => {
+        const profile = await getProfileByUserName(userName);
 
-      try {
-        if (profile) {
-          const [[card], posts, postsCount] = await Promise.all([
-            getUsersCards([profile.id]),
-            getProfilesPostsWithTopComment(profile.id, 5, 0),
-            getProfilesPostsCount(profile.id),
-          ]);
-
-          if (card) {
-            const [[cover], modules] = await Promise.all([
-              getCardCoversByIds([card.coverId]),
-              getCardModules(card.id),
+        try {
+          if (profile?.cardIsPublished) {
+            const [posts, postsCount, modules, media] = await Promise.all([
+              getProfilesPostsWithTopComment(profile.id, 5, 0),
+              getProfilesPostsCount(profile.id),
+              getCardModules(profile.id),
+              profile.coverData?.mediaId
+                ? getMediasByIds([profile.coverData.mediaId]).then(
+                    ([media]) => media,
+                  )
+                : null,
             ]);
 
-            if (cover) {
-              const [media] = await getMediasByIds([cover.mediaId]);
-              const backgrounds = await getStaticMediasByIds(
-                convertToNonNullArray(
-                  modules.map(module => module.data.backgroundId),
-                ),
-              );
+            const backgroundIds = convertToNonNullArray(
+              modules.map(module => (module.data as any).backgroundId),
+            );
 
-              return {
-                profile,
-                card,
-                cover,
-                modules,
-                media,
-                posts,
-                postsCount,
-                backgrounds,
-              };
-            }
+            const backgrounds = backgroundIds.length
+              ? await getStaticMediasByIds(backgroundIds)
+              : [];
+
+            return {
+              profile,
+              modules,
+              media,
+              posts,
+              postsCount,
+              backgrounds,
+            };
           }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
-      }
 
-      return {
-        profile,
-        card: undefined,
-        cover: undefined,
-        modules: [],
-        media: undefined,
-        posts: [],
-        postsCount: 0,
-        backgrounds: [],
-      };
-    },
-    [userName],
-    { tags: [userName] },
-  )();
+        return {
+          profile,
+          card: undefined,
+          cover: undefined,
+          modules: [],
+          media: undefined,
+          posts: [],
+          postsCount: 0,
+          backgrounds: [],
+        };
+      },
+      [userName],
+      { tags: [userName] },
+    )();
 
-  if (!profile || !card || !cover || !media) {
+  if (!profile?.cardIsPublished || !media) {
     return notFound();
   }
 
@@ -98,7 +87,6 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
 
   return (
     <ProfilePageLayout
-      card={card}
       profile={profile}
       modules={
         <>
@@ -107,6 +95,8 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
               resizeModes={resizeModes}
               module={module}
               key={module.id}
+              colorPalette={profile.cardColors ?? DEFAULT_COLOR_PALETTE}
+              cardStyle={profile.cardStyle ?? DEFAULT_CARD_STYLE}
             />
           ))}
         </>
@@ -114,7 +104,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
       posts={posts}
       postsCount={postsCount}
       media={media}
-      cover={<CoverRenderer cover={cover} />}
+      cover={<CoverRenderer profile={profile} media={media} />}
     />
   );
 };

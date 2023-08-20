@@ -1,122 +1,230 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  interpolate,
+  useWorkletCallback,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql, usePreloadedQuery } from 'react-relay';
-import { colors, shadow } from '#theme';
-import { useRouter } from '#components/NativeRouter';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import Container from '#ui/Container';
-import FollowingsPostsList from './FollowingsPostsList';
+import { graphql, useFragment } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
+import { useOnFocus, useRouter } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useAnimatedState from '#hooks/useAnimatedState';
+import useAuthState from '#hooks/useAuthState';
+import useToggle from '#hooks/useToggle';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import HomeBackground from './HomeBackground';
+import HomeBottomPanel from './HomeBottomPanel';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import HomeContactCardLandscape from './HomeContactCardLandscape';
 import HomeHeader from './HomeHeader';
-import HomeProfilesList from './HomeProfilesList';
-import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { HomeRoute } from '#routes';
-import type { HomeScreenContentQuery } from '@azzapp/relay/artifacts/HomeScreenContentQuery.graphql';
+import { MENU_HEIGHT } from './HomeMenu';
+import HomeProfileLink from './HomeProfileLink';
+import HomeProfilesCarousel from './HomeProfilesCarousel';
+import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
+import type { HomeScreenContent_user$key } from '@azzapp/relay/artifacts/HomeScreenContent_user.graphql';
+import type { LayoutChangeEvent } from 'react-native';
 
-type HomeScreenContentProps = RelayScreenProps<
-  HomeRoute,
-  HomeScreenContentQuery
-> & {
-  onReady: () => void;
-  onLoaded: () => void;
+type HomeScreenContentProps = {
+  user: HomeScreenContent_user$key;
 };
 
-export const homeScreenQuery = graphql`
-  query HomeScreenContentQuery {
-    viewer {
-      profile {
-        id
-        ...HomeProfilesList_profile
+const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
+  // data
+  const user = useFragment(
+    graphql`
+      fragment HomeScreenContent_user on User {
+        profiles {
+          id
+          userName
+          ...ContactCard_profile
+        }
+        ...HomeProfileLink_user
+        ...HomeProfilesCarousel_user
+        ...HomeContactCard_user
+        ...HomeInformations_user
+        ...HomeStatistics_user
+        ...HomeBackground_user
+        ...HomeHeader_user
       }
-      ...HomeProfilesList_viewer
-      ...FollowingsPostsList_viewer
-    }
-  }
-`;
+    `,
+    userKey,
+  );
 
-const HomeScreen = ({
-  preloadedQuery,
-  hasFocus = true,
-  onReady,
-  onLoaded,
-}: HomeScreenContentProps) => {
-  const { viewer } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
-  useEffect(() => {
-    // the usePreloadedQuery hook will suspend until the query is ready
-    onLoaded?.();
-  }, [onLoaded]);
+  const auth = useAuthState();
+
+  const initialProfileIndex = useMemo(() => {
+    const index = user.profiles?.findIndex(
+      profile => profile.id === auth.profileId,
+    );
+    return index !== undefined && index !== -1 ? index : 0;
+    // we only want to run this once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [currentProfileIndex, setCurrentProfileIndex] =
+    useState(initialProfileIndex);
+  const currentProfileIndexRef = useRef(initialProfileIndex);
+  const currentProfileIndexSharedValue = useSharedValue(currentProfileIndex);
+  const currentProfile = user.profiles?.[currentProfileIndex];
+
+  const switchProfile = useDebouncedCallback((profileId: string) => {
+    if (profileId && auth.profileId !== profileId) {
+      void dispatchGlobalEvent({
+        type: 'PROFILE_CHANGE',
+        payload: {
+          profileId,
+        },
+      });
+    }
+  }, 50);
+
+  const onCurrentProfileIndexChange = useCallback(
+    (index: number) => {
+      currentProfileIndexRef.current = index;
+      setCurrentProfileIndex(index);
+      const newProfileId = user.profiles?.[index]?.id;
+      if (newProfileId) {
+        switchProfile(newProfileId);
+      }
+    },
+    [switchProfile, user.profiles],
+  );
+
+  const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
+  const onCurrentProfileIndexChangeAnimated = useWorkletCallback(
+    (index: number) => {
+      'worklet';
+      currentProfileIndexSharedValue.value = index;
+    },
+    [],
+  );
+
+  useOnFocus(() => {
+    const authProfileIndex = user.profiles?.findIndex(
+      profile => profile.id === auth.profileId,
+    );
+    if (
+      authProfileIndex !== undefined &&
+      authProfileIndex !== -1 &&
+      authProfileIndex !== currentProfileIndexRef.current
+    ) {
+      carouselRef.current?.scrollToProfileIndex(authProfileIndex, false);
+    }
+  });
 
   const router = useRouter();
-  const goToSettings = useCallback(() => {
-    router.push({ route: 'ACCOUNT' });
-  }, [router]);
+  useAnimatedReaction(
+    () => currentProfileIndexSharedValue.value,
+    actual => {
+      if (actual === -1) {
+        runOnJS(router.push)({
+          route: 'NEW_PROFILE',
+        });
+      }
+    },
+    [currentProfileIndexSharedValue],
+  );
 
-  const postsReady = useRef(false);
-  const coversReady = useRef(false);
+  // Layout
+  const { bottom } = useSafeAreaInsets();
 
-  const onPostsReady = useCallback(() => {
-    postsReady.current = true;
-    if (coversReady.current) {
-      onReady?.();
-    }
-  }, [onReady]);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [showModal, toggleShowModal] = useToggle(false);
+  const bottomMargin = bottom > 0 ? bottom : 13;
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    setContainerHeight(
+      Math.round((nativeEvent.layout.height - MENU_HEIGHT) / 5),
+    );
+  }, []);
 
-  const onCoversReady = useCallback(() => {
-    coversReady.current = true;
-    if (postsReady.current) {
-      onReady?.();
-    }
-  }, [onReady]);
+  // Animation rotation landscape
+  const [orientation, setOrientation] = useState(
+    DeviceMotionOrientation.Portrait,
+  );
+  useEffect(() => {
+    // could be improve using a hook to know if this is the current display screen
+    // maybe to much battery consuming
+    DeviceMotion.setUpdateInterval(1000);
+    const subscription = DeviceMotion.addListener(deviceMotionData => {
+      setOrientation(
+        deviceMotionData.orientation === 180 ? 0 : deviceMotionData.orientation,
+      );
+    });
 
-  const insets = useSafeAreaInsets();
-  const styles = useStyleSheet(styleSheet);
-
-  if (!viewer.profile) {
-    return null;
-  }
+    return () => subscription?.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const orientationTimer = useAnimatedState(orientation);
+  const containerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      flex: 1,
+      justifyContent: 'flex-start',
+      paddingBottom: bottomMargin + BOTTOM_MENU_HEIGHT + 15,
+      opacity: interpolate(orientationTimer.value, [-90, 0, 90], [0, 1, 0]),
+    };
+  }, []);
 
   return (
-    <FollowingsPostsList
-      viewer={viewer}
-      canPlay={hasFocus}
-      ListHeaderComponent={
-        <Container style={{ marginTop: insets.top }}>
-          <HomeHeader goToSettings={goToSettings} />
-          <HomeProfilesList
-            viewer={viewer}
-            profile={viewer.profile}
-            style={styles.followingsList}
-            onReady={onCoversReady}
+    <View style={{ flex: 1 }}>
+      <Animated.View style={containerAnimatedStyle}>
+        <HomeBackground
+          user={user}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+        />
+        <HomeHeader
+          openPanel={toggleShowModal}
+          user={user}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+        />
+        <HomeProfileLink
+          user={user}
+          currentProfileIndex={currentProfileIndex}
+        />
+        <View style={styles.bottomContainer} onLayout={onLayout}>
+          <HomeProfilesCarousel
+            ref={carouselRef}
+            user={user}
+            height={3 * containerHeight}
+            onCurrentProfileIndexChange={onCurrentProfileIndexChange}
+            onCurrentProfileIndexChangeAnimated={
+              onCurrentProfileIndexChangeAnimated
+            }
+            initialProfileIndex={initialProfileIndex}
           />
-        </Container>
-      }
-      stickyHeaderIndices={[0]}
-      style={styles.followingsPosts}
-      postsContainerStyle={styles.followingsPostsListPostsContainerShadow}
-      onReady={onPostsReady}
-    />
+          {containerHeight > 0 && (
+            <HomeBottomPanel
+              containerHeight={containerHeight}
+              user={user}
+              currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+              currentUserIndex={currentProfileIndex}
+            />
+          )}
+        </View>
+        <HomeBottomSheetPanel visible={showModal} close={toggleShowModal} />
+      </Animated.View>
+      {currentProfile && (
+        <HomeContactCardLandscape
+          containerHeight={containerHeight}
+          profile={currentProfile}
+          orientationTimer={orientationTimer}
+        />
+      )}
+    </View>
   );
 };
 
-export default HomeScreen;
+export default HomeScreenContent;
 
-const styleSheet = createStyleSheet(appearance => ({
-  followingsPosts: {
+const styles = StyleSheet.create({
+  bottomContainer: {
     flex: 1,
+    justifyContent: 'flex-start',
+    overflow: 'visible',
   },
-  followingsList: {
-    height: 200,
-    marginTop: 10,
-    marginBottom: 13,
-    marginLeft: 10,
-  },
-  followingsPostsListPostsContainerShadow: [
-    {
-      paddingVertical: 8,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      zIndex: 20,
-      backgroundColor: appearance === 'dark' ? colors.black : colors.white,
-    },
-    shadow(appearance),
-  ],
-}));
+});

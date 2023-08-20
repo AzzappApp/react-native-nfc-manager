@@ -1,12 +1,13 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, Modal, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import ImagePicker, {
@@ -14,11 +15,12 @@ import ImagePicker, {
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
+import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import useDataEditor from '#hooks/useDataEditor';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -125,6 +127,25 @@ const PhotoWithTextAndTitleEditionScreen = ({
           uri
           resizeMode
         }
+        profile {
+          cardColors {
+            primary
+            dark
+            light
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+        }
       }
     `,
     viewerKey,
@@ -133,10 +154,37 @@ const PhotoWithTextAndTitleEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: photoWithTextAndTitle,
-      defaultValue: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  const initialValue = useMemo(() => {
+    return {
+      image: photoWithTextAndTitle?.image ?? null,
+      fontFamily: photoWithTextAndTitle?.fontFamily ?? null,
+      fontColor: photoWithTextAndTitle?.fontColor ?? null,
+      textAlign: photoWithTextAndTitle?.textAlign ?? null,
+      imageMargin: photoWithTextAndTitle?.imageMargin ?? null,
+      verticalArrangement: photoWithTextAndTitle?.verticalArrangement ?? null,
+      horizontalArrangement:
+        photoWithTextAndTitle?.horizontalArrangement ?? null,
+      gap: photoWithTextAndTitle?.gap ?? null,
+      text: photoWithTextAndTitle?.text ?? null,
+      title: photoWithTextAndTitle?.title ?? null,
+      fontSize: photoWithTextAndTitle?.fontSize ?? null,
+      textSize: photoWithTextAndTitle?.textSize ?? null,
+      borderRadius: photoWithTextAndTitle?.borderRadius ?? null,
+      marginHorizontal: photoWithTextAndTitle?.marginHorizontal ?? null,
+      marginVertical: photoWithTextAndTitle?.marginVertical ?? null,
+      backgroundId: photoWithTextAndTitle?.background?.id ?? null,
+      backgroundStyle: photoWithTextAndTitle?.backgroundStyle ?? null,
+      verticalSpacing: photoWithTextAndTitle?.verticalSpacing ?? null,
+      aspectRatio: photoWithTextAndTitle?.aspectRatio ?? null,
+    };
+  }, [photoWithTextAndTitle]);
+
+  const { data, value, fieldUpdateHandler, updateFields, dirty } =
+    useModuleDataEditor({
+      initialValue,
+      cardStyle: viewer.profile?.cardStyle,
+      styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+      defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
 
   const {
@@ -155,11 +203,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
     borderRadius,
     marginHorizontal,
     marginVertical,
-    background,
+    backgroundId,
     backgroundStyle,
     verticalSpacing,
     aspectRatio,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -169,9 +225,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
         $input: SavePhotoWithTextAndTitleModuleInput!
       ) {
         savePhotoWithTextAndTitleModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...PhotoWithTextAndTitleEditionScreen_module
@@ -192,11 +248,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const {
-      image: updateImage,
-      background: updateBackground,
-      ...rest
-    } = updates;
+    const { image: updateImage, ...rest } = value;
     let mediaId = updateImage?.id;
 
     if (!mediaId && updateImage?.uri) {
@@ -230,13 +282,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     const input: SavePhotoWithTextAndTitleModuleInput = {
       moduleId: photoWithTextAndTitle?.id,
-      image: mediaId ?? data.image.id,
       ...rest,
+      image: mediaId ?? value.image!.id,
+      text: value.text!,
+      title: value.title!,
     };
-
-    if (updateBackground?.id !== photoWithTextAndTitle?.background?.id) {
-      input.backgroundId = updateBackground?.id ?? null;
-    }
 
     commit({
       variables: {
@@ -256,15 +306,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    photoWithTextAndTitle?.id,
-    photoWithTextAndTitle?.background?.id,
-    data?.image?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, value, photoWithTextAndTitle?.id, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -359,19 +401,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onGapChange = fieldUpdateHandler('gap');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -441,7 +471,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
       <PressableOpacity onPress={onPickImage}>
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={data}
+          data={previewData}
+          colorPalette={viewer.profile?.cardColors}
+          cardStyle={viewer.profile?.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -517,7 +549,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleBackgroundEditionPanel
                 viewer={viewer}
-                backgroundId={background?.id}
+                backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -533,7 +565,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       />
       <TextAreaModal
         visible={showContentModal}
-        value={text}
+        value={text ?? ''}
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
           description:
@@ -552,7 +584,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 description:
                   'Title placeholder in PhotoWithTextAndTitle module',
               })}
-              value={title}
+              value={title ?? ''}
               onChangeText={onTitleChange}
               maxLength={300}
               style={{ borderWidth: 0 }}
@@ -561,7 +593,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
               variant="smallbold"
               style={[
                 styles.counter,
-                title.length >= 300 && {
+                (title?.length ?? 0) >= 300 && {
                   color: colors.red400,
                 },
               ]}
@@ -582,12 +614,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={photoWithTextAndTitle?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-              data,
+              data: previewData,
             }}
             style={{
               flex: 1,

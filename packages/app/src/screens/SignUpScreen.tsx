@@ -17,11 +17,9 @@ import {
   isValidEmail,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
-import { mainRoutes, newProfileRoute } from '#mobileRoutes';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
@@ -56,8 +54,6 @@ const SignupScreen = () => {
   const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
-
-  const router = useRouter();
 
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
@@ -119,12 +115,6 @@ const SignupScreen = () => {
               profileId,
             },
           });
-          if (profileId) {
-            router.replaceAll(mainRoutes);
-          } else {
-            router.replaceAll(newProfileRoute);
-          }
-          return;
         } else {
           await dispatchGlobalEvent({
             type: 'SIGN_UP',
@@ -135,9 +125,7 @@ const SignupScreen = () => {
               },
             },
           });
-          router.replace({ route: 'NEW_PROFILE' });
           setIsSubmitting(false);
-          return;
         }
       } catch (error: any) {
         if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
@@ -165,7 +153,6 @@ const SignupScreen = () => {
           );
         }
         setIsSubmitting(false);
-        return;
       }
     }
   }, [
@@ -175,7 +162,6 @@ const SignupScreen = () => {
     emailOrPhoneNumber,
     intl,
     password,
-    router,
   ]);
 
   const focusPassword = () => {

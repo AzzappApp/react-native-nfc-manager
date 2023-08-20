@@ -1,10 +1,12 @@
+extend type Mutation {
+  duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload!
+}
+
 input DuplicateModuleInput {
   moduleId: ID!
-  clientMutationId: String
 }
 
 type DuplicateModulePayload {
-  card: Card!
+  profile: Profile!
   createdModuleId: ID!
-  clientMutationId: String
 }

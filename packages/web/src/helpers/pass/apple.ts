@@ -1,10 +1,7 @@
 import { PKPass } from 'passkit-generator';
 import {
   getProfilesByIds,
-  getUsersCards,
-  getCardCoversByIds,
   getMediasByIds,
-  getContactCard,
   buildDefaultContactCard,
 } from '@azzapp/data/domains';
 import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
@@ -21,9 +18,9 @@ import { convertHexToRGBA } from '../color';
 export const buildApplePass = async (profileId: string, locale: string) => {
   const [profile] = await getProfilesByIds([profileId]);
   if (profile) {
-    const [card] = await getUsersCards([profileId]);
-    const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
-    const [media] = cover ? await getMediasByIds([cover.mediaId]) : [];
+    const [media] = profile.coverData?.mediaId
+      ? await getMediasByIds([profile.coverData?.mediaId])
+      : [];
 
     const thumbnails: Record<string, Buffer> = {};
 
@@ -64,10 +61,10 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       }
     }
 
-    let contactCard = await getContactCard(profileId);
+    let contactCard = profile.contactCard;
 
     if (!contactCard && profile) {
-      contactCard = buildDefaultContactCard(profile);
+      contactCard = await buildDefaultContactCard(profile);
     }
 
     const [logoContent, logo2xContent] = await Promise.all([
@@ -79,6 +76,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       ).then(res => res.arrayBuffer()),
     ]);
 
+    const primary = profile.cardColors?.primary;
     const pass = new PKPass(
       {
         'icon.png': Buffer.from(logoContent),
@@ -105,9 +103,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         organizationName: process.env.APPLE_ORGANIZATION_NAME ?? '',
         description: 'Contact Card',
         foregroundColor: 'rgb(255, 255, 255)',
-        backgroundColor: contactCard?.backgroundStyle?.backgroundColor
-          ? convertHexToRGBA(contactCard.backgroundStyle.backgroundColor)
-          : 'rgb(0, 0, 0)',
+        backgroundColor: primary ? convertHexToRGBA(primary) : 'rgb(0, 0, 0)',
         labelColor: 'rgb(255, 255, 255)',
         logoText: 'azzapp',
         suppressStripShine: false,
@@ -122,6 +118,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
 
     if (contactCard && profile) {
       const { data, signature } = await serializeAndSignContactCard(
+        profile.id,
         profile.userName,
         contactCard,
       );

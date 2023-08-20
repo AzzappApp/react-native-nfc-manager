@@ -9,8 +9,8 @@ import Animated, {
 import type { CarouselRawData } from './CarouselRenderer';
 
 type CarouselImageProps = {
-  image: CarouselRawData['images'][number];
-  borderSize: number;
+  image: Exclude<CarouselRawData['images'], null>[number];
+  borderWidth: number;
   borderRadius: number;
   borderColor: string;
   squareRatio: boolean;
@@ -21,7 +21,7 @@ type CarouselImageProps = {
 const CarouselImage = (props: CarouselImageProps) => {
   const {
     image,
-    borderSize,
+    borderWidth,
     borderColor,
     borderRadius,
     squareRatio,
@@ -61,7 +61,7 @@ const CarouselImage = (props: CarouselImageProps) => {
           height: image.aspectRatio < 1 ? '100%' : undefined,
           borderRadius,
           borderColor,
-          borderWidth: borderSize,
+          borderWidth,
           aspectRatio: squareRatio ? 1 : image.aspectRatio,
           position: 'absolute',
           left: 25,

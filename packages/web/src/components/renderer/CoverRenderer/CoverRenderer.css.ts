@@ -24,10 +24,22 @@ const content = style({
   maxWidth: '375px',
 });
 
+const foregroundMedia = style({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  maskSize: 'cover',
+  maskRepeat: 'no-repeat',
+  maskPosition: 'center',
+});
+
 const styles = {
   coverMedia,
   backgroundMedia,
   content,
+  foregroundMedia,
 };
 
 export default styles;

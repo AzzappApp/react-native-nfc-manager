@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
+import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import type { SimpleButtonBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleButtonBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -89,7 +89,7 @@ const SimpleButtonBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <EditorLayerSelectorPanel
+      <ProfileBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',

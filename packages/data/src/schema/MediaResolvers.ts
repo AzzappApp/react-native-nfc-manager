@@ -47,5 +47,4 @@ export const MediaImage: MediaImageResolvers = {
 export const StaticMedia: StaticMediaResolvers = {
   uri: ({ id }, { width, pixelRatio }) =>
     getImageURLForSize(id, width, undefined, pixelRatio),
-  tags: ({ tags }) => (typeof tags == 'string' ? tags.split(',') : []),
 };

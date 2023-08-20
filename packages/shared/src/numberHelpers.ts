@@ -11,3 +11,8 @@ export function getPrecision(a: number) {
   }
   return p;
 }
+
+export function pseudoSinRandom(seed: number) {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}

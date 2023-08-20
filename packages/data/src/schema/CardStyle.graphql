@@ -1,0 +1,44 @@
+type CardStyle implements Node {
+  id: ID!
+  fontFamily: String!
+  fontSize: Int!
+  titleFontFamily: String!
+  titleFontSize: Int!
+  buttonRadius: Int!
+  borderRadius: Int!
+  borderWidth: Int!
+  borderColor: String!
+  buttonColor: String!
+  gap: Int!
+  label: String
+}
+
+"""
+A connection to a list of items.
+"""
+type CardStyleConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [CardStyleEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type CardStyleEdge {
+  """
+  The item at the end of the edge
+  """
+  node: CardStyle
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}

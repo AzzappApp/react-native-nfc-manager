@@ -1,4 +1,3 @@
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { db, getCardModulesByIds, updateCardModule } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -6,22 +5,23 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const swapModules: MutationResolvers['swapModules'] = async (
   _,
   { input: { moduleAId, moduleBId } },
-  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  { auth, profileLoader, cardUpdateListener },
 ) => {
-  const profileId = getProfileId(auth);
+  const profileId = auth.profileId;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
-  const card = await cardByProfileLoader.load(profileId);
-  if (!card) {
+
+  const profile = await profileLoader.load(profileId);
+  if (!profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
   const [moduleA, moduleB] = await getCardModulesByIds([moduleAId, moduleBId]);
   if (
     !moduleA ||
     !moduleB ||
-    moduleA.cardId !== card.id ||
-    moduleB.cardId !== card.id
+    moduleA.profileId !== profileId ||
+    moduleB.profileId !== profileId
   ) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
@@ -36,10 +36,9 @@ const swapModules: MutationResolvers['swapModules'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const profile = await profileLoader.load(profileId);
-  cardUpdateListener(profile!.userName);
+  cardUpdateListener(profile.userName);
 
-  return { card };
+  return { profile };
 };
 
 export default swapModules;

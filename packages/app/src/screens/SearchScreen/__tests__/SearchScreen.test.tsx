@@ -1,9 +1,7 @@
-import { loadQuery, RelayEnvironmentProvider } from 'react-relay';
+import { RelayEnvironmentProvider } from 'react-relay';
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
-import SearchScreenQueryNode from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import { SearchScreen } from '../SearchScreen';
-import type { SearchScreenQuery } from '@azzapp/relay/artifacts/SearchScreenQuery.graphql';
 
 jest.mock('../SearchTabContainer', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,18 +21,6 @@ jest.mock('../SearchTabContainer', () => {
 });
 
 jest.mock('../RecentSearch', () => 'RecentSearch');
-
-jest.mock('../WallRecommendation', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createElement } = require('react');
-  function WallRecommendation() {
-    return createElement('WallRecommendation', {
-      testID: 'WallRecommendation',
-    });
-  }
-
-  return WallRecommendation;
-});
 
 const renderScreen = () => {
   const environment = createMockEnvironment();
@@ -86,23 +72,8 @@ const renderScreen = () => {
     });
   });
 
-  const preloadedQuery = loadQuery<SearchScreenQuery>(
-    environment,
-    SearchScreenQueryNode,
-    {},
-  );
-
   const TestRenderer = () => {
-    return (
-      <SearchScreen
-        screenId="SEARCH"
-        hasFocus={true}
-        preloadedQuery={preloadedQuery}
-        route={{
-          route: 'SEARCH',
-        }}
-      />
-    );
+    return <SearchScreen hasFocus={true} />;
   };
 
   const component = render(
@@ -125,27 +96,6 @@ const renderScreen = () => {
 xdescribe('SearchScreen component', () => {
   jest.useFakeTimers();
 
-  test('Wall recommendation should be displayed on initial render', () => {
-    renderScreen();
-    expect(screen.getByTestId('WallRecommendation')).toBeTruthy();
-    //fire event to sizing of searchBar
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__SearchBar__container-view'),
-        'layout',
-        {
-          nativeEvent: { layout: { width: 450, height: 100 } },
-        },
-      );
-    });
-
-    expect(screen.queryByTestId('azzapp__searchbar__textInput')).not.toBeNull();
-    expect(
-      screen.queryByTestId('azzaap_searchScreeb-RecentSearch_viewTransition'),
-    ).toHaveStyle({ opacity: 0 });
-    expect(screen.queryByTestId('SearchTabContainer')).toBeNull();
-  });
-
   test('RecentSearch should be displayed on focus SearchBar (having opacity = 1)', () => {
     renderScreen();
 
@@ -166,33 +116,6 @@ xdescribe('SearchScreen component', () => {
       screen.queryByTestId('azzaap_searchScreeb-RecentSearch_viewTransition'),
     ).toHaveStyle({ opacity: 1 });
     expect(screen.queryByTestId('SearchTabContainer')).toBeNull();
-  });
-
-  test('`onChangeText`should dismount wall of recommendation', () => {
-    renderScreen();
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__SearchBar__container-view'),
-        'layout',
-        {
-          nativeEvent: { layout: { width: 450, height: 100 } },
-        },
-      );
-    });
-    act(() => {
-      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
-    });
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__searchbar__textInput'),
-        'onChangeText',
-        'search',
-      );
-    });
-    expect(screen.queryByTestId('WallRecommendation')).toBeNull();
-    expect(
-      screen.queryByTestId('azzaap_searchScreeb-RecentSearch_viewTransition'),
-    ).toHaveStyle({ opacity: 1 });
   });
 
   test('`onSubmittedSearch`should mount the SearchTab Container', () => {
@@ -264,50 +187,5 @@ xdescribe('SearchScreen component', () => {
       );
     });
     expect(screen.queryByTestId('SearchTabContainer')).toBeNull();
-  });
-
-  test('should mount WallRecommendation when hitting cancel button after showing search result', () => {
-    renderScreen();
-
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__SearchBar__container-view'),
-        'layout',
-        {
-          nativeEvent: { layout: { width: 450, height: 100 } },
-        },
-      );
-    });
-    act(() => {
-      fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'onFocus');
-    });
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__searchbar__textInput'),
-        'onChangeText',
-        'search',
-      );
-    });
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__searchbar__textInput'),
-        'onSubmitEditing',
-      );
-    });
-    expect(screen.queryByTestId('SearchTabContainer')).not.toBeNull();
-    expect(
-      screen.queryByTestId('azzaap_searchScreeb-RecentSearch_viewTransition'),
-    ).toHaveStyle({ opacity: 1 });
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__SearchBar__cancel-button'),
-        'onPress',
-      );
-    });
-    expect(
-      screen.queryByTestId('azzaap_searchScreeb-RecentSearch_viewTransition'),
-    ).toHaveStyle({ opacity: 0 });
-    expect(screen.queryByTestId('SearchTabContainer')).toBeNull();
-    expect(screen.queryByTestId('WallRecommendation')).not.toBeNull();
   });
 });

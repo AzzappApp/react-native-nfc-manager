@@ -1,20 +1,29 @@
 import { assignInlineVars } from '@vanilla-extract/dynamic';
 import cn from 'classnames';
-import { PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles, { wrapperMarginTop } from './PhotoWithTextAndTitleRenderer.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
+import type { CardModulePhotoWithTextAndTitle } from '@azzapp/data/domains';
 import type { CSSProperties } from 'react';
 
-export type PhotoWithTextAndTitleRendererProps = ModuleRendererProps &
-  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
+export type PhotoWithTextAndTitleRendererProps =
+  ModuleRendererProps<CardModulePhotoWithTextAndTitle> &
+    Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a PhotoWithTextAndTitle module
  */
 const PhotoWithTextAndTitleRenderer = ({
   module,
+  colorPalette,
+  cardStyle,
   ...props
 }: PhotoWithTextAndTitleRendererProps) => {
   const {
@@ -37,7 +46,12 @@ const PhotoWithTextAndTitleRenderer = ({
     aspectRatio,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  });
 
   const classnames = cn(styles.wrapper, {
     [styles.wrapperArrangmentTop]: verticalArrangement === 'top',
@@ -50,9 +64,10 @@ const PhotoWithTextAndTitleRenderer = ({
 
   return (
     <CardModuleBackground
-      {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
+      {...props}
     >
       <div
         style={
@@ -111,7 +126,7 @@ const PhotoWithTextAndTitleRenderer = ({
                 textAlign,
                 fontSize,
                 fontFamily,
-                color: fontColor,
+                color: swapColor(fontColor, colorPalette),
               }}
             >
               {title}
@@ -123,7 +138,7 @@ const PhotoWithTextAndTitleRenderer = ({
                 fontSize: textSize,
                 fontFamily,
                 marginTop: 7,
-                color: fontColor,
+                color: swapColor(fontColor, colorPalette),
                 lineHeight:
                   fontSize && verticalSpacing
                     ? `${fontSize * 1.2 + verticalSpacing}px`

@@ -6,15 +6,81 @@ type Profile implements Node {
   The ID of an object
   """
   id: ID!
+  """
+  The user name of the profile
+  """
   userName: String!
-  firstName: String
-  lastName: String
-  companyName: String
-  companyActivity: CompanyActivity
+  """
+  The kind of the profile (business, personal)
+  """
   profileKind: ProfileKind
+  """
+  The profile category
+  """
   profileCategory: ProfileCategory
-  card: Card
-  colorPalette: [String!]
+  """
+  The first name of the profile, will only be set for personal profile
+  """
+  firstName: String
+  """
+  The last name of the profile, will only be set for personal profile
+  """
+  lastName: String
+  """
+  The company name of the profile, will only be set for business profile
+  """
+  companyName: String
+  """
+  The company activity of the profile, will only be set for business profile
+  """
+  companyActivity: CompanyActivity
+  """
+  The colors used by the webcard and the contact card of the profile
+  """
+  cardColors: CardColors
+  """
+  The profile WebCard cover
+  """
+  cardCover: CardCover
+  """
+  the profile WebCar style
+  """
+  cardStyle: ProfileCardStyle
+  """
+  the profle WebCard modules
+  """
+  cardModules: [CardModule!]!
+  """
+  Is the profile webcard published
+  """
+  cardIsPublished: Boolean!
+  """
+  The profile contact card
+  """
+  contactCard: ContactCard
+  """
+  True if the current viewer is following this profile
+  """
+  isFollowing: Boolean!
+  """
+  the number of likes received by the profile posts
+  """
+  nbLikes: Int!
+  """
+  the number of profile followed by this profile
+  """
+  nbFollowings: Int!
+  """
+  the number of followers of the profile
+  """
+  nbFollowers: Int!
+  """
+  the number of posts of the profile
+  """
+  nbPosts: Int!
+  """
+  return the list of the profile posts
+  """
   posts(
     """
     Returns the items in the list that come after the specified cursor.
@@ -26,12 +92,32 @@ type Profile implements Node {
     """
     first: Int
   ): PostConnection
-  isFollowing: Boolean!
-  isViewer: Boolean!
-  nbPosts: Int!
-  nbFollowings: Int!
-  nbFollowers: Int!
-  contactCard: ContactCard!
+
+  #TODO
+  statsSummary: [DailyStatsSumary]!
+}
+
+type ProfileCardStyle {
+  fontFamily: String!
+  fontSize: Int!
+  titleFontFamily: String!
+  titleFontSize: Int!
+  buttonRadius: Int!
+  borderRadius: Int!
+  borderWidth: Int!
+  borderColor: String!
+  buttonColor: String!
+  gap: Int!
+}
+
+"""
+Represent the daily stats summary of a profile
+"""
+type DailyStatsSumary {
+  date: String!
+  scans: Int!
+  webcardViews: Int!
+  totalLikes: Int!
 }
 
 """
@@ -64,10 +150,12 @@ type ProfileEdge {
   cursor: String!
 }
 
+"""
+Represent a Profile Kind
+"""
 enum ProfileKind {
   business
   personal
-  product
 }
 
 """
@@ -93,4 +181,14 @@ type CompanyActivity implements Node {
   """
   id: ID!
   label: String
+}
+
+"""
+A set of colors used by the webcard and the contact card of attached profiles
+"""
+type CardColors {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
 }

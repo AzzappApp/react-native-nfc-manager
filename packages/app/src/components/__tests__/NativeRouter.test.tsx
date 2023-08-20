@@ -29,7 +29,7 @@ describe('NativeRouter', () => {
             },
             { id: 'NEW_POST', route: 'NEW_POST' },
           ],
-          modals: [{ id: 'CHAT', route: 'CHAT' }],
+          modals: [{ id: 'CHAT', route: 'NEW_POST' }],
         });
       });
 
@@ -40,7 +40,7 @@ describe('NativeRouter', () => {
               "id": "CHAT",
               "kind": "route",
               "state": {
-                "route": "CHAT",
+                "route": "NEW_POST",
               },
             },
           ],
@@ -121,12 +121,12 @@ describe('NativeRouter', () => {
               },
               { id: 'NEW_POST', route: 'NEW_POST' },
             ],
-            modals: [{ id: 'CHAT', route: 'CHAT' }],
+            modals: [{ id: 'CHAT', route: 'NEW_POST' }],
           });
         });
 
         expect(result.current.router.getCurrentRoute()).toEqual({
-          route: 'CHAT',
+          route: 'NEW_POST',
         });
       });
 
@@ -382,8 +382,8 @@ describe('NativeRouter', () => {
                     ],
                   },
                   {
-                    id: 'ACCOUNT',
-                    route: 'ACCOUNT',
+                    id: 'FOLLOWINGS',
+                    route: 'FOLLOWINGS',
                   },
                 ],
               },
@@ -392,7 +392,7 @@ describe('NativeRouter', () => {
         });
 
         act(() => {
-          result.current.router.push({ route: 'ACCOUNT' });
+          result.current.router.push({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -426,10 +426,10 @@ describe('NativeRouter', () => {
                       ],
                     },
                     {
-                      "id": "ACCOUNT",
+                      "id": "FOLLOWINGS",
                       "kind": "route",
                       "state": {
-                        "route": "ACCOUNT",
+                        "route": "FOLLOWINGS",
                       },
                     },
                   ],
@@ -453,8 +453,8 @@ describe('NativeRouter', () => {
                     route: 'HOME',
                   },
                   {
-                    id: 'ACCOUNT',
-                    route: 'ACCOUNT',
+                    id: 'FOLLOWINGS',
+                    route: 'FOLLOWINGS',
                   },
                 ],
               },
@@ -467,7 +467,7 @@ describe('NativeRouter', () => {
         }));
 
         act(() => {
-          result.current.router.push({ route: 'ACCOUNT' });
+          result.current.router.push({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -488,10 +488,10 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "ACCOUNT",
+                      "id": "FOLLOWINGS",
                       "kind": "route",
                       "state": {
-                        "route": "ACCOUNT",
+                        "route": "FOLLOWINGS",
                       },
                     },
                   ],
@@ -508,7 +508,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "ACCOUNT",
+                  "route": "FOLLOWINGS",
                 },
               },
             ],
@@ -770,7 +770,7 @@ describe('NativeRouter', () => {
               },
               {
                 id: 'CHAT',
-                route: 'CHAT',
+                route: 'NEW_POST',
               },
             ],
             modals: [
@@ -779,8 +779,8 @@ describe('NativeRouter', () => {
                 route: 'SIGN_IN',
               },
               {
-                id: 'ACCOUNT',
-                route: 'ACCOUNT',
+                id: 'FOLLOWINGS',
+                route: 'FOLLOWINGS',
               },
             ],
           });
@@ -813,7 +813,7 @@ describe('NativeRouter', () => {
                 "id": "CHAT",
                 "kind": "route",
                 "state": {
-                  "route": "CHAT",
+                  "route": "NEW_POST",
                 },
               },
             ],
@@ -839,7 +839,7 @@ describe('NativeRouter', () => {
                 "id": "CHAT",
                 "kind": "route",
                 "state": {
-                  "route": "CHAT",
+                  "route": "NEW_POST",
                 },
               },
             ],
@@ -998,8 +998,8 @@ describe('NativeRouter', () => {
                     ],
                   },
                   {
-                    id: 'ACCOUNT',
-                    route: 'ACCOUNT',
+                    id: 'FOLLOWINGS',
+                    route: 'FOLLOWINGS',
                   },
                 ],
               },
@@ -1008,7 +1008,7 @@ describe('NativeRouter', () => {
         });
 
         act(() => {
-          result.current.router.replace({ route: 'ACCOUNT' });
+          result.current.router.replace({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1042,10 +1042,10 @@ describe('NativeRouter', () => {
                       ],
                     },
                     {
-                      "id": "ACCOUNT",
+                      "id": "FOLLOWINGS",
                       "kind": "route",
                       "state": {
-                        "route": "ACCOUNT",
+                        "route": "FOLLOWINGS",
                       },
                     },
                   ],
@@ -1069,8 +1069,8 @@ describe('NativeRouter', () => {
                     route: 'HOME',
                   },
                   {
-                    id: 'ACCOUNT',
-                    route: 'ACCOUNT',
+                    id: 'FOLLOWINGS',
+                    route: 'FOLLOWINGS',
                   },
                 ],
               },
@@ -1083,7 +1083,7 @@ describe('NativeRouter', () => {
         }));
 
         act(() => {
-          result.current.router.replace({ route: 'ACCOUNT' });
+          result.current.router.replace({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1104,10 +1104,10 @@ describe('NativeRouter', () => {
                       },
                     },
                     {
-                      "id": "ACCOUNT",
+                      "id": "FOLLOWINGS",
                       "kind": "route",
                       "state": {
-                        "route": "ACCOUNT",
+                        "route": "FOLLOWINGS",
                       },
                     },
                   ],
@@ -1117,7 +1117,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "ACCOUNT",
+                  "route": "FOLLOWINGS",
                 },
               },
             ],
@@ -1194,7 +1194,7 @@ describe('NativeRouter', () => {
           });
         });
         act(() => {
-          result.current.router.showModal({ route: 'ACCOUNT' });
+          result.current.router.showModal({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1204,7 +1204,7 @@ describe('NativeRouter', () => {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "ACCOUNT",
+                  "route": "FOLLOWINGS",
                 },
               },
             ],
@@ -1234,13 +1234,13 @@ describe('NativeRouter', () => {
             modals: [
               {
                 id: 'CHAT',
-                route: 'CHAT',
+                route: 'NEW_POST',
               },
             ],
           });
         });
         act(() => {
-          result.current.router.showModal({ route: 'ACCOUNT' });
+          result.current.router.showModal({ route: 'FOLLOWINGS' });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -1250,14 +1250,14 @@ describe('NativeRouter', () => {
                 "id": "CHAT",
                 "kind": "route",
                 "state": {
-                  "route": "CHAT",
+                  "route": "NEW_POST",
                 },
               },
               {
                 "id": "created-id",
                 "kind": "route",
                 "state": {
-                  "route": "ACCOUNT",
+                  "route": "FOLLOWINGS",
                 },
               },
             ],
@@ -1521,7 +1521,7 @@ describe('NativeRouter', () => {
               },
               {
                 id: 'CHAT',
-                route: 'CHAT',
+                route: 'NEW_POST',
               },
             ],
             modals: [
@@ -1530,8 +1530,8 @@ describe('NativeRouter', () => {
                 route: 'SIGN_IN',
               },
               {
-                id: 'ACCOUNT',
-                route: 'ACCOUNT',
+                id: 'FOLLOWINGS',
+                route: 'FOLLOWINGS',
               },
             ],
           });
@@ -1564,7 +1564,7 @@ describe('NativeRouter', () => {
                 "id": "CHAT",
                 "kind": "route",
                 "state": {
-                  "route": "CHAT",
+                  "route": "NEW_POST",
                 },
               },
             ],
@@ -1590,7 +1590,7 @@ describe('NativeRouter', () => {
                 "id": "CHAT",
                 "kind": "route",
                 "state": {
-                  "route": "CHAT",
+                  "route": "NEW_POST",
                 },
               },
             ],
@@ -1627,7 +1627,7 @@ describe('NativeRouter', () => {
               },
               { id: 'NEW_POST', route: 'NEW_POST' },
             ],
-            modals: [{ id: 'CHAT', route: 'CHAT' }],
+            modals: [{ id: 'CHAT', route: 'NEW_POST' }],
           });
         });
         act(() => {
@@ -1683,7 +1683,7 @@ describe('NativeRouter', () => {
             id: 'test',
             stack: [
               { id: 'HOME', route: 'HOME' },
-              { id: 'ACCOUNT', route: 'ACCOUNT' },
+              { id: 'FOLLOWINGS', route: 'FOLLOWINGS' },
             ],
             modals: [],
           });
@@ -1704,8 +1704,8 @@ describe('NativeRouter', () => {
         });
 
         expect(screenWillBeRemovedListenerSpy).toHaveBeenCalledWith({
-          id: 'ACCOUNT',
-          route: { route: 'ACCOUNT' },
+          id: 'FOLLOWINGS',
+          route: { route: 'FOLLOWINGS' },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
@@ -1816,7 +1816,7 @@ describe('NativeRouter', () => {
                 currentIndex: 0,
                 tabs: [
                   { id: 'HOME', route: 'HOME' },
-                  { id: 'ACCOUNT', route: 'ACCOUNT' },
+                  { id: 'FOLLOWINGS', route: 'FOLLOWINGS' },
                 ],
               },
             ],
@@ -1835,20 +1835,20 @@ describe('NativeRouter', () => {
         router.addRouteWillChangeListener(routeDidChangeListenerSpy);
 
         act(() => {
-          router.push({ route: 'ACCOUNT' });
+          router.push({ route: 'FOLLOWINGS' });
         });
 
         expect(screenWillBePushedListenerSpy).toHaveBeenCalledWith({
           id: expect.any(String),
-          route: { route: 'ACCOUNT' },
+          route: { route: 'FOLLOWINGS' },
         });
 
         expect(routeWillChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'ACCOUNT',
+          route: 'FOLLOWINGS',
         });
 
         expect(routeDidChangeListenerSpy).toHaveBeenCalledWith({
-          route: 'ACCOUNT',
+          route: 'FOLLOWINGS',
         });
       });
     });

@@ -1,11 +1,18 @@
 import { View, Image } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  HORIZONTAL_PHOTO_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   HorizontalPhotoRenderer_module$data,
   HorizontalPhotoRenderer_module$key,
 } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
 export type HorizontalPhotoRendererProps = ViewProps & {
@@ -13,6 +20,14 @@ export type HorizontalPhotoRendererProps = ViewProps & {
    * A relay fragment reference for a HorizontalPhoto module
    */
   module: HorizontalPhotoRenderer_module$key;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -24,7 +39,7 @@ const HorizontalPhotoRenderer = ({
 }: HorizontalPhotoRendererProps) => {
   const data = useFragment(
     graphql`
-      fragment HorizontalPhotoRenderer_module on CardModule
+      fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
       @argumentDefinitions(
         screenWidth: {
           type: "Float!"
@@ -35,27 +50,24 @@ const HorizontalPhotoRenderer = ({
           provider: "../providers/PixelRatio.relayprovider"
         }
       ) {
-        id
-        ... on CardModuleHorizontalPhoto {
-          borderWidth
-          borderRadius
-          borderColor
-          marginHorizontal
-          marginVertical
-          height
-          background {
-            id
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-          image {
-            id
-            uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          }
+        borderWidth
+        borderRadius
+        borderColor
+        marginHorizontal
+        marginVertical
+        imageHeight
+        background {
+          id
+          uri
+          resizeMode
+        }
+        backgroundStyle {
+          backgroundColor
+          patternColor
+        }
+        image {
+          id
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
         }
       }
     `,
@@ -67,9 +79,8 @@ const HorizontalPhotoRenderer = ({
 
 export default HorizontalPhotoRenderer;
 
-export type HorizontalPhotoRawData = Omit<
-  HorizontalPhotoRenderer_module$data,
-  ' $fragmentType'
+export type HorizontalPhotoRawData = NullableFields<
+  Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
 >;
 
 type HorizontalPhotoRendererRawProps = ViewProps & {
@@ -77,6 +88,14 @@ type HorizontalPhotoRendererRawProps = ViewProps & {
    * The data for the HorizontalPhoto module
    */
   data: HorizontalPhotoRawData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -86,6 +105,8 @@ type HorizontalPhotoRendererRawProps = ViewProps & {
  */
 export const HorizontalPhotoRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   ...props
 }: HorizontalPhotoRendererRawProps) => {
@@ -95,29 +116,37 @@ export const HorizontalPhotoRendererRaw = ({
     borderColor,
     marginHorizontal,
     marginVertical,
-    height,
     background,
     backgroundStyle,
+    imageHeight,
     image,
-  } = Object.assign({}, HORIZONTAL_PHOTO_DEFAULT_VALUES, data);
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       style={style}
     >
       {image?.uri && (
         <View
           style={{
-            height,
+            height: imageHeight,
             borderWidth,
             borderRadius,
             marginHorizontal,
             marginVertical,
-            borderColor,
+            borderColor: swapColor(borderColor, colorPalette),
             overflow: 'hidden',
           }}
         >

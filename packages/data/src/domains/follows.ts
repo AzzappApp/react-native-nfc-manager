@@ -2,34 +2,19 @@ import { eq, and } from 'drizzle-orm';
 import {
   index,
   primaryKey,
-  datetime,
-  varchar,
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
+import db, { cols } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const FollowTable = mysqlTable(
   'Follow',
   {
-    followerId: varchar('followerId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }).notNull(),
-    followingId: varchar('followingId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }).notNull(),
-    createdAt: datetime('createdAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
+    followerId: cols.cuid('followerId').notNull(),
+    followingId: cols.cuid('followingId').notNull(),
+    createdAt: cols.dateTime('createdAt', true).notNull(),
   },
   table => {
     return {

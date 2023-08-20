@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -69,6 +69,11 @@ const SimpleButtonBordersEditionPanel = ({
       fragment SimpleButtonBordersEditionPanel_viewer on Viewer {
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            dark
+            light
+          }
         }
       }
     `,
@@ -96,11 +101,14 @@ const SimpleButtonBordersEditionPanel = ({
             description: 'Border color tab label in SimpleButton edition',
           }),
           rightElement: (
-            <ColorPreview color={borderColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(borderColor, profile?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [borderColor, intl],
+    [borderColor, intl, profile?.cardColors],
   );
 
   return (

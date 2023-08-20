@@ -1,0 +1,63 @@
+import { sql } from 'drizzle-orm';
+import {
+  mysqlTable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  MySqlTableWithColumns as _unused,
+} from 'drizzle-orm/mysql-core';
+import db, { cols } from './db';
+import type { InferModel } from 'drizzle-orm';
+
+export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
+  id: cols.cuid('id').notNull().primaryKey(),
+  mediaId: cols.cuid('mediaId').notNull(),
+  profileCategoryId: cols.cuid('profileCategoryId'),
+  companyActivityId: cols.cuid('companyActivityId'),
+});
+
+export type MediaSuggestion = InferModel<typeof MediaSuggestionTable>;
+export type NewMediaSuggestion = InferModel<
+  typeof MediaSuggestionTable,
+  'insert'
+>;
+
+/**
+ * Return a list of media suggestions. filtered by profile kind and template kind
+ * @param profileKind the profile kind to filter by
+ * @param templateKind the template kind to filter by
+ * @param randomSeed the random seed to use for random ordering
+ * @param offset the offset to use for pagination
+ * @param limit the limit to use for pagination
+ * @return {*}  {Promise<Array<MediaSuggestion & { cursor: string }>>}
+ */
+export const getMediaSuggestions = async (
+  randomSeed: string,
+  profileCategoryId: string | null | undefined,
+  companyActivityId: string | null | undefined,
+  offset?: string | null,
+  limit?: number | null,
+) => {
+  const query = sql`
+    SELECT *, RAND(${randomSeed}) as cursor
+    FROM MediaSuggestion
+    WHERE enabled = 1
+  `;
+
+  if (profileCategoryId) {
+    query.append(sql`AND profileCategoryId = ${profileCategoryId}`);
+  }
+
+  if (companyActivityId) {
+    query.append(sql`AND companyActivityId = ${companyActivityId}`);
+  }
+  if (offset) {
+    query.append(sql`AND cursor > ${offset}`);
+  }
+  query.append(sql`ORDER BY cursor`);
+  if (limit) {
+    query.append(sql`LIMIT ${limit}`);
+  }
+
+  return (await db.execute(query)).rows as Array<
+    MediaSuggestion & { cursor: string }
+  >;
+};

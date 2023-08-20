@@ -29,13 +29,12 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
     <Animated.View style={styles.item} exiting={FadeOutUp}>
       <Link
         route="PROFILE"
-        params={{ userName: profile.userName, profileID: profile.id }}
+        params={{ userName: profile.userName, profileId: profile.id }}
       >
         <PressableNative style={styles.profile}>
           <CoverRenderer
-            cover={profile.card?.cover}
+            profile={profile}
             width={COVER_WIDTH}
-            userName={profile.userName}
             videoEnabled={false}
           />
           <Text variant="large" numberOfLines={1}>
@@ -93,11 +92,7 @@ const ProfileList = ({
       fragment ProfileList_users on Profile @relay(plural: true) {
         id
         userName
-        card {
-          cover {
-            ...CoverRenderer_cover
-          }
-        }
+        ...CoverRenderer_profile
       }
     `,
     usersKey,

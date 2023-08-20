@@ -1,24 +1,34 @@
 import 'server-only';
-import { getMediasByIds } from '@azzapp/data/domains';
+import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CoverRenderer.css';
 import CoverRendererBackground from './CoverRendererBackground';
-import type { CardCover } from '@azzapp/data/domains';
+import type { Media, Profile } from '@azzapp/data/domains';
 
-type CoverRendererProps = Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
-  cover: CardCover;
+type CoverRendererProps = Omit<
+  React.HTMLProps<HTMLDivElement>,
+  'children' | 'media'
+> & {
+  profile: Profile;
+  media: Media;
 };
 
 const CoverRenderer = async ({
-  cover: { title, subTitle, mediaId, textPreviewMediaId },
+  profile: { coverData, coverTitle, coverSubTitle, cardColors },
+  media,
+  style,
   ...props
 }: CoverRendererProps) => {
-  const [media] = await getMediasByIds([mediaId]);
-
+  if (!coverData) {
+    return null;
+  }
+  const { textPreviewMediaId } = coverData;
+  // TODO render foreground
   return (
-    <div style={{ backgroundImage: media?.id, position: 'relative' }}>
+    <div {...props} style={{ position: 'relative', ...style }}>
       <CoverRendererBackground media={media} />
       <div
         {...props}
@@ -48,11 +58,25 @@ const CoverRenderer = async ({
               fluid
             />
           ))}
+        {coverData.foregroundId && (
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.foregroundColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              WebkitMaskImage: `url(${getImageURL(coverData.foregroundId)})`,
+              maskImage: `url(${getImageURL(coverData.foregroundId)}.svg)`,
+            }}
+            className={styles.foregroundMedia}
+          />
+        )}
         {textPreviewMediaId && (
           <h1 className={styles.coverMedia}>
             <CloudinaryImage
               mediaId={textPreviewMediaId}
-              alt={`${title} - ${subTitle}`}
+              alt={`${coverTitle} - ${coverSubTitle}`}
               className={styles.coverMedia}
               sizes="100vw"
               fill

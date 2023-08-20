@@ -3,21 +3,14 @@ import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 import {
   text,
   index,
-  datetime,
-  varchar,
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import { CardCoverTable } from './cardCovers';
-import { CardTable } from './cards';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
-import { MediaTable } from './medias';
+import { getMediasByIds } from './medias';
 import { PostTable } from './posts';
 import { ProfileTable } from './profiles';
 import type { Media } from './medias';
@@ -27,20 +20,11 @@ import type { InferModel } from 'drizzle-orm';
 export const PostCommentTable = mysqlTable(
   'PostComment',
   {
-    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
-      .primaryKey()
-      .notNull(),
-    profileId: varchar('profileId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }).notNull(),
-    postId: varchar('postId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    id: cols.cuid('id').notNull().primaryKey(),
+    profileId: cols.cuid('profileId').notNull(),
+    postId: cols.cuid('postId').notNull(),
     comment: text('comment').notNull(),
-    createdAt: datetime('createdAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
+    createdAt: cols.dateTime('createdAt', true).notNull(),
   },
   table => {
     return {
@@ -108,18 +92,35 @@ export const getPostCommentsWithProfile = async (
       ),
     )
     .innerJoin(ProfileTable, eq(ProfileTable.id, PostCommentTable.profileId))
-    .innerJoin(CardTable, eq(CardTable.profileId, ProfileTable.id))
-    .innerJoin(CardCoverTable, eq(CardCoverTable.id, CardTable.coverId))
-    .innerJoin(MediaTable, eq(MediaTable.id, CardCoverTable.mediaId))
+    .where(eq(ProfileTable.cardIsPublished, true))
     .orderBy(desc(PostCommentTable.createdAt))
     .limit(limit);
 
-  return res.map(({ PostComment, Profile, Media }) => ({
-    ...PostComment,
-    firstName: Profile.firstName,
-    lastName: Profile.lastName,
-    media: Media,
-  })) satisfies PostCommentWithProfile[];
+  const mediasMap = (
+    await getMediasByIds(
+      convertToNonNullArray(
+        res.map(({ Profile }) => Profile.coverData?.mediaId),
+      ),
+    )
+  ).reduce((acc, media) => {
+    if (!media) return acc;
+    acc.set(media.id, media);
+    return acc;
+  }, new Map<string, Media>());
+
+  const result: PostCommentWithProfile[] = [];
+
+  for (const { PostComment, Profile } of res) {
+    const media = mediasMap.get(Profile.coverData?.mediaId ?? '');
+    if (!media) continue;
+    result.push({
+      ...PostComment,
+      firstName: Profile.firstName,
+      lastName: Profile.lastName,
+      media,
+    });
+  }
+  return result;
 };
 
 /**
@@ -153,7 +154,9 @@ export const getPostCommentsByDate = async (
  * @param offset - The number of profiles to skip
  * @returns A list of PostComment
  */
-export const getTopPostsComment = async (postId: string[]) => {
+export const getTopPostsComment = async (
+  postId: string[],
+): Promise<Array<PostComment & { author: Profile }>> => {
   const comments = await db
     .select({
       postsId: PostCommentTable.postId,

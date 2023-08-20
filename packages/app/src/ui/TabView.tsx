@@ -1,6 +1,6 @@
-import { Screen, ScreenContainer } from 'react-native-screens';
-import type { ReactElement } from 'react';
-import type { ViewProps } from 'react-native';
+import { useMemo, type ReactElement, useEffect, useRef } from 'react';
+import { View, type ViewProps } from 'react-native';
+import PagerView from 'react-native-pager-view';
 
 export type TabViewProps = Omit<ViewProps, 'children'> & {
   currentTab: string;
@@ -8,18 +8,35 @@ export type TabViewProps = Omit<ViewProps, 'children'> & {
 };
 
 const TabView = ({ tabs, currentTab, ...props }: TabViewProps) => {
+  const initialPage = useMemo(
+    () => tabs.findIndex(({ id }) => id === currentTab),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const tabRef = useRef<PagerView>(null);
+  const lastPage = useRef<number>(initialPage);
+  useEffect(() => {
+    const nextPage = tabs.findIndex(({ id }) => id === currentTab);
+    if (nextPage !== lastPage.current) {
+      tabRef.current?.setPageWithoutAnimation(nextPage);
+      lastPage.current = nextPage;
+    }
+  }, [currentTab, initialPage, tabs]);
+
   return (
-    <ScreenContainer hasTwoStates {...props}>
+    <PagerView
+      ref={tabRef}
+      scrollEnabled={false}
+      {...props}
+      initialPage={initialPage}
+    >
       {tabs.map(({ id, element }) => (
-        <Screen
-          key={id}
-          activityState={currentTab === id ? 2 : 0}
-          gestureEnabled={false}
-        >
+        <View key={id} style={{ flex: 1 }} collapsable={false}>
           {element}
-        </Screen>
+        </View>
       ))}
-    </ScreenContainer>
+    </PagerView>
   );
 };
 export default TabView;

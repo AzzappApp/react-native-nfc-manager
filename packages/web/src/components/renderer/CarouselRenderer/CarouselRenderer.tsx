@@ -1,12 +1,18 @@
 import 'server-only';
 import { getMediasByIds } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  CAROUSEL_DEFAULT_VALUES,
+  CAROUSEL_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
 import Carousel from './Carousel';
 import type { ModuleRendererProps } from '../ModuleRenderer';
+import type { CardModuleCarousel } from '@azzapp/data/domains';
 
-export type CarouselRendererProps = ModuleRendererProps &
+export type CarouselRendererProps = ModuleRendererProps<CardModuleCarousel> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
@@ -15,12 +21,14 @@ export type CarouselRendererProps = ModuleRendererProps &
 const CarouselRenderer = async ({
   module,
   style,
+  cardStyle,
+  colorPalette,
   ...props
 }: CarouselRendererProps) => {
   const {
     images,
     squareRatio,
-    borderSize,
+    borderWidth,
     borderColor,
     borderRadius,
     marginVertical,
@@ -29,7 +37,12 @@ const CarouselRenderer = async ({
     gap,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, CAROUSEL_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: CAROUSEL_STYLE_VALUES,
+    defaultValues: CAROUSEL_DEFAULT_VALUES,
+  });
 
   const height = imageHeight + marginVertical * 2;
   const medias = images
@@ -41,6 +54,7 @@ const CarouselRenderer = async ({
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={{ ...style, height }}
     >
       <div
@@ -52,9 +66,9 @@ const CarouselRenderer = async ({
         }}
       >
         <Carousel
-          borderColor={borderColor}
+          borderColor={swapColor(borderColor, colorPalette)}
           borderRadius={borderRadius}
-          borderSize={borderSize}
+          borderWidth={borderWidth}
           gap={gap}
           imageHeight={imageHeight}
           marginHorizontal={marginHorizontal}

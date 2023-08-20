@@ -6,3 +6,7 @@ type Entry<T> = Exclude<
 export function typedEntries<T extends object>(object: T) {
   return Object.entries(object) as Array<Entry<T>>;
 }
+
+export type NullableFields<T> = {
+  [K in keyof T]: T[K] | null;
+};

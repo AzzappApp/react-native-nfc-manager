@@ -1,7 +1,12 @@
 import { useRef } from 'react';
 import { Image, ScrollView } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  CAROUSEL_DEFAULT_VALUES,
+  CAROUSEL_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import PressableNative from '#ui/PressableNative';
 import CardModuleBackground from '../CardModuleBackground';
 import CarouselFullscreen from './CarouselFullscreen';
@@ -10,6 +15,8 @@ import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
 } from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
 export type CarouselRendererProps = ViewProps & {
@@ -17,6 +24,14 @@ export type CarouselRendererProps = ViewProps & {
    * A relay fragment reference for a Carousel module
    */
   module: CarouselRenderer_module$key;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -42,7 +57,7 @@ const CarouselRenderer = ({ module, ...props }: CarouselRendererProps) => {
           aspectRatio
         }
         squareRatio
-        borderSize
+        borderWidth
         borderColor
         borderRadius
         marginVertical
@@ -66,9 +81,8 @@ const CarouselRenderer = ({ module, ...props }: CarouselRendererProps) => {
 
 export default CarouselRenderer;
 
-export type CarouselRawData = Omit<
-  CarouselRenderer_module$data,
-  ' $fragmentType'
+export type CarouselRawData = NullableFields<
+  Omit<CarouselRenderer_module$data, ' $fragmentType'>
 >;
 
 type CarouselRendererRawProps = ViewProps & {
@@ -76,6 +90,14 @@ type CarouselRendererRawProps = ViewProps & {
    * The data for the carousel module
    */
   data: CarouselRawData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -85,13 +107,15 @@ type CarouselRendererRawProps = ViewProps & {
  */
 export const CarouselRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   ...props
 }: CarouselRendererRawProps) => {
   const {
     images,
     squareRatio,
-    borderSize,
+    borderWidth,
     borderColor,
     borderRadius,
     marginVertical,
@@ -100,17 +124,25 @@ export const CarouselRendererRaw = ({
     gap,
     background,
     backgroundStyle,
-  } = Object.assign({}, CAROUSEL_DEFAULT_VALUES, data);
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: CAROUSEL_DEFAULT_VALUES,
+    styleValuesMap: CAROUSEL_STYLE_VALUES,
+  });
 
-  const height = imageHeight + marginVertical * 2 + borderSize * 2;
+  const height = imageHeight + marginVertical * 2 + borderWidth * 2;
   const modal = useRef<CarouselFullscrenActions>(null);
 
   return (
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       style={[{ height }, style]}
     >
       <ScrollView
@@ -135,10 +167,10 @@ export const CarouselRendererRaw = ({
               key={image.id}
               source={{ uri: image.uri }}
               style={{
-                height: imageHeight + borderSize * 2,
+                height: imageHeight + borderWidth * 2,
                 borderRadius,
-                borderColor,
-                borderWidth: borderSize,
+                borderColor: swapColor(borderColor, colorPalette),
+                borderWidth,
                 aspectRatio: squareRatio ? 1 : image.aspectRatio,
                 resizeMode: 'cover',
               }}
@@ -151,7 +183,7 @@ export const CarouselRendererRaw = ({
         images={images}
         borderColor={borderColor}
         borderRadius={borderRadius}
-        borderSize={borderSize}
+        borderWidth={borderWidth}
         squareRatio={squareRatio}
       />
     </CardModuleBackground>

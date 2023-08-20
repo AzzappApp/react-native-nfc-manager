@@ -1,8 +1,9 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
+import { fromGlobalId } from 'graphql-relay';
+
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  Pressable,
   View,
   useWindowDimensions,
   Image,
@@ -17,35 +18,34 @@ import Animated, {
   FadeOut,
   interpolate,
   useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withDelay,
-  withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import AccountHeader from '#components/AccountHeader';
-import ContactCard from '#components/ContactCard';
+import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import useAnimatedState from '#hooks/useAnimatedState';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import ColorPreview from '#ui/ColorPreview';
 import Container from '#ui/Container';
+import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
+import ContactCardHeader from './ContactCardHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardRoute } from '#routes';
 import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
+import type { LayoutChangeEvent } from 'react-native';
 
 const contactCardMobileScreenQuery = graphql`
   query ContactCardScreenQuery {
@@ -53,17 +53,18 @@ const contactCardMobileScreenQuery = graphql`
       profile {
         id
         userName
+        ...ContactCardHeader_profile
         ...AccountHeader_profile
         ...ProfileColorPicker_profile
+        ...ContactCard_profile
         contactCard {
           public
           isDisplayedOnWebCard
-          backgroundStyle {
-            backgroundColor
-          }
-          ...ContactCard_card
           ...ContactCardEditModal_card
           ...ContactCardExportVcf_card
+        }
+        cardColors {
+          primary
         }
       }
     }
@@ -71,81 +72,97 @@ const contactCardMobileScreenQuery = graphql`
 `;
 
 const defaultTimingParam = {
-  duration: 400,
-  easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+  duration: 600,
+  easing: Easing.inOut(Easing.ease), //Easing.bezier(0.25, 0.1, 0.25, 1),
 };
 
 const ContactCardScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
-  const contactCardData = usePreloadedQuery(
+  const { viewer } = usePreloadedQuery(
     contactCardMobileScreenQuery,
     preloadedQuery,
   );
-
-  const profile = contactCardData.viewer?.profile;
+  const { width, height } = useWindowDimensions();
+  const profile = viewer?.profile;
   const intl = useIntl();
 
-  const fullScreen = useSharedValue<boolean>(false);
+  const [fullScreen, setFullscreen] = useToggle(false);
 
-  const { height } = useWindowDimensions();
+  const sharedRotationState = useAnimatedState(fullScreen, defaultTimingParam);
 
-  const scaleValue = useDerivedValue(() => {
-    return withDelay(
-      fullScreen.value ? 100 : 0,
-      withTiming(fullScreen.value ? 1 : 0, {
-        ...defaultTimingParam,
-        duration: fullScreen.value ? defaultTimingParam.duration : 170,
-      }),
-    );
-  }, [fullScreen.value]);
+  const cardWidth = (width * 78) / 100;
+  const cardHeight = cardWidth / CONTACT_CARD_RATIO;
+  const fullScreenCardWidth = width - 40;
+  const fullScreenCardHeight = fullScreenCardWidth * CONTACT_CARD_RATIO;
 
-  const screenModeValue = useDerivedValue(() => {
-    return withTiming(fullScreen.value ? 1 : 0, defaultTimingParam);
-  }, [fullScreen.value]);
+  const [topCardY, setTopCardY] = useState(0);
+  const onLayout = (event: LayoutChangeEvent) => {
+    const middleY = event.nativeEvent.layout.y + cardHeight / 2;
+    const topYAfterScale = fullScreenCardHeight / 2 - middleY;
+    setTopCardY(topYAfterScale);
+  };
 
-  const style = useAnimatedStyle(
-    () => ({
-      width: 335,
-      transform: [
-        {
-          scale: interpolate(
-            scaleValue.value,
-            [0, 1],
-            [0.73, Math.min(1.8, (height - 150) / 335)],
-          ),
-        },
-        {
-          rotate: `${interpolate(screenModeValue.value, [0, 1], [0, -90])}deg`,
-        },
-        {
-          translateX: interpolate(screenModeValue.value, [0, 1], [0, -130]),
-        },
-      ],
-    }),
-    [screenModeValue.value, scaleValue.value],
-  );
+  const animatedContactCardStyle = useAnimatedStyle(() => {
+    //calcul the center for Y translation and X translation
 
-  const headerStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        {
-          translateY: interpolate(screenModeValue.value, [0, 1], [0, -100]),
-        },
-      ],
-    }),
-    [screenModeValue.value],
-  );
+    const transform = [
+      {
+        scale: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [1, fullScreenCardWidth / cardHeight],
+        ),
+      },
+      {
+        translateY: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
+        ),
+      },
+
+      {
+        rotate: `${interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, -90],
+        )}deg`,
+      },
+    ];
+
+    return {
+      zIndex: 10,
+      // height: interpolate(
+      //   sharedRotationState.value,
+      //   [0, 1],
+      //   [cardHeight, fullScreenCardWidth],
+      // ),
+
+      transform,
+    };
+  }, [sharedRotationState.value, cardWidth, width, topCardY]);
 
   const footerStyle = useAnimatedStyle(
     () => ({
       transform: [
         {
-          translateY: interpolate(screenModeValue.value, [0, 1], [0, height]),
+          translateY: interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [0, height],
+          ),
         },
       ],
     }),
-    [screenModeValue.value],
+    [sharedRotationState.value],
+  );
+
+  const headerStyle = useAnimatedStyle(
+    () => ({
+      opacity: interpolate(sharedRotationState.value, [0, 1], [1, 0]),
+    }),
+    [sharedRotationState.value],
   );
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
@@ -154,13 +171,12 @@ const ContactCardScreen = ({
     graphql`
       mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
         saveContactCard(input: $input) {
-          contactCard {
-            public
-            isDisplayedOnWebCard
-            backgroundStyle {
-              backgroundColor
+          profile {
+            contactCard {
+              public
+              isDisplayedOnWebCard
+              ...ContactCardEditModal_card
             }
-            ...ContactCardEditModal_card
           }
         }
       }
@@ -194,31 +210,24 @@ const ContactCardScreen = ({
   const [loadingPass, setLoadingPass] = useState(false);
 
   const colorScheme = useColorScheme();
+  if (!profile) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container style={styles.container}>
         <Animated.View style={headerStyle}>
-          <AccountHeader
-            userName={profile?.userName}
-            profile={profile}
-            title={intl.formatMessage({
-              defaultMessage: 'Contact Card',
-              description:
-                'Title of the contact card screen, displayed in the header.',
-            })}
-          />
+          <ContactCardHeader profileKey={profile} />
         </Animated.View>
-        {profile && (
-          <Pressable onPress={() => (fullScreen.value = !fullScreen.value)}>
-            <Animated.View style={[styles.header, style]}>
-              <ContactCard
-                userName={profile?.userName ?? ''}
-                contactCard={profile.contactCard}
-              />
-            </Animated.View>
-          </Pressable>
-        )}
+
+        <PressableAnimated
+          onPress={setFullscreen}
+          style={[styles.contactCard, animatedContactCardStyle]}
+          onLayout={onLayout}
+        >
+          <ContactCard profile={profile} height={cardHeight} />
+        </PressableAnimated>
 
         <Animated.View style={[footerStyle, styles.footer]}>
           <Text variant="xsmall" style={styles.contactCardDescriptionText}>
@@ -252,25 +261,21 @@ const ContactCardScreen = ({
             onPress={toggleColorPickerVisible}
           >
             <ColorPreview
-              color={
-                contactCardData.viewer?.profile?.contactCard?.backgroundStyle
-                  ?.backgroundColor ?? colors.black
-              }
+              color={viewer?.profile?.cardColors?.primary ?? colors.black}
               colorSize={16}
             />
           </PressableNative>
-          {contactCardData.viewer.profile && (
+          {viewer.profile && (
             <ProfileColorPicker
               visible={colorPickerVisible}
               height={400}
-              profile={contactCardData.viewer.profile}
+              profile={viewer.profile}
               title={intl.formatMessage({
                 defaultMessage: ' color',
                 description: ' color title in BlockText edition',
               })}
               selectedColor={
-                contactCardData.viewer?.profile?.contactCard?.backgroundStyle
-                  ?.backgroundColor ?? colors.black
+                viewer?.profile?.cardColors?.primary ?? colors.black
               }
               onColorChange={color => {
                 commit({
@@ -356,6 +361,7 @@ const ContactCardScreen = ({
                   setLoadingPass(true);
                   if (Platform.OS === 'ios') {
                     const pass = await getAppleWalletPass({
+                      profileId: fromGlobalId(profile.id).id,
                       locale: intl.locale,
                     });
 
@@ -366,6 +372,7 @@ const ContactCardScreen = ({
                     await addPass(base64Pass);
                   } else if (Platform.OS === 'android') {
                     const pass = await getGoogleWalletPass({
+                      profileId: fromGlobalId(profile.id).id,
                       locale: intl.locale,
                     });
 
@@ -415,18 +422,18 @@ const ContactCardScreen = ({
               </Text>
             </PressableNative>
 
-            {profile && (
+            {profile?.contactCard && (
               <ContactCardExportVcf
                 userName={profile.userName}
-                contactCard={profile?.contactCard}
+                contactCard={profile.contactCard}
               />
             )}
           </View>
         </Animated.View>
-        {contactCardData.viewer.profile && (
+        {viewer.profile.contactCard && (
           <ContactCardEditModal
-            key={contactCardData.viewer.profile?.id ?? ''}
-            contactCard={contactCardData.viewer.profile.contactCard}
+            key={viewer.profile.id}
+            contactCard={viewer.profile.contactCard}
             visible={contactCardEditModal}
             toggleBottomSheet={toggleContactEditModal}
           />
@@ -443,9 +450,9 @@ export default relayScreen(ContactCardScreen, {
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
-    position: 'relative',
+    justifyContent: 'flex-start',
   },
-  header: {
+  contactCard: {
     alignSelf: 'center',
   },
   editContactCardButton: {
@@ -458,6 +465,7 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.black : colors.white,
   },
   footer: {
+    marginTop: 20,
     alignItems: 'center',
     rowGap: 20,
     paddingHorizontal: 10,

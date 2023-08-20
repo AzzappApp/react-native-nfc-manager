@@ -1,14 +1,20 @@
 import { useState, useCallback } from 'react';
-import { useIntl } from 'react-intl';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
-import { PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
   PhotoWithTextAndTitleRenderer_module$key,
 } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {
   ViewProps,
   LayoutChangeEvent,
@@ -22,6 +28,14 @@ export type PhotoWithTextAndTitleRendererProps = ViewProps & {
    * A relay fragment reference for a PhotoWithTextAndTitle module
    */
   module: PhotoWithTextAndTitleRenderer_module$key;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -33,7 +47,7 @@ const PhotoWithTextAndTitleRenderer = ({
 }: PhotoWithTextAndTitleRendererProps) => {
   const data = useFragment(
     graphql`
-      fragment PhotoWithTextAndTitleRenderer_module on CardModule
+      fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
       @argumentDefinitions(
         screenWidth: {
           type: "Float!"
@@ -44,36 +58,34 @@ const PhotoWithTextAndTitleRenderer = ({
           provider: "../providers/PixelRatio.relayprovider"
         }
       ) {
-        id
-        ... on CardModulePhotoWithTextAndTitle {
-          image {
-            id
-            uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          }
-          aspectRatio
-          fontFamily
-          fontColor
-          textAlign
-          imageMargin
-          verticalArrangement
-          horizontalArrangement
-          gap
-          fontSize
-          textSize
-          text
-          title
-          borderRadius
-          marginHorizontal
-          marginVertical
-          background {
-            id
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
+        image {
+          id
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
+        }
+        aspectRatio
+        fontFamily
+        fontColor
+        textAlign
+        imageMargin
+        verticalArrangement
+        horizontalArrangement
+        gap
+        fontSize
+        textSize
+        text
+        title
+        borderRadius
+        verticalSpacing
+        marginHorizontal
+        marginVertical
+        background {
+          id
+          uri
+          resizeMode
+        }
+        backgroundStyle {
+          backgroundColor
+          patternColor
         }
       }
     `,
@@ -84,9 +96,8 @@ const PhotoWithTextAndTitleRenderer = ({
 
 export default PhotoWithTextAndTitleRenderer;
 
-export type PhotoWithTextAndTitleRawData = Omit<
-  PhotoWithTextAndTitleRenderer_module$data,
-  ' $fragmentType'
+export type PhotoWithTextAndTitleRawData = NullableFields<
+  Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
 >;
 
 type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
@@ -98,6 +109,14 @@ type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
    * The view mode for the module
    */
   viewMode?: 'desktop' | 'mobile';
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -107,6 +126,8 @@ type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
  */
 export const PhotoWithTextAndTitleRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   viewMode,
   ...props
@@ -131,7 +152,12 @@ export const PhotoWithTextAndTitleRendererRaw = ({
     aspectRatio,
     background,
     backgroundStyle,
-  } = Object.assign({}, PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES, data);
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  });
 
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
   const onLayout = useCallback(
@@ -166,14 +192,16 @@ export const PhotoWithTextAndTitleRendererRaw = ({
       ? 'column'
       : 'column-reverse';
 
-  const intl = useIntl();
-
   return (
     <View
       {...props}
       style={[
         style,
-        { backgroundColor: backgroundStyle?.backgroundColor ?? colors.white },
+        {
+          backgroundColor:
+            swapColor(backgroundStyle?.backgroundColor, colorPalette) ??
+            colors.white,
+        },
       ]}
       onLayout={onLayout}
     >
@@ -181,7 +209,9 @@ export const PhotoWithTextAndTitleRendererRaw = ({
         <View style={styles.background} pointerEvents="none">
           <SvgUri
             uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
+            color={
+              swapColor(backgroundStyle?.patternColor, colorPalette) ?? '#000'
+            }
             width={layout?.width ?? 0}
             height={layout?.height ?? 0}
             preserveAspectRatio="xMidYMid slice"
@@ -235,14 +265,10 @@ export const PhotoWithTextAndTitleRendererRaw = ({
               textAlign: textAlign as TextStyle['textAlign'],
               fontSize,
               fontFamily,
-              color: fontColor as ColorValue,
+              color: swapColor(fontColor, colorPalette) as ColorValue,
             }}
           >
-            {title ||
-              intl.formatMessage({
-                defaultMessage: 'Add section Title here',
-                description: 'PhotoWithTextAndTitle default module title',
-              })}
+            {title}
           </Text>
           <Text
             style={{
@@ -250,19 +276,14 @@ export const PhotoWithTextAndTitleRendererRaw = ({
               fontSize: textSize,
               fontFamily,
               marginTop: 7,
-              color: fontColor as ColorValue,
+              color: swapColor(fontColor, colorPalette) as ColorValue,
               lineHeight:
                 fontSize && verticalSpacing
                   ? fontSize * 1.2 + verticalSpacing
                   : undefined,
             }}
           >
-            {text ||
-              intl.formatMessage({
-                defaultMessage:
-                  "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
-                description: 'PhotoWithTextAndTitle default module text',
-              })}
+            {text}
           </Text>
         </View>
       </View>

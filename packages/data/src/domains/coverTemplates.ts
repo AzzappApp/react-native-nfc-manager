@@ -1,59 +1,45 @@
-import { eq, inArray, and, isNull, or } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 import {
-  datetime,
-  varchar,
-  customType,
   mysqlTable,
+  mysqlEnum,
+  boolean,
+  json,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
-import { customTinyInt, sortEntitiesByIds } from './generic';
+import db, { cols } from './db';
+import { sortEntitiesByIds } from './generic';
+import type {
+  TextOrientation,
+  TextPosition,
+  TextStyle,
+} from '@azzapp/shared/coverHelpers';
 import type { InferModel } from 'drizzle-orm';
 
-type CoverTemplateData = {
-  sourceMediaId?: string;
+export type CoverTemplateData = {
+  titleStyle?: TextStyle | null;
+  subTitleStyle?: TextStyle | null;
+  textOrientation: TextOrientation;
+  textPosition: TextPosition;
+  backgroundId?: string | null;
+  backgroundColor?: string | null;
+  backgroundPatternColor?: string | null;
+  foregroundId?: string | null;
+  foregroundColor?: string | null;
+  mediaFilter?: string | null;
+  mediaParameters?: Record<string, any> | null;
+  merged: boolean;
 };
 
 export const CoverTemplateTable = mysqlTable('CoverTemplate', {
-  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
-  name: varchar('name', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
-  colorPalette: varchar('colorPalette', { length: DEFAULT_VARCHAR_LENGTH }),
-  enabled: customTinyInt('enabled').default(true).notNull(),
-  createdAt: datetime('createdAt', {
-    mode: 'date',
-    fsp: DEFAULT_DATETIME_PRECISION,
-  })
-    .default(DEFAULT_DATETIME_VALUE)
-    .notNull(),
-  updatedAt: datetime('updatedAt', {
-    mode: 'date',
-    fsp: DEFAULT_DATETIME_PRECISION,
-  })
-    .default(DEFAULT_DATETIME_VALUE)
-    .notNull(),
-  data: customType<{ data: CoverTemplateData }>({
-    toDriver: value => JSON.stringify(value),
-    fromDriver: value => value as CoverTemplateData,
-    dataType: () => 'json',
-  })('data').notNull(),
-  merged: customTinyInt('merged').notNull(),
-  segmented: customTinyInt('segmented').notNull(),
-  tags: varchar('tags', { length: DEFAULT_VARCHAR_LENGTH }),
-  category: customType<{ data: { en?: string } }>({
-    toDriver: value => JSON.stringify(value),
-    fromDriver: value => value as { en: string },
-    dataType: () => 'json',
-  })('category'),
-  previewMediaId: varchar('previewMediaId', { length: DEFAULT_VARCHAR_LENGTH }),
-  suggested: customTinyInt('suggested').default(false).notNull(),
-  companyActivityIds: varchar('companyActivityIds', {
-    length: DEFAULT_VARCHAR_LENGTH,
-  }),
+  id: cols.cuid('id').notNull().primaryKey(),
+  name: cols.defaultVarchar('name').notNull(),
+  kind: mysqlEnum('kind', ['people', 'video', 'others']).notNull(),
+  previewMediaId: cols.cuid('previewMediaId').notNull(),
+  data: json('data').$type<CoverTemplateData>().notNull(),
+  colorPaletteId: cols.cuid('colorPaletteId').notNull(),
+  businessEnabled: boolean('businessEnabled').default(true).notNull(),
+  personalEnabled: boolean('personalEnabled').default(true).notNull(),
 });
 
 export type CoverTemplate = InferModel<typeof CoverTemplateTable>;
@@ -75,46 +61,35 @@ export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
   );
 
 /**
- * It returns a promise that resolves to an array of cover templates for a given profile kind
- * @param {segmented}  boolean | null - segmented cover template
+ * Return a list of cover templates. filtered by profile kind and template kind
+ * @param profileKind the profile kind to filter by
+ * @param templateKind the template kind to filter by
+ * @param randomSeed the random seed to use for random ordering
+ * @param offset the offset to use for pagination
+ * @param limit the limit to use for pagination
+ * @return {*}  {Promise<Array<CoverTemplate & { cursor: string }>>}
  */
-export const getCoverTemplates = async (segmented?: boolean | null) => {
-  const res = await db
-    .select()
-    .from(CoverTemplateTable)
-    .where(
-      and(
-        eq(CoverTemplateTable.enabled, true),
-        eq(CoverTemplateTable.suggested, false),
-        segmented != null
-          ? eq(CoverTemplateTable.segmented, !!segmented)
-          : undefined,
-      ),
-    );
-  return res;
-};
-
-/**
- * It retuens a promise that resolves to an array of suggested cover templates for a given profile kind and company activity id
- *
- * @param {string} companyActivityId
- * @return {*}  {Promise<CoverTemplate[]>}
- */
-export const getCoverTemplatesSuggestion = async (
-  companyActivityId: string,
+export const getCoverTemplates = async (
+  profileKind: 'business' | 'personal',
+  templateKind: 'others' | 'people' | 'video',
+  randomSeed: string,
+  offset?: string | null,
+  limit?: number | null,
 ) => {
-  const res = await db
-    .select()
-    .from(CoverTemplateTable)
-    .where(
-      and(
-        eq(CoverTemplateTable.enabled, true),
-        eq(CoverTemplateTable.suggested, true),
-        or(
-          isNull(CoverTemplateTable.companyActivityIds),
-          inArray(CoverTemplateTable.companyActivityIds, [companyActivityId]),
-        ),
-      ),
-    );
-  return res;
+  const query = sql`
+    SELECT *, RAND(${randomSeed}) as cursor
+    FROM CoverTemplate
+    WHERE ${
+      profileKind === 'business'
+        ? CoverTemplateTable.businessEnabled
+        : CoverTemplateTable.personalEnabled
+    } = 1
+    AND ${CoverTemplateTable.kind} = ${templateKind}
+    ${offset ? sql`AND cursor > ${offset}` : sql``}
+    ${limit ? sql`LIMIT ${limit}` : sql``}
+  `;
+
+  return (await db.execute(query)).rows as Array<
+    CoverTemplate & { cursor: string }
+  >;
 };

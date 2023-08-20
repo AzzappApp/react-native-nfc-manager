@@ -1,16 +1,18 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KIND_SIMPLE_BUTTON,
   SIMPLE_BUTTON_DEFAULT_VALUES,
+  SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
-import useDataEditor from '#hooks/useDataEditor';
+import WebCardModulePreview from '#components/WebCardModulePreview';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -92,6 +94,25 @@ const SimpleButtonEditionScreen = ({
           uri
           resizeMode
         }
+        profile {
+          cardColors {
+            primary
+            dark
+            light
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+        }
       }
     `,
     viewerKey,
@@ -100,11 +121,33 @@ const SimpleButtonEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: simpleButton,
-      defaultValue: SIMPLE_BUTTON_DEFAULT_VALUES,
-    });
+  const initialValue = useMemo(() => {
+    return {
+      buttonLabel: simpleButton?.buttonLabel ?? null,
+      actionType: simpleButton?.actionType ?? null,
+      actionLink: simpleButton?.actionLink ?? null,
+      fontFamily: simpleButton?.fontFamily ?? null,
+      fontColor: simpleButton?.fontColor ?? null,
+      fontSize: simpleButton?.fontSize ?? null,
+      buttonColor: simpleButton?.buttonColor ?? null,
+      borderColor: simpleButton?.borderColor ?? null,
+      borderWidth: simpleButton?.borderWidth ?? null,
+      borderRadius: simpleButton?.borderRadius ?? null,
+      marginTop: simpleButton?.marginTop ?? null,
+      marginBottom: simpleButton?.marginBottom ?? null,
+      width: simpleButton?.width ?? null,
+      height: simpleButton?.height ?? null,
+      backgroundId: simpleButton?.background?.id ?? null,
+      backgroundStyle: simpleButton?.backgroundStyle ?? null,
+    };
+  }, [simpleButton]);
+
+  const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
+    initialValue,
+    cardStyle: viewer.profile?.cardStyle,
+    styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
+    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+  });
 
   const {
     buttonLabel,
@@ -121,9 +164,17 @@ const SimpleButtonEditionScreen = ({
     marginBottom,
     width,
     height,
-    background,
+    backgroundId,
     backgroundStyle,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -133,9 +184,9 @@ const SimpleButtonEditionScreen = ({
         $input: SaveSimpleButtonModuleInput!
       ) {
         saveSimpleButtonModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...SimpleButtonEditionScreen_module
@@ -144,7 +195,8 @@ const SimpleButtonEditionScreen = ({
         }
       }
     `);
-  const isValid = true; //TODO:
+  const isValid =
+    !!value.buttonLabel && !!value.actionType && !!value.actionLink;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
@@ -152,16 +204,13 @@ const SimpleButtonEditionScreen = ({
     if (!canSave) {
       return;
     }
-    //check the link format
-    const { background, ...rest } = updates;
 
     const input: SaveSimpleButtonModuleInput = {
+      ...value,
       moduleId: simpleButton?.id,
-      backgroundId:
-        simpleButton?.background?.id !== data.background?.id
-          ? background?.id ?? null
-          : simpleButton?.background?.id ?? null,
-      ...rest,
+      buttonLabel: value.buttonLabel!,
+      actionType: value.actionType!,
+      actionLink: value.actionLink!,
     };
 
     commit({
@@ -180,15 +229,7 @@ const SimpleButtonEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    simpleButton?.id,
-    simpleButton?.background?.id,
-    data?.background?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, value, simpleButton?.id, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -226,19 +267,7 @@ const SimpleButtonEditionScreen = ({
 
   const onHeightChange = fieldUpdateHandler('height');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -292,7 +321,9 @@ const SimpleButtonEditionScreen = ({
       >
         <SimpleButtonPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={data}
+          data={previewData}
+          colorPalette={viewer.profile?.cardColors}
+          cardStyle={viewer.profile?.cardStyle}
         />
         <TabView
           style={{ height: bottomPanelHeight }}
@@ -303,11 +334,11 @@ const SimpleButtonEditionScreen = ({
               element: (
                 <SimpleButtonSettingsEditionPanel
                   viewer={viewer}
-                  buttonLabel={buttonLabel}
+                  buttonLabel={buttonLabel ?? ''}
                   onButtonLabelChange={onButtonLabelChange}
-                  actionType={actionType}
+                  actionType={actionType ?? ''}
                   onActionTypeChange={onActionTypeChange}
-                  actionLink={actionLink}
+                  actionLink={actionLink ?? ''}
                   onActionLinkChange={onActionLinkChange}
                   fontFamily={fontFamily}
                   onFontFamilyChange={onFontFamilyChange}
@@ -368,7 +399,7 @@ const SimpleButtonEditionScreen = ({
               element: (
                 <SimpleButtonBackgroundEditionPanel
                   viewer={viewer}
-                  backgroundId={background?.id}
+                  backgroundId={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
@@ -394,12 +425,12 @@ const SimpleButtonEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={simpleButton?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_SIMPLE_BUTTON,
-              data,
+              data: previewData,
             }}
             style={{
               flex: 1,

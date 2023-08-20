@@ -7,16 +7,15 @@ import {
 } from 'google-wallet/lib/cjs/generic';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@azzapp/auth/viewer';
 import {
-  getContactCard,
   getProfilesByIds,
   buildDefaultContactCard,
+  getProfileById,
 } from '@azzapp/data/domains';
 import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
-import type { SessionData } from '@azzapp/auth/viewer';
+import { getSessionData } from '#helpers/tokens';
 import type {
   GenericClass,
   GenericObject,
@@ -24,13 +23,19 @@ import type {
 
 const getGoogleWalletPass = async (
   _: Request,
-  { params: { lang } }: { params: { lang: string } },
+  {
+    params: { lang },
+    searchParams,
+  }: {
+    params: { lang: string };
+    searchParams: { profileId: string };
+  },
 ) => {
-  let viewer: SessionData;
+  const profileId = searchParams.profileId;
   try {
-    viewer = await getSessionData();
-
-    if (viewer.isAnonymous || !viewer.profileId) {
+    const { userId } = (await getSessionData()) ?? {};
+    const profile = await getProfileById(profileId);
+    if (!profile || profile.userId !== userId) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },
         { status: 401 },
@@ -75,16 +80,17 @@ const getGoogleWalletPass = async (
   // Create or update a contact card object
   const objectSuffix = 'contactCard_object';
 
-  let contactCard = await getContactCard(viewer.profileId);
+  const [profile] = await getProfilesByIds([profileId]);
 
-  const [profile] = await getProfilesByIds([viewer.profileId]);
+  let { contactCard } = profile ?? {};
 
   if (!contactCard && profile) {
-    contactCard = buildDefaultContactCard(profile);
+    contactCard = await buildDefaultContactCard(profile);
   }
 
   if (contactCard) {
     const { data, signature } = await serializeAndSignContactCard(
+      profileId,
       profile?.userName ?? '',
       contactCard,
     );
@@ -119,9 +125,8 @@ const getGoogleWalletPass = async (
         alternateText: '',
       },
       classId: classData.id,
-      id: `${process.env.GOOGLE_PASS_ISSUER_ID}.${objectSuffix}.${viewer.profileId}`,
-      hexBackgroundColor:
-        contactCard?.backgroundStyle?.backgroundColor ?? '#000000',
+      id: `${process.env.GOOGLE_PASS_ISSUER_ID}.${objectSuffix}.${profileId}`,
+      hexBackgroundColor: profile?.cardColors?.primary ?? '#000000',
       state: StateEnum.ACTIVE,
       logo: {
         sourceUri: {
@@ -150,7 +155,7 @@ const getGoogleWalletPass = async (
 
     let genericObject = await generic.getObject(
       process.env.GOOGLE_PASS_ISSUER_ID ?? '',
-      `${objectSuffix}.${viewer.profileId}`,
+      `${objectSuffix}.${profileId}`,
     );
     if (!genericObject) {
       genericObject = await generic.createObject(objectData);

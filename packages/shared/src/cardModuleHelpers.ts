@@ -1,164 +1,475 @@
-export type ModuleKind =
-  | 'blockText'
-  | 'carousel'
-  | 'horizontalPhoto'
-  | 'lineDivider'
-  | 'openingHours'
-  | 'photoWithTextAndTitle'
-  | 'simpleButton'
-  | 'simpleText'
-  | 'simpleTitle'
-  | 'socialLinks'
-  | 'webCardsCarousel';
+import { getValuesFromStyle, type CardStyle } from './cardHelpers';
+import { typedEntries } from './objectHelpers';
 
-export const MODULE_KIND_BLOCK_TEXT = 'blockText';
-
-export const MODULE_KIND_CAROUSEL = 'carousel';
-
-export const MODULE_KIND_HORIZONTAL_PHOTO = 'horizontalPhoto';
-
-export const MODULE_KIND_LINE_DIVIDER = 'lineDivider';
-
-export const MODULE_KIND_OPENING_HOURS = 'openingHours';
-
-export const MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE = 'photoWithTextAndTitle';
-
-export const MODULE_KIND_SIMPLE_BUTTON = 'simpleButton';
-
+//#region SimpleText
 export const MODULE_KIND_SIMPLE_TEXT = 'simpleText';
 
-export const MODULE_KIND_SIMPLE_TITLE = 'simpleTitle';
+export type CardModuleSimpleTextData = {
+  text: string;
+  fontFamily?: string | null;
+  fontColor?: string | null;
+  textAlign?: TextAlignment | null;
+  fontSize?: number | null;
+  verticalSpacing?: number | null;
+  marginHorizontal?: number | null;
+  marginVertical?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
 
-export const MODULE_KIND_SOCIAL_LINKS = 'socialLinks';
-
-export const MODULE_KIND_WEB_CARDS_CAROUSEL = 'webCardsCarousel';
-
-export const MODULE_KINDS: ModuleKind[] = [
-  'blockText',
-  'carousel',
-  'horizontalPhoto',
-  'lineDivider',
-  'openingHours',
-  'photoWithTextAndTitle',
-  'simpleButton',
-  'simpleText',
-  'simpleTitle',
-  'socialLinks',
-  'webCardsCarousel',
-];
+export const SIMPLE_TEXT_STYLE_VALUES = {
+  fontFamily: 'fontFamily',
+  fontSize: 'fontSize',
+} as const satisfies Partial<
+  Record<keyof CardModuleSimpleTextData, keyof CardStyle>
+>;
 
 export const SIMPLE_TEXT_DEFAULT_VALUES = {
-  fontFamily: 'Arial',
-  fontSize: 12,
-  color: '#000000',
-  textAlign: 'left',
-  verticalSpacing: 0,
-  marginHorizontal: 10,
-  marginVertical: 10,
-} as const;
+  fontColor: '#000000',
+  textAlign: 'center',
+  verticalSpacing: 12,
+  marginHorizontal: 20,
+  marginVertical: 20,
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleSimpleTextData>;
 
 export const SIMPLE_TEXT_MAX_LENGTH = 2000;
+//#endregion
+
+//#region SimpleTitle
+export const MODULE_KIND_SIMPLE_TITLE = 'simpleTitle';
+
+export const SIMPLE_TITLE_STYLE_VALUES = {
+  fontFamily: 'titleFontFamily',
+  fontSize: 'titleFontSize',
+} as const satisfies Partial<
+  Record<keyof CardModuleSimpleTextData, keyof CardStyle>
+>;
 
 export const SIMPLE_TITLE_DEFAULT_VALUES = {
-  fontFamily: 'Arial',
-  fontSize: 20,
-  color: '#000000',
+  fontColor: '#000000',
   textAlign: 'center',
-  verticalSpacing: 0,
-  marginHorizontal: 10,
+  verticalSpacing: 20,
+  marginHorizontal: 20,
   marginVertical: 20,
-} as const;
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleSimpleTextData>;
 
 export const SIMPLE_TITLE_MAX_LENGTH = 300;
+//#endregion
+
+//#region LineDivider
+export const MODULE_KIND_LINE_DIVIDER = 'lineDivider';
+
+export type CardModuleLineDividerData = {
+  orientation?: 'bottomRight' | 'topLeft' | null;
+  marginBottom?: number | null;
+  marginTop?: number | null;
+  height?: number | null;
+  colorTop?: string | null;
+  colorBottom?: string | null;
+};
 
 export const LINE_DIVIDER_DEFAULT_VALUES = {
-  orientation: 'bottomRight',
+  orientation: 'topLeft',
   marginBottom: 0,
   marginTop: 0,
   height: 100,
-  colorTop: '#FFFFFF',
-  colorBottom: '#000000', // use theme colors(not important from azzapp/app here)
-} as const;
+  colorTop: 'light',
+  colorBottom: 'dark',
+} as const satisfies Partial<CardModuleLineDividerData>;
+//#endregion
+
+//#region HorizontalPhoto
+export const MODULE_KIND_HORIZONTAL_PHOTO = 'horizontalPhoto';
+
+export type CardModuleHorizontalPhotoData = {
+  image: string;
+  borderWidth?: number | null;
+  borderColor?: string | null;
+  borderRadius?: number | null;
+  marginHorizontal?: number | null;
+  marginVertical?: number | null;
+  imageHeight?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
+
+export const HORIZONTAL_PHOTO_STYLE_VALUES = {
+  borderRadius: 'borderRadius',
+} as const satisfies Partial<
+  Record<keyof CardModuleHorizontalPhotoData, keyof CardStyle>
+>;
 
 export const HORIZONTAL_PHOTO_DEFAULT_VALUES = {
   borderWidth: 0,
-  borderRadius: 1,
-  borderColor: '#000000',
-  marginHorizontal: 0,
-  marginVertical: 0,
-  height: 200,
-} as const;
+  borderColor: '#FFFFFF',
+  imageHeight: 200,
+  marginHorizontal: 20,
+  marginVertical: 20,
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleHorizontalPhotoData>;
+//#endregion
+
+//#region Carousel
+export const MODULE_KIND_CAROUSEL = 'carousel';
+
+export type CardModuleCarouselData = {
+  images: string[];
+  squareRatio?: boolean | null;
+  borderWidth?: number | null;
+  borderColor?: string | null;
+  borderRadius?: number | null;
+  marginHorizontal?: number | null;
+  marginVertical?: number | null;
+  imageHeight?: number | null;
+  gap?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
+
+export const CAROUSEL_STYLE_VALUES = {
+  borderRadius: 'borderRadius',
+  gap: 'gap',
+} as const satisfies Partial<
+  Record<keyof CardModuleCarouselData, keyof CardStyle>
+>;
 
 export const CAROUSEL_DEFAULT_VALUES = {
-  borderSize: 0,
-  borderColor: '#000000',
+  borderWidth: 0,
+  borderColor: '#FFFFFF',
   borderRadius: 0,
-  marginVertical: 0,
-  marginHorizontal: 0,
-  gap: 10,
-  imageHeight: 400,
+  marginVertical: 20,
+  marginHorizontal: 20,
+  imageHeight: 300,
   squareRatio: false,
-} as const;
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleCarouselData>;
 
 export const CAROUSEL_IMAGE_MAX_WIDTH = 2048;
+//#endregion
+
+//#region SimpleButton
+export const MODULE_KIND_SIMPLE_BUTTON = 'simpleButton';
+
+export type CardModuleSimpleButtonData = {
+  buttonLabel: string;
+  actionType: string;
+  actionLink: string;
+  fontFamily?: string | null;
+  fontColor?: string | null;
+  fontSize?: number | null;
+  buttonColor?: string | null;
+  borderColor?: string | null;
+  borderWidth?: number | null;
+  borderRadius?: number | null;
+  marginTop?: number | null;
+  marginBottom?: number | null;
+  width?: number | null;
+  height?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
+
+export const SIMPLE_BUTTON_STYLE_VALUES = {
+  fontFamily: 'fontFamily',
+  fontSize: 'fontSize',
+  borderRadius: 'buttonRadius',
+  borderWidth: 'borderWidth',
+  borderColor: 'borderColor',
+} as const satisfies Partial<
+  Record<keyof CardModuleSimpleButtonData, keyof CardStyle>
+>;
 
 export const SIMPLE_BUTTON_DEFAULT_VALUES = {
-  buttonLabel: '',
-  actionType: 'email',
-  actionLink: '',
-  fontFamily: 'Arial',
-  fontColor: '#FFFFFF',
-  fontSize: 14,
-  buttonColor: '#000000',
-  borderColor: '#000000',
-  borderWidth: 5,
-  borderRadius: 5,
-  marginTop: 0,
-  marginBottom: 0,
-  width: 150,
-  height: 50,
-} as const;
+  fontColor: 'dark',
+  buttonColor: 'light',
+  height: 54,
+  width: 200,
+  marginTop: 20,
+  marginBottom: 20,
+} as const satisfies Partial<CardModuleSimpleButtonData>;
+//#endregion
+
+//#region PhotoWithTextAndTitle
+export const MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE = 'photoWithTextAndTitle';
+
+export type CardModulePhotoWithTextAndTitleData = {
+  image: string;
+  fontFamily?: string | null;
+  fontColor?: string | null;
+  textAlign?: TextAlignment | null;
+  imageMargin?: 'width_full' | 'width_limited' | null;
+  horizontalArrangement?: 'left' | 'right' | null;
+  verticalArrangement?: 'bottom' | 'top' | null;
+  gap?: number | null;
+  fontSize?: number | null;
+  textSize?: number | null;
+  title: string;
+  text: string;
+  borderRadius?: number | null;
+  marginHorizontal?: number | null;
+  marginVertical?: number | null;
+  verticalSpacing?: number | null;
+  aspectRatio?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
+
+export const PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES = {
+  fontFamily: 'fontFamily',
+  fontSize: 'titleFontSize',
+  textSize: 'fontSize',
+  borderRadius: 'borderRadius',
+} as const satisfies Partial<
+  Record<
+    keyof CardModulePhotoWithTextAndTitleData,
+    keyof CardStyle | 'textSize'
+  >
+>;
 
 export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES = {
-  fontFamily: 'Arial',
-  fontColor: '#000000',
   textAlign: 'left',
   imageMargin: 'width_full',
-  verticalArrangement: 'top',
   horizontalArrangement: 'left',
-  gap: 10,
-  fontSize: 20,
-  textSize: 14,
-  borderRadius: 0,
-  marginHorizontal: 10,
-  marginVertical: 0,
+  verticalArrangement: 'top',
   aspectRatio: 1,
-  verticalSpacing: 1,
-  text: '',
-  title: '',
-} as const;
+  marginHorizontal: 20,
+  marginVertical: 20,
+  verticalSpacing: 12,
+  gap: 20,
+  fontColor: '#000000',
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModulePhotoWithTextAndTitleData>;
+//#endregion
+
+//#region SocialLinks
+export const MODULE_KIND_SOCIAL_LINKS = 'socialLinks';
+
+export type CardModuleSocialLinksData = {
+  links: Array<{ socialId: string; link: string; position: number }>;
+  iconColor?: string | null;
+  arrangement?: 'inline' | 'multiline' | null;
+  iconSize?: number | null;
+  borderWidth?: number | null;
+  columnGap?: number | null;
+  marginTop?: number | null;
+  marginBottom?: number | null;
+  marginHorizontal?: number | null;
+  backgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+};
 
 export const SOCIAL_LINKS_DEFAULT_VALUES = {
-  links: [],
-  iconColor: '#000000',
-  arrangement: 'inline',
-  iconSize: 40,
+  arrangement: 'multiline',
+  iconSize: 44,
+  iconColor: 'primary',
   borderWidth: 2,
-  columnGap: 15,
+  columnGap: 20,
   marginTop: 20,
   marginBottom: 20,
   marginHorizontal: 20,
-} as const;
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleSocialLinksData>;
+//#endregion
+
+//#region BlockText
+export const MODULE_KIND_BLOCK_TEXT = 'blockText';
+
+export type CardModuleBlockTextData = {
+  text: string;
+  fontFamily?: string | null;
+  fontColor?: string | null;
+  textAlign?: TextAlignment | null;
+  fontSize?: number | null;
+  verticalSpacing?: number | null;
+  textMarginVertical?: number | null;
+  textMarginHorizontal?: number | null;
+  marginHorizontal?: number | null;
+  marginVertical?: number | null;
+  textBackgroundStyle?: ModuleTextBackgroundStyle | null;
+  textBackgroundId?: string | null;
+  backgroundStyle?: ModuleBackgroundStyle | null;
+  backgroundId?: string | null;
+};
+
+export const BLOCK_TEXT_STYLE_VALUES = {
+  fontSize: 'fontSize',
+  fontFamily: 'fontFamily',
+} as const satisfies Partial<
+  Record<keyof CardModuleBlockTextData, keyof CardStyle>
+>;
 
 export const BLOCK_TEXT_DEFAULT_VALUES = {
-  fontFamily: 'Arial',
-  fontColor: '#000000',
-  textAlign: 'left',
-  fontSize: 14,
-  verticalSpacing: 1,
-  textMarginHorizontal: 20,
-  textMarginVertical: 20,
+  verticalSpacing: 12,
+  textAlign: 'center',
   marginHorizontal: 20,
   marginVertical: 20,
-  text: '',
+  textMarginVertical: 20,
+  textMarginHorizontal: 20,
+  fontColor: '#FFFFFF',
+  textBackgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'primary',
+    opacity: 1,
+  },
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+} as const satisfies Partial<CardModuleBlockTextData>;
+//#endregion
+
+//#region OpeningHours
+export const MODULE_KIND_OPENING_HOURS = 'openingHours';
+// TODO add opening hours type
+//#endregion
+
+//#region WebCardsCarousel
+export const MODULE_KIND_WEB_CARDS_CAROUSEL = 'webCardsCarousel';
+//TODO add web cards carousel type
+//#endregion
+
+//#region Commons
+export const MODULE_KINDS = [
+  MODULE_KIND_BLOCK_TEXT,
+  MODULE_KIND_CAROUSEL,
+  MODULE_KIND_HORIZONTAL_PHOTO,
+  MODULE_KIND_LINE_DIVIDER,
+  MODULE_KIND_OPENING_HOURS,
+  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
+  MODULE_KIND_SIMPLE_BUTTON,
+  MODULE_KIND_SIMPLE_TEXT,
+  MODULE_KIND_SIMPLE_TITLE,
+  MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_WEB_CARDS_CAROUSEL,
+] as const;
+
+export const MODULES_STYLES_VALUES = {
+  [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_STYLE_VALUES,
+  [MODULE_KIND_CAROUSEL]: CAROUSEL_STYLE_VALUES,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_STYLE_VALUES,
+  [MODULE_KIND_LINE_DIVIDER]: {},
+  [MODULE_KIND_OPENING_HOURS]: {},
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
+    PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_STYLE_VALUES,
+  [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_STYLE_VALUES,
+  [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_STYLE_VALUES,
+  [MODULE_KIND_SOCIAL_LINKS]: {},
+  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
 } as const;
+
+export const MODULES_DEFAULT_VALUES = {
+  [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_DEFAULT_VALUES,
+  [MODULE_KIND_CAROUSEL]: CAROUSEL_DEFAULT_VALUES,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  [MODULE_KIND_LINE_DIVIDER]: LINE_DIVIDER_DEFAULT_VALUES,
+  [MODULE_KIND_OPENING_HOURS]: {},
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
+    PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_DEFAULT_VALUES,
+  [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_DEFAULT_VALUES,
+  [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_DEFAULT_VALUES,
+  [MODULE_KIND_SOCIAL_LINKS]: SOCIAL_LINKS_DEFAULT_VALUES,
+  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
+} as const;
+
+export type ModuleKind = (typeof MODULE_KINDS)[number];
+
+export type ModuleBackgroundStyle = {
+  backgroundColor: string;
+  patternColor: string;
+};
+
+export type ModuleTextBackgroundStyle = {
+  backgroundColor: string;
+  patternColor: string;
+  opacity: number;
+};
+
+export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
+//#endregion
+
+// #region Helpers function
+/**
+ * Helper function to get the values for rendering a module.
+ * It will return the values from the module data, by merging the values from the card style
+ * and the default values.
+ */
+export const getModuleDataValues = <
+  TModuleData extends object,
+  TStyleValues extends object,
+  TDefaultValues extends object,
+>({
+  data,
+  cardStyle,
+  styleValuesMap,
+  defaultValues,
+}: {
+  /**
+   * The module data.
+   */
+  data: TModuleData;
+  /**
+   * The card style used to render the web card.
+   */
+  cardStyle: CardStyle | null | undefined;
+  /**
+   * A map of the module data keys to the card style keys.
+   */
+  styleValuesMap: TStyleValues | null | undefined;
+  /**
+   * The default values for the module data.
+   */
+  defaultValues: TDefaultValues;
+}): {
+  [key in keyof TModuleData]-?: key extends keyof TStyleValues
+    ? Exclude<TModuleData[key], null | undefined>
+    : key extends keyof TDefaultValues
+    ? TDefaultValues[key] extends NonNullable<unknown>
+      ? Exclude<TModuleData[key], null | undefined>
+      : TModuleData[key]
+    : TModuleData[key];
+} => {
+  const cardStyleValues = getValuesFromStyle(cardStyle, styleValuesMap as any);
+  return typedEntries(data).reduce((acc, [key, value]) => {
+    if (value != null) {
+      acc[key] = value;
+    } else if (cardStyleValues[key] != null) {
+      acc[key] = cardStyleValues[key];
+    } else {
+      acc[key] = (defaultValues as any)[key];
+    }
+    return acc;
+  }, {} as any);
+};
+
+export const textAlignmentOrDefault = (
+  textAlignment: unknown,
+): TextAlignment => {
+  if (
+    ['center', 'justify', 'left', 'right'].includes(textAlignment as string)
+  ) {
+    return textAlignment as TextAlignment;
+  }
+  return 'center';
+};

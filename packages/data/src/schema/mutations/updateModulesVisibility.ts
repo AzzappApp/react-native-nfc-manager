@@ -1,31 +1,27 @@
 import { inArray } from 'drizzle-orm';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
-  async (
-    _source,
-    args,
-    { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
-  ) => {
-    const { modulesIds, visible } = args.input;
-
-    const profileId = getProfileId(auth);
+  async (_source, args, { auth, profileLoader, cardUpdateListener }) => {
+    const profileId = auth.profileId;
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
+
+    const profile = await profileLoader.load(profileId);
+    if (!profile) {
+      throw new Error(ERRORS.INVALID_REQUEST);
+    }
+    const { modulesIds, visible } = args.input;
     if (modulesIds.length === 0) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
-
-    const card = await cardByProfileLoader.load(profileId);
-    if (!card) {
-      throw new Error(ERRORS.INVALID_REQUEST);
-    }
     const modules = await getCardModulesByIds(modulesIds);
-    if (!modules.every(module => module != null && module.cardId === card.id)) {
+    if (
+      modules.some(module => module == null || module.profileId !== profileId)
+    ) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }
 
@@ -39,10 +35,9 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const profile = await profileLoader.load(profileId);
-    cardUpdateListener(profile!.userName);
+    cardUpdateListener(profile.userName);
 
-    return { card };
+    return { profile };
   };
 
 export default updateModulesVisibility;

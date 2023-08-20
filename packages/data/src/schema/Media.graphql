@@ -43,7 +43,6 @@ type StaticMedia {
   name: String
   usage: StaticMediaUsage!
   resizeMode: StaticMediaResizeMode!
-  tags: [String!]!
 }
 
 enum StaticMediaUsage {
@@ -62,4 +61,34 @@ enum StaticMediaResizeMode {
 enum MediaKind {
   video
   image
+}
+
+"""
+A connection to a list of items.
+"""
+type MediaConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [MediaEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type MediaEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Media
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }

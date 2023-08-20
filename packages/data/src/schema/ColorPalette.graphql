@@ -1,0 +1,36 @@
+type ColorPalette implements Node {
+  id: ID!
+  primary: String!
+  dark: String!
+  light: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type ColorPaletteConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ColorPaletteEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type ColorPaletteEdge {
+  """
+  The item at the end of the edge
+  """
+  node: ColorPalette
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}

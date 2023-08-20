@@ -1,19 +1,22 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { graphql, useFragment, useMutation } from 'react-relay';
-import { useDebounce } from 'use-debounce';
-import { CARD_DEFAULT_BACKGROUND_COLOR } from '@azzapp/shared/cardHelpers';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { graphql, useFragment } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import ProfileColorPicker from '#components/ProfileColorPicker';
+import WebCardBackground from '#components/WebCardBackground';
+import WebcardColorPicker from '#ui/ColorPicker/WebcardColorPicker';
+import CardStyleModal from './CardStyleModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
 import ProfileScreenFooter from './ProfileScreenFooter';
 import ProfileScreenHeader from './ProfileScreenHeader';
 import ProfileScreenScrollView from './ProfileScreenScrollView';
+import { useEditTransition } from './ProfileScreenTransitions';
 import type {
   ProfileBodyHandle,
   ModuleSelectionInfos,
@@ -35,6 +38,10 @@ type ProfileScreenProps = {
    * If the profile is in edit mode.
    */
   editing: boolean;
+  /**
+   * If the profile can be edited.
+   */
+  isViewer: boolean;
   /**
    * If the profile is in selection mode.
    */
@@ -62,6 +69,7 @@ const ProfileScreenContent = ({
   profile: profileKey,
   ready,
   editing,
+  isViewer,
   selectionMode,
   onToggleSelectionMode,
   onToggleEditing: onToggleEditMode,
@@ -73,15 +81,18 @@ const ProfileScreenContent = ({
       fragment ProfileScreenContent_profile on Profile {
         id
         userName
-        card {
-          id
-          backgroundColor
-          cover {
-            ...CoverRenderer_cover
-          }
-          ...ProfileScreenBody_card
-        }
+        ...CoverRenderer_profile
+        ...ProfileScreenBody_profile
         ...ProfileColorPicker_profile
+        ...WebCardBackground_profile
+        cardCover {
+          backgroundColor
+        }
+        cardColors {
+          primary
+          dark
+          light
+        }
       }
     `,
     profileKey,
@@ -110,44 +121,15 @@ const ProfileScreenContent = ({
   // #endregion
 
   // #region Color picker
-  const [backgroundColor, setBackgroundColor] = useState(
-    profile.card?.backgroundColor ?? CARD_DEFAULT_BACKGROUND_COLOR,
-  );
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const onRequestColorPicker = useCallback(() => {
-    setShowColorPicker(true);
+  const [showWebcardColorPicker, setShowWebcardColorPicker] = useState(false);
+  const onRequestWebcardColorPicker = useCallback(() => {
+    setShowWebcardColorPicker(true);
   }, []);
 
-  const onCloseColorPicker = useCallback(() => {
-    setShowColorPicker(false);
+  const onClosWebcardeColorPicker = useCallback(() => {
+    setShowWebcardColorPicker(false);
   }, []);
 
-  const [commitBackground] = useMutation(graphql`
-    mutation ProfileScreenContentUpdateCardMutation($input: UpdateCardInput!) {
-      updateCard(input: $input) {
-        card {
-          id
-          backgroundColor
-        }
-      }
-    }
-  `);
-
-  const firstTime = useRef(true);
-  const [debouncedBackgroundColor] = useDebounce(backgroundColor, 300);
-  useEffect(() => {
-    if (firstTime.current) {
-      firstTime.current = false;
-      return;
-    }
-    commitBackground({
-      variables: {
-        input: {
-          backgroundColor: debouncedBackgroundColor,
-        },
-      },
-    });
-  }, [commitBackground, debouncedBackgroundColor]);
   // #endregion
 
   // #region New Module
@@ -192,10 +174,7 @@ const ProfileScreenContent = ({
 
   const onEditCover = useCallback(() => {
     router.push({
-      route: 'CARD_MODULE_EDITION',
-      params: {
-        module: 'cover',
-      },
+      route: 'COVER_EDITION',
     });
   }, [router]);
 
@@ -240,6 +219,15 @@ const ProfileScreenContent = ({
   );
   // #endregion
 
+  // #region Card style
+  const [showCardStyleModal, setShowCardStyleModal] = useState(false);
+  const openCardStyleModal = useCallback(() => {
+    setShowCardStyleModal(true);
+  }, []);
+  const closeCardStyleModal = useCallback(() => {
+    setShowCardStyleModal(false);
+  }, []);
+
   const [modulesCount, setModulesCount] = useState(1);
 
   const onScroll = useCallback(
@@ -250,12 +238,23 @@ const ProfileScreenContent = ({
     [onContentPositionChange],
   );
 
-  const intl = useIntl();
   const { width: windowSize } = useWindowDimensions();
+  const coverBackgroundColor =
+    swapColor(profile.cardCover?.backgroundColor, profile.cardColors) ??
+    profile.cardColors?.light ??
+    colors.white;
+
+  const editTransiton = useEditTransition();
+
+  const backgroundStyle = useAnimatedStyle(() => {
+    return {
+      opacity: 1 - editTransiton.value,
+    };
+  }, []);
 
   return (
     <>
-      <View style={{ flex: 1, backgroundColor }}>
+      <View style={{ flex: 1 }}>
         <ProfileScreenHeader
           editing={editing}
           nbSelectedModules={nbSelectedModules}
@@ -275,70 +274,95 @@ const ProfileScreenContent = ({
           onScroll={onScroll}
         >
           <ProfileBlockContainer
-            backgroundColor={backgroundColor}
+            backgroundColor={coverBackgroundColor}
             editing={editing}
             displayEditionButtons={false}
             onModulePress={onEditCover}
           >
             <CoverRenderer
-              cover={profile.card?.cover}
-              userName={profile.userName}
+              profile={profile}
               width={windowSize}
               videoEnabled={ready}
               hideBorderRadius
             />
           </ProfileBlockContainer>
           <Suspense fallback={null}>
-            {profile.card && (
-              <ProfileScreenBody
-                ref={profileBodyRef}
-                card={profile.card}
-                editing={editing}
-                selectionMode={selectionMode}
-                backgroundColor={backgroundColor}
-                onEditModule={onEditModule}
-                onSelectionStateChange={onSelectionStateChange}
-                onModulesCountChange={setModulesCount}
-              />
-            )}
+            <ProfileScreenBody
+              ref={profileBodyRef}
+              profile={profile}
+              editing={editing}
+              selectionMode={selectionMode}
+              onEditModule={onEditModule}
+              onSelectionStateChange={onSelectionStateChange}
+              onModulesCountChange={setModulesCount}
+            />
           </Suspense>
         </ProfileScreenScrollView>
-        <ProfileScreenFooter
-          editing={editing}
-          currentEditionView={editingDisplayMode}
-          selectionMode={selectionMode}
-          hasSelectedModules={nbSelectedModules > 0}
-          selectionContainsHiddenModules={selectionContainsHiddenModules}
-          backgroundColor={backgroundColor}
-          onEditingDisplayModeChange={setEditingDisplayMode}
-          onRequestNewModule={onRequestNewModule}
-          onRequestColorPicker={onRequestColorPicker}
-          onDelete={onDeleteSelectedModules}
-          onToggleVisibility={onToggleSelectedModulesVisibility}
-        />
+        <Suspense fallback={null}>
+          <ProfileScreenFooter
+            editing={editing}
+            currentEditionView={editingDisplayMode}
+            selectionMode={selectionMode}
+            hasSelectedModules={nbSelectedModules > 0}
+            selectionContainsHiddenModules={selectionContainsHiddenModules}
+            profile={profile}
+            onEditingDisplayModeChange={setEditingDisplayMode}
+            onRequestNewModule={onRequestNewModule}
+            onRequestColorPicker={onRequestWebcardColorPicker}
+            onRequestWebcardStyle={openCardStyleModal}
+            onDelete={onDeleteSelectedModules}
+            onToggleVisibility={onToggleSelectedModulesVisibility}
+          />
+        </Suspense>
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: -1,
+            },
+            backgroundStyle,
+          ]}
+        >
+          <Suspense
+            fallback={
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: coverBackgroundColor,
+                }}
+              />
+            }
+          >
+            <WebCardBackground profile={profile} style={{ flex: 1 }} />
+          </Suspense>
+        </Animated.View>
       </View>
-      <ModuleSelectionListModal
-        visible={showModulePicker}
-        onRequestClose={onCloseModulePicker}
-        onSelectModuleKind={onSelectModuleKind}
-        animationType="slide"
-      />
-      <Suspense>
-        <ProfileColorPicker
-          title={intl.formatMessage({
-            defaultMessage: 'Web card color',
-            description: 'Profile screen color picker title',
-          })}
-          profile={profile}
-          visible={showColorPicker}
-          selectedColor={
-            profile.card?.backgroundColor ?? CARD_DEFAULT_BACKGROUND_COLOR
-          }
-          height={350}
-          onColorChange={setBackgroundColor}
-          onRequestClose={onCloseColorPicker}
-        />
-      </Suspense>
+
+      {isViewer && (
+        <>
+          <ModuleSelectionListModal
+            visible={showModulePicker}
+            onRequestClose={onCloseModulePicker}
+            onSelectModuleKind={onSelectModuleKind}
+            animationType="slide"
+          />
+          <Suspense fallback={null}>
+            <CardStyleModal
+              visible={showCardStyleModal}
+              onRequestClose={closeCardStyleModal}
+            />
+            <WebcardColorPicker
+              profile={profile}
+              visible={showWebcardColorPicker}
+              onRequestClose={onClosWebcardeColorPicker}
+            />
+          </Suspense>
+        </>
+      )}
     </>
   );
 };

@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
 
 type CarouselFullscreenProps = {
   images: CarouselRawData['images'];
-  borderSize: number;
+  borderWidth: number;
   borderRadius: number;
   borderColor: string;
   squareRatio: boolean;
@@ -25,7 +25,7 @@ const CarouselFullscreen = forwardRef(
     props: CarouselFullscreenProps,
     ref: ForwardedRef<CarouselFullscrenActions>,
   ) => {
-    const { images, borderColor, borderRadius, borderSize, squareRatio } =
+    const { images, borderColor, borderRadius, borderWidth, squareRatio } =
       props;
 
     const [displayedImage, setDisplayedImage] = useState<number | null>(null);
@@ -33,15 +33,15 @@ const CarouselFullscreen = forwardRef(
     const onPreviousMedia = () => {
       setDisplayedImage(prevMedia => {
         if (prevMedia === null) return 0;
-        if (prevMedia === 0) return images.length - 1;
+        if (prevMedia === 0) return images ? images.length - 1 : 0;
         return prevMedia - 1;
       });
     };
 
     const onNextMedia = () => {
       setDisplayedImage(prevMedia => {
-        if (prevMedia === null) return images.length - 1;
-        if (prevMedia === images.length - 1) return 0;
+        if (prevMedia === null) return images ? images.length - 1 : 0;
+        if (images && prevMedia === images.length - 1) return 0;
         return prevMedia + 1;
       });
     };
@@ -93,12 +93,12 @@ const CarouselFullscreen = forwardRef(
           onTouchEnd={onTouchEnd}
           style={styles.content}
         >
-          {images.map((image, i) => (
+          {images?.map((image, i) => (
             <CarouselImage
               key={i}
               borderColor={borderColor}
               borderRadius={borderRadius}
-              borderSize={borderSize}
+              borderWidth={borderWidth}
               image={image}
               index={i}
               squareRatio={squareRatio}

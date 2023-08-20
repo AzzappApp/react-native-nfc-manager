@@ -1,20 +1,28 @@
 'use client';
 import cn from 'classnames';
-import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  SOCIAL_LINKS_DEFAULT_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
 import SocialLink from './SocialLink';
 import styles from './SocialLinksRenderer.css';
 import type { SocialLinkType } from './SocialLink';
 import type { ModuleRendererProps } from '../ModuleRenderer';
+import type { CardModuleSocialLinks } from '@azzapp/data/domains';
 
-export type SocialLinksRendererProps = ModuleRendererProps &
-  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
+export type SocialLinksRendererProps =
+  ModuleRendererProps<CardModuleSocialLinks> &
+    Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a SocialLinks module
  */
 const SocialLinksRenderer = ({
   module,
+  colorPalette,
+  cardStyle,
   ...props
 }: SocialLinksRendererProps) => {
   const {
@@ -29,7 +37,12 @@ const SocialLinksRenderer = ({
     backgroundId,
     backgroundStyle,
     marginHorizontal,
-  } = Object.assign({}, SOCIAL_LINKS_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: {},
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+  });
 
   const linksOrdered =
     (links as SocialLinkType[])
@@ -39,6 +52,7 @@ const SocialLinksRenderer = ({
   return (
     <CardModuleBackground
       {...props}
+      colorPalette={colorPalette}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
     >
@@ -63,7 +77,7 @@ const SocialLinksRenderer = ({
                 key={link.socialId}
                 link={link}
                 borderWidth={borderWidth}
-                iconColor={iconColor}
+                iconColor={swapColor(iconColor, colorPalette)}
                 iconSize={iconSize}
               />
             ))}
@@ -89,7 +103,7 @@ const SocialLinksRenderer = ({
               key={link.socialId}
               link={link}
               borderWidth={borderWidth}
-              iconColor={iconColor}
+              iconColor={swapColor(iconColor, colorPalette)}
               iconSize={iconSize}
             />
           ))}

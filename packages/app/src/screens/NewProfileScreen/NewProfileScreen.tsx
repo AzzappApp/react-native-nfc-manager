@@ -1,30 +1,36 @@
-import { toGlobalId } from 'graphql-relay';
-import { useState, useCallback } from 'react';
-import { View, StyleSheet, SafeAreaView, PixelRatio } from 'react-native';
-import {
-  fetchQuery,
-  graphql,
-  usePreloadedQuery,
-  useRelayEnvironment,
-} from 'react-relay';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import { PixelRatio, useWindowDimensions } from 'react-native';
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Screen, ScreenContainer } from 'react-native-screens';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import { prefetchImage } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
+import CardEditionStep from './CardEditionStep';
+import CoverEditionStep from './CoverEditionStep';
+import { TRANSITION_DURATION } from './newProfileScreenHelpers';
+import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
 import type { NewProfileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileScreenPreloadQuery.graphql';
 import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
-import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
+import type { ReactNode } from 'react';
 
 const newProfileScreenQuery = graphql`
   query NewProfileScreenQuery {
@@ -37,130 +43,239 @@ const newProfileScreenQuery = graphql`
   }
 `;
 
+const STEPS = ['PROFIKE_KIND', 'PROFILE_FORM', 'COVER', 'CARD'] as const;
+
+type Step = (typeof STEPS)[number];
+
 export const NewProfileScreen = ({
   preloadedQuery,
-  route: { params },
 }: RelayScreenProps<NewProfileRoute, NewProfileScreenQuery>) => {
+  // #region Data
   const { profileCategories } = usePreloadedQuery(
     newProfileScreenQuery,
     preloadedQuery,
   );
+  // #endregion
+
+  // #region Navigation
   const [currentPage, setPage] = useState(0);
+  const currentStep = STEPS[currentPage];
+
+  const previousPage = useRef(currentPage);
+  const transitionProgress = useSharedValue(0);
+  const [transitionInformation, setTransitionInformation] = useState<{
+    transitionKind: 'back' | 'forward';
+    transitioningPage: number;
+    disappearingPage: number;
+  } | null>(null);
+
+  const onTransitionEnd = useCallback(() => {
+    setTransitionInformation(null);
+    setTimeout(() => {
+      transitionProgress.value = 0;
+    }, 0);
+  }, [transitionProgress]);
+
+  useEffect(() => {
+    if (previousPage.current === currentPage) {
+      return;
+    }
+    const transitionKind =
+      currentPage > previousPage.current ? 'forward' : 'back';
+    setTransitionInformation({
+      transitionKind,
+      transitioningPage:
+        transitionKind === 'forward' ? currentPage : previousPage.current,
+      disappearingPage: previousPage.current,
+    });
+    previousPage.current = currentPage;
+    transitionProgress.value = withTiming(
+      1,
+      {
+        duration: TRANSITION_DURATION,
+        easing: Easing.inOut(Easing.ease),
+      },
+      () => {
+        runOnJS(onTransitionEnd)();
+      },
+    );
+  }, [currentPage, onTransitionEnd, transitionProgress]);
 
   const next = useCallback(() => {
-    setPage(pa => Math.min(pa + 1, 3));
+    setPage(page => Math.min(page + 1, STEPS.length - 1));
   }, [setPage]);
 
   const prev = useCallback(() => {
-    setPage(pa => Math.max(0, pa - 1));
+    setPage(page => Math.max(0, page - 1));
   }, [setPage]);
 
-  const environment = useRelayEnvironment();
+  const router = useRouter();
+  const onBack = useCallback(() => {
+    router.back();
+  }, [router]);
+  // #endregion
 
-  const onProfileCreated = (response: {
-    token: string;
-    refreshToken: string;
-    profileId: string;
-    profileData: Omit<CreateProfileParams, 'authMethod'>;
-  }) => {
-    const { profileData, profileId, token, refreshToken } = response;
-    environment.commitUpdate(updater => {
-      const root = updater.getRoot();
-      const user = root.getLinkedRecord('currentUser');
-      const profiles = user?.getLinkedRecords('profiles');
-      if (!profiles) {
-        return;
-      }
-
-      const newProfile = updater.create(
-        toGlobalId('Profile', profileId),
-        'Profile',
-      );
-
-      typedEntries(profileData).forEach(([key, value]) => {
-        newProfile.setValue(value, key);
-      });
-
-      user?.setLinkedRecords(
-        profiles
-          ?.concat(newProfile)
-          .sort((a, b) =>
-            ((a.getValue('userName') as string) ?? '').localeCompare(
-              (b.getValue('userName') as string) ?? '',
-            ),
-          ),
-        'profiles',
-      );
-
-      root.setLinkedRecord(user, 'currentUser');
-    });
-
-    void dispatchGlobalEvent({
-      type: 'PROFILE_CHANGE',
-      payload: {
-        authTokens: {
-          token,
-          refreshToken,
-        },
-        profileId,
-      },
-    });
-    if (params?.goBack) {
-      router.back();
-    } else {
-      router.replaceAll(mainRoutes);
-    }
-  };
-
+  // #region Profile kind selection
   const [profileCategoryId, setProfileCategoryId] = useState<string | null>(
     profileCategories?.[0]?.id ?? null,
   );
-
-  const onProfileCategoryChange = useCallback((profileCategoryId: string) => {
-    setProfileCategoryId(profileCategoryId);
-  }, []);
-
   const profileCategory = profileCategories?.find(
     pc => pc.id === profileCategoryId,
   );
   const profileKind = profileCategory?.profileKind;
 
-  const router = useRouter();
+  const onProfileCategoryChange = useCallback((profileCategoryId: string) => {
+    setProfileCategoryId(profileCategoryId);
+  }, []);
+  // #endregion
+
+  // #region Profile creation
+  const [profileInfo, setProfileInfo] = useState<{
+    profileId: string;
+    userName: string;
+  } | null>(null);
+
+  const onProfileCreated = async (profileId: string, userName: string) => {
+    setProfileInfo({
+      profileId,
+      userName,
+    });
+    next();
+  };
+  // #endregion
+
+  // #region Card creation
+  const onCoverSaved = useCallback(() => {
+    next();
+  }, [next]);
+
+  const onCoverTemplateApplied = useCallback(() => {
+    router.replace({
+      route: 'PROFILE',
+      params: { ...profileInfo!, editing: true },
+    });
+  }, [profileInfo, router]);
+  // #endregion
+
+  // #region Layout
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const contentHeight =
+    windowHeight - insets.top - insets.bottom - PAGER_HEADER_HEIGHT;
+  // #endregion
+
+  const intl = useIntl();
+  const pages: Record<Step, { title: string; element: ReactNode }> = {
+    PROFIKE_KIND: {
+      title: intl.formatMessage({
+        defaultMessage: 'What WebCard™\nwould you like to create?',
+        description: 'WebCard kind selection screen title',
+      }),
+      element: (
+        <ProfileKindStep
+          profileCategories={profileCategories}
+          profileCategoryId={profileCategoryId!}
+          onNext={next}
+          onProfileCategoryChange={onProfileCategoryChange}
+        />
+      ),
+    },
+    PROFILE_FORM: {
+      title:
+        profileKind === 'personal'
+          ? intl.formatMessage({
+              defaultMessage: 'What’s your name?',
+              description: 'Profile creation form title for personal profile',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Provide more details',
+              description: 'Profile creation form title for business profile',
+            }),
+      element: profileCategory ? (
+        <ProfileForm
+          profileKind={profileKind!}
+          profileCategory={profileCategory}
+          onProfileCreated={onProfileCreated}
+        />
+      ) : null,
+    },
+    COVER: {
+      title: intl.formatMessage({
+        defaultMessage: 'Create your cover',
+        description: 'Cover creation screen title',
+      }),
+      element:
+        profileInfo != null ? (
+          <CoverEditionStep
+            profileKind={profileKind!}
+            height={contentHeight}
+            onCoverSaved={onCoverSaved}
+          />
+        ) : null,
+    },
+    CARD: {
+      title: intl.formatMessage({
+        defaultMessage: 'Select a WebCard template',
+        description: 'WebCard creation screen title',
+      }),
+      element:
+        profileInfo !== null ? (
+          <CardEditionStep
+            height={contentHeight}
+            onCoverTemplateApplied={onCoverTemplateApplied}
+          />
+        ) : null,
+    },
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Container style={styles.container}>
-        {currentPage === 0 && (
-          <View key="0" style={styles.page} collapsable={false}>
-            <ProfileKindStep
-              onBack={params?.goBack ? router.back : null}
-              profileCategories={profileCategories}
-              profileCategoryId={profileCategoryId!}
-              onNext={next}
-              onProfileCategoryChange={onProfileCategoryChange}
-            />
-          </View>
-        )}
+    <Container
+      style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
+    >
+      <PagerHeader
+        nbPages={4}
+        currentPage={currentPage}
+        onBack={currentPage > 0 ? prev : onBack}
+        title={pages[currentStep].title}
+      />
 
-        {currentPage === 1 && (
-          <View key="1" style={styles.page} collapsable={false}>
-            <ProfileForm
-              profileKind={profileKind!}
-              profileCategory={profileCategory!}
-              onProfileCreated={onProfileCreated}
-              onBack={prev}
-            />
-          </View>
-        )}
-      </Container>
-    </SafeAreaView>
+      <ScreenContainer style={{ height: contentHeight }}>
+        {STEPS.map((step, index) => {
+          const { element } = pages[step];
+          return (
+            <TransitionScreen
+              key={`NewProfileScreen-${step}`}
+              activityState={
+                index === currentPage
+                  ? 2
+                  : transitionInformation?.disappearingPage === index
+                  ? 1
+                  : 0
+              }
+              transitionProgress={
+                transitionInformation?.transitioningPage === index
+                  ? transitionProgress
+                  : null
+              }
+              transitionKind={
+                transitionInformation?.transitionKind ?? 'forward'
+              }
+              width={windowWidth}
+              height={contentHeight}
+            >
+              {element}
+            </TransitionScreen>
+          );
+        })}
+      </ScreenContainer>
+    </Container>
   );
 };
 
 NewProfileScreen.prefetch = () => {
   const pixelRatio = Math.min(2, PixelRatio.get());
   const environment = getRelayEnvironment();
-  return fetchQuery<NewProfileScreenPreloadQuery>(
+  return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
     environment,
     graphql`
       query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
@@ -191,23 +306,53 @@ NewProfileScreen.prefetch = () => {
 
 NewProfileScreen.options = {
   replaceAnimation: 'push',
+  stackAnimation: 'slide_from_bottom',
 };
 
 export default relayScreen(NewProfileScreen, {
   query: newProfileScreenQuery,
 });
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loaderPage: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  page: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    left: 0,
-    top: 0,
-  },
-});
+type TransitionScreenProps = {
+  activityState: 0 | 1 | 2;
+  transitionProgress: Animated.SharedValue<number> | null;
+  transitionKind: 'back' | 'forward';
+  children: React.ReactNode;
+  width: number;
+  height: number;
+};
+
+const TransitionScreen = ({
+  activityState,
+  transitionProgress,
+  transitionKind,
+  children,
+  width,
+  height,
+}: TransitionScreenProps) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    if (transitionProgress == null) {
+      return {};
+    }
+    return {
+      transform: [
+        {
+          translateX:
+            transitionKind === 'forward'
+              ? (1 - transitionProgress.value) * width
+              : transitionProgress.value * width,
+        },
+      ],
+    };
+  }, [transitionProgress, transitionKind]);
+
+  const layoutStyle = { width, height };
+
+  return (
+    <Screen activityState={activityState} style={layoutStyle}>
+      <Animated.View style={[layoutStyle, animatedStyle]}>
+        <Container style={{ flex: 1 }}>{children}</Container>
+      </Animated.View>
+    </Screen>
+  );
+};

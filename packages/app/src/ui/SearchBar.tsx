@@ -33,6 +33,7 @@ type SearchBarProps = {
   placeholder?: string;
   animationDuration?: number;
   value?: string;
+  autoFocus?: boolean;
 };
 
 const SearchBar = ({
@@ -45,6 +46,7 @@ const SearchBar = ({
   placeholder,
   value,
   animationDuration = 300,
+  autoFocus,
 }: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
@@ -173,6 +175,7 @@ const SearchBar = ({
                   selectionColor={colors.primary400}
                   returnKeyType="search"
                   onSubmitEditing={onSubmitEditingLocal}
+                  autoFocus={autoFocus}
                 />
                 {isNotFalsyString(searchValue) && (
                   <PressableNative

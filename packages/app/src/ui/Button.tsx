@@ -14,7 +14,7 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
-  variant?: 'primary' | 'secondary';
+  variant?: 'little_round' | 'primary' | 'secondary';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
 };
@@ -94,10 +94,12 @@ const Button = (
 
 export default forwardRef(Button);
 
+export const BUTTON_HEIGHT = 47;
+
 const computedStyles = createVariantsStyleSheet(appearance => ({
   default: {
     root: {
-      height: 47,
+      height: BUTTON_HEIGHT,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
@@ -127,6 +129,24 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       backgroundColor: 'transparent',
       borderColor: appearance === 'light' ? colors.black : colors.white,
       borderWidth: 1,
+    },
+    label: {
+      color: appearance === 'light' ? colors.black : colors.white,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey200 : colors.grey900,
+      borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
+      backgroundColor: 'transparent',
+    },
+  },
+  little_round: {
+    root: {
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+      borderColor: appearance === 'light' ? colors.black : colors.white,
+      borderWidth: 1,
+      height: 29,
+      borderRadius: 29,
+      paddingHorizontal: 15,
     },
     label: {
       color: appearance === 'light' ? colors.black : colors.white,

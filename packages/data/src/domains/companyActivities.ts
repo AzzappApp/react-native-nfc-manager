@@ -1,22 +1,32 @@
 import { eq } from 'drizzle-orm';
 import {
   int,
-  varchar,
-  mysqlTable, // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
+  mysqlTable,
+  primaryKey,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH } from './db';
-import { customLabels } from './generic';
+import db, { cols } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = mysqlTable('CompanyActivity', {
-  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
-  labels: customLabels('labels'),
-  profileCategoryId: varchar('profileCategoryId', {
-    length: DEFAULT_VARCHAR_LENGTH,
-  }).notNull(),
-  order: int('order').notNull(),
+  id: cols.cuid('id').notNull(),
+  labels: cols.labels('labels').notNull(),
 });
+
+export const ProfileCategoryCompanyActivityTable = mysqlTable(
+  'ProfileCategoryCompanyActivity',
+  {
+    profileCategoryId: cols.cuid('profileCategoryId').notNull(),
+    companyActivityId: cols.cuid('companyActivityId').notNull(),
+    order: int('order').notNull(),
+  },
+  table => {
+    return {
+      pk: primaryKey(table.profileCategoryId, table.companyActivityId),
+    };
+  },
+);
 
 export type CompanyActivity = InferModel<typeof CompanyActivityTable>;
 export type NewCompanyActivity = InferModel<
@@ -29,15 +39,27 @@ export type NewCompanyActivity = InferModel<
  * @param profileCategoryId - The id of the profile category to filter the list by
  * @returns A list of company activities
  */
-export const getCompanyActivities = async (profileCategoryId?: string) => {
+export const getCompanyActivitiesByProfileCategory = async (
+  profileCategoryId: string,
+) => {
   return db
     .select()
     .from(CompanyActivityTable)
+    .innerJoin(
+      ProfileCategoryCompanyActivityTable,
+      eq(
+        CompanyActivityTable.id,
+        ProfileCategoryCompanyActivityTable.companyActivityId,
+      ),
+    )
     .where(
-      profileCategoryId
-        ? eq(CompanyActivityTable.profileCategoryId, profileCategoryId)
-        : undefined,
-    );
+      eq(
+        ProfileCategoryCompanyActivityTable.profileCategoryId,
+        profileCategoryId,
+      ),
+    )
+    .orderBy(ProfileCategoryCompanyActivityTable.order)
+    .then(res => res.map(r => r.CompanyActivity));
 };
 
 /**
@@ -50,6 +72,5 @@ export const getCompanyActivityById = async (id: string) => {
     .select()
     .from(CompanyActivityTable)
     .where(eq(CompanyActivityTable.id, id))
-
     .then(res => res.pop() ?? null);
 };

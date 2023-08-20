@@ -1,22 +1,19 @@
 /* eslint-disable no-bitwise */
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@azzapp/auth/viewer';
-import { getCrypto } from '@azzapp/shared/crypto';
+import { createMedia } from '@azzapp/data/domains';
+import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import cors from '#helpers/cors';
-import type { SessionData } from '@azzapp/auth/viewer';
-
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
-const CLOUDINARY_BASE_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUDNAME}`;
+import { getSessionData } from '#helpers/tokens';
+import type { SessionData } from '#helpers/tokens';
 
 const uploadSignApi = async (req: Request) => {
-  let viewer: SessionData;
+  let viewer: SessionData | null = null;
   try {
     viewer = await getSessionData();
 
-    if (viewer.isAnonymous) {
+    if (!viewer?.userId) {
       return NextResponse.json(
         { message: ERRORS.UNAUTORIZED },
         { status: 401 },
@@ -50,59 +47,20 @@ const uploadSignApi = async (req: Request) => {
     );
   }
 
-  const uploadURL: string =
-    kind === 'image'
-      ? `${CLOUDINARY_BASE_URL}/image/upload`
-      : `${CLOUDINARY_BASE_URL}/video/upload`;
-  const uploadParameters: Record<string, any> = {
-    timestamp: Math.round(Date.now() / 1000),
-    public_id: createId(),
-    context: `author=${viewer.profileId}|target=${target}`,
-  };
-
-  // TODO transformations
-
-  Object.assign(uploadParameters, {
-    signature: await apiSinRequest(
-      uploadParameters,
-      process.env.CLOUDINARY_API_SECRET!,
-    ),
-    api_key: CLOUDINARY_API_KEY,
+  const mediaId = createId();
+  await createMedia({
+    id: mediaId,
+    kind,
+    height: 0,
+    width: 0,
   });
-
+  const { uploadParameters, uploadURL } = await createPresignedUpload(
+    mediaId,
+    kind,
+  );
   return NextResponse.json({ uploadURL, uploadParameters });
 };
 
 export const { POST, OPTIONS } = cors({ POST: uploadSignApi });
 
 export const runtime = 'edge';
-
-// extracted from Cloudinary SDK to avoid importing the whole SDK
-// which has edge runtime issues
-
-const apiSinRequest = (paramsToSign: object, apiSecret: string) => {
-  const toSign = Object.entries(paramsToSign)
-    .filter(([, value]) => value != null && `${value}`.length > 0)
-    .map(([key, value]) => `${key}=${toArray(value).join(',')}`)
-    .sort()
-    .join('&');
-  return digestMessage(toSign + apiSecret);
-};
-
-function toArray(value: string[] | string): string[] {
-  if (value == null) {
-    return [];
-  } else if (Array.isArray(value)) {
-    return value;
-  } else {
-    return [value];
-  }
-}
-
-async function digestMessage(message: string) {
-  const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
-  const hashBuffer = await getCrypto().subtle.digest('SHA-1', msgUint8); // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
-  return hashHex;
-}

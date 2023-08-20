@@ -1,3 +1,4 @@
+import { getCrypto } from './crypto';
 import { fetchJSON } from './networkHelpers';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
@@ -161,3 +162,66 @@ export const deleteMediaByPublicIds = async (
   // TODO manage cursor and partial deletion
   await Promise.all([videoPromise, imagePromise]);
 };
+
+/**
+ * Create a presigned upload for cloudinary.
+ * @param kind The kind of media to upload.
+ * @returns The upload URL and parameters.
+ */
+export const createPresignedUpload = async (
+  publicId: string,
+  kind: 'image' | 'video',
+  preset?: string | null,
+  context?: string | null,
+) => {
+  const uploadURL: string =
+    kind === 'image'
+      ? `${CLOUDINARY_API_URL}/image/upload`
+      : `${CLOUDINARY_API_URL}/video/upload`;
+  const uploadParameters: Record<string, any> = {
+    timestamp: Math.round(Date.now() / 1000),
+    public_id: publicId,
+    context,
+  };
+  // TODO transformations based on preset
+
+  Object.assign(uploadParameters, {
+    signature: await apiSinRequest(
+      uploadParameters,
+      process.env.CLOUDINARY_API_SECRET!,
+    ),
+    api_key: CLOUDINARY_API_KEY,
+  });
+
+  return {
+    uploadURL,
+    uploadParameters,
+  };
+};
+
+const apiSinRequest = (paramsToSign: object, apiSecret: string) => {
+  const toSign = Object.entries(paramsToSign)
+    .filter(([, value]) => value != null && `${value}`.length > 0)
+    .map(([key, value]) => `${key}=${toArray(value).join(',')}`)
+    .sort()
+    .join('&');
+  return digestMessage(toSign + apiSecret);
+};
+
+function toArray(value: string[] | string): string[] {
+  if (value == null) {
+    return [];
+  } else if (Array.isArray(value)) {
+    return value;
+  } else {
+    return [value];
+  }
+}
+
+async function digestMessage(message: string) {
+  const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
+  const hashBuffer = await getCrypto().subtle.digest('SHA-1', msgUint8); // hash the message
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+  return hashHex;
+}

@@ -27,12 +27,12 @@ const MediaVideoRenderer = (
     aspectRatio,
     muted = false,
     paused = false,
-    testID,
     currentTime,
-    style,
     onProgress,
     onEnd,
     onReadyForDisplay,
+    style,
+    ...props
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
 ) => {
@@ -117,7 +117,7 @@ const MediaVideoRenderer = (
         { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
       ]}
       ref={containerRef}
-      testID={testID}
+      {...props}
     >
       <NativeMediaVideoRenderer
         ref={videoRef}

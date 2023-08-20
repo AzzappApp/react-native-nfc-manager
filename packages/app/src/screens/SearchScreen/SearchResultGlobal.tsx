@@ -31,11 +31,13 @@ export const searchResultGlobalQuery = graphql`
 type SearchResultGlobalProps = {
   queryReference: PreloadedQuery<SearchResultGlobalQuery>;
   hasFocus: boolean;
+  goToProfilesTab: () => void;
 };
 
 const SearchResultGlobal = ({
   queryReference,
   hasFocus,
+  goToProfilesTab,
 }: SearchResultGlobalProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
@@ -116,7 +118,10 @@ const SearchResultGlobal = ({
       posts={posts}
       canPlay={hasFocus}
       ListHeaderComponent={
-        <SearchResultGlobalListHeader viewer={preloadedQuery.viewer} />
+        <SearchResultGlobalListHeader
+          viewer={preloadedQuery.viewer}
+          goToProfilesTab={goToProfilesTab}
+        />
       }
       ListFooterComponent={
         <ListLoadingFooter loading={showLoadingIndicatorDebounced} />

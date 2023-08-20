@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getContactCard, getProfilesByIds } from '@azzapp/data/domains';
+import { getProfilesByIds } from '@azzapp/data/domains';
 import { unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
@@ -25,7 +25,6 @@ const updatePass = async (
   const ifModifiedSince = req.headers.get('If-Modified-Since');
 
   const [profile] = await getProfilesByIds([params.serial]);
-  const contactCard = await getContactCard(params.serial);
 
   if (!profile) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });
@@ -33,7 +32,7 @@ const updatePass = async (
 
   if (
     ifModifiedSince &&
-    new Date(ifModifiedSince) >= (contactCard ?? profile)?.updatedAt
+    new Date(ifModifiedSince) >= profile.lastContactCardUpdate
   ) {
     return new NextResponse(null, {
       status: 304,

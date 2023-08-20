@@ -7,23 +7,42 @@ import SimpleButtonRenderer from './SimpleButtonRenderer';
 import SimpleTextRenderer from './SimpleTextRenderer';
 import SocialLinksRenderer from './SocialLinksRenderer';
 import type { CardModule } from '@azzapp/data/domains';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ComponentType } from 'react';
 
-export type ModuleRendererProps = {
-  module: CardModule;
+export type ModuleRendererProps<TModule extends CardModule> = {
+  module: TModule;
+  cardStyle: CardStyle;
+  colorPalette: ColorPalette;
   resizeModes: Map<string, string>;
 };
 
-const ModuleRenderer = (props: ModuleRendererProps) => {
-  const { module, resizeModes } = props;
+const ModuleRenderer = <TModule extends CardModule>({
+  module,
+  cardStyle,
+  colorPalette,
+  resizeModes,
+}: ModuleRendererProps<TModule>) => {
+  const Renderer = renderers[module.kind] as any;
+  if (!Renderer) {
+    return null;
+  }
 
-  const Renderer = renderers[module.kind];
-  if (!Renderer) return null;
-
-  return <Renderer module={module} resizeModes={resizeModes} />;
+  return (
+    <Renderer
+      module={module}
+      cardStyle={cardStyle}
+      colorPalette={colorPalette}
+      resizeModes={resizeModes}
+    />
+  );
 };
 
-const renderers = {
+const renderers: {
+  [TModule in CardModule as TModule['kind']]: ComponentType<
+    ModuleRendererProps<TModule>
+  >;
+} = {
   blockText: BlockTextRenderer,
   carousel: CarouselRenderer,
   horizontalPhoto: HorizontalPhotoRenderer,
@@ -35,6 +54,6 @@ const renderers = {
   socialLinks: SocialLinksRenderer,
   openingHours: () => null,
   webCardsCarousel: () => null,
-} satisfies Record<CardModule['kind'], ComponentType<ModuleRendererProps>>;
+};
 
 export default ModuleRenderer;

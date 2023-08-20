@@ -1,8 +1,12 @@
+import {
+  useWindowDimensions,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import FooterBar from '#ui/FooterBar';
+import BottomMenu from '#ui/BottomMenu';
 import { useRouter } from './NativeRouter';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { StyleProp, ViewStyle } from 'react-native';
 
 /**
  * The main tab bar of the app.
@@ -20,44 +24,46 @@ const MainTabBar = ({
   };
 
   const inset = useSafeAreaInsets();
-
+  const { width } = useWindowDimensions();
+  const bottom = inset.bottom > 0 ? inset.bottom : 10;
   return (
-    <FooterBar
-      style={[{ marginBottom: inset.bottom }, style]}
-      currentTab={['HOME', 'SEARCH', 'CHAT', 'ALBUMS'][currentIndex]}
+    <BottomMenu
+      style={[
+        {
+          bottom,
+          position: 'absolute',
+          left: MARGIN_HORIZONTAL,
+          width: width - 2 * MARGIN_HORIZONTAL,
+        },
+        style,
+      ]}
+      currentTab={['HOME', 'MEDIA'][currentIndex]}
       iconSize={28}
       tabs={TABS}
       onItemPress={onItemPress}
-      decoration="label"
+      showLabel
+      showCircle={false}
     />
   );
 };
 
+const MARGIN_HORIZONTAL = 30;
+
 const TABS: FooterBarItem[] = [
   {
     key: 'HOME',
-    label: 'Home',
+    label: 'Webcards',
     icon: 'home',
   },
   {
-    key: 'SEARCH',
-    label: 'Search',
-    icon: 'search',
-  },
-  {
     key: 'NEW_POST',
-    label: 'Posts',
-    icon: 'add_circle',
+    label: 'New Post',
+    icon: 'add_filled',
   },
   {
-    key: 'CHAT',
-    label: 'Messages',
-    icon: 'chat',
-  },
-  {
-    key: 'ALBUMS',
-    label: 'Albums',
-    icon: 'albums',
+    key: 'MEDIA',
+    label: 'Media',
+    icon: 'media',
   },
 ];
 

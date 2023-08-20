@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { fromGlobalId } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { updatePost } from '#domains';
 import type { Post } from '#domains';
@@ -12,8 +11,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   { input },
   { auth, postLoader, profileLoader, cardUpdateListener }: GraphQLContext,
 ) => {
-  const profileId = getProfileId(auth);
-
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }

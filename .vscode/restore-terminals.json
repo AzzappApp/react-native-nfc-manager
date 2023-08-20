@@ -22,14 +22,6 @@
     {
       "splitTerminals": [
         {
-          "name": "auth",
-          "commands": ["cd packages/auth", "yarn dev"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
           "name": "backoffice",
           "commands": ["cd packages/backoffice", "yarn dev"]
         }

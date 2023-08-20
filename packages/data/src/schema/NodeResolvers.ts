@@ -1,42 +1,46 @@
 import { fromGlobalId } from 'graphql-relay';
-import { getCompanyActivityById, getProfileCategoryById } from '#domains';
+import {
+  getCardStyleById,
+  getCardTemplateById,
+  getColorPaletteById,
+  getCompanyActivityById,
+  getProfileCategoryById,
+} from '#domains';
 import type { NodeResolvers } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 
+const cardStyleSymbol = Symbol('CardStyle');
+const colorPaletteSymbol = Symbol('ColorPalette');
+const cardTemplateSymbol = Symbol('CardTemplate');
+const coverTemplateSymbol = Symbol('CoverTemplate');
+const postSymbol = Symbol('Post');
+const postCommentSymbol = Symbol('PostComment');
 const profileSymbol = Symbol('Profile');
 const profileCategorySymbol = Symbol('ProfileCategory');
 const companyActivitySymbol = Symbol('CompanyActivity');
-const cardSymbol = Symbol('Card');
-const postSymbol = Symbol('Post');
-const postCommentSymbol = Symbol('PostComment');
-const coverTemplate = Symbol('CoverTemplate');
 
 export const fetchNode = async (
   gqlId: string,
   {
     profileLoader,
-    cardLoader,
     postLoader,
     postCommentLoader,
     coverTemplateLoader,
   }: GraphQLContext,
-) => {
+): Promise<any> => {
   const { id, type } = fromGlobalId(gqlId);
 
   switch (type) {
-    case 'Profile':
-      return withTypeSymbol(await profileLoader.load(id), profileSymbol);
-    case 'ProfileCategory':
+    case 'CardStyle':
+      return withTypeSymbol(await getCardStyleById(id), cardStyleSymbol);
+    case 'ColorPalette':
+      return withTypeSymbol(await getColorPaletteById(id), colorPaletteSymbol);
+    case 'CardTemplate':
+      return withTypeSymbol(await getCardTemplateById(id), cardTemplateSymbol);
+    case 'CoverTemplate':
       return withTypeSymbol(
-        await getProfileCategoryById(id),
-        profileCategorySymbol,
-      );
-    case 'Card':
-      return withTypeSymbol(await cardLoader.load(id), cardSymbol);
-    case 'CompanyActivity':
-      return withTypeSymbol(
-        await getCompanyActivityById(id),
-        companyActivitySymbol,
+        await coverTemplateLoader.load(id),
+        coverTemplateSymbol,
       );
     case 'Post':
       return withTypeSymbol(await postLoader.load(id), postSymbol);
@@ -45,8 +49,18 @@ export const fetchNode = async (
         await postCommentLoader.load(id),
         postCommentSymbol,
       );
-    case 'CoverTemplate':
-      return withTypeSymbol(await coverTemplateLoader.load(id), coverTemplate);
+    case 'Profile':
+      return withTypeSymbol(await profileLoader.load(id), profileSymbol);
+    case 'ProfileCategory':
+      return withTypeSymbol(
+        await getProfileCategoryById(id),
+        profileCategorySymbol,
+      );
+    case 'CompanyActivity':
+      return withTypeSymbol(
+        await getCompanyActivityById(id),
+        companyActivitySymbol,
+      );
   }
   return null;
 };
@@ -55,17 +69,17 @@ const withTypeSymbol = <T extends object | null>(value: T, symbol: symbol): T =>
   (value ? { ...value, [symbol]: true } : null) as T;
 
 const resolveNode = (value: any) => {
-  if (value[profileSymbol]) {
-    return 'Profile';
+  if (value[cardStyleSymbol]) {
+    return 'CardStyle';
   }
-  if (value[profileCategorySymbol]) {
-    return 'ProfileCategory';
+  if (value[colorPaletteSymbol]) {
+    return 'ColorPalette';
   }
-  if (value[cardSymbol]) {
-    return 'Card';
+  if (value[cardTemplateSymbol]) {
+    return 'CardTemplate';
   }
-  if (value[companyActivitySymbol]) {
-    return 'CompanyActivity';
+  if (value[coverTemplateSymbol]) {
+    return 'CoverTemplate';
   }
   if (value[postSymbol]) {
     return 'Post';
@@ -73,8 +87,14 @@ const resolveNode = (value: any) => {
   if (value[postCommentSymbol]) {
     return 'PostComment';
   }
-  if (value[coverTemplate]) {
-    return 'CoverTemplate';
+  if (value[profileSymbol]) {
+    return 'Profile';
+  }
+  if (value[profileCategorySymbol]) {
+    return 'ProfileCategory';
+  }
+  if (value[companyActivitySymbol]) {
+    return 'CompanyActivity';
   }
   return null;
 };

@@ -69,7 +69,7 @@ describe('ContactCardEditModal', () => {
       return (
         data.viewer.profile && (
           <ContactCardEditModal
-            contactCard={data.viewer.profile.contactCard}
+            contactCard={data.viewer.profile.contactCard!}
             visible
             toggleBottomSheet={() => void 0}
             {...props}

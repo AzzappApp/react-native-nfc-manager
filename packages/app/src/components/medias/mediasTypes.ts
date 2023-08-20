@@ -1,11 +1,10 @@
 import type {
   HostComponent,
   NativeSyntheticEvent,
-  StyleProp,
-  ViewStyle,
+  ViewProps,
 } from 'react-native';
 
-export type MediaImageRendererProps = {
+export type MediaImageRendererProps = ViewProps & {
   /**
    * if true, the MediaImageRenderer will display the first frame of the video
    */
@@ -39,17 +38,9 @@ export type MediaImageRendererProps = {
    * A callback called when an error was throw while loading the media
    */
   onError?: (error: Error) => void;
-  /**
-   * @see ViewProps#style
-   */
-  style?: StyleProp<ViewStyle>;
-  /**
-   * @see ViewProps#testID
-   */
-  testID?: string;
 };
 
-export type MediaVideoRendererProps = {
+export type MediaVideoRendererProps = ViewProps & {
   /**
    * The video alt text
    */
@@ -91,14 +82,6 @@ export type MediaVideoRendererProps = {
    * A callback called while the video is playing, allowing to track the current time
    */
   onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
-  /**
-   * @see ViewProps#style
-   */
-  style?: StyleProp<ViewStyle>;
-  /**
-   * @see ViewProps#testID
-   */
-  testID?: string;
 };
 
 /**

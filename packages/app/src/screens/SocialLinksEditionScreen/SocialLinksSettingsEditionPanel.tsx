@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -91,6 +92,11 @@ const SocialLinksSettingsEditionPanel = ({
       fragment SocialLinksSettingsEditionPanel_viewer on Viewer {
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            light
+            dark
+          }
         }
       }
     `,
@@ -118,11 +124,14 @@ const SocialLinksSettingsEditionPanel = ({
             description: 'Settings color tab label in SocialLinks edition',
           }),
           rightElement: (
-            <ColorPreview color={iconColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(iconColor, profile?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [iconColor, intl],
+    [iconColor, intl, profile?.cardColors],
   );
 
   return (

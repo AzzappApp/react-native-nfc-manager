@@ -8,14 +8,12 @@ import PostFeed from './PostFeed';
 import styles from './ProfilePage.css';
 import ProfilePostNavigation from './ProfilePostNavigation';
 import type {
-  Card,
   Profile,
   Media,
   PostWithCommentAndAuthor,
 } from '@azzapp/data/domains';
 
 type ProfilePageLayoutProps = {
-  card: Card;
   profile: Profile;
   modules: React.ReactNode;
   cover: React.ReactNode;
@@ -25,7 +23,7 @@ type ProfilePageLayoutProps = {
 };
 
 const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
-  const { card, profile, modules, cover, posts, postsCount, media } = props;
+  const { profile, modules, cover, posts, postsCount, media } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
 
@@ -46,7 +44,8 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
         username={profile.userName}
       />
       <main
-        style={{ backgroundColor: card.backgroundColor ?? '#FFF' }}
+        // TODO card.backgroundColor
+        style={{ backgroundColor: '#FFF' }}
         className={cn(styles.modules, {
           [styles.modulesBehind]: display === 'posts' && hasPosts,
           [styles.modulesWithPosts]: hasPosts && postsOpen,

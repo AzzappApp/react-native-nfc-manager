@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import {
@@ -63,24 +64,25 @@ const AuthorCartouche = ({
       ) {
         id
         userName
-        card {
-          cover {
-            media {
-              id
-              ... on MediaImage {
-                avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
-              }
-              ... on MediaVideo {
-                avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
-              }
+        cardColors {
+          primary
+          light
+          dark
+        }
+        cardCover {
+          media {
+            id
+            ... on MediaImage {
+              avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
             }
-            foregroundStyle {
-              color
+            ... on MediaVideo {
+              avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
             }
-            foreground {
-              id
-              uri: uri(width: 25, pixelRatio: $pixelRatio)
-            }
+          }
+          foregroundColor
+          foreground {
+            id
+            uri: uri(width: 25, pixelRatio: $pixelRatio)
           }
         }
       }
@@ -89,7 +91,8 @@ const AuthorCartouche = ({
   );
 
   const styles = useVariantStyleSheet(stylesheet, variant);
-  const { media, foreground, foregroundStyle } = author?.card?.cover ?? {};
+  const { cardCover, cardColors } = author ?? {};
+  const { media, foreground, foregroundColor } = cardCover ?? {};
 
   const content = useMemo(() => {
     return (
@@ -114,7 +117,7 @@ const AuthorCartouche = ({
                   mediaId: foreground.id,
                   requestedSize: MEDIA_WIDTH,
                 }}
-                tintColor={foregroundStyle?.color}
+                tintColor={swapColor(foregroundColor, cardColors)}
                 aspectRatio={COVER_RATIO}
                 style={[
                   styles.layer,
@@ -126,7 +129,7 @@ const AuthorCartouche = ({
             )}
           </View>
         ) : (
-          author.card?.cover.media.id == null && <View style={[styles.image]} />
+          media?.id == null && <View style={[styles.image]} />
         )}
         {!hideUserName && (
           <Text
@@ -145,11 +148,11 @@ const AuthorCartouche = ({
     styles.layer,
     styles.userName,
     foreground,
-    foregroundStyle?.color,
-    author.card?.cover.media.id,
-    author?.userName,
+    foregroundColor,
+    cardColors,
     hideUserName,
     variant,
+    author?.userName,
   ]);
 
   if (activeLink) {

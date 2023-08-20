@@ -11,12 +11,13 @@ import type {
   CardModulePhotoWithTextAndTitleResolvers,
   CardModuleSocialLinksResolvers,
   CardModuleBlockTextResolvers,
+  CardModuleLineDividerResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
 const isKnownModule = (moduleKind: string): moduleKind is ModuleKind =>
-  (MODULE_KINDS as string[]).includes(moduleKind);
+  MODULE_KINDS.includes(moduleKind as any);
 
 export const CardModule: CardModuleResolvers = {
   __resolveType: cardModule => {
@@ -47,34 +48,16 @@ const background = (
     : null;
 };
 
-function getData<TResult, B>(
-  key: keyof CardModuleModel['data'],
-  optional?: B,
-): (cardModule: CardModuleModel) => B extends true ? TResult | null : TResult;
-function getData<TResult>(key: keyof CardModuleModel['data'], optional: true) {
-  return (cardModule: CardModuleModel): TResult | null => {
-    const { data } = cardModule;
-    if (data && key in data) {
-      return data[key] as TResult;
-    }
-    if (optional) {
-      return null;
-    } else {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-  };
-}
-
 export const CardModuleCarousel: CardModuleCarouselResolvers = {
-  backgroundStyle: getData('backgroundStyle', true),
-  borderColor: getData('borderColor'),
-  gap: getData('gap'),
-  borderRadius: getData('borderRadius'),
-  borderSize: getData('borderSize'),
-  imageHeight: getData('imageHeight'),
-  marginHorizontal: getData('marginHorizontal'),
-  marginVertical: getData('marginVertical'),
-  squareRatio: getData('squareRatio'),
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  borderColor: module => module.data.borderColor ?? null,
+  gap: module => module.data.gap ?? null,
+  borderRadius: module => module.data.borderRadius ?? null,
+  borderWidth: module => module.data.borderWidth ?? null,
+  imageHeight: module => module.data.imageHeight ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  marginVertical: module => module.data.marginVertical ?? null,
+  squareRatio: module => module.data.squareRatio ?? null,
   images: async (cardModule, _, { mediaLoader }) => {
     const { data } = cardModule;
     return data?.images
@@ -87,17 +70,17 @@ export const CardModuleCarousel: CardModuleCarouselResolvers = {
 };
 
 export const CardModuleHorizontalPhoto: CardModuleHorizontalPhotoResolvers = {
-  backgroundStyle: getData('backgroundStyle', true),
-  borderColor: getData('borderColor'),
-  borderRadius: getData('borderRadius'),
-  borderWidth: getData('borderWidth'),
-  height: getData('height'),
-  marginHorizontal: getData('marginHorizontal'),
-  marginVertical: getData('marginVertical'),
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  borderColor: module => module.data.borderColor ?? null,
+  borderRadius: module => module.data.borderRadius ?? null,
+  borderWidth: module => module.data.borderWidth ?? null,
+  imageHeight: module => module.data.imageHeight ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  marginVertical: module => module.data.marginVertical ?? null,
   image: async (cardModule, _, { mediaLoader }) => {
     const { data } = cardModule;
     if (data && typeof data === 'object' && 'image' in data) {
-      const image = await mediaLoader.load(data.image as string);
+      const image = await mediaLoader.load(data.image);
       if (image) {
         return image;
       }
@@ -109,48 +92,56 @@ export const CardModuleHorizontalPhoto: CardModuleHorizontalPhotoResolvers = {
 };
 
 export const CardModuleSimpleText: CardModuleSimpleTextResolvers = {
-  backgroundStyle: getData('backgroundStyle', true),
-  color: getData('color'),
-  fontFamily: getData('fontFamily'),
-  marginHorizontal: getData('marginHorizontal'),
-  marginVertical: getData('marginVertical'),
-  fontSize: getData('fontSize'),
-  textAlign: getData('textAlign'),
-  verticalSpacing: getData('verticalSpacing'),
-  text: getData('text'),
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  fontColor: module => module.data.fontColor ?? null,
+  fontFamily: module => module.data.fontFamily ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  marginVertical: module => module.data.marginVertical ?? null,
+  fontSize: module => module.data.fontSize ?? null,
+  textAlign: module => module.data.textAlign ?? null,
+  verticalSpacing: module => module.data.verticalSpacing ?? null,
+  text: module => module.data.text ?? null,
   background,
 };
 
 export const CardModuleSimpleTitle: CardModuleSimpleTitleResolvers = {
-  backgroundStyle: getData('backgroundStyle', true),
-  color: getData('color'),
-  fontFamily: getData('fontFamily'),
-  marginHorizontal: getData('marginHorizontal'),
-  fontSize: getData('fontSize'),
-  textAlign: getData('textAlign'),
-  marginVertical: getData('marginVertical'),
-  text: getData('text'),
-  verticalSpacing: getData('verticalSpacing'),
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  fontColor: module => module.data.fontColor ?? null,
+  fontFamily: module => module.data.fontFamily ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  fontSize: module => module.data.fontSize ?? null,
+  textAlign: module => module.data.textAlign ?? null,
+  marginVertical: module => module.data.marginVertical ?? null,
+  text: module => module.data.text,
+  verticalSpacing: module => module.data.verticalSpacing ?? null,
   background,
 };
 
 export const CardModuleSimpleButton: CardModuleSimpleButtonResolvers = {
-  actionLink: getData('actionLink'),
-  backgroundStyle: getData('backgroundStyle', true),
-  actionType: getData('actionType'),
-  borderColor: getData('borderColor'),
-  borderRadius: getData('borderRadius'),
-  borderWidth: getData('borderWidth'),
-  buttonColor: getData('buttonColor'),
-  buttonLabel: getData('buttonLabel'),
-  fontColor: getData('fontColor'),
-  fontSize: getData('fontSize'),
-  fontFamily: getData('fontFamily'),
-  height: getData('height'),
-  marginBottom: getData('marginBottom'),
-  marginTop: getData('marginTop'),
-  width: getData('width'),
+  actionLink: module => module.data.actionLink,
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  actionType: module => module.data.actionType,
+  borderColor: module => module.data.borderColor ?? null,
+  borderRadius: module => module.data.borderRadius ?? null,
+  borderWidth: module => module.data.borderWidth ?? null,
+  buttonColor: module => module.data.buttonColor ?? null,
+  buttonLabel: module => module.data.buttonLabel,
+  fontColor: module => module.data.fontColor ?? null,
+  fontSize: module => module.data.fontSize ?? null,
+  fontFamily: module => module.data.fontFamily ?? null,
+  height: module => module.data.height ?? null,
+  marginBottom: module => module.data.marginBottom ?? null,
+  marginTop: module => module.data.marginTop ?? null,
+  width: module => module.data.width ?? null,
   background,
+};
+export const CardModuleLineDivider: CardModuleLineDividerResolvers = {
+  colorBottom: module => module.data.colorBottom ?? null,
+  colorTop: module => module.data.colorTop ?? null,
+  marginBottom: module => module.data.marginBottom ?? null,
+  height: module => module.data.height ?? null,
+  marginTop: module => module.data.marginTop ?? null,
+  orientation: module => module.data.orientation ?? null,
 };
 
 export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleResolvers =
@@ -158,7 +149,7 @@ export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleRes
     image: async (cardModule, _, { mediaLoader }) => {
       const { data } = cardModule;
       if (data && typeof data === 'object' && 'image' in data) {
-        const image = await mediaLoader.load(data.image as string);
+        const image = await mediaLoader.load(data.image);
         if (image) {
           return image;
         }
@@ -166,63 +157,58 @@ export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleRes
 
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     },
-    title: getData('title'),
-    text: getData('text'),
-    backgroundStyle: getData('backgroundStyle', true),
-    fontFamily: getData('fontFamily'),
-    marginHorizontal: getData('marginHorizontal'),
-    fontSize: getData('fontSize'),
-    textAlign: getData('textAlign'),
-    marginVertical: getData('marginVertical'),
-    verticalSpacing: getData('verticalSpacing'),
+    title: module => module.data.title,
+    text: module => module.data.text,
+    backgroundStyle: module => module.data.backgroundStyle ?? null,
+    fontFamily: module => module.data.fontFamily ?? null,
+    marginHorizontal: module => module.data.marginHorizontal ?? null,
+    fontSize: module => module.data.fontSize ?? null,
+    textAlign: module => module.data.textAlign ?? null,
+    marginVertical: module => module.data.marginVertical ?? null,
+    verticalSpacing: module => module.data.verticalSpacing ?? null,
     background,
-    aspectRatio: getData('aspectRatio'),
-    borderRadius: getData('borderRadius'),
-    fontColor: getData('fontColor'),
-    gap: getData('gap'),
-    horizontalArrangement: getData('horizontalArrangement'),
-    imageMargin: getData('imageMargin'),
-    textSize: getData('textSize'),
-    verticalArrangement: getData('verticalArrangement'),
+    aspectRatio: module => module.data.aspectRatio ?? null,
+    borderRadius: module => module.data.borderRadius ?? null,
+    fontColor: module => module.data.fontColor ?? null,
+    gap: module => module.data.gap ?? null,
+    horizontalArrangement: module => module.data.horizontalArrangement ?? null,
+    imageMargin: module => module.data.imageMargin ?? null,
+    textSize: module => module.data.textSize ?? null,
+    verticalArrangement: module => module.data.verticalArrangement ?? null,
   };
 
 export const CardModuleSocialLinks: CardModuleSocialLinksResolvers = {
-  links: getData('links'),
-  iconColor: getData('iconColor'),
-  arrangement: getData('arrangement'),
-  iconSize: getData('iconSize'),
-  borderWidth: getData('borderWidth'),
-  columnGap: getData('columnGap'),
-  marginTop: getData('marginTop'),
-  marginBottom: getData('marginBottom'),
-  marginHorizontal: getData('marginHorizontal'),
-  backgroundStyle: getData('backgroundStyle', true),
+  links: module => module.data.links,
+  iconColor: module => module.data.iconColor ?? null,
+  arrangement: module => module.data.arrangement ?? null,
+  iconSize: module => module.data.iconSize ?? null,
+  borderWidth: module => module.data.borderWidth ?? null,
+  columnGap: module => module.data.columnGap ?? null,
+  marginTop: module => module.data.marginTop ?? null,
+  marginBottom: module => module.data.marginBottom ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
   background,
-};
-
-const textBackground = (
-  cardModule: CardModuleModel,
-  _: unknown,
-  { staticMediaLoader }: GraphQLContext,
-) => {
-  const { data } = cardModule;
-  return data.textBackgroundId
-    ? staticMediaLoader.load(data.textBackgroundId)
-    : null;
 };
 
 export const CardModuleBlockText: CardModuleBlockTextResolvers = {
-  fontFamily: getData('fontFamily'),
-  fontColor: getData('fontColor'),
-  textAlign: getData('textAlign'),
-  fontSize: getData('fontSize'),
-  verticalSpacing: getData('verticalSpacing'),
-  textMarginVertical: getData('textMarginVertical'),
-  textMarginHorizontal: getData('textMarginHorizontal'),
-  marginHorizontal: getData('marginHorizontal'),
-  marginVertical: getData('marginVertical'),
-  backgroundStyle: getData('backgroundStyle', true),
-  textBackgroundStyle: getData('textBackgroundStyle', true),
+  text: module => module.data.text,
+  fontFamily: module => module.data.fontFamily ?? null,
+  fontColor: module => module.data.fontColor ?? null,
+  textAlign: module => module.data.textAlign ?? null,
+  fontSize: module => module.data.fontSize ?? null,
+  verticalSpacing: module => module.data.verticalSpacing ?? null,
+  textMarginVertical: module => module.data.textMarginVertical ?? null,
+  textMarginHorizontal: module => module.data.textMarginHorizontal ?? null,
+  marginHorizontal: module => module.data.marginHorizontal ?? null,
+  marginVertical: module => module.data.marginVertical ?? null,
+  backgroundStyle: module => module.data.backgroundStyle ?? null,
+  textBackgroundStyle: module => module.data.textBackgroundStyle ?? null,
   background,
-  textBackground,
+  textBackground: (module, _, { staticMediaLoader }: GraphQLContext) => {
+    const { data } = module;
+    return data.textBackgroundId
+      ? staticMediaLoader.load(data.textBackgroundId)
+      : null;
+  },
 };

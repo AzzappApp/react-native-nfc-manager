@@ -1,7 +1,7 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IntlProvider } from 'react-intl';
-import { View, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -9,12 +9,7 @@ import {
 
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import {
-  mainRoutes,
-  newProfileRoute,
-  signInRoutes,
-  signUpRoutes,
-} from '#mobileRoutes';
+import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -37,18 +32,21 @@ import {
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
 import waitFor from '#helpers/waitFor';
+import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
-import AccountScreen from '#screens/AccountScreen';
-import CardModuleEditionMobileScreen from '#screens/CardModuleEditionMobileScreen';
+import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import CoverEditionScreen from '#screens/CoverEditionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
+import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
 import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmationScreen';
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
@@ -69,17 +67,17 @@ const screens = {
   FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
   RESET_PASSWORD: ResetPasswordScreen,
   HOME: HomeScreen,
+  MEDIA: MediaScreen,
   SEARCH: SearchScreen,
-  ACCOUNT: AccountScreen,
-  ALBUMS: () => <View />,
-  CHAT: () => <View />,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
   NEW_POST: PostCreationScreen,
   NEW_PROFILE: NewProfileScreen,
-  CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
+  CARD_MODULE_EDITION: CardModuleEditionScreen,
+  COVER_EDITION: CoverEditionScreen,
   PROFILE: ProfileScreen,
   FOLLOWINGS: FollowingsScreen,
+  FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
@@ -109,14 +107,12 @@ const init = async () => {
 const App = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, profileId, hasBeenSignedIn } = getAuthState();
-    if (!authenticated) {
-      return hasBeenSignedIn ? signInRoutes : signUpRoutes;
-    }
-    if (!profileId) {
-      return newProfileRoute;
-    }
-    return mainRoutes;
+    const { authenticated, hasBeenSignedIn } = getAuthState();
+    return authenticated
+      ? mainRoutes
+      : hasBeenSignedIn
+      ? signInRoutes
+      : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
@@ -128,6 +124,11 @@ const App = () => {
       !unauthenticatedRoutes.includes(router.getCurrentRoute().route)
     ) {
       router.replaceAll(signInRoutes);
+    } else if (
+      authenticated &&
+      unauthenticatedRoutes.includes(router.getCurrentRoute().route)
+    ) {
+      router.replaceAll(mainRoutes);
     }
   }, [authenticated, router]);
 
@@ -138,7 +139,12 @@ const App = () => {
 
   const screenPrefetcher = useMemo(
     () =>
-      createScreenPrefetcher(screens as Record<ROUTES, ScreenPrefetchOptions>),
+      createScreenPrefetcher(
+        screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
+        router.getCurrentRoute(),
+        router.getCurrentScreenId(),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -204,6 +210,13 @@ const App = () => {
       backgroundColor: colorScheme === 'light' ? colors.white : colors.black,
     };
   }, [colorScheme]);
+
+  // TODO handle errors
+  const [fontLoaded] = useApplicationFonts();
+
+  if (!fontLoaded) {
+    return null;
+  }
 
   return (
     <RelayEnvironmentProvider environment={getRelayEnvironment()}>

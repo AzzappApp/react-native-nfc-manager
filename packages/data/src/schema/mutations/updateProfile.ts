@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains/profiles';
 import type { Profile } from '#domains';
@@ -11,7 +10,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   args,
   { auth, profileLoader }: GraphQLContext,
 ) => {
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
@@ -26,21 +25,18 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { colorPalette, ...profileUpdates } = args.input;
+  const { ...profileUpdates } = args.input;
 
   const partialProfile: Partial<
     Omit<Profile, 'createdAt' | 'id' | 'profileKind' | 'updatedAt'>
   > = {
     ...profileUpdates,
   };
-  if (colorPalette) {
-    partialProfile.colorPalette = colorPalette.join(',');
-  }
 
   try {
-    const resultProfile = await updateProfile(profile.id, partialProfile);
+    await updateProfile(profile.id, partialProfile);
     return {
-      profile: { ...profile, ...resultProfile },
+      profile: { ...profile, ...partialProfile },
     };
   } catch (error) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

@@ -1,22 +1,39 @@
 import { createContext, useCallback, useContext } from 'react';
 import { useCurrentScreenID } from '#components/NativeRouter';
+import fetchQueryAndRetain from './fetchQueryAndRetain';
+import { getRelayEnvironment } from './relayEnvironment';
 import type { ROUTES, Route } from '#routes';
-import type { Observable, Subscription } from 'relay-runtime';
+import type {
+  Observable,
+  Subscription,
+  Variables,
+  GraphQLTaggedNode,
+} from 'relay-runtime';
 
-export type ScreenPrefetchOptions = {
+export type ScreenPrefetchOptions<TRoute extends Route> = {
   /**
    * Function used to prefetch data for a given route
    * @param route The route to prefetch
    */
-  prefetch?: <TRoute extends Route>(
-    route: TRoute,
-  ) => Observable<any> | null | undefined;
+  prefetch?: (route: TRoute) => Observable<any> | null | undefined;
   /**
    * Function used to list routes to prefetch when a screen is pushed
    * @param route The route that was pushed
    * @returns An array of routes to prefetch
    */
   getRoutesToPrefetch?: (route: Route) => Route[];
+
+  /**
+   * The query to load, can be a static query or a function that returns a query
+   * based on the params of the screen route
+   */
+  query?: GraphQLTaggedNode | ((params: TRoute['params']) => GraphQLTaggedNode);
+  /**
+   * A function that returns the variables of the query based on the params of the screen route
+   * @param params
+   * @returns the query variables
+   */
+  getVariables?: (params: TRoute['params']) => Variables;
 };
 
 /**
@@ -63,7 +80,9 @@ type ScreenPrefetcher = {
  * @returns
  */
 export const createScreenPrefetcher = (
-  screens: Record<ROUTES, ScreenPrefetchOptions>,
+  screens: Record<ROUTES, ScreenPrefetchOptions<Route>>,
+  initialRoute: Route,
+  initialScreenId: string,
 ): ScreenPrefetcher => {
   const screenSubscriptions = new Map<
     string,
@@ -72,8 +91,16 @@ export const createScreenPrefetcher = (
 
   const prefetchRoute = (intiatorId: string, route: Route) => {
     const Component = screens[route.route];
-    if (Component.prefetch) {
-      const observable = Component.prefetch(route);
+    if (Component.prefetch || Component.query) {
+      const observable = Component.prefetch
+        ? Component.prefetch(route)
+        : fetchQueryAndRetain(
+            getRelayEnvironment(),
+            typeof Component.query === 'function'
+              ? Component.query(route.params)
+              : Component.query!,
+            Component.getVariables?.(route.params) ?? ({} as any),
+          );
       if (!observable) {
         return;
       }
@@ -83,10 +110,10 @@ export const createScreenPrefetcher = (
         screenSubscriptions.set(intiatorId, subscriptions);
       }
       const subscription = observable.subscribe({
-        error: () => {
+        error: (error: any) => {
           const stringParams = JSON.stringify(route.params, undefined, 2);
           console.warn(
-            `Error preloading route ${route.route} with params ${stringParams}`,
+            `Error preloading route ${route.route} with params ${stringParams}, error: ${error}`,
           );
           subscription.unsubscribe();
           const index = subscriptions!.findIndex(
@@ -127,6 +154,8 @@ export const createScreenPrefetcher = (
       screenSubscriptions.delete(id);
     }
   };
+
+  screenWillBePushed(initialScreenId, initialRoute);
 
   return {
     prefetchRoute,

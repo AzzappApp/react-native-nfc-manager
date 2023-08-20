@@ -15,18 +15,9 @@ export const mainRoutes: NativeRouterInit = {
           route: 'HOME',
         },
         {
-          id: 'SEARCH',
-          route: 'SEARCH',
+          id: 'MEDIA',
+          route: 'MEDIA',
         },
-        {
-          id: 'CHAT',
-          route: 'CHAT',
-        },
-        {
-          id: 'ALBUMS',
-          route: 'ALBUMS',
-        },
-        { id: 'ACCOUNT', route: 'ACCOUNT' },
       ],
     },
   ],
@@ -46,12 +37,4 @@ export const signInRoutes: NativeRouterInit = {
 export const signUpRoutes: NativeRouterInit = {
   id: 'SIGN_UP_STACK',
   stack: [{ id: 'SIGN_UP', route: 'SIGN_UP' }],
-};
-
-/**
- * New profile stack, used when the user is signing up but has not completed the profile
- */
-export const newProfileRoute: NativeRouterInit = {
-  id: 'NEW_PROFILE_STACK',
-  stack: [{ id: 'NEW_PROFILE', route: 'NEW_PROFILE' }],
 };

@@ -1,30 +1,25 @@
 import { fromGlobalId } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import { getContactCard, unfollows } from '#domains';
+import { unfollows } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
   _,
-  { input },
-  { auth },
+  { input: { profileId: removedFollowerId } },
+  { auth, profileLoader },
 ) => {
-  if (auth.isAnonymous) {
-    throw new Error(ERRORS.UNAUTORIZED);
-  }
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(input.profileId);
-  if (type !== 'Profile') {
+  const { id: targetId, type } = fromGlobalId(removedFollowerId);
+  const profile = await profileLoader.load(targetId);
+  if (type !== 'Profile' || !profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
-  const contactCard = await getContactCard(profileId);
-
-  if (contactCard?.public) {
+  if (!profile.cardIsPrivate) {
     throw new Error(ERRORS.FORBIDDEN);
   }
 
@@ -34,7 +29,7 @@ const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  return { removedFollowerId: input.profileId };
+  return { removedFollowerId };
 };
 
 export default removeFollowerMutation;

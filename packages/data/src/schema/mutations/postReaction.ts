@@ -1,5 +1,4 @@
 import { fromGlobalId } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import {
   deletePostReaction,
@@ -10,37 +9,36 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   _,
-  { input },
+  { input: { postId, reactionKind } },
   { auth, postLoader },
 ) => {
-  if (auth.isAnonymous) {
+  if (!auth.userId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
-  const profileId = getProfileId(auth);
+  const profileId = auth.profileId;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(input.postId);
-  if (type !== 'Post') {
+  const { id: targetId, type } = fromGlobalId(postId);
+  const post = await postLoader.load(targetId);
+  if (type !== 'Post' || !post) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   try {
     const reaction = await getPostReaction(profileId, targetId);
-    if (reaction && reaction.reactionKind === input.reactionKind) {
+    if (reaction && reaction.reactionKind === reactionKind) {
       await deletePostReaction(profileId, targetId);
-    } else if (input.reactionKind) {
-      await insertPostReaction(profileId, targetId, input.reactionKind);
+    } else if (reactionKind) {
+      await insertPostReaction(profileId, targetId, reactionKind);
     }
   } catch (e) {
+    console.error(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  //have to refetch because Kysely/planetscale doesn't support returning
-  const post = await postLoader.load(targetId);
-
-  return post ? { post } : null;
+  return { post };
 };
 
 export default togglePostReaction;

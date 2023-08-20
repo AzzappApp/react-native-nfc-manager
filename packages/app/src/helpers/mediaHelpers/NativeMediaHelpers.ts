@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { NativeModules, Platform } from 'react-native';
 
 const { AZPMediaHelpers } = NativeModules;
@@ -37,22 +36,3 @@ export const getPHAssetPath: (uri: string) => Promise<string | null> =
  */
 export const segmentImage: (uri: string) => Promise<string | null> =
   AZPMediaHelpers.segmentImage;
-
-let availableFonts: string[] = [];
-
-/**
- * Returns a list of available fonts on the device.
- * @returns A list of available fonts on the device.
- */
-export const useAvailableFonts = () => {
-  const [fonts, setFonts] = useState(availableFonts);
-  useEffect(() => {
-    if (availableFonts.length === 0) {
-      AZPMediaHelpers.getAvailableFonts((fonts: string[]) => {
-        availableFonts = fonts;
-        setFonts(fonts);
-      });
-    }
-  }, []);
-  return fonts;
-};

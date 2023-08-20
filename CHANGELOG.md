@@ -1,4 +1,4 @@
-## 0.1.3-canary.3
+## 0.1.3-canary.8
 
 * **fix:**  - webcard responsive ([#699](https://github.com/AzzappApp/azzapp/pull/699))
 * **fix:**  - share url domain ([#697](https://github.com/AzzappApp/azzapp/pull/697))

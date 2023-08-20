@@ -157,12 +157,7 @@ const PostCreationScreen = ({
     commit({
       variables: {
         input: {
-          media: {
-            kind: kind === 'video' ? 'video' : 'image',
-            id: public_id,
-            width: exportedMedia.size.width,
-            height: exportedMedia.size.height,
-          },
+          mediaId: public_id,
           allowComments,
           allowLikes,
           content,

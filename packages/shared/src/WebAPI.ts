@@ -1,34 +1,26 @@
 /**
  * API methods used by all clients
  */
-import { fromGlobalId } from 'graphql-relay';
 import { fetchJSON, postFormData } from './networkHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
 
-type APIMethod<Params, ReturnType> = (
+export type APIMethod<Params, ReturnType> = (
   params: Params,
-  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
-) => Promise<ReturnType>;
-
-type APIMethodWithOptionalInit<Params, ReturnType> = (
-  params: Params,
-  init?: RequestInit,
-) => Promise<ReturnType>;
-
-type APIMethodWithoutParams<ReturnType> = (
-  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
+  init?: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
 ) => Promise<ReturnType>;
 
 const apiFetch = <ReturnType>(
   input: RequestInfo,
-  init: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
-): Promise<ReturnType> => init.fetchFunction(input, init);
+  init?: RequestInit & { fetchFunction?: FetchFunction<ReturnType> },
+): Promise<ReturnType> => {
+  const fetchFunction = init?.fetchFunction ?? fetchJSON;
+  return fetchFunction(input, init);
+};
 
 export type SignUpParams = {
   password: string;
-  authMethod?: 'cookie' | 'token';
 } & ({ email: string } | { phoneNumber: string });
 
 export type TokensResponse = {
@@ -46,7 +38,6 @@ export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
 export type SignInParams = {
   credential: string;
   password: string;
-  authMethod?: 'cookie' | 'token';
 };
 
 export const signin: APIMethod<
@@ -59,51 +50,11 @@ export const signin: APIMethod<
     body: JSON.stringify(data),
   });
 
-export type CreateProfileParams = {
-  userName: string;
-  profileKind: string;
-  profileCategoryId?: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  companyName?: string | null;
-  companyActivityId?: string | null;
-  authMethod?: 'cookie' | 'token';
-};
-
-export const createProfile: APIMethod<
-  CreateProfileParams,
-  TokensResponse & { profileId: string }
-> = (data, init) =>
-  apiFetch(`${API_ENDPOINT}/new-profile`, {
-    ...init,
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-
-export type SwitchProfileParams = {
-  profileId: string;
-  authMethod?: 'cookie' | 'token';
-};
-
-export const switchProfile: APIMethod<
-  SwitchProfileParams,
-  TokensResponse & { profileId: string }
-> = (data, init) =>
-  apiFetch(`${API_ENDPOINT}/switch-profile`, {
-    ...init,
-    method: 'POST',
-    body: JSON.stringify({
-      ...data,
-      profileId: fromGlobalId(data.profileId).id,
-    }),
-  });
-
 export type ForgotPasswordParams = {
   credential: string;
   locale: string;
 };
 
-//TODO: check if  forgotPassword method exist on server
 export const forgotPassword: APIMethod<
   ForgotPasswordParams,
   { issuer: string }
@@ -130,23 +81,15 @@ export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
     body: JSON.stringify(data),
   });
 
-export const refreshTokens: APIMethodWithOptionalInit<
-  string,
-  TokensResponse
-> = (refreshToken, init) =>
+export const refreshTokens: APIMethod<string, TokensResponse> = (
+  refreshToken,
+  init,
+) =>
   apiFetch(`${API_ENDPOINT}/refreshTokens`, {
     ...init,
-    fetchFunction: fetchJSON as FetchFunction<TokensResponse>,
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
   });
-
-export const logout: APIMethodWithoutParams<void> = async init => {
-  await apiFetch(`${API_ENDPOINT}/logout`, {
-    ...init,
-    method: 'POST',
-  });
-};
 
 export const uploadSign: APIMethod<
   { kind: 'image' | 'video'; target: 'cover' | 'post' },
@@ -184,19 +127,19 @@ export const verifySign: APIMethod<
   });
 
 export const getAppleWalletPass = (
-  { locale }: { locale: string },
+  { locale, profileId }: { locale: string; profileId: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple`, {
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?profileId=${profileId}`, {
     ...init,
     method: 'GET',
   });
 
 export const getGoogleWalletPass: APIMethod<
-  { locale: string },
+  { locale: string; profileId: string },
   { token: string }
-> = ({ locale }: { locale: string }, init) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google`, {
+> = ({ locale, profileId }, init) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?profileId=${profileId}`, {
     ...init,
     method: 'GET',
   });

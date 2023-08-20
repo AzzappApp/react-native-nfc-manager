@@ -10,6 +10,7 @@ import type { TextProps as NativeTextProps } from 'react-native';
 
 export type TextProps = NativeTextProps & {
   variant?:
+    | 'azzapp'
     | 'button'
     | 'error'
     | 'hyperLink'
@@ -33,7 +34,7 @@ export type TextProps = NativeTextProps & {
  *
  */
 const Text = ({ variant = 'none', appearance, ...props }: TextProps) => {
-  const styles = useVariantStyleSheet(computedStyles, variant, appearance);
+  const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
   return createElement(NativeText, {
     ...props,
@@ -42,13 +43,17 @@ const Text = ({ variant = 'none', appearance, ...props }: TextProps) => {
   });
 };
 
-const computedStyles = createVariantsStyleSheet(appearance => ({
+export const textStyleSheet = createVariantsStyleSheet(appearance => ({
   default: {
     text: {
       color: appearance === 'light' ? colors.black : colors.white,
     },
   },
-  none: {},
+  none: {
+    text: {
+      fontFamily: 'PlusJakartaSans-Regular',
+    },
+  },
   xlarge: {
     text: {
       ...textStyles.xlarge,
@@ -98,6 +103,11 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     text: {
       ...textStyles.small,
       color: colors.red400,
+    },
+  },
+  azzapp: {
+    text: {
+      ...textStyles.azzapp,
     },
   },
 }));

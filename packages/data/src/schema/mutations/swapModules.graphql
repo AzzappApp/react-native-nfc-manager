@@ -1,10 +1,12 @@
+extend type Mutation {
+  swapModules(input: SwapModulesInput!): SwapModulesPayload!
+}
+
 input SwapModulesInput {
   moduleAId: ID!
   moduleBId: ID!
-  clientMutationId: String
 }
 
 type SwapModulesPayload {
-  card: Card!
-  clientMutationId: String
+  profile: Profile!
 }

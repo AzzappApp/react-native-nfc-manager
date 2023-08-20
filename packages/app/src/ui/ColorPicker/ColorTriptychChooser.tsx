@@ -1,0 +1,362 @@
+import { memo, useCallback, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { FlatList, View } from 'react-native';
+import { graphql, useLazyLoadQuery } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { colors, shadow } from '#theme';
+import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Icon from '#ui/Icon';
+import PressableOpacity from '#ui/PressableOpacity';
+import Text from '#ui/Text';
+import type { PressableOpacityProps } from '#ui/PressableOpacity';
+import type { ColorTriptychChooserQuery } from '@azzapp/relay/artifacts/ColorTriptychChooserQuery.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { ListRenderItemInfo } from 'react-native';
+
+export type ColorTriptychChooserProps = {
+  size: number;
+  colorPalette: ColorPalette;
+  previousColorPalette: ColorPalette;
+  onUpdateColorPalette: (colorPalette: ColorPalette) => void;
+  onSelectColorPaletteType: (state: 'dark' | 'light' | 'primary') => void;
+};
+
+const ColorTriptychChooser = ({
+  size,
+  colorPalette,
+  previousColorPalette,
+  onSelectColorPaletteType,
+  onUpdateColorPalette,
+}: ColorTriptychChooserProps) => {
+  const { viewer } = useLazyLoadQuery<ColorTriptychChooserQuery>(
+    graphql`
+      query ColorTriptychChooserQuery {
+        viewer {
+          colorPalettes(first: 100) {
+            edges {
+              node {
+                id
+                dark
+                primary
+                light
+              }
+            }
+          }
+        }
+      }
+    `,
+    {},
+  );
+
+  const styles = useStyleSheet(stylesheet);
+
+  const onPressprimary = useCallback(() => {
+    onSelectColorPaletteType('primary');
+  }, [onSelectColorPaletteType]);
+
+  const onPressdark = useCallback(() => {
+    onSelectColorPaletteType('dark');
+  }, [onSelectColorPaletteType]);
+
+  const onPresslight = useCallback(() => {
+    onSelectColorPaletteType('light');
+  }, [onSelectColorPaletteType]);
+
+  const onSelectTriptychColor = useCallback(
+    (colorPalette: ColorPaletteItem) => {
+      const { id, ...rest } = colorPalette;
+      onUpdateColorPalette(rest);
+    },
+    [onUpdateColorPalette],
+  );
+
+  const renderTryptich = useCallback(
+    ({ item }: ListRenderItemInfo<ColorPaletteItem>) => {
+      return (
+        <TriptychItem item={item} onSelectTripTych={onSelectTriptychColor} />
+      );
+    },
+    [onSelectTriptychColor],
+  );
+
+  const colorPalettesList: ColorPaletteItem[] = useMemo(() => {
+    return convertToNonNullArray(
+      viewer.colorPalettes?.edges?.map(edge => edge?.node) ?? [],
+    );
+  }, [viewer.colorPalettes.edges]);
+
+  const onRestorePreviousTriptych = useCallback(() => {
+    onUpdateColorPalette(previousColorPalette);
+  }, [onUpdateColorPalette, previousColorPalette]);
+
+  return (
+    <View>
+      <View
+        style={{
+          alignItems: 'center',
+          height: 150,
+          marginTop: 20,
+          justifyContent: 'center',
+        }}
+      >
+        <View style={{ width: size, height: size }}>
+          <ColorTriptychRenderer
+            width={size}
+            height={size}
+            primary={colorPalette.primary ?? colors.red400}
+            dark={colorPalette.dark ?? colors.black}
+            light={colorPalette.light}
+          />
+          <View
+            style={{
+              position: 'absolute',
+              top: -size / RATIO_PRESS - 10,
+              left: 15,
+            }}
+          >
+            <Text variant="xsmall" style={{ color: colors.grey200 }}>
+              <FormattedMessage
+                defaultMessage="Main color"
+                description="ColorTriptych choose - Main color"
+              />
+            </Text>
+          </View>
+          <View
+            style={{
+              position: 'absolute',
+              start: -size / RATIO_PRESS - 20,
+              bottom: 0,
+            }}
+          >
+            <Text variant="xsmall" style={{ color: colors.grey200 }}>
+              <FormattedMessage
+                defaultMessage="Dark"
+                description="ColorTriptych choose - Dark color"
+              />
+            </Text>
+          </View>
+          <View
+            style={{
+              position: 'absolute',
+              end: -size / RATIO_PRESS - 20,
+              bottom: 0,
+            }}
+          >
+            <Text variant="xsmall" style={{ color: colors.grey200 }}>
+              <FormattedMessage
+                defaultMessage="Light"
+                description="ColorTriptych choose - Light color"
+              />
+            </Text>
+          </View>
+          <Text />
+          <PressableSlice
+            onPress={onPressprimary}
+            size={size}
+            style={{
+              backgroundColor: colorPalette.primary,
+              top: (-size / RATIO_PRESS) * PRESSABLE_OFFSET_FACTOR,
+              left: (size - size / RATIO_PRESS) / 2,
+            }}
+            testID={'primary-color-button'}
+          />
+          <PressableSlice
+            onPress={onPressdark}
+            size={size}
+            style={{
+              backgroundColor: colorPalette.dark,
+              bottom: (-size / RATIO_PRESS) * (1 - PRESSABLE_OFFSET_FACTOR),
+              left: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
+            }}
+            testID={'dark-color-button'}
+          />
+          <PressableSlice
+            onPress={onPresslight}
+            size={size}
+            style={{
+              backgroundColor: colorPalette.light,
+              bottom: (-size / RATIO_PRESS) * (1 - PRESSABLE_OFFSET_FACTOR),
+              right: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
+            }}
+            testID={'light-color-button'}
+          />
+        </View>
+      </View>
+      <View
+        style={{
+          alignItems: 'center',
+          marginBottom: 10,
+        }}
+      >
+        <Text variant="smallbold">
+          <FormattedMessage
+            defaultMessage="Pre-defined colors"
+            description="ColorTriptychChoose - predefined colors section title"
+          />
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', height: 58 }}>
+        <View
+          style={{
+            width: 50,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'row',
+          }}
+        >
+          <PressableOpacity
+            style={[styles.colorPaletteContainer]}
+            onPress={onRestorePreviousTriptych}
+          >
+            <ColorTriptychRenderer
+              width={20}
+              height={20}
+              {...previousColorPalette}
+            />
+          </PressableOpacity>
+          <View
+            style={{
+              marginLeft: 5,
+              width: 4,
+              height: 4,
+              borderRadius: 2,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.black,
+            }}
+          />
+        </View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ height: 30 }}
+          data={colorPalettesList}
+          keyExtractor={paletteKeyExtract}
+          renderItem={renderTryptich}
+        />
+      </View>
+    </View>
+  );
+};
+
+type ColorPaletteItem = ColorPalette & { id: string };
+const paletteKeyExtract = (item: ColorPaletteItem) => item.id;
+
+export default ColorTriptychChooser;
+
+// the ratio size between the central circle and the pressable circle around it
+const RATIO_PRESS = 1.72;
+// the offset factor to center the pressable circle around the central circle
+const PRESSABLE_OFFSET_FACTOR = 7 / 10;
+// the icon ratio based on size of the tryptich
+const RATIO_ICON = 0.279;
+
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+type PressableSlideComponentProps = PressableOpacityProps & {
+  size: number;
+};
+
+const PressableSliceComponent = ({
+  size,
+  style,
+  ...props
+}: PressableSlideComponentProps) => {
+  const styles = useStyleSheet(stylesheet);
+  return (
+    <PressableOpacity
+      activeOpacity={0.5}
+      hitSlop={{
+        top: 10,
+        bottom: size / 5,
+        right: size / 5,
+        left: size / 5,
+      }}
+      style={[
+        styles.buttonContainerCommon,
+        {
+          width: size / RATIO_PRESS,
+          height: size / RATIO_PRESS,
+          borderRadius: size / RATIO_PRESS / 2,
+        },
+        style,
+      ]}
+      {...props}
+    >
+      <Icon
+        icon="edit"
+        style={{
+          tintColor: colors.white,
+          width: size * RATIO_ICON,
+          height: size * RATIO_ICON,
+        }}
+      />
+    </PressableOpacity>
+  );
+};
+
+const PressableSlice = memo(PressableSliceComponent);
+
+const TriptychItemComponent = ({
+  item,
+  onSelectTripTych,
+}: {
+  item: ColorPaletteItem;
+  onSelectTripTych: (colorPalette: ColorPaletteItem) => void;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  const onPress = useCallback(() => {
+    onSelectTripTych(item);
+  }, [item, onSelectTripTych]);
+
+  return (
+    <View
+      style={{
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <PressableOpacity
+        style={[styles.colorPaletteContainer]}
+        onPress={onPress}
+      >
+        <ColorTriptychRenderer width={20} height={20} {...item} />
+      </PressableOpacity>
+    </View>
+  );
+};
+
+//got hunderds of items
+const TriptychItem = memo(TriptychItemComponent);
+
+const PALETTE_LIST_HEIGHT = 30;
+
+const stylesheet = createStyleSheet(appearance => ({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    aspectRatio: 1,
+  },
+  buttonContainerCommon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: colors.white,
+    position: 'absolute',
+    ...shadow(appearance, 'bottom'),
+  },
+  colorPaletteContainer: {
+    width: PALETTE_LIST_HEIGHT,
+    height: PALETTE_LIST_HEIGHT,
+    borderRadius: PALETTE_LIST_HEIGHT / 2,
+    borderWidth: 3,
+    borderColor: colors.grey100,
+    transform: [{ scale: 0.8 }],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+}));

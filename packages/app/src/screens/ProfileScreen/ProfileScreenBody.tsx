@@ -32,7 +32,7 @@ import SocialLinksRenderer from '#components/cardModules/SocialLinksRenderer';
 import { createId } from '#helpers/idHelpers';
 import SimpleTextRenderer from '../../components/cardModules/SimpleTextRenderer';
 import ProfileBlockContainer from './ProfileBlockContainer';
-import type { ProfileScreenBody_card$key } from '@azzapp/relay/artifacts/ProfileScreenBody_card.graphql';
+import type { ProfileScreenBody_profile$key } from '@azzapp/relay/artifacts/ProfileScreenBody_profile.graphql';
 import type { ProfileScreenBodyDeleteModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDeleteModuleMutation.graphql';
 import type { ProfileScreenBodyDuplicateModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDuplicateModuleMutation.graphql';
 import type { ProfileScreenBodySwapModulesMutation } from '@azzapp/relay/artifacts/ProfileScreenBodySwapModulesMutation.graphql';
@@ -63,7 +63,7 @@ export type ProfileScreenBodyProps = {
   /**
    * The card to display
    */
-  card: ProfileScreenBody_card$key;
+  profile: ProfileScreenBody_profile$key;
   /**
    * If the card is in editing mode
    */
@@ -72,10 +72,6 @@ export type ProfileScreenBodyProps = {
    * If the card is in selection mode
    */
   selectionMode: boolean;
-  /**
-   * The background color of the card
-   */
-  backgroundColor: string;
   /**
    * A callback called when the number of rendered modules change
    */
@@ -103,10 +99,9 @@ export type ProfileBodyHandle = {
  */
 const ProfileScreenBody = (
   {
-    card,
+    profile,
     editing,
     selectionMode,
-    backgroundColor,
     onModulesCountChange,
     onEditModule,
     onSelectionStateChange,
@@ -114,12 +109,16 @@ const ProfileScreenBody = (
   forwardedRef: ForwardedRef<ProfileBodyHandle>,
 ): any => {
   // #region Relay
-  const { id: cardId, modules } = useFragment(
+  const {
+    id: profileId,
+    cardModules,
+    cardColors,
+    cardStyle,
+  } = useFragment(
     graphql`
-      fragment ProfileScreenBody_card on Card {
+      fragment ProfileScreenBody_profile on Profile {
         id
-        backgroundColor
-        modules {
+        cardModules {
           id
           kind
           visible
@@ -132,20 +131,39 @@ const ProfileScreenBody = (
           ...LineDividerRenderer_module
           ...CarouselRenderer_module
         }
+        cardColors {
+          primary
+          light
+          dark
+        }
+        cardStyle {
+          borderColor
+          borderRadius
+          buttonRadius
+          borderWidth
+          buttonColor
+          fontFamily
+          fontSize
+          gap
+          titleFontFamily
+          titleFontSize
+        }
       }
     `,
-    card,
+    profile,
   );
 
   useEffect(() => {
-    onModulesCountChange(modules.length);
-  }, [modules.length, onModulesCountChange]);
+    onModulesCountChange(cardModules?.length ?? 0);
+  }, [cardModules?.length, onModulesCountChange]);
 
   const [commitSwapModules, swapModulesActive] =
     useMutation<ProfileScreenBodySwapModulesMutation>(graphql`
       mutation ProfileScreenBodySwapModulesMutation($input: SwapModulesInput!) {
         swapModules(input: $input) {
-          clientMutationId
+          profile {
+            id
+          }
         }
       }
     `);
@@ -157,7 +175,9 @@ const ProfileScreenBody = (
           $input: DeleteModulesInput!
         ) {
           deleteModules(input: $input) {
-            clientMutationId
+            profile {
+              id
+            }
           }
         }
       `,
@@ -183,7 +203,9 @@ const ProfileScreenBody = (
           $input: UpdateModulesVisibilityInput!
         ) {
           updateModulesVisibility(input: $input) {
-            clientMutationId
+            profile {
+              id
+            }
           }
         }
       `,
@@ -225,12 +247,13 @@ const ProfileScreenBody = (
     onSelectionStateChange({
       nbSelectedModules: Object.keys(selectedModules).length,
       selectionContainsAllModules:
-        Object.keys(selectedModules).length === modules.length,
+        Object.keys(selectedModules).length === cardModules.length,
       selectionContainsHiddenModules: Object.keys(selectedModules).some(
-        moduleId => !modules.find(module => module?.id === moduleId)?.visible,
+        moduleId =>
+          !cardModules.find(module => module?.id === moduleId)?.visible,
       ),
     });
-  }, [selectedModules, onSelectionStateChange, modules]);
+  }, [selectedModules, onSelectionStateChange, cardModules]);
   // #endregion
 
   // #region Modules manipulation
@@ -239,19 +262,21 @@ const ProfileScreenBody = (
       if (moduleMutationActive) {
         return;
       }
-      const moduleIndex = modules.findIndex(module => module?.id === moduleId);
+      const moduleIndex = cardModules.findIndex(
+        module => module?.id === moduleId,
+      );
       if (moduleIndex === -1) {
         return;
       }
       const nextModuleIndex =
         direction === 'down' ? moduleIndex + 1 : moduleIndex - 1;
-      if (nextModuleIndex < 0 || nextModuleIndex >= modules.length) {
+      if (nextModuleIndex < 0 || nextModuleIndex >= cardModules.length) {
         return;
       }
-      const nextModule = modules[nextModuleIndex];
+      const nextModule = cardModules[nextModuleIndex];
 
       const updater: SelectorStoreUpdater<unknown> = store => {
-        const cardRecord = store.get(cardId);
+        const cardRecord = store.get(profileId);
         if (!cardRecord) {
           return;
         }
@@ -278,7 +303,7 @@ const ProfileScreenBody = (
         optimisticUpdater: updater,
       });
     },
-    [commitSwapModules, moduleMutationActive, cardId, modules],
+    [commitSwapModules, moduleMutationActive, profileId, cardModules],
   );
 
   const deleteModules = useCallback(
@@ -287,7 +312,7 @@ const ProfileScreenBody = (
         return;
       }
       const updater: SelectorStoreUpdater<unknown> = store => {
-        const cardRecord = store.get(cardId);
+        const cardRecord = store.get(profileId);
         if (!cardRecord) {
           return;
         }
@@ -310,7 +335,7 @@ const ProfileScreenBody = (
         optimisticUpdater: updater,
       });
     },
-    [cardId, commitDeleteModules, moduleMutationActive],
+    [profileId, commitDeleteModules, moduleMutationActive],
   );
 
   const onRemoveModule = useCallback(
@@ -330,7 +355,7 @@ const ProfileScreenBody = (
         store: RecordSourceSelectorProxy,
         newModuleId: string,
       ) => {
-        const cardRecord = store.get(cardId);
+        const cardRecord = store.get(profileId);
         if (!cardRecord) {
           return;
         }
@@ -372,7 +397,7 @@ const ProfileScreenBody = (
         },
       });
     },
-    [cardId, commitDuplicateModule, moduleMutationActive],
+    [profileId, commitDuplicateModule, moduleMutationActive],
   );
 
   const updateModulesVisibility = useCallback(
@@ -423,7 +448,7 @@ const ProfileScreenBody = (
       },
       selectAllModules() {
         setSelectedModules(
-          modules.reduce((acc, module) => {
+          cardModules.reduce((acc, module) => {
             acc[module.id] = true;
             return acc;
           }, {} as Record<string, boolean>),
@@ -433,7 +458,7 @@ const ProfileScreenBody = (
         setSelectedModules({});
       },
     }),
-    [deleteModules, modules, selectedModules, updateModulesVisibility],
+    [deleteModules, cardModules, selectedModules, updateModulesVisibility],
   );
   //#endregion
 
@@ -473,44 +498,86 @@ const ProfileScreenBody = (
     ],
   );
 
-  return modules.map((module, index) => (
+  return cardModules.map((module, index) => (
     <ProfileBlockContainerMemo
       key={module.id}
       editing={editing}
       isFirst={index === 0}
-      isLast={index === modules.length - 1}
+      isLast={index === cardModules.length - 1}
       visible={module.visible}
       selectionMode={selectionMode}
       selected={!!selectedModules[module.id]}
-      backgroundColor={backgroundColor}
+      backgroundColor={cardColors?.light ?? '#fff'}
+      // @ts-expect-error this extraData is used to trigger a re-render when the module data change
+      extraData={{
+        cardStyle,
+        cardColors,
+        module,
+      }}
       {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
     >
       {module.kind === MODULE_KIND_SIMPLE_TEXT && (
-        <SimpleTextRenderer module={module} />
+        <SimpleTextRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_SIMPLE_TITLE && (
-        <SimpleTextRenderer module={module} />
+        <SimpleTextRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_LINE_DIVIDER && (
-        <LineDividerRenderer module={module} />
+        <LineDividerRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_HORIZONTAL_PHOTO && (
-        <HorizontalPhotoRenderer module={module} />
+        <HorizontalPhotoRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_CAROUSEL && (
-        <CarouselRenderer module={module} />
+        <CarouselRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_SIMPLE_BUTTON && (
-        <SimpleButtonRenderer module={module} />
+        <SimpleButtonRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE && (
-        <PhotoWithTextAndTitleRenderer module={module} />
+        <PhotoWithTextAndTitleRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_SOCIAL_LINKS && (
-        <SocialLinksRenderer module={module} />
+        <SocialLinksRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
       {module.kind === MODULE_KIND_BLOCK_TEXT && (
-        <BlockTextRenderer module={module} />
+        <BlockTextRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
       )}
     </ProfileBlockContainerMemo>
   ));

@@ -102,6 +102,11 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
       fragment PhotoWithTextAndTitleSettingsEditionPanel_viewer on Viewer {
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            light
+            dark
+          }
         }
       }
     `,

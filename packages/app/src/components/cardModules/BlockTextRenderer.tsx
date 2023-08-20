@@ -1,19 +1,34 @@
-import { useIntl } from 'react-intl';
 import { type ViewProps, type ColorValue, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  BLOCK_TEXT_DEFAULT_VALUES,
+  BLOCK_TEXT_STYLE_VALUES,
+  getModuleDataValues,
+  textAlignmentOrDefault,
+} from '@azzapp/shared/cardModuleHelpers';
 import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   BlockTextRenderer_module$data,
   BlockTextRenderer_module$key,
 } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 
 export type BlockTextRendererProps = ViewProps & {
   /**
    * A relay fragment reference for a BlockText module
    */
   module: BlockTextRenderer_module$key;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -22,37 +37,34 @@ export type BlockTextRendererProps = ViewProps & {
 const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
   const data = useFragment(
     graphql`
-      fragment BlockTextRenderer_module on CardModule {
-        id
-        ... on CardModuleBlockText {
-          text
-          fontFamily
-          fontColor
-          textAlign
-          fontSize
-          verticalSpacing
-          textMarginVertical
-          textMarginHorizontal
-          marginHorizontal
-          marginVertical
-          textBackground {
-            id
-            uri
-          }
-          textBackgroundStyle {
-            backgroundColor
-            patternColor
-            opacity
-          }
-          background {
-            id
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
+      fragment BlockTextRenderer_module on CardModuleBlockText {
+        text
+        fontFamily
+        fontColor
+        textAlign
+        fontSize
+        verticalSpacing
+        textMarginVertical
+        textMarginHorizontal
+        marginHorizontal
+        marginVertical
+        textBackground {
+          id
+          uri
+        }
+        textBackgroundStyle {
+          backgroundColor
+          patternColor
+          opacity
+        }
+        background {
+          id
+          uri
+          resizeMode
+        }
+        backgroundStyle {
+          backgroundColor
+          patternColor
         }
       }
     `,
@@ -63,9 +75,8 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
 
 export default BlockTextRenderer;
 
-export type BlockTextRawData = Omit<
-  BlockTextRenderer_module$data,
-  ' $fragmentType'
+export type BlockTextRawData = NullableFields<
+  Omit<BlockTextRenderer_module$data, ' $fragmentType'>
 >;
 
 type BlockTextRendererRawProps = ViewProps & {
@@ -73,6 +84,14 @@ type BlockTextRendererRawProps = ViewProps & {
    * The data for the BlockText module
    */
   data: BlockTextRawData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
@@ -82,6 +101,8 @@ type BlockTextRendererRawProps = ViewProps & {
  */
 export const BlockTextRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   ...props
 }: BlockTextRendererRawProps) => {
   const {
@@ -99,16 +120,22 @@ export const BlockTextRendererRaw = ({
     textBackgroundStyle,
     background,
     backgroundStyle,
-  } = Object.assign({}, BLOCK_TEXT_DEFAULT_VALUES, data);
-
-  const intl = useIntl();
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+    styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
     >
       <View
         style={{
@@ -120,15 +147,21 @@ export const BlockTextRendererRaw = ({
           {...props}
           backgroundUri={textBackground?.uri}
           backgroundOpacity={textBackgroundStyle?.opacity}
-          backgroundColor={textBackgroundStyle?.backgroundColor}
-          patternColor={textBackgroundStyle?.patternColor}
+          backgroundColor={swapColor(
+            textBackgroundStyle?.backgroundColor,
+            colorPalette,
+          )}
+          patternColor={swapColor(
+            textBackgroundStyle?.patternColor,
+            colorPalette,
+          )}
         >
           <Text
             style={{
               paddingHorizontal: 2 * textMarginHorizontal,
               paddingVertical: 2 * textMarginVertical,
-              textAlign,
-              color: fontColor as ColorValue,
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: swapColor(fontColor, colorPalette) as ColorValue,
               fontSize,
               fontFamily,
               lineHeight:
@@ -137,12 +170,7 @@ export const BlockTextRendererRaw = ({
                   : undefined,
             }}
           >
-            {text ||
-              intl.formatMessage({
-                defaultMessage:
-                  "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
-                description: 'Default text for the BlockText module',
-              })}
+            {text}
           </Text>
         </CardModuleBackground>
       </View>

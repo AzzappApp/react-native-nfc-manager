@@ -1,17 +1,16 @@
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, memo, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import PressableNative from '#ui/PressableNative';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
-import QRCodeModal from './QRCodeModal';
-import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
+import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -19,15 +18,9 @@ export type CoverRendererProps = {
   /**
    * The relay reference to the cover
    */
-  cover: CoverRenderer_cover$key | null | undefined;
-  /**
-   * The user name of the card owner
-   * Used to generate the QR code
-   */
-  userName: string;
+  profile: CoverRenderer_profile$key | null | undefined;
   /**
    * The width of the displayed cover
-   * Must be a number on native, vw unit are supported on web
    */
   width?: number;
   /**
@@ -58,8 +51,7 @@ export type CoverRendererProps = {
  */
 const CoverRenderer = (
   {
-    cover: coverKey,
-    userName,
+    profile: coverKey,
     width = 125,
     hideBorderRadius,
     style,
@@ -69,56 +61,67 @@ const CoverRenderer = (
   forwardRef: ForwardedRef<View>,
 ) => {
   //#region Data
-  const cover = useFragment(
-    graphql`
-      fragment CoverRenderer_cover on CardCover
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        cappedPixelRatio: {
-          type: "Float!"
-          provider: "../providers/CappedPixelRatio.relayprovider"
-        }
-      ) {
-        media {
-          id
-          __typename
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          ... on MediaVideo {
-            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+  const { cardColors, cardCover } =
+    useFragment(
+      graphql`
+        fragment CoverRenderer_profile on Profile
+        @argumentDefinitions(
+          screenWidth: {
+            type: "Float!"
+            provider: "../providers/ScreenWidth.relayprovider"
           }
-          ... on MediaImage {
-            smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+          pixelRatio: {
+            type: "Float!"
+            provider: "../providers/PixelRatio.relayprovider"
           }
-          ... on MediaVideo {
-            smallThumbnail: thumbnail(width: 125, pixelRatio: $cappedPixelRatio)
+          cappedPixelRatio: {
+            type: "Float!"
+            provider: "../providers/CappedPixelRatio.relayprovider"
+          }
+        ) {
+          cardColors {
+            primary
+            dark
+            light
+          }
+          cardCover {
+            media {
+              id
+              __typename
+              uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              ... on MediaVideo {
+                thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+              }
+              ... on MediaImage {
+                smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+              }
+              ... on MediaVideo {
+                smallThumbnail: thumbnail(
+                  width: 125
+                  pixelRatio: $cappedPixelRatio
+                )
+              }
+            }
+            textPreviewMedia {
+              id
+              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
+            foreground {
+              id
+              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
+            foregroundColor
+            # Only here for the animation
+            backgroundColor
+            title
+            subTitle
           }
         }
-        textPreviewMedia {
-          id
-          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-        }
-        foreground {
-          id
-          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-        }
-        foregroundStyle {
-          color
-        }
-        title
-        subTitle
-      }
-    `,
-    coverKey ?? null,
-  );
+      `,
+      coverKey ?? null,
+    ) ?? {};
   //#endregion
 
   //#region Ready states
@@ -128,26 +131,26 @@ const CoverRenderer = (
   const readyStates = useRef({ text: false, media: false, foreground: false });
 
   const sources = useRef({
-    media: cover?.media?.id,
-    text: cover?.textPreviewMedia?.id,
-    foreground: cover?.foreground?.id,
+    media: cardCover?.media?.id,
+    text: cardCover?.textPreviewMedia?.id,
+    foreground: cardCover?.foreground?.id,
   });
 
-  if (sources.current.media !== cover?.media?.id) {
+  if (sources.current.media !== cardCover?.media?.id) {
     readyStates.current.media = false;
-    sources.current.media = cover?.media?.id;
+    sources.current.media = cardCover?.media?.id;
   }
 
-  if (sources.current.text !== cover?.textPreviewMedia?.id) {
+  if (sources.current.text !== cardCover?.textPreviewMedia?.id) {
     readyStates.current.text = false;
-    sources.current.text = cover?.textPreviewMedia?.id;
+    sources.current.text = cardCover?.textPreviewMedia?.id;
   }
 
   if (!sources.current.foreground) {
     readyStates.current.foreground = true;
-  } else if (sources.current.foreground !== cover?.foreground?.id) {
+  } else if (sources.current.foreground !== cardCover?.foreground?.id) {
     readyStates.current.foreground = false;
-    sources.current.foreground = cover?.foreground?.id;
+    sources.current.foreground = cardCover?.foreground?.id;
   }
 
   const onMediaReadyForDisplay = () => {
@@ -172,16 +175,6 @@ const CoverRenderer = (
   };
   //#endregion
 
-  //#region QR Code
-  const [qrCodeVisible, setQRCodeVisible] = useState(false);
-  const showQRCode = () => {
-    setQRCodeVisible(true);
-  };
-  const hideQRCode = () => {
-    setQRCodeVisible(false);
-  };
-  //#endregion
-
   //#region Styles
   const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
 
@@ -191,8 +184,8 @@ const CoverRenderer = (
     title,
     subTitle,
     foreground,
-    foregroundStyle,
-  } = cover ?? {};
+    foregroundColor,
+  } = cardCover ?? {};
 
   const intl = useIntl();
   //#endregion
@@ -263,7 +256,7 @@ const CoverRenderer = (
                 mediaId: foreground.id,
                 requestedSize: width,
               }}
-              tintColor={foregroundStyle?.color}
+              tintColor={swapColor(foregroundColor, cardColors)}
               aspectRatio={COVER_RATIO}
               alt={`${title} - ${subTitle}`}
               onReadyForDisplay={onForegroundReadyForDisplay}
@@ -274,30 +267,11 @@ const CoverRenderer = (
       ) : (
         <View style={styles.coverPlaceHolder} />
       )}
-      <PressableNative
-        onPress={showQRCode}
-        accessibilityRole="button"
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap me to show the QR Code fullscreen',
-          description: 'CoverRenderer - Accessibility Qr code button',
-        })}
-        style={styles.qrCode}
-      >
-        <Image
-          testID="cover-renderer-qrcode"
-          accessibilityRole="image"
-          source={require('#assets/qrcode.png')}
-          style={styles.layer}
-        />
-      </PressableNative>
-      {qrCodeVisible && (
-        <QRCodeModal onRequestClose={hideQRCode} userName={userName} />
-      )}
     </View>
   );
 };
 
-export default forwardRef(CoverRenderer);
+export default memo(forwardRef(CoverRenderer));
 
 const styles = StyleSheet.create({
   root: {

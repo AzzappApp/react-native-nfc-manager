@@ -41,6 +41,7 @@ export const fontFamilies = {
   semibold: { fontFamily: 'PlusJakartaSans-SemiBold', fontWeight: '600' },
   medium: { fontFamily: 'PlusJakartaSans-Medium', fontWeight: '500' },
   regular: { fontFamily: 'PlusJakartaSans-Regular', fontWeight: '400' },
+  azzapp: { fontFamily: 'Azzapp', fontWeight: '400' },
 } as const;
 
 export const textStyles = StyleSheet.create({
@@ -61,6 +62,9 @@ export const textStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
     textDecorationLine: 'underline',
+  },
+  azzapp: {
+    ...fontFamilies.azzapp,
   },
 });
 
@@ -85,6 +89,6 @@ export const shadow = (
       height: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
     },
     shadowOpacity: 0.2,
-    shadowRadius: 20,
+    shadowRadius: 10,
     elevation: 1,
   };

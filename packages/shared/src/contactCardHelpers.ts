@@ -18,18 +18,22 @@ export type ContactCard = {
   }> | null;
 };
 
-export const serializeContactCard = (username: string, card: ContactCard) => {
+export const serializeContactCard = (
+  username: string,
+  profileId: string,
+  card: ContactCard | null,
+) => {
   const serializedContactCard = [
-    card.profileId,
-    card.firstName ?? '',
-    card.lastName ?? '',
-    card.company ?? '',
-    card.title ?? '',
-    card.phoneNumbers
+    profileId,
+    card?.firstName ?? '',
+    card?.lastName ?? '',
+    card?.company ?? '',
+    card?.title ?? '',
+    card?.phoneNumbers
       ?.filter(p => p.selected)
       .map(p => `${p.label},${p.number}`)
       .join(';') ?? '',
-    card.emails
+    card?.emails
       ?.filter(e => e.selected)
       .map(e => `${e.label},${e.address}`)
       .join(';') ?? '',

@@ -1,7 +1,5 @@
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { destroySession, setSession } from '@azzapp/auth/session';
-import { generateTokens } from '@azzapp/auth/tokens';
 import {
   createUser,
   getUserByEmail,
@@ -15,16 +13,16 @@ import {
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
 import { handleSigninAuthMethod } from '#helpers/auth';
+import { generateTokens } from '#helpers/tokens';
 
 type SignupBody = {
   email?: string | null;
   phoneNumber?: string | null;
   password?: string;
-  authMethod?: 'cookie' | 'token';
 };
 
 export const POST = async (req: Request) => {
-  const { email, phoneNumber, password, authMethod } =
+  const { email, phoneNumber, password } =
     ((await req.json()) as SignupBody) || {};
 
   //we need at least one email or one phone number
@@ -52,7 +50,7 @@ export const POST = async (req: Request) => {
           if (user?.password && bcrypt.compareSync(password, user.password)) {
             // we can log the user
             const [profile] = await getUserProfiles(user.id);
-            return await handleSigninAuthMethod(authMethod, user, profile);
+            return await handleSigninAuthMethod(user, profile);
           }
         } catch (error) {
           return NextResponse.json(
@@ -77,7 +75,7 @@ export const POST = async (req: Request) => {
           if (user?.password && bcrypt.compareSync(password, user.password)) {
             // we can log the user
             const [profile] = await getUserProfiles(user.id);
-            await handleSigninAuthMethod(authMethod, user, profile);
+            await handleSigninAuthMethod(user, profile);
           }
         } catch (error) {
           return NextResponse.json(
@@ -99,21 +97,10 @@ export const POST = async (req: Request) => {
       roles: null,
     });
 
-    if (authMethod === 'token') {
-      const { token, refreshToken } = await generateTokens({
-        userId: user.id,
-        profileId: null,
-      });
-      return destroySession(
-        NextResponse.json({ ok: true, token, refreshToken }),
-      );
-    } else {
-      return setSession(NextResponse.json({ ok: true }), {
-        userId: user.id,
-        profileId: null,
-        isAnonymous: false,
-      });
-    }
+    const { token, refreshToken } = await generateTokens({
+      userId: user.id,
+    });
+    return NextResponse.json({ ok: true, token, refreshToken });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

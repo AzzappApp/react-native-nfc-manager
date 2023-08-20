@@ -1,16 +1,18 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   BLOCK_TEXT_DEFAULT_VALUES,
+  BLOCK_TEXT_STYLE_VALUES,
   MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
-import useDataEditor from '#hooks/useDataEditor';
+import WebCardModulePreview from '#components/WebCardModulePreview';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -98,6 +100,25 @@ const BlockTextEditionScreen = ({
           uri
           resizeMode
         }
+        profile {
+          cardColors {
+            primary
+            light
+            dark
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+        }
       }
     `,
     viewerKey,
@@ -106,11 +127,31 @@ const BlockTextEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: blockText,
-      defaultValue: BLOCK_TEXT_DEFAULT_VALUES,
-    });
+  const initialValue = useMemo(() => {
+    return {
+      text: blockText?.text ?? null,
+      fontFamily: blockText?.fontFamily ?? null,
+      fontColor: blockText?.fontColor ?? null,
+      textAlign: blockText?.textAlign ?? null,
+      fontSize: blockText?.fontSize ?? null,
+      verticalSpacing: blockText?.verticalSpacing ?? null,
+      textMarginVertical: blockText?.textMarginVertical ?? null,
+      textMarginHorizontal: blockText?.textMarginHorizontal ?? null,
+      marginHorizontal: blockText?.marginHorizontal ?? null,
+      marginVertical: blockText?.marginVertical ?? null,
+      textBackgroundId: blockText?.textBackground?.id ?? null,
+      textBackgroundStyle: blockText?.textBackgroundStyle ?? null,
+      backgroundId: blockText?.background?.id ?? null,
+      backgroundStyle: blockText?.backgroundStyle ?? null,
+    };
+  }, [blockText]);
+
+  const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
+    initialValue,
+    cardStyle: viewer.profile?.cardStyle,
+    styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+  });
 
   const {
     text,
@@ -123,11 +164,23 @@ const BlockTextEditionScreen = ({
     textMarginHorizontal,
     marginHorizontal,
     marginVertical,
-    textBackground,
+    textBackgroundId,
     textBackgroundStyle,
-    background,
+    backgroundId,
     backgroundStyle,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId', 'textBackgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+    textBackground:
+      viewer.moduleBackgrounds.find(
+        background => background.id === textBackgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -137,9 +190,9 @@ const BlockTextEditionScreen = ({
         $input: SaveBlockTextModuleInput!
       ) {
         saveBlockTextModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...BlockTextEditionScreen_module
@@ -157,23 +210,11 @@ const BlockTextEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const {
-      background: updateBackground,
-      textBackground: updateTextBackground,
-      ...rest
-    } = updates;
 
     const input: SaveBlockTextModuleInput = {
+      ...value,
       moduleId: blockText?.id,
-      backgroundId:
-        blockText?.background?.id !== data.background?.id
-          ? updateBackground?.id ?? null
-          : blockText?.background?.id ?? null,
-      textBackgroundId:
-        blockText?.textBackground?.id !== data.textBackground?.id
-          ? updateTextBackground?.id ?? null
-          : blockText?.textBackground?.id ?? null,
-      ...rest,
+      text: value.text!,
     };
 
     commit({
@@ -192,17 +233,7 @@ const BlockTextEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    blockText?.id,
-    blockText?.background?.id,
-    blockText?.textBackground?.id,
-    data?.background?.id,
-    data?.textBackground?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, blockText?.id, value, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -234,35 +265,11 @@ const BlockTextEditionScreen = ({
 
   const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
 
-  const onTextBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        textBackground:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onTextBackgroundChange = fieldUpdateHandler('textBackgroundId');
 
   const onTextBackgroundStyleChange = fieldUpdateHandler('textBackgroundStyle');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -332,8 +339,10 @@ const BlockTextEditionScreen = ({
       />
       <BlockTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data}
+        data={previewData}
         onPreviewPress={onPreviewPress}
+        colorPalette={viewer.profile?.cardColors}
+        cardStyle={viewer.profile?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -386,7 +395,7 @@ const BlockTextEditionScreen = ({
             element: (
               <BlockTextTextBackgroundEditionPanel
                 viewer={viewer}
-                textBackgroundId={textBackground?.id}
+                textBackgroundId={textBackgroundId}
                 textBackgroundStyle={textBackgroundStyle}
                 onTextBackgroundChange={onTextBackgroundChange}
                 onTextBackgroundStyleChange={onTextBackgroundStyleChange}
@@ -403,7 +412,7 @@ const BlockTextEditionScreen = ({
             element: (
               <BlockTextSectionBackgroundEditionPanel
                 viewer={viewer}
-                backgroundId={background?.id}
+                backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -428,12 +437,12 @@ const BlockTextEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={blockText?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_BLOCK_TEXT,
-              data,
+              data: previewData,
             }}
             style={{
               flex: 1,

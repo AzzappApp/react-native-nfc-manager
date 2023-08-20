@@ -171,19 +171,33 @@ type Viewer {
   moduleBackgrounds: [StaticMedia!]!
 
   """
-  Fetches all cover templates for a given kind
+  Fetches cover templates for a given kind
   """
-  coverTemplates: [CoverTemplate!]!
+  coverTemplates(
+    kind: CoverTemplateKind!
+    first: Int
+    after: String
+  ): CoverTemplateConnection!
 
   """
-  Fetches all cover templates for a given kind ordered by Category
+  Fetches card styles
   """
-  coverTemplatesByCategory(segmented: Boolean): [CoverTemplateCategory!]!
+  cardStyles(first: Int, after: String): CardStyleConnection!
 
   """
-  Return Suggested Cover Templates for business profile
+  Fetches card styles
   """
-  coverTemplatesSuggestion: [CoverTemplate]!
+  cardTemplates(first: Int, after: String): CardTemplateConnection!
+
+  """
+  Fetches color palettes
+  """
+  colorPalettes(first: Int, after: String): ColorPaletteConnection!
+
+  """
+  Fetches suggested medias
+  """
+  suggestedMedias(first: Int, after: String): MediaConnection!
 }
 
 """

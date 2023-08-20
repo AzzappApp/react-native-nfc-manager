@@ -4,7 +4,6 @@
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
       "@azzapp/data/*": ["../data/src/*"],
-      "@azzapp/auth/*": ["../auth/src/*"],
       "#*": ["./src/*"]
     }
   }

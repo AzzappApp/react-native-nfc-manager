@@ -4,25 +4,19 @@ import {
   json,
   text,
   int,
-  datetime,
   index,
-  varchar,
   mysqlTable,
+  boolean,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
+import db, { cols } from './db';
 import { FollowTable } from './follows';
-import { customTinyInt, sortEntitiesByIds } from './generic';
-import { getMediasByIds } from './medias';
+import { sortEntitiesByIds } from './generic';
+import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
 import type { DbTransaction } from './db';
-import type { Media } from './medias';
 import type { PostComment } from './postComments';
 import type { Profile } from './profiles';
 import type { InferModel, SQL } from 'drizzle-orm';
@@ -30,28 +24,16 @@ import type { InferModel, SQL } from 'drizzle-orm';
 export const PostTable = mysqlTable(
   'Post',
   {
-    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
-      .primaryKey()
-      .notNull(),
-    authorId: varchar('authorId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    id: cols.cuid('id').primaryKey().notNull(),
+    authorId: cols.cuid('authorId').notNull(),
     content: text('content'),
-    allowComments: customTinyInt('allowComments').notNull(),
-    allowLikes: customTinyInt('allowLikes').notNull(),
-    createdAt: datetime('createdAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
-    updatedAt: datetime('updatedAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
-    medias: json('medias').notNull().$type<string[]>(),
+    allowComments: boolean('allowComments').notNull(),
+    allowLikes: boolean('allowLikes').notNull(),
+    medias: json('medias').$type<string[]>().notNull(),
     counterReactions: int('counterReactions').default(0).notNull(),
     counterComments: int('counterComments').default(0).notNull(),
+    createdAt: cols.dateTime('createdAt', true).notNull(),
+    updatedAt: cols.dateTime('updatedAt', true).notNull(),
   },
   table => {
     return {
@@ -178,7 +160,7 @@ export const getProfilesPostsWithTopComment = async (
   profileId: string,
   limit: number,
   offset = 0,
-) => {
+): Promise<PostWithCommentAndAuthor[]> => {
   const posts = await db
     .select()
     .from(PostTable)
@@ -203,7 +185,7 @@ export const getProfilesPostsWithTopComment = async (
     medias: medias.filter(media =>
       post.medias.find(postMedia => media.id === postMedia),
     ),
-  })) satisfies PostWithCommentAndAuthor[];
+  }));
 };
 
 /**

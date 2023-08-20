@@ -18,14 +18,14 @@ import type { CSSProperties, ForwardedRef, HTMLAttributes } from 'react';
 type CarouselFullScreenProps = HTMLAttributes<HTMLDivElement> & {
   medias: Media[];
   mediaStyle: CSSProperties;
-  borderSize: number;
+  borderWidth: number;
 };
 
 const CarouselFullScreen = (
   props: CarouselFullScreenProps,
   ref: ForwardedRef<CarouselFullScreenActions>,
 ) => {
-  const { medias, mediaStyle, borderSize, className, children, ...others } =
+  const { medias, mediaStyle, borderWidth, className, children, ...others } =
     props;
 
   const [open, setOpen] = useState(false);
@@ -103,7 +103,7 @@ const CarouselFullScreen = (
             mediaId={media.id}
             fill
             alt="todo"
-            style={{ ...mediaStyle, borderWidth: borderSize }}
+            style={{ ...mediaStyle, borderWidth }}
           />
         </div>
       </div>

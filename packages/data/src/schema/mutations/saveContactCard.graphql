@@ -3,6 +3,13 @@ input ContactCardEmailInput {
   label: String!
   selected: Boolean!
 }
+extend type Mutation {
+  """
+  Save the current user's contact card.
+  """
+  saveContactCard(input: SaveContactCardInput!): SaveContactCardPayload!
+}
+
 
 input ContactCardPhoneNumberInput {
   number: String!
@@ -21,13 +28,10 @@ input SaveContactCardInput {
   company: String
   emails: [ContactCardEmailInput!]
   phoneNumbers: [ContactCardPhoneNumberInput!]
-  clientMutationId: String
-  public: Boolean
-  isDisplayedOnWebCard: Boolean
-  backgroundStyle: ContactCardStyleInput
+  isPrivate: Boolean
+  displayedOnWebCard: Boolean
 }
 
 type SaveContactCardPayload {
-  contactCard: ContactCard!
-  clientMutationId: String
+  profile: Profile!
 }

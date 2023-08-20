@@ -1,16 +1,25 @@
-import { HORIZONTAL_PHOTO_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  HORIZONTAL_PHOTO_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
+import type { CardModuleHorizontalPhoto } from '@azzapp/data/domains';
 
-export type HorizontalPhotoRendererProps = ModuleRendererProps &
-  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
+export type HorizontalPhotoRendererProps =
+  ModuleRendererProps<CardModuleHorizontalPhoto> &
+    Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a HorizontalPhoto module
  */
 const HorizontalPhotoRenderer = async ({
   module,
+  colorPalette,
+  cardStyle,
   style,
   ...props
 }: HorizontalPhotoRendererProps) => {
@@ -20,17 +29,23 @@ const HorizontalPhotoRenderer = async ({
     borderColor,
     marginHorizontal,
     marginVertical,
-    height,
+    imageHeight,
     backgroundId,
     backgroundStyle,
     image,
-  } = Object.assign({}, HORIZONTAL_PHOTO_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={style}
     >
       <div
@@ -42,7 +57,7 @@ const HorizontalPhotoRenderer = async ({
         <div
           style={{
             ...style,
-            height,
+            height: imageHeight,
             borderWidth,
             borderRadius,
             borderStyle: 'solid',
@@ -50,7 +65,7 @@ const HorizontalPhotoRenderer = async ({
             marginLeft: marginHorizontal,
             marginTop: marginVertical,
             marginBottom: marginVertical,
-            borderColor,
+            borderColor: swapColor(borderColor, colorPalette) ?? '#FFF',
             overflow: 'hidden',
             position: 'relative',
           }}

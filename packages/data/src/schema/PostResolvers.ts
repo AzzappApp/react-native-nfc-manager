@@ -1,5 +1,4 @@
 import { connectionFromArray } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import {
   db,
@@ -46,10 +45,7 @@ export const Post: PostResolvers = {
     return post.content ?? '';
   },
   viewerPostReaction: async (post, _, { auth }) => {
-    if (auth.isAnonymous) {
-      return null;
-    }
-    const profileId = getProfileId(auth);
+    const { profileId } = auth;
     if (!profileId) {
       return null;
     }

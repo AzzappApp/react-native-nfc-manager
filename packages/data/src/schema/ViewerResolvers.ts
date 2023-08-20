@@ -2,22 +2,24 @@ import { like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import {
   getFollowerProfiles,
-  getFollowingsPostsCount,
   getFollowingsPosts,
-  getAllPosts,
   db,
   getStaticMediasByUsage,
-  getCoverTemplates,
-  getCoverTemplatesSuggestion,
   ProfileTable,
   PostTable,
   getFollowingsProfiles,
+  getRecommendedProfiles,
+  getCoverTemplates,
+  getCardTemplates,
 } from '#domains';
+import { getCardStyles } from '#domains/cardStyles';
+import { getColorPalettes } from '#domains/colorPalettes';
+import { getMediaSuggestions } from '#domains/mediasSuggestion';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
+  emptyConnection,
 } from '#helpers/connectionsHelpers';
-import type { CoverTemplate } from '#domains';
 import type { ViewerResolvers } from './__generated__/types';
 
 export const Viewer: ViewerResolvers = {
@@ -26,7 +28,6 @@ export const Viewer: ViewerResolvers = {
     if (!profileId) {
       return null;
     }
-
     return profileLoader.load(profileId);
   },
   followings: async (_root, args, { auth }) => {
@@ -91,15 +92,11 @@ export const Viewer: ViewerResolvers = {
     if (!profileId) {
       return connectionFromArray([], args);
     }
-    const nbPosts = await getFollowingsPostsCount(profileId);
 
     const first = args.first ?? 100;
     const offset = args.after ? cursorToDate(args.after) : null;
 
-    const posts = nbPosts
-      ? await getFollowingsPosts(profileId, first, offset)
-      : // TODO instead of returning all posts, we should return a list of recommanded posts
-        await getAllPosts(first, offset);
+    const posts = await getFollowingsPosts(profileId, first, offset);
 
     return connectionFromDateSortedItems(posts, {
       getDate: post => post.createdAt,
@@ -116,9 +113,16 @@ export const Viewer: ViewerResolvers = {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(await db.select().from(PostTable), args);
   },
-  recommendedProfiles: async (_, args) => {
+  recommendedProfiles: async (_, args, { auth }) => {
+    const { profileId, userId } = auth;
+    if (!profileId || !userId) {
+      return connectionFromArray([], args);
+    }
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(ProfileTable), args);
+    return connectionFromArray(
+      await getRecommendedProfiles(profileId, userId),
+      args,
+    );
   },
   searchPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
@@ -143,62 +147,123 @@ export const Viewer: ViewerResolvers = {
   coverBackgrounds: async () => getStaticMediasByUsage('coverBackground'),
   coverForegrounds: async () => getStaticMediasByUsage('coverForeground'),
   moduleBackgrounds: async () => getStaticMediasByUsage('moduleBackground'),
-  coverTemplates: async () => {
-    return getCoverTemplates();
-  },
-  coverTemplatesByCategory: async (
+  coverTemplates: async (
     _,
-    { segmented },
-    { auth, profileLoader, cardLoader },
+    { kind, after, first },
+    { auth: { profileId }, profileLoader },
   ) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      return [];
+    const profile = profileId ? await profileLoader.load(profileId) : null;
+    if (!profile) {
+      return emptyConnection;
     }
-    const profile = await profileLoader.load(profileId);
+    const limit = first ?? 100;
+    const templates = await getCoverTemplates(
+      profile.profileKind,
+      kind,
+      profile.id,
+      after,
+      first ?? 100,
+    );
 
-    let determinedSegmented = segmented;
-    if (segmented == null) {
-      // we need to determine which segmented value to use in order to  avoid to mulitple subsequent calls from client while loading the page
-      const card = await cardLoader.load(profileId);
-      if (card?.coverId == null) {
-        determinedSegmented = profile?.profileKind === 'personal';
-      }
-    }
-
-    const templates = await getCoverTemplates(determinedSegmented);
-
-    const categories: Array<{ templates: CoverTemplate[]; category: string }> =
-      [];
-    // TODO refactor this, this is a mess, we should not use the en label as a group by ...
-    templates.forEach(template => {
-      const category = template.category?.en;
-
-      if (category) {
-        // find object in categories array with category name === category
-        const existingCategory = categories.find(
-          categoryItem => categoryItem.category === category,
-        );
-
-        if (existingCategory) {
-          existingCategory.templates.push(template);
-        } else {
-          categories.push({
-            category,
-            templates: [template],
-          });
-        }
-      }
-    });
-    return categories;
+    return {
+      edges: templates.map(template => ({
+        node: template,
+        cursor: template.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: templates.length > limit,
+        hasPreviousPage: false,
+        startCursor: templates[0]?.cursor,
+        endCursor: templates[templates.length - 1]?.cursor,
+      },
+    };
   },
-  coverTemplatesSuggestion: async (_, __, { auth, profileLoader }) => {
-    const profileId = auth.profileId;
+  cardTemplates: async (_, { after, first }, { auth: { profileId } }) => {
     if (!profileId) {
-      return [];
+      return emptyConnection;
     }
-    const profile = await profileLoader.load(profileId);
-    if (profile?.profileKind !== 'business') return [];
-    return getCoverTemplatesSuggestion(profile.companyActivityId!);
+    const limit = first ?? 100;
+    const cardTemplates = await getCardTemplates(profileId, after, limit);
+
+    return {
+      edges: cardTemplates.map(cardTemplate => ({
+        node: cardTemplate,
+        cursor: cardTemplate.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: cardTemplates.length > limit,
+        hasPreviousPage: false,
+        startCursor: cardTemplates[0]?.cursor,
+        endCursor: cardTemplates[cardTemplates.length - 1]?.cursor,
+      },
+    };
+  },
+  cardStyles: async (_, { after, first }, { auth: { profileId } }) => {
+    if (!profileId) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const cardStyles = await getCardStyles(profileId, after, limit);
+
+    return {
+      edges: cardStyles.map(style => ({
+        node: style,
+        cursor: style.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: cardStyles.length > limit,
+        hasPreviousPage: false,
+        startCursor: cardStyles[0]?.cursor,
+        endCursor: cardStyles[cardStyles.length - 1]?.cursor,
+      },
+    };
+  },
+  colorPalettes: async (_, { after, first }, { auth: { profileId } }) => {
+    if (!profileId) {
+      return emptyConnection;
+    }
+    first = first ?? 100;
+    const colorPalettes = await getColorPalettes(profileId);
+
+    return connectionFromArray(colorPalettes, {
+      after,
+      first,
+    });
+  },
+  suggestedMedias: async (
+    _,
+    { after, first },
+    { auth: { profileId }, profileLoader, mediaLoader },
+  ) => {
+    const profile = profileId ? await profileLoader.load(profileId) : null;
+    if (!profile) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const suggestions = await getMediaSuggestions(
+      profile.id,
+      profile.profileCategoryId,
+      profile.companyActivityId,
+      after,
+      first ?? 100,
+    );
+
+    // resolvers doesn't understand the type of Media, so we need to cast it
+    const edges: any[] = await Promise.all(
+      suggestions.map(async ({ mediaId, cursor }) => ({
+        node: await mediaLoader.load(mediaId),
+        cursor,
+      })),
+    );
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: suggestions.length > limit,
+        hasPreviousPage: false,
+        startCursor: suggestions[0]?.cursor,
+        endCursor: suggestions[suggestions.length - 1]?.cursor,
+      },
+    };
   },
 };

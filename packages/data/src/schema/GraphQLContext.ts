@@ -1,20 +1,17 @@
 import DataLoader from 'dataloader';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import {
-  getCardsByIds,
-  getCardCoversByIds,
   getPostsByIds,
   getPostCommentsByIds,
-  getUsersCards,
   getProfilesByIds,
   getMediasByIds,
   getCoverTemplatesByIds,
   getStaticMediasByIds,
   getUsersByIds,
+  getCardStylesByIds,
+  getCardTemplatesByIds,
 } from '#domains';
 import type {
-  Card,
-  CardCover,
   Post,
   Media,
   Profile,
@@ -22,21 +19,24 @@ import type {
   StaticMedia,
   PostComment,
   User,
+  CardStyle,
+  CardTemplate,
 } from '#domains';
-import type { SessionData } from '@azzapp/auth/viewer';
 
 export type GraphQLContext = {
   cardUpdateListener: (username: string) => void;
-  auth: SessionData;
+  auth: {
+    userId?: string;
+    profileId?: string;
+  };
   locale: string;
   profileLoader: DataLoader<string, Profile | null>;
-  cardLoader: DataLoader<string, Card | null>;
-  cardByProfileLoader: DataLoader<string, Card | null>;
-  coverLoader: DataLoader<string, CardCover | null>;
   postLoader: DataLoader<string, Post | null>;
   postCommentLoader: DataLoader<string, PostComment | null>;
   mediaLoader: DataLoader<string, Media | null>;
+  cardStyleLoader: DataLoader<string, CardStyle | null>;
   staticMediaLoader: DataLoader<string, StaticMedia | null>;
+  cardTemplateLoader: DataLoader<string, CardTemplate | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
   userLoader: DataLoader<string, User | null>;
 };
@@ -47,28 +47,31 @@ const dataloadersOptions = {
 
 export const createGraphQLContext = (
   cardUpdateListener: (username: string) => void,
-  userInfos?: SessionData,
+  userId?: string,
+  profile?: Profile,
   locale: string = DEFAULT_LOCALE,
 ): GraphQLContext => {
-  userInfos = userInfos ?? { isAnonymous: true };
-
+  const profileLoader = new DataLoader(getProfilesByIds, dataloadersOptions);
+  if (profile) {
+    profileLoader.prime(profile.id, profile);
+  }
   return {
-    auth: userInfos,
+    auth: {
+      userId,
+      profileId: profile?.id,
+    },
     locale,
     cardUpdateListener,
-    profileLoader: new DataLoader(getProfilesByIds, dataloadersOptions),
-    cardByProfileLoader: new DataLoader(async (ids: readonly string[]) => {
-      const cards = await getUsersCards(ids as string[]);
-      const cardsMap = new Map(cards.map(card => [card.profileId, card]));
-
-      return ids.map(id => cardsMap.get(id) ?? null);
-    }, dataloadersOptions),
-    cardLoader: new DataLoader(getCardsByIds, dataloadersOptions),
-    coverLoader: new DataLoader(getCardCoversByIds, dataloadersOptions),
+    profileLoader,
     postLoader: new DataLoader(getPostsByIds, dataloadersOptions),
     postCommentLoader: new DataLoader(getPostCommentsByIds, dataloadersOptions),
+    cardStyleLoader: new DataLoader(getCardStylesByIds, dataloadersOptions),
     mediaLoader: new DataLoader(getMediasByIds, dataloadersOptions),
     staticMediaLoader: new DataLoader(getStaticMediasByIds, dataloadersOptions),
+    cardTemplateLoader: new DataLoader(
+      getCardTemplatesByIds,
+      dataloadersOptions,
+    ),
     coverTemplateLoader: new DataLoader(
       getCoverTemplatesByIds,
       dataloadersOptions,

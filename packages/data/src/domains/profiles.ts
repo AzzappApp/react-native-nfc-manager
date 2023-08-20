@@ -1,58 +1,109 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, asc, inArray, sql, and, lt, desc } from 'drizzle-orm';
+import { eq, asc, inArray, sql, and, lt, desc, isNull, ne } from 'drizzle-orm';
 import {
   mysqlEnum,
-  datetime,
   index,
   uniqueIndex,
-  varchar,
   fulltextIndex,
   mysqlTable,
+  json,
+  boolean,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import ERRORS from '@azzapp/shared/errors';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
+import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { sortEntitiesByIds } from './generic';
+import { getUserById } from './users';
 import type { Profile } from '#schema/ProfileResolvers';
+import type { DbTransaction } from './db';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type {
+  TextOrientation,
+  TextPosition,
+  TextStyle,
+} from '@azzapp/shared/coverHelpers';
 import type { InferModel } from 'drizzle-orm';
+
+export type ContactCard = {
+  firstName?: string | null;
+  lastName?: string | null;
+  title?: string | null;
+  company?: string | null;
+  emails?: Array<{
+    address: string;
+    label: string;
+    selected: boolean;
+  }> | null;
+  phoneNumbers?: Array<{
+    number: string;
+    label: string;
+    selected: boolean;
+  }> | null;
+};
 
 export const ProfileTable = mysqlTable(
   'Profile',
   {
-    id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH })
-      .primaryKey()
-      .notNull(),
-    userId: varchar('userId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
-    userName: varchar('userName', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
-    firstName: varchar('firstName', { length: DEFAULT_VARCHAR_LENGTH }),
-    lastName: varchar('lastName', { length: DEFAULT_VARCHAR_LENGTH }),
+    /* Profile infos */
+    id: cols.cuid('id').primaryKey().notNull(),
+    userId: cols.cuid('userId').notNull(),
+    userName: cols.defaultVarchar('userName').notNull(),
     profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
-    companyName: varchar('companyName', { length: DEFAULT_VARCHAR_LENGTH }),
-    createdAt: datetime('createdAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
+    profileCategoryId: cols.cuid('profileCategoryId'),
+    firstName: cols.defaultVarchar('firstName'),
+    lastName: cols.defaultVarchar('lastName'),
+    companyName: cols.defaultVarchar('companyName'),
+    companyActivityId: cols.cuid('companyActivityId'),
+    createdAt: cols.dateTime('createdAt', true).notNull(),
+    updatedAt: cols.dateTime('createdAt', true).notNull(),
+
+    /* Cards infos */
+    cardColors: json('cardColors').$type<{
+      primary: string;
+      light: string;
+      dark: string;
+      otherColors: string[];
+    } | null>(),
+    cardStyle: json('cardStyle').$type<CardStyle>(),
+    cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
+    cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
+    lastCardUpdate: cols.dateTime('lastCardUpdate', true).notNull(),
+
+    /* Covers infos */
+    coverTitle: cols.defaultVarchar('coverTitle'),
+    coverSubTitle: cols.defaultVarchar('coverSubTitle'),
+    coverData: json('coverData').$type<{
+      titleStyle: TextStyle;
+      subTitleStyle: TextStyle;
+      textOrientation: TextOrientation;
+      textPosition: TextPosition;
+      backgroundId?: string | null;
+      backgroundColor?: string | null;
+      backgroundPatternColor?: string | null;
+      foregroundId?: string | null;
+      foregroundColor?: string | null;
+      sourceMediaId: string | null;
+      maskMediaId?: string | null;
+      mediaFilter?: string | null;
+      mediaParameters?: Record<string, any> | null;
+      mediaId?: string | null;
+      textPreviewMediaId?: string | null;
+      merged: boolean;
+      segmented: boolean;
+    }>(),
+
+    /* Contact cards infos */
+    contactCard: json('contactCard').$type<ContactCard>(),
+    contactCardIsPrivate: boolean('contactCardIsPrivate')
+      .default(true)
       .notNull(),
-    updatedAt: datetime('updatedAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
+    contactCardDisplayedOnWebCard: boolean('contactCardDisplayedOnWebCard')
+      .default(false)
       .notNull(),
-    colorPalette: varchar('colorPalette', { length: DEFAULT_VARCHAR_LENGTH }),
-    profileCategoryId: varchar('profileCategoryId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }),
-    companyActivityId: varchar('companyActivityId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }),
+    lastContactCardUpdate: cols
+      .dateTime('lastContactCardUpdate', true)
+      .notNull(),
   },
   table => {
     return {
@@ -79,6 +130,18 @@ export const getProfilesByIds = async (ids: readonly string[]) =>
       .from(ProfileTable)
       .where(inArray(ProfileTable.id, ids as string[])),
   );
+
+/**
+ * Retrieves a profile by its id
+ * @param id - The id of the profile to retrieve
+ * @returns The profile if found, otherwise null
+ */
+export const getProfileById = async (id: string) =>
+  db
+    .select()
+    .from(ProfileTable)
+    .where(eq(ProfileTable.id, id))
+    .then(res => res[0] ?? null);
 
 /**
  * Retrieves a list of associated to an user
@@ -128,6 +191,31 @@ export const getFollowings = async (
         params.userName
           ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${params.userName}*" IN BOOLEAN MODE)`
           : undefined,
+      ),
+    );
+
+  return result.map(({ Profile }) => Profile);
+};
+
+export const getRecommendedProfiles = async (
+  profileId: string,
+  userId: string,
+) => {
+  const result = await db
+    .select({ Profile: ProfileTable })
+    .from(ProfileTable)
+    .leftJoin(
+      FollowTable,
+      and(
+        eq(FollowTable.followingId, ProfileTable.id),
+        eq(FollowTable.followerId, profileId),
+      ),
+    )
+    .where(
+      and(
+        ne(ProfileTable.userId, userId),
+        isNull(FollowTable.followerId),
+        eq(ProfileTable.cardIsPublished, true),
       ),
     );
 
@@ -239,41 +327,62 @@ export const getFollowingsProfiles = async (
  * @param data - The profile fields, excluding the id
  * @returns The newly created profile
  */
-export const createProfile = async (data: NewProfile) => {
-  const addedProfile = {
+export const createProfile = async (data: NewProfile): Promise<string> => {
+  const profileId = createId();
+  await db.insert(ProfileTable).values({
+    id: profileId,
     ...data,
-    id: createId(),
-  };
-  await db.insert(ProfileTable).values(addedProfile);
-  return {
-    ...addedProfile,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    firstName: data.firstName ?? '',
-    lastName: data.lastName ?? '',
-    companyName: data.companyName ?? '',
-    colorPalette: data.colorPalette ?? '',
-    profileCategoryId: data.profileCategoryId ?? null,
-    companyActivityId: data.companyActivityId ?? null,
-  };
+  });
+  return profileId;
 };
 
 export const updateProfile = async (
   profileId: string,
   updates: Partial<Profile>,
+  tx: DbTransaction = db,
 ) => {
   const updatedProfile = {
     updatedAt: new Date(),
     ...updates,
   };
 
-  const result = await db
+  await tx
     .update(ProfileTable)
     .set(updatedProfile)
     .where(eq(ProfileTable.id, profileId));
-  if (result.rowsAffected > 0) {
-    return updatedProfile;
-  } else {
-    throw new Error(ERRORS.USER_NOT_FOUND);
-  }
+};
+
+/**
+ * Build a default contact card from a profile and a user
+ * @param profile
+ * @returns
+ */
+export const buildDefaultContactCard = async (
+  profile: NewProfile,
+): Promise<ContactCard> => {
+  const user = await getUserById(profile.userId);
+  return {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    company: profile.companyName,
+    title: null,
+    emails: user?.email
+      ? [
+          {
+            address: user.email,
+            label: 'Home',
+            selected: true,
+          },
+        ]
+      : null,
+    phoneNumbers: user?.phoneNumber
+      ? [
+          {
+            number: user.phoneNumber,
+            label: 'Home',
+            selected: true,
+          },
+        ]
+      : null,
+  };
 };

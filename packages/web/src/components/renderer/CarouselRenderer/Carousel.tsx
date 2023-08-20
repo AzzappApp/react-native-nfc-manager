@@ -18,7 +18,7 @@ type CarouselProps = {
   squareRatio: boolean;
   borderRadius: number;
   borderColor: string;
-  borderSize: number;
+  borderWidth: number;
   medias: Media[];
 };
 
@@ -31,7 +31,7 @@ const Carousel = (props: CarouselProps) => {
     squareRatio,
     borderRadius,
     borderColor,
-    borderSize,
+    borderWidth,
     medias,
   } = props;
 
@@ -135,7 +135,7 @@ const Carousel = (props: CarouselProps) => {
             media={media}
             borderColor={borderColor}
             borderRadius={borderRadius}
-            borderSize={borderSize}
+            borderWidth={borderWidth}
             imageHeight={imageHeight}
             squareRatio={squareRatio}
             onClick={() => modal.current?.open(i)}
@@ -145,7 +145,7 @@ const Carousel = (props: CarouselProps) => {
       <CarouselFullScreen
         ref={modal}
         medias={medias}
-        borderSize={borderSize}
+        borderWidth={borderWidth}
         mediaStyle={{
           borderRadius,
           borderColor,

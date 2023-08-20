@@ -40,6 +40,9 @@ class ErrorBoundaryWithRetry extends React.Component<
   render() {
     const { children, fallback } = this.props;
     const { error } = this.state;
+    if (this.props.screenId === 'HOME') {
+      return children;
+    }
     if (error) {
       if (typeof fallback === 'function') {
         fallback({

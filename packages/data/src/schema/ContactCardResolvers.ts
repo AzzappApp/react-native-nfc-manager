@@ -1,12 +1,23 @@
 import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
+
 import { idResolver } from './utils';
 import type { ContactCardResolvers } from './__generated__/types';
 
 export const ContactCard: ContactCardResolvers = {
-  id: card => idResolver('contactCard')({ id: card.profileId ?? '' }), // relay needs an id + one contact card per profile + manage default contact card case
-  serializedContactCard: async (card, _, { profileLoader }) => {
-    const profile = await profileLoader.load(card.profileId ?? '');
-
-    return serializeAndSignContactCard(profile?.userName ?? '', card);
-  },
+  id: profile => idResolver('ContactCard')({ id: profile.id }),
+  firstName: profile => profile.contactCard?.firstName ?? null,
+  lastName: profile => profile.contactCard?.lastName ?? null,
+  title: profile => profile.contactCard?.title ?? null,
+  company: profile => profile.contactCard?.company ?? null,
+  emails: profile => profile.contactCard?.emails ?? null,
+  phoneNumbers: profile => profile.contactCard?.phoneNumbers ?? null,
+  public: profile => !profile.contactCardIsPrivate,
+  isDisplayedOnWebCard: profile =>
+    profile.contactCardDisplayedOnWebCard ?? false,
+  serializedContactCard: profile =>
+    serializeAndSignContactCard(
+      profile.userName ?? '',
+      profile.id,
+      profile.contactCard,
+    ),
 };

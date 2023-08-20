@@ -1,3 +1,4 @@
+import { toGlobalId } from 'graphql-relay';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
@@ -60,7 +61,7 @@ export const init = async () => {
     'SIGN_IN',
     async ({ payload: { authTokens: tokens, profileId } }) => {
       if (profileId) {
-        storage.set(MMKVS_PROFILE_ID, profileId);
+        storage.set(MMKVS_PROFILE_ID, toGlobalId('Profile', profileId));
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
@@ -74,12 +75,7 @@ export const init = async () => {
 
   addGlobalEventListener(
     'PROFILE_CHANGE',
-    async ({ payload: { authTokens: tokens, profileId } }) => {
-      await EncryptedStorage.setItem(
-        ENCRYPTED_STORAGE_TOKENS_KEY,
-        JSON.stringify(tokens),
-      );
-      authTokens = tokens;
+    async ({ payload: { profileId } }) => {
       storage.set(MMKVS_PROFILE_ID, profileId);
       emitAuthState();
     },

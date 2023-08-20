@@ -1,0 +1,28 @@
+export const APPLICATIONS_FONTS = [
+  'Anton_Regular',
+  'Archivo_Regular',
+  'Cinzel_Regular',
+  'Inter_Regular',
+  'Inter_Medium',
+  'Inter_SemiBold',
+  'Inter_Black',
+  'Jost_Regular',
+  'Koulen_Regular',
+  'Limelight_Regular',
+  'Lora_Regular',
+  'Lora_Bold',
+  'Manrope_ExtraLight',
+  'Manrope_Light',
+  'Manrope_Regular',
+  'Montserrat_Regular',
+  'Montserrat_SemiBold',
+  'Poppins_Regular',
+  'Poppins_SemiBold',
+  'Poppins_Bold',
+  'Poppins_Black',
+  'Raleway_Regular',
+  'Righteous_Regular',
+  'Rye_Regular',
+] as const;
+
+export type ApplicationFonts = (typeof APPLICATIONS_FONTS)[number];

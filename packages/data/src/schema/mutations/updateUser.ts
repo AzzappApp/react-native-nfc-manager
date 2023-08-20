@@ -18,11 +18,10 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   args,
   { auth },
 ) => {
-  if (auth.isAnonymous) {
+  const userId = auth.userId;
+  if (!userId) {
     return null;
   }
-
-  const userId = auth.userId;
 
   const { email, phoneNumber, currentPassword, newPassword } = args.input;
 

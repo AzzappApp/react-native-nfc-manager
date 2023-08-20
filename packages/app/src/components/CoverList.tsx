@@ -1,7 +1,12 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_BASE_WIDTH } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_BASE_WIDTH,
+  COVER_CARD_RADIUS,
+} from '@azzapp/shared/coverHelpers';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CoverLink from './CoverLink';
 import type {
   CoverList_users$data,
@@ -16,6 +21,7 @@ type CoverListProps = {
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   coverStyle?: StyleProp<ViewStyle>;
+  columnWrapperStyle?: StyleProp<ViewStyle>;
   horizontal?: boolean;
   numColums?: number;
   onReady?: () => void;
@@ -25,6 +31,12 @@ type CoverListProps = {
     | React.ReactElement
     | null
     | undefined;
+  renderItem?: (
+    info: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>,
+  ) => React.ReactElement | null;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  withShadow?: boolean;
 };
 // TODO docs and tests once this component is production ready
 const CoverList = ({
@@ -33,11 +45,16 @@ const CoverList = ({
   style,
   coverStyle = {},
   containerStyle,
+  withShadow,
   horizontal = true,
   numColums = 1,
   initialNumToRender = 5,
   onReady,
   ListHeaderComponent,
+  renderItem: customRenderItem,
+  columnWrapperStyle,
+  refreshing,
+  onRefresh,
 }: CoverListProps) => {
   const coverWidth = useMemo(() => {
     //TODO: refactoring aka do it better :). number is required. flatten will give a string.
@@ -54,12 +71,7 @@ const CoverList = ({
       fragment CoverList_users on Profile @relay(plural: true) {
         id
         userName
-        card {
-          backgroundColor
-          cover {
-            ...CoverRenderer_cover
-          }
-        }
+        ...CoverLink_profile
       }
     `,
     usersKey,
@@ -81,25 +93,36 @@ const CoverList = ({
     }
   }, [initialNumToRender, onReady, users.length]);
 
+  const styles = useStyleSheet(styleSheet);
+
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
-      <CoverLink
-        cover={item.card?.cover}
-        width={coverWidth}
-        userName={item.userName}
-        profileID={item.id}
-        style={[
-          styles.item,
-          { height: horizontal ? '100%' : 'auto' },
-          item.card?.backgroundColor != null && {
-            backgroundColor: item.card?.backgroundColor,
-          },
-          coverStyle,
-        ]}
-        onReadyForDisplay={onCoverReady}
-      />
+      <View
+        style={
+          withShadow
+            ? {
+                ...styles.coverContainerStyle,
+                borderRadius: COVER_CARD_RADIUS * coverWidth,
+              }
+            : null
+        }
+      >
+        <CoverLink
+          profile={item}
+          width={coverWidth}
+          profileId={item.id}
+          style={coverStyle}
+          onReadyForDisplay={onCoverReady}
+        />
+      </View>
     ),
-    [coverStyle, coverWidth, horizontal, onCoverReady],
+    [
+      coverStyle,
+      coverWidth,
+      onCoverReady,
+      styles.coverContainerStyle,
+      withShadow,
+    ],
   );
 
   //TODO: handle vertical layout with height instead of width
@@ -118,7 +141,7 @@ const CoverList = ({
       accessibilityRole="list"
       data={users}
       keyExtractor={keyExtractor}
-      renderItem={renderItem}
+      renderItem={customRenderItem ?? renderItem}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
       horizontal={horizontal}
@@ -130,19 +153,22 @@ const CoverList = ({
       getItemLayout={getItemLayout}
       ListHeaderComponent={ListHeaderComponent}
       initialNumToRender={initialNumToRender}
+      columnWrapperStyle={columnWrapperStyle}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
     />
   );
 };
 
 export default CoverList;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flexGrow: 0,
+    gap: 5,
   },
-  item: {
-    height: '100%',
-    marginRight: 10,
-    width: 125,
+  coverContainerStyle: {
+    ...shadow(appearance, 'center'),
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
-});
+}));

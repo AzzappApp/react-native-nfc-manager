@@ -1,13 +1,11 @@
 import { unstable_cache } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 import {
-  getCardCoversByIds,
   getMediasByIds,
   getPostByIdWithMedia,
   getPostCommentsWithProfile,
   getProfilesByIds,
   getProfilesPostsWithMedias,
-  getUsersCards,
 } from '@azzapp/data/domains';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import PostFeedHeader from '../PostFeed/PostFeedHeader';
@@ -38,9 +36,9 @@ const PostPage = async (props: PostPageProps) => {
           : [];
       const comments = post ? await getPostCommentsWithProfile(post.id, 5) : [];
 
-      const [card] = author ? await getUsersCards([author.id]) : [];
-      const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
-      const [media] = cover ? await getMediasByIds([cover.mediaId]) : [];
+      const [media] = author?.coverData?.mediaId
+        ? await getMediasByIds([author.coverData.mediaId])
+        : [];
 
       return {
         post,

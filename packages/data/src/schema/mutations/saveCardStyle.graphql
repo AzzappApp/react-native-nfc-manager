@@ -1,0 +1,23 @@
+extend type Mutation {
+  """
+  Update the card cover of the current profile
+  """
+  saveCardStyle(input: SaveCardStyleInput!): SaveCardStylePayload!
+}
+
+input SaveCardStyleInput {
+  fontFamily: String!
+  fontSize: Int!
+  titleFontFamily: String!
+  titleFontSize: Int!
+  borderRadius: Int!
+  buttonRadius: Int!
+  borderWidth: Int!
+  borderColor: String!
+  buttonColor: String!
+  gap: Int!
+}
+
+type SaveCardStylePayload {
+  profile: Profile!
+}
