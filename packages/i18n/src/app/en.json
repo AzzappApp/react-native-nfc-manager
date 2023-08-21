@@ -351,6 +351,10 @@
     "defaultMessage": "My WebCard colors",
     "description": "Name of the color palette section in color choose"
   },
+  "7qzuti": {
+    "defaultMessage": "Introduce yourself in a new way by creating your own WebCard.",
+    "description": "Subtitle for welcome screen"
+  },
   "87390w": {
     "defaultMessage": "Let's get started with Azzapp!",
     "description": "Signup Screen - Let's get started with Azzapp! subtitle"
@@ -1191,6 +1195,10 @@
     "defaultMessage": "Moves the module up",
     "description": "Accessibility hint for the move up button in the profile edition screen"
   },
+  "RzQXIU": {
+    "defaultMessage": "Welcome to Azzap",
+    "description": "Title for welcome screen"
+  },
   "SD0DRz": {
     "defaultMessage": "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
     "description": "Default text for the BlockText module"
@@ -1286,6 +1294,10 @@
   "Tw2G6K": {
     "defaultMessage": "Shows the module in your webcard",
     "description": "Accessibility hint for the show button in the profile edition screen"
+  },
+  "TwYeKK": {
+    "defaultMessage": "Account details",
+    "description": "Account details label for welcome screen"
   },
   "Tx4u9Y": {
     "defaultMessage": "Simple text",
@@ -1402,6 +1414,10 @@
   "VoVt5c": {
     "defaultMessage": "Select a calling code or email",
     "description": "Signup - The accessibility label for the country selector"
+  },
+  "VuGd3D": {
+    "defaultMessage": "Create my first webcard",
+    "description": "Button label for welcome screen"
   },
   "Vw6ZqZ": {
     "defaultMessage": "Unselect",
@@ -1590,6 +1606,10 @@
   "Zq9BX5": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
+  },
+  "ZsIcNJ": {
+    "defaultMessage": "Log out",
+    "description": "Log out label for welcome screen"
   },
   "ZvFZeW": {
     "defaultMessage": "Schedule",
@@ -2419,6 +2439,10 @@
     "defaultMessage": "Invalid email/phone number or no account found",
     "description": "ForgotpasswordScreen - Invalid email or phone number error"
   },
+  "pytqoD": {
+    "defaultMessage": "Invite friends",
+    "description": "Invite friends label for welcome screen"
+  },
   "q+WL41": {
     "defaultMessage": "My posts",
     "description": "Media screen tab bar item label for my posts tab"
@@ -2462,6 +2486,10 @@
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
+  },
+  "qd7dQ1": {
+    "defaultMessage": "About",
+    "description": "About label for welcome screen"
   },
   "qkbfOu": {
     "defaultMessage": "Middle left",

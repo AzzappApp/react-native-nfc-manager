@@ -19,13 +19,17 @@ export const homeScreenQuery = graphql`
 
 const HomeScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   // data
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
-  if (!currentUser.profiles?.length) {
+  if (!currentUser.profiles?.length && hasFocus) {
     return <WelcomeScreen />;
   }
-  return <HomeScreenContent user={currentUser} />;
+
+  return currentUser.profiles?.length ? (
+    <HomeScreenContent user={currentUser} />
+  ) : null;
 };
 
 export default relayScreen(HomeScreen, { query: homeScreenQuery });
