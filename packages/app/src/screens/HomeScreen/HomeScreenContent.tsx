@@ -12,7 +12,11 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { useOnFocus, useRouter } from '#components/NativeRouter';
+import {
+  useOnFocus,
+  useRouter,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useAuthState from '#hooks/useAuthState';
@@ -57,7 +61,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   );
 
   const auth = useAuthState();
-
+  const hasFocus = useScreenHasFocus();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
       profile => profile.id === auth.profileId,
@@ -208,7 +212,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         </View>
         <HomeBottomSheetPanel visible={showModal} close={toggleShowModal} />
       </Animated.View>
-      {currentProfile && (
+      {currentProfile && hasFocus && (
         <HomeContactCardLandscape
           containerHeight={containerHeight}
           profile={currentProfile}
