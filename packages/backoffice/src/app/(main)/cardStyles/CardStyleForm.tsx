@@ -149,6 +149,14 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           {...fieldProps('buttonColor')}
         />
         <TextField
+          name="buttonRadius"
+          type="number"
+          label="Button Radius"
+          disabled={saving}
+          required
+          {...fieldProps('buttonRadius', { parse: intParser })}
+        />
+        <TextField
           name="gap"
           type="number"
           label="Gap"
