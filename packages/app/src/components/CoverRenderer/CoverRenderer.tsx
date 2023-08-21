@@ -228,23 +228,6 @@ const CoverRenderer = (
             onReadyForDisplay={onMediaReadyForDisplay}
             style={styles.layer}
           />
-          {textPreviewMedia && (
-            <MediaImageRenderer
-              testID="CoverRenderer_text"
-              source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? textPreviewMedia.smallURI
-                    : textPreviewMedia.largeURI,
-                mediaId: textPreviewMedia.id,
-                requestedSize: width,
-              }}
-              aspectRatio={COVER_RATIO}
-              alt={`${title} - ${subTitle}`}
-              onReadyForDisplay={onTextReadyForDisplay}
-              style={styles.layer}
-            />
-          )}
           {foreground && (
             <MediaImageRenderer
               testID="CoverRenderer_foreground"
@@ -260,6 +243,23 @@ const CoverRenderer = (
               aspectRatio={COVER_RATIO}
               alt={`${title} - ${subTitle}`}
               onReadyForDisplay={onForegroundReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
+          {textPreviewMedia && (
+            <MediaImageRenderer
+              testID="CoverRenderer_text"
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? textPreviewMedia.smallURI
+                    : textPreviewMedia.largeURI,
+                mediaId: textPreviewMedia.id,
+                requestedSize: width,
+              }}
+              aspectRatio={COVER_RATIO}
+              alt={`${title} - ${subTitle}`}
+              onReadyForDisplay={onTextReadyForDisplay}
               style={styles.layer}
             />
           )}

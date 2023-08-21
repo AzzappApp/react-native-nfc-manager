@@ -129,12 +129,14 @@ const WebCardList = ({
   }, []);
 
   useEffect(() => {
-    flatListRef?.current?.scrollToIndex({
-      index: currentIndexRef.current,
-      animated: false,
-    });
+    if (cards.length > 0) {
+      flatListRef?.current?.scrollToIndex({
+        index: currentIndexRef.current,
+        animated: false,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode]);
+  }, [viewMode, cards]);
 
   const renderItem = useCallback<ListRenderItem<WebCardInfo>>(
     ({ item, index }) => (

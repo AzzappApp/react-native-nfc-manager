@@ -67,13 +67,13 @@ const columns: GridColDef[] = [
   },
   {
     field: 'dark',
-    headerName: 'Secondary Color',
+    headerName: 'Dark Color',
     flex: 1,
     renderCell: renderColor('dark'),
   },
   {
     field: 'light',
-    headerName: 'Background Color',
+    headerName: 'Light Color',
     flex: 1,
     renderCell: renderColor('light'),
   },

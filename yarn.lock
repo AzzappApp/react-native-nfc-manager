@@ -1826,10 +1826,35 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/cinzel/-/cinzel-0.2.3.tgz#0fe277cc2c26e99ae3b5d647841f4bc587681dce"
   integrity sha512-fGSiWMAHJfXvkGQBJ2sWw6c0hSx2hgtMtN7cuFe6o6H/0nL4ttZG/SoEAJXQJU9YjMdduj/1uKkFm5CfRtorGw==
 
+"@expo-google-fonts/courier-prime@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/courier-prime/-/courier-prime-0.2.3.tgz#dd46681e00f2a649795b7bb70683d442a2b2a6fa"
+  integrity sha512-QOIpcF0V8PQ2O66yrMBkBa9LcOjbV3qmeEdvPBGQaCz38YQKd//pT7FizvRVHPi0RHDhKeg0yk+KidyXcy88tw==
+
+"@expo-google-fonts/dm-serif-display@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/dm-serif-display/-/dm-serif-display-0.2.3.tgz#aee6a1e6b858852deb361a7185f226c7da0b9ed5"
+  integrity sha512-RdhKvpjCFg05q9S1z4S2+mdxr3QPjNjsgFT8pUVF8w2iP+l4HYkywxLC2gGH35LxL0jncdGhCAM1eTpK5qaP7A==
+
+"@expo-google-fonts/fauna-one@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/fauna-one/-/fauna-one-0.2.3.tgz#167c94e61d0c17b1faf7c73c33f3016e62e226f2"
+  integrity sha512-nmxjTz8oLhB657kZde1rGIF105tC9zyBvqay8U8rzAmpTCfk3NyIgT33m2xpZ3+KNY/aqwH1VaPjqXxcC8UfAA==
+
+"@expo-google-fonts/fraunces@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/fraunces/-/fraunces-0.2.3.tgz#73e6ae22193315deaad7cf4caad6ca5204bc9606"
+  integrity sha512-krgIGxViwYutW+egNHfSfc8u10ZpP+UL10MZHxbQ8C4LwEKA4HWuWLEiqSsbj1Kq3OoiXnbR+x9ERWgdhuoB1A==
+
 "@expo-google-fonts/inter@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/inter/-/inter-0.2.3.tgz#82bf7224bb76fc6614a00393a9e9ee4d6dd09dcb"
   integrity sha512-iHK9FI+dnE45X5c2Z5hSFwNH4zUWethizpbv3XUn0FIGw5jwvzriENz0a6wCdkI4/d+1QkurnHo5XHti7TbNJA==
+
+"@expo-google-fonts/josefin-sans@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/josefin-sans/-/josefin-sans-0.2.3.tgz#f17ee524c5bd38f1e93e7095c4a714f0545812de"
+  integrity sha512-JZvUDnecgTzwYV6onl/ud2fUp3v0/7qPyxgzBA2uzgpvRm2QGTIm7Rg8LASNY61jHcf7C31b89mZ4E3d5h0HuA==
 
 "@expo-google-fonts/jost@^0.2.3":
   version "0.2.3"
@@ -1840,6 +1865,11 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/koulen/-/koulen-0.2.3.tgz#a6a7283dd0177db8be18d7aea1cb15746b5af262"
   integrity sha512-cxQlCSePbvzrkD43Z6nRoHkc4ODMnYVO9yNDDvNIob257Cltk7XYIPoQpHsL1g1Vzde9BOro/8anMKEzmp1jTQ==
+
+"@expo-google-fonts/libre-caslon-text@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/libre-caslon-text/-/libre-caslon-text-0.2.3.tgz#9848c58ea70262d8da9073c601bb0a70f8631d16"
+  integrity sha512-s6OGqPsVg5LUsGvW8p9beKYTfMbB4FEsU8PpN9vKKpjeEng9Gke2g5JEJc0CvdOYwR1Jkvu1MzXddn/XlpZB5w==
 
 "@expo-google-fonts/limelight@^0.2.3":
   version "0.2.3"
@@ -1866,6 +1896,21 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/montserrat/-/montserrat-0.2.3.tgz#e22b337ee6bd2007126b466ddd18f9de59eb3fc6"
   integrity sha512-9imhwIs6j5uyTkTxoNplC5T8ERES1W98ZgF7kf7OaypnbcoLoIW0wKH6oudecZyiEqoSktC7epkRpj+UEUvzWg==
 
+"@expo-google-fonts/open-sans@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/open-sans/-/open-sans-0.2.3.tgz#63b9f9a555f8764718d3370757431ee084ca66ec"
+  integrity sha512-HjEue5908n2yTtNSo47lAN3UFi2sAp00u6E3tx9nSEr0P2SDFDjYgsA89nPaAYOyxDN0EPGtNTa2K/VUe3jgmA==
+
+"@expo-google-fonts/playfair-display@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/playfair-display/-/playfair-display-0.2.3.tgz#892805793743fc5d110a39d31442ae269d43de47"
+  integrity sha512-J4H/k29XpbM7WDfC/rsJk9qOt/mmKDLFi4UFWxZxmleQoMp8KYRJhAFlESxRQeecYdp0QNcYpDlTzjs8tHddvg==
+
+"@expo-google-fonts/plus-jakarta-sans@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/plus-jakarta-sans/-/plus-jakarta-sans-0.2.3.tgz#d13debe67e40b2059797e5bbb8e1f32c13312ab5"
+  integrity sha512-7vukKMax5xrMlrf0DCzOpqqCQwxYaUXH4BmVxbal5Xrys1LIQmaqoiPftd7RtTSRbwPEhU/GYqIGrkuCAydRrQ==
+
 "@expo-google-fonts/poppins@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/poppins/-/poppins-0.2.3.tgz#807fc1bf58948c32ddfb9c67f7329ff16cc78d14"
@@ -1885,6 +1930,16 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/rye/-/rye-0.2.3.tgz#829a6ec9a93011285f8c38801a26de6271995583"
   integrity sha512-nb2FtSld1j31XT7/u6udAe6IHQMcLBnCU7jt3TFL7siY3vUn87tvzYuFyRMOvJDh9aIG2BFOYPlkt98JovVXpw==
+
+"@expo-google-fonts/source-sans-pro@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/source-sans-pro/-/source-sans-pro-0.2.3.tgz#e667c909d04bb676c1066562be763395fc4b00b4"
+  integrity sha512-/vDE5/vECqJT4Xdi1QiKG6rL8+mdrvqu3OlSe2dMPB7B9BR+cWsu0fSHTqRa1cQY03bXSPSIwOiHG4fy/CHBJg==
+
+"@expo-google-fonts/yeseva-one@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/yeseva-one/-/yeseva-one-0.2.3.tgz#c70ec98b77a327c4ac280298c94951fbcee7409e"
+  integrity sha512-glrKj69VQadOYqBeuMATLGPear4aIhP/CRtqH/U1LHyJmcu6tlor3VS+OOUqt/chugkJzGC6N+1Subr97JhWZw==
 
 "@expo/bunyan@4.0.0", "@expo/bunyan@^4.0.0":
   version "4.0.0"
