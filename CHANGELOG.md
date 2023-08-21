@@ -1,4 +1,4 @@
-## 0.1.3-canary.9
+## 0.1.3-canary.10
 
 * **feat:**  - **WebCard:** new cover system ([#680](https://github.com/AzzappApp/azzapp/pull/680))
 * **fix:**  - 🐛 improve card modules ([#733](https://github.com/AzzappApp/azzapp/pull/733))
