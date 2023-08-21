@@ -236,7 +236,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       }
     `);
-  const isValid = isNotFalsyString(text) && isNotFalsyString(title) && image;
+  const isValid = isNotFalsyString(text) && image;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
@@ -285,8 +285,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
       ...rest,
       image: mediaId ?? value.image!.id,
       text: value.text!,
-      title: value.title!,
     };
+    if (value.title) {
+      input.title = value.title;
+    }
 
     commit({
       variables: {

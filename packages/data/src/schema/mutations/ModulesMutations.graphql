@@ -108,7 +108,7 @@ input SavePhotoWithTextAndTitleModuleInput {
   moduleId: ID
   image: String!
   text: String!
-  title: String!
+  title: String
   fontFamily: String
   fontColor: String
   textAlign: TextAlignment

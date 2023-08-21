@@ -157,7 +157,7 @@ export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleRes
 
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     },
-    title: module => module.data.title,
+    title: module => module.data.title ?? null,
     text: module => module.data.text,
     backgroundStyle: module => module.data.backgroundStyle ?? null,
     fontFamily: module => module.data.fontFamily ?? null,

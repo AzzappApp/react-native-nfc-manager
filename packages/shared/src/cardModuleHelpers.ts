@@ -217,7 +217,7 @@ export type CardModulePhotoWithTextAndTitleData = {
   gap?: number | null;
   fontSize?: number | null;
   textSize?: number | null;
-  title: string;
+  title?: string | null;
   text: string;
   borderRadius?: number | null;
   marginHorizontal?: number | null;

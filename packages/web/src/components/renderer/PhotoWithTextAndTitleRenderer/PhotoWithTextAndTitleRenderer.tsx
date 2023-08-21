@@ -121,16 +121,18 @@ const PhotoWithTextAndTitleRenderer = ({
             }}
             className={styles.text}
           >
-            <h2
-              style={{
-                textAlign,
-                fontSize,
-                fontFamily,
-                color: swapColor(fontColor, colorPalette),
-              }}
-            >
-              {title}
-            </h2>
+            {title && (
+              <h2
+                style={{
+                  textAlign,
+                  fontSize,
+                  fontFamily,
+                  color: swapColor(fontColor, colorPalette),
+                }}
+              >
+                {title}
+              </h2>
+            )}
 
             <div
               style={{

@@ -260,16 +260,18 @@ export const PhotoWithTextAndTitleRendererRaw = ({
             marginHorizontal: os === 'web' ? 0 : marginHorizontal,
           }}
         >
-          <Text
-            style={{
-              textAlign: textAlign as TextStyle['textAlign'],
-              fontSize,
-              fontFamily,
-              color: swapColor(fontColor, colorPalette) as ColorValue,
-            }}
-          >
-            {title}
-          </Text>
+          {title && (
+            <Text
+              style={{
+                textAlign: textAlign as TextStyle['textAlign'],
+                fontSize,
+                fontFamily,
+                color: swapColor(fontColor, colorPalette) as ColorValue,
+              }}
+            >
+              {title}
+            </Text>
+          )}
           <Text
             style={{
               textAlign: textAlign as TextStyle['textAlign'],
