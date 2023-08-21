@@ -10,7 +10,7 @@ import db, { cols } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = mysqlTable('CompanyActivity', {
-  id: cols.cuid('id').notNull(),
+  id: cols.cuid('id').notNull().primaryKey(),
   labels: cols.labels('labels').notNull(),
 });
 
