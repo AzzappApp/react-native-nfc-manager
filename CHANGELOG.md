@@ -1,5 +1,7 @@
-## 0.1.3-canary.2
+## 0.1.3-canary.3
 
+* **feat:**  - 🎸 add welcome screen ([#770](https://github.com/AzzappApp/azzapp/pull/770))
+* **feat:**  - PhotoWithTextTItle has optional title ([#769](https://github.com/AzzappApp/azzapp/pull/769))
 * **fix:**  - crash on new profile ([#753](https://github.com/AzzappApp/azzapp/pull/753))
 * **feat:**  - **WebCard:** new cover system ([#680](https://github.com/AzzappApp/azzapp/pull/680))
 * **fix:**  - 🐛 improve card modules ([#733](https://github.com/AzzappApp/azzapp/pull/733))
