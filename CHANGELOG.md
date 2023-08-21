@@ -1,5 +1,6 @@
-## 0.1.3-canary.1
+## 0.1.3-canary.2
 
+* **fix:**  - crash on new profile ([#753](https://github.com/AzzappApp/azzapp/pull/753))
 * **feat:**  - **WebCard:** new cover system ([#680](https://github.com/AzzappApp/azzapp/pull/680))
 * **fix:**  - 🐛 improve card modules ([#733](https://github.com/AzzappApp/azzapp/pull/733))
 * **feat:**  - 🎸 add carousel interaction & transition for web & mobile ([#707](https://github.com/AzzappApp/azzapp/pull/707))
