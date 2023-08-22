@@ -1,7 +1,7 @@
 import getRuntimeEnvironment from './getRuntimeEnvironment';
 
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+//const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/azzapp`;
 
 /**
  * Helpers used to create cloudinary URL for image given size parameters
