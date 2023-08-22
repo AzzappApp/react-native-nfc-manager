@@ -1,4 +1,3 @@
-import { ExceptionModel, trackError } from 'appcenter-crashes';
 import React from 'react';
 
 type ErrorBoundaryWithRetryProps = {
@@ -29,12 +28,13 @@ class ErrorBoundaryWithRetry extends React.Component<
     });
   };
 
-  componentDidCatch(error: Error) {
-    if (!__DEV__) {
-      trackError(ExceptionModel.createFromError(error), {
-        screenId: this.props.screenId,
-      });
-    }
+  componentDidCatch(_error: Error) {
+    // TODO sentry
+    // if (!__DEV__) {
+    //   trackError(ExceptionModel.createFromError(error), {
+    //     screenId: this.props.screenId,
+    //   });
+    // }
   }
 
   render() {

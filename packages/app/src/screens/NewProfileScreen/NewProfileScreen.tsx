@@ -293,8 +293,9 @@ NewProfileScreen.prefetch = () => {
     { pixelRatio },
   ).mergeMap(({ profileCategories }) => {
     const observables = convertToNonNullArray(
-      profileCategories.flatMap(category =>
-        category.medias?.map(media => prefetchImage(media.preloadURI)),
+      profileCategories.flatMap(
+        category =>
+          category.medias?.map(media => prefetchImage(media.preloadURI)),
       ),
     );
     if (observables.length === 0) {

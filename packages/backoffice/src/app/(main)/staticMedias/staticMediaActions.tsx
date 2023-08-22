@@ -36,7 +36,7 @@ export const addStaticMedias = async ({
           resizeMode,
           order: maxOrder + index,
           enabled: true,
-        } as const),
+        }) as const,
     );
     await trx.insert(StaticMediaTable).values(staticMedias);
     revalidatePath(`/staticMedias`);

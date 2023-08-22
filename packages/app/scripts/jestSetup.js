@@ -5,8 +5,6 @@ const { jest } = require('@jest/globals');
 require('@testing-library/jest-native/extend-expect');
 //#endregion
 
-//#region AppCenter Mock
-require('appcenter-crashes/test/AppCenterCrashesMock');
 //#endregion
 
 //#region Native Dependencies mock

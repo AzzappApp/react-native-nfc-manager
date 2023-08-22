@@ -82,8 +82,8 @@ const ProfileKindStep = ({
 
   useEffect(() => {
     const observables = convertToNonNullArray(
-      profileCategories.flatMap(category =>
-        category.medias?.map(media => prefetchImage(media.uri)),
+      profileCategories.flatMap(
+        category => category.medias?.map(media => prefetchImage(media.uri)),
       ),
     );
     const subscription = observables.length

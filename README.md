@@ -146,7 +146,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 ### Miscellaneous
 
 - The authentification process of the mobile applications is based on tokens
-- [Microsoft App Center](https://appcenter.ms/) is used of Code Push, crash reporting and distribution of staging and development version of the application
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
@@ -161,9 +160,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 - `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
 - `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_API_TOKEN`: the api token of the appcenter app
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_NAME`: the name the appcenter app
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_SECRET`: the app secret the appcenter app
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
 Valid platforms are  `IOS` and `ANDROID`. 

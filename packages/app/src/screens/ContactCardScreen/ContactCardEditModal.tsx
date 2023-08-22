@@ -101,19 +101,17 @@ const ContactCardEditModal = ({
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
-  const [commit] = useMutation(
-    graphql`
-      mutation ContactCardEditModalMutation($input: SaveContactCardInput!) {
-        saveContactCard(input: $input) {
-          profile {
-            contactCard {
-              ...ContactCardEditModal_card
-            }
+  const [commit] = useMutation(graphql`
+    mutation ContactCardEditModalMutation($input: SaveContactCardInput!) {
+      saveContactCard(input: $input) {
+        profile {
+          contactCard {
+            ...ContactCardEditModal_card
           }
         }
       }
-    `,
-  );
+    }
+  `);
 
   const {
     control,

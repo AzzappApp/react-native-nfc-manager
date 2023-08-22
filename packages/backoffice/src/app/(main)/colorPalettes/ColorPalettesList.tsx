@@ -38,17 +38,16 @@ const ColorPalettesList = ({ colorPalettes }: ColorPalettesListProps) => {
 };
 
 // eslint-disable-next-line react/display-name
-const renderColor = (field: string) => (params: any) =>
-  (
-    <Box
-      sx={{
-        width: 100,
-        height: 30,
-        backgroundColor: params.row[field],
-        border: `1px solid #000`,
-      }}
-    />
-  );
+const renderColor = (field: string) => (params: any) => (
+  <Box
+    sx={{
+      width: 100,
+      height: 30,
+      backgroundColor: params.row[field],
+      border: `1px solid #000`,
+    }}
+  />
+);
 
 const columns: GridColDef[] = [
   {

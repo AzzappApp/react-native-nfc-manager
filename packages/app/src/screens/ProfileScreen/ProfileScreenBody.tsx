@@ -169,47 +169,41 @@ const ProfileScreenBody = (
     `);
 
   const [commitDeleteModules, deleteModulesActive] =
-    useMutation<ProfileScreenBodyDeleteModuleMutation>(
-      graphql`
-        mutation ProfileScreenBodyDeleteModuleMutation(
-          $input: DeleteModulesInput!
-        ) {
-          deleteModules(input: $input) {
-            profile {
-              id
-            }
+    useMutation<ProfileScreenBodyDeleteModuleMutation>(graphql`
+      mutation ProfileScreenBodyDeleteModuleMutation(
+        $input: DeleteModulesInput!
+      ) {
+        deleteModules(input: $input) {
+          profile {
+            id
           }
         }
-      `,
-    );
+      }
+    `);
 
   const [commitDuplicateModule, duplicateModuleActive] =
-    useMutation<ProfileScreenBodyDuplicateModuleMutation>(
-      graphql`
-        mutation ProfileScreenBodyDuplicateModuleMutation(
-          $input: DuplicateModuleInput!
-        ) {
-          duplicateModule(input: $input) {
-            createdModuleId
-          }
+    useMutation<ProfileScreenBodyDuplicateModuleMutation>(graphql`
+      mutation ProfileScreenBodyDuplicateModuleMutation(
+        $input: DuplicateModuleInput!
+      ) {
+        duplicateModule(input: $input) {
+          createdModuleId
         }
-      `,
-    );
+      }
+    `);
 
   const [commitUpdateModulesVisibility, updateModulesVisibilityActive] =
-    useMutation<ProfileScreenBodyUpdateModulesVisibilityMutation>(
-      graphql`
-        mutation ProfileScreenBodyUpdateModulesVisibilityMutation(
-          $input: UpdateModulesVisibilityInput!
-        ) {
-          updateModulesVisibility(input: $input) {
-            profile {
-              id
-            }
+    useMutation<ProfileScreenBodyUpdateModulesVisibilityMutation>(graphql`
+      mutation ProfileScreenBodyUpdateModulesVisibilityMutation(
+        $input: UpdateModulesVisibilityInput!
+      ) {
+        updateModulesVisibility(input: $input) {
+          profile {
+            id
           }
         }
-      `,
-    );
+      }
+    `);
 
   const moduleMutationActive =
     swapModulesActive ||
@@ -448,10 +442,13 @@ const ProfileScreenBody = (
       },
       selectAllModules() {
         setSelectedModules(
-          cardModules.reduce((acc, module) => {
-            acc[module.id] = true;
-            return acc;
-          }, {} as Record<string, boolean>),
+          cardModules.reduce(
+            (acc, module) => {
+              acc[module.id] = true;
+              return acc;
+            },
+            {} as Record<string, boolean>,
+          ),
         );
       },
       unselectAllModules() {

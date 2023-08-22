@@ -1,4 +1,5 @@
 import { IntlErrorCode } from '@formatjs/intl';
+import * as Sentry from '@sentry/react-native';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IntlProvider } from 'react-intl';
 import { useColorScheme } from 'react-native';
@@ -58,6 +59,13 @@ import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  enabled: !__DEV__,
+  environment: process.env.DEPLOYMENT_ENVIRONMENT,
+  // TODO better configuration based on environment
+});
 
 // #region Routing Definitions
 const screens = {

@@ -54,29 +54,27 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     {},
   );
 
-  const [commit, isInFlight] = useMutation(
-    graphql`
-      mutation CardStyleModalMutation($input: SaveCardStyleInput!) {
-        saveCardStyle(input: $input) {
-          profile {
-            id
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonRadius
-              buttonColor
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
+  const [commit, isInFlight] = useMutation(graphql`
+    mutation CardStyleModalMutation($input: SaveCardStyleInput!) {
+      saveCardStyle(input: $input) {
+        profile {
+          id
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonRadius
+            buttonColor
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
           }
         }
       }
-    `,
-  );
+    }
+  `);
 
   const onCloseInner = useCallback(() => {
     if (!isInFlight) {

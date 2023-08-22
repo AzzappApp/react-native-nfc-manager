@@ -46,21 +46,19 @@ const PostRendererActionBar = ({
     postKey,
   );
 
-  const [commit] = useMutation(
-    graphql`
-      mutation PostRendererActionBarReactionMutation(
-        $input: TogglePostReactionInput!
-      ) {
-        togglePostReaction(input: $input) {
-          post {
-            id
-            viewerPostReaction
-            counterReactions
-          }
+  const [commit] = useMutation(graphql`
+    mutation PostRendererActionBarReactionMutation(
+      $input: TogglePostReactionInput!
+    ) {
+      togglePostReaction(input: $input) {
+        post {
+          id
+          viewerPostReaction
+          counterReactions
         }
       }
-    `,
-  );
+    }
+  `);
 
   const [reaction, setReaction] = useState<ReactionKind | null>(
     viewerPostReaction,

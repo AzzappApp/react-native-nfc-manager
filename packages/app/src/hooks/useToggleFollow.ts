@@ -112,8 +112,8 @@ const useToggleFollow = (
   currentProfileId?: string | null,
   userNameFilter?: string,
 ) => {
-  const [commit, toggleFollowingActive] =
-    useMutation<useToggleFollowMutation>(graphql`
+  const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
+    graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
         toggleFollowing(input: $input) {
           profile {
@@ -122,7 +122,8 @@ const useToggleFollow = (
           }
         }
       }
-    `);
+    `,
+  );
 
   const toggleFollow = (profileId: string, follow: boolean) => {
     // TODO do we really want to prevent fast clicking?

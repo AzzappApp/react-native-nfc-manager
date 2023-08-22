@@ -167,21 +167,19 @@ const ContactCardScreen = ({
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
-  const [commit] = useMutation(
-    graphql`
-      mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
-        saveContactCard(input: $input) {
-          profile {
-            contactCard {
-              public
-              isDisplayedOnWebCard
-              ...ContactCardEditModal_card
-            }
+  const [commit] = useMutation(graphql`
+    mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
+      saveContactCard(input: $input) {
+        profile {
+          contactCard {
+            public
+            isDisplayedOnWebCard
+            ...ContactCardEditModal_card
           }
         }
       }
-    `,
-  );
+    }
+  `);
 
   const [isPublicCard, setIsPublicCard] = useToggle(false);
   const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(false);

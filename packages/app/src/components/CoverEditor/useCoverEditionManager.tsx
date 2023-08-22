@@ -541,8 +541,9 @@ const useCoverEditionManager = ({
 
         const [sourceMediaId, maskMediaId, mediaId, textPreviewMediaId] =
           await Promise.all(
-            uploads.map(upload =>
-              upload?.promise.then(({ public_id }) => public_id as string),
+            uploads.map(
+              upload =>
+                upload?.promise.then(({ public_id }) => public_id as string),
             ),
           );
         setUploadProgress(null);

@@ -52,8 +52,8 @@ const FollowersScreenList = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
-  const [commit] =
-    useMutation<FollowersScreenList_removeFollowerMutation>(graphql`
+  const [commit] = useMutation<FollowersScreenList_removeFollowerMutation>(
+    graphql`
       mutation FollowersScreenList_removeFollowerMutation(
         $connections: [ID!]!
         $input: RemoveFollowerInput!
@@ -62,7 +62,8 @@ const FollowersScreenList = ({
           removedFollowerId @deleteEdge(connections: $connections)
         }
       }
-    `);
+    `,
+  );
 
   const removeFollower = useCallback(
     (profileId: string) => {

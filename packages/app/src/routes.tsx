@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
@@ -77,7 +76,7 @@ export type NewPostRoute = {
 
 export type CoverEditionRoute = {
   route: 'COVER_EDITION';
-  params?: { isCreation?: boolean; coverKind?: 'people' | 'video' | 'others' };
+  params?: { isCreation?: boolean; coverKind?: 'others' | 'people' | 'video' };
 };
 
 export type CardModuleEditionRoute = {
@@ -128,26 +127,26 @@ export type ResetPasswordRoute = {
 };
 
 export type Route =
+  | AccountDetailsRoute
+  | CardModuleEditionRoute
+  | ContactCardRoute
+  | CoverEditionRoute
+  | FollowersRoute
+  | FollowingsMosaicRoute
+  | FollowingsRoute
+  | ForgotPasswordConfirmationRoute
+  | ForgotPasswordRoute
   | HomeRoute
+  | InviteFriendsRoute
   | MediaRoute
-  | SearchRoute
-  | ProfileRoute
-  | PostRoute
-  | PostCommentsRoute
   | NewPostRoute
   | NewProfileRoute
-  | SignInRoute
-  | SignUpRoute
-  | ForgotPasswordRoute
-  | CardModuleEditionRoute
-  | CoverEditionRoute
-  | FollowingsRoute
-  | FollowingsMosaicRoute
-  | FollowersRoute
-  | AccountDetailsRoute
-  | InviteFriendsRoute
-  | ContactCardRoute
+  | PostCommentsRoute
+  | PostRoute
+  | ProfileRoute
   | ResetPasswordRoute
-  | ForgotPasswordConfirmationRoute;
+  | SearchRoute
+  | SignInRoute
+  | SignUpRoute;
 
 export type ROUTES = Route['route'];

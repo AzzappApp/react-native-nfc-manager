@@ -1,10 +1,6 @@
 #import "AppDelegate.h"
-
 #import <React/RCTBundleURLProvider.h>
 
-#import <AppCenterReactNative.h>
-#import <AppCenterReactNativeAnalytics.h>
-#import <AppCenterReactNativeCrashes.h>
 #import <RNScreens/RNSScreenStackAnimator.h>
 #import "AZPCustomReavealTransition.h"
 #import <React/RCTLinkingManager.h>
@@ -45,10 +41,6 @@ static void ClearKeychainIfNecessary() {
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
-
-  [AppCenterReactNative register];
-  [AppCenterReactNativeAnalytics registerWithInitiallyEnabled:true];
-  [AppCenterReactNativeCrashes registerWithAutomaticProcessing];
   
   [RNSScreenStackAnimator registerCustomAnimator:[[AZPCustomReavealTransition alloc] init] forName:@"reveal"];
 

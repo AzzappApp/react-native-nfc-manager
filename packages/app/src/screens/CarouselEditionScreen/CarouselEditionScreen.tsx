@@ -188,8 +188,8 @@ const CarouselEditionScreen = ({
 
   // #region Mutations and saving logic
   const [saving, setSaving] = useState(false);
-  const [commit] =
-    useMutation<CarouselEditionScreenUpdateModuleMutation>(graphql`
+  const [commit] = useMutation<CarouselEditionScreenUpdateModuleMutation>(
+    graphql`
       mutation CarouselEditionScreenUpdateModuleMutation(
         $input: SaveCarouselModuleInput!
       ) {
@@ -204,7 +204,8 @@ const CarouselEditionScreen = ({
           }
         }
       }
-    `);
+    `,
+  );
 
   const isValid = images.length > 0;
   const canSave = dirty && isValid && !saving;

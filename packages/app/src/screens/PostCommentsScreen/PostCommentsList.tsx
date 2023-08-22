@@ -106,25 +106,23 @@ const PostCommentsList = ({
     );
   };
 
-  const [commit] = useMutation(
-    graphql`
-      mutation PostCommentsListMutation(
-        $input: CreatePostCommentInput!
-        $connections: [ID!]!
-      ) {
-        createPostComment(input: $input) {
-          postComment
-            @prependNode(
-              connections: $connections
-              edgeTypeName: "PostCommentEdge"
-            ) {
-            id
-            ...CommentItemFragment_comment
-          }
+  const [commit] = useMutation(graphql`
+    mutation PostCommentsListMutation(
+      $input: CreatePostCommentInput!
+      $connections: [ID!]!
+    ) {
+      createPostComment(input: $input) {
+        postComment
+          @prependNode(
+            connections: $connections
+            edgeTypeName: "PostCommentEdge"
+          ) {
+          id
+          ...CommentItemFragment_comment
         }
       }
-    `,
-  );
+    }
+  `);
 
   const [submitting, setSubmitting] = useState(false);
 
