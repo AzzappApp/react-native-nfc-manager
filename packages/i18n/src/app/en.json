@@ -1295,6 +1295,10 @@
     "defaultMessage": "Shows the module in your webcard",
     "description": "Accessibility hint for the show button in the profile edition screen"
   },
+  "TwYeKK": {
+    "defaultMessage": "Account details",
+    "description": "Account details label for welcome screen"
+  },
   "Tx4u9Y": {
     "defaultMessage": "Simple text",
     "description": "Simple text screen title"
@@ -1602,6 +1606,10 @@
   "Zq9BX5": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
+  },
+  "ZsIcNJ": {
+    "defaultMessage": "Log out",
+    "description": "Log out label for welcome screen"
   },
   "ZvFZeW": {
     "defaultMessage": "Schedule",
@@ -2431,6 +2439,10 @@
     "defaultMessage": "Invalid email/phone number or no account found",
     "description": "ForgotpasswordScreen - Invalid email or phone number error"
   },
+  "pytqoD": {
+    "defaultMessage": "Invite friends",
+    "description": "Invite friends label for welcome screen"
+  },
   "q+WL41": {
     "defaultMessage": "My posts",
     "description": "Media screen tab bar item label for my posts tab"
@@ -2474,6 +2486,10 @@
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
+  },
+  "qd7dQ1": {
+    "defaultMessage": "About",
+    "description": "About label for welcome screen"
   },
   "qkbfOu": {
     "defaultMessage": "Middle left",

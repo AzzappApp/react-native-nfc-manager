@@ -31,18 +31,20 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
 
   return (
     <div className={styles.wrapper}>
-      <ProfilePostNavigation
-        postsCount={postsCount}
-        onClickCover={() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onClickPosts={() => setPostsOpen(true)}
-        className={cn(styles.postNavigation, {
-          [styles.postNavigationHidden]: postsOpen,
-        })}
-        cover={media}
-        username={profile.userName}
-      />
+      {posts.length > 0 && (
+        <ProfilePostNavigation
+          postsCount={postsCount}
+          onClickCover={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onClickPosts={() => setPostsOpen(true)}
+          className={cn(styles.postNavigation, {
+            [styles.postNavigationHidden]: postsOpen,
+          })}
+          cover={media}
+          username={profile.userName}
+        />
+      )}
       <main
         // TODO card.backgroundColor
         style={{ backgroundColor: '#FFF' }}

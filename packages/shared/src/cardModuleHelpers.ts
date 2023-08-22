@@ -1,6 +1,5 @@
+import uniq from 'lodash/uniq';
 import { getValuesFromStyle, type CardStyle } from './cardHelpers';
-import { typedEntries } from './objectHelpers';
-
 //#region SimpleText
 export const MODULE_KIND_SIMPLE_TEXT = 'simpleText';
 
@@ -451,7 +450,14 @@ export const getModuleDataValues = <
     : TModuleData[key];
 } => {
   const cardStyleValues = getValuesFromStyle(cardStyle, styleValuesMap as any);
-  return typedEntries(data).reduce((acc, [key, value]) => {
+  const fields = uniq([
+    ...Object.keys(data),
+    ...Object.keys(cardStyleValues ?? {}),
+    ...Object.keys(defaultValues ?? {}),
+  ]) as Array<keyof TModuleData>;
+
+  return fields.reduce((acc, key) => {
+    const value = data[key];
     if (value != null) {
       acc[key] = value;
     } else if (cardStyleValues[key] != null) {
