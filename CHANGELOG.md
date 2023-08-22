@@ -1,5 +1,6 @@
-## 0.1.3-canary.3
+## 0.1.3-canary.4
 
+* **fix:**  - hardcode cloudinary mode
 * **feat:**  - 🎸 add welcome screen ([#770](https://github.com/AzzappApp/azzapp/pull/770))
 * **feat:**  - PhotoWithTextTItle has optional title ([#769](https://github.com/AzzappApp/azzapp/pull/769))
 * **fix:**  - crash on new profile ([#753](https://github.com/AzzappApp/azzapp/pull/753))
