@@ -32,4 +32,7 @@ const HomeScreen = ({
   ) : null;
 };
 
-export default relayScreen(HomeScreen, { query: homeScreenQuery });
+export default relayScreen(HomeScreen, {
+  query: homeScreenQuery,
+  canGoback: false,
+});

@@ -1,7 +1,14 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { IntlProvider } from 'react-intl';
+import {
+  Component,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { useColorScheme } from 'react-native';
 import {
   initialWindowMetrics,
@@ -32,7 +39,6 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import waitFor from '#helpers/waitFor';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
@@ -57,8 +63,13 @@ import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
+import Button from '#ui/Button';
+import Container from '#ui/Container';
+import Text from '#ui/Text';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
+import type { ReactNode } from 'react';
+import type { IntlShape } from 'react-intl';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -66,6 +77,39 @@ Sentry.init({
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
 });
+
+/**
+ * Initialize the application
+ * called at first launch before rendering the App component
+ */
+const init = async () => {
+  await initAuthStore();
+  initLocaleHelpers();
+  RelayQueryManager.init();
+};
+
+const initPromise = init();
+
+const App = () => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    initPromise.finally(() => setReady(true));
+  }, []);
+
+  if (!ready) {
+    return null;
+  }
+
+  return (
+    <AppIntlProvider>
+      <AppErrorBoundary>
+        <AppRouter />
+      </AppErrorBoundary>
+    </AppIntlProvider>
+  );
+};
+
+export default App;
 
 // #region Routing Definitions
 const screens = {
@@ -98,21 +142,12 @@ const tabs = {
 
 // #endregion
 
-/**
- * Initialize the application
- * called at first launch before rendering the App component
- * @see waitFor
- */
-const init = async () => {
-  await initAuthStore();
-  initLocaleHelpers();
-  RelayQueryManager.init();
-};
+const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 
 /**
  * The main application component
  */
-const App = () => {
+const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
     const { authenticated, hasBeenSignedIn } = getAuthState();
@@ -191,24 +226,6 @@ const App = () => {
   }, [screenIdToDispose]);
   // #endregion
 
-  // #region Internationalization
-  const locale = useCurrentLocale();
-
-  const onIntlError = (err: any) => {
-    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
-      return;
-    }
-    console.error(err);
-  };
-
-  const langMessages = useMemo(() => {
-    let langMessages = messages[DEFAULT_LOCALE];
-    if (locale !== DEFAULT_LOCALE) {
-      langMessages = Object.assign({}, langMessages, messages[locale]);
-    }
-    return langMessages;
-  }, [locale]);
-
   // #endregion
 
   const colorScheme = useColorScheme();
@@ -233,29 +250,101 @@ const App = () => {
           initialMetrics={initialWindowMetrics}
           style={safeAreaBackgroundStyle}
         >
-          <IntlProvider
-            locale={locale}
-            defaultLocale={DEFAULT_LOCALE}
-            messages={langMessages}
-            onError={onIntlError}
-          >
-            <RouterProvider value={router}>
-              <ScreensRenderer
-                routerState={routerState}
-                screens={screens}
-                tabs={tabs}
-                onScreenDismissed={onScreenDismissed}
-                onFinishTransitioning={onFinishTransitioning}
-              />
-            </RouterProvider>
-            <Toast />
-          </IntlProvider>
+          <RouterProvider value={router}>
+            <ScreensRenderer
+              routerState={routerState}
+              screens={screens}
+              tabs={tabs}
+              onScreenDismissed={onScreenDismissed}
+              onFinishTransitioning={onFinishTransitioning}
+            />
+          </RouterProvider>
+          <Toast />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>
   );
 };
 
-export default waitFor(App, init());
+const AppIntlProvider = ({ children }: { children: ReactNode }) => {
+  // #region Internationalization
+  const locale = useCurrentLocale();
 
-const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
+  const langMessages = useMemo(() => {
+    let langMessages = messages[DEFAULT_LOCALE];
+    if (locale !== DEFAULT_LOCALE) {
+      langMessages = Object.assign({}, langMessages, messages[locale]);
+    }
+    return langMessages;
+  }, [locale]);
+
+  const onIntlError = (err: any) => {
+    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
+      return;
+    }
+    console.error(err);
+  };
+  return (
+    <IntlProvider
+      locale={locale}
+      defaultLocale={DEFAULT_LOCALE}
+      messages={langMessages}
+      onError={onIntlError}
+    >
+      {children}
+    </IntlProvider>
+  );
+};
+
+class _AppErrorBoundary extends Component<{
+  intl: IntlShape;
+  children: ReactNode;
+}> {
+  state = { error: null };
+
+  componentDidCatch(error: Error) {
+    if (!__DEV__) {
+      Sentry.captureException(error);
+    }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  retry() {
+    this.setState({ error: null });
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <Container
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 20,
+          }}
+        >
+          <Text variant="large">
+            <FormattedMessage
+              defaultMessage="Something went wrong"
+              description="Top level error message for uncaught exceptions"
+            />
+          </Text>
+          <Button
+            label={this.props.intl.formatMessage({
+              defaultMessage: 'Retry',
+              description: 'Retry button for uncaught exceptions',
+            })}
+            onPress={this.retry}
+          />
+        </Container>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AppErrorBoundary = injectIntl(_AppErrorBoundary);

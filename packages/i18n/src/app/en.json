@@ -555,6 +555,10 @@
     "defaultMessage": "Cancel",
     "description": "Cancel button label in Simple Button module screen"
   },
+  "D27QTT": {
+    "defaultMessage": "Something went wrong",
+    "description": "Top level error message for uncaught exceptions"
+  },
   "D44+KI": {
     "defaultMessage": "Edit Links",
     "description": "SocialLinks bottom menu label for Links tab"
@@ -1295,10 +1299,6 @@
     "defaultMessage": "Shows the module in your webcard",
     "description": "Accessibility hint for the show button in the profile edition screen"
   },
-  "TwYeKK": {
-    "defaultMessage": "Account details",
-    "description": "Account details label for welcome screen"
-  },
   "Tx4u9Y": {
     "defaultMessage": "Simple text",
     "description": "Simple text screen title"
@@ -1607,10 +1607,6 @@
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
   },
-  "ZsIcNJ": {
-    "defaultMessage": "Log out",
-    "description": "Log out label for welcome screen"
-  },
   "ZvFZeW": {
     "defaultMessage": "Schedule",
     "description": "Module selection list modal Opening Hours module label"
@@ -1798,6 +1794,10 @@
   "dTAhzw": {
     "defaultMessage": "Lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
     "description": "Home Screen - Create a new webcard description"
+  },
+  "dZ8sPj": {
+    "defaultMessage": "Retry",
+    "description": "Retry button for uncaught exceptions"
   },
   "dab/aC": {
     "defaultMessage": "Divider #1",
@@ -2439,10 +2439,6 @@
     "defaultMessage": "Invalid email/phone number or no account found",
     "description": "ForgotpasswordScreen - Invalid email or phone number error"
   },
-  "pytqoD": {
-    "defaultMessage": "Invite friends",
-    "description": "Invite friends label for welcome screen"
-  },
   "q+WL41": {
     "defaultMessage": "My posts",
     "description": "Media screen tab bar item label for my posts tab"
@@ -2486,10 +2482,6 @@
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
-  },
-  "qd7dQ1": {
-    "defaultMessage": "About",
-    "description": "About label for welcome screen"
   },
   "qkbfOu": {
     "defaultMessage": "Middle left",
