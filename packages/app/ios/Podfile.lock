@@ -18,7 +18,7 @@ PODS:
     - React-Core
   - EXPermissions (14.2.1):
     - ExpoModulesCore
-  - Expo (49.0.7):
+  - Expo (49.0.8):
     - ExpoModulesCore
   - ExpoClipboard (4.3.1):
     - ExpoModulesCore
@@ -34,7 +34,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (12.3.0):
     - ExpoModulesCore
-  - ExpoModulesCore (1.5.9):
+  - ExpoModulesCore (1.5.10):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-RCTAppDelegate
@@ -863,13 +863,13 @@ SPEC CHECKSUMS:
   EXFont: 738c44c390953ebcbab075a4848bfbef025fd9ee
   EXMediaLibrary: 8ac14ce76f266026b10cac2ab049debe032d7ae7
   EXPermissions: 4f80cf527001aa408a22eddf076e61465ea71d5a
-  Expo: d310f3b84bd30843324d41f23ea7cc5e4273abf1
+  Expo: 900dc423a0e2c7e822b2c683a89426e82695fb27
   ExpoClipboard: 695f274f8e028cd113837f917da40c76850877eb
   ExpoHaptics: 360af6898407ee4e8265d30a1a8fb16491a660eb
   ExpoImage: e3170a9043c6a80080efbf2268b3df2334021949
   ExpoKeepAwake: be4cbd52d9b177cde0fd66daa1913afa3161fc1d
   ExpoLinearGradient: 5966dd5d49872cc9c104fedc8bbc298b6049b2e8
-  ExpoModulesCore: af228cd4b0469c9833496d4d8574f599a46a5e1c
+  ExpoModulesCore: a27b4c5914416b5598369b54f6bff5f0d06a9c21
   EXSensors: d26e160b5c91ada2df4a638859ef0c5731bf6404
   FBLazyVector: f1897022b53abf1469d6ad692ee2c69f57d967f3
   FBReactNativeSpec: 43f72817e6c5b61171597c1739f8e903ed8b32ad
