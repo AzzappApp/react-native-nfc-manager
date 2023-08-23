@@ -37,7 +37,7 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
         JOIN ( 
           SELECT 
             id, 
-            ROW_NUMBER() OVER (PARTITION BY cardId ORDER BY position) position
+            ROW_NUMBER() OVER (PARTITION BY profileId ORDER BY position) position
           FROM CardModule
           WHERE profileId = ${profileId}
         ) AS NewPos

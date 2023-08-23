@@ -270,11 +270,11 @@ const ProfileScreenBody = (
       const nextModule = cardModules[nextModuleIndex];
 
       const updater: SelectorStoreUpdater<unknown> = store => {
-        const cardRecord = store.get(profileId);
-        if (!cardRecord) {
+        const profileRecord = store.get(profileId);
+        if (!profileRecord) {
           return;
         }
-        const modulesRecord = cardRecord.getLinkedRecords('modules');
+        const modulesRecord = profileRecord.getLinkedRecords('cardModules');
         if (!modulesRecord) {
           return;
         }
@@ -283,7 +283,7 @@ const ProfileScreenBody = (
         const moduleBRecord = newModules[nextModuleIndex];
         newModules[moduleIndex] = moduleBRecord;
         newModules[nextModuleIndex] = moduleARecord;
-        cardRecord.setLinkedRecords(newModules, 'modules');
+        profileRecord.setLinkedRecords(newModules, 'cardModules');
       };
 
       commitSwapModules({
@@ -306,18 +306,18 @@ const ProfileScreenBody = (
         return;
       }
       const updater: SelectorStoreUpdater<unknown> = store => {
-        const cardRecord = store.get(profileId);
-        if (!cardRecord) {
+        const profileRecord = store.get(profileId);
+        if (!profileRecord) {
           return;
         }
-        const modulesRecord = cardRecord.getLinkedRecords('modules');
+        const modulesRecord = profileRecord.getLinkedRecords('cardModules');
         if (!modulesRecord) {
           return;
         }
         const newModules = modulesRecord.filter(
           moduleRecord => !modulesIds.includes(moduleRecord?.getDataID()),
         );
-        cardRecord.setLinkedRecords(newModules, 'modules');
+        profileRecord.setLinkedRecords(newModules, 'cardModules');
       };
       commitDeleteModules({
         variables: {
@@ -349,11 +349,11 @@ const ProfileScreenBody = (
         store: RecordSourceSelectorProxy,
         newModuleId: string,
       ) => {
-        const cardRecord = store.get(profileId);
-        if (!cardRecord) {
+        const profileRecord = store.get(profileId);
+        if (!profileRecord) {
           return;
         }
-        let modules = cardRecord.getLinkedRecords('modules') ?? [];
+        let modules = profileRecord.getLinkedRecords('cardModules') ?? [];
         const moduleRecordIndex = modules.findIndex(
           moduleRecord => moduleRecord?.getDataID() === moduleId,
         );
@@ -369,7 +369,7 @@ const ProfileScreenBody = (
         newModuleRecord.setValue(newModuleId, 'id');
         modules = [...modules];
         modules.splice(moduleRecordIndex + 1, 0, newModuleRecord);
-        cardRecord.setLinkedRecords(modules, 'modules');
+        profileRecord.setLinkedRecords(modules, 'cardModules');
       };
 
       commitDuplicateModule({

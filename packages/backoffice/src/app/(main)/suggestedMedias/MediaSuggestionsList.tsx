@@ -6,11 +6,12 @@ import {
   Button,
   Dialog,
   DialogContent,
+  Pagination,
   TextField,
   Typography,
 } from '@mui/material';
 import { experimental_useOptimistic, useState } from 'react';
-import { getImageURL, getVideoURL } from '@azzapp/shared/imagesHelpers';
+import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
@@ -39,6 +40,8 @@ const MediaSuggestionsList = ({
   categories,
   mediasSuggestions,
 }: MediaSuggestionsListProps) => {
+  const itemsPerPage = 15;
+  const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] =
     useState<ProfileCategory | null>(null);
   const [selectedActivity, setSelectedActivity] =
@@ -164,7 +167,7 @@ const MediaSuggestionsList = ({
   return (
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Medias Suggestions
+        Cover Suggestions
       </Typography>
       <Box
         sx={{
@@ -223,8 +226,21 @@ const MediaSuggestionsList = ({
             + Add suggestion
           </Button>
         </Box>
-        {suggestions.map(
-          ({ mediaId, kind, selectedActivities, selectedCategories }) => (
+        <Box component="span">
+          <Pagination
+            count={Math.ceil(suggestions.length / itemsPerPage)}
+            page={page}
+            onChange={(_, page) => setPage(page)}
+            defaultPage={1}
+            color="primary"
+            size="large"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+        {suggestions
+          .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+          .map(({ mediaId, kind, selectedActivities, selectedCategories }) => (
             <SuggestionRenderer
               key={mediaId}
               mediaId={mediaId}
@@ -237,9 +253,9 @@ const MediaSuggestionsList = ({
                 void onSuggestionsChange(mediaId, categories, activities);
               }}
             />
-          ),
-        )}
+          ))}
       </Box>
+
       <SuggesionAddForm
         categories={categories}
         activities={activities}
@@ -303,7 +319,7 @@ const SuggestionRenderer = ({
       {kind === 'video' ? (
         <video src={getVideoURL(mediaId)} />
       ) : (
-        <img src={getImageURL(mediaId)} />
+        <img src={getImageURLForSize(mediaId, null, 600)} />
       )}
       <ItemWithLabelSelectionList
         label="Profile Categories"
