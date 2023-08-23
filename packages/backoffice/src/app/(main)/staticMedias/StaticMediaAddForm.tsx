@@ -21,7 +21,7 @@ type StaticMediaAddFormProps = {
   handleClose: () => void;
   onAdd: (
     medias: File[],
-    resizeMode: 'center' | 'contain' | 'cover' | 'repeat',
+    resizeMode: 'center' | 'contain' | 'cover' | 'repeat' | 'stretch',
   ) => void;
 };
 
@@ -34,7 +34,7 @@ const StaticMediaAddForm = ({
 }: StaticMediaAddFormProps) => {
   const [medias, setMedias] = useState<File[] | null>(null);
   const [resizeMode, setResizeMode] = useState<
-    'center' | 'contain' | 'cover' | 'repeat'
+    'center' | 'contain' | 'cover' | 'repeat' | 'stretch'
   >('cover');
 
   const [mediaErrors, setMediaErrors] = useState<string | null>(null);
@@ -87,6 +87,7 @@ const StaticMediaAddForm = ({
               <MenuItem value="contain">Contain</MenuItem>
               <MenuItem value="cover">Cover</MenuItem>
               <MenuItem value="repeat">Repeat</MenuItem>
+              <MenuItem value="stretch">Stretch</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>

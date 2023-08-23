@@ -13,7 +13,7 @@ export const addStaticMedias = async ({
 }: {
   medias: string[];
   usage: 'coverBackground' | 'coverForeground' | 'moduleBackground';
-  resizeMode: 'center' | 'contain' | 'cover' | 'repeat';
+  resizeMode: 'center' | 'contain' | 'cover' | 'repeat' | 'stretch';
 }) => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');

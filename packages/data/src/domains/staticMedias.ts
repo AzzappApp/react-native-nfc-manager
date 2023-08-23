@@ -24,6 +24,7 @@ export const StaticMediaTable = mysqlTable('StaticMedia', {
     'contain',
     'center',
     'repeat',
+    'stretch',
   ]).default('cover'),
   order: int('order').notNull(),
   enabled: boolean('enabled').default(true).notNull(),

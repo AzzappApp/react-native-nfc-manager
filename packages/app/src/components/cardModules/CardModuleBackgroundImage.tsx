@@ -49,7 +49,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
       containerStyle.alignItems = 'center';
     }
 
-    if (resizeMode === 'contain') {
+    if (resizeMode === 'contain' || resizeMode === 'stretch') {
       const size = Math.min(width, height);
       svgProps.width = size;
       svgProps.height = size;
@@ -65,12 +65,17 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
       patternProps.height = `${svgSize.height}px`;
     }
 
+    if (resizeMode === 'stretch' && svgSize) {
+      patternProps.width = `${svgSize.width}px`;
+      patternProps.height = `${svgSize.height}px`;
+    }
+
     return [svgProps, containerStyle, patternProps];
   }, [layout?.width, layout?.height, resizeMode, svgSize]);
 
   if (!backgroundUri) return null;
 
-  if (resizeMode === 'repeat') {
+  if (resizeMode === 'repeat' || resizeMode === 'stretch') {
     return (
       <Svg
         width="100%"
@@ -90,6 +95,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
               {...svg}
               uri={backgroundUri}
               style={[{ opacity: backgroundOpacity }]}
+              color={patternColor ?? '#000'}
             />
           </Pattern>
         </Defs>

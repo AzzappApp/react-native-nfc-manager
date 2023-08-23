@@ -136,6 +136,7 @@ export const BlockTextRendererRaw = ({
         colorPalette,
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
     >
       <View
         style={{

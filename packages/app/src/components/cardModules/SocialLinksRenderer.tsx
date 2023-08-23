@@ -145,6 +145,7 @@ export const SocialLinksRendererRaw = ({
         colorPalette,
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={style}
     >
       {arrangement === 'inline' ? (

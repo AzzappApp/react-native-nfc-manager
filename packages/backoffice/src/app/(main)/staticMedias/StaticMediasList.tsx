@@ -65,7 +65,7 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
 
   const saveMedias = async (
     medias: File[],
-    resizeMode: 'center' | 'contain' | 'cover' | 'repeat',
+    resizeMode: 'center' | 'contain' | 'cover' | 'repeat' | 'stretch',
   ) => {
     setUploading(true);
     try {

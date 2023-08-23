@@ -136,6 +136,7 @@ export const HorizontalPhotoRendererRaw = ({
         colorPalette,
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={style}
     >
       {image?.uri && (

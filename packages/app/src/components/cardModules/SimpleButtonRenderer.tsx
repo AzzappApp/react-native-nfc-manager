@@ -150,6 +150,7 @@ export const SimpleButtonRendererRaw = ({
         colorPalette,
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={[
         style,
         {

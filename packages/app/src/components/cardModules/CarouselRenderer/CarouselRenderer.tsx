@@ -143,6 +143,7 @@ export const CarouselRendererRaw = ({
         colorPalette,
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={[{ height }, style]}
     >
       <ScrollView
