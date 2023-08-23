@@ -1,5 +1,9 @@
-## 0.1.3-canary.4
+## 0.1.3-canary.5
 
+* **fix:**  - github action build xcode script ([#817](https://github.com/AzzappApp/azzapp/pull/817))
+* **feat:**  - add missing font ([#812](https://github.com/AzzappApp/azzapp/pull/812))
+* **Fix:**  - Blocking Point for QA  ([#809](https://github.com/AzzappApp/azzapp/pull/809))
+* **fix:**  - 🐛 restore web display ([#778](https://github.com/AzzappApp/azzapp/pull/778))
 * **fix:**  - hardcode cloudinary mode
 * **feat:**  - 🎸 add welcome screen ([#770](https://github.com/AzzappApp/azzapp/pull/770))
 * **feat:**  - PhotoWithTextTItle has optional title ([#769](https://github.com/AzzappApp/azzapp/pull/769))
