@@ -1,5 +1,6 @@
-## 0.1.3-canary.5
+## 0.1.3-canary.6
 
+* **fix:**  - 🐛 make svg display color for linear gradient ([#808](https://github.com/AzzappApp/azzapp/pull/808))
 * **fix:**  - github action build xcode script ([#817](https://github.com/AzzappApp/azzapp/pull/817))
 * **feat:**  - add missing font ([#812](https://github.com/AzzappApp/azzapp/pull/812))
 * **Fix:**  - Blocking Point for QA  ([#809](https://github.com/AzzappApp/azzapp/pull/809))
