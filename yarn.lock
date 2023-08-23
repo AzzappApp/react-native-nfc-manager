@@ -1830,6 +1830,11 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/fraunces/-/fraunces-0.2.3.tgz#73e6ae22193315deaad7cf4caad6ca5204bc9606"
   integrity sha512-krgIGxViwYutW+egNHfSfc8u10ZpP+UL10MZHxbQ8C4LwEKA4HWuWLEiqSsbj1Kq3OoiXnbR+x9ERWgdhuoB1A==
 
+"@expo-google-fonts/great-vibes@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/great-vibes/-/great-vibes-0.2.3.tgz#4dbfd91c8f07bb90d664626f7869bf15a49a9c5f"
+  integrity sha512-7fwgixv2Si6GCjEqsGhEsG6JCepKIDuJkLgbxSjzJuSGUwDU+HIkmSRgP6dwxHgHSBJ0spwrRWdiEfcm1CISXw==
+
 "@expo-google-fonts/inter@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/inter/-/inter-0.2.3.tgz#82bf7224bb76fc6614a00393a9e9ee4d6dd09dcb"
@@ -1844,6 +1849,11 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/jost/-/jost-0.2.3.tgz#bcd5a72669a4f2eebb7c3fdb08af7a6a0d2eae13"
   integrity sha512-KQfz/mlNMAPdLxz9ZtiItUND81U0mqGbd1pysKQicUuwd7ZlB1VI1aFiaQRajcYZ3tp7OTefCPDdSww0DSqi9A==
+
+"@expo-google-fonts/kaushan-script@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/kaushan-script/-/kaushan-script-0.2.3.tgz#1a87fada1e0e73bbb3174c8253b0378d115e72a9"
+  integrity sha512-MRJ3PqIET6vICkrE8Vevi5flcNo6EWiTtG/bewnoy2r7l6K5clHprSAKCFfR18qBxiAjxz98RtK9MmZsjtudHA==
 
 "@expo-google-fonts/koulen@^0.2.3":
   version "0.2.3"
@@ -1880,6 +1890,11 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/montserrat/-/montserrat-0.2.3.tgz#e22b337ee6bd2007126b466ddd18f9de59eb3fc6"
   integrity sha512-9imhwIs6j5uyTkTxoNplC5T8ERES1W98ZgF7kf7OaypnbcoLoIW0wKH6oudecZyiEqoSktC7epkRpj+UEUvzWg==
 
+"@expo-google-fonts/mr-dafoe@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/mr-dafoe/-/mr-dafoe-0.2.3.tgz#0b490c3c072674d9fdaff17a5e7dd55fe82e6bb2"
+  integrity sha512-/LuDQgMomsmcVwp63wDmDkX6p7PzIvw5fSpGSsX3Ob4E12de+7mlX+uoZXrQ5xORV5FmZn2f+M0qLlBwU97Byg==
+
 "@expo-google-fonts/open-sans@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/open-sans/-/open-sans-0.2.3.tgz#63b9f9a555f8764718d3370757431ee084ca66ec"
@@ -1914,6 +1929,11 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/rye/-/rye-0.2.3.tgz#829a6ec9a93011285f8c38801a26de6271995583"
   integrity sha512-nb2FtSld1j31XT7/u6udAe6IHQMcLBnCU7jt3TFL7siY3vUn87tvzYuFyRMOvJDh9aIG2BFOYPlkt98JovVXpw==
+
+"@expo-google-fonts/seaweed-script@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/seaweed-script/-/seaweed-script-0.2.3.tgz#d99443faee75a602d847ac44915a0f8b350a82c5"
+  integrity sha512-7YI7Chw5pHGaN0dDtAOub0+sqcbgy9e3QFl0Ny/cMzUgsCoPHhCX4NTD6QdHCQyjBa8c1JOENTZOmlFWWy11+Q==
 
 "@expo-google-fonts/source-sans-pro@^0.2.3":
   version "0.2.3"

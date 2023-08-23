@@ -7,6 +7,7 @@ import { CourierPrime_400Regular } from '@expo-google-fonts/courier-prime';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { FaunaOne_400Regular } from '@expo-google-fonts/fauna-one';
 import { Fraunces_300Light } from '@expo-google-fonts/fraunces';
+import { GreatVibes_400Regular } from '@expo-google-fonts/great-vibes';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -15,6 +16,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { JosefinSans_400Regular } from '@expo-google-fonts/josefin-sans';
 import { Jost_400Regular } from '@expo-google-fonts/jost';
+import { KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
 import { Koulen_400Regular } from '@expo-google-fonts/koulen';
 import { LibreCaslonText_400Regular } from '@expo-google-fonts/libre-caslon-text';
 import { Limelight_400Regular } from '@expo-google-fonts/limelight';
@@ -24,10 +26,12 @@ import {
   Manrope_300Light,
   Manrope_400Regular,
 } from '@expo-google-fonts/manrope';
+import { Monoton_400Regular } from '@expo-google-fonts/monoton';
 import {
   Montserrat_400Regular,
   Montserrat_600SemiBold,
 } from '@expo-google-fonts/montserrat';
+import { MrDafoe_400Regular } from '@expo-google-fonts/mr-dafoe';
 import { OpenSans_400Regular } from '@expo-google-fonts/open-sans';
 import { PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
 import {
@@ -43,6 +47,7 @@ import {
 import { Raleway_400Regular } from '@expo-google-fonts/raleway';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
 import { Rye_400Regular } from '@expo-google-fonts/rye';
+import { SeaweedScript_400Regular } from '@expo-google-fonts/seaweed-script';
 import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
 import { useFonts } from 'expo-font';
@@ -63,6 +68,8 @@ const fontMap: Record<ApplicationFonts, any> = {
   Inter_Black: Inter_900Black,
   JosefinSans_Regular: JosefinSans_400Regular,
   Jost_Regular: Jost_400Regular,
+  GreatVibes_Regular: GreatVibes_400Regular,
+  Kaushan_Regular: KaushanScript_400Regular,
   Koulen_Regular: Koulen_400Regular,
   LibreCaslonText_Regular: LibreCaslonText_400Regular,
   Limelight_Regular: Limelight_400Regular,
@@ -71,8 +78,10 @@ const fontMap: Record<ApplicationFonts, any> = {
   Manrope_ExtraLight: Manrope_200ExtraLight,
   Manrope_Light: Manrope_300Light,
   Manrope_Regular: Manrope_400Regular,
+  Monoton_Regular: Monoton_400Regular,
   Montserrat_Regular: Montserrat_400Regular,
   Montserrat_SemiBold: Montserrat_600SemiBold,
+  MrDafoe_Regular: MrDafoe_400Regular,
   OpenSans_Regular: OpenSans_400Regular,
   PlayfairDisplay_Bold: PlayfairDisplay_700Bold,
   'Plus-Jakarta_Light': PlusJakartaSans_300Light,
@@ -84,6 +93,7 @@ const fontMap: Record<ApplicationFonts, any> = {
   Raleway_Regular: Raleway_400Regular,
   Righteous_Regular: Righteous_400Regular,
   Rye_Regular: Rye_400Regular,
+  SeaweedScript_Regular: SeaweedScript_400Regular,
   SourcePro_Regular: SourceSansPro_400Regular,
   YesevaOne_Regular: YesevaOne_400Regular,
 };
