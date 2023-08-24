@@ -48,7 +48,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   const [dbUser] = await getUsersByIds([userId]);
 
   if (!dbUser) {
-    throw new Error(ERRORS.USER_NOT_FOUND);
+    throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   if (newPassword) {
@@ -64,9 +64,9 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   }
 
   try {
-    const result = await updateUser(userId, partialUser);
+    await updateUser(userId, partialUser);
 
-    return { user: { ...dbUser, ...result } };
+    return { user: { ...dbUser, ...partialUser } };
   } catch (error) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }

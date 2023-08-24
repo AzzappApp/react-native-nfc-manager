@@ -1,7 +1,9 @@
 import { buildUserUrl } from './urlHelpers';
 
+/**
+ * A contact card
+ */
 export type ContactCard = {
-  profileId: string;
   firstName?: string | null;
   lastName?: string | null;
   company?: string | null;
@@ -18,6 +20,9 @@ export type ContactCard = {
   }> | null;
 };
 
+/**
+ * Serializes a contact card to a string
+ */
 export const serializeContactCard = (
   username: string,
   profileId: string,
@@ -43,6 +48,11 @@ export const serializeContactCard = (
   return serializedContactCard;
 };
 
+/**
+ * Parses a contact card from a string
+ * @param contactCardData
+ * @returns the parsed contact card
+ */
 export const parseContactCard = (contactCardData: string) => {
   const [
     profileId,

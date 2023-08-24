@@ -1,6 +1,11 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
 
+/**
+ * Generates a vCard from a serialized contact card
+ * @param contactCardData The serialized contact card
+ * @returns The vCard
+ */
 export const buildVCard = (contactCardData: string) => {
   const contactCard = parseContactCard(contactCardData);
 

@@ -1,3 +1,7 @@
+/**
+ * List of fonts that are supported by the application and can be used in
+ * the cover and module editors.
+ */
 export const APPLICATIONS_FONTS = [
   'Anton_Regular',
   'Archivo_Black',

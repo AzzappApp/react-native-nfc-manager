@@ -5,7 +5,6 @@ import {
   getLocales as getLocalesRNLocalize,
 } from 'react-native-localize';
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@azzapp/i18n';
-import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
 
 let currentLocale: string | null = null;
 const localeChangeListeners: Array<() => void> = [];
@@ -17,9 +16,6 @@ const localeChangeListeners: Array<() => void> = [];
  * @see https://github.com/zoontek/react-native-localize#getlocales
  */
 export const getLocales = () => {
-  if (getRuntimeEnvironment() === 'node') {
-    return [];
-  }
   return getLocalesRNLocalize();
 };
 

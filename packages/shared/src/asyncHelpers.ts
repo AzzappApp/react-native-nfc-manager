@@ -1,3 +1,11 @@
+/**
+ * Executes a task with retries if the task fails. (rejection or exception)
+ *
+ * @param task - task to execute
+ * @param retries - array of numbers representing the time to wait before retrying in milliseconds
+ * @param shouldRretry - optional function to determine if the task should be retried
+ * @returns the result of the task if it succeeds
+ */
 export const executeWithRetries = async <T>(
   task: () => Promise<T>,
   retries: number[],
@@ -24,17 +32,28 @@ export const executeWithRetries = async <T>(
   throw error;
 };
 
+/**
+ * Waits for a given time
+ * @param time - time to wait in milliseconds
+ * @returns a promise that resolves after the given time
+ */
 export const waitTime = (time: number) =>
   new Promise(resolve => {
     setTimeout(resolve, time);
   });
 
+/**
+ * A deferred promise
+ */
 type Deferred<T> = {
   promise: Promise<T>;
   resolve(value: T): void;
   reject(error: Error): void;
 };
 
+/**
+ * Creates a deferred promise
+ */
 export const createDeffered = <T>(): Deferred<T> => {
   const deffered = {} as Deferred<T>;
   deffered.promise = new Promise<T>((resolve, reject) => {

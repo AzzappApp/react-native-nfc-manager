@@ -92,8 +92,10 @@ export const POST = async (req: Request) => {
       }
     }
     if (user == null || issuer === undefined) {
+      // TODO we should not leak the fact that the user does not exist
+      // this is a security risk
       return NextResponse.json(
-        { message: ERRORS.USER_NOT_FOUND },
+        { message: ERRORS.INVALID_REQUEST },
         { status: 400 },
       );
     }

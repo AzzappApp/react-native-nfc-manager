@@ -4,13 +4,13 @@ import getRuntimeEnvironment from './getRuntimeEnvironment';
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/azzapp`;
 
 /**
- * Helpers used to create cloudinary URL for image given size parameters
+ * Helpers used to create cloudinary url for an image given cloudinary id and size parameters
  *
  * @param id the id of the cloudinary file
  * @param width the desired image width
  * @param height the desired height
  * @param pixelRatio the desired pixeld density - default 1
- * @returns the url of a transformed imate
+ * @returns the url of a transformed image
  */
 export const getImageURLForSize = (
   id: string,
@@ -36,7 +36,7 @@ export const getImageURLForSize = (
 };
 
 /**
- * Helpers used to create cloudinary URL for image
+ * Helpers used to create an image url from a cloudinary id
  *
  * @param id the id of the cloudinary file
  * @returns
@@ -52,7 +52,7 @@ export const getImageURL = (id: string) => {
 };
 
 /**
- * Helpers used to create cloudinary URL for a video
+ * Helpers used to create a video url from a cloudinary id
  *
  * @param id the id of the cloudinary file
  * @returns
@@ -68,13 +68,13 @@ export const getVideoURL = (id: string) => {
 };
 
 /**
- * Helpers used to create cloudinary url for video given size parameters
+ * Helpers used to create a video url from a cloudinary id and size parameters
  *
  * @param id the id of the cloudinary file
  * @param width the desired image width
  * @param height the desired height
  * @param pixelRatio the desired pixeld density - default 1
- * @returns the url of a transformed imate
+ * @returns the url of a transformed video
  */
 export const getVideoUrlForSize = (
   id: string,
@@ -96,7 +96,7 @@ export const getVideoUrlForSize = (
 };
 
 /**
- * Helpers used to create cloudinary thumbnail url for video given size parameters
+ * Helpers used to create a video thumbnail url from a cloudinary id and size parameters
  *
  * @param id the public id of the cloudinary file
  * @param width the desired image width
@@ -123,6 +123,9 @@ export const getVideoThumbnailURL = (
   return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${id}.jpg`;
 };
 
+/**
+ * Compute the cloudinary transformations for a given width height and pixel ratio
+ */
 const resizeTransforms = (
   width: number,
   height?: number | null,
@@ -138,6 +141,7 @@ const resizeTransforms = (
 
 /**
  * Returns the media id from a cloudinary url
+ *
  * @param url the cloudinary url
  * @returns the media id
  */

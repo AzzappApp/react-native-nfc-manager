@@ -12,8 +12,8 @@ import {
   buildDefaultContactCard,
   getProfileById,
 } from '@azzapp/data/domains';
-import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { getSessionData } from '#helpers/tokens';
 import type {

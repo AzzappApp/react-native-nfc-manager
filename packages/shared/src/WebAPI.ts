@@ -1,5 +1,5 @@
 /**
- * API methods used by all clients
+ * This modules contains helper functions to make API calls to the backend.
  */
 import { fetchJSON, postFormData } from './networkHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
@@ -11,6 +11,9 @@ export type APIMethod<Params, ReturnType> = (
   init?: RequestInit & { fetchFunction: FetchFunction<ReturnType> },
 ) => Promise<ReturnType>;
 
+/**
+ * An helper function that allows injecting a custom fetch function.
+ */
 const apiFetch = <ReturnType>(
   input: RequestInfo,
   init?: RequestInit & { fetchFunction?: FetchFunction<ReturnType> },
@@ -19,15 +22,40 @@ const apiFetch = <ReturnType>(
   return fetchFunction(input, init);
 };
 
-export type SignUpParams = {
-  password: string;
-} & ({ email: string } | { phoneNumber: string });
-
+/**
+ * Respon of API call related to authentication.
+ */
 export type TokensResponse = {
   token: string;
   refreshToken: string;
 };
 
+/**
+ * Parameters for the signup API call.
+ */
+export type SignUpParams = {
+  /**
+   * The user's chosen password.
+   */
+  password: string;
+} & (
+  | {
+      /**
+       * The user's email address.
+       */
+      email: string;
+    }
+  | {
+      /**
+       * The user's phone number.
+       */
+      phoneNumber: string;
+    }
+);
+
+/**
+ * API call to signup a new user.
+ */
 export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
     ...init,
@@ -35,11 +63,23 @@ export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
     body: JSON.stringify(data),
   });
 
+/**
+ * Parameters for the signin API call.
+ */
 export type SignInParams = {
+  /**
+   * The user's email address or phone number.
+   */
   credential: string;
+  /**
+   * The user's password.
+   */
   password: string;
 };
 
+/**
+ * API call to signin a user.
+ */
 export const signin: APIMethod<
   SignInParams,
   TokensResponse & { profileId?: string }
@@ -50,11 +90,23 @@ export const signin: APIMethod<
     body: JSON.stringify(data),
   });
 
+/**
+ * Parameters for the forgotPassword API call.
+ */
 export type ForgotPasswordParams = {
+  /**
+   * The user's email address or phone number.
+   */
   credential: string;
+  /**
+   * The user's locale.
+   */
   locale: string;
 };
 
+/**
+ * API call to request a password reset.
+ */
 export const forgotPassword: APIMethod<
   ForgotPasswordParams,
   { issuer: string }
@@ -65,12 +117,27 @@ export const forgotPassword: APIMethod<
     body: JSON.stringify(data),
   });
 
+/**
+ * Parameters for the changePassword API call.
+ */
 export type ChangePasswordParams = {
+  /**
+   * The user's new password.
+   */
   password: string;
+  /**
+   * The user's generated token from the forgotPassword API call.
+   */
   token: string;
+  /**
+   * The user's email address or phone number used to retrieve the token.
+   */
   issuer: string;
 };
 
+/**
+ * API call to change a user's password after a password reset.
+ */
 export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
   data,
   init,
@@ -81,6 +148,12 @@ export const changePassword: APIMethod<ChangePasswordParams, TokensResponse> = (
     body: JSON.stringify(data),
   });
 
+/**
+ * Refresh the user's tokens.
+ * @param refreshToken The user's refresh token.
+ * @param init Optional init object to inject a custom fetch function.
+ * @returns A promise that resolves to the new tokens.
+ */
 export const refreshTokens: APIMethod<string, TokensResponse> = (
   refreshToken,
   init,
@@ -91,6 +164,9 @@ export const refreshTokens: APIMethod<string, TokensResponse> = (
     body: JSON.stringify({ refreshToken }),
   });
 
+/**
+ * Api call to get a signed URL to upload a file to cloud storage.
+ */
 export const uploadSign: APIMethod<
   { kind: 'image' | 'video'; target: 'cover' | 'post' },
   { uploadURL: string; uploadParameters: Record<string, any> }
@@ -101,6 +177,16 @@ export const uploadSign: APIMethod<
     body: JSON.stringify({ kind, target }),
   });
 
+/**
+ * Api call to upload a file to cloud storage.
+ * @param file The file to upload.
+ * @param uploadURL The signed URL to upload the file to.
+ * @param uploadParameters the signed parameters to upload the file.
+ * @param signal An optional AbortSignal to abort the upload.
+ * @returns an object containing :
+ *  - A promise that resolves to the upload response. (currently a cloudinary response)
+ *  - An observable that emits the upload progress.
+ */
 export const uploadMedia = (
   file: File,
   uploadURL: string,
@@ -116,6 +202,9 @@ export const uploadMedia = (
   return postFormData(uploadURL, formData, 'json', signal);
 };
 
+/**
+ * Api call to check the signature of a contact card.
+ */
 export const verifySign: APIMethod<
   { signature: string; data: string; salt: string },
   { message: string }
@@ -126,6 +215,9 @@ export const verifySign: APIMethod<
     body: JSON.stringify({ signature, data, salt }),
   });
 
+/**
+ * Api call to generate an apple wallet pass.
+ */
 export const getAppleWalletPass = (
   { locale, profileId }: { locale: string; profileId: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
@@ -135,6 +227,9 @@ export const getAppleWalletPass = (
     method: 'GET',
   });
 
+/**
+ * Api call to generate a google wallet pass.
+ */
 export const getGoogleWalletPass: APIMethod<
   { locale: string; profileId: string },
   { token: string }

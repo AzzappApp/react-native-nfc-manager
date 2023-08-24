@@ -1,6 +1,14 @@
 import * as Iron from 'iron-webcrypto';
 import type { SealOptions, RawPassword } from 'iron-webcrypto';
 
+/**
+ * Returns the native crypto implementation for the current context.
+ * In node, this is the native crypto module, in the browser it is the
+ * crypto implementation provided by the browser.
+ * In edge, this is the webcrypto implementation provided by the edge runtime.
+ *
+ * @returns {Crypto} - the native crypto implementation
+ */
 export const getCrypto = (): Crypto => {
   if (process.env.NEXT_RUNTIME !== 'edge') {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -17,6 +25,14 @@ export const getCrypto = (): Crypto => {
     'no native implementation of WebCrypto is available in current context',
   );
 };
+
+/**
+ * Seal data with a password
+ * @param data - data to seal
+ * @param password - password to seal data with
+ * @param options - options for sealing @see SealOptions
+ * @returns sealed string
+ */
 export const seal = (
   data: unknown,
   password: RawPassword,
@@ -27,6 +43,13 @@ export const seal = (
     ...options,
   });
 
+/**
+ * Unseal data with a password
+ * @param seal - sealed string
+ * @param password - password to unseal data with
+ * @param options - options for unsealing @see SealOptions
+ * @returns unsealed data
+ */
 export const unseal = async (
   seal: string,
   password: Iron.Password | Iron.password.Hash,
@@ -45,6 +68,13 @@ const DEFAULT_HMAC_OPTIONS = {
   algorithm: 'sha256',
 } as const;
 
+/**
+ * Calculates a HMAC digest.
+ * @param password  A password string or buffer
+ * @param data String to calculate the HMAC over
+ * @param options Object used to customize the key derivation algorithm @see Iron.GenerateKeyOptions
+ * @returns An object with keys: digest, salt
+ */
 export const hmacWithPassword = async (
   password: Iron.Password,
   data: string,
@@ -63,6 +93,14 @@ export const hmacWithPassword = async (
   return { digest, salt: key.salt };
 };
 
+/**
+ * Verifies a HMAC digest.
+ * @param password  A password string or buffer
+ * @param signature HMAC signature to verify
+ * @param data String to calculate the HMAC over
+ * @param options Object used to customize the key derivation algorithm @see Iron.GenerateKeyOptions
+ * @returns true if the signature is valid, false otherwise
+ */
 export const verifyHmacWithPassword = async (
   password: Iron.Password,
   signature: string,

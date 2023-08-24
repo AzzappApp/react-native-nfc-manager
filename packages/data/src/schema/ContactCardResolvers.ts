@@ -1,4 +1,4 @@
-import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 
 import { idResolver } from './utils';
 import type { ContactCardResolvers } from './__generated__/types';
@@ -16,8 +16,8 @@ export const ContactCard: ContactCardResolvers = {
     profile.contactCardDisplayedOnWebCard ?? false,
   serializedContactCard: profile =>
     serializeAndSignContactCard(
-      profile.userName ?? '',
       profile.id,
-      profile.contactCard,
+      profile.userName ?? '',
+      profile.contactCard ?? {},
     ),
 };

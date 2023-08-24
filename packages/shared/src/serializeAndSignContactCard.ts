@@ -1,8 +1,8 @@
 import { serializeContactCard } from './contactCardHelpers';
 import { hmacWithPassword } from './crypto';
-import type { ContactCard } from 'contactCardHelpers';
+import type { ContactCard } from './contactCardHelpers';
 
-export const serializeAndSignContactCard = async (
+const serializeAndSignContactCard = async (
   profileId: string,
   userName: string,
   card: ContactCard,
@@ -22,3 +22,5 @@ export const serializeAndSignContactCard = async (
     data: serializedContactCard,
   };
 };
+
+export default serializeAndSignContactCard;

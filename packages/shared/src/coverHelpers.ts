@@ -28,48 +28,28 @@ export const COVER_CARD_RADIUS = 0.128;
 export const COVER_BASE_WIDTH = 125;
 
 /**
- * The max width
+ * The max width of user card media (image or video) in pixels
  */
 export const COVER_MAX_HEIGHT = 2048;
 
 /**
- * The max width
+ * The max height of user card media (image or video) in pixels
  */
 export const COVER_MAX_WIDTH = COVER_MAX_HEIGHT * COVER_RATIO;
 
 /**
- * The max size of the cover image source file
+ * The max size of the cover image source file in pixels
+ * @note this dimension applies to the width and height of the image
  */
 export const COVER_SOURCE_MAX_IMAGE_DIMENSION = 4096;
 
 /**
  * The max size of the cover video source file
+ * @note this dimension applies to the width and height of the video
  */
-export const COVER_SOURCE_MAX_VIDEO_DIMENSION = 1920;
+export const COVER_SOURCE_MAX_VIDEO_DIMENSION = 2048;
 
-/**
- * list of possible covertitle position
- */
-export const TEXT_POSITIONS = [
-  'topLeft',
-  'topCenter',
-  'topRight',
-  'middleLeft',
-  'middleCenter',
-  'middleRight',
-  'bottomLeft',
-  'bottomCenter',
-  'bottomRight',
-] as const;
-
-/**
- * list of possible text orientation
- */
-export const TEXT_ORIENTATIONS = [
-  'horizontal',
-  'topToBottom',
-  'bottomToTop',
-] as const;
+// TODO REVIEW all the following constants
 
 export const DEFAULT_COVER_FONT_FAMILY = 'Arial';
 
@@ -93,23 +73,37 @@ export const DEFAULT_COVER_MAX_FONT_SIZE = 24;
 
 export const TITLE_MAX_FONT_SIZE = 72;
 
-export type TextPosition = (typeof TEXT_POSITIONS)[number];
+export const TITLE_MIN_VERTICAL_SPACING = 0;
 
-export type TextStyle = {
-  color: string;
-  fontSize: number;
-  fontFamily: string;
-};
+// TODO END REVIEW
 
-export type TextOrientation = (typeof TEXT_ORIENTATIONS)[number];
+/**
+ * list of possible cover title position
+ */
+export const TEXT_POSITIONS = [
+  'topLeft',
+  'topCenter',
+  'topRight',
+  'middleLeft',
+  'middleCenter',
+  'middleRight',
+  'bottomLeft',
+  'bottomCenter',
+  'bottomRight',
+] as const;
 
-export const textOrientationOrDefaut = (
-  orientation: string | null | undefined,
-): TextOrientation =>
-  TEXT_ORIENTATIONS.includes(orientation as any)
-    ? (orientation as TextOrientation)
-    : 'horizontal';
+/**
+ * list of possible text orientation
+ */
+export const TEXT_ORIENTATIONS = [
+  'horizontal',
+  'topToBottom',
+  'bottomToTop',
+] as const;
 
+/**
+ * An helper function that returns the given position if it is valid, otherwise it returns the default one
+ */
 export const textPositionOrDefaut = (
   position: string | null | undefined,
 ): TextPosition =>
@@ -117,4 +111,32 @@ export const textPositionOrDefaut = (
     ? (position as TextPosition)
     : 'bottomLeft';
 
-export const TITLE_MIN_VERTICAL_SPACING = 0;
+/**
+ * The enum of possible text position
+ */
+export type TextPosition = (typeof TEXT_POSITIONS)[number];
+
+/**
+ * The style type for the cover text
+ */
+export type TextStyle = {
+  color: string;
+  fontSize: number;
+  fontFamily: string;
+};
+
+/**
+ * The enum of possible text orientation
+ */
+export type TextOrientation = (typeof TEXT_ORIENTATIONS)[number];
+
+/**
+ * An helper function that returns the given orientation if it is valid, otherwise it returns the default one
+ *
+ */
+export const textOrientationOrDefaut = (
+  orientation: string | null | undefined,
+): TextOrientation =>
+  TEXT_ORIENTATIONS.includes(orientation as any)
+    ? (orientation as TextOrientation)
+    : 'horizontal';

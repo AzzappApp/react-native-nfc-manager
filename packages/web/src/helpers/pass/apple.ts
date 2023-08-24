@@ -4,12 +4,12 @@ import {
   getMediasByIds,
   buildDefaultContactCard,
 } from '@azzapp/data/domains';
-import { serializeAndSignContactCard } from '@azzapp/shared/contactCardSignHelpers';
 import { seal } from '@azzapp/shared/crypto';
 import {
   getImageURLForSize,
   getVideoThumbnailURL,
 } from '@azzapp/shared/imagesHelpers';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import logo from '@azzapp/web/public/pass/logo.png';
 import logo2x from '@azzapp/web/public/pass/logo@2x.png';

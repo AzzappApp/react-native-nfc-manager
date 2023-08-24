@@ -18,29 +18,13 @@ import { getUserById } from './users';
 import type { Profile } from '#schema/ProfileResolvers';
 import type { DbTransaction } from './db';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type {
   TextOrientation,
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
 import type { InferModel } from 'drizzle-orm';
-
-export type ContactCard = {
-  firstName?: string | null;
-  lastName?: string | null;
-  title?: string | null;
-  company?: string | null;
-  emails?: Array<{
-    address: string;
-    label: string;
-    selected: boolean;
-  }> | null;
-  phoneNumbers?: Array<{
-    number: string;
-    label: string;
-    selected: boolean;
-  }> | null;
-};
 
 export const ProfileTable = mysqlTable(
   'Profile',

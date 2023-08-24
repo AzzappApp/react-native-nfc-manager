@@ -7,7 +7,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import ERRORS from '@azzapp/shared/errors';
 import db, { cols } from './db';
 import type { InferModel } from 'drizzle-orm';
 
@@ -107,18 +106,10 @@ export const createUser = async (data: NewUser): Promise<User> => {
 export const updateUser = async (
   userId: string,
   data: Partial<User>,
-): Promise<Partial<User>> => {
+): Promise<void> => {
   const updatedUser = {
     updatedAt: new Date(),
     ...data,
   };
-  const result = await db
-    .update(UserTable)
-    .set(updatedUser)
-    .where(eq(UserTable.id, userId));
-  if (result.rowsAffected > 0) {
-    return updatedUser;
-  } else {
-    throw new Error(ERRORS.USER_NOT_FOUND);
-  }
+  await db.update(UserTable).set(updatedUser).where(eq(UserTable.id, userId));
 };

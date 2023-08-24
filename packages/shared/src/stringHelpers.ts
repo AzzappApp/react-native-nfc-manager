@@ -1,12 +1,7 @@
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import isEmail from 'validator/lib/isEmail';
 import type { CountryCode } from 'libphonenumber-js';
-export const isValidEmail: (email?: string) => boolean = email => {
-  if (isNotFalsyString(email)) {
-    return isEmail(email!);
-  }
-  return false;
-};
+
 /**
  * Check is string is valid( not null, undefined, or '')
  *
@@ -14,16 +9,19 @@ export const isValidEmail: (email?: string) => boolean = email => {
  * @returns {boolean}
  */
 export const isNotFalsyString = (value: string | null | undefined) => {
-  if (value === null) {
-    return false;
+  return !!value;
+};
+
+/**
+ * Check is email is valid
+ * @param {string} email - The email to validate.
+ * @returns A boolean value
+ */
+export const isValidEmail: (email?: string) => boolean = email => {
+  if (isNotFalsyString(email)) {
+    return isEmail(email!);
   }
-  if (value === undefined) {
-    return false;
-  }
-  if (value === '') {
-    return false;
-  }
-  return true;
+  return false;
 };
 
 // TODO improve regex
@@ -62,9 +60,8 @@ export const isPhoneNumber = (
 };
 
 /**
- * If the phone number is not a falsy string, then return whether or not the phone number is valid.
+ * If the phone number is not a falsy string, then return whether or not the phone number is a valid international phonenumber.
  * @param {string} phoneNumber - The phone number to validate.
- * @param {string} countryCode - The country code of the phone number.
  * @returns A boolean value
  */
 export const isInternationalPhoneNumber = (phoneNumber?: string | null) => {
@@ -73,8 +70,8 @@ export const isInternationalPhoneNumber = (phoneNumber?: string | null) => {
   }
   return false;
 };
-export const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_]{1,30}$/;
-export const REGEX_CHAR_USERNAME = /^[a-zA-Z0-9_]$/;
+
+const REGEX_USERNAME = /^(?=.*[a-zA-Z])[a-zA-Z0-9_]{1,30}$/;
 /**
  * Validate username using simple regex (does not start with specific charaters, does not container special characters and only one _ allowed at the end)
  * Also check to be URLEncoded indentical
