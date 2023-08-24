@@ -1,6 +1,6 @@
 'use server';
 import { createId } from '@paralleldrive/cuid2';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   ProfileCategoryTable,
@@ -84,17 +84,30 @@ export const saveProfileCategory = async (
           }
         });
 
+        //delete all activities associated to the category
+        await trx
+          .delete(ProfileCategoryCompanyActivityTable)
+          .where(
+            and(
+              eq(
+                ProfileCategoryCompanyActivityTable.profileCategoryId,
+                profileCategoryId,
+              ),
+            ),
+          );
+
         if (activitiesToCreate.length) {
           await trx.insert(CompanyActivityTable).values(activitiesToCreate);
         }
-
-        await trx.insert(ProfileCategoryCompanyActivityTable).values(
-          categoriesToAssociate.map((activityId, index) => ({
-            profileCategoryId,
-            companyActivityId: activityId,
-            order: index,
-          })),
-        );
+        if (categoriesToAssociate.length > 0) {
+          await trx.insert(ProfileCategoryCompanyActivityTable).values(
+            categoriesToAssociate.map((activityId, index) => ({
+              profileCategoryId,
+              companyActivityId: activityId,
+              order: index,
+            })),
+          );
+        }
       }
       return profileCategoryId;
     });
