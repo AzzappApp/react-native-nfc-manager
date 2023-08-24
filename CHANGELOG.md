@@ -1,5 +1,6 @@
-## 0.1.3-canary.9
+## 0.1.3-canary.10
 
+* **fix:**  - only play sleected video on demo cover ([#844](https://github.com/AzzappApp/azzapp/pull/844))
 * **fix:**  - save profileCategories with activity [#776](https://github.com/AzzappApp/azzapp/pull/776) ([#818](https://github.com/AzzappApp/azzapp/pull/818))
 * **fix:**  - video cover template ([#824](https://github.com/AzzappApp/azzapp/pull/824))
 * **fix:**  - 🐛 stretch background using transform ([#823](https://github.com/AzzappApp/azzapp/pull/823))
