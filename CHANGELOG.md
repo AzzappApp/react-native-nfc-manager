@@ -1,5 +1,6 @@
-## 0.1.3-canary.7
+## 0.1.3-canary.8
 
+* **fix:**  - save profileCategories with activity [#776](https://github.com/AzzappApp/azzapp/pull/776) ([#818](https://github.com/AzzappApp/azzapp/pull/818))
 * **fix:**  - video cover template ([#824](https://github.com/AzzappApp/azzapp/pull/824))
 * **fix:**  - 🐛 stretch background using transform ([#823](https://github.com/AzzappApp/azzapp/pull/823))
 * **fix:**  - 🐛 make svg display color for linear gradient ([#808](https://github.com/AzzappApp/azzapp/pull/808))
