@@ -7,7 +7,7 @@ type CoverTemplate implements Node {
   """
   id: ID!
   kind: CoverTemplateKind!
-  previewMedia: MediaImage!
+  previewMedia: Media!
   data: CoverTemplateData!
   colorPalette: ColorPalette!
   colorPalettes(first: Int, after: String): ColorPaletteConnection!
