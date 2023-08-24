@@ -1,5 +1,7 @@
-## 0.1.3-canary.6
+## 0.1.3-canary.7
 
+* **fix:**  - video cover template ([#824](https://github.com/AzzappApp/azzapp/pull/824))
+* **fix:**  - 🐛 stretch background using transform ([#823](https://github.com/AzzappApp/azzapp/pull/823))
 * **fix:**  - 🐛 make svg display color for linear gradient ([#808](https://github.com/AzzappApp/azzapp/pull/808))
 * **fix:**  - github action build xcode script ([#817](https://github.com/AzzappApp/azzapp/pull/817))
 * **feat:**  - add missing font ([#812](https://github.com/AzzappApp/azzapp/pull/812))
