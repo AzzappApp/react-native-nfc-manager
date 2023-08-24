@@ -1,4 +1,4 @@
-## 0.1.3-canary.2
+## 0.2.0-canary.1
 
 * **feat:**  - rework photoWithTextAndTitle module ([#832](https://github.com/AzzappApp/azzapp/pull/832))
 * **fix:**  - margintop color on lineDivider ([#848](https://github.com/AzzappApp/azzapp/pull/848))
