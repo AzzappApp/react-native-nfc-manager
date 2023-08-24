@@ -91,7 +91,12 @@ const LineDividerRenderer = ({
       onLayout={onLayout}
     >
       {marginTop > 0 && (
-        <View style={{ height: marginTop, backgroundColor: colorTop }} />
+        <View
+          style={{
+            height: marginTop,
+            backgroundColor: swapColor(colorTop, colorPalette),
+          }}
+        />
       )}
       <View
         style={{
