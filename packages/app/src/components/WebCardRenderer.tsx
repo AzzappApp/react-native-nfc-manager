@@ -1,7 +1,7 @@
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { ScrollView, useWindowDimensions } from 'react-native';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
-import CoverRenderer from './CoverRenderer';
+import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
 import WebCardBackground from './WebCardBackground';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
@@ -55,7 +55,7 @@ const WebCardRenderer = (
     cardModules,
     cardColors,
     cardStyle,
-    viewMode: _viewMode,
+    viewMode,
     onModuleLayout,
     style,
     ...props
@@ -64,16 +64,41 @@ const WebCardRenderer = (
 ) => {
   const { width: windowWidth } = useWindowDimensions();
 
-  const lastModule = cardModules.at(-1);
-  const overrideLastModule =
-    lastModule && 'data' in lastModule ? lastModule : null;
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const mergeRef = useCallback(
+    (value: ScrollView | null) => {
+      scrollViewRef.current = value;
+      if (typeof ref === 'function') {
+        ref?.(value);
+      } else if (ref) {
+        ref.current = value;
+      }
+    },
+    [ref],
+  );
+
+  useEffect(() => {
+    if (viewMode === 'desktop') {
+      if (props.contentOffset?.y !== undefined) {
+        scrollViewRef.current?.scrollTo({
+          y: 0,
+          animated: false,
+        });
+      }
+    }
+  }, [props.contentOffset?.y, viewMode, windowWidth]);
 
   return (
-    <ScrollView ref={ref} style={[{ flex: 1 }, style]} {...props}>
+    <ScrollView
+      ref={mergeRef}
+      style={[{ flex: 1, backgroundColor: 'blue' }, style]}
+      scrollEventThrottle={16}
+      {...props}
+    >
       <WebCardBackground
         profile={profile}
         overrideCardStyle={cardStyle}
-        overrideLastModule={overrideLastModule}
+        overrideLastModule={cardModules.at(-1)}
         style={{
           position: 'absolute',
           width: '100%',
@@ -83,7 +108,11 @@ const WebCardRenderer = (
           zIndex: -1,
         }}
       />
-      <CoverRenderer profile={profile} width={windowWidth} hideBorderRadius />
+      {viewMode === 'desktop' ? (
+        <CoverRendererPreviewDesktop profile={profile} />
+      ) : (
+        <CoverRenderer profile={profile} width={windowWidth} hideBorderRadius />
+      )}
       {cardModules.map((module, index) => {
         const onLayout = onModuleLayout
           ? (e: LayoutChangeEvent) => {
@@ -97,6 +126,7 @@ const WebCardRenderer = (
             onLayout={onLayout}
             colorPalette={cardColors}
             cardStyle={cardStyle}
+            viewMode={viewMode}
           />
         );
       })}

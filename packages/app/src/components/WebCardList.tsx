@@ -151,11 +151,11 @@ const WebCardList = ({
               style={{
                 width: webCardsInnerdWidth,
                 height: webCardInnerHeight,
-                backgroundColor: 'yellow',
+                backgroundColor: '#FFFFFF',
                 transform: [
+                  { translateX: (webCardsItemWidth - webCardsInnerdWidth) / 2 },
+                  { translateY: (webCardsItemHeight - webCardInnerHeight) / 2 },
                   { scale },
-                  { translateX: -webCardsInnerdWidth / 2 },
-                  { translateY: -webCardInnerHeight / 2 },
                 ],
               }}
             >
@@ -205,6 +205,7 @@ const WebCardList = ({
       styles.labelContainerHeight,
       webCardsInnerdWidth,
       webCardInnerHeight,
+      webCardsItemHeight,
       scale,
       initialWebCardScrollPosition,
       viewMode,

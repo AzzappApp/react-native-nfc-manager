@@ -154,21 +154,42 @@ type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * The color palette to use
    */
   colorPalette: ColorPalette | null | undefined;
+  /**
+   * Should the preview be rendered in mobile or desktop mode.
+   * @default 'mobile'
+   */
+  viewMode?: 'desktop' | 'mobile';
 };
 
 const CardModuleRenderer = <T extends ModuleRenderInfo>({
   module,
+  viewMode = 'mobile',
   ...props
 }: CardModuleRendererProps<T>) => {
   if (!(module.kind in MODULE_RENDERERS)) {
     return null;
   }
-  const Renderer = MODULE_RENDERERS[module.kind];
+  const renderers =
+    viewMode === 'mobile' ? MODULE_RENDERERS : MODULE_RENDERERS_DESKTOP;
+
+  const Renderer = renderers[module.kind];
   return <Renderer data={module.data as any} {...props} />;
 };
 export default CardModuleRenderer;
 
 const MODULE_RENDERERS = {
+  [MODULE_KIND_BLOCK_TEXT]: BlockTextRenderer,
+  [MODULE_KIND_CAROUSEL]: CarouselRenderer,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoRenderer,
+  [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: PhotoWithTextAndTitleRenderer,
+  [MODULE_KIND_SIMPLE_BUTTON]: SimpleButtonRenderer,
+  [MODULE_KIND_SIMPLE_TEXT]: SimpleTextRenderer,
+  [MODULE_KIND_SIMPLE_TITLE]: SimpleTextRenderer,
+  [MODULE_KIND_SOCIAL_LINKS]: SocialLinksRenderer,
+} as const;
+
+const MODULE_RENDERERS_DESKTOP = {
   [MODULE_KIND_BLOCK_TEXT]: BlockTextRenderer,
   [MODULE_KIND_CAROUSEL]: CarouselRenderer,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoRenderer,
