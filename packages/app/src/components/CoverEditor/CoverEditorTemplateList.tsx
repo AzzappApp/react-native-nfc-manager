@@ -509,6 +509,7 @@ const CoverEditorTemplateList = ({
             computing={mediaComputing}
             cropEditionMode={false}
             height={carouselHeight}
+            paused={!isSelectedItem}
             style={styles.templateItemContainer}
           />
         </PressableScaleHighlight>
@@ -610,6 +611,7 @@ const CoverEditorTemplateList = ({
           renderItem={renderTryptich}
           contentContainerStyle={styles.colorPalettContainer}
           onViewableItemsChanged={onViewableItemsChanged}
+          windowSize={templateKind === 'video' ? 5 : 11} //21 is the default value.
         />
       </MaskedView>
     </>

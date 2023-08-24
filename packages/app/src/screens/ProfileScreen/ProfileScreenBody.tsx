@@ -471,7 +471,6 @@ const ProfileScreenBody = (
   );
 
   const modulesData = useModulesData(cardModules);
-  console.log('modulesData', modulesData);
 
   return modulesData.map((module, index) => (
     <ProfileBlockContainerMemo
