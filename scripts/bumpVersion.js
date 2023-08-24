@@ -10,7 +10,7 @@ if (preReleaseKind && !preReleaseKind.match(/^[a-z]+$/)) {
 
 const version = pkg.version;
 const [, currentPreReleaseKind, preReleaseNumber] =
-  version.match(/-([a-z]+)\.(\d)+$/) ?? [];
+  version.match(/-([a-z]+)\.(\d+)$/) ?? [];
 const [major, minor, patch] = version.split('-')[0].split('.');
 
 let nextVersion = '';
