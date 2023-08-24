@@ -34,7 +34,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
   };
 
   const [svg, style, pattern] = useMemo(() => {
-    const svgProps: Omit<UriProps, 'uri'> = {};
+    const svgProps: Omit<UriProps, 'uri'> = { style: {} };
     const containerStyle: StyleProp<ViewStyle> = {};
     const patternProps: PatternProps = {};
 
@@ -49,13 +49,13 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
       containerStyle.alignItems = 'center';
     }
 
-    if (resizeMode === 'contain' || resizeMode === 'stretch') {
+    if (resizeMode === 'contain') {
       const size = Math.min(width, height);
       svgProps.width = size;
       svgProps.height = size;
     }
 
-    if (resizeMode === 'center' || resizeMode === 'contain') {
+    if (['center', 'contain', 'stretch'].includes(resizeMode!)) {
       containerStyle.justifyContent = 'center';
       containerStyle.alignItems = 'center';
     }
@@ -65,9 +65,17 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
       patternProps.height = `${svgSize.height}px`;
     }
 
-    if (resizeMode === 'stretch' && svgSize) {
-      patternProps.width = `${svgSize.width}px`;
-      patternProps.height = `${svgSize.height}px`;
+    if (resizeMode === 'stretch' && svgSize && width && height) {
+      svgProps.style = {
+        transform: [
+          {
+            scaleX: width / svgSize.width,
+          },
+          {
+            scaleY: height / svgSize.height,
+          },
+        ],
+      };
     }
 
     return [svgProps, containerStyle, patternProps];
@@ -75,7 +83,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
 
   if (!backgroundUri) return null;
 
-  if (resizeMode === 'repeat' || resizeMode === 'stretch') {
+  if (resizeMode === 'repeat') {
     return (
       <Svg
         width="100%"
@@ -107,6 +115,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
   return (
     <View style={[styles.background, style]} pointerEvents="none">
       <SvgUri
+        onLayout={handleSvgLayout}
         {...svg}
         uri={backgroundUri}
         color={patternColor ?? '#000'}
@@ -115,6 +124,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
           {
             opacity: backgroundOpacity,
           },
+          svg.style,
         ]}
       />
     </View>
