@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
+import { createOperationDescriptor, getRequest } from 'relay-runtime';
 import {
   addEnvironmentListener,
   getRelayEnvironment,
 } from './relayEnvironment';
 import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
+import type { ReaderLinkedField } from 'relay-runtime';
 
 /**
  * This module is used to load and dispose queries for a given screen.
@@ -20,16 +22,14 @@ const activeQueries = new Map<
     preloadedQuery: PreloadedQuery<any>;
     variables: Variables;
     query: GraphQLTaggedNode;
+    useViewer: boolean;
   }
 >();
 
 /**
  * A map of listeners, indexed by screenId
  */
-const listeners = new Map<
-  string,
-  Array<(query: PreloadedQuery<any>) => void>
->();
+const listeners = new Map<string, Array<() => void>>();
 
 /**
  * Add a listener for a query status change
@@ -39,10 +39,7 @@ const listeners = new Map<
  * @param listener
  * @returns
  */
-const addListener = (
-  screenId: string,
-  listener: (query: PreloadedQuery<any>) => void,
-) => {
+const addListener = (screenId: string, listener: () => void) => {
   if (!listeners.has(screenId)) {
     listeners.set(screenId, []);
   }
@@ -64,20 +61,60 @@ const addListener = (
  * Initialize the query manager
  */
 export const init = () => {
-  addEnvironmentListener(() => {
-    [...activeQueries.entries()].forEach(([screenId, entry]) => {
-      const { preloadedQuery, query, variables } = entry;
-      preloadedQuery.dispose();
-      entry.preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
-      listeners
-        .get(screenId)
-        ?.forEach(callback => callback(entry.preloadedQuery));
-    });
+  addEnvironmentListener(kind => {
+    switch (kind) {
+      case 'invalidateViewer':
+        refreshQueries();
+        break;
+      case 'reset':
+        resetQueries();
+        break;
+    }
   });
 };
 
-export const clearActiveQueries = () => {
-  activeQueries.clear();
+let refreshQueryTimeout: any = null;
+const refreshQueries = () => {
+  clearTimeout(refreshQueryTimeout);
+  // avoid some race conditions
+  refreshQueryTimeout = setTimeout(() => {
+    [...activeQueries.entries()].forEach(([screenId, entry]) => {
+      const {
+        query,
+        variables,
+        useViewer,
+        preloadedQuery: previousPreloadedQuery,
+      } = entry;
+
+      if (useViewer) {
+        entry.preloadedQuery = loadQuery(
+          getRelayEnvironment(),
+          query,
+          variables,
+        );
+        listeners.get(screenId)?.forEach(listener => listener());
+        setTimeout(() => {
+          previousPreloadedQuery.dispose();
+        }, 0);
+      }
+    });
+  }, 50);
+};
+
+let resetTimeout: any = null;
+const resetQueries = () => {
+  clearTimeout(resetTimeout);
+  clearTimeout(refreshQueryTimeout);
+  // avoid some race conditions
+  resetTimeout = setTimeout(() => {
+    [...activeQueries.entries()].forEach(([, entry]) => {
+      entry.preloadedQuery.dispose();
+    });
+    activeQueries.clear();
+    for (const screenListeners of listeners.values()) {
+      screenListeners.forEach(listener => listener());
+    }
+  }, 50);
 };
 
 /**
@@ -102,18 +139,18 @@ export const useManagedQuery = (screenId: string) => {
 /**
  * Query options
  */
-export type LoadQueryOptions<T> = {
+export type LoadQueryOptions<TParams> = {
   /**
    * The query to load, can be a static query or a function that returns a query
    * based on the params of the screen route
    */
-  query: GraphQLTaggedNode | ((params: T) => GraphQLTaggedNode);
+  query: GraphQLTaggedNode | ((params: TParams) => GraphQLTaggedNode);
   /**
    * A function that returns the variables of the query based on the params of the screen route
    * @param params
    * @returns the query variables
    */
-  getVariables?: (params: T) => Variables;
+  getVariables?: (params: TParams) => Variables;
 };
 
 /**
@@ -135,9 +172,22 @@ export const loadQueryFor = <T>(
         ? options.query(params)
         : options.query;
     const variables = options.getVariables?.(params) ?? {};
+
+    const operation = createOperationDescriptor(getRequest(query), variables);
+    const useViewer = operation.fragment.node.selections.some(
+      selection =>
+        selection.kind === 'LinkedField' &&
+        (selection as ReaderLinkedField).name === 'viewer',
+    );
+
     const preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
-    activeQueries.set(screenId, { query, preloadedQuery, variables });
-    listeners.get(screenId)?.forEach(callback => callback(preloadedQuery));
+    activeQueries.set(screenId, {
+      query,
+      preloadedQuery,
+      variables,
+      useViewer,
+    });
+    listeners.get(screenId)?.forEach(listener => listener());
   }
 };
 

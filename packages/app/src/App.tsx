@@ -15,7 +15,6 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
@@ -33,7 +32,10 @@ import {
   messages,
   useCurrentLocale,
 } from '#helpers/localeHelpers';
-import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import {
+  addEnvironmentListener,
+  getRelayEnvironment,
+} from '#helpers/relayEnvironment';
 import * as RelayQueryManager from '#helpers/RelayQueryManager';
 import { isRelayScreen } from '#helpers/relayScreen';
 import {
@@ -181,6 +183,18 @@ const AppRouter = () => {
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
+  const environmentReseted = useRef(false);
+  const [environment, setEnvironment] = useState(getRelayEnvironment());
+  useEffect(
+    () =>
+      addEnvironmentListener(event => {
+        if (event === 'reset') {
+          environmentReseted.current = true;
+        }
+      }),
+    [],
+  );
+
   const screenIdToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
@@ -222,6 +236,12 @@ const AppRouter = () => {
   );
 
   const onFinishTransitioning = useCallback(() => {
+    // We reset the environment only here
+    // To avoid resetting it when old screens are still visible
+    if (environmentReseted.current) {
+      setEnvironment(getRelayEnvironment());
+      environmentReseted.current = false;
+    }
     screenIdToDispose.forEach(screen =>
       RelayQueryManager.disposeQueryFor(screen),
     );
@@ -247,7 +267,7 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider environment={getRelayEnvironment()}>
+    <RelayEnvironmentProvider environment={environment}>
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}

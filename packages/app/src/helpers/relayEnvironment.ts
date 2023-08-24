@@ -12,8 +12,6 @@ import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
 import { getCurrentLocale } from './localeHelpers';
-import { clearActiveQueries } from './RelayQueryManager';
-import type { AuthState } from './authStore';
 import type {
   MissingFieldHandler,
   FetchFunction,
@@ -22,22 +20,18 @@ import type {
 } from 'relay-runtime';
 
 let environment: Environment | null;
-const listeners: Array<() => void> = [];
+
+type RelayEnvironmentListener = (event: 'invalidateViewer' | 'reset') => void;
+const listeners: RelayEnvironmentListener[] = [];
 
 export const getRelayEnvironment = () => {
   if (!environment) {
-    environment = new Environment({
-      network: createNetwork(),
-      store: new Store(new RecordSource()),
-      isServer: false,
-      missingFieldHandlers,
-    });
-    addAuthStateListener(resetEnvironment);
+    init();
   }
-  return environment;
+  return environment!;
 };
 
-export const addEnvironmentListener = (listener: () => void) => {
+export const addEnvironmentListener = (listener: RelayEnvironmentListener) => {
   listeners.push(listener);
   return () => {
     const index = listeners.indexOf(listener);
@@ -45,6 +39,29 @@ export const addEnvironmentListener = (listener: () => void) => {
       listeners.splice(index, 1);
     }
   };
+};
+
+const init = () => {
+  createEnvironment();
+  let authState = getAuthState();
+  addAuthStateListener(newAuthState => {
+    if (newAuthState.profileId !== authState.profileId) {
+      profileChanged();
+    }
+    if (!newAuthState.authenticated && authState.authenticated) {
+      resetEnvironment();
+    }
+    authState = newAuthState;
+  });
+};
+
+const createEnvironment = () => {
+  environment = new Environment({
+    network: createNetwork(),
+    store: new Store(new RecordSource()),
+    isServer: false,
+    missingFieldHandlers,
+  });
 };
 
 const GRAPHQL_ENDPOINT = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/graphql`;
@@ -167,15 +184,14 @@ const missingFieldHandlers: MissingFieldHandler[] = [
   },
 ];
 
-const resetEnvironment = (state: AuthState) => {
+const resetEnvironment = () => {
+  createEnvironment();
+  listeners.forEach(listener => listener('reset'));
+};
+
+const profileChanged = () => {
   environment?.commitUpdate(store => {
     store.getRoot().getLinkedRecord('viewer')?.invalidateRecord();
-    if (!state.authenticated) {
-      store.getRoot().getLinkedRecord('currentUser')?.invalidateRecord();
-
-      //TODO remove this when we have a better way to manage active queries (see issues #612 and #591)
-      clearActiveQueries();
-    }
   });
-  listeners.forEach(listener => listener());
+  listeners.forEach(listener => listener('invalidateViewer'));
 };

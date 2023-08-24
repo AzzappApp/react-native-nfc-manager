@@ -12,26 +12,30 @@ import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import { loadQueryFor, useManagedQuery } from './RelayQueryManager';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
+import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
 import type { ComponentType } from 'react';
 import type { PreloadedQuery } from 'react-relay';
 import type { OperationType } from 'relay-runtime';
 
-export type RelayScreenOptions<U> = LoadQueryOptions<U> & {
-  /**
-   * The fallback component to render while the query is loading.
-   */
-  fallback?: React.ComponentType<any> | null;
-  /**
-   * The component to render when an error occurs.
-   */
-  errorFallback?: React.ComponentType<any> | null;
-  /**
-   * Wether the screen can go back or not.
-   *
-   * @default true
-   */
-  canGoback?: boolean;
-};
+export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
+  TRoute['params']
+> &
+  ScreenPrefetchOptions<TRoute> & {
+    /**
+     * The fallback component to render while the query is loading.
+     */
+    fallback?: React.ComponentType<any> | null;
+    /**
+     * The component to render when an error occurs.
+     */
+    errorFallback?: React.ComponentType<any> | null;
+    /**
+     * Wether the screen can go back or not.
+     *
+     * @default true
+     */
+    canGoback?: boolean;
+  };
 
 /**
  * The props injected in a screen component by the `relayScreen` HOC.
@@ -64,16 +68,17 @@ export const isRelayScreen = (
  * @param param1 The Query Options.
  * @returns
  */
-function relayScreen<T extends RelayScreenProps<any, any>>(
-  Component: ComponentType<T>,
+function relayScreen<TRoute extends Route>(
+  Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
     fallback: Fallback,
     errorFallback: ErrorFallback,
     canGoback = true,
     ...options
-  }: RelayScreenOptions<T['route']['params']>,
-): ComponentType<Omit<T, 'preloadedQuery'>> & typeof options {
-  const RelayWrapper = (props: T) => {
+  }: RelayScreenOptions<TRoute>,
+): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
+  typeof options {
+  const RelayWrapper = (props: RelayScreenProps<TRoute, any>) => {
     const {
       screenId,
       route: { params },

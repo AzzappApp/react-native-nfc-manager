@@ -1,13 +1,18 @@
 import { createContext, useCallback, useContext } from 'react';
+import { createOperationDescriptor, getRequest } from 'relay-runtime';
 import { useCurrentScreenID } from '#components/NativeRouter';
 import fetchQueryAndRetain from './fetchQueryAndRetain';
-import { getRelayEnvironment } from './relayEnvironment';
+import {
+  addEnvironmentListener,
+  getRelayEnvironment,
+} from './relayEnvironment';
 import type { ROUTES, Route } from '#routes';
 import type {
   Observable,
   Subscription,
   Variables,
   GraphQLTaggedNode,
+  ReaderLinkedField,
 } from 'relay-runtime';
 
 export type ScreenPrefetchOptions<TRoute extends Route> = {
@@ -16,6 +21,10 @@ export type ScreenPrefetchOptions<TRoute extends Route> = {
    * @param route The route to prefetch
    */
   prefetch?: (route: TRoute) => Observable<any> | null | undefined;
+  /**
+   * If true, the prefetcher won't refresh the data when the profile changes
+   */
+  prefetchProfileIndependent?: boolean;
   /**
    * Function used to list routes to prefetch when a screen is pushed
    * @param route The route that was pushed
@@ -86,57 +95,75 @@ export const createScreenPrefetcher = (
 ): ScreenPrefetcher => {
   const screenSubscriptions = new Map<
     string,
-    Array<{ subscription: Subscription; route: Route }>
+    Array<{ subscription: Subscription; route: Route; useViewer: boolean }>
   >();
 
   const prefetchRoute = (intiatorId: string, route: Route) => {
     const Component = screens[route.route];
-    if (Component.prefetch || Component.query) {
-      const observable = Component.prefetch
-        ? Component.prefetch(route)
-        : fetchQueryAndRetain(
-            getRelayEnvironment(),
-            typeof Component.query === 'function'
-              ? Component.query(route.params)
-              : Component.query!,
-            Component.getVariables?.(route.params) ?? ({} as any),
-          );
-      if (!observable) {
-        return;
-      }
-      let subscriptions = screenSubscriptions.get(intiatorId);
-      if (!subscriptions) {
-        subscriptions = [];
-        screenSubscriptions.set(intiatorId, subscriptions);
-      }
-      const subscription = observable.subscribe({
-        error: (error: any) => {
-          const stringParams = JSON.stringify(route.params, undefined, 2);
-          console.warn(
-            `Error preloading route ${route.route} with params ${stringParams}, error: ${error}`,
-          );
-          subscription.unsubscribe();
-          const index = subscriptions!.findIndex(
-            ({ subscription: s }) => s === subscription,
-          );
-          if (index !== -1) {
-            subscriptions!.splice(index, 1);
-          }
-        },
-        complete: () => {
-          const index = subscriptions!.findIndex(
-            ({ subscription: s }) => s === subscription,
-          );
-          if (index !== -1) {
-            subscriptions!.splice(index, 1);
-          }
-        },
-      });
-      subscriptions.push({
-        subscription,
-        route,
-      });
+    let useViewer = false;
+    let observable: Observable<any> | null | undefined = null;
+
+    if (Component.prefetch) {
+      observable = Component.prefetch(route);
+      useViewer = !Component.prefetchProfileIndependent;
+    } else if (Component.query) {
+      const query =
+        typeof Component.query === 'function'
+          ? Component.query(route.params)
+          : Component.query;
+
+      const variables = Component.getVariables?.(route.params) ?? ({} as any);
+
+      const operation = createOperationDescriptor(getRequest(query), variables);
+      useViewer = operation.fragment.node.selections.some(
+        selection =>
+          selection.kind === 'LinkedField' &&
+          (selection as ReaderLinkedField).name === 'viewer',
+      );
+
+      observable = fetchQueryAndRetain(
+        getRelayEnvironment(),
+        query,
+        Component.getVariables?.(route.params) ?? ({} as any),
+      );
     }
+
+    if (!observable) {
+      return;
+    }
+    let subscriptions = screenSubscriptions.get(intiatorId);
+    if (!subscriptions) {
+      subscriptions = [];
+      screenSubscriptions.set(intiatorId, subscriptions);
+    }
+    const subscription = observable.subscribe({
+      error: (error: any) => {
+        const stringParams = JSON.stringify(route.params, undefined, 2);
+        console.warn(
+          `Error preloading route ${route.route} with params ${stringParams}, error: ${error}`,
+        );
+        subscription.unsubscribe();
+        const index = subscriptions!.findIndex(
+          ({ subscription: s }) => s === subscription,
+        );
+        if (index !== -1) {
+          subscriptions!.splice(index, 1);
+        }
+      },
+      complete: () => {
+        const index = subscriptions!.findIndex(
+          ({ subscription: s }) => s === subscription,
+        );
+        if (index !== -1) {
+          subscriptions!.splice(index, 1);
+        }
+      },
+    });
+    subscriptions.push({
+      subscription,
+      route,
+      useViewer,
+    });
   };
 
   const screenWillBePushed = (id: string, route: Route) => {
@@ -156,6 +183,45 @@ export const createScreenPrefetcher = (
   };
 
   screenWillBePushed(initialScreenId, initialRoute);
+
+  let refreshQueryTimeout: any = null;
+  const refreshQueries = () => {
+    clearTimeout(refreshQueryTimeout);
+    refreshQueryTimeout = setTimeout(() => {
+      for (const [screenId, subscriptions] of screenSubscriptions) {
+        subscriptions.forEach(({ subscription, useViewer }) => {
+          if (useViewer) {
+            subscription.unsubscribe();
+            prefetchRoute(screenId, subscriptions[0].route);
+          }
+        });
+      }
+    });
+  };
+
+  let resetQueryTimeout: any = null;
+  const resetQueries = () => {
+    clearTimeout(resetQueryTimeout);
+    resetQueryTimeout = setTimeout(() => {
+      screenSubscriptions.forEach(subscriptions => {
+        subscriptions.forEach(({ subscription }) => {
+          subscription.unsubscribe();
+        });
+      });
+      screenSubscriptions.clear();
+    }, 50);
+  };
+
+  addEnvironmentListener(kind => {
+    switch (kind) {
+      case 'invalidateViewer':
+        refreshQueries();
+        break;
+      case 'reset':
+        resetQueries();
+        break;
+    }
+  });
 
   return {
     prefetchRoute,

@@ -272,39 +272,6 @@ export const NewProfileScreen = ({
   );
 };
 
-NewProfileScreen.prefetch = () => {
-  const pixelRatio = Math.min(2, PixelRatio.get());
-  const environment = getRelayEnvironment();
-  return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
-    environment,
-    graphql`
-      query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
-        profileCategories {
-          id
-          profileKind
-          ...ProfileKindStep_profileCategories
-          ...ProfileForm_profileCategory
-          medias {
-            preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
-          }
-        }
-      }
-    `,
-    { pixelRatio },
-  ).mergeMap(({ profileCategories }) => {
-    const observables = convertToNonNullArray(
-      profileCategories.flatMap(
-        category =>
-          category.medias?.map(media => prefetchImage(media.preloadURI)),
-      ),
-    );
-    if (observables.length === 0) {
-      return Observable.from(null);
-    }
-    return combineLatest(observables);
-  });
-};
-
 NewProfileScreen.options = {
   replaceAnimation: 'push',
   stackAnimation: 'slide_from_bottom',
@@ -312,6 +279,39 @@ NewProfileScreen.options = {
 
 export default relayScreen(NewProfileScreen, {
   query: newProfileScreenQuery,
+  prefetchProfileIndependent: true,
+  prefetch: () => {
+    const pixelRatio = Math.min(2, PixelRatio.get());
+    const environment = getRelayEnvironment();
+    return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
+      environment,
+      graphql`
+        query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
+          profileCategories {
+            id
+            profileKind
+            ...ProfileKindStep_profileCategories
+            ...ProfileForm_profileCategory
+            medias {
+              preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
+            }
+          }
+        }
+      `,
+      { pixelRatio },
+    ).mergeMap(({ profileCategories }) => {
+      const observables = convertToNonNullArray(
+        profileCategories.flatMap(
+          category =>
+            category.medias?.map(media => prefetchImage(media.preloadURI)),
+        ),
+      );
+      if (observables.length === 0) {
+        return Observable.from(null);
+      }
+      return combineLatest(observables);
+    });
+  },
 });
 
 type TransitionScreenProps = {

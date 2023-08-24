@@ -125,55 +125,6 @@ const CoverEditionScreenInner = ({
   );
 };
 
-CoverEditionScreen.prefetch = () => {
-  const environment = getRelayEnvironment();
-  return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
-    environment,
-    graphql`
-      query CoverEditionScreenPrefetchQuery {
-        viewer {
-          ...CoverEditorCustom_viewer
-          ...useCoverEditionManager_viewer @relay(mask: false)
-        }
-        viewerPeople: viewer {
-          ...CoverEditorTemplateList_viewer
-            @arguments(initialTemplateKind: people)
-        }
-        viewerOthers: viewer {
-          ...CoverEditorTemplateList_viewer
-            @arguments(initialTemplateKind: others)
-        }
-        viewerVideo: viewer {
-          ...CoverEditorTemplateList_viewer
-            @arguments(initialTemplateKind: video)
-        }
-      }
-    `,
-    {},
-  ).mergeMap(({ viewer }) => {
-    if (!viewer.profile?.cardCover) {
-      return [];
-    }
-    const { background, foreground, sourceMedia, maskMedia } =
-      viewer.profile.cardCover;
-    const medias = convertToNonNullArray([
-      background && { kind: 'image', uri: background.uri },
-      foreground && { kind: 'image', uri: foreground.uri },
-      sourceMedia && {
-        kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
-        uri: sourceMedia.uri,
-      },
-      maskMedia && { kind: 'image', uri: maskMedia.uri },
-    ]);
-    return combineLatest(
-      medias.map(media => {
-        const prefetch = media.kind === 'image' ? prefetchImage : prefetchVideo;
-        return prefetch(media.uri);
-      }),
-    );
-  });
-};
-
 const query = graphql`
   query CoverEditionScreenQuery {
     viewer {
@@ -189,4 +140,55 @@ const query = graphql`
   }
 `;
 
-export default relayScreen(CoverEditionScreen, { query });
+export default relayScreen(CoverEditionScreen, {
+  query,
+  prefetch: () => {
+    const environment = getRelayEnvironment();
+    return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
+      environment,
+      graphql`
+        query CoverEditionScreenPrefetchQuery {
+          viewer {
+            ...CoverEditorCustom_viewer
+            ...useCoverEditionManager_viewer @relay(mask: false)
+          }
+          viewerPeople: viewer {
+            ...CoverEditorTemplateList_viewer
+              @arguments(initialTemplateKind: people)
+          }
+          viewerOthers: viewer {
+            ...CoverEditorTemplateList_viewer
+              @arguments(initialTemplateKind: others)
+          }
+          viewerVideo: viewer {
+            ...CoverEditorTemplateList_viewer
+              @arguments(initialTemplateKind: video)
+          }
+        }
+      `,
+      {},
+    ).mergeMap(({ viewer }) => {
+      if (!viewer.profile?.cardCover) {
+        return [];
+      }
+      const { background, foreground, sourceMedia, maskMedia } =
+        viewer.profile.cardCover;
+      const medias = convertToNonNullArray([
+        background && { kind: 'image', uri: background.uri },
+        foreground && { kind: 'image', uri: foreground.uri },
+        sourceMedia && {
+          kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
+          uri: sourceMedia.uri,
+        },
+        maskMedia && { kind: 'image', uri: maskMedia.uri },
+      ]);
+      return combineLatest(
+        medias.map(media => {
+          const prefetch =
+            media.kind === 'image' ? prefetchImage : prefetchVideo;
+          return prefetch(media.uri);
+        }),
+      );
+    });
+  },
+});
