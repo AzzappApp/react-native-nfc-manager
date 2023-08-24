@@ -327,10 +327,6 @@
     "defaultMessage": "Your Contact Card is a convenient way to share your contact information.",
     "description": "Description of the contact card screen."
   },
-  "6x/B5C": {
-    "defaultMessage": "Title size : {size}",
-    "description": "Title size message in PhotoWithTextAndTitle edition"
-  },
   "74j5Wg": {
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
@@ -666,10 +662,6 @@
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
-  },
-  "F2YTe8": {
-    "defaultMessage": "Text size : {size}",
-    "description": "textSize message in PhotoWithTextAndTitle edition"
   },
   "F4CT77": {
     "defaultMessage": "Cancel",
@@ -1267,10 +1259,6 @@
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
     "description": "Account details - error message when password is not compliant with our rules"
   },
-  "TOykA8": {
-    "defaultMessage": "Configuration",
-    "description": "Title of the settings section in Line Divider edition"
-  },
   "TWOsUN": {
     "defaultMessage": "Webcard colors",
     "description": "Webcard ColorPicker component hearder title"
@@ -1859,6 +1847,10 @@
     "defaultMessage": "Move up",
     "description": "Accessibility label for the move up button in the profile edition screen"
   },
+  "eVIPhA": {
+    "defaultMessage": "Text",
+    "description": "Photo with Text and Title - TabBar Text"
+  },
   "eXD2ND": {
     "defaultMessage": "Border radius : {size}",
     "description": "border radius message in SimpleButton edition"
@@ -2050,6 +2042,10 @@
   "i4akRg": {
     "defaultMessage": "Edit Margin",
     "description": "Carousel bottom menu label for margin tab"
+  },
+  "i7bEYW": {
+    "defaultMessage": "Title",
+    "description": "Photo with Text and Title - TabBar Title"
   },
   "i9jMTB": {
     "defaultMessage": "{countReactions} likes",
@@ -2342,6 +2338,10 @@
   "noNWRA": {
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
+  },
+  "nv6doU": {
+    "defaultMessage": "Font size : {size}",
+    "description": "Font size message in PhotoWithTextAndTitle edition"
   },
   "nybB30": {
     "defaultMessage": "Text left/right margin",

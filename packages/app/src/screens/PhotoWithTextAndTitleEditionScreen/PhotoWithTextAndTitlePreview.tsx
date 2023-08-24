@@ -43,8 +43,8 @@ const PhotoWithTextAndTitlePreview = ({
         defaultMessage: 'Add section Title here',
         description: 'PhotoWithTextAndTitle default module title',
       }),
-    text:
-      data.text ||
+    content:
+      data.content ||
       intl.formatMessage({
         defaultMessage:
           "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",

@@ -207,30 +207,35 @@ export const MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE = 'photoWithTextAndTitle';
 
 export type CardModulePhotoWithTextAndTitleData = {
   image: string;
-  fontFamily?: string | null;
-  fontColor?: string | null;
-  textAlign?: TextAlignment | null;
+  contentFontFamily?: string | null;
+  contentFontColor?: string | null;
+  contentTextAlign?: TextAlignment | null;
+  contentFontSize?: number | null;
+  contentVerticalSpacing?: number | null;
+  content?: string | null;
+  titleFontFamily?: string | null;
+  titleFontColor?: string | null;
+  titleTextAlign?: TextAlignment | null;
+  titleFontSize?: number | null;
+  titleVerticalSpacing?: number | null;
+  title?: string | null;
   imageMargin?: 'width_full' | 'width_limited' | null;
   horizontalArrangement?: 'left' | 'right' | null;
   verticalArrangement?: 'bottom' | 'top' | null;
   gap?: number | null;
-  fontSize?: number | null;
-  textSize?: number | null;
-  title?: string | null;
-  text: string;
   borderRadius?: number | null;
   marginHorizontal?: number | null;
   marginVertical?: number | null;
-  verticalSpacing?: number | null;
   aspectRatio?: number | null;
   backgroundId?: string | null;
   backgroundStyle?: ModuleBackgroundStyle | null;
 };
 
 export const PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES = {
-  fontFamily: 'fontFamily',
-  fontSize: 'titleFontSize',
-  textSize: 'fontSize',
+  contentFontFamily: 'fontFamily',
+  contentFontSize: 'fontSize',
+  titleFontFamily: 'titleFontFamily',
+  titleFontSize: 'titleFontSize',
   borderRadius: 'borderRadius',
 } as const satisfies Partial<
   Record<
@@ -240,16 +245,19 @@ export const PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES = {
 >;
 
 export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES = {
-  textAlign: 'left',
+  contentTextAlign: 'left',
+  titleTextAlign: 'left',
+  contentVerticalSpacing: 12,
+  titleVerticalSpacing: 12,
+  contentFontColor: '#000000',
+  titleFontColor: '#000000',
   imageMargin: 'width_full',
   horizontalArrangement: 'left',
   verticalArrangement: 'top',
   aspectRatio: 1,
   marginHorizontal: 20,
   marginVertical: 20,
-  verticalSpacing: 12,
   gap: 20,
-  fontColor: '#000000',
   backgroundStyle: {
     backgroundColor: 'light',
     patternColor: 'primary',

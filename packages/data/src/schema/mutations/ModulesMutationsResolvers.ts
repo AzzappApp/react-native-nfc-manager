@@ -136,10 +136,17 @@ export const MODULES_SAVE_RULES: {
     getMedias: ({ image }) => (image ? [image] : null),
   },
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: {
-    validator: z.object({
-      image: z.string(),
-      text: z.string().min(1),
-    }),
+    validator: z
+      .object({
+        image: z.string(),
+        text: z.string().min(1),
+      })
+      .or(
+        z.object({
+          image: z.string(),
+          title: z.string().min(1),
+        }),
+      ),
     getMedias: ({ image }) => (image ? [image] : null),
   },
   [MODULE_KIND_SIMPLE_TEXT]: {

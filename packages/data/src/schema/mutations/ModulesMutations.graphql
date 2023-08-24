@@ -107,21 +107,25 @@ input SaveLineDividerModuleInput {
 input SavePhotoWithTextAndTitleModuleInput {
   moduleId: ID
   image: String!
-  text: String!
+  contentFontFamily: String
+  contentFontColor: String
+  contentTextAlign:TextAlignment
+  contentFontSize: Int
+  contentVerticalSpacing:Int
+  content: String
+  titleFontFamily: String
+  titleFontColor: String
+  titleTextAlign:TextAlignment
+  titleFontSize: Int
+  titleVerticalSpacing: Int
   title: String
-  fontFamily: String
-  fontColor: String
-  textAlign: TextAlignment
   imageMargin: CardModulePhotoWithTextAndTitleImageMargin
   horizontalArrangement: HorizontalArrangement
   verticalArrangement: VerticalArrangement
   gap: Int
-  fontSize: Int
-  textSize: Int
   borderRadius: Int
   marginHorizontal: Int
   marginVertical: Int
-  verticalSpacing: Int
   aspectRatio: Float
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle

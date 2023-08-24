@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
@@ -10,7 +11,7 @@ import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import TitleWithLine from '#ui/TitleWithLine';
+import TabsBar from '#ui/TabsBar';
 import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { PhotoWithTextAndTitleSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleSettingsEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
@@ -21,53 +22,85 @@ type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
    */
   viewer: PhotoWithTextAndTitleSettingsEditionPanel_viewer$key;
   /**
-   * The fontFamily currently set on the module
+   * The content fontFamily currently set on the module
    */
-  fontFamily: string;
+  titleFontFamily: string;
   /**
-   * A callback called when the user update the fontFamily
+   * A callback called when the user update the title fontFamily
    */
-  onFontFamilyChange: (fontFamily: string) => void;
+  onTitleFontFamilyChange: (fontFamily: string) => void;
   /**
-   * The fontColor currently set on the module
+   * The title fontColor currently set on the module
    */
-  fontColor: string;
+  titleFontColor: string;
   /**
-   * A callback called when the user update the fontColor
+   * A callback called when the user update the titlefontColor
    */
-  onFontColorChange: (fontColor: string) => void;
+  onTitleFontColorChange: (fontColor: string) => void;
   /**
-   * The textAlign currently set on the module
+   * The title textAlign currently set on the module
    */
-  textAlign: TextAlignment;
+  titleTextAlign: TextAlignment;
   /**
-   * A callback called when the user update the textAlign
+   * A callback called when the user update the title textAlign
    */
-  onTextAlignChange: (textAlign: TextAlignment) => void;
+  onTitleTextAlignChange: (textAlign: TextAlignment) => void;
   /**
-   * The fontSize currently set on the module
+   * The title fontSize currently set on the module
    */
-  fontSize: number;
+  titleFontSize: number;
   /**
-   * A callback called when the user update the fontSize
+   * A callback called when the user update the title fontSize
    */
-  onFontSizeChange: (fontSize: number) => void;
+  onTitleFontSizeChange: (fontSize: number) => void;
   /**
-   * The textSize currently set on the module
+   * The title verticalSpacing currently set on the module
    */
-  textSize: number;
+  titleVerticalSpacing: number;
   /**
-   * A callback called when the user update the textSize
+   * A callback called when the user update the title verticalSpacing
    */
-  onTextSizeChange: (textSize: number) => void;
+  onTitleVerticalSpacingChange: (verticalSpacing: number) => void;
   /**
-   * The verticalSpacing currently set on the module
+   * The content fontFamily currently set on the module
    */
-  verticalSpacing: number;
+  contentFontFamily: string;
   /**
-   * A callback called when the user update the verticalSpacing
+   * A callback called when the user update the content fontFamily
    */
-  onVerticalSpacingChange: (verticalSpacing: number) => void;
+  onContentFontFamilyChange: (fontFamily: string) => void;
+  /**
+   * The content fontColor currently set on the module
+   */
+  contentFontColor: string;
+  /**
+   * A callback called when the user update the contentfontColor
+   */
+  onContentFontColorChange: (fontColor: string) => void;
+  /**
+   * The content textAlign currently set on the module
+   */
+  contentTextAlign: TextAlignment;
+  /**
+   * A callback called when the user update the content textAlign
+   */
+  onContentTextAlignChange: (textAlign: TextAlignment) => void;
+  /**
+   * The content fontSize currently set on the module
+   */
+  contentFontSize: number;
+  /**
+   * A callback called when the user update the content fontSize
+   */
+  onContentFontSizeChange: (fontSize: number) => void;
+  /**
+   * The content verticalSpacing currently set on the module
+   */
+  contentVerticalSpacing: number;
+  /**
+   * A callback called when the user update the content verticalSpacing
+   */
+  onContentVerticalSpacingChange: (verticalSpacing: number) => void;
   /**
    * The height of the bottom sheet
    */
@@ -79,23 +112,32 @@ type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
  */
 const PhotoWithTextAndTitleSettingsEditionPanel = ({
   viewer,
-  fontFamily,
-  onFontFamilyChange,
-  fontColor,
-  onFontColorChange,
-  textAlign,
-  onTextAlignChange,
-  verticalSpacing,
-  onVerticalSpacingChange,
-  fontSize,
-  onFontSizeChange,
-  textSize,
-  onTextSizeChange,
+  titleFontFamily,
+  onTitleFontFamilyChange,
+  titleFontColor,
+  onTitleFontColorChange,
+  titleTextAlign,
+  onTitleTextAlignChange,
+  titleFontSize,
+  onTitleFontSizeChange,
+  titleVerticalSpacing,
+  onTitleVerticalSpacingChange,
+  contentFontFamily,
+  onContentFontFamilyChange,
+  contentFontColor,
+  onContentFontColorChange,
+  contentTextAlign,
+  onContentTextAlignChange,
+  contentFontSize,
+  onContentFontSizeChange,
+  contentVerticalSpacing,
+  onContentVerticalSpacingChange,
   style,
   bottomSheetHeight,
   ...props
 }: PhotoWithTextAndTitleSettingsEditionPanelProps) => {
   const intl = useIntl();
+  const [currentTab, setCurrentTab] = useState<string>('title');
 
   const { profile } = useFragment(
     graphql`
@@ -113,86 +155,119 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
     viewer,
   );
 
+  const tabs = useMemo(() => {
+    return [
+      {
+        tabKey: 'title',
+        label: intl.formatMessage({
+          defaultMessage: 'Title',
+          description: 'Photo with Text and Title - TabBar Title',
+        }),
+      },
+      {
+        tabKey: 'text',
+        label: intl.formatMessage({
+          defaultMessage: 'Text',
+          description: 'Photo with Text and Title - TabBar Text',
+        }),
+      },
+    ];
+  }, [intl]);
+
   return (
     <View style={[styles.root, style]} {...props}>
-      <TitleWithLine
-        title={intl.formatMessage({
-          defaultMessage: 'Configuration',
-          description: 'Title of the settings section in Line Divider edition',
-        })}
+      <TabsBar
+        currentTab={currentTab}
+        onTabPress={setCurrentTab}
+        tabs={tabs}
+        decoration="underline"
       />
       <View style={styles.paramContainer}>
         <View style={styles.buttonContainer}>
           <FontDropDownPicker
-            fontFamily={fontFamily}
-            onFontFamilyChange={onFontFamilyChange}
+            fontFamily={
+              currentTab === 'title' ? titleFontFamily : contentFontFamily
+            }
+            onFontFamilyChange={
+              currentTab === 'title'
+                ? onTitleFontFamilyChange
+                : onContentFontFamilyChange
+            }
             bottomSheetHeight={bottomSheetHeight}
           />
           <ProfileColorDropDownPicker
             profile={profile!}
-            color={fontColor}
-            onColorChange={onFontColorChange}
+            color={currentTab === 'title' ? titleFontColor : contentFontColor}
+            onColorChange={
+              currentTab === 'title'
+                ? onTitleFontColorChange
+                : onContentFontColorChange
+            }
             bottomSheetHeight={bottomSheetHeight}
           />
           <AlignmentButton
-            alignment={textAlign}
-            onAlignmentChange={onTextAlignChange}
+            alignment={
+              currentTab === 'title' ? titleTextAlign : contentTextAlign
+            }
+            onAlignmentChange={
+              currentTab === 'title'
+                ? onTitleTextAlignChange
+                : onContentTextAlignChange
+            }
           />
         </View>
         <View style={styles.titletextContainer}>
           <LabeledDashedSlider
             label={
               <FormattedMessage
-                defaultMessage="Title size : {size}"
-                description="Title size message in PhotoWithTextAndTitle edition"
+                defaultMessage="Font size : {size}"
+                description="Font size message in PhotoWithTextAndTitle edition"
                 values={{
-                  size: fontSize,
+                  size:
+                    currentTab === 'title' ? titleFontSize : contentFontSize,
                 }}
               />
             }
-            value={fontSize}
+            value={currentTab === 'title' ? titleFontSize : contentFontSize}
             min={DEFAULT_COVER_MIN_FONT_SIZE}
-            max={TITLE_MAX_FONT_SIZE}
-            step={1}
-            onChange={onFontSizeChange}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Title size',
-              description:
-                'Label of the Title size slider in PhotoWithTextAndTitle edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Slide to change the Title size',
-              description:
-                'Hint of the Title size slider in PhotoWithTextAndTitle edition',
-            })}
-            style={styles.halfSlider}
-          />
-          <LabeledDashedSlider
-            label={
-              <FormattedMessage
-                defaultMessage="Text size : {size}"
-                description="textSize message in PhotoWithTextAndTitle edition"
-                values={{
-                  size: textSize,
-                }}
-              />
+            max={
+              currentTab === 'title'
+                ? TITLE_MAX_FONT_SIZE
+                : DEFAULT_COVER_MAX_FONT_SIZE
             }
-            value={textSize}
-            min={DEFAULT_COVER_MIN_FONT_SIZE}
-            max={DEFAULT_COVER_MAX_FONT_SIZE}
             step={1}
-            onChange={onTextSizeChange}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Text size',
-              description:
-                'Label of the textSize slider in PhotoWithTextAndTitle edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Slide to change the Text size',
-              description:
-                'Hint of the textSize slider in PhotoWithTextAndTitle edition',
-            })}
-            style={styles.halfSlider}
+            onChange={
+              currentTab === 'title'
+                ? onTitleFontSizeChange
+                : onContentFontSizeChange
+            }
+            accessibilityLabel={
+              currentTab === 'title'
+                ? intl.formatMessage({
+                    defaultMessage: 'Title size',
+                    description:
+                      'Label of the Title size slider in PhotoWithTextAndTitle edition',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'Text size',
+                    description:
+                      'Label of the textSize slider in PhotoWithTextAndTitle edition',
+                  })
+            }
+            accessibilityHint={
+              currentTab === 'title'
+                ? intl.formatMessage({
+                    defaultMessage: 'Slide to change the Title size',
+                    description:
+                      'Hint of the Title size slider in PhotoWithTextAndTitle edition',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'Slide to change the Text size',
+                    description:
+                      'Hint of the textSize slider in PhotoWithTextAndTitle edition',
+                  })
+            }
+            style={styles.slider}
           />
         </View>
         <LabeledDashedSlider
@@ -201,15 +276,26 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               defaultMessage="Vertical Spacing: {size}"
               description="Vertical Spacing message in PhotoWithTextAndTitle edition"
               values={{
-                size: verticalSpacing,
+                size:
+                  currentTab === 'title'
+                    ? titleVerticalSpacing
+                    : contentVerticalSpacing,
               }}
             />
           }
-          value={verticalSpacing}
+          value={
+            currentTab === 'title'
+              ? titleVerticalSpacing
+              : contentVerticalSpacing
+          }
           min={0}
           max={20}
           step={1}
-          onChange={onVerticalSpacingChange}
+          onChange={
+            currentTab === 'title'
+              ? onTitleVerticalSpacingChange
+              : onContentVerticalSpacingChange
+          }
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',
             description:
@@ -248,10 +334,6 @@ const styles = StyleSheet.create({
   },
   slider: {
     width: '90%',
-    alignSelf: 'center',
-  },
-  halfSlider: {
-    width: '40%',
     alignSelf: 'center',
   },
   buttonContainer: {

@@ -28,21 +28,25 @@ const PhotoWithTextAndTitleRenderer = ({
 }: PhotoWithTextAndTitleRendererProps) => {
   const {
     image,
-    fontFamily,
-    fontColor,
-    textAlign,
-    text,
+    contentFontFamily,
+    contentFontColor,
+    contentTextAlign,
+    contentFontSize,
+    contentVerticalSpacing,
+    content,
+    titleFontFamily,
+    titleFontColor,
+    titleTextAlign,
+    titleFontSize,
+    titleVerticalSpacing,
     title,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
     gap,
-    fontSize,
-    textSize,
     borderRadius,
     marginHorizontal,
     marginVertical,
-    verticalSpacing,
     aspectRatio,
     backgroundId,
     backgroundStyle,
@@ -124,32 +128,37 @@ const PhotoWithTextAndTitleRenderer = ({
             {title && (
               <h2
                 style={{
-                  textAlign,
-                  fontSize,
-                  fontFamily,
-                  color: swapColor(fontColor, colorPalette),
+                  textAlign: titleTextAlign,
+                  fontSize: titleFontSize,
+                  fontFamily: titleFontFamily,
+                  color: swapColor(titleFontColor, colorPalette),
+                  lineHeight:
+                    titleFontSize && titleVerticalSpacing
+                      ? `${titleFontSize * 1.2 + titleVerticalSpacing}px`
+                      : undefined,
                 }}
               >
                 {title}
               </h2>
             )}
-
-            <div
-              style={{
-                textAlign,
-                fontSize: textSize,
-                fontFamily,
-                marginTop: 7,
-                color: swapColor(fontColor, colorPalette),
-                lineHeight:
-                  fontSize && verticalSpacing
-                    ? `${fontSize * 1.2 + verticalSpacing}px`
-                    : undefined,
-                whiteSpace: 'pre-line',
-              }}
-            >
-              {text}
-            </div>
+            {content && (
+              <div
+                style={{
+                  textAlign: contentTextAlign,
+                  fontSize: contentFontSize,
+                  fontFamily: contentFontFamily,
+                  marginTop: 7,
+                  color: swapColor(contentFontColor, colorPalette),
+                  lineHeight:
+                    contentFontSize && contentVerticalSpacing
+                      ? `${contentFontSize * 1.2 + contentVerticalSpacing}px`
+                      : undefined,
+                  whiteSpace: 'pre-line',
+                }}
+              >
+                {content}
+              </div>
+            )}
           </div>
         </div>
       </div>

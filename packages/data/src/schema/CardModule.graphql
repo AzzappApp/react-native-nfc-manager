@@ -278,21 +278,26 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
   The Media image of the horizontal photo module, cannot be null
   """
   image: MediaImage!
-  fontFamily: String
-  fontColor: String
-  textAlign: TextAlignment
+  
   imageMargin: CardModulePhotoWithTextAndTitleImageMargin
   horizontalArrangement: HorizontalArrangement
   verticalArrangement: VerticalArrangement
   gap: Int
-  fontSize: Int
-  textSize: Int
+  titleFontFamily: String
+  titleFontColor: String
+  titleTextAlign: TextAlignment
+  titleFontSize: Int
+  titleVerticalSpacing: Int
   title: String
-  text: String!
+  contentFontFamily: String
+  contentFontColor: String
+  contentTextAlign: TextAlignment
+  contentFontSize: Int
+  contentVerticalSpacing: Int
+  content: String
   borderRadius: Int
   marginHorizontal: Int
   marginVertical: Int
-  verticalSpacing: Int
   aspectRatio: Float
   background: StaticMedia
   backgroundStyle: ModuleBackgroundStyle

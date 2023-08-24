@@ -40,20 +40,25 @@ const PhotoWithTextAndTitleRendererFragment = graphql`
       id
       uri(width: $screenWidth, pixelRatio: $pixelRatio)
     }
+    contentFontFamily
+    contentFontColor
+    contentTextAlign
+    contentFontSize
+    contentVerticalSpacing
+    content
+    titleFontFamily
+    titleFontColor
+    titleTextAlign
+    titleFontSize
+    titleVerticalSpacing
+    title
     aspectRatio
-    fontFamily
-    fontColor
-    textAlign
     imageMargin
     verticalArrangement
     horizontalArrangement
     gap
-    fontSize
-    textSize
-    text
     title
     borderRadius
-    verticalSpacing
     marginHorizontal
     marginVertical
     background {
@@ -108,21 +113,25 @@ const PhotoWithTextAndTitleRenderer = ({
 }: PhotoWithTextAndTitleRendererProps) => {
   const {
     image,
-    fontFamily,
-    fontColor,
-    textAlign,
-    text,
+    contentFontFamily,
+    contentFontColor,
+    contentTextAlign,
+    contentFontSize,
+    contentVerticalSpacing,
+    content,
+    titleFontFamily,
+    titleFontColor,
+    titleTextAlign,
+    titleFontSize,
+    titleVerticalSpacing,
     title,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
     gap,
-    fontSize,
-    textSize,
     borderRadius,
     marginHorizontal,
     marginVertical,
-    verticalSpacing,
     aspectRatio,
     background,
     backgroundStyle,
@@ -237,30 +246,36 @@ const PhotoWithTextAndTitleRenderer = ({
           {title && (
             <Text
               style={{
-                textAlign: textAlign as TextStyle['textAlign'],
-                fontSize,
-                fontFamily,
-                color: swapColor(fontColor, colorPalette) as ColorValue,
+                textAlign: titleTextAlign as TextStyle['textAlign'],
+                fontSize: titleFontSize,
+                fontFamily: titleFontFamily,
+                color: swapColor(titleFontColor, colorPalette) as ColorValue,
+                lineHeight:
+                  titleFontSize && titleVerticalSpacing
+                    ? titleFontSize * 1.2 + titleVerticalSpacing
+                    : undefined,
               }}
             >
               {title}
             </Text>
           )}
-          <Text
-            style={{
-              textAlign: textAlign as TextStyle['textAlign'],
-              fontSize: textSize,
-              fontFamily,
-              marginTop: 7,
-              color: swapColor(fontColor, colorPalette) as ColorValue,
-              lineHeight:
-                fontSize && verticalSpacing
-                  ? fontSize * 1.2 + verticalSpacing
-                  : undefined,
-            }}
-          >
-            {text}
-          </Text>
+          {content && (
+            <Text
+              style={{
+                textAlign: contentTextAlign as TextStyle['textAlign'],
+                fontSize: contentFontSize,
+                fontFamily: contentFontFamily,
+                marginTop: 7,
+                color: swapColor(contentFontColor, colorPalette) as ColorValue,
+                lineHeight:
+                  contentFontSize && contentVerticalSpacing
+                    ? contentFontSize * 1.2 + contentVerticalSpacing
+                    : undefined,
+              }}
+            >
+              {content}
+            </Text>
+          )}
         </View>
       </View>
     </View>

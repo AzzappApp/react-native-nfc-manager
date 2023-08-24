@@ -87,22 +87,26 @@ const PhotoWithTextAndTitleEditionScreen = ({
           height
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
         }
-        fontFamily
-        fontColor
-        textAlign
+        contentFontFamily
+        contentFontColor
+        contentTextAlign
+        contentFontSize
+        contentVerticalSpacing
+        content
+        titleFontFamily
+        titleFontColor
+        titleTextAlign
+        titleFontSize
+        titleVerticalSpacing
+        title
         imageMargin
         verticalArrangement
         horizontalArrangement
         gap
-        fontSize
-        textSize
-        text
-        title
         borderRadius
         marginHorizontal
         marginVertical
         aspectRatio
-        verticalSpacing
         background {
           id
           uri
@@ -156,25 +160,30 @@ const PhotoWithTextAndTitleEditionScreen = ({
   // #region Data edition
   const initialValue = useMemo(() => {
     return {
+      contentFontFamily: photoWithTextAndTitle?.contentFontFamily ?? null,
+      contentFontColor: photoWithTextAndTitle?.contentFontColor ?? null,
+      contentTextAlign: photoWithTextAndTitle?.contentTextAlign ?? null,
+      contentFontSize: photoWithTextAndTitle?.contentFontSize ?? null,
+      contentVerticalSpacing:
+        photoWithTextAndTitle?.contentVerticalSpacing ?? null,
+      content: photoWithTextAndTitle?.content ?? null,
+      titleFontFamily: photoWithTextAndTitle?.titleFontFamily ?? null,
+      titleFontColor: photoWithTextAndTitle?.titleFontColor ?? null,
+      titleTextAlign: photoWithTextAndTitle?.titleTextAlign ?? null,
+      titleFontSize: photoWithTextAndTitle?.titleFontSize ?? null,
+      titleVerticalSpacing: photoWithTextAndTitle?.titleVerticalSpacing ?? null,
+      title: photoWithTextAndTitle?.title ?? null,
       image: photoWithTextAndTitle?.image ?? null,
-      fontFamily: photoWithTextAndTitle?.fontFamily ?? null,
-      fontColor: photoWithTextAndTitle?.fontColor ?? null,
-      textAlign: photoWithTextAndTitle?.textAlign ?? null,
       imageMargin: photoWithTextAndTitle?.imageMargin ?? null,
       verticalArrangement: photoWithTextAndTitle?.verticalArrangement ?? null,
       horizontalArrangement:
         photoWithTextAndTitle?.horizontalArrangement ?? null,
       gap: photoWithTextAndTitle?.gap ?? null,
-      text: photoWithTextAndTitle?.text ?? null,
-      title: photoWithTextAndTitle?.title ?? null,
-      fontSize: photoWithTextAndTitle?.fontSize ?? null,
-      textSize: photoWithTextAndTitle?.textSize ?? null,
       borderRadius: photoWithTextAndTitle?.borderRadius ?? null,
       marginHorizontal: photoWithTextAndTitle?.marginHorizontal ?? null,
       marginVertical: photoWithTextAndTitle?.marginVertical ?? null,
       backgroundId: photoWithTextAndTitle?.background?.id ?? null,
       backgroundStyle: photoWithTextAndTitle?.backgroundStyle ?? null,
-      verticalSpacing: photoWithTextAndTitle?.verticalSpacing ?? null,
       aspectRatio: photoWithTextAndTitle?.aspectRatio ?? null,
     };
   }, [photoWithTextAndTitle]);
@@ -189,23 +198,27 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const {
     image,
-    fontFamily,
-    fontColor,
-    textAlign,
+    content,
+    contentFontFamily,
+    contentFontColor,
+    contentTextAlign,
+    contentVerticalSpacing,
+    contentFontSize,
+    title,
+    titleFontFamily,
+    titleFontColor,
+    titleTextAlign,
+    titleVerticalSpacing,
+    titleFontSize,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
     gap,
-    text,
-    title,
-    fontSize,
-    textSize,
     borderRadius,
     marginHorizontal,
     marginVertical,
     backgroundId,
     backgroundStyle,
-    verticalSpacing,
     aspectRatio,
   } = data;
 
@@ -236,7 +249,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       }
     `);
-  const isValid = isNotFalsyString(text) && image;
+  const isValid =
+    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
@@ -284,10 +298,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
       moduleId: photoWithTextAndTitle?.id,
       ...rest,
       image: mediaId ?? value.image!.id,
-      text: value.text!,
     };
     if (value.title) {
       input.title = value.title;
+    }
+    if (value.content) {
+      input.content = value.content;
     }
 
     commit({
@@ -357,15 +373,32 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onImageChange = fieldUpdateHandler('image');
 
-  const onTextChange = fieldUpdateHandler('text');
+  const onTitleFontFamilyChange = fieldUpdateHandler('titleFontFamily');
+
+  const onTitleFontColorChange = fieldUpdateHandler('titleFontColor');
+
+  const onTitleTextAlignChange = fieldUpdateHandler('titleTextAlign');
+
+  const onTitleFontSizeChange = fieldUpdateHandler('titleFontSize');
+
+  const onContentChange = fieldUpdateHandler('content');
+
+  const onTitleVerticalSpacingChange = fieldUpdateHandler(
+    'titleVerticalSpacing',
+  );
+  const onContentFontFamilyChange = fieldUpdateHandler('contentFontFamily');
+
+  const onContentFontColorChange = fieldUpdateHandler('contentFontColor');
+
+  const onContentTextAlignChange = fieldUpdateHandler('contentTextAlign');
+
+  const onContentFontSizeChange = fieldUpdateHandler('contentFontSize');
 
   const onTitleChange = fieldUpdateHandler('title');
 
-  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
-
-  const onFontColorChange = fieldUpdateHandler('fontColor');
-
-  const onTextAlignChange = fieldUpdateHandler('textAlign');
+  const onContentVerticalSpacingChange = fieldUpdateHandler(
+    'contentVerticalSpacing',
+  );
 
   const onImageMarginChange = useCallback(() => {
     updateFields({
@@ -387,17 +420,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
   }, [horizontalArrangement, updateFields]);
 
-  const onFontSizeChange = fieldUpdateHandler('fontSize');
-
-  const onTextSizeChange = fieldUpdateHandler('textSize');
-
   const onBorderRadiusChange = fieldUpdateHandler('borderRadius');
 
   const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
 
   const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
-
-  const onVerticalSpacingChange = fieldUpdateHandler('verticalSpacing');
 
   const onAspectRatioChange = fieldUpdateHandler('aspectRatio');
 
@@ -487,23 +514,31 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleSettingsEditionPanel
                 viewer={viewer}
-                fontFamily={fontFamily}
-                onFontFamilyChange={onFontFamilyChange}
-                fontColor={fontColor}
-                onFontColorChange={onFontColorChange}
-                textAlign={textAlign}
-                onTextAlignChange={onTextAlignChange}
-                fontSize={fontSize}
-                onFontSizeChange={onFontSizeChange}
-                textSize={textSize}
-                onTextSizeChange={onTextSizeChange}
-                verticalSpacing={verticalSpacing}
-                onVerticalSpacingChange={onVerticalSpacingChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
                 bottomSheetHeight={bottomPanelHeight}
+                titleFontFamily={titleFontFamily}
+                onTitleFontFamilyChange={onTitleFontFamilyChange}
+                titleFontColor={titleFontColor}
+                onTitleFontColorChange={onTitleFontColorChange}
+                titleTextAlign={titleTextAlign}
+                onTitleTextAlignChange={onTitleTextAlignChange}
+                titleFontSize={titleFontSize}
+                onTitleFontSizeChange={onTitleFontSizeChange}
+                titleVerticalSpacing={titleVerticalSpacing}
+                onTitleVerticalSpacingChange={onTitleVerticalSpacingChange}
+                contentFontFamily={contentFontFamily}
+                onContentFontFamilyChange={onContentFontFamilyChange}
+                contentFontColor={contentFontColor}
+                onContentFontColorChange={onContentFontColorChange}
+                contentTextAlign={contentTextAlign}
+                onContentTextAlignChange={onContentTextAlignChange}
+                contentFontSize={contentFontSize}
+                onContentFontSizeChange={onContentFontSizeChange}
+                contentVerticalSpacing={contentVerticalSpacing}
+                onContentVerticalSpacingChange={onContentVerticalSpacingChange}
               />
             ),
           },
@@ -567,7 +602,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       />
       <TextAreaModal
         visible={showContentModal}
-        value={text ?? ''}
+        value={content ?? ''}
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
           description:
@@ -575,7 +610,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         })}
         maxLength={2200}
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={onContentChange}
         closeOnBlur={false}
         ItemTopComponent={
           <>
