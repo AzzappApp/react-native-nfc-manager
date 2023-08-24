@@ -1,5 +1,7 @@
-## 0.1.3-canary.10
+## 0.1.3-canary.1
 
+* **feat:**  - rework photoWithTextAndTitle module ([#832](https://github.com/AzzappApp/azzapp/pull/832))
+* **fix:**  - margintop color on lineDivider ([#848](https://github.com/AzzappApp/azzapp/pull/848))
 * **fix:**  - only play sleected video on demo cover ([#844](https://github.com/AzzappApp/azzapp/pull/844))
 * **fix:**  - save profileCategories with activity [#776](https://github.com/AzzappApp/azzapp/pull/776) ([#818](https://github.com/AzzappApp/azzapp/pull/818))
 * **fix:**  - video cover template ([#824](https://github.com/AzzappApp/azzapp/pull/824))
