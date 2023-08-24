@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
-import { BlockTextRendererRaw } from '#components/cardModules/BlockTextRenderer';
+import BlockTextRenderer from '#components/cardModules/BlockTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { BlockTextRawData } from '#components/cardModules/BlockTextRenderer';
+import type { BlockTextRendererData } from '#components/cardModules/BlockTextRenderer';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -9,7 +9,7 @@ type BlockTextPreviewProps = ViewProps & {
   /**
    * the data of the module to preview.
    */
-  data: BlockTextRawData;
+  data: BlockTextRendererData;
   /**
    * the color palette
    */
@@ -47,7 +47,7 @@ const BlockTextPreview = ({
   };
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
-      <BlockTextRendererRaw
+      <BlockTextRenderer
         data={moduleData}
         cardStyle={cardStyle}
         colorPalette={colorPalette}

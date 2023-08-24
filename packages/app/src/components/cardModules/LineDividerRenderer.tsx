@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   LINE_DIVIDER_DEFAULT_VALUES,
@@ -18,55 +18,29 @@ import type {
   LayoutRectangle,
 } from 'react-native';
 
-export type LineDividerRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a line divider module
-   */
-  module: LineDividerRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
+const LineDividerRendererFragment = graphql`
+  fragment LineDividerRenderer_module on CardModuleLineDivider @inline {
+    orientation
+    marginBottom
+    marginTop
+    height
+    colorTop
+    colorBottom
+  }
+`;
 
-/**
- * Render a line divider module
- */
-const LineDividerRenderer = ({
-  module,
-  ...props
-}: LineDividerRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment LineDividerRenderer_module on CardModuleLineDivider {
-        orientation
-        marginBottom
-        marginTop
-        height
-        colorTop
-        colorBottom
-      }
-    `,
-    module,
-  );
-  return <LineDividerRendererRaw data={data} {...props} />;
-};
+export const readLineDividerData = (module: LineDividerRenderer_module$key) =>
+  readInlineData(LineDividerRendererFragment, module);
 
-export default LineDividerRenderer;
-
-export type LineDividerRawData = NullableFields<
+export type LineDividerRendererData = NullableFields<
   Omit<LineDividerRenderer_module$data, ' $fragmentType'>
 >;
 
-type LineDividerRendererRawProps = ViewProps & {
+type LineDividerRendererProps = ViewProps & {
   /**
    * The data for the line divider module
    */
-  data: LineDividerRawData;
+  data: LineDividerRendererData;
   /**
    * the color palette
    */
@@ -78,17 +52,15 @@ type LineDividerRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the line divider module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
+ * Render a LineDivider module
  */
-export const LineDividerRendererRaw = ({
+const LineDividerRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: LineDividerRendererRawProps) => {
+}: LineDividerRendererProps) => {
   const {
     orientation,
     marginBottom,
@@ -144,3 +116,5 @@ export const LineDividerRendererRaw = ({
     </View>
   );
 };
+
+export default LineDividerRenderer;

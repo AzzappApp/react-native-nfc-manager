@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Image, ScrollView } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
@@ -19,77 +19,58 @@ import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
-export type CarouselRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a Carousel module
-   */
-  module: CarouselRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
 /**
  * Render a carousel module
  */
-const CarouselRenderer = ({ module, ...props }: CarouselRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment CarouselRenderer_module on CardModuleCarousel
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-      ) {
-        images {
-          id
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          aspectRatio
-        }
-        squareRatio
-        borderWidth
-        borderColor
-        borderRadius
-        marginVertical
-        marginHorizontal
-        imageHeight
-        gap
-        background {
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-      }
-    `,
-    module,
-  );
-  return <CarouselRendererRaw data={data} {...props} />;
-};
+const CarouselRendererFragment = graphql`
+  fragment CarouselRenderer_module on CardModuleCarousel
+  @inline
+  @argumentDefinitions(
+    screenWidth: {
+      type: "Float!"
+      provider: "../providers/ScreenWidth.relayprovider"
+    }
+    pixelRatio: {
+      type: "Float!"
+      provider: "../providers/PixelRatio.relayprovider"
+    }
+  ) {
+    images {
+      id
+      uri(width: $screenWidth, pixelRatio: $pixelRatio)
+      aspectRatio
+    }
+    squareRatio
+    borderWidth
+    borderColor
+    borderRadius
+    marginVertical
+    marginHorizontal
+    imageHeight
+    gap
+    background {
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-export default CarouselRenderer;
+export const readCarouselData = (module: CarouselRenderer_module$key) =>
+  readInlineData(CarouselRendererFragment, module);
 
-export type CarouselRawData = NullableFields<
+export type CarouselRendererData = NullableFields<
   Omit<CarouselRenderer_module$data, ' $fragmentType'>
 >;
 
-type CarouselRendererRawProps = ViewProps & {
+type CarouselRendererProps = ViewProps & {
   /**
    * The data for the carousel module
    */
-  data: CarouselRawData;
+  data: CarouselRendererData;
   /**
    * the color palette
    */
@@ -101,17 +82,17 @@ type CarouselRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the carousel module
+ *  implementation of the carousel module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const CarouselRendererRaw = ({
+const CarouselRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: CarouselRendererRawProps) => {
+}: CarouselRendererProps) => {
   const {
     images,
     squareRatio,
@@ -190,3 +171,5 @@ export const CarouselRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default CarouselRenderer;

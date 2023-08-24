@@ -1,5 +1,6 @@
-import CarouselRenderer, { CarouselRendererRaw } from './CarouselRenderer';
-import type { CarouselRawData } from './CarouselRenderer';
+import CarouselRenderer from './CarouselRenderer';
+import type { CarouselRendererData } from './CarouselRenderer';
 
-export { CarouselRendererRaw, CarouselRawData };
 export default CarouselRenderer;
+
+export type { CarouselRendererData };

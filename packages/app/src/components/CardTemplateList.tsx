@@ -13,8 +13,8 @@ import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import WebCardList from './WebCardList';
+import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { WebCardInfo } from './WebCardList';
-import type { ModuleInfo } from './WebCardRenderer';
 import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListLoadCardTemplateMutation } from '@azzapp/relay/artifacts/CardTemplateListLoadCardTemplateMutation.graphql';
 import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
@@ -112,19 +112,6 @@ const CardTemplateList = ({
         loadCardTemplate(input: $loadCardTemplateInput) {
           profile {
             id
-            cardModules {
-              id
-              kind
-              visible
-              ...BlockTextRenderer_module
-              ...PhotoWithTextAndTitleRenderer_module
-              ...SocialLinksRenderer_module
-              ...HorizontalPhotoRenderer_module
-              ...SimpleButtonRenderer_module
-              ...SimpleTextRenderer_module
-              ...LineDividerRenderer_module
-              ...CarouselRenderer_module
-            }
             cardStyle {
               borderColor
               borderRadius
@@ -156,7 +143,7 @@ const CardTemplateList = ({
             cardStyle,
             profile: profile!,
             cardColors: profile?.cardColors,
-            cardModules: modules as ModuleInfo[],
+            cardModules: modules as ModuleRenderInfo[],
           };
         }) ?? [],
       ),

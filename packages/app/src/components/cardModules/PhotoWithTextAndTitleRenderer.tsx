@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { SvgUri } from 'react-native-svg';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
@@ -23,88 +23,64 @@ import type {
   TextStyle,
 } from 'react-native';
 
-export type PhotoWithTextAndTitleRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a PhotoWithTextAndTitle module
-   */
-  module: PhotoWithTextAndTitleRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
+const PhotoWithTextAndTitleRendererFragment = graphql`
+  fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
+  @inline
+  @argumentDefinitions(
+    screenWidth: {
+      type: "Float!"
+      provider: "../providers/ScreenWidth.relayprovider"
+    }
+    pixelRatio: {
+      type: "Float!"
+      provider: "../providers/PixelRatio.relayprovider"
+    }
+  ) {
+    image {
+      id
+      uri(width: $screenWidth, pixelRatio: $pixelRatio)
+    }
+    aspectRatio
+    fontFamily
+    fontColor
+    textAlign
+    imageMargin
+    verticalArrangement
+    horizontalArrangement
+    gap
+    fontSize
+    textSize
+    text
+    title
+    borderRadius
+    verticalSpacing
+    marginHorizontal
+    marginVertical
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-/**
- * Render a PhotoWithTextAndTitle module
- */
-const PhotoWithTextAndTitleRenderer = ({
-  module,
-  ...props
-}: PhotoWithTextAndTitleRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-      ) {
-        image {
-          id
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
-        }
-        aspectRatio
-        fontFamily
-        fontColor
-        textAlign
-        imageMargin
-        verticalArrangement
-        horizontalArrangement
-        gap
-        fontSize
-        textSize
-        text
-        title
-        borderRadius
-        verticalSpacing
-        marginHorizontal
-        marginVertical
-        background {
-          id
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-      }
-    `,
-    module,
-  );
-  return <PhotoWithTextAndTitleRendererRaw data={data} {...props} />;
-};
+export const readPhotoWithTextAndTitleData = (
+  module: PhotoWithTextAndTitleRenderer_module$key,
+) => readInlineData(PhotoWithTextAndTitleRendererFragment, module);
 
-export default PhotoWithTextAndTitleRenderer;
-
-export type PhotoWithTextAndTitleRawData = NullableFields<
+export type PhotoWithTextAndTitleRendererData = NullableFields<
   Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
 >;
 
-type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
+type PhotoWithTextAndTitleRendererProps = ViewProps & {
   /**
    * The data for the PhotoWithTextAndTitle module
    */
-  data: PhotoWithTextAndTitleRawData;
+  data: PhotoWithTextAndTitleRendererData;
   /**
    * The view mode for the module
    */
@@ -120,18 +96,16 @@ type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the PhotoWithTextAndTitle module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
+ * Render a PhotoWithTextAndTitle module
  */
-export const PhotoWithTextAndTitleRendererRaw = ({
+const PhotoWithTextAndTitleRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   viewMode,
   ...props
-}: PhotoWithTextAndTitleRendererRawProps) => {
+}: PhotoWithTextAndTitleRendererProps) => {
   const {
     image,
     fontFamily,
@@ -292,6 +266,8 @@ export const PhotoWithTextAndTitleRendererRaw = ({
     </View>
   );
 };
+
+export default PhotoWithTextAndTitleRenderer;
 
 const styles = StyleSheet.create({
   background: {

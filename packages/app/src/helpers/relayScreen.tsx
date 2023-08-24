@@ -139,6 +139,17 @@ function relayScreen<T extends RelayScreenProps<any, any>>(
       );
     }, [intl, retry, router]);
 
+    const inner = (
+      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
+        {preloadedQuery && (
+          <Component {...props} preloadedQuery={preloadedQuery} />
+        )}
+      </Suspense>
+    );
+    if (__DEV__) {
+      return inner;
+    }
+
     ErrorFallback = ErrorFallback ?? Fallback;
     return (
       <RelayScreenErrorBoundary
@@ -148,11 +159,7 @@ function relayScreen<T extends RelayScreenProps<any, any>>(
           ErrorFallback ? <ErrorFallback {...props} retry={retry} /> : null
         }
       >
-        <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-          {preloadedQuery && (
-            <Component {...props} preloadedQuery={preloadedQuery} />
-          )}
-        </Suspense>
+        {inner}
       </RelayScreenErrorBoundary>
     );
   };

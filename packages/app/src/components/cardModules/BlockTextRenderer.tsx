@@ -1,5 +1,5 @@
 import { type ViewProps, type ColorValue, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   BLOCK_TEXT_DEFAULT_VALUES,
@@ -16,11 +16,51 @@ import type {
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 
-export type BlockTextRendererProps = ViewProps & {
+const BlockTextRendererFragment = graphql`
+  fragment BlockTextRenderer_module on CardModuleBlockText @inline {
+    text
+    fontFamily
+    fontColor
+    textAlign
+    fontSize
+    verticalSpacing
+    textMarginVertical
+    textMarginHorizontal
+    marginHorizontal
+    marginVertical
+    textBackground {
+      id
+      uri
+    }
+    textBackgroundStyle {
+      backgroundColor
+      patternColor
+      opacity
+    }
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
+
+export const readBlockTextData = (module: BlockTextRenderer_module$key) =>
+  readInlineData(BlockTextRendererFragment, module);
+
+export type BlockTextRendererData = NullableFields<
+  Omit<BlockTextRenderer_module$data, ' $fragmentType'>
+>;
+
+type BlockTextRendererProps = ViewProps & {
   /**
-   * A relay fragment reference for a BlockText module
+   * The data for the BlockText module
    */
-  module: BlockTextRenderer_module$key;
+  data: BlockTextRendererData;
   /**
    * the color palette
    */
@@ -34,77 +74,12 @@ export type BlockTextRendererProps = ViewProps & {
 /**
  * Render a BlockText module
  */
-const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment BlockTextRenderer_module on CardModuleBlockText {
-        text
-        fontFamily
-        fontColor
-        textAlign
-        fontSize
-        verticalSpacing
-        textMarginVertical
-        textMarginHorizontal
-        marginHorizontal
-        marginVertical
-        textBackground {
-          id
-          uri
-        }
-        textBackgroundStyle {
-          backgroundColor
-          patternColor
-          opacity
-        }
-        background {
-          id
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-      }
-    `,
-    module,
-  );
-  return <BlockTextRendererRaw data={data} {...props} />;
-};
-
-export default BlockTextRenderer;
-
-export type BlockTextRawData = NullableFields<
-  Omit<BlockTextRenderer_module$data, ' $fragmentType'>
->;
-
-type BlockTextRendererRawProps = ViewProps & {
-  /**
-   * The data for the BlockText module
-   */
-  data: BlockTextRawData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
-/**
- * Raw implementation of the BlockText module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
- */
-export const BlockTextRendererRaw = ({
+const BlockTextRenderer = ({
   data,
   colorPalette,
   cardStyle,
   ...props
-}: BlockTextRendererRawProps) => {
+}: BlockTextRendererProps) => {
   const {
     text,
     fontFamily,
@@ -178,3 +153,5 @@ export const BlockTextRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default BlockTextRenderer;

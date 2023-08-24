@@ -3,11 +3,11 @@ import { Modal, StyleSheet, View } from 'react-native';
 import { useSwipe } from '#hooks/useSwipe';
 import IconButton from '#ui/IconButton';
 import CarouselImage from './CarouselImage';
-import type { CarouselRawData } from './CarouselRenderer';
+import type { CarouselRendererData } from './CarouselRenderer';
 import type { ForwardedRef } from 'react';
 
 type CarouselFullscreenProps = {
-  images: CarouselRawData['images'];
+  images: CarouselRendererData['images'];
   borderWidth: number;
   borderRadius: number;
   borderColor: string;

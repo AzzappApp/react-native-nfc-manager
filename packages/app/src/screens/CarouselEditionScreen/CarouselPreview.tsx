@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 import { colors, shadow } from '#theme';
-import { CarouselRendererRaw } from '#components/cardModules/CarouselRenderer';
+import CarouselRenderer from '#components/cardModules/CarouselRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { CarouselRawData } from '#components/cardModules/CarouselRenderer';
+import type { CarouselRendererData } from '#components/cardModules/CarouselRenderer';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
 
@@ -10,7 +10,7 @@ type CarouselPreviewProps = ViewProps & {
   /**
    * the data of the module to preview.
    */
-  data: CarouselRawData;
+  data: CarouselRendererData;
   /**
    * height of the preview
    */
@@ -57,7 +57,7 @@ const CarouselPreview = ({
           justifyContent: 'center',
         }}
       >
-        <CarouselRendererRaw
+        <CarouselRenderer
           data={data}
           colorPalette={colorPalette}
           cardStyle={cardStyle}

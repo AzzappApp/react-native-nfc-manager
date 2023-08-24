@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-svg/src/xml.tsx b/node_modules/react-native-svg/src/xml.tsx
-index 385dd09..f03fe89 100644
+index 9e2352a..8763641 100644
 --- a/node_modules/react-native-svg/src/xml.tsx
 +++ b/node_modules/react-native-svg/src/xml.tsx
-@@ -131,13 +131,13 @@ export async function fetchText(uri: string) {
+@@ -132,13 +132,13 @@ export async function fetchText(uri: string) {
  
  export function SvgUri(props: UriProps) {
    const { onError = err, uri, onLoad, fallback } = props;
@@ -18,7 +18,7 @@ index 385dd09..f03fe89 100644
              isError && setIsError(false);
              onLoad?.();
            })
-@@ -145,12 +145,20 @@ export function SvgUri(props: UriProps) {
+@@ -146,12 +146,20 @@ export function SvgUri(props: UriProps) {
              onError(e);
              setIsError(true);
            })

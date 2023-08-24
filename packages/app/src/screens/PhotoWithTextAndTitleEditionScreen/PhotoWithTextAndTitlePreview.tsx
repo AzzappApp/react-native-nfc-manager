@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
-import { PhotoWithTextAndTitleRendererRaw } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
+import PhotoWithTextAndTitleRenderer from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { PhotoWithTextAndTitleRawData } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
+import type { PhotoWithTextAndTitleRendererData } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -9,7 +9,7 @@ type PhotoWithTextAndTitlePreviewProps = ViewProps & {
   /**
    * the data of the module to preview.
    */
-  data: PhotoWithTextAndTitleRawData;
+  data: PhotoWithTextAndTitleRendererData;
   /**
    * the color palette
    */
@@ -53,7 +53,7 @@ const PhotoWithTextAndTitlePreview = ({
   };
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
-      <PhotoWithTextAndTitleRendererRaw
+      <PhotoWithTextAndTitleRenderer
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={moduleData}

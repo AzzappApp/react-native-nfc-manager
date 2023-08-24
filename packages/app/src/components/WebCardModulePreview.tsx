@@ -5,10 +5,10 @@ import { graphql, useLazyLoadQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import Container from '#ui/Container';
 import TitleWithLine from '#ui/TitleWithLine';
+import { useModulesData } from './cardModules/ModuleData';
 import SwitchToggle from './SwitchToggle';
 import WebCardRenderer from './WebCardRenderer';
-import type { ModuleInfo } from './WebCardRenderer';
-import type { CardModuleKind } from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
+import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { WebCardModulePreviewQuery } from '@azzapp/relay/artifacts/WebCardModulePreviewQuery.graphql';
 import type {
   LayoutChangeEvent,
@@ -26,7 +26,7 @@ type WebCardModulePreviewProps = Omit<ViewProps, 'children'> & {
   /**
    * The module rendering informations.
    */
-  editedModuleInfo: ModuleInfo;
+  editedModuleInfo: ModuleRenderInfo;
   /**
    * Does the preview is visible.
    */
@@ -72,16 +72,8 @@ const WebCardModulePreview = ({
             }
             cardModules {
               id
-              kind
               visible
-              ...HorizontalPhotoRenderer_module
-              ...SimpleTextRenderer_module
-              ...LineDividerRenderer_module
-              ...CarouselRenderer_module
-              ...SimpleButtonRenderer_module
-              ...PhotoWithTextAndTitleRenderer_module
-              ...SocialLinksRenderer_module
-              ...BlockTextRenderer_module
+              ...ModuleData_cardModules
             }
             cardColors {
               primary
@@ -95,21 +87,20 @@ const WebCardModulePreview = ({
     {},
   );
 
+  const cardModules = useModulesData(profile?.cardModules ?? []);
+
   const { editedIndex, modules } = useMemo(() => {
     if (!profile) {
       return { modules: [editedModuleInfo], editedIndex: 0 };
     }
     let editedIndex = 0;
     const modules = convertToNonNullArray(
-      profile.cardModules.map((module, index) => {
+      cardModules.map((module, index) => {
         if (module.id === editedModuleId) {
           editedIndex = index;
           return editedModuleInfo;
         } else if (module.visible) {
-          return {
-            kind: module.kind as Exclude<CardModuleKind, '%future added value'>,
-            key: module,
-          } as ModuleInfo;
+          return module;
         }
         return null;
       }),
@@ -119,7 +110,7 @@ const WebCardModulePreview = ({
       modules.push(editedModuleInfo);
     }
     return { editedIndex, modules };
-  }, [profile, editedModuleId, editedModuleInfo]);
+  }, [profile, cardModules, editedModuleId, editedModuleInfo]);
 
   const scrollViewRef = useRef<ScrollView | null>(null);
   const editeModuleLayoutRef = useRef<LayoutRectangle | null>(null);

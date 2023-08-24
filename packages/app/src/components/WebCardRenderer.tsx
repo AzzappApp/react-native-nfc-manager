@@ -1,59 +1,10 @@
 import { forwardRef } from 'react';
 import { ScrollView, useWindowDimensions } from 'react-native';
-import {
-  MODULE_KIND_BLOCK_TEXT,
-  MODULE_KIND_CAROUSEL,
-  MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SIMPLE_BUTTON,
-  MODULE_KIND_SIMPLE_TEXT,
-  MODULE_KIND_SIMPLE_TITLE,
-  MODULE_KIND_SOCIAL_LINKS,
-} from '@azzapp/shared/cardModuleHelpers';
-import BlockTextRenderer, {
-  BlockTextRendererRaw,
-  type BlockTextRawData,
-} from './cardModules/BlockTextRenderer';
-import CarouselRenderer, {
-  CarouselRendererRaw,
-  type CarouselRawData,
-} from './cardModules/CarouselRenderer';
-import HorizontalPhotoRenderer, {
-  HorizontalPhotoRendererRaw,
-  type HorizontalPhotoRawData,
-} from './cardModules/HorizontalPhotoRenderer';
-import LineDividerRenderer, {
-  LineDividerRendererRaw,
-  type LineDividerRawData,
-} from './cardModules/LineDividerRenderer';
-import PhotoWithTextAndTitleRenderer, {
-  PhotoWithTextAndTitleRendererRaw,
-  type PhotoWithTextAndTitleRawData,
-} from './cardModules/PhotoWithTextAndTitleRenderer';
-import SimpleButtonRenderer, {
-  SimpleButtonRendererRaw,
-  type SimpleButtonRawData,
-} from './cardModules/SimpleButtonRenderer';
-import SimpleTextRenderer, {
-  SimpleTextRendererRaw,
-  type SimpleTextRawData,
-} from './cardModules/SimpleTextRenderer';
-import SocialLinksRenderer, {
-  SocialLinksRendererRaw,
-} from './cardModules/SocialLinksRenderer';
+import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
 import WebCardBackground from './WebCardBackground';
-import type { SocialLinksRawData } from './cardModules/SocialLinksRenderer';
-import type { BlockTextRenderer_module$key } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
-import type { CarouselRenderer_module$key } from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
+import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
-import type { HorizontalPhotoRenderer_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
-import type { LineDividerRenderer_module$key } from '@azzapp/relay/artifacts/LineDividerRenderer_module.graphql';
-import type { PhotoWithTextAndTitleRenderer_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
-import type { SimpleButtonRenderer_module$key } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
-import type { SimpleTextRenderer_module$key } from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
-import type { SocialLinksRenderer_module$key } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
 import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
@@ -84,7 +35,7 @@ export type WebCardRendererProps = Omit<ScrollViewProps, 'children'> & {
   /**
    * The modules list to render.
    */
-  cardModules: ModuleInfo[];
+  cardModules: ModuleRenderInfo[];
   /**
    * Called when a module is layouted.
    *
@@ -93,75 +44,6 @@ export type WebCardRendererProps = Omit<ScrollViewProps, 'children'> & {
    */
   onModuleLayout?: (index: number, layout: LayoutRectangle) => void;
 };
-
-// clearly ugly, but here relay play against us
-type ModuleInfoBase<TKind extends string, TData, TFragmentKey> =
-  | {
-      kind: TKind;
-      data: TData;
-    }
-  | {
-      kind: TKind;
-      key: TFragmentKey;
-    };
-
-type SimpleTextModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_SIMPLE_TEXT | typeof MODULE_KIND_SIMPLE_TITLE,
-  SimpleTextRawData,
-  SimpleTextRenderer_module$key
->;
-
-type LineDividerModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_LINE_DIVIDER,
-  LineDividerRawData,
-  LineDividerRenderer_module$key
->;
-
-type HorizontalPhotoModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_HORIZONTAL_PHOTO,
-  HorizontalPhotoRawData,
-  HorizontalPhotoRenderer_module$key
->;
-
-type CarouselModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_CAROUSEL,
-  CarouselRawData,
-  CarouselRenderer_module$key
->;
-
-type SimpleButtonInfo = ModuleInfoBase<
-  typeof MODULE_KIND_SIMPLE_BUTTON,
-  SimpleButtonRawData,
-  SimpleButtonRenderer_module$key
->;
-
-type PhotoWithTextAndTitleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  PhotoWithTextAndTitleRawData,
-  PhotoWithTextAndTitleRenderer_module$key
->;
-
-type SocialLinksModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_SOCIAL_LINKS,
-  SocialLinksRawData,
-  SocialLinksRenderer_module$key
->;
-
-type BlockTextModuleInfo = ModuleInfoBase<
-  typeof MODULE_KIND_BLOCK_TEXT,
-  BlockTextRawData,
-  BlockTextRenderer_module$key
->;
-
-export type ModuleInfo =
-  | BlockTextModuleInfo
-  | CarouselModuleInfo
-  | HorizontalPhotoModuleInfo
-  | LineDividerModuleInfo
-  | PhotoWithTextAndTitleInfo
-  | SimpleButtonInfo
-  | SimpleTextModuleInfo
-  | SocialLinksModuleInfo;
 
 /**
  * This component is used to render a web card.
@@ -208,72 +90,18 @@ const WebCardRenderer = (
               onModuleLayout?.(index, e.nativeEvent.layout);
             }
           : undefined;
-        const ModuleRenderer = MODULE_RENDERERS[module.kind];
-        if (ModuleRenderer) {
-          if ('key' in module) {
-            return (
-              <ModuleRenderer.relay
-                module={module.key as any}
-                key={index}
-                onLayout={onLayout}
-                colorPalette={cardColors}
-                cardStyle={cardStyle}
-              />
-            );
-          }
-          return (
-            <ModuleRenderer.raw
-              data={module.data as any}
-              key={index}
-              onLayout={onLayout}
-              colorPalette={cardColors}
-              cardStyle={cardStyle}
-            />
-          );
-        }
-        return null;
+        return (
+          <CardModuleRenderer
+            module={module}
+            key={index}
+            onLayout={onLayout}
+            colorPalette={cardColors}
+            cardStyle={cardStyle}
+          />
+        );
       })}
     </ScrollView>
   );
-};
-
-const MODULE_RENDERERS = {
-  [MODULE_KIND_SIMPLE_TEXT]: {
-    raw: SimpleTextRendererRaw,
-    relay: SimpleTextRenderer,
-  },
-  [MODULE_KIND_SIMPLE_TITLE]: {
-    raw: SimpleTextRendererRaw,
-    relay: SimpleTextRenderer,
-  },
-  [MODULE_KIND_LINE_DIVIDER]: {
-    raw: LineDividerRendererRaw,
-    relay: LineDividerRenderer,
-  },
-  [MODULE_KIND_HORIZONTAL_PHOTO]: {
-    raw: HorizontalPhotoRendererRaw,
-    relay: HorizontalPhotoRenderer,
-  },
-  [MODULE_KIND_CAROUSEL]: {
-    raw: CarouselRendererRaw,
-    relay: CarouselRenderer,
-  },
-  [MODULE_KIND_SIMPLE_BUTTON]: {
-    raw: SimpleButtonRendererRaw,
-    relay: SimpleButtonRenderer,
-  },
-  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: {
-    raw: PhotoWithTextAndTitleRendererRaw,
-    relay: PhotoWithTextAndTitleRenderer,
-  },
-  [MODULE_KIND_SOCIAL_LINKS]: {
-    raw: SocialLinksRendererRaw,
-    relay: SocialLinksRenderer,
-  },
-  [MODULE_KIND_BLOCK_TEXT]: {
-    raw: BlockTextRendererRaw,
-    relay: BlockTextRenderer,
-  },
 };
 
 export default forwardRef(WebCardRenderer);

@@ -1,5 +1,5 @@
 import { Text } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   MODULE_KIND_SIMPLE_TITLE,
@@ -12,101 +12,80 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from './CardModuleBackground';
 import type {
-  SimpleTextRenderer_module$data,
-  SimpleTextRenderer_module$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
+  SimpleTextRenderer_simpleTextModule$data,
+  SimpleTextRenderer_simpleTextModule$key,
+} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
+import type {
+  SimpleTextRenderer_simpleTitleModule$data,
+  SimpleTextRenderer_simpleTitleModule$key,
+} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
-export type SimpleTextRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a simple text module
-   */
-  module: SimpleTextRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
-/**
- * Render a simple text module
- */
-const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
-  const { simpleText, simpleTitle } = useFragment(
-    graphql`
-      fragment SimpleTextRenderer_module on CardModule {
-        ... on CardModuleSimpleText @alias(as: "simpleText") {
-          kind
-          text
-          fontFamily
-          fontSize
-          fontColor
-          textAlign
-          verticalSpacing
-          marginHorizontal
-          marginVertical
-          background {
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-        ... on CardModuleSimpleTitle @alias(as: "simpleTitle") {
-          kind
-          text
-          fontFamily
-          fontSize
-          fontColor
-          textAlign
-          verticalSpacing
-          marginHorizontal
-          marginVertical
-          background {
-            uri
-            resizeMode
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-      }
-    `,
-    module,
-  );
-
-  const data = simpleText ?? simpleTitle;
-
-  if (!data) {
-    return null;
+const SimpleTextRendererFragment = graphql`
+  fragment SimpleTextRenderer_simpleTextModule on CardModuleSimpleText @inline {
+    kind
+    text
+    fontFamily
+    fontSize
+    fontColor
+    textAlign
+    verticalSpacing
+    marginHorizontal
+    marginVertical
+    background {
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
   }
+`;
 
-  return <SimpleTextRendererRaw data={data} {...props} />;
-};
+const SimpleTitleRendererFragment = graphql`
+  fragment SimpleTextRenderer_simpleTitleModule on CardModuleSimpleTitle
+  @inline {
+    kind
+    text
+    fontFamily
+    fontSize
+    fontColor
+    textAlign
+    verticalSpacing
+    marginHorizontal
+    marginVertical
+    background {
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-export default SimpleTextRenderer;
+export const readSimpleTextData = (
+  module: SimpleTextRenderer_simpleTextModule$key,
+) => readInlineData(SimpleTextRendererFragment, module);
 
-export type SimpleTextRawData = NullableFields<
-  NonNullable<
-    | SimpleTextRenderer_module$data['simpleText']
-    | SimpleTextRenderer_module$data['simpleTitle']
-  >
+export const readSimpleTitleData = (
+  module: SimpleTextRenderer_simpleTitleModule$key,
+) => readInlineData(SimpleTitleRendererFragment, module);
+
+export type SimpleTextRendererData = NullableFields<
+  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
+  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
 >;
 
-type SimpleTextRendererRawProps = ViewProps & {
+type SimpleTextRendererProps = ViewProps & {
   /**
    * The data for the simple text module
    */
-  data: SimpleTextRawData;
+  data: SimpleTextRendererData;
   /**
    * the color palette
    */
@@ -118,17 +97,17 @@ type SimpleTextRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the simple text module
+ *  implementation of the simple text module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const SimpleTextRendererRaw = ({
+const SimpleTextRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: SimpleTextRendererRawProps) => {
+}: SimpleTextRendererProps) => {
   // the getModuleDataValues typings does not match the data type
   // because of the 2 different types of modules
   const {
@@ -191,3 +170,5 @@ export const SimpleTextRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default SimpleTextRenderer;

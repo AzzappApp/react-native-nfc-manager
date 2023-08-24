@@ -1,5 +1,5 @@
 import { Linking, ScrollView, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SOCIAL_LINKS_DEFAULT_VALUES,
@@ -17,71 +17,48 @@ import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
-export type SocialLinksRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a SocialLinks module
-   */
-  module: SocialLinksRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
 /**
  * Render a SocialLinks module
  */
-const SocialLinksRenderer = ({
-  module,
-  ...props
-}: SocialLinksRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment SocialLinksRenderer_module on CardModuleSocialLinks {
-        links {
-          socialId
-          link
-          position
-        }
-        iconColor
-        iconSize
-        arrangement
-        borderWidth
-        columnGap
-        marginTop
-        marginBottom
-        marginHorizontal
-        background {
-          id
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-      }
-    `,
-    module,
-  );
-  return <SocialLinksRendererRaw data={data} {...props} />;
-};
+const SocialLinksRendererFragment = graphql`
+  fragment SocialLinksRenderer_module on CardModuleSocialLinks @inline {
+    links {
+      socialId
+      link
+      position
+    }
+    iconColor
+    iconSize
+    arrangement
+    borderWidth
+    columnGap
+    marginTop
+    marginBottom
+    marginHorizontal
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-export default SocialLinksRenderer;
+export const readSocialLinksData = (module: SocialLinksRenderer_module$key) =>
+  readInlineData(SocialLinksRendererFragment, module);
 
-export type SocialLinksRawData = NullableFields<
+export type SocialLinksRendererData = NullableFields<
   Omit<SocialLinksRenderer_module$data, ' $fragmentType'>
 >;
 
-type SocialLinksRendererRawProps = ViewProps & {
+type SocialLinksRendererProps = ViewProps & {
   /**
    * The data for the SocialLinks module
    */
-  data: SocialLinksRawData;
+  data: SocialLinksRendererData;
   /**
    * the color palette
    */
@@ -93,17 +70,17 @@ type SocialLinksRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the SocialLinks module
+ *  implementation of the SocialLinks module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const SocialLinksRendererRaw = ({
+const SocialLinksRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: SocialLinksRendererRawProps) => {
+}: SocialLinksRendererProps) => {
   const {
     links,
     iconSize,
@@ -233,6 +210,8 @@ export const SocialLinksRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default SocialLinksRenderer;
 
 export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'behance', mask: 'behance.net/' },

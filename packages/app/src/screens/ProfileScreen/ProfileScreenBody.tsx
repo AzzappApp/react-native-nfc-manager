@@ -11,26 +11,9 @@ import {
   useState,
 } from 'react';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import {
-  MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_CAROUSEL,
-  MODULE_KIND_SIMPLE_TEXT,
-  MODULE_KIND_SIMPLE_TITLE,
-  MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_SIMPLE_BUTTON,
-  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SOCIAL_LINKS,
-  MODULE_KIND_BLOCK_TEXT,
-} from '@azzapp/shared/cardModuleHelpers';
-import BlockTextRenderer from '#components/cardModules/BlockTextRenderer';
-import CarouselRenderer from '#components/cardModules/CarouselRenderer';
-import HorizontalPhotoRenderer from '#components/cardModules/HorizontalPhotoRenderer';
-import LineDividerRenderer from '#components/cardModules/LineDividerRenderer';
-import PhotoWithTextAndTitleRenderer from '#components/cardModules/PhotoWithTextAndTitleRenderer';
-import SimpleButtonRenderer from '#components/cardModules/SimpleButtonRenderer';
-import SocialLinksRenderer from '#components/cardModules/SocialLinksRenderer';
+import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
+import { useModulesData } from '#components/cardModules/ModuleData';
 import { createId } from '#helpers/idHelpers';
-import SimpleTextRenderer from '../../components/cardModules/SimpleTextRenderer';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import type { ProfileScreenBody_profile$key } from '@azzapp/relay/artifacts/ProfileScreenBody_profile.graphql';
 import type { ProfileScreenBodyDeleteModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDeleteModuleMutation.graphql';
@@ -120,16 +103,8 @@ const ProfileScreenBody = (
         id
         cardModules {
           id
-          kind
           visible
-          ...BlockTextRenderer_module
-          ...PhotoWithTextAndTitleRenderer_module
-          ...SocialLinksRenderer_module
-          ...HorizontalPhotoRenderer_module
-          ...SimpleButtonRenderer_module
-          ...SimpleTextRenderer_module
-          ...LineDividerRenderer_module
-          ...CarouselRenderer_module
+          ...ModuleData_cardModules
         }
         cardColors {
           primary
@@ -495,7 +470,10 @@ const ProfileScreenBody = (
     ],
   );
 
-  return cardModules.map((module, index) => (
+  const modulesData = useModulesData(cardModules);
+  console.log('modulesData', modulesData);
+
+  return modulesData.map((module, index) => (
     <ProfileBlockContainerMemo
       key={module.id}
       editing={editing}
@@ -513,69 +491,11 @@ const ProfileScreenBody = (
       }}
       {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
     >
-      {module.kind === MODULE_KIND_SIMPLE_TEXT && (
-        <SimpleTextRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_SIMPLE_TITLE && (
-        <SimpleTextRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_LINE_DIVIDER && (
-        <LineDividerRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_HORIZONTAL_PHOTO && (
-        <HorizontalPhotoRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_CAROUSEL && (
-        <CarouselRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_SIMPLE_BUTTON && (
-        <SimpleButtonRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE && (
-        <PhotoWithTextAndTitleRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_SOCIAL_LINKS && (
-        <SocialLinksRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
-      {module.kind === MODULE_KIND_BLOCK_TEXT && (
-        <BlockTextRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-        />
-      )}
+      <CardModuleRenderer
+        module={module}
+        colorPalette={cardColors}
+        cardStyle={cardStyle}
+      />
     </ProfileBlockContainerMemo>
   ));
 };

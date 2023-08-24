@@ -7,7 +7,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import SwitchToggle from './SwitchToggle';
 import WebCardRenderer, { DESKTOP_PREVIEW_WIDTH } from './WebCardRenderer';
-import type { ModuleInfo } from './WebCardRenderer';
+import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
@@ -42,7 +42,7 @@ export type WebCardInfo = {
   /**
    * The modules list to render.
    */
-  cardModules: ModuleInfo[];
+  cardModules: ModuleRenderInfo[];
 };
 
 type WebCardListProps = Omit<ViewProps, 'children'> & {

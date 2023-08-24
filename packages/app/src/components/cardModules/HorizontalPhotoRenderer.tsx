@@ -1,5 +1,5 @@
 import { View, Image } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
@@ -15,11 +15,54 @@ import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
-export type HorizontalPhotoRendererProps = ViewProps & {
+const HorizontalPhotoRendererFragment = graphql`
+  fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
+  @inline
+  @argumentDefinitions(
+    screenWidth: {
+      type: "Float!"
+      provider: "../providers/ScreenWidth.relayprovider"
+    }
+    pixelRatio: {
+      type: "Float!"
+      provider: "../providers/PixelRatio.relayprovider"
+    }
+  ) {
+    borderWidth
+    borderRadius
+    borderColor
+    marginHorizontal
+    marginVertical
+    imageHeight
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+    image {
+      id
+      uri(width: $screenWidth, pixelRatio: $pixelRatio)
+    }
+  }
+`;
+
+export const readHorizontalPhotoData = (
+  module: HorizontalPhotoRenderer_module$key,
+) => readInlineData(HorizontalPhotoRendererFragment, module);
+
+export type HorizontalPhotoRendererData = NullableFields<
+  Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
+>;
+
+type HorizontalPhotoRendererProps = ViewProps & {
   /**
-   * A relay fragment reference for a HorizontalPhoto module
+   * The data for the HorizontalPhoto module
    */
-  module: HorizontalPhotoRenderer_module$key;
+  data: HorizontalPhotoRendererData;
   /**
    * the color palette
    */
@@ -34,82 +77,12 @@ export type HorizontalPhotoRendererProps = ViewProps & {
  * Render a HorizontalPhoto module
  */
 const HorizontalPhotoRenderer = ({
-  module,
-  ...props
-}: HorizontalPhotoRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-      ) {
-        borderWidth
-        borderRadius
-        borderColor
-        marginHorizontal
-        marginVertical
-        imageHeight
-        background {
-          id
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-        image {
-          id
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
-        }
-      }
-    `,
-    module,
-  );
-
-  return <HorizontalPhotoRendererRaw data={data} {...props} />;
-};
-
-export default HorizontalPhotoRenderer;
-
-export type HorizontalPhotoRawData = NullableFields<
-  Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
->;
-
-type HorizontalPhotoRendererRawProps = ViewProps & {
-  /**
-   * The data for the HorizontalPhoto module
-   */
-  data: HorizontalPhotoRawData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
-/**
- * Raw implementation of the HorizontalPhoto module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
- */
-export const HorizontalPhotoRendererRaw = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: HorizontalPhotoRendererRawProps) => {
+}: HorizontalPhotoRendererProps) => {
   const {
     borderWidth,
     borderRadius,
@@ -161,3 +134,5 @@ export const HorizontalPhotoRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default HorizontalPhotoRenderer;

@@ -6,10 +6,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import type { CarouselRawData } from './CarouselRenderer';
+import type { CarouselRendererData } from './CarouselRenderer';
 
 type CarouselImageProps = {
-  image: Exclude<CarouselRawData['images'], null>[number];
+  image: Exclude<CarouselRendererData['images'], null>[number];
   borderWidth: number;
   borderRadius: number;
   borderColor: string;

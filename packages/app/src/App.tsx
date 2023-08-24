@@ -2,6 +2,7 @@ import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
 import {
   Component,
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -100,11 +101,13 @@ const App = () => {
     return null;
   }
 
+  const ErrorBoundary = __DEV__ ? Fragment : AppErrorBoundary;
+
   return (
     <AppIntlProvider>
-      <AppErrorBoundary>
+      <ErrorBoundary>
         <AppRouter />
-      </AppErrorBoundary>
+      </ErrorBoundary>
     </AppIntlProvider>
   );
 };
@@ -312,9 +315,9 @@ class _AppErrorBoundary extends Component<{
     return { error };
   }
 
-  retry() {
+  retry = () => {
     this.setState({ error: null });
-  }
+  };
 
   render() {
     if (this.state.error) {

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Linking, Text, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
@@ -17,72 +17,49 @@ import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
 
-export type SimpleButtonRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a SimpleButton module
-   */
-  module: SimpleButtonRenderer_module$key;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
-};
-
 /**
  * Render a SimpleButton module
  */
-const SimpleButtonRenderer = ({
-  module,
-  ...props
-}: SimpleButtonRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment SimpleButtonRenderer_module on CardModuleSimpleButton {
-        buttonLabel
-        actionType
-        actionLink
-        fontFamily
-        fontColor
-        fontSize
-        buttonColor
-        borderColor
-        borderWidth
-        borderRadius
-        marginTop
-        marginBottom
-        width
-        height
-        background {
-          id
-          uri
-          resizeMode
-        }
-        backgroundStyle {
-          backgroundColor
-          patternColor
-        }
-      }
-    `,
-    module,
-  );
-  return <SimpleButtonRendererRaw data={data} {...props} />;
-};
+const SimpleButtonRendererFragment = graphql`
+  fragment SimpleButtonRenderer_module on CardModuleSimpleButton @inline {
+    buttonLabel
+    actionType
+    actionLink
+    fontFamily
+    fontColor
+    fontSize
+    buttonColor
+    borderColor
+    borderWidth
+    borderRadius
+    marginTop
+    marginBottom
+    width
+    height
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-export default SimpleButtonRenderer;
+export const readSimpleButtonData = (module: SimpleButtonRenderer_module$key) =>
+  readInlineData(SimpleButtonRendererFragment, module);
 
-export type SimpleButtonRawData = NullableFields<
+export type SimpleButtonRendererData = NullableFields<
   Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
 >;
 
-type SimpleButtonRendererRawProps = ViewProps & {
+type SimpleButtonRendererProps = ViewProps & {
   /**
    * The data for the SimpleButton module
    */
-  data: SimpleButtonRawData;
+  data: SimpleButtonRendererData;
   /**
    * the color palette
    */
@@ -94,17 +71,17 @@ type SimpleButtonRendererRawProps = ViewProps & {
 };
 
 /**
- * Raw implementation of the SimpleButton module
+ *  implementation of the SimpleButton module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const SimpleButtonRendererRaw = ({
+const SimpleButtonRenderer = ({
   data,
   colorPalette,
   cardStyle,
   style,
   ...props
-}: SimpleButtonRendererRawProps) => {
+}: SimpleButtonRendererProps) => {
   const {
     buttonLabel,
     actionType,
@@ -191,3 +168,5 @@ export const SimpleButtonRendererRaw = ({
     </CardModuleBackground>
   );
 };
+
+export default SimpleButtonRenderer;

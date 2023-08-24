@@ -10,6 +10,7 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { useModulesData } from '#components/cardModules/ModuleData';
 import WebCardList from '#components/WebCardList';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
@@ -17,7 +18,6 @@ import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { WebCardInfo } from '#components/WebCardList';
-import type { ModuleInfo } from '#components/WebCardRenderer';
 import type { CardStyleModal_cardStyles$key } from '@azzapp/relay/artifacts/CardStyleModal_cardStyles.graphql';
 import type { CardStyleModal_profile$key } from '@azzapp/relay/artifacts/CardStyleModal_profile.graphql';
 import type { CardStyleModal_viewer$key } from '@azzapp/relay/artifacts/CardStyleModal_viewer.graphql';
@@ -201,14 +201,7 @@ const CardStyleList = ({
           id
           kind
           visible
-          ...HorizontalPhotoRenderer_module
-          ...SimpleTextRenderer_module
-          ...LineDividerRenderer_module
-          ...CarouselRenderer_module
-          ...SimpleButtonRenderer_module
-          ...PhotoWithTextAndTitleRenderer_module
-          ...SocialLinksRenderer_module
-          ...BlockTextRenderer_module
+          ...ModuleData_cardModules
         }
         cardColors {
           primary
@@ -257,19 +250,10 @@ const CardStyleList = ({
     viewer as CardStyleModal_cardStyles$key,
   );
 
-  const cardModules: ModuleInfo[] = useMemo(
-    () =>
-      convertToNonNullArray(
-        profile?.cardModules?.map(module =>
-          module.visible
-            ? ({
-                kind: module.kind,
-                key: module,
-              } as ModuleInfo)
-            : null,
-        ) ?? [],
-      ),
-    [profile?.cardModules],
+  const cardModules = useModulesData(profile?.cardModules ?? []);
+  const visibileCardModules = useMemo(
+    () => cardModules.filter(module => module.visible),
+    [cardModules],
   );
 
   const cards: WebCardInfo[] = useMemo(
@@ -310,12 +294,12 @@ const CardStyleList = ({
               titleFontFamily,
               titleFontSize,
             },
-            cardModules,
+            cardModules: visibileCardModules,
             cardColors: profile?.cardColors,
           };
         }) ?? [],
       ),
-    [cardModules, cardStyles.edges, profile],
+    [cardStyles.edges, profile, visibileCardModules],
   );
 
   const onSelectedIndexChange = useCallback(
