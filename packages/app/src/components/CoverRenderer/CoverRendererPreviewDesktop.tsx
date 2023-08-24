@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useFragment } from 'react-relay';
 import CoverRendererFragment from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
-import CoverRenderer from '.';
+import CoverRenderer from './CoverRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
