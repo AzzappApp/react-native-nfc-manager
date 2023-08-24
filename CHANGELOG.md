@@ -1,4 +1,4 @@
-## 0.1.3-canary.8
+## 0.1.3-canary.9
 
 * **fix:**  - save profileCategories with activity [#776](https://github.com/AzzappApp/azzapp/pull/776) ([#818](https://github.com/AzzappApp/azzapp/pull/818))
 * **fix:**  - video cover template ([#824](https://github.com/AzzappApp/azzapp/pull/824))
