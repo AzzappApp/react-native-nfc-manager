@@ -29,6 +29,9 @@ const connection = connect({
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
+    if (process.env.NODE_ENV === 'development') {
+      return fetch(input, init);
+    }
     return concurrentQueue(() => fetch(input, init)) as any;
   },
 });
