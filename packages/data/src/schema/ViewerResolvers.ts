@@ -1,5 +1,6 @@
 import { like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
+import { shuffle } from '@azzapp/shared/arrayHelpers';
 import {
   getFollowerProfiles,
   getFollowingsPosts,
@@ -218,12 +219,19 @@ export const Viewer: ViewerResolvers = {
       },
     };
   },
-  colorPalettes: async (_, { after, first }, { auth: { profileId } }) => {
+  colorPalettes: async (
+    _,
+    { after, first },
+    { auth: { profileId }, colorPalettesLoader },
+  ) => {
     if (!profileId) {
       return emptyConnection;
     }
     first = first ?? 100;
-    const colorPalettes = await getColorPalettes(profileId);
+    const colorPalettes = shuffle(
+      await colorPalettesLoader(),
+      parseInt(profileId, 36),
+    );
 
     return connectionFromArray(colorPalettes, {
       after,
