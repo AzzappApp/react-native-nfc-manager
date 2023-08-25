@@ -63,7 +63,11 @@ export const POST = async (req: NextRequest) => {
         locale ?? DEFAULT_LOCALE,
       ),
     });
-    if (process.env.NODE_ENV !== 'production' && result.errors) {
+    if (
+      (process.env.NODE_ENV !== 'production' ||
+        process.env.DEPLOYMENT_ENVIRONMENT === 'development') &&
+      !!result.errors?.length
+    ) {
       console.warn('GraphQL errors:');
       console.warn(result.errors);
       console.warn(result.errors[0].stack);

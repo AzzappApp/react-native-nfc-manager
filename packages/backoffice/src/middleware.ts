@@ -15,7 +15,15 @@ export async function middleware(request: NextRequest) {
     return undefined;
   }
 
-  const session = await getRequestSession(request);
+  const session = await getRequestSession(request).catch(e => {
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEPLOYMENT_ENVIRONMENT === 'development'
+    ) {
+      console.error(e);
+    }
+    return null;
+  });
 
   if (!session?.userId) {
     return redirectToLogin(nextUrl);
