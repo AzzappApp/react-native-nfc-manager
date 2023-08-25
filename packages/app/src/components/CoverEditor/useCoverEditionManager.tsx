@@ -45,7 +45,7 @@ import type { CoverPreviewHandler } from '#components/CoverPreviewRenderer';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
-import type { useCoverEditionManager_viewer$key } from '@azzapp/relay/artifacts/useCoverEditionManager_viewer.graphql';
+import type { useCoverEditionManager_profile$key } from '@azzapp/relay/artifacts/useCoverEditionManager_profile.graphql';
 import type {
   SaveCoverInput,
   useCoverEditionManagerMutation,
@@ -75,7 +75,7 @@ export type CoverData = {
 };
 
 type UserCoverEditorUpdaterOptions = {
-  viewer: useCoverEditionManager_viewer$key;
+  profile: useCoverEditionManager_profile$key | null;
   initialData: CoverData | null;
   initialColorPalette: ColorPalette | null;
   acceptedMediaKind?: 'image' | 'mixed' | 'video';
@@ -83,77 +83,75 @@ type UserCoverEditorUpdaterOptions = {
 };
 
 const useCoverEditionManager = ({
-  viewer: viewerKey,
+  profile: profileKey,
   initialData,
   initialColorPalette,
   acceptedMediaKind = 'mixed',
   onCoverSaved,
 }: UserCoverEditorUpdaterOptions) => {
-  const { profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment useCoverEditionManager_viewer on Viewer {
-        profile {
-          id
-          profileKind
-          firstName
-          lastName
-          companyName
-          companyActivity {
-            label
+      fragment useCoverEditionManager_profile on Profile {
+        id
+        profileKind
+        firstName
+        lastName
+        companyName
+        companyActivity {
+          label
+        }
+        cardCover {
+          title
+          subTitle
+          mediaParameters
+          mediaFilter
+          sourceMedia {
+            __typename
+            id
+            uri
+            width
+            height
           }
-          cardCover {
-            title
-            subTitle
-            mediaParameters
-            mediaFilter
-            sourceMedia {
-              __typename
-              id
-              uri
-              width
-              height
-            }
-            maskMedia {
-              id
-              uri
-            }
-            background {
-              id
-              uri
-              resizeMode
-            }
-            foreground {
-              id
-              uri
-            }
-            backgroundColor
-            backgroundPatternColor
-            foregroundColor
-            segmented
-            merged
-            textOrientation
-            textPosition
-            titleStyle {
-              fontFamily
-              fontSize
-              color
-            }
-            subTitleStyle {
-              fontFamily
-              fontSize
-              color
-            }
+          maskMedia {
+            id
+            uri
           }
-          cardColors {
-            primary
-            light
-            dark
-            otherColors
+          background {
+            id
+            uri
+            resizeMode
           }
+          foreground {
+            id
+            uri
+          }
+          backgroundColor
+          backgroundPatternColor
+          foregroundColor
+          segmented
+          merged
+          textOrientation
+          textPosition
+          titleStyle {
+            fontFamily
+            fontSize
+            color
+          }
+          subTitleStyle {
+            fontFamily
+            fontSize
+            color
+          }
+        }
+        cardColors {
+          primary
+          light
+          dark
+          otherColors
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   const cardCover = profile?.cardCover;
@@ -380,6 +378,7 @@ const useCoverEditionManager = ({
         profile {
           id
           ...CoverRenderer_profile
+          ...useCoverEditionManager_profile
           cardCover {
             media {
               id

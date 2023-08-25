@@ -65,8 +65,10 @@ const CoverEditor = (
       @argumentDefinitions(
         initialTemplateKind: { type: CoverTemplateKind, defaultValue: people }
       ) {
+        profile {
+          ...useCoverEditionManager_profile
+        }
         ...CoverEditorCustom_viewer
-        ...useCoverEditionManager_viewer
         ...CoverEditorTemplateList_viewer
           @arguments(initialTemplateKind: $initialTemplateKind)
       }
@@ -111,7 +113,7 @@ const CoverEditor = (
     initialData: null,
     initialColorPalette: null,
     onCoverSaved,
-    viewer,
+    profile: viewer.profile ?? null,
   });
 
   // #endregion

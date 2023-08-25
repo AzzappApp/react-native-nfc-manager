@@ -93,7 +93,9 @@ const CoverEditorCustom = ({
       fragment CoverEditorCustom_viewer on Viewer {
         ...CECBackgroundPanel_viewer
         ...CECForegroundPanel_viewer
-        ...useCoverEditionManager_viewer
+        profile {
+          ...useCoverEditionManager_profile
+        }
         coverBackgrounds {
           id
           uri
@@ -136,7 +138,7 @@ const CoverEditorCustom = ({
     initialData,
     initialColorPalette,
     onCoverSaved,
-    viewer,
+    profile: viewer.profile ?? null,
   });
   //#endregion
 

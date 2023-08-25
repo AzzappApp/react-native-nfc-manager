@@ -150,7 +150,9 @@ export default relayScreen(CoverEditionScreen, {
         query CoverEditionScreenPrefetchQuery {
           viewer {
             ...CoverEditorCustom_viewer
-            ...useCoverEditionManager_viewer @relay(mask: false)
+            profile {
+              ...useCoverEditionManager_profile @relay(mask: false)
+            }
           }
           viewerPeople: viewer {
             ...CoverEditorTemplateList_viewer
