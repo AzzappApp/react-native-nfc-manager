@@ -1,5 +1,7 @@
-## 0.2.0-canary.9
+## 0.2.0-canary.10
 
+* **fix:**  - **CoverEdition:** various crash
+* **fix:**  - color picker crash
 * **fix:**  - **CoverEdition:** cache issue
 * **fix:**  - max fetch concurency in edge
 * **feat:**  - rework photoWithTextAndTitle module ([#832](https://github.com/AzzappApp/azzapp/pull/832))
