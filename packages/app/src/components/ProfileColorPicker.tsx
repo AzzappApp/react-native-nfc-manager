@@ -148,7 +148,8 @@ export const useProfileCardColors = (
   );
 
   const colorList = useMemo(
-    () => profile.cardColors?.otherColors.slice() ?? DEFAULT_COLOR_LIST.slice(),
+    () =>
+      profile.cardColors?.otherColors?.slice() ?? DEFAULT_COLOR_LIST.slice(),
     [profile.cardColors],
   );
 
