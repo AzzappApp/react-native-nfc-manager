@@ -10,6 +10,8 @@ import {
   getUsersByIds,
   getCardStylesByIds,
   getCardTemplatesByIds,
+  getColorPalettesByIds,
+  getColorPalettes,
 } from '#domains';
 import type {
   Post,
@@ -21,6 +23,7 @@ import type {
   User,
   CardStyle,
   CardTemplate,
+  ColorPalette,
 } from '#domains';
 
 export type GraphQLContext = {
@@ -35,10 +38,12 @@ export type GraphQLContext = {
   postCommentLoader: DataLoader<string, PostComment | null>;
   mediaLoader: DataLoader<string, Media | null>;
   cardStyleLoader: DataLoader<string, CardStyle | null>;
+  colorPaletteLoader: DataLoader<string, ColorPalette | null>;
   staticMediaLoader: DataLoader<string, StaticMedia | null>;
   cardTemplateLoader: DataLoader<string, CardTemplate | null>;
   coverTemplateLoader: DataLoader<string, CoverTemplate | null>;
   userLoader: DataLoader<string, User | null>;
+  colorPalettesLoader: () => Promise<ColorPalette[]>;
 };
 
 const dataloadersOptions = {
@@ -55,6 +60,8 @@ export const createGraphQLContext = (
   if (profile) {
     profileLoader.prime(profile.id, profile);
   }
+
+  let colorPalettes: ColorPalette[] | null = null;
   return {
     auth: {
       userId,
@@ -76,11 +83,21 @@ export const createGraphQLContext = (
       getCoverTemplatesByIds,
       dataloadersOptions,
     ),
+    colorPaletteLoader: new DataLoader(
+      getColorPalettesByIds,
+      dataloadersOptions,
+    ),
     userLoader: new DataLoader(async (ids: readonly string[]) => {
       const users = await getUsersByIds(ids as string[]);
       const usersMap = new Map(users.map(user => [user.id, user]));
 
       return ids.map(id => usersMap.get(id) ?? null);
     }, dataloadersOptions),
+    colorPalettesLoader: async () => {
+      if (!colorPalettes) {
+        colorPalettes = await getColorPalettes();
+      }
+      return colorPalettes!;
+    },
   };
 };

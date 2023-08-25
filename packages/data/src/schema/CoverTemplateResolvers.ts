@@ -1,5 +1,6 @@
 import { connectionFromArray } from 'graphql-relay';
-import { getColorPaletteById, getColorPalettes, type Media } from '#domains';
+import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { getColorPaletteById, type Media } from '#domains';
 import { idResolver } from './utils';
 import type {
   CoverTemplateDataResolvers,
@@ -12,12 +13,18 @@ export const CoverTemplate: CoverTemplateResolvers = {
     mediaLoader.load(previewMediaId) as Promise<Media>,
   colorPalette: async ({ colorPaletteId }) =>
     getColorPaletteById(colorPaletteId),
-  colorPalettes: async ({ colorPaletteId }, { first, after }, { auth }) => {
-    const mainColorPalette = await getColorPaletteById(colorPaletteId);
+  colorPalettes: async (
+    { colorPaletteId },
+    { first, after },
+    { auth, colorPaletteLoader, colorPalettesLoader },
+  ) => {
+    const mainColorPalette = await colorPaletteLoader.load(colorPaletteId);
     const colorPalettes = [
       mainColorPalette,
-      ...(await getColorPalettes(auth.profileId ?? '' + colorPaletteId)).filter(
-        ({ id }) => id !== colorPaletteId,
+      ...shuffle(
+        await colorPalettesLoader(),
+        // stupid hack to make sure the color palettes are shuffled in the same way for a given user
+        parseInt(auth.profileId ?? '' + colorPaletteId, 36),
       ),
     ];
     return connectionFromArray(colorPalettes, { first, after });

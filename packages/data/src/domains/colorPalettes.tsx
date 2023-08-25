@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { inArray, sql, type InferModel, eq, and } from 'drizzle-orm';
+import { inArray, type InferModel, eq, and } from 'drizzle-orm';
 import {
   mysqlTable,
   boolean,
@@ -111,10 +111,8 @@ export const updateColorPalette = async (
  * Return a list of color palettes. filtered by profile kind and template kind
  * @param randomSeed the random seed to use for random ordering
  */
-export const getColorPalettes = async (randomSeed?: string) => {
-  let query = db.select().from(ColorPaletteTable);
-  if (randomSeed) {
-    query = query.orderBy(sql`RAND(${randomSeed})`);
-  }
-  return query;
-};
+export const getColorPalettes = async (): Promise<ColorPalette[]> =>
+  db
+    .select()
+    .from(ColorPaletteTable)
+    .where(eq(ColorPaletteTable.enabled, true));

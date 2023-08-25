@@ -18,9 +18,7 @@ type SessionData = {
 };
 
 export const getRequestSession = async (req: NextRequest) => {
-  console.log('COOKIE_NAME', COOKIE_NAME);
   const seal = req.cookies.get(COOKIE_NAME)?.value;
-  console.log('seal', seal);
   if (!seal) {
     return null;
   }

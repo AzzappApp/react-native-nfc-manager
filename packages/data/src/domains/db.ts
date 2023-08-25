@@ -2,6 +2,7 @@ import { connect } from '@planetscale/database';
 import { sql as sqlDrizzle } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { createConcurrentQueue } from '@azzapp/shared/asyncHelpers';
 import type { SQL } from 'drizzle-orm';
 
 // see https://github.com/drizzle-team/drizzle-orm/issues/656
@@ -14,13 +15,21 @@ const fetch =
     ? require('node-fetch')
     : globalThis.fetch;
 
+const MAX_CONCURRENT_QUERIES = 20;
+
+const concurrentQueue = createConcurrentQueue(MAX_CONCURRENT_QUERIES, () => {
+  console.warn(
+    `Maximum number of concurrent queries (${MAX_CONCURRENT_QUERIES}) reached`,
+  );
+});
+
 // create the connection
 const connection = connect({
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    return fetch(input, init);
+    return concurrentQueue(() => fetch(input, init)) as any;
   },
 });
 

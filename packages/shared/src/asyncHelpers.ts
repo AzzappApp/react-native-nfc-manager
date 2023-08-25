@@ -62,3 +62,45 @@ export const createDeffered = <T>(): Deferred<T> => {
   });
   return deffered;
 };
+
+/**
+ * Creates a concurrent queue that executes tasks with a given concurrency
+ */
+export const createConcurrentQueue = <T>(
+  maxConcurrencyLimit: number,
+  onMaxConcurrency?: () => void,
+) => {
+  const queue: Array<{ task: () => Promise<any>; deferred: Deferred<any> }> =
+    [];
+  let size = 0;
+  const execute = async () => {
+    if (size >= maxConcurrencyLimit) {
+      void onMaxConcurrency?.();
+      return;
+    }
+    const operation = queue.shift();
+    if (!operation) {
+      return;
+    }
+    size++;
+    let result: any;
+    let hasError = false;
+    try {
+      result = await operation.task();
+    } catch (e) {
+      operation.deferred.reject(e as any);
+      hasError = true;
+    }
+    if (!hasError) {
+      operation.deferred.resolve(result);
+    }
+    size--;
+    execute();
+  };
+  return (task: () => Promise<T>) => {
+    const deferred = createDeffered<T>();
+    queue.push({ task, deferred });
+    void execute();
+    return deferred.promise;
+  };
+};
