@@ -1,7 +1,7 @@
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
-import { getColorPaletteById, type Media } from '#domains';
 import { idResolver } from './utils';
+import type { Media } from '#domains';
 import type {
   CoverTemplateDataResolvers,
   CoverTemplateResolvers,
