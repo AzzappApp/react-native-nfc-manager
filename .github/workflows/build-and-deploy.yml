@@ -260,13 +260,14 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
-          ENVIRONMENT="development"
+          ENVIRONMENT="preview"
+          ADDITIONAL_ARGS=""
           if [["${{github.ref}}" == "refs/heads/stable"]; then
             ENVIRONMENT="production"
-          elif [["${{github.ref}}" == "refs/heads/staging"]; then
-            ENVIRONMENT="staging"
+          elif [["${{github.ref}}" == "refs/heads/main"]; then
+            ADDITIONAL_ARGS="--gitbranch=main"
           fi
-          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }}
+          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel build
         env:
@@ -296,13 +297,14 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
-          ENVIRONMENT="development"
+          ENVIRONMENT="preview"
+          ADDITIONAL_ARGS=""
           if [["${{github.ref}}" == "refs/heads/stable"]; then
             ENVIRONMENT="production"
-          elif [["${{github.ref}}" == "refs/heads/staging"]; then
-            ENVIRONMENT="staging"
+          elif [["${{github.ref}}" == "refs/heads/main"]; then
+            ADDITIONAL_ARGS="--gitbranch=main"
           fi
-          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }}
+          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel build
         env:
