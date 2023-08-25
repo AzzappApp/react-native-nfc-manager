@@ -454,7 +454,7 @@ const useCoverEditionManager = ({
 
       const shouldRecreateMedia =
         !cardCover ||
-        sourceMedia?.id != null ||
+        sourceMedia?.id == null ||
         (coverStyle.segmented && maskMedia?.id != null) ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
