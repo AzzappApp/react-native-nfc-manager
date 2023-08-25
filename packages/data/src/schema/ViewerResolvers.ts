@@ -14,7 +14,6 @@ import {
   getCardTemplates,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
-import { getColorPalettes } from '#domains/colorPalettes';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
 import {
   cursorToDate,
