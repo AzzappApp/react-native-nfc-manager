@@ -18,7 +18,9 @@ type SessionData = {
 };
 
 export const getRequestSession = async (req: NextRequest) => {
+  console.log('COOKIE_NAME', COOKIE_NAME);
   const seal = req.cookies.get(COOKIE_NAME)?.value;
+  console.log('seal', seal);
   if (!seal) {
     return null;
   }
@@ -33,18 +35,7 @@ export const getSession = (): Promise<SessionData | null> | null => {
   return unsealData(seal) as Promise<SessionData | null>;
 };
 
-export const setSession = async (res: NextResponse, data: SessionData) => {
-  const seal = await sealData(data);
-  res.cookies.set({
-    name: COOKIE_NAME,
-    value: seal,
-    maxAge: TTL,
-    ...COOKIE_OPTIONS,
-  });
-  return res;
-};
-
-export const setSessionServerActions = async (data: SessionData) => {
+export const setSession = async (data: SessionData) => {
   cookies().set({
     name: COOKIE_NAME,
     value: await sealData(data),

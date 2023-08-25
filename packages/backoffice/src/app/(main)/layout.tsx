@@ -24,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { logout } from '#app/loginActions';
 import getCurrentUser from '#helpers/getCurrentUser';
 import backOfficeSections from '../../backOfficeSections';
 
@@ -79,16 +80,14 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         </List>
         <Divider sx={{ mt: 'auto' }} />
         <List>
-          {PLACEHOLDER_LINKS.map(({ text, icon: Icon }) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton component={Link} href="/logout">
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <ListItem disablePadding>
+            <ListItemButton component="button" formAction={logout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
       <Box
@@ -110,8 +109,6 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 export default MainLayout;
 
 const DRAWER_WIDTH = 240;
-
-const PLACEHOLDER_LINKS = [{ text: 'Logout', icon: LogoutIcon }];
 
 const SectionIcons: Record<string, React.ComponentType> = {
   '/users': Person,

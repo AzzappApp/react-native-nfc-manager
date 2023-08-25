@@ -25,6 +25,8 @@ export async function middleware(request: NextRequest) {
     return null;
   });
 
+  console.log('session', session);
+
   if (!session?.userId) {
     return redirectToLogin(nextUrl);
   }
