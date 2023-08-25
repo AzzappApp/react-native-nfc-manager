@@ -1,5 +1,6 @@
-## 0.2.0-canary.10
+## 0.2.0-canary.11
 
+* **fix:**  - **CoverEdition:** source media not updated
 * **fix:**  - **CoverEdition:** various crash
 * **fix:**  - color picker crash
 * **fix:**  - **CoverEdition:** cache issue
