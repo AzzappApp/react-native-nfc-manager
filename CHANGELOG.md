@@ -1,4 +1,4 @@
-## 0.2.0-canary.7
+## 0.2.0-canary.8
 
 * **fix:**  - max fetch concurency in edge
 * **feat:**  - rework photoWithTextAndTitle module ([#832](https://github.com/AzzappApp/azzapp/pull/832))
