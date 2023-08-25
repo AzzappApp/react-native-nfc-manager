@@ -11,8 +11,8 @@ export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
   previewMedia: async ({ previewMediaId }, _, { mediaLoader }) =>
     mediaLoader.load(previewMediaId) as Promise<Media>,
-  colorPalette: async ({ colorPaletteId }) =>
-    getColorPaletteById(colorPaletteId),
+  colorPalette: async ({ colorPaletteId }, _, { colorPaletteLoader }) =>
+    (await colorPaletteLoader.load(colorPaletteId))!,
   colorPalettes: async (
     { colorPaletteId },
     { first, after },
