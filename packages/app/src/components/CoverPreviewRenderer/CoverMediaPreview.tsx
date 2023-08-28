@@ -225,7 +225,7 @@ const CoverMediaPreview = (
           )}
         </GPUView>
       )}
-      {kind === 'video' && pausedOnFirstLoad && (
+      {kind === 'video' && (
         <GPUImageView
           {...loadingHandlers}
           style={[
