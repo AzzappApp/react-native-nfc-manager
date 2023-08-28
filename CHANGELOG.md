@@ -1,5 +1,6 @@
-## 0.2.0-canary.14
+## 0.2.0-canary.15
 
+* **fix:**  - AVAsset cache crash
 * **fix:**  - order of module in cardtemplate (loading) ([#865](https://github.com/AzzappApp/azzapp/pull/865))
 * **fix:**  - pointer event on AnimatedText ([#860](https://github.com/AzzappApp/azzapp/pull/860))
 * **fix:**  - contact card informaiton layout ([#863](https://github.com/AzzappApp/azzapp/pull/863))
