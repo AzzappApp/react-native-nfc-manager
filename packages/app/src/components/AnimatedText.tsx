@@ -56,6 +56,7 @@ const AnimatedText = ({
       editable={false}
       value={text.value}
       style={[styles.text, style]}
+      pointerEvents={'box-none'}
       {...{ animatedProps }}
     />
   );
