@@ -6,8 +6,8 @@ type ContactCard {
     company: String
     emails: [ContactCardEmail!]
     phoneNumbers: [ContactCardPhoneNumber!]
-    public: Boolean!
-    isDisplayedOnWebCard: Boolean!
+    isPrivate: Boolean!
+    displayedOnWebCard: Boolean!
     serializedContactCard: SerializedContactCard!
 }
 

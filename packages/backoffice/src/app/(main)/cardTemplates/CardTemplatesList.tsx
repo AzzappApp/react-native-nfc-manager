@@ -50,7 +50,10 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'name',
+    field: 'labels',
+    valueGetter: params => {
+      return params.row.labels.en;
+    },
     headerName: 'Name',
     flex: 1,
   },

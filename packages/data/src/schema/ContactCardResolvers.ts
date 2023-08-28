@@ -8,9 +8,8 @@ export const ContactCard: ContactCardResolvers = {
   company: profile => profile.contactCard?.company ?? null,
   emails: profile => profile.contactCard?.emails ?? null,
   phoneNumbers: profile => profile.contactCard?.phoneNumbers ?? null,
-  public: profile => !profile.contactCardIsPrivate,
-  isDisplayedOnWebCard: profile =>
-    profile.contactCardDisplayedOnWebCard ?? false,
+  isPrivate: profile => !profile.contactCardIsPrivate,
+  displayedOnWebCard: profile => profile.contactCardDisplayedOnWebCard ?? false,
   serializedContactCard: profile =>
     serializeAndSignContactCard(
       profile.id,

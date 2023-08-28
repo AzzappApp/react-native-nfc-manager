@@ -192,6 +192,7 @@ const ProfileForm = ({
             webcardViews
             totalLikes
           }
+          ...ContactCard_profile
           nbPosts
           nbFollowings
           nbFollowers

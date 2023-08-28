@@ -20,6 +20,8 @@ import type {
   StyleProp,
   ViewStyle,
   ViewProps,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 
 type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
@@ -146,6 +148,14 @@ function CarouselSelectList<TItem = any>(
     },
   });
 
+  const onMomentumScrollEnd = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const index = event.nativeEvent.contentOffset.x / itemWidth;
+      onSelectedIndexChange?.(Math.round(index));
+    },
+    [itemWidth, onSelectedIndexChange],
+  );
+
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
       length: itemWidth,
@@ -231,6 +241,7 @@ function CarouselSelectList<TItem = any>(
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       style={[{ width, height }, style as any]}
+      onMomentumScrollEnd={onMomentumScrollEnd}
       contentContainerStyle={[
         {
           height,

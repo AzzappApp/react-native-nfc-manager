@@ -58,8 +58,8 @@ const contactCardMobileScreenQuery = graphql`
         ...ProfileColorPicker_profile
         ...ContactCard_profile
         contactCard {
-          public
-          isDisplayedOnWebCard
+          isPrivate
+          displayedOnWebCard
           ...ContactCardEditModal_card
           ...ContactCardExportVcf_card
         }
@@ -172,8 +172,8 @@ const ContactCardScreen = ({
       saveContactCard(input: $input) {
         profile {
           contactCard {
-            public
-            isDisplayedOnWebCard
+            isPrivate
+            displayedOnWebCard
             ...ContactCardEditModal_card
           }
         }
@@ -182,19 +182,22 @@ const ContactCardScreen = ({
   `);
 
   const [isPublicCard, setIsPublicCard] = useToggle(false);
-  const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(false);
+  const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
+    viewer.profile?.contactCard?.displayedOnWebCard ?? false,
+  );
 
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle(false);
 
   const [debouncedPublic] = useDebounce(isPublicCard, 500);
   const [debouncedDisplayedOnWebCard] = useDebounce(isDisplayedOnWebCard, 500);
 
+  //TODO: find another way, we are saving the contact card when displaying the page(initial render)
   useEffect(() => {
     commit({
       variables: {
         input: {
-          public: debouncedPublic,
-          isDisplayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
+          isPrivate: !debouncedPublic,
+          displayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
         },
       },
       onError: err => {
