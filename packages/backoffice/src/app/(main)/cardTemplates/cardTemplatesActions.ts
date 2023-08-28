@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import {
   CardModuleTable,
   CardTemplateCompanyActivityTable,
@@ -20,7 +20,8 @@ export const getModulesData = async (profileUserName: string) => {
     .select()
     .from(CardModuleTable)
     .innerJoin(ProfileTable, eq(ProfileTable.id, CardModuleTable.profileId))
-    .where(eq(ProfileTable.userName, profileUserName));
+    .where(eq(ProfileTable.userName, profileUserName))
+    .orderBy(asc(CardModuleTable.position));
 
   if (res.length < 1) return null;
 
