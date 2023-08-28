@@ -1,5 +1,6 @@
-## 0.2.0-canary.11
+## 0.2.0-canary.12
 
+* **feat:**  - hide tab bar in home when create profile selected ([#846](https://github.com/AzzappApp/azzapp/pull/846))
 * **fix:**  - **CoverEdition:** source media not updated
 * **fix:**  - **CoverEdition:** various crash
 * **fix:**  - color picker crash
