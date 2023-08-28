@@ -10,7 +10,6 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { CameraButton, CropButton } from '#components/commonsButtons';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
-import { getNextOrientation } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -28,7 +27,7 @@ import CECImageEditionPanel from './CECImageEditionPanel';
 import CECTitlePanel from './CECTitlePanel';
 import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
-import type { CropData, EditionParameters } from '#components/gpu';
+import type { EditionParameters } from '#components/gpu';
 import type { ColorPalette, CoverStyleData } from '../coverEditorTypes';
 import type { CoverData } from '../useCoverEditionManager';
 import type { CoverEditorCustom_viewer$key } from '@azzapp/relay/artifacts/CoverEditorCustom_viewer.graphql';
@@ -129,7 +128,7 @@ const CoverEditorCustom = ({
     setTitle,
     setSubTitle,
     setCoverStyle,
-    setMediaCropParameter,
+    toggleCropMode,
     setColorPalette,
     setOtherColors,
     openImagePicker,
@@ -179,20 +178,14 @@ const CoverEditorCustom = ({
     keyof EditionParameters | null
   >(null);
 
-  const editionParametersSave = useRef({
-    mediaCropParameter,
-    mediaParameter: coverStyle.mediaParameters,
-  });
+  const editionParametersSave = useRef(coverStyle.mediaParameters);
 
   const onStartParameterEdition = useCallback(
     (param: keyof EditionParameters) => {
-      editionParametersSave.current = {
-        mediaCropParameter,
-        mediaParameter: coverStyle.mediaParameters,
-      };
+      editionParametersSave.current = coverStyle.mediaParameters;
       setEditedParameter(param);
     },
-    [coverStyle.mediaParameters, mediaCropParameter],
+    [coverStyle.mediaParameters],
   );
 
   const onParameterValueChange = useCallback(
@@ -200,22 +193,15 @@ const CoverEditorCustom = ({
       param: T,
       value: EditionParameters[T],
     ) => {
-      if (param === 'cropData' || param === 'roll' || param === 'orientation') {
-        setMediaCropParameter(mediaCropParameter => ({
-          ...mediaCropParameter,
+      setCoverStyle(coverStyle => ({
+        ...coverStyle,
+        mediaParameters: {
+          ...coverStyle.mediaParameters,
           [param]: value,
-        }));
-      } else {
-        setCoverStyle(coverStyle => ({
-          ...coverStyle,
-          mediaParameters: {
-            ...coverStyle.mediaParameters,
-            [param]: value,
-          },
-        }));
-      }
+        },
+      }));
     },
-    [setCoverStyle, setMediaCropParameter],
+    [setCoverStyle],
   );
 
   const onEditedParameterValueChange = useCallback(
@@ -225,37 +211,18 @@ const CoverEditorCustom = ({
     [editedParameter, onParameterValueChange],
   );
 
-  const onCropDataChange = useCallback(
-    (value: CropData) => {
-      onParameterValueChange('cropData', value);
-    },
-    [onParameterValueChange],
-  );
-
   const onParameterEditionSave = useCallback(() => {
     setEditedParameter(null);
   }, []);
 
   const onParameterEditionCancel = useCallback(() => {
-    setMediaCropParameter(editionParametersSave.current.mediaCropParameter);
     setCoverStyle(coverStyle => ({
       ...coverStyle,
-      mediaParameters: editionParametersSave.current.mediaParameter,
+      mediaParameters: editionParametersSave.current,
     }));
     setEditedParameter(null);
-  }, [setCoverStyle, setMediaCropParameter]);
+  }, [setCoverStyle]);
 
-  const onNextOrientation = useCallback(() => {
-    setMediaCropParameter(mediaCropParameter => ({
-      ...mediaCropParameter,
-      orientation: getNextOrientation(mediaCropParameter?.orientation),
-    }));
-  }, [setMediaCropParameter]);
-
-  const onActivateCropMode = () => {
-    // a little hack since we allow roll to be edited in crop mode
-    onStartParameterEdition('roll');
-  };
   //#endregion
 
   //#region Segmentation and merge
@@ -351,17 +318,6 @@ const CoverEditorCustom = ({
 
   const kind = currentMedia?.kind ?? 'image';
   const uri = currentMedia?.uri ?? null;
-  const mediaSize = useMemo(
-    () =>
-      currentMedia
-        ? {
-            width: currentMedia.width,
-            height: currentMedia.height,
-          }
-        : null,
-    [currentMedia],
-  );
-
   const editionParameters = useMemo<EditionParameters>(
     () => ({
       ...coverStyle.mediaParameters,
@@ -396,7 +352,6 @@ const CoverEditorCustom = ({
     bottomSheetHeights,
   } = useCoverEditorCustomLayout();
 
-  const cropEditionMode = editedParameter === 'roll';
   const intl = useIntl();
 
   return (
@@ -412,26 +367,21 @@ const CoverEditorCustom = ({
         <CECHeader
           // TODO
           isCreation={false}
-          cropEditionMode={cropEditionMode}
           canSave={!!sourceMedia}
           onCancel={onCancel}
           onSave={onSave}
-          onNextOrientation={onNextOrientation}
           editedParameter={editedParameter}
         />
         <View style={[styles.topPanel, { height: topPanelHeight }]}>
           <PressableNative
             style={{ height: coverHeight, aspectRatio: COVER_RATIO }}
             onPress={openImagePicker}
-            disabled={cropEditionMode}
-            disabledOpacity={1}
           >
             <CoverPreviewRenderer
               ref={coverPreviewRef}
               kind={kind}
               uri={uri}
               maskUri={segmented ? maskMedia?.uri : null}
-              mediaSize={mediaSize}
               foregroundId={foreground?.id}
               foregroundImageUri={foreground?.uri}
               foregroundImageTintColor={foregroundColor}
@@ -448,17 +398,15 @@ const CoverEditorCustom = ({
               textOrientation={textOrientationOrDefaut(textOrientation)}
               textPosition={textPositionOrDefaut(textPosition)}
               computing={mediaComputing}
-              cropEditionMode={cropEditionMode}
-              onCropDataChange={onCropDataChange}
               // onReady={onCoverPreviewReady}
               onError={onMediaError}
               height={coverHeight}
               colorPalette={colorPalette}
             />
           </PressableNative>
-          {sourceMedia && !cropEditionMode && !editedParameter && (
+          {sourceMedia && !editedParameter && (
             <CropButton
-              onPress={onActivateCropMode}
+              onPress={toggleCropMode}
               style={{
                 position: 'absolute',
                 top: topPanelButtonsTop,
@@ -466,7 +414,7 @@ const CoverEditorCustom = ({
               }}
             />
           )}
-          {!cropEditionMode && !editedParameter && (
+          {!editedParameter && (
             <CameraButton
               onPress={openImagePicker}
               style={{

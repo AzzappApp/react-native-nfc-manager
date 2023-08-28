@@ -60,13 +60,15 @@ export type CoverEditorProps = {
   subTitle: string | null;
   width: number;
   height: number;
-  mediaParameters: EditionParameters | null;
+  mediaCropParameters: EditionParameters | null;
   timeRange: TimeRange | null;
   currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
   coverPreviewRef: Ref<CoverPreviewHandler> | null;
   mediaComputing: boolean;
   showTemplatesMedias: boolean;
+  initialSelectedIndex: number;
+  onSelectedIndexChange: (index: number) => void;
   onCoverStyleChange: (data: CoverStyleData) => void;
   onColorPaletteChange: (palette: ColorPalette) => void;
   onPreviewMediaChange: (media: {
@@ -82,7 +84,7 @@ const CoverEditorTemplateList = ({
   templateKind = 'people',
   media,
   maskUri,
-  mediaParameters,
+  mediaCropParameters,
   timeRange,
   title,
   subTitle,
@@ -93,9 +95,11 @@ const CoverEditorTemplateList = ({
   coverPreviewRef,
   mediaComputing,
   showTemplatesMedias,
+  initialSelectedIndex,
   onCoverStyleChange,
   onColorPaletteChange,
   onPreviewMediaChange,
+  onSelectedIndexChange,
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
@@ -158,7 +162,13 @@ const CoverEditorTemplateList = ({
       } = readInlineData(
         graphql`
           fragment CoverEditorTemplateListItem_coverTemplate on CoverTemplate
-          @inline {
+          @inline
+          @argumentDefinitions(
+            cappedPixelRatio: {
+              type: "Float!"
+              provider: "../providers/CappedPixelRatio.relayprovider"
+            }
+          ) {
             id
             kind
             colorPalette {
@@ -167,7 +177,7 @@ const CoverEditorTemplateList = ({
             previewMedia {
               __typename
               id
-              uri
+              uri(width: 300, pixelRatio: $cappedPixelRatio)
               width
               height
             }
@@ -214,6 +224,10 @@ const CoverEditorTemplateList = ({
         colorPalettes,
       );
 
+      const templateEditionParameters =
+        mediaParameters as EditionParameters | null;
+
+      const displayTemplateMedia = showTemplatesMedias || !media;
       return {
         id,
         title,
@@ -222,18 +236,22 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
-        media:
-          showTemplatesMedias || !media
-            ? {
-                uri: previewMedia.uri,
-                kind:
-                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-                width: previewMedia.width,
-                height: previewMedia.height,
-              }
-            : media,
+        media: displayTemplateMedia
+          ? {
+              uri: previewMedia.uri,
+              kind:
+                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+              width: previewMedia.width,
+              height: previewMedia.height,
+            }
+          : media,
         mediaFilter,
-        mediaParameters: mediaParameters as EditionParameters,
+        mediaParameters: displayTemplateMedia
+          ? (templateEditionParameters as EditionParameters | null) ?? {}
+          : {
+              ...templateEditionParameters,
+              ...mediaCropParameters,
+            },
         maskUri: kind === 'people' && !showTemplatesMedias ? maskUri : null,
         background: background ?? null,
         backgroundColor,
@@ -245,7 +263,7 @@ const CoverEditorTemplateList = ({
       };
     });
 
-    if (currentCoverStyle) {
+    if (currentCoverStyle && media) {
       let colorPalette: ColorPalette;
       let colorPaletteIndex: number;
       if (cardColors) {
@@ -272,9 +290,13 @@ const CoverEditorTemplateList = ({
         id: 'cover',
         title,
         subTitle: subTitle!,
-        media: media!,
+        media,
         maskUri,
         ...currentCoverStyle,
+        mediaParameters: {
+          ...(currentCoverStyle.mediaParameters as EditionParameters),
+          ...(mediaCropParameters as EditionParameters),
+        },
         colorPalettes: coverColorPalettes,
       });
     }
@@ -284,10 +306,11 @@ const CoverEditorTemplateList = ({
     coverTemplates.edges,
     currentCoverStyle,
     colorPalettes,
-    title,
-    subTitle,
     showTemplatesMedias,
     media,
+    title,
+    subTitle,
+    mediaCropParameters,
     maskUri,
     cardColors,
   ]);
@@ -301,8 +324,9 @@ const CoverEditorTemplateList = ({
 
   const carouselRef = useRef<CarouselSelectListHandle>(null);
   const colorPalletesListRef = useRef<FlatList<ColorPalette> | null>(null);
-  const onSelectedIndexChange = useCallback(
+  const onSelectedIndexChangeInner = useCallback(
     (index: number) => {
+      onSelectedIndexChange?.(index);
       const selectedItem = items[index];
       unstable_batchedUpdates(() => {
         setSelectedItem(selectedItem);
@@ -313,7 +337,7 @@ const CoverEditorTemplateList = ({
         });
       });
     },
-    [colorPalettesIndexes, items],
+    [colorPalettesIndexes, items, onSelectedIndexChange],
   );
 
   const scrollToIndex = useCallback((index: number) => {
@@ -430,7 +454,7 @@ const CoverEditorTemplateList = ({
           scrollToIndex(index);
         }
       };
-      const { uri, kind, width: mediaWidth, height: mediaHeight } = item.media;
+      const { uri, kind } = item.media;
       return (
         <PressableScaleHighlight
           style={{
@@ -453,10 +477,7 @@ const CoverEditorTemplateList = ({
             foregroundImageUri={item.foreground?.uri}
             foregroundImageTintColor={item.foregroundColor}
             backgroundMultiply={item.merged}
-            editionParameters={{
-              ...item.mediaParameters,
-              ...mediaParameters,
-            }}
+            editionParameters={item.mediaParameters}
             filter={item.mediaFilter}
             title={item.title}
             titleStyle={item.titleStyle}
@@ -468,9 +489,7 @@ const CoverEditorTemplateList = ({
             colorPalette={
               item.colorPalettes[colorPalettesIndexes[item.id] ?? 0]
             }
-            mediaSize={{ width: mediaWidth, height: mediaHeight }}
             computing={mediaComputing}
-            cropEditionMode={false}
             height={carouselHeight}
             paused={!isSelectedItem}
             style={styles.templateItemContainer}
@@ -484,7 +503,6 @@ const CoverEditorTemplateList = ({
       coverPreviewRef,
       timeRange?.startTime,
       timeRange?.duration,
-      mediaParameters,
       colorPalettesIndexes,
       mediaComputing,
       carouselHeight,
@@ -539,14 +557,15 @@ const CoverEditorTemplateList = ({
         scaleRatio={0.5}
         keyExtractor={templateKeyExtractor}
         renderItem={renderTemplate}
-        onEndReached={onEndTemplateReached}
         style={styles.carousel}
         width={width}
         height={carouselHeight}
         itemWidth={templateWidth}
         contentContainerStyle={styles.carouselContentContainer}
         itemContainerStyle={styles.carouselContentContainer}
-        onSelectedIndexChange={onSelectedIndexChange}
+        initialScrollIndex={initialSelectedIndex}
+        onSelectedIndexChange={onSelectedIndexChangeInner}
+        onEndReached={onEndTemplateReached}
       />
       <MaskedView
         style={[

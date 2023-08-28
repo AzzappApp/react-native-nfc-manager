@@ -8,7 +8,6 @@ import {
   COVER_VIDEO_BITRATE,
 } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
-import Cropper from '#components/Cropper';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -17,11 +16,7 @@ import Delay from '#ui/Delay';
 import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import CoverTextPreview from './CoverTextPreview';
-import type {
-  CropData,
-  GPUImageViewHandle,
-  GPUVideoViewHandle,
-} from '#components/gpu';
+import type { GPUImageViewHandle, GPUVideoViewHandle } from '#components/gpu';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
 import type {
   CoverTextPreviewProps,
@@ -51,10 +46,6 @@ type CoverPreviewRendererProps = CoverTextPreviewProps &
      */
     foregroundImageTintColor?: string | null;
     /**
-     * The size of the source media
-     */
-    mediaSize?: { width: number; height: number } | null;
-    /**
      * the Color palette of the cover
      */
     colorPalette?: {
@@ -66,16 +57,6 @@ type CoverPreviewRendererProps = CoverTextPreviewProps &
      * if true, a loading indicator will be displayed after a delay
      */
     computing?: boolean | null;
-    /**
-     * Enable the crop edition mode on the sourceMedia image
-     *
-     * @type {(boolean | null)}
-     */
-    cropEditionMode?: boolean | null;
-    /**
-     * Callback called when the crop data of the sourceMedia image change
-     */
-    onCropDataChange?: (cropData: CropData) => void;
     /**
      * Callback called when the cover preview is ready
      */
@@ -130,14 +111,12 @@ const CoverPreviewRenderer = (
     textPosition,
     // other props
     colorPalette,
-    mediaSize,
     computing,
-    cropEditionMode,
     height,
-    onCropDataChange,
     onReady,
     onError,
     style,
+    paused,
     ...props
   }: CoverPreviewRendererProps,
   forwardedRef: ForwardedRef<CoverPreviewHandler>,
@@ -227,48 +206,32 @@ const CoverPreviewRenderer = (
           </View>
         ) : (
           <>
-            {mediaSize && uri && (
-              <Cropper
-                mediaSize={mediaSize}
-                aspectRatio={COVER_RATIO}
-                cropData={editionParameters?.cropData}
-                orientation={editionParameters?.orientation}
-                pitch={editionParameters?.pitch}
-                yaw={editionParameters?.yaw}
-                roll={editionParameters?.roll}
-                cropEditionMode={cropEditionMode}
-                onCropDataChange={onCropDataChange}
-                style={styles.cover}
-              >
-                {cropData => (
-                  <CoverMediaPreview
-                    ref={mediaRef}
-                    uri={uri}
-                    kind={kind}
-                    time={time}
-                    startTime={startTime}
-                    duration={duration}
-                    backgroundColor={swapColor(backgroundColor, colorPalette)}
-                    maskUri={maskUri}
-                    backgroundImageUri={backgroundImageUri}
-                    backgroundImageTintColor={swapColor(
-                      backgroundImageTintColor,
-                      colorPalette,
-                    )}
-                    backgroundMultiply={backgroundMultiply}
-                    filter={filter}
-                    editionParameters={{
-                      ...editionParameters,
-                      cropData,
-                    }}
-                    onLoadingStart={onLoadStart}
-                    onLoadingEnd={onLoad}
-                    onLoadingError={onLoadingError}
-                    style={styles.cover}
-                    testID="cover-edition-screen-cover-preview"
-                  />
+            {uri && (
+              <CoverMediaPreview
+                key={uri}
+                ref={mediaRef}
+                uri={uri}
+                kind={kind}
+                time={time}
+                startTime={startTime}
+                duration={duration}
+                backgroundColor={swapColor(backgroundColor, colorPalette)}
+                maskUri={maskUri}
+                backgroundImageUri={backgroundImageUri}
+                backgroundImageTintColor={swapColor(
+                  backgroundImageTintColor,
+                  colorPalette,
                 )}
-              </Cropper>
+                backgroundMultiply={backgroundMultiply}
+                filter={filter}
+                editionParameters={editionParameters}
+                paused={paused}
+                onLoadingStart={onLoadStart}
+                onLoadingEnd={onLoad}
+                onLoadingError={onLoadingError}
+                style={styles.cover}
+                testID="cover-edition-screen-cover-preview"
+              />
             )}
             {foregroundImageUri && foregroundId && (
               <MediaImageRenderer
@@ -281,16 +244,13 @@ const CoverPreviewRenderer = (
                 }}
                 tintColor={swapColor(foregroundImageTintColor, colorPalette)}
                 aspectRatio={COVER_RATIO}
-                style={[
-                  {
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    height,
-                    width: height * COVER_RATIO,
-                  },
-                  cropEditionMode && { opacity: 0.5 },
-                ]}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  height,
+                  width: height * COVER_RATIO,
+                }}
                 alt={'Cover edition foreground'}
               />
             )}

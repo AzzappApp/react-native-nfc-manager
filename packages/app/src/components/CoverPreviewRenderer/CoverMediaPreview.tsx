@@ -1,4 +1,5 @@
-import { forwardRef, useCallback, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import {
   GPUImageView,
   GPUVideoView,
@@ -6,6 +7,8 @@ import {
   Video,
   VideoFrame,
 } from '#components/gpu';
+import { prefetchVideo } from '#components/medias';
+import { isFileURL } from '#helpers/fileHelpers';
 import type {
   EditionParameters,
   GPUImageViewHandle,
@@ -13,6 +16,7 @@ import type {
 } from '#components/gpu';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { Subscription } from 'relay-runtime';
 
 export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
   /**
@@ -114,6 +118,22 @@ const CoverMediaPreview = (
 ) => {
   const GPUView = kind === 'video' ? GPUVideoView : GPUImageView;
 
+  const pausedOnFirstLoad = useRef(paused).current;
+
+  useEffect(() => {
+    let subscription: Subscription;
+    if (uri && !isFileURL(uri) && kind === 'video' && pausedOnFirstLoad) {
+      subscription = prefetchVideo(uri).subscribe({
+        error: () => {
+          /* ignore */
+        },
+      });
+    }
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [kind, pausedOnFirstLoad, uri]);
+
   const videoViewReadyState = useRef({
     imagesLoaded: false,
     playerReady: false,
@@ -136,6 +156,12 @@ const CoverMediaPreview = (
     onLoadingStart?.();
   }, [onLoadingStart]);
 
+  const [playerReady, setPlayerReady] = useState(false);
+
+  const onProgress = useCallback(() => {
+    setPlayerReady(true);
+  }, []);
+
   const onPlayerReady = useCallback(() => {
     videoViewReadyState.current.playerReady = true;
     const hasImages = !!backgroundImageUri || !!maskUri;
@@ -151,6 +177,7 @@ const CoverMediaPreview = (
           onImagesLoaded: onVideoViewImagesLoaded,
           onPlayerStartBuffing,
           onPlayerReady,
+          onProgress,
           onError: onLoadingError,
         }
       : {
@@ -168,28 +195,56 @@ const CoverMediaPreview = (
   } as const;
 
   return (
-    <GPUView
-      {...props}
-      {...loadingHandlers}
-      paused={paused}
-      ref={viewRef as any}
+    <View
       style={[style, backgroundColor != null && { backgroundColor }]}
+      {...props}
     >
-      {backgroundImageUri && (
-        <Image uri={backgroundImageUri} tintColor={backgroundImageTintColor} />
+      {(kind !== 'video' || !paused) && (
+        <GPUView
+          {...loadingHandlers}
+          paused={paused}
+          ref={viewRef as any}
+          style={{ flex: 1 }}
+        >
+          {backgroundImageUri && (
+            <Image
+              uri={backgroundImageUri}
+              tintColor={backgroundImageTintColor}
+            />
+          )}
+          {kind === 'video' ? (
+            <Video
+              {...mainGPULayerProps}
+              startTime={startTime}
+              duration={duration}
+            />
+          ) : kind === 'videoFrame' ? (
+            <VideoFrame {...mainGPULayerProps} time={time} />
+          ) : (
+            <Image {...mainGPULayerProps} />
+          )}
+        </GPUView>
       )}
-      {kind === 'video' ? (
-        <Video
-          {...mainGPULayerProps}
-          startTime={startTime}
-          duration={duration}
-        />
-      ) : kind === 'videoFrame' ? (
-        <VideoFrame {...mainGPULayerProps} time={time} />
-      ) : (
-        <Image {...mainGPULayerProps} />
+      {kind === 'video' && pausedOnFirstLoad && (
+        <GPUImageView
+          {...loadingHandlers}
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              opacity: paused || !playerReady ? 1 : 0,
+            },
+          ]}
+        >
+          {backgroundImageUri && (
+            <Image
+              uri={backgroundImageUri}
+              tintColor={backgroundImageTintColor}
+            />
+          )}
+          <VideoFrame {...mainGPULayerProps} time={startTime ?? 0} />
+        </GPUImageView>
       )}
-    </GPUView>
+    </View>
   );
 };
 

@@ -18,6 +18,7 @@ RCT_EXPORT_VIEW_PROPERTY(onImagesLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onImagesLoaded, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onPlayerStartBuffing, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onPlayerReady, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onProgress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
 
 

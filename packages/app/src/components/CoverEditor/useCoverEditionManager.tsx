@@ -42,6 +42,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
+import CoverEditorCropModal from './CoverEditorCropModal';
 import type { CoverPreviewHandler } from '#components/CoverPreviewRenderer';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
@@ -79,7 +80,7 @@ type UserCoverEditorUpdaterOptions = {
   profile: useCoverEditionManager_profile$key | null;
   initialData: CoverData | null;
   initialColorPalette: ColorPalette | null;
-  acceptedMediaKind?: 'image' | 'mixed' | 'video';
+  initialTemplateKind?: 'image' | 'mixed' | 'video';
   onCoverSaved: () => void;
 };
 
@@ -87,7 +88,7 @@ const useCoverEditionManager = ({
   profile: profileKey,
   initialData,
   initialColorPalette,
-  acceptedMediaKind = 'mixed',
+  initialTemplateKind = 'mixed',
   onCoverSaved,
 }: UserCoverEditorUpdaterOptions) => {
   const profile = useFragment(
@@ -250,6 +251,69 @@ const useCoverEditionManager = ({
     initialData?.coverStyle ?? currentCoverStyle ?? DEFAULT_COVER_STYLE,
   );
   // #endregion
+
+  // #region Media kind
+  const [mediaKind, setMediaKind] = useState<'image' | 'mixed' | 'video'>(
+    initialTemplateKind,
+  );
+  type MediaInfos = {
+    sourceMedia: CoverData['sourceMedia'] | null;
+    maskMedia: CoverData['maskMedia'] | null;
+    mediaCropParameter: CoverData['mediaCropParameter'] | null;
+  };
+  const mediaInfosRef = useRef<{
+    video: MediaInfos | null;
+    image: MediaInfos | null;
+  }>({
+    video: null,
+    image: null,
+  });
+
+  const updateEditedMediaKind = useCallback(
+    (kind: 'image' | 'mixed' | 'video') => {
+      unstable_batchedUpdates(() => {
+        if (kind === 'video' && mediaKind === 'image') {
+          mediaInfosRef.current.image = {
+            sourceMedia,
+            maskMedia,
+            mediaCropParameter,
+          };
+          const videoInfos = mediaInfosRef.current.video;
+          setSourceMedia(videoInfos?.sourceMedia ?? null);
+          setMaskMedia(null);
+          setMediaCropParameter(videoInfos?.mediaCropParameter ?? null);
+        } else if (kind === 'image' && mediaKind === 'video') {
+          mediaInfosRef.current.video = {
+            sourceMedia,
+            maskMedia,
+            mediaCropParameter,
+          };
+          const imageInfos = mediaInfosRef.current.image;
+          setSourceMedia(imageInfos?.sourceMedia ?? null);
+          setMaskMedia(imageInfos?.maskMedia ?? null);
+          setMediaCropParameter(imageInfos?.mediaCropParameter ?? null);
+        }
+        setMediaKind(kind);
+      });
+    },
+    [maskMedia, mediaCropParameter, mediaKind, sourceMedia],
+  );
+  //#endregion
+
+  //#region Crop mode
+  const [cropMode, setCropMode] = useState(false);
+  const toggleCropMode = useCallback(() => {
+    setCropMode(cropMode => !cropMode);
+  }, []);
+
+  const onSaveCropData = useCallback(
+    (editionParameters: EditionParameters) => {
+      setMediaCropParameter(editionParameters);
+      setCropMode(false);
+    },
+    [setMediaCropParameter],
+  );
+  //#endregion
 
   // #region Color palette
   const [colorPalette, setColorPalette] = useState<ColorPalette>(() => {
@@ -424,7 +488,10 @@ const useCoverEditionManager = ({
         foregroundId: coverStyle.foreground?.id ?? null,
         foregroundColor: coverStyle.foregroundColor,
         mediaFilter: coverStyle.mediaFilter,
-        mediaParameters: coverStyle.mediaParameters,
+        mediaParameters: {
+          ...coverStyle.mediaParameters,
+          ...mediaCropParameter,
+        },
         merged: coverStyle.merged,
         segmented: coverStyle.segmented,
         subTitle: subTitle ?? null,
@@ -447,8 +514,6 @@ const useCoverEditionManager = ({
         'background',
         'backgroundColor',
         'backgroundPatternColor',
-        'foreground',
-        'foregroundColor',
         'merged',
         'segmented',
       ] as const;
@@ -459,7 +524,16 @@ const useCoverEditionManager = ({
         (coverStyle.segmented && maskMedia?.id != null) ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
-          pick(coverStyle, ...mediaStyle),
+          pick(
+            {
+              ...coverStyle,
+              mediaParameters: {
+                ...coverStyle.mediaParameters,
+                ...mediaCropParameter,
+              },
+            },
+            ...mediaStyle,
+          ),
         ) ||
         paletteChanged;
 
@@ -623,8 +697,9 @@ const useCoverEditionManager = ({
     coverStyle,
     colorPalette,
     mediaComputation,
-    commit,
     otherColors,
+    commit,
+    mediaCropParameter,
     subTitle,
     title,
     cardColors,
@@ -635,6 +710,7 @@ const useCoverEditionManager = ({
   ]);
 
   const intl = useIntl();
+
   const modals = (
     <>
       <Modal
@@ -643,7 +719,7 @@ const useCoverEditionManager = ({
         onRequestClose={closeImagePicker}
       >
         <ImagePicker
-          kind={acceptedMediaKind}
+          kind={mediaKind}
           forceAspectRatio={COVER_RATIO}
           maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
           onFinished={onMediaSelected}
@@ -694,6 +770,19 @@ const useCoverEditionManager = ({
           />
         </Container>
       </Modal>
+      <CoverEditorCropModal
+        visible={cropMode}
+        media={sourceMedia}
+        maskMedia={coverStyle.segmented ? maskMedia : null}
+        title={title}
+        subTitle={subTitle}
+        timeRange={timeRange}
+        coverStyle={coverStyle}
+        mediaParameters={mediaCropParameter}
+        colorPalette={colorPalette}
+        onClose={toggleCropMode}
+        onSave={onSaveCropData}
+      />
       <UploadProgressModal
         visible={saving}
         progressIndicator={uploadProgress}
@@ -736,11 +825,12 @@ const useCoverEditionManager = ({
     setTitle,
     setSubTitle,
     setCoverStyle,
-    setMediaCropParameter,
+    toggleCropMode,
     setColorPalette,
     setOtherColors,
     openImagePicker,
     retryMediaComputation,
+    updateEditedMediaKind,
     onSave,
   };
 };

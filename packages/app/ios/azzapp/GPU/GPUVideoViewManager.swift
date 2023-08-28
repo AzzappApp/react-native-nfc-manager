@@ -389,6 +389,9 @@ class GPUVideoView: UIView {
   
   @objc
   var onPlayerReady: RCTDirectEventBlock?
+  
+  @objc
+  public var onProgress: RCTDirectEventBlock?
 
   @objc
   var onImagesLoaded: RCTDirectEventBlock?
@@ -655,6 +658,9 @@ class GPUVideoView: UIView {
     setUpPlayer()
   }
   
+  
+  private var playerTimeObserver: Any?
+  
   private func setUpPlayer() {
     guard let playerItem = playerItem else {
       return
@@ -671,6 +677,18 @@ class GPUVideoView: UIView {
       options: [.old, .new],
       context: &playerObserverContext
     )
+    playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(0.1, preferredTimescale:600), queue: nil, using: {
+      [weak self] time in
+      guard let self = self else { return }
+      guard let currentItem = player.currentItem, currentItem.status == .readyToPlay else {
+        return
+      }
+      let currentTime = CMTimeGetSeconds(currentItem.currentTime())
+      if(currentTime >= 0) {
+        self.onProgress?(["currentTime": currentTime])
+      }
+    })
+    
     self.player = player
     self.playerLayer?.player = player
     
@@ -772,6 +790,9 @@ class GPUVideoView: UIView {
     playerLooper = nil
     playerReady = false
     if let player = player {
+       if let playerTimeObserver = playerTimeObserver {
+        player.removeTimeObserver(playerTimeObserver)
+      }
       player.removeAllItems()
       player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status), context: &playerObserverContext)
       self.player = nil

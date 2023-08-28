@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
-import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_POSITION,
@@ -85,10 +84,9 @@ const CECTitlePanel = ({
     return {
       fontFamily: textStyles?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY,
       fontSize: textStyles?.fontSize ?? DEFAULT_COVER_FONT_SIZE,
-      color:
-        swapColor(textStyles?.color, colorPalette) ?? DEFAULT_COVER_TEXT_COLOR,
+      color: textStyles?.color ?? DEFAULT_COVER_TEXT_COLOR,
     };
-  }, [colorPalette, currentTab, subTitleStyle, titleStyle]);
+  }, [currentTab, subTitleStyle, titleStyle]);
 
   const orientation = textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
   const position = textPosition ?? DEFAULT_COVER_CONTENT_POSITION;

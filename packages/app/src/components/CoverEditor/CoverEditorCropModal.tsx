@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, View, useWindowDimensions } from 'react-native';
+import { Modal, View, useColorScheme, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { shadow } from '#theme';
 import { RotateButton } from '#components/commonsButtons';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
+import Cropper from '#components/Cropper';
 import {
   getNextOrientation,
   type CropData,
@@ -87,6 +90,8 @@ const CoverEditorCropModal = ({
 
   const coverHeight = windowHeight - top - bottom - HEADER_HEIGHT - 180;
 
+  const appearance = useColorScheme();
+
   if (!media) {
     return null;
   }
@@ -102,39 +107,61 @@ const CoverEditorCropModal = ({
           rightElement={<RotateButton onPress={onNextOrientation} />}
           style={{ marginBottom: 20 }}
         />
-        <CoverPreviewRenderer
-          uri={media.uri}
-          kind={media.kind}
-          startTime={timeRange?.startTime}
-          duration={timeRange?.duration}
-          backgroundColor={coverStyle?.backgroundColor}
-          maskUri={maskMedia?.uri}
-          backgroundImageUri={coverStyle?.background?.uri}
-          backgroundImageTintColor={coverStyle?.backgroundPatternColor}
-          foregroundId={coverStyle?.foreground?.id}
-          foregroundImageUri={coverStyle?.foreground?.uri}
-          foregroundImageTintColor={coverStyle?.foregroundColor}
-          backgroundMultiply={coverStyle?.merged}
-          editionParameters={{
-            ...coverStyle?.mediaParameters,
-            ...editionParameters,
-          }}
-          filter={coverStyle?.mediaFilter}
-          // text props
-          title={title}
-          titleStyle={coverStyle?.titleStyle}
-          subTitle={subTitle}
-          subTitleStyle={coverStyle?.subTitleStyle}
-          textOrientation={coverStyle?.textOrientation}
-          textPosition={coverStyle?.textPosition}
-          // other props
-          colorPalette={colorPalette!}
+        <Cropper
           mediaSize={media}
-          height={coverHeight}
-          onCropDataChange={onCropDataChange}
+          aspectRatio={COVER_RATIO}
+          cropData={editionParameters?.cropData}
+          orientation={editionParameters?.orientation}
+          pitch={editionParameters?.pitch}
+          yaw={editionParameters?.yaw}
+          roll={editionParameters?.roll}
           cropEditionMode
-          style={{ alignSelf: 'center' }}
-        />
+          onCropDataChange={onCropDataChange}
+          displayOuterLines={false}
+          style={[
+            {
+              height: coverHeight,
+              alignSelf: 'center',
+              aspectRatio: COVER_RATIO,
+              borderRadius: COVER_CARD_RADIUS * COVER_RATIO * coverHeight,
+            },
+            shadow(appearance ?? 'light'),
+          ]}
+        >
+          {cropData => (
+            <CoverPreviewRenderer
+              uri={media.uri}
+              kind={media.kind}
+              startTime={timeRange?.startTime}
+              duration={timeRange?.duration}
+              backgroundColor={coverStyle?.backgroundColor}
+              maskUri={maskMedia?.uri}
+              backgroundImageUri={coverStyle?.background?.uri}
+              backgroundImageTintColor={coverStyle?.backgroundPatternColor}
+              foregroundId={coverStyle?.foreground?.id}
+              foregroundImageUri={coverStyle?.foreground?.uri}
+              foregroundImageTintColor={coverStyle?.foregroundColor}
+              backgroundMultiply={coverStyle?.merged}
+              editionParameters={{
+                ...coverStyle?.mediaParameters,
+                ...editionParameters,
+                cropData,
+              }}
+              filter={coverStyle?.mediaFilter}
+              // text props
+              title={title}
+              titleStyle={coverStyle?.titleStyle}
+              subTitle={subTitle}
+              subTitleStyle={coverStyle?.subTitleStyle}
+              textOrientation={coverStyle?.textOrientation}
+              textPosition={coverStyle?.textPosition}
+              // other props
+              colorPalette={colorPalette!}
+              height={coverHeight}
+              style={{ flex: 1, shadowOpacity: 0 }}
+            />
+          )}
+        </Cropper>
         <View style={{ flex: 1 }}>
           <ImageEditionParameterControl
             value={editionParameters.roll}

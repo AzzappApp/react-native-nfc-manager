@@ -1,11 +1,11 @@
 import {
   Suspense,
-  startTransition,
   useCallback,
   useImperativeHandle,
   useRef,
   useState,
   forwardRef,
+  startTransition,
 } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -14,11 +14,11 @@ import {
   Modal,
   StyleSheet,
   View,
+  unstable_batchedUpdates,
   useWindowDimensions,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { type EditionParameters } from '#components/gpu';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
@@ -28,7 +28,6 @@ import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabBarMenuItem, { TAB_BAR_MENU_ITEM_HEIGHT } from '#ui/TabBarMenuItem';
 import TextInput from '#ui/TextInput';
-import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
 import useCoverEditionManager from './useCoverEditionManager';
@@ -72,15 +71,11 @@ const CoverEditor = (
     viewerKey,
   );
 
+  // #endregion
+
+  // #region Data edition
   const [templateKind, setTemplateKind] =
     useState<TemplateKind>(initialTemplateKind);
-
-  const onSwitchTemplateKind = useCallback(async (kind: TemplateKind) => {
-    startTransition(() => {
-      setTemplateKind(kind);
-    });
-  }, []);
-  // #endregion
 
   const {
     title,
@@ -101,17 +96,32 @@ const CoverEditor = (
     setTitle,
     setSubTitle,
     setCoverStyle,
-    setMediaCropParameter,
     setColorPalette,
+    toggleCropMode,
     openImagePicker,
     onSave,
+    updateEditedMediaKind,
   } = useCoverEditionManager({
     initialData: null,
     initialColorPalette: null,
     onCoverSaved,
+    initialTemplateKind: templateKind === 'video' ? 'video' : 'image',
     profile: viewer.profile ?? null,
   });
 
+  const onSwitchTemplateKind = useCallback(
+    async (kind: TemplateKind) => {
+      startTransition(() => {
+        // We try to take advantage of the transition to reduce the flickering
+        // but it's not perfect, and we would need to use react 18 concurrent mode
+        unstable_batchedUpdates(() => {
+          setTemplateKind(kind);
+          updateEditedMediaKind(kind === 'video' ? 'video' : 'image');
+        });
+      });
+    },
+    [updateEditedMediaKind],
+  );
   // #endregion
 
   // #region Preview media
@@ -150,19 +160,6 @@ const CoverEditor = (
   }, []);
   // #endregion
 
-  // #region Crop mode
-  const [cropMode, setCropMode] = useState(false);
-  const toggleCropMode = useCallback(() => {
-    setCropMode(cropMode => !cropMode);
-  }, []);
-
-  const onSaveCropData = useCallback(
-    (editionParameters: EditionParameters) => {
-      setMediaCropParameter(editionParameters);
-      setCropMode(false);
-    },
-    [setMediaCropParameter],
-  );
   // #endregion
 
   // #region Custom edition
@@ -216,7 +213,6 @@ const CoverEditor = (
         FLOATING_BUTTON_SIZE),
     windowWidth / (COVER_RATIO * 1.5),
   );
-
   // #endregion
 
   const templateListWidth = templateListHeight * COVER_RATIO * 2;
@@ -227,6 +223,19 @@ const CoverEditor = (
       save: onSave,
     }),
     [onSave],
+  );
+
+  const indexes = useRef({
+    people: 0,
+    video: 0,
+    others: 0,
+  });
+
+  const onSelectedIndexChange = useCallback(
+    (index: number) => {
+      indexes.current[templateKind] = index;
+    },
+    [templateKind],
   );
 
   return (
@@ -286,6 +295,7 @@ const CoverEditor = (
             }
           >
             <CoverEditorTemplateList
+              key={templateKind}
               coverPreviewRef={coverPreviewRef}
               viewer={viewer}
               templateKind={templateKind}
@@ -298,13 +308,15 @@ const CoverEditor = (
               subTitle={subTitle}
               width={templateListWidth}
               height={templateListHeight}
-              mediaParameters={mediaCropParameter}
+              mediaCropParameters={mediaCropParameter}
               timeRange={timeRange}
               currentCoverStyle={currentCoverStyle}
               cardColors={cardColors ?? null}
+              initialSelectedIndex={indexes.current[templateKind]}
               onPreviewMediaChange={onPreviewMediaChange}
               onCoverStyleChange={setCoverStyle}
               onColorPaletteChange={setColorPalette}
+              onSelectedIndexChange={onSelectedIndexChange}
               mediaComputing={mediaComputing}
             />
           </Suspense>
@@ -360,19 +372,6 @@ const CoverEditor = (
           />
         </View>
       </BottomSheetModal>
-      <CoverEditorCropModal
-        visible={cropMode}
-        media={sourceMedia}
-        maskMedia={maskMedia}
-        title={title}
-        subTitle={subTitle}
-        timeRange={timeRange}
-        coverStyle={coverStyle}
-        mediaParameters={mediaCropParameter}
-        colorPalette={colorPalette}
-        onClose={toggleCropMode}
-        onSave={onSaveCropData}
-      />
       {modals}
       <Modal
         visible={customEditionProps != null}
