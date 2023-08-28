@@ -203,9 +203,12 @@ const styles = StyleSheet.create({
   webCardLabel: { color: colors.white },
   webCardFooter: { justifyContent: 'flex-end', marginTop: 10 },
   webcardText: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: '100%',
-    alignItems: 'center',
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    rowGap: 5,
   },
   qrCodeContainer: {
     justifyContent: 'center',
