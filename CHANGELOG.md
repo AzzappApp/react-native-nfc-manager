@@ -1,4 +1,4 @@
-## 0.2.0-canary.15
+## 0.2.0-canary.16
 
 * **fix:**  - AVAsset cache crash
 * **fix:**  - order of module in cardtemplate (loading) ([#865](https://github.com/AzzappApp/azzapp/pull/865))
