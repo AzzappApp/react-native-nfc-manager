@@ -907,6 +907,10 @@
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
   },
+  "KR7gh7": {
+    "defaultMessage": "Loading a new template will remove current contents of your WebCarda and replace them with the new template. Are you ready to start from the scratch?",
+    "description": "Confirmation description for load card template modal"
+  },
   "KVGArG": {
     "defaultMessage": "Margin top/bottom : {size}",
     "description": "Font size message in cover edition"
@@ -1087,6 +1091,10 @@
     "defaultMessage": "Top/bottom margin size",
     "description": "Label of the Top/bottom margin size slider in HorizontalPhoto edition"
   },
+  "OavmSI": {
+    "defaultMessage": "Delete your current WebCard contents?",
+    "description": "Confirmation title for load card template modal"
+  },
   "Oe7IDs": {
     "defaultMessage": "Border radius",
     "description": "Label of the border radius in carousel edition"
@@ -1114,6 +1122,10 @@
   "P2PER8": {
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
+  },
+  "POvY5S": {
+    "defaultMessage": "Remove current contents",
+    "description": "Confirmation button for load card template modal"
   },
   "PTMgPC": {
     "defaultMessage": "Edit email address",
@@ -1611,6 +1623,10 @@
     "defaultMessage": "Webcard builder",
     "description": "Webcard builder header title"
   },
+  "a4p3hZ": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button for load card template modal"
+  },
   "a5bH/t": {
     "defaultMessage": "Slide to change the Top/bottom marginsize",
     "description": "Hint of the Top/bottom margin slider in HorizontalPhoto edition"
@@ -2099,6 +2115,10 @@
     "defaultMessage": "Slide to change theVertical Spacing",
     "description": "Hint of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
   },
+  "jKxfet": {
+    "defaultMessage": "You can completly change your WebCard by loading a new template",
+    "description": "ProfileScreenBody description to load a new template"
+  },
   "jPNeTz": {
     "defaultMessage": "New password",
     "description": "Account Details - Change password form - new password label"
@@ -2571,6 +2591,10 @@
     "defaultMessage": "Adjust",
     "description": "Accessibility label of the Adjust tab in image editing view"
   },
+  "sIXr0q": {
+    "defaultMessage": "Load a WebCard® template",
+    "description": "WebCard creation screen title"
+  },
   "sLCCI/": {
     "defaultMessage": "Text size",
     "description": "Label of the textSize slider in PhotoWithTextAndTitle edition"
@@ -2670,6 +2694,10 @@
   "uQktw0": {
     "defaultMessage": "Left/Right margin",
     "description": "Label of the Left/Right margin slider in PhotoWithTextAndTitle edition"
+  },
+  "uVFyvX": {
+    "defaultMessage": "Load a new WebCard template",
+    "description": "ProfileScreenBody button to load a new template"
   },
   "uaRWqJ": {
     "defaultMessage": "Image",

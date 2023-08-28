@@ -1,5 +1,6 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { useIntl } from 'react-intl';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -8,8 +9,11 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackground';
+import Button from '#ui/Button';
 import WebcardColorPicker from '#ui/ColorPicker/WebcardColorPicker';
+import Text from '#ui/Text';
 import CardStyleModal from './CardStyleModal';
+import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
@@ -217,6 +221,8 @@ const ProfileScreenContent = ({
     },
     [onToggleSelectionMode],
   );
+
+  const [loadTemplate, setLoadTemplate] = useState(false);
   // #endregion
 
   // #region Card style
@@ -251,6 +257,8 @@ const ProfileScreenContent = ({
       opacity: 1 - editTransiton.value,
     };
   }, []);
+
+  const intl = useIntl();
 
   return (
     <>
@@ -296,6 +304,29 @@ const ProfileScreenContent = ({
               onSelectionStateChange={onSelectionStateChange}
               onModulesCountChange={setModulesCount}
             />
+            {editing && (
+              <>
+                <View style={styles.loadTemplate}>
+                  <Text style={styles.loadDescription}>
+                    {intl.formatMessage({
+                      defaultMessage:
+                        'You can completly change your WebCard by loading a new template',
+                      description:
+                        'ProfileScreenBody description to load a new template',
+                    })}
+                  </Text>
+                  <Button
+                    variant="secondary"
+                    label={intl.formatMessage({
+                      defaultMessage: 'Load a new WebCard template',
+                      description:
+                        'ProfileScreenBody button to load a new template',
+                    })}
+                    onPress={() => setLoadTemplate(true)}
+                  />
+                </View>
+              </>
+            )}
           </Suspense>
         </ProfileScreenScrollView>
         <Suspense fallback={null}>
@@ -355,6 +386,10 @@ const ProfileScreenContent = ({
               visible={showCardStyleModal}
               onRequestClose={closeCardStyleModal}
             />
+            <LoadCardTemplateModal
+              onClose={() => setLoadTemplate(false)}
+              visible={loadTemplate}
+            />
             <WebcardColorPicker
               profile={profile}
               visible={showWebcardColorPicker}
@@ -366,5 +401,19 @@ const ProfileScreenContent = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  loadTemplate: {
+    marginTop: 30,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 20,
+    alignItems: 'center',
+  },
+  loadDescription: {
+    textAlign: 'center',
+    color: colors.grey700,
+  },
+});
 
 export default ProfileScreenContent;

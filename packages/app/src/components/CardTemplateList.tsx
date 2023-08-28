@@ -1,12 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import {
-  graphql,
-  useLazyLoadQuery,
-  useMutation,
-  usePaginationFragment,
-} from 'react-relay';
+import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
@@ -16,22 +11,21 @@ import WebCardList from './WebCardList';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { WebCardInfo } from './WebCardList';
 import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
-import type { CardTemplateListLoadCardTemplateMutation } from '@azzapp/relay/artifacts/CardTemplateListLoadCardTemplateMutation.graphql';
 import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   height: number;
-  canSkip?: boolean;
-  onTemplateApplied: () => void;
+  onApplyTemplate: (cardTemplateId: string) => void;
   onSkip?: () => void;
+  loading: boolean;
 };
 
 const CardTemplateList = ({
   height,
-  canSkip = false,
-  onTemplateApplied,
+  onApplyTemplate,
   onSkip,
+  loading,
   style,
   ...props
 }: CardTemplateListProps) => {
@@ -104,31 +98,6 @@ const CardTemplateList = ({
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const [commit, inFlight] =
-    useMutation<CardTemplateListLoadCardTemplateMutation>(graphql`
-      mutation CardTemplateListLoadCardTemplateMutation(
-        $loadCardTemplateInput: LoadCardTemplateInput!
-      ) {
-        loadCardTemplate(input: $loadCardTemplateInput) {
-          profile {
-            id
-            cardStyle {
-              borderColor
-              borderRadius
-              buttonRadius
-              borderWidth
-              buttonColor
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-          }
-        }
-      }
-    `);
-
   const cards = useMemo(
     () =>
       convertToNonNullArray(
@@ -153,17 +122,10 @@ const CardTemplateList = ({
   const onSubmit = () => {
     if (!cards) return;
 
-    commit({
-      variables: {
-        loadCardTemplateInput: {
-          cardTemplateId: cards[selectedIndex].id,
-        },
-      },
-      onCompleted: () => {
-        onTemplateApplied();
-      },
-    });
+    onApplyTemplate(cards[selectedIndex].id);
   };
+
+  const canSkip = !!onSkip;
 
   const listHeight =
     height -
@@ -193,21 +155,23 @@ const CardTemplateList = ({
             description:
               'label of the button allowing to retry loading card template',
           })}
-          loading={inFlight}
+          loading={loading}
         />
-        <PressableNative
-          onPress={onSkip}
-          style={styles.skipButton}
-          disabled={inFlight}
-        >
-          <Text style={styles.skip}>
-            {intl.formatMessage({
-              defaultMessage: 'Skip',
-              description:
-                'label of the button allowing to skil loading card template',
-            })}
-          </Text>
-        </PressableNative>
+        {canSkip && (
+          <PressableNative
+            onPress={onSkip}
+            style={styles.skipButton}
+            disabled={loading}
+          >
+            <Text style={styles.skip}>
+              {intl.formatMessage({
+                defaultMessage: 'Skip',
+                description:
+                  'label of the button allowing to skil loading card template',
+              })}
+            </Text>
+          </PressableNative>
+        )}
       </View>
     </View>
   );

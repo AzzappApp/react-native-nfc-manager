@@ -222,6 +222,7 @@ export const NewProfileScreen = ({
         profileInfo !== null ? (
           <CardEditionStep
             height={contentHeight}
+            onSkip={onCoverTemplateApplied}
             onCoverTemplateApplied={onCoverTemplateApplied}
           />
         ) : null,
