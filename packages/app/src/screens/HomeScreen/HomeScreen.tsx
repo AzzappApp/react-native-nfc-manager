@@ -1,5 +1,7 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import relayScreen from '#helpers/relayScreen';
+import useToggle from '#hooks/useToggle';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeScreenContent from './HomeScreenContent';
 import WelcomeScreen from './WelcomeScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -19,17 +21,22 @@ export const homeScreenQuery = graphql`
 
 const HomeScreen = ({
   preloadedQuery,
-  hasFocus,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   // data
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
-  if (!currentUser.profiles?.length && hasFocus) {
-    return <WelcomeScreen />;
-  }
+  const hasProfiles = !!currentUser.profiles?.length;
 
-  return currentUser.profiles?.length ? (
-    <HomeScreenContent user={currentUser} />
-  ) : null;
+  const [showMenu, toggleShowMenu] = useToggle(false);
+  return (
+    <>
+      {hasProfiles ? (
+        <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
+      ) : (
+        <WelcomeScreen onShowMenu={toggleShowMenu} />
+      )}
+      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
+    </>
+  );
 };
 
 export default relayScreen(HomeScreen, {

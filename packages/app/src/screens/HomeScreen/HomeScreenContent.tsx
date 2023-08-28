@@ -3,28 +3,22 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
-  runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
   interpolate,
   useWorkletCallback,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import {
-  useOnFocus,
-  useRouter,
-  useScreenHasFocus,
-} from '#components/NativeRouter';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useOnFocus, useScreenHasFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useAuthState from '#hooks/useAuthState';
-import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
-import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeContactCardLandscape from './HomeContactCardLandscape';
 import HomeHeader from './HomeHeader';
 import { MENU_HEIGHT } from './HomeMenu';
@@ -36,9 +30,13 @@ import type { LayoutChangeEvent } from 'react-native';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
+  onShowMenu: () => void;
 };
 
-const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
+const HomeScreenContent = ({
+  user: userKey,
+  onShowMenu,
+}: HomeScreenContentProps) => {
   // data
   const user = useFragment(
     graphql`
@@ -122,24 +120,16 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     }
   });
 
-  const router = useRouter();
-  useAnimatedReaction(
-    () => currentProfileIndexSharedValue.value,
-    actual => {
-      if (actual === -1) {
-        runOnJS(router.push)({
-          route: 'NEW_PROFILE',
-        });
-      }
-    },
-    [currentProfileIndexSharedValue],
+  const tabBarVisible = useDerivedValue(
+    () => 1 + Math.min(0, currentProfileIndexSharedValue.value),
   );
+
+  useMainTabBarVisiblilityController(tabBarVisible);
 
   // Layout
   const { bottom } = useSafeAreaInsets();
 
   const [containerHeight, setContainerHeight] = useState(0);
-  const [showModal, toggleShowModal] = useToggle(false);
   const bottomMargin = bottom > 0 ? bottom : 13;
   const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     setContainerHeight(
@@ -182,7 +172,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         />
         <HomeHeader
-          openPanel={toggleShowModal}
+          openPanel={onShowMenu}
           user={user}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         />
@@ -210,7 +200,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
             />
           )}
         </View>
-        <HomeBottomSheetPanel visible={showModal} close={toggleShowModal} />
       </Animated.View>
       {currentProfile && hasFocus && (
         <HomeContactCardLandscape

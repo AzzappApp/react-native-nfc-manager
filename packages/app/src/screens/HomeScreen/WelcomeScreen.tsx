@@ -1,33 +1,37 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, Modal, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '#theme';
 import Link from '#components/Link';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
-import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 
-const Logo = require('#assets/logo-full_white.png');
-const Welcome = require('#assets/welcome.png');
+type WelcomeScreenProps = {
+  onShowMenu: () => void;
+};
 
-const WelcomeScreen = () => {
-  const [bottomVisible, setBottomVisible] = useState(false);
+const WelcomeScreen = ({ onShowMenu }: WelcomeScreenProps) => {
   const intl = useIntl();
+  useMainTabBarVisiblilityController(false);
 
   return (
-    <Modal animationType="none" visible>
+    <Container style={{ flex: 1 }}>
       <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
-      <Image source={Logo} style={styles.logo} />
+      <Image
+        source={require('#assets/logo-full_white.png')}
+        style={styles.logo}
+      />
       <View style={styles.imageContainer}>
-        <Image source={Welcome} style={styles.image} />
+        <Image source={require('#assets/welcome.png')} style={styles.image} />
       </View>
       <IconButton
         icon="menu"
         style={styles.menu}
         iconStyle={{ tintColor: 'white' }}
-        onPress={() => setBottomVisible(true)}
+        onPress={onShowMenu}
       />
 
       <View style={styles.content}>
@@ -53,11 +57,7 @@ const WelcomeScreen = () => {
           />
         </Link>
       </View>
-      <HomeBottomSheetPanel
-        visible={bottomVisible}
-        close={() => setBottomVisible(false)}
-      />
-    </Modal>
+    </Container>
   );
 };
 
