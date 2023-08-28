@@ -1,5 +1,8 @@
-## 0.2.0-canary.12
+## 0.2.0-canary.13
 
+* **fix:**  - pointer event on AnimatedText ([#860](https://github.com/AzzappApp/azzapp/pull/860))
+* **fix:**  - contact card informaiton layout ([#863](https://github.com/AzzappApp/azzapp/pull/863))
+* **feat:**  - 🎸 add screen for load template from webcard ([#839](https://github.com/AzzappApp/azzapp/pull/839))
 * **feat:**  - hide tab bar in home when create profile selected ([#846](https://github.com/AzzappApp/azzapp/pull/846))
 * **fix:**  - **CoverEdition:** source media not updated
 * **fix:**  - **CoverEdition:** various crash

@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.2.0-canary.12",
+  "version": "0.2.0-canary.13",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,10 +13,10 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.2.0-canary.12",
-    "@azzapp/i18n": "0.2.0-canary.12",
-    "@azzapp/relay": "0.2.0-canary.12",
-    "@azzapp/shared": "0.2.0-canary.12",
+    "@azzapp/data": "0.2.0-canary.13",
+    "@azzapp/i18n": "0.2.0-canary.13",
+    "@azzapp/relay": "0.2.0-canary.13",
+    "@azzapp/shared": "0.2.0-canary.13",
     "@paralleldrive/cuid2": "^2.2.2",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
