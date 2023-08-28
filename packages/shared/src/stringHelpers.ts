@@ -145,3 +145,18 @@ export function formatDisplayName(
   if (isNotFalsyString(lastName)) return lastName;
   return undefined;
 }
+
+/* eslint-disable no-bitwise*/
+/**
+ * This is a simple, *insecure* hash that's short, fast, and has no dependencies.
+ */
+export const simpleHash = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash &= hash; // Convert to 32bit integer
+  }
+  return new Uint32Array([hash])[0];
+};
+/* eslint-enable no-bitwise*/

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import {
   getByTokenValue,
   updateUser,
-  getUsersByIds,
+  getUserById,
   deleteToken,
   getUserByEmail,
 } from '@azzapp/data/domains';
@@ -31,7 +31,7 @@ export const POST = async (req: Request) => {
     foundToken.createdAt.getTime() > Date.now() - 1000 * 60 * 60 * 24
   ) {
     await getUserByEmail(issuer);
-    const [user] = await getUsersByIds([foundToken.userId]);
+    const user = await getUserById(foundToken.userId);
     if (user) {
       await updateUser(foundToken.userId, {
         password: bcrypt.hashSync(password, 12),

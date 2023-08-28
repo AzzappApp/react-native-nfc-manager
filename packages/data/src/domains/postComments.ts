@@ -9,7 +9,6 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
-import { sortEntitiesByIds } from './generic';
 import { getMediasByIds } from './medias';
 import { PostTable } from './posts';
 import { ProfileTable } from './profiles';
@@ -185,17 +184,3 @@ export const getTopPostsComment = async (
       })),
     );
 };
-
-/**
- * Retrieve a list of post comments by their ids.
- * @param ids - The ids of the comments to retrieve
- * @returns A list of comments, where the order of the posts matches the order of the ids
- */
-export const getPostCommentsByIds = async (ids: readonly string[]) =>
-  sortEntitiesByIds(
-    ids,
-    await db
-      .select()
-      .from(PostCommentTable)
-      .where(inArray(PostCommentTable.id, ids as string[])),
-  );

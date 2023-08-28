@@ -29,7 +29,6 @@ const ContactCard = ({
           light
         }
         contactCard {
-          id
           firstName
           lastName
           title

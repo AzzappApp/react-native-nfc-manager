@@ -3,6 +3,10 @@ import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { createGraphQLContext, schema } from '@azzapp/data';
 import { getProfileById } from '@azzapp/data/domains';
+import {
+  getDatabaseConnectionsInfos,
+  startDatabaseConnectionMonitoring,
+} from '@azzapp/data/domains/databaseMonitorer';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
@@ -29,6 +33,10 @@ export const POST = async (req: NextRequest) => {
     }
   }
 
+  if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+    startDatabaseConnectionMonitoring();
+  }
+
   const requestParams = await req.json();
   const { profileId, locale } = requestParams;
   let profile: Profile | null = null;
@@ -49,12 +57,14 @@ export const POST = async (req: NextRequest) => {
   };
 
   try {
+    const graphqlRequest = requestParams.id
+      ? (queryMap as any)[requestParams.id]
+      : requestParams.query;
+
     const result = await graphql({
       schema,
       rootValue: {},
-      source: requestParams.id
-        ? (queryMap as any)[requestParams.id]
-        : requestParams.query,
+      source: graphqlRequest,
       variableValues: requestParams.variables,
       contextValue: createGraphQLContext(
         cardUpdateListener,
@@ -76,6 +86,21 @@ export const POST = async (req: NextRequest) => {
     cardUsernamesToRevalidate.forEach(username => {
       revalidateTag(username);
     });
+    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+      const infos = await getDatabaseConnectionsInfos();
+      if (infos) {
+        const gqlName = /query\s*(\S+)\s*[{(]/g.exec(graphqlRequest)?.[1];
+        console.log(
+          `-------------------- Graphql Query : ${gqlName}--------------------`,
+        );
+        console.log('Number database requests', infos.nbRequests);
+        console.log('Max concurrent requests', infos.maxConcurrentRequests);
+        console.log('Queries:\n---\n', infos.queries.join('\n---\n'));
+        console.log(
+          '----------------------------------------------------------------',
+        );
+      }
+    }
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);

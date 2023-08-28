@@ -4,13 +4,13 @@ import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
-  async (_source, args, { auth, profileLoader, cardUpdateListener }) => {
+  async (_source, args, { auth, loaders, cardUpdateListener }) => {
     const profileId = auth.profileId;
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
-    const profile = await profileLoader.load(profileId);
+    const profile = await loaders.Profile.load(profileId);
     if (!profile) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }

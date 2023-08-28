@@ -1,11 +1,4 @@
 import { fromGlobalId } from 'graphql-relay';
-import {
-  getCardStyleById,
-  getCardTemplateById,
-  getColorPaletteById,
-  getCompanyActivityById,
-  getProfileCategoryById,
-} from '#domains';
 import type { NodeResolvers } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 
@@ -21,44 +14,45 @@ const companyActivitySymbol = Symbol('CompanyActivity');
 
 export const fetchNode = async (
   gqlId: string,
-  {
-    profileLoader,
-    postLoader,
-    postCommentLoader,
-    coverTemplateLoader,
-  }: GraphQLContext,
+  { loaders }: GraphQLContext,
 ): Promise<any> => {
   const { id, type } = fromGlobalId(gqlId);
 
   switch (type) {
     case 'CardStyle':
-      return withTypeSymbol(await getCardStyleById(id), cardStyleSymbol);
+      return withTypeSymbol(await loaders.CardStyle.load(id), cardStyleSymbol);
     case 'ColorPalette':
-      return withTypeSymbol(await getColorPaletteById(id), colorPaletteSymbol);
+      return withTypeSymbol(
+        await loaders.ColorPalette.load(id),
+        colorPaletteSymbol,
+      );
     case 'CardTemplate':
-      return withTypeSymbol(await getCardTemplateById(id), cardTemplateSymbol);
+      return withTypeSymbol(
+        await loaders.CardTemplate.load(id),
+        cardTemplateSymbol,
+      );
     case 'CoverTemplate':
       return withTypeSymbol(
-        await coverTemplateLoader.load(id),
+        await loaders.CoverTemplate.load(id),
         coverTemplateSymbol,
       );
     case 'Post':
-      return withTypeSymbol(await postLoader.load(id), postSymbol);
+      return withTypeSymbol(await loaders.Post.load(id), postSymbol);
     case 'PostComment':
       return withTypeSymbol(
-        await postCommentLoader.load(id),
+        await loaders.PostComment.load(id),
         postCommentSymbol,
       );
     case 'Profile':
-      return withTypeSymbol(await profileLoader.load(id), profileSymbol);
+      return withTypeSymbol(await loaders.Profile.load(id), profileSymbol);
     case 'ProfileCategory':
       return withTypeSymbol(
-        await getProfileCategoryById(id),
+        await loaders.ProfileCategory.load(id),
         profileCategorySymbol,
       );
     case 'CompanyActivity':
       return withTypeSymbol(
-        await getCompanyActivityById(id),
+        await loaders.CompanyActivity.load(id),
         companyActivitySymbol,
       );
   }

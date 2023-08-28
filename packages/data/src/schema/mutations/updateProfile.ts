@@ -8,7 +8,7 @@ import type { GraphQLContext } from '../GraphQLContext';
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
   args,
-  { auth, profileLoader }: GraphQLContext,
+  { auth, loaders }: GraphQLContext,
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -17,7 +17,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   let profile: Profile | null;
   try {
-    profile = await profileLoader.load(profileId);
+    profile = await loaders.Profile.load(profileId);
   } catch (e) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }

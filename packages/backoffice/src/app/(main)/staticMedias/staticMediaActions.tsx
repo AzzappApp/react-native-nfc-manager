@@ -3,6 +3,7 @@
 import { eq, sql, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { StaticMediaTable, db, MediaTable } from '@azzapp/data/domains';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 
@@ -26,7 +27,12 @@ export const addStaticMedias = async ({
       .where(eq(StaticMediaTable.usage, usage))
       .then(rows => rows[0].order);
 
-    await trx.delete(MediaTable).where(inArray(MediaTable.id, medias));
+    await trx.delete(MediaTable).where(
+      inArray(
+        MediaTable.id,
+        medias.map(id => encodeMediaId(id, 'image')),
+      ),
+    );
 
     const staticMedias = medias.map(
       (media, index) =>

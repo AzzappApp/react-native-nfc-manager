@@ -17,10 +17,10 @@ generates:
       useImplementingTypes: true
       mappers:
         Profile: ../../domains#Profile as ProfileModel
-        StaticMedia: ../../domains#StaticMedia as StaticMediaModel
+        StaticMedia: ../MediaResolvers#DefferedStaticMedia as StaticMediaModel
         ProfileCategory: ../../domains#ProfileCategory as ProfileCategoryModel
-        MediaImage: ../../domains#Media as MediaModel
-        MediaVideo: ../../domains#Media as MediaModel
+        MediaImage: ../MediaResolvers#DefferedMedia as MediaImageModel
+        MediaVideo: ../MediaResolvers#DefferedMedia as MediaVideoModel
         CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
         Post: ../../domains#Post as PostModel
         PostComment: ../../domains#PostComment as PostCommentModel

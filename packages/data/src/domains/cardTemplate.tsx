@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { inArray, type InferModel, eq, sql } from 'drizzle-orm';
+import { type InferModel, eq, sql } from 'drizzle-orm';
 import {
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
@@ -9,7 +9,6 @@ import {
   primaryKey,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { sortEntitiesByIds } from './generic';
 import type { CardModule } from './cardModules';
 import type { DbTransaction } from './db';
 
@@ -64,22 +63,6 @@ export const getCardTemplateById = (id: string) =>
     .from(CardTemplateTable)
     .where(eq(CardTemplateTable.id, id))
     .then(rows => rows[0] ?? null);
-/**
- * Retrieve a list of cardTemplates by their ids.
- * @param ids - The ids of the cardTemplates to retrieve
- * @returns A list of cardTemplate, where the order of the cardTemplates matches the order of the ids
- */
-export const getCardTemplatesByIds = async (
-  ids: readonly string[],
-  tx: DbTransaction = db,
-) =>
-  sortEntitiesByIds(
-    ids,
-    await tx
-      .select()
-      .from(CardTemplateTable)
-      .where(inArray(CardTemplateTable.id, ids as string[])),
-  );
 
 /**
  * Create a cardTemplate.

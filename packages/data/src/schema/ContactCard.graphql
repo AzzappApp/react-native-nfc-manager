@@ -1,6 +1,5 @@
 
 type ContactCard {
-    id: ID!
     firstName: String
     lastName: String
     title: String

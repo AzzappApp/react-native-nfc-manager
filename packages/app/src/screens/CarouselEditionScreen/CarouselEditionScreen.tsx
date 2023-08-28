@@ -10,6 +10,7 @@ import {
   CAROUSEL_STYLE_VALUES,
   MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
@@ -269,7 +270,7 @@ const CarouselEditionScreen = ({
       const medias = await Promise.all(
         uploads.map(({ promise, uri }) =>
           promise.then(uploadResult => ({
-            id: uploadResult.public_id as string,
+            id: encodeMediaId(uploadResult.public_id as string, 'image'),
             uri,
           })),
         ),

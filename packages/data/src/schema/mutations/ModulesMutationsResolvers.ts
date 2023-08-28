@@ -38,14 +38,14 @@ const createModuleSavingMutation =
         moduleId?: string | null;
       };
     },
-    { auth, profileLoader, cardUpdateListener }: GraphQLContext,
+    { auth, loaders, cardUpdateListener }: GraphQLContext,
   ) => {
     const profileId = auth.profileId;
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
     }
 
-    const profile = await profileLoader.load(profileId);
+    const profile = await loaders.Profile.load(profileId);
     if (!profile) {
       throw new Error(ERRORS.INVALID_REQUEST);
     }

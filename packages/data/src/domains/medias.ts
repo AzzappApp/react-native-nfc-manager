@@ -9,13 +9,14 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
+import { encodeMediaId, decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const MediaTable = mysqlTable('Media', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.mediaId('id').notNull().primaryKey(),
   kind: mysqlEnum('kind', ['image', 'video']).notNull(),
   height: double('height').notNull(),
   width: double('width').notNull(),
@@ -56,7 +57,10 @@ export const createMedia = async (
   newMedia: NewMedia,
   tx: DbTransaction = db,
 ) => {
-  await tx.insert(MediaTable).values(newMedia);
+  const { kind, id: mediaId } = newMedia;
+  await tx
+    .insert(MediaTable)
+    .values({ ...newMedia, id: encodeMediaId(mediaId, kind) });
   return newMedia;
 };
 
@@ -162,7 +166,7 @@ export const checkMedias = async (mediaIds: string[]) => {
   if (newMedias.length > 0) {
     const cloudinaryMedias = await getMediaInfoByPublicIds(
       newMedias.map(media => ({
-        publicId: media!.id,
+        publicId: decodeMediaId(media!.id),
         kind: media!.kind,
       })),
     );
@@ -176,7 +180,15 @@ export const checkMedias = async (mediaIds: string[]) => {
             width: cloudinaryMedia!.width,
             height: cloudinaryMedia!.height,
           })
-          .where(eq(MediaTable.id, cloudinaryMedia!.public_id)),
+          .where(
+            eq(
+              MediaTable.id,
+              encodeMediaId(
+                cloudinaryMedia!.public_id,
+                cloudinaryMedia!.resource_type === 'video' ? 'video' : 'image',
+              ),
+            ),
+          ),
       ),
     );
   }

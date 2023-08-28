@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, asc, inArray, sql, and, lt, desc, isNull, ne } from 'drizzle-orm';
+import { eq, asc, sql, and, lt, desc, isNull, ne } from 'drizzle-orm';
 import {
   mysqlEnum,
   index,
@@ -10,10 +10,10 @@ import {
   boolean,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
+  int,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
-import { sortEntitiesByIds } from './generic';
 import { getUserById } from './users';
 import type { Profile } from '#schema/ProfileResolvers';
 import type { DbTransaction } from './db';
@@ -88,6 +88,11 @@ export const ProfileTable = mysqlTable(
     lastContactCardUpdate: cols
       .dateTime('lastContactCardUpdate', true)
       .notNull(),
+
+    nbFollowers: int('nbFollowers').default(0).notNull(),
+    nbFollowings: int('nbFollowings').default(0).notNull(),
+    nbPosts: int('nbPosts').default(0).notNull(),
+    nbLikes: int('nbLikes').default(0).notNull(),
   },
   table => {
     return {
@@ -100,20 +105,6 @@ export const ProfileTable = mysqlTable(
 
 export type Profile = InferModel<typeof ProfileTable>;
 export type NewProfile = Omit<InferModel<typeof ProfileTable, 'insert'>, 'id'>;
-
-/**
- * Retrieves a list of profile by their ids.
- * @param ids - The ids of the profile to retrieve
- * @returns A list of profile, where the order of the profile matches the order of the ids
- */
-export const getProfilesByIds = async (ids: readonly string[]) =>
-  sortEntitiesByIds(
-    ids,
-    await db
-      .select()
-      .from(ProfileTable)
-      .where(inArray(ProfileTable.id, ids as string[])),
-  );
 
 /**
  * Retrieves a profile by its id
@@ -206,19 +197,6 @@ export const getRecommendedProfiles = async (
   return result.map(({ Profile }) => Profile);
 };
 
-/* Retrieve the number of profile a profile is following
- * @param profileId - The id of the profile
- * @returns the number of profile a profile is following
- */
-export const getFollowingsCount = async (profileId: string) =>
-  db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(ProfileTable)
-    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
-    .where(eq(FollowTable.followerId, profileId))
-
-    .then(res => res[0].count);
-
 /**
  * Retrieve the list of profile a profile is being followed
  * @param profileId - The id of the profile
@@ -255,20 +233,6 @@ export const getFollowerProfiles = async (
     )
     .orderBy(desc(FollowTable.createdAt))
     .limit(limit);
-
-/**
- * Retrieve the number of profile a profile is being followed
- * @param profileId - The id of the profile
- * @returns the number of profile a profile is being followed
- */
-export const getFollowerProfilesCount = async (profileId: string) =>
-  db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(ProfileTable)
-    .innerJoin(FollowTable, eq(FollowTable.followerId, ProfileTable.id))
-    .where(eq(FollowTable.followingId, profileId))
-
-    .then(res => res[0].count);
 
 /**
  * Retrieve the list of profile a profile is following

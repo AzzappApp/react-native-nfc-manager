@@ -1,6 +1,6 @@
 import { PKPass } from 'passkit-generator';
 import {
-  getProfilesByIds,
+  getProfileById,
   getMediasByIds,
   buildDefaultContactCard,
 } from '@azzapp/data/domains';
@@ -16,7 +16,7 @@ import logo2x from '@azzapp/web/public/pass/logo@2x.png';
 import { convertHexToRGBA } from '../color';
 
 export const buildApplePass = async (profileId: string, locale: string) => {
-  const [profile] = await getProfilesByIds([profileId]);
+  const profile = await getProfileById(profileId);
   if (profile) {
     const [media] = profile.coverData?.mediaId
       ? await getMediasByIds([profile.coverData?.mediaId])

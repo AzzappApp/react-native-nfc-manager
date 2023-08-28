@@ -1,4 +1,4 @@
-import { inArray, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   mysqlTable,
   mysqlEnum,
@@ -8,7 +8,6 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { sortEntitiesByIds } from './generic';
 import type {
   TextOrientation,
   TextPosition,
@@ -35,7 +34,7 @@ export const CoverTemplateTable = mysqlTable('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey(),
   name: cols.defaultVarchar('name').notNull(),
   kind: mysqlEnum('kind', ['people', 'video', 'others']).notNull(),
-  previewMediaId: cols.cuid('previewMediaId').notNull(),
+  previewMediaId: cols.mediaId('previewMediaId').notNull(),
   data: json('data').$type<CoverTemplateData>().notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   businessEnabled: boolean('businessEnabled').default(true).notNull(),
@@ -46,19 +45,16 @@ export type CoverTemplate = InferModel<typeof CoverTemplateTable>;
 export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
 
 /**
- * Retrireves a list of cover templates by their ids.
- *
- * @param {string[]} ids
- * @return {*}  {(Promise<Array<CoverTemplate>>)}
+ * Retrieve a coverTemplate by its id.
+ * @param id - The id of the coverTemplate to retrieve
+ * @returns the coverTemplate, or null if no cardTemplate was found
  */
-export const getCoverTemplatesByIds = async (ids: readonly string[]) =>
-  sortEntitiesByIds(
-    ids,
-    await db
-      .select()
-      .from(CoverTemplateTable)
-      .where(inArray(CoverTemplateTable.id, ids as string[])),
-  );
+export const getCoverTemplateById = (id: string) =>
+  db
+    .select()
+    .from(CoverTemplateTable)
+    .where(eq(CoverTemplateTable.id, id))
+    .then(rows => rows[0] ?? null);
 
 /**
  * Return a list of cover templates. filtered by profile kind and template kind

@@ -7,11 +7,7 @@ import {
 } from 'google-wallet/lib/cjs/generic';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import {
-  getProfilesByIds,
-  buildDefaultContactCard,
-  getProfileById,
-} from '@azzapp/data/domains';
+import { buildDefaultContactCard, getProfileById } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
@@ -80,7 +76,7 @@ const getGoogleWalletPass = async (
   // Create or update a contact card object
   const objectSuffix = 'contactCard_object';
 
-  const [profile] = await getProfilesByIds([profileId]);
+  const profile = await getProfileById(profileId);
 
   let { contactCard } = profile ?? {};
 

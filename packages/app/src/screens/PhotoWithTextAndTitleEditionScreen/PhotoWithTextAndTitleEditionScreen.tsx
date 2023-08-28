@@ -8,6 +8,7 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import ImagePicker, {
@@ -286,7 +287,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
-        mediaId = public_id;
+        mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
         console.log(error);
       } finally {

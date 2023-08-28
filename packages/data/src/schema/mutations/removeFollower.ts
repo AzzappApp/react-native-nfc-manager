@@ -6,7 +6,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
   _,
   { input: { profileId: removedFollowerId } },
-  { auth, profileLoader },
+  { auth, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -14,7 +14,7 @@ const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
   }
 
   const { id: targetId, type } = fromGlobalId(removedFollowerId);
-  const profile = await profileLoader.load(targetId);
+  const profile = await loaders.Profile.load(targetId);
   if (type !== 'Profile' || !profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }

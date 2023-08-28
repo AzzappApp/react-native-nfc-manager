@@ -2,13 +2,11 @@
 
 import { headers } from 'next/headers';
 import {
-  getFollowingsCount,
-  getFollowerProfilesCount,
   getProfilesPosts,
-  getProfilesPostsCount,
   getProfilesPostsWithTopComment,
   getPostCommentsWithProfile,
   getPostByIdWithMedia,
+  getProfileById,
 } from '@azzapp/data/domains';
 
 export const loadProfilePosts = async (
@@ -47,20 +45,13 @@ export const loadPostById = async (id: string) => {
   return getPostByIdWithMedia(id);
 };
 
-export const loadProfilesPostsCount = async (profileId: string) => {
+export const loadProfileStats = async (profileId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  return getProfilesPostsCount(profileId);
-};
-
-export const loadFollowingCount = async (profileId: string) => {
-  // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
-  return getFollowingsCount(profileId);
-};
-
-export const loadFollowerProfilesCount = async (profileId: string) => {
-  // @TODO: make this function dynamic with a better mechanism than headers
-  headers();
-  return getFollowerProfilesCount(profileId);
+  const profile = await getProfileById(profileId);
+  return {
+    nbFollowers: profile.nbFollowers,
+    nbFollowings: profile.nbFollowings,
+    nbPosts: profile.nbPosts,
+  };
 };

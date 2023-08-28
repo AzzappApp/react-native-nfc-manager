@@ -1,4 +1,4 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
   index,
   primaryKey,
@@ -8,7 +8,7 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { PostTable } from './posts';
+import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const PostReactionTable = mysqlTable(
@@ -49,20 +49,12 @@ export const insertPostReaction = async (
   profileId: string,
   postId: string,
   reactionKind: PostReaction['reactionKind'],
+  trx: DbTransaction = db,
 ) =>
-  db.transaction(async trx => {
-    await trx.insert(PostReactionTable).values({
-      profileId,
-      postId,
-      reactionKind,
-    });
-
-    await trx
-      .update(PostTable)
-      .set({
-        counterReactions: sql`${PostTable.counterReactions} + 1`,
-      })
-      .where(eq(PostTable.id, postId));
+  trx.insert(PostReactionTable).values({
+    profileId,
+    postId,
+    reactionKind,
   });
 
 /**
@@ -72,24 +64,19 @@ export const insertPostReaction = async (
  * @param {string} postId
  * @return {*}  {Promise<void>}
  */
-export const deletePostReaction = async (profileId: string, postId: string) =>
-  db.transaction(async trx => {
-    await trx
-      .delete(PostReactionTable)
-      .where(
-        and(
-          eq(PostReactionTable.profileId, profileId),
-          eq(PostReactionTable.postId, postId),
-        ),
-      );
-
-    await trx
-      .update(PostTable)
-      .set({
-        counterReactions: sql`${PostTable.counterReactions} - 1`,
-      })
-      .where(eq(PostTable.id, postId));
-  });
+export const deletePostReaction = async (
+  profileId: string,
+  postId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
+    .delete(PostReactionTable)
+    .where(
+      and(
+        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.postId, postId),
+      ),
+    );
 
 /**
  * get a post reaction

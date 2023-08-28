@@ -9,7 +9,7 @@ import type { InferModel } from 'drizzle-orm';
 
 export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
   id: cols.cuid('id').notNull().primaryKey(),
-  mediaId: cols.cuid('mediaId').notNull(),
+  mediaId: cols.mediaId('mediaId').notNull(),
   profileCategoryId: cols.cuid('profileCategoryId'),
   companyActivityId: cols.cuid('companyActivityId'),
 });

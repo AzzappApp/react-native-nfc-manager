@@ -2,11 +2,7 @@
 
 import { useEffect, useState, forwardRef } from 'react';
 import { Button, Modal, type ModalProps } from '#ui';
-import {
-  loadFollowingCount,
-  loadFollowerProfilesCount,
-  loadProfilesPostsCount,
-} from '#app/actions/profileActions';
+import { loadProfileStats } from '#app/actions/profileActions';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
@@ -33,12 +29,14 @@ const DownloadAppModal = forwardRef(
 
     useEffect(() => {
       async function loadStats() {
-        const [posts, followers, following] = await Promise.all([
-          loadProfilesPostsCount(profile.id),
-          loadFollowerProfilesCount(profile.id),
-          loadFollowingCount(profile.id),
-        ]);
-        setStats({ posts, followers, following });
+        const { nbFollowers, nbPosts, nbFollowings } = await loadProfileStats(
+          profile.id,
+        );
+        setStats({
+          posts: nbPosts,
+          followers: nbFollowers,
+          following: nbFollowings,
+        });
       }
 
       void loadStats();

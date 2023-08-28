@@ -4,7 +4,7 @@ import {
   getMediasByIds,
   getPostByIdWithMedia,
   getPostCommentsWithProfile,
-  getProfilesByIds,
+  getProfileById,
   getProfilesPostsWithMedias,
 } from '@azzapp/data/domains';
 import CloudinaryImage from '#ui/CloudinaryImage';
@@ -29,7 +29,7 @@ const PostPage = async (props: PostPageProps) => {
   const { post, seeMorePosts, media, comments, author } = await unstable_cache(
     async () => {
       const post = await getPostByIdWithMedia(postId);
-      const [author] = post ? await getProfilesByIds([post.authorId]) : [];
+      const author = post ? await getProfileById(post.authorId) : null;
       const seeMorePosts =
         author && post
           ? await getProfilesPostsWithMedias(author.id, 3, 0, post.id)

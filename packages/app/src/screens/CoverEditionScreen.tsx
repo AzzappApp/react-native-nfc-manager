@@ -1,8 +1,8 @@
-import { Suspense, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql, useLazyLoadQuery, usePreloadedQuery } from 'react-relay';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
@@ -20,7 +20,6 @@ import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CoverEditionRoute } from '#routes';
-import type { CoverEditionScreenCoverEditorQuery } from '@azzapp/relay/artifacts/CoverEditionScreenCoverEditorQuery.graphql';
 import type { CoverEditionScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionScreenPrefetchQuery.graphql';
 import type { CoverEditionScreenQuery } from '@azzapp/relay/artifacts/CoverEditionScreenQuery.graphql';
 
@@ -44,20 +43,6 @@ const CoverEditionScreen = ({
     [],
   );
 
-  return (
-    <Suspense>
-      <CoverEditionScreenInner templateKind={templateKind} />
-    </Suspense>
-  );
-};
-
-type CoverEditionScreenInnerProps = {
-  templateKind: 'others' | 'people' | 'video';
-};
-
-const CoverEditionScreenInner = ({
-  templateKind,
-}: CoverEditionScreenInnerProps) => {
   const intl = useIntl();
   const router = useRouter();
 
@@ -74,19 +59,6 @@ const CoverEditionScreenInner = ({
   const onCancel = useCallback(() => {
     router.back();
   }, [router]);
-
-  const { viewer } = useLazyLoadQuery<CoverEditionScreenCoverEditorQuery>(
-    graphql`
-      query CoverEditionScreenCoverEditorQuery(
-        $templateKind: CoverTemplateKind!
-      ) {
-        viewer {
-          ...CoverEditor_viewer @arguments(initialTemplateKind: $templateKind)
-        }
-      }
-    `,
-    { templateKind },
-  );
 
   const { height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -128,7 +100,9 @@ const CoverEditionScreenInner = ({
 const query = graphql`
   query CoverEditionScreenQuery {
     viewer {
+      ...CoverEditor_viewer
       profile {
+        ...CoverRenderer_profile
         cardCover {
           media {
             __typename
@@ -151,20 +125,9 @@ export default relayScreen(CoverEditionScreen, {
           viewer {
             ...CoverEditorCustom_viewer
             profile {
+              ...CoverRenderer_profile
               ...useCoverEditionManager_profile @relay(mask: false)
             }
-          }
-          viewerPeople: viewer {
-            ...CoverEditorTemplateList_viewer
-              @arguments(initialTemplateKind: people)
-          }
-          viewerOthers: viewer {
-            ...CoverEditorTemplateList_viewer
-              @arguments(initialTemplateKind: others)
-          }
-          viewerVideo: viewer {
-            ...CoverEditorTemplateList_viewer
-              @arguments(initialTemplateKind: video)
           }
         }
       `,

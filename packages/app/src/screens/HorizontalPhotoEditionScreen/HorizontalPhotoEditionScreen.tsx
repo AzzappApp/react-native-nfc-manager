@@ -8,6 +8,7 @@ import {
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
   EditImageStep,
@@ -232,7 +233,7 @@ const HorizontalPhotoEditionScreen = ({
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
-        mediaId = public_id;
+        mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
         console.log(error);
       } finally {

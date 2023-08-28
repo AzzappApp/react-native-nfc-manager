@@ -1,19 +1,14 @@
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   getCompanyActivitiesByProfileCategory,
   getCompanyActivityById,
-  getFollowingsCount,
-  getFollowerProfilesCount,
   getProfileCategoryById,
   getProfilesPosts,
-  getProfilesPostsCount,
   isFollowing,
   getCardModules,
 } from '#domains';
 import { generateFakeInsightsData } from '#helpers/fakerHelper';
 import { getLabel, idResolver } from './utils';
-import type { Media } from '#domains';
 import type {
   CompanyActivityResolvers,
   ProfileCategoryResolvers,
@@ -59,20 +54,6 @@ export const Profile: ProfileResolvers = {
   isFollowing: async (profile, _, { auth }) => {
     return auth.profileId ? isFollowing(auth.profileId, profile.id) : false;
   },
-  nbPosts: async (profile, _) => {
-    return getProfilesPostsCount(profile.id);
-  },
-  nbFollowings: async (profile, _) => {
-    return getFollowingsCount(profile.id);
-  },
-  nbFollowers: async (profile, _) => {
-    return getFollowerProfilesCount(profile.id);
-  },
-  nbLikes: () => {
-    //TODO: I don't know if it is releavant or how we will handlez counter (sql count or value maintain)
-    // for the purpose of developing the ui of new homescreen , i will return an fake value
-    return Math.floor(Math.random() * 10000);
-  },
   posts: async (profile, args) => {
     // TODO we should use a bookmark instead of offset, perhaps by using createdAt as a bookmark
     let { after, first } = args;
@@ -85,7 +66,7 @@ export const Profile: ProfileResolvers = {
       { after, first },
       {
         sliceStart: offset,
-        arrayLength: await getProfilesPostsCount(profile.id),
+        arrayLength: profile.nbPosts,
       },
     );
   },
@@ -97,13 +78,7 @@ export const Profile: ProfileResolvers = {
 export const ProfileCategory: ProfileCategoryResolvers = {
   id: idResolver('ProfileCategory'),
   label: getLabel,
-  medias: async (profileCategory, _, { mediaLoader }) => {
-    return convertToNonNullArray(
-      (await mediaLoader.loadMany(profileCategory.medias)).filter(
-        m => !(m instanceof Error),
-      ) as Media[],
-    );
-  },
+  medias: profileCategory => profileCategory.medias,
   companyActivities: async (profileCategory, _) => {
     return getCompanyActivitiesByProfileCategory(profileCategory.id);
   },

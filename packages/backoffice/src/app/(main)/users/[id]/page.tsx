@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getUsersByIds } from '@azzapp/data/domains';
+import { getUserById } from '@azzapp/data/domains';
 import UserForm from './UserForm';
 
 type UserPageProps = {
@@ -9,7 +9,7 @@ type UserPageProps = {
 };
 
 const UserPage = async ({ params: { id } }: UserPageProps) => {
-  const [user] = await getUsersByIds([id]);
+  const user = await getUserById(id);
   if (!user) {
     return notFound();
   }

@@ -1,7 +1,7 @@
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { getColorPalettes } from '#domains';
 import { idResolver } from './utils';
-import type { Media } from '#domains';
 import type {
   CoverTemplateDataResolvers,
   CoverTemplateResolvers,
@@ -9,22 +9,20 @@ import type {
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
-  previewMedia: async ({ previewMediaId }, _, { mediaLoader }) =>
-    mediaLoader.load(previewMediaId) as Promise<Media>,
-  colorPalette: async ({ colorPaletteId }, _, { colorPaletteLoader }) =>
-    (await colorPaletteLoader.load(colorPaletteId))!,
+  previewMedia: ({ previewMediaId }) => previewMediaId,
+  colorPalette: async ({ colorPaletteId }, _, { loaders }) =>
+    (await loaders.ColorPalette.load(colorPaletteId))!,
   colorPalettes: async (
     { colorPaletteId },
     { first, after },
-    { auth, colorPaletteLoader, colorPalettesLoader },
+    { auth, loaders, sessionMemoized },
   ) => {
-    const mainColorPalette = await colorPaletteLoader.load(colorPaletteId);
+    const mainColorPalette = await loaders.ColorPalette.load(colorPaletteId);
     const colorPalettes = [
       mainColorPalette,
       ...shuffle(
-        await colorPalettesLoader(),
-        // stupid hack to make sure the color palettes are shuffled in the same way for a given user
-        parseInt(auth.profileId ?? '' + colorPaletteId, 36),
+        await sessionMemoized(getColorPalettes),
+        auth.profileId ?? '' + colorPaletteId,
       ),
     ];
     return connectionFromArray(colorPalettes, { first, after });
@@ -32,10 +30,6 @@ export const CoverTemplate: CoverTemplateResolvers = {
 };
 
 export const CoverTemplateData: CoverTemplateDataResolvers = {
-  background: ({ backgroundId }, _, { staticMediaLoader }) => {
-    return backgroundId ? staticMediaLoader.load(backgroundId) : null;
-  },
-  foreground: ({ foregroundId }, _, { staticMediaLoader }) => {
-    return foregroundId ? staticMediaLoader.load(foregroundId) : null;
-  },
+  background: ({ backgroundId }) => backgroundId ?? null,
+  foreground: ({ foregroundId }) => foregroundId ?? null,
 };

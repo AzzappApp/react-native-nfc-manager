@@ -12,7 +12,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
   _,
   { input: { moduleId } },
-  { auth, profileLoader, cardUpdateListener },
+  { auth, loaders, cardUpdateListener },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -52,7 +52,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const profile = (await profileLoader.load(profileId))!;
+  const profile = (await loaders.Profile.load(profileId))!;
   cardUpdateListener(profile.userName);
 
   return { profile, createdModuleId };

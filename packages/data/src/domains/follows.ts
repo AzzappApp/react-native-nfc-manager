@@ -7,6 +7,7 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
+import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const FollowTable = mysqlTable(
@@ -57,8 +58,12 @@ export const isFollowing = async (userId: string, targetId: string) =>
  * @param userId - The id of the follower
  * @param targetId - The id of the followed user
  */
-export const follows = async (userId: string, targetId: string) =>
-  db
+export const follows = async (
+  userId: string,
+  targetId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .insert(FollowTable)
     .values({
       followerId: userId,
@@ -73,8 +78,12 @@ export const follows = async (userId: string, targetId: string) =>
  * @param userId - The id of the follower
  * @param targetId - The id of the followed user
  */
-export const unfollows = (userId: string, targetId: string) =>
-  db
+export const unfollows = (
+  userId: string,
+  targetId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .delete(FollowTable)
     .where(
       and(

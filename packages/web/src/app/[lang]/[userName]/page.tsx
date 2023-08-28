@@ -5,7 +5,6 @@ import {
   getMediasByIds,
   getProfileByUserName,
   getProfilesPostsWithTopComment,
-  getProfilesPostsCount,
   getStaticMediasByIds,
 } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -23,59 +22,56 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { profile, modules, media, posts, postsCount, backgrounds } =
-    await unstable_cache(
-      async () => {
-        const profile = await getProfileByUserName(userName);
+  const { profile, modules, media, posts, backgrounds } = await unstable_cache(
+    async () => {
+      const profile = await getProfileByUserName(userName);
 
-        try {
-          if (profile?.cardIsPublished) {
-            const [posts, postsCount, modules, media] = await Promise.all([
-              getProfilesPostsWithTopComment(profile.id, 5, 0),
-              getProfilesPostsCount(profile.id),
-              getCardModules(profile.id),
-              profile.coverData?.mediaId
-                ? getMediasByIds([profile.coverData.mediaId]).then(
-                    ([media]) => media,
-                  )
-                : null,
-            ]);
+      try {
+        if (profile?.cardIsPublished) {
+          const [posts, modules, media] = await Promise.all([
+            getProfilesPostsWithTopComment(profile.id, 5, 0),
+            getCardModules(profile.id),
+            profile.coverData?.mediaId
+              ? getMediasByIds([profile.coverData.mediaId]).then(
+                  ([media]) => media,
+                )
+              : null,
+          ]);
 
-            const backgroundIds = convertToNonNullArray(
-              modules.map(module => (module.data as any).backgroundId),
-            );
+          const backgroundIds = convertToNonNullArray(
+            modules.map(module => (module.data as any).backgroundId),
+          );
 
-            const backgrounds = backgroundIds.length
-              ? await getStaticMediasByIds(backgroundIds)
-              : [];
+          const backgrounds = backgroundIds.length
+            ? await getStaticMediasByIds(backgroundIds)
+            : [];
 
-            return {
-              profile,
-              modules,
-              media,
-              posts,
-              postsCount,
-              backgrounds,
-            };
-          }
-        } catch (e) {
-          console.error(e);
+          return {
+            profile,
+            modules,
+            media,
+            posts,
+            backgrounds,
+          };
         }
+      } catch (e) {
+        console.error(e);
+      }
 
-        return {
-          profile,
-          card: undefined,
-          cover: undefined,
-          modules: [],
-          media: undefined,
-          posts: [],
-          postsCount: 0,
-          backgrounds: [],
-        };
-      },
-      [userName],
-      { tags: [userName] },
-    )();
+      return {
+        profile,
+        card: undefined,
+        cover: undefined,
+        modules: [],
+        media: undefined,
+        posts: [],
+        postsCount: 0,
+        backgrounds: [],
+      };
+    },
+    [userName],
+    { tags: [userName] },
+  )();
 
   if (!profile?.cardIsPublished || !media) {
     return notFound();
@@ -102,7 +98,6 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
         </>
       }
       posts={posts}
-      postsCount={postsCount}
       media={media}
       cover={<CoverRenderer profile={profile} media={media} />}
     />

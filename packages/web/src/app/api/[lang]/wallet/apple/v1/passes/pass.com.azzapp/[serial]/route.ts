@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfilesByIds } from '@azzapp/data/domains';
+import { getProfileById } from '@azzapp/data/domains';
 import { unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
@@ -24,7 +24,7 @@ const updatePass = async (
 
   const ifModifiedSince = req.headers.get('If-Modified-Since');
 
-  const [profile] = await getProfilesByIds([params.serial]);
+  const profile = await getProfileById(params.serial);
 
   if (!profile) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });

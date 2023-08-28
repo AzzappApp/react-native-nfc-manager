@@ -11,7 +11,6 @@ import {
   connectionFromDateSortedItems,
 } from '#helpers/connectionsHelpers';
 import { idResolver } from './utils';
-import type { Media } from '#domains';
 import type {
   PostCommentResolvers,
   PostResolvers,
@@ -19,28 +18,14 @@ import type {
 
 export const Post: PostResolvers = {
   id: idResolver('Post'),
-  author: async (post, _, { profileLoader }) => {
-    const author = await profileLoader.load(post.authorId);
+  author: async (post, _, { loaders }) => {
+    const author = await loaders.Profile.load(post.authorId);
     if (author) {
       return author;
     }
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   },
-  media: async (post, _, { mediaLoader }) => {
-    return mediaLoader
-      .loadMany(post.medias)
-      .then(
-        medias =>
-          (
-            medias.filter(
-              media => media && !(media instanceof Error),
-            ) as Media[]
-          )[0]!,
-      )
-      .catch(err => {
-        throw err;
-      });
-  },
+  media: async post => post.medias[0],
   content: async post => {
     return post.content ?? '';
   },
@@ -92,8 +77,8 @@ export const Post: PostResolvers = {
 
 export const PostComment: PostCommentResolvers = {
   id: idResolver('PostComment'),
-  author: async (post, _, { profileLoader }) => {
-    const author = await profileLoader.load(post.profileId);
+  author: async (post, _, { loaders }) => {
+    const author = await loaders.Profile.load(post.profileId);
     if (author) {
       return author;
     }

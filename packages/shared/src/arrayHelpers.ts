@@ -1,4 +1,5 @@
 import { pseudoSinRandom } from './numberHelpers';
+import { simpleHash } from './stringHelpers';
 
 export type ArrayItemType<T> = T extends ReadonlyArray<infer U> ? U : never;
 
@@ -12,18 +13,19 @@ export const convertToNonNullArray = <T>(
 /**
  * And helper function that returns a shuffled version of the given array using the given seed
  */
-export function shuffle<T>(array: T[], seed: number) {
+export function shuffle<T>(array: T[], seed: number | string) {
   const result = [...array];
   let m = array.length;
   let t;
   let i;
 
+  let s = typeof seed === 'string' ? simpleHash(seed) : seed;
   while (m) {
-    i = Math.floor(pseudoSinRandom(seed) * m--); // <-- MODIFIED LINE
+    i = Math.floor(pseudoSinRandom(s) * m--); // <-- MODIFIED LINE
     t = result[m];
     result[m] = result[i];
     result[i] = t;
-    ++seed; // <-- ADDED LINE
+    ++s; // <-- ADDED LINE
   }
 
   return result;

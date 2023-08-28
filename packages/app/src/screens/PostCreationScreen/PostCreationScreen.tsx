@@ -12,6 +12,7 @@ import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRati
 import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
 import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
 import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -157,7 +158,7 @@ const PostCreationScreen = ({
     commit({
       variables: {
         input: {
-          mediaId: public_id,
+          mediaId: encodeMediaId(public_id, kind),
           allowComments,
           allowLikes,
           content,

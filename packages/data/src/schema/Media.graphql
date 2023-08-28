@@ -40,7 +40,6 @@ Media used in web card edition provided by azzapp
 type StaticMedia {
   id: ID!
   uri(width: Float, pixelRatio: Float): String!
-  name: String
   usage: StaticMediaUsage!
   resizeMode: StaticMediaResizeMode!
 }

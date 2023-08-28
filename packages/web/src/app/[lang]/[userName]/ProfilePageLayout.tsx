@@ -18,12 +18,11 @@ type ProfilePageLayoutProps = {
   modules: React.ReactNode;
   cover: React.ReactNode;
   posts: PostWithCommentAndAuthor[];
-  postsCount: number;
   media: Media;
 };
 
 const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
-  const { profile, modules, cover, posts, postsCount, media } = props;
+  const { profile, modules, cover, posts, media } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
 
@@ -33,7 +32,7 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
     <div className={styles.wrapper}>
       {posts.length > 0 && (
         <ProfilePostNavigation
-          postsCount={postsCount}
+          postsCount={profile.nbPosts}
           onClickCover={() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
@@ -68,7 +67,7 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
           })}
         >
           <PostFeed
-            postsCount={postsCount}
+            postsCount={profile.nbPosts}
             defaultPosts={posts}
             media={media}
             profile={profile}

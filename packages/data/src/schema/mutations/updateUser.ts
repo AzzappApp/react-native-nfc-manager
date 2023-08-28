@@ -4,19 +4,14 @@ import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
-import {
-  getUserByEmail,
-  getUserByPhoneNumber,
-  getUsersByIds,
-  updateUser,
-} from '#domains';
+import { getUserByEmail, getUserByPhoneNumber, updateUser } from '#domains';
 import type { User } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateUserMutation: MutationResolvers['updateUser'] = async (
   _,
   args,
-  { auth },
+  { auth, loaders },
 ) => {
   const userId = auth.userId;
   if (!userId) {
@@ -45,7 +40,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
   }
 
-  const [dbUser] = await getUsersByIds([userId]);
+  const dbUser = await loaders.User.load(userId);
 
   if (!dbUser) {
     throw new Error(ERRORS.INVALID_REQUEST);

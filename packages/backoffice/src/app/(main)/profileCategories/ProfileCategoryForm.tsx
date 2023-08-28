@@ -20,6 +20,7 @@ import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
@@ -105,7 +106,7 @@ const ProfileCategoryForm = ({
             const { uploadURL, uploadParameters } = uploadsInfos[index];
             return uploadMedia(file, uploadURL, uploadParameters).promise.then(
               ({ public_id }) => ({
-                id: public_id as string,
+                id: encodeMediaId(public_id, 'image'),
                 index: mediaIndex,
               }),
             );

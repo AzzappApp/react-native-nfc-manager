@@ -14,14 +14,14 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
   { input },
-  { auth, profileLoader },
+  { auth, loaders },
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const profile = await profileLoader.load(profileId);
+  const profile = await loaders.Profile.load(profileId);
   if (!profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }

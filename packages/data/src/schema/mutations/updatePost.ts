@@ -9,7 +9,7 @@ import type { GraphQLContext } from '../GraphQLContext';
 const updatePostMutation: MutationResolvers['updatePost'] = async (
   _,
   { input },
-  { auth, postLoader, profileLoader, cardUpdateListener }: GraphQLContext,
+  { auth, loaders, cardUpdateListener }: GraphQLContext,
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -19,7 +19,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   const { postId, ...postInput } = input;
   const { id: targetId } = fromGlobalId(postId);
 
-  const post = await postLoader.load(targetId);
+  const post = await loaders.Post.load(targetId);
 
   if (!post) {
     throw new Error(ERRORS.UNAUTORIZED);
@@ -32,7 +32,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   try {
     await updatePost(post.id, partialPost);
 
-    const profile = await profileLoader.load(profileId);
+    const profile = await loaders.Profile.load(profileId);
     cardUpdateListener(profile!.userName);
 
     return {

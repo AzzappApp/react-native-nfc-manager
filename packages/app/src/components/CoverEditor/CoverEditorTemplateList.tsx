@@ -1,6 +1,6 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
-import { isEqual } from 'lodash';
+import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, unstable_batchedUpdates } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
@@ -30,6 +30,9 @@ import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
 import type { CoverEditorTemplateList_templates$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templates.graphql';
+import type { CoverEditorTemplateList_templatesOthers$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesOthers.graphql';
+import type { CoverEditorTemplateList_templatesPeople$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesPeople.graphql';
+import type { CoverEditorTemplateList_templatesVideos$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesVideos.graphql';
 import type { CoverEditorTemplateList_viewer$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_viewer.graphql';
 import type {
   CoverEditorTemplateListItem_coverTemplate$key,
@@ -96,10 +99,7 @@ const CoverEditorTemplateList = ({
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
-      fragment CoverEditorTemplateList_viewer on Viewer
-      @argumentDefinitions(
-        initialTemplateKind: { type: CoverTemplateKind, defaultValue: people }
-      ) {
+      fragment CoverEditorTemplateList_viewer on Viewer {
         colorPalettes(first: 100) {
           edges {
             node {
@@ -111,50 +111,13 @@ const CoverEditorTemplateList = ({
           }
         }
         ...CoverEditorTemplateList_templates
-          @arguments(kind: $initialTemplateKind)
       }
     `,
     viewerKey,
   );
 
-  const {
-    data: { coverTemplates },
-    refetch,
-    loadNext,
-    isLoadingNext,
-    hasNext,
-  } = usePaginationFragment(
-    graphql`
-      fragment CoverEditorTemplateList_templates on Viewer
-      @refetchable(queryName: "CoverEditorTemplateList_templates_query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 20 }
-        kind: { type: CoverTemplateKind, defaultValue: people }
-      ) {
-        coverTemplates(kind: $kind, after: $after, first: $first)
-          @connection(
-            key: "CoverEditorTemplateList_connection_coverTemplates"
-          ) {
-          edges {
-            node {
-              ...CoverEditorTemplateListItem_coverTemplate
-            }
-          }
-        }
-      }
-    `,
-    viewer as CoverEditorTemplateList_templates$key,
-  );
-
-  const templateKindRef = useRef<CoverTemplateKind>(templateKind);
-
-  useEffect(() => {
-    if (templateKindRef.current !== templateKind) {
-      templateKindRef.current = templateKind;
-      refetch({ kind: templateKind });
-    }
-  }, [refetch, templateKind]);
+  const { coverTemplates, loadNext, isLoadingNext, hasNext } =
+    useCoverTemplates(viewer, templateKind);
 
   const onEndTemplateReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -619,6 +582,121 @@ const CoverEditorTemplateList = ({
 };
 
 export default CoverEditorTemplateList;
+
+const useCoverTemplates = (
+  viewerKey: CoverEditorTemplateList_templates$key,
+  kind: string,
+) => {
+  const viewer = useFragment(
+    graphql`
+      fragment CoverEditorTemplateList_templates on Viewer {
+        ...CoverEditorTemplateList_templatesPeople
+        ...CoverEditorTemplateList_templatesVideos
+        ...CoverEditorTemplateList_templatesOthers
+      }
+    `,
+    viewerKey,
+  );
+
+  const peopleFragmentResult = usePaginationFragment(
+    graphql`
+      fragment CoverEditorTemplateList_templatesPeople on Viewer
+      @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
+      @argumentDefinitions(
+        after: { type: String }
+        first: { type: Int, defaultValue: 20 }
+      ) {
+        peopleCoverTemplates: coverTemplates(
+          kind: people
+          after: $after
+          first: $first
+        )
+          @connection(
+            key: "CoverEditorTemplateList_connection_peopleCoverTemplates"
+          ) {
+          edges {
+            node {
+              ...CoverEditorTemplateListItem_coverTemplate
+            }
+          }
+        }
+      }
+    `,
+    viewer as CoverEditorTemplateList_templatesPeople$key,
+  );
+
+  const videosFragmentResult = usePaginationFragment(
+    graphql`
+      fragment CoverEditorTemplateList_templatesVideos on Viewer
+      @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
+      @argumentDefinitions(
+        after: { type: String }
+        first: { type: Int, defaultValue: 20 }
+      ) {
+        videosCoverTemplates: coverTemplates(
+          kind: video
+          after: $after
+          first: $first
+        )
+          @connection(
+            key: "CoverEditorTemplateList_connection_videosCoverTemplates"
+          ) {
+          edges {
+            node {
+              ...CoverEditorTemplateListItem_coverTemplate
+            }
+          }
+        }
+      }
+    `,
+    viewer as CoverEditorTemplateList_templatesVideos$key,
+  );
+
+  const othersFragmentResult = usePaginationFragment(
+    graphql`
+      fragment CoverEditorTemplateList_templatesOthers on Viewer
+      @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
+      @argumentDefinitions(
+        after: { type: String }
+        first: { type: Int, defaultValue: 20 }
+      ) {
+        othersCoverTemplates: coverTemplates(
+          kind: others
+          after: $after
+          first: $first
+        )
+          @connection(
+            key: "CoverEditorTemplateList_connection_othersCoverTemplates"
+          ) {
+          edges {
+            node {
+              ...CoverEditorTemplateListItem_coverTemplate
+            }
+          }
+        }
+      }
+    `,
+    viewer as CoverEditorTemplateList_templatesOthers$key,
+  );
+
+  switch (kind) {
+    case 'people':
+      return {
+        coverTemplates: peopleFragmentResult.data.peopleCoverTemplates,
+        ...omit(peopleFragmentResult, 'data'),
+      };
+    case 'video':
+      return {
+        coverTemplates: videosFragmentResult.data.videosCoverTemplates,
+        ...omit(videosFragmentResult, 'data'),
+      };
+    default:
+      return {
+        coverTemplates: othersFragmentResult.data.othersCoverTemplates,
+        ...omit(othersFragmentResult, 'data'),
+      };
+  }
+};
 
 const CoverPreviewRendererMemo = memo(
   CoverPreviewRenderer,

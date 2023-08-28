@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { inArray, type InferModel, eq, and } from 'drizzle-orm';
+import { type InferModel, eq, and } from 'drizzle-orm';
 import {
   mysqlTable,
   boolean,
@@ -7,7 +7,6 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 
 export const ColorPaletteTable = mysqlTable('ColorPalette', {
@@ -32,22 +31,6 @@ export const getColorPaletteById = (id: string) =>
     .from(ColorPaletteTable)
     .where(eq(ColorPaletteTable.id, id))
     .then(rows => rows[0] ?? null);
-/**
- * Retrieve a list of colorPalette by their ids.
- * @param ids - The ids of the colorPalette to retrieve
- * @returns A list of colorPalette, where the order of the colorPalette matches the order of the ids
- */
-export const getColorPalettesByIds = async (
-  ids: readonly string[],
-  tx: DbTransaction = db,
-) =>
-  sortEntitiesByIds(
-    ids,
-    await tx
-      .select()
-      .from(ColorPaletteTable)
-      .where(inArray(ColorPaletteTable.id, ids as string[])),
-  );
 
 /**
  * Retrieve a colorPalette by its colors.

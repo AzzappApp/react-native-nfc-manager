@@ -19,13 +19,13 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
   { input: { cardTemplateId } },
-  { auth, profileLoader, cardUpdateListener },
+  { auth, loaders, cardUpdateListener },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
-  const profile = await profileLoader.load(profileId);
+  const profile = await loaders.Profile.load(profileId);
   if (!profile) {
     throw new Error(ERRORS.UNAUTORIZED);
   }

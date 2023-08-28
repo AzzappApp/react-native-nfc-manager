@@ -1,6 +1,7 @@
 import { like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
   getFollowerProfiles,
   getFollowingsPosts,
@@ -12,6 +13,7 @@ import {
   getRecommendedProfiles,
   getCoverTemplates,
   getCardTemplates,
+  getColorPalettes,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
@@ -23,12 +25,12 @@ import {
 import type { ViewerResolvers } from './__generated__/types';
 
 export const Viewer: ViewerResolvers = {
-  profile: async (_root, _, { auth, profileLoader }) => {
+  profile: async (_root, _, { auth, loaders }) => {
     const profileId = auth.profileId;
     if (!profileId) {
       return null;
     }
-    return profileLoader.load(profileId);
+    return loaders.Profile.load(profileId);
   },
   followings: async (_root, args, { auth }) => {
     const profileId = auth.profileId;
@@ -150,9 +152,9 @@ export const Viewer: ViewerResolvers = {
   coverTemplates: async (
     _,
     { kind, after, first },
-    { auth: { profileId }, profileLoader },
+    { auth: { profileId }, loaders },
   ) => {
-    const profile = profileId ? await profileLoader.load(profileId) : null;
+    const profile = profileId ? await loaders.Profile.load(profileId) : null;
     if (!profile) {
       return emptyConnection;
     }
@@ -221,15 +223,15 @@ export const Viewer: ViewerResolvers = {
   colorPalettes: async (
     _,
     { after, first },
-    { auth: { profileId }, colorPalettesLoader },
+    { auth: { profileId }, sessionMemoized },
   ) => {
     if (!profileId) {
       return emptyConnection;
     }
     first = first ?? 100;
     const colorPalettes = shuffle(
-      await colorPalettesLoader(),
-      parseInt(profileId, 36),
+      await sessionMemoized(getColorPalettes),
+      simpleHash(profileId),
     );
 
     return connectionFromArray(colorPalettes, {
@@ -240,9 +242,9 @@ export const Viewer: ViewerResolvers = {
   suggestedMedias: async (
     _,
     { after, first },
-    { auth: { profileId }, profileLoader, mediaLoader },
+    { auth: { profileId }, loaders },
   ) => {
-    const profile = profileId ? await profileLoader.load(profileId) : null;
+    const profile = profileId ? await loaders.Profile.load(profileId) : null;
     if (!profile) {
       return emptyConnection;
     }
@@ -255,13 +257,10 @@ export const Viewer: ViewerResolvers = {
       first ?? 100,
     );
 
-    // resolvers doesn't understand the type of Media, so we need to cast it
-    const edges: any[] = await Promise.all(
-      suggestions.map(async ({ mediaId, cursor }) => ({
-        node: await mediaLoader.load(mediaId),
-        cursor,
-      })),
-    );
+    const edges = suggestions.map(({ mediaId, cursor }) => ({
+      node: mediaId,
+      cursor,
+    })) as any[];
 
     return {
       edges,

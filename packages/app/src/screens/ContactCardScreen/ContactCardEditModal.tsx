@@ -72,7 +72,6 @@ const ContactCardEditModal = ({
   const contactCard = useFragment(
     graphql`
       fragment ContactCardEditModal_card on ContactCard {
-        id
         firstName
         lastName
         title

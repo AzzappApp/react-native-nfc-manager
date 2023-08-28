@@ -1,6 +1,5 @@
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
-import ERRORS from '@azzapp/shared/errors';
-import type { CardModule as CardModuleModel, Media } from '#domains';
+import type { CardModule as CardModuleModel } from '#domains';
 import type {
   CardModuleCarouselResolvers,
   CardModuleHorizontalPhotoResolvers,
@@ -13,7 +12,6 @@ import type {
   CardModuleBlockTextResolvers,
   CardModuleLineDividerResolvers,
 } from './__generated__/types';
-import type { GraphQLContext } from './GraphQLContext';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
 const isKnownModule = (moduleKind: string): moduleKind is ModuleKind =>
@@ -34,17 +32,13 @@ export const CardModule: CardModuleResolvers = {
   },
 };
 
-const background = (
-  cardModule: CardModuleModel,
-  _: unknown,
-  { staticMediaLoader }: GraphQLContext,
-) => {
+const background = (cardModule: CardModuleModel) => {
   const { data } = cardModule;
   return typeof data === 'object' &&
     data &&
     'backgroundId' in data &&
     typeof data.backgroundId === 'string'
-    ? staticMediaLoader.load(data.backgroundId)
+    ? data.backgroundId
     : null;
 };
 
@@ -58,13 +52,9 @@ export const CardModuleCarousel: CardModuleCarouselResolvers = {
   marginHorizontal: module => module.data.marginHorizontal ?? null,
   marginVertical: module => module.data.marginVertical ?? null,
   squareRatio: module => module.data.squareRatio ?? null,
-  images: async (cardModule, _, { mediaLoader }) => {
+  images: async cardModule => {
     const { data } = cardModule;
-    return data?.images
-      ? ((await mediaLoader.loadMany(data.images)).filter(
-          m => m && !(m instanceof Error),
-        ) as Media[])
-      : [];
+    return data?.images;
   },
   background,
 };
@@ -77,17 +67,7 @@ export const CardModuleHorizontalPhoto: CardModuleHorizontalPhotoResolvers = {
   imageHeight: module => module.data.imageHeight ?? null,
   marginHorizontal: module => module.data.marginHorizontal ?? null,
   marginVertical: module => module.data.marginVertical ?? null,
-  image: async (cardModule, _, { mediaLoader }) => {
-    const { data } = cardModule;
-    if (data && typeof data === 'object' && 'image' in data) {
-      const image = await mediaLoader.load(data.image);
-      if (image) {
-        return image;
-      }
-    }
-
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-  },
+  image: module => module.data.image,
   background,
 };
 
@@ -146,17 +126,7 @@ export const CardModuleLineDivider: CardModuleLineDividerResolvers = {
 
 export const CardModulePhotoWithTextAndTitle: CardModulePhotoWithTextAndTitleResolvers =
   {
-    image: async (cardModule, _, { mediaLoader }) => {
-      const { data } = cardModule;
-      if (data && typeof data === 'object' && 'image' in data) {
-        const image = await mediaLoader.load(data.image);
-        if (image) {
-          return image;
-        }
-      }
-
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    },
+    image: module => module.data.image,
     backgroundStyle: module => module.data.backgroundStyle ?? null,
     contentFontFamily: module => module.data.contentFontFamily ?? null,
     contentFontColor: module => module.data.contentFontColor ?? null,
@@ -210,10 +180,5 @@ export const CardModuleBlockText: CardModuleBlockTextResolvers = {
   backgroundStyle: module => module.data.backgroundStyle ?? null,
   textBackgroundStyle: module => module.data.textBackgroundStyle ?? null,
   background,
-  textBackground: (module, _, { staticMediaLoader }: GraphQLContext) => {
-    const { data } = module;
-    return data.textBackgroundId
-      ? staticMediaLoader.load(data.textBackgroundId)
-      : null;
-  },
+  textBackground: module => module.data.textBackgroundId ?? null,
 };

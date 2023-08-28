@@ -61,16 +61,12 @@ const CoverEditor = (
   // #region Data
   const viewer = useFragment(
     graphql`
-      fragment CoverEditor_viewer on Viewer
-      @argumentDefinitions(
-        initialTemplateKind: { type: CoverTemplateKind, defaultValue: people }
-      ) {
+      fragment CoverEditor_viewer on Viewer {
         profile {
           ...useCoverEditionManager_profile
         }
         ...CoverEditorCustom_viewer
         ...CoverEditorTemplateList_viewer
-          @arguments(initialTemplateKind: $initialTemplateKind)
       }
     `,
     viewerKey,

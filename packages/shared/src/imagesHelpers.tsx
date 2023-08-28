@@ -24,6 +24,7 @@ export const getImageURLForSize = (
   ) {
     throw new Error('getImageURLForSize is not supported on react-native');
   }
+  id = decodeMediaId(id);
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
   }
@@ -48,6 +49,7 @@ export const getImageURL = (id: string) => {
   ) {
     throw new Error('getImageURL is not supported on react-native');
   }
+  id = decodeMediaId(id);
   return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
 };
 
@@ -64,6 +66,7 @@ export const getVideoURL = (id: string) => {
   ) {
     throw new Error('getImageURL is not supported on react-native');
   }
+  id = decodeMediaId(id);
   return `${CLOUDINARY_BASE_URL}/video/upload/${id}`;
 };
 
@@ -88,6 +91,7 @@ export const getVideoUrlForSize = (
   ) {
     throw new Error('getVideoUrlForSize is not supported on react-native');
   }
+  id = decodeMediaId(id);
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.mp4`;
   }
@@ -116,6 +120,7 @@ export const getVideoThumbnailURL = (
   ) {
     throw new Error('getVideoThumbnailURL is not supported on react-native');
   }
+  id = decodeMediaId(id);
   if (!width) {
     return `${CLOUDINARY_BASE_URL}/video/upload/${id}.jpg`;
   }
@@ -140,12 +145,16 @@ const resizeTransforms = (
 };
 
 /**
- * Returns the media id from a cloudinary url
- *
- * @param url the cloudinary url
- * @returns the media id
+ * Extract the media id from a database id
  */
-export const getMediaIDFromURL = (url: string) => {
-  const segments = url.split('/');
-  return segments[segments.length - 1].split('.')[0];
+export const decodeMediaId = (dbId: string) => {
+  const segments = dbId.split(':');
+  return segments[segments.length - 1];
+};
+
+/**
+ * Create a database id from a media id
+ */
+export const encodeMediaId = (mediaId: string, kind: 'image' | 'video') => {
+  return `${kind === 'video' ? 'v' : 'i'}:${mediaId}`;
 };

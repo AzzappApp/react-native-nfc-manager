@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, inArray, desc, sql, and, lt, notInArray } from 'drizzle-orm';
+import { eq, desc, sql, and, lt, notInArray } from 'drizzle-orm';
 import {
   json,
   text,
@@ -13,7 +13,6 @@ import {
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
-import { sortEntitiesByIds } from './generic';
 import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
 import type { DbTransaction } from './db';
@@ -48,20 +47,6 @@ export type PostWithMedias = Omit<Post, 'medias'> & { medias: Media[] };
 export type PostWithCommentAndAuthor = PostWithMedias & {
   comment: (PostComment & { author: Profile }) | null;
 };
-
-/**
- * Retrieve a list of post by their ids.
- * @param ids - The ids of the post to retrieve
- * @returns A list of post, where the order of the post matches the order of the ids
- */
-export const getPostsByIds = async (ids: readonly string[]) =>
-  sortEntitiesByIds(
-    ids,
-    await db
-      .select()
-      .from(PostTable)
-      .where(inArray(PostTable.id, ids as string[])),
-  );
 
 /**
  * Retrieve a post by its ids.
@@ -187,19 +172,6 @@ export const getProfilesPostsWithTopComment = async (
     ),
   }));
 };
-
-/**
- * Retrieve the number of post a profile has.
- * @param profileId - The id of the profile
- * @returns he number of post the profile has
- */
-export const getProfilesPostsCount = (profileId: string) =>
-  db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(PostTable)
-    .where(eq(PostTable.authorId, profileId))
-
-    .then(res => res[0].count);
 
 /**
  * Retrieve a list of all post, ordered by date, with pagination based on postDate.

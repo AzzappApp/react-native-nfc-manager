@@ -1,18 +1,25 @@
+import { sql } from 'drizzle-orm';
 import ERRORS from '@azzapp/shared/errors';
-import { checkMedias, createPost, db, referencesMedias } from '#domains';
+import {
+  ProfileTable,
+  checkMedias,
+  createPost,
+  db,
+  referencesMedias,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostMutation: MutationResolvers['createPost'] = async (
   _,
   { input: { mediaId, content, allowComments, allowLikes } },
-  { auth, profileLoader, cardUpdateListener },
+  { auth, loaders, cardUpdateListener },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const profile = await profileLoader.load(profileId);
+  const profile = await loaders.Profile.load(profileId);
   if (!profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
@@ -25,6 +32,9 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     await checkMedias([mediaId]);
     const post = await db.transaction(async trx => {
       await referencesMedias([mediaId], null, trx);
+      await trx.update(ProfileTable).set({
+        nbPosts: sql`nbPosts + 1`,
+      });
       const post = await createPost(
         {
           authorId: profileId,

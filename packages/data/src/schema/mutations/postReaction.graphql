@@ -10,7 +10,7 @@ input TogglePostReactionInput {
   The post id we want toggle like on
   """
   postId: ID!
-  reactionKind: ReactionKind
+  reactionKind: ReactionKind!
 }
 
 type TogglePostReactionPayload {

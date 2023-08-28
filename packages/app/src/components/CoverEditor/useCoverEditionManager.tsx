@@ -21,6 +21,7 @@ import {
   textOrientationOrDefaut,
   textPositionOrDefaut,
 } from '@azzapp/shared/coverHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
   exportImage,
@@ -542,7 +543,9 @@ const useCoverEditionManager = ({
           await Promise.all(
             uploads.map(
               upload =>
-                upload?.promise.then(({ public_id }) => public_id as string),
+                upload?.promise.then(({ public_id, resource_type }) => {
+                  return encodeMediaId(public_id, resource_type);
+                }),
             ),
           );
         setUploadProgress(null);

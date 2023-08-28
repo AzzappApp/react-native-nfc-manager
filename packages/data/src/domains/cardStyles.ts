@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { inArray, sql, type InferModel, eq } from 'drizzle-orm';
+import { sql, type InferModel, eq } from 'drizzle-orm';
 import {
   mysqlTable,
   boolean,
@@ -8,7 +8,6 @@ import {
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 
 export const CardStyleTable = mysqlTable('CardStyle', {
@@ -41,23 +40,6 @@ export const getCardStyleById = (id: string) =>
     .from(CardStyleTable)
     .where(eq(CardStyleTable.id, id))
     .then(rows => rows[0] ?? null);
-/**
-/**
- * Retrieve a list of cardStyle by their ids.
- * @param ids - The ids of the cardStyle to retrieve
- * @returns A list of cardStyle, where the order of the cardStyle matches the order of the ids
- */
-export const getCardStylesByIds = async (
-  ids: readonly string[],
-  tx: DbTransaction = db,
-) =>
-  sortEntitiesByIds(
-    ids,
-    await tx
-      .select()
-      .from(CardStyleTable)
-      .where(inArray(CardStyleTable.id, ids as string[])),
-  );
 
 /**
  * Create a cardStyle.

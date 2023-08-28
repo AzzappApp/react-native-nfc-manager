@@ -25,10 +25,9 @@ const CoverEditionStep = ({
 }: CoverEditionStepProps) => {
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
     graphql`
-      query CoverEditionStepQuery($initialTemplateKind: CoverTemplateKind!) {
+      query CoverEditionStepQuery {
         viewer {
           ...CoverEditor_viewer
-            @arguments(initialTemplateKind: $initialTemplateKind)
         }
       }
     `,

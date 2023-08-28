@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import {
   getColorPalettes,
-  getCoverTemplatesByIds,
+  getCoverTemplateById,
   getMediasByIds,
   getStaticMediasByUsage,
 } from '@azzapp/data/domains';
@@ -20,7 +20,7 @@ const CoverTemplatePage = async ({
   params: { id },
   searchParams,
 }: CoverTemplatePageProps) => {
-  const [coverTemplate] = await getCoverTemplatesByIds([id]);
+  const coverTemplate = await getCoverTemplateById(id);
   const [previewMedia] = coverTemplate
     ? await getMediasByIds([coverTemplate.previewMediaId])
     : [];

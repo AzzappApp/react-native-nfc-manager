@@ -5,7 +5,7 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
   getUserProfiles,
-  getUsersByIds,
+  getUserById,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -50,7 +50,7 @@ const signin = async (req: Request) => {
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);
-      [user] = profile ? await getUsersByIds([profile.userId]) : [];
+      user = profile ? await getUserById(profile.userId) : null;
     }
 
     if (!user?.password) {

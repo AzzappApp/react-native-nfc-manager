@@ -17,7 +17,7 @@ import type { GraphQLContext } from '../GraphQLContext';
 const createProfileMutation: MutationResolvers['createProfile'] = async (
   _,
   { input },
-  { auth, profileLoader }: GraphQLContext,
+  { auth, loaders }: GraphQLContext,
 ) => {
   const { userId } = auth;
   if (!userId) {
@@ -85,7 +85,7 @@ const createProfileMutation: MutationResolvers['createProfile'] = async (
 
   try {
     const profileId = await createProfile({ ...inputProfile, contactCard });
-    const profile = await profileLoader.load(profileId);
+    const profile = await loaders.Profile.load(profileId);
     if (!profile) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }

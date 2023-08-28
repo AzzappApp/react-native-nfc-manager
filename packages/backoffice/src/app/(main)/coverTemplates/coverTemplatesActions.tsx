@@ -8,7 +8,7 @@ import {
   checkMedias,
   db,
   getColorPaletteByColors,
-  getCoverTemplatesByIds,
+  getCoverTemplateById,
   getMediasByIds,
   getProfileByUserName,
   referencesMedias,
@@ -70,7 +70,7 @@ export const saveCoverTemplate = async (
     let previousMediaId: string | null = null;
     let coverTemplateId: string;
     if (data.id) {
-      const [coverTemplate] = await getCoverTemplatesByIds([data.id]);
+      const coverTemplate = await getCoverTemplateById(data.id);
 
       if (!coverTemplate) {
         throw new Error('Cover template not found');

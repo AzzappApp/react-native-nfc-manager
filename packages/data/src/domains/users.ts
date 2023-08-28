@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import {
   uniqueIndex,
   mysqlTable,
@@ -42,13 +42,6 @@ export const getUserById = (id: string): Promise<User | null> =>
     .from(UserTable)
     .where(eq(UserTable.id, id))
     .then(user => user[0]);
-/**
- * Retrieve a list of user by their ids
- * @param ids - The ids of the user to retrieve
- * @returns A list of user, where the order of the user matches the order of the ids
- */
-export const getUsersByIds = (ids: string[]): Promise<User[]> =>
-  db.select().from(UserTable).where(inArray(UserTable.id, ids));
 
 /**
  * Retrieve a user by their email
