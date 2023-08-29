@@ -1,4 +1,4 @@
-import { asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import {
   mysqlEnum,
   varchar,
@@ -55,5 +55,10 @@ export const getStaticMediasByUsage = async (usage: StaticMedia['usage']) =>
   db
     .select()
     .from(StaticMediaTable)
-    .where(eq(StaticMediaTable.usage, usage))
+    .where(
+      and(
+        eq(StaticMediaTable.usage, usage),
+        eq(StaticMediaTable.enabled, true),
+      ),
+    )
     .orderBy(asc(StaticMediaTable.order));

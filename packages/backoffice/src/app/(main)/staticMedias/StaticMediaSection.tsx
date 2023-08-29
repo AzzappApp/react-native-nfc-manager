@@ -128,7 +128,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
           position: 'absolute',
           top: 5,
           right: 5,
-          backgroundColor: 'white',
+          backgroundColor: media.enabled ? 'white' : 'red',
           borderRadius: '50%',
         }}
       >
