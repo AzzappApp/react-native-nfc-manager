@@ -87,6 +87,7 @@ const sectionText = style({
       maxWidth: '100%',
     },
   },
+  zIndex: 1,
 });
 
 const styles = {

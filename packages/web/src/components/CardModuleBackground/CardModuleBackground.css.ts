@@ -37,6 +37,12 @@ const backgroundRepeat = style({
   maskRepeat: 'repeat',
 });
 
+const backgroundStretch = style({
+  maskRepeat: 'no-repeat',
+  maskPosition: 'center',
+  maskSize: '100% 100%',
+});
+
 const content = style({
   zIndex: '1',
 });
@@ -49,6 +55,7 @@ const styles = {
   backgroundCenter,
   backgroundRepeat,
   content,
+  backgroundStretch,
 };
 
 export default styles;

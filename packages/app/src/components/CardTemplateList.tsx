@@ -7,8 +7,8 @@ import { colors } from '#theme';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import { readModulesData } from './cardModules/ModuleData';
 import WebCardList from './WebCardList';
-import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { WebCardInfo } from './WebCardList';
 import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
@@ -79,8 +79,7 @@ const CardTemplateList = ({
                 buttonRadius
               }
               modules {
-                kind
-                data
+                ...ModuleDataInline_cardModules
               }
             }
           }
@@ -112,7 +111,7 @@ const CardTemplateList = ({
             cardStyle,
             profile: profile!,
             cardColors: profile?.cardColors,
-            cardModules: modules as ModuleRenderInfo[],
+            cardModules: readModulesData(modules),
           };
         }) ?? [],
       ),

@@ -1,4 +1,4 @@
-import { graphql, useFragment } from 'react-relay';
+import { graphql, readInlineData, useFragment } from 'react-relay';
 import {
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
@@ -24,6 +24,7 @@ import type { CarouselRenderer_module$key } from '@azzapp/relay/artifacts/Carous
 import type { HorizontalPhotoRenderer_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
 import type { LineDividerRenderer_module$key } from '@azzapp/relay/artifacts/LineDividerRenderer_module.graphql';
 import type { ModuleData_cardModules$key } from '@azzapp/relay/artifacts/ModuleData_cardModules.graphql';
+import type { ModuleDataInline_cardModules$key } from '@azzapp/relay/artifacts/ModuleDataInline_cardModules.graphql';
 import type { PhotoWithTextAndTitleRenderer_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { SimpleButtonRenderer_module$key } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
 import type { SimpleTextRenderer_simpleTextModule$key } from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
@@ -110,4 +111,34 @@ export const useModulesData = (cardModulesKey: ModuleData_cardModules$key) => {
         data: readModuleData(module as any),
       }) as ModuleRenderInfo & { id: string; visible: boolean },
   );
+};
+
+const ModuleDataInlineFragment = graphql`
+  fragment ModuleDataInline_cardModules on CardModule @inline {
+    id
+    kind
+    visible
+    ...BlockTextRenderer_module
+    ...PhotoWithTextAndTitleRenderer_module
+    ...SocialLinksRenderer_module
+    ...HorizontalPhotoRenderer_module
+    ...SimpleButtonRenderer_module
+    ...SimpleTextRenderer_simpleTitleModule
+    ...SimpleTextRenderer_simpleTextModule
+    ...LineDividerRenderer_module
+    ...CarouselRenderer_module
+  }
+`;
+export const readModulesData = (
+  modules: readonly ModuleDataInline_cardModules$key[],
+) => {
+  return modules.map(key => {
+    const module = readInlineData(ModuleDataInlineFragment, key);
+    return {
+      id: module.id,
+      kind: module.kind,
+      visible: module.visible,
+      data: readModuleData(module as any),
+    } as ModuleRenderInfo & { id: string; visible: boolean };
+  });
 };

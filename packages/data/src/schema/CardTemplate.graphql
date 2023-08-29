@@ -8,15 +8,7 @@ type CardTemplate implements Node {
   id: ID!
   label: String
   cardStyle: CardStyle!
-  modules: [CardModuleTemplate]
-}
-
-"""
-Card template display informations
-"""
-type CardModuleTemplate {
-  kind: CardModuleKind!
-  data: JSON
+  modules: [CardModule!]!
 }
 
 """

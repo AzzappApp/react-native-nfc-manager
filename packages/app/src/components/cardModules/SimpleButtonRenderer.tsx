@@ -15,7 +15,7 @@ import type {
 } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { ViewProps } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 /**
  * Render a SimpleButton module
@@ -55,7 +55,7 @@ export type SimpleButtonRendererData = NullableFields<
   Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
 >;
 
-type SimpleButtonRendererProps = ViewProps & {
+export type SimpleButtonRendererProps = ViewProps & {
   /**
    * The data for the SimpleButton module
    */
@@ -68,6 +68,10 @@ type SimpleButtonRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -80,6 +84,7 @@ const SimpleButtonRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  contentStyle,
   ...props
 }: SimpleButtonRendererProps) => {
   const {
@@ -136,7 +141,7 @@ const SimpleButtonRenderer = ({
         },
       ]}
     >
-      <PressableOpacity onPress={onPress}>
+      <PressableOpacity onPress={onPress} style={[contentStyle]}>
         <View
           style={{
             height,

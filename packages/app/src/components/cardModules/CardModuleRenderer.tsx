@@ -31,14 +31,32 @@ import SimpleTextRenderer, {
 import SocialLinksRenderer, {
   readSocialLinksData,
 } from './SocialLinksRenderer';
-import type { BlockTextRendererData } from './BlockTextRenderer';
+import type {
+  BlockTextRendererData,
+  BlockTextRendererProps,
+} from './BlockTextRenderer';
 import type { CarouselRendererData } from './CarouselRenderer';
-import type { HorizontalPhotoRendererData } from './HorizontalPhotoRenderer';
+import type {
+  HorizontalPhotoRendererData,
+  HorizontalPhotoRendererProps,
+} from './HorizontalPhotoRenderer';
 import type { LineDividerRendererData } from './LineDividerRenderer';
-import type { PhotoWithTextAndTitleRendererData } from './PhotoWithTextAndTitleRenderer';
-import type { SimpleButtonRendererData } from './SimpleButtonRenderer';
-import type { SimpleTextRendererData } from './SimpleTextRenderer';
-import type { SocialLinksRendererData } from './SocialLinksRenderer';
+import type {
+  PhotoWithTextAndTitleRendererData,
+  PhotoWithTextAndTitleRendererProps,
+} from './PhotoWithTextAndTitleRenderer';
+import type {
+  SimpleButtonRendererData,
+  SimpleButtonRendererProps,
+} from './SimpleButtonRenderer';
+import type {
+  SimpleTextRendererData,
+  SimpleTextRendererProps,
+} from './SimpleTextRenderer';
+import type {
+  SocialLinksRendererData,
+  SocialLinksRendererProps,
+} from './SocialLinksRenderer';
 import type { BlockTextRenderer_module$key } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
 import type { CarouselRenderer_module$key } from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
 import type { HorizontalPhotoRenderer_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
@@ -190,13 +208,66 @@ const MODULE_RENDERERS = {
 } as const;
 
 const MODULE_RENDERERS_DESKTOP = {
-  [MODULE_KIND_BLOCK_TEXT]: BlockTextRenderer,
+  [MODULE_KIND_BLOCK_TEXT]: (props: BlockTextRendererProps) => (
+    <BlockTextRenderer
+      {...props}
+      contentStyle={{
+        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        alignSelf: 'center',
+      }}
+    />
+  ),
   [MODULE_KIND_CAROUSEL]: CarouselRenderer,
-  [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoRenderer,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: (props: HorizontalPhotoRendererProps) => (
+    <HorizontalPhotoRenderer
+      {...props}
+      contentStyle={{
+        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        width: '100%',
+        alignSelf: 'center',
+      }}
+    />
+  ),
   [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
-  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: PhotoWithTextAndTitleRenderer,
-  [MODULE_KIND_SIMPLE_BUTTON]: SimpleButtonRenderer,
-  [MODULE_KIND_SIMPLE_TEXT]: SimpleTextRenderer,
-  [MODULE_KIND_SIMPLE_TITLE]: SimpleTextRenderer,
-  [MODULE_KIND_SOCIAL_LINKS]: SocialLinksRenderer,
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: (
+    props: PhotoWithTextAndTitleRendererProps,
+  ) => <PhotoWithTextAndTitleRenderer {...props} viewMode="desktop" />,
+  [MODULE_KIND_SIMPLE_BUTTON]: (props: SimpleButtonRendererProps) => (
+    <SimpleButtonRenderer
+      {...props}
+      contentStyle={{
+        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        alignSelf: 'center',
+      }}
+    />
+  ),
+  [MODULE_KIND_SIMPLE_TEXT]: (props: SimpleTextRendererProps) => (
+    <SimpleTextRenderer
+      {...props}
+      contentStyle={{
+        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        alignSelf: 'center',
+      }}
+    />
+  ),
+  [MODULE_KIND_SIMPLE_TITLE]: (props: SimpleTextRendererProps) => (
+    <SimpleTextRenderer
+      {...props}
+      contentStyle={{
+        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        alignSelf: 'center',
+      }}
+    />
+  ),
+  [MODULE_KIND_SOCIAL_LINKS]: (props: SocialLinksRendererProps) => (
+    <SocialLinksRenderer
+      {...props}
+      multilineStyle={{
+        maxWidth: 800,
+        alignSelf: 'center',
+      }}
+    />
+  ),
 } as const;
+
+const DESKTOP_CONTENT_MAX_WIDTH = 800;

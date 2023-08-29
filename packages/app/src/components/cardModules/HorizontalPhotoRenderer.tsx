@@ -13,7 +13,7 @@ import type {
 } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { ViewProps } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 const HorizontalPhotoRendererFragment = graphql`
   fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
@@ -58,7 +58,7 @@ export type HorizontalPhotoRendererData = NullableFields<
   Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
 >;
 
-type HorizontalPhotoRendererProps = ViewProps & {
+export type HorizontalPhotoRendererProps = ViewProps & {
   /**
    * The data for the HorizontalPhoto module
    */
@@ -71,6 +71,10 @@ type HorizontalPhotoRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -81,6 +85,7 @@ const HorizontalPhotoRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  contentStyle,
   ...props
 }: HorizontalPhotoRendererProps) => {
   const {
@@ -114,15 +119,18 @@ const HorizontalPhotoRenderer = ({
     >
       {image?.uri && (
         <View
-          style={{
-            height: imageHeight,
-            borderWidth,
-            borderRadius,
-            marginHorizontal,
-            marginVertical,
-            borderColor: swapColor(borderColor, colorPalette),
-            overflow: 'hidden',
-          }}
+          style={[
+            {
+              height: imageHeight,
+              borderWidth,
+              borderRadius,
+              marginHorizontal,
+              marginVertical,
+              borderColor: swapColor(borderColor, colorPalette),
+              overflow: 'hidden',
+            },
+            contentStyle,
+          ]}
         >
           <Image
             source={{ uri: image.uri }}

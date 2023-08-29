@@ -7,6 +7,7 @@ const content = style({
     display: 'none',
     width: '0 !important',
   },
+  zIndex: 1,
 });
 
 const styles = {

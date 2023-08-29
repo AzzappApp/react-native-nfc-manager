@@ -81,7 +81,7 @@ export type PhotoWithTextAndTitleRendererData = NullableFields<
   Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
 >;
 
-type PhotoWithTextAndTitleRendererProps = ViewProps & {
+export type PhotoWithTextAndTitleRendererProps = ViewProps & {
   /**
    * The data for the PhotoWithTextAndTitle module
    */
@@ -241,6 +241,7 @@ const PhotoWithTextAndTitleRenderer = ({
           style={{
             width: os === 'web' ? widthMargin / 2 - gap : undefined,
             marginHorizontal: os === 'web' ? 0 : marginHorizontal,
+            justifyContent: viewMode === 'desktop' ? 'center' : undefined,
           }}
         >
           {title && (

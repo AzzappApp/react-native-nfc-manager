@@ -1,4 +1,10 @@
-import { type ViewProps, type ColorValue, View } from 'react-native';
+import {
+  type ViewProps,
+  type ColorValue,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -56,7 +62,7 @@ export type BlockTextRendererData = NullableFields<
   Omit<BlockTextRenderer_module$data, ' $fragmentType'>
 >;
 
-type BlockTextRendererProps = ViewProps & {
+export type BlockTextRendererProps = ViewProps & {
   /**
    * The data for the BlockText module
    */
@@ -69,6 +75,10 @@ type BlockTextRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -78,6 +88,7 @@ const BlockTextRenderer = ({
   data,
   colorPalette,
   cardStyle,
+  contentStyle,
   ...props
 }: BlockTextRendererProps) => {
   const {
@@ -114,10 +125,13 @@ const BlockTextRenderer = ({
       resizeMode={background?.resizeMode}
     >
       <View
-        style={{
-          marginVertical: 2 * marginVertical,
-          marginHorizontal: 2 * marginHorizontal,
-        }}
+        style={[
+          {
+            marginVertical: 2 * marginVertical,
+            marginHorizontal: 2 * marginHorizontal,
+          },
+          contentStyle,
+        ]}
       >
         <CardModuleBackground
           {...props}

@@ -7,4 +7,10 @@ export const CardTemplate: CardTemplateResolvers = {
   cardStyle: async ({ cardStyleId }, _, { loaders }) =>
     loaders.CardStyle.load(cardStyleId) as Promise<CardStyle>,
   label: getLabel,
+  modules: template =>
+    template.modules.map((module, index) => ({
+      id: template.id + index,
+      visible: true,
+      ...module,
+    })) as any,
 };

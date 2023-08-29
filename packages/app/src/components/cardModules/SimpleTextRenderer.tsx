@@ -21,7 +21,7 @@ import type {
 } from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { ViewProps } from 'react-native';
+import type { StyleProp, TextStyle, ViewProps } from 'react-native';
 
 const SimpleTextRendererFragment = graphql`
   fragment SimpleTextRenderer_simpleTextModule on CardModuleSimpleText @inline {
@@ -81,7 +81,7 @@ export type SimpleTextRendererData = NullableFields<
   | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
 >;
 
-type SimpleTextRendererProps = ViewProps & {
+export type SimpleTextRendererProps = ViewProps & {
   /**
    * The data for the simple text module
    */
@@ -94,6 +94,10 @@ type SimpleTextRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<TextStyle>;
 };
 
 /**
@@ -106,6 +110,7 @@ const SimpleTextRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  contentStyle,
   ...props
 }: SimpleTextRendererProps) => {
   // the getModuleDataValues typings does not match the data type
@@ -154,16 +159,19 @@ const SimpleTextRenderer = ({
       ]}
     >
       <Text
-        style={{
-          textAlign: textAlignmentOrDefault(textAlign),
-          color: swapColor(fontColor, colorPalette),
-          fontSize,
-          fontFamily,
-          lineHeight:
-            fontSize && verticalSpacing
-              ? fontSize * 1.2 + verticalSpacing
-              : undefined,
-        }}
+        style={[
+          {
+            textAlign: textAlignmentOrDefault(textAlign),
+            color: swapColor(fontColor, colorPalette),
+            fontSize,
+            fontFamily,
+            lineHeight:
+              fontSize && verticalSpacing
+                ? fontSize * 1.2 + verticalSpacing
+                : undefined,
+          },
+          contentStyle,
+        ]}
       >
         {text}
       </Text>

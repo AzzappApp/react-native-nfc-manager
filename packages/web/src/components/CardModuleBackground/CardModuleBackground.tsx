@@ -44,6 +44,7 @@ const CardModuleBackground = ({
     [styles.backgroundContain]: resizeMode === 'contain',
     [styles.backgroundCenter]: resizeMode === 'center',
     [styles.backgroundRepeat]: resizeMode === 'repeat',
+    [styles.backgroundStretch]: resizeMode === 'stretch',
   });
 
   return (

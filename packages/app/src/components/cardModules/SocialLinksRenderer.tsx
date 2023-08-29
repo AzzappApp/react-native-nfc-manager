@@ -15,7 +15,7 @@ import type {
 } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { ViewProps } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 /**
  * Render a SocialLinks module
@@ -54,7 +54,7 @@ export type SocialLinksRendererData = NullableFields<
   Omit<SocialLinksRenderer_module$data, ' $fragmentType'>
 >;
 
-type SocialLinksRendererProps = ViewProps & {
+export type SocialLinksRendererProps = ViewProps & {
   /**
    * The data for the SocialLinks module
    */
@@ -67,6 +67,10 @@ type SocialLinksRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  multilineStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -79,6 +83,7 @@ const SocialLinksRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  multilineStyle,
   ...props
 }: SocialLinksRendererProps) => {
   const {
@@ -168,18 +173,21 @@ const SocialLinksRenderer = ({
         </ScrollView>
       ) : (
         <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            marginTop,
-            marginBottom,
-            paddingLeft: marginHorizontal,
-            paddingRight: marginHorizontal,
-            columnGap,
-            rowGap: columnGap,
-          }}
+          style={[
+            {
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginTop,
+              marginBottom,
+              paddingLeft: marginHorizontal,
+              paddingRight: marginHorizontal,
+              columnGap,
+              rowGap: columnGap,
+            },
+            multilineStyle,
+          ]}
         >
           {linksOrdered.map((link, index) => (
             <PressableOpacity
