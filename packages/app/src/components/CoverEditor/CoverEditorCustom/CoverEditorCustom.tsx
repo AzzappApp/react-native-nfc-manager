@@ -165,10 +165,10 @@ const CoverEditorCustom = ({
   //#endregion
 
   const onFilterChange = useCallback(
-    (filter: string) => {
+    (mediaFilter: string) => {
       setCoverStyle(style => ({
         ...style,
-        filter,
+        mediaFilter,
       }));
     },
     [setCoverStyle],

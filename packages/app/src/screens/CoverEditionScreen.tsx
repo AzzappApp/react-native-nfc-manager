@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -47,6 +47,7 @@ const CoverEditionScreen = ({
   const router = useRouter();
 
   const coverEditorRef = useRef<CoverEditorHandle>(null);
+  const [canSave, setCanSave] = useState(true);
 
   const onSave = useCallback(() => {
     coverEditorRef.current?.save();
@@ -84,13 +85,14 @@ const CoverEditionScreen = ({
           description: 'CoverEditionScreen header title',
         })}
         leftElement={<CancelHeaderButton onPress={onCancel} />}
-        rightElement={<SaveHeaderButton onPress={onSave} />}
+        rightElement={<SaveHeaderButton onPress={onSave} disabled={!canSave} />}
       />
       <CoverEditor
         ref={coverEditorRef}
         viewer={viewer}
         height={editorHeight}
         onCoverSaved={onCoverSaved}
+        onCanSaveChange={setCanSave}
         initialTemplateKind={templateKind}
       />
     </Container>

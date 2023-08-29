@@ -269,7 +269,7 @@ const CoverPreviewRenderer = (
             />
 
             {(computing || isLoading) && (
-              <Delay delay={computing ? 0 : 500}>
+              <Delay delay={computing ? 0 : 100}>
                 <View style={styles.maskComputingOverlay}>
                   <ActivityIndicator color="white" />
                 </View>

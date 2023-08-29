@@ -15,6 +15,7 @@ import type {
   GPUVideoViewHandle,
 } from '#components/gpu';
 import type { ForwardedRef } from 'react';
+import type { NativeSyntheticEvent } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 import type { Subscription } from 'relay-runtime';
 
@@ -116,8 +117,6 @@ const CoverMediaPreview = (
   }: CoverMediaPreviewProps,
   viewRef: ForwardedRef<GPUImageViewHandle | GPUVideoViewHandle>,
 ) => {
-  const GPUView = kind === 'video' ? GPUVideoView : GPUImageView;
-
   const pausedOnFirstLoad = useRef(paused).current;
 
   useEffect(() => {
@@ -157,10 +156,15 @@ const CoverMediaPreview = (
   }, [onLoadingStart]);
 
   const [playerReady, setPlayerReady] = useState(false);
-
-  const onProgress = useCallback(() => {
-    setPlayerReady(true);
-  }, []);
+  const onProgress = useCallback(
+    (event: NativeSyntheticEvent<{ currentTime: number }>) => {
+      // wait the first frame to be displayed before considering the player ready
+      if (event.nativeEvent.currentTime > 0.04) {
+        setPlayerReady(true);
+      }
+    },
+    [],
+  );
 
   const onPlayerReady = useCallback(() => {
     videoViewReadyState.current.playerReady = true;
@@ -194,17 +198,33 @@ const CoverMediaPreview = (
     blending: backgroundMultiply ? 'multiply' : 'none',
   } as const;
 
+  const GPUView = kind === 'video' ? GPUVideoView : GPUImageView;
+
   return (
     <View
       style={[style, backgroundColor != null && { backgroundColor }]}
       {...props}
     >
+      {kind === 'video' && (
+        <GPUImageView {...loadingHandlers} style={StyleSheet.absoluteFill}>
+          {backgroundImageUri && (
+            <Image
+              uri={backgroundImageUri}
+              tintColor={backgroundImageTintColor}
+            />
+          )}
+          <VideoFrame {...mainGPULayerProps} time={startTime ?? 0} />
+        </GPUImageView>
+      )}
       {(kind !== 'video' || !paused) && (
         <GPUView
           {...loadingHandlers}
           paused={paused}
           ref={viewRef as any}
-          style={{ flex: 1 }}
+          style={{
+            flex: 1,
+            opacity: kind !== 'video' || playerReady ? 1 : 0,
+          }}
         >
           {backgroundImageUri && (
             <Image
@@ -224,25 +244,6 @@ const CoverMediaPreview = (
             <Image {...mainGPULayerProps} />
           )}
         </GPUView>
-      )}
-      {kind === 'video' && (
-        <GPUImageView
-          {...loadingHandlers}
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              opacity: paused || !playerReady ? 1 : 0,
-            },
-          ]}
-        >
-          {backgroundImageUri && (
-            <Image
-              uri={backgroundImageUri}
-              tintColor={backgroundImageTintColor}
-            />
-          )}
-          <VideoFrame {...mainGPULayerProps} time={startTime ?? 0} />
-        </GPUImageView>
       )}
     </View>
   );

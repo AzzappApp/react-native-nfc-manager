@@ -6,6 +6,7 @@ import {
   useState,
   forwardRef,
   startTransition,
+  useEffect,
 } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -42,6 +43,7 @@ export type CoverEditorProps = {
   height: number;
   initialTemplateKind?: TemplateKind;
   onCoverSaved: () => void;
+  onCanSaveChange: (canSave: boolean) => void;
 };
 
 export type CoverEditorHandle = {
@@ -54,6 +56,7 @@ const CoverEditor = (
     height,
     initialTemplateKind = 'people',
     onCoverSaved,
+    onCanSaveChange,
   }: CoverEditorProps,
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
@@ -160,6 +163,12 @@ const CoverEditor = (
   }, []);
   // #endregion
 
+  // #region canSave
+  const canSave = !mediaComputing && mediaVisible;
+
+  useEffect(() => {
+    onCanSaveChange(canSave);
+  }, [canSave, onCanSaveChange]);
   // #endregion
 
   // #region Custom edition
@@ -310,7 +319,9 @@ const CoverEditor = (
               height={templateListHeight}
               mediaCropParameters={mediaCropParameter}
               timeRange={timeRange}
-              currentCoverStyle={currentCoverStyle}
+              currentCoverStyle={
+                initialTemplateKind === templateKind ? currentCoverStyle : null
+              }
               cardColors={cardColors ?? null}
               initialSelectedIndex={indexes.current[templateKind]}
               onPreviewMediaChange={onPreviewMediaChange}
@@ -343,7 +354,11 @@ const CoverEditor = (
             </PressableOpacity>
           )}
           {sourceMedia && (
-            <FloatingIconButton icon="crop" onPress={toggleCropMode} />
+            <FloatingIconButton
+              icon="crop"
+              onPress={toggleCropMode}
+              disabled={!mediaVisible}
+            />
           )}
           <FloatingIconButton icon="settings" onPress={onCustomEdition} />
         </View>
@@ -404,6 +419,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     justifyContent: 'space-between',
+    overflow: 'hidden',
   },
   tabBarContainer: {
     flexDirection: 'row',

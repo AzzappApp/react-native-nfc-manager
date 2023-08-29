@@ -622,7 +622,6 @@ const useCoverEditionManager = ({
                 }),
             ),
           );
-        setUploadProgress(null);
 
         if (sourceMediaId) {
           saveCoverInput.sourceMediaId = sourceMediaId;
@@ -661,6 +660,7 @@ const useCoverEditionManager = ({
           // TODO
           console.error(errors);
           setSaving(false);
+          setUploadProgress(null);
           return;
         }
         if (mediaPath) {
@@ -684,12 +684,15 @@ const useCoverEditionManager = ({
             );
           }
         }
-        onCoverSaved();
         setSaving(false);
+        setUploadProgress(null);
+        onCoverSaved();
       },
       onError: error => {
         // TODO
         console.error(error);
+        setSaving(false);
+        setUploadProgress(null);
       },
     });
   }, [
@@ -770,19 +773,21 @@ const useCoverEditionManager = ({
           />
         </Container>
       </Modal>
-      <CoverEditorCropModal
-        visible={cropMode}
-        media={sourceMedia}
-        maskMedia={coverStyle.segmented ? maskMedia : null}
-        title={title}
-        subTitle={subTitle}
-        timeRange={timeRange}
-        coverStyle={coverStyle}
-        mediaParameters={mediaCropParameter}
-        colorPalette={colorPalette}
-        onClose={toggleCropMode}
-        onSave={onSaveCropData}
-      />
+      {cropMode && (
+        <CoverEditorCropModal
+          visible
+          media={sourceMedia}
+          maskMedia={coverStyle.segmented ? maskMedia : null}
+          title={title}
+          subTitle={subTitle}
+          timeRange={timeRange}
+          coverStyle={coverStyle}
+          mediaParameters={mediaCropParameter}
+          colorPalette={colorPalette}
+          onClose={toggleCropMode}
+          onSave={onSaveCropData}
+        />
+      )}
       <UploadProgressModal
         visible={saving}
         progressIndicator={uploadProgress}
@@ -917,8 +922,6 @@ const createMediaComputation = ({
             });
 
       uri = `file://${resizePath}`;
-      width = newSize.width;
-      height = newSize.height;
       if (editionParameters.cropData) {
         const scale = newSize.width / width;
         editionParameters = {
@@ -926,6 +929,8 @@ const createMediaComputation = ({
           cropData: mapValues(editionParameters.cropData, v => v * scale),
         };
       }
+      width = newSize.width;
+      height = newSize.height;
     }
     if (canceled) {
       return 'canceled';

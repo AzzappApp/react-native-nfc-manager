@@ -163,7 +163,6 @@ class GPUVideoViewManager: RCTViewManager {
     }
     
     var asset: AVAsset;
-    
     if (uri.isFileURL) {
       asset = AVAsset(url: uri)
     } else {
@@ -182,17 +181,30 @@ class GPUVideoViewManager: RCTViewManager {
     }
     
     // TODO wait for duration loading
-    let timeRange = CMTimeRangeMake(start: startTime ?? CMTime.zero, duration: duration ?? asset.duration - (startTime ?? CMTime.zero))
-    let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: [
-      AVVideoCodecKey: AVVideoCodecType.h264,
-      AVVideoWidthKey: outputSize.width,
-      AVVideoHeightKey: outputSize.height,
-      AVVideoCompressionPropertiesKey: [
-        AVVideoProfileLevelKey: AVVideoProfileLevelH264High41,
-        AVVideoMaxKeyFrameIntervalKey: 30,
-        AVVideoAverageBitRateKey: bitRate
-      ] as [String : Any]
-    ])
+    let timeRange = CMTimeRange(
+      start: startTime ?? CMTime.zero,
+      duration: duration ?? (asset.duration - (startTime ?? CMTime.zero))
+    )
+    
+    var formatHint: CMFormatDescription? = nil
+    if let format = videoTrack.formatDescriptions.last  {
+      formatHint = (format as! CMFormatDescription)
+    }
+    let videoWriterInput = AVAssetWriterInput(
+      mediaType: AVMediaType.video,
+      outputSettings: [
+        AVVideoCodecKey: AVVideoCodecType.h264,
+        AVVideoWidthKey: outputSize.width,
+        AVVideoHeightKey: outputSize.height,
+        AVVideoCompressionPropertiesKey: [
+          AVVideoProfileLevelKey:AVVideoProfileLevelH264HighAutoLevel,
+          AVVideoH264EntropyModeKey:AVVideoH264EntropyModeCABAC,
+          AVVideoAllowFrameReorderingKey:videoTrack.requiresFrameReordering,
+          AVVideoAverageBitRateKey: bitRate
+        ] as [String : Any],
+      ],
+      sourceFormatHint: formatHint
+    )
     videoWriterInput.transform = CGAffineTransformIdentity
     videoWriterInput.expectsMediaDataInRealTime = false
     videoWriterInput.performsMultiPassEncodingIfSupported = true
@@ -239,8 +251,7 @@ class GPUVideoViewManager: RCTViewManager {
         request.finish(with: image, context: nil)
     })
     composition.renderSize = outputSize
-    
-    let timescale = Int32(ceil(min(30, max(videoTrack.nominalFrameRate, 25))))
+    let timescale = Int32(ceil(min(30, videoTrack.nominalFrameRate)))
     composition.frameDuration = CMTimeMake(value: 1, timescale: timescale)
     
     let videoOutput = AVAssetReaderVideoCompositionOutput(videoTracks: [videoTrack], videoSettings: nil)
@@ -266,7 +277,7 @@ class GPUVideoViewManager: RCTViewManager {
     if let audioTrack = audioTrack, !removeSound {
       // TODO use async load(.formatDescription)
       var formatHint: CMFormatDescription? = nil
-      if let format = audioTrack.formatDescriptions.first  {
+      if let format = audioTrack.formatDescriptions.last  {
         formatHint = (format as! CMFormatDescription)
       }
       
@@ -304,19 +315,26 @@ class GPUVideoViewManager: RCTViewManager {
     }
     
     let writeToAudioTrack = {
+      var audioFinished = false;
       if let audioWriterInput = audioWriterInput, let audioReader = audioReader, let audioOutput = audioOutput {
         audioWriterInput.requestMediaDataWhenReady(on: dispatchQueue) {
           while(audioWriterInput.isReadyForMoreMediaData) {
             if audioReader.status == .completed {
-              audioWriterInput.markAsFinished()
-              finishWriting()
+              if (!audioFinished) {
+                audioFinished = true;
+                audioWriterInput.markAsFinished()
+                finishWriting()
+              }
               return;
             } else if audioReader.status == .failed {
-              reject(
-                GPUViewError.FAILED_TO_EXPORT_CODE,
-                "audioReader.status : failed",
-                videoReader.error
-              );
+              if (!audioFinished) {
+                audioFinished = true;
+                reject(
+                  GPUViewError.FAILED_TO_EXPORT_CODE,
+                  "audioReader.status : failed",
+                  videoReader.error
+                );
+              }
               return;
             }
               
@@ -333,18 +351,25 @@ class GPUVideoViewManager: RCTViewManager {
       }
     }
     
+    var videoFinished = false;
     videoWriterInput.requestMediaDataWhenReady(on: dispatchQueue) {
       while(videoWriterInput.isReadyForMoreMediaData) {
         if videoReader.status == .completed {
-          videoWriterInput.markAsFinished()
-          writeToAudioTrack()
+          if (!videoFinished) {
+            videoFinished = true;
+            videoWriterInput.markAsFinished()
+            writeToAudioTrack()
+          }
           return;
         } else if videoReader.status == .failed {
-          reject(
-            GPUViewError.FAILED_TO_EXPORT_CODE,
-            "videoReader.status : failed",
-            videoReader.error
-          );
+          if (!videoFinished) {
+            videoFinished = true;
+            reject(
+              GPUViewError.FAILED_TO_EXPORT_CODE,
+              "videoReader.status : failed",
+              videoReader.error
+            );
+          }
           return;
         }
         if let sampleBuffer = videoOutput.copyNextSampleBuffer() {
@@ -356,7 +381,6 @@ class GPUVideoViewManager: RCTViewManager {
       }
     }
   }
-  
   
   private func downloadFile (url: URL) async throws -> URL {
     return try await withCheckedThrowingContinuation({
@@ -692,12 +716,15 @@ class GPUVideoView: UIView {
     self.player = player
     self.playerLayer?.player = player
     
-    let startTime = self.startTime ?? CMTime.zero
-    let duration = self.duration ?? playerItem.duration - startTime
+    
+    var timerange = CMTimeRange.invalid
+    if let startTime = self.startTime, let duration = self.duration  {
+      timerange = CMTimeRange(start: startTime, duration: duration)
+    }
     playerLooper = AVPlayerLooper(
       player: player,
       templateItem: playerItem,
-      timeRange: CMTimeRange(start: startTime, duration: duration)
+      timeRange: timerange
     )
     startPlayingIfReady()
   }

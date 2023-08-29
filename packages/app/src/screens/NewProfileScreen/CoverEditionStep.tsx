@@ -1,4 +1,4 @@
-import { Suspense, useRef } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,6 +36,8 @@ const CoverEditionStep = ({
     },
   );
 
+  const [canSave, setCanSave] = useState(true);
+
   const ref = useRef<CoverEditorHandle>(null);
   const onSave = () => {
     ref.current?.save();
@@ -72,6 +74,7 @@ const CoverEditionStep = ({
           viewer={data.viewer}
           height={eidtorHeight}
           onCoverSaved={onCoverSaved}
+          onCanSaveChange={setCanSave}
         />
         <Button
           label={intl.formatMessage({
@@ -80,6 +83,7 @@ const CoverEditionStep = ({
           })}
           style={styles.saveButton}
           onPress={onSave}
+          disabled={!canSave}
         />
       </View>
     </Suspense>

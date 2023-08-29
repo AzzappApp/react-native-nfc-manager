@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, View, StyleSheet } from 'react-native';
 
@@ -16,12 +16,7 @@ const UploadProgressModal = ({
   visible,
   progressIndicator,
 }: UploadProgressModalProps) => {
-  const [progress, setProgress] = useState(0);
-  const visibleRef = useRef(visible);
-  if (!visible && visibleRef.current) {
-    setProgress(0);
-  }
-  visibleRef.current = visible;
+  const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
     let subscribtion: Subscription;
@@ -33,7 +28,10 @@ const UploadProgressModal = ({
         },
       });
     }
-    return () => subscribtion?.unsubscribe();
+    return () => {
+      subscribtion?.unsubscribe();
+      setProgress(null);
+    };
   }, [progressIndicator]);
 
   const intl = useIntl();
@@ -92,7 +90,10 @@ const UploadProgressModal = ({
         <Text variant="xlarge" style={styles.text}>
           {text}
         </Text>
-        <ProgressBar progress={progress} style={styles.progressBarWidth} />
+        <ProgressBar
+          progress={progress ?? 0}
+          style={[styles.progressBarWidth, progress === null && { opacity: 0 }]}
+        />
       </View>
     </Modal>
   );
