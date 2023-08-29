@@ -62,7 +62,7 @@ const PostCreationScreen = ({
     profile?.id &&
     ConnectionHandler.getConnectionID(
       profile.id,
-      'ProfilePostsListprofile_connection_posts',
+      'ProfilePostsList_profile_connection_posts',
     );
 
   const router = useRouter();
