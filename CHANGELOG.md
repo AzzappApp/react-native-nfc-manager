@@ -1,4 +1,4 @@
-## 0.2.0-canary.17
+## 0.2.0-canary.18
 
 * **fix:**  - **CoverEdition:** various fix on video and general behavior ([#880](https://github.com/AzzappApp/azzapp/pull/880))
 * **fix:**  - main tabbar pointer event on visibility false ([#874](https://github.com/AzzappApp/azzapp/pull/874))
