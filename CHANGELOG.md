@@ -1,5 +1,8 @@
-## 0.2.0-canary.16
+## 0.2.0-canary.17
 
+* **fix:**  - **CoverEdition:** various fix on video and general behavior ([#880](https://github.com/AzzappApp/azzapp/pull/880))
+* **fix:**  - main tabbar pointer event on visibility false ([#874](https://github.com/AzzappApp/azzapp/pull/874))
+* **feat:**  - **Web:** display fonts on web ([#881](https://github.com/AzzappApp/azzapp/pull/881))
 * **fix:**  - AVAsset cache crash
 * **fix:**  - order of module in cardtemplate (loading) ([#865](https://github.com/AzzappApp/azzapp/pull/865))
 * **fix:**  - pointer event on AnimatedText ([#860](https://github.com/AzzappApp/azzapp/pull/860))
