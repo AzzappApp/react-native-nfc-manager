@@ -1,5 +1,6 @@
-## 0.2.0-canary.20
+## 0.2.0-canary.21
 
+* **fix:**  - ProfilePostsList connection name writing cache ([#894](https://github.com/AzzappApp/azzapp/pull/894))
 * **fix:**  - 🐛 set correct size for flip post ([#891](https://github.com/AzzappApp/azzapp/pull/891))
 * **feat:**  - display web ([#888](https://github.com/AzzappApp/azzapp/pull/888))
 * **fix:**  - **CoverEdition:** various fix on video and general behavior ([#880](https://github.com/AzzappApp/azzapp/pull/880))
