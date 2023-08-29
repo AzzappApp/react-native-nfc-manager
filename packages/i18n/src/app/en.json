@@ -311,10 +311,6 @@
     "defaultMessage": "Done",
     "description": "Done button label in profile edition screen"
   },
-  "6o2WcD": {
-    "defaultMessage": "{title} - background image",
-    "description": "CoverRenderer - Accessibility cover image"
-  },
   "6tePdC": {
     "defaultMessage": "Preview",
     "description": "BlockText bottom menu label for Preview tab"
@@ -714,10 +710,6 @@
   "FiW5y4": {
     "defaultMessage": "Button Label",
     "description": "Placeholder for button that has no label yet"
-  },
-  "FnmYrQ": {
-    "defaultMessage": "Merge",
-    "description": "Label of the merge switch in cover edition"
   },
   "FoeiuO": {
     "defaultMessage": "Top/Bottom Margin",

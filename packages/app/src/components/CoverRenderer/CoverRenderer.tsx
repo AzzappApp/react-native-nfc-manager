@@ -1,5 +1,4 @@
 import { forwardRef, memo, useRef } from 'react';
-import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -113,8 +112,13 @@ const CoverRenderer = (
               smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             }
             foregroundColor
-            # Only here for the animation
+            background {
+              id
+              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
             backgroundColor
+            backgroundPatternColor
             title
             subTitle
           }
@@ -128,12 +132,18 @@ const CoverRenderer = (
   // We need to wait for both the media and the text to be ready for display
   // before calling the onReadyForDisplay callback, however, we need to
   // redispatch it when the cover changes
-  const readyStates = useRef({ text: false, media: false, foreground: false });
+  const readyStates = useRef({
+    text: false,
+    media: false,
+    foreground: false,
+    background: false,
+  });
 
   const sources = useRef({
     media: cardCover?.media?.id,
     text: cardCover?.textPreviewMedia?.id,
     foreground: cardCover?.foreground?.id,
+    background: cardCover?.background?.id,
   });
 
   if (sources.current.media !== cardCover?.media?.id) {
@@ -145,6 +155,12 @@ const CoverRenderer = (
     readyStates.current.text = false;
     sources.current.text = cardCover?.textPreviewMedia?.id;
   }
+  if (!sources.current.background) {
+    readyStates.current.background = true;
+  } else if (sources.current.background !== cardCover?.background?.id) {
+    readyStates.current.background = false;
+    sources.current.background = cardCover?.background?.id;
+  }
 
   if (!sources.current.foreground) {
     readyStates.current.foreground = true;
@@ -155,21 +171,43 @@ const CoverRenderer = (
 
   const onMediaReadyForDisplay = () => {
     readyStates.current.media = true;
-    if (readyStates.current.text && readyStates.current.foreground) {
+    if (
+      readyStates.current.text &&
+      readyStates.current.foreground &&
+      readyStates.current.background
+    ) {
       onReadyForDisplay?.();
     }
   };
 
   const onTextReadyForDisplay = () => {
     readyStates.current.text = true;
-    if (readyStates.current.media && readyStates.current.foreground) {
+    if (
+      readyStates.current.media &&
+      readyStates.current.foreground &&
+      readyStates.current.background
+    ) {
       onReadyForDisplay?.();
     }
   };
 
   const onForegroundReadyForDisplay = () => {
     readyStates.current.foreground = true;
-    if (readyStates.current.media && readyStates.current.text) {
+    if (
+      readyStates.current.media &&
+      readyStates.current.text &&
+      readyStates.current.background
+    ) {
+      onReadyForDisplay?.();
+    }
+  };
+  const onBackgroundReadyForDisplay = () => {
+    readyStates.current.background = true;
+    if (
+      readyStates.current.media &&
+      readyStates.current.text &&
+      readyStates.current.foreground
+    ) {
       onReadyForDisplay?.();
     }
   };
@@ -185,9 +223,11 @@ const CoverRenderer = (
     subTitle,
     foreground,
     foregroundColor,
+    background,
+    backgroundColor,
+    backgroundPatternColor,
   } = cardCover ?? {};
 
-  const intl = useIntl();
   //#endregion
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
@@ -208,23 +248,41 @@ const CoverRenderer = (
   return (
     <View
       ref={forwardRef}
-      style={[styles.root, { borderRadius, width }, style]}
+      style={[
+        styles.root,
+        {
+          borderRadius,
+          width,
+          backgroundColor: swapColor(backgroundColor, cardColors) as any,
+        },
+        style,
+      ]}
       testID="cover-renderer"
     >
       {media ? (
         <>
+          {background && (
+            <MediaImageRenderer
+              testID="CoverRenderer_background"
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? background.smallURI
+                    : background.largeURI,
+                mediaId: background.id,
+                requestedSize: width,
+              }}
+              tintColor={swapColor(backgroundPatternColor, cardColors)}
+              aspectRatio={COVER_RATIO}
+              onReadyForDisplay={onBackgroundReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
           <MediaRenderer
             testID="CoverRenderer_media"
             source={{ uri: mediaUri!, requestedSize: width, mediaId: media.id }}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
             aspectRatio={COVER_RATIO}
-            alt={intl.formatMessage(
-              {
-                defaultMessage: '{title} - background image',
-                description: 'CoverRenderer - Accessibility cover image',
-              },
-              { title: `${title} - ${subTitle}` },
-            )}
             onReadyForDisplay={onMediaReadyForDisplay}
             style={styles.layer}
           />
@@ -241,7 +299,6 @@ const CoverRenderer = (
               }}
               tintColor={swapColor(foregroundColor, cardColors)}
               aspectRatio={COVER_RATIO}
-              alt={`${title} - ${subTitle}`}
               onReadyForDisplay={onForegroundReadyForDisplay}
               style={styles.layer}
             />

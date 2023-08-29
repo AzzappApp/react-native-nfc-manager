@@ -12,7 +12,7 @@ export type MediaImageRendererProps = ViewProps & {
   /**
    * The media alt text
    */
-  alt: string;
+  alt?: string;
   /**
    * The source containing the uri of the media, the cacheId and the requestedSize
    */
@@ -44,7 +44,7 @@ export type MediaVideoRendererProps = ViewProps & {
   /**
    * The video alt text
    */
-  alt: string;
+  alt?: string;
   /**
    * the thumbnail URI of the video to display while the video is loading
    */

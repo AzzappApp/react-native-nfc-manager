@@ -24,7 +24,7 @@ const content = style({
   maxWidth: '375px',
 });
 
-const foregroundMedia = style({
+const layerMedia = style({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -39,7 +39,7 @@ const styles = {
   coverMedia,
   backgroundMedia,
   content,
-  foregroundMedia,
+  layerMedia,
 };
 
 export default styles;

@@ -34,9 +34,27 @@ const CoverRenderer = async ({
         {...props}
         style={{
           aspectRatio: `${COVER_RATIO}`,
+          backgroundColor: swapColor(
+            coverData.backgroundColor ?? 'light',
+            cardColors ?? DEFAULT_COLOR_PALETTE,
+          ),
         }}
         className={styles.content}
       >
+        {coverData.backgroundId && (
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.backgroundPatternColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              WebkitMaskImage: `url(${getImageURL(coverData.backgroundId)})`,
+              maskImage: `url(${getImageURL(coverData.backgroundId)})`,
+            }}
+            className={styles.layerMedia}
+          />
+        )}
         {media != null &&
           (media.kind === 'image' ? (
             <>
@@ -67,9 +85,9 @@ const CoverRenderer = async ({
                   cardColors ?? DEFAULT_COLOR_PALETTE,
                 ) ?? '#000',
               WebkitMaskImage: `url(${getImageURL(coverData.foregroundId)})`,
-              maskImage: `url(${getImageURL(coverData.foregroundId)}.svg)`,
+              maskImage: `url(${getImageURL(coverData.foregroundId)})`,
             }}
-            className={styles.foregroundMedia}
+            className={styles.layerMedia}
           />
         )}
         {textPreviewMediaId && (

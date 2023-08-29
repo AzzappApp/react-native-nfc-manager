@@ -41,7 +41,7 @@ const exportMedia = async ({
         },
       ],
       size,
-      format: 'JPEG',
+      format: 'jpg',
       quality: 0.8,
     });
   } else {

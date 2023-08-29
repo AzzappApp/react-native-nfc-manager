@@ -151,7 +151,13 @@ class GPUImageViewManager: RCTViewManager {
     
     var imageData: Data?;
     let colorSpaceRGB = CGColorSpaceCreateDeviceRGB();
-    if (format == "PNG") {
+    
+    var imageFormat = format
+    if (imageFormat == "auto") {
+      imageFormat = getPreferredFormat(image)
+    }
+    
+    if (imageFormat == "png") {
       imageData = GPUImageView.ciContext.pngRepresentation(
         of: image,
         format: CIFormat.RGBA8,
@@ -180,6 +186,38 @@ class GPUImageViewManager: RCTViewManager {
       return;
     }
     resolve(fileUrl.path)
+  }
+  
+  
+  private func getPreferredFormat(_ image: CIImage) -> String {
+  
+    guard #available(iOS 14.0, *) else {
+      return "jpg"
+    }
+    
+
+    let filter = CIFilter.areaAverage()
+    filter.inputImage = image
+    filter.extent = image.extent
+    guard let output = filter.outputImage else {
+      return "jpg"
+    }
+    
+    var bitmap = [UInt8](repeating: 0, count: 4)
+    GPUImageView.ciContext.render(
+      output,
+      toBitmap: &bitmap,
+      rowBytes: 4,
+      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+      format: .RGBA8,
+      colorSpace: nil
+    )
+    
+    if (CGFloat(bitmap[3]) < 255) {
+      return "png"
+    } else {
+      return "jpg"
+    }
   }
 }
 

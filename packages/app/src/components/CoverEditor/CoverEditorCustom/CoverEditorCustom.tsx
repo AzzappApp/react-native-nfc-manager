@@ -226,12 +226,12 @@ const CoverEditorCustom = ({
   //#endregion
 
   //#region Segmentation and merge
-  const onToggleMerge = useCallback(() => {
-    setCoverStyle(coverStyle => ({
-      ...coverStyle,
-      merged: !coverStyle.merged,
-    }));
-  }, [setCoverStyle]);
+  // const onToggleMerge = useCallback(() => {
+  //   setCoverStyle(coverStyle => ({
+  //     ...coverStyle,
+  //     merged: !coverStyle.merged,
+  //   }));
+  // }, [setCoverStyle]);
 
   const onToggleSegmentation = useCallback(() => {
     setCoverStyle(coverStyle => ({
@@ -437,7 +437,11 @@ const CoverEditorCustom = ({
                 })}
               />
             )}
-            <SwitchLabel
+            {/* 
+              We for the moment disable merging since we don't supporting it anymore with
+              background extraction
+            */}
+            {/* <SwitchLabel
               variant="small"
               value={merged ?? false}
               onValueChange={onToggleMerge}
@@ -445,7 +449,7 @@ const CoverEditorCustom = ({
                 defaultMessage: 'Merge',
                 description: 'Label of the merge switch in cover edition',
               })}
-            />
+            /> */}
           </CECToolBar>
         </View>
 

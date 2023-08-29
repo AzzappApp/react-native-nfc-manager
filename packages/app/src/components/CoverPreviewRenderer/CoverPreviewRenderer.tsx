@@ -17,6 +17,7 @@ import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import CoverTextPreview from './CoverTextPreview';
 import type { GPUImageViewHandle, GPUVideoViewHandle } from '#components/gpu';
+import type { ExportImageOptions } from '#components/gpu/GPUNativeMethods';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
 import type {
   CoverTextPreviewProps,
@@ -142,7 +143,19 @@ const CoverPreviewRenderer = (
           return null;
         }
         if ('exportImage' in mediaRef.current) {
-          return mediaRef.current.exportImage({ size });
+          let exportOptions: ExportImageOptions = {
+            size,
+            format: 'auto',
+            quality: 90,
+          };
+          if (maskUri != null) {
+            exportOptions = {
+              size,
+              format: 'png',
+            };
+          }
+
+          return mediaRef.current.exportImage(exportOptions);
         }
         return mediaRef.current.exportVideo({
           size,
@@ -151,7 +164,7 @@ const CoverPreviewRenderer = (
         });
       },
     }),
-    [],
+    [maskUri],
   );
 
   const intl = useIntl();
@@ -206,6 +219,41 @@ const CoverPreviewRenderer = (
           </View>
         ) : (
           <>
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height,
+                width: height * COVER_RATIO,
+                backgroundColor: swapColor(
+                  backgroundColor,
+                  colorPalette,
+                ) as any,
+              }}
+            />
+            {backgroundImageUri && (
+              <MediaImageRenderer
+                testID="cover-background-preview"
+                pointerEvents="none"
+                source={{
+                  uri: backgroundImageUri,
+                  mediaId: backgroundImageUri,
+                  requestedSize: windowWidth,
+                }}
+                tintColor={swapColor(backgroundImageTintColor, colorPalette)}
+                aspectRatio={COVER_RATIO}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  height,
+                  width: height * COVER_RATIO,
+                  zIndex: -1,
+                }}
+                alt={'Cover edition foreground'}
+              />
+            )}
             {uri && (
               <CoverMediaPreview
                 key={uri}
@@ -215,13 +263,7 @@ const CoverPreviewRenderer = (
                 time={time}
                 startTime={startTime}
                 duration={duration}
-                backgroundColor={swapColor(backgroundColor, colorPalette)}
                 maskUri={maskUri}
-                backgroundImageUri={backgroundImageUri}
-                backgroundImageTintColor={swapColor(
-                  backgroundImageTintColor,
-                  colorPalette,
-                )}
                 backgroundMultiply={backgroundMultiply}
                 filter={filter}
                 editionParameters={editionParameters}

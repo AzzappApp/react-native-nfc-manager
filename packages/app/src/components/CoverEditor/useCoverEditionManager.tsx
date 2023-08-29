@@ -511,9 +511,6 @@ const useCoverEditionManager = ({
       const mediaStyle = [
         'mediaFilter',
         'mediaParameters',
-        'background',
-        'backgroundColor',
-        'backgroundPatternColor',
         'merged',
         'segmented',
       ] as const;
@@ -595,7 +592,9 @@ const useCoverEditionManager = ({
               uri: media.uri,
               type:
                 mime.lookup(fileName) || media.kind === 'image'
-                  ? 'image/jpg'
+                  ? isPNG(media.uri)
+                    ? 'image/png'
+                    : 'image/jpg'
                   : 'video/mp4',
             } as any,
             uploadURL,
@@ -905,7 +904,7 @@ const createMediaComputation = ({
           ? await exportImage({
               layers: [{ kind: 'image', uri }],
               size: newSize,
-              format: isPNG(uri) ? 'PNG' : 'JPEG',
+              format: 'auto',
             })
           : await exportVideo({
               layers: [
