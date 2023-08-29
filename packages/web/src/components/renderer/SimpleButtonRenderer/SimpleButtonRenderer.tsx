@@ -1,9 +1,11 @@
+import cx from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './SimpleButtonRenderer.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
@@ -88,11 +90,10 @@ const SimpleButtonRenderer = ({
       >
         <span
           style={{
-            fontFamily,
             color: swapColor(fontColor, colorPalette),
             fontSize,
           }}
-          className={styles.label}
+          className={cx(styles.label, fontsMap[fontFamily].className)}
         >
           {buttonLabel}
         </span>

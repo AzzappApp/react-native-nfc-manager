@@ -6,6 +6,7 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { fontsMap } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles, { wrapperMarginTop } from './PhotoWithTextAndTitleRenderer.css';
@@ -130,13 +131,13 @@ const PhotoWithTextAndTitleRenderer = ({
                 style={{
                   textAlign: titleTextAlign,
                   fontSize: titleFontSize,
-                  fontFamily: titleFontFamily,
                   color: swapColor(titleFontColor, colorPalette),
                   lineHeight:
                     titleFontSize && titleVerticalSpacing
                       ? `${titleFontSize * 1.2 + titleVerticalSpacing}px`
                       : undefined,
                 }}
+                className={fontsMap[titleFontFamily].className}
               >
                 {title}
               </h2>
@@ -146,7 +147,6 @@ const PhotoWithTextAndTitleRenderer = ({
                 style={{
                   textAlign: contentTextAlign,
                   fontSize: contentFontSize,
-                  fontFamily: contentFontFamily,
                   marginTop: 7,
                   color: swapColor(contentFontColor, colorPalette),
                   lineHeight:
@@ -155,6 +155,7 @@ const PhotoWithTextAndTitleRenderer = ({
                       : undefined,
                   whiteSpace: 'pre-line',
                 }}
+                className={fontsMap[contentFontFamily].className}
               >
                 {content}
               </div>

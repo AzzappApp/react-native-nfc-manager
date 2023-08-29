@@ -6,6 +6,7 @@ import {
   SIMPLE_TITLE_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
 import type { CardModuleSimpleText } from '@azzapp/data/domains';
@@ -58,7 +59,6 @@ const SimpleTextRenderer = ({
             textAlign,
             color: swapColor(fontColor, colorPalette),
             fontSize,
-            fontFamily,
             lineHeight:
               fontSize && verticalSpacing
                 ? `${fontSize * 1.2 + verticalSpacing}px`
@@ -71,6 +71,7 @@ const SimpleTextRenderer = ({
             flexShrink: 0,
             whiteSpace: 'pre-line',
           }}
+          className={fontsMap[fontFamily].className}
         >
           {text}
         </div>
