@@ -45,6 +45,7 @@ const posts = style({
       position: 'absolute',
       transform: 'perspective(1000px) rotateY(0deg) rotateX(0deg)',
       backfaceVisibility: 'hidden',
+      width: '100%',
       // Fix backface-visibility on Chrome and Edge
       opacity: 0.999,
     },
