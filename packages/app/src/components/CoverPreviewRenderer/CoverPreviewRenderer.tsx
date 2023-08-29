@@ -146,7 +146,7 @@ const CoverPreviewRenderer = (
           let exportOptions: ExportImageOptions = {
             size,
             format: 'auto',
-            quality: 90,
+            quality: 95,
           };
           if (maskUri != null) {
             exportOptions = {
@@ -249,7 +249,6 @@ const CoverPreviewRenderer = (
                   left: 0,
                   height,
                   width: height * COVER_RATIO,
-                  zIndex: -1,
                 }}
                 alt={'Cover edition foreground'}
               />

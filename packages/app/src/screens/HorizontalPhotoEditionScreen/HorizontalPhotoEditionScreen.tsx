@@ -6,10 +6,12 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
+  MODULE_IMAGE_MAX_WIDTH,
   MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
+import { exportImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -17,11 +19,11 @@ import ImagePicker, {
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -283,24 +285,31 @@ const HorizontalPhotoEditionScreen = ({
     useState<Observable<number> | null>(null);
 
   const onMediaSelected = async ({
-    kind,
     uri,
-    aspectRatio,
+    width,
+    height,
     editionParameters,
     filter,
   }: ImagePickerResult) => {
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          filters: filter ? [filter] : [],
+        },
+      ],
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportedMedia.uri,
-      width: exportedMedia.size.width,
-      height: exportedMedia.size.height,
+      uri: exportUri,
+      width: size.width,
+      height: size.height,
       kind: 'image',
     });
   };

@@ -6,7 +6,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
-  CAROUSEL_IMAGE_MAX_WIDTH,
+  MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
   MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -336,11 +336,12 @@ const CarouselEditionScreen = ({
       filter,
     }: ImagePickerResult) => {
       const aspectRatio = width / height;
-      const exportWidth = Math.min(CAROUSEL_IMAGE_MAX_WIDTH, width);
+      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
       const localPath = await exportImage({
         size: { width: exportWidth, height: exportHeight },
-        quality: 0.9,
+        quality: 95,
+        format: 'auto',
         layers: [
           {
             kind: 'image',

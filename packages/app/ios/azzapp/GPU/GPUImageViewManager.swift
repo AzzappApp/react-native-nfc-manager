@@ -28,7 +28,7 @@ class GPUImageViewManager: RCTViewManager {
   final func exportViewImage(
     _ tag: NSNumber,
     format: String,
-    quality: Double,
+    quality: NSNumber,
     size: CGSize,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
@@ -49,7 +49,7 @@ class GPUImageViewManager: RCTViewManager {
         layersImages: layersImages,
         backgroundColor: view.backgroundColor,
         format: format,
-        quality: quality,
+        quality: quality.doubleValue / 100,
         size: size,
         resolve: resolve,
         reject: reject
@@ -63,7 +63,7 @@ class GPUImageViewManager: RCTViewManager {
     _ layers: NSArray,
     backgroundColor: UIColor?,
     format: String,
-    quality: Double,
+    quality: NSNumber,
     size: CGSize,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock) {
@@ -108,7 +108,7 @@ class GPUImageViewManager: RCTViewManager {
         layersImages: layersImages,
         backgroundColor: backgroundColor,
         format: format,
-        quality: quality,
+        quality: quality.doubleValue / 100,
         size: size,
         resolve: resolve,
         reject: reject
@@ -178,7 +178,7 @@ class GPUImageViewManager: RCTViewManager {
       return;
     }
     
-    let fileUrl = FileUtils.getRanfomFileURL(withExtension: format == "PNG" ? "png" : "jpg")
+    let fileUrl = FileUtils.getRanfomFileURL(withExtension: format == "png" ? "png" : "jpg")
     do {
       try imageData.write(to: fileUrl)
     } catch {

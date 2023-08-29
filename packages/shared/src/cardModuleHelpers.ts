@@ -157,7 +157,6 @@ export const CAROUSEL_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleCarouselData>;
 
-export const CAROUSEL_IMAGE_MAX_WIDTH = 2048;
 //#endregion
 
 //#region SimpleButton
@@ -414,6 +413,9 @@ export type ModuleTextBackgroundStyle = {
 };
 
 export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
+
+export const MODULE_IMAGE_MAX_WIDTH = 2048;
+
 //#endregion
 
 // #region Helpers function

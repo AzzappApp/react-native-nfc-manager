@@ -138,9 +138,9 @@ const resizeTransforms = (
 ) => {
   width = Math.round(width * pixelRatio);
   if (height != null) {
-    return `c_fill,q_auto:eco,w_${width},h_${height}`;
+    return `c_fill,q_auto:best,w_${width},h_${height}`;
   } else {
-    return `q_auto:eco,w_${width}`;
+    return `q_auto:best,w_${width}`;
   }
 };
 

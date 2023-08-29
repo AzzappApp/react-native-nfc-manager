@@ -905,6 +905,7 @@ const createMediaComputation = ({
               layers: [{ kind: 'image', uri }],
               size: newSize,
               format: 'auto',
+              quality: 95,
             })
           : await exportVideo({
               layers: [

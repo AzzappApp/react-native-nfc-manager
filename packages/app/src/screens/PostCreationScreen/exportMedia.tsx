@@ -1,9 +1,9 @@
 import { exportImage, exportVideo } from '#components/gpu';
 import type { EditionParameters } from '#components/gpu';
 
-const VIDEO_MAX_SIZE = 1280;
+const VIDEO_MAX_SIZE = 1440;
 const IMAGE_MAX_SIZE = 2048;
-const VIDEO_BIT_RATE = 3000000;
+const VIDEO_BIT_RATE = 4000000;
 
 const exportMedia = async ({
   uri,
@@ -42,7 +42,7 @@ const exportMedia = async ({
       ],
       size,
       format: 'jpg',
-      quality: 0.8,
+      quality: 95,
     });
   } else {
     result = await exportVideo({
