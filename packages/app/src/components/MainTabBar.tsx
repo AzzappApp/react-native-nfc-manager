@@ -4,7 +4,10 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedProps,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createId } from '#helpers/idHelpers';
 import BottomMenu from '#ui/BottomMenu';
@@ -76,6 +79,23 @@ const MainTabBar = ({
     };
   }, [visibilityState]);
 
+  const animatedProps = useAnimatedProps((): {
+    pointerEvents: 'auto' | 'box-none' | 'box-only' | 'none' | undefined;
+  } => {
+    const pointerEvents =
+      visibilityState === true
+        ? 'box-none'
+        : visibilityState === false
+        ? 'none'
+        : visibilityState?.value === 0
+        ? 'none'
+        : 'box-none';
+
+    return {
+      pointerEvents,
+    };
+  }, [visibilityState]);
+
   useEffect(() => {
     const listener = () => {
       setVisibilitySharedValue(
@@ -100,6 +120,7 @@ const MainTabBar = ({
         visibilityStyle,
         style,
       ]}
+      animatedProps={animatedProps}
     >
       <BottomMenu
         currentTab={['HOME', 'MEDIA'][currentIndex]}
