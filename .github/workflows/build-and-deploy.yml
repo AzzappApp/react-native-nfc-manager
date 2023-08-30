@@ -265,7 +265,7 @@ jobs:
           if [["${{github.ref}}" == "refs/heads/stable"]; then
             ENVIRONMENT="production"
           elif [["${{github.ref}}" == "refs/heads/main"]; then
-            ADDITIONAL_ARGS="--gitbranch=main"
+            ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
@@ -302,7 +302,7 @@ jobs:
           if [["${{github.ref}}" == "refs/heads/stable"]; then
             ENVIRONMENT="production"
           elif [["${{github.ref}}" == "refs/heads/main"]; then
-            ADDITIONAL_ARGS="--gitbranch=main"
+            ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
