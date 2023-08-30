@@ -19,6 +19,7 @@ jobs:
       VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: "azzapp"
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
     steps:
       ############################################
       #
@@ -268,7 +269,6 @@ jobs:
             ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-          vercel env pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel build
         env:
@@ -306,7 +306,6 @@ jobs:
             ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-          vercel env pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel build
         env:
