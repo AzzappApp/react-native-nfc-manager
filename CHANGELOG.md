@@ -1,5 +1,7 @@
-## 0.2.0-canary.29
+## 0.2.0-canary.30
 
+* **fix:**  - **backoffice:** Cover suggestion ([#914](https://github.com/AzzappApp/azzapp/pull/914))
+* **fix:**  - use vars at build time for NEXT_PUBLIC variables
 * **fix:**  - pull vercel environment in ci
 * **fix:**  - environment variables in CI
 * **fix:**  - 🐛 avoid stuck post sound ([#906](https://github.com/AzzappApp/azzapp/pull/906))
