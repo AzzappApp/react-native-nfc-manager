@@ -1,5 +1,6 @@
-## 0.2.0-canary.28
+## 0.2.0-canary.29
 
+* **fix:**  - pull vercel environment in ci
 * **fix:**  - environment variables in CI
 * **fix:**  - 🐛 avoid stuck post sound ([#906](https://github.com/AzzappApp/azzapp/pull/906))
 * **fix:**  - **CoverEdition:** background in editor, and image/video compression ([#899](https://github.com/AzzappApp/azzapp/pull/899))
