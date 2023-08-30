@@ -1,4 +1,4 @@
-## 0.2.0-canary.24
+## 0.2.0-canary.25
 
 * **fix:**  - 🐛 avoid stuck post sound ([#906](https://github.com/AzzappApp/azzapp/pull/906))
 * **fix:**  - **CoverEdition:** background in editor, and image/video compression ([#899](https://github.com/AzzappApp/azzapp/pull/899))
