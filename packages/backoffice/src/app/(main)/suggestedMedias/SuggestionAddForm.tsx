@@ -41,10 +41,10 @@ const SuggesionAddForm = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    //
     if (
       !medias?.length ||
-      !selectedCategories.size ||
-      !selectedActivities.size
+      !(selectedCategories.size || selectedActivities.size)
     ) {
       setMediaErrors('Required');
       return;
