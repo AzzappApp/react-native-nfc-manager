@@ -28,6 +28,7 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
           {media && (
             <CloudinaryImage
               mediaId={media.id}
+              assetKind="cover"
               videoThumbnail={media.kind === 'video'}
               alt="cover"
               width={20}

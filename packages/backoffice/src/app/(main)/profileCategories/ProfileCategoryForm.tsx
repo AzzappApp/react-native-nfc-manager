@@ -98,7 +98,7 @@ const ProfileCategoryForm = ({
       let uploads: Array<{ id: string; index: number }>;
       try {
         const uploadsInfos = await Promise.all(
-          mediasToUpload.map(() => getSignedUpload('image')),
+          mediasToUpload.map(() => getSignedUpload('image', 'cover')),
         );
 
         uploads = await Promise.all(

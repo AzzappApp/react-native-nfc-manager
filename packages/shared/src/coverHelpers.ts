@@ -140,3 +140,7 @@ export const textOrientationOrDefaut = (
   TEXT_ORIENTATIONS.includes(orientation as any)
     ? (orientation as TextOrientation)
     : 'horizontal';
+/**
+ * the list of possible cover asset pre generated sizes
+ */
+export const COVER_ASSET_SIZES = [128, 256, 512, 1024];

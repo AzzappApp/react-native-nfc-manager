@@ -9,7 +9,10 @@ import type {
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
-  previewMedia: ({ previewMediaId }) => previewMediaId,
+  previewMedia: ({ previewMediaId }) => ({
+    media: previewMediaId,
+    assetKind: 'cover',
+  }),
   colorPalette: async ({ colorPaletteId }, _, { loaders }) =>
     (await loaders.ColorPalette.load(colorPaletteId))!,
   colorPalettes: async (
@@ -30,6 +33,18 @@ export const CoverTemplate: CoverTemplateResolvers = {
 };
 
 export const CoverTemplateData: CoverTemplateDataResolvers = {
-  background: ({ backgroundId }) => backgroundId ?? null,
-  foreground: ({ foregroundId }) => foregroundId ?? null,
+  background: ({ backgroundId }) =>
+    backgroundId
+      ? {
+          staticMedia: backgroundId,
+          assetKind: 'cover',
+        }
+      : null,
+  foreground: ({ foregroundId }) =>
+    foregroundId
+      ? {
+          staticMedia: foregroundId,
+          assetKind: 'cover',
+        }
+      : null,
 };

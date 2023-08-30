@@ -218,7 +218,7 @@ const HorizontalPhotoEditionScreen = ({
       //we need to save the media first
       const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
-        target: 'cover',
+        target: 'module',
       });
       const fileName = getFileName(updateMedia.uri);
       const file: any = {

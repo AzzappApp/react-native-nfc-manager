@@ -177,7 +177,7 @@ const CoverEditorTemplateList = ({
             previewMedia {
               __typename
               id
-              uri(width: 300, pixelRatio: $cappedPixelRatio)
+              uri(width: 256, pixelRatio: $cappedPixelRatio)
               width
               height
             }

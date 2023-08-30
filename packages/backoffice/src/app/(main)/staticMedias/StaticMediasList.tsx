@@ -72,7 +72,10 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
       const mediaToUploads = await Promise.all(
         medias.map(async media => ({
           media,
-          ...(await getSignedUpload('image')),
+          ...(await getSignedUpload(
+            'image',
+            addingMediaUsage !== 'moduleBackground' ? 'cover' : null,
+          )),
         })),
       );
       const mediaIds = await Promise.all(

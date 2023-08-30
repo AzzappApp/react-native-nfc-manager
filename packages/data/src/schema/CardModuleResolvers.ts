@@ -38,7 +38,10 @@ const background = (cardModule: CardModuleModel) => {
     data &&
     'backgroundId' in data &&
     typeof data.backgroundId === 'string'
-    ? data.backgroundId
+    ? {
+        staticMedia: data.backgroundId,
+        assetKind: 'module' as const,
+      }
     : null;
 };
 
@@ -54,7 +57,10 @@ export const CardModuleCarousel: CardModuleCarouselResolvers = {
   squareRatio: module => module.data.squareRatio ?? null,
   images: async cardModule => {
     const { data } = cardModule;
-    return data?.images;
+    return data?.images.map(image => ({
+      media: image,
+      assetKind: 'module',
+    }));
   },
   background,
 };
@@ -67,7 +73,10 @@ export const CardModuleHorizontalPhoto: CardModuleHorizontalPhotoResolvers = {
   imageHeight: module => module.data.imageHeight ?? null,
   marginHorizontal: module => module.data.marginHorizontal ?? null,
   marginVertical: module => module.data.marginVertical ?? null,
-  image: module => module.data.image,
+  image: module => ({
+    media: module.data.image,
+    assetKind: 'module',
+  }),
   background,
 };
 

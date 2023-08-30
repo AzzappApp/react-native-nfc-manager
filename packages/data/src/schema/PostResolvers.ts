@@ -25,7 +25,10 @@ export const Post: PostResolvers = {
     }
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   },
-  media: async post => post.medias[0],
+  media: async post => ({
+    media: post.medias[0],
+    assetKind: 'post',
+  }),
   content: async post => {
     return post.content ?? '';
   },

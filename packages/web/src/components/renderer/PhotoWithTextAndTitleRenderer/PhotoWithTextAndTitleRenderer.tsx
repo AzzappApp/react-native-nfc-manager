@@ -102,6 +102,7 @@ const PhotoWithTextAndTitleRenderer = ({
             >
               <CloudinaryImage
                 mediaId={image}
+                assetKind="module"
                 fill
                 alt="TODO"
                 style={Object.assign({

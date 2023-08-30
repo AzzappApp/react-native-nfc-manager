@@ -23,6 +23,7 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
     >
       <CloudinaryImage
         mediaId={media.id}
+        assetKind="cover"
         alt="cover"
         fill
         style={{

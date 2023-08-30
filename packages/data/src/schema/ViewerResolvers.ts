@@ -146,8 +146,20 @@ export const Viewer: ViewerResolvers = {
       args,
     );
   },
-  coverBackgrounds: async () => getStaticMediasByUsage('coverBackground'),
-  coverForegrounds: async () => getStaticMediasByUsage('coverForeground'),
+  coverBackgrounds: async () =>
+    getStaticMediasByUsage('coverBackground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'cover',
+      })),
+    ),
+  coverForegrounds: async () =>
+    getStaticMediasByUsage('coverForeground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'cover',
+      })),
+    ),
   moduleBackgrounds: async () => getStaticMediasByUsage('moduleBackground'),
   coverTemplates: async (
     _,

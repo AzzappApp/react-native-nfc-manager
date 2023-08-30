@@ -35,6 +35,7 @@ const PostFeedItem = (props: PostFeedItemProps) => {
           {media && (
             <CloudinaryImage
               mediaId={media.id}
+              assetKind="cover"
               videoThumbnail={media.kind === 'video'}
               alt="cover"
               width={20}
@@ -55,6 +56,7 @@ const PostFeedItem = (props: PostFeedItemProps) => {
           >
             <CloudinaryImage
               mediaId={postMedia.id}
+              assetKind="post"
               alt="cover"
               fill
               style={{

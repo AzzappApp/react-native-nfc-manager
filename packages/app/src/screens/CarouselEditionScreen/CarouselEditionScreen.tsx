@@ -235,7 +235,7 @@ const CarouselEditionScreen = ({
             }
             const uploadInfos = await uploadSign({
               kind: 'image',
-              target: 'cover',
+              target: 'module',
             });
             return {
               uri: image.uri,

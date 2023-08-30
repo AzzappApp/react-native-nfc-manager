@@ -1,9 +1,10 @@
+import {
+  POST_IMAGE_MAX_SIZE,
+  POST_VIDEO_BIT_RATE,
+  POST_VIDEO_MAX_SIZE,
+} from '@azzapp/shared/postHelpers';
 import { exportImage, exportVideo } from '#components/gpu';
 import type { EditionParameters } from '#components/gpu';
-
-const VIDEO_MAX_SIZE = 1440;
-const IMAGE_MAX_SIZE = 2048;
-const VIDEO_BIT_RATE = 4000000;
 
 const exportMedia = async ({
   uri,
@@ -24,7 +25,7 @@ const exportMedia = async ({
   startTime?: number;
   duration?: number;
 }): Promise<{ uri: string; size: { width: number; height: number } }> => {
-  const maxSize = kind === 'image' ? IMAGE_MAX_SIZE : VIDEO_MAX_SIZE;
+  const maxSize = kind === 'image' ? POST_IMAGE_MAX_SIZE : POST_VIDEO_MAX_SIZE;
   const size = {
     width: aspectRatio >= 1 ? maxSize : maxSize * aspectRatio,
     height: aspectRatio < 1 ? maxSize : maxSize / aspectRatio,
@@ -57,7 +58,7 @@ const exportMedia = async ({
         },
       ],
       size,
-      bitRate: VIDEO_BIT_RATE,
+      bitRate: POST_VIDEO_BIT_RATE,
       removeSound,
     });
   }

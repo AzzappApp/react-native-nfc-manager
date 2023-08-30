@@ -568,13 +568,13 @@ const useCoverEditionManager = ({
 
       if (Object.values(mediaToUploads).some(media => !!media)) {
         const uploadInfos = await Promise.all(
-          mediaToUploads.map(async media =>
+          mediaToUploads.map(async (media, index) =>
             media
               ? {
                   media,
                   ...(await uploadSign({
                     kind: media.kind,
-                    target: 'cover',
+                    target: index > 1 ? 'cover' : 'coverSource',
                   })),
                 }
               : null,

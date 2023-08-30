@@ -99,8 +99,9 @@ const CarouselFullScreen = (
           }}
         >
           <CloudinaryImage
-            draggable={false}
             mediaId={media.id}
+            assetKind="module"
+            draggable={false}
             fill
             alt="todo"
             style={{ ...mediaStyle, borderWidth }}

@@ -115,7 +115,10 @@ const CoverTemplateForm = ({
       const kind = file.type.startsWith('image') ? 'image' : 'video';
       let public_id: string;
       try {
-        const { uploadURL, uploadParameters } = await getSignedUpload(kind);
+        const { uploadURL, uploadParameters } = await getSignedUpload(
+          kind,
+          'cover',
+        );
         ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
           .promise);
         setUploading(false);

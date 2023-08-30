@@ -47,6 +47,7 @@ const DownloadAppModal = forwardRef(
         <div className={styles.coverWrapper}>
           <CloudinaryImage
             mediaId={media.id}
+            assetKind="cover"
             videoThumbnail={media.kind === 'video'}
             alt="cover"
             fill

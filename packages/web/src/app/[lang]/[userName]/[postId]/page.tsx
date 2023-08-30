@@ -74,7 +74,8 @@ const PostPage = async (props: PostPageProps) => {
             >
               <CloudinaryImage
                 mediaId={postMedia.id}
-                alt="cover"
+                assetKind="post"
+                alt="post"
                 fill
                 style={{
                   objectFit: 'contain',

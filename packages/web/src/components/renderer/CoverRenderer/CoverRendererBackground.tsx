@@ -14,6 +14,7 @@ const CoverRendererBackground = ({ media }: CoverRendererBackgroundProps) => {
   return media.kind === 'image' ? (
     <CloudinaryImage
       mediaId={media.id}
+      assetKind="cover"
       alt="background"
       fill
       priority
@@ -22,6 +23,7 @@ const CoverRendererBackground = ({ media }: CoverRendererBackgroundProps) => {
   ) : (
     <CloudinaryVideo
       media={media}
+      assetKind="cover"
       alt="background"
       className={cn(styles.coverMedia, styles.backgroundMedia)}
       muted

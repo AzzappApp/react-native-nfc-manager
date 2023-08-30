@@ -15,10 +15,11 @@ const CommentFeedItem = (props: CommentFeedItemProps) => {
     <div className={styles.item}>
       <CloudinaryImage
         mediaId={comment.media.id}
+        assetKind="cover"
+        height={32}
         videoThumbnail={comment.media.kind === 'video'}
         alt="cover"
         width={20}
-        height={32}
         style={{
           objectFit: 'cover',
           marginRight: 5,

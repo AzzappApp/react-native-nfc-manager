@@ -35,9 +35,10 @@ const CarouselMedia = (props: CarouselMediaProps) => {
   return (
     <Button.Empty ref={button}>
       <CloudinaryImage
+        mediaId={media.id}
+        assetKind="module"
         draggable={false}
         key={media.id}
-        mediaId={media.id}
         width={width}
         height={imageHeight}
         alt="todo"

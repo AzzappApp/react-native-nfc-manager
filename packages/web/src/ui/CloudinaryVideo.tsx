@@ -1,8 +1,10 @@
 'use client';
+import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
   getVideoThumbnailURL,
   getVideoUrlForSize,
 } from '@azzapp/shared/imagesHelpers';
+import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data/domains';
 
 type CloudinaryVideoProps = Omit<
@@ -17,6 +19,7 @@ type CloudinaryVideoProps = Omit<
   | 'width'
 > & {
   media: Media;
+  assetKind: 'cover' | 'post';
   autoPlay?: boolean;
   loop?: boolean;
   alt: string;
@@ -27,6 +30,7 @@ type CloudinaryVideoProps = Omit<
 
 const CloudinaryVideo = ({
   media,
+  assetKind,
   autoPlay = true,
   loop = true,
   width,
@@ -39,31 +43,38 @@ const CloudinaryVideo = ({
       'MediaVideoRenderer: width is required for non fluid video',
     );
   }
-  const sizes = width != null ? [2 * width] : SIZES;
+
+  const pregeneratedSizes =
+    assetKind === 'cover' ? COVER_ASSET_SIZES : POST_VIDEO_SIZES;
+
+  const maxSize = pregeneratedSizes.at(-1);
   return (
     <video
       poster={getVideoThumbnailURL(media.id)}
       src={getVideoUrlForSize(media.id)}
       autoPlay={autoPlay}
       loop={loop}
-      style={{ aspectRatio: `${media.width / media.height}`, width, ...style }}
+      style={{
+        aspectRatio: `${media.width / media.height}`,
+        width,
+        ...style,
+      }}
       {...props}
     >
-      {sizes.map((size, index) => {
-        const src = getVideoUrlForSize(
-          media.id,
-          Math.min(2 * size, media.width),
-        );
-        const mediaAttr =
-          index === sizes.length - 1 ? 'all' : `all and (max-width: ${size}px)`;
+      {pregeneratedSizes.map(size => {
+        const src = getVideoUrlForSize(media.id, size);
+        const mediaAttr = `all and (max-width: ${size}px)`;
         return (
           <source key={size} src={src} type="video/mp4" media={mediaAttr} />
         );
       })}
+      <source
+        key={maxSize}
+        src={getVideoUrlForSize(media.id, maxSize)}
+        media="all"
+      />
     </video>
   );
 };
 
 export default CloudinaryVideo;
-
-const SIZES = [512, 1024, 1440, 1920];

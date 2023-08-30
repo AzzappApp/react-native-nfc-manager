@@ -91,6 +91,7 @@ const ProfilePostNavigation = (props: ProfilePostNavigationProps) => {
         <button className={styles.coverContainer} onClick={onClickCover}>
           <CloudinaryImage
             mediaId={cover.id}
+            assetKind="cover"
             videoThumbnail={cover.kind === 'video'}
             alt="cover"
             fill

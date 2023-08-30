@@ -1,5 +1,6 @@
 import uniq from 'lodash/uniq';
 import { getValuesFromStyle, type CardStyle } from './cardHelpers';
+
 //#region SimpleText
 export const MODULE_KIND_SIMPLE_TEXT = 'simpleText';
 
@@ -414,7 +415,14 @@ export type ModuleTextBackgroundStyle = {
 
 export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
 
+/**
+ * the max width of the module images
+ */
 export const MODULE_IMAGE_MAX_WIDTH = 2048;
+/**
+ * the list of possible post images pregenerated sizes
+ */
+export const MODULE_IMAGES_SIZES = [128, 256, 512, 1024, 1536];
 
 //#endregion
 

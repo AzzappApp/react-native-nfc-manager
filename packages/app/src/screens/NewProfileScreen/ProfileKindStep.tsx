@@ -40,7 +40,7 @@ const profileCategoriesFragment = graphql`
     id
     medias {
       id
-      uri(pixelRatio: $pixelRatio, width: 300)
+      uri(pixelRatio: $pixelRatio, width: 256)
     }
     label
   }

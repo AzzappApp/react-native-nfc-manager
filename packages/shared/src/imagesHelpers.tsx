@@ -1,7 +1,29 @@
 import getRuntimeEnvironment from './getRuntimeEnvironment';
 
-//const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/azzapp`;
+const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+
+/**
+ * Helpers used to create an asset url from a cloudinary id without any transformation
+ *
+ * @param id the id of the cloudinary file
+ * @returns
+ */
+export const getCloudinaryAssetURL = (id: string, kind: 'image' | 'video') => {
+  assetNotRN('getCloudinaryAssetURL');
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}`;
+};
+
+/**
+ * Helpers used to create an image url from a cloudinary id
+ *
+ * @param id the id of the cloudinary file
+ * @returns
+ */
+export const getImageURL = (id: string) => {
+  assetNotRN('getImageURL');
+  return assembleCloudinaryUrl(decodeMediaId(id), 'image', resizeTransforms());
+};
 
 /**
  * Helpers used to create cloudinary url for an image given cloudinary id and size parameters
@@ -17,40 +39,17 @@ export const getImageURLForSize = (
   width?: number | null,
   height?: number | null,
   pixelRatio: number | null = 1,
+  pregeneratedSizes?: number[] | null,
 ) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error('getImageURLForSize is not supported on react-native');
-  }
+  assetNotRN('getImageURLForSize');
   id = decodeMediaId(id);
-  if (!width) {
-    return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
-  }
   const transforms = resizeTransforms(
-    Math.floor(width),
-    height ? Math.floor(height) : null,
-    pixelRatio ?? 1,
+    width,
+    height,
+    pixelRatio,
+    pregeneratedSizes,
   );
-  return `${CLOUDINARY_BASE_URL}/image/upload/${transforms}/${id}`;
-};
-
-/**
- * Helpers used to create an image url from a cloudinary id
- *
- * @param id the id of the cloudinary file
- * @returns
- */
-export const getImageURL = (id: string) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error('getImageURL is not supported on react-native');
-  }
-  id = decodeMediaId(id);
-  return `${CLOUDINARY_BASE_URL}/image/upload/${id}`;
+  return assembleCloudinaryUrl(id, 'image', transforms);
 };
 
 /**
@@ -60,14 +59,13 @@ export const getImageURL = (id: string) => {
  * @returns
  */
 export const getVideoURL = (id: string) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error('getImageURL is not supported on react-native');
-  }
-  id = decodeMediaId(id);
-  return `${CLOUDINARY_BASE_URL}/video/upload/${id}`;
+  assetNotRN('getVideoURL');
+  return assembleCloudinaryUrl(
+    decodeMediaId(id),
+    'video',
+    resizeTransforms(),
+    'mp4',
+  );
 };
 
 /**
@@ -83,20 +81,18 @@ export const getVideoUrlForSize = (
   id: string,
   width?: number | null,
   height?: number | null,
-  pixelRatio: number | null = 1,
+  pixelRatio?: number | null,
+  pregeneratedSizes?: number[] | null,
 ) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error('getVideoUrlForSize is not supported on react-native');
-  }
+  assetNotRN('getVideoUrlForSize');
   id = decodeMediaId(id);
-  if (!width) {
-    return `${CLOUDINARY_BASE_URL}/video/upload/${id}.mp4`;
-  }
-  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
-  return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${id}.mp4`;
+  const transforms = resizeTransforms(
+    width,
+    height,
+    pixelRatio,
+    pregeneratedSizes,
+  );
+  return assembleCloudinaryUrl(id, 'video', transforms, 'mp4');
 };
 
 /**
@@ -113,35 +109,17 @@ export const getVideoThumbnailURL = (
   width?: number | null,
   height?: number | null,
   pixelRatio: number | null = 1,
+  pregeneratedSizes?: number[] | null,
 ) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    getRuntimeEnvironment() === 'react-native'
-  ) {
-    throw new Error('getVideoThumbnailURL is not supported on react-native');
-  }
+  assetNotRN('getVideoThumbnailURL');
   id = decodeMediaId(id);
-  if (!width) {
-    return `${CLOUDINARY_BASE_URL}/video/upload/${id}.jpg`;
-  }
-  const transforms = resizeTransforms(width, height, pixelRatio ?? 1);
-  return `${CLOUDINARY_BASE_URL}/video/upload/${transforms}/${id}.jpg`;
-};
-
-/**
- * Compute the cloudinary transformations for a given width height and pixel ratio
- */
-const resizeTransforms = (
-  width: number,
-  height?: number | null,
-  pixelRatio = 1,
-) => {
-  width = Math.round(width * pixelRatio);
-  if (height != null) {
-    return `c_fill,q_auto:best,w_${width},h_${height}`;
-  } else {
-    return `q_auto:best,w_${width}`;
-  }
+  const transforms = resizeTransforms(
+    width,
+    height,
+    pixelRatio,
+    pregeneratedSizes,
+  );
+  return assembleCloudinaryUrl(id, 'video', transforms, 'jpg');
 };
 
 /**
@@ -153,8 +131,64 @@ export const decodeMediaId = (dbId: string) => {
 };
 
 /**
+ * Compute the cloudinary transformations for a given width height and pixel ratio
+ *
+ * @param width the desired image width
+ * @param height the desired height
+ * @param pixelRatio the desired pixeld density - default 1
+ * @param pregeneratedSizes a set of pregenerated sizes to use for the transformation
+ */
+export const resizeTransforms = (
+  width?: number | null,
+  height?: number | null,
+  pixelRatio?: number | null,
+  pregeneratedSizes?: number[] | null,
+) => {
+  pixelRatio = pixelRatio ?? 1;
+  if (width == null) {
+    return `q_auto:best`;
+  }
+  width = Math.ceil(width * pixelRatio);
+  if (pregeneratedSizes) {
+    const index = pregeneratedSizes.findIndex(size => size >= width!);
+    if (index === -1) {
+      if (height != null) {
+        const aspectRatio = Math.round((width * 1000) / height) / 1000;
+        return `c_fill,q_auto:best,ar_${aspectRatio}`;
+      }
+      return `q_auto:best`;
+    }
+    return `q_auto:best,w_${pregeneratedSizes[index]}`;
+  }
+  if (height != null) {
+    return `c_fill,q_auto:best,w_${width},h_${height}`;
+  } else {
+    return `q_auto:best,w_${width}`;
+  }
+};
+
+/**
  * Create a database id from a media id
  */
 export const encodeMediaId = (mediaId: string, kind: 'image' | 'video') => {
   return `${kind === 'video' ? 'v' : 'i'}:${mediaId}`;
+};
+
+const assetNotRN = (funcName: string) => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    getRuntimeEnvironment() === 'react-native'
+  ) {
+    throw new Error(`${funcName} is not supported on react-native`);
+  }
+};
+
+const assembleCloudinaryUrl = (
+  id: string,
+  kind: 'image' | 'video',
+  transforms: string,
+  extention?: string,
+) => {
+  // prettier-ignore
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${transforms}/${id}${extention?`.${extention}`:''}`;
 };

@@ -294,7 +294,7 @@ export default relayScreen(NewProfileScreen, {
             ...ProfileKindStep_profileCategories
             ...ProfileForm_profileCategory
             medias {
-              preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
+              preloadURI: uri(width: 256, pixelRatio: $pixelRatio)
             }
           }
         }

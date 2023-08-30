@@ -1,4 +1,5 @@
 import { getCrypto } from './crypto';
+import { resizeTransforms } from './imagesHelpers';
 import { fetchJSON } from './networkHelpers';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
@@ -171,7 +172,7 @@ export const deleteMediaByPublicIds = async (
 export const createPresignedUpload = async (
   publicId: string,
   kind: 'image' | 'video',
-  preset?: string | null,
+  pregeneratedSizes?: number[] | null,
   context?: string | null,
 ) => {
   const uploadURL: string =
@@ -183,6 +184,14 @@ export const createPresignedUpload = async (
     public_id: publicId,
     context,
   };
+
+  if (pregeneratedSizes) {
+    uploadParameters.eager = pregeneratedSizes
+      .map(size => resizeTransforms(size))
+      .join('|');
+    uploadParameters.eager_async = true;
+  }
+
   // TODO transformations based on preset
 
   Object.assign(uploadParameters, {

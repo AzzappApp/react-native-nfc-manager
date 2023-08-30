@@ -60,6 +60,7 @@ const CoverRenderer = async ({
             <>
               <CloudinaryImage
                 mediaId={media.id}
+                assetKind="cover"
                 alt="background"
                 sizes="100vw"
                 fill
@@ -70,6 +71,7 @@ const CoverRenderer = async ({
           ) : (
             <CloudinaryVideo
               media={media}
+              assetKind="cover"
               alt="background"
               className={styles.coverMedia}
               muted
@@ -94,6 +96,7 @@ const CoverRenderer = async ({
           <h1 className={styles.coverMedia}>
             <CloudinaryImage
               mediaId={textPreviewMediaId}
+              assetKind="cover"
               alt={`${coverTitle} - ${coverSubTitle}`}
               className={styles.coverMedia}
               sizes="100vw"
