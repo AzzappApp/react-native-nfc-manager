@@ -215,14 +215,6 @@ class MediaVideoRenderer: UIView {
     reset()
   }
   
-  override func didMoveToWindow() {
-    super.didMoveToWindow();
-    
-    if (self.window == nil) {
-      playerLayer.player?.isMuted = true
-    }
-  }
-  
   override public func layoutSubviews() {
     super.layoutSubviews()
 
