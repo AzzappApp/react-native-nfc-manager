@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import Animated, { FadeOutUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
@@ -26,7 +26,8 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <Animated.View style={styles.item} exiting={FadeOutUp}>
+    // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+    <Animated.View style={styles.item} /*exiting={FadeOutUp}*/>
       <Link
         route="PROFILE"
         params={{ userName: profile.userName, profileId: profile.id }}

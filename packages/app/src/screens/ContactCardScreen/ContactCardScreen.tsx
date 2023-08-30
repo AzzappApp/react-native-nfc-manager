@@ -14,8 +14,6 @@ import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import { fromByteArray } from 'react-native-quick-base64';
 import Animated, {
   Easing,
-  FadeIn,
-  FadeOut,
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
@@ -328,8 +326,10 @@ const ContactCardScreen = ({
           {isPublicCard && (
             <Animated.View
               style={{ width: '100%' }}
-              entering={FadeIn}
-              exiting={FadeOut}
+              // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+
+              // entering={FadeIn}
+              // exiting={FadeOut}
             >
               <View style={styles.publicOptions}>
                 <Text variant="large">

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Controller,
   type Control,
@@ -9,9 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
-  FadeInDown,
-  FadeOutUp,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -37,7 +34,7 @@ const ContactCardEditModalField = ({
   openDeleteButton,
   deleted,
   deleteButtonRect,
-  closeDeleteButton,
+  closeDeleteButton: _,
   valueKey,
   selectedKey,
   control,
@@ -80,10 +77,10 @@ const ContactCardEditModalField = ({
     }
   }, [deleteButtonRect, deleteField, deleteMode, deleted]);
 
-  const callback = useCallback(() => {
-    'worklet';
-    runOnJS(closeDeleteButton)();
-  }, [closeDeleteButton]);
+  // const callback = useCallback(() => {
+  //   'worklet';
+  //   runOnJS(closeDeleteButton)();
+  // }, [closeDeleteButton]);
 
   const label = useWatch({
     control,
@@ -97,10 +94,12 @@ const ContactCardEditModalField = ({
       <Animated.View
         style={[styles.field, style, { backgroundColor: colors.white }]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
-        entering={FadeInDown}
-        exiting={FadeOutUp.withInitialValues({
-          originX: -50,
-        }).withCallback(callback)}
+        // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+
+        // entering={FadeInDown}
+        // exiting={FadeOutUp.withInitialValues({
+        //   originX: -50,
+        // }).withCallback(callback)}
       >
         <View
           style={{

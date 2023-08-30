@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
-import Animated, { FadeOut } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import {
   ConnectionHandler,
   commitLocalUpdate,
@@ -107,7 +107,8 @@ const CoverLinkWithOptions = ({
   const intl = useIntl();
 
   return (
-    <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
+    // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+    <Animated.View style={styles.coverContainerStyle} /*exiting={FadeOut}*/>
       <CoverLink {...props} width={135} />
       <View style={styles.bottomActions}>
         <Button

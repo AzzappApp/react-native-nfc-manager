@@ -1,10 +1,9 @@
 import { View } from 'react-native';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
-import { TRANSITION_DURATION } from './newProfileScreenHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type PagerHeaderProps = Omit<ViewProps, 'children'> & {
@@ -38,8 +37,9 @@ const PagerHeader = ({
         <Animated.View
           key={currentPage}
           style={styles.titleTextContainer}
-          exiting={FadeOutDown.duration(TRANSITION_DURATION)}
-          entering={FadeInDown.duration(TRANSITION_DURATION)}
+          // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+          // exiting={FadeOutDown.duration(TRANSITION_DURATION)}
+          // entering={FadeInDown.duration(TRANSITION_DURATION)}
         >
           <Text variant="xlarge" style={styles.titleText}>
             {title}
