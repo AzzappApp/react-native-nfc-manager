@@ -617,116 +617,120 @@ class GPUVideoView: UIView {
   }
   
   private func setupPlayerItem() {
-    guard let asset = asset else {
-      return
-    }
-    let width = self.bounds.width
-    let height = self.bounds.height
-    if width == 0 || height == 0 {
-      return
-    }
-    let videoComposition = AVMutableVideoComposition(asset: asset, applyingCIFiltersWithHandler: {
-      [weak self] request in
-        let videoImage = request.sourceImage
-        guard let videoView = self else {
-          request.finish(with: videoImage, context: nil)
-          return
-        }
-        guard let videoLayer = videoView.gpuLayers?.first(where: {
-          if case .video = $0.source {
-            return true
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self, let asset = asset  else {
+        return
+      }
+      let width = self.bounds.width
+      let height = self.bounds.height
+      if width == 0 || height == 0 {
+        return
+      }
+      let videoComposition = AVMutableVideoComposition(asset: asset, applyingCIFiltersWithHandler: {
+        [weak self] request in
+          let videoImage = request.sourceImage
+          guard let videoView = self else {
+            request.finish(with: videoImage, context: nil)
+            return
           }
-          return false
-        }) else {
-          request.finish(with: videoImage, context: nil)
-          return
-        }
-      
-        var layersImages = videoView.layersImages ?? [:]
-        layersImages[videoLayer.source] = videoImage
+          guard let videoLayer = videoView.gpuLayers?.first(where: {
+            if case .video = $0.source {
+              return true
+            }
+            return false
+          }) else {
+            request.finish(with: videoImage, context: nil)
+            return
+          }
         
-        let size = request.renderSize
-        var image: CIImage? = nil
-        if let backgroundColor = videoView.backgroundColorCopy {
-          image = CIImage(color: CIColor(color: backgroundColor))
-            .cropped(to: CGRectMake(0, 0, size.width, size.height))
-        }
-        
-        if let layers = videoView.gpuLayers {
-          for layer in layers {
-            if let layerImage = GPULayer.draw(
-              layer,
-              withSize: size,
-              onTopOf: image,
-              withImages: layersImages
-            ) {
-              image = layerImage
+          var layersImages = videoView.layersImages ?? [:]
+          layersImages[videoLayer.source] = videoImage
+          
+          let size = request.renderSize
+          var image: CIImage? = nil
+          if let backgroundColor = videoView.backgroundColorCopy {
+            image = CIImage(color: CIColor(color: backgroundColor))
+              .cropped(to: CGRectMake(0, 0, size.width, size.height))
+          }
+          
+          if let layers = videoView.gpuLayers {
+            for layer in layers {
+              if let layerImage = GPULayer.draw(
+                layer,
+                withSize: size,
+                onTopOf: image,
+                withImages: layersImages
+              ) {
+                image = layerImage
+              }
             }
           }
-        }
-        
-        guard let image = image else {
-          request.finish(with: videoImage, context: nil)
-          return
-        }
           
-        request.finish(with: image, context: nil)
-    })
-    let pixelRatio = UIScreen.main.scale
-    videoComposition.renderSize = CGSize(
-      width: width * pixelRatio,
-      height: height * pixelRatio
-    )
-    playerItem = AVPlayerItem(asset: asset)
-    playerItem!.videoComposition = videoComposition
-    setUpPlayer()
+          guard let image = image else {
+            request.finish(with: videoImage, context: nil)
+            return
+          }
+            
+          request.finish(with: image, context: nil)
+      })
+      let pixelRatio = UIScreen.main.scale
+      videoComposition.renderSize = CGSize(
+        width: width * pixelRatio,
+        height: height * pixelRatio
+      )
+      playerItem = AVPlayerItem(asset: asset)
+      playerItem!.videoComposition = videoComposition
+      setUpPlayer()
+    }
   }
   
   
   private var playerTimeObserver: Any?
   
   private func setUpPlayer() {
-    guard let playerItem = playerItem else {
-      return
-    }
-    resetPlayer()
-    onPlayerStartBuffing?(nil)
-    
-    let player = AVQueuePlayer()
-    player.isMuted = true
-    player.allowsExternalPlayback = false
-    player.addObserver(
-      self,
-      forKeyPath: #keyPath(AVPlayer.status),
-      options: [.old, .new],
-      context: &playerObserverContext
-    )
-    playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(0.1, preferredTimescale:600), queue: nil, using: {
-      [weak self] time in
-      guard let self = self else { return }
-      guard let currentItem = player.currentItem, currentItem.status == .readyToPlay else {
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self, let playerItem = playerItem else {
         return
       }
-      let currentTime = CMTimeGetSeconds(currentItem.currentTime())
-      if(currentTime >= 0) {
-        self.onProgress?(["currentTime": currentTime])
+      resetPlayer()
+      onPlayerStartBuffing?(nil)
+      
+      let player = AVQueuePlayer()
+      player.isMuted = true
+      player.allowsExternalPlayback = false
+      player.addObserver(
+        self,
+        forKeyPath: #keyPath(AVPlayer.status),
+        options: [.old, .new],
+        context: &playerObserverContext
+      )
+      playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(0.1, preferredTimescale:600), queue: nil, using: {
+        [weak self] time in
+        guard let self = self else { return }
+        guard let currentItem = player.currentItem, currentItem.status == .readyToPlay else {
+          return
+        }
+        let currentTime = CMTimeGetSeconds(currentItem.currentTime())
+        if(currentTime >= 0) {
+          self.onProgress?(["currentTime": currentTime])
+        }
+      })
+      
+      self.player = player
+      self.playerLayer?.player = player
+      
+      
+      var timerange = CMTimeRange.invalid
+      if let startTime = self.startTime, let duration = self.duration  {
+        timerange = CMTimeRange(start: startTime, duration: duration)
       }
-    })
-    
-    self.player = player
-    self.playerLayer?.player = player
-    
-    
-    var timerange = CMTimeRange.invalid
-    if let startTime = self.startTime, let duration = self.duration  {
-      timerange = CMTimeRange(start: startTime, duration: duration)
+      playerLooper = AVPlayerLooper(
+        player: player,
+        templateItem: playerItem,
+        timeRange: timerange
+      )
+      startPlayingIfReady()
     }
-    playerLooper = AVPlayerLooper(
-      player: player,
-      templateItem: playerItem,
-      timeRange: timerange
-    )
-    startPlayingIfReady()
   }
   
   override func observeValue(
