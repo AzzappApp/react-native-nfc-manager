@@ -1,5 +1,7 @@
-## 0.2.0-canary.32
+## 0.2.0-canary.33
 
+* **fix:**  - pagination with randomSeed as cursor and hasNexPage indicator ([#920](https://github.com/AzzappApp/azzapp/pull/920))
+* **fix:**  - 🐛 update webcard on cover change ([#922](https://github.com/AzzappApp/azzapp/pull/922))
 * **fix:**  - **NewProfile:** close custom editor on save ([#917](https://github.com/AzzappApp/azzapp/pull/917))
 * **fix:**  - **Navigation:** Don't show main tabbar during transitions ([#916](https://github.com/AzzappApp/azzapp/pull/916))
 * **fix:**  - **CoverEdition:** GPUVideoView block the ui thread ([#915](https://github.com/AzzappApp/azzapp/pull/915))
