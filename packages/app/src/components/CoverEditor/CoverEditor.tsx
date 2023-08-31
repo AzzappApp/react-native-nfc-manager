@@ -210,6 +210,11 @@ const CoverEditor = (
     setCustomEditionProps(null);
   }, []);
 
+  const onCustomCoverSaved = useCallback(() => {
+    setCustomEditionProps(null);
+    onCoverSaved();
+  }, [onCoverSaved]);
+
   // #region Layout
   const { width: windowWidth } = useWindowDimensions();
 
@@ -400,7 +405,7 @@ const CoverEditor = (
             initialColorPalette={customEditionProps.colorPalette}
             previewMedia={customEditionProps.previewMedia}
             onCancel={onCustomEditionCancel}
-            onCoverSaved={onCoverSaved}
+            onCoverSaved={onCustomCoverSaved}
             viewer={viewer}
           />
         )}
