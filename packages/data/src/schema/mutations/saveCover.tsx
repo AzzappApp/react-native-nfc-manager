@@ -14,7 +14,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
   { input },
-  { auth, loaders },
+  { auth, loaders, cardUpdateListener },
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
@@ -120,6 +120,8 @@ const saveCover: MutationResolvers['saveCover'] = async (
       await updateProfile(profileId, updates, trx);
       updatedProfile = { ...updatedProfile, ...updates };
     });
+
+    cardUpdateListener(profile.userName);
     return { profile: updatedProfile };
   } catch (error) {
     console.log(error);
