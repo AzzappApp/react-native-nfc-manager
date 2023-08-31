@@ -1,5 +1,6 @@
-## 0.2.0-canary.34
+## 0.2.0-canary.35
 
+* **fix:**  - reactivate module actions
 * **fix:**  - pagination with randomSeed as cursor and hasNexPage indicator ([#920](https://github.com/AzzappApp/azzapp/pull/920))
 * **fix:**  - 🐛 update webcard on cover change ([#922](https://github.com/AzzappApp/azzapp/pull/922))
 * **fix:**  - **NewProfile:** close custom editor on save ([#917](https://github.com/AzzappApp/azzapp/pull/917))
