@@ -1,4 +1,4 @@
-## 0.2.0-canary.31
+## 0.2.0-canary.32
 
 * **fix:**  - **NewProfile:** close custom editor on save ([#917](https://github.com/AzzappApp/azzapp/pull/917))
 * **fix:**  - **Navigation:** Don't show main tabbar during transitions ([#916](https://github.com/AzzappApp/azzapp/pull/916))
