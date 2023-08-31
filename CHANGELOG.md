@@ -1,5 +1,8 @@
-## 0.2.0-canary.30
+## 0.2.0-canary.31
 
+* **fix:**  - **NewProfile:** close custom editor on save ([#917](https://github.com/AzzappApp/azzapp/pull/917))
+* **fix:**  - **Navigation:** Don't show main tabbar during transitions ([#916](https://github.com/AzzappApp/azzapp/pull/916))
+* **fix:**  - **CoverEdition:** GPUVideoView block the ui thread ([#915](https://github.com/AzzappApp/azzapp/pull/915))
 * **fix:**  - **backoffice:** Cover suggestion ([#914](https://github.com/AzzappApp/azzapp/pull/914))
 * **fix:**  - use vars at build time for NEXT_PUBLIC variables
 * **fix:**  - pull vercel environment in ci
