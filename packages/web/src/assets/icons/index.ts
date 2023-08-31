@@ -4,3 +4,6 @@ export { default as HearthIcon } from './hearth.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as FlipIcon } from './flip.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
+export { default as SoundOffIcon } from './sound_off.svg';
+export { default as SoundOnIcon } from './sound_on.svg';
+export { default as PlayIcon } from './play.svg';

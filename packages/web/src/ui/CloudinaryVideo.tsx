@@ -1,4 +1,5 @@
 'use client';
+import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
   getVideoThumbnailURL,
@@ -7,7 +8,7 @@ import {
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data/domains';
 
-type CloudinaryVideoProps = Omit<
+export type CloudinaryVideoProps = Omit<
   React.HTMLProps<HTMLVideoElement>,
   | 'autoPlay'
   | 'children'
@@ -15,6 +16,7 @@ type CloudinaryVideoProps = Omit<
   | 'loop'
   | 'media'
   | 'poster'
+  | 'ref'
   | 'src'
   | 'width'
 > & {
@@ -28,16 +30,19 @@ type CloudinaryVideoProps = Omit<
   height?: number;
 };
 
-const CloudinaryVideo = ({
-  media,
-  assetKind,
-  autoPlay = true,
-  loop = true,
-  width,
-  style,
-  fluid,
-  ...props
-}: CloudinaryVideoProps) => {
+const CloudinaryVideo = (
+  {
+    media,
+    assetKind,
+    autoPlay = true,
+    loop = true,
+    width,
+    style,
+    fluid,
+    ...props
+  }: CloudinaryVideoProps,
+  ref: ForwardedRef<HTMLVideoElement>,
+) => {
   if (width == null && !fluid) {
     throw new Error(
       'MediaVideoRenderer: width is required for non fluid video',
@@ -50,6 +55,7 @@ const CloudinaryVideo = ({
   const maxSize = pregeneratedSizes.at(-1);
   return (
     <video
+      ref={ref}
       poster={getVideoThumbnailURL(media.id)}
       src={getVideoUrlForSize(media.id)}
       autoPlay={autoPlay}
@@ -77,4 +83,4 @@ const CloudinaryVideo = ({
   );
 };
 
-export default CloudinaryVideo;
+export default forwardRef(CloudinaryVideo);

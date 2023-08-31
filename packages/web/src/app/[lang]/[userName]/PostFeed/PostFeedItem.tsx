@@ -6,6 +6,7 @@ import { generateSharePostLink } from '#helpers';
 import { ButtonIcon } from '#ui';
 import ShareModal from '#components/ShareModal';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import styles from './PostFeedItem.css';
 import type { ModalActions } from '#ui/Modal';
 import type {
@@ -52,17 +53,34 @@ const PostFeedItem = (props: PostFeedItemProps) => {
         {postMedia && (
           <div
             className={styles.postMedias}
-            style={{ aspectRatio: `${postMedia.width / postMedia.height}` }}
+            style={{
+              aspectRatio: `${postMedia.width / postMedia.height}`,
+            }}
           >
-            <CloudinaryImage
-              mediaId={postMedia.id}
-              assetKind="post"
-              alt="cover"
-              fill
-              style={{
-                objectFit: 'cover',
-              }}
-            />
+            {postMedia.kind === 'video' ? (
+              <>
+                <CloudinaryVideoPlayer
+                  assetKind="post"
+                  media={postMedia}
+                  alt="cover"
+                  fluid
+                  style={{
+                    objectFit: 'cover',
+                    width: '100%',
+                  }}
+                />
+              </>
+            ) : (
+              <CloudinaryImage
+                mediaId={postMedia.id}
+                assetKind="post"
+                alt="cover"
+                fill
+                style={{
+                  objectFit: 'cover',
+                }}
+              />
+            )}
           </div>
         )}
         <div className={styles.postFooter}>
