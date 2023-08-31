@@ -388,6 +388,7 @@ const SimpleTextEditionScreen = ({
             id: 'margins',
             element: (
               <SimpleTextMarginEditionPanel
+                moduleKind={moduleKind}
                 marginHorizontal={marginHorizontal ?? 0}
                 marginVertical={marginVertical ?? 0}
                 onMarginHorizontalChange={onMarginHorizontalChange}

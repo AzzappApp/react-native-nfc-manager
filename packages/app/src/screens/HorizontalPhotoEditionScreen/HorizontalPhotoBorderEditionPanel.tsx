@@ -3,6 +3,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  HORIZONTAL_PHOTO_MAX_BORDER_RADIUS,
+  HORIZONTAL_PHOTO_MAX_BORDER_WIDTH,
+} from '@azzapp/shared/cardModuleHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -120,7 +124,7 @@ const HorizontalPhotoBorderEditionPanel = ({
           }
           value={borderWidth}
           min={0}
-          max={10}
+          max={HORIZONTAL_PHOTO_MAX_BORDER_WIDTH}
           step={1}
           onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
@@ -147,7 +151,7 @@ const HorizontalPhotoBorderEditionPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={200}
+          max={HORIZONTAL_PHOTO_MAX_BORDER_RADIUS}
           step={1}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({

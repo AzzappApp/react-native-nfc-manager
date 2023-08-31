@@ -1,5 +1,9 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  LINE_DIVIDER_MAX_HEIGHT,
+  LINE_DIVIDER_MIN_HEIGHT,
+} from '@azzapp/shared/cardModuleHelpers';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
@@ -69,8 +73,8 @@ const LineDividerSettingsEditionPanel = ({
           />
         }
         value={height}
-        min={20}
-        max={400}
+        min={LINE_DIVIDER_MIN_HEIGHT}
+        max={LINE_DIVIDER_MAX_HEIGHT}
         step={1}
         onChange={onHeightChange}
         accessibilityLabel={intl.formatMessage({

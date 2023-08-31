@@ -1,5 +1,10 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  SOCIAL_LINKS_MAX_MARGIN_BOTTOM,
+  SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL,
+  SOCIAL_LINKS_MAX_MARGIN_TOP,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
@@ -71,8 +76,8 @@ const SocialLinksMarginsEditionPanel = ({
             />
           }
           value={marginTop}
-          min={10}
-          max={100}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_TOP}
           step={1}
           onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
@@ -97,8 +102,8 @@ const SocialLinksMarginsEditionPanel = ({
             />
           }
           value={marginBottom}
-          min={10}
-          max={100}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_BOTTOM}
           step={1}
           onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
@@ -124,8 +129,8 @@ const SocialLinksMarginsEditionPanel = ({
             />
           }
           value={marginHorizontal}
-          min={10}
-          max={100}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL}
           step={1}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({

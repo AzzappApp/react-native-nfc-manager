@@ -5,6 +5,12 @@ import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  SOCIAL_LINKS_MAX_BORDER_WIDTH,
+  SOCIAL_LINKS_MAX_COLUMN_GAP,
+  SOCIAL_LINKS_MAX_ICON_SIZE,
+  SOCIAL_LINKS_MIN_ICON_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -166,8 +172,8 @@ const SocialLinksSettingsEditionPanel = ({
             />
           }
           value={iconSize}
-          min={10}
-          max={100}
+          min={SOCIAL_LINKS_MIN_ICON_SIZE}
+          max={SOCIAL_LINKS_MAX_ICON_SIZE}
           step={1}
           onChange={onIconSizeChange}
           accessibilityLabel={intl.formatMessage({
@@ -192,7 +198,7 @@ const SocialLinksSettingsEditionPanel = ({
           }
           value={borderWidth}
           min={0}
-          max={10}
+          max={SOCIAL_LINKS_MAX_BORDER_WIDTH}
           step={1}
           onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
@@ -218,8 +224,8 @@ const SocialLinksSettingsEditionPanel = ({
             />
           }
           value={columnGap}
-          min={1}
-          max={50}
+          min={0}
+          max={SOCIAL_LINKS_MAX_COLUMN_GAP}
           step={1}
           onChange={onColumnGapChange}
           accessibilityLabel={intl.formatMessage({

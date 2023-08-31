@@ -3,10 +3,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import {
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-  TITLE_MAX_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_FONT_SIZE,
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_TITLE_FONT_SIZE,
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_SPACING,
+  PHOTO_WITH_TEXT_AND_TITLE_MIN_FONT_SIZE,
+  PHOTO_WITH_TEXT_AND_TITLE_MIN_TITLE_FONT_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
@@ -229,11 +231,15 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               />
             }
             value={currentTab === 'title' ? titleFontSize : contentFontSize}
-            min={DEFAULT_COVER_MIN_FONT_SIZE}
+            min={
+              currentTab === 'title'
+                ? PHOTO_WITH_TEXT_AND_TITLE_MIN_TITLE_FONT_SIZE
+                : PHOTO_WITH_TEXT_AND_TITLE_MIN_FONT_SIZE
+            }
             max={
               currentTab === 'title'
-                ? TITLE_MAX_FONT_SIZE
-                : DEFAULT_COVER_MAX_FONT_SIZE
+                ? PHOTO_WITH_TEXT_AND_TITLE_MAX_TITLE_FONT_SIZE
+                : PHOTO_WITH_TEXT_AND_TITLE_MAX_FONT_SIZE
             }
             step={1}
             onChange={
@@ -289,7 +295,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               : contentVerticalSpacing
           }
           min={0}
-          max={20}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_SPACING}
           step={1}
           onChange={
             currentTab === 'title'

@@ -1,10 +1,20 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  SIMPLE_TEXT_MAX_HORIZONTAL_MARGIN,
+  SIMPLE_TEXT_MAX_VERTICAL_MARGIN,
+  SIMPLE_TITLE_MAX_HORIZONTAL_MARGIN,
+  SIMPLE_TITLE_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextMarginEditionPanelProps = ViewProps & {
+  /**
+   * The module kind
+   */
+  moduleKind: 'simpleText' | 'simpleTitle';
   /**
    * The horizontal margin currently set on the module
    */
@@ -27,6 +37,7 @@ type SimpleTextMarginEditionPanelProps = ViewProps & {
  * A panel to edit the margins of the simple text module
  */
 const SimpleTextMarginEditionPanel = ({
+  moduleKind,
   marginHorizontal,
   marginVertical,
   onMarginVerticalChange,
@@ -57,7 +68,11 @@ const SimpleTextMarginEditionPanel = ({
           }
           value={marginVertical}
           min={0}
-          max={60}
+          max={
+            moduleKind === 'simpleText'
+              ? SIMPLE_TEXT_MAX_VERTICAL_MARGIN
+              : SIMPLE_TITLE_MAX_VERTICAL_MARGIN
+          }
           step={1}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
@@ -82,7 +97,11 @@ const SimpleTextMarginEditionPanel = ({
           }
           value={marginHorizontal}
           min={0}
-          max={60}
+          max={
+            moduleKind === 'simpleText'
+              ? SIMPLE_TEXT_MAX_HORIZONTAL_MARGIN
+              : SIMPLE_TITLE_MAX_HORIZONTAL_MARGIN
+          }
           step={1}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({

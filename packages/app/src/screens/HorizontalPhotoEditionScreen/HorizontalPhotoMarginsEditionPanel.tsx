@@ -1,5 +1,9 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN,
+  HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -59,7 +63,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
           }
           value={marginVertical}
           min={0}
-          max={100}
+          max={HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN}
           step={1}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
@@ -86,7 +90,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
           }
           value={marginHorizontal}
           min={0}
-          max={100}
+          max={HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN}
           step={1}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({

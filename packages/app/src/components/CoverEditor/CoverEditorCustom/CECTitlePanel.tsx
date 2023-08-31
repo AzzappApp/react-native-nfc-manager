@@ -6,8 +6,8 @@ import {
   DEFAULT_COVER_CONTENT_POSITION,
   DEFAULT_COVER_FONT_FAMILY,
   DEFAULT_COVER_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-  DEFAULT_COVER_MIN_FONT_SIZE,
+  COVER_MAX_FONT_SIZE,
+  COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
   TEXT_POSITIONS,
 } from '@azzapp/shared/coverHelpers';
@@ -256,8 +256,8 @@ const CECTitlePanel = ({
             />
           }
           value={fontSize}
-          min={DEFAULT_COVER_MIN_FONT_SIZE}
-          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          min={COVER_MIN_FONT_SIZE}
+          max={COVER_MAX_FONT_SIZE}
           step={1}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({

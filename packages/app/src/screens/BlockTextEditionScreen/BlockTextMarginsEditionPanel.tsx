@@ -1,5 +1,11 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  BLOCK_TEXT_MAX_HORIZONTAL_MARGIN,
+  BLOCK_TEXT_MAX_VERTICAL_MARGIN,
+  BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN,
+  BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
@@ -78,7 +84,7 @@ const BlockTextMarginsEditionPanel = ({
           }
           value={textMarginVertical}
           min={0}
-          max={100}
+          max={BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN}
           step={1}
           onChange={onTextMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
@@ -105,7 +111,7 @@ const BlockTextMarginsEditionPanel = ({
           }
           value={textMarginHorizontal}
           min={0}
-          max={100}
+          max={BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN}
           step={1}
           onChange={onTextMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
@@ -139,7 +145,7 @@ const BlockTextMarginsEditionPanel = ({
             }
             value={marginVertical}
             min={0}
-            max={100}
+            max={BLOCK_TEXT_MAX_VERTICAL_MARGIN}
             step={1}
             onChange={onMarginVerticalChange}
             accessibilityLabel={intl.formatMessage({
@@ -166,7 +172,7 @@ const BlockTextMarginsEditionPanel = ({
             }
             value={marginHorizontal}
             min={0}
-            max={100}
+            max={BLOCK_TEXT_MAX_HORIZONTAL_MARGIN}
             step={1}
             onChange={onMarginHorizontalChange}
             accessibilityLabel={intl.formatMessage({

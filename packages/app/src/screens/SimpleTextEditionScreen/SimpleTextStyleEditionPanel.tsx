@@ -2,11 +2,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
-  DEFAULT_COVER_MAX_FONT_SIZE,
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  TITLE_MAX_FONT_SIZE,
-  TITLE_MIN_VERTICAL_SPACING,
-} from '@azzapp/shared/coverHelpers';
+  SIMPLE_TEXT_MAX_FONT_SIZE,
+  SIMPLE_TEXT_MAX_VERTICAL_SPACING,
+  SIMPLE_TEXT_MIN_FONT_SIZE,
+  SIMPLE_TITLE_MAX_FONT_SIZE,
+  SIMPLE_TITLE_MAX_VERTICAL_SPACING,
+  SIMPLE_TITLE_MIN_FONT_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
@@ -146,11 +148,15 @@ const SimpleTextStyleEditionPanel = ({
           />
         }
         value={fontSize}
-        min={DEFAULT_COVER_MIN_FONT_SIZE}
+        min={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MIN_FONT_SIZE
+            : SIMPLE_TITLE_MIN_FONT_SIZE
+        }
         max={
-          moduleKind === 'simpleTitle'
-            ? TITLE_MAX_FONT_SIZE
-            : DEFAULT_COVER_MAX_FONT_SIZE
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MAX_FONT_SIZE
+            : SIMPLE_TITLE_MAX_FONT_SIZE
         }
         step={1}
         onChange={onFontSizeChange}
@@ -173,8 +179,12 @@ const SimpleTextStyleEditionPanel = ({
           />
         }
         value={verticalSpacing}
-        min={TITLE_MIN_VERTICAL_SPACING}
-        max={DEFAULT_COVER_MAX_FONT_SIZE}
+        min={0}
+        max={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MAX_VERTICAL_SPACING
+            : SIMPLE_TITLE_MAX_VERTICAL_SPACING
+        }
         step={1}
         onChange={onVerticalSpacingChange}
         accessibilityLabel={intl.formatMessage({

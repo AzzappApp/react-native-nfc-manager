@@ -7,6 +7,7 @@ import {
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
@@ -609,7 +610,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           description:
             'Placeholder for text area in simple text edition screen',
         })}
-        maxLength={2200}
+        maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
         onChangeText={onContentChange}
         closeOnBlur={false}
@@ -624,7 +625,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
               })}
               value={title ?? ''}
               onChangeText={onTitleChange}
-              maxLength={300}
+              maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
               style={{ borderWidth: 0 }}
             />
             <Text

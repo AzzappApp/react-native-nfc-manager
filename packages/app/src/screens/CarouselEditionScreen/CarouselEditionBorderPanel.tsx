@@ -3,6 +3,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  CAROUSEL_MAX_BORDER_RADIUS,
+  CAROUSEL_MAX_BORDER_WIDTH,
+} from '@azzapp/shared/cardModuleHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -124,7 +128,7 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderWidth}
           min={0}
-          max={50}
+          max={CAROUSEL_MAX_BORDER_WIDTH}
           step={1}
           onChange={onBorderSizeChange}
           accessibilityLabel={intl.formatMessage({
@@ -147,7 +151,7 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={200}
+          max={CAROUSEL_MAX_BORDER_RADIUS}
           step={1}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({

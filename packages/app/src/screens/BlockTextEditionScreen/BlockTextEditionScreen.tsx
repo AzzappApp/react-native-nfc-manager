@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   BLOCK_TEXT_DEFAULT_VALUES,
+  BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
   MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -469,7 +470,7 @@ const BlockTextEditionScreen = ({
           description:
             'Placeholder for text area in simple text edition screen',
         })}
-        maxLength={2200}
+        maxLength={BLOCK_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
         onChangeText={onTextChange}
       />

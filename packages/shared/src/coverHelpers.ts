@@ -49,33 +49,58 @@ export const COVER_SOURCE_MAX_IMAGE_DIMENSION = 4096;
  */
 export const COVER_SOURCE_MAX_VIDEO_DIMENSION = 2048;
 
-// TODO REVIEW all the following constants
+/**
+ * The default cover font family
+ */
+export const DEFAULT_COVER_FONT_FAMILY = 'Poppins_Bold';
 
-export const DEFAULT_COVER_FONT_FAMILY = 'Arial';
+/**
+ * The default cover font size
+ */
+export const DEFAULT_COVER_FONT_SIZE = 16;
 
-export const DEFAULT_COVER_FONT_SIZE = 14;
+/**
+ * The default cover text color
+ */
+export const DEFAULT_COVER_TEXT_COLOR = '#FFF';
 
-export const DEFAULT_COVER_TEXT_COLOR = '#000000';
-
+/**
+ * The default cover text color
+ */
 export const DEFAULT_COVER_CONTENT_ORTIENTATION = 'horizontal' as const;
 
-export const DEFAULT_COVER_CONTENT_POSITION = 'bottomLeft' as const;
+/**
+ * The default cover text color
+ */
+export const DEFAULT_COVER_CONTENT_POSITION = 'middleCenter' as const;
 
+/**
+ * The default cover text style
+ */
 export const DEFAULT_COVER_TEXT_STYLE: TextStyle = {
   color: DEFAULT_COVER_TEXT_COLOR,
   fontSize: DEFAULT_COVER_FONT_SIZE,
   fontFamily: DEFAULT_COVER_FONT_FAMILY,
 };
 
-export const DEFAULT_COVER_MIN_FONT_SIZE = 10;
+/**
+ * The default cover subtitle text style
+ */
+export const DEFAULT_COVER_SUBTITLE_TEXT_STYLE: TextStyle = {
+  color: 'primary',
+  fontSize: 8,
+  fontFamily: DEFAULT_COVER_FONT_FAMILY,
+};
 
-export const DEFAULT_COVER_MAX_FONT_SIZE = 24;
+/**
+ * The minimum font size for the cover title/subtitle
+ */
+export const COVER_MIN_FONT_SIZE = 6;
 
-export const TITLE_MAX_FONT_SIZE = 72;
-
-export const TITLE_MIN_VERTICAL_SPACING = 0;
-
-// TODO END REVIEW
+/**
+ * The maximum font size for the cover title/subtitle
+ */
+export const COVER_MAX_FONT_SIZE = 48;
 
 /**
  * list of possible cover title position

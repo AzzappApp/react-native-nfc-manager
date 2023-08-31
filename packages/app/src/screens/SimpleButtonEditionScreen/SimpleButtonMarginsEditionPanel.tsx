@@ -1,5 +1,13 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  SIMPLE_BUTTON_MAX_HEIGHT,
+  SIMPLE_BUTTON_MAX_MARGIN_BOTTOM,
+  SIMPLE_BUTTON_MAX_MARGIN_TOP,
+  SIMPLE_BUTTON_MAX_WIDTH,
+  SIMPLE_BUTTON_MIN_HEIGHT,
+  SIMPLE_BUTTON_MIN_WIDTH,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
@@ -77,7 +85,7 @@ const SimpleButtonMarginsEditionPanel = ({
         }
         value={marginTop}
         min={0}
-        max={50}
+        max={SIMPLE_BUTTON_MAX_MARGIN_TOP}
         step={1}
         onChange={onMargintopChange}
         accessibilityLabel={intl.formatMessage({
@@ -102,7 +110,7 @@ const SimpleButtonMarginsEditionPanel = ({
         }
         value={marginBottom}
         min={0}
-        max={50}
+        max={SIMPLE_BUTTON_MAX_MARGIN_BOTTOM}
         step={1}
         onChange={onMarginbottomChange}
         accessibilityLabel={intl.formatMessage({
@@ -135,8 +143,8 @@ const SimpleButtonMarginsEditionPanel = ({
             />
           }
           value={width}
-          min={50}
-          max={300}
+          min={SIMPLE_BUTTON_MIN_WIDTH}
+          max={SIMPLE_BUTTON_MAX_WIDTH}
           step={1}
           onChange={onWidthChange}
           accessibilityLabel={intl.formatMessage({
@@ -160,8 +168,8 @@ const SimpleButtonMarginsEditionPanel = ({
             />
           }
           value={height}
-          min={10}
-          max={200}
+          min={SIMPLE_BUTTON_MIN_HEIGHT}
+          max={SIMPLE_BUTTON_MAX_HEIGHT}
           step={1}
           onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({

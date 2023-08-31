@@ -17,6 +17,7 @@ import {
   COVER_SOURCE_MAX_IMAGE_DIMENSION,
   COVER_SOURCE_MAX_VIDEO_DIMENSION,
   COVER_VIDEO_BITRATE,
+  DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   DEFAULT_COVER_TEXT_STYLE,
   textOrientationOrDefaut,
   textPositionOrDefaut,
@@ -229,7 +230,8 @@ const useCoverEditionManager = ({
       cardCover
         ? {
             titleStyle: cardCover.titleStyle ?? DEFAULT_COVER_TEXT_STYLE,
-            subTitleStyle: cardCover.subTitleStyle ?? DEFAULT_COVER_TEXT_STYLE,
+            subTitleStyle:
+              cardCover.subTitleStyle ?? DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
             textOrientation: textOrientationOrDefaut(cardCover.textOrientation),
             textPosition: textPositionOrDefaut(cardCover.textPosition),
             mediaFilter: cardCover.mediaFilter ?? null,
@@ -851,7 +853,7 @@ const DEFAULT_COVER_STYLE: CoverStyleData = {
   mediaParameters: {},
   merged: false,
   segmented: false,
-  subTitleStyle: DEFAULT_COVER_TEXT_STYLE,
+  subTitleStyle: DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   textOrientation: 'horizontal',
   textPosition: 'bottomLeft',
   titleStyle: DEFAULT_COVER_TEXT_STYLE,

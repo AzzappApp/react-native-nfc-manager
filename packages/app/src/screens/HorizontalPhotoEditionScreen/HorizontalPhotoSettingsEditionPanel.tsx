@@ -1,5 +1,9 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  HORIZONTAL_PHOTO_MAX_IMAGE_HEIGHT,
+  HORIZONTAL_PHOTO_MIN_IMAGE_HEIGHT,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
@@ -47,8 +51,8 @@ const HorizontalPhotoSettingsEditionPanel = ({
             />
           }
           value={height}
-          min={50}
-          max={400}
+          min={HORIZONTAL_PHOTO_MIN_IMAGE_HEIGHT}
+          max={HORIZONTAL_PHOTO_MAX_IMAGE_HEIGHT}
           step={1}
           onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
