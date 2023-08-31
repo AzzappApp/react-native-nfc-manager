@@ -334,14 +334,14 @@ const ProfileScreenBody = (
 
   // #region Modules deletions
   const canDelete =
-    !duplicateModuleActive &&
+    !deleteModulesActive &&
     !duplicateModuleActive &&
     !reorderPending &&
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
   const deleteModules = useCallback(
     (modulesIds: string[]) => {
-      if (canDelete) {
+      if (!canDelete) {
         return;
       }
       const updater: StoreUpdater = store => {
@@ -382,13 +382,14 @@ const ProfileScreenBody = (
   // #region Modules duplication
   const canDuplicate =
     !duplicateModuleActive &&
-    !duplicateModuleActive &&
+    !deleteModulesActive &&
     !reorderPending &&
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
+
   const onDuplicateModule = useCallback(
     (moduleId: string) => {
-      if (canDuplicate) {
+      if (!canDuplicate) {
         return;
       }
 
@@ -446,7 +447,7 @@ const ProfileScreenBody = (
   const canUpdateVisibility = !deleteModulesActive && !duplicateModuleActive;
   const updateModulesVisibility = useCallback(
     (modulesIds: string[], visible: boolean) => {
-      if (canUpdateVisibility) {
+      if (!canUpdateVisibility) {
         return;
       }
       const updater: StoreUpdater = store => {
