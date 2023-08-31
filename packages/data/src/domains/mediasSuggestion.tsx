@@ -50,11 +50,11 @@ export const getMediaSuggestions = async (
     query.append(sql`AND companyActivityId = ${companyActivityId}`);
   }
   if (offset) {
-    query.append(sql`AND cursor > ${offset}`);
+    query.append(sql` HAVING cursor > ${offset} `);
   }
-  query.append(sql`ORDER BY cursor`);
+  query.append(sql` ORDER BY cursor `);
   if (limit) {
-    query.append(sql`LIMIT ${limit}`);
+    query.append(sql` LIMIT ${limit} `);
   }
 
   return (await db.execute(query)).rows as Array<

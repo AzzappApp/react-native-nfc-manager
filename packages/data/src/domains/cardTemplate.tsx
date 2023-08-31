@@ -109,9 +109,14 @@ export const getCardTemplates = async (
   const query = sql`
     SELECT *, RAND(${randomSeed}) as cursor
     FROM CardTemplate
-    ${offset ? sql`WHERE cursor > ${offset}` : sql``}
-    ${limit ? sql`LIMIT ${limit}` : sql``}
-  `;
+   `;
+  if (offset) {
+    query.append(sql` HAVING cursor > ${offset} `);
+  }
+  query.append(sql` ORDER BY cursor `);
+  if (limit) {
+    query.append(sql` LIMIT ${limit} `);
+  }
 
   return (await db.execute(query)).rows as Array<
     CardTemplate & { cursor: string }

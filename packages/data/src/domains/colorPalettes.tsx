@@ -92,7 +92,6 @@ export const updateColorPalette = async (
 
 /**
  * Return a list of color palettes. filtered by profile kind and template kind
- * @param randomSeed the random seed to use for random ordering
  */
 export const getColorPalettes = async (): Promise<ColorPalette[]> =>
   db

@@ -95,15 +95,15 @@ export const Viewer: ViewerResolvers = {
       return connectionFromArray([], args);
     }
 
-    const first = args.first ?? 100;
+    const limit = args.first ?? 100;
     const offset = args.after ? cursorToDate(args.after) : null;
 
-    const posts = await getFollowingsPosts(profileId, first, offset);
+    const posts = await getFollowingsPosts(profileId, limit + 1, offset);
 
-    return connectionFromDateSortedItems(posts, {
+    return connectionFromDateSortedItems(posts.slice(0, limit), {
       getDate: post => post.createdAt,
       // approximations that should be good enough, and avoid a query
-      hasNextPage: posts.length > 0,
+      hasNextPage: posts.length > limit,
       hasPreviousPage: offset !== null,
     });
   },
@@ -176,11 +176,11 @@ export const Viewer: ViewerResolvers = {
       kind,
       profile.id,
       after,
-      first ?? 100,
+      limit + 1,
     );
-
+    const sizedTemplate = templates.slice(0, limit);
     return {
-      edges: templates.map(template => ({
+      edges: sizedTemplate.map(template => ({
         node: template,
         cursor: template.cursor,
       })),
@@ -188,7 +188,7 @@ export const Viewer: ViewerResolvers = {
         hasNextPage: templates.length > limit,
         hasPreviousPage: false,
         startCursor: templates[0]?.cursor,
-        endCursor: templates[templates.length - 1]?.cursor,
+        endCursor: sizedTemplate[sizedTemplate.length - 1].cursor,
       },
     };
   },
@@ -197,10 +197,10 @@ export const Viewer: ViewerResolvers = {
       return emptyConnection;
     }
     const limit = first ?? 100;
-    const cardTemplates = await getCardTemplates(profileId, after, limit);
-
+    const cardTemplates = await getCardTemplates(profileId, after, limit + 1);
+    const sizedCardtemplate = cardTemplates.slice(0, limit);
     return {
-      edges: cardTemplates.map(cardTemplate => ({
+      edges: sizedCardtemplate.map(cardTemplate => ({
         node: cardTemplate,
         cursor: cardTemplate.cursor,
       })),
@@ -208,7 +208,7 @@ export const Viewer: ViewerResolvers = {
         hasNextPage: cardTemplates.length > limit,
         hasPreviousPage: false,
         startCursor: cardTemplates[0]?.cursor,
-        endCursor: cardTemplates[cardTemplates.length - 1]?.cursor,
+        endCursor: sizedCardtemplate[sizedCardtemplate.length - 1].cursor,
       },
     };
   },
@@ -217,10 +217,10 @@ export const Viewer: ViewerResolvers = {
       return emptyConnection;
     }
     const limit = first ?? 100;
-    const cardStyles = await getCardStyles(profileId, after, limit);
-
+    const cardStyles = await getCardStyles(profileId, after, limit + 1);
+    const sizedCardStyles = cardStyles.slice(0, limit);
     return {
-      edges: cardStyles.map(style => ({
+      edges: sizedCardStyles.map(style => ({
         node: style,
         cursor: style.cursor,
       })),
@@ -228,7 +228,7 @@ export const Viewer: ViewerResolvers = {
         hasNextPage: cardStyles.length > limit,
         hasPreviousPage: false,
         startCursor: cardStyles[0]?.cursor,
-        endCursor: cardStyles[cardStyles.length - 1]?.cursor,
+        endCursor: cardStyles[sizedCardStyles.length - 1].cursor,
       },
     };
   },
@@ -266,10 +266,10 @@ export const Viewer: ViewerResolvers = {
       profile.profileCategoryId,
       profile.companyActivityId,
       after,
-      first ?? 100,
+      (first ?? 100) + 1,
     );
-
-    const edges = suggestions.map(({ mediaId, cursor }) => ({
+    const sizedSuggestion = suggestions.slice(0, limit);
+    const edges = sizedSuggestion.map(({ mediaId, cursor }) => ({
       node: mediaId,
       cursor,
     })) as any[];
@@ -280,7 +280,7 @@ export const Viewer: ViewerResolvers = {
         hasNextPage: suggestions.length > limit,
         hasPreviousPage: false,
         startCursor: suggestions[0]?.cursor,
-        endCursor: suggestions[suggestions.length - 1]?.cursor,
+        endCursor: sizedSuggestion[sizedSuggestion.length - 1]?.cursor,
       },
     };
   },

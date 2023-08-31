@@ -80,10 +80,14 @@ export const getCoverTemplates = async (
         ? CoverTemplateTable.businessEnabled
         : CoverTemplateTable.personalEnabled
     } = 1
-    AND ${CoverTemplateTable.kind} = ${templateKind}
-    ${offset ? sql`AND cursor > ${offset}` : sql``}
-    ${limit ? sql`LIMIT ${limit}` : sql``}
-  `;
+    AND ${CoverTemplateTable.kind} = ${templateKind}`;
+  if (offset) {
+    query.append(sql` HAVING cursor > ${offset} `);
+  }
+  query.append(sql` ORDER BY cursor `);
+  if (limit) {
+    query.append(sql` LIMIT ${limit} `);
+  }
 
   return (await db.execute(query)).rows as Array<
     CoverTemplate & { cursor: string }
