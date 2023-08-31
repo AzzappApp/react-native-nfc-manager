@@ -11,7 +11,11 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createId } from '#helpers/idHelpers';
 import BottomMenu from '#ui/BottomMenu';
-import { useRouter, useScreenHasFocus } from './NativeRouter';
+import {
+  useNativeNavigationEvent,
+  useRouter,
+  useScreenHasFocus,
+} from './NativeRouter';
 import type { FooterBarItem } from '#ui/FooterBar';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -25,10 +29,19 @@ export const useMainTabBarVisiblilityController = (
   visibilityState: SharedValue<number> | false | true,
 ) => {
   const hasFocus = useScreenHasFocus();
+  const [controlVisibility, setControlVisibility] = useState(hasFocus);
+
+  useNativeNavigationEvent('disappear', () => {
+    setControlVisibility(false);
+  });
+
+  useNativeNavigationEvent('willAppear', () => {
+    setControlVisibility(true);
+  });
 
   const id = useMemo(() => createId(), []);
   useEffect(() => {
-    if (hasFocus) {
+    if (controlVisibility) {
       mainTabBarVisibilityStates.push({ id, state: visibilityState });
       mainTabBarVisibleListners.forEach(listener => listener());
     }
@@ -41,7 +54,7 @@ export const useMainTabBarVisiblilityController = (
         mainTabBarVisibleListners.forEach(listener => listener());
       }
     };
-  }, [hasFocus, id, visibilityState]);
+  }, [controlVisibility, id, visibilityState]);
 };
 
 /**
