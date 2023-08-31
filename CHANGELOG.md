@@ -1,4 +1,4 @@
-## 0.2.0-canary.33
+## 0.2.0-canary.34
 
 * **fix:**  - pagination with randomSeed as cursor and hasNexPage indicator ([#920](https://github.com/AzzappApp/azzapp/pull/920))
 * **fix:**  - 🐛 update webcard on cover change ([#922](https://github.com/AzzappApp/azzapp/pull/922))
