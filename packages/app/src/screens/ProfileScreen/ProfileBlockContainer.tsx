@@ -40,15 +40,31 @@ export type ProfileBlockContainerProps = {
    */
   editing: boolean;
   /**
-   * when true, the animation are disabled
-   */
-  disableAnimation?: boolean;
-  /**
    * If false, the edition buttons are not displayed
    *
    * @default true
    */
   displayEditionButtons?: boolean;
+  /**
+   * prevent the user from deleting the module if false
+   * @default true
+   */
+  canDelete?: boolean;
+  /**
+   * prevent the user from moving the module if false
+   * @default true
+   */
+  canMove?: boolean;
+  /**
+   * prevent the user from toggling the visibility of the module if false
+   * @default true
+   */
+  canToggleVisibility?: boolean;
+  /**
+   * prevent the user from duplicating the module if false
+   * @default true
+   */
+  canDuplicate?: boolean;
   /**
    * Whether the block is visible in the webcard
    * @default true
@@ -114,6 +130,10 @@ const ProfileBlockContainer = ({
   editing,
   visible = true,
   displayEditionButtons = true,
+  canDelete = true,
+  canMove = true,
+  canToggleVisibility = true,
+  canDuplicate = true,
   isLast,
   isFirst,
   selectionMode,
@@ -343,7 +363,7 @@ const ProfileBlockContainer = ({
             >
               <IconButton
                 onPress={onMoveDown}
-                disabled={activeSection !== 'none'}
+                disabled={activeSection !== 'none' || !canMove}
                 icon="arrow_down"
                 size={buttonSize}
                 iconSize={iconSize}
@@ -378,7 +398,7 @@ const ProfileBlockContainer = ({
             >
               <IconButton
                 onPress={onMoveUp}
-                disabled={activeSection !== 'none'}
+                disabled={activeSection !== 'none' || !canMove}
                 icon="arrow_up"
                 size={buttonSize}
                 iconSize={iconSize}
@@ -414,7 +434,11 @@ const ProfileBlockContainer = ({
           >
             <IconButton
               onPress={() => onToggleVisibility?.(!visible)}
-              disabled={activeSection !== 'left' || selectionMode}
+              disabled={
+                activeSection !== 'left' ||
+                selectionMode ||
+                !canToggleVisibility
+              }
               icon={visible ? 'hide' : 'preview'}
               size={buttonSize}
               iconSize={iconSize}
@@ -447,7 +471,9 @@ const ProfileBlockContainer = ({
             />
             <IconButton
               onPress={onDuplicate}
-              disabled={activeSection !== 'left' || selectionMode}
+              disabled={
+                activeSection !== 'left' || selectionMode || !canDuplicate
+              }
               icon="background"
               size={buttonSize}
               iconSize={iconSize}
@@ -512,7 +538,7 @@ const ProfileBlockContainer = ({
           >
             <IconButton
               onPress={onRemove}
-              disabled={activeSection !== 'right'}
+              disabled={activeSection !== 'right' || !canDelete}
               icon="delete"
               size={buttonSize}
               iconSize={iconSize}

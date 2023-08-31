@@ -8,9 +8,16 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  graphql,
+  useFragment,
+  useMutation,
+  useRelayEnvironment,
+} from 'react-relay';
+import { swap } from '@azzapp/shared/arrayHelpers';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { createId } from '#helpers/idHelpers';
@@ -22,10 +29,8 @@ import type { ProfileScreenBodySwapModulesMutation } from '@azzapp/relay/artifac
 import type { ProfileScreenBodyUpdateModulesVisibilityMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyUpdateModulesVisibilityMutation.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ForwardedRef } from 'react';
-import type {
-  SelectorStoreUpdater,
-  RecordSourceSelectorProxy,
-} from 'relay-runtime';
+import type { Disposable } from 'react-relay';
+import type { StoreUpdater, RecordSourceSelectorProxy } from 'relay-runtime';
 
 export type ModuleSelectionInfos = {
   /**
@@ -127,64 +132,6 @@ const ProfileScreenBody = (
     `,
     profile,
   );
-
-  useEffect(() => {
-    onModulesCountChange(cardModules?.length ?? 0);
-  }, [cardModules?.length, onModulesCountChange]);
-
-  const [commitSwapModules, swapModulesActive] =
-    useMutation<ProfileScreenBodySwapModulesMutation>(graphql`
-      mutation ProfileScreenBodySwapModulesMutation($input: SwapModulesInput!) {
-        swapModules(input: $input) {
-          profile {
-            id
-          }
-        }
-      }
-    `);
-
-  const [commitDeleteModules, deleteModulesActive] =
-    useMutation<ProfileScreenBodyDeleteModuleMutation>(graphql`
-      mutation ProfileScreenBodyDeleteModuleMutation(
-        $input: DeleteModulesInput!
-      ) {
-        deleteModules(input: $input) {
-          profile {
-            id
-          }
-        }
-      }
-    `);
-
-  const [commitDuplicateModule, duplicateModuleActive] =
-    useMutation<ProfileScreenBodyDuplicateModuleMutation>(graphql`
-      mutation ProfileScreenBodyDuplicateModuleMutation(
-        $input: DuplicateModuleInput!
-      ) {
-        duplicateModule(input: $input) {
-          createdModuleId
-        }
-      }
-    `);
-
-  const [commitUpdateModulesVisibility, updateModulesVisibilityActive] =
-    useMutation<ProfileScreenBodyUpdateModulesVisibilityMutation>(graphql`
-      mutation ProfileScreenBodyUpdateModulesVisibilityMutation(
-        $input: UpdateModulesVisibilityInput!
-      ) {
-        updateModulesVisibility(input: $input) {
-          profile {
-            id
-          }
-        }
-      }
-    `);
-
-  const moduleMutationActive =
-    swapModulesActive ||
-    deleteModulesActive ||
-    duplicateModuleActive ||
-    updateModulesVisibilityActive;
   // #endregion
 
   // #region Selection
@@ -223,12 +170,133 @@ const ProfileScreenBody = (
       ),
     });
   }, [selectedModules, onSelectionStateChange, cardModules]);
+
+  useEffect(() => {
+    onModulesCountChange(cardModules?.length ?? 0);
+  }, [cardModules?.length, onModulesCountChange]);
   // #endregion
 
-  // #region Modules manipulation
+  // #region Modules mutations
+  const [commitDeleteModules, deleteModulesActive] =
+    useMutation<ProfileScreenBodyDeleteModuleMutation>(graphql`
+      mutation ProfileScreenBodyDeleteModuleMutation(
+        $input: DeleteModulesInput!
+      ) {
+        deleteModules(input: $input) {
+          profile {
+            id
+          }
+        }
+      }
+    `);
+
+  const [commitDuplicateModule, duplicateModuleActive] =
+    useMutation<ProfileScreenBodyDuplicateModuleMutation>(graphql`
+      mutation ProfileScreenBodyDuplicateModuleMutation(
+        $input: DuplicateModuleInput!
+      ) {
+        duplicateModule(input: $input) {
+          createdModuleId
+        }
+      }
+    `);
+
+  const [commitUpdateModulesVisibility, updateModulesVisibilityActive] =
+    useMutation<ProfileScreenBodyUpdateModulesVisibilityMutation>(graphql`
+      mutation ProfileScreenBodyUpdateModulesVisibilityMutation(
+        $input: UpdateModulesVisibilityInput!
+      ) {
+        updateModulesVisibility(input: $input) {
+          profile {
+            id
+          }
+        }
+      }
+    `);
+
+  // #endregion
+
+  // #region Modules reordering
+  const [commitReorderModules, reorderModulesActive] =
+    useMutation<ProfileScreenBodySwapModulesMutation>(graphql`
+      mutation ProfileScreenBodySwapModulesMutation(
+        $input: ReorderModulesInput!
+      ) {
+        reorderModules(input: $input) {
+          profile {
+            id
+          }
+        }
+      }
+    `);
+
+  const moduleOrderUpdater = useCallback<(moduleIds: string[]) => StoreUpdater>(
+    moduleIds => store => {
+      const profileRecord = store.get(profileId);
+      if (!profileRecord) {
+        return;
+      }
+      const modulesRecord = profileRecord.getLinkedRecords('cardModules');
+      if (!modulesRecord) {
+        return;
+      }
+      const newModules = moduleIds.map(
+        moduleId =>
+          modulesRecord.find(
+            moduleRecord => moduleRecord?.getDataID() === moduleId,
+          ) ?? null,
+      );
+      profileRecord.setLinkedRecords(newModules, 'cardModules');
+    },
+    [profileId],
+  );
+
+  const [reorderPending, setReorderPending] = useState(false);
+  const moduleOrderTimeoutRef = useRef<any>(null);
+  const optimisticUpdate = useRef<Disposable | null>();
+  const scheduleModuleOrderUpdate = useCallback(
+    (moduleIds: string[]) => {
+      if (moduleOrderTimeoutRef.current) {
+        clearTimeout(moduleOrderTimeoutRef.current);
+      }
+      setReorderPending(true);
+      moduleOrderTimeoutRef.current = setTimeout(() => {
+        setReorderPending(false);
+        moduleOrderTimeoutRef.current = null;
+        const currentOptimisticUpdate = optimisticUpdate.current;
+        const updater = moduleOrderUpdater(moduleIds);
+
+        commitReorderModules({
+          variables: {
+            input: { moduleIds },
+          },
+          updater: store => {
+            if (currentOptimisticUpdate === optimisticUpdate.current) {
+              updater(store);
+            }
+          },
+          optimisticUpdater: store => {
+            if (currentOptimisticUpdate === optimisticUpdate.current) {
+              updater(store);
+            }
+          },
+          onCompleted() {
+            if (currentOptimisticUpdate === optimisticUpdate.current) {
+              currentOptimisticUpdate?.dispose();
+              optimisticUpdate.current = null;
+            }
+          },
+        });
+      }, 2000);
+    },
+    [commitReorderModules, moduleOrderUpdater],
+  );
+
+  const environment = useRelayEnvironment();
+  const canReorder = !deleteModulesActive && !duplicateModuleActive;
   const onMoveModule = useCallback(
     (moduleId: string, direction: 'down' | 'up') => {
-      if (moduleMutationActive) {
+      if (!canReorder) {
         return;
       }
       const moduleIndex = cardModules.findIndex(
@@ -242,45 +310,41 @@ const ProfileScreenBody = (
       if (nextModuleIndex < 0 || nextModuleIndex >= cardModules.length) {
         return;
       }
-      const nextModule = cardModules[nextModuleIndex];
-
-      const updater: SelectorStoreUpdater<unknown> = store => {
-        const profileRecord = store.get(profileId);
-        if (!profileRecord) {
-          return;
-        }
-        const modulesRecord = profileRecord.getLinkedRecords('cardModules');
-        if (!modulesRecord) {
-          return;
-        }
-        const newModules = [...modulesRecord];
-        const moduleARecord = newModules[moduleIndex];
-        const moduleBRecord = newModules[nextModuleIndex];
-        newModules[moduleIndex] = moduleBRecord;
-        newModules[nextModuleIndex] = moduleARecord;
-        profileRecord.setLinkedRecords(newModules, 'cardModules');
-      };
-
-      commitSwapModules({
-        variables: {
-          input: {
-            moduleAId: moduleId,
-            moduleBId: nextModule.id,
-          },
-        },
-        updater,
-        optimisticUpdater: updater,
+      const moduleIds = swap(
+        cardModules.map(module => module.id),
+        moduleIndex,
+        nextModuleIndex,
+      );
+      const prevUpdate = optimisticUpdate.current;
+      optimisticUpdate.current = environment.applyUpdate({
+        storeUpdater: moduleOrderUpdater(moduleIds),
       });
+      prevUpdate?.dispose();
+      scheduleModuleOrderUpdate(moduleIds);
     },
-    [commitSwapModules, moduleMutationActive, profileId, cardModules],
+    [
+      canReorder,
+      cardModules,
+      environment,
+      moduleOrderUpdater,
+      scheduleModuleOrderUpdate,
+    ],
   );
+  // #endregion
 
+  // #region Modules deletions
+  const canDelete =
+    !duplicateModuleActive &&
+    !duplicateModuleActive &&
+    !reorderPending &&
+    !reorderModulesActive &&
+    !updateModulesVisibilityActive;
   const deleteModules = useCallback(
     (modulesIds: string[]) => {
-      if (moduleMutationActive) {
+      if (canDelete) {
         return;
       }
-      const updater: SelectorStoreUpdater<unknown> = store => {
+      const updater: StoreUpdater = store => {
         const profileRecord = store.get(profileId);
         if (!profileRecord) {
           return;
@@ -304,7 +368,7 @@ const ProfileScreenBody = (
         optimisticUpdater: updater,
       });
     },
-    [profileId, commitDeleteModules, moduleMutationActive],
+    [canDelete, commitDeleteModules, profileId],
   );
 
   const onRemoveModule = useCallback(
@@ -313,10 +377,18 @@ const ProfileScreenBody = (
     },
     [deleteModules],
   );
+  // #endregion
 
+  // #region Modules duplication
+  const canDuplicate =
+    !duplicateModuleActive &&
+    !duplicateModuleActive &&
+    !reorderPending &&
+    !reorderModulesActive &&
+    !updateModulesVisibilityActive;
   const onDuplicateModule = useCallback(
     (moduleId: string) => {
-      if (moduleMutationActive) {
+      if (canDuplicate) {
         return;
       }
 
@@ -366,15 +438,18 @@ const ProfileScreenBody = (
         },
       });
     },
-    [profileId, commitDuplicateModule, moduleMutationActive],
+    [canDuplicate, commitDuplicateModule, profileId],
   );
+  // #endregion
 
+  // #region Modules visibility toggling
+  const canUpdateVisibility = !deleteModulesActive && !duplicateModuleActive;
   const updateModulesVisibility = useCallback(
     (modulesIds: string[], visible: boolean) => {
-      if (moduleMutationActive) {
+      if (canUpdateVisibility) {
         return;
       }
-      const updater: SelectorStoreUpdater<unknown> = store => {
+      const updater: StoreUpdater = store => {
         modulesIds.forEach(moduleId => {
           const moduleRecord = store.get(moduleId);
           if (!moduleRecord) {
@@ -394,7 +469,7 @@ const ProfileScreenBody = (
         optimisticUpdater: updater,
       });
     },
-    [commitUpdateModulesVisibility, moduleMutationActive],
+    [canUpdateVisibility, commitUpdateModulesVisibility],
   );
 
   const onToggleModuleVisibility = useCallback(
@@ -403,7 +478,9 @@ const ProfileScreenBody = (
     },
     [updateModulesVisibility],
   );
+  // #endregion
 
+  // #region Imperative handle
   useImperativeHandle(
     forwardedRef,
     () => ({
@@ -476,6 +553,10 @@ const ProfileScreenBody = (
     <ProfileBlockContainerMemo
       key={module.id}
       editing={editing}
+      canMove={canReorder}
+      canDelete={canDelete}
+      canDuplicate={canDuplicate}
+      canToggleVisibility={canUpdateVisibility}
       isFirst={index === 0}
       isLast={index === cardModules.length - 1}
       visible={module.visible}

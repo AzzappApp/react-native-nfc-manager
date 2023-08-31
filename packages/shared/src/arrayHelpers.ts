@@ -30,3 +30,18 @@ export function shuffle<T>(array: T[], seed: number | string) {
 
   return result;
 }
+
+/**
+ * Swap two elements in an array
+ * @param arr The array
+ * @param index1 The index of the first element to swap
+ * @param index2 The index of the second element to swap
+ * @returns a copy of the array with the two elements swapped
+ */
+export const swap = <T>(arr: T[], index1: number, index2: number): T[] => {
+  arr = arr.slice();
+  const temp = arr[index1];
+  arr[index1] = arr[index2];
+  arr[index2] = temp;
+  return arr;
+};

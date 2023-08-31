@@ -1,6 +1,11 @@
-import { inArray, sql } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
 import ERRORS from '@azzapp/shared/errors';
-import { CardModuleTable, db, getCardModulesByIds } from '#domains';
+import {
+  CardModuleTable,
+  db,
+  getCardModulesByIds,
+  resetCardModulesPositions,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
@@ -25,27 +30,10 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
 
   try {
     await db.transaction(async trx => {
-      await trx
+      await db
         .delete(CardModuleTable)
         .where(inArray(CardModuleTable.id, modulesIds));
-
-      // TODO : We need to evaluate if this the performance of this query
-      // is acceptable. If not, we can always find a better way to
-      // manage the position of the modules.
-      const updatePosQuery = sql`
-        UPDATE CardModule
-        JOIN ( 
-          SELECT 
-            id, 
-            ROW_NUMBER() OVER (PARTITION BY profileId ORDER BY position) position
-          FROM CardModule
-          WHERE profileId = ${profileId}
-        ) AS NewPos
-        ON CardModule.id = NewPos.id
-        SET CardModule.position = NewPos.position - 1
-        WHERE CardModule.profileId = ${profileId}
-      `;
-      await trx.execute(updatePosQuery);
+      await resetCardModulesPositions(profileId, trx);
     });
   } catch (e) {
     console.error(e);

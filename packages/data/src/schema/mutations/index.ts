@@ -17,11 +17,11 @@ import {
 import togglePostReaction from './postReaction';
 import publishCard from './publishCard';
 import removeFollower from './removeFollower';
+import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
-import swapModules from './swapModules';
 import toggleFollowing from './toggleFollowing';
 import updateModulesVisibility from './updateModulesVisibility';
 import updatePost from './updatePost';
@@ -46,7 +46,7 @@ export const Mutation: MutationResolvers = {
   saveSimpleButtonModule,
   saveSocialLinksModule,
   saveBlockTextModule,
-  swapModules,
+  reorderModules,
   deleteModules,
   duplicateModule,
   loadCardTemplate,

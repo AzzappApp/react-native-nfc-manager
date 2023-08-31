@@ -1,10 +1,15 @@
 import ERRORS from '@azzapp/shared/errors';
-import { db, getCardModulesByIds, updateCardModule } from '#domains';
+import {
+  db,
+  getCardModulesByIds,
+  resetCardModulesPositions,
+  updateCardModule,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
-const swapModules: MutationResolvers['swapModules'] = async (
+const reorderModules: MutationResolvers['reorderModules'] = async (
   _,
-  { input: { moduleAId, moduleBId } },
+  { input: { moduleIds } },
   { auth, loaders, cardUpdateListener },
 ) => {
   const profileId = auth.profileId;
@@ -16,20 +21,18 @@ const swapModules: MutationResolvers['swapModules'] = async (
   if (!profile) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
-  const [moduleA, moduleB] = await getCardModulesByIds([moduleAId, moduleBId]);
-  if (
-    !moduleA ||
-    !moduleB ||
-    moduleA.profileId !== profileId ||
-    moduleB.profileId !== profileId
-  ) {
+  const modules = await getCardModulesByIds(moduleIds);
+  if (modules.some(module => module?.profileId !== profileId)) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   try {
     await db.transaction(async trx => {
-      await updateCardModule(moduleAId, { position: moduleB.position }, trx);
-      await updateCardModule(moduleBId, { position: moduleA.position }, trx);
+      for (let index = 0; index < moduleIds.length; index++) {
+        const moduleId = moduleIds[index];
+        await updateCardModule(moduleId, { position: index }, trx);
+      }
+      await resetCardModulesPositions(profileId, trx);
     });
   } catch (e) {
     console.error(e);
@@ -41,4 +44,4 @@ const swapModules: MutationResolvers['swapModules'] = async (
   return { profile };
 };
 
-export default swapModules;
+export default reorderModules;

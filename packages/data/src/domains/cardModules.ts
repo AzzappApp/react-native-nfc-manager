@@ -223,3 +223,19 @@ export const updateCardModule = async (
     .set(values)
     .where(eq(CardModuleTable.id, id));
 };
+
+/**
+ * Reset all card modules positions to match their order in the array
+ */
+export const resetCardModulesPositions = async (
+  profileId: string,
+  trx: DbTransaction = db,
+) => {
+  const modules = await getCardModules(profileId, true, trx);
+  await modules.map((module, index) =>
+    trx
+      .update(CardModuleTable)
+      .set({ position: index })
+      .where(eq(CardModuleTable.id, module.id)),
+  );
+};
