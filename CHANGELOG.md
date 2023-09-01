@@ -1,4 +1,4 @@
-## 0.2.0-canary.39
+## 0.2.0-canary.40
 
 * **fix:**  - **WebCardEdition:** refactor color picker ([#937](https://github.com/AzzappApp/azzapp/pull/937))
 * **feat:**  - 🎸 add video player on post + auto play on feed ([#929](https://github.com/AzzappApp/azzapp/pull/929))
