@@ -1,5 +1,7 @@
-## 0.2.0-canary.37
+## 0.2.0-canary.38
 
+* **feat:**  - 🎸 add video player on post + auto play on feed ([#929](https://github.com/AzzappApp/azzapp/pull/929))
+* **fix:**  - **Web:** image with text ([#944](https://github.com/AzzappApp/azzapp/pull/944))
 * **fix:**  - **mobile:** BlockText background resize ([#936](https://github.com/AzzappApp/azzapp/pull/936))
 * **fix:**  - react native bug on textinput with maxlenght and multiline ([#926](https://github.com/AzzappApp/azzapp/pull/926))
 * **fix:**  - **WebCardEdition:** Prevent on press to be triggered during gesture ([#928](https://github.com/AzzappApp/azzapp/pull/928))
