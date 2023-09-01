@@ -20,7 +20,7 @@ import ColorChooser from '#ui/ColorPicker/ColorChooser';
 import ColorTriptychChooser from './ColorTriptychChooser';
 import type { WebCardColorPicker_profile$key } from '@azzapp/relay/artifacts/WebCardColorPicker_profile.graphql';
 import type { WebCardColorPickerMutation } from '@azzapp/relay/artifacts/WebCardColorPickerMutation.graphql';
-import type { Disposable } from 'react-relay';
+import type { StoreUpdater, OptimisticUpdateFunction } from 'relay-runtime';
 
 export type ColorPickerProps = {
   /*
@@ -72,12 +72,6 @@ const WebCardColorPicker = ({
       saveCardColors(input: $input) {
         profile {
           id
-          cardColors {
-            primary
-            light
-            dark
-            otherColors
-          }
         }
       }
     }
@@ -91,7 +85,7 @@ const WebCardColorPicker = ({
   >(null);
 
   const environment = useRelayEnvironment();
-  const optimisticUpdate = useRef<Disposable | null>(null);
+  const optimisticUpdate = useRef<OptimisticUpdateFunction | null>(null);
 
   const onSave = () => {
     if (saving) {
@@ -107,21 +101,13 @@ const WebCardColorPicker = ({
       variables: {
         input,
       },
-      optimisticResponse: {
-        saveCardColors: {
-          profile: {
-            id: profile.id,
-            cardColors: colorPalette,
-          },
-        },
-      },
+      updater: cardColorsStoreUpdater(profile.id, colorPalette),
       onCompleted: (_, error) => {
         if (error) {
           //TODO: handle error
           console.log(error);
           return;
         }
-        optimisticUpdate.current?.dispose();
         setCurrentPalette(pick(input, ['primary', 'light', 'dark']));
         onRequestClose();
       },
@@ -133,23 +119,15 @@ const WebCardColorPicker = ({
   };
 
   const onUpdateColorPalette = (newPalette: ColorPalette) => {
-    optimisticUpdate.current = environment.applyUpdate({
-      storeUpdater: store => {
-        const profileRecord = store.get(profile.id);
-        if (!profileRecord) {
-          return;
-        }
-        let colors = profileRecord.getLinkedRecord('cardColors');
-
-        if (!colors) {
-          colors = store.create(`${profile.id}:cardColors`, 'CardColors');
-          profileRecord.setLinkedRecord(colors, 'cardColors');
-        }
-        colors.setValue(newPalette.primary, 'primary');
-        colors.setValue(newPalette.light, 'light');
-        colors.setValue(newPalette.dark, 'dark');
-      },
-    });
+    const update = {
+      storeUpdater: cardColorsStoreUpdater(profile.id, newPalette),
+    };
+    if (optimisticUpdate.current) {
+      environment.replaceUpdate(optimisticUpdate.current, update);
+    } else {
+      environment.applyUpdate(update);
+    }
+    optimisticUpdate.current = update;
   };
 
   const intl = useIntl();
@@ -179,8 +157,14 @@ const WebCardColorPicker = ({
   };
 
   const onCancelInner = () => {
+    console.log('onCancelInner');
+    console.log(editedColor);
+    console.log(optimisticUpdate);
     if (!editedColor) {
-      optimisticUpdate.current?.dispose();
+      if (optimisticUpdate.current) {
+        environment.revertUpdate(optimisticUpdate.current);
+        optimisticUpdate.current = null;
+      }
       onRequestClose();
     } else {
       onUpdateColorPalette({
@@ -290,3 +274,21 @@ const WebCardColorPicker = ({
 };
 
 export default WebCardColorPicker;
+
+const cardColorsStoreUpdater =
+  (profileId: string, newPalette: ColorPalette): StoreUpdater =>
+  store => {
+    const profileRecord = store.get(profileId);
+    if (!profileRecord) {
+      return;
+    }
+    let colors = profileRecord.getLinkedRecord('cardColors');
+
+    if (!colors) {
+      colors = store.create(`${profileId}:cardColors`, 'CardColors');
+      profileRecord.setLinkedRecord(colors, 'cardColors');
+    }
+    colors.setValue(newPalette.primary, 'primary');
+    colors.setValue(newPalette.light, 'light');
+    colors.setValue(newPalette.dark, 'dark');
+  };
