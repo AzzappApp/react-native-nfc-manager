@@ -418,8 +418,6 @@ PODS:
     - React
     - React-callinvoker
     - React-Core
-  - react-native-view-shot (3.7.0):
-    - React-Core
   - React-perflogger (0.71.13)
   - React-RCTActionSheet (0.71.13):
     - React-Core/RCTActionSheetHeaders (= 0.71.13)
@@ -647,7 +645,6 @@ DEPENDENCIES:
   - react-native-quick-base64 (from `../../../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
-  - react-native-view-shot (from `../../../node_modules/react-native-view-shot`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -797,8 +794,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-skia:
     :path: "../../../node_modules/@shopify/react-native-skia"
-  react-native-view-shot:
-    :path: "../../../node_modules/react-native-view-shot"
   React-perflogger:
     :path: "../../../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -918,7 +913,6 @@ SPEC CHECKSUMS:
   react-native-quick-base64: a5dbe4528f1453e662fcf7351029500b8b63e7bb
   react-native-safe-area-context: 9697629f7b2cda43cf52169bb7e0767d330648c2
   react-native-skia: e385b516950c050926c1c8d5a2d5a9377842983f
-  react-native-view-shot: f5507655f122e6b104888a11130f267a427f0d57
   React-perflogger: 431a655960a02f01257d631b2a9bfbb02fd21064
   React-RCTActionSheet: 38c8d496d0faa63013d16f709e10a3acf6b5f100
   React-RCTAnimation: 6da4d599f3262ed8021433ddd96de45ac9e731b1
