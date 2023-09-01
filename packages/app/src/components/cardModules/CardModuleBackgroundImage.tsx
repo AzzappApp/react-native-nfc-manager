@@ -1,19 +1,19 @@
 import { useMemo, useState } from 'react';
-import {
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
-  View,
-  type LayoutChangeEvent,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Defs, Pattern, Rect, Svg, SvgUri } from 'react-native-svg';
+import type {
+  ColorValue,
+  ViewStyle,
+  StyleProp,
+  LayoutChangeEvent,
+} from 'react-native';
 import type { PatternProps, UriProps } from 'react-native-svg';
 
 type CardModuleBackgroundImageProps = {
   layout: { width?: number; height?: number } | null;
   resizeMode: string | null | undefined;
   backgroundUri: string | null | undefined;
-  patternColor: string | null | undefined;
+  patternColor: ColorValue | string | null | undefined;
   backgroundOpacity: number;
 };
 

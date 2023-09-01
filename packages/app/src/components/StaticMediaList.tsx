@@ -4,13 +4,13 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { SvgUri } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
 import PressableNative from '#ui/PressableNative';
+import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
 import type {
   StaticMediaList_staticMedias$data,
   StaticMediaList_staticMedias$key,
@@ -21,6 +21,7 @@ import type {
   ColorValue,
   ListRenderItemInfo,
 } from 'react-native';
+
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type StaticMediaListProps = ViewProps & {
@@ -76,6 +77,7 @@ const StaticMediaList = ({
         id
         # we use arbitrary values here, but it should be good enough
         smallURI: uri(width: 125, pixelRatio: 2)
+        resizeMode
       }
     `,
     mediasKey,
@@ -92,7 +94,8 @@ const StaticMediaList = ({
           <StaticMediaListItemMemo
             item={item}
             imageRatio={imageRatio}
-            isSelected={selectedMedia === item?.id}
+            isSelected={selectedMedia === item.id}
+            resizeMode={item.resizeMode}
             backgroundColor={backgroundColor}
             onSelectMedia={onSelectMedia}
             svgMode={svgMode}
@@ -159,7 +162,13 @@ type StaticMediaListItemProps = {
   backgroundColor: ColorValue;
   onSelectMedia: (id: string) => void;
   svgMode: boolean;
-  tintColor: ColorValue;
+  tintColor: ColorValue | string;
+  /**
+   *
+   *
+   * @type {('center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null)}
+   */
+  resizeMode: string | null;
 };
 
 const StaticMediaListItem = ({
@@ -170,6 +179,7 @@ const StaticMediaListItem = ({
   tintColor,
   onSelectMedia,
   svgMode,
+  resizeMode,
 }: StaticMediaListItemProps) => {
   const timing = useAnimatedState(isSelected, { duration: 120 });
 
@@ -182,39 +192,46 @@ const StaticMediaListItem = ({
   }, [imageRatio, timing]);
   const styles = useStyleSheet(styleSheet);
 
-  const [borderRadius, setBorderRadius] = useState(0);
-  const onLayout = (event: LayoutChangeEvent) => {
-    setBorderRadius(event.nativeEvent.layout.width * COVER_CARD_RADIUS);
-  };
-
   const onPress = useCallback(() => {
     onSelectMedia(item.id);
   }, [item.id, onSelectMedia]);
 
+  const [layout, setLayout] = useState({ width: 0, height: 0 });
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    setLayout(event.nativeEvent.layout);
+  };
+
   return (
-    <Animated.View style={itemAnimatedStyle}>
+    <Animated.View style={[itemAnimatedStyle]} onLayout={onLayout}>
       <PressableNative
-        style={[styles.button, { borderRadius, backgroundColor }]}
+        style={[
+          styles.button,
+          {
+            borderRadius: layout.width * COVER_CARD_RADIUS,
+            backgroundColor,
+          },
+        ]}
         onPress={onPress}
         accessibilityRole="button"
       >
         {item?.smallURI ? (
           <View
-            style={{
-              borderRadius,
-              overflow: 'hidden',
-              aspectRatio: imageRatio,
-            }}
+            style={[
+              {
+                borderRadius: layout.width * COVER_CARD_RADIUS,
+                overflow: 'hidden',
+                aspectRatio: imageRatio,
+              },
+            ]}
           >
             {svgMode ? (
-              <SvgUri
-                uri={item.smallURI}
-                color={tintColor}
-                width="100%"
-                height="100%"
-                preserveAspectRatio="xMidYMid slice"
-                style={[styles.image, { backgroundColor }]}
-                onLayout={onLayout}
+              <CardModuleBackgroundImage
+                layout={layout}
+                resizeMode={resizeMode}
+                backgroundUri={item.smallURI}
+                patternColor={tintColor}
+                backgroundOpacity={1}
               />
             ) : (
               <Image
@@ -227,7 +244,6 @@ const StaticMediaListItem = ({
                     aspectRatio: imageRatio,
                   },
                 ]}
-                onLayout={onLayout}
               />
             )}
           </View>
@@ -236,7 +252,11 @@ const StaticMediaListItem = ({
             style={[
               styles.image,
               styles.nullImage,
-              { borderRadius, backgroundColor, aspectRatio: imageRatio },
+              {
+                borderRadius: layout.width * COVER_CARD_RADIUS,
+                backgroundColor,
+                aspectRatio: imageRatio,
+              },
             ]}
           />
         )}

@@ -12,7 +12,7 @@ const EmptyButton = (
 ) => {
   const { className, ...others } = props;
 
-  const classnames = cn(className, styles.empty);
+  const classnames = cn(className, styles.empty, styles.none);
 
   return <button ref={ref} {...others} className={classnames} />;
 };

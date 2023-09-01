@@ -127,8 +127,8 @@ const BlockTextRenderer = ({
       <View
         style={[
           {
-            marginVertical: 2 * marginVertical,
-            marginHorizontal: 2 * marginHorizontal,
+            marginVertical,
+            marginHorizontal,
           },
           contentStyle,
         ]}
@@ -148,8 +148,8 @@ const BlockTextRenderer = ({
         >
           <Text
             style={{
-              paddingHorizontal: 2 * textMarginHorizontal,
-              paddingVertical: 2 * textMarginVertical,
+              paddingHorizontal: textMarginHorizontal,
+              paddingVertical: textMarginVertical,
               textAlign: textAlignmentOrDefault(textAlign),
               color: swapColor(fontColor, colorPalette) as ColorValue,
               fontSize,

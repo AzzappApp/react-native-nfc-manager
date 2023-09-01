@@ -50,6 +50,10 @@ const large = style({
   padding: '20px 24px 21px 24px',
 });
 
+const none = style({
+  padding: '0px 0px 0px 0px',
+});
+
 const styles = {
   empty,
   button,
@@ -58,6 +62,7 @@ const styles = {
   small,
   medium,
   large,
+  none,
 };
 
 export default styles;

@@ -7,7 +7,7 @@ import type { MouseEventHandler } from 'react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   type?: 'primary' | 'secondary';
-  size?: 'large' | 'medium' | 'small';
+  size?: 'large' | 'medium' | 'none' | 'small';
   disabled?: boolean;
   loading?: boolean;
 };
@@ -29,6 +29,7 @@ const Button = (props: ButtonProps) => {
     [styles.small]: size === 'small',
     [styles.medium]: size === 'medium',
     [styles.large]: size === 'large',
+    [styles.none]: size === 'none',
   });
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
