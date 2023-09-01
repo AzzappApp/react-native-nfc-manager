@@ -17,16 +17,18 @@ import type { ListRenderItemInfo } from 'react-native';
 export type ColorTriptychChooserProps = {
   size: number;
   colorPalette: ColorPalette;
-  previousColorPalette: ColorPalette;
+  currentPalette: ColorPalette;
+  saving: boolean;
   onUpdateColorPalette: (colorPalette: ColorPalette) => void;
-  onSelectColorPaletteType: (state: 'dark' | 'light' | 'primary') => void;
+  onEditColor: (state: 'dark' | 'light' | 'primary') => void;
 };
 
 const ColorTriptychChooser = ({
   size,
   colorPalette,
-  previousColorPalette,
-  onSelectColorPaletteType,
+  currentPalette,
+  saving,
+  onEditColor,
   onUpdateColorPalette,
 }: ColorTriptychChooserProps) => {
   const { viewer } = useLazyLoadQuery<ColorTriptychChooserQuery>(
@@ -52,16 +54,16 @@ const ColorTriptychChooser = ({
   const styles = useStyleSheet(stylesheet);
 
   const onPressprimary = useCallback(() => {
-    onSelectColorPaletteType('primary');
-  }, [onSelectColorPaletteType]);
+    onEditColor('primary');
+  }, [onEditColor]);
 
   const onPressdark = useCallback(() => {
-    onSelectColorPaletteType('dark');
-  }, [onSelectColorPaletteType]);
+    onEditColor('dark');
+  }, [onEditColor]);
 
   const onPresslight = useCallback(() => {
-    onSelectColorPaletteType('light');
-  }, [onSelectColorPaletteType]);
+    onEditColor('light');
+  }, [onEditColor]);
 
   const onSelectTriptychColor = useCallback(
     (colorPalette: ColorPaletteItem) => {
@@ -74,10 +76,14 @@ const ColorTriptychChooser = ({
   const renderTryptich = useCallback(
     ({ item }: ListRenderItemInfo<ColorPaletteItem>) => {
       return (
-        <TriptychItem item={item} onSelectTripTych={onSelectTriptychColor} />
+        <TriptychItem
+          item={item}
+          onSelectTripTych={onSelectTriptychColor}
+          disabled={saving}
+        />
       );
     },
-    [onSelectTriptychColor],
+    [onSelectTriptychColor, saving],
   );
 
   const colorPalettesList: ColorPaletteItem[] = useMemo(() => {
@@ -87,8 +93,8 @@ const ColorTriptychChooser = ({
   }, [viewer.colorPalettes.edges]);
 
   const onRestorePreviousTriptych = useCallback(() => {
-    onUpdateColorPalette(previousColorPalette);
-  }, [onUpdateColorPalette, previousColorPalette]);
+    onUpdateColorPalette(currentPalette);
+  }, [onUpdateColorPalette, currentPalette]);
 
   return (
     <View>
@@ -160,6 +166,8 @@ const ColorTriptychChooser = ({
               left: (size - size / RATIO_PRESS) / 2,
             }}
             testID={'primary-color-button'}
+            disabled={saving}
+            disabledOpacity={1}
           />
           <PressableSlice
             onPress={onPressdark}
@@ -170,6 +178,8 @@ const ColorTriptychChooser = ({
               left: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
             testID={'dark-color-button'}
+            disabled={saving}
+            disabledOpacity={1}
           />
           <PressableSlice
             onPress={onPresslight}
@@ -180,6 +190,8 @@ const ColorTriptychChooser = ({
               right: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
             testID={'light-color-button'}
+            disabled={saving}
+            disabledOpacity={1}
           />
         </View>
       </View>
@@ -210,11 +222,7 @@ const ColorTriptychChooser = ({
             style={[styles.colorPaletteContainer]}
             onPress={onRestorePreviousTriptych}
           >
-            <ColorTriptychRenderer
-              width={20}
-              height={20}
-              {...previousColorPalette}
-            />
+            <ColorTriptychRenderer width={20} height={20} {...currentPalette} />
           </PressableOpacity>
           <View
             style={{
@@ -301,9 +309,11 @@ const PressableSlice = memo(PressableSliceComponent);
 const TriptychItemComponent = ({
   item,
   onSelectTripTych,
+  disabled,
 }: {
   item: ColorPaletteItem;
   onSelectTripTych: (colorPalette: ColorPaletteItem) => void;
+  disabled?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -323,6 +333,8 @@ const TriptychItemComponent = ({
       <PressableOpacity
         style={[styles.colorPaletteContainer]}
         onPress={onPress}
+        disabled={disabled}
+        disabledOpacity={1}
       >
         <ColorTriptychRenderer width={20} height={20} {...item} />
       </PressableOpacity>

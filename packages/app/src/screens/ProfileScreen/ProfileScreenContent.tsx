@@ -9,8 +9,8 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackground';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import Button from '#ui/Button';
-import WebcardColorPicker from '#ui/ColorPicker/WebcardColorPicker';
 import Text from '#ui/Text';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
@@ -88,6 +88,7 @@ const ProfileScreenContent = ({
         ...CoverRenderer_profile
         ...ProfileScreenBody_profile
         ...ProfileColorPicker_profile
+        ...WebCardColorPicker_profile
         ...WebCardBackground_profile
         cardCover {
           backgroundColor
@@ -390,7 +391,7 @@ const ProfileScreenContent = ({
               onClose={() => setLoadTemplate(false)}
               visible={loadTemplate}
             />
-            <WebcardColorPicker
+            <WebCardColorPicker
               profile={profile}
               visible={showWebcardColorPicker}
               onRequestClose={onClosWebcardeColorPicker}

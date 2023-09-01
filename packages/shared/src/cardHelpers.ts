@@ -31,15 +31,7 @@ export const DEFAULT_COLOR_PALETTE = {
 /**
  * A default list of colors that will be assigned to user `otherColors`
  */
-export const DEFAULT_COLOR_LIST = [
-  '#FFFFFF',
-  '#000000',
-  '#68C4C9',
-  '#EBCC60',
-  '#F3A1B0',
-  '#B0C0F8',
-  '#C8F491',
-];
+export const DEFAULT_COLOR_LIST = ['#FFFFFF', '#000000'];
 
 /**
  * Swap a color name with its value in a color palette if the value is a color name
