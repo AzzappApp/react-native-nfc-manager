@@ -1,5 +1,7 @@
-## 0.2.0-canary.35
+## 0.2.0-canary.36
 
+* **fix:**  - react native bug on textinput with maxlenght and multiline ([#926](https://github.com/AzzappApp/azzapp/pull/926))
+* **fix:**  - **WebCardEdition:** Prevent on press to be triggered during gesture ([#928](https://github.com/AzzappApp/azzapp/pull/928))
 * **fix:**  - reactivate module actions
 * **fix:**  - pagination with randomSeed as cursor and hasNexPage indicator ([#920](https://github.com/AzzappApp/azzapp/pull/920))
 * **fix:**  - 🐛 update webcard on cover change ([#922](https://github.com/AzzappApp/azzapp/pull/922))
