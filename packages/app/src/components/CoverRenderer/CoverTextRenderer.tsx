@@ -1,6 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Text, View } from 'react-native';
-import { captureRef } from 'react-native-view-shot';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -16,10 +14,9 @@ import type {
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
-import type { ForwardedRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 
-export type CoverTextPreviewProps = Omit<ViewProps, 'children'> & {
+export type CoverTextRendererProps = Omit<ViewProps, 'children'> & {
   /**
    * The title of the cover
    */
@@ -58,25 +55,18 @@ export type CoverTextPreviewProps = Omit<ViewProps, 'children'> & {
   };
 };
 
-export type CoverTextPreviewHandle = {
-  capture: () => Promise<string | null>;
-};
-
-const CoverTextPreview = (
-  {
-    title,
-    titleStyle,
-    subTitle,
-    subTitleStyle,
-    textOrientation,
-    textPosition,
-    height,
-    style,
-    colorPalette,
-    ...props
-  }: CoverTextPreviewProps,
-  forwardedRef: ForwardedRef<CoverTextPreviewHandle>,
-) => {
+const CoverTextRenderer = ({
+  title,
+  titleStyle,
+  subTitle,
+  subTitleStyle,
+  textOrientation,
+  textPosition,
+  height,
+  style,
+  colorPalette,
+  ...props
+}: CoverTextRendererProps) => {
   const width = height * COVER_RATIO;
   const scale = width / COVER_BASE_WIDTH;
 
@@ -147,6 +137,9 @@ const CoverTextPreview = (
         : 'right';
   }
 
+  const topPadding = width * 0.3;
+  const padding = width * 0.05;
+
   const titleOverlayStyles: ViewStyle | null = {
     position: 'absolute',
     width: orientation === 'horizontal' ? width : height,
@@ -169,10 +162,10 @@ const CoverTextPreview = (
             },
           ]
         : [],
-    padding: '5%',
-    paddingTop: orientation === 'horizontal' ? '15%' : '5%',
-    paddingLeft: orientation === 'topToBottom' ? '15%' : '5%',
-    paddingRight: orientation === 'bottomToTop' ? '15%' : '5%',
+    paddingBottom: padding,
+    paddingTop: orientation === 'horizontal' ? topPadding : padding,
+    paddingLeft: orientation === 'topToBottom' ? topPadding : padding,
+    paddingRight: orientation === 'bottomToTop' ? topPadding : padding,
     justifyContent: overlayJustifyContent,
   };
 
@@ -196,26 +189,8 @@ const CoverTextPreview = (
     textAlign,
   } as const;
 
-  const textOverlayRef = useRef<View | null>(null);
-
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      async capture() {
-        if (textOverlayRef.current == null) {
-          return null;
-        }
-        return captureRef(textOverlayRef.current, {
-          format: 'png',
-          quality: 1,
-        });
-      },
-    }),
-    [],
-  );
-
   return (
-    <View ref={textOverlayRef} style={[style, { height, width }]} {...props}>
+    <View style={[style, { height, width }]} {...props}>
       <View style={titleOverlayStyles}>
         <Text allowFontScaling={false} style={titleTextStyle}>
           {title ?? ''}
@@ -230,4 +205,4 @@ const CoverTextPreview = (
   );
 };
 
-export default forwardRef(CoverTextPreview);
+export default CoverTextRenderer;

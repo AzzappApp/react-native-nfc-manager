@@ -31,13 +31,6 @@ export const CardCover: CardCoverResolvers = {
       : null,
   mediaFilter: profile => profile.coverData?.mediaFilter ?? null,
   mediaParameters: profile => profile.coverData?.mediaParameters ?? null,
-  textPreviewMedia: profile =>
-    profile.coverData?.textPreviewMediaId
-      ? {
-          media: profile.coverData?.textPreviewMediaId,
-          assetKind: 'cover',
-        }
-      : null,
   background: async profile =>
     profile.coverData?.backgroundId
       ? {

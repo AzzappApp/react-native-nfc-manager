@@ -1,14 +1,17 @@
 import { forwardRef, memo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { swapColor } from '@azzapp/shared/cardHelpers';
+import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
+  textOrientationOrDefaut,
+  textPositionOrDefaut,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
+import CoverTextRenderer from './CoverTextRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -101,11 +104,6 @@ const CoverRenderer = (
                 )
               }
             }
-            textPreviewMedia {
-              id
-              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            }
             foreground {
               id
               largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
@@ -120,7 +118,19 @@ const CoverRenderer = (
             backgroundColor
             backgroundPatternColor
             title
+            titleStyle {
+              color
+              fontFamily
+              fontSize
+            }
             subTitle
+            subTitleStyle {
+              color
+              fontFamily
+              fontSize
+            }
+            textOrientation
+            textPosition
           }
         }
       `,
@@ -133,7 +143,6 @@ const CoverRenderer = (
   // before calling the onReadyForDisplay callback, however, we need to
   // redispatch it when the cover changes
   const readyStates = useRef({
-    text: false,
     media: false,
     foreground: false,
     background: false,
@@ -141,7 +150,6 @@ const CoverRenderer = (
 
   const sources = useRef({
     media: cardCover?.media?.id,
-    text: cardCover?.textPreviewMedia?.id,
     foreground: cardCover?.foreground?.id,
     background: cardCover?.background?.id,
   });
@@ -149,11 +157,6 @@ const CoverRenderer = (
   if (sources.current.media !== cardCover?.media?.id) {
     readyStates.current.media = false;
     sources.current.media = cardCover?.media?.id;
-  }
-
-  if (sources.current.text !== cardCover?.textPreviewMedia?.id) {
-    readyStates.current.text = false;
-    sources.current.text = cardCover?.textPreviewMedia?.id;
   }
   if (!sources.current.background) {
     readyStates.current.background = true;
@@ -171,43 +174,20 @@ const CoverRenderer = (
 
   const onMediaReadyForDisplay = () => {
     readyStates.current.media = true;
-    if (
-      readyStates.current.text &&
-      readyStates.current.foreground &&
-      readyStates.current.background
-    ) {
-      onReadyForDisplay?.();
-    }
-  };
-
-  const onTextReadyForDisplay = () => {
-    readyStates.current.text = true;
-    if (
-      readyStates.current.media &&
-      readyStates.current.foreground &&
-      readyStates.current.background
-    ) {
+    if (readyStates.current.foreground && readyStates.current.background) {
       onReadyForDisplay?.();
     }
   };
 
   const onForegroundReadyForDisplay = () => {
     readyStates.current.foreground = true;
-    if (
-      readyStates.current.media &&
-      readyStates.current.text &&
-      readyStates.current.background
-    ) {
+    if (readyStates.current.media && readyStates.current.background) {
       onReadyForDisplay?.();
     }
   };
   const onBackgroundReadyForDisplay = () => {
     readyStates.current.background = true;
-    if (
-      readyStates.current.media &&
-      readyStates.current.text &&
-      readyStates.current.foreground
-    ) {
+    if (readyStates.current.media && readyStates.current.foreground) {
       onReadyForDisplay?.();
     }
   };
@@ -218,9 +198,12 @@ const CoverRenderer = (
 
   const {
     media,
-    textPreviewMedia,
     title,
+    titleStyle,
     subTitle,
+    subTitleStyle,
+    textOrientation,
+    textPosition,
     foreground,
     foregroundColor,
     background,
@@ -303,23 +286,16 @@ const CoverRenderer = (
               style={styles.layer}
             />
           )}
-          {textPreviewMedia && (
-            <MediaImageRenderer
-              testID="CoverRenderer_text"
-              source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? textPreviewMedia.smallURI
-                    : textPreviewMedia.largeURI,
-                mediaId: textPreviewMedia.id,
-                requestedSize: width,
-              }}
-              aspectRatio={COVER_RATIO}
-              alt={`${title} - ${subTitle}`}
-              onReadyForDisplay={onTextReadyForDisplay}
-              style={styles.layer}
-            />
-          )}
+          <CoverTextRenderer
+            title={title}
+            subTitle={subTitle}
+            textOrientation={textOrientationOrDefaut(textOrientation)}
+            textPosition={textPositionOrDefaut(textPosition)}
+            titleStyle={titleStyle}
+            subTitleStyle={subTitleStyle}
+            colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
+            height={width / COVER_RATIO}
+          />
         </>
       ) : (
         <View style={styles.coverPlaceHolder} />

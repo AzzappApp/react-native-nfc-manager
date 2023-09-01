@@ -51,10 +51,6 @@ input SaveCoverInput {
   """
   mediaParameters: JSON
   """
-  The text of the cover renderered as an image to avoid font loading issues
-  """
-  textPreviewMediaId: ID
-  """
   The background image of the card cover
   """
   backgroundId: ID

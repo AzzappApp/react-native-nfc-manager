@@ -37,10 +37,6 @@ jest.mock('react-native-encrypted-storage');
 // React Encrypted Storage Mock
 jest.mock('react-native-vision-camera');
 
-// React Native View Shot Mock
-jest.mock('react-native-view-shot');
-//#endregion
-
 //#region AZP Modules Mock
 jest.mock('#helpers/mediaHelpers/NativeMediaHelpers');
 

@@ -72,7 +72,6 @@ export const ProfileTable = mysqlTable(
       mediaFilter?: string | null;
       mediaParameters?: Record<string, any> | null;
       mediaId?: string | null;
-      textPreviewMediaId?: string | null;
       merged: boolean;
       segmented: boolean;
     }>(),

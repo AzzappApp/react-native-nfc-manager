@@ -1,4 +1,4 @@
-import { isEqual, mapValues, omit, pick } from 'lodash';
+import { isEqual, mapValues, pick } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Modal, unstable_batchedUpdates } from 'react-native';
@@ -450,9 +450,6 @@ const useCoverEditionManager = ({
             media {
               id
             }
-            textPreviewMedia {
-              id
-            }
           }
         }
       }
@@ -481,7 +478,6 @@ const useCoverEditionManager = ({
 
     let saveCoverInput: SaveCoverInput;
     let mediaPath: string | null = null;
-    let textMediaPath: string | null = null;
     try {
       saveCoverInput = {
         backgroundId: coverStyle.background?.id ?? null,
@@ -543,19 +539,6 @@ const useCoverEditionManager = ({
           })
         : null;
 
-      const shouldRecreateTextMedia =
-        !cardCover ||
-        title !== cardCover?.title ||
-        subTitle !== cardCover?.subTitle ||
-        !isEqual(
-          omit(currentCoverStyle, ...mediaStyle),
-          omit(coverStyle, ...mediaStyle),
-        );
-
-      textMediaPath = shouldRecreateTextMedia
-        ? await coverPreviewRef.current.exportTextMedia()
-        : null;
-
       const mediaToUploads: Array<{
         uri: string;
         kind: 'image' | 'video';
@@ -565,18 +548,17 @@ const useCoverEditionManager = ({
           ? { uri: maskMedia.uri, kind: 'image' }
           : null,
         mediaPath ? { uri: mediaPath, kind: sourceMedia.kind } : null,
-        textMediaPath ? { uri: textMediaPath, kind: 'image' } : null,
       ];
 
       if (Object.values(mediaToUploads).some(media => !!media)) {
         const uploadInfos = await Promise.all(
-          mediaToUploads.map(async (media, index) =>
+          mediaToUploads.map(async media =>
             media
               ? {
                   media,
                   ...(await uploadSign({
                     kind: media.kind,
-                    target: index > 1 ? 'cover' : 'coverSource',
+                    target: media.uri === mediaPath ? 'cover' : 'coverSource',
                   })),
                 }
               : null,
@@ -614,15 +596,14 @@ const useCoverEditionManager = ({
           ),
         );
 
-        const [sourceMediaId, maskMediaId, mediaId, textPreviewMediaId] =
-          await Promise.all(
-            uploads.map(
-              upload =>
-                upload?.promise.then(({ public_id, resource_type }) => {
-                  return encodeMediaId(public_id, resource_type);
-                }),
-            ),
-          );
+        const [sourceMediaId, maskMediaId, mediaId] = await Promise.all(
+          uploads.map(
+            upload =>
+              upload?.promise.then(({ public_id, resource_type }) => {
+                return encodeMediaId(public_id, resource_type);
+              }),
+          ),
+        );
 
         if (sourceMediaId) {
           saveCoverInput.sourceMediaId = sourceMediaId;
@@ -632,9 +613,6 @@ const useCoverEditionManager = ({
         }
         if (mediaId) {
           saveCoverInput.mediaId = mediaId;
-        }
-        if (textPreviewMediaId) {
-          saveCoverInput.textPreviewMediaId = textPreviewMediaId;
         }
       }
     } catch (error) {
@@ -671,17 +649,6 @@ const useCoverEditionManager = ({
               mediaId,
               sourceMedia.kind,
               `file://${mediaPath}`,
-            );
-          }
-        }
-        if (textMediaPath) {
-          const mediaId =
-            response.saveCover.profile.cardCover?.textPreviewMedia?.id;
-          if (mediaId) {
-            addLocalCachedMediaFile(
-              mediaId,
-              'image',
-              `file://${textMediaPath}`,
             );
           }
         }

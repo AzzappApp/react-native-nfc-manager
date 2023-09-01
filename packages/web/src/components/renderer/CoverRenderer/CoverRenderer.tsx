@@ -6,6 +6,7 @@ import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CoverRenderer.css';
 import CoverRendererBackground from './CoverRendererBackground';
+import CoverTextRenderer from './CoverTextRenderer';
 import type { Media, Profile } from '@azzapp/data/domains';
 
 type CoverRendererProps = Omit<
@@ -25,7 +26,6 @@ const CoverRenderer = async ({
   if (!coverData) {
     return null;
   }
-  const { textPreviewMediaId } = coverData;
   // TODO render foreground
   return (
     <div {...props} style={{ position: 'relative', ...style }}>
@@ -92,19 +92,15 @@ const CoverRenderer = async ({
             className={styles.layerMedia}
           />
         )}
-        {textPreviewMediaId && (
-          <h1 className={styles.coverMedia}>
-            <CloudinaryImage
-              mediaId={textPreviewMediaId}
-              assetKind="cover"
-              alt={`${coverTitle} - ${coverSubTitle}`}
-              className={styles.coverMedia}
-              sizes="100vw"
-              fill
-              priority
-            />
-          </h1>
-        )}
+        <CoverTextRenderer
+          title={coverTitle}
+          titleStyle={coverData.titleStyle}
+          subTitle={coverSubTitle}
+          subTitleStyle={coverData.subTitleStyle}
+          colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
+          textOrientation={coverData.textOrientation}
+          textPosition={coverData.textPosition}
+        />
       </div>
     </div>
   );

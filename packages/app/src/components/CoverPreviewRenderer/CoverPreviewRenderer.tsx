@@ -8,6 +8,7 @@ import {
   COVER_VIDEO_BITRATE,
 } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
+import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -15,17 +16,13 @@ import Button from '#ui/Button';
 import Delay from '#ui/Delay';
 import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
-import CoverTextPreview from './CoverTextPreview';
+import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
 import type { GPUImageViewHandle, GPUVideoViewHandle } from '#components/gpu';
 import type { ExportImageOptions } from '#components/gpu/GPUNativeMethods';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
-import type {
-  CoverTextPreviewProps,
-  CoverTextPreviewHandle,
-} from './CoverTextPreview';
 import type { ForwardedRef } from 'react';
 
-type CoverPreviewRendererProps = CoverTextPreviewProps &
+type CoverPreviewRendererProps = CoverTextRendererProps &
   Omit<
     CoverMediaPreviewProps,
     'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
@@ -73,7 +70,6 @@ type CoverPreviewRendererProps = CoverTextPreviewProps &
   };
 
 export type CoverPreviewHandler = {
-  exportTextMedia: () => Promise<string | null>;
   exportMedia: (size: {
     width: number;
     height: number;
@@ -127,17 +123,10 @@ const CoverPreviewRenderer = (
   const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const mediaRef = useRef<GPUImageViewHandle | GPUVideoViewHandle | null>(null);
-  const textOverlayRef = useRef<CoverTextPreviewHandle | null>(null);
 
   useImperativeHandle(
     forwardedRef,
     () => ({
-      async exportTextMedia() {
-        if (textOverlayRef.current == null) {
-          return null;
-        }
-        return textOverlayRef.current.capture();
-      },
       async exportMedia(size) {
         if (mediaRef.current == null) {
           return null;
@@ -295,14 +284,13 @@ const CoverPreviewRenderer = (
                 alt={'Cover edition foreground'}
               />
             )}
-            <CoverTextPreview
+            <CoverTextRenderer
               title={title}
               subTitle={subTitle}
               titleStyle={titleStyle}
               subTitleStyle={subTitleStyle}
               textOrientation={textOrientation}
               textPosition={textPosition}
-              ref={textOverlayRef}
               pointerEvents="none"
               style={styles.titleOverlayContainer}
               colorPalette={colorPalette}

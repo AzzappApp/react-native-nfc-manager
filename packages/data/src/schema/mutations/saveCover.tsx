@@ -41,11 +41,6 @@ const saveCover: MutationResolvers['saveCover'] = async (
     newMedias.push(input.mediaId);
   }
 
-  if (input.textPreviewMediaId) {
-    oldMedias.push(profile.coverData?.textPreviewMediaId ?? null);
-    newMedias.push(input.textPreviewMediaId);
-  }
-
   if (input.sourceMediaId) {
     oldMedias.push(profile.coverData?.sourceMediaId ?? null);
     newMedias.push(input.sourceMediaId);
@@ -86,11 +81,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
           ...profile.coverData,
           ...coverData,
         };
-        if (
-          !coverDataUpdated.sourceMediaId ||
-          !coverDataUpdated.textPreviewMediaId ||
-          !coverDataUpdated.mediaId
-        ) {
+        if (!coverDataUpdated.sourceMediaId || !coverDataUpdated.mediaId) {
           throw new Error(ERRORS.INVALID_REQUEST);
         }
         updates.coverData = {
@@ -105,7 +96,6 @@ const saveCover: MutationResolvers['saveCover'] = async (
           textPosition:
             coverDataUpdated.textPosition ?? DEFAULT_COVER_DATA.textPosition,
           sourceMediaId: coverDataUpdated.sourceMediaId,
-          textPreviewMediaId: coverDataUpdated.textPreviewMediaId,
           merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
         };
@@ -135,14 +125,12 @@ const creationValidator = z.object({
   title: z.string().min(1).max(191),
   mediaId: z.string(),
   sourceMediaId: z.string(),
-  textPreviewMediaId: z.string(),
 });
 
 const updateValidator = z.object({
   title: z.string().min(1).max(191).optional(),
   mediaId: z.string().optional(),
   sourceMediaId: z.string().optional(),
-  textPreviewMediaId: z.string().optional(),
 });
 
 const DEFAULT_COVER_DATA = {
