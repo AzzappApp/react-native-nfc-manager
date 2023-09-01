@@ -203,6 +203,7 @@ const ProfileBlockContainer = ({
     },
   );
 
+  const panGestureActive = useSharedValue(false);
   const dragXStartValue = useSharedValue(0);
   const panGesture = useMemo(
     () =>
@@ -210,6 +211,7 @@ const ProfileBlockContainer = ({
         .activeOffsetX([-10, 10])
         .onStart(() => {
           dragXStartValue.value = dragX.value;
+          panGestureActive.value = true;
         })
         .enabled(editing && displayEditionButtons && !selectionMode)
         .onChange(e => {
@@ -219,6 +221,7 @@ const ProfileBlockContainer = ({
           );
         })
         .onEnd(() => {
+          panGestureActive.value = false;
           if (dragX.value > dragRightLimit / 2) {
             dragX.value = withTiming(dragRightLimit, {
               duration: 120,
@@ -240,9 +243,16 @@ const ProfileBlockContainer = ({
       dragX,
       dragXStartValue,
       editing,
+      panGestureActive,
       selectionMode,
     ],
   );
+
+  const onModulePressInner = useCallback(() => {
+    if (!panGestureActive.value && activeSection === 'none' && !selectionMode) {
+      onModulePress();
+    }
+  }, [activeSection, onModulePress, panGestureActive, selectionMode]);
 
   // gap doesn't work on reanimated 2
   const blockStyle = useAnimatedStyle(() => ({
@@ -314,7 +324,7 @@ const ProfileBlockContainer = ({
           {/** this View is only here because ios bug with shadow and overlow hidden */}
           <Animated.View style={moduleInnerContainerStyle}>
             <PressableNative
-              onPress={editing ? onModulePress : undefined}
+              onPress={editing ? onModulePressInner : undefined}
               disabledOpacity={1}
               accessible={editing}
               disabled={!editing || activeSection !== 'none'}
