@@ -37,6 +37,7 @@ const BlockTextRendererFragment = graphql`
     textBackground {
       id
       uri
+      resizeMode
     }
     textBackgroundStyle {
       backgroundColor
@@ -134,7 +135,6 @@ const BlockTextRenderer = ({
         ]}
       >
         <CardModuleBackground
-          {...props}
           backgroundUri={textBackground?.uri}
           backgroundOpacity={textBackgroundStyle?.opacity}
           backgroundColor={swapColor(
@@ -145,6 +145,7 @@ const BlockTextRenderer = ({
             textBackgroundStyle?.patternColor,
             colorPalette,
           )}
+          resizeMode={textBackground?.resizeMode}
         >
           <Text
             style={{
