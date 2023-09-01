@@ -1,5 +1,6 @@
-## 0.2.0-canary.36
+## 0.2.0-canary.37
 
+* **fix:**  - **mobile:** BlockText background resize ([#936](https://github.com/AzzappApp/azzapp/pull/936))
 * **fix:**  - react native bug on textinput with maxlenght and multiline ([#926](https://github.com/AzzappApp/azzapp/pull/926))
 * **fix:**  - **WebCardEdition:** Prevent on press to be triggered during gesture ([#928](https://github.com/AzzappApp/azzapp/pull/928))
 * **fix:**  - reactivate module actions
