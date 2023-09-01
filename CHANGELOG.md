@@ -1,5 +1,6 @@
-## 0.2.0-canary.40
+## 0.2.0-canary.41
 
+* **fix:**  - **Cover:** Remove Text preview media and render text manually ([#942](https://github.com/AzzappApp/azzapp/pull/942))
 * **fix:**  - **WebCardEdition:** refactor color picker ([#937](https://github.com/AzzappApp/azzapp/pull/937))
 * **feat:**  - 🎸 add video player on post + auto play on feed ([#929](https://github.com/AzzappApp/azzapp/pull/929))
 * **fix:**  - **Web:** image with text ([#944](https://github.com/AzzappApp/azzapp/pull/944))
