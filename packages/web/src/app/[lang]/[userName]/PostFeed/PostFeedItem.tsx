@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRef, forwardRef } from 'react';
 import { getElapsedTime } from '@azzapp/shared/timeHelpers';
 import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
@@ -8,22 +8,29 @@ import ShareModal from '#components/ShareModal';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import styles from './PostFeedItem.css';
+import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
 import type { ModalActions } from '#ui/Modal';
 import type {
   Media,
   PostWithCommentAndAuthor,
   Profile,
 } from '@azzapp/data/domains';
+import type { ForwardedRef } from 'react';
 
 type PostFeedItemProps = {
   post: PostWithCommentAndAuthor;
   media: Media;
   profile: Profile;
   onDownload: () => void;
+  onPlay: () => void;
+  onMuteChanged: (muted: boolean) => void;
 };
 
-const PostFeedItem = (props: PostFeedItemProps) => {
-  const { post, media, profile, onDownload } = props;
+const PostFeedItem = (
+  props: PostFeedItemProps,
+  ref: ForwardedRef<CloudinaryVideoPlayerActions>,
+) => {
+  const { post, media, profile, onDownload, onPlay, onMuteChanged } = props;
   const share = useRef<ModalActions>(null);
 
   const elapsedTime = getElapsedTime(new Date(post.createdAt).getTime());
@@ -60,6 +67,7 @@ const PostFeedItem = (props: PostFeedItemProps) => {
             {postMedia.kind === 'video' ? (
               <>
                 <CloudinaryVideoPlayer
+                  ref={ref}
                   assetKind="post"
                   media={postMedia}
                   alt="cover"
@@ -68,6 +76,9 @@ const PostFeedItem = (props: PostFeedItemProps) => {
                     objectFit: 'cover',
                     width: '100%',
                   }}
+                  onPlay={onPlay}
+                  onMuteChanged={onMuteChanged}
+                  autoPlay={false}
                 />
               </>
             ) : (
@@ -124,4 +135,4 @@ const PostFeedItem = (props: PostFeedItemProps) => {
   );
 };
 
-export default PostFeedItem;
+export default forwardRef(PostFeedItem);

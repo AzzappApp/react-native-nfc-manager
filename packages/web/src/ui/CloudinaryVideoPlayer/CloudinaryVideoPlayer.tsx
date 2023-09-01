@@ -1,21 +1,37 @@
 'use client';
-import { useCallback, useRef, useState } from 'react';
+import {
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+  forwardRef,
+} from 'react';
 import { PlayIcon, SoundOffIcon, SoundOnIcon } from '#assets';
 import ButtonIcon from '../ButtonIcon';
 import CloudinaryVideo from '../CloudinaryVideo';
 import styles from './CloudinaryVideoPlayer.css';
 import type { CloudinaryVideoProps } from '../CloudinaryVideo';
+import type { ForwardedRef } from 'react';
 
-const CloudinaryVideoPlayer = (props: CloudinaryVideoProps) => {
+type CloudinaryVideoPlayerProps = CloudinaryVideoProps & {
+  onMuteChanged?: (muted: boolean) => void;
+};
+
+const CloudinaryVideoPlayer = (
+  props: CloudinaryVideoPlayerProps,
+  ref: ForwardedRef<CloudinaryVideoPlayerActions>,
+) => {
+  const { autoPlay = true, onMuteChanged, ...others } = props;
   const video = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
-  const [playing, setPlaying] = useState(VIDEO_AUTOPLAY);
+  const [playing, setPlaying] = useState(autoPlay);
 
   const toggleMuted = useCallback(() => {
     setMuted(prevMuted => {
+      onMuteChanged?.(!prevMuted);
       return !prevMuted;
     });
-  }, []);
+  }, [onMuteChanged]);
 
   const togglePlaying = useCallback(() => {
     setPlaying(prevPlaying => {
@@ -26,15 +42,38 @@ const CloudinaryVideoPlayer = (props: CloudinaryVideoProps) => {
     });
   }, []);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => {
+        video.current?.play();
+        setPlaying(true);
+      },
+      pause: () => {
+        video.current?.pause();
+        setPlaying(false);
+      },
+      mute: (propagate?: boolean) => {
+        setMuted(true);
+        if (propagate) onMuteChanged?.(true);
+      },
+      unmute: (propagate?: boolean) => {
+        setMuted(false);
+        if (propagate) onMuteChanged?.(false);
+      },
+    }),
+    [onMuteChanged],
+  );
+
   return (
     <div style={{ position: 'relative' }}>
       <CloudinaryVideo
         ref={video}
-        {...props}
+        {...others}
         loop={true}
         onClick={togglePlaying}
         muted={muted}
-        autoPlay={VIDEO_AUTOPLAY}
+        autoPlay={autoPlay}
       />
       <ButtonIcon
         Icon={muted ? SoundOffIcon : SoundOnIcon}
@@ -56,6 +95,11 @@ const CloudinaryVideoPlayer = (props: CloudinaryVideoProps) => {
   );
 };
 
-export default CloudinaryVideoPlayer;
+export default forwardRef(CloudinaryVideoPlayer);
 
-const VIDEO_AUTOPLAY = true;
+export type CloudinaryVideoPlayerActions = {
+  play: () => void;
+  pause: () => void;
+  mute: (propagate: boolean) => void;
+  unmute: (propagate: boolean) => void;
+};

@@ -8,6 +8,7 @@ import {
   getProfilesPostsWithMedias,
 } from '@azzapp/data/domains';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import PostFeedHeader from '../PostFeed/PostFeedHeader';
 import CommentFeed from './CommentFeed';
 import CommentFeedSeeMore from './CommentFeedSeeMore';
@@ -72,15 +73,30 @@ const PostPage = async (props: PostPageProps) => {
               className={styles.postMedia}
               style={{ aspectRatio: `${postMedia.width / postMedia.height}` }}
             >
-              <CloudinaryImage
-                mediaId={postMedia.id}
-                assetKind="post"
-                alt="post"
-                fill
-                style={{
-                  objectFit: 'contain',
-                }}
-              />
+              {postMedia.kind === 'video' ? (
+                <>
+                  <CloudinaryVideoPlayer
+                    assetKind="post"
+                    media={postMedia}
+                    alt="post"
+                    fluid
+                    style={{
+                      objectFit: 'contain',
+                      width: '100%',
+                    }}
+                  />
+                </>
+              ) : (
+                <CloudinaryImage
+                  mediaId={postMedia.id}
+                  assetKind="post"
+                  alt="post"
+                  fill
+                  style={{
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
             </div>
           </div>
           <CommentFeed

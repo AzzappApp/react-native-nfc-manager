@@ -1,5 +1,5 @@
 'use client';
-import { useState, useTransition, useRef, useEffect } from 'react';
+import { useState, useTransition, useRef, useEffect, useCallback } from 'react';
 import { generateShareProfileLink } from '#helpers';
 import { ProfileActions } from '#app/actions';
 import DownloadAppModal from '#components/DownloadAppModal';
@@ -8,6 +8,7 @@ import useScrollEnd from '#hooks/useScrollEnd';
 import styles from './PostFeed.css';
 import PostFeedHeader from './PostFeedHeader';
 import PostFeedItem from './PostFeedItem';
+import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
 import type { ModalActions } from '#ui/Modal';
 import type {
   Profile,
@@ -30,6 +31,20 @@ const PostFeed = (props: PostFeedProps) => {
   const download = useRef<ModalActions>(null);
   const [posts, setPosts] = useState(defaultPosts);
   const [isPending, startTransition] = useTransition();
+
+  const videos = useRef<Array<CloudinaryVideoPlayerActions | null>>([]);
+
+  useEffect(() => {
+    videos.current = videos.current.slice(0, posts.length);
+  }, [posts]);
+
+  useEffect(() => {
+    const firstVideoIndex = defaultPosts.findIndex(post =>
+      post.medias.find(media => media.kind === 'video'),
+    );
+
+    if (firstVideoIndex >= 0) videos.current?.[firstVideoIndex]?.play();
+  }, [defaultPosts]);
 
   const ref = useScrollEnd<HTMLDivElement>(() => {
     startTransition(async () => {
@@ -56,6 +71,19 @@ const PostFeed = (props: PostFeedProps) => {
     });
   }, [profile.id]);
 
+  const onVideoPlay = useCallback((playedVideoIndex: number) => {
+    videos.current.forEach((video, i) => {
+      if (i !== playedVideoIndex) video?.pause();
+    });
+  }, []);
+
+  const onMuteChanged = useCallback((muted: boolean) => {
+    videos.current.forEach(video => {
+      if (muted) video?.mute(false);
+      else video?.unmute(false);
+    });
+  }, []);
+
   return (
     <>
       <div className={styles.wrapper} ref={ref}>
@@ -67,11 +95,16 @@ const PostFeed = (props: PostFeedProps) => {
         />
         {posts.map((post, i) => (
           <PostFeedItem
+            ref={e => {
+              videos.current[i] = e;
+            }}
             key={`${post.id}-${i}`}
             media={media}
             profile={profile}
             post={post}
             onDownload={() => download.current?.open()}
+            onPlay={() => onVideoPlay(i)}
+            onMuteChanged={muted => onMuteChanged(muted)}
           />
         ))}
       </div>
@@ -84,6 +117,6 @@ const PostFeed = (props: PostFeedProps) => {
   );
 };
 
-const COUNT_POSTS_TO_FETCH = 5;
+const COUNT_POSTS_TO_FETCH = 2;
 
 export default PostFeed;

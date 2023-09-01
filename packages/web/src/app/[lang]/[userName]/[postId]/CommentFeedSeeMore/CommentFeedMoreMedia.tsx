@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CommentFeedSeeMore.css';
 import type { PostWithMedias, Profile } from '@azzapp/data/domains';
 
@@ -21,15 +22,31 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
         aspectRatio: `${media.width / media.height}`,
       }}
     >
-      <CloudinaryImage
-        mediaId={media.id}
-        assetKind="cover"
-        alt="cover"
-        fill
-        style={{
-          objectFit: 'cover',
-        }}
-      />
+      {media.kind === 'video' ? (
+        <>
+          <CloudinaryVideo
+            assetKind="cover"
+            media={media}
+            alt="cover"
+            fluid
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+            }}
+            autoPlay={false}
+          />
+        </>
+      ) : (
+        <CloudinaryImage
+          mediaId={media.id}
+          assetKind="cover"
+          alt="cover"
+          fill
+          style={{
+            objectFit: 'cover',
+          }}
+        />
+      )}
     </Link>
   );
 };
