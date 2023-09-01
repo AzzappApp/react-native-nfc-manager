@@ -60,11 +60,37 @@ const sectionImage = style({
       flexDirection: 'row',
       width: '50%',
       justifyContent: 'flex-start',
+      selectors: {
+        [`${wrapperArrangmentLeft} &`]: {
+          justifyContent: 'flex-end',
+        },
+        [`${wrapperArrangmentRight} &`]: {
+          justifyContent: 'flex-start',
+        },
+      },
     },
     [MediaQuery.BelowSmallMobile]: {
       maxWidth: '100%',
     },
   },
+});
+
+const sectionImageInner = style({
+  '@media': {
+    [MediaQuery.AtLeastSmallMobile]: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+    },
+    [MediaQuery.BelowSmallMobile]: {
+      maxWidth: '100%!important',
+    },
+  },
+});
+
+const image = style({
+  height: 'auto!important',
+  position: 'initial!important' as 'initial',
 });
 
 const sectionText = style({
@@ -98,7 +124,9 @@ const styles = {
   wrapperArrangmentRight,
   text,
   sectionImage,
+  sectionImageInner,
   sectionText,
+  image,
 };
 
 export default styles;

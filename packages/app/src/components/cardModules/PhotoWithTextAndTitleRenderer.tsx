@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Image, Platform, StyleSheet, Text, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { Image, Platform, Text, View } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -8,7 +7,7 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
   PhotoWithTextAndTitleRenderer_module$key,
@@ -176,31 +175,18 @@ const PhotoWithTextAndTitleRenderer = ({
       : 'column-reverse';
 
   return (
-    <View
+    <CardModuleBackground
       {...props}
-      style={[
-        style,
-        {
-          backgroundColor:
-            swapColor(backgroundStyle?.backgroundColor, colorPalette) ??
-            colors.white,
-        },
-      ]}
+      backgroundUri={background?.uri}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
+      style={style}
       onLayout={onLayout}
     >
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={
-              swapColor(backgroundStyle?.patternColor, colorPalette) ?? '#000'
-            }
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-          />
-        </View>
-      )}
       <View
         style={{
           marginVertical,
@@ -279,19 +265,8 @@ const PhotoWithTextAndTitleRenderer = ({
           )}
         </View>
       </View>
-    </View>
+    </CardModuleBackground>
   );
 };
 
 export default PhotoWithTextAndTitleRenderer;
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});

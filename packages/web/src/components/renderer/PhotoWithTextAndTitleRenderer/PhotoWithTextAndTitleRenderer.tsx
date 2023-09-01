@@ -93,23 +93,24 @@ const PhotoWithTextAndTitleRenderer = ({
             <div
               style={{
                 position: 'relative',
-                aspectRatio: `${aspectRatio}`,
                 maxWidth: isImageFull ? '100%' : `calc(400px - ${gap / 2}px)`,
                 width: '100%',
                 marginTop: isImageFull ? 0 : marginVertical,
                 marginBottom: isImageFull ? 0 : marginVertical,
               }}
+              className={styles.sectionImageInner}
             >
               <CloudinaryImage
                 mediaId={image}
                 assetKind="module"
                 fill
                 alt="TODO"
-                style={Object.assign({
+                style={{
                   objectFit: 'cover',
                   aspectRatio: `${aspectRatio}`,
                   borderRadius,
-                })}
+                }}
+                className={styles.image}
               />
             </div>
           </div>
@@ -122,6 +123,7 @@ const PhotoWithTextAndTitleRenderer = ({
               paddingLeft: marginHorizontal,
               paddingRight: marginHorizontal,
               maxWidth: `calc(400px - ${gap / 2}px)`,
+              width: '100%',
               marginTop: marginVertical,
               marginBottom: marginVertical,
             }}
