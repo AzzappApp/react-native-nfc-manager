@@ -112,9 +112,9 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - hermes-engine (0.71.5):
-    - hermes-engine/Pre-built (= 0.71.5)
-  - hermes-engine/Pre-built (0.71.5)
+  - hermes-engine (0.71.13):
+    - hermes-engine/Pre-built (= 0.71.13)
+  - hermes-engine/Pre-built (0.71.13)
   - libaom (3.0.0):
     - libvmaf (>= 2.2.0)
   - libavif (0.11.1):
@@ -879,7 +879,7 @@ SPEC CHECKSUMS:
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  hermes-engine: 0784cadad14b011580615c496f77e0ae112eed75
+  hermes-engine: 8b9dc37355d2e12879267382f4256afd356349a1
   libaom: 144606b1da4b5915a1054383c3a4459ccdb3c661
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
@@ -950,4 +950,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a9222a840143d4be8c0337cf757173eadf90dc25
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.11.3
