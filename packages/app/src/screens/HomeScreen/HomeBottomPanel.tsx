@@ -104,7 +104,6 @@ const HomeBottomPanel = ({
                 <HomeContactCard
                   user={user}
                   height={2 * containerHeight}
-                  animated={selectedPanel === 'CONTACT_CARD'}
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
                   }

@@ -1,7 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useRef } from 'react';
+import { memo } from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
 import ContactCard from '#components/ContactCard';
@@ -13,20 +12,17 @@ import type {
   HomeContactCard_user$data,
 } from '@azzapp/relay/artifacts/HomeContactCard_user.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeContacCardProps = {
   user: HomeContactCard_user$key;
   height: number;
-  animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
 };
 
 const HomeContactCard = ({
   user,
   height,
-  animated,
   currentProfileIndexSharedValue,
 }: HomeContacCardProps) => {
   const { profiles } = useFragment(
@@ -41,59 +37,29 @@ const HomeContactCard = ({
     `,
     user,
   );
-  const { width } = useWindowDimensions();
-
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ProfileType>) => {
-      return (
-        //receive warning during test for not optimzed content and large list issue.(create a PureComponent)
-        // after test, the js thread was less imapacted, almost max all the time at 60 fps
-        <MemoContactCardItem width={width} height={height} item={item} />
-      );
-    },
-    [height, width],
-  );
-  const ref = useRef<FlashList<ProfileType>>(null);
-
-  const scrollToOffset = useCallback(
-    (index: number) => {
-      ref.current?.scrollToOffset({
-        offset: index * width,
-        animated: false,
-      });
-    },
-    [width],
-  );
-
-  useAnimatedReaction(
-    () => currentProfileIndexSharedValue.value,
-    current => {
-      if (current >= 0 && animated) {
-        runOnJS(scrollToOffset)(current);
-      } else if (current >= 0 && !animated && Math.trunc(current) === current) {
-        runOnJS(scrollToOffset)(Math.trunc(current));
-      }
-    },
-    [animated],
-  );
+  const { width: windowWidth } = useWindowDimensions();
 
   return (
-    <FlashList<ProfileType>
-      ref={ref}
-      horizontal
-      data={profiles}
-      estimatedItemSize={width}
-      renderItem={renderItem}
-      scrollEnabled={false}
-      keyExtractor={keyExtractor}
-      //perf improvement settings(to refine is necessary)
-      estimatedListSize={{ height, width }}
-      disableHorizontalListHeightMeasurement
-    />
+    <View
+      style={{
+        width: windowWidth,
+        height,
+        overflow: 'visible',
+      }}
+    >
+      {profiles?.map((item, index) => (
+        <MemoContactCardItem
+          key={item.id}
+          width={windowWidth}
+          height={height}
+          item={item}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          index={index}
+        />
+      ))}
+    </View>
   );
 };
-
-const keyExtractor = (item: ProfileType) => item.id;
 
 export default memo(HomeContactCard);
 
@@ -103,23 +69,49 @@ type ContactCardItemProps = {
   width: number;
   height: number;
   item: ProfileType;
+  index: number;
+  currentProfileIndexSharedValue: SharedValue<number>;
 };
-const ContactCardItem = ({ width, height, item }: ContactCardItemProps) => {
+
+const ContactCardItem = ({
+  width,
+  height,
+  item,
+  index,
+  currentProfileIndexSharedValue,
+}: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
+  const positionStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: (index - currentProfileIndexSharedValue.value) * width },
+    ],
+  }));
   return (
-    <Link route="CONTACT_CARD">
-      <PressableNative style={[{ width, height }, styles.itemContainer]}>
-        <View style={styles.card}>
-          <ContactCard profile={item} height={height - 4} />
-        </View>
-      </PressableNative>
-    </Link>
+    <Animated.View
+      style={[
+        {
+          width,
+          height,
+        },
+        styles.itemContainer,
+        positionStyle,
+      ]}
+    >
+      <Link route="CONTACT_CARD">
+        <PressableNative style={{ flex: 1 }}>
+          <ContactCard profile={item} height={height - 4} style={styles.card} />
+        </PressableNative>
+      </Link>
+    </Animated.View>
   );
 };
 const MemoContactCardItem = memo(ContactCardItem);
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     alignItems: 'center',
     justifyContent: 'center',
     paddingLeft: 20,
