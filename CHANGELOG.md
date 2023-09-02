@@ -1,5 +1,6 @@
-## 0.2.0-canary.43
+## 0.2.0-canary.44
 
+* **fix:**  - **Home:** improve contact card slider performance
 * **fix:**  - **CoverEdition:** Don't use cover cover preview for media export
 * **fix:**  - don't need to recreate media when colors change
 * **fix:**  - **Cover:** Remove Text preview media and render text manually ([#942](https://github.com/AzzappApp/azzapp/pull/942))
