@@ -1,5 +1,7 @@
-## 0.2.0-canary.42
+## 0.2.0-canary.43
 
+* **fix:**  - **CoverEdition:** Don't use cover cover preview for media export
+* **fix:**  - don't need to recreate media when colors change
 * **fix:**  - **Cover:** Remove Text preview media and render text manually ([#942](https://github.com/AzzappApp/azzapp/pull/942))
 * **fix:**  - **WebCardEdition:** refactor color picker ([#937](https://github.com/AzzappApp/azzapp/pull/937))
 * **feat:**  - 🎸 add video player on post + auto play on feed ([#929](https://github.com/AzzappApp/azzapp/pull/929))
