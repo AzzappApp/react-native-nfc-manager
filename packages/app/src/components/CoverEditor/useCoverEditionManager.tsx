@@ -28,6 +28,7 @@ import {
   exportImage,
   type EditionParameters,
   exportVideo,
+  extractLayoutParameters,
 } from '#components/gpu';
 import ImagePicker, {
   ImagePickerCardMediaWrapper,
@@ -215,12 +216,7 @@ const useCoverEditionManager = ({
       return initialData?.mediaCropParameter;
     }
     if (cardCover?.mediaParameters) {
-      return pick(
-        cardCover?.mediaParameters,
-        'cropData',
-        'orientation',
-        'roll',
-      );
+      return extractLayoutParameters(cardCover.mediaParameters)[0];
     }
     return null;
   });
@@ -393,12 +389,13 @@ const useCoverEditionManager = ({
             unstable_batchedUpdates(() => {
               setSourceMedia(media);
               setMediaCropParameter(
-                pick(editionParameters, 'cropData', 'orientation', 'roll'),
+                extractLayoutParameters(editionParameters)[0],
               );
               if (maskURI) {
                 setMaskMedia({ uri: maskURI, source: uri });
               }
               setMediaComputation(null);
+              setTimeRange(null);
             });
           },
           error => {
@@ -423,9 +420,7 @@ const useCoverEditionManager = ({
       const { uri, kind, width, height, editionParameters, timeRange } = result;
       setShowImagePicker(false);
       setSourceMedia({ uri, kind, width, height });
-      setMediaCropParameter(
-        pick(editionParameters, 'cropData', 'orientation', 'roll'),
-      );
+      setMediaCropParameter(extractLayoutParameters(editionParameters)[0]);
       setTimeRange(timeRange ?? null);
       startMediaComputation(result);
     });
@@ -478,7 +473,7 @@ const useCoverEditionManager = ({
     let saveCoverInput: SaveCoverInput;
     let mediaPath: string | null = null;
     const mediaParameters = {
-      ...coverStyle.mediaParameters,
+      ...extractLayoutParameters(coverStyle.mediaParameters)[1],
       ...mediaCropParameter,
     };
     try {

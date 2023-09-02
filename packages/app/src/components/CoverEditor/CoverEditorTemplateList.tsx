@@ -20,11 +20,14 @@ import {
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
+import {
+  extractLayoutParameters,
+  type EditionParameters,
+} from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import type { EditionParameters } from '#components/gpu';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
@@ -224,6 +227,9 @@ const CoverEditorTemplateList = ({
         mediaParameters as EditionParameters | null;
 
       const displayTemplateMedia = showTemplatesMedias || !media;
+      const templateStyleParameters = templateEditionParameters
+        ? extractLayoutParameters(templateEditionParameters)[1]
+        : null;
       return {
         id,
         title,
@@ -245,7 +251,7 @@ const CoverEditorTemplateList = ({
         mediaParameters: displayTemplateMedia
           ? (templateEditionParameters as EditionParameters | null) ?? {}
           : {
-              ...templateEditionParameters,
+              ...templateStyleParameters,
               ...mediaCropParameters,
             },
         maskUri: kind === 'people' && !showTemplatesMedias ? maskUri : null,
@@ -282,6 +288,9 @@ const CoverEditorTemplateList = ({
         colorPalettes,
       );
 
+      const coverStyleParameters = extractLayoutParameters(
+        currentCoverStyle.mediaParameters,
+      )[1];
       items.unshift({
         id: 'cover',
         title,
@@ -290,8 +299,8 @@ const CoverEditorTemplateList = ({
         maskUri,
         ...currentCoverStyle,
         mediaParameters: {
-          ...(currentCoverStyle.mediaParameters as EditionParameters),
-          ...(mediaCropParameters as EditionParameters),
+          ...coverStyleParameters,
+          ...mediaCropParameters,
         },
         colorPalettes: coverColorPalettes,
       });

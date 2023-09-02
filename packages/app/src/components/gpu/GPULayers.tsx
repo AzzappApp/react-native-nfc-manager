@@ -1,5 +1,6 @@
 import { Children, useMemo } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { typedEntries } from '@azzapp/shared/objectHelpers';
 
 /**
  * Crop informations for an image or video
@@ -152,4 +153,27 @@ export const getNextOrientation = (
     default:
       return 'RIGHT';
   }
+};
+
+const LAYOUT_PARAMETERS = ['cropData', 'orientation', 'roll', 'pitch', 'yaw'];
+
+export const extractLayoutParameters = (
+  parameters: EditionParameters | null | undefined,
+): [
+  layoutParameters: EditionParameters,
+  otherParameters: EditionParameters,
+] => {
+  const layoutParameters: EditionParameters = {};
+  const otherParameters: EditionParameters = {};
+  if (!parameters) {
+    return [layoutParameters, otherParameters];
+  }
+  typedEntries(parameters).forEach(([key, value]) => {
+    if (LAYOUT_PARAMETERS.includes(key)) {
+      layoutParameters[key] = value as any;
+    } else {
+      otherParameters[key] = value as any;
+    }
+  });
+  return [layoutParameters, otherParameters];
 };
