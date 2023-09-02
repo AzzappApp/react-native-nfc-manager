@@ -157,9 +157,6 @@ const WebCardColorPicker = ({
   };
 
   const onCancelInner = () => {
-    console.log('onCancelInner');
-    console.log(editedColor);
-    console.log(optimisticUpdate);
     if (!editedColor) {
       if (optimisticUpdate.current) {
         environment.revertUpdate(optimisticUpdate.current);

@@ -529,8 +529,7 @@ const useCoverEditionManager = ({
             },
             ...mediaStyle,
           ),
-        ) ||
-        paletteChanged;
+        );
 
       mediaPath = shouldRecreateMedia
         ? await coverPreviewRef.current.exportMedia({
