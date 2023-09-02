@@ -1,12 +1,8 @@
-import { useImperativeHandle, useRef, useState, forwardRef } from 'react';
+import { useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import {
-  COVER_CARD_RADIUS,
-  COVER_RATIO,
-  COVER_VIDEO_BITRATE,
-} from '@azzapp/shared/coverHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
 import { MediaImageRenderer } from '#components/medias';
@@ -18,9 +14,7 @@ import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
 import type { GPUImageViewHandle, GPUVideoViewHandle } from '#components/gpu';
-import type { ExportImageOptions } from '#components/gpu/GPUNativeMethods';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
-import type { ForwardedRef } from 'react';
 
 type CoverPreviewRendererProps = CoverTextRendererProps &
   Omit<
@@ -69,92 +63,50 @@ type CoverPreviewRendererProps = CoverTextRendererProps &
     height: number;
   };
 
-export type CoverPreviewHandler = {
-  exportMedia: (size: {
-    width: number;
-    height: number;
-  }) => Promise<string | null>;
-};
-
 /**
  * Render a cover in preview mode, which means that the cover will be rendered from the sourceMedia
  * and the different text styles that will be applied on it instead of the generated cover media
  * used in CoverEditionScreen and in CoverTemplateRenderer
  */
-const CoverPreviewRenderer = (
-  {
-    // media props
-    uri,
-    kind,
-    time,
-    startTime,
-    duration,
-    backgroundColor,
-    maskUri,
-    backgroundImageUri,
-    backgroundImageTintColor,
-    foregroundId,
-    foregroundImageUri,
-    foregroundImageTintColor,
-    backgroundMultiply,
-    editionParameters,
-    filter,
-    // text props
-    title,
-    titleStyle,
-    subTitle,
-    subTitleStyle,
-    textOrientation,
-    textPosition,
-    // other props
-    colorPalette,
-    computing,
-    height,
-    onReady,
-    onError,
-    style,
-    paused,
-    ...props
-  }: CoverPreviewRendererProps,
-  forwardedRef: ForwardedRef<CoverPreviewHandler>,
-) => {
+const CoverPreviewRenderer = ({
+  // media props
+  uri,
+  kind,
+  time,
+  startTime,
+  duration,
+  backgroundColor,
+  maskUri,
+  backgroundImageUri,
+  backgroundImageTintColor,
+  foregroundId,
+  foregroundImageUri,
+  foregroundImageTintColor,
+  backgroundMultiply,
+  editionParameters,
+  filter,
+  // text props
+  title,
+  titleStyle,
+  subTitle,
+  subTitleStyle,
+  textOrientation,
+  textPosition,
+  // other props
+  colorPalette,
+  computing,
+  height,
+  onReady,
+  onError,
+  style,
+  paused,
+  ...props
+}: CoverPreviewRendererProps) => {
   const borderRadius = height * COVER_RATIO * COVER_CARD_RADIUS;
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const mediaRef = useRef<GPUImageViewHandle | GPUVideoViewHandle | null>(null);
-
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      async exportMedia(size) {
-        if (mediaRef.current == null) {
-          return null;
-        }
-        if ('exportImage' in mediaRef.current) {
-          let exportOptions: ExportImageOptions = {
-            size,
-            format: 'auto',
-            quality: 95,
-          };
-          if (maskUri != null) {
-            exportOptions = {
-              size,
-              format: 'png',
-            };
-          }
-
-          return mediaRef.current.exportImage(exportOptions);
-        }
-        return mediaRef.current.exportVideo({
-          size,
-          removeSound: true,
-          bitRate: COVER_VIDEO_BITRATE,
-        });
-      },
-    }),
-    [maskUri],
-  );
 
   const intl = useIntl();
 
@@ -311,7 +263,7 @@ const CoverPreviewRenderer = (
   );
 };
 
-export default forwardRef(CoverPreviewRenderer);
+export default CoverPreviewRenderer;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {

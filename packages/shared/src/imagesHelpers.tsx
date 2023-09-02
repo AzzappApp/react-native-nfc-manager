@@ -11,7 +11,8 @@ const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`
  */
 export const getCloudinaryAssetURL = (id: string, kind: 'image' | 'video') => {
   assetNotRN('getCloudinaryAssetURL');
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}`;
+  const ext = kind === 'video' ? '.mp4' : '';
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}${ext}`;
 };
 
 /**

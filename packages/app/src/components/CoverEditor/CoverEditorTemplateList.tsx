@@ -24,7 +24,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import type { CoverPreviewHandler } from '#components/CoverPreviewRenderer';
 import type { EditionParameters } from '#components/gpu';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
@@ -43,7 +42,6 @@ import type {
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
-import type { Ref } from 'react';
 import type { ListRenderItemInfo, ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
@@ -64,7 +62,6 @@ export type CoverEditorProps = {
   timeRange: TimeRange | null;
   currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
-  coverPreviewRef: Ref<CoverPreviewHandler> | null;
   mediaComputing: boolean;
   showTemplatesMedias: boolean;
   initialSelectedIndex: number;
@@ -92,7 +89,6 @@ const CoverEditorTemplateList = ({
   height,
   currentCoverStyle,
   cardColors,
-  coverPreviewRef,
   mediaComputing,
   showTemplatesMedias,
   initialSelectedIndex,
@@ -464,7 +460,6 @@ const CoverEditorTemplateList = ({
           onPress={onPress}
         >
           <CoverPreviewRendererMemo
-            ref={isSelectedItem ? coverPreviewRef : null}
             uri={uri}
             kind={kind}
             maskUri={item.maskUri}
@@ -500,7 +495,6 @@ const CoverEditorTemplateList = ({
     [
       selectedItem,
       templateWidth,
-      coverPreviewRef,
       timeRange?.startTime,
       timeRange?.duration,
       colorPalettesIndexes,

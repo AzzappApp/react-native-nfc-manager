@@ -44,7 +44,7 @@ import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
-import type { CoverPreviewHandler } from '#components/CoverPreviewRenderer';
+import type { ExportImageOptions } from '#components/gpu/GPUNativeMethods';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
@@ -437,7 +437,6 @@ const useCoverEditionManager = ({
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
   const onSaveRetryCount = useRef(0);
-  const coverPreviewRef = useRef<CoverPreviewHandler>(null);
 
   const [commit] = useMutation<useCoverEditionManagerMutation>(graphql`
     mutation useCoverEditionManagerMutation($saveCoverInput: SaveCoverInput!) {
@@ -462,7 +461,7 @@ const useCoverEditionManager = ({
       return;
     }
     setSaving(true);
-    if (!coverStyle || !colorPalette || !coverPreviewRef.current) {
+    if (!coverStyle || !colorPalette) {
       // TODO invalid state, should not happens
       if (onSaveRetryCount.current >= 3) {
         // TODO
@@ -478,6 +477,10 @@ const useCoverEditionManager = ({
 
     let saveCoverInput: SaveCoverInput;
     let mediaPath: string | null = null;
+    const mediaParameters = {
+      ...coverStyle.mediaParameters,
+      ...mediaCropParameter,
+    };
     try {
       saveCoverInput = {
         backgroundId: coverStyle.background?.id ?? null,
@@ -486,10 +489,7 @@ const useCoverEditionManager = ({
         foregroundId: coverStyle.foreground?.id ?? null,
         foregroundColor: coverStyle.foregroundColor,
         mediaFilter: coverStyle.mediaFilter,
-        mediaParameters: {
-          ...coverStyle.mediaParameters,
-          ...mediaCropParameter,
-        },
+        mediaParameters,
         merged: coverStyle.merged,
         segmented: coverStyle.segmented,
         subTitle: subTitle ?? null,
@@ -499,12 +499,6 @@ const useCoverEditionManager = ({
         title,
         titleStyle: coverStyle.titleStyle,
       };
-
-      const colorsProps = ['dark', 'light', 'dark'] as const;
-      const paletteChanged = !isEqual(
-        pick(colorPalette, ...colorsProps),
-        pick(cardColors, ...colorsProps),
-      );
 
       const mediaStyle = [
         'mediaFilter',
@@ -519,24 +513,57 @@ const useCoverEditionManager = ({
         (coverStyle.segmented && maskMedia?.id != null) ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
-          pick(
-            {
-              ...coverStyle,
-              mediaParameters: {
-                ...coverStyle.mediaParameters,
-                ...mediaCropParameter,
-              },
-            },
-            ...mediaStyle,
-          ),
+          pick({ ...coverStyle, mediaParameters }, ...mediaStyle),
         );
 
-      mediaPath = shouldRecreateMedia
-        ? await coverPreviewRef.current.exportMedia({
-            width: COVER_MAX_WIDTH,
-            height: COVER_MAX_HEIGHT,
-          })
-        : null;
+      if (shouldRecreateMedia) {
+        const size = {
+          width: COVER_MAX_WIDTH,
+          height: COVER_MAX_HEIGHT,
+        };
+        const isSegmented = coverStyle.segmented && maskMedia != null;
+        const layerOptions = {
+          parameters: mediaParameters,
+          maskUri: isSegmented ? maskMedia?.uri ?? null : null,
+          filters: coverStyle.mediaFilter ? [coverStyle.mediaFilter] : null,
+        };
+        if (sourceMedia.kind === 'image') {
+          let exportOptions: ExportImageOptions = {
+            size,
+            format: 'auto',
+            quality: 95,
+          };
+          if (isSegmented) {
+            exportOptions = {
+              size,
+              format: 'png',
+            };
+          }
+          mediaPath = await exportImage({
+            ...exportOptions,
+            layers: [
+              {
+                kind: 'image',
+                uri: sourceMedia.uri,
+                ...layerOptions,
+              },
+            ],
+          });
+        } else {
+          mediaPath = await exportVideo({
+            size,
+            bitRate: COVER_VIDEO_BITRATE,
+            removeSound: true,
+            layers: [
+              {
+                kind: 'video',
+                uri: sourceMedia.uri,
+                ...layerOptions,
+              },
+            ],
+          });
+        }
+      }
 
       const mediaToUploads: Array<{
         uri: string;
@@ -672,7 +699,6 @@ const useCoverEditionManager = ({
     mediaCropParameter,
     subTitle,
     title,
-    cardColors,
     cardCover,
     maskMedia,
     currentCoverStyle,
@@ -789,9 +815,6 @@ const useCoverEditionManager = ({
 
     // react elements
     modals,
-
-    // refs
-    coverPreviewRef,
 
     //callbacks
     setTitle,

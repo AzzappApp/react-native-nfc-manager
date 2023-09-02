@@ -124,7 +124,6 @@ const CoverEditorCustom = ({
     // TODO handle
     // mediaComputationError
     modals,
-    coverPreviewRef,
     setTitle,
     setSubTitle,
     setCoverStyle,
@@ -378,7 +377,6 @@ const CoverEditorCustom = ({
             onPress={openImagePicker}
           >
             <CoverPreviewRenderer
-              ref={coverPreviewRef}
               kind={kind}
               uri={uri}
               maskUri={segmented ? maskMedia?.uri : null}

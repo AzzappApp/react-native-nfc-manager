@@ -95,7 +95,6 @@ const CoverEditor = (
     mediaComputing,
     // TODO handle
     // mediaComputationError
-    coverPreviewRef,
     setTitle,
     setSubTitle,
     setCoverStyle,
@@ -310,7 +309,6 @@ const CoverEditor = (
           >
             <CoverEditorTemplateList
               key={templateKind}
-              coverPreviewRef={coverPreviewRef}
               viewer={viewer}
               templateKind={templateKind}
               media={sourceMedia}
