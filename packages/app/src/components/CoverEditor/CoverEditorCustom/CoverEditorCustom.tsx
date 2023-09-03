@@ -314,6 +314,7 @@ const CoverEditorCustom = ({
   //#endregion
 
   const currentMedia = sourceMedia ?? previewMedia;
+  const isPreview = sourceMedia == null && previewMedia != null;
 
   const kind = currentMedia?.kind ?? 'image';
   const uri = currentMedia?.uri ?? null;
@@ -424,7 +425,7 @@ const CoverEditorCustom = ({
           )}
 
           <CECToolBar>
-            {clippingEnabled && (
+            {clippingEnabled && !isPreview && (
               <SwitchLabel
                 variant="small"
                 value={segmented ?? false}

@@ -245,9 +245,16 @@ const useCoverEditionManager = ({
     [cardCover],
   );
 
-  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(
-    initialData?.coverStyle ?? currentCoverStyle ?? DEFAULT_COVER_STYLE,
-  );
+  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(() => {
+    if (initialData?.coverStyle) {
+      const style = { ...initialData.coverStyle };
+      if (!sourceMedia && style.segmented) {
+        style.segmented = false;
+      }
+      return style;
+    }
+    return currentCoverStyle ?? DEFAULT_COVER_STYLE;
+  });
   // #endregion
 
   // #region Media kind
