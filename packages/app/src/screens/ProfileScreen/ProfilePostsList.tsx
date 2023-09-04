@@ -28,7 +28,10 @@ const ProfilePostsList = ({
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      edges={{ bottom: 'off', top: 'additive' }}
+    >
       <Header
         middleElement={
           isViewer

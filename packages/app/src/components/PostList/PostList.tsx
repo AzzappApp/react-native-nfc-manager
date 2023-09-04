@@ -11,7 +11,7 @@ import type {
 } from '@azzapp/relay/artifacts/PostList_posts.graphql';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { ViewProps, ViewToken } from 'react-native';
 
 type PostListProps = ViewProps & {
@@ -22,6 +22,7 @@ type PostListProps = ViewProps & {
   onRefresh?: () => void;
   refreshing?: boolean;
   loading?: boolean;
+  contentContainerStyle?: ContentStyle;
 };
 
 // TODO docs and tests once this component is production ready

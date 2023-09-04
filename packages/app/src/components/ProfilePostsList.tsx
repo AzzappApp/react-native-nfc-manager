@@ -76,8 +76,11 @@ const ProfilePostList = ({
       refreshing={refreshing}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
+      contentContainerStyle={{ paddingBottom: FOOTER_ICONS_HEIGHT }}
     />
   );
 };
 
 export default ProfilePostList;
+
+const FOOTER_ICONS_HEIGHT = 50;
