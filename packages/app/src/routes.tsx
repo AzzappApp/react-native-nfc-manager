@@ -40,7 +40,9 @@ export type ForgotPasswordConfirmationRoute = {
 
 export type NewProfileRoute = {
   route: 'NEW_PROFILE';
-  params?: never;
+  params?: {
+    profileId: string;
+  };
 };
 
 export type ProfileRoute = {

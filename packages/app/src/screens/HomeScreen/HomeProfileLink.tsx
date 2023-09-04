@@ -1,6 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
@@ -8,13 +9,16 @@ import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeProfileLink_user$key } from '@azzapp/relay/artifacts/HomeProfileLink_user.graphql';
+import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
   currentProfileIndex: number;
+  currentProfileIndexSharedValue: SharedValue<number>;
   user: HomeProfileLink_user$key;
 };
 const HomeProfileLink = ({
   currentProfileIndex,
+  currentProfileIndexSharedValue,
   user: userKey,
 }: HomeProfileLinkProps) => {
   const user = useFragment(
@@ -33,8 +37,12 @@ const HomeProfileLink = ({
   const userName = profiles[Math.max(currentProfileIndex, 0)]?.userName;
   const url = buildUserUrl(userName) ?? null;
 
+  const opacityStyle = useAnimatedStyle(() => ({
+    opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
+  }));
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, opacityStyle]}>
       <PressableOpacity
         accessibilityRole="button"
         onPress={() => Clipboard.setStringAsync(url)}
@@ -47,7 +55,7 @@ const HomeProfileLink = ({
           <View style={styles.emptyViewCenter} />
         </View>
       </PressableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 

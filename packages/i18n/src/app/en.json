@@ -195,10 +195,6 @@
     "defaultMessage": "Title",
     "description": "Title placeholder in PhotoWithTextAndTitle module"
   },
-  "3WSH+O": {
-    "defaultMessage": "OK",
-    "description": "Publish modal button label"
-  },
   "3cosT4": {
     "defaultMessage": "Cancel",
     "description": "Webcard ColorPicker component Cancel button label"
@@ -330,6 +326,10 @@
   "7HPaV3": {
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
+  },
+  "7ejsLd": {
+    "defaultMessage": "This WebCard{azzappAp} needs a cover",
+    "description": "Home Screen - Missing cover title"
   },
   "7kcyZE": {
     "defaultMessage": "Report this post",
@@ -527,6 +527,14 @@
     "defaultMessage": "Border color",
     "description": "Bordercolor color title in SimpleButton edition"
   },
+  "CfMaC7": {
+    "defaultMessage": "Create a new Webcard{azzappAp}",
+    "description": "Home Screen - Create a new WebCard"
+  },
+  "CgyU99": {
+    "defaultMessage": "Hide my content for the moment",
+    "description": "Publish modal publish later button label"
+  },
   "CmkC/M": {
     "defaultMessage": "Slide to change the border size",
     "description": "Hint of the border size slider in carousel edition"
@@ -626,6 +634,10 @@
   "EVxFpC": {
     "defaultMessage": "Slide to change the border Width",
     "description": "Hint of the border Width slider in SimpleButton edition"
+  },
+  "EgBk9b": {
+    "defaultMessage": "Ok, publish my WebCard!",
+    "description": "Publish modal publish button label"
   },
   "EkLdGU": {
     "defaultMessage": "Webcards",
@@ -979,6 +991,10 @@
     "defaultMessage": "Slide to change the Text size",
     "description": "Hint of the textSize slider in PhotoWithTextAndTitle edition"
   },
+  "LccwjY": {
+    "defaultMessage": "Create your WebCard cover",
+    "description": "Home Screen - Missing cover button"
+  },
   "Lls+Xd": {
     "defaultMessage": "Border color",
     "description": "Title of the border color section in carousel edition"
@@ -1022,6 +1038,10 @@
   "MYq2d8": {
     "defaultMessage": "Select an activity",
     "description": "ProfileForm - Activity BottomSheet - Title"
+  },
+  "Md9UnQ": {
+    "defaultMessage": "Introduce yourself in a new way by creating your own WebCard{azzappAp}.",
+    "description": "Home Screen - Create a new webcard description"
   },
   "MilZHQ": {
     "defaultMessage": "Edit the background",
@@ -1443,10 +1463,6 @@
     "defaultMessage": "Description",
     "description": "Post creation screen textarea modal title"
   },
-  "WzMUk2": {
-    "defaultMessage": "Your WebCard is now published",
-    "description": "Publish modal title"
-  },
   "X5oGqP": {
     "defaultMessage": "Font color",
     "description": "Title of the color picker modal in cover edition for font color"
@@ -1510,6 +1526,10 @@
   "YJRxy5": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
+  },
+  "YK3L08": {
+    "defaultMessage": "This WebCard{azzappAp} has not been published, nobody can see it for the moment.",
+    "description": "Home Screen - webcard not published text"
   },
   "YM0Ycc": {
     "defaultMessage": "Close",
@@ -1727,6 +1747,10 @@
     "defaultMessage": "Slide to change the Image/Text Gap",
     "description": "Hint of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
   },
+  "c8LxOJ": {
+    "defaultMessage": "Your WebCard{azzappA} url is:",
+    "description": "Publish modal url label"
+  },
   "cDfk8A": {
     "defaultMessage": "Tap to reset your password",
     "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
@@ -1786,10 +1810,6 @@
   "dOTFi5": {
     "defaultMessage": "Posts",
     "description": "HomeScreen - information panel - Post label"
-  },
-  "dTAhzw": {
-    "defaultMessage": "Lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
-    "description": "Home Screen - Create a new webcard description"
   },
   "dZ8sPj": {
     "defaultMessage": "Retry",
@@ -2091,6 +2111,14 @@
     "defaultMessage": "Edit",
     "description": "Edit modules button label in profile edition screen"
   },
+  "iix9+T": {
+    "defaultMessage": "Congratulations!",
+    "description": "Publish modal title"
+  },
+  "ijAAfc": {
+    "defaultMessage": "Publish this WebCard",
+    "description": "Home Screen - webcard not published button"
+  },
   "iuu5Vg": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in carousel edition"
@@ -2179,6 +2207,10 @@
     "defaultMessage": "First name",
     "description": "First name registered for the contact card"
   },
+  "ks86TC": {
+    "defaultMessage": "This WebCard{azzappAp} is not published",
+    "description": "Home Screen - webcard not published title"
+  },
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
@@ -2266,10 +2298,6 @@
   "m4sams": {
     "defaultMessage": "Dark",
     "description": "ColorTriptych choose - Dark color"
-  },
-  "m5uoQt": {
-    "defaultMessage": "Create a new Webcard",
-    "description": "Home Screen - Create a new WebCard"
   },
   "m6YUMx": {
     "defaultMessage": "Slide to change the Space left/right",
@@ -2755,6 +2783,10 @@
     "defaultMessage": "Delete",
     "description": "Delete email or phone number"
   },
+  "vQ8VeN": {
+    "defaultMessage": "This WebCard{azzappAp} has no cover and can’t be published.",
+    "description": "Home Screen - Missing cover text"
+  },
   "vpm4+X": {
     "defaultMessage": "Edit Settings",
     "description": "BlockText bottom menu label for Settings tab"
@@ -2810,6 +2842,10 @@
   "xFUH8n": {
     "defaultMessage": "Loading error",
     "description": "Screen alert message loading error title"
+  },
+  "xIye6S": {
+    "defaultMessage": "Your personal WebCard{azzappA}, visible both in app and online, is created.",
+    "description": "Publish modal subtitle"
   },
   "xJBeUF": {
     "defaultMessage": "Save",

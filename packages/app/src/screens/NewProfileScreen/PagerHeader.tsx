@@ -4,12 +4,14 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import type { Icons } from '#ui/Icon';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type PagerHeaderProps = Omit<ViewProps, 'children'> & {
   title: React.ReactNode;
   currentPage: number;
   nbPages: number;
+  backIcon?: Icons;
   onBack: () => void;
 };
 
@@ -19,6 +21,7 @@ const PagerHeader = ({
   nbPages,
   currentPage,
   style,
+  backIcon = 'arrow_left',
   ...props
 }: PagerHeaderProps) => {
   const styles = useStyleSheet(styleSheet);
@@ -27,7 +30,7 @@ const PagerHeader = ({
       <View style={styles.header}>
         <View style={styles.headerSegment}>
           <IconButton
-            icon={currentPage === 0 ? 'arrow_down' : 'arrow_left'}
+            icon={backIcon}
             onPress={onBack}
             iconSize={28}
             variant="icon"

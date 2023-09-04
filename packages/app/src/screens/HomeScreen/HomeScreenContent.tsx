@@ -6,12 +6,10 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
   useWorkletCallback,
-  useDerivedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useOnFocus, useScreenHasFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAnimatedState from '#hooks/useAnimatedState';
@@ -48,9 +46,7 @@ const HomeScreenContent = ({
         }
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
-        ...HomeContactCard_user
-        ...HomeInformations_user
-        ...HomeStatistics_user
+        ...HomeBottomPanel_user
         ...HomeBackground_user
         ...HomeHeader_user
       }
@@ -120,12 +116,6 @@ const HomeScreenContent = ({
     }
   });
 
-  const tabBarVisible = useDerivedValue(
-    () => 1 + Math.min(0, currentProfileIndexSharedValue.value),
-  );
-
-  useMainTabBarVisiblilityController(tabBarVisible);
-
   // Layout
   const { bottom } = useSafeAreaInsets();
 
@@ -178,6 +168,7 @@ const HomeScreenContent = ({
         />
         <HomeProfileLink
           user={user}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           currentProfileIndex={currentProfileIndex}
         />
         <View style={styles.bottomContainer} onLayout={onLayout}>
@@ -196,7 +187,7 @@ const HomeScreenContent = ({
               containerHeight={containerHeight}
               user={user}
               currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-              currentUserIndex={currentProfileIndex}
+              currentProfileIndex={currentProfileIndex}
             />
           )}
         </View>

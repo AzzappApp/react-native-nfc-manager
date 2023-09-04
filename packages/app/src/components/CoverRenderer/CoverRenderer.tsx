@@ -1,5 +1,5 @@
 import { forwardRef, memo, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -298,7 +298,16 @@ const CoverRenderer = (
           />
         </>
       ) : (
-        <View style={styles.coverPlaceHolder} />
+        <View style={styles.coverPlaceHolder}>
+          <Image
+            source={require('#assets/webcard/logo-substract-full.png')}
+            style={{
+              width: width / 2,
+              height: width / 2,
+            }}
+            resizeMode="contain"
+          />
+        </View>
       )}
     </View>
   );
@@ -319,14 +328,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   coverPlaceHolder: {
-    backgroundColor: colors.grey100,
+    backgroundColor: colors.black,
     aspectRatio: COVER_RATIO,
-  },
-  qrCode: {
-    position: 'absolute',
-    top: '10%',
-    left: '45%',
-    width: '10%',
-    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

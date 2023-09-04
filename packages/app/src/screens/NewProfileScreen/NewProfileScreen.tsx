@@ -1,15 +1,7 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { PixelRatio, useWindowDimensions } from 'react-native';
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Screen, ScreenContainer } from 'react-native-screens';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -19,18 +11,17 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
-import Container from '#ui/Container';
 import CardEditionStep from './CardEditionStep';
 import CoverEditionStep from './CoverEditionStep';
-import { TRANSITION_DURATION } from './newProfileScreenHelpers';
-import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
+import { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
+import WizzardTransitioner from './WizzardTransitioner';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
 import type { NewProfileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileScreenPreloadQuery.graphql';
 import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
-import type { ReactNode } from 'react';
+import type { NewProfileScreenWithProfileQuery } from '@azzapp/relay/artifacts/NewProfileScreenWithProfileQuery.graphql';
 
 const newProfileScreenQuery = graphql`
   query NewProfileScreenQuery {
@@ -43,81 +34,48 @@ const newProfileScreenQuery = graphql`
   }
 `;
 
-const STEPS = ['PROFIKE_KIND', 'PROFILE_FORM', 'COVER', 'CARD'] as const;
-
-type Step = (typeof STEPS)[number];
+const newProfileScreenQueryWithProfile = graphql`
+  query NewProfileScreenWithProfileQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        id
+        userName
+        profileCategory {
+          id
+        }
+      }
+    }
+    profileCategories {
+      id
+      profileKind
+      ...ProfileKindStep_profileCategories
+      ...ProfileForm_profileCategory
+    }
+  }
+`;
 
 export const NewProfileScreen = ({
+  route: { params },
   preloadedQuery,
-}: RelayScreenProps<NewProfileRoute, NewProfileScreenQuery>) => {
+}: RelayScreenProps<
+  NewProfileRoute,
+  NewProfileScreenQuery | NewProfileScreenWithProfileQuery
+>) => {
   // #region Data
-  const { profileCategories } = usePreloadedQuery(
-    newProfileScreenQuery,
+  const data = usePreloadedQuery(
+    params?.profileId
+      ? newProfileScreenQueryWithProfile
+      : newProfileScreenQuery,
     preloadedQuery,
   );
-  // #endregion
+  const { profileCategories } = data;
+  const profile = 'profile' in data ? data.profile : null;
 
-  // #region Navigation
-  const [currentPage, setPage] = useState(0);
-  const currentStep = STEPS[currentPage];
-
-  const previousPage = useRef(currentPage);
-  const transitionProgress = useSharedValue(0);
-  const [transitionInformation, setTransitionInformation] = useState<{
-    transitionKind: 'back' | 'forward';
-    transitioningPage: number;
-    disappearingPage: number;
-  } | null>(null);
-
-  const onTransitionEnd = useCallback(() => {
-    setTransitionInformation(null);
-    setTimeout(() => {
-      transitionProgress.value = 0;
-    }, 0);
-  }, [transitionProgress]);
-
-  useEffect(() => {
-    if (previousPage.current === currentPage) {
-      return;
-    }
-    const transitionKind =
-      currentPage > previousPage.current ? 'forward' : 'back';
-    setTransitionInformation({
-      transitionKind,
-      transitioningPage:
-        transitionKind === 'forward' ? currentPage : previousPage.current,
-      disappearingPage: previousPage.current,
-    });
-    previousPage.current = currentPage;
-    transitionProgress.value = withTiming(
-      1,
-      {
-        duration: TRANSITION_DURATION,
-        easing: Easing.inOut(Easing.ease),
-      },
-      () => {
-        runOnJS(onTransitionEnd)();
-      },
-    );
-  }, [currentPage, onTransitionEnd, transitionProgress]);
-
-  const next = useCallback(() => {
-    setPage(page => Math.min(page + 1, STEPS.length - 1));
-  }, [setPage]);
-
-  const prev = useCallback(() => {
-    setPage(page => Math.max(0, page - 1));
-  }, [setPage]);
-
-  const router = useRouter();
-  const onBack = useCallback(() => {
-    router.back();
-  }, [router]);
   // #endregion
 
   // #region Profile kind selection
   const [profileCategoryId, setProfileCategoryId] = useState<string | null>(
-    profileCategories?.[0]?.id ?? null,
+    profile?.profileCategory?.id ?? profileCategories?.[0]?.id ?? null,
   );
   const profileCategory = profileCategories?.find(
     pc => pc.id === profileCategoryId,
@@ -133,7 +91,35 @@ export const NewProfileScreen = ({
   const [profileInfo, setProfileInfo] = useState<{
     profileId: string;
     userName: string;
-  } | null>(null);
+  } | null>(
+    profile?.id && profile?.userName
+      ? {
+          profileId: profile.id,
+          userName: profile.userName,
+        }
+      : null,
+  );
+
+  // #region Navigation
+  const [currentStepIndex, setCurrentStepIndex] = useState(profileInfo ? 2 : 0);
+
+  const next = useCallback(() => {
+    setCurrentStepIndex(page => Math.min(page + 1, 4));
+  }, [setCurrentStepIndex]);
+
+  const prev = useCallback(() => {
+    setCurrentStepIndex(page => Math.max(0, page - 1));
+  }, [setCurrentStepIndex]);
+
+  const router = useRouter();
+  const onBack = useCallback(() => {
+    if (currentStepIndex === 1) {
+      prev();
+    } else {
+      router.back();
+    }
+  }, [currentStepIndex, prev, router]);
+  // #endregion
 
   const onProfileCreated = async (profileId: string, userName: string) => {
     setProfileInfo({
@@ -165,8 +151,8 @@ export const NewProfileScreen = ({
   // #endregion
 
   const intl = useIntl();
-  const pages: Record<Step, { title: string; element: ReactNode }> = {
-    PROFIKE_KIND: {
+  const steps = [
+    {
       title: intl.formatMessage({
         defaultMessage: 'What WebCard™\nwould you like to create?',
         description: 'WebCard kind selection screen title',
@@ -179,8 +165,9 @@ export const NewProfileScreen = ({
           onProfileCategoryChange={onProfileCategoryChange}
         />
       ),
+      backIcon: 'arrow_down' as const,
     },
-    PROFILE_FORM: {
+    {
       title:
         profileKind === 'personal'
           ? intl.formatMessage({
@@ -198,8 +185,9 @@ export const NewProfileScreen = ({
           onProfileCreated={onProfileCreated}
         />
       ) : null,
+      backIcon: 'arrow_left' as const,
     },
-    COVER: {
+    {
       title: intl.formatMessage({
         defaultMessage: 'Create your cover',
         description: 'Cover creation screen title',
@@ -212,8 +200,9 @@ export const NewProfileScreen = ({
             onCoverSaved={onCoverSaved}
           />
         ) : null,
+      backIcon: 'arrow_down' as const,
     },
-    CARD: {
+    {
       title: intl.formatMessage({
         defaultMessage: 'Select a WebCard template',
         description: 'WebCard creation screen title',
@@ -226,50 +215,20 @@ export const NewProfileScreen = ({
             onCoverTemplateApplied={onCoverTemplateApplied}
           />
         ) : null,
+
+      backIcon: 'arrow_down' as const,
     },
-  };
+  ];
 
   return (
-    <Container
+    <WizzardTransitioner
+      currentStepIndex={currentStepIndex}
+      steps={steps}
+      width={windowWidth}
+      contentHeight={contentHeight}
+      onBack={onBack}
       style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
-    >
-      <PagerHeader
-        nbPages={4}
-        currentPage={currentPage}
-        onBack={currentPage > 0 ? prev : onBack}
-        title={pages[currentStep].title}
-      />
-
-      <ScreenContainer style={{ height: contentHeight }}>
-        {STEPS.map((step, index) => {
-          const { element } = pages[step];
-          return (
-            <TransitionScreen
-              key={`NewProfileScreen-${step}`}
-              activityState={
-                index === currentPage
-                  ? 2
-                  : transitionInformation?.disappearingPage === index
-                  ? 1
-                  : 0
-              }
-              transitionProgress={
-                transitionInformation?.transitioningPage === index
-                  ? transitionProgress
-                  : null
-              }
-              transitionKind={
-                transitionInformation?.transitionKind ?? 'forward'
-              }
-              width={windowWidth}
-              height={contentHeight}
-            >
-              {element}
-            </TransitionScreen>
-          );
-        })}
-      </ScreenContainer>
-    </Container>
+    />
   );
 };
 
@@ -279,7 +238,13 @@ NewProfileScreen.options = {
 };
 
 export default relayScreen(NewProfileScreen, {
-  query: newProfileScreenQuery,
+  query: params =>
+    params?.profileId
+      ? newProfileScreenQueryWithProfile
+      : newProfileScreenQuery,
+  getVariables: params =>
+    params?.profileId ? { profileId: params.profileId } : {},
+
   prefetchProfileIndependent: true,
   prefetch: () => {
     const pixelRatio = Math.min(2, PixelRatio.get());
@@ -314,47 +279,3 @@ export default relayScreen(NewProfileScreen, {
     });
   },
 });
-
-type TransitionScreenProps = {
-  activityState: 0 | 1 | 2;
-  transitionProgress: Animated.SharedValue<number> | null;
-  transitionKind: 'back' | 'forward';
-  children: React.ReactNode;
-  width: number;
-  height: number;
-};
-
-const TransitionScreen = ({
-  activityState,
-  transitionProgress,
-  transitionKind,
-  children,
-  width,
-  height,
-}: TransitionScreenProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    if (transitionProgress == null) {
-      return {};
-    }
-    return {
-      transform: [
-        {
-          translateX:
-            transitionKind === 'forward'
-              ? (1 - transitionProgress.value) * width
-              : transitionProgress.value * width,
-        },
-      ],
-    };
-  }, [transitionProgress, transitionKind]);
-
-  const layoutStyle = { width, height };
-
-  return (
-    <Screen activityState={activityState} style={layoutStyle}>
-      <Animated.View style={[layoutStyle, animatedStyle]}>
-        <Container style={{ flex: 1 }}>{children}</Container>
-      </Animated.View>
-    </Screen>
-  );
-};

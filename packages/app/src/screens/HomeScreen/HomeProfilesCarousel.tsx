@@ -14,6 +14,7 @@ import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
+import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
@@ -71,6 +72,9 @@ const HomeProfilesCarousel = (
         profiles {
           id
           userName
+          cardCover {
+            title
+          }
           ...CoverLink_profile
           ...CoverRenderer_profile
         }
@@ -219,6 +223,34 @@ const ItemRenderComponent = ({
           })}
         >
           <Icon icon="add" style={styles.icon} />
+        </PressableOpacity>
+      </Link>
+    );
+  }
+
+  if (!item.cardCover) {
+    return (
+      <Link
+        route="NEW_PROFILE"
+        params={{
+          profileId: item.id,
+        }}
+      >
+        <PressableOpacity
+          style={[
+            styles.coverShadow,
+            {
+              width: coverWidth,
+              height: coverHeight,
+              borderRadius: coverWidth * COVER_CARD_RADIUS,
+            },
+          ]}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Create a new profile',
+            description: 'Start new profile creation from account screen',
+          })}
+        >
+          <CoverRenderer width={coverWidth} profile={item} />
         </PressableOpacity>
       </Link>
     );

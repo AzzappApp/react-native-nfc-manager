@@ -15,6 +15,7 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 export type ButtonProps = PressableProps & {
   label: string;
   variant?: 'little_round' | 'primary' | 'secondary';
+  appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
 };
@@ -23,6 +24,7 @@ const Button = (
   {
     label,
     variant = 'primary',
+    appearance,
     loading,
     disabled,
     style,
@@ -32,17 +34,23 @@ const Button = (
 ) => {
   const colorScheme = useColorScheme();
 
+  appearance = appearance ?? colorScheme ?? 'light';
+
   const highlightColor =
     variant === 'primary'
-      ? colorScheme === 'light'
+      ? appearance === 'light'
         ? colors.grey900
         : colors.grey100
       : undefined;
-  const variantStyles = useVariantStyleSheet(computedStyles, variant);
+  const variantStyles = useVariantStyleSheet(
+    computedStyles,
+    variant,
+    appearance,
+  );
   const buttonProps = {
     accessibilityRole: 'button',
     children: loading ? (
-      <ActivityIndicator color={colorScheme === 'light' ? 'white' : 'black'} />
+      <ActivityIndicator color={appearance === 'light' ? 'white' : 'black'} />
     ) : (
       <Text variant="button" style={variantStyles.label} numberOfLines={1}>
         {label}
