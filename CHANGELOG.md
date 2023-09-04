@@ -1,5 +1,8 @@
-## 0.2.0-canary.44
+## 0.2.0-canary.45
 
+* **fix:**  - dimish top text position on cover
+* **fix:**  - **CoverEdition:** hide segmented switch with preview media in CustomCoverEditor
+* **fix:**  - **CoverEdition:** background color in exportImage
 * **fix:**  - **Home:** improve contact card slider performance
 * **fix:**  - **CoverEdition:** Don't use cover cover preview for media export
 * **fix:**  - don't need to recreate media when colors change
