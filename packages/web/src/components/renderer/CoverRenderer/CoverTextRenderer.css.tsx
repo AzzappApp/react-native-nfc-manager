@@ -40,12 +40,12 @@ const converTextContainerVertical = style({
 
 const converTextContainerTopToBottom = style({
   transform: 'rotate(90deg)',
-  paddingLeft: '30%',
+  paddingLeft: '15%',
 });
 
 const converTextContainerBottomToTop = style({
   transform: 'rotate(-90deg)',
-  paddingRight: '30%',
+  paddingRight: '15%',
 });
 
 export default {

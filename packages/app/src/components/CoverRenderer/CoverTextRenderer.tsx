@@ -137,7 +137,7 @@ const CoverTextRenderer = ({
         : 'right';
   }
 
-  const topPadding = width * 0.3;
+  const topPadding = width * 0.15;
   const padding = width * 0.05;
 
   const titleOverlayStyles: ViewStyle | null = {
