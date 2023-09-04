@@ -37,7 +37,7 @@ export const exportImage = (
     format = 'jpg',
     quality = 90,
     size,
-    backgroundColor = '#000',
+    backgroundColor = 'transparent',
   } = options;
   return GPUImageViewManager.exportLayers(
     layers,
