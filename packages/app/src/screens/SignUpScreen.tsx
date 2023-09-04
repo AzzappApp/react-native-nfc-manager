@@ -179,7 +179,7 @@ const SignupScreen = () => {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={insets.bottom}
+        keyboardVerticalOffset={-insets.bottom}
         style={styles.content}
         pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
