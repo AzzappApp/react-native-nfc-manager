@@ -290,7 +290,7 @@ const ItemList = ({
       disabled={isSelected}
       style={{ width: webCardsItemWidth }}
     >
-      <View style={styles.webCardContainer} pointerEvents="none">
+      <View style={styles.webCardContainer}>
         <View style={styles.webCardContainerRadius}>
           <View
             style={{
@@ -332,6 +332,7 @@ const ItemList = ({
               overScrollMode="always"
               scrollEnabled={isSelected}
               showsVerticalScrollIndicator={false}
+              moduleActionEnabled={false}
             />
           </View>
         </View>

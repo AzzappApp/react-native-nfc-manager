@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useRef } from 'react';
-import { ScrollView, useWindowDimensions } from 'react-native';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
 import WebCardBackground from './WebCardBackground';
@@ -43,6 +43,12 @@ export type WebCardRendererProps = Omit<ScrollViewProps, 'children'> & {
    * @param layout The module layout.
    */
   onModuleLayout?: (index: number, layout: LayoutRectangle) => void;
+  /**
+   * define if the list shoudl handle  the touch action on each module (using pointer events)
+   *
+   * @type {boolean}
+   */
+  moduleActionEnabled?: boolean;
 };
 
 /**
@@ -58,6 +64,7 @@ const WebCardRenderer = (
     viewMode,
     onModuleLayout,
     style,
+    moduleActionEnabled = true,
     ...props
   }: WebCardRendererProps,
   ref: ForwardedRef<ScrollView>,
@@ -95,41 +102,47 @@ const WebCardRenderer = (
       scrollEventThrottle={16}
       {...props}
     >
-      <WebCardBackground
-        profile={profile}
-        overrideCardStyle={cardStyle}
-        overrideLastModule={cardModules.at(-1)}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '150%',
-          top: '-25%',
-          left: 0,
-          zIndex: -1,
-        }}
-      />
-      {viewMode === 'desktop' ? (
-        <CoverRendererPreviewDesktop profile={profile} />
-      ) : (
-        <CoverRenderer profile={profile} width={windowWidth} hideBorderRadius />
-      )}
-      {cardModules.map((module, index) => {
-        const onLayout = onModuleLayout
-          ? (e: LayoutChangeEvent) => {
-              onModuleLayout?.(index, e.nativeEvent.layout);
-            }
-          : undefined;
-        return (
-          <CardModuleRenderer
-            module={module}
-            key={index}
-            onLayout={onLayout}
-            colorPalette={cardColors}
-            cardStyle={cardStyle}
-            viewMode={viewMode}
+      <View pointerEvents={moduleActionEnabled ? 'box-none' : 'none'}>
+        <WebCardBackground
+          profile={profile}
+          overrideCardStyle={cardStyle}
+          overrideLastModule={cardModules.at(-1)}
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '150%',
+            top: '-25%',
+            left: 0,
+            zIndex: -1,
+          }}
+        />
+        {viewMode === 'desktop' ? (
+          <CoverRendererPreviewDesktop profile={profile} />
+        ) : (
+          <CoverRenderer
+            profile={profile}
+            width={windowWidth}
+            hideBorderRadius
           />
-        );
-      })}
+        )}
+        {cardModules.map((module, index) => {
+          const onLayout = onModuleLayout
+            ? (e: LayoutChangeEvent) => {
+                onModuleLayout?.(index, e.nativeEvent.layout);
+              }
+            : undefined;
+          return (
+            <CardModuleRenderer
+              module={module}
+              key={index}
+              onLayout={onLayout}
+              colorPalette={cardColors}
+              cardStyle={cardStyle}
+              viewMode={viewMode}
+            />
+          );
+        })}
+      </View>
     </ScrollView>
   );
 };
