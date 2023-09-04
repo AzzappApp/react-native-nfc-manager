@@ -1,5 +1,6 @@
-## 0.2.0-canary.49
+## 0.2.0-canary.50
 
+* **fix:**  - 🐛 use white space AND line break when needed ([#981](https://github.com/AzzappApp/azzapp/pull/981))
 * **fix:**  - 🐛 add missing elements to reset ([#979](https://github.com/AzzappApp/azzapp/pull/979))
 * **fix:**  - 🐛 replace margin by padding ([#978](https://github.com/AzzappApp/azzapp/pull/978))
 * **fix:**  - Bug_20230821-12 - In webcard_creation process, 'continue' button on DETAILS frame is missing [#775](https://github.com/AzzappApp/azzapp/pull/775) ([#975](https://github.com/AzzappApp/azzapp/pull/975))
