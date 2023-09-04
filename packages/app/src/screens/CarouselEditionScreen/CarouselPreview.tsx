@@ -44,18 +44,21 @@ const CarouselPreview = ({
   return (
     <View {...props}>
       <View
-        style={{
-          position: 'absolute',
-          backgroundColor: colors.white,
-          minHeight: height,
-          top: scale === 1 ? 0 : (height - moduleHeight) / 2,
-          left: `${(100 - 100 / scale) / 2}%`,
-          width: `${100 / scale}%`,
-          transform: [{ scale }],
-          overflow: 'visible',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        style={[
+          {
+            position: 'absolute',
+            backgroundColor: colors.white,
+            minHeight: height,
+            top: scale === 1 ? 0 : (height - moduleHeight) / 2,
+            left: `${(100 - 100 / scale) / 2}%`,
+            width: `${100 / scale}%`,
+            transform: [{ scale }],
+            overflow: 'visible',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          styles.container,
+        ]}
       >
         <CarouselRenderer
           data={data}
@@ -72,4 +75,5 @@ export default CarouselPreview;
 
 const styleSheet = createStyleSheet(apperance => ({
   module: [{ width: '100%' }, shadow(apperance)],
+  container: shadow(apperance),
 }));

@@ -141,7 +141,6 @@ const CarouselRenderer = ({
         {images?.map((image, i) => (
           <PressableNative
             key={image.id}
-            // style={[styles.root, style]}
             onPress={() => modal.current?.open(i)}
             accessibilityRole="alert"
           >

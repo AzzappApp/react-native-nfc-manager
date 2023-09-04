@@ -36,13 +36,9 @@ export type ProfileScreenFooterProps = {
    */
   selectionContainsHiddenModules: boolean;
   /**
-   * edit mode display mode
-   */
-  currentEditionView: 'desktop' | 'mobile';
-  /**
    * A callback called when the user switch the edit mode display mode
    */
-  onEditingDisplayModeChange: (view: 'desktop' | 'mobile') => void;
+  onRequestPreview: () => void;
   /**
    * A callback called when the user press the add module button
    */
@@ -68,11 +64,10 @@ export type ProfileScreenFooterProps = {
 const ProfileScreenFooter = ({
   profile: profileKey,
   editing,
-  currentEditionView,
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
-  onEditingDisplayModeChange,
+  onRequestPreview,
   onRequestNewModule,
   onRequestColorPicker,
   onRequestWebcardStyle,
@@ -87,8 +82,9 @@ const ProfileScreenFooter = ({
     (key: string) => {
       switch (key) {
         case 'mobile':
-        case 'desktop':
-          onEditingDisplayModeChange(key);
+          break;
+        case 'preview':
+          onRequestPreview();
           break;
         case 'add':
           onRequestNewModule();
@@ -102,9 +98,9 @@ const ProfileScreenFooter = ({
       }
     },
     [
-      onEditingDisplayModeChange,
       onRequestColorPicker,
       onRequestNewModule,
+      onRequestPreview,
       onRequestWebcardStyle,
     ],
   );
@@ -123,12 +119,12 @@ const ProfileScreenFooter = ({
         }),
       },
       {
-        key: 'desktop',
-        icon: 'desktop',
+        key: 'preview',
+        icon: 'preview',
         label: intl.formatMessage({
-          defaultMessage: 'Desktop',
+          defaultMessage: 'Preview',
           description:
-            'ProfileScreen bottom menu accessibility label for Desktop tab',
+            'ProfileScreen bottom menu accessibility label for Preview tab',
         }),
       },
       {
@@ -195,7 +191,7 @@ const ProfileScreenFooter = ({
         <BottomMenu
           tabs={tabs}
           showLabel
-          currentTab={currentEditionView}
+          currentTab={'mobile'}
           onItemPress={onItemPress}
         />
       </Animated.View>

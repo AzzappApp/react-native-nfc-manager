@@ -91,7 +91,7 @@ const WebCardRenderer = (
   return (
     <ScrollView
       ref={mergeRef}
-      style={[{ flex: 1, backgroundColor: 'blue' }, style]}
+      style={[{ flex: 1 }, style]}
       scrollEventThrottle={16}
       {...props}
     >

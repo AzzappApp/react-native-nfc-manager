@@ -1015,6 +1015,10 @@
     "defaultMessage": "Border radius : {size}",
     "description": "borderRadius message in PhotoWithTextAndTitle edition"
   },
+  "MW6m0v": {
+    "defaultMessage": "Preview",
+    "description": "ProfileScreen bottom menu accessibility label for Preview tab"
+  },
   "MYq2d8": {
     "defaultMessage": "Select an activity",
     "description": "ProfileForm - Activity BottomSheet - Title"
@@ -1158,10 +1162,6 @@
   "RDCQtK": {
     "defaultMessage": "Account details",
     "description": "Link to open account details form to change email, phone number, etc."
-  },
-  "RDYvOJ": {
-    "defaultMessage": "Desktop",
-    "description": "ProfileScreen bottom menu accessibility label for Desktop tab"
   },
   "REyvTQ": {
     "defaultMessage": "Slide to change the Border size",
@@ -1690,6 +1690,10 @@
   "be8Hdp": {
     "defaultMessage": "Border size : {size}",
     "description": "borderWidth message in SimpleButton edition"
+  },
+  "bfGNde": {
+    "defaultMessage": "Preview",
+    "description": "Preview modal title"
   },
   "bv6Xu2": {
     "defaultMessage": "Invite with Whatsapp",

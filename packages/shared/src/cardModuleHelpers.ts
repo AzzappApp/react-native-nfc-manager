@@ -297,7 +297,7 @@ export const LINE_DIVIDER_DEFAULT_VALUES = {
 /**
  * The minimum height for the line divider module
  */
-export const LINE_DIVIDER_MIN_HEIGHT = 20;
+export const LINE_DIVIDER_MIN_HEIGHT = 1;
 
 /**
  * The maximum height for the line divider module

@@ -574,7 +574,6 @@ const CoverEditorTemplateList = ({
         style={[
           styles.colorPaletteListcontainer,
           { width: templateWidth + 92 },
-          { backgroundColor: 'blue' },
         ]}
         maskElement={
           <LinearGradient

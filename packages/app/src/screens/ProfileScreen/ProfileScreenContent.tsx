@@ -15,6 +15,7 @@ import Text from '#ui/Text';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
+import PreviewModal from './PreviewModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
 import ProfileScreenFooter from './ProfileScreenFooter';
@@ -90,6 +91,7 @@ const ProfileScreenContent = ({
         ...ProfileColorPicker_profile
         ...WebCardColorPicker_profile
         ...WebCardBackground_profile
+        ...PreviewModal_viewer
         cardCover {
           backgroundColor
         }
@@ -113,14 +115,8 @@ const ProfileScreenContent = ({
   // #endregion
 
   // #region Edition state
-
-  const [editingDisplayMode, setEditingDisplayMode] = useState<
-    'desktop' | 'mobile'
-  >('mobile');
-
   const onDone = useCallback(() => {
     onToggleEditMode();
-    setEditingDisplayMode('mobile');
   }, [onToggleEditMode]);
 
   // #endregion
@@ -234,6 +230,17 @@ const ProfileScreenContent = ({
   const closeCardStyleModal = useCallback(() => {
     setShowCardStyleModal(false);
   }, []);
+  // #endregion
+
+  // #region preview
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const openPreviewModal = useCallback(() => {
+    setShowPreviewModal(true);
+  }, []);
+  const closePreviewModal = useCallback(() => {
+    setShowPreviewModal(false);
+  }, []);
+  // #endregion
 
   const [modulesCount, setModulesCount] = useState(1);
 
@@ -333,15 +340,14 @@ const ProfileScreenContent = ({
         <Suspense fallback={null}>
           <ProfileScreenFooter
             editing={editing}
-            currentEditionView={editingDisplayMode}
             selectionMode={selectionMode}
             hasSelectedModules={nbSelectedModules > 0}
             selectionContainsHiddenModules={selectionContainsHiddenModules}
             profile={profile}
-            onEditingDisplayModeChange={setEditingDisplayMode}
             onRequestNewModule={onRequestNewModule}
             onRequestColorPicker={onRequestWebcardColorPicker}
             onRequestWebcardStyle={openCardStyleModal}
+            onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
@@ -383,6 +389,11 @@ const ProfileScreenContent = ({
             animationType="slide"
           />
           <Suspense fallback={null}>
+            <PreviewModal
+              visible={showPreviewModal}
+              onRequestClose={closePreviewModal}
+              profile={profile}
+            />
             <CardStyleModal
               visible={showCardStyleModal}
               onRequestClose={closeCardStyleModal}
