@@ -7,7 +7,7 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MediasListInput from '#components/MediasListInput';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
 import type { CompanyActivity, ProfileCategory } from '@azzapp/data/domains';
@@ -55,6 +55,10 @@ const SuggesionAddForm = ({
       [...selectedActivities.values()],
     );
   };
+
+  useEffect(() => {
+    if (!open) setMedias([]);
+  }, [open]);
 
   return (
     <Dialog
