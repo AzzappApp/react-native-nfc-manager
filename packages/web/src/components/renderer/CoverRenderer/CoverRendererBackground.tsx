@@ -30,6 +30,7 @@ const CoverRendererBackground = ({
             WebkitMaskImage: `url(${getImageURL(coverData.backgroundId)})`,
             maskImage: `url(${getImageURL(coverData.backgroundId)})`,
             maskPosition: 'bottom',
+            WebkitMaskPosition: 'bottom',
           }}
           className={styles.layerMedia}
         />
@@ -64,6 +65,7 @@ const CoverRendererBackground = ({
             WebkitMaskImage: `url(${getImageURL(coverData.foregroundId)})`,
             maskImage: `url(${getImageURL(coverData.foregroundId)})`,
             maskPosition: 'bottom',
+            WebkitMaskPosition: 'bottom',
           }}
           className={styles.layerMedia}
         />

@@ -3,8 +3,8 @@ import { style } from '@vanilla-extract/css';
 const wrapper = style({
   filter: 'blur(15px)',
   position: 'absolute',
-  top: '-5%',
-  left: '-5%',
+  top: '-4%',
+  left: '-4%',
   width: '110%',
   height: '110%',
 });

@@ -30,7 +30,10 @@ const CoverRenderer = async ({
   }
   // TODO render foreground
   return (
-    <div {...props} style={{ position: 'relative', ...style }}>
+    <div
+      {...props}
+      style={{ position: 'relative', overflow: 'hidden', ...style }}
+    >
       <CoverRendererBackground media={media} profile={profile} />
       <div
         {...props}
