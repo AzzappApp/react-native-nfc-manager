@@ -289,7 +289,7 @@ struct GPULayer: Equatable {
       image = image.transformed(by: CGAffineTransform(translationX: -cropData.origin.x, y: -cropData.origin.y))
     }
     
-    let scale = size.width / image.extent.width
+    let scale = max(size.width / image.extent.width, size.height / image.extent.height)
     image = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
     
     if parameters.brightness != nil || parameters.saturation != nil || parameters.contrast != nil {
