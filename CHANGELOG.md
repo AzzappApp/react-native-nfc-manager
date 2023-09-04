@@ -1,5 +1,6 @@
-## 0.2.0-canary.47
+## 0.2.0-canary.48
 
+* **fix:**  - **HomeScreen:** button clicked under the panel
 * **fix:**  - 🐛 correct desktop web card UI ([#956](https://github.com/AzzappApp/azzapp/pull/956))
 * **fix:**  - 🐛 refresh list of suggested medias after adding ([#960](https://github.com/AzzappApp/azzapp/pull/960))
 * **fix:**  - 🐛 correct blur and background on cover ([#951](https://github.com/AzzappApp/azzapp/pull/951))
