@@ -306,7 +306,11 @@ const ProfileForm = ({
   );
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.root}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.root}
+      keyboardVerticalOffset={250}
+    >
       <Form style={styles.form} onSubmit={onSubmit}>
         {profileKind === 'personal' ? (
           <>
@@ -475,7 +479,7 @@ const ProfileForm = ({
                   autoCapitalize="none"
                   autoComplete="off"
                   autoCorrect={false}
-                  returnKeyType="send"
+                  returnKeyType="next"
                   onSubmitEditing={onSubmit}
                 />
               </Label>
