@@ -79,7 +79,7 @@ const BlockTextRenderer = ({
                 fontSize && verticalSpacing
                   ? `${fontSize * 1.2 + verticalSpacing}px`
                   : undefined,
-              whiteSpace: 'pre',
+              whiteSpace: 'pre-wrap',
             }}
             className={fontsMap[fontFamily].className}
           >

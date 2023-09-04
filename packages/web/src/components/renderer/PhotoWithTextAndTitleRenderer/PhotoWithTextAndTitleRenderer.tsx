@@ -139,7 +139,7 @@ const PhotoWithTextAndTitleRenderer = ({
                     titleFontSize && titleVerticalSpacing
                       ? `${titleFontSize * 1.2 + titleVerticalSpacing}px`
                       : undefined,
-                  whiteSpace: 'pre-line',
+                  whiteSpace: 'pre-wrap',
                 }}
                 className={fontsMap[titleFontFamily].className}
               >
@@ -157,7 +157,7 @@ const PhotoWithTextAndTitleRenderer = ({
                     contentFontSize && contentVerticalSpacing
                       ? `${contentFontSize * 1.2 + contentVerticalSpacing}px`
                       : undefined,
-                  whiteSpace: 'pre',
+                  whiteSpace: 'pre-wrap',
                 }}
                 className={fontsMap[contentFontFamily].className}
               >

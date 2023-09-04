@@ -69,7 +69,7 @@ const SimpleTextRenderer = ({
             paddingTop: marginVertical,
             paddingBottom: marginVertical,
             flexShrink: 0,
-            whiteSpace: 'pre',
+            whiteSpace: 'pre-wrap',
           }}
           className={fontsMap[fontFamily].className}
         >
