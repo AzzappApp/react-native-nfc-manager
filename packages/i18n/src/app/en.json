@@ -2599,6 +2599,10 @@
     "defaultMessage": "Enter your phone number",
     "description": "Signup Screen - Accessibility TextInput phone number"
   },
+  "s3CmD7": {
+    "defaultMessage": "Your WebCard has been published",
+    "description": "Home Screen - webcard published toast"
+  },
   "s5MWk0": {
     "defaultMessage": "TextBackground opacity",
     "description": "Label of the Photo Opacityslider in BlockText edition"

@@ -3,9 +3,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
+  useAnimatedProps,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
 import Link from '#components/Link';
@@ -105,6 +107,13 @@ const HomeBottomPanel = ({
           console.log(error);
           return;
         }
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'Your WebCard has been published',
+            description: 'Home Screen - webcard published toast',
+          }),
+        });
       },
       onError: error => {
         //TODO - handle error
@@ -178,20 +187,54 @@ const HomeBottomPanel = ({
     opacity: panelVisibilities.value.newProfilePanelVisible,
     zIndex: panelVisibilities.value.newProfilePanelVisible,
   }));
+  const newCardPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.newProfilePanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
 
   const missingCoverPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.missingCoverPanelVisible,
     zIndex: panelVisibilities.value.missingCoverPanelVisible,
   }));
+  const missingCoverPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.missingCoverPanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
 
   const webCardPublishPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.webCardPublishPanelVisible,
     zIndex: panelVisibilities.value.webCardPublishPanelVisible,
   }));
+  const webCardPublishPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.webCardPublishPanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
 
   const bottomPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.bottomPanelVisible,
   }));
+  const bottomPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.bottomPanelVisible === 1 ? 'auto' : 'none',
+      }) as const,
+  );
 
   const mainTabBarVisible = useDerivedValue(
     () => panelVisibilities.value.bottomPanelVisible,
@@ -203,7 +246,11 @@ const HomeBottomPanel = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <Animated.View style={[styles.informationPanel, newCardPanelStyle]}>
+      <Animated.View
+        style={[styles.informationPanel, newCardPanelStyle]}
+        pointerEvents={currentProfileIndex === -1 ? 'auto' : 'none'}
+        animatedProps={newCardPanelProps}
+      >
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
             defaultMessage="Create a new Webcard{azzappAp}"
@@ -224,7 +271,10 @@ const HomeBottomPanel = ({
         </Text>
       </Animated.View>
 
-      <Animated.View style={[styles.informationPanel, missingCoverPanelStyle]}>
+      <Animated.View
+        style={[styles.informationPanel, missingCoverPanelStyle]}
+        animatedProps={missingCoverPanelProps}
+      >
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
@@ -264,6 +314,7 @@ const HomeBottomPanel = ({
 
       <Animated.View
         style={[styles.informationPanel, webCardPublishPanelStyle]}
+        animatedProps={webCardPublishPanelProps}
       >
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
@@ -296,7 +347,10 @@ const HomeBottomPanel = ({
         />
       </Animated.View>
 
-      <Animated.View style={[styles.bottomPanel, bottomPanelStyle]}>
+      <Animated.View
+        style={[styles.bottomPanel, bottomPanelStyle]}
+        animatedProps={bottomPanelProps}
+      >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
 
         <TabView
