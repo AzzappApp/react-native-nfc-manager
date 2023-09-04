@@ -1,5 +1,6 @@
-## 0.2.0-canary.45
+## 0.2.0-canary.46
 
+* **fix:**  - **MediaEdition:** fix scale behavior of gpu layer
 * **fix:**  - dimish top text position on cover
 * **fix:**  - **CoverEdition:** hide segmented switch with preview media in CustomCoverEditor
 * **fix:**  - **CoverEdition:** background color in exportImage
