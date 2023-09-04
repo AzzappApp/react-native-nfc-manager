@@ -1,5 +1,14 @@
 import { style } from '@vanilla-extract/css';
 
+const wrapper = style({
+  filter: 'blur(15px)',
+  position: 'absolute',
+  top: '-5%',
+  left: '-5%',
+  width: '110%',
+  height: '110%',
+});
+
 const coverMedia = style({
   position: 'absolute',
   top: 0,
@@ -9,13 +18,8 @@ const coverMedia = style({
 });
 
 const backgroundMedia = style({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
   objectFit: 'cover',
-  filter: 'blur(2px)',
+  objectPosition: 'bottom',
 });
 
 const content = style({
@@ -36,6 +40,7 @@ const layerMedia = style({
 });
 
 const styles = {
+  wrapper,
   coverMedia,
   backgroundMedia,
   content,

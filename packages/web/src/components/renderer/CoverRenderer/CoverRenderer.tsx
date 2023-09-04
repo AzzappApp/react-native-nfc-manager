@@ -18,18 +18,20 @@ type CoverRendererProps = Omit<
 };
 
 const CoverRenderer = async ({
-  profile: { coverData, coverTitle, coverSubTitle, cardColors },
+  profile,
   media,
   style,
   ...props
 }: CoverRendererProps) => {
+  const { coverData, coverTitle, coverSubTitle, cardColors } = profile;
+
   if (!coverData) {
     return null;
   }
   // TODO render foreground
   return (
     <div {...props} style={{ position: 'relative', ...style }}>
-      <CoverRendererBackground media={media} />
+      <CoverRendererBackground media={media} profile={profile} />
       <div
         {...props}
         style={{
