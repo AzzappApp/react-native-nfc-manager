@@ -57,7 +57,12 @@ const SuggesionAddForm = ({
   };
 
   useEffect(() => {
-    if (!open) setMedias([]);
+    if (!open) {
+      setMedias([]);
+      setSelectedCategories(new Set());
+      setSelectedActivities(new Set());
+      setMediaErrors(null);
+    }
   }, [open]);
 
   return (
