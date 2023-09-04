@@ -1,5 +1,12 @@
-## 0.2.0-canary.48
+## 0.2.0-canary.49
 
+* **fix:**  - 🐛 add missing elements to reset ([#979](https://github.com/AzzappApp/azzapp/pull/979))
+* **fix:**  - 🐛 replace margin by padding ([#978](https://github.com/AzzappApp/azzapp/pull/978))
+* **fix:**  - Bug_20230821-12 - In webcard_creation process, 'continue' button on DETAILS frame is missing [#775](https://github.com/AzzappApp/azzapp/pull/775) ([#975](https://github.com/AzzappApp/azzapp/pull/975))
+* **fix:**  - webcard list should stay scrollable ([#968](https://github.com/AzzappApp/azzapp/pull/968))
+* **fix:**  - 🐛 improve blur display + chrome compatibility ([#966](https://github.com/AzzappApp/azzapp/pull/966))
+* **fix:**  - 🐛 display multiples spaces ([#965](https://github.com/AzzappApp/azzapp/pull/965))
+* **fix:**  - Signupscreen keyboard position offset ([#964](https://github.com/AzzappApp/azzapp/pull/964))
 * **fix:**  - **HomeScreen:** button clicked under the panel
 * **fix:**  - 🐛 correct desktop web card UI ([#956](https://github.com/AzzappApp/azzapp/pull/956))
 * **fix:**  - 🐛 refresh list of suggested medias after adding ([#960](https://github.com/AzzappApp/azzapp/pull/960))
