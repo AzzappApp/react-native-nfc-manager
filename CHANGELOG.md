@@ -1,5 +1,9 @@
-## 0.2.0-canary.46
+## 0.2.0-canary.47
 
+* **fix:**  - 🐛 correct desktop web card UI ([#956](https://github.com/AzzappApp/azzapp/pull/956))
+* **fix:**  - 🐛 refresh list of suggested medias after adding ([#960](https://github.com/AzzappApp/azzapp/pull/960))
+* **fix:**  - 🐛 correct blur and background on cover ([#951](https://github.com/AzzappApp/azzapp/pull/951))
+* **feat:**  - **Home:**  profile publication system ([#954](https://github.com/AzzappApp/azzapp/pull/954))
 * **fix:**  - **MediaEdition:** fix scale behavior of gpu layer
 * **fix:**  - dimish top text position on cover
 * **fix:**  - **CoverEdition:** hide segmented switch with preview media in CustomCoverEditor
