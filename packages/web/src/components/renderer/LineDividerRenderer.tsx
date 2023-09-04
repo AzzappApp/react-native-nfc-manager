@@ -59,7 +59,7 @@ const LineDividerRenderer = ({
         style={{
           height,
           backgroundColor: colorTop,
-          backgroundImage: `linear-gradient(${cssOrientation}, ${colorTop} 50%, ${colorBottom} 50%)`,
+          backgroundImage: `linear-gradient(${cssOrientation}, ${colorTop} 50%, ${colorBottom} 50.3%)`,
         }}
       />
       {marginBottom > 0 && (

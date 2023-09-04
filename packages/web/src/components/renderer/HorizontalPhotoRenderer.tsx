@@ -47,11 +47,20 @@ const HorizontalPhotoRenderer = async ({
       backgroundStyle={backgroundStyle}
       colorPalette={colorPalette}
       style={style}
+      containerStyle={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+      }}
     >
       <div
         style={{
-          maxWidth: marginHorizontal || marginVertical ? 800 : '100%',
-          margin: 'auto',
+          maxWidth: marginHorizontal ? 800 : '100%',
+          width: '100%',
+          marginRight: marginHorizontal,
+          marginLeft: marginHorizontal,
+          marginTop: marginVertical,
+          marginBottom: marginVertical,
         }}
       >
         <div
@@ -61,10 +70,6 @@ const HorizontalPhotoRenderer = async ({
             borderWidth,
             borderRadius,
             borderStyle: 'solid',
-            marginRight: marginHorizontal,
-            marginLeft: marginHorizontal,
-            marginTop: marginVertical,
-            marginBottom: marginVertical,
             borderColor: swapColor(borderColor, colorPalette) ?? '#FFF',
             overflow: 'hidden',
             position: 'relative',

@@ -139,6 +139,7 @@ const PhotoWithTextAndTitleRenderer = ({
                     titleFontSize && titleVerticalSpacing
                       ? `${titleFontSize * 1.2 + titleVerticalSpacing}px`
                       : undefined,
+                  whiteSpace: 'pre-line',
                 }}
                 className={fontsMap[titleFontFamily].className}
               >

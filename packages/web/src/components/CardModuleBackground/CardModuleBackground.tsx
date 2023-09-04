@@ -63,7 +63,7 @@ const CardModuleBackground = ({
         <div
           style={{
             backgroundColor: convertHexToRGBA(
-              swapColor(patternColor, colorPalette) ?? '#FFF',
+              swapColor(patternColor, colorPalette) ?? '#000',
               opacity,
             ),
             WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,
