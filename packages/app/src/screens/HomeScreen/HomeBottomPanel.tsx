@@ -248,7 +248,6 @@ const HomeBottomPanel = ({
     <View style={{ flex: 1 }}>
       <Animated.View
         style={[styles.informationPanel, newCardPanelStyle]}
-        pointerEvents={currentProfileIndex === -1 ? 'auto' : 'none'}
         animatedProps={newCardPanelProps}
       >
         <Text variant="large" style={{ color: colors.white }}>
