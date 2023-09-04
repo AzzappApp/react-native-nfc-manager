@@ -157,7 +157,7 @@ const PhotoWithTextAndTitleRenderer = ({
                     contentFontSize && contentVerticalSpacing
                       ? `${contentFontSize * 1.2 + contentVerticalSpacing}px`
                       : undefined,
-                  whiteSpace: 'pre-line',
+                  whiteSpace: 'pre',
                 }}
                 className={fontsMap[contentFontFamily].className}
               >
