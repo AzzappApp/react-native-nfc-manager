@@ -1,5 +1,6 @@
-## 0.2.0-canary.52
+## 0.2.0-canary.53
 
+* **feat:**  - 🎸 add mission placeholders for contact card ([#982](https://github.com/AzzappApp/azzapp/pull/982))
 * **feat:**  - app icons and splash screen ([#980](https://github.com/AzzappApp/azzapp/pull/980))
 * **feat:**  - **CoverEdition:** cover edition screen fallback ([#967](https://github.com/AzzappApp/azzapp/pull/967))
 * **fix:**  - 🐛 use white space AND line break when needed ([#981](https://github.com/AzzappApp/azzapp/pull/981))
