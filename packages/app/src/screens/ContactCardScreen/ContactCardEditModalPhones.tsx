@@ -101,6 +101,10 @@ const ContactCardEditModalPhones = ({
           deleteField={() => remove(index)}
           keyboardType="phone-pad"
           labelValues={labelValues}
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Enter a phone number',
+            description: 'Placeholder for phone number inside contact card',
+          })}
         />
       ))}
       <View>

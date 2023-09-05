@@ -39,6 +39,7 @@ const ContactCardEditModalField = ({
   selectedKey,
   control,
   labelValues,
+  placeholder,
 }: {
   deleted: boolean;
   deleteButtonRect: LayoutRectangle | null;
@@ -51,6 +52,7 @@ const ContactCardEditModalField = ({
   selectedKey: FieldPath<ContactCardEditForm>;
   control: Control<ContactCardEditForm>;
   labelValues: Array<{ key: string; value: string }>;
+  placeholder?: string;
 }) => {
   const deleteMode = useSharedValue(false);
 
@@ -142,6 +144,7 @@ const ContactCardEditModalField = ({
               keyboardType={keyboardType}
               clearButtonMode="while-editing"
               testID="contact-card-edit-modal-field"
+              placeholder={placeholder}
             />
           )}
         />

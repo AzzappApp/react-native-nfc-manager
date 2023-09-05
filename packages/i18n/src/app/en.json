@@ -163,6 +163,10 @@
     "defaultMessage": "Image Carousel",
     "description": "Module selection list modal Image Carousel module label"
   },
+  "2cJR0f": {
+    "defaultMessage": "Enter a company name",
+    "description": "Placeholder for company name inside contact card"
+  },
   "2je5uN": {
     "defaultMessage": "Image & Text",
     "description": "PhotoWithTextAndTitle text screen title"
@@ -250,6 +254,10 @@
   "5/HOhV": {
     "defaultMessage": "Profiles",
     "description": "SearchPage - Result - Global search profiles title"
+  },
+  "50a48X": {
+    "defaultMessage": "Enter a last name",
+    "description": "Placeholder for last name contact card"
   },
   "5VwKcb": {
     "defaultMessage": "Log In",
@@ -370,6 +378,10 @@
   "9/DfwF": {
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
+  },
+  "91uOUx": {
+    "defaultMessage": "Enter an email",
+    "description": "Placeholder for email inside contact card"
   },
   "92LIBk": {
     "defaultMessage": "Left/right margin: {size}",
@@ -1010,6 +1022,10 @@
   "M/YmS/": {
     "defaultMessage": "Border shape",
     "description": "Border shape tab label in HorizontalPhoto edition"
+  },
+  "M1inoY": {
+    "defaultMessage": "Enter a title",
+    "description": "Placeholder for title inside contact card"
   },
   "M32J+R": {
     "defaultMessage": "Next",
@@ -1887,6 +1903,10 @@
     "defaultMessage": "Display on my webcard",
     "description": "When true the contact card is displayed on the webcard"
   },
+  "ebysAs": {
+    "defaultMessage": "Enter a first name",
+    "description": "Placeholder for first name inside contact card"
+  },
   "eiD1yA": {
     "defaultMessage": "Followers",
     "description": "HomeScreen - information panel - Followers label"
@@ -2694,6 +2714,10 @@
   "u3cA22": {
     "defaultMessage": "Bottom margin : {size}",
     "description": "Bottom margin message in SimpleButton edition"
+  },
+  "u4ewv6": {
+    "defaultMessage": "Enter a phone number",
+    "description": "Placeholder for phone number inside contact card"
   },
   "uAudXH": {
     "defaultMessage": "Margins",

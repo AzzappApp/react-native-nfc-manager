@@ -226,6 +226,11 @@ const ContactCardEditModal = ({
                   onChangeText={onChange}
                   onBlur={onBlur}
                   style={styles.input}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a first name',
+                    description:
+                      'Placeholder for first name inside contact card',
+                  })}
                 />
               </View>
             )}
@@ -248,6 +253,10 @@ const ContactCardEditModal = ({
                   onBlur={onBlur}
                   style={styles.input}
                   clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a last name',
+                    description: 'Placeholder for last name contact card',
+                  })}
                 />
               </View>
             )}
@@ -270,6 +279,10 @@ const ContactCardEditModal = ({
                   onBlur={onBlur}
                   style={styles.input}
                   clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a title',
+                    description: 'Placeholder for title inside contact card',
+                  })}
                 />
               </View>
             )}
@@ -291,6 +304,11 @@ const ContactCardEditModal = ({
                   onBlur={onBlur}
                   style={styles.input}
                   clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a company name',
+                    description:
+                      'Placeholder for company name inside contact card',
+                  })}
                 />
               </View>
             )}
