@@ -2,7 +2,7 @@ import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql } from 'react-relay';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
@@ -15,7 +15,6 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
-import usePrelodedQueryWhenScreenReady from '#hooks/usePreloadedQueryWhenScreenReady';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -114,7 +113,7 @@ const CoverEditionScreenCoverEditor = ({
   onCoverSaved,
   onCanSaveChange,
 }: CoverEditionScreenCoverEditorProps) => {
-  const { viewer } = usePrelodedQueryWhenScreenReady<CoverEditionScreenQuery>(
+  const { viewer } = usePreloadedQuery<CoverEditionScreenQuery>(
     query,
     preloadedQuery,
   );
