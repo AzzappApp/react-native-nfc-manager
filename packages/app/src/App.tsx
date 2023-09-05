@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { useColorScheme } from 'react-native';
+import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -96,7 +97,9 @@ const initPromise = init();
 const App = () => {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    initPromise.finally(() => setReady(true));
+    initPromise.finally(() => {
+      setReady(true);
+    });
   }, []);
 
   if (!ready) {
@@ -235,6 +238,7 @@ const AppRouter = () => {
     [router, screenIdToDispose, screenPrefetcher],
   );
 
+  const slapshScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
     // We reset the environment only here
     // To avoid resetting it when old screens are still visible
@@ -246,6 +250,11 @@ const AppRouter = () => {
       RelayQueryManager.disposeQueryFor(screen),
     );
     screenIdToDispose.length = 0;
+    if (!slapshScreenHidden.current) {
+      setTimeout(() => {
+        hideSplashScreen({ fade: true });
+      }, 200);
+    }
   }, [screenIdToDispose]);
   // #endregion
 

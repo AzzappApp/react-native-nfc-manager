@@ -502,6 +502,8 @@ PODS:
     - React-jsi (= 0.71.13)
     - React-logger (= 0.71.13)
     - React-perflogger (= 0.71.13)
+  - RNBootSplash (5.0.2):
+    - React-Core
   - RNCAsyncStorage (1.19.2):
     - React-Core
   - RNCMaskedView (0.2.9):
@@ -658,6 +660,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
+  - RNBootSplash (from `../../../node_modules/react-native-bootsplash`)
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
@@ -820,6 +823,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
+  RNBootSplash:
+    :path: "../../../node_modules/react-native-bootsplash"
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
@@ -926,6 +931,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 2271362cdf9ff2dae6a2156f5101e5c30b02694d
   React-runtimeexecutor: 35cec6420c9d4144b0d06f9fdb093cf8f02bd52c
   ReactCommon: fc9d1da17fa902910dcba550a54c16e7e1c70d2c
+  RNBootSplash: 162e6b22df17b8fadc1ab68b0a43093d1e6c4cab
   RNCAsyncStorage: f57e929cd7757f2cb3dd8186d123c09e8281a1ad
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6
   RNFlashList: 25b0e092b4470c84db0386d4f5316dc34123bb6d
@@ -950,4 +956,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a9222a840143d4be8c0337cf757173eadf90dc25
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

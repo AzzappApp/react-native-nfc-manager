@@ -120,6 +120,10 @@
 		FD39DAF62A52AC2100C49A82 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */; };
 		FD39DAF72A52AC2100C49A82 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		FD39DAFC2A52AC2100C49A82 /* Nuke.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FD4BD5462AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
+		FD4BD5472AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
+		FD4BD5482AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
+		FD4BD5492AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
@@ -257,6 +261,7 @@
 		FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPScrollToTopInterceptor.m; path = azzapp/AZPScrollToTopInterceptor.m; sourceTree = "<group>"; };
 		FD39DAC92A52AB5F00C49A82 /* azzapp-dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD39DB002A52AC2100C49A82 /* azzapp-staging.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-staging.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = azzapp/BootSplash.storyboard; sourceTree = "<group>"; };
 		FD4EC42428A54C8F00DDC5C9 /* AZPSnapshotManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshotManager.h; path = azzapp/AZPSnapshotManager.h; sourceTree = "<group>"; };
 		FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshotManager.m; path = azzapp/AZPSnapshotManager.m; sourceTree = "<group>"; };
 		FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshot.h; path = azzapp/AZPSnapshot.h; sourceTree = "<group>"; };
@@ -350,6 +355,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
+				FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				FD4EC42428A54C8F00DDC5C9 /* AZPSnapshotManager.h */,
 				FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */,
@@ -692,6 +698,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD4BD5492AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +709,7 @@
 				96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */,
 				BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */,
+				FD4BD5462AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				96678DE529D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf in Resources */,
@@ -717,6 +725,7 @@
 				FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAB92A52AB5F00C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				FD39DABB2A52AB5F00C49A82 /* PlusJakartaSans-Bold.ttf in Resources */,
+				FD4BD5472AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				FD39DABC2A52AB5F00C49A82 /* PlusJakartaSans-Medium.ttf in Resources */,
 				FD39DABD2A52AB5F00C49A82 /* LaunchScreen.storyboard in Resources */,
 				FD39DABE2A52AB5F00C49A82 /* PlusJakartaSans-SemiBold.ttf in Resources */,
@@ -732,6 +741,7 @@
 				FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAF02A52AC2100C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				FD39DAF22A52AC2100C49A82 /* PlusJakartaSans-Bold.ttf in Resources */,
+				FD4BD5482AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				FD39DAF32A52AC2100C49A82 /* PlusJakartaSans-Medium.ttf in Resources */,
 				FD39DAF42A52AC2100C49A82 /* LaunchScreen.storyboard in Resources */,
 				FD39DAF52A52AC2100C49A82 /* PlusJakartaSans-SemiBold.ttf in Resources */,
@@ -1676,6 +1686,7 @@
 			baseConfigurationReference = B6ADC0198955819309228FBD /* Pods-common-azzapp-staging.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N349L99RA9;
@@ -1708,6 +1719,7 @@
 			baseConfigurationReference = 9CF8C7BFE5E5D64C5E114A6E /* Pods-common-azzapp-staging.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N349L99RA9;

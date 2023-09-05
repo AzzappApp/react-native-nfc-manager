@@ -77,7 +77,7 @@ const MainTabBar = ({
   const bottom = inset.bottom > 0 ? inset.bottom : 10;
 
   const [visibilityState, setVisibilitySharedValue] = useState(
-    mainTabBarVisibilityStates.at(-1)?.state ?? true,
+    mainTabBarVisibilityStates.at(-1)?.state ?? false,
   );
 
   const visibilityStyle = useAnimatedStyle(() => {

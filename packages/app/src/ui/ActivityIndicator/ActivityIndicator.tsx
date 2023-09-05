@@ -33,4 +33,8 @@ function ActivityIndicator({
   );
 }
 
+export const ACTIVITY_INDICATOR_WIDTH = 40;
+
+export const ACTIVITY_INDICATOR_HEIGHT = 51;
+
 export default ActivityIndicator;

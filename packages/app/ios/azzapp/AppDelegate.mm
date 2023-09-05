@@ -1,9 +1,9 @@
 #import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
-
-#import <RNScreens/RNSScreenStackAnimator.h>
-#import "AZPCustomReavealTransition.h"
 #import <React/RCTLinkingManager.h>
+#import <RNScreens/RNSScreenStackAnimator.h>
+#import <RNBootSplash/RNBootSplash.h>
+#import "AZPCustomReavealTransition.h"
 
 
 /**
@@ -81,6 +81,18 @@ static void ClearKeychainIfNecessary() {
  return [RCTLinkingManager application:application
                   continueUserActivity:userActivity
                     restorationHandler:restorationHandler];
+}
+
+- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
+                          moduleName:(NSString *)moduleName
+                           initProps:(NSDictionary *)initProps {
+  UIView *rootView = [super createRootViewWithBridge:bridge
+                                          moduleName:moduleName
+                                           initProps:initProps];
+
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+
+  return rootView;
 }
 
 @end

@@ -263,6 +263,7 @@ const ItemRenderComponent = ({
       profileId={item.id}
       onPress={onPress}
       prefetch
+      videoEnabled={currentUserIndex === index}
     />
   );
 };
