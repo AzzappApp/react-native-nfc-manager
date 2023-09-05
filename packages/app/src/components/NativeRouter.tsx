@@ -836,7 +836,7 @@ type NativeNavigationEvent =
   | 'willAppear'
   | 'willDisappear';
 
-const ScreenRendererContext = React.createContext<{
+export const ScreenRendererContext = React.createContext<{
   id: string;
   navigationEventEmitter: EventEmitter;
   hasFocus?: boolean;

@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
@@ -15,6 +15,8 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
+import usePrelodedQueryWhenScreenReady from '#hooks/usePreloadedQueryWhenScreenReady';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
@@ -22,27 +24,12 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CoverEditionRoute } from '#routes';
 import type { CoverEditionScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionScreenPrefetchQuery.graphql';
 import type { CoverEditionScreenQuery } from '@azzapp/relay/artifacts/CoverEditionScreenQuery.graphql';
+import type { Ref } from 'react';
+import type { PreloadedQuery } from 'react-relay';
 
 const CoverEditionScreen = ({
   preloadedQuery,
 }: RelayScreenProps<CoverEditionRoute, CoverEditionScreenQuery>) => {
-  const { viewer } = usePreloadedQuery<CoverEditionScreenQuery>(
-    query,
-    preloadedQuery,
-  );
-
-  const templateKind = useMemo(
-    () =>
-      viewer.profile?.cardCover?.media?.__typename === 'MediaVideo'
-        ? 'video'
-        : viewer.profile?.cardCover?.segmented === false
-        ? 'others'
-        : 'people',
-    // we only want to recompute the template kind the first time
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   const intl = useIntl();
   const router = useRouter();
 
@@ -87,15 +74,72 @@ const CoverEditionScreen = ({
         leftElement={<CancelHeaderButton onPress={onCancel} />}
         rightElement={<SaveHeaderButton onPress={onSave} disabled={!canSave} />}
       />
-      <CoverEditor
-        ref={coverEditorRef}
-        viewer={viewer}
-        height={editorHeight}
-        onCoverSaved={onCoverSaved}
-        onCanSaveChange={setCanSave}
-        initialTemplateKind={templateKind}
-      />
+      <Suspense
+        fallback={
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        }
+      >
+        <CoverEditionScreenCoverEditor
+          preloadedQuery={preloadedQuery}
+          coverEditorRef={coverEditorRef}
+          editorHeight={editorHeight}
+          onCoverSaved={onCoverSaved}
+          onCanSaveChange={setCanSave}
+        />
+      </Suspense>
     </Container>
+  );
+};
+
+type CoverEditionScreenCoverEditorProps = {
+  preloadedQuery: PreloadedQuery<CoverEditionScreenQuery>;
+  coverEditorRef: Ref<CoverEditorHandle>;
+  editorHeight: number;
+  onCoverSaved: () => void;
+  onCanSaveChange: (canSave: boolean) => void;
+};
+
+const CoverEditionScreenCoverEditor = ({
+  preloadedQuery,
+  coverEditorRef,
+  editorHeight,
+  onCoverSaved,
+  onCanSaveChange,
+}: CoverEditionScreenCoverEditorProps) => {
+  const { viewer } = usePrelodedQueryWhenScreenReady<CoverEditionScreenQuery>(
+    query,
+    preloadedQuery,
+  );
+
+  const templateKind = useMemo(
+    () =>
+      viewer.profile?.cardCover?.media?.__typename === 'MediaVideo'
+        ? 'video'
+        : viewer.profile?.cardCover?.segmented === false
+        ? 'others'
+        : 'people',
+    // we only want to recompute the template kind the first time
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  return (
+    <CoverEditor
+      ref={coverEditorRef}
+      viewer={viewer}
+      height={editorHeight}
+      onCoverSaved={onCoverSaved}
+      onCanSaveChange={onCanSaveChange}
+      initialTemplateKind={templateKind}
+    />
   );
 };
 
