@@ -1,4 +1,4 @@
-## 0.2.0-canary.51
+## 0.2.0-canary.52
 
 * **feat:**  - app icons and splash screen ([#980](https://github.com/AzzappApp/azzapp/pull/980))
 * **feat:**  - **CoverEdition:** cover edition screen fallback ([#967](https://github.com/AzzappApp/azzapp/pull/967))
