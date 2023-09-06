@@ -1,7 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions, Pressable } from 'react-native';
+import { View, useWindowDimensions, Pressable, FlatList } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -12,11 +11,11 @@ import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ListRenderItem } from '@shopify/flash-list';
 import type {
   ViewProps,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  ListRenderItem,
 } from 'react-native';
 
 export type WebCardInfo = {
@@ -110,7 +109,16 @@ const WebCardList = ({
     [webCardsItemWidth, onSelectedIndexChange],
   );
 
-  const flatListRef = useRef<FlashList<WebCardInfo>>(null);
+  const getItemLayout = useCallback(
+    (_data: unknown, index: number) => ({
+      length: webCardsItemWidth,
+      offset: (webCardsItemWidth + GAP) * index,
+      index,
+    }),
+    [webCardsItemWidth],
+  );
+
+  const flatListRef = useRef<FlatList>(null);
   const scrollToIndex = useCallback((index: number) => {
     flatListRef?.current?.scrollToIndex({
       index,
@@ -128,27 +136,18 @@ const WebCardList = ({
   }, [viewMode, cards]);
 
   const renderItem = useCallback<ListRenderItem<WebCardInfo>>(
-    ({ item, index, target }) =>
-      target === 'Measurement' ? (
-        <View
-          style={{
-            width: webCardsItemWidth + GAP,
-            height: webCardsItemHeight,
-            paddingHorizontal: GAP / 2,
-          }}
-        />
-      ) : (
-        <WebCardListItem
-          index={index}
-          item={item}
-          isSelected={currentIndex === index}
-          initialWebCardScrollPosition={initialWebCardScrollPosition}
-          viewMode={viewMode}
-          webCardsItemWidth={webCardsItemWidth}
-          webCardsItemHeight={webCardsItemHeight}
-          scrollToIndex={scrollToIndex}
-        />
-      ),
+    ({ item, index }) => (
+      <WebCardListItem
+        index={index}
+        item={item}
+        isSelected={currentIndex === index}
+        initialWebCardScrollPosition={initialWebCardScrollPosition}
+        viewMode={viewMode}
+        webCardsItemWidth={webCardsItemWidth}
+        webCardsItemHeight={webCardsItemHeight}
+        scrollToIndex={scrollToIndex}
+      />
+    ),
     [
       currentIndex,
       webCardsItemWidth,
@@ -157,21 +156,6 @@ const WebCardList = ({
       viewMode,
       scrollToIndex,
     ],
-  );
-
-  const flashListStyle = useMemo(
-    () => ({
-      paddingVertical: GAP,
-      paddingHorizontal: viewMode === 'mobile' ? windowWidth / 4 : 50,
-    }),
-    [viewMode, windowWidth],
-  );
-
-  const overrideItemLayout = useCallback(
-    (layout: { span?: number; size?: number }) => {
-      layout.size = webCardsItemWidth + GAP;
-    },
-    [webCardsItemWidth],
   );
 
   return (
@@ -198,24 +182,31 @@ const WebCardList = ({
           ]}
         />
       </View>
-      <FlashList
+      <FlatList
         ref={flatListRef}
         data={cards}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReached={onEndReached}
+        getItemLayout={getItemLayout}
         snapToInterval={webCardsItemWidth + GAP}
-        estimatedItemSize={webCardsItemWidth + GAP}
-        overrideItemLayout={overrideItemLayout}
         snapToAlignment="start"
         decelerationRate="fast"
         onScroll={onScroll}
         scrollEventThrottle={16}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={flashListStyle}
+        style={styles.webCardList}
+        contentContainerStyle={[
+          styles.webCardListContentContainer,
+          {
+            paddingHorizontal: viewMode === 'mobile' ? windowWidth / 4 : 50,
+            gap: GAP,
+          },
+        ]}
         nestedScrollEnabled
-        onEndReachedThreshold={0.5}
+        initialNumToRender={2}
+        onEndReachedThreshold={2}
       />
     </View>
   );
@@ -254,6 +245,12 @@ const stylesheet = createStyleSheet(theme => ({
     overflow: 'hidden',
     flex: 1,
   },
+  webCardList: {
+    flex: 1,
+  },
+  webCardListContentContainer: {
+    paddingVertical: GAP,
+  },
 }));
 
 type WebCardListItemProps = {
@@ -267,7 +264,7 @@ type WebCardListItemProps = {
   scrollToIndex: (index: number) => void;
 };
 
-const _WebCardListItem = ({
+const ItemList = ({
   index,
   item,
   isSelected,
@@ -288,72 +285,63 @@ const _WebCardListItem = ({
     scrollToIndex(index);
   };
   return (
-    <View
-      style={{
-        width: webCardsItemWidth + GAP,
-        height: webCardsItemHeight,
-        paddingHorizontal: GAP / 2,
-      }}
+    <Pressable
+      onPress={onPress}
+      disabled={isSelected}
+      style={{ width: webCardsItemWidth }}
     >
-      <Pressable
-        onPress={onPress}
-        disabled={isSelected}
-        style={{ width: webCardsItemWidth, height: webCardsItemHeight }}
-      >
-        <View style={styles.webCardContainer}>
-          <View style={styles.webCardContainerRadius}>
-            <View
+      <View style={styles.webCardContainer}>
+        <View style={styles.webCardContainerRadius}>
+          <View
+            style={{
+              width: webCardsInnerdWidth,
+              height: webCardInnerHeight,
+              backgroundColor: '#FFFFFF',
+              transform: [
+                { translateX: (webCardsItemWidth - webCardsInnerdWidth) / 2 },
+                { translateY: (webCardsItemHeight - webCardInnerHeight) / 2 },
+                { scale },
+              ],
+            }}
+          >
+            <WebCardRenderer
+              contentOffset={{
+                x: 0,
+                y:
+                  initialWebCardScrollPosition === 'halfCover'
+                    ? webCardsItemWidth / (2 * COVER_RATIO) / scale
+                    : 0,
+              }}
+              profile={item.profile}
+              cardStyle={item.cardStyle}
+              cardColors={item.cardColors}
+              cardModules={item.cardModules}
+              viewMode={viewMode}
               style={{
+                flexShrink: 0,
                 width: webCardsInnerdWidth,
                 height: webCardInnerHeight,
-                backgroundColor: '#FFFFFF',
-                transform: [
-                  { translateX: (webCardsItemWidth - webCardsInnerdWidth) / 2 },
-                  { translateY: (webCardsItemHeight - webCardInnerHeight) / 2 },
-                  { scale },
-                ],
               }}
-            >
-              <WebCardRenderer
-                contentOffset={{
-                  x: 0,
-                  y:
-                    initialWebCardScrollPosition === 'halfCover'
-                      ? webCardsItemWidth / (2 * COVER_RATIO) / scale
-                      : 0,
-                }}
-                profile={item.profile}
-                cardStyle={item.cardStyle}
-                cardColors={item.cardColors}
-                cardModules={item.cardModules}
-                viewMode={viewMode}
-                style={{
-                  flexShrink: 0,
-                  width: webCardsInnerdWidth,
-                  height: webCardInnerHeight,
-                }}
-                contentContainerStyle={{
-                  flexShrink: 0,
-                  flexGrow: 1,
-                  minHeight:
-                    webCardInnerHeight +
-                    webCardsItemWidth / COVER_RATIO / scale,
-                }}
-                nestedScrollEnabled
-                overScrollMode="always"
-                scrollEnabled={isSelected}
-                showsVerticalScrollIndicator={false}
-                moduleActionEnabled={false}
-              />
-            </View>
+              contentContainerStyle={{
+                flexShrink: 0,
+                flexGrow: 1,
+                minHeight:
+                  webCardInnerHeight + webCardsItemWidth / COVER_RATIO / scale,
+              }}
+              nestedScrollEnabled
+              overScrollMode="always"
+              scrollEnabled={isSelected}
+              showsVerticalScrollIndicator={false}
+              moduleActionEnabled={false}
+            />
           </View>
         </View>
-        <View style={styles.labelContainerHeight}>
-          <Text variant="smallbold">{item.label}</Text>
-        </View>
-      </Pressable>
-    </View>
+      </View>
+      <View style={styles.labelContainerHeight}>
+        <Text variant="smallbold">{item.label}</Text>
+      </View>
+    </Pressable>
   );
 };
 
-const WebCardListItem = memo(_WebCardListItem);
+const WebCardListItem = memo(ItemList);
