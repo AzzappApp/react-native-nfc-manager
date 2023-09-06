@@ -1,4 +1,5 @@
 import { graphql, readInlineData, useFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
@@ -102,14 +103,18 @@ const ModulesDataFragment = graphql`
 
 export const useModulesData = (cardModulesKey: ModuleData_cardModules$key) => {
   const modules = useFragment(ModulesDataFragment, cardModulesKey);
-  return modules.map(
-    module =>
-      ({
-        id: module.id,
-        kind: module.kind,
-        visible: module.visible,
-        data: readModuleData(module as any),
-      }) as ModuleRenderInfo & { id: string; visible: boolean },
+  return convertToNonNullArray(
+    modules.map(module => {
+      if (module) {
+        return {
+          id: module.id,
+          kind: module.kind,
+          visible: module.visible,
+          data: readModuleData(module as any),
+        } as ModuleRenderInfo & { id: string; visible: boolean };
+      }
+      return null;
+    }),
   );
 };
 
