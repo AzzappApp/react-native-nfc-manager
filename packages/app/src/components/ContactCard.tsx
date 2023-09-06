@@ -132,7 +132,10 @@ const ContactCard = ({
               </Text>
             )}
             {contactCard.company && (
-              <Text variant="large" style={[styles.webCardLabel]}>
+              <Text
+                variant="large"
+                style={[styles.webCardLabel, { color: readableColor }]}
+              >
                 {contactCard.company}
               </Text>
             )}
