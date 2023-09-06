@@ -18,7 +18,15 @@ const CoverRendererBackground = ({
   if (!media) return null;
 
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={styles.wrapper}
+      style={{
+        backgroundColor: swapColor(
+          coverData?.backgroundColor ?? 'light',
+          cardColors ?? DEFAULT_COLOR_PALETTE,
+        ),
+      }}
+    >
       {coverData?.backgroundId && (
         <div
           style={{

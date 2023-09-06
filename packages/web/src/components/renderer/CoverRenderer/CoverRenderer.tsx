@@ -28,7 +28,7 @@ const CoverRenderer = async ({
   if (!coverData) {
     return null;
   }
-  // TODO render foreground
+
   return (
     <div
       {...props}
