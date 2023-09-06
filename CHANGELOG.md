@@ -1,5 +1,6 @@
-## 0.2.0-canary.56
+## 0.2.0-canary.57
 
+* **fix:**  - new carstyle modal
 * **fix:**  - module can be null ([#997](https://github.com/AzzappApp/azzapp/pull/997))
 * **fix:**  - **Home:** layout and performance ([#993](https://github.com/AzzappApp/azzapp/pull/993))
 * **feat:**  - 🎸 add background color to cover background ([#991](https://github.com/AzzappApp/azzapp/pull/991))
