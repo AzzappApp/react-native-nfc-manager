@@ -1,5 +1,8 @@
-## 0.2.0-canary.53
+## 0.2.0-canary.54
 
+* **fix:**  - module can be null ([#997](https://github.com/AzzappApp/azzapp/pull/997))
+* **fix:**  - **Home:** layout and performance ([#993](https://github.com/AzzappApp/azzapp/pull/993))
+* **feat:**  - 🎸 add background color to cover background ([#991](https://github.com/AzzappApp/azzapp/pull/991))
 * **feat:**  - 🎸 add mission placeholders for contact card ([#982](https://github.com/AzzappApp/azzapp/pull/982))
 * **feat:**  - app icons and splash screen ([#980](https://github.com/AzzappApp/azzapp/pull/980))
 * **feat:**  - **CoverEdition:** cover edition screen fallback ([#967](https://github.com/AzzappApp/azzapp/pull/967))
