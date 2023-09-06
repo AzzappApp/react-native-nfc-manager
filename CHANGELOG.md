@@ -1,5 +1,6 @@
-## 0.2.0-canary.57
+## 0.2.0-canary.58
 
+* **fix:**  - CardStyle TemplateList save
 * **fix:**  - new carstyle modal
 * **fix:**  - module can be null ([#997](https://github.com/AzzappApp/azzapp/pull/997))
 * **fix:**  - **Home:** layout and performance ([#993](https://github.com/AzzappApp/azzapp/pull/993))
