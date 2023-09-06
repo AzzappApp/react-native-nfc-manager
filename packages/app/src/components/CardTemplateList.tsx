@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
@@ -95,7 +95,15 @@ const CardTemplateList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedIndexRef = useRef(0);
+
+  const onSelectedIndexChange = useCallback(
+    (index: number) => {
+      console.log('onSelectedIndexChange', index);
+      selectedIndexRef.current = index;
+    },
+    [selectedIndexRef],
+  );
 
   const cards = useMemo(
     () =>
@@ -121,7 +129,9 @@ const CardTemplateList = ({
   const onSubmit = () => {
     if (!cards) return;
 
-    onApplyTemplate(cards[selectedIndex].id);
+    console.log('onSubmit', selectedIndexRef.current);
+
+    onApplyTemplate(cards[selectedIndexRef.current].id);
   };
 
   const canSkip = !!onSkip;
@@ -140,7 +150,7 @@ const CardTemplateList = ({
             cards={cards as unknown as WebCardInfo[]}
             height={listHeight}
             initialWebCardScrollPosition="halfCover"
-            onSelectedIndexChange={setSelectedIndex}
+            onSelectedIndexChange={onSelectedIndexChange}
             onEndReached={onEndReached}
             style={styles.cardTemplateList}
           />

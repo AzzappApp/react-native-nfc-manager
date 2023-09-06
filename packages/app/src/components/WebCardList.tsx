@@ -100,6 +100,10 @@ const WebCardList = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentIndexSharedValue = useSharedValue(currentIndex);
 
+  useEffect(() => {
+    onSelectedIndexChange?.(currentIndex);
+  }, [currentIndex, onSelectedIndexChange]);
+
   const scrollToIndex = useCallback(
     (index: number) => {
       currentIndexSharedValue.value = withTiming(
@@ -150,8 +154,8 @@ const WebCardList = ({
               deceleration: 0.8,
             },
             () => {
-              const endIndex = currentIndexSharedValue.value;
-              currentIndexSharedValue.value = withSpring(Math.round(endIndex));
+              const endIndex = Math.round(currentIndexSharedValue.value);
+              currentIndexSharedValue.value = withSpring(endIndex);
               runOnJS(setCurrentIndex)(endIndex);
             },
           );

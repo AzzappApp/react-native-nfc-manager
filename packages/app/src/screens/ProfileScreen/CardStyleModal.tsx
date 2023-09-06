@@ -1,3 +1,4 @@
+import { pick } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -28,6 +29,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { CardStyleModal_cardStyles$key } from '@azzapp/relay/artifacts/CardStyleModal_cardStyles.graphql';
 import type { CardStyleModal_profile$key } from '@azzapp/relay/artifacts/CardStyleModal_profile.graphql';
+import type { CardStyleModalMutation } from '@azzapp/relay/artifacts/CardStyleModalMutation.graphql';
 import type { CardStyleModalQuery } from '@azzapp/relay/artifacts/CardStyleModalQuery.graphql';
 
 type CardStyleModalProps = {
@@ -92,7 +94,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const [cardStyle, setCardStyle] = useState<CardStyleItem>(currentCardStyle);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
 
-  const [commit, isInFlight] = useMutation(graphql`
+  const [commit, isInFlight] = useMutation<CardStyleModalMutation>(graphql`
     mutation CardStyleModalMutation($input: SaveCardStyleInput!) {
       saveCardStyle(input: $input) {
         profile {
@@ -123,9 +125,19 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const applyCardStyle = useCallback(() => {
     commit({
       variables: {
-        input: {
-          ...cardStyle,
-        },
+        input: pick(
+          cardStyle,
+          'borderColor',
+          'borderRadius',
+          'borderWidth',
+          'buttonColor',
+          'buttonRadius',
+          'fontFamily',
+          'fontSize',
+          'gap',
+          'titleFontFamily',
+          'titleFontSize',
+        ),
       },
       onCompleted: () => {
         onRequestClose();
@@ -179,6 +191,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
                 })}
                 onPress={applyCardStyle}
                 disabled={cardStyle.id === CURRENT_STYLE_ID}
+                loading={isInFlight}
               />
             }
             middleElement={intl.formatMessage({
