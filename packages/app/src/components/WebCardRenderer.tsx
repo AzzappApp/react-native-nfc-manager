@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useRef } from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
 import WebCardBackground from './WebCardBackground';

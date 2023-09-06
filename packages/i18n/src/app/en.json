@@ -1879,6 +1879,10 @@
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
   },
+  "e4PqPI": {
+    "defaultMessage": "Current style",
+    "description": "Card style modal current style label"
+  },
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
@@ -2359,10 +2363,6 @@
     "defaultMessage": "Top Color",
     "description": "Top Color title in Line Divider module screen"
   },
-  "n4dQQJ": {
-    "defaultMessage": "Apply this style",
-    "description": "Card style modal apply button"
-  },
   "n9GfPA": {
     "defaultMessage": "Share the post",
     "description": "PostRendererActionBar Share post button accessibility"
@@ -2718,6 +2718,10 @@
   "u4ewv6": {
     "defaultMessage": "Enter a phone number",
     "description": "Placeholder for phone number inside contact card"
+  },
+  "u7nQXh": {
+    "defaultMessage": "Apply",
+    "description": "Card style modal apply button label"
   },
   "uAudXH": {
     "defaultMessage": "Margins",

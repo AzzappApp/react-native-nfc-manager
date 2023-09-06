@@ -131,13 +131,13 @@ const WebCardList = ({
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
+        .activeOffsetX([-20, 20])
         .onBegin(() => {
           startOffset.value = currentIndexSharedValue.value;
         })
         .onUpdate(event => {
           currentIndexSharedValue.value =
             startOffset.value - event.translationX / windowWidth;
-          console.log(currentIndexSharedValue.value);
         })
         .onEnd(({ velocityX }) => {
           const prevIndex = Math.floor(currentIndexSharedValue.value);
@@ -146,7 +146,8 @@ const WebCardList = ({
             {
               velocity: -velocityX,
               clamp: [Math.max(prevIndex, 0), Math.min(nextIndex, nbCards - 1)],
-              deceleration: 0.995,
+              velocityFactor: 1 / windowWidth,
+              deceleration: 0.8,
             },
             () => {
               const endIndex = currentIndexSharedValue.value;
