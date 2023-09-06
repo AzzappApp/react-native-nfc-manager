@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import ERRORS from '@azzapp/shared/errors';
 import {
   ProfileTable,
@@ -32,9 +32,12 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     await checkMedias([mediaId]);
     const post = await db.transaction(async trx => {
       await referencesMedias([mediaId], null, trx);
-      await trx.update(ProfileTable).set({
-        nbPosts: sql`nbPosts + 1`,
-      });
+      await trx
+        .update(ProfileTable)
+        .set({
+          nbPosts: sql`nbPosts + 1`,
+        })
+        .where(eq(ProfileTable.id, profileId));
       const post = await createPost(
         {
           authorId: profileId,
