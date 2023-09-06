@@ -53,7 +53,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
 };
 
 const HOME_MENU_PADDING = 10;
-export const MENU_HEIGHT = 32 + HOME_MENU_PADDING;
+export const HOME_MENU_HEIGHT = 32 + HOME_MENU_PADDING;
 export default HomeMenu;
 
 const CLEAR_GRADIENT_COLOR = 'rgba(255, 255, 255, 0)';
@@ -61,7 +61,7 @@ const END_GRADIENT_COLOR = 'rgba(255, 255, 255, 0.3)';
 
 const styles = StyleSheet.create({
   container: {
-    height: MENU_HEIGHT,
+    height: HOME_MENU_HEIGHT,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginLeft: 20,

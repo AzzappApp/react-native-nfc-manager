@@ -15,7 +15,7 @@ type WelcomeScreenProps = {
 
 const WelcomeScreen = ({ onShowMenu }: WelcomeScreenProps) => {
   const intl = useIntl();
-  useMainTabBarVisiblilityController(false);
+  useMainTabBarVisiblilityController(false, true);
 
   return (
     <Container style={{ flex: 1 }}>

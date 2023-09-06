@@ -6,7 +6,6 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
@@ -14,22 +13,22 @@ import { getTextColor } from '#helpers/colorsHelper';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { HomeHeader_user$key } from '@azzapp/relay/artifacts/HomeHeader_user.graphql';
-import type { ColorValue } from 'react-native';
+import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeHeaderProps = {
   openPanel: () => void;
   user: HomeHeader_user$key;
   currentProfileIndexSharedValue: SharedValue<number>;
+  style?: StyleProp<ViewStyle>;
 };
 
 const HomeHeader = ({
   openPanel,
   user: userKey,
   currentProfileIndexSharedValue,
+  style,
 }: HomeHeaderProps) => {
-  const { top } = useSafeAreaInsets();
-
   const { profiles } = useFragment(
     graphql`
       fragment HomeHeader_user on User {
@@ -102,12 +101,14 @@ const HomeHeader = ({
           />
         </View>
       }
-      style={[styles.header, { marginTop: top }]}
+      style={[styles.header, style]}
     />
   );
 };
 
 export default HomeHeader;
+
+export const HOME_HEADER_HEIGHT = 28;
 
 const styles = StyleSheet.create({
   rightButtonContainer: {
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: 'transparent',
-    height: 28,
+    height: HOME_HEADER_HEIGHT,
   },
 });
 

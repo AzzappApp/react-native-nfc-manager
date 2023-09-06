@@ -18,7 +18,7 @@ import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
-import HomeMenu from './HomeMenu';
+import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import HomeStatistics from './HomeStatistics';
 import type { HOME_TAB } from './HomeMenu';
 import type { HomeBottomPanel_user$key } from '@azzapp/relay/artifacts/HomeBottomPanel_user.graphql';
@@ -31,7 +31,7 @@ type HomeBottomPanelProps = {
    *
    * @type {number}
    */
-  containerHeight: number;
+  height: number;
   user: HomeBottomPanel_user$key;
   /**
    * current position of the scrolling profile (based on profile index and not scrollValue )
@@ -44,10 +44,10 @@ type HomeBottomPanelProps = {
 };
 
 const HomeBottomPanel = ({
-  containerHeight,
   user: userKey,
   currentProfileIndexSharedValue,
   currentProfileIndex,
+  height,
 }: HomeBottomPanelProps) => {
   //#region data
   const user = useFragment(
@@ -153,8 +153,13 @@ const HomeBottomPanel = ({
 
     const missingCoverPanelVisible = interpolate(
       currentProfileIndexSharedValue.value,
-      [prev, next],
-      [prevIsNewProfile || prevHasWebCover ? 0 : 1, nextHasWebCover ? 0 : 1],
+      [prev, prev + 0.2, next - 0.2, next],
+      [
+        prevIsNewProfile || prevHasWebCover ? 0 : 1,
+        0,
+        0,
+        nextHasWebCover ? 0 : 1,
+      ],
     );
 
     const webCardPublishPanelVisible = interpolate(
@@ -243,6 +248,8 @@ const HomeBottomPanel = ({
   //#endregion
 
   const intl = useIntl();
+
+  const panelHeight = height - HOME_MENU_HEIGHT;
 
   return (
     <View style={{ flex: 1 }}>
@@ -360,7 +367,7 @@ const HomeBottomPanel = ({
               element: (
                 <HomeContactCard
                   user={user}
-                  height={2 * containerHeight}
+                  height={panelHeight}
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
                   }
@@ -372,7 +379,7 @@ const HomeBottomPanel = ({
               element: (
                 <HomeStatistics
                   user={user}
-                  height={2 * containerHeight}
+                  height={panelHeight}
                   animated={selectedPanel === 'STATS'}
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
@@ -387,6 +394,7 @@ const HomeBottomPanel = ({
                 <HomeInformations
                   user={user}
                   animated={selectedPanel === 'INFORMATION'}
+                  height={panelHeight}
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
                   }

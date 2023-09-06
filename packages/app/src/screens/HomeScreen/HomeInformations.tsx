@@ -18,6 +18,7 @@ import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
   animated: boolean;
+  height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
 };
 /**
@@ -32,6 +33,7 @@ type HomeInformationsProps = {
  */
 const HomeInformations = ({
   animated,
+  height,
   user,
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
@@ -158,7 +160,7 @@ const HomeInformations = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height }]}>
       <View style={styles.row}>
         <Link
           route="PROFILE"
@@ -243,7 +245,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     rowGap: 12,
-    flex: 1,
   },
   row: {
     flexDirection: 'row',

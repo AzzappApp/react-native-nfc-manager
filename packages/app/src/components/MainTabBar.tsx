@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   useWindowDimensions,
   type StyleProp,
@@ -27,9 +27,12 @@ const mainTabBarVisibilityStates: Array<{
 const mainTabBarVisibleListners = new Set<() => void>();
 export const useMainTabBarVisiblilityController = (
   visibilityState: SharedValue<number> | false | true,
+  active = true,
 ) => {
   const hasFocus = useScreenHasFocus();
   const [controlVisibility, setControlVisibility] = useState(hasFocus);
+
+  const id = useMemo(() => createId(), []);
 
   useNativeNavigationEvent('disappear', () => {
     setControlVisibility(false);
@@ -38,10 +41,8 @@ export const useMainTabBarVisiblilityController = (
   useNativeNavigationEvent('willAppear', () => {
     setControlVisibility(true);
   });
-
-  const id = useMemo(() => createId(), []);
-  useEffect(() => {
-    if (controlVisibility) {
+  useLayoutEffect(() => {
+    if (controlVisibility && active) {
       mainTabBarVisibilityStates.push({ id, state: visibilityState });
       mainTabBarVisibleListners.forEach(listener => listener());
     }
@@ -54,7 +55,7 @@ export const useMainTabBarVisiblilityController = (
         mainTabBarVisibleListners.forEach(listener => listener());
       }
     };
-  }, [controlVisibility, id, visibilityState]);
+  }, [controlVisibility, id, visibilityState, active]);
 };
 
 /**
@@ -76,9 +77,9 @@ const MainTabBar = ({
   const { width } = useWindowDimensions();
   const bottom = inset.bottom > 0 ? inset.bottom : 10;
 
-  const [visibilityState, setVisibilitySharedValue] = useState(
-    mainTabBarVisibilityStates.at(-1)?.state ?? false,
-  );
+  const [, forceUpdate] = useState(0);
+
+  const visibilityState = mainTabBarVisibilityStates.at(-1)?.state ?? false;
 
   const visibilityStyle = useAnimatedStyle(() => {
     const visible =
@@ -111,9 +112,7 @@ const MainTabBar = ({
 
   useEffect(() => {
     const listener = () => {
-      setVisibilitySharedValue(
-        mainTabBarVisibilityStates.at(-1)?.state ?? true,
-      );
+      forceUpdate(v => v + 1);
     };
     mainTabBarVisibleListners.add(listener);
     return () => {

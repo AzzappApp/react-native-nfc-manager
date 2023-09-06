@@ -61,7 +61,17 @@ const HomeProfileLink = ({
 
 export default memo(HomeProfileLink);
 
+export const PROFILE_LINK_HEIGHT = 29;
+
+export const PROFILE_LINK_MARGIN_TOP = 21;
+
 const styles = StyleSheet.create({
+  container: {
+    height: PROFILE_LINK_HEIGHT,
+    wdith: '100%',
+    alignItems: 'center',
+    marginTop: PROFILE_LINK_MARGIN_TOP,
+  },
   emptyViewCenter: {
     marginRight: 13,
     height: 18,
@@ -75,7 +85,7 @@ const styles = StyleSheet.create({
     width: 18,
   },
   containerText: {
-    height: 29,
+    height: PROFILE_LINK_HEIGHT,
     width: '82%',
     borderWidth: 1,
     borderRadius: 14,
@@ -84,11 +94,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  container: {
-    height: 29,
-    wdith: '100%',
-    alignItems: 'center',
-    marginTop: 21,
   },
 });

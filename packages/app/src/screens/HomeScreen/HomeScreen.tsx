@@ -44,7 +44,7 @@ const HomeScreen = ({
 };
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisiblilityController(false);
+  useMainTabBarVisiblilityController(false, true);
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 

@@ -3,7 +3,7 @@ import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
-import ContactCard from '#components/ContactCard';
+import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
@@ -31,6 +31,7 @@ const HomeContactCard = ({
         profiles {
           id
           userName
+          cardIsPublished
           ...ContactCard_profile
         }
       }
@@ -86,6 +87,11 @@ const ContactCardItem = ({
       { translateX: (index - currentProfileIndexSharedValue.value) * width },
     ],
   }));
+
+  const maxWidth = width - 40;
+  const maxHeight = maxWidth / CONTACT_CARD_RATIO;
+  const cardHeight = Math.min(height, maxHeight);
+
   return (
     <Animated.View
       style={[
@@ -97,11 +103,23 @@ const ContactCardItem = ({
         positionStyle,
       ]}
     >
-      <Link route="CONTACT_CARD">
-        <PressableNative style={{ flex: 1 }}>
-          <ContactCard profile={item} height={height - 4} style={styles.card} />
-        </PressableNative>
-      </Link>
+      {item.cardIsPublished && (
+        <Link route="CONTACT_CARD">
+          <PressableNative
+            style={{
+              width: cardHeight * CONTACT_CARD_RATIO,
+              height: cardHeight,
+              overflow: 'visible',
+            }}
+          >
+            <ContactCard
+              profile={item}
+              height={Math.min(height, maxHeight)}
+              style={styles.card}
+            />
+          </PressableNative>
+        </Link>
+      )}
     </Animated.View>
   );
 };

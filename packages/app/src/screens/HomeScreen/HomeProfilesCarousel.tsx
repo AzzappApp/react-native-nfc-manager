@@ -16,6 +16,7 @@ import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
+import Skeleton from '#components/Skeleton';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -84,7 +85,7 @@ const HomeProfilesCarousel = (
   );
 
   const { width: windowWidth } = useWindowDimensions();
-  const coverHeight = height - 2 * MARGIN;
+  const coverHeight = height - 2 * VERTICAL_MARGIN;
   const coverWidth = Math.trunc(coverHeight * COVER_RATIO);
 
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
@@ -142,33 +143,31 @@ const HomeProfilesCarousel = (
   }
 
   return (
-    <View
-      style={{
-        width: windowWidth,
-        height,
-        paddingVertical: MARGIN,
-      }}
-    >
-      <CarouselSelectList
-        ref={carouselRef}
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        width={windowWidth}
-        height={coverHeight}
-        itemWidth={coverWidth}
-        scaleRatio={SCALE_RATIO}
-        style={styles.carousel}
-        itemContainerStyle={styles.carouselContentContainer}
-        onSelectedIndexChange={onSelectedIndexChange}
-        onSelectedIndexChangeAnimated={onSelectedIndexChangeAnimated}
-        initialScrollIndex={initialProfileIndex + 1}
-      />
-    </View>
+    <CarouselSelectList
+      ref={carouselRef}
+      data={data}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      width={windowWidth}
+      height={coverHeight}
+      itemWidth={coverWidth}
+      scaleRatio={SCALE_RATIO}
+      style={[
+        styles.carousel,
+        {
+          width: windowWidth,
+          height,
+        },
+      ]}
+      itemContainerStyle={styles.carouselContentContainer}
+      onSelectedIndexChange={onSelectedIndexChange}
+      onSelectedIndexChangeAnimated={onSelectedIndexChangeAnimated}
+      initialScrollIndex={initialProfileIndex + 1}
+    />
   );
 };
 
-const MARGIN = 15;
+const VERTICAL_MARGIN = 15;
 
 const SCALE_RATIO = 108 / 291;
 
@@ -196,6 +195,12 @@ const ItemRenderComponent = ({
   scrollToIndex,
 }: ItemRenderProps) => {
   const intl = useIntl();
+
+  const [ready, setReady] = useState(!item?.cardCover);
+
+  const onReady = useCallback(() => {
+    setReady(true);
+  }, []);
 
   const onPress = (event: GestureResponderEvent) => {
     if (index !== currentUserIndex) {
@@ -228,43 +233,70 @@ const ItemRenderComponent = ({
     );
   }
 
-  if (!item.cardCover) {
-    return (
-      <Link
-        route="NEW_PROFILE"
-        params={{
-          profileId: item.id,
-        }}
-      >
-        <PressableOpacity
-          style={[
-            styles.coverShadow,
-            {
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: coverWidth * COVER_CARD_RADIUS,
-            },
-          ]}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Create a new profile',
-            description: 'Start new profile creation from account screen',
-          })}
-        >
-          <CoverRenderer width={coverWidth} profile={item} />
-        </PressableOpacity>
-      </Link>
-    );
-  }
-
   return (
-    <CoverLink
-      profile={item}
-      width={coverWidth}
-      profileId={item.id}
-      onPress={onPress}
-      prefetch
-      videoEnabled={currentUserIndex === index}
-    />
+    <View
+      style={[
+        styles.coverShadow,
+        styles.coverContainer,
+        {
+          width: coverWidth,
+          height: coverHeight,
+          borderRadius: coverWidth * COVER_CARD_RADIUS,
+        },
+      ]}
+    >
+      {item.cardCover ? (
+        <CoverLink
+          profile={item}
+          width={coverWidth}
+          profileId={item.id}
+          onPress={onPress}
+          prefetch
+          videoEnabled={currentUserIndex === index}
+          onReadyForDisplay={onReady}
+        />
+      ) : (
+        <Link
+          route="NEW_PROFILE"
+          params={{
+            profileId: item.id,
+          }}
+        >
+          <PressableOpacity
+            style={[
+              {
+                width: coverWidth,
+                height: coverHeight,
+                borderRadius: coverWidth * COVER_CARD_RADIUS,
+                overflow: 'visible',
+              },
+            ]}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Create a new profile',
+              description: 'Start new profile creation from account screen',
+            })}
+          >
+            <CoverRenderer
+              width={coverWidth}
+              profile={item}
+              onReadyForDisplay={onReady}
+            />
+          </PressableOpacity>
+        </Link>
+      )}
+      {!ready && (
+        <Skeleton
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: coverWidth,
+            height: coverHeight,
+            borderRadius: coverWidth * COVER_CARD_RADIUS,
+          }}
+        />
+      )}
+    </View>
   );
 };
 
@@ -275,26 +307,29 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     overflow: 'visible',
     alignSelf: 'center',
+    paddingVertical: VERTICAL_MARGIN,
   },
   carouselContentContainer: {
     flexGrow: 0,
     overflow: 'visible',
   },
+  coverShadow: shadow('light', 'bottom'),
   newCover: {
     aspectRatio: COVER_RATIO,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.white,
-    overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: 'visible',
   },
   icon: {
     tintColor: colors.white,
     width: 44,
     height: 44,
   },
-  coverShadow: {
-    ...shadow('light', 'bottom'),
+  coverContainer: {
+    overflow: 'visible',
+    // trick to have the shadow on the cover
   },
 });

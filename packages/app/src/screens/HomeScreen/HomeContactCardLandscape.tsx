@@ -1,91 +1,95 @@
+import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
+import { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import Animated, {
-  interpolate,
   useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import { MENU_HEIGHT } from './HomeMenu';
-import type { ContactCard_profile$key } from '@azzapp/relay/artifacts/ContactCard_profile.graphql';
+import { graphql, useFragment } from 'react-relay';
+import ContactCard from '#components/ContactCard';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
 
 type HomeContactCardLandscapeProps = {
-  /**
-   * The height of the contact card container in portrait mode
-   *
-   * @type {number}
-   */
-  containerHeight: number;
-  profile: ContactCard_profile$key;
-  /**
-   * the animation orientation shared value
-   *
-   * @type {Animated.SharedValue<number>}
-   */
-  orientationTimer: Animated.SharedValue<number>;
+  profile: HomeContactCardLandscape_profile$key | null;
 };
 
 const HomeContactCardLandscape = ({
-  containerHeight,
-  profile,
-  orientationTimer,
+  profile: profileKey,
 }: HomeContactCardLandscapeProps) => {
-  const { width: screenWidth } = useWindowDimensions();
-  const cardWidth = screenWidth - 20;
-  const animatedCard = useAnimatedStyle(() => {
-    return {
-      left: 10,
-      top: (cardWidth * CONTACT_CARD_RATIO) / 2,
-      zIndex: 100,
-      opacity: interpolate(
-        orientationTimer.value,
-        [-90, -1, 1, 90],
-        [1, 0, 0, 1],
-      ),
-      transform: [
-        {
-          translateY: interpolate(
-            orientationTimer.value,
-            [-90, -1, 1, 90],
-            [
-              0,
-              4 * containerHeight -
-                (cardWidth * CONTACT_CARD_RATIO) / 2 +
-                20 +
-                MENU_HEIGHT,
-              4 * containerHeight -
-                (cardWidth * CONTACT_CARD_RATIO) / 2 +
-                20 +
-                MENU_HEIGHT,
-              0,
-            ],
-          ),
-        },
-        {
-          rotate: `${interpolate(
-            orientationTimer.value,
-            [-90, -45, 45, 90],
-            [90, 0, 0, 90],
-          )}deg`,
-        },
-        {
-          scale: interpolate(
-            orientationTimer.value,
-            [-90, -1, 0, 1, 90],
-            [
-              cardWidth / (cardWidth / CONTACT_CARD_RATIO),
-              0.9,
-              0,
-              0.9,
-              cardWidth / (cardWidth / CONTACT_CARD_RATIO),
-            ],
-          ),
-        },
-      ],
-    };
-  });
+  const profile = useFragment(
+    graphql`
+      fragment HomeContactCardLandscape_profile on Profile {
+        ...ContactCard_profile
+        cardIsPublished
+      }
+    `,
+    profileKey,
+  );
+
+  const [orientation, setOrientation] = useState(
+    DeviceMotionOrientation.Portrait,
+  );
+  const orientationRef = useRef(orientation);
+  const visibleSharedValue = useSharedValue(0);
+  const tabBarVisibleSharedValue = useDerivedValue(
+    () => 1 - visibleSharedValue.value,
+    [visibleSharedValue],
+  );
+  useEffect(() => {
+    // could be improve using a hook to know if this is the current display screen
+    // maybe to much battery consuming
+    DeviceMotion.setUpdateInterval(1000);
+    const subscription = DeviceMotion.addListener(({ orientation }) => {
+      if (orientation !== orientationRef.current) {
+        const visible = Math.abs(orientation) === 90;
+        visibleSharedValue.value = withTiming(visible ? 1 : 0, {
+          duration: 120,
+        });
+        orientationRef.current = -orientation;
+        setOrientation(-orientation);
+      }
+    });
+
+    return () => subscription?.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: visibleSharedValue.value,
+  }));
+
+  useMainTabBarVisiblilityController(
+    tabBarVisibleSharedValue,
+    Math.abs(orientation) === 90,
+  );
+
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  if (!profile || !profile.cardIsPublished) {
+    return null;
+  }
 
   return (
-    <Animated.View style={[{ position: 'absolute' }, animatedCard]}>
-      <ContactCard profile={profile} height={cardWidth / CONTACT_CARD_RATIO} />
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          top: (windowHeight - windowWidth) / 2,
+          left: (windowWidth - windowHeight) / 2,
+          backgroundColor: 'white',
+          transform: [{ rotate: `${orientation}deg` }],
+          height: windowWidth,
+          width: windowHeight,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        animatedStyle,
+      ]}
+      pointerEvents="none"
+    >
+      <ContactCard profile={profile} height={windowWidth - 40} />
     </Animated.View>
   );
 };
