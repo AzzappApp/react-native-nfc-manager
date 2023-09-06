@@ -1,22 +1,27 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions, Pressable, FlatList } from 'react-native';
+import { View, useWindowDimensions, Pressable } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDecay,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
+import Skeleton from './Skeleton';
 import SwitchToggle from './SwitchToggle';
 import WebCardRenderer, { DESKTOP_PREVIEW_WIDTH } from './WebCardRenderer';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type {
-  ViewProps,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  ListRenderItem,
-} from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type WebCardInfo = {
   /**
@@ -93,70 +98,83 @@ const WebCardList = ({
     height - SWITCH_TOGGLE_HEIGHT_SECTION_HEIGHT - LABEL_CONTAINER_HEIGHT;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const currentIndexRef = useRef(currentIndex);
-  const onScroll = useCallback(
-    ({
-      nativeEvent: { contentOffset },
-    }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const index = Math.round(contentOffset.x / (webCardsItemWidth + GAP));
-      if (index === currentIndexRef.current) {
-        return;
-      }
-      currentIndexRef.current = index;
-      setCurrentIndex(index);
-      onSelectedIndexChange?.(index);
+  const currentIndexSharedValue = useSharedValue(currentIndex);
+
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      currentIndexSharedValue.value = withTiming(
+        index,
+        { duration: 100 },
+        () => {
+          runOnJS(setCurrentIndex)(index);
+        },
+      );
     },
-    [webCardsItemWidth, onSelectedIndexChange],
+    [currentIndexSharedValue],
   );
 
-  const getItemLayout = useCallback(
-    (_data: unknown, index: number) => ({
-      length: webCardsItemWidth,
-      offset: (webCardsItemWidth + GAP) * index,
-      index,
-    }),
-    [webCardsItemWidth],
-  );
-
-  const flatListRef = useRef<FlatList>(null);
-  const scrollToIndex = useCallback((index: number) => {
-    flatListRef?.current?.scrollToIndex({
-      index,
-    });
-  }, []);
+  const onEndReachedRef = useRef(onEndReached);
+  useEffect(() => {
+    onEndReachedRef.current = onEndReached;
+  }, [onEndReached]);
 
   useEffect(() => {
-    if (cards.length > 0) {
-      flatListRef?.current?.scrollToIndex({
-        index: currentIndexRef.current,
-        animated: false,
-      });
+    if (currentIndex >= cards.length - 4) {
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, cards]);
+    onEndReachedRef.current?.();
+  }, [currentIndex, cards.length]);
 
-  const renderItem = useCallback<ListRenderItem<WebCardInfo>>(
-    ({ item, index }) => (
-      <WebCardListItem
-        index={index}
-        item={item}
-        isSelected={currentIndex === index}
-        initialWebCardScrollPosition={initialWebCardScrollPosition}
-        viewMode={viewMode}
-        webCardsItemWidth={webCardsItemWidth}
-        webCardsItemHeight={webCardsItemHeight}
-        scrollToIndex={scrollToIndex}
-      />
-    ),
-    [
-      currentIndex,
-      webCardsItemWidth,
-      webCardsItemHeight,
-      initialWebCardScrollPosition,
-      viewMode,
-      scrollToIndex,
-    ],
+  const nbCards = cards.length;
+
+  const startOffset = useSharedValue(0);
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .onBegin(() => {
+          startOffset.value = currentIndexSharedValue.value;
+        })
+        .onUpdate(event => {
+          currentIndexSharedValue.value =
+            startOffset.value - event.translationX / windowWidth;
+          console.log(currentIndexSharedValue.value);
+        })
+        .onEnd(({ velocityX }) => {
+          const prevIndex = Math.floor(currentIndexSharedValue.value);
+          const nextIndex = Math.ceil(currentIndexSharedValue.value);
+          currentIndexSharedValue.value = withDecay(
+            {
+              velocity: -velocityX,
+              clamp: [Math.max(prevIndex, 0), Math.min(nextIndex, nbCards - 1)],
+              deceleration: 0.995,
+            },
+            () => {
+              const endIndex = currentIndexSharedValue.value;
+              currentIndexSharedValue.value = withSpring(Math.round(endIndex));
+              runOnJS(setCurrentIndex)(endIndex);
+            },
+          );
+        }),
+    [nbCards, currentIndexSharedValue, startOffset, windowWidth],
   );
+
+  const webCardListAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX:
+            -currentIndexSharedValue.value * (webCardsItemWidth + GAP),
+        },
+      ],
+    };
+  }, [webCardsItemWidth]);
+
+  const renderedItems = cards
+    .map((card, index) => ({ card, index }))
+    .slice(
+      Math.max(currentIndex - 2, 0),
+      Math.min(currentIndex + 4, cards.length),
+    );
 
   return (
     <View {...props}>
@@ -182,39 +200,162 @@ const WebCardList = ({
           ]}
         />
       </View>
-      <FlatList
-        ref={flatListRef}
-        data={cards}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        onEndReached={onEndReached}
-        getItemLayout={getItemLayout}
-        snapToInterval={webCardsItemWidth + GAP}
-        snapToAlignment="start"
-        decelerationRate="fast"
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.webCardList}
-        contentContainerStyle={[
-          styles.webCardListContentContainer,
-          {
-            paddingHorizontal: viewMode === 'mobile' ? windowWidth / 4 : 50,
-            gap: GAP,
-          },
-        ]}
-        nestedScrollEnabled
-        initialNumToRender={2}
-        onEndReachedThreshold={2}
-      />
+      <View key={viewMode} style={{ flex: 1 }}>
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[styles.webCardList, webCardListAnimatedStyle]}>
+            {renderedItems.map(({ card, index }) => (
+              <WebCardListItemMemo
+                key={card.id}
+                card={card}
+                index={index}
+                skeltonOnly={Math.abs(currentIndex - index) > 2}
+                isSelected={currentIndex === index}
+                initialWebCardScrollPosition={initialWebCardScrollPosition}
+                viewMode={viewMode}
+                webCardsItemWidth={webCardsItemWidth}
+                webCardsItemHeight={webCardsItemHeight}
+                scrollToIndex={scrollToIndex}
+              />
+            ))}
+          </Animated.View>
+        </GestureDetector>
+      </View>
     </View>
   );
 };
 
 export default WebCardList;
 
-const keyExtractor = (item: WebCardInfo) => item.id;
+type WebCardListItemProps = {
+  card: WebCardInfo;
+  index: number;
+  isSelected: boolean;
+  skeltonOnly?: boolean;
+  initialWebCardScrollPosition: 'halfCover' | 'start';
+  viewMode: 'desktop' | 'mobile';
+  webCardsItemWidth: number;
+  webCardsItemHeight: number;
+  scrollToIndex: (index: number) => void;
+};
+
+const WebCardListItem = ({
+  card,
+  index,
+  isSelected,
+  skeltonOnly,
+  initialWebCardScrollPosition,
+  viewMode,
+  webCardsItemWidth,
+  webCardsItemHeight,
+  scrollToIndex,
+}: WebCardListItemProps) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const styles = useStyleSheet(stylesheet);
+  const webCardsInnerdWidth =
+    viewMode === 'mobile' ? windowWidth : DESKTOP_PREVIEW_WIDTH;
+  const scale = webCardsItemWidth / webCardsInnerdWidth;
+  const webCardInnerHeight = webCardsItemHeight / scale;
+  const initialOffset = viewMode === 'mobile' ? windowWidth / 4 : 50;
+  const position = initialOffset + index * (webCardsItemWidth + GAP);
+
+  const onPress = () => {
+    scrollToIndex(index);
+  };
+
+  const [showSkelton, setShowSkelton] = useState(true);
+
+  useEffect(() => {
+    if (skeltonOnly) {
+      setShowSkelton(true);
+    } else {
+      setTimeout(() => {
+        setShowSkelton(false);
+      }, 300);
+    }
+  }, [skeltonOnly]);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={isSelected}
+      style={{
+        position: 'absolute',
+        top: GAP,
+        left: position,
+        width: webCardsItemWidth,
+        height: webCardsItemHeight,
+      }}
+    >
+      <View style={styles.webCardContainer}>
+        {!skeltonOnly && (
+          <View style={styles.webCardContainerRadius}>
+            <View
+              style={{
+                width: webCardsInnerdWidth,
+                height: webCardInnerHeight,
+                backgroundColor: '#FFFFFF',
+                transform: [
+                  { translateX: (webCardsItemWidth - webCardsInnerdWidth) / 2 },
+                  { translateY: (webCardsItemHeight - webCardInnerHeight) / 2 },
+                  { scale },
+                ],
+              }}
+            >
+              <WebCardRenderer
+                contentOffset={{
+                  x: 0,
+                  y:
+                    initialWebCardScrollPosition === 'halfCover'
+                      ? webCardsItemWidth / (2 * COVER_RATIO) / scale
+                      : 0,
+                }}
+                profile={card.profile}
+                cardStyle={card.cardStyle}
+                cardColors={card.cardColors}
+                cardModules={card.cardModules}
+                viewMode={viewMode}
+                style={{
+                  flexShrink: 0,
+                  width: webCardsInnerdWidth,
+                  height: webCardInnerHeight,
+                }}
+                contentContainerStyle={{
+                  flexShrink: 0,
+                  flexGrow: 1,
+                  minHeight:
+                    webCardInnerHeight +
+                    webCardsItemWidth / COVER_RATIO / scale,
+                }}
+                nestedScrollEnabled
+                overScrollMode="always"
+                scrollEnabled={isSelected}
+                showsVerticalScrollIndicator={false}
+                moduleActionEnabled={false}
+              />
+            </View>
+          </View>
+        )}
+        {showSkelton && (
+          <Skeleton
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              borderRadius: ITEM_RADIUS,
+            }}
+          />
+        )}
+      </View>
+      <View style={styles.labelContainerHeight}>
+        <Text variant="smallbold">{card.label}</Text>
+      </View>
+    </Pressable>
+  );
+};
+
+const WebCardListItemMemo = memo(WebCardListItem);
 
 const GAP = 20;
 const ITEM_RADIUS = 20;
@@ -248,100 +389,4 @@ const stylesheet = createStyleSheet(theme => ({
   webCardList: {
     flex: 1,
   },
-  webCardListContentContainer: {
-    paddingVertical: GAP,
-  },
 }));
-
-type WebCardListItemProps = {
-  index: number;
-  item: WebCardInfo;
-  isSelected: boolean;
-  initialWebCardScrollPosition: 'halfCover' | 'start';
-  viewMode: 'desktop' | 'mobile';
-  webCardsItemWidth: number;
-  webCardsItemHeight: number;
-  scrollToIndex: (index: number) => void;
-};
-
-const ItemList = ({
-  index,
-  item,
-  isSelected,
-  initialWebCardScrollPosition,
-  viewMode,
-  webCardsItemWidth,
-  webCardsItemHeight,
-  scrollToIndex,
-}: WebCardListItemProps) => {
-  const { width: windowWidth } = useWindowDimensions();
-  const styles = useStyleSheet(stylesheet);
-  const webCardsInnerdWidth =
-    viewMode === 'mobile' ? windowWidth : DESKTOP_PREVIEW_WIDTH;
-  const scale = webCardsItemWidth / webCardsInnerdWidth;
-  const webCardInnerHeight = webCardsItemHeight / scale;
-
-  const onPress = () => {
-    scrollToIndex(index);
-  };
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={isSelected}
-      style={{ width: webCardsItemWidth }}
-    >
-      <View style={styles.webCardContainer}>
-        <View style={styles.webCardContainerRadius}>
-          <View
-            style={{
-              width: webCardsInnerdWidth,
-              height: webCardInnerHeight,
-              backgroundColor: '#FFFFFF',
-              transform: [
-                { translateX: (webCardsItemWidth - webCardsInnerdWidth) / 2 },
-                { translateY: (webCardsItemHeight - webCardInnerHeight) / 2 },
-                { scale },
-              ],
-            }}
-          >
-            <WebCardRenderer
-              contentOffset={{
-                x: 0,
-                y:
-                  initialWebCardScrollPosition === 'halfCover'
-                    ? webCardsItemWidth / (2 * COVER_RATIO) / scale
-                    : 0,
-              }}
-              profile={item.profile}
-              cardStyle={item.cardStyle}
-              cardColors={item.cardColors}
-              cardModules={item.cardModules}
-              viewMode={viewMode}
-              style={{
-                flexShrink: 0,
-                width: webCardsInnerdWidth,
-                height: webCardInnerHeight,
-              }}
-              contentContainerStyle={{
-                flexShrink: 0,
-                flexGrow: 1,
-                minHeight:
-                  webCardInnerHeight + webCardsItemWidth / COVER_RATIO / scale,
-              }}
-              nestedScrollEnabled
-              overScrollMode="always"
-              scrollEnabled={isSelected}
-              showsVerticalScrollIndicator={false}
-              moduleActionEnabled={false}
-            />
-          </View>
-        </View>
-      </View>
-      <View style={styles.labelContainerHeight}>
-        <Text variant="smallbold">{item.label}</Text>
-      </View>
-    </Pressable>
-  );
-};
-
-const WebCardListItem = memo(ItemList);
