@@ -1,4 +1,4 @@
-## 0.2.0-canary.54
+## 0.2.0-canary.55
 
 * **fix:**  - module can be null ([#997](https://github.com/AzzappApp/azzapp/pull/997))
 * **fix:**  - **Home:** layout and performance ([#993](https://github.com/AzzappApp/azzapp/pull/993))
