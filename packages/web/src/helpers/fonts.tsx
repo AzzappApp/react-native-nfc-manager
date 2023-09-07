@@ -28,6 +28,7 @@ import {
   Seaweed_Script,
   Source_Sans_3,
   Yeseva_One,
+  Monoton,
 } from 'next/font/google';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
 import type { NextFont } from 'next/dist/compiled/@next/font';
@@ -152,10 +153,10 @@ const Manrope_Regular = Manrope({
   display: 'swap',
   subsets: ['latin-ext'],
 });
-const Monoton_Regular = Manrope({
+const Monoton_Regular = Monoton({
   weight: '400',
   display: 'swap',
-  subsets: ['latin-ext'],
+  subsets: ['latin'],
 });
 const Montserrat_Regular = Montserrat({
   weight: '400',
