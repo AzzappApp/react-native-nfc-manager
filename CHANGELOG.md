@@ -1,4 +1,4 @@
-## 0.2.0-canary.63
+## 0.2.0-canary.64
 
 * **fix:**  - add zIndex for header Menu to be touchable ([#1011](https://github.com/AzzappApp/azzapp/pull/1011))
 * **fix:**  - video taking ([#1024](https://github.com/AzzappApp/azzapp/pull/1024))
