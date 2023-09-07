@@ -50,6 +50,7 @@ const SelectImageStep = ({
     aspectRatio,
     onMediaChange,
     onAspectRatioChange,
+    onEditionParametersChange,
     clearMedia,
   } = useImagePickerState();
 
@@ -141,8 +142,39 @@ const SelectImageStep = ({
       },
       forceCameraRatio,
     );
+    if (forceAspectRatio) {
+      let editionParameters = {};
+      if (forceAspectRatio < 1) {
+        const wantedWidth = height * forceAspectRatio;
+        editionParameters = {
+          cropData: {
+            height,
+            originX: (width - wantedWidth) / 2,
+            originY: 0,
+            width,
+          },
+        };
+      } else if (forceAspectRatio >= 1) {
+        const wantedHeight = width / forceAspectRatio;
+        editionParameters = {
+          cropData: {
+            height,
+            originX: 0,
+            originY: (height - wantedHeight) / 2,
+            width,
+          },
+        };
+      }
+      onEditionParametersChange(editionParameters);
+    }
     onNext();
-  }, [forceCameraRatio, onMediaChange, onNext]);
+  }, [
+    forceAspectRatio,
+    forceCameraRatio,
+    onEditionParametersChange,
+    onMediaChange,
+    onNext,
+  ]);
 
   const captureSession = useRef<RecordSession | null>(null);
   const onStartRecording = useCallback(() => {
