@@ -1,5 +1,6 @@
-## 0.2.0-canary.58
+## 0.2.0-canary.59
 
+* **fix:**  - 🐛 restore post fetch count ([#1016](https://github.com/AzzappApp/azzapp/pull/1016))
 * **fix:**  - CardStyle TemplateList save
 * **fix:**  - new carstyle modal
 * **fix:**  - module can be null ([#997](https://github.com/AzzappApp/azzapp/pull/997))
