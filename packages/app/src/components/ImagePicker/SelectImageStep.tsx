@@ -343,8 +343,7 @@ const SelectImageStep = ({
             !mediaLibraryPermission.granted) ||
           (pickerMode === 'photo' && !hasCameraPermission) ||
           (pickerMode === 'video' &&
-            !hasCameraPermission &&
-            !hasMicrophonePermission)
+            (!hasCameraPermission || !hasMicrophonePermission))
         }
         permissionsFor={pickerMode}
         onRequestClose={onCameraPermissionModalClose}
