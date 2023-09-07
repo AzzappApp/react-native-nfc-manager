@@ -1,4 +1,4 @@
-## 0.2.0-canary.61
+## 0.2.0-canary.62
 
 * **feat:**  - **CardTemplate:** new template list ([#1019](https://github.com/AzzappApp/azzapp/pull/1019))
 * **fix:**  - SimpleText icon ([#1014](https://github.com/AzzappApp/azzapp/pull/1014))
