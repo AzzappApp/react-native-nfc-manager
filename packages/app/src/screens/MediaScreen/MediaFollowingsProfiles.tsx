@@ -44,9 +44,9 @@ const MediaFollowingsProfiles = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.followings.edges?.map(edge => edge?.node) ?? [],
+      data.followings?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.followings.edges]);
+  }, [data.followings?.edges]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

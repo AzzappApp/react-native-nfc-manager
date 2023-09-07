@@ -42,9 +42,9 @@ const FollowingsMosaicScreen = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.followings.edges?.map(edge => edge?.node) ?? [],
+      data.followings?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.followings.edges]);
+  }, [data.followings?.edges]);
 
   return (
     <CoverList

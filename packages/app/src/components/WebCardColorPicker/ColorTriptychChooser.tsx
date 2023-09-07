@@ -90,7 +90,7 @@ const ColorTriptychChooser = ({
     return convertToNonNullArray(
       viewer.colorPalettes?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [viewer.colorPalettes.edges]);
+  }, [viewer.colorPalettes?.edges]);
 
   const onRestorePreviousTriptych = useCallback(() => {
     onUpdateColorPalette(currentPalette);
