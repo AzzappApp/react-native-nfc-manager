@@ -104,7 +104,7 @@ const switchContent = style({
 const postNavigation = style({
   transition: 'visibility 0s 0.3s',
   position: 'fixed',
-  zIndex: 1,
+  zIndex: 2,
   top: '20px',
   right: '20px',
   '@media': {

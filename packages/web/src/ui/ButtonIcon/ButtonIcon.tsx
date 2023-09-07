@@ -15,7 +15,7 @@ const ButtonIcon = (props: ButtonIconProps) => {
     size = 24,
     Icon,
     className,
-    color,
+    color = 'black',
     width,
     height,
     children,
