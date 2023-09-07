@@ -1,5 +1,6 @@
-## 0.2.0-canary.64
+## 0.2.0-canary.65
 
+* **fix:**  - 🐛 make follow transaction work ([#1025](https://github.com/AzzappApp/azzapp/pull/1025))
 * **fix:**  - add zIndex for header Menu to be touchable ([#1011](https://github.com/AzzappApp/azzapp/pull/1011))
 * **fix:**  - video taking ([#1024](https://github.com/AzzappApp/azzapp/pull/1024))
 * **fix:**  - cropping data for camera picture ([#1023](https://github.com/AzzappApp/azzapp/pull/1023))
