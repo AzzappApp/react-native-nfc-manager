@@ -159,7 +159,7 @@ export type ModuleRenderInfo =
       data: SocialLinksRendererData;
     };
 
-type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
+export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
   /**
    * The module to render
    */

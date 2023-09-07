@@ -6,12 +6,15 @@ import {
   CardTemplateCompanyActivityTable,
   CardTemplateProfileCategoryTable,
   ProfileTable,
+  checkMedias,
   createCardTemplate,
   db,
+  getCardTemplateById,
+  referencesMedias,
   updateCardTemplate,
 } from '@azzapp/data/domains';
 import {
-  coverTemplateSchema,
+  cardTemplateSchema,
   type CardTemplateFormValue,
 } from './cardTemplateSchema';
 
@@ -35,7 +38,7 @@ export const saveCardTemplate = async (
   data: Partial<CardTemplateFormValue>,
   id?: string,
 ) => {
-  const validation = coverTemplateSchema.safeParse(data);
+  const validation = cardTemplateSchema.safeParse(data);
 
   if (!validation.success) {
     return {
@@ -48,13 +51,20 @@ export const saveCardTemplate = async (
     labels: validation.data.labels,
     cardStyleId: validation.data.cardStyle,
     modules: validation.data.modules,
+    previewMediaId: validation.data.previewMediaId,
     businessEnabled: validation.data.businessEnabled,
     personalEnabled: validation.data.personalEnabled,
   };
 
+  await checkMedias([validation.data.previewMediaId]);
+
   await db.transaction(async trx => {
     let cardTemplateId: string;
+    let previousMediaId: string | null = null;
+
     if (id) {
+      const cardTemplate = await getCardTemplateById(id);
+
       await trx
         .delete(CardTemplateCompanyActivityTable)
         .where(eq(CardTemplateCompanyActivityTable.cardTemplateId, id));
@@ -62,9 +72,9 @@ export const saveCardTemplate = async (
       await trx
         .delete(CardTemplateProfileCategoryTable)
         .where(eq(CardTemplateProfileCategoryTable.cardTemplateId, id));
-    }
-    if (id) {
       cardTemplateId = id;
+      previousMediaId = cardTemplate.previewMediaId;
+
       await updateCardTemplate(id, template);
     } else {
       const cardTemplate = await createCardTemplate(template);
@@ -86,6 +96,7 @@ export const saveCardTemplate = async (
         })),
       );
     }
+    await referencesMedias([template.previewMediaId], [previousMediaId], trx);
   });
 
   return {

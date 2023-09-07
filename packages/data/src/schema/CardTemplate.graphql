@@ -8,6 +8,7 @@ type CardTemplate implements Node {
   id: ID!
   label: String
   cardStyle: CardStyle!
+  previewMedia: Media
   modules: [CardModule!]!
 }
 

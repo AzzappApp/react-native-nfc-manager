@@ -4,6 +4,8 @@ import {
   Autocomplete,
   Box,
   Button,
+  Dialog,
+  DialogContent,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -19,6 +21,10 @@ import { omit } from 'lodash';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { uploadMedia } from '@azzapp/shared/WebAPI';
+import { getSignedUpload } from '#app/mediaActions';
+import MediaInput from '#components/MediaInput';
 import { labelsOptions, useForm } from '#helpers/formHelpers';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
@@ -53,11 +59,16 @@ const CardTemplateForm = ({
   const [modulesLoading, loadModules] = useTransition();
   const [modulesError, setModulesError] = useState<string | null>(null);
 
-  const [saving, startSaving] = useTransition();
-  const [error, setError] = useState<CardTemplateErrors | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [formErrors, setFormError] = useState<CardTemplateErrors | null>(null);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(false);
 
-  const { data, setData, fieldProps } = useForm<CardTemplateFormValue>(
+  type Data = Omit<CardTemplateFormValue, 'previewMediaId'> & {
+    previewMediaId: File | string | null;
+  };
+  const { data, setData, fieldProps } = useForm<Data>(
     () => {
       if (cardTemplate) {
         return {
@@ -68,6 +79,7 @@ const CardTemplateForm = ({
           personalEnabled: cardTemplate.personalEnabled,
           profileCategories: templateCategories,
           companyActivities: templateActivities,
+          previewMediaId: cardTemplate.previewMediaId,
         };
       }
       return {
@@ -75,7 +87,7 @@ const CardTemplateForm = ({
         personalEnabled: true,
       };
     },
-    error?.fieldErrors,
+    formErrors?.fieldErrors,
     [],
   );
 
@@ -101,20 +113,56 @@ const CardTemplateForm = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    startSaving(async () => {
-      setError(null);
+    setSaving(true);
 
+    let previewMediaId: string;
+    if (data.previewMediaId instanceof File) {
+      const file = data.previewMediaId;
+      setUploading(true);
+      let public_id: string;
+      try {
+        const { uploadURL, uploadParameters } = await getSignedUpload(
+          'image',
+          'module',
+        );
+        ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
+          .promise);
+        setUploading(false);
+      } catch (error) {
+        setError(error);
+        setSaving(false);
+        setUploading(false);
+        return;
+      }
+
+      previewMediaId = encodeMediaId(public_id, 'image');
+    } else {
+      previewMediaId = data.previewMediaId as any;
+    }
+
+    setFormError(null);
+
+    try {
       const { success, formErrors } = await saveCardTemplate(
-        data,
+        {
+          ...data,
+          previewMediaId,
+        },
         cardTemplate?.id,
       );
-
-      if (!success) setError(formErrors);
-      else setDisplaySaveSuccess(true);
-    });
+      if (!success) {
+        setFormError(formErrors);
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } catch (error) {
+      setError(error);
+      setSaving(false);
+      return;
+    }
   };
 
   const fields = {
@@ -191,7 +239,7 @@ const CardTemplateForm = ({
         <Button type="submit" variant="contained">
           Load
         </Button>
-        {error?.fieldErrors.modules && (
+        {formErrors?.fieldErrors.modules && (
           <Typography variant="body1" color="error">
             Missing modules
           </Typography>
@@ -288,6 +336,21 @@ const CardTemplateForm = ({
           </Select>
           <FormHelperText>{fields.cardStyle.helperText}</FormHelperText>
         </FormControl>
+        {/*@ts-expect-error bad type */}
+        <MediaInput
+          label="Preview Media"
+          name="previewMedia"
+          kind="image"
+          {...fieldProps('previewMediaId', {
+            format: (value: File | string | null | undefined) =>
+              typeof value === 'string'
+                ? {
+                    id: value,
+                    kind: 'image' as const,
+                  }
+                : value ?? null,
+          })}
+        />
         <FormControlLabel
           control={
             <Switch
@@ -322,6 +385,7 @@ const CardTemplateForm = ({
           }
           label="Personal Enabled"
         />
+
         <Button
           type="submit"
           variant="contained"
@@ -329,12 +393,15 @@ const CardTemplateForm = ({
         >
           Save
         </Button>
-        {error?.formErrors.map(formError => (
-          <Typography key={formError} variant="body1" color="error">
-            {formError}
+        {error && (
+          <Typography variant="body1" color="error">
+            Something went wrong {error?.message}
           </Typography>
-        ))}
+        )}
       </Box>
+      <Dialog open={uploading}>
+        <DialogContent>Uploading ...</DialogContent>
+      </Dialog>
       <Snackbar
         open={displaySaveSuccess}
         onClose={() => setDisplaySaveSuccess(false)}

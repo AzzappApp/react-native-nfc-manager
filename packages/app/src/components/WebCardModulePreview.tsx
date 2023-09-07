@@ -1,13 +1,13 @@
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import Container from '#ui/Container';
+import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import TitleWithLine from '#ui/TitleWithLine';
 import { useModulesData } from './cardModules/ModuleData';
-import SwitchToggle from './SwitchToggle';
-import WebCardRenderer, { DESKTOP_PREVIEW_WIDTH } from './WebCardRenderer';
+import WebCardPreview from './WebCardPreview';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { WebCardModulePreviewQuery } from '@azzapp/relay/artifacts/WebCardModulePreviewQuery.graphql';
 import type {
@@ -28,13 +28,17 @@ type WebCardModulePreviewProps = Omit<ViewProps, 'children'> & {
    */
   editedModuleInfo: ModuleRenderInfo;
   /**
+   * height of the preview.
+   */
+  height: number;
+  /**
+   * contentContainer padding bottom of the preview scrollView.
+   */
+  contentPaddingBottom: number;
+  /**
    * Does the preview is visible.
    */
   visible: boolean;
-  /**
-   * The content container style of the web card preview scroll view.
-   */
-  contentContainerStyle?: ViewProps['style'];
 };
 
 /**
@@ -44,15 +48,16 @@ const WebCardModulePreview = ({
   editedModuleInfo,
   editedModuleId,
   visible,
+  height,
+  contentPaddingBottom,
   style,
-  contentContainerStyle,
   ...props
 }: WebCardModulePreviewProps) => {
   const {
     viewer: { profile },
   } = useLazyLoadQuery<WebCardModulePreviewQuery>(
     graphql`
-      query WebCardModulePreviewQuery @raw_response_type {
+      query WebCardModulePreviewQuery {
         viewer {
           profile {
             id
@@ -161,36 +166,7 @@ const WebCardModulePreview = ({
 
   const intl = useIntl();
 
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
-
-  const [containerDimensions, setContainerDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({
-    width: 0,
-    height: 0,
-  });
-
-  const onContainerLayout = (event: LayoutChangeEvent) => {
-    setContainerDimensions(event.nativeEvent.layout);
-  };
-
-  const scale =
-    viewMode === 'mobile'
-      ? 1
-      : containerDimensions.width / DESKTOP_PREVIEW_WIDTH;
-
-  const webCardWidth =
-    viewMode === 'mobile' ? containerDimensions.width : DESKTOP_PREVIEW_WIDTH;
-  const webCardHeight = containerDimensions.height / scale;
-
-  const flatContainerStyle = StyleSheet.flatten(contentContainerStyle);
-
-  const transformedContentContainerStyle = {
-    ...flatContainerStyle,
-    paddingBottom: ((flatContainerStyle?.paddingBottom as number) ?? 0) / scale,
-    paddingTop: ((flatContainerStyle?.paddingTop as number) ?? 0) / scale,
-  };
+  const previewHeight = height - TAB_BAR_HEIGHT - 16;
 
   if (!profile) {
     return null;
@@ -206,53 +182,20 @@ const WebCardModulePreview = ({
             description: 'Webcard preview - Preview title',
           })}
         />
-        <SwitchToggle
-          value={viewMode}
-          onChange={setViewMode}
-          values={[
-            {
-              value: 'mobile',
-              label: intl.formatMessage({
-                defaultMessage: 'Mobile',
-                description: 'Mobile view mode title in web card preview',
-              }),
-            },
-            {
-              value: 'desktop',
-              label: intl.formatMessage({
-                defaultMessage: 'Desktop',
-                description: 'Desktop view mode title in web card preview',
-              }),
-            },
-          ]}
+      </Container>
+      <Container>
+        <WebCardPreview
+          profile={profile}
+          cardStyle={profile.cardStyle}
+          cardColors={profile.cardColors}
+          height={previewHeight}
+          cardModules={modules}
+          onLayout={onScrollViewLayout}
+          ref={scrollRefCallback}
+          onModuleLayout={onEditedModuleLayout}
+          contentPaddingBottom={contentPaddingBottom}
         />
       </Container>
-      <View style={{ flex: 1 }} onLayout={onContainerLayout}>
-        <View
-          style={{
-            width: webCardWidth,
-            height: webCardHeight,
-            transform: [
-              { translateX: (containerDimensions.width - webCardWidth) / 2 },
-              { translateY: (containerDimensions.height - webCardHeight) / 2 },
-              { scale },
-            ],
-          }}
-        >
-          <WebCardRenderer
-            profile={profile}
-            viewMode={viewMode}
-            cardStyle={profile.cardStyle}
-            cardColors={profile.cardColors}
-            style={{ flex: 1 }}
-            cardModules={modules}
-            onLayout={onScrollViewLayout}
-            ref={scrollRefCallback}
-            contentContainerStyle={transformedContentContainerStyle}
-            onModuleLayout={onEditedModuleLayout}
-          />
-        </View>
-      </View>
     </View>
   );
 };

@@ -660,12 +660,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
               kind: MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
               data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

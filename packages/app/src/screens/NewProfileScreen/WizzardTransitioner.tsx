@@ -19,6 +19,7 @@ type WizzardTransitionerProps = {
     element: React.ReactNode;
     backIcon?: Icons;
   }>;
+  headerHidden?: boolean;
   contentHeight: number;
   width: number;
   style?: StyleProp<ViewStyle>;
@@ -29,6 +30,7 @@ const WizzardTransitioner = ({
   steps,
   currentStepIndex,
   contentHeight,
+  headerHidden,
   width,
   style,
   onBack,
@@ -79,13 +81,15 @@ const WizzardTransitioner = ({
 
   return (
     <Container style={style}>
-      <PagerHeader
-        nbPages={steps.length}
-        currentPage={currentStepIndex}
-        onBack={onBack}
-        title={currentStep.title}
-        backIcon={currentStep.backIcon}
-      />
+      {!headerHidden && (
+        <PagerHeader
+          nbPages={steps.length}
+          currentPage={currentStepIndex}
+          onBack={onBack}
+          title={currentStep.title}
+          backIcon={currentStep.backIcon}
+        />
+      )}
 
       <ScreenContainer style={{ height: contentHeight }}>
         {steps.map(({ element }, index) => (

@@ -437,12 +437,8 @@ const SimpleTextEditionScreen = ({
               kind: moduleKind,
               data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

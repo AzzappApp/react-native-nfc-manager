@@ -18,6 +18,7 @@ export const CardTemplateTable = mysqlTable('CardTemplate', {
   id: cols.cuid('id').notNull().primaryKey(),
   labels: cols.labels('labels').notNull(),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
+  previewMediaId: cols.mediaId('previewMediaId'),
   modules: json('modules').$type<CardModuleTemplate[]>().notNull(),
   businessEnabled: boolean('businessEnabled').default(true).notNull(),
   personalEnabled: boolean('personalEnabled').default(true).notNull(),

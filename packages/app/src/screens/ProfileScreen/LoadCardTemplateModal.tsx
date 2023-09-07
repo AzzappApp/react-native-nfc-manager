@@ -6,6 +6,8 @@ import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
@@ -23,8 +25,9 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
   const intl = useIntl();
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-
-  const height = windowHeight - insets.top - insets.bottom - HEADER_HEIGHT;
+  const topInset = Math.max(insets.top, 16);
+  const bottomInset = Math.max(insets.bottom, 16);
+  const height = windowHeight - topInset - bottomInset - HEADER_HEIGHT;
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
@@ -46,26 +49,27 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
 
   return (
     <Modal animationType="none" visible={visible}>
-      <View style={styles.header}>
-        <View style={styles.headerSegment}>
-          <IconButton
-            icon={'arrow_down'}
-            onPress={onClose}
-            iconSize={28}
-            variant="icon"
-            style={styles.backIcon}
-          />
-        </View>
-        <View style={styles.titleTextContainer}>
-          <Text variant="large" style={styles.titleText}>
-            {intl.formatMessage({
-              defaultMessage: 'Load a WebCard® template',
-              description: 'WebCard creation screen title',
-            })}
-          </Text>
-        </View>
-      </View>
-      <View style={[styles.wrapper, { height }]}>
+      <Container
+        style={{
+          flex: 1,
+          paddingBottom: bottomInset,
+          paddingTop: topInset,
+        }}
+      >
+        <Header
+          leftElement={
+            <IconButton
+              icon="arrow_down"
+              onPress={onClose}
+              iconSize={28}
+              variant="icon"
+            />
+          }
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Load a WebCard® template',
+            description: 'WebCard creation screen title',
+          })}
+        />
         <Suspense
           fallback={
             <View style={styles.activityIndicatorContainer}>
@@ -81,11 +85,12 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
             loading={inFlight}
           />
         </Suspense>
-      </View>
+      </Container>
 
       <Modal
         animationType="none"
         visible={visible && !!cardTemplateId && !inFlight}
+        style={{ zIndex: 1000 }}
       >
         <View style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
@@ -134,39 +139,9 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
   );
 };
 
-const HEADER_HEIGHT = 70;
-
 export default LoadCardTemplateModal;
 
 const styles = StyleSheet.create({
-  wrapper: {
-    width: '100%',
-    paddingBottom: 30,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 45,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-    flex: 1,
-  },
-  headerSegment: {
-    width: 40,
-  },
-  backIcon: {
-    height: 17,
-    width: 10,
-  },
-  titleTextContainer: {
-    flex: 1,
-    alingSelft: 'stretch',
-  },
-  titleText: {
-    textAlign: 'center',
-    paddingTop: 0,
-    textAlignVertical: 'center',
-  },
   activityIndicatorContainer: {
     flex: 1,
     alignItems: 'center',

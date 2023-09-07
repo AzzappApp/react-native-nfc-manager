@@ -16,10 +16,7 @@ import { DEFAULT_CARD_STYLE, type CardStyle } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import SwitchToggle from '#components/SwitchToggle';
-import WebCardRenderer, {
-  DESKTOP_PREVIEW_WIDTH,
-} from '#components/WebCardRenderer';
+import WebCardPreview from '#components/WebCardPreview';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -92,7 +89,6 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   );
 
   const [cardStyle, setCardStyle] = useState<CardStyleItem>(currentCardStyle);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
 
   const [commit, isInFlight] = useMutation<CardStyleModalMutation>(graphql`
     mutation CardStyleModalMutation($input: SaveCardStyleInput!) {
@@ -154,7 +150,6 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     windowHeight -
     topInset -
     HEADER_HEIGHT -
-    SWITCH_TOGGLE_SECTION_HEIGHT -
     CARD_STYLE_LIST_HEIGHT -
     bottomInset;
 
@@ -173,55 +168,31 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
           },
         ]}
       >
-        <View>
-          <Header
-            leftElement={
-              <IconButton
-                icon="arrow_down"
-                onPress={onCloseInner}
-                iconSize={28}
-                variant="icon"
-              />
-            }
-            rightElement={
-              <HeaderButton
-                label={intl.formatMessage({
-                  defaultMessage: 'Apply',
-                  description: 'Card style modal apply button label',
-                })}
-                onPress={applyCardStyle}
-                disabled={cardStyle.id === CURRENT_STYLE_ID}
-                loading={isInFlight}
-              />
-            }
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Apply a style',
-              description: 'Card style modal title',
-            })}
-          />
-          <View style={styles.switchToggleSection}>
-            <SwitchToggle
-              value={viewMode}
-              onChange={setViewMode}
-              values={[
-                {
-                  value: 'mobile',
-                  label: intl.formatMessage({
-                    defaultMessage: 'Mobile',
-                    description: 'Mobile view mode title in web card preview',
-                  }),
-                },
-                {
-                  value: 'desktop',
-                  label: intl.formatMessage({
-                    defaultMessage: 'Desktop',
-                    description: 'Desktop view mode title in web card preview',
-                  }),
-                },
-              ]}
+        <Header
+          leftElement={
+            <IconButton
+              icon="arrow_down"
+              onPress={onCloseInner}
+              iconSize={28}
+              variant="icon"
             />
-          </View>
-        </View>
+          }
+          rightElement={
+            <HeaderButton
+              label={intl.formatMessage({
+                defaultMessage: 'Apply',
+                description: 'Card style modal apply button label',
+              })}
+              onPress={applyCardStyle}
+              disabled={cardStyle.id === CURRENT_STYLE_ID}
+              loading={isInFlight}
+            />
+          }
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Apply a style',
+            description: 'Card style modal title',
+          })}
+        />
         <Suspense
           fallback={
             <View style={styles.activityIndicatorContainer}>
@@ -231,7 +202,6 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
         >
           {visible && viewer.profile && (
             <CardStylePreview
-              viewMode={viewMode}
               height={previewHeight}
               profile={viewer.profile}
               cardStyle={cardStyle}
@@ -252,14 +222,12 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
 type CardStylePreviewProps = {
   profile: CardStyleModal_profile$key;
   cardStyle: CardStyle;
-  viewMode: 'desktop' | 'mobile';
   height: number;
 };
 
 const CardStylePreview = ({
   profile: profileKey,
   cardStyle,
-  viewMode,
   height,
 }: CardStylePreviewProps) => {
   const profile = useFragment(
@@ -291,48 +259,24 @@ const CardStylePreview = ({
   );
 
   const { width: windowWidth } = useWindowDimensions();
-  const scale = viewMode === 'mobile' ? 1 : windowWidth / DESKTOP_PREVIEW_WIDTH;
-  const webCardWidth =
-    viewMode === 'mobile' ? windowWidth : DESKTOP_PREVIEW_WIDTH;
-  const webCardHeight = height / scale;
 
   if (!profile) {
     return null;
   }
 
   return (
-    <View
-      style={{
-        width: windowWidth,
-        height,
+    <WebCardPreview
+      profile={profile}
+      contentOffset={{
+        x: 0,
+        y: windowWidth / COVER_RATIO / 2,
       }}
-    >
-      <View
-        style={{
-          overflow: 'hidden',
-          width: webCardWidth,
-          height: webCardHeight,
-          transform: [
-            { translateX: (windowWidth - webCardWidth) / 2 },
-            { translateY: (height - webCardHeight) / 2 },
-            { scale },
-          ],
-        }}
-      >
-        <WebCardRenderer
-          profile={profile}
-          contentOffset={{
-            x: 0,
-            y: webCardWidth / (2 * COVER_RATIO) / scale,
-          }}
-          viewMode={viewMode}
-          cardStyle={cardStyle}
-          cardColors={profile.cardColors}
-          style={{ flex: 1 }}
-          cardModules={visibileCardModules}
-        />
-      </View>
-    </View>
+      height={height}
+      cardStyle={cardStyle}
+      cardColors={profile.cardColors}
+      style={{ flex: 1 }}
+      cardModules={visibileCardModules}
+    />
   );
 };
 
@@ -442,17 +386,11 @@ const keyExtractor = (item: CardStyleItem) => item.id;
 
 const CURRENT_STYLE_ID = 'CURRENT_STYLE_ID';
 
-const SWITCH_TOGGLE_SECTION_HEIGHT = 52;
 const CARD_STYLE_LIST_HEIGHT = 90;
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  switchToggleSection: {
-    paddingHorizontal: 20,
-    height: SWITCH_TOGGLE_SECTION_HEIGHT,
-    justifyContent: 'center',
   },
   activityIndicatorContainer: {
     flex: 1,

@@ -9,12 +9,16 @@ type CardEditionStepPros = {
   height: number;
   onSkip?: () => void;
   onCoverTemplateApplied: () => void;
+  hideHeader: () => void;
+  showHeader: () => void;
 };
 
 const CardEditionStep = ({
   height,
   onSkip,
   onCoverTemplateApplied,
+  hideHeader,
+  showHeader,
 }: CardEditionStepPros) => {
   const insets = useSafeAreaInsets();
   const eidtorHeight = height - Math.min(insets.bottom, 16);
@@ -47,6 +51,11 @@ const CardEditionStep = ({
         onSkip={onSkip}
         onApplyTemplate={onSubmit}
         loading={inFlight}
+        onPreviewModal={hideHeader}
+        onPreviewModalClose={showHeader}
+        previewModalStyle={{
+          transform: [{ translateY: -insets.top }],
+        }}
       />
     </Suspense>
   );

@@ -445,12 +445,8 @@ const BlockTextEditionScreen = ({
               kind: MODULE_KIND_BLOCK_TEXT,
               data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

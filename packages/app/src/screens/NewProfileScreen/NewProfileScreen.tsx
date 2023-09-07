@@ -150,6 +150,8 @@ export const NewProfileScreen = ({
     windowHeight - insets.top - insets.bottom - PAGER_HEADER_HEIGHT;
   // #endregion
 
+  const [headerHidden, setHeaderHiden] = useState(false);
+
   const intl = useIntl();
   const steps = [
     {
@@ -213,6 +215,8 @@ export const NewProfileScreen = ({
             height={contentHeight}
             onSkip={onCoverTemplateApplied}
             onCoverTemplateApplied={onCoverTemplateApplied}
+            hideHeader={() => setHeaderHiden(true)}
+            showHeader={() => setHeaderHiden(false)}
           />
         ) : null,
 
@@ -227,6 +231,7 @@ export const NewProfileScreen = ({
       width={windowWidth}
       contentHeight={contentHeight}
       onBack={onBack}
+      headerHidden={headerHidden}
       style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
     />
   );

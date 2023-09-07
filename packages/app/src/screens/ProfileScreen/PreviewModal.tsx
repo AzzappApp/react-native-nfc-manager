@@ -1,20 +1,15 @@
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import SwitchToggle from '#components/SwitchToggle';
-import WebCardRenderer, {
-  DESKTOP_PREVIEW_WIDTH,
-} from '#components/WebCardRenderer';
+import WebCardPreview from '#components/WebCardPreview';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { PreviewModal_viewer$key } from '@azzapp/relay/artifacts/PreviewModal_viewer.graphql';
-
-import type { LayoutChangeEvent } from 'react-native';
 
 type PreviewModalProps = {
   profile: PreviewModal_viewer$key;
@@ -69,31 +64,16 @@ const PreviewModal = ({
     profileKey,
   );
 
+  const cardModules = useModulesData(profile?.cardModules ?? []);
+
   const intl = useIntl();
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
+
+  const { height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const [containerDimensions, setContainerDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({
-    width: 0,
-    height: 0,
-  });
-
-  const onContainerLayout = (event: LayoutChangeEvent) => {
-    setContainerDimensions(event.nativeEvent.layout);
-  };
-  const scale =
-    viewMode === 'mobile'
-      ? 1
-      : containerDimensions.width / DESKTOP_PREVIEW_WIDTH;
-
-  const webCardWidth =
-    viewMode === 'mobile' ? containerDimensions.width : DESKTOP_PREVIEW_WIDTH;
-  const webCardHeight = containerDimensions.height / scale;
   const topInset = Math.max(insets.top, 16);
   const bottomInset = Math.max(insets.bottom, 16);
-  const cardModules = useModulesData(profile?.cardModules ?? []);
+
+  const previewHeight = windowHeight - topInset - HEADER_HEIGHT;
 
   return (
     <Modal
@@ -101,9 +81,7 @@ const PreviewModal = ({
       animationType="slide"
       onRequestClose={onRequestClose}
     >
-      <Container
-        style={[{ flex: 1, paddingTop: topInset, paddingBottom: bottomInset }]}
-      >
+      <Container style={{ flex: 1, paddingTop: topInset }}>
         <Header
           leftElement={
             <IconButton
@@ -125,59 +103,15 @@ const PreviewModal = ({
             </View>
           }
         >
-          <View style={[{ flex: 1 }]}>
-            <Container style={{ padding: 8 }}>
-              <SwitchToggle
-                value={viewMode}
-                onChange={setViewMode}
-                values={[
-                  {
-                    value: 'mobile',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Mobile',
-                      description: 'Mobile view mode title in web card preview',
-                    }),
-                  },
-                  {
-                    value: 'desktop',
-                    label: intl.formatMessage({
-                      defaultMessage: 'Desktop',
-                      description:
-                        'Desktop view mode title in web card preview',
-                    }),
-                  },
-                ]}
-              />
-            </Container>
-            <View style={{ flex: 1 }} onLayout={onContainerLayout}>
-              <View
-                style={{
-                  width: webCardWidth,
-                  height: webCardHeight,
-                  transform: [
-                    {
-                      translateX:
-                        (containerDimensions.width - webCardWidth) / 2,
-                    },
-                    {
-                      translateY:
-                        (containerDimensions.height - webCardHeight) / 2,
-                    },
-                    { scale },
-                  ],
-                }}
-              >
-                <WebCardRenderer
-                  profile={profile}
-                  viewMode={viewMode}
-                  cardStyle={profile.cardStyle}
-                  cardColors={profile.cardColors}
-                  style={{ flex: 1 }}
-                  cardModules={cardModules}
-                />
-              </View>
-            </View>
-          </View>
+          <WebCardPreview
+            profile={profile}
+            height={previewHeight}
+            cardStyle={profile.cardStyle}
+            cardColors={profile.cardColors}
+            style={{ flex: 1 }}
+            cardModules={cardModules}
+            contentPaddingBottom={bottomInset}
+          />
         </Suspense>
       </Container>
     </Modal>

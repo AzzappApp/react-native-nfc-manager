@@ -1347,6 +1347,10 @@
     "defaultMessage": "Phone number",
     "description": "Signup Screen - phone number input placeholder"
   },
+  "TvsTSU": {
+    "defaultMessage": "Preview",
+    "description": "label of the button allowing to preview template"
+  },
   "Tw2G6K": {
     "defaultMessage": "Shows the module in your webcard",
     "description": "Accessibility hint for the show button in the profile edition screen"
@@ -1938,6 +1942,10 @@
   "ebysAs": {
     "defaultMessage": "Enter a first name",
     "description": "Placeholder for first name inside contact card"
+  },
+  "eco+tq": {
+    "defaultMessage": "Apply",
+    "description": "Apply button label in card template preview"
   },
   "eiD1yA": {
     "defaultMessage": "Followers",

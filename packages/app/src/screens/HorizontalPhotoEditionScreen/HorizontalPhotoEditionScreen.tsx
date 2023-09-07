@@ -499,12 +499,8 @@ const HorizontalPhotoEditionScreen = ({
               kind: MODULE_KIND_HORIZONTAL_PHOTO,
               data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>
