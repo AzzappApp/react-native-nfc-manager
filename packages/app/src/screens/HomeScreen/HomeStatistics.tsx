@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   View,
@@ -13,6 +14,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useAnimatedReaction,
+  useAnimatedRef,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
@@ -162,6 +164,12 @@ const HomeStatistics = ({
     [currentProfileIndexSharedValue.value, animated],
   );
 
+  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
+
+  const onSelectStat = (index: number) => {
+    scrollViewRef?.current?.scrollTo({ x: index * BOX_NUMBER_WIDTH, y: 0 });
+  };
+
   //TODO: if performance issue, inquiry a more complex way to do the chart(skia, D3 etc). it is the simpler using only animated view.
   return (
     <View style={styles.container}>
@@ -175,6 +183,7 @@ const HomeStatistics = ({
         chartsData={chartsData}
       />
       <AnimatedScrollView
+        ref={scrollViewRef}
         style={{
           height: BOX_NUMBER_HEIGHT,
           width: '100%',
@@ -203,6 +212,7 @@ const HomeStatistics = ({
           })}
           scrollIndex={scrollIndexOffset}
           index={0}
+          onSelect={onSelectStat}
         />
         <StatisticItems
           value={totalScans}
@@ -212,6 +222,7 @@ const HomeStatistics = ({
           })}
           scrollIndex={scrollIndexOffset}
           index={1}
+          onSelect={onSelectStat}
         />
         <StatisticItems
           value={totalLikes}
@@ -221,6 +232,7 @@ const HomeStatistics = ({
           })}
           scrollIndex={scrollIndexOffset}
           index={2}
+          onSelect={onSelectStat}
         />
       </AnimatedScrollView>
     </View>
@@ -238,12 +250,14 @@ type StatisticItemsProps = {
   scrollIndex: SharedValue<number>;
   title: string;
   index: number;
+  onSelect: (index: number) => void;
 };
 const StatisticItems = ({
   value,
   scrollIndex,
   title,
   index,
+  onSelect,
 }: StatisticItemsProps) => {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
@@ -276,15 +290,21 @@ const StatisticItems = ({
     };
   }, [scrollIndex]);
 
+  const onPress = () => {
+    onSelect(index);
+  };
+
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
-      <AnimatedText
-        style={[styles.largetText, animatedTextStyle]}
-        text={value}
-      />
-      <Text variant="smallbold" style={styles.smallText}>
-        {title}
-      </Text>
+      <Pressable onPress={onPress}>
+        <AnimatedText
+          style={[styles.largetText, animatedTextStyle]}
+          text={value}
+        />
+        <Text variant="smallbold" style={styles.smallText}>
+          {title}
+        </Text>
+      </Pressable>
     </Animated.View>
   );
 };

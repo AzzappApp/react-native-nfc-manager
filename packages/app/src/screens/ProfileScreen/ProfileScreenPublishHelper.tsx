@@ -59,7 +59,7 @@ const ProfileScreenPublishHelper = ({
         Toast.show({
           type: 'info',
           text1: intl.formatMessage({
-            defaultMessage: 'Tap on a section of your WebCarda to modify it',
+            defaultMessage: 'Tap on a section of your WebCard to modify it',
             description:
               'Toast info message that appears when the user is in webcard edit mode for the first time',
           }),

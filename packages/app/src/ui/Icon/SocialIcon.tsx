@@ -40,9 +40,6 @@ const socialIcons = {
   get instagram() {
     return require('./assets/social/instagram.png');
   },
-  get kult() {
-    return require('./assets/social/kult.png');
-  },
   get letterboxd() {
     return require('./assets/social/letterboxd.png');
   },

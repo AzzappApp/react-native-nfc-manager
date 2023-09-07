@@ -61,10 +61,8 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'github', mask: 'github.com/' },
   { id: 'gitlab', mask: 'gitlab.com/' },
   { id: 'glassdoor', mask: 'glassdoor.com/' },
-  { id: 'google', mask: 'google.com/' },
-  { id: 'hashnode', mask: 'hashnode.com/' },
+  { id: 'hashnode', mask: 'hashnode.com/@' },
   { id: 'instagram', mask: 'instagram.com/' },
-  { id: 'kult', mask: 'kult.cc/' },
   { id: 'letterboxd', mask: 'letterboxd.com/' },
   { id: 'linkedin', mask: 'linkedin.com/in/' },
   { id: 'mastodon', mask: 'mastodon.social/' },
@@ -81,7 +79,7 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'typefully', mask: 'typefully.app/' },
   { id: 'whatsapp', mask: 'wa.me/' },
   { id: 'yelp', mask: 'yelp.com/' },
-  { id: 'youtube', mask: 'youtube.com/channel/' },
+  { id: 'youtube', mask: 'youtube.com/' },
 ];
 
 const SOCIAL_LINKS_URL_MAP = new Map(

@@ -1115,6 +1115,10 @@
     "defaultMessage": "Text",
     "description": "CoverEditionScreen bottom menu label for Text tab"
   },
+  "NJtjrA": {
+    "defaultMessage": "Tap on a section of your WebCard to modify it",
+    "description": "Toast info message that appears when the user is in webcard edit mode for the first time"
+  },
   "NTkvNY": {
     "defaultMessage": "First name",
     "description": "ProfileForm first name textinput label"
@@ -2906,10 +2910,6 @@
   "x/HwUu": {
     "defaultMessage": "Take a picture",
     "description": "Accessibility label of the camera tabs in image picking wizzard"
-  },
-  "x1P4jT": {
-    "defaultMessage": "Tap on a section of your WebCarda to modify it",
-    "description": "Toast info message that appears when the user is in webcard edit mode for the first time"
   },
   "x288ev": {
     "defaultMessage": "Unknown error - Please retry",

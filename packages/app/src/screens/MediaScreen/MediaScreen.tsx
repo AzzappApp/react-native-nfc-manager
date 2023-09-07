@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import ProfilePostsList from '#components/ProfilePostsList';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
@@ -44,8 +45,9 @@ const MediaScreen = ({
   preloadedQuery,
   hasFocus = true,
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
+  useMainTabBarVisiblilityController(true);
   const { viewer } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
-
+  const { top } = useSafeAreaInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
 
   const tabs: Array<{ id: TAB; element: ReactElement }> = [
@@ -129,11 +131,9 @@ const MediaScreen = ({
   }
 
   return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <MediaScreenTabBar currentTab={tab} setTab={setTab} />
-        <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
-      </SafeAreaView>
+    <Container style={{ flex: 1, marginTop: top }}>
+      <MediaScreenTabBar currentTab={tab} setTab={setTab} />
+      <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
     </Container>
   );
 };
