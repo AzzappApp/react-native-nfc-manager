@@ -128,11 +128,12 @@ const CoverEditorTemplateList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
+  //in some casser viewer.colorPalette seems to be null (sentry crash
   const colorPalettes = useMemo(() => {
     return convertToNonNullArray(
-      (viewer.colorPalettes.edges ?? []).map(edge => edge?.node ?? null),
+      (viewer?.colorPalettes?.edges ?? []).map(edge => edge?.node ?? null),
     );
-  }, [viewer.colorPalettes.edges]);
+  }, [viewer?.colorPalettes?.edges]);
 
   const items = useMemo<TemplateListItem[]>(() => {
     const templates = convertToNonNullArray(

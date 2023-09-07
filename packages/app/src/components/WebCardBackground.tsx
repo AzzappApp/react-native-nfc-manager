@@ -108,7 +108,7 @@ const WebCardBackground = ({
     swapColor(cardCover?.backgroundColor, cardColors) ??
     cardColors?.light ??
     '#fff';
-  const lastModule = cardModules.at(-1);
+  const lastModule = cardModules ? cardModules.at(-1) : undefined;
 
   let lastColor = firstColor;
   const kind = overrideLastModule?.kind ?? lastModule?.kind;

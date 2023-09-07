@@ -86,7 +86,7 @@ const MediaFollowingsScreen = ({
     [data.followingsPosts?.edges],
   );
 
-  useSubscribeToInvalidationState([data.followingsPosts.__id], () => {
+  useSubscribeToInvalidationState([data.followingsPosts?.__id], () => {
     refetch({ after: null, first: 10 });
   });
 
