@@ -31,9 +31,6 @@ const socialIcons = {
   get glassdoor() {
     return require('./assets/social/glassdoor.png');
   },
-  get google() {
-    return require('./assets/social/google.png');
-  },
   get hashnode() {
     return require('./assets/social/hashnode.png');
   },
