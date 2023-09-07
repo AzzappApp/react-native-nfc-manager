@@ -1,4 +1,4 @@
-## 0.2.0-canary.65
+## 0.2.0-canary.66
 
 * **fix:**  - 🐛 make follow transaction work ([#1025](https://github.com/AzzappApp/azzapp/pull/1025))
 * **fix:**  - add zIndex for header Menu to be touchable ([#1011](https://github.com/AzzappApp/azzapp/pull/1011))
