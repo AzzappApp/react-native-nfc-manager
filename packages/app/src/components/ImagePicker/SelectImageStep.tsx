@@ -151,14 +151,14 @@ const SelectImageStep = ({
             height,
             originX: (width - wantedWidth) / 2,
             originY: 0,
-            width,
+            width: wantedWidth,
           },
         };
       } else if (forceAspectRatio >= 1) {
         const wantedHeight = width / forceAspectRatio;
         editionParameters = {
           cropData: {
-            height,
+            height: wantedHeight,
             originX: 0,
             originY: (height - wantedHeight) / 2,
             width,
