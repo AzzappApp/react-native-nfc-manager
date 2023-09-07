@@ -1,5 +1,7 @@
-## 0.2.0-canary.67
+## 0.2.0-canary.68
 
+* **fix:**  - monoton font on web
+* **feat:**  - update splash-screen logo size
 * **fix:**  - 🐛 make follow transaction work ([#1025](https://github.com/AzzappApp/azzapp/pull/1025))
 * **fix:**  - add zIndex for header Menu to be touchable ([#1011](https://github.com/AzzappApp/azzapp/pull/1011))
 * **fix:**  - video taking ([#1024](https://github.com/AzzappApp/azzapp/pull/1024))
