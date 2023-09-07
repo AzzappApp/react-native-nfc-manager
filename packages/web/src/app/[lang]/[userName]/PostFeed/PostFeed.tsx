@@ -117,6 +117,6 @@ const PostFeed = (props: PostFeedProps) => {
   );
 };
 
-const COUNT_POSTS_TO_FETCH = 2;
+const COUNT_POSTS_TO_FETCH = 5;
 
 export default PostFeed;
