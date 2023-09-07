@@ -43,7 +43,7 @@ const ContactCardEditModalField = ({
 }: {
   deleted: boolean;
   deleteButtonRect: LayoutRectangle | null;
-  labelKey: FieldPath<ContactCardEditForm>;
+  labelKey?: FieldPath<ContactCardEditForm>;
   keyboardType: TextInputProps['keyboardType'];
   deleteField: () => void;
   openDeleteButton: (changeEvent: LayoutRectangle) => void;
@@ -51,7 +51,7 @@ const ContactCardEditModalField = ({
   valueKey: FieldPath<ContactCardEditForm>;
   selectedKey: FieldPath<ContactCardEditForm>;
   control: Control<ContactCardEditForm>;
-  labelValues: Array<{ key: string; value: string }>;
+  labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
 }) => {
   const deleteMode = useSharedValue(false);
@@ -84,10 +84,14 @@ const ContactCardEditModalField = ({
   //   runOnJS(closeDeleteButton)();
   // }, [closeDeleteButton]);
 
-  const label = useWatch({
-    control,
-    name: labelKey,
-  });
+  const watchable = labelKey
+    ? {
+        control,
+        name: labelKey,
+      }
+    : { control };
+
+  const label = useWatch(watchable);
 
   const [visible, setVisible] = useState(false);
 
@@ -121,16 +125,18 @@ const ContactCardEditModalField = ({
               }
             }}
           />
-          <PressableNative
-            style={styles.labelSelector}
-            onPress={() => setVisible(true)}
-          >
-            <Text variant="smallbold">
-              {labelValues.find(l => l.key === label)?.value ??
-                (label as string)}
-            </Text>
-            <Icon icon="arrow_down" />
-          </PressableNative>
+          {labelValues && labelValues.length > 0 && (
+            <PressableNative
+              style={styles.labelSelector}
+              onPress={() => setVisible(true)}
+            >
+              <Text variant="smallbold">
+                {labelValues.find(l => l.key === label)?.value ??
+                  (label as string)}
+              </Text>
+              <Icon icon="arrow_down" />
+            </PressableNative>
+          )}
         </View>
         <Controller
           control={control}
@@ -169,29 +175,31 @@ const ContactCardEditModalField = ({
         </PressableNative>
       </Animated.View>
 
-      <BottomSheetModal
-        visible={visible}
-        onRequestClose={() => setVisible(false)}
-      >
-        <View>
-          <Controller
-            name={labelKey}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <SelectList
-                keyExtractor={item => item.key}
-                data={labelValues}
-                onItemSelected={item => {
-                  onChange(item.key);
-                  setVisible(false);
-                }}
-                selectedItemKey={value as string}
-                labelField="value"
-              />
-            )}
-          />
-        </View>
-      </BottomSheetModal>
+      {labelKey && (
+        <BottomSheetModal
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+        >
+          <View>
+            <Controller
+              name={labelKey}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <SelectList
+                  keyExtractor={item => item.key}
+                  data={labelValues}
+                  onItemSelected={item => {
+                    onChange(item.key);
+                    setVisible(false);
+                  }}
+                  selectedItemKey={value as string}
+                  labelField="value"
+                />
+              )}
+            />
+          </View>
+        </BottomSheetModal>
+      )}
     </>
   );
 };

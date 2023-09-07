@@ -18,6 +18,23 @@ export type ContactCard = {
     address: string;
     selected: boolean;
   }> | null;
+  urls?: Array<{
+    address: string;
+    selected: boolean;
+  }> | null;
+  addresses?: Array<{
+    label: string;
+    address: string;
+    selected: boolean;
+  }> | null;
+  birthdays?: Array<{
+    birthday: string;
+    selected: boolean;
+  }> | null;
+  socials?: Array<{
+    social: string;
+    selected: boolean;
+  }> | null;
 };
 
 /**

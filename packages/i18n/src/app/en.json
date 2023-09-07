@@ -99,6 +99,10 @@
     "defaultMessage": "Horizontal margin",
     "description": "Label of the horizontal margin slider in SocialLinks edition"
   },
+  "0sGGHs": {
+    "defaultMessage": "Enter a social profile",
+    "description": "Placeholder for social profile inside contact card"
+  },
   "106q2H": {
     "defaultMessage": "Background",
     "description": "Carousel  bottom menu label for Background tab"
@@ -166,6 +170,10 @@
   "2cJR0f": {
     "defaultMessage": "Enter a company name",
     "description": "Placeholder for company name inside contact card"
+  },
+  "2iAMC8": {
+    "defaultMessage": "Add address",
+    "description": "Add address to the contact card"
   },
   "2je5uN": {
     "defaultMessage": "Image & Text",
@@ -403,6 +411,10 @@
     "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
     "description": "Accessibility hint of the rotate button in in media edition screen"
   },
+  "9JP1Px": {
+    "defaultMessage": "Add birthday",
+    "description": "Add birthday to the contact card"
+  },
   "9PmLw5": {
     "defaultMessage": "color",
     "description": " color title in BlockText edition"
@@ -438,6 +450,10 @@
   "AL14KG": {
     "defaultMessage": "Vertical Space : {size}",
     "description": "vertical Spacing message in BlockText edition"
+  },
+  "AUcL2V": {
+    "defaultMessage": "birthday",
+    "description": "Section title for birthday"
   },
   "AV7xEU": {
     "defaultMessage": "Font size",
@@ -778,6 +794,10 @@
   "GpcxYL": {
     "defaultMessage": "Company name",
     "description": "Company name field registered for the contact card"
+  },
+  "GqDXgw": {
+    "defaultMessage": "address",
+    "description": "Section title for address"
   },
   "GsE7SA": {
     "defaultMessage": "Welcome!",
@@ -1150,6 +1170,10 @@
   "P2PER8": {
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
+  },
+  "P7WCv3": {
+    "defaultMessage": "Add social profile",
+    "description": "Add social profile to the contact card"
   },
   "POvY5S": {
     "defaultMessage": "Remove current contents",
@@ -1947,6 +1971,10 @@
     "defaultMessage": "Tap to sign in",
     "description": "SignIn Screen - AccessibilityLabel Sign In button"
   },
+  "faLJMw": {
+    "defaultMessage": "Enter a birthday",
+    "description": "Placeholder for birthday inside contact card"
+  },
   "fbl908": {
     "defaultMessage": "{nbSelectedModules} selected",
     "description": "Webcard builder header title in module edition mode"
@@ -2166,6 +2194,10 @@
   "jPNeTz": {
     "defaultMessage": "New password",
     "description": "Account Details - Change password form - new password label"
+  },
+  "jQ6Q7A": {
+    "defaultMessage": "social profile",
+    "description": "Section title for social profile"
   },
   "jUgt3y": {
     "defaultMessage": "Border radius",
@@ -2399,6 +2431,10 @@
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
+  "nuPEgc": {
+    "defaultMessage": "Enter a URL",
+    "description": "Placeholder for URL inside contact card"
+  },
   "nv6doU": {
     "defaultMessage": "Font size : {size}",
     "description": "Font size message in PhotoWithTextAndTitle edition"
@@ -2539,6 +2575,10 @@
     "defaultMessage": "Unlike the post",
     "description": "PostRendererActionBar unlike button accessibility"
   },
+  "qJLWGe": {
+    "defaultMessage": "URL",
+    "description": "Section title for URL"
+  },
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
@@ -2566,6 +2606,10 @@
   "r2XHrR": {
     "defaultMessage": "Middle right",
     "description": "Label of the middle right position in cover edition"
+  },
+  "r2olGP": {
+    "defaultMessage": "Add URL",
+    "description": "Add URL to the contact card"
   },
   "r3LnPL": {
     "defaultMessage": "Filter",
@@ -2914,6 +2958,10 @@
   "xbxx1v": {
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in BlockText edition"
+  },
+  "xfxHRE": {
+    "defaultMessage": "Enter an adress",
+    "description": "Placeholder for adress inside contact card"
   },
   "xo15bY": {
     "defaultMessage": "Slide to change the font size",

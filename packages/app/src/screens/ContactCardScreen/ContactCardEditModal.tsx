@@ -17,12 +17,16 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
+import ContactCardEditModalBirthdays from './ContactCardEditModalBirthday';
 import ContactCardEditModalEmails from './ContactCardEditModalEmails';
 import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
+import ContactCardEditModalSocials from './ContactCardEditModalSocials';
 import ContactCardEditModalStyles, {
   DELETE_BUTTON_WIDTH,
 } from './ContactCardEditModalStyles';
+import ContactCardEditModalUrls from './ContactCardEditModalUrls';
 import type { ContactCardEditForm } from './ContactCardEditModalSchema';
 import type { ContactCardEditModal_card$key } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
 import type { LayoutRectangle } from 'react-native';
@@ -86,6 +90,23 @@ const ContactCardEditModal = ({
           number
           selected
         }
+        urls {
+          address
+          selected
+        }
+        addresses {
+          address
+          label
+          selected
+        }
+        birthdays {
+          birthday
+          selected
+        }
+        socials {
+          social
+          selected
+        }
         serializedContactCard {
           data
           signature
@@ -123,6 +144,10 @@ const ContactCardEditModal = ({
       ...contactCard,
       emails: contactCard.emails?.map(m => ({ ...m })) ?? [],
       phoneNumbers: contactCard.phoneNumbers?.map(p => ({ ...p })) ?? [],
+      urls: contactCard.urls?.map(p => ({ ...p })) ?? [],
+      addresses: contactCard.addresses?.map(p => ({ ...p })) ?? [],
+      birthdays: contactCard.birthdays?.map(p => ({ ...p })) ?? [],
+      socials: contactCard.socials?.map(p => ({ ...p })) ?? [],
     },
   });
 
@@ -148,6 +173,10 @@ const ContactCardEditModal = ({
             phoneNumbers: data.phoneNumbers.filter(
               phoneNumber => phoneNumber.number,
             ),
+            urls: data.urls.filter(url => url.address),
+            addresses: data.addresses.filter(address => address.address),
+            birthdays: data.birthdays.filter(birthday => birthday.birthday),
+            socials: data.socials.filter(social => social.social),
           },
         },
         onCompleted: () => {
@@ -341,6 +370,74 @@ const ContactCardEditModal = ({
           </View>
 
           <ContactCardEditModalEmails
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+
+          <View style={styles.sectionTitleContainer}>
+            <Text variant="xsmall" style={styles.sectionTitle}>
+              <FormattedMessage
+                defaultMessage="URL"
+                description="Section title for URL"
+              />
+            </Text>
+          </View>
+
+          <ContactCardEditModalUrls
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+
+          <View style={styles.sectionTitleContainer}>
+            <Text variant="xsmall" style={styles.sectionTitle}>
+              <FormattedMessage
+                defaultMessage="address"
+                description="Section title for address"
+              />
+            </Text>
+          </View>
+
+          <ContactCardEditModalAddresses
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+
+          <View style={styles.sectionTitleContainer}>
+            <Text variant="xsmall" style={styles.sectionTitle}>
+              <FormattedMessage
+                defaultMessage="birthday"
+                description="Section title for birthday"
+              />
+            </Text>
+          </View>
+
+          <ContactCardEditModalBirthdays
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+
+          <View style={styles.sectionTitleContainer}>
+            <Text variant="xsmall" style={styles.sectionTitle}>
+              <FormattedMessage
+                defaultMessage="social profile"
+                description="Section title for social profile"
+              />
+            </Text>
+          </View>
+
+          <ContactCardEditModalSocials
             deleted={state.deleted}
             deleteButtonRect={state.rect}
             control={control}

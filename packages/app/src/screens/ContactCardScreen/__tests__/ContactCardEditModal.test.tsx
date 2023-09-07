@@ -122,7 +122,7 @@ describe('ContactCardEditModal', () => {
     act(() => {
       expect(
         screen.getAllByTestId('contact-card-edit-modal-field'),
-      ).toHaveLength(3);
+      ).toHaveLength(7);
 
       const newPhoneInput = screen.getByDisplayValue('');
       if (newPhoneInput) {
@@ -168,6 +168,31 @@ describe('ContactCardEditModal', () => {
           label: 'Home',
           number: '1234567890 3',
           selected: true,
+        },
+      ],
+      addresses: [
+        {
+          address: '<mock-value-for-field-"address">',
+          label: '<mock-value-for-field-"label">',
+          selected: false,
+        },
+      ],
+      birthdays: [
+        {
+          birthday: '<mock-value-for-field-"birthday">',
+          selected: false,
+        },
+      ],
+      socials: [
+        {
+          selected: false,
+          social: '<mock-value-for-field-"social">',
+        },
+      ],
+      urls: [
+        {
+          address: '<mock-value-for-field-"address">',
+          selected: false,
         },
       ],
     });
