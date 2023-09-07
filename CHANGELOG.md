@@ -1,5 +1,8 @@
-## 0.2.0-canary.62
+## 0.2.0-canary.63
 
+* **fix:**  - add zIndex for header Menu to be touchable ([#1011](https://github.com/AzzappApp/azzapp/pull/1011))
+* **fix:**  - video taking ([#1024](https://github.com/AzzappApp/azzapp/pull/1024))
+* **fix:**  - cropping data for camera picture ([#1023](https://github.com/AzzappApp/azzapp/pull/1023))
 * **feat:**  - **CardTemplate:** new template list ([#1019](https://github.com/AzzappApp/azzapp/pull/1019))
 * **fix:**  - SimpleText icon ([#1014](https://github.com/AzzappApp/azzapp/pull/1014))
 * **fix:**  - visiblity of tabbar in media and bottom inset for scrolling ([#1010](https://github.com/AzzappApp/azzapp/pull/1010))
