@@ -152,7 +152,7 @@ const HomeInformations = ({
         );
       }
     },
-    [animated],
+    [animated, profiles],
   );
 
   if (!currentProfile) {

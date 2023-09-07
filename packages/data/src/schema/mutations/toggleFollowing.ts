@@ -30,24 +30,25 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
   const { follow } = input;
-  try {
-    db.transaction(async trx => {
-      await Promise.all([
-        trx
-          .update(ProfileTable)
-          .set({
-            nbFollowers: sql`nbFollowers ${follow ? '+' : '-'} 1`,
-          })
-          .where(eq(ProfileTable.id, targetId)),
-        trx
-          .update(ProfileTable)
-          .set({
-            nbFollowings: sql`nbFollowings ${follow ? '+' : '-'} 1`,
-          })
-          .where(eq(ProfileTable.id, profileId)),
 
-        input ? follows(profileId, targetId) : unfollows(profileId, targetId),
-      ]);
+  try {
+    await db.transaction(async trx => {
+      await trx
+        .update(ProfileTable)
+        .set({
+          nbFollowers: follow ? sql`nbFollowers + 1` : sql`nbFollowers - 1`,
+        })
+        .where(eq(ProfileTable.id, targetId));
+
+      await trx
+        .update(ProfileTable)
+        .set({
+          nbFollowings: follow ? sql`nbFollowings + 1` : sql`nbFollowings - 1`,
+        })
+        .where(eq(ProfileTable.id, profileId));
+
+      if (follow) await follows(profileId, targetId, trx);
+      else await unfollows(profileId, targetId, trx);
     });
   } catch (e) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
