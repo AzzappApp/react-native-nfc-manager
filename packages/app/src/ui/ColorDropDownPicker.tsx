@@ -73,7 +73,6 @@ export const ColorDropDownPicker = ({
         <Text
           style={{
             fontSize: 24,
-            color: swapColor(color, colorPalette),
           }}
         >
           A

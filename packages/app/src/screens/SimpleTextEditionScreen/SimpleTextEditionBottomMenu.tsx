@@ -17,7 +17,7 @@ const SimpleTextEditionBottomMenu = (
         () => [
           {
             key: 'style',
-            icon: 'settings',
+            icon: 'text',
             label: intl.formatMessage({
               defaultMessage: 'Edit Style',
               description: 'Simple text bottom menu label for style tab',
