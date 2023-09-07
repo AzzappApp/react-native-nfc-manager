@@ -1,5 +1,5 @@
 import { pick } from 'lodash';
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import {
@@ -79,6 +79,12 @@ const WebCardColorPicker = ({
 
   const [currentPalette, setCurrentPalette] =
     useState<ColorPalette>(colorPalette);
+
+  useEffect(() => {
+    if (!visible) {
+      setCurrentPalette(colorPalette);
+    }
+  }, [colorPalette, visible]);
 
   const [editedColor, setEditedColor] = useState<
     'dark' | 'light' | 'primary' | null
