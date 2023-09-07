@@ -313,6 +313,7 @@ const SimpleButtonEditionScreen = ({
             })}
           />
         }
+        style={{ zIndex: 50 }}
       />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
