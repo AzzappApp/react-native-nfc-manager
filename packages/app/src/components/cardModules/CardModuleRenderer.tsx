@@ -1,4 +1,6 @@
 import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
@@ -8,6 +10,7 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import BlockTextRenderer, { readBlockTextData } from './BlockTextRenderer';
 import CarouselRenderer from './CarouselRenderer';
@@ -218,16 +221,25 @@ const MODULE_RENDERERS_DESKTOP = {
     />
   ),
   [MODULE_KIND_CAROUSEL]: CarouselRenderer,
-  [MODULE_KIND_HORIZONTAL_PHOTO]: (props: HorizontalPhotoRendererProps) => (
-    <HorizontalPhotoRenderer
-      {...props}
-      contentStyle={{
-        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
-        width: '100%',
-        alignSelf: 'center',
-      }}
-    />
-  ),
+  [MODULE_KIND_HORIZONTAL_PHOTO]: (props: HorizontalPhotoRendererProps) => {
+    const { marginHorizontal } = getModuleDataValues({
+      data: props.data,
+      cardStyle: props.cardStyle,
+      defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+      styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
+    });
+
+    return (
+      <HorizontalPhotoRenderer
+        {...props}
+        contentStyle={{
+          maxWidth: marginHorizontal ? DESKTOP_CONTENT_MAX_WIDTH : '100%',
+          width: '100%',
+          alignSelf: 'center',
+        }}
+      />
+    );
+  },
   [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: (
     props: PhotoWithTextAndTitleRendererProps,
