@@ -345,7 +345,7 @@ jobs:
           GITHUB_REF="${{ github.ref }}"
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             PROFILE="production"
-          el if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
+          elif [ "$GITHUB_REF" == "refs/heads/staging" ]; then
             PROFILE="staging"
           fi
           eas build --platform all --profile $PROFILE --non-interactive --no-wait
