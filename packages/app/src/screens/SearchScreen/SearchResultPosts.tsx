@@ -94,9 +94,9 @@ const SearchResultPosts = ({
 
   const posts: PostsGrid_posts$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchPosts.edges?.map(edge => edge?.node) ?? [],
+      data.searchPosts?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchPosts.edges]);
+  }, [data.searchPosts?.edges]);
 
   return (
     <PostsGrid

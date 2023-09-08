@@ -61,9 +61,9 @@ const SearchResultProfiles = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchProfiles.edges?.map(edge => edge?.node) ?? [],
+      data.searchProfiles?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchProfiles.edges]);
+  }, [data.searchProfiles?.edges]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

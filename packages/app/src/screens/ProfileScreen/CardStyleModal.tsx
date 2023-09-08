@@ -336,10 +336,10 @@ const CardStyleList = ({
     () => [
       currentCardStyle,
       ...convertToNonNullArray(
-        cardStyles.edges?.map(edge => edge?.node ?? null) ?? [],
+        cardStyles?.edges?.map(edge => edge?.node ?? null) ?? [],
       ),
     ],
-    [cardStyles.edges, currentCardStyle],
+    [cardStyles?.edges, currentCardStyle],
   );
 
   const onEndReached = useCallback(() => {

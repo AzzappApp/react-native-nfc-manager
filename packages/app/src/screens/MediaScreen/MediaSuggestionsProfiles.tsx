@@ -61,9 +61,9 @@ const MediaSuggestionsProfiles = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.recommendedProfiles.edges?.map(edge => edge?.node) ?? [],
+      data.recommendedProfiles?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.recommendedProfiles.edges]);
+  }, [data.recommendedProfiles?.edges]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

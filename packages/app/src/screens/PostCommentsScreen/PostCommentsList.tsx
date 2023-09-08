@@ -179,7 +179,7 @@ const PostCommentsList = ({
     () =>
       data.comments?.edges
         ? convertToNonNullArray(
-            data.comments.edges.map(edge => edge?.node ?? null),
+            data.comments?.edges?.map(edge => edge?.node ?? null),
           )
         : [],
     [data.comments?.edges],
