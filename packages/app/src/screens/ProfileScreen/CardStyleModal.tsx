@@ -252,11 +252,7 @@ const CardStylePreview = ({
     profileKey as CardStyleModal_profile$key | null,
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? []);
-  const visibileCardModules = useMemo(
-    () => cardModules.filter(module => module.visible),
-    [cardModules],
-  );
+  const cardModules = useModulesData(profile?.cardModules ?? [], true);
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -275,7 +271,7 @@ const CardStylePreview = ({
       cardStyle={cardStyle}
       cardColors={profile.cardColors}
       style={{ flex: 1 }}
-      cardModules={visibileCardModules}
+      cardModules={cardModules}
     />
   );
 };

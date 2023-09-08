@@ -64,7 +64,7 @@ const PreviewModal = ({
     profileKey,
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? []);
+  const cardModules = useModulesData(profile?.cardModules ?? [], true);
 
   const intl = useIntl();
 

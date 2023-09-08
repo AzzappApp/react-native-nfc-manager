@@ -100,11 +100,24 @@ const ModulesDataFragment = graphql`
   }
 `;
 
-export const useModulesData = (cardModulesKey: ModuleData_cardModules$key) => {
+/**
+ *  Return the list of modules(can be filter using visible)
+ *
+ * @param {ModuleData_cardModules$key} cardModulesKey
+ * @param {boolean} visible show only Visible module
+ * @return {*}
+ */
+export const useModulesData = (
+  cardModulesKey: ModuleData_cardModules$key,
+  visible: boolean = false,
+) => {
   const modules = useFragment(ModulesDataFragment, cardModulesKey);
   return convertToNonNullArray(
     modules.map(module => {
       if (module) {
+        if (visible && !module.visible) {
+          return null;
+        }
         return {
           id: module.id,
           kind: module.kind,

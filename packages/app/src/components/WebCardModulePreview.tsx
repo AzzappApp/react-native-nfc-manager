@@ -92,7 +92,7 @@ const WebCardModulePreview = ({
     {},
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? []);
+  const cardModules = useModulesData(profile?.cardModules ?? [], true);
 
   const { editedIndex, modules } = useMemo(() => {
     if (!profile) {
@@ -104,10 +104,8 @@ const WebCardModulePreview = ({
         if (module.id === editedModuleId) {
           editedIndex = index;
           return editedModuleInfo;
-        } else if (module.visible) {
-          return module;
         }
-        return null;
+        return module;
       }),
     );
     if (!editedModuleId) {
