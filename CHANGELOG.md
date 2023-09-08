@@ -1,4 +1,4 @@
-## 0.2.0-canary.68
+## 0.2.0-canary.69
 
 * **fix:**  - monoton font on web
 * **feat:**  - update splash-screen logo size
