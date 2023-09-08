@@ -14,7 +14,7 @@ const sql = <T>(strings: TemplateStringsArray, ...params: any[]): SQL<T> => {
 const fetchFunction =
   process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
 
-const MAX_CONCURRENT_QUERIES = 20;
+const MAX_CONCURRENT_QUERIES = 6;
 
 const concurrentQueue = createConcurrentQueue(MAX_CONCURRENT_QUERIES, () => {
   console.warn(
