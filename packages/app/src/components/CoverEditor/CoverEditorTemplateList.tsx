@@ -137,7 +137,7 @@ const CoverEditorTemplateList = ({
 
   const items = useMemo<TemplateListItem[]>(() => {
     const templates = convertToNonNullArray(
-      (coverTemplates.edges ?? []).map(edge => edge?.node ?? null),
+      (coverTemplates?.edges ?? []).map(edge => edge?.node ?? null),
     );
     const items: TemplateListItem[] = templates.map((item, index) => {
       const {
@@ -309,7 +309,7 @@ const CoverEditorTemplateList = ({
 
     return items;
   }, [
-    coverTemplates.edges,
+    coverTemplates?.edges,
     currentCoverStyle,
     colorPalettes,
     showTemplatesMedias,
