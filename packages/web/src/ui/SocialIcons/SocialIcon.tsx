@@ -7,10 +7,8 @@ import figma from './assets/figma.svg';
 import github from './assets/github.svg';
 import gitlab from './assets/gitlab.svg';
 import glassdoor from './assets/glassdoor.svg';
-import google from './assets/google.svg';
 import hashnode from './assets/hashnode.svg';
 import instagram from './assets/instagram.svg';
-import kult from './assets/kult.svg';
 import letterboxd from './assets/letterboxd.svg';
 import linkedin from './assets/linkedin.svg';
 import mastodon from './assets/mastodon.svg';
@@ -53,10 +51,8 @@ const socialIcons = {
   github,
   gitlab,
   glassdoor,
-  google,
   hashnode,
   instagram,
-  kult,
   letterboxd,
   linkedin,
   mastodon,

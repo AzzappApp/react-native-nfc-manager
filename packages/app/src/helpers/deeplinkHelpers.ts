@@ -12,6 +12,9 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
+const profileUrl = new RegExp('^profile/([^?]+)');
+const resetPasswordUrl = new RegExp('^reset-password');
+
 export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
@@ -20,12 +23,10 @@ export const matchUrlWithRoute = async (
   if (prefix) {
     const withoutPrefix = url.replace(prefix, '');
 
-    const regex = new RegExp('^profile/([^?]+)');
+    const matchProfile = withoutPrefix.match(profileUrl);
 
-    const match = withoutPrefix.match(regex);
-
-    if (match) {
-      const username = match[1];
+    if (matchProfile) {
+      const username = matchProfile[1];
 
       const signature = decodeURIComponent(
         getSearchParamFromURL(url, 's') ?? '',
@@ -68,6 +69,27 @@ export const matchUrlWithRoute = async (
             },
           };
         }
+      }
+    }
+
+    const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
+    if (matchResetPassword) {
+      const token = decodeURIComponent(
+        getSearchParamFromURL(url, 'token') ?? '',
+      );
+
+      const issuer = decodeURIComponent(
+        getSearchParamFromURL(url, 'issuer') ?? '',
+      );
+
+      if (token) {
+        return {
+          route: 'RESET_PASSWORD',
+          params: {
+            token,
+            issuer,
+          },
+        };
       }
     }
   }

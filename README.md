@@ -107,7 +107,6 @@ The sources of the project are organized as a monorepo. Dependencies are managed
 The differents packages of the application are located under the `packages` directory :
 
 - [app](./packages/app/): contains the source code of the client React Native application.
-- [app](./packages/auth/): authentification related logic.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the GraphQL API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.
@@ -146,8 +145,7 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Miscellaneous
 
-- The authentification process of the mobile applications is based on [JWT](https://jwt.io/) tokens
-- [Microsoft App Center](https://appcenter.ms/) is used of Code Push, crash reporting and distribution of staging and development version of the application
+- The authentification process of the mobile applications is based on tokens
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
@@ -162,9 +160,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 - `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
 - `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_API_TOKEN`: the api token of the appcenter app
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_NAME`: the name the appcenter app
-- `APPCENTER_{ENVIRONMENT}_{PLATFORM}_APP_SECRET`: the app secret the appcenter app
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
 Valid platforms are  `IOS` and `ANDROID`. 

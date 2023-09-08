@@ -1,5 +1,9 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  LINE_DIVIDER_MAX_MARGIN_BOTTOM,
+  LINE_DIVIDER_MAX_MARGIN_TOP,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -57,7 +61,7 @@ const LineDividerMarginEditionPanel = ({
           }
           value={marginTop}
           min={0}
-          max={200}
+          max={LINE_DIVIDER_MAX_MARGIN_TOP}
           step={1}
           onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
@@ -84,7 +88,7 @@ const LineDividerMarginEditionPanel = ({
           }
           value={marginBottom}
           min={0}
-          max={200}
+          max={LINE_DIVIDER_MAX_MARGIN_BOTTOM}
           step={1}
           onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({

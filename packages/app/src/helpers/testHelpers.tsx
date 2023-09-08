@@ -3,6 +3,7 @@ import React from 'react';
 import { IntlProvider } from 'react-intl';
 
 import { Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RouterProvider, useNativeRouter } from '#components/NativeRouter';
 import type { NativeRouterInit } from '#components/NativeRouter';
 import type { RenderResult } from '@testing-library/react-native';
@@ -44,7 +45,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
         defaultLocale="fr"
         messages={{}}
       >
-        {children}
+        <SafeAreaProvider>{children}</SafeAreaProvider>
       </IntlProvider>
     </RouterProvider>
   );

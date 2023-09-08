@@ -1,19 +1,26 @@
-import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import cx from 'classnames';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  SIMPLE_BUTTON_DEFAULT_VALUES,
+  SIMPLE_BUTTON_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
+import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles from './SimpleButtonRenderer.module.css';
-import type { CardModule } from '@azzapp/data/domains';
+import styles from './SimpleButtonRenderer.css';
+import type { ModuleRendererProps } from '../ModuleRenderer';
+import type { CardModuleSimpleButton } from '@azzapp/data/domains';
 
-export type SimpleButtonRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type SimpleButtonRendererProps =
+  ModuleRendererProps<CardModuleSimpleButton> &
+    Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 /**
  * Render a SimpleButton module
  */
 const SimpleButtonRenderer = ({
   module,
+  colorPalette,
+  cardStyle,
   style,
   ...props
 }: SimpleButtonRendererProps) => {
@@ -34,7 +41,12 @@ const SimpleButtonRenderer = ({
     height,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, SIMPLE_BUTTON_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
+    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+  });
 
   let href: string | undefined;
   switch (actionType as string) {
@@ -53,6 +65,7 @@ const SimpleButtonRenderer = ({
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={{
         ...style,
         height: height + marginTop + marginBottom,
@@ -68,20 +81,19 @@ const SimpleButtonRenderer = ({
           width,
           marginBottom,
           marginTop,
-          backgroundColor: buttonColor,
+          backgroundColor: swapColor(buttonColor, colorPalette),
           borderRadius,
           borderWidth,
-          borderColor,
+          borderColor: swapColor(borderColor, colorPalette),
         }}
         href={href}
       >
         <span
           style={{
-            fontFamily,
-            color: fontColor,
+            color: swapColor(fontColor, colorPalette),
             fontSize,
           }}
-          className={styles.label}
+          className={cx(styles.label, fontsMap[fontFamily].className)}
         >
           {buttonLabel}
         </span>

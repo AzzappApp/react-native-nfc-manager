@@ -1,17 +1,24 @@
 import { graphql } from 'graphql';
 import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@azzapp/auth/viewer';
 import { createGraphQLContext, schema } from '@azzapp/data';
+import { getProfileById } from '@azzapp/data/domains';
+import {
+  getDatabaseConnectionsInfos,
+  startDatabaseConnectionMonitoring,
+} from '@azzapp/data/domains/databaseMonitorer';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
-import type { SessionData } from '@azzapp/auth/viewer';
+import { getSessionData } from '#helpers/tokens';
+import type { SessionData } from '#helpers/tokens';
+import type { Profile } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
 
 export const POST = async (req: NextRequest) => {
-  let viewerInfos: SessionData;
+  let sessionData: SessionData | null;
   try {
-    viewerInfos = await getSessionData();
+    sessionData = await getSessionData();
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json(
@@ -26,34 +33,74 @@ export const POST = async (req: NextRequest) => {
     }
   }
 
+  if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+    startDatabaseConnectionMonitoring();
+  }
+
+  const requestParams = await req.json();
+  const { profileId, locale } = requestParams;
+  let profile: Profile | null = null;
+  if (profileId) {
+    profile = await getProfileById(profileId);
+    if (!profile || profile.userId !== sessionData?.userId) {
+      return NextResponse.json(
+        { message: ERRORS.UNAUTORIZED },
+        { status: 401 },
+      );
+    }
+  }
+
   const cardUsernamesToRevalidate = new Set<string>();
 
   const cardUpdateListener = (username: string) => {
     cardUsernamesToRevalidate.add(username);
   };
 
-  const requestParams = await req.json();
   try {
+    const graphqlRequest = requestParams.id
+      ? (queryMap as any)[requestParams.id]
+      : requestParams.query;
+
     const result = await graphql({
       schema,
       rootValue: {},
-      source: requestParams.id
-        ? (queryMap as any)[requestParams.id]
-        : requestParams.query,
+      source: graphqlRequest,
       variableValues: requestParams.variables,
       contextValue: createGraphQLContext(
         cardUpdateListener,
-        viewerInfos,
-        undefined,
+        sessionData?.userId,
+        profile,
+        locale ?? DEFAULT_LOCALE,
       ),
     });
-    if (process.env.NODE_ENV !== 'production' && result.errors) {
+    if (
+      (process.env.NODE_ENV !== 'production' ||
+        process.env.DEPLOYMENT_ENVIRONMENT === 'development') &&
+      !!result.errors?.length
+    ) {
+      console.warn('GraphQL errors:');
       console.warn(result.errors);
+      console.warn(result.errors[0].stack);
     }
 
     cardUsernamesToRevalidate.forEach(username => {
       revalidateTag(username);
     });
+    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+      const infos = await getDatabaseConnectionsInfos();
+      if (infos) {
+        const gqlName = /query\s*(\S+)\s*[{(]/g.exec(graphqlRequest)?.[1];
+        console.log(
+          `-------------------- Graphql Query : ${gqlName}--------------------`,
+        );
+        console.log('Number database requests', infos.nbRequests);
+        console.log('Max concurrent requests', infos.maxConcurrentRequests);
+        console.log('Queries:\n---\n', infos.queries.join('\n---\n'));
+        console.log(
+          '----------------------------------------------------------------',
+        );
+      }
+    }
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);

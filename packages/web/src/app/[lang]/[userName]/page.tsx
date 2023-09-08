@@ -1,13 +1,19 @@
 import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import {
-  getCardCoversByIds,
   getCardModules,
+  getMediasByIds,
   getProfileByUserName,
-  getUsersCards,
+  getProfilesPostsWithTopComment,
+  getStaticMediasByIds,
 } from '@azzapp/data/domains';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  DEFAULT_CARD_STYLE,
+  DEFAULT_COLOR_PALETTE,
+} from '@azzapp/shared/cardHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
-import DownloadVCard from './DownloadVCard';
+import ProfilePageLayout from './ProfilePageLayout';
 
 type ProfilePageProps = {
   params: {
@@ -16,33 +22,85 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { profile, card, cover, modules } = await unstable_cache(
+  const { profile, modules, media, posts, backgrounds } = await unstable_cache(
     async () => {
       const profile = await getProfileByUserName(userName);
-      const [card] = profile ? await getUsersCards([profile.id]) : [];
-      const [cover] = card ? await getCardCoversByIds([card.coverId]) : [];
-      const modules = card ? await getCardModules(card.id) : [];
 
-      return { profile, card, cover, modules };
+      try {
+        if (profile?.cardIsPublished) {
+          const [posts, modules, media] = await Promise.all([
+            getProfilesPostsWithTopComment(profile.id, 5, 0),
+            getCardModules(profile.id),
+            profile.coverData?.mediaId
+              ? getMediasByIds([profile.coverData.mediaId]).then(
+                  ([media]) => media,
+                )
+              : null,
+          ]);
+
+          const backgroundIds = convertToNonNullArray(
+            modules.map(module => (module.data as any).backgroundId),
+          );
+
+          const backgrounds = backgroundIds.length
+            ? await getStaticMediasByIds(backgroundIds)
+            : [];
+
+          return {
+            profile,
+            modules,
+            media,
+            posts,
+            backgrounds,
+          };
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      return {
+        profile,
+        card: undefined,
+        cover: undefined,
+        modules: [],
+        media: undefined,
+        posts: [],
+        postsCount: 0,
+        backgrounds: [],
+      };
     },
     [userName],
     { tags: [userName] },
   )();
 
-  if (!profile || !card || !cover) {
+  if (!profile?.cardIsPublished || !media) {
     return notFound();
   }
 
+  const resizeModes = new Map(
+    convertToNonNullArray(backgrounds).map(b => [b.id, b.resizeMode!]),
+  );
+
   return (
-    <div style={{ backgroundColor: card.backgroundColor ?? '#FFF' }}>
-      <CoverRenderer cover={cover} />
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw' }}>
-        {modules.map(module => (
-          <ModuleRenderer module={module} key={module.id} />
-        ))}
-      </div>
-      <DownloadVCard profileId={profile.id} userName={userName} />
-    </div>
+    <ProfilePageLayout
+      profile={profile}
+      modules={
+        <>
+          {modules.map(module => (
+            <ModuleRenderer
+              resizeModes={resizeModes}
+              module={module}
+              key={module.id}
+              colorPalette={profile.cardColors ?? DEFAULT_COLOR_PALETTE}
+              cardStyle={profile.cardStyle ?? DEFAULT_CARD_STYLE}
+            />
+          ))}
+        </>
+      }
+      posts={posts}
+      media={media}
+      cover={<CoverRenderer profile={profile} media={media} />}
+    />
   );
 };
 

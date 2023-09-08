@@ -1,153 +1,182 @@
-import { useIntl } from 'react-intl';
 import { Text } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { SIMPLE_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { graphql, readInlineData } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  MODULE_KIND_SIMPLE_TITLE,
+  SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TEXT_STYLE_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
+  SIMPLE_TITLE_STYLE_VALUES,
+  getModuleDataValues,
+  textAlignmentOrDefault,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from './CardModuleBackground';
 import type {
-  SimpleTextRenderer_module$data,
-  SimpleTextRenderer_module$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_module.graphql';
-import type { ViewProps, ColorValue } from 'react-native';
+  SimpleTextRenderer_simpleTextModule$data,
+  SimpleTextRenderer_simpleTextModule$key,
+} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
+import type {
+  SimpleTextRenderer_simpleTitleModule$data,
+  SimpleTextRenderer_simpleTitleModule$key,
+} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { StyleProp, TextStyle, ViewProps } from 'react-native';
+
+const SimpleTextRendererFragment = graphql`
+  fragment SimpleTextRenderer_simpleTextModule on CardModuleSimpleText @inline {
+    kind
+    text
+    fontFamily
+    fontSize
+    fontColor
+    textAlign
+    verticalSpacing
+    marginHorizontal
+    marginVertical
+    background {
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
+
+const SimpleTitleRendererFragment = graphql`
+  fragment SimpleTextRenderer_simpleTitleModule on CardModuleSimpleTitle
+  @inline {
+    kind
+    text
+    fontFamily
+    fontSize
+    fontColor
+    textAlign
+    verticalSpacing
+    marginHorizontal
+    marginVertical
+    background {
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
+
+export const readSimpleTextData = (
+  module: SimpleTextRenderer_simpleTextModule$key,
+) => readInlineData(SimpleTextRendererFragment, module);
+
+export const readSimpleTitleData = (
+  module: SimpleTextRenderer_simpleTitleModule$key,
+) => readInlineData(SimpleTitleRendererFragment, module);
+
+export type SimpleTextRendererData = NullableFields<
+  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
+  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
+>;
 
 export type SimpleTextRendererProps = ViewProps & {
   /**
-   * A relay fragment reference for a simple text module
-   */
-  module: SimpleTextRenderer_module$key;
-};
-
-/**
- * Render a simple text module
- */
-const SimpleTextRenderer = ({ module, ...props }: SimpleTextRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment SimpleTextRenderer_module on CardModule {
-        kind
-        ... on CardModuleSimpleText {
-          text
-          fontFamily
-          fontSize
-          color
-          textAlign
-          verticalSpacing
-          marginHorizontal
-          marginVertical
-          background {
-            uri
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-        ... on CardModuleSimpleTitle {
-          text
-          fontFamily
-          fontSize
-          color
-          textAlign
-          verticalSpacing
-          marginHorizontal
-          marginVertical
-          background {
-            uri
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-      }
-    `,
-    module,
-  );
-
-  return <SimpleTextRendererRaw data={data} {...props} />;
-};
-
-export default SimpleTextRenderer;
-
-export type SimpleTextRawData = Omit<
-  SimpleTextRenderer_module$data,
-  ' $fragmentType'
->;
-
-type SimpleTextRendererRawProps = ViewProps & {
-  /**
    * The data for the simple text module
    */
-  data: SimpleTextRawData;
+  data: SimpleTextRendererData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<TextStyle>;
 };
 
 /**
- * Raw implementation of the simple text module
+ *  implementation of the simple text module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const SimpleTextRendererRaw = ({
+const SimpleTextRenderer = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
+  contentStyle,
   ...props
-}: SimpleTextRendererRawProps) => {
+}: SimpleTextRendererProps) => {
+  // the getModuleDataValues typings does not match the data type
+  // because of the 2 different types of modules
   const {
     text,
     fontFamily,
     fontSize,
     textAlign,
-    color,
+    fontColor,
     verticalSpacing,
     marginHorizontal,
     marginVertical,
     background,
     backgroundStyle,
-    kind,
-  } = Object.assign({}, SIMPLE_TEXT_DEFAULT_VALUES, data);
-
-  const intl = useIntl();
+  } = getModuleDataValues({
+    data,
+    styleValuesMap:
+      data.kind === MODULE_KIND_SIMPLE_TITLE
+        ? SIMPLE_TITLE_STYLE_VALUES
+        : SIMPLE_TEXT_STYLE_VALUES,
+    cardStyle,
+    defaultValues:
+      data.kind === MODULE_KIND_SIMPLE_TITLE
+        ? SIMPLE_TITLE_DEFAULT_VALUES
+        : SIMPLE_TEXT_DEFAULT_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={[
         style,
         {
-          paddingHorizontal: marginHorizontal,
-          paddingVertical: marginVertical,
+          paddingHorizontal: marginHorizontal ?? 0,
+          paddingVertical: marginVertical ?? 0,
           flexShrink: 0,
         },
       ]}
     >
       <Text
-        style={{
-          textAlign,
-          color: color as ColorValue,
-          fontSize,
-          fontFamily,
-          lineHeight:
-            fontSize && verticalSpacing
-              ? fontSize * 1.2 + verticalSpacing
-              : undefined,
-        }}
+        style={[
+          {
+            textAlign: textAlignmentOrDefault(textAlign),
+            color: swapColor(fontColor, colorPalette),
+            fontSize,
+            fontFamily,
+            lineHeight:
+              fontSize && verticalSpacing
+                ? fontSize * 1.2 + verticalSpacing
+                : undefined,
+          },
+          contentStyle,
+        ]}
       >
-        {
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          text ||
-            (kind === 'simpleText'
-              ? intl.formatMessage({
-                  defaultMessage:
-                    "Add your Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
-                  description: 'Default text for the simple text module',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Add section Title here',
-                  description: 'Default text for the simple title module',
-                }))
-        }
+        {text}
       </Text>
     </CardModuleBackground>
   );
 };
+
+export default SimpleTextRenderer;

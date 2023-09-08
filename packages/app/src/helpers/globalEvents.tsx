@@ -33,7 +33,6 @@ export type PROFILE_CHANGE = {
   type: 'PROFILE_CHANGE';
   payload: {
     profileId: string;
-    authTokens: { token: string; refreshToken: string };
   };
 };
 

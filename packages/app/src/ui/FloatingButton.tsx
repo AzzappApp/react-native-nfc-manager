@@ -17,7 +17,7 @@ export type FloatingButtonProps = Omit<PressableProps, 'style'> & {
 const FloatingButton = (
   {
     onPress,
-    size = 50,
+    size = FLOATING_BUTTON_SIZE,
     variant = 'normal',
     children,
     disabled = false,
@@ -49,6 +49,8 @@ const FloatingButton = (
 };
 
 export default forwardRef(FloatingButton);
+
+export const FLOATING_BUTTON_SIZE = 50;
 
 const computedStyle = createVariantsStyleSheet(appearance => ({
   default: {

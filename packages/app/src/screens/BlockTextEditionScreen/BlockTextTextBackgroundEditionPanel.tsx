@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
+import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
@@ -107,7 +107,7 @@ const BlockTextTextBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <EditorLayerSelectorPanel
+      <ProfileBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'TextBackground',
           description:

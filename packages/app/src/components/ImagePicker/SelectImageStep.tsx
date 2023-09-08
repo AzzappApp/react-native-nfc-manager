@@ -50,6 +50,7 @@ const SelectImageStep = ({
     aspectRatio,
     onMediaChange,
     onAspectRatioChange,
+    onEditionParametersChange,
     clearMedia,
   } = useImagePickerState();
 
@@ -141,8 +142,39 @@ const SelectImageStep = ({
       },
       forceCameraRatio,
     );
+    if (forceAspectRatio) {
+      let editionParameters = {};
+      if (forceAspectRatio < 1) {
+        const wantedWidth = height * forceAspectRatio;
+        editionParameters = {
+          cropData: {
+            height,
+            originX: (width - wantedWidth) / 2,
+            originY: 0,
+            width: wantedWidth,
+          },
+        };
+      } else if (forceAspectRatio >= 1) {
+        const wantedHeight = width / forceAspectRatio;
+        editionParameters = {
+          cropData: {
+            height: wantedHeight,
+            originX: 0,
+            originY: (height - wantedHeight) / 2,
+            width,
+          },
+        };
+      }
+      onEditionParametersChange(editionParameters);
+    }
     onNext();
-  }, [forceCameraRatio, onMediaChange, onNext]);
+  }, [
+    forceAspectRatio,
+    forceCameraRatio,
+    onEditionParametersChange,
+    onMediaChange,
+    onNext,
+  ]);
 
   const captureSession = useRef<RecordSession | null>(null);
   const onStartRecording = useCallback(() => {
@@ -311,8 +343,7 @@ const SelectImageStep = ({
             !mediaLibraryPermission.granted) ||
           (pickerMode === 'photo' && !hasCameraPermission) ||
           (pickerMode === 'video' &&
-            !hasCameraPermission &&
-            !hasMicrophonePermission)
+            (!hasCameraPermission || !hasMicrophonePermission))
         }
         permissionsFor={pickerMode}
         onRequestClose={onCameraPermissionModalClose}
@@ -322,6 +353,12 @@ const SelectImageStep = ({
 };
 
 SelectImageStep.STEP_ID = 'SELECT_IMAGE';
+
+export const SelectImageStepWithFrontCameraByDefault = (
+  props: SelectImageStepProps,
+) => {
+  return <SelectImageStep {...props} initialCameraPosition="front" />;
+};
 
 export default SelectImageStep;
 

@@ -5,16 +5,13 @@ const { jest } = require('@jest/globals');
 require('@testing-library/jest-native/extend-expect');
 //#endregion
 
-//#region AppCenter Mock
-require('appcenter-crashes/test/AppCenterCrashesMock');
 //#endregion
 
 //#region Native Dependencies mock
 // Reanimated Mock
 require('react-native-reanimated/lib/reanimated2/jestUtils').setUpTests();
 global.ReanimatedDataMock = {
-  //fix a bug since 2.5.0
-  now: () => 0,
+  now: () => Date.now(),
 };
 
 // RNGestureHandler Mock
@@ -40,10 +37,6 @@ jest.mock('react-native-encrypted-storage');
 // React Encrypted Storage Mock
 jest.mock('react-native-vision-camera');
 
-// React Native View Shot Mock
-jest.mock('react-native-view-shot');
-//#endregion
-
 //#region AZP Modules Mock
 jest.mock('#helpers/mediaHelpers/NativeMediaHelpers');
 
@@ -53,14 +46,6 @@ jest.mock('#components/medias/NativeMediaVideoRenderer');
 jest.mock('#components/medias');
 
 jest.mock('#components/gpu/GPUNativeMethods');
-//#endregion
-
-//#region Relay Provider Mock
-jest.mock('@azzapp/relay/providers/isNative.relayprovider', () => ({
-  get() {
-    return true;
-  },
-}));
 //#endregion
 
 //#region flashlist

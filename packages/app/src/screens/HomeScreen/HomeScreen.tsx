@@ -1,41 +1,75 @@
-import { Suspense, useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, View, useWindowDimensions } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import relayScreen from '#helpers/relayScreen';
-import HomeScreenContent, { homeScreenQuery } from './HomeScreenContent';
-import HomeScreenFallback from './HomeScreenFallback';
+import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import { ACTIVITY_INDICATOR_WIDTH } from '#ui/ActivityIndicator/ActivityIndicator';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import HomeScreenContent from './HomeScreenContent';
+import WelcomeScreen from './WelcomeScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeRoute } from '#routes';
-import type { HomeScreenContentQuery } from '@azzapp/relay/artifacts/HomeScreenContentQuery.graphql';
+import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
 
-const HomeScreen = (
-  props: RelayScreenProps<HomeRoute, HomeScreenContentQuery>,
-) => {
-  const [loaded, setLoaded] = useState(false);
-  const [ready, setReady] = useState(false);
-  const onLoaded = useCallback(() => {
-    setLoaded(true);
-  }, []);
-
-  const onReady = useCallback(() => {
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (loaded) {
-      setTimeout(() => {
-        // In case of slow connexion, we don't want to show the fallback for too long
-        setReady(true);
-      }, READY_TIMEOUT);
+export const homeScreenQuery = graphql`
+  query HomeScreenQuery {
+    currentUser {
+      profiles {
+        id
+      }
+      ...HomeScreenContent_user
     }
-  }, [loaded]);
+  }
+`;
+
+const HomeScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
+  // data
+  const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
+  const hasProfiles = !!currentUser.profiles?.length;
+
+  const [showMenu, toggleShowMenu] = useToggle(false);
+  return (
+    <>
+      {hasProfiles ? (
+        <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
+      ) : (
+        <WelcomeScreen onShowMenu={toggleShowMenu} />
+      )}
+      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
+    </>
+  );
+};
+
+const HomeScreenFallback = () => {
+  useMainTabBarVisiblilityController(false, true);
+
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   return (
-    <View style={{ flex: 1 }}>
-      <Suspense>
-        <HomeScreenContent {...props} onReady={onReady} onLoaded={onLoaded} />
-      </Suspense>
-      {/** We wait for the home image to be ready for display before displaying the home screen */}
-      {!ready && <HomeScreenFallback style={StyleSheet.absoluteFill} />}
+    <View
+      style={{
+        flex: 1,
+        gap: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Image
+        source={require('#assets/logo-full.png')}
+        style={{
+          width: 180,
+        }}
+      />
+      <ActivityIndicator
+        style={{
+          position: 'absolute',
+          top: windowHeight / 2 + 40,
+          left: (windowWidth - ACTIVITY_INDICATOR_WIDTH) / 2,
+        }}
+      />
     </View>
   );
 };
@@ -43,6 +77,5 @@ const HomeScreen = (
 export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
   fallback: HomeScreenFallback,
+  canGoback: false,
 });
-
-const READY_TIMEOUT = 1000;

@@ -43,9 +43,4 @@ type Query {
   Return a list of profile categories
   """
   profileCategories: [ProfileCategory!]!
-
-  """
-  Return a list of interests
-  """
-  interests: [Interest!]!
 }

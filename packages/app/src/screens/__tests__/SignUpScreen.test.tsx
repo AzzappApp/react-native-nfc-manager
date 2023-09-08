@@ -22,16 +22,6 @@ jest.mock('#helpers/localeHelpers', () => ({
 jest.mock('#helpers/MobileWebAPI');
 jest.mock('#helpers/globalEvents');
 
-const mockRouter = {
-  replace: jest.fn(),
-};
-jest.mock('#components/NativeRouter', () => ({
-  ...jest.requireActual('#components/NativeRouter'),
-  useRouter() {
-    return mockRouter;
-  },
-}));
-
 describe('SignUpScreen', () => {
   const signupMock = jest.mocked(signup);
   const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
@@ -98,9 +88,6 @@ describe('SignUpScreen', () => {
         },
       },
     });
-    expect(mockRouter.replace).toHaveBeenCalledWith({
-      route: 'NEW_PROFILE',
-    });
   });
 
   test('should call the `signup` callback if form is filled with a valid phone number', async () => {
@@ -146,9 +133,6 @@ describe('SignUpScreen', () => {
           refreshToken: 'fake-refreshToken',
         },
       },
-    });
-    expect(mockRouter.replace).toHaveBeenCalledWith({
-      route: 'NEW_PROFILE',
     });
   });
 

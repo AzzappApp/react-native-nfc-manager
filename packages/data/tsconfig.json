@@ -4,10 +4,15 @@
     "noEmit": true,
     "paths": {
       "@azzapp/shared/*": ["../../shared/src/*"],
-      "@azzapp/auth/*": ["../../auth/src/*"],
       "#*": ["./src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
-  "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"]
+  "exclude": [
+    "lib",
+    "node_modules",
+    "package.json",
+    "tsconfig.json",
+    "./drizzle/*"
+  ]
 }

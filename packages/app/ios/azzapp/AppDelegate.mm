@@ -1,13 +1,9 @@
 #import "AppDelegate.h"
-
 #import <React/RCTBundleURLProvider.h>
-
-#import <AppCenterReactNative.h>
-#import <AppCenterReactNativeAnalytics.h>
-#import <AppCenterReactNativeCrashes.h>
-#import <RNScreens/RNSScreenStackAnimator.h>
-#import "AZPCustomReavealTransition.h"
 #import <React/RCTLinkingManager.h>
+#import <RNScreens/RNSScreenStackAnimator.h>
+#import <RNBootSplash/RNBootSplash.h>
+#import "AZPCustomReavealTransition.h"
 
 
 /**
@@ -45,10 +41,6 @@ static void ClearKeychainIfNecessary() {
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
-
-  [AppCenterReactNative register];
-  [AppCenterReactNativeAnalytics registerWithInitiallyEnabled:true];
-  [AppCenterReactNativeCrashes registerWithAutomaticProcessing];
   
   [RNSScreenStackAnimator registerCustomAnimator:[[AZPCustomReavealTransition alloc] init] forName:@"reveal"];
 
@@ -89,6 +81,18 @@ static void ClearKeychainIfNecessary() {
  return [RCTLinkingManager application:application
                   continueUserActivity:userActivity
                     restorationHandler:restorationHandler];
+}
+
+- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
+                          moduleName:(NSString *)moduleName
+                           initProps:(NSDictionary *)initProps {
+  UIView *rootView = [super createRootViewWithBridge:bridge
+                                          moduleName:moduleName
+                                           initProps:initProps];
+
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+
+  return rootView;
 }
 
 @end

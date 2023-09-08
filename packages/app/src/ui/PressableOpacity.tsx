@@ -1,20 +1,23 @@
-import { forwardRef, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
-import { getPressableStyle } from '#helpers/gestureHelpers';
-import PressableTransition from './PressableTransition';
-import type { Easing } from './ViewTransition';
-import type { ForwardedRef } from 'react';
-import type {
-  PressableProps,
-  View,
-  PressableStateCallbackType,
-} from 'react-native';
+import { forwardRef } from 'react';
+import {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  type EasingFunctionFactory,
+} from 'react-native-reanimated';
 
-type PressableOpacityProps = PressableProps & {
+import PressableAnimated from './PressableAnimated';
+import type { PressableAnimatedProps } from './PressableAnimated';
+import type { ForwardedRef } from 'react';
+import type { View, EasingFunction, ViewStyle, StyleProp } from 'react-native';
+
+export type PressableOpacityProps = PressableAnimatedProps & {
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;
-  easing?: Easing;
+  easing?: EasingFunction | EasingFunctionFactory;
+  style?: StyleProp<ViewStyle>;
 };
 
 const PressableOpacity = (
@@ -22,46 +25,45 @@ const PressableOpacity = (
     activeOpacity = 0.2,
     animationDuration = 150,
     disabledOpacity = 0.3,
-    easing = 'ease-in-out',
+    easing = Easing.inOut(Easing.ease),
     disabled,
     style,
     ...props
   }: PressableOpacityProps,
   ref: ForwardedRef<View>,
 ) => {
-  const styleFunc = useCallback(
-    (state: PressableStateCallbackType) => {
-      const styleObj = getPressableStyle(style, { pressed: false });
-      const defaultOpacity = StyleSheet.flatten(styleObj)?.opacity ?? 1;
+  const opacityValue = useSharedValue(1);
 
-      return [
-        getPressableStyle(style, state),
-        {
-          opacity: disabled
-            ? disabledOpacity
-            : state.pressed
-            ? activeOpacity
-            : defaultOpacity,
-        },
-      ];
-    },
-    [activeOpacity, disabled, disabledOpacity, style],
-  );
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacityValue.value,
+    };
+  }, [opacityValue]);
+
+  const onFadeIn = () => {
+    opacityValue.value = withTiming(activeOpacity, {
+      duration: animationDuration,
+      easing,
+    });
+  };
+
+  const onFadeOut = () => {
+    opacityValue.value = withTiming(1, {
+      duration: animationDuration,
+      easing,
+    });
+  };
 
   return (
-    <PressableTransition
+    <PressableAnimated
       ref={ref}
-      style={styleFunc}
-      disabled={disabled}
-      accessibilityState={{ disabled: disabled ?? false }}
-      transitions={opacityTransitions}
-      transitionDuration={animationDuration}
-      easing={easing}
       {...props}
+      onPressIn={onFadeIn}
+      onPressOut={onFadeOut}
+      disabled={disabled}
+      style={[style, disabled ? { opacity: disabledOpacity } : animatedStyle]}
     />
   );
 };
 
 export default forwardRef(PressableOpacity);
-
-const opacityTransitions = ['opacity'] as const;

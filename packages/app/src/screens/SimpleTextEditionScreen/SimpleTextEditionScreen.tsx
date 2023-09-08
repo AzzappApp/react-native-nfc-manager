@@ -1,18 +1,22 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { type SimpleTextEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TEXT_MAX_LENGTH,
   SIMPLE_TITLE_MAX_LENGTH,
+  SIMPLE_TEXT_STYLE_VALUES,
+  SIMPLE_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
-import useDataEditor from '#hooks/useDataEditor';
+import WebCardModulePreview from '#components/WebCardModulePreview';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -26,7 +30,6 @@ import SimpleTextPreview from './SimpleTextPreview';
 import SimpleTextStyleEditionPanel from './SimpleTextStyleEditionPanel';
 import type { SimpleTextEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
 import type { SimpleTextEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_viewer.graphql';
-import type { SimpleTextEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SimpleTextEditionScreenProps = ViewProps & {
@@ -53,15 +56,14 @@ const SimpleTextEditionScreen = ({
   moduleKind,
 }: SimpleTextEditionScreenProps) => {
   // #region Data retrieval
-  const simpleText = useFragment(
+  const moduleData = useFragment(
     graphql`
       fragment SimpleTextEditionScreen_module on CardModule {
         id
-        kind
-        ... on CardModuleSimpleText {
+        ... on CardModuleSimpleText @alias(as: "simpleText") {
           text
           textAlign
-          color
+          fontColor
           fontSize
           fontFamily
           verticalSpacing
@@ -70,16 +72,17 @@ const SimpleTextEditionScreen = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
             patternColor
           }
         }
-        ... on CardModuleSimpleTitle {
+        ... on CardModuleSimpleTitle @alias(as: "simpleTitle") {
           text
           textAlign
-          color
+          fontColor
           fontSize
           fontFamily
           verticalSpacing
@@ -88,6 +91,7 @@ const SimpleTextEditionScreen = ({
           background {
             id
             uri
+            resizeMode
           }
           backgroundStyle {
             backgroundColor
@@ -99,7 +103,11 @@ const SimpleTextEditionScreen = ({
     module,
   );
 
-  if (simpleText && simpleText.kind !== moduleKind) {
+  if (
+    moduleData?.id &&
+    ((moduleKind === 'simpleText' && !moduleData.simpleText == null) ||
+      (moduleKind === 'simpleTitle' && !moduleData.simpleTitle == null))
+  ) {
     // TODO error ?
   }
 
@@ -107,12 +115,31 @@ const SimpleTextEditionScreen = ({
     graphql`
       fragment SimpleTextEditionScreen_viewer on Viewer {
         ...SimpleTextEditionBackgroundPanel_viewer
+        ...SimpleTextStyleEditionPanel_viewer
         profile {
           ...ProfileColorPicker_profile
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          cardColors {
+            primary
+            light
+            dark
+          }
         }
         moduleBackgrounds {
           id
           uri
+          resizeMode
         }
       }
     `,
@@ -121,27 +148,57 @@ const SimpleTextEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: simpleText,
-      defaultValue:
-        moduleKind === 'simpleText'
-          ? SIMPLE_TEXT_DEFAULT_VALUES
-          : SIMPLE_TITLE_DEFAULT_VALUES,
-    });
+  const initialValue = useMemo(() => {
+    const data = moduleData?.simpleText ?? moduleData?.simpleTitle;
+    return {
+      backgroundId: data?.background?.id ?? null,
+      backgroundStyle: data?.backgroundStyle ?? null,
+      fontColor: data?.fontColor ?? null,
+      fontFamily: data?.fontFamily ?? null,
+      fontSize: data?.fontSize ?? null,
+      marginHorizontal: data?.marginHorizontal ?? null,
+      marginVertical: data?.marginVertical ?? null,
+      moduleId: moduleData?.id ?? null,
+      text: data?.text ?? null,
+      textAlign: data?.textAlign ?? null,
+      verticalSpacing: data?.verticalSpacing ?? null,
+    };
+  }, [moduleData]);
+
+  const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
+    initialValue,
+    cardStyle: viewer.profile?.cardStyle,
+    styleValuesMap:
+      moduleKind === 'simpleText'
+        ? SIMPLE_TEXT_STYLE_VALUES
+        : SIMPLE_TITLE_STYLE_VALUES,
+    defaultValues:
+      moduleKind === 'simpleText'
+        ? SIMPLE_TEXT_DEFAULT_VALUES
+        : SIMPLE_TITLE_DEFAULT_VALUES,
+  });
 
   const {
     text,
     textAlign,
-    color,
+    fontColor,
     fontSize,
     fontFamily,
     verticalSpacing,
     marginHorizontal,
     marginVertical,
-    background,
+    backgroundId,
     backgroundStyle,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    kind: moduleKind,
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -151,9 +208,9 @@ const SimpleTextEditionScreen = ({
         $input: SaveSimpleTextModuleInput!
       ) {
         saveSimpleTextModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               visible
               ...SimpleTextEditionScreen_module
             }
@@ -170,18 +227,14 @@ const SimpleTextEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const { background, ...rest } = updates;
 
     commit({
       variables: {
         input: {
+          ...value,
+          moduleId: moduleData?.id ?? null,
           kind: moduleKind,
-          moduleId: simpleText?.id,
-          backgroundId:
-            simpleText?.background?.id !== data.background?.id
-              ? background?.id ?? null
-              : simpleText?.background?.id ?? null,
-          ...rest,
+          text: value.text!,
         },
       },
       onCompleted() {
@@ -196,16 +249,7 @@ const SimpleTextEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    simpleText?.background,
-    simpleText?.id,
-    commit,
-    moduleKind,
-    data.background?.id,
-    router,
-  ]);
+  }, [canSave, commit, value, moduleData?.id, moduleKind, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -213,10 +257,9 @@ const SimpleTextEditionScreen = ({
   // #endregion
 
   // #region Fields edition handlers
-
   const onTextChange = fieldUpdateHandler('text');
 
-  const onColorChange = fieldUpdateHandler('color');
+  const onColorChange = fieldUpdateHandler('fontColor');
 
   const onFontSizeChange = fieldUpdateHandler('fontSize');
 
@@ -230,17 +273,7 @@ const SimpleTextEditionScreen = ({
 
   const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(({ id }) => id === backgroundId),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
   // #endregion
@@ -277,15 +310,24 @@ const SimpleTextEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
+
   const intl = useIntl();
+
+  const middleElement =
+    moduleKind === 'simpleText'
+      ? intl.formatMessage({
+          defaultMessage: 'Simple text',
+          description: 'Simple text screen title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Simple title',
+          description: 'Simple title screen title',
+        });
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Simple text',
-          description: 'Simple text screen title',
-        })}
+        middleElement={middleElement}
         leftElement={
           <HeaderButton
             variant="secondary"
@@ -309,8 +351,10 @@ const SimpleTextEditionScreen = ({
       />
       <SimpleTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={{ ...data, kind: moduleKind }}
+        data={previewData}
         onPreviewPress={onPreviewPress}
+        colorPalette={viewer.profile?.cardColors}
+        cardStyle={viewer.profile?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -320,8 +364,9 @@ const SimpleTextEditionScreen = ({
             id: 'style',
             element: (
               <SimpleTextStyleEditionPanel
-                profile={viewer.profile!}
-                color={color ?? '#000'}
+                moduleKind={moduleKind}
+                viewer={viewer}
+                fontColor={fontColor ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}
                 fontSize={fontSize ?? 12}
                 textAlignment={textAlign ?? 'left'}
@@ -343,6 +388,7 @@ const SimpleTextEditionScreen = ({
             id: 'margins',
             element: (
               <SimpleTextMarginEditionPanel
+                moduleKind={moduleKind}
                 marginHorizontal={marginHorizontal ?? 0}
                 marginVertical={marginVertical ?? 0}
                 onMarginHorizontalChange={onMarginHorizontalChange}
@@ -359,7 +405,7 @@ const SimpleTextEditionScreen = ({
             element: (
               <SimpleTextEditionBackgroundPanel
                 viewer={viewer}
-                backgroundId={background?.id}
+                backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -384,19 +430,15 @@ const SimpleTextEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
-            editedModuleId={simpleText?.id}
+          <WebCardModulePreview
+            editedModuleId={moduleData?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: moduleKind,
-              data,
+              data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

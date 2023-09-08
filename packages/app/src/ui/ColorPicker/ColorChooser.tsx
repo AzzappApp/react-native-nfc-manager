@@ -47,7 +47,7 @@ const ColorChooser = ({ value, onColorChange, style }: ColorChooserProps) => {
   };
 
   return (
-    <View style={[style]}>
+    <View style={style}>
       <SaturationValuePicker
         hue={hsv.hue}
         value={[hsv.saturation, hsv.value]}

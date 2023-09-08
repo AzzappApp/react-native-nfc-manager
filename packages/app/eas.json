@@ -3,7 +3,14 @@
     "version": ">= 3.14.0"
   },
   "build": {
+    "base": {
+      "node": "18.12.0",
+      "env": {
+        "SENTRY_DSN": "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
+      }
+    },
     "development": {
+      "extends": "base",
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleDebug"
@@ -14,10 +21,12 @@
       },
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-dev.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api"
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api",
+        "DEPLOYMENT_ENVIRONMENT": "development"
       }
     },
     "staging": {
+      "extends": "base",
       "distribution": "internal",
       "ios": {
         "buildConfiguration": "Release",
@@ -25,17 +34,20 @@
       },
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-staging.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api"
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api",
+        "DEPLOYMENT_ENVIRONMENT": "staging"
       }
     },
     "production": {
+      "extends": "base",
       "ios": {
         "buildConfiguration": "Release",
         "scheme": "azzapp"
       },
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api"
+        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api",
+        "DEPLOYMENT_ENVIRONMENT": "production"
       }
     }
   },

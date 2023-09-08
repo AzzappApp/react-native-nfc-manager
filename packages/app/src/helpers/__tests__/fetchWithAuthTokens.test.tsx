@@ -36,7 +36,9 @@ describe('fetchWithAuthTokens', () => {
 
   test('should not amend the request if there is no tokens in the store', () => {
     getTokensMock.mockReturnValueOnce(null);
-    void fetchWithAuthTokens('https://example.com', { method: 'POST' });
+    void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    });
     expect(fetchJSONMock).toHaveBeenCalledWith('https://example.com', {
       method: 'POST',
     });
@@ -47,7 +49,9 @@ describe('fetchWithAuthTokens', () => {
       token: 'fakeToken',
       refreshToken: 'fakeRefreshToken',
     });
-    void fetchWithAuthTokens('https://example.com', { method: 'POST' });
+    void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    });
     expect(fetchJSONMock).toHaveBeenCalledWith('https://example.com', {
       method: 'POST',
       headers: {
@@ -71,7 +75,9 @@ describe('fetchWithAuthTokens', () => {
       refreshToken: 'fakeRefreshToken2',
     });
 
-    void fetchWithAuthTokens('https://example.com', { method: 'POST' });
+    void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    });
     await flushPromises();
 
     expect(fetchJSONMock).toHaveBeenNthCalledWith(1, 'https://example.com', {
@@ -106,7 +112,9 @@ describe('fetchWithAuthTokens', () => {
     fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
     refreshTokensMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
 
-    fetchWithAuthTokens('https://example.com', { method: 'POST' }).catch(e => {
+    fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    }).catch(e => {
       expect(e.message).toBe(ERRORS.INVALID_TOKEN);
     });
     jest.runAllTicks();
@@ -123,7 +131,9 @@ describe('fetchWithAuthTokens', () => {
   test('should throw an error if the error is not invalid token', () => {
     expect.assertions(2);
     fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.UNAUTORIZED));
-    fetchWithAuthTokens('https://example.com', { method: 'POST' }).catch(e => {
+    fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    }).catch(e => {
       expect(e.message).toBe(ERRORS.UNAUTORIZED);
     });
     expect(fetchJSONMock).toHaveBeenCalledTimes(1);
@@ -132,10 +142,10 @@ describe('fetchWithAuthTokens', () => {
   test('should return the result of the request ', () => {
     expect.assertions(1);
     fetchJSONMock.mockResolvedValueOnce({ data: 'fakeData' });
-    void fetchWithAuthTokens('https://example.com', { method: 'POST' }).then(
-      res => {
-        expect(res).toEqual({ data: 'fakeData' });
-      },
-    );
+    void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    }).then(res => {
+      expect(res).toEqual({ data: 'fakeData' });
+    });
   });
 });

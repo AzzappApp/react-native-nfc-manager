@@ -184,10 +184,7 @@ const FooterBarItem = ({
         style={[
           { backgroundColor: 'transparent' },
           showCircle && isSelected && styles.selectedMenu,
-          showCircle &&
-            isSelected &&
-            decoration === 'label' &&
-            styles.circleWithLabel,
+          showCircle && decoration === 'label' && styles.circleWithLabel,
         ]}
       >
         {icon && (
@@ -279,6 +276,8 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
   },
   circleWithLabel: {
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 34,
     height: 34,
     borderRadius: 17,

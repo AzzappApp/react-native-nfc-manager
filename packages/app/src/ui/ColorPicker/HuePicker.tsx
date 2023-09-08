@@ -1,8 +1,8 @@
 import chroma from 'chroma-js';
+import { LinearGradient } from 'expo-linear-gradient';
 import clamp from 'lodash/clamp';
 import { useCallback, useRef, useState } from 'react';
 import { View, PanResponder, StyleSheet } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import type {
   StyleProp,
   ViewStyle,

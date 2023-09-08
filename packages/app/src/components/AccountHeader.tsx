@@ -12,22 +12,18 @@ const COVER_WIDTH = 29;
 
 const AccountHeader = ({
   profile: profileKey,
-  userName,
   title,
 }: {
   profile: AccountHeader_profile$key | null;
-  userName?: string;
   title: string;
 }) => {
   const profile = useFragment(
     graphql`
       fragment AccountHeader_profile on Profile {
-        card {
-          backgroundColor
-          cover {
-            ...CoverRenderer_cover
-          }
+        cardColors {
+          primary
         }
+        ...CoverRenderer_profile
       }
     `,
     profileKey,
@@ -60,11 +56,10 @@ const AccountHeader = ({
           >
             <CoverRenderer
               width={COVER_WIDTH}
-              userName={userName ?? ''}
-              cover={profile.card?.cover}
+              profile={profile}
               style={
-                profile.card?.backgroundColor != null && {
-                  backgroundColor: profile.card?.backgroundColor,
+                profile.cardColors?.primary != null && {
+                  backgroundColor: profile.cardColors?.primary,
                 }
               }
             />

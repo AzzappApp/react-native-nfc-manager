@@ -1,15 +1,19 @@
-import { inArray, sql } from 'drizzle-orm';
-import { getProfileId } from '@azzapp/auth/viewer';
+import { inArray } from 'drizzle-orm';
 import ERRORS from '@azzapp/shared/errors';
-import { CardModuleTable, db, getCardModulesByIds } from '#domains';
+import {
+  CardModuleTable,
+  db,
+  getCardModulesByIds,
+  resetCardModulesPositions,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
   { input: { modulesIds } },
-  { auth, cardByProfileLoader, profileLoader, cardUpdateListener },
+  { auth, loaders, cardUpdateListener },
 ) => {
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
@@ -17,48 +21,29 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
-  const card = await cardByProfileLoader.load(profileId);
-  if (!card) {
-    throw new Error(ERRORS.INVALID_REQUEST);
-  }
   const modules = await getCardModulesByIds(modulesIds);
-  if (!modules.every(module => module != null && module.cardId === card.id)) {
+  if (
+    !modules.every(module => module != null && module.profileId === profileId)
+  ) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   try {
     await db.transaction(async trx => {
-      await trx
+      await db
         .delete(CardModuleTable)
         .where(inArray(CardModuleTable.id, modulesIds));
-
-      // TODO : We need to evaluate if this the performance of this query
-      // is acceptable. If not, we can always find a better way to
-      // manage the position of the modules.
-      const updatePosQuery = sql`
-        UPDATE CardModule
-        JOIN ( 
-          SELECT 
-            id, 
-            ROW_NUMBER() OVER (PARTITION BY cardId ORDER BY position) position
-          FROM CardModule
-          WHERE cardId = ${card.id}
-        ) AS NewPos
-        ON CardModule.id = NewPos.id
-        SET CardModule.position = NewPos.position - 1
-        WHERE CardModule.cardId = ${card.id}
-      `;
-      await trx.execute(updatePosQuery);
+      await resetCardModulesPositions(profileId, trx);
     });
   } catch (e) {
     console.error(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const profile = await profileLoader.load(profileId);
-  cardUpdateListener(profile!.userName);
+  const profile = (await loaders.Profile.load(profileId))!;
+  cardUpdateListener(profile.userName);
 
-  return { card };
+  return { profile };
 };
 
 export default deleteModules;

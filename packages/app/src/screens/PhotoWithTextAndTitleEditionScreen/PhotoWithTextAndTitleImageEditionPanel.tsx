@@ -1,12 +1,17 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_ASPECT_RATIO,
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_BORDER_RADIUS,
+  PHOTO_WITH_TEXT_AND_TITLE_MIN_ASPECT_RATIO,
+} from '@azzapp/shared/cardModuleHelpers';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { Icons } from '#ui/Icon';
 import type {
+  CardModulePhotoWithTextAndTitleImageMargin,
   HorizontalArrangement,
-  ItemMargin,
   VerticalArrangement,
 } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
@@ -23,7 +28,7 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The imageMargin currently set on the module
    */
-  imageMargin: ItemMargin;
+  imageMargin: CardModulePhotoWithTextAndTitleImageMargin;
   /**
    * A callback called when the user update the imageMargin
    */
@@ -137,7 +142,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={50}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_BORDER_RADIUS}
           step={1}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
@@ -163,8 +168,8 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
             />
           }
           value={aspectRatio}
-          min={0.5}
-          max={16 / 9}
+          min={PHOTO_WITH_TEXT_AND_TITLE_MIN_ASPECT_RATIO}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_ASPECT_RATIO}
           step={0.01}
           onChange={onAspectRatioChange}
           accessibilityLabel={intl.formatMessage({

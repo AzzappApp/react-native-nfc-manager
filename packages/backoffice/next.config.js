@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const config = {
   productionBrowserSourceMaps: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -9,4 +9,14 @@ module.exports = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
+  experimental: {
+    serverActions: true,
+  },
+  modularizeImports: {
+    '@mui/icons-material': {
+      transform: '@mui/icons-material/{{member}}',
+    },
+  },
 };
+
+module.exports = config;

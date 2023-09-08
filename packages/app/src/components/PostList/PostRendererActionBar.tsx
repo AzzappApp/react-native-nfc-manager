@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 
 import { useMutation, graphql, useFragment } from 'react-relay';
 
-import { useDebounce } from 'use-debounce';
+import { useDebouncedCallback } from 'use-debounce';
 import { useRouter } from '#components/NativeRouter';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -40,26 +40,25 @@ const PostRendererActionBar = ({
         allowComments
         allowLikes
         counterReactions
+        content
       }
     `,
     postKey,
   );
 
-  const [commit] = useMutation(
-    graphql`
-      mutation PostRendererActionBarReactionMutation(
-        $input: TogglePostReactionInput!
-      ) {
-        togglePostReaction(input: $input) {
-          post {
-            id
-            viewerPostReaction
-            counterReactions
-          }
+  const [commit] = useMutation(graphql`
+    mutation PostRendererActionBarReactionMutation(
+      $input: TogglePostReactionInput!
+    ) {
+      togglePostReaction(input: $input) {
+        post {
+          id
+          viewerPostReaction
+          counterReactions
         }
       }
-    `,
-  );
+    }
+  `);
 
   const [reaction, setReaction] = useState<ReactionKind | null>(
     viewerPostReaction,
@@ -68,30 +67,8 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
-  // toggle the value locally
-  const toggleReaction = () => {
-    if (reaction) {
-      setCountReactions(countReactions - 1);
-      setReaction(null);
-    } else {
-      setCountReactions(countReactions + 1);
-      setReaction('like');
-    }
-  };
-
-  //refresh the value based on the GraphQL response
-  useEffect(() => {
-    setReaction(viewerPostReaction);
-  }, [viewerPostReaction]);
-
-  useEffect(() => {
-    setCountReactions(counterReactions);
-  }, [counterReactions]);
-
-  const [valueReaction] = useDebounce(reaction, 600);
-
-  useEffect(() => {
-    if (valueReaction !== viewerPostReaction) {
+  const debouncedCommit = useDebouncedCallback(
+    (add: boolean) => {
       commit({
         variables: {
           input: {
@@ -108,17 +85,43 @@ const PostRendererActionBar = ({
             },
           },
         },
+        updater: store => {
+          const post = store.get<{ counterReactions: number }>(postId);
+          if (post) {
+            const counter = post?.getValue('counterReactions');
+
+            if (typeof counter === 'number') {
+              post?.setValue(counter + (add ? 1 : -1), 'counterReactions');
+            }
+            post.setValue(add ? reaction : null, 'viewerPostReaction');
+          }
+        },
       });
+    },
+    // delay in ms
+    600,
+  );
+  // toggle the value locally
+  const toggleReaction = useCallback(() => {
+    if (reaction) {
+      setCountReactions(countReactions - 1);
+      setReaction(null);
+      debouncedCommit(false);
+    } else {
+      setCountReactions(countReactions + 1);
+      setReaction('like');
+      debouncedCommit(true);
     }
-  }, [
-    commit,
-    countReactions,
-    counterReactions,
-    postId,
-    reaction,
-    valueReaction,
-    viewerPostReaction,
-  ]);
+  }, [countReactions, debouncedCommit, reaction]);
+
+  //refresh the value based on the GraphQL response
+  useEffect(() => {
+    setReaction(viewerPostReaction);
+  }, [viewerPostReaction]);
+
+  useEffect(() => {
+    setCountReactions(counterReactions);
+  }, [counterReactions]);
 
   const goToComments = () => {
     router.push({ route: 'POST_COMMENTS', params: { postId } });

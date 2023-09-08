@@ -1,8 +1,8 @@
 import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -14,7 +14,6 @@ import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import ToggleButton from '#ui/ToggleButton';
 import ContinueButton from './ContinueButton';
-import NewProfileScreenPageHeader from './NewProfileScreenPageHeader';
 import type {
   ProfileKindStep_profileCategories$key,
   ProfileKindStep_profileCategories$data,
@@ -27,7 +26,6 @@ type ProfileKindStepProps = {
   profileCategoryId: string;
   onProfileCategoryChange: (profileCategoryId: string) => void;
   onNext: () => void;
-  onBack: (() => void) | null;
 };
 
 const profileCategoriesFragment = graphql`
@@ -42,7 +40,7 @@ const profileCategoriesFragment = graphql`
     id
     medias {
       id
-      uri(pixelRatio: $pixelRatio, width: 300)
+      uri(pixelRatio: $pixelRatio, width: 256)
     }
     label
   }
@@ -64,7 +62,6 @@ const ProfileKindStep = ({
   profileCategoryId,
   onProfileCategoryChange,
   onNext,
-  onBack,
 }: ProfileKindStepProps) => {
   const profileCategories = useFragment(
     profileCategoriesFragment,
@@ -85,8 +82,8 @@ const ProfileKindStep = ({
 
   useEffect(() => {
     const observables = convertToNonNullArray(
-      profileCategories.flatMap(category =>
-        category.medias?.map(media => prefetchImage(media.uri)),
+      profileCategories.flatMap(
+        category => category.medias?.map(media => prefetchImage(media.uri)),
       ),
     );
     const subscription = observables.length
@@ -113,10 +110,8 @@ const ProfileKindStep = ({
             defaultMessage: 'Category image',
             description: 'ProfileKindStep - Category image alt',
           })}
-          width={300}
           aspectRatio={COVER_RATIO}
-          source={media.id}
-          uri={media.uri}
+          source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
           style={[styles.mediaImage, { width: cardWidth, borderRadius }]}
         />
       </View>
@@ -186,16 +181,6 @@ const ProfileKindStep = ({
 
   return (
     <View style={styles.root}>
-      <NewProfileScreenPageHeader
-        activeIndex={0}
-        title={
-          <FormattedMessage
-            defaultMessage="What best describe you?"
-            description="NewProfileType User Type Screen - Title"
-          />
-        }
-        onBack={onBack}
-      />
       {selectedCategory && (
         <InfiniteCarousel
           key={selectedCategory.id}

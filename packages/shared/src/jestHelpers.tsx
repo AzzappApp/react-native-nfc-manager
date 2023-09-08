@@ -1,3 +1,7 @@
+/**
+ * Waits for all pending promises and timers to complete.
+ * Use this function to wait for all promises and timers to complete before continuing with your test.
+ */
 export const waitForPromisesAndFakeTimers = async () => {
   if (isFakeTimersEnabled()) {
     do {
@@ -9,9 +13,16 @@ export const waitForPromisesAndFakeTimers = async () => {
   }
 };
 
+/**
+ * Flushes all pending promises in the Promise queue.
+ * Use this function to wait for all promises to resolve before continuing with your test.
+ */
 export const flushPromises = (): Promise<void> =>
   new Promise(jest.requireActual('timers').setImmediate);
 
+/**
+ * Returns true if fake timers are enabled.
+ */
 export const isFakeTimersEnabled = () => {
   // @ts-expect-error - jest.setTimeout is not defined in the type definition
 
@@ -23,6 +34,12 @@ export const isFakeTimersEnabled = () => {
   );
 };
 
+/**
+ * An helper function to mock a React component.
+ * @param name The name of the component.
+ * @param additionalProps Additional props to pass to the component.
+ * @param mockRef A function that returns the ref object of the component (if any).
+ */
 export const mockReactComponent = (
   name: string,
   additionalProps: any,

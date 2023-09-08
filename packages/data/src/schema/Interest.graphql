@@ -1,7 +1,0 @@
-"""
-Represent a subject of interest
-"""
-type Interest {
-  tag: ID!
-  label: String
-}

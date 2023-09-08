@@ -1,5 +1,10 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_GAP,
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_HORIZONTAL_MARGIN,
+  PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
@@ -68,7 +73,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           }
           value={marginHorizontal}
           min={0}
-          max={50}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_HORIZONTAL_MARGIN}
           step={1}
           onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
@@ -95,7 +100,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           }
           value={marginVertical}
           min={0}
-          max={100}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_MARGIN}
           step={1}
           onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
@@ -122,7 +127,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
           }
           value={gap}
           min={0}
-          max={100}
+          max={PHOTO_WITH_TEXT_AND_TITLE_MAX_GAP}
           step={1}
           onChange={onGapChange}
           accessibilityLabel={intl.formatMessage({

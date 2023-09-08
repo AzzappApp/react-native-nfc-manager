@@ -62,7 +62,6 @@ const AccountDetailsScreen = ({
         }}
       >
         <AccountHeader
-          userName={profile?.userName}
           profile={viewer.profile}
           title={intl.formatMessage({
             defaultMessage: 'Account details',

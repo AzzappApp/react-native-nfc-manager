@@ -2,13 +2,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import ProfileColorPicker from '#components/ProfileColorPicker';
 import StaticMediaList from '#components/StaticMediaList';
+import ColorPicker from '#ui/ColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import TabsBar from '#ui/TabsBar';
-import type { ProfileColorPicker_profile$key } from '@azzapp/relay/artifacts/ProfileColorPicker_profile.graphql';
+import { useProfileCardColors } from './ProfileColorPicker';
+import type { ProfileColorsBoundsComponentProps } from './ProfileColorPicker';
 import type { StaticMediaList_staticMedias$key } from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
 
 export type EditorLayerSelectorPanelProps = ViewProps & {
@@ -17,10 +20,13 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
    */
   title: string;
   /**
-   * Profile of the current user.
-   * Used to access the user's profile color palette.
+   * Color palette of the current user.
    */
-  profile: ProfileColorPicker_profile$key;
+  colorPalette: ColorPalette;
+  /**
+   * Other user's profile colors.
+   */
+  colorList: string[];
   /**
    * List of available medias.
    */
@@ -40,9 +46,9 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
   backgroundColor?: string;
   /**
    * Callback called when the user selects a media.
-   * @param mediaID the id of the selected media.
+   * @param mediaId the id of the selected media.
    */
-  onMediaChange: (mediaID: string | null) => void;
+  onMediaChange: (mediaId: string | null) => void;
   /**
    * Callback called when the user changes the tint or background color.
    *
@@ -65,6 +71,19 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
    * Ratio of the image.
    */
   imageRatio?: number;
+  /**
+   * If true, the user can edit the color palette.
+   * Default to false.
+   */
+  canEditPalette?: boolean;
+  /**
+   * Called when the user update the color palette
+   */
+  onUpdateColorPalette: (colorPalette: ColorPalette) => void;
+  /**
+   * Called when the user update the color list
+   */
+  onUpdateColorList: (color: string[]) => void;
 };
 
 /**
@@ -76,16 +95,20 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
  */
 const EditorLayerSelectorPanel = ({
   title,
-  profile,
+  colorPalette,
+  colorList: otherColors,
   medias,
   selectedMedia,
   tintColor,
   backgroundColor,
-  onMediaChange,
-  onColorChange,
   imageRatio,
   svgMode,
   bottomSheetHeight,
+  canEditPalette = false,
+  onMediaChange,
+  onColorChange,
+  onUpdateColorList,
+  onUpdateColorPalette,
   ...props
 }: EditorLayerSelectorPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('media');
@@ -134,7 +157,7 @@ const EditorLayerSelectorPanel = ({
               label: backgroundColorLabel,
               rightElement: (
                 <ColorPreview
-                  color={backgroundColor}
+                  color={swapColor(backgroundColor, colorPalette)}
                   style={{ marginLeft: 5 }}
                 />
               ),
@@ -144,13 +167,17 @@ const EditorLayerSelectorPanel = ({
           tabKey: 'tintColor',
           label: tintColorLabel,
           rightElement: (
-            <ColorPreview color={tintColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(tintColor, colorPalette)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
     [
       backgroundColor,
       backgroundColorLabel,
+      colorPalette,
       hasBackground,
       tintColor,
       tintColorLabel,
@@ -163,33 +190,38 @@ const EditorLayerSelectorPanel = ({
       <StaticMediaList
         medias={medias}
         selectedMedia={selectedMedia}
-        backgroundColor={backgroundColor ?? colors.white}
-        tintColor={tintColor}
+        backgroundColor={swapColor(
+          backgroundColor ?? colors.white,
+          colorPalette,
+        )}
+        tintColor={swapColor(tintColor, colorPalette)}
         onSelectMedia={onMediaChange}
         style={styles.content}
         imageRatio={imageRatio}
         svgMode={svgMode}
         testID="cover-layer-list-background"
       />
-      {profile && (
-        <ProfileColorPicker
-          visible={currentTab !== 'media'}
-          height={bottomSheetHeight}
-          profile={profile}
-          title={
-            currentTab === 'backgroundColor'
-              ? backgroundColorLabel
-              : tintColorLabel
-          }
-          selectedColor={
-            currentTab === 'backgroundColor'
-              ? backgroundColor ?? colors.white
-              : tintColor
-          }
-          onColorChange={onCurrentColorChange}
-          onRequestClose={onProfileColorPickerClose}
-        />
-      )}
+      <ColorPicker
+        title={
+          currentTab === 'backgroundColor'
+            ? backgroundColorLabel
+            : tintColorLabel
+        }
+        selectedColor={
+          currentTab === 'backgroundColor'
+            ? backgroundColor ?? colors.white
+            : tintColor
+        }
+        colorPalette={colorPalette}
+        colorList={otherColors}
+        visible={currentTab !== 'media'}
+        height={bottomSheetHeight}
+        canEditPalette={canEditPalette}
+        onColorChange={onCurrentColorChange}
+        onRequestClose={onProfileColorPickerClose}
+        onUpdateColorList={onUpdateColorList}
+        onUpdateColorPalette={onUpdateColorPalette}
+      />
     </View>
   );
 };
@@ -201,3 +233,17 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
 });
+
+export type ProfileColorsBoundEditorLayerSelectorPanel =
+  ProfileColorsBoundsComponentProps<EditorLayerSelectorPanelProps>;
+
+/**
+ * EditorLayerSelectorPanel component with the profile colors bound to the one of the current profile.
+ */
+export const ProfileBoundEditorLayerSelectorPanel = ({
+  profile,
+  ...props
+}: ProfileColorsBoundEditorLayerSelectorPanel) => {
+  const profileColorsProps = useProfileCardColors(profile);
+  return <EditorLayerSelectorPanel {...profileColorsProps} {...props} />;
+};

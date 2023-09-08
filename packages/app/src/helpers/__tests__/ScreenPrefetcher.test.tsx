@@ -1,5 +1,11 @@
+import { graphql } from 'react-relay';
 import { Observable } from 'relay-runtime';
+import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { createScreenPrefetcher } from '#helpers/ScreenPrefetcher';
+
+jest.mock('#helpers/fetchQueryAndRetain');
+
+const mockedFetchQueryAndRetain = jest.mocked(fetchQueryAndRetain);
 
 describe('ScreenPrefetcher', () => {
   const screens = {
@@ -11,14 +17,61 @@ describe('ScreenPrefetcher', () => {
     POST_COMMENTS: {
       prefetch: jest.fn(),
     },
+    POST: {
+      query: graphql`
+        query ScreenPrefetcherTestQuery($postId: ID!) @relay_test_operation {
+          node(id: $postId) {
+            ... on Post {
+              id
+            }
+          }
+        }
+      `,
+      getVariables: () => ({ postId: 'fake-post-id' }),
+    },
   };
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
+  describe('init', () => {
+    test('should prefetch initial screen `getRoutesToPrefetch` routes', () => {
+      screens.PROFILE.getRoutesToPrefetch.mockReturnValueOnce([
+        { route: 'POST_COMMENTS', params: { userName: 'fake-user-name' } },
+      ]);
+      screens.POST_COMMENTS.prefetch.mockReturnValue(
+        Observable.create(sink => {
+          setTimeout(() => sink.complete());
+        }),
+      );
+
+      const screenId = 'fake-id';
+
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'PROFILE', params: { userName: 'fake-user-name' } },
+        screenId,
+      );
+
+      expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(1);
+    });
+
+    test('should not prefetch anything if the initial screen does not have a `getRoutesToPrefetch` option', () => {
+      const screenId = 'fake-id';
+
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        screenId,
+      );
+
+      expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
+    });
+  });
+
   describe('prefetchRoute', () => {
-    test('should prefetch the screen if it does have a `prefetch` options', () => {
+    test('should prefetch the screen if it does have a `prefetch` option', () => {
       jest.useFakeTimers();
       screens.POST_COMMENTS.prefetch.mockReturnValueOnce(
         Observable.create(sink => {
@@ -28,7 +81,11 @@ describe('ScreenPrefetcher', () => {
 
       const screenId = 'fake-id';
 
-      const screenPrefetcher = createScreenPrefetcher(screens as any);
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        'HOME',
+      );
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
 
       screenPrefetcher.prefetchRoute(screenId, {
@@ -42,10 +99,48 @@ describe('ScreenPrefetcher', () => {
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
     });
 
-    test('should not prefetch the screen if it does not have a `prefetch` options', () => {
+    test('should prefetch the screen if it does have a `query` option', () => {
+      jest.useFakeTimers();
+      mockedFetchQueryAndRetain.mockReturnValueOnce(
+        Observable.from({
+          node: {
+            id: 'fake-post-id',
+          },
+        }),
+      );
+
       const screenId = 'fake-id';
 
-      const screenPrefetcher = createScreenPrefetcher(screens as any);
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        'HOME',
+      );
+      expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
+
+      screenPrefetcher.prefetchRoute(screenId, {
+        route: 'POST',
+        params: { postId: 'fake-post-id' },
+      });
+
+      expect(mockedFetchQueryAndRetain).toHaveBeenCalledTimes(1);
+      expect(mockedFetchQueryAndRetain).toHaveBeenCalledWith(
+        expect.anything(),
+        screens.POST.query,
+        screens.POST.getVariables(),
+      );
+
+      expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(1);
+    });
+
+    test('should not prefetch the screen if it does not have a `prefetch` or a `query` option', () => {
+      const screenId = 'fake-id';
+
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        'HOME',
+      );
       expect(screenPrefetcher.getActiveSubscriptionCount(screenId)).toBe(0);
 
       screenPrefetcher.prefetchRoute(screenId, {
@@ -56,10 +151,14 @@ describe('ScreenPrefetcher', () => {
   });
 
   describe('screenWillBePushed', () => {
-    test('should prefetch the route returned by the `getRoutesToPrefetch` options', () => {
+    test('should prefetch the route returned by the `getRoutesToPrefetch` option', () => {
       jest.useFakeTimers();
       const screenId = 'fake-id';
-      const screenPrefetcher = createScreenPrefetcher(screens as any);
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        'HOME',
+      );
       screens.PROFILE.getRoutesToPrefetch.mockReturnValueOnce([
         { route: 'POST_COMMENTS', params: { userName: 'fake-user-name' } },
         { route: 'POST_COMMENTS', params: { userName: 'fake-user-name2' } },
@@ -98,7 +197,11 @@ describe('ScreenPrefetcher', () => {
   describe('screenWillBeRemoved', () => {
     test('should unsubscribe from all the active subscriptions', () => {
       const screenId = 'fake-id';
-      const screenPrefetcher = createScreenPrefetcher(screens as any);
+      const screenPrefetcher = createScreenPrefetcher(
+        screens as any,
+        { route: 'HOME' },
+        'HOME',
+      );
       screens.PROFILE.getRoutesToPrefetch.mockReturnValueOnce([
         { route: 'POST_COMMENTS', params: { userName: 'fake-user-name' } },
         { route: 'POST_COMMENTS', params: { userName: 'fake-user-name2' } },

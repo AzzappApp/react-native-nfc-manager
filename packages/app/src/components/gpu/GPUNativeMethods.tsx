@@ -13,7 +13,7 @@ if (!GPUVideoViewManager) {
 }
 
 export type ExportImageOptions = {
-  format?: 'JPEG' | 'PNG';
+  format?: 'auto' | 'jpg' | 'png';
   quality?: number;
   size: { width: number; height: number };
 };
@@ -22,7 +22,7 @@ export const exportViewImage = (
   node: number,
   options: ExportImageOptions,
 ): Promise<string> => {
-  const { format = 'JPEG', quality = 90, size } = options;
+  const { format = 'jpg', quality = 90, size } = options;
   return GPUImageViewManager.exportViewImage(node, format, quality, size);
 };
 
@@ -34,10 +34,10 @@ export const exportImage = (
 ): Promise<string> => {
   const {
     layers,
-    format = 'JPEG',
+    format = 'jpg',
     quality = 90,
     size,
-    backgroundColor = '#000',
+    backgroundColor = 'transparent',
   } = options;
   return GPUImageViewManager.exportLayers(
     layers,

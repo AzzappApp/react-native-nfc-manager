@@ -1,10 +1,10 @@
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { useColorScheme } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
 import SearchResultGlobal, {
   SearchResultGlobalPlaceHolder,
@@ -109,6 +109,7 @@ const SearchTabContainer = ({
   const renderScene = useCallback(
     ({
       route,
+      jumpTo,
     }: SceneRendererProps & {
       route: {
         key: string;
@@ -123,6 +124,7 @@ const SearchTabContainer = ({
                 <SearchResultGlobal
                   queryReference={tabQueryReference['searchGlobal']}
                   hasFocus={hasFocus}
+                  goToProfilesTab={() => jumpTo('searchProfiles')}
                 />
               )}
             </Suspense>
@@ -175,45 +177,55 @@ const TabBarSearch = (
 ) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const styles = useStyleSheet(styleSheet);
-  const colorScheme = useColorScheme();
 
   return (
     <TabBar
       {...props}
       style={styles.tabBarStyle}
-      indicatorStyle={[
-        styles.indicatorStyle,
-        {
-          width: props.layout.width / 3 - 18,
-        },
-      ]}
-      inactiveColor={colorScheme === 'light' ? colors.grey50 : colors.grey900}
-      activeColor={colorScheme === 'light' ? colors.black : colors.white}
-      renderLabel={({ route }) => (
-        <Text variant="smallbold">{route.label}</Text>
-      )}
+      renderIndicator={() => null}
+      contentContainerStyle={{
+        gap: 10,
+        paddingLeft: 10,
+      }}
+      renderTabBarItem={({ route, labelStyle, getLabelText, onPress }) => {
+        return (
+          <TabBarMenuItem
+            selected={
+              props.navigationState.routes[props.navigationState.index].key ===
+              route.key
+            }
+            setSelected={onPress}
+            labelStyle={labelStyle}
+            containerStyle={styles.tabItemContainerStyle}
+          >
+            {getLabelText({ route })}
+            {route.key === 'searchProfiles' && <Text variant="azzapp">a</Text>}
+          </TabBarMenuItem>
+        );
+      }}
+      getLabelText={({ route }) => route.label}
     />
   );
 };
 
 const styleSheet = createStyleSheet(appearance => ({
-  tabBarStyle: [
-    {
-      backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    },
-    shadow(appearance, 'center'),
-  ],
-  indicatorStyle: {
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
-    height: 2,
-    borderRadius: 4,
-    marginLeft: 9,
-    marginRight: 9,
+  tabBarStyle: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    shadowOpacity: 0,
+    height: 52,
+    justifyContent: 'center',
   },
   tabViewstyle: {
     position: 'absolute',
     height: '100%',
     width: '100%',
+    borderColor: 'red',
+  },
+  tabItemContainerStyle: {
+    borderWidth: 1,
+    borderColor: colors.grey50,
+    padding: 0,
+    minWidth: 109,
   },
 }));
 

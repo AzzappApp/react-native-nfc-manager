@@ -6,18 +6,20 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
-  CAROUSEL_IMAGE_MAX_WIDTH,
+  MODULE_IMAGE_MAX_WIDTH,
+  CAROUSEL_STYLE_VALUES,
   MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { exportImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
+import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import useDataEditor from '#hooks/useDataEditor';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -76,7 +78,7 @@ const CarouselEditionScreen = ({
           aspectRatio
         }
         squareRatio
-        borderSize
+        borderWidth
         borderColor
         borderRadius
         imageHeight
@@ -86,6 +88,7 @@ const CarouselEditionScreen = ({
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -100,11 +103,30 @@ const CarouselEditionScreen = ({
     graphql`
       fragment CarouselEditionScreen_viewer on Viewer {
         ...CarouselEditionBackgroundPanel_viewer
+        ...CarouselEditionBorderPanel_viewer
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            light
+            dark
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
         }
         moduleBackgrounds {
           id
+          resizeMode
           uri
         }
       }
@@ -114,40 +136,68 @@ const CarouselEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const {
-    data: {
-      images,
-      squareRatio,
-      borderSize,
-      borderColor,
-      borderRadius,
-      imageHeight,
-      marginVertical,
-      marginHorizontal,
-      gap,
-      background,
-      backgroundStyle,
-    },
-    updates,
-    dirty,
-    updateFields,
-    fieldUpdateHandler,
-  } = useDataEditor<CarouseEditionValue>({
-    initialValue: carousel,
-    defaultValue: { ...CAROUSEL_DEFAULT_VALUES, images: [] },
-  });
+  const initialValue = useMemo(() => {
+    return {
+      images: (carousel?.images ?? []) as ReadonlyArray<{
+        readonly aspectRatio: number;
+        readonly id: string;
+        readonly uri: string;
+        local?: true;
+      }>,
+      squareRatio: carousel?.squareRatio ?? null,
+      borderWidth: carousel?.borderWidth ?? null,
+      borderColor: carousel?.borderColor ?? null,
+      borderRadius: carousel?.borderRadius ?? null,
+      imageHeight: carousel?.imageHeight ?? null,
+      marginHorizontal: carousel?.marginHorizontal ?? null,
+      marginVertical: carousel?.marginVertical ?? null,
+      gap: carousel?.gap ?? null,
+      backgroundId: carousel?.background?.id ?? null,
+      backgroundStyle: carousel?.backgroundStyle ?? null,
+    };
+  }, [carousel]);
 
-  const [saving, setSaving] = useState(false);
+  const { data, value, updateFields, fieldUpdateHandler, dirty } =
+    useModuleDataEditor({
+      initialValue,
+      cardStyle: viewer.profile?.cardStyle,
+      styleValuesMap: CAROUSEL_STYLE_VALUES,
+      defaultValues: CAROUSEL_DEFAULT_VALUES,
+    });
+
+  const {
+    images,
+    squareRatio,
+    borderWidth,
+    borderColor,
+    borderRadius,
+    imageHeight,
+    marginHorizontal,
+    marginVertical,
+    gap,
+    backgroundId,
+    backgroundStyle,
+  } = data;
+
+  const previewData = {
+    ...data,
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
+
   // #region Mutations and saving logic
-  const [commit] =
-    useMutation<CarouselEditionScreenUpdateModuleMutation>(graphql`
+  const [saving, setSaving] = useState(false);
+  const [commit] = useMutation<CarouselEditionScreenUpdateModuleMutation>(
+    graphql`
       mutation CarouselEditionScreenUpdateModuleMutation(
         $input: SaveCarouselModuleInput!
       ) {
         saveCarouselModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...CarouselEditionScreen_module
@@ -155,7 +205,8 @@ const CarouselEditionScreen = ({
           }
         }
       }
-    `);
+    `,
+  );
 
   const isValid = images.length > 0;
   const canSave = dirty && isValid && !saving;
@@ -169,7 +220,7 @@ const CarouselEditionScreen = ({
       return;
     }
     setSaving(true);
-    const { background, images, ...rest } = updates;
+    const { images, ...rest } = value;
 
     let mediasMap: Record<
       string,
@@ -184,7 +235,7 @@ const CarouselEditionScreen = ({
             }
             const uploadInfos = await uploadSign({
               kind: 'image',
-              target: 'cover',
+              target: 'module',
             });
             return {
               uri: image.uri,
@@ -219,9 +270,7 @@ const CarouselEditionScreen = ({
       const medias = await Promise.all(
         uploads.map(({ promise, uri }) =>
           promise.then(uploadResult => ({
-            id: uploadResult.public_id as string,
-            width: uploadResult.width as number,
-            height: uploadResult.height as number,
+            id: encodeMediaId(uploadResult.public_id as string, 'image'),
             uri,
           })),
         ),
@@ -237,14 +286,13 @@ const CarouselEditionScreen = ({
     commit({
       variables: {
         input: {
-          images: images?.map(image => {
+          images: images!.map(image => {
             if ('local' in image) {
               return mediasMap[image.uri].id;
             }
             return image.id;
           }),
           moduleId: carousel?.id,
-          backgroundId: background == null ? null : background.id,
           ...rest,
         },
       },
@@ -260,7 +308,7 @@ const CarouselEditionScreen = ({
         }
       },
     });
-  }, [canSave, updates, commit, carousel?.id, router]);
+  }, [canSave, value, commit, carousel?.id, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -288,11 +336,12 @@ const CarouselEditionScreen = ({
       filter,
     }: ImagePickerResult) => {
       const aspectRatio = width / height;
-      const exportWidth = Math.min(CAROUSEL_IMAGE_MAX_WIDTH, width);
+      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
       const localPath = await exportImage({
         size: { width: exportWidth, height: exportHeight },
-        quality: 0.9,
+        quality: 95,
+        format: 'auto',
         layers: [
           {
             kind: 'image',
@@ -308,9 +357,9 @@ const CarouselEditionScreen = ({
           ...images,
           {
             local: true,
+            id: localPath,
             uri: `file://${localPath}`,
-            width: exportWidth,
-            height: exportHeight,
+            aspectRatio,
           },
         ],
       });
@@ -330,7 +379,7 @@ const CarouselEditionScreen = ({
 
   const onSquareRatioChange = fieldUpdateHandler('squareRatio');
 
-  const onBorderSizeChange = fieldUpdateHandler('borderSize');
+  const onBorderSizeChange = fieldUpdateHandler('borderWidth');
 
   const onBorderColorChange = fieldUpdateHandler('borderColor');
 
@@ -344,58 +393,11 @@ const CarouselEditionScreen = ({
 
   const onGapChange = fieldUpdateHandler('gap');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(({ id }) => id === backgroundId),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   // #endregion
-  const previewData = useMemo(
-    () => ({
-      images: images.map(image =>
-        'local' in image
-          ? {
-              id: image.uri,
-              uri: image.uri,
-              aspectRatio: image.width / image.height,
-            }
-          : image,
-      ),
-      squareRatio,
-      borderSize,
-      borderColor,
-      borderRadius,
-      marginVertical,
-      marginHorizontal,
-      imageHeight,
-      gap,
-      background,
-      backgroundStyle,
-    }),
-    [
-      background,
-      backgroundStyle,
-      borderColor,
-      borderRadius,
-      borderSize,
-      gap,
-      imageHeight,
-      images,
-      marginHorizontal,
-      marginVertical,
-      squareRatio,
-    ],
-  );
-
   const {
     bottomPanelHeight,
     topPanelHeight,
@@ -437,6 +439,8 @@ const CarouselEditionScreen = ({
         data={previewData}
         height={topPanelHeight - 40}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
+        colorPalette={viewer.profile?.cardColors}
+        cardStyle={viewer.profile?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -464,8 +468,8 @@ const CarouselEditionScreen = ({
             id: 'border',
             element: (
               <CarouselEditionBorderPanel
-                profile={viewer.profile!}
-                borderSize={borderSize}
+                viewer={viewer}
+                borderWidth={borderWidth}
                 borderColor={borderColor}
                 borderRadius={borderRadius}
                 bottomSheetHeight={bottomPanelHeight}
@@ -501,7 +505,7 @@ const CarouselEditionScreen = ({
             element: (
               <CarouselEditionBackgroundPanel
                 viewer={viewer}
-                backgroundId={background?.id ?? null}
+                backgroundId={backgroundId ?? null}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -526,19 +530,15 @@ const CarouselEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={carousel?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_CAROUSEL,
               data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>
@@ -581,35 +581,3 @@ const styles = StyleSheet.create({
 });
 
 export default CarouselEditionScreen;
-
-type CarouseEditionValue = {
-  images: ReadonlyArray<
-    | {
-        id: string;
-        uri: string;
-        aspectRatio: number;
-      }
-    | {
-        local: true;
-        uri: string;
-        width: number;
-        height: number;
-      }
-  >;
-  squareRatio: boolean;
-  borderSize: number;
-  borderColor: string;
-  borderRadius: number;
-  imageHeight: number;
-  marginVertical: number;
-  marginHorizontal: number;
-  gap: number;
-  background: Readonly<{
-    id: string;
-    uri: string;
-  }> | null;
-  backgroundStyle: Readonly<{
-    backgroundColor: string;
-    patternColor: string;
-  }> | null;
-};

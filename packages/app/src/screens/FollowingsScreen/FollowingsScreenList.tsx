@@ -80,7 +80,7 @@ const FollowingsScreenList = ({
           'Message displayed in the followed profiles screen when the user is not following anyone',
       })}
       users={convertToNonNullArray(
-        data.followings.edges?.map(edge => edge?.node) ?? [],
+        data.followings?.edges?.map(edge => edge?.node) ?? [],
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}

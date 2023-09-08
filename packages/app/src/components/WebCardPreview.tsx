@@ -1,305 +1,120 @@
-import { useRef, useEffect, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
-import { graphql, useLazyLoadQuery } from 'react-relay';
-import {
-  MODULE_KIND_CAROUSEL,
-  MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_SIMPLE_TEXT,
-  MODULE_KIND_SIMPLE_TITLE,
-  MODULE_KIND_SIMPLE_BUTTON,
-  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SOCIAL_LINKS,
-  MODULE_KIND_BLOCK_TEXT,
-} from '@azzapp/shared/cardModuleHelpers';
-import Container from '#ui/Container';
-import TitleWithLine from '#ui/TitleWithLine';
-import BlockTextRenderer, {
-  BlockTextRendererRaw,
-} from './cardModules/BlockTextRenderer';
-import CarouselRenderer, {
-  CarouselRendererRaw,
-} from './cardModules/CarouselRenderer';
-import HorizontalPhotoRenderer, {
-  HorizontalPhotoRendererRaw,
-} from './cardModules/HorizontalPhotoRenderer';
-import LineDividerRenderer, {
-  LineDividerRendererRaw,
-} from './cardModules/LineDividerRenderer';
-import PhotoWithTextAndTitleRenderer, {
-  PhotoWithTextAndTitleRendererRaw,
-} from './cardModules/PhotoWithTextAndTitleRenderer';
-import SimpleButtonRenderer, {
-  SimpleButtonRendererRaw,
-} from './cardModules/SimpleButtonRenderer';
-import SimpleTextRenderer, {
-  SimpleTextRendererRaw,
-} from './cardModules/SimpleTextRenderer';
-import SocialLinksRenderer, {
-  SocialLinksRendererRaw,
-} from './cardModules/SocialLinksRenderer';
-import CoverRenderer from './CoverRenderer';
+import { View, useWindowDimensions } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import CardModuleRenderer from './cardModules/CardModuleRenderer';
+import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
 import SwitchToggle from './SwitchToggle';
-import type { BlockTextRawData } from './cardModules/BlockTextRenderer';
-import type { CarouselRawData } from './cardModules/CarouselRenderer';
-import type { HorizontalPhotoRawData } from './cardModules/HorizontalPhotoRenderer';
-import type { LineDividerRawData } from './cardModules/LineDividerRenderer';
-import type { PhotoWithTextAndTitleRawData } from './cardModules/PhotoWithTextAndTitleRenderer';
-import type { SimpleButtonRawData } from './cardModules/SimpleButtonRenderer';
-import type { SimpleTextRawData } from './cardModules/SimpleTextRenderer';
-import type { WebCardPreviewQuery } from '@azzapp/relay/artifacts/WebCardPreviewQuery.graphql';
-import type {
-  LayoutChangeEvent,
-  LayoutRectangle,
-  ViewProps,
-} from 'react-native';
+import WebCardBackground from './WebCardBackground';
+import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
+import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
+import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { ForwardedRef } from 'react';
+import type { LayoutRectangle, PointProp, ViewProps } from 'react-native';
 
-type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
-  editedModuleId?: string;
-  editedModuleInfo: ModuleInfo;
-  visible: boolean;
-  contentContainerStyle?: ViewProps['style'];
+export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
+  /**
+   * The profile to render.
+   * Contains the cover informations.
+   */
+  profile: CoverRenderer_profile$key & WebCardBackground_profile$key;
+  /**
+   * The card style to use.
+   */
+  cardStyle: CardStyle | null;
+  /**
+   * The card colors to use.
+   */
+  cardColors?: ColorPalette | null;
+  /**
+   * The modules list to render.
+   */
+  cardModules: ModuleRenderInfo[];
+  /**
+   * The height of the preview.
+   */
+  height: number;
+  /**
+   * @see ScrollViewProps#contentOffset
+   */
+  contentOffset?: PointProp | undefined; // zeros
+  /**
+   * scrollView contentContainer padding bottom
+   * @default 0
+   */
+  contentPaddingBottom?: number;
+  /**
+   * Called when a module is layouted.
+   *
+   * @param index The module index.
+   * @param layout The module layout.
+   */
+  onModuleLayout?: (index: number, layout: LayoutRectangle) => void;
 };
 
-type SimpleTextModuleInfo = {
-  kind: typeof MODULE_KIND_SIMPLE_TEXT | typeof MODULE_KIND_SIMPLE_TITLE;
-  data: SimpleTextRawData;
-};
+/**
+ * This component is used to preview a web card in mobile or desktop mode.
+ */
+const WebCardPreview = (
+  {
+    profile,
+    cardModules,
+    cardColors,
+    cardStyle,
+    onModuleLayout,
+    height,
+    contentOffset,
+    contentPaddingBottom = 0,
+    style,
+    ...props
+  }: WebCardPreviewProps,
+  ref: ForwardedRef<ScrollView>,
+) => {
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
 
-type LineDividerModuleInfo = {
-  kind: typeof MODULE_KIND_LINE_DIVIDER;
-  data: LineDividerRawData;
-};
-
-type HorizontalPhotoModuleInfo = {
-  kind: typeof MODULE_KIND_HORIZONTAL_PHOTO;
-  data: HorizontalPhotoRawData;
-};
-
-type CarouselModuleInfo = {
-  kind: typeof MODULE_KIND_CAROUSEL;
-  data: CarouselRawData;
-};
-
-type SimpleButtonInfo = {
-  kind: typeof MODULE_KIND_SIMPLE_BUTTON;
-  data: SimpleButtonRawData;
-};
-
-type PhotoWithTextAndTitleInfo = {
-  kind: typeof MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE;
-  data: PhotoWithTextAndTitleRawData;
-};
-
-type SocialLinksModuleInfo = {
-  kind: typeof MODULE_KIND_SOCIAL_LINKS;
-  data: PhotoWithTextAndTitleRawData;
-};
-
-type BlockTextModuleInfo = {
-  kind: typeof MODULE_KIND_BLOCK_TEXT;
-  data: BlockTextRawData;
-};
-
-type ModuleInfo =
-  | BlockTextModuleInfo
-  | CarouselModuleInfo
-  | HorizontalPhotoModuleInfo
-  | LineDividerModuleInfo
-  | PhotoWithTextAndTitleInfo
-  | SimpleButtonInfo
-  | SimpleTextModuleInfo
-  | SocialLinksModuleInfo;
-
-const WebCardPreview = ({
-  editedModuleInfo,
-  editedModuleId,
-  visible,
-  style,
-  contentContainerStyle,
-  ...props
-}: WebCardPreviewProps) => {
-  const {
-    viewer: { profile },
-  } = useLazyLoadQuery<WebCardPreviewQuery>(
-    graphql`
-      query WebCardPreviewQuery {
-        viewer {
-          profile {
-            id
-            userName
-            card {
-              id
-              backgroundColor
-              cover {
-                ...CoverRenderer_cover
-              }
-              modules {
-                id
-                kind
-                ...HorizontalPhotoRenderer_module
-                ...SimpleTextRenderer_module
-                ...LineDividerRenderer_module
-                ...CarouselRenderer_module
-                ...SimpleButtonRenderer_module
-                ...PhotoWithTextAndTitleRenderer_module
-                ...SocialLinksRenderer_module
-                ...BlockTextRenderer_module
-              }
-            }
-            ...ProfileColorPicker_profile
-          }
-        }
-      }
-    `,
-    {},
-  );
-
-  const scrollViewRef = useRef<ScrollView | null>(null);
-  const editeModuleLayoutRef = useRef<LayoutRectangle | null>(null);
-  const scrollViewLayoutRef = useRef<LayoutRectangle | null>(null);
-
-  const scrollToEditedModule = () => {
-    if (
-      !scrollViewRef.current ||
-      !editeModuleLayoutRef.current ||
-      !scrollViewLayoutRef.current
-    ) {
-      return;
-    }
-    const { y: moduleY, height: moduleHeight } = editeModuleLayoutRef.current;
-    const { height: scrollViewHeight } = scrollViewLayoutRef.current;
-    scrollViewRef.current.scrollTo({
-      y: moduleY - scrollViewHeight / 2 + moduleHeight / 2,
-      animated: false,
-    });
-  };
-
-  const onEditedModuleLayout = ({
-    nativeEvent: { layout },
-  }: LayoutChangeEvent) => {
-    editeModuleLayoutRef.current = layout;
-    scrollToEditedModule();
-  };
-
-  const onScrollViewLayout = (event: LayoutChangeEvent) => {
-    if (!scrollViewRef.current) {
-      return;
-    }
-    scrollViewLayoutRef.current = event.nativeEvent.layout;
-    scrollToEditedModule();
-    props.onLayout?.(event);
-  };
-
-  const scrollRefCallback = (ref: ScrollView | null) => {
-    scrollViewRef.current = ref;
-    scrollToEditedModule();
-  };
-  useEffect(() => {
-    if (visible) {
-      scrollToEditedModule();
-    }
-  }, [visible]);
+  const { width: windowWidth } = useWindowDimensions();
+  const scale = viewMode === 'mobile' ? 1 : windowWidth / DESKTOP_PREVIEW_WIDTH;
+  const webCardWidth =
+    viewMode === 'mobile' ? windowWidth : DESKTOP_PREVIEW_WIDTH;
+  const webCardOuterHeight = height - SWITCH_TOGGLE_SECTION_HEIGHT;
+  const webCardHeight = webCardOuterHeight / scale;
 
   const intl = useIntl();
 
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
+  const contentRef = useRef<View>(null);
 
-  const { width: screenWidth } = useWindowDimensions();
-
-  if (!profile?.card) {
-    return null;
-  }
-
-  const {
-    userName,
-    card: { backgroundColor, cover, modules },
-  } = profile;
-
-  const renderEditedModule = () => {
-    switch (editedModuleInfo.kind) {
-      case MODULE_KIND_SIMPLE_TEXT:
-      case MODULE_KIND_SIMPLE_TITLE:
-        return (
-          <SimpleTextRendererRaw
-            data={{ ...editedModuleInfo.data, kind: editedModuleInfo.kind }}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_LINE_DIVIDER:
-        return (
-          <LineDividerRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_HORIZONTAL_PHOTO:
-        return (
-          <HorizontalPhotoRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_CAROUSEL:
-        return (
-          <CarouselRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_SIMPLE_BUTTON:
-        return (
-          <SimpleButtonRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE:
-        return (
-          <PhotoWithTextAndTitleRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-            viewMode={viewMode}
-          />
-        );
-      case MODULE_KIND_SOCIAL_LINKS:
-        return (
-          <SocialLinksRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      case MODULE_KIND_BLOCK_TEXT:
-        return (
-          <BlockTextRendererRaw
-            data={editedModuleInfo.data}
-            key={module.id}
-            onLayout={onEditedModuleLayout}
-          />
-        );
-      default:
-        return null;
+  const onModuleLayoutInner = (index: number, moduleView: View) => {
+    if (
+      !onModuleLayout ||
+      !contentRef.current ||
+      // we take some precautions to avoid type mismatch
+      !moduleView ||
+      typeof moduleView !== 'object' ||
+      !('measureLayout' in moduleView)
+    ) {
+      return;
     }
+    moduleView.measureLayout(contentRef.current, (x, y, width, height) => {
+      onModuleLayout(index, { x, y, width, height });
+    });
   };
 
   return (
-    <View {...props} style={[{ flex: 1 }, style]}>
-      <Container style={{ padding: 8 }}>
-        <TitleWithLine
-          style={{ backgroundColor: 'transparent' }}
-          title={intl.formatMessage({
-            defaultMessage: 'Preview',
-            description: 'Webcard preview - Preview title',
-          })}
-        />
+    <View
+      style={{
+        width: windowWidth,
+        height,
+      }}
+      {...props}
+    >
+      <View
+        style={{
+          paddingHorizontal: 20,
+          height: SWITCH_TOGGLE_SECTION_HEIGHT,
+          justifyContent: 'center',
+        }}
+      >
         <SwitchToggle
           value={viewMode}
           onChange={setViewMode}
@@ -320,56 +135,71 @@ const WebCardPreview = ({
             },
           ]}
         />
-      </Container>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: backgroundColor ?? '#FFFFFF' }}
-        onLayout={onScrollViewLayout}
-        ref={scrollRefCallback}
-        contentContainerStyle={contentContainerStyle}
+      </View>
+      <View
+        style={{
+          overflow: 'hidden',
+          width: webCardWidth,
+          height: webCardHeight,
+          transform: [
+            { translateX: (windowWidth - webCardWidth) / 2 },
+            { translateY: (webCardOuterHeight - webCardHeight) / 2 },
+            { scale },
+          ],
+        }}
       >
-        <CoverRenderer
-          cover={cover}
-          userName={userName}
-          width={screenWidth}
-          hideBorderRadius
-        />
-        {modules.map(module => {
-          if (editedModuleId === module.id) {
-            return renderEditedModule();
-          }
-          switch (module.kind) {
-            case MODULE_KIND_SIMPLE_TEXT:
-            case MODULE_KIND_SIMPLE_TITLE:
-              return <SimpleTextRenderer module={module} key={module.id} />;
-            case MODULE_KIND_LINE_DIVIDER:
-              return <LineDividerRenderer module={module} key={module.id} />;
-            case MODULE_KIND_HORIZONTAL_PHOTO:
-              return (
-                <HorizontalPhotoRenderer module={module} key={module.id} />
-              );
-            case MODULE_KIND_CAROUSEL:
-              return <CarouselRenderer module={module} key={module.id} />;
-            case MODULE_KIND_SIMPLE_BUTTON:
-              return <SimpleButtonRenderer module={module} key={module.id} />;
-            case MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE:
-              return (
-                <PhotoWithTextAndTitleRenderer
-                  module={module}
-                  key={module.id}
-                />
-              );
-            case MODULE_KIND_SOCIAL_LINKS:
-              return <SocialLinksRenderer module={module} key={module.id} />;
-            case MODULE_KIND_BLOCK_TEXT:
-              return <BlockTextRenderer module={module} key={module.id} />;
-            default:
-              return null;
-          }
-        })}
-        {!editedModuleId && renderEditedModule()}
-      </ScrollView>
+        <ScrollView
+          ref={ref}
+          style={[{ flex: 1 }, style]}
+          contentOffset={contentOffset}
+          contentContainerStyle={{
+            paddingBottom: contentPaddingBottom * scale,
+          }}
+        >
+          <View ref={contentRef}>
+            <WebCardBackground
+              profile={profile}
+              overrideCardStyle={cardStyle}
+              overrideLastModule={cardModules.at(-1)}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '150%',
+                top: '-25%',
+                left: 0,
+                zIndex: -1,
+              }}
+            />
+            {viewMode === 'desktop' ? (
+              <CoverRendererPreviewDesktop profile={profile} />
+            ) : (
+              <CoverRenderer
+                profile={profile}
+                width={windowWidth}
+                hideBorderRadius
+              />
+            )}
+            {cardModules.map((module, index) => (
+              <CardModuleRenderer
+                module={module}
+                key={index}
+                onLayout={e =>
+                  onModuleLayoutInner?.(index, e.target as unknown as View)
+                }
+                colorPalette={cardColors}
+                cardStyle={cardStyle}
+                viewMode={viewMode}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
     </View>
   );
 };
 
-export default WebCardPreview;
+export default forwardRef(WebCardPreview);
+
+const SWITCH_TOGGLE_SECTION_HEIGHT = 52;
+
+export const DESKTOP_PREVIEW_WIDTH = 900;

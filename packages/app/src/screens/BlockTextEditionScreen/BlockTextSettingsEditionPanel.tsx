@@ -3,9 +3,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import {
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+  BLOCK_TEXT_MAX_FONT_SIZE,
+  BLOCK_TEXT_MAX_VERTICAL_SPACING,
+  BLOCK_TEXT_MIN_FONT_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import ProfileColorPicker, {
   ProfileColorDropDownPicker,
 } from '#components/ProfileColorPicker';
@@ -140,8 +141,8 @@ const BlockTextSettingsEditionPanel = ({
             />
           }
           value={fontSize}
-          min={DEFAULT_COVER_MIN_FONT_SIZE}
-          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          min={BLOCK_TEXT_MIN_FONT_SIZE}
+          max={BLOCK_TEXT_MAX_FONT_SIZE}
           step={1}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
@@ -166,7 +167,7 @@ const BlockTextSettingsEditionPanel = ({
           }
           value={verticalSpacing}
           min={0}
-          max={10}
+          max={BLOCK_TEXT_MAX_VERTICAL_SPACING}
           step={1}
           onChange={onVerticalSpacingChange}
           accessibilityLabel={intl.formatMessage({

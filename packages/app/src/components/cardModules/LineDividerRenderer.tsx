@@ -1,73 +1,66 @@
 import { useState, useCallback } from 'react';
 import { View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { graphql, readInlineData } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  LINE_DIVIDER_DEFAULT_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import type {
   LineDividerRenderer_module$data,
   LineDividerRenderer_module$key,
 } from '@azzapp/relay/artifacts/LineDividerRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {
   ViewProps,
   LayoutChangeEvent,
   LayoutRectangle,
 } from 'react-native';
 
-export type LineDividerRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a line divider module
-   */
-  module: LineDividerRenderer_module$key;
-};
+const LineDividerRendererFragment = graphql`
+  fragment LineDividerRenderer_module on CardModuleLineDivider @inline {
+    orientation
+    marginBottom
+    marginTop
+    height
+    colorTop
+    colorBottom
+  }
+`;
 
-/**
- * Render a line divider module
- */
-const LineDividerRenderer = ({
-  module,
-  ...props
-}: LineDividerRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment LineDividerRenderer_module on CardModule {
-        ... on CardModuleLineDivider {
-          orientation
-          marginBottom
-          marginTop
-          height
-          colorTop
-          colorBottom
-        }
-      }
-    `,
-    module,
-  );
-  return <LineDividerRendererRaw data={data} {...props} />;
-};
+export const readLineDividerData = (module: LineDividerRenderer_module$key) =>
+  readInlineData(LineDividerRendererFragment, module);
 
-export default LineDividerRenderer;
-
-export type LineDividerRawData = Omit<
-  LineDividerRenderer_module$data,
-  ' $fragmentType'
+export type LineDividerRendererData = NullableFields<
+  Omit<LineDividerRenderer_module$data, ' $fragmentType'>
 >;
 
-type LineDividerRendererRawProps = ViewProps & {
+type LineDividerRendererProps = ViewProps & {
   /**
    * The data for the line divider module
    */
-  data: LineDividerRawData;
+  data: LineDividerRendererData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
- * Raw implementation of the line divider module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
+ * Render a LineDivider module
  */
-export const LineDividerRendererRaw = ({
+const LineDividerRenderer = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   ...props
-}: LineDividerRendererRawProps) => {
+}: LineDividerRendererProps) => {
   const {
     orientation,
     marginBottom,
@@ -75,7 +68,12 @@ export const LineDividerRendererRaw = ({
     height,
     colorTop,
     colorBottom,
-  } = Object.assign({}, LINE_DIVIDER_DEFAULT_VALUES, data);
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
+    styleValuesMap: null,
+  });
 
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
   const onLayout = useCallback(
@@ -93,7 +91,12 @@ export const LineDividerRendererRaw = ({
       onLayout={onLayout}
     >
       {marginTop > 0 && (
-        <View style={{ height: marginTop, backgroundColor: colorTop }} />
+        <View
+          style={{
+            height: marginTop,
+            backgroundColor: swapColor(colorTop, colorPalette),
+          }}
+        />
       )}
       <View
         style={{
@@ -101,15 +104,22 @@ export const LineDividerRendererRaw = ({
           maxHeight: height,
           borderRightWidth: orientation === 'bottomRight' ? layout?.width : 0,
           borderLeftWidth: orientation !== 'bottomRight' ? layout?.width : 0,
-          borderRightColor: colorBottom,
-          borderLeftColor: colorBottom,
+          borderRightColor: swapColor(colorBottom, colorPalette),
+          borderLeftColor: swapColor(colorBottom, colorPalette),
           borderTopWidth: height,
-          borderTopColor: colorTop,
+          borderTopColor: swapColor(colorTop, colorPalette),
         }}
       />
       {marginBottom > 0 && (
-        <View style={{ height: marginBottom, backgroundColor: colorBottom }} />
+        <View
+          style={{
+            height: marginBottom,
+            backgroundColor: swapColor(colorBottom, colorPalette),
+          }}
+        />
       )}
     </View>
   );
 };
+
+export default LineDividerRenderer;

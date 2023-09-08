@@ -1,11 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
+import { useProfileCardColors } from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
-import ColorPreview from '#ui/ColorPreview';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import {
@@ -13,8 +15,10 @@ import {
   useSelectionModeTransition,
 } from './ProfileScreenTransitions';
 import type { FooterBarItem } from '#ui/FooterBar';
+import type { ProfileColorPicker_profile$key } from '@azzapp/relay/artifacts/ProfileColorPicker_profile.graphql';
 
 export type ProfileScreenFooterProps = {
+  profile: ProfileColorPicker_profile$key;
   /**
    * Whether the profile is in edit mode
    */
@@ -32,21 +36,17 @@ export type ProfileScreenFooterProps = {
    */
   selectionContainsHiddenModules: boolean;
   /**
-   * edit mode display mode
-   */
-  currentEditionView: 'desktop' | 'mobile' | 'preview';
-  /**
-   * the background color of the profile
-   */
-  backgroundColor: string;
-  /**
    * A callback called when the user switch the edit mode display mode
    */
-  onEditingDisplayModeChange: (view: 'desktop' | 'mobile') => void;
+  onRequestPreview: () => void;
   /**
    * A callback called when the user press the add module button
    */
   onRequestNewModule: () => void;
+  /**
+   * A callback called when the user press the style button
+   */
+  onRequestWebcardStyle: () => void;
   /**
    * A callback called when the user press the color picker button
    */
@@ -62,26 +62,29 @@ export type ProfileScreenFooterProps = {
 };
 
 const ProfileScreenFooter = ({
+  profile: profileKey,
   editing,
-  currentEditionView,
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
-  backgroundColor,
-  onEditingDisplayModeChange,
+  onRequestPreview,
   onRequestNewModule,
   onRequestColorPicker,
+  onRequestWebcardStyle,
   onDelete,
   onToggleVisibility,
 }: ProfileScreenFooterProps) => {
+  const { colorPalette } = useProfileCardColors(profileKey);
+
   const inset = useSafeAreaInsets();
 
   const onItemPress = useCallback(
     (key: string) => {
       switch (key) {
         case 'mobile':
-        case 'desktop':
-          onEditingDisplayModeChange(key);
+          break;
+        case 'preview':
+          onRequestPreview();
           break;
         case 'add':
           onRequestNewModule();
@@ -89,9 +92,17 @@ const ProfileScreenFooter = ({
         case 'colorpicker':
           onRequestColorPicker();
           break;
+        case 'style':
+          onRequestWebcardStyle();
+          break;
       }
     },
-    [onEditingDisplayModeChange, onRequestColorPicker, onRequestNewModule],
+    [
+      onRequestColorPicker,
+      onRequestNewModule,
+      onRequestPreview,
+      onRequestWebcardStyle,
+    ],
   );
 
   const intl = useIntl();
@@ -108,19 +119,19 @@ const ProfileScreenFooter = ({
         }),
       },
       {
-        key: 'desktop',
-        icon: 'desktop',
+        key: 'preview',
+        icon: 'preview',
         label: intl.formatMessage({
-          defaultMessage: 'Desktop',
+          defaultMessage: 'Preview',
           description:
-            'ProfileScreen bottom menu accessibility label for Desktop tab',
+            'ProfileScreen bottom menu accessibility label for Preview tab',
         }),
       },
       {
         key: 'add',
         icon: 'add',
         label: intl.formatMessage({
-          defaultMessage: 'Add a module',
+          defaultMessage: 'Add',
           description:
             'ProfileScreen bottom menu accessibility label for Add a module button',
         }),
@@ -128,20 +139,27 @@ const ProfileScreenFooter = ({
       {
         key: 'colorpicker',
         IconComponent: (
-          <ColorPreview
-            color={backgroundColor}
-            style={styles.colorPreview}
-            colorSize={16}
-          />
+          <View style={styles.viewTriptych}>
+            <ColorTriptychRenderer {...colorPalette} width={16} height={16} />
+          </View>
         ),
         label: intl.formatMessage({
-          defaultMessage: 'Change background color',
+          defaultMessage: 'Colors',
           description:
-            'ProfileScreen bottom menu accessibility label for Change background color button',
+            'ProfileScreen bottom menu accessibility label for Colors button',
+        }),
+      },
+      {
+        key: 'style',
+        icon: 'text',
+        label: intl.formatMessage({
+          defaultMessage: 'Style',
+          description:
+            'ProfileScreen bottom menu accessibility label for webcard style button',
         }),
       },
     ],
-    [backgroundColor, intl, styles.colorPreview],
+    [colorPalette, intl, styles.viewTriptych],
   );
 
   const editTransition = useEditTransition();
@@ -172,7 +190,8 @@ const ProfileScreenFooter = ({
       >
         <BottomMenu
           tabs={tabs}
-          currentTab={currentEditionView}
+          showLabel
+          currentTab={'mobile'}
           onItemPress={onItemPress}
         />
       </Animated.View>
@@ -263,5 +282,14 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     borderColor: colors.grey200,
     marginLeft: 1,
+  },
+  viewTriptych: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: colors.grey200,
   },
 }));

@@ -1,18 +1,26 @@
-import { BLOCK_TEXT_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  BLOCK_TEXT_DEFAULT_VALUES,
+  BLOCK_TEXT_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
+import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../CardModuleBackground';
-import type { CardModule } from '@azzapp/data/domains';
+import type { ModuleRendererProps } from './ModuleRenderer';
+import type { CardModuleBlockText } from '@azzapp/data/domains';
 
-export type BlockTextRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type BlockTextRendererProps = ModuleRendererProps<CardModuleBlockText> &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a BlockText module
  */
-const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
+const BlockTextRenderer = ({
+  module,
+  colorPalette,
+  cardStyle,
+  ...props
+}: BlockTextRendererProps) => {
   const {
     text,
     fontFamily,
@@ -28,13 +36,19 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
     textBackgroundStyle,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, BLOCK_TEXT_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+  });
 
   return (
     <CardModuleBackground
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={{
         paddingLeft: marginHorizontal,
         paddingRight: marginHorizontal,
@@ -42,33 +56,37 @@ const BlockTextRenderer = ({ module, ...props }: BlockTextRendererProps) => {
         paddingBottom: marginVertical,
       }}
     >
-      <CardModuleBackground
-        backgroundId={textBackgroundId}
-        backgroundStyle={textBackgroundStyle}
-        style={{
-          paddingLeft: textMarginHorizontal,
-          paddingRight: textMarginHorizontal,
-          paddingTop: textMarginVertical,
-          paddingBottom: textMarginVertical,
-        }}
-      >
-        <p
+      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+        <CardModuleBackground
+          backgroundId={textBackgroundId}
+          backgroundStyle={textBackgroundStyle}
+          colorPalette={colorPalette}
           style={{
-            marginTop: 10,
-            marginBottom: 10,
-            textAlign,
-            color: fontColor,
-            fontSize,
-            fontFamily,
-            lineHeight:
-              fontSize && verticalSpacing
-                ? `${fontSize * 1.2 + verticalSpacing}px`
-                : undefined,
+            paddingLeft: textMarginHorizontal,
+            paddingRight: textMarginHorizontal,
+            paddingTop: textMarginVertical,
+            paddingBottom: textMarginVertical,
           }}
         >
-          {text}
-        </p>
-      </CardModuleBackground>
+          <p
+            style={{
+              marginTop: 10,
+              marginBottom: 10,
+              textAlign,
+              color: swapColor(fontColor, colorPalette),
+              fontSize,
+              lineHeight:
+                fontSize && verticalSpacing
+                  ? `${fontSize * 1.2 + verticalSpacing}px`
+                  : undefined,
+              whiteSpace: 'pre-wrap',
+            }}
+            className={fontsMap[fontFamily].className}
+          >
+            {text}
+          </p>
+        </CardModuleBackground>
+      </div>
     </CardModuleBackground>
   );
 };

@@ -6,17 +6,23 @@ import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_RETRIES = [1000, 3000];
 
+export type FetchFunction<ReturnType> = (
+  input: RequestInfo,
+  init?: RequestInit,
+) => Promise<ReturnType>;
+
 /**
- * A function used to handle JSON request with parametrable timeout
+ * A function used to handle JSON request with parametrable timeout and retries
  *
  * @param input identical to the native fetch input parameter
  * @param init identical to the native fetch init parameter but with a `timeout` option
- * if not provided a timeout of 15 seconds will be used
- * @param addHeaders if true the `Content-type: application/json` header will be
- * added to the request - default true
- * @returns
+ * if not provided a timeout of 15 seconds will be used, and a `retries` option that
+ * is an array of number representing the time in milliseconds between each retry.
+ * If not provided, the default value will be [1000, 3000]
+ *
+ * @returns a Promise that will be resolved with the json data of the response
  */
-export const fetchJSON = async <JSON = unknown>(
+export const fetchJSON = async <JSON>(
   input: RequestInfo,
   init?: RequestInit & { timeout?: number; retries?: number[] },
 ): Promise<JSON> => {
@@ -29,7 +35,7 @@ export const fetchJSON = async <JSON = unknown>(
     },
   };
 
-  const response: Response = await fetchWithRetries(input, init);
+  const response = await fetchWithRetries(input, init);
 
   if (response.ok) {
     try {
@@ -51,6 +57,41 @@ export const fetchJSON = async <JSON = unknown>(
   });
 };
 
+/**
+ * A function used to handle Blob request with parametrable timeout and retries
+ *
+ * @param input @see fetchJSON
+ * @param init @see fetchJSON
+ * @returns a Promise that will be resolved with the blob data of the response
+ */
+export const fetchBlob = async (
+  input: RequestInfo,
+  init?: RequestInit & { timeout?: number; retries?: number[] },
+) => {
+  const response = await fetchWithRetries(input, init);
+
+  if (response.ok) {
+    try {
+      return response.blob();
+    } catch (e) {
+      throw new FetchError({
+        message: ERRORS.BLOB_DECODING_ERROR,
+        response,
+        data: { error: ERRORS.BLOB_DECODING_ERROR },
+      });
+    }
+  }
+  const data = await response.json().catch(() => ({}));
+
+  throw new FetchError({
+    message: data.message ?? response.statusText,
+    response,
+  });
+};
+
+/**
+ * A function used to handle fetch request with parametrable timeout and retries
+ */
 export const fetchWithRetries = async (
   input: RequestInfo,
   init?: RequestInit & { timeout?: number; retries?: number[] },
@@ -64,6 +105,9 @@ export const fetchWithRetries = async (
   );
 };
 
+/**
+ * A function used to handle fetch request with parametrable timeout
+ */
 export const fetchWithTimeout = async (
   input: RequestInfo,
   init?: RequestInit & { timeout?: number },

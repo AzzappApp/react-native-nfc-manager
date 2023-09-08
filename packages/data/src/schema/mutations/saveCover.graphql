@@ -1,0 +1,95 @@
+extend type Mutation {
+  """
+  Update the card cover of the current profile
+  """
+  saveCover(input: SaveCoverInput!): SaveCoverPayload!
+}
+
+input SaveCoverInput {
+  """
+  The title of the card
+  """
+  title: String
+  """
+  The style of the title text
+  """
+  titleStyle: CardCoverTextStyleInput
+  """
+  The subtitle of the card
+  """
+  subTitle: String
+  """
+  The style of the subtitle text
+  """
+  subTitleStyle: CardCoverTextStyleInput
+  """
+  The position of the text in the card cover
+  """
+  textOrientation: CardCoverTextOrientation
+  """
+  The position of the text in the card cover
+  """
+  textPosition: CardCoverTextPosition
+  """
+  The media of the card cover generated from the source media
+  """
+  mediaId: ID
+  """
+  The source media of the cover, used to generate the media
+  """
+  sourceMediaId: ID
+  """
+  The mask media of the cover, used to generate the media
+  """
+  maskMediaId: ID
+  """
+  The filter applied to the source media to generate the media
+  """
+  mediaFilter: String
+  """
+  The transform applied to the source media to generate the media
+  """
+  mediaParameters: JSON
+  """
+  The background image of the card cover
+  """
+  backgroundId: ID
+  """
+  The background color of the card cover
+  """
+  backgroundColor: String
+  """
+  A color used to tint the background image
+  """
+  backgroundPatternColor: String
+  """
+  The foreground image of the card cover
+  """
+  foregroundId: ID
+  """
+  A color used to tint the foreground image
+  """
+  foregroundColor: String
+  """
+  if true, the card cover media use selfie segmentation
+  """
+  segmented: Boolean
+  """
+  if true, the card cover media is merged with the background using multiply blending
+  """
+  merged: Boolean
+  """
+  updated user card colors
+  """
+  cardColors: SaveCardColorsInput
+}
+
+input CardCoverTextStyleInput {
+  color: String!
+  fontSize: Int!
+  fontFamily: String!
+}
+
+type SaveCoverPayload {
+  profile: Profile!
+}

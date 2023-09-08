@@ -20,7 +20,7 @@ const propagateFollowUpdateInProfileList = (
         followed,
         'ProfileEdge',
       );
-      ConnectionHandler.insertEdgeAfter(connection, edge);
+      ConnectionHandler.insertEdgeBefore(connection, edge);
     }
   } else {
     ConnectionHandler.deleteNode(connection, profileId);
@@ -92,6 +92,15 @@ const updater = (
       );
     }
 
+    const connectionRecordSuggestions = ConnectionHandler.getConnection(
+      viewer,
+      'Viewer_recommendedProfiles',
+    );
+
+    if (follow && connectionRecordSuggestions) {
+      ConnectionHandler.deleteNode(connectionRecordSuggestions, profileId);
+    }
+
     ConnectionHandler.getConnection(
       viewer,
       'Viewer_followingsPosts',
@@ -100,11 +109,11 @@ const updater = (
 };
 
 const useToggleFollow = (
-  currentProfileId?: string,
+  currentProfileId?: string | null,
   userNameFilter?: string,
 ) => {
-  const [commit, toggleFollowingActive] =
-    useMutation<useToggleFollowMutation>(graphql`
+  const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
+    graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
         toggleFollowing(input: $input) {
           profile {
@@ -113,7 +122,8 @@ const useToggleFollow = (
           }
         }
       }
-    `);
+    `,
+  );
 
   const toggleFollow = (profileId: string, follow: boolean) => {
     // TODO do we really want to prevent fast clicking?

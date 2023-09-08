@@ -1,5 +1,10 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  CAROUSEL_MAX_GAP,
+  CAROUSEL_MAX_HORIZONTAL_MARGIN,
+  CAROUSEL_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -67,7 +72,7 @@ const CarouselEditionMarginPanel = ({
           }
           value={marginVertical}
           min={0}
-          max={100}
+          max={CAROUSEL_MAX_VERTICAL_MARGIN}
           step={1}
           onChange={onMarginVerticalChange}
           style={styles.slider}
@@ -84,7 +89,7 @@ const CarouselEditionMarginPanel = ({
           }
           value={marginHorizontal}
           min={0}
-          max={100}
+          max={CAROUSEL_MAX_HORIZONTAL_MARGIN}
           step={1}
           onChange={onMarginHorizontalChange}
           style={styles.slider}
@@ -99,7 +104,7 @@ const CarouselEditionMarginPanel = ({
           }
           value={gap}
           min={0}
-          max={100}
+          max={CAROUSEL_MAX_GAP}
           step={1}
           onChange={onGapChange}
           style={styles.slider}

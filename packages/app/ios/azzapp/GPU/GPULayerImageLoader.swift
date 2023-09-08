@@ -14,7 +14,67 @@ class GPULayerImageLoader {
   
   static let shared = GPULayerImageLoader()
   
-  private init() {}
+  private class CacheEntry {
+    var task: Task<CIImage?, Error>?
+    weak var image: CIImage?
+    
+    init(task: Task<CIImage?, Error>) {
+      self.task = task
+    }
+    
+    func setResult(image: CIImage) {
+      self.task = nil
+      self.image = image;
+    }
+  }
+  
+  private var imageCache = [String: CacheEntry]()
+  
+  private var cacheDispatchQueue = DispatchQueue(label: "com.azzapp.azzapp.GPULayerImageLoader")
+  
+  private var cleanTimer: Timer? = nil
+  
+  deinit {
+    cleanTimer?.invalidate()
+  }
+  
+  private func startCleanTimer() {
+    DispatchQueue.main.sync {
+      guard cleanTimer == nil else { return }
+
+      cleanTimer = Timer.scheduledTimer(
+        timeInterval: TimeInterval(60),
+        target: self,
+        selector: #selector(GPULayerImageLoader.cleanCache),
+        userInfo: nil,
+        repeats: true
+      )
+    }
+  }
+  
+  @objc private func cleanCache() {
+    cacheDispatchQueue.sync {
+      for (key, entry) in imageCache {
+        if (entry.image == nil && entry.task == nil) {
+          imageCache.removeValue(forKey: key)
+        }
+      }
+    }
+  }
+  
+  private func getCacheEntry(forKey key: String) -> CacheEntry? {
+    return cacheDispatchQueue.sync { return imageCache[key] }
+  }
+  
+  private func addCacheEntry(_ entry: CacheEntry, forKey key: String) {
+    cacheDispatchQueue.sync { imageCache[key] = entry }
+  }
+  
+  private func removeCacheEntry(forKey key: String) {
+    _ = cacheDispatchQueue.sync {
+      imageCache.removeValue(forKey: key)
+    }
+  }
   
   func loadLayerImage(_ layerSource: GPULayerSource) async throws -> CIImage? {
     var image: CIImage? = nil
@@ -39,35 +99,18 @@ class GPULayerImageLoader {
     return image
   }
 
-  private class CacheEntry {
-    var task: Task<CIImage?, Error>?
-    var image: CIImage?
-    
-    init(task: Task<CIImage?, Error>) {
-      self.task = task
-    }
-    
-    func setResult(image: CIImage) {
-      self.task = nil
-      self.image = image;
-    }
-  }
-  
-  private let imageCache = NSMapTable<NSString, CacheEntry>.init(
-    keyOptions: .copyIn,
-    valueOptions: .weakMemory
-  )
   
   private func loadImageIfNotCached(
     key: String,
     loader: @escaping () async throws -> CIImage?
   ) async throws -> CIImage? {
-    let nsKey = key as NSString;
-    if let entry = imageCache.object(forKey: nsKey) {
+    startCleanTimer()
+    if let entry = getCacheEntry(forKey: key) {
       if let image = entry.image {
         return image
-      } else {
-        return try await entry.task?.value
+      }
+      if let task = entry.task {
+        return try await task.value
       }
     }
     
@@ -75,17 +118,17 @@ class GPULayerImageLoader {
       try await loader()
     }
     let entry = CacheEntry(task: task)
-    imageCache.setObject(entry, forKey: nsKey)
+    addCacheEntry(entry, forKey: key)
 
     do {
       guard let image = try await task.value else {
-        imageCache.removeObject(forKey: nsKey)
+        removeCacheEntry(forKey: key)
         return nil;
       }
       entry.setResult(image: image)
       return image
     } catch {
-      imageCache.removeObject(forKey: nsKey)
+      removeCacheEntry(forKey: key)
       throw error
     }
   }

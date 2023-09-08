@@ -1,85 +1,66 @@
-import { fetchJSON } from '@azzapp/shared/networkHelpers';
+import { fetchBlob, fetchJSON } from '@azzapp/shared/networkHelpers';
 import * as WebAPI from '@azzapp/shared/WebAPI';
-import { getTokens } from './authStore';
-import fetchWithAuthTokens, { injectToken } from './fetchWithAuthTokens';
+import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
-import { dispatchGlobalEvent } from './globalEvents';
+import type { FetchFunction } from '@azzapp/shared/networkHelpers';
 
-const authenticatedFetch = fetchWithGlobalEvents(fetchWithAuthTokens);
-const unauthenticatedFetch = fetchWithGlobalEvents(fetchJSON);
+const authenticatedFetchJSON = fetchWithGlobalEvents(
+  fetchWithAuthTokens(fetchJSON),
+);
+const authenticatedFetchBlob = fetchWithGlobalEvents(
+  fetchWithAuthTokens(fetchBlob),
+);
+const unauthenticatedFetchJSON = fetchWithGlobalEvents(fetchJSON);
 
-type Logout = typeof WebAPI.logout;
-export const logout: Logout = init => {
-  const res = WebAPI.logout(
-    injectToken(getTokens()?.token, {
-      ...init,
-      fetchFunction: unauthenticatedFetch,
-    } as RequestInit),
-  );
-  void dispatchGlobalEvent({ type: 'SIGN_OUT' });
-  return res;
-};
+const withFetchFunction = <TMethod extends WebAPI.APIMethod<any, any>>(
+  fn: TMethod,
+  fetchFunction: FetchFunction<any>,
+): TMethod =>
+  ((params: any, init: any) => fn(params, { ...init, fetchFunction })) as any;
 
-type Signin = typeof WebAPI.signin;
-export const signin: Signin = params =>
-  WebAPI.signin(
-    { ...params, authMethod: 'token' },
-    { fetchFunction: unauthenticatedFetch },
-  );
+export const signin = withFetchFunction(
+  WebAPI.signin,
+  unauthenticatedFetchJSON,
+);
 
-export const signup: typeof WebAPI.signup = params =>
-  WebAPI.signup(
-    { ...params, authMethod: 'token' },
-    { fetchFunction: unauthenticatedFetch },
-  );
+export const signup = withFetchFunction(
+  WebAPI.signup,
+  unauthenticatedFetchJSON,
+);
 
-export const createProfile: typeof WebAPI.createProfile = (
-  params: WebAPI.CreateProfileParams,
-  init,
-) =>
-  WebAPI.createProfile(
-    { ...params, authMethod: 'token' },
-    {
-      ...init,
-      fetchFunction: authenticatedFetch,
-    },
-  );
+export const forgotPassword = withFetchFunction(
+  WebAPI.forgotPassword,
+  unauthenticatedFetchJSON,
+);
 
-export const switchProfile: typeof WebAPI.switchProfile = (
-  params: WebAPI.SwitchProfileParams,
-  init,
-) =>
-  WebAPI.switchProfile(
-    { ...params, authMethod: 'token' },
-    { ...init, fetchFunction: authenticatedFetch },
-  );
+export const changePassword = withFetchFunction(
+  WebAPI.changePassword,
+  authenticatedFetchJSON,
+);
 
-export const forgotPassword: typeof WebAPI.forgotPassword = (
-  params: WebAPI.ForgotPasswordParams,
-) =>
-  WebAPI.forgotPassword({ ...params }, { fetchFunction: unauthenticatedFetch });
+export const refreshTokens = WebAPI.refreshTokens;
 
-export const changePassword: typeof WebAPI.changePassword = (
-  params: WebAPI.ChangePasswordParams,
-) =>
-  WebAPI.changePassword({ ...params }, { fetchFunction: authenticatedFetch });
+export const uploadMedia = WebAPI.uploadMedia;
 
-export const refreshTokens: typeof WebAPI.refreshTokens = (params, init) =>
-  WebAPI.refreshTokens(params, {
-    ...init,
-    fetchFunction: unauthenticatedFetch,
+export const uploadSign = withFetchFunction(
+  WebAPI.uploadSign,
+  authenticatedFetchJSON,
+);
+
+export const verifySign = withFetchFunction(
+  WebAPI.verifySign,
+  unauthenticatedFetchJSON,
+);
+
+export const getAppleWalletPass = (params: {
+  locale: string;
+  profileId: string;
+}) =>
+  WebAPI.getAppleWalletPass(params, {
+    fetchFunction: authenticatedFetchBlob,
   });
 
-export const uploadMedia: typeof WebAPI.uploadMedia = WebAPI.uploadMedia;
-
-export const uploadSign: typeof WebAPI.uploadSign = (params, init) =>
-  WebAPI.uploadSign(params, {
-    ...init,
-    fetchFunction: authenticatedFetch,
-  });
-
-export const verifySign: typeof WebAPI.verifySign = (params, init) =>
-  WebAPI.verifySign(params, {
-    ...init,
-    fetchFunction: unauthenticatedFetch,
-  });
+export const getGoogleWalletPass = withFetchFunction(
+  WebAPI.getGoogleWalletPass,
+  authenticatedFetchJSON,
+);

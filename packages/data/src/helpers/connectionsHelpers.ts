@@ -31,3 +31,13 @@ export const connectionFromDateSortedItems = <Item>(
     },
   };
 };
+
+export const emptyConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+};

@@ -1,17 +1,18 @@
-import { forwardRef, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { forwardRef, memo, useRef } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
+  textOrientationOrDefaut,
+  textPositionOrDefaut,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import PressableNative from '#ui/PressableNative';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
-import QRCodeModal from './QRCodeModal';
-import type { CoverRenderer_cover$key } from '@azzapp/relay/artifacts/CoverRenderer_cover.graphql';
+import CoverTextRenderer from './CoverTextRenderer';
+import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -19,15 +20,9 @@ export type CoverRendererProps = {
   /**
    * The relay reference to the cover
    */
-  cover: CoverRenderer_cover$key | null | undefined;
-  /**
-   * The user name of the card owner
-   * Used to generate the QR code
-   */
-  userName: string;
+  profile: CoverRenderer_profile$key | null | undefined;
   /**
    * The width of the displayed cover
-   * Must be a number on native, vw unit are supported on web
    */
   width?: number;
   /**
@@ -58,8 +53,7 @@ export type CoverRendererProps = {
  */
 const CoverRenderer = (
   {
-    cover: coverKey,
-    userName,
+    profile: coverKey,
     width = 125,
     hideBorderRadius,
     style,
@@ -69,114 +63,154 @@ const CoverRenderer = (
   forwardRef: ForwardedRef<View>,
 ) => {
   //#region Data
-  const cover = useFragment(
-    graphql`
-      fragment CoverRenderer_cover on CardCover
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        cappedPixelRatio: {
-          type: "Float!"
-          provider: "../providers/CappedPixelRatio.relayprovider"
-        }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
-      ) {
-        media {
-          id
-          __typename
-          uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            @include(if: $isNative)
-          ... on MediaVideo {
-            thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-              @include(if: $isNative)
+  const { cardColors, cardCover } =
+    useFragment(
+      graphql`
+        fragment CoverRenderer_profile on Profile
+        @argumentDefinitions(
+          screenWidth: {
+            type: "Float!"
+            provider: "../providers/ScreenWidth.relayprovider"
           }
-          ... on MediaImage {
-            smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-              @include(if: $isNative)
+          pixelRatio: {
+            type: "Float!"
+            provider: "../providers/PixelRatio.relayprovider"
           }
-          ... on MediaVideo {
-            smallThumbnail: thumbnail(
-              width: 125
-              pixelRatio: $cappedPixelRatio
-            ) @include(if: $isNative)
+          cappedPixelRatio: {
+            type: "Float!"
+            provider: "../providers/CappedPixelRatio.relayprovider"
+          }
+        ) {
+          cardColors {
+            primary
+            dark
+            light
+          }
+          cardCover {
+            media {
+              id
+              __typename
+              uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              ... on MediaVideo {
+                thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+              }
+              ... on MediaImage {
+                smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+              }
+              ... on MediaVideo {
+                smallThumbnail: thumbnail(
+                  width: 125
+                  pixelRatio: $cappedPixelRatio
+                )
+              }
+            }
+            foreground {
+              id
+              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
+            foregroundColor
+            background {
+              id
+              largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
+            backgroundColor
+            backgroundPatternColor
+            title
+            titleStyle {
+              color
+              fontFamily
+              fontSize
+            }
+            subTitle
+            subTitleStyle {
+              color
+              fontFamily
+              fontSize
+            }
+            textOrientation
+            textPosition
           }
         }
-        textPreviewMedia {
-          id
-          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-            @include(if: $isNative)
-          smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-            @include(if: $isNative)
-        }
-        title
-        subTitle
-      }
-    `,
-    coverKey ?? null,
-  );
+      `,
+      coverKey ?? null,
+    ) ?? {};
   //#endregion
 
   //#region Ready states
   // We need to wait for both the media and the text to be ready for display
   // before calling the onReadyForDisplay callback, however, we need to
   // redispatch it when the cover changes
-  const readyStates = useRef({ text: false, media: false });
-
-  const sources = useRef({
-    media: cover?.media?.id,
-    text: cover?.textPreviewMedia?.id,
+  const readyStates = useRef({
+    media: false,
+    foreground: false,
+    background: false,
   });
 
-  if (sources.current.media !== cover?.media?.id) {
+  const sources = useRef({
+    media: cardCover?.media?.id,
+    foreground: cardCover?.foreground?.id,
+    background: cardCover?.background?.id,
+  });
+
+  if (sources.current.media !== cardCover?.media?.id) {
     readyStates.current.media = false;
-    sources.current.media = cover?.media?.id;
+    sources.current.media = cardCover?.media?.id;
+  }
+  if (!sources.current.background) {
+    readyStates.current.background = true;
+  } else if (sources.current.background !== cardCover?.background?.id) {
+    readyStates.current.background = false;
+    sources.current.background = cardCover?.background?.id;
   }
 
-  if (sources.current.text !== cover?.textPreviewMedia?.id) {
-    readyStates.current.text = false;
-    sources.current.text = cover?.textPreviewMedia?.id;
+  if (!sources.current.foreground) {
+    readyStates.current.foreground = true;
+  } else if (sources.current.foreground !== cardCover?.foreground?.id) {
+    readyStates.current.foreground = false;
+    sources.current.foreground = cardCover?.foreground?.id;
   }
 
   const onMediaReadyForDisplay = () => {
     readyStates.current.media = true;
-    if (readyStates.current.text) {
+    if (readyStates.current.foreground && readyStates.current.background) {
       onReadyForDisplay?.();
     }
   };
 
-  const onTextReadyForDisplay = () => {
-    readyStates.current.text = true;
-    if (readyStates.current.media) {
+  const onForegroundReadyForDisplay = () => {
+    readyStates.current.foreground = true;
+    if (readyStates.current.media && readyStates.current.background) {
       onReadyForDisplay?.();
     }
   };
-  //#endregion
-
-  //#region QR Code
-  const [qrCodeVisible, setQRCodeVisible] = useState(false);
-  const showQRCode = () => {
-    setQRCodeVisible(true);
-  };
-  const hideQRCode = () => {
-    setQRCodeVisible(false);
+  const onBackgroundReadyForDisplay = () => {
+    readyStates.current.background = true;
+    if (readyStates.current.media && readyStates.current.foreground) {
+      onReadyForDisplay?.();
+    }
   };
   //#endregion
 
   //#region Styles
   const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
 
-  const { media, textPreviewMedia, title, subTitle } = cover ?? {};
+  const {
+    media,
+    title,
+    titleStyle,
+    subTitle,
+    subTitleStyle,
+    textOrientation,
+    textPosition,
+    foreground,
+    foregroundColor,
+    background,
+    backgroundColor,
+    backgroundPatternColor,
+  } = cardCover ?? {};
 
-  const intl = useIntl();
   //#endregion
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
@@ -197,72 +231,89 @@ const CoverRenderer = (
   return (
     <View
       ref={forwardRef}
-      style={[styles.root, { borderRadius, width }, style]}
+      style={[
+        styles.root,
+        {
+          borderRadius,
+          width,
+          backgroundColor: swapColor(backgroundColor, cardColors) as any,
+        },
+        style,
+      ]}
       testID="cover-renderer"
     >
       {media ? (
         <>
-          <MediaRenderer
-            testID="CoverRenderer_media"
-            source={media.id}
-            uri={mediaUri}
-            thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-            width={width}
-            aspectRatio={COVER_RATIO}
-            alt={intl.formatMessage(
-              {
-                defaultMessage: '{title} - background image',
-                description: 'CoverRenderer - Accessibility cover image',
-              },
-              { title: `${title} - ${subTitle}` },
-            )}
-            onReadyForDisplay={onMediaReadyForDisplay}
-            style={styles.layer}
-          />
-          {textPreviewMedia && (
+          {background && (
             <MediaImageRenderer
-              testID="CoverRenderer_text"
-              source={textPreviewMedia.id}
-              uri={
-                width === COVER_BASE_WIDTH
-                  ? textPreviewMedia.smallURI
-                  : textPreviewMedia.largeURI
-              }
-              width={width}
+              testID="CoverRenderer_background"
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? background.smallURI
+                    : background.largeURI,
+                mediaId: background.id,
+                requestedSize: width,
+              }}
+              tintColor={swapColor(backgroundPatternColor, cardColors)}
               aspectRatio={COVER_RATIO}
-              alt={`${title} - ${subTitle}`}
-              onReadyForDisplay={onTextReadyForDisplay}
+              onReadyForDisplay={onBackgroundReadyForDisplay}
               style={styles.layer}
             />
           )}
+          <MediaRenderer
+            testID="CoverRenderer_media"
+            source={{ uri: mediaUri!, requestedSize: width, mediaId: media.id }}
+            thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+            aspectRatio={COVER_RATIO}
+            onReadyForDisplay={onMediaReadyForDisplay}
+            style={styles.layer}
+          />
+          {foreground && (
+            <MediaImageRenderer
+              testID="CoverRenderer_foreground"
+              source={{
+                uri:
+                  width === COVER_BASE_WIDTH
+                    ? foreground.smallURI
+                    : foreground.largeURI,
+                mediaId: foreground.id,
+                requestedSize: width,
+              }}
+              tintColor={swapColor(foregroundColor, cardColors)}
+              aspectRatio={COVER_RATIO}
+              onReadyForDisplay={onForegroundReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
+          <CoverTextRenderer
+            title={title}
+            subTitle={subTitle}
+            textOrientation={textOrientationOrDefaut(textOrientation)}
+            textPosition={textPositionOrDefaut(textPosition)}
+            titleStyle={titleStyle}
+            subTitleStyle={subTitleStyle}
+            colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
+            height={width / COVER_RATIO}
+          />
         </>
       ) : (
-        <View style={styles.coverPlaceHolder} />
-      )}
-      <PressableNative
-        onPress={showQRCode}
-        accessibilityRole="button"
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap me to show the QR Code fullscreen',
-          description: 'CoverRenderer - Accessibility Qr code button',
-        })}
-        style={styles.qrCode}
-      >
-        <Image
-          testID="cover-renderer-qrcode"
-          accessibilityRole="image"
-          source={require('#assets/qrcode.png')}
-          style={styles.layer}
-        />
-      </PressableNative>
-      {qrCodeVisible && (
-        <QRCodeModal onRequestClose={hideQRCode} userName={userName} />
+        <View style={styles.coverPlaceHolder}>
+          <Image
+            source={require('#assets/webcard/logo-substract-full.png')}
+            style={{
+              width: width / 2,
+              height: width / 2,
+            }}
+            resizeMode="contain"
+          />
+        </View>
       )}
     </View>
   );
 };
 
-export default forwardRef(CoverRenderer);
+export default memo(forwardRef(CoverRenderer));
 
 const styles = StyleSheet.create({
   root: {
@@ -277,14 +328,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   coverPlaceHolder: {
-    backgroundColor: colors.grey100,
+    backgroundColor: colors.black,
     aspectRatio: COVER_RATIO,
-  },
-  qrCode: {
-    position: 'absolute',
-    top: '10%',
-    left: '45%',
-    width: '10%',
-    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

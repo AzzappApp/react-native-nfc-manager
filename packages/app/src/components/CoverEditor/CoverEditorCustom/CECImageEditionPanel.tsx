@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import FilterSelectionList from '#components/FilterSelectionList';
+import ImageEditionParametersList from '#components/ImageEditionParametersList';
+import TabsBar from '#ui/TabsBar';
+import type { EditionParameters } from '#components/gpu';
+import type { StyleProp, ViewStyle } from 'react-native';
+
+type CECImageEditionPanelProps = {
+  /**
+   * Source Media to Override the Source Media of the template
+   */
+  uri?: string | null;
+  /**
+   * The source media type
+   */
+  kind?: 'image' | 'video' | 'videoFrame';
+  /**
+   * if the source media is a videoFrame, the time of the frame to display
+   */
+  time?: number | null;
+  filter: string | null;
+  editionParameters: EditionParameters;
+  merged: boolean;
+  backgroundImageColor?: string | null;
+  backgroundImageTintColor?: string | null;
+  foregroundImageTintColor?: string | null;
+  onFilterChange(filter: string): void;
+  onStartParameterEdition(parameter: string): void;
+  style?: StyleProp<ViewStyle>;
+};
+
+const CECImageEditionPanel = ({
+  uri,
+  kind,
+  time,
+  filter,
+  editionParameters,
+  onFilterChange,
+  onStartParameterEdition,
+  style,
+}: CECImageEditionPanelProps) => {
+  const [currentTab, setCurrentTab] = useState<'edit' | 'filter'>('filter');
+
+  const onTabPress = (tab: string) => {
+    setCurrentTab(tab as 'edit' | 'filter');
+  };
+
+  const intl = useIntl();
+
+  if (!uri) {
+    return null;
+  }
+
+  return (
+    <View style={style}>
+      <TabsBar
+        currentTab={currentTab}
+        onTabPress={onTabPress}
+        decoration="underline"
+        tabs={[
+          {
+            tabKey: 'filter',
+            label: intl.formatMessage({
+              defaultMessage: 'Effect',
+              description: 'Label of the effect tab in cover edition',
+            }),
+          },
+          {
+            tabKey: 'edit',
+            label: intl.formatMessage({
+              defaultMessage: 'Adjust',
+              description: 'Label of the adjust tab in cover edition',
+            }),
+          },
+        ]}
+      />
+      <View style={styles.body}>
+        {currentTab === 'filter' && (
+          <FilterSelectionList
+            layer={{
+              kind: kind === 'video' ? 'videoFrame' : 'image',
+              uri,
+              time,
+              parameters: editionParameters,
+            }}
+            aspectRatio={COVER_RATIO}
+            selectedFilter={filter}
+            onChange={onFilterChange}
+            style={styles.filterSelectionList}
+            contentContainerStyle={styles.filterSelectionListContentContainer}
+            cardRadius={COVER_CARD_RADIUS}
+          />
+        )}
+        {currentTab === 'edit' && (
+          <ImageEditionParametersList
+            style={{ flexGrow: 0 }}
+            onSelectParam={onStartParameterEdition}
+            excludedParams={['cropData']}
+            showsHorizontalScrollIndicator={false}
+          />
+        )}
+      </View>
+    </View>
+  );
+};
+
+export default CECImageEditionPanel;
+
+const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingBottom: 10,
+  },
+  filterSelectionListContentContainer: { paddingHorizontal: 20 },
+  filterSelectionList: {
+    flex: 1,
+    maxHeight: 300,
+    marginTop: 20,
+  },
+});

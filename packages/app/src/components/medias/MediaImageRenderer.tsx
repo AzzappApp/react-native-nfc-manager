@@ -13,30 +13,24 @@ import type { HostComponent } from 'react-native';
  */
 const MediaImageRenderer = (
   {
-    uri,
     alt,
     source,
-    width,
     aspectRatio,
     onLoad,
     onReadyForDisplay,
     style,
+    tintColor,
     ...props
   }: MediaImageRendererProps,
   ref: ForwardedRef<HostComponent<any>>,
 ) => {
-  if (typeof width === 'string') {
-    console.error('Invalide `vw` size used on native media renderer');
-    width = parseFloat(width.replace(/vw/g, ''));
-  }
-
   const isReady = useRef(false);
 
   // we need to clean the state as fast as possible
   // to dispatch ready if in cache
-  const uriRef = useRef(uri);
-  if (uri !== uriRef.current) {
-    uriRef.current = uri;
+  const uriRef = useRef(source.uri);
+  if (source.uri !== uriRef.current) {
+    uriRef.current = source.uri;
     isReady.current = false;
   }
 
@@ -58,16 +52,16 @@ const MediaImageRenderer = (
   return (
     <NativeMediaImageRenderer
       ref={ref}
-      source={{
-        uri,
-        mediaID: source,
-        requestedSize: typeof width == 'number' ? width : 0,
-      }}
+      source={source}
       accessibilityRole="image"
       accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
-      style={[{ width, aspectRatio, overflow: 'hidden' }, style]}
+      style={[
+        { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
+        style,
+      ]}
+      tintColor={tintColor}
       {...props}
     />
   );

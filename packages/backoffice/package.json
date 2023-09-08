@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.1.1-canary.0",
+  "version": "0.2.0-canary.70",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,18 +13,28 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/auth": "0.1.1-canary.0",
-    "@azzapp/data": "0.1.1-canary.0",
-    "@azzapp/shared": "0.1.1-canary.0",
+    "@azzapp/data": "0.2.0-canary.70",
+    "@azzapp/shared": "0.2.0-canary.70",
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
+    "@mui/icons-material": "latest",
+    "@mui/material": "latest",
+    "@mui/x-data-grid": "latest",
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
+    "@dnd-kit/utilities": "^3.2.1",
+    "classnames": "^2.3.2",
+    "drizzle-orm": "0.27.0",
     "lodash": "^4.17.21",
-    "next": "^13.4.8",
+    "next": "^13.4.19",
     "react": "^18.2.0",
-    "react-admin": "^4.9.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "@types/react": "18.2.12",
-    "@types/react-dom": "^18.2.5"
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7"
   }
 }

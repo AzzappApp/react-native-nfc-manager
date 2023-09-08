@@ -1,46 +1,48 @@
+import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
-import ERRORS from '@azzapp/shared/errors';
 import {
-  isInternationalPhoneNumber,
-  isValidEmail,
-} from '@azzapp/shared/stringHelpers';
+  getByTokenValue,
+  updateUser,
+  getUserById,
+  deleteToken,
+  getUserByEmail,
+} from '@azzapp/data/domains';
+import ERRORS from '@azzapp/shared/errors';
 
 type ChangePasswordBody = {
   password: string;
-  credential: string;
   token: string;
+  issuer: string;
 };
 
 export const POST = async (req: Request) => {
-  const { credential } = (await req.json()) as ChangePasswordBody;
-  if (!credential) {
+  const { password, token, issuer } = (await req.json()) as ChangePasswordBody;
+  if (!password || !token) {
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
     );
   }
-  try {
-    let user;
-    if (!isValidEmail(credential)) {
-      user = await getUserByEmail(credential);
+
+  const foundToken = await getByTokenValue(token, issuer);
+
+  if (
+    foundToken &&
+    foundToken.createdAt.getTime() > Date.now() - 1000 * 60 * 60 * 24
+  ) {
+    await getUserByEmail(issuer);
+    const user = await getUserById(foundToken.userId);
+    if (user) {
+      await updateUser(foundToken.userId, {
+        password: bcrypt.hashSync(password, 12),
+      });
+      await deleteToken(foundToken.userId);
+      return NextResponse.json({ ok: true });
     }
-    if (user == null && isInternationalPhoneNumber(credential)) {
-      user = await getUserByPhoneNumber(credential);
-    }
-    if (user == null) {
-      return NextResponse.json(
-        { message: ERRORS.USER_NOT_FOUND },
-        { status: 400 },
-      );
-    }
-    //TODO: send an email or an sms
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: ERRORS.INTERNAL_SERVER_ERROR },
-      { status: 500 },
-    );
   }
+
+  return NextResponse.json(
+    { message: ERRORS.INTERNAL_SERVER_ERROR },
+    { status: 500 },
+  );
 };

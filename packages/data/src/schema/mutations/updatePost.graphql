@@ -1,12 +1,14 @@
+extend type Mutation {
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+}
+
 input UpdatePostInput {
   postId: String!
   content: String
   allowComments: Boolean
   allowLikes: Boolean
-  clientMutationId: String
 }
 
 type UpdatePostPayload {
   post: Post
-  clientMutationId: String
 }

@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import ColorPicker from './ColorPicker';
 import FloatingButton from './FloatingButton';
 import Text from './Text';
 import type { FloatingButtonProps } from './FloatingButton';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 export type ColorDropDownPickerProps = FloatingButtonProps & {
   /**
    * The currently selected color
    */
   color: string;
+  /**
+   * The color palette of the user
+   */
+  colorPalette: ColorPalette;
   /**
    * The list of available colors
    */
@@ -27,6 +33,10 @@ export type ColorDropDownPickerProps = FloatingButtonProps & {
    * A callback called when the user update the color list
    */
   onUpdateColorList: (color: string[]) => void;
+  /**
+   * Called when the user update the color palette
+   */
+  onUpdateColorPalette: (colorPalette: ColorPalette) => void;
 };
 
 /**
@@ -35,9 +45,11 @@ export type ColorDropDownPickerProps = FloatingButtonProps & {
 export const ColorDropDownPicker = ({
   color,
   colorList,
+  colorPalette,
   bottomSheetHeight,
   onColorChange,
   onUpdateColorList,
+  onUpdateColorPalette,
   ...props
 }: ColorDropDownPickerProps) => {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
@@ -61,7 +73,6 @@ export const ColorDropDownPicker = ({
         <Text
           style={{
             fontSize: 24,
-            color,
           }}
         >
           A
@@ -71,7 +82,7 @@ export const ColorDropDownPicker = ({
             width: 25,
             height: 3,
             borderRadius: 4,
-            backgroundColor: color,
+            backgroundColor: swapColor(color, colorPalette),
           }}
         />
       </FloatingButton>
@@ -84,9 +95,11 @@ export const ColorDropDownPicker = ({
         selectedColor={color}
         visible={colorPickerOpen}
         colorList={colorList}
+        colorPalette={colorPalette}
         onRequestClose={() => setColorPickerOpen(false)}
         onColorChange={onColorChange}
         onUpdateColorList={onUpdateColorList}
+        onUpdateColorPalette={onUpdateColorPalette}
         height={bottomSheetHeight}
       />
     </>

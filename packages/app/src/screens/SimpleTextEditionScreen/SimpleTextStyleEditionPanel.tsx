@@ -1,27 +1,32 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import {
-  DEFAULT_COVER_MAX_FONT_SIZE,
-  DEFAULT_COVER_MIN_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+  SIMPLE_TEXT_MAX_FONT_SIZE,
+  SIMPLE_TEXT_MAX_VERTICAL_SPACING,
+  SIMPLE_TEXT_MIN_FONT_SIZE,
+  SIMPLE_TITLE_MAX_FONT_SIZE,
+  SIMPLE_TITLE_MAX_VERTICAL_SPACING,
+  SIMPLE_TITLE_MIN_FONT_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { ProfileColorPicker_profile$key } from '@azzapp/relay/artifacts/ProfileColorPicker_profile.graphql';
 import type { TextAlignment } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextStyleEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleTextStyleEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextStyleEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the profile
    */
-  profile: ProfileColorPicker_profile$key;
+  viewer: SimpleTextStyleEditionPanel_viewer$key;
   /**
    * The color of the text
    */
-  color: string;
+  fontColor: string;
   /**
    * The font family of the text
    */
@@ -42,6 +47,10 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
    * The text alignment
    */
   textAlignment: TextAlignment;
+  /**
+   * The maximum allowed font size of the text
+   */
+  moduleKind: 'simpleText' | 'simpleTitle';
   /**
    * A callback called when the user update the font family
    */
@@ -68,8 +77,8 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
  * Panel to edit the style of the simple text
  */
 const SimpleTextStyleEditionPanel = ({
-  profile,
-  color,
+  viewer,
+  fontColor,
   fontSize,
   verticalSpacing,
   fontFamily,
@@ -81,9 +90,26 @@ const SimpleTextStyleEditionPanel = ({
   onVerticalSpacingChange,
   onTextAlignmentChange,
   style,
+  moduleKind,
   ...props
 }: SimpleTextStyleEditionPanelProps) => {
   const intl = useIntl();
+
+  const { profile } = useFragment(
+    graphql`
+      fragment SimpleTextStyleEditionPanel_viewer on Viewer {
+        profile {
+          ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            dark
+            light
+          }
+        }
+      }
+    `,
+    viewer,
+  );
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -101,8 +127,8 @@ const SimpleTextStyleEditionPanel = ({
           bottomSheetHeight={bottomSheetHeight}
         />
         <ProfileColorDropDownPicker
-          profile={profile}
-          color={color}
+          profile={profile!}
+          color={fontColor}
           onColorChange={onColorChange}
           bottomSheetHeight={bottomSheetHeight}
         />
@@ -122,8 +148,16 @@ const SimpleTextStyleEditionPanel = ({
           />
         }
         value={fontSize}
-        min={DEFAULT_COVER_MIN_FONT_SIZE}
-        max={DEFAULT_COVER_MAX_FONT_SIZE}
+        min={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MIN_FONT_SIZE
+            : SIMPLE_TITLE_MIN_FONT_SIZE
+        }
+        max={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MAX_FONT_SIZE
+            : SIMPLE_TITLE_MAX_FONT_SIZE
+        }
         step={1}
         onChange={onFontSizeChange}
         accessibilityLabel={intl.formatMessage({
@@ -145,8 +179,12 @@ const SimpleTextStyleEditionPanel = ({
           />
         }
         value={verticalSpacing}
-        min={DEFAULT_COVER_MIN_FONT_SIZE}
-        max={DEFAULT_COVER_MAX_FONT_SIZE}
+        min={0}
+        max={
+          moduleKind === 'simpleText'
+            ? SIMPLE_TEXT_MAX_VERTICAL_SPACING
+            : SIMPLE_TITLE_MAX_VERTICAL_SPACING
+        }
         step={1}
         onChange={onVerticalSpacingChange}
         accessibilityLabel={intl.formatMessage({

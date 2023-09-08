@@ -95,6 +95,7 @@ const PostRenderer = (
         id
         ...PostRendererBottomPanelFragment_post
         ...PostRendererMediaFragment_post
+        ...PostRendererActionBar_post
       }
     `,
     postKey,

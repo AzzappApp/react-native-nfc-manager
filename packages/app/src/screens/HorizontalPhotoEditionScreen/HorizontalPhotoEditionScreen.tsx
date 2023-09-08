@@ -1,24 +1,29 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  HORIZONTAL_PHOTO_STYLE_VALUES,
+  MODULE_IMAGE_MAX_WIDTH,
   MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { CameraButton } from '#components/commonsButtons';
+import { exportImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
+import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import useDataEditor from '#hooks/useDataEditor';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
-import { CameraButton } from '#screens/CoverEditionScreen/CoverEditionScreensButtons';
-import exportMedia from '#screens/PostCreationScreen/exportMedia';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -80,10 +85,11 @@ const HorizontalPhotoEditionScreen = ({
         borderColor
         marginHorizontal
         marginVertical
-        height
+        imageHeight
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -108,6 +114,26 @@ const HorizontalPhotoEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
+        }
+        profile {
+          cardColors {
+            primary
+            light
+            dark
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
         }
       }
     `,
@@ -117,11 +143,26 @@ const HorizontalPhotoEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: horizontalPhoto,
-      defaultValue: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-    });
+  const initialValue = useMemo(() => {
+    return {
+      borderWidth: horizontalPhoto?.borderWidth ?? null,
+      borderRadius: horizontalPhoto?.borderRadius ?? null,
+      borderColor: horizontalPhoto?.borderColor ?? null,
+      marginHorizontal: horizontalPhoto?.marginHorizontal ?? null,
+      marginVertical: horizontalPhoto?.marginVertical ?? null,
+      imageHeight: horizontalPhoto?.imageHeight ?? null,
+      backgroundId: horizontalPhoto?.background?.id ?? null,
+      backgroundStyle: horizontalPhoto?.backgroundStyle ?? null,
+      image: horizontalPhoto?.image ?? null,
+    };
+  }, [horizontalPhoto]);
+
+  const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
+    initialValue,
+    cardStyle: viewer.profile?.cardStyle,
+    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+  });
 
   const {
     borderWidth,
@@ -129,12 +170,19 @@ const HorizontalPhotoEditionScreen = ({
     borderColor,
     marginHorizontal,
     marginVertical,
-    height,
-    background,
+    imageHeight,
+    backgroundId,
     backgroundStyle,
     image,
   } = data;
 
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #region Mutations and saving logic
   const [commit, saving] =
     useMutation<HorizontalPhotoEditionScreenUpdateModuleMutation>(graphql`
@@ -142,9 +190,9 @@ const HorizontalPhotoEditionScreen = ({
         $input: SaveHorizontalPhotoModuleInput!
       ) {
         saveHorizontalPhotoModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...HorizontalPhotoEditionScreen_module
@@ -163,18 +211,14 @@ const HorizontalPhotoEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const {
-      background: updateBackground,
-      image: updateMedia,
-      ...rest
-    } = updates;
+    const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
       //we need to save the media first
       const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
-        target: 'cover',
+        target: 'module',
       });
       const fileName = getFileName(updateMedia.uri);
       const file: any = {
@@ -191,7 +235,7 @@ const HorizontalPhotoEditionScreen = ({
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
-        mediaId = public_id;
+        mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
         console.log(error);
       } finally {
@@ -201,12 +245,9 @@ const HorizontalPhotoEditionScreen = ({
 
     const input: SaveHorizontalPhotoModuleInput = {
       moduleId: horizontalPhoto?.id,
-      image: mediaId ?? data.image.id,
+      image: mediaId ?? value.image!.id,
       ...rest,
     };
-    if (updateBackground?.id !== horizontalPhoto?.background?.id) {
-      input.backgroundId = updateBackground?.id ?? null;
-    }
 
     commit({
       variables: {
@@ -224,15 +265,7 @@ const HorizontalPhotoEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    horizontalPhoto?.id,
-    horizontalPhoto?.background?.id,
-    data?.image?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, value, horizontalPhoto?.id, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -252,24 +285,31 @@ const HorizontalPhotoEditionScreen = ({
     useState<Observable<number> | null>(null);
 
   const onMediaSelected = async ({
-    kind,
     uri,
-    aspectRatio,
+    width,
+    height,
     editionParameters,
     filter,
   }: ImagePickerResult) => {
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          filters: filter ? [filter] : [],
+        },
+      ],
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportedMedia.uri,
-      width: exportedMedia.size.width,
-      height: exportedMedia.size.height,
+      uri: exportUri,
+      width: size.width,
+      height: size.height,
       kind: 'image',
     });
   };
@@ -290,21 +330,9 @@ const HorizontalPhotoEditionScreen = ({
 
   const onMarginverticalChange = fieldUpdateHandler('marginVertical');
 
-  const onHeightChange = fieldUpdateHandler('height');
+  const onHeightChange = fieldUpdateHandler('imageHeight');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -366,7 +394,9 @@ const HorizontalPhotoEditionScreen = ({
       <PressableOpacity onPress={onPickImage}>
         <HorizontalPhotoPreview
           style={{ height: topPanelHeight - 110, marginVertical: 10 }}
-          data={data}
+          data={previewData}
+          colorPalette={viewer.profile?.cardColors}
+          cardStyle={viewer.profile?.cardStyle}
         />
       </PressableOpacity>
       <View
@@ -389,7 +419,7 @@ const HorizontalPhotoEditionScreen = ({
             id: 'settings',
             element: (
               <HorizontalPhotoSettingsEditionPanel
-                height={height}
+                height={imageHeight}
                 onHeightChange={onHeightChange}
                 style={{
                   flex: 1,
@@ -437,7 +467,7 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoBackgroundEditionPanel
                 viewer={viewer}
-                backgroundId={background?.id}
+                backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -462,19 +492,15 @@ const HorizontalPhotoEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={horizontalPhoto?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_HORIZONTAL_PHOTO,
-              data,
+              data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

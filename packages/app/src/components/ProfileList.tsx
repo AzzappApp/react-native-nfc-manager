@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import Animated, { FadeOutUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
@@ -26,16 +26,16 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <Animated.View style={styles.item} exiting={FadeOutUp}>
+    // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+    <Animated.View style={styles.item} /*exiting={FadeOutUp}*/>
       <Link
         route="PROFILE"
-        params={{ userName: profile.userName, profileID: profile.id }}
+        params={{ userName: profile.userName, profileId: profile.id }}
       >
         <PressableNative style={styles.profile}>
           <CoverRenderer
-            cover={profile.card?.cover}
+            profile={profile}
             width={COVER_WIDTH}
-            userName={profile.userName}
             videoEnabled={false}
           />
           <Text variant="large" numberOfLines={1}>
@@ -93,11 +93,7 @@ const ProfileList = ({
       fragment ProfileList_users on Profile @relay(plural: true) {
         id
         userName
-        card {
-          cover {
-            ...CoverRenderer_cover
-          }
-        }
+        ...CoverRenderer_profile
       }
     `,
     usersKey,

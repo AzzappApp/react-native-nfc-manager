@@ -1,6 +1,7 @@
+import { eq, sql } from 'drizzle-orm';
 import { fromGlobalId } from 'graphql-relay';
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
+import { PostTable, ProfileTable, db } from '#domains';
 import {
   deletePostReaction,
   getPostReaction,
@@ -10,37 +11,55 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   _,
-  { input },
-  { auth, postLoader },
+  { input: { postId, reactionKind } },
+  { auth, loaders },
 ) => {
-  if (auth.isAnonymous) {
+  if (!auth.userId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
-  const profileId = getProfileId(auth);
+  const profileId = auth.profileId;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(input.postId);
-  if (type !== 'Post') {
+  const { id: targetId, type } = fromGlobalId(postId);
+  const post = await loaders.Post.load(targetId);
+  if (type !== 'Post' || !post) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   try {
-    const reaction = await getPostReaction(profileId, targetId);
-    if (reaction && reaction.reactionKind === input.reactionKind) {
-      await deletePostReaction(profileId, targetId);
-    } else if (input.reactionKind) {
-      await insertPostReaction(profileId, targetId, input.reactionKind);
-    }
+    db.transaction(async trx => {
+      const reaction = await getPostReaction(profileId, targetId);
+      const removeReaction = reaction?.reactionKind === reactionKind;
+
+      await Promise.all([
+        removeReaction
+          ? deletePostReaction(profileId, targetId, trx)
+          : insertPostReaction(profileId, targetId, reactionKind, trx),
+        trx
+          .update(PostTable)
+          .set({
+            //prettier-ignore
+            counterReactions: sql`${PostTable.counterReactions} ${removeReaction ? '-' : '+'} 1`,
+          })
+          .where(eq(PostTable.id, targetId)),
+        reactionKind === 'like' &&
+          trx
+            .update(ProfileTable)
+            .set({
+              //prettier-ignore
+              nbLikes: sql`${PostTable.counterReactions} ${removeReaction ? '-' : '+'} 1`,
+            })
+            .where(eq(ProfileTable.id, post.authorId)),
+      ]);
+    });
   } catch (e) {
+    console.error(e);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  //have to refetch because Kysely/planetscale doesn't support returning
-  const post = await postLoader.load(targetId);
-
-  return post ? { post } : null;
+  return { post };
 };
 
 export default togglePostReaction;

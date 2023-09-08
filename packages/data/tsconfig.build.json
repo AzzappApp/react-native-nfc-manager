@@ -15,6 +15,7 @@
     "package.json",
     "tsconfig.json",
     "tsconfig.build.json",
+    "./drizzle/*",
     "babel.config.js",
     "**/__mocks__/*",
     "**/__tests__/*"

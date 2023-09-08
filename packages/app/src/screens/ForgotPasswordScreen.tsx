@@ -1,35 +1,38 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   View,
-  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useRouter } from '#components/NativeRouter';
 import { getLocales } from '#helpers/localeHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
+import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
-import ViewTransition from '#ui/ViewTransition';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();
   const intl = useIntl();
 
+  const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
+    CountryCode | 'email'
+  >('email');
+
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState(false);
 
   const isValidMailOrPhone = useMemo(() => {
     if (isValidEmail(emailOrPhone)) {
@@ -48,9 +51,22 @@ const ForgotPasswordScreen = () => {
   const onSubmit = async () => {
     if (isValidMailOrPhone) {
       if (!isSubmitted) {
-        await forgotPassword({ credential: emailOrPhone });
+        try {
+          const { issuer } = await forgotPassword({
+            locale: intl.locale,
+            credential: emailOrPhone,
+          });
+
+          router.push({
+            route: 'FORGOT_PASSWORD_CONFIRMATION',
+            params: { issuer },
+          });
+
+          setIsSubmitted(true);
+        } catch (e) {
+          setError(true);
+        }
       }
-      setIsSubmitted(true);
     }
   };
 
@@ -58,7 +74,6 @@ const ForgotPasswordScreen = () => {
     router.back();
   };
 
-  const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
   return (
@@ -67,102 +82,60 @@ const ForgotPasswordScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
       >
-        <View onTouchStart={Keyboard.dismiss} style={[styles.container]}>
+        <View onTouchStart={Keyboard.dismiss} style={styles.container}>
           <Form style={styles.inner} onSubmit={onSubmit}>
-            <ViewTransition
-              testID="azzapp__ForgotPasswordScreen__ViewTransition-confirm"
-              style={[
-                styles.viewtransition,
-                { width: screenWidth, opacity: isSubmitted ? 1 : 0 },
-              ]}
-              transitionDuration={300}
-              transitions={['opacity']}
-              pointerEvents="none"
-            >
-              <View style={styles.logoContainer}>
-                <Image
-                  source={require('#assets/mail/mail.png')}
-                  resizeMode="contain"
-                  style={styles.logo}
+            <View style={styles.logoContainer}>
+              <Icon icon="unlock_line" style={styles.logo} />
+            </View>
+            <View style={styles.viewText}>
+              <Text style={styles.textForgot} variant="xlarge">
+                <FormattedMessage
+                  defaultMessage="Forgot your password?"
+                  description="ForgotPasswordScreen - Forgot your password title"
                 />
-              </View>
-              <View style={styles.viewText}>
-                <Text style={styles.textForgot} variant="xlarge">
-                  <FormattedMessage
-                    defaultMessage="Check your emails or messages!"
-                    description="ForgotPasswordScreen - Check your emails or messages!"
-                  />
-                </Text>
-                <Text style={styles.textForgotExplain} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="We just send you a link to create a new password"
-                    description="ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
-                  />
-                </Text>
-              </View>
-            </ViewTransition>
-            <ViewTransition
-              testID="azzapp__ForgotPasswordScreen__ViewTransition-email"
-              style={[
-                styles.viewtransition,
-                { width: screenWidth, opacity: isSubmitted ? 0 : 1 },
-              ]}
-              transitionDuration={300}
-              transitions={['opacity']}
-            >
-              <View style={styles.logoContainer}>
-                <Image
-                  source={require('#assets/lock/lock.png')}
-                  resizeMode="contain"
-                  style={styles.logo}
+              </Text>
+              <Text style={styles.textForgotExplain} variant="medium">
+                <FormattedMessage
+                  defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
+                  description="ForgotPasswordScreen - Forgot your password description"
                 />
-              </View>
-              <View style={styles.viewText}>
-                <Text style={styles.textForgot} variant="xlarge">
-                  <FormattedMessage
-                    defaultMessage="Forgot your password?"
-                    description="ForgotPasswordScreen - Forgot your password title"
-                  />
-                </Text>
-                <Text style={styles.textForgotExplain} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
-                    description="ForgotPasswordScreen - Forgot your password description"
-                  />
-                </Text>
-              </View>
-              <TextInput
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Phone number or email address',
-                  description:
-                    'ForgotpasswordScreen - Phone number or email address placeholder',
-                })}
+              </Text>
+            </View>
+            <View style={styles.input}>
+              <EmailOrPhoneInput
                 value={emailOrPhone}
-                onChangeText={setEmailOrPhone}
-                autoCapitalize="none"
-                autoComplete="email"
-                keyboardType="email-address"
-                autoCorrect={false}
-                autoFocus
-                style={styles.input}
+                onChange={setEmailOrPhone}
+                hasError={error}
+                countryCodeOrEmail={countryCodeOrEmail}
+                setCountryCodeOrEmail={setCountryCodeOrEmail}
               />
-              <Submit>
-                <Button
-                  label={intl.formatMessage({
-                    defaultMessage: 'Reset password',
-                    description: 'ForgotpasswordScreen - Reset password',
-                  })}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Tap to reset your passward',
-                    description:
-                      'ForgotPassword Screen - AccessibilityLabel Reset password button',
-                  })}
-                  style={styles.button}
-                  onPress={onSubmit}
-                  disabled={!isValidMailOrPhone}
-                />
-              </Submit>
-            </ViewTransition>
+            </View>
+            {error && (
+              <Text variant="error" style={styles.error}>
+                {intl.formatMessage({
+                  defaultMessage:
+                    'Invalid email/phone number or no account found',
+                  description:
+                    'ForgotpasswordScreen - Invalid email or phone number error',
+                })}
+              </Text>
+            )}
+            <Submit>
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Reset password',
+                  description: 'ForgotpasswordScreen - Reset password',
+                })}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to reset your password',
+                  description:
+                    'ForgotPassword Screen - AccessibilityLabel Reset password button',
+                })}
+                style={styles.button}
+                onPress={onSubmit}
+                disabled={!isValidMailOrPhone}
+              />
+            </Submit>
           </Form>
         </View>
       </KeyboardAvoidingView>
@@ -192,20 +165,11 @@ export default ForgotPasswordScreen;
 const styles = StyleSheet.create({
   inner: {
     height: 300,
-  },
-  viewtransition: {
-    position: 'absolute',
-    top: 0,
-    alignContent: 'center',
-    justifyContent: 'center',
-    height: 300,
-    paddingLeft: 15,
-    paddingRight: 15,
+    rowGap: 20,
   },
   textForgotExplain: {
     color: colors.grey400,
     textAlign: 'center',
-    marginTop: 20,
   },
   textForgot: {
     color: colors.grey900,
@@ -216,22 +180,25 @@ const styles = StyleSheet.create({
     paddingRight: 38,
   },
   flex: { flex: 1 },
-  button: { marginLeft: 10, marginRight: 10, marginTop: 20 },
+  button: { marginHorizontal: 10 },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItem: 'center',
     marginBottom: 100,
+    paddingHorizontal: 15,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 25,
   },
-  logo: { width: 38, height: 54 },
+  logo: { width: 64, height: 64 },
   back: { color: colors.grey200 },
   input: {
-    marginTop: 20,
     marginHorizontal: 12,
+  },
+  error: {
+    marginHorizontal: 12,
+    marginTop: 6,
   },
 });

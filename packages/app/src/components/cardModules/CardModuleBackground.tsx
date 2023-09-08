@@ -1,8 +1,8 @@
 import chroma from 'chroma-js';
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
 import { colors } from '#theme';
+import CardModuleBackgroundImage from './CardModuleBackgroundImage';
 import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -11,6 +11,7 @@ type CardModuleBackgroundProps = ViewProps & {
   backgroundColor?: string | null;
   backgroundOpacity?: number | null;
   patternColor?: string | null;
+  resizeMode?: string | null;
 };
 
 const CardModuleBackground = ({
@@ -18,6 +19,7 @@ const CardModuleBackground = ({
   backgroundColor,
   backgroundOpacity,
   patternColor,
+  resizeMode,
   children,
   style,
   ...props
@@ -37,24 +39,29 @@ const CardModuleBackground = ({
     : colors.white;
 
   return (
-    <View
-      {...props}
-      style={[{ opacity: layout ? 1 : 0, backgroundColor }, style]}
-      onLayout={onLayout}
-    >
-      {backgroundUri && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={backgroundUri}
-            color={patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-            style={{ opacity: backgroundOpacity }}
-          />
-        </View>
-      )}
-      {children}
+    <View style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
+      <View
+        {...props}
+        style={[{ opacity: layout ? 1 : 0 }, style]}
+        onLayout={onLayout}
+      >
+        {children}
+      </View>
+      <View
+        style={[
+          styles.background,
+          { backgroundColor, opacity: layout ? 1 : 0 },
+        ]}
+        pointerEvents="none"
+      >
+        <CardModuleBackgroundImage
+          backgroundOpacity={backgroundOpacity}
+          backgroundUri={backgroundUri}
+          layout={layout}
+          patternColor={patternColor}
+          resizeMode={resizeMode}
+        />
+      </View>
     </View>
   );
 };

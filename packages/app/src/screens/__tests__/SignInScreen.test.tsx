@@ -1,6 +1,5 @@
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
@@ -8,16 +7,6 @@ import SignInScreen from '../SignInScreen';
 
 jest.mock('#helpers/MobileWebAPI');
 jest.mock('#helpers/globalEvents');
-
-const mockRouter = {
-  replaceAll: jest.fn(),
-};
-jest.mock('#components/NativeRouter', () => ({
-  ...jest.requireActual('#components/NativeRouter'),
-  useRouter() {
-    return mockRouter;
-  },
-}));
 
 describe('Signin Screen', () => {
   const signinMock = jest.mocked(signin);
@@ -81,7 +70,6 @@ describe('Signin Screen', () => {
         profileId: 'fake-profileId',
       },
     });
-    expect(mockRouter.replaceAll).toHaveBeenCalledWith(mainRoutes);
   });
 
   test('should display an error message if the `signin` callback fails', async () => {

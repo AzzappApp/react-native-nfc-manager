@@ -1,52 +1,60 @@
 import { fromGlobalId } from 'graphql-relay';
-import { getCompanyActivityById, getProfileCategoryById } from '#domains';
 import type { NodeResolvers } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
 
+const cardStyleSymbol = Symbol('CardStyle');
+const colorPaletteSymbol = Symbol('ColorPalette');
+const cardTemplateSymbol = Symbol('CardTemplate');
+const coverTemplateSymbol = Symbol('CoverTemplate');
+const postSymbol = Symbol('Post');
+const postCommentSymbol = Symbol('PostComment');
 const profileSymbol = Symbol('Profile');
 const profileCategorySymbol = Symbol('ProfileCategory');
 const companyActivitySymbol = Symbol('CompanyActivity');
-const cardSymbol = Symbol('Card');
-const postSymbol = Symbol('Post');
-const postCommentSymbol = Symbol('PostComment');
-const coverTemplate = Symbol('CoverTemplate');
 
 export const fetchNode = async (
   gqlId: string,
-  {
-    profileLoader,
-    cardLoader,
-    postLoader,
-    postCommentLoader,
-    coverTemplateLoader,
-  }: GraphQLContext,
-) => {
+  { loaders }: GraphQLContext,
+): Promise<any> => {
   const { id, type } = fromGlobalId(gqlId);
 
   switch (type) {
-    case 'Profile':
-      return withTypeSymbol(await profileLoader.load(id), profileSymbol);
-    case 'ProfileCategory':
+    case 'CardStyle':
+      return withTypeSymbol(await loaders.CardStyle.load(id), cardStyleSymbol);
+    case 'ColorPalette':
       return withTypeSymbol(
-        await getProfileCategoryById(id),
-        profileCategorySymbol,
+        await loaders.ColorPalette.load(id),
+        colorPaletteSymbol,
       );
-    case 'Card':
-      return withTypeSymbol(await cardLoader.load(id), cardSymbol);
-    case 'CompanyActivity':
+    case 'CardTemplate':
       return withTypeSymbol(
-        await getCompanyActivityById(id),
-        companyActivitySymbol,
-      );
-    case 'Post':
-      return withTypeSymbol(await postLoader.load(id), postSymbol);
-    case 'PostComment':
-      return withTypeSymbol(
-        await postCommentLoader.load(id),
-        postCommentSymbol,
+        await loaders.CardTemplate.load(id),
+        cardTemplateSymbol,
       );
     case 'CoverTemplate':
-      return withTypeSymbol(await coverTemplateLoader.load(id), coverTemplate);
+      return withTypeSymbol(
+        await loaders.CoverTemplate.load(id),
+        coverTemplateSymbol,
+      );
+    case 'Post':
+      return withTypeSymbol(await loaders.Post.load(id), postSymbol);
+    case 'PostComment':
+      return withTypeSymbol(
+        await loaders.PostComment.load(id),
+        postCommentSymbol,
+      );
+    case 'Profile':
+      return withTypeSymbol(await loaders.Profile.load(id), profileSymbol);
+    case 'ProfileCategory':
+      return withTypeSymbol(
+        await loaders.ProfileCategory.load(id),
+        profileCategorySymbol,
+      );
+    case 'CompanyActivity':
+      return withTypeSymbol(
+        await loaders.CompanyActivity.load(id),
+        companyActivitySymbol,
+      );
   }
   return null;
 };
@@ -55,17 +63,17 @@ const withTypeSymbol = <T extends object | null>(value: T, symbol: symbol): T =>
   (value ? { ...value, [symbol]: true } : null) as T;
 
 const resolveNode = (value: any) => {
-  if (value[profileSymbol]) {
-    return 'Profile';
+  if (value[cardStyleSymbol]) {
+    return 'CardStyle';
   }
-  if (value[profileCategorySymbol]) {
-    return 'ProfileCategory';
+  if (value[colorPaletteSymbol]) {
+    return 'ColorPalette';
   }
-  if (value[cardSymbol]) {
-    return 'Card';
+  if (value[cardTemplateSymbol]) {
+    return 'CardTemplate';
   }
-  if (value[companyActivitySymbol]) {
-    return 'CompanyActivity';
+  if (value[coverTemplateSymbol]) {
+    return 'CoverTemplate';
   }
   if (value[postSymbol]) {
     return 'Post';
@@ -73,8 +81,14 @@ const resolveNode = (value: any) => {
   if (value[postCommentSymbol]) {
     return 'PostComment';
   }
-  if (value[coverTemplate]) {
-    return 'CoverTemplate';
+  if (value[profileSymbol]) {
+    return 'Profile';
+  }
+  if (value[profileCategorySymbol]) {
+    return 'ProfileCategory';
+  }
+  if (value[companyActivitySymbol]) {
+    return 'CompanyActivity';
   }
   return null;
 };

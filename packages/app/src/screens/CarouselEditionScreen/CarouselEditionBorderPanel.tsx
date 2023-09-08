@@ -1,18 +1,24 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  CAROUSEL_MAX_BORDER_RADIUS,
+  CAROUSEL_MAX_BORDER_WIDTH,
+} from '@azzapp/shared/cardModuleHelpers';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { ProfileColorPicker_profile$key } from '@azzapp/relay/artifacts/ProfileColorPicker_profile.graphql';
+import type { CarouselEditionBorderPanel_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionBorderPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
   /**
    * The size of the border.
    */
-  borderSize: number;
+  borderWidth: number;
   /**
    * The color of the border.
    */
@@ -28,11 +34,11 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
   /**
    * The current profile. used for the color picker.
    */
-  profile: ProfileColorPicker_profile$key;
+  viewer: CarouselEditionBorderPanel_viewer$key;
   /**
    * Called when the user wants to change the border size.
    */
-  onBorderSizeChange: (borderSize: number) => void;
+  onBorderSizeChange: (borderWidth: number) => void;
   /**
    * Called when the user wants to change the border color.
    */
@@ -47,8 +53,8 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
  * A panel to edit the border of the carousel.
  */
 const CarouselEditionBorderPanel = ({
-  profile,
-  borderSize,
+  viewer,
+  borderWidth,
   borderColor,
   borderRadius,
   bottomSheetHeight,
@@ -59,6 +65,22 @@ const CarouselEditionBorderPanel = ({
   ...props
 }: CarouselEditionBorderPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('size');
+
+  const { profile } = useFragment(
+    graphql`
+      fragment CarouselEditionBorderPanel_viewer on Viewer {
+        profile {
+          ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            dark
+            light
+          }
+        }
+      }
+    `,
+    viewer,
+  );
 
   const onProfileColorPickerClose = useCallback(() => {
     setCurrentTab('size');
@@ -82,11 +104,14 @@ const CarouselEditionBorderPanel = ({
           description: 'Title of the border color section in carousel edition',
         }),
         rightElement: (
-          <ColorPreview color={borderColor} style={{ marginLeft: 5 }} />
+          <ColorPreview
+            color={swapColor(borderColor, profile?.cardColors)}
+            style={{ marginLeft: 5 }}
+          />
         ),
       },
     ],
-    [borderColor, intl],
+    [borderColor, intl, profile?.cardColors],
   );
 
   return (
@@ -98,12 +123,12 @@ const CarouselEditionBorderPanel = ({
             <FormattedMessage
               defaultMessage="Border size : {size}"
               description="Border size message in carousel edition"
-              values={{ size: borderSize }}
+              values={{ size: borderWidth }}
             />
           }
-          value={borderSize}
+          value={borderWidth}
           min={0}
-          max={50}
+          max={CAROUSEL_MAX_BORDER_WIDTH}
           step={1}
           onChange={onBorderSizeChange}
           accessibilityLabel={intl.formatMessage({
@@ -126,7 +151,7 @@ const CarouselEditionBorderPanel = ({
           }
           value={borderRadius}
           min={0}
-          max={200}
+          max={CAROUSEL_MAX_BORDER_RADIUS}
           step={1}
           onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({

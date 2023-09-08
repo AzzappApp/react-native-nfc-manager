@@ -11,10 +11,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { mainRoutes, newProfileRoute } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
@@ -32,7 +30,6 @@ const SignInScreen = () => {
   const [signinError, setSigninError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const route = useRouter();
   const onSubmit = useCallback(async () => {
     if (!isNotFalsyString(credential) || !isNotFalsyString(password)) {
       return;
@@ -62,13 +59,7 @@ const SignInScreen = () => {
       type: 'SIGN_IN',
       payload: { authTokens: { token, refreshToken }, profileId },
     });
-
-    if (profileId) {
-      route.replaceAll(mainRoutes);
-    } else {
-      route.replaceAll(newProfileRoute);
-    }
-  }, [credential, password, route]);
+  }, [credential, password]);
 
   const passwordRef = useRef<NativeTextInput>(null);
   const focusPassword = () => {

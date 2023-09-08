@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import {
@@ -60,26 +61,28 @@ const AuthorCartouche = ({
           type: "Float!"
           provider: "../providers/PixelRatio.relayprovider"
         }
-        isNative: {
-          type: "Boolean!"
-          provider: "../providers/isNative.relayprovider"
-        }
       ) {
         id
         userName
-        card {
-          cover {
-            media {
-              id
-              ... on MediaImage {
-                avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
-                  @include(if: $isNative)
-              }
-              ... on MediaVideo {
-                avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
-                  @include(if: $isNative)
-              }
+        cardColors {
+          primary
+          light
+          dark
+        }
+        cardCover {
+          media {
+            id
+            ... on MediaImage {
+              avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
             }
+            ... on MediaVideo {
+              avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
+            }
+          }
+          foregroundColor
+          foreground {
+            id
+            uri: uri(width: 25, pixelRatio: $pixelRatio)
           }
         }
       }
@@ -87,29 +90,51 @@ const AuthorCartouche = ({
     authorKey,
   );
 
-  const variantStyle = useVariantStyleSheet(computedStyle, variant);
+  const styles = useVariantStyleSheet(stylesheet, variant);
+  const { cardCover, cardColors } = author ?? {};
+  const { media, foreground, foregroundColor } = cardCover ?? {};
 
   const content = useMemo(() => {
     return (
       <>
-        {author.card?.cover.media.id != null ? (
-          <MediaImageRenderer
-            width={25}
-            aspectRatio={COVER_RATIO}
-            source={author.card.cover.media.id}
-            uri={author.card?.cover.media.avatarURI}
-            alt={'avatar'}
-            style={variantStyle.image}
-          />
+        {media?.id != null ? (
+          <View style={{}}>
+            <MediaImageRenderer
+              aspectRatio={COVER_RATIO}
+              source={{
+                uri: media.avatarURI!,
+                mediaId: media.id,
+                requestedSize: MEDIA_WIDTH,
+              }}
+              alt={'avatar'}
+              style={styles.image}
+            />
+            {foreground && (
+              <MediaImageRenderer
+                testID="CoverPreview_foreground"
+                source={{
+                  uri: foreground.uri,
+                  mediaId: foreground.id,
+                  requestedSize: MEDIA_WIDTH,
+                }}
+                tintColor={swapColor(foregroundColor, cardColors)}
+                aspectRatio={COVER_RATIO}
+                style={[
+                  styles.layer,
+                  styles.image,
+                  { backgroundColor: 'transaprent' },
+                ]}
+                alt={'Cover edition foreground'}
+              />
+            )}
+          </View>
         ) : (
-          author.card?.cover.media.id == null && (
-            <View style={[variantStyle.image]} />
-          )
+          media?.id == null && <View style={[styles.image]} />
         )}
         {!hideUserName && (
           <Text
             variant={variant === 'post' ? 'button' : 'smallbold'}
-            style={variantStyle.userName}
+            style={styles.userName}
           >
             {author?.userName}
           </Text>
@@ -117,19 +142,23 @@ const AuthorCartouche = ({
       </>
     );
   }, [
-    author?.card?.cover.media.avatarURI,
-    author?.card?.cover.media.id,
-    author?.userName,
+    media?.id,
+    media?.avatarURI,
+    styles.image,
+    styles.layer,
+    styles.userName,
+    foreground,
+    foregroundColor,
+    cardColors,
     hideUserName,
     variant,
-    variantStyle.image,
-    variantStyle.userName,
+    author?.userName,
   ]);
 
   if (activeLink) {
     return (
       <Link route="PROFILE" params={{ userName: author.userName }}>
-        <PressableOpacity style={[variantStyle.container, style]} {...props}>
+        <PressableOpacity style={[styles.container, style]} {...props}>
           {content}
         </PressableOpacity>
       </Link>
@@ -137,13 +166,13 @@ const AuthorCartouche = ({
   }
 
   return (
-    <View style={[variantStyle.container, style]} {...props}>
+    <View style={[styles.container, style]} {...props}>
       {content}
     </View>
   );
 };
 
-const computedStyle = createVariantsStyleSheet(appearance => ({
+const stylesheet = createVariantsStyleSheet(appearance => ({
   default: {
     container: {
       height: AUTHOR_CARTOUCHE_HEIGHT,
@@ -152,6 +181,13 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       alignItems: 'center',
     },
     userName: {},
+    layer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+    },
   },
   createPost: {
     image: {
@@ -199,5 +235,6 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
 
 export default AuthorCartouche;
 
+export const MEDIA_WIDTH = 25;
 export const AUTHOR_CARTOUCHE_HEIGHT = 40;
 export const AUTHOR_CARTOUCHE_SMALL_HEIGHT = 28;

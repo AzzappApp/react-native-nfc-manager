@@ -19,6 +19,31 @@ export const contactCardEditSchema = z.object({
       selected: z.boolean(),
     }),
   ),
+  urls: z.array(
+    z.object({
+      address: z.string(),
+      selected: z.boolean(),
+    }),
+  ),
+  addresses: z.array(
+    z.object({
+      label: z.string(),
+      address: z.string(),
+      selected: z.boolean(),
+    }),
+  ),
+  birthdays: z.array(
+    z.object({
+      birthday: z.string(),
+      selected: z.boolean(),
+    }),
+  ),
+  socials: z.array(
+    z.object({
+      social: z.string(),
+      selected: z.boolean(),
+    }),
+  ),
 });
 
 export type ContactCardEditForm = z.infer<typeof contactCardEditSchema>;

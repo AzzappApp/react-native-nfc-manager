@@ -1,5 +1,9 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, ScrollView, Image } from 'react-native';
+import {
+  CAROUSEL_MAX_IMAGE_HEIGHT,
+  CAROUSEL_MIN_IMAGE_HEIGHT,
+} from '@azzapp/shared/cardModuleHelpers';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -135,8 +139,8 @@ const CarouselImagesEditionPanel = ({
             />
           }
           value={imageHeight}
-          min={20}
-          max={600}
+          min={CAROUSEL_MIN_IMAGE_HEIGHT}
+          max={CAROUSEL_MAX_IMAGE_HEIGHT}
           step={5}
           onChange={onImageHeightChange}
           style={styles.slider}

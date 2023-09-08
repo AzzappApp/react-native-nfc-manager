@@ -65,6 +65,7 @@ const styleSheet = createStyleSheet(appearance => ({
   input: {
     ...textStyles.textField,
     paddingHorizontal: 15,
+    paddingVertical: 3,
     height: 47,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderWidth: 1,

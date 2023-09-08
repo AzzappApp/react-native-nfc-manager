@@ -1,16 +1,18 @@
+extend type Mutation {
+  updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
+}
+
+
+
 input UpdateProfileInput {
   firstName: String
   lastName: String
   profileKind: ProfileKind
   companyName: String
-  companyActivityId: String
-  isReady: Boolean
-  colorPalette: [String!]
-  interests: [String!]
-  clientMutationId: String
+  profileCategoryId: ID
+  companyActivityId: ID
 }
 
 type UpdateProfilePayload {
   profile: Profile
-  clientMutationId: String
 }

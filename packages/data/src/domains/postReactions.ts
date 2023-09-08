@@ -1,42 +1,35 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
   index,
   primaryKey,
   mysqlEnum,
-  datetime,
-  varchar,
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
-import { post } from './posts';
+import db, { cols } from './db';
+import type { DbTransaction } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const PostReactionTable = mysqlTable(
   'PostReaction',
   {
-    profileId: varchar('profileId', {
-      length: DEFAULT_VARCHAR_LENGTH,
-    }).notNull(),
-    postId: varchar('postId', { length: DEFAULT_VARCHAR_LENGTH }).notNull(),
+    profileId: cols.cuid('profileId').notNull(),
+    postId: cols.cuid('postId').notNull(),
     reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
-    createdAt: datetime('createdAt', {
-      mode: 'date',
-      fsp: DEFAULT_DATETIME_PRECISION,
-    })
-      .default(DEFAULT_DATETIME_VALUE)
-      .notNull(),
+    createdAt: cols.dateTime('createdAt', true).notNull(),
   },
   table => {
     return {
+      // TODO : not sure about this one : do we want to support several reactions on the same post (like and dislike) ?
+      // We could imagine to user the last one but do we need to keep an historic of reactions ?
+      postReactionPostIdReactionKindProfileId: primaryKey(
+        table.postId,
+        table.profileId,
+        table.reactionKind,
+      ),
       postIdIdx: index('PostReaction_postId_idx').on(table.postId),
       profileIdIdx: index('PostReaction_profileId_idx').on(table.profileId),
-      postReactionPostIdProfileId: primaryKey(table.postId, table.profileId),
     };
   },
 );
@@ -56,20 +49,12 @@ export const insertPostReaction = async (
   profileId: string,
   postId: string,
   reactionKind: PostReaction['reactionKind'],
+  trx: DbTransaction = db,
 ) =>
-  db.transaction(async trx => {
-    await trx.insert(PostReactionTable).values({
-      profileId,
-      postId,
-      reactionKind,
-    });
-
-    await trx
-      .update(post)
-      .set({
-        counterReactions: sql`${post.counterReactions} + 1`,
-      })
-      .where(eq(post.id, postId));
+  trx.insert(PostReactionTable).values({
+    profileId,
+    postId,
+    reactionKind,
   });
 
 /**
@@ -79,24 +64,19 @@ export const insertPostReaction = async (
  * @param {string} postId
  * @return {*}  {Promise<void>}
  */
-export const deletePostReaction = async (profileId: string, postId: string) =>
-  db.transaction(async trx => {
-    await trx
-      .delete(PostReactionTable)
-      .where(
-        and(
-          eq(PostReactionTable.profileId, profileId),
-          eq(PostReactionTable.postId, postId),
-        ),
-      );
-
-    await trx
-      .update(post)
-      .set({
-        counterReactions: sql`${post.counterReactions} - 1`,
-      })
-      .where(eq(post.id, postId));
-  });
+export const deletePostReaction = async (
+  profileId: string,
+  postId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
+    .delete(PostReactionTable)
+    .where(
+      and(
+        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.postId, postId),
+      ),
+    );
 
 /**
  * get a post reaction

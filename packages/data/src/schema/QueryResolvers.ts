@@ -1,8 +1,4 @@
-import {
-  getInterests,
-  getProfileByUserName,
-  getProfileCategories,
-} from '#domains';
+import { getProfileByUserName, getProfileCategories } from '#domains';
 import { fetchNode } from './NodeResolvers';
 import type { QueryResolvers } from './__generated__/types';
 
@@ -19,5 +15,4 @@ export const Query: QueryResolvers = {
     return getProfileByUserName(userName);
   },
   profileCategories: async () => getProfileCategories(),
-  interests: async () => getInterests(),
 };

@@ -17,6 +17,7 @@ export const BOTTOM_MENU_HEIGHT = 70;
  */
 const BottomMenu = ({
   showLabel = false,
+  showCircle = true,
   style,
   ...props
 }: BottomMenuProps) => {
@@ -29,7 +30,7 @@ const BottomMenu = ({
       decoration={showLabel ? 'label' : 'none'}
       style={[styles.container, style]}
       tabItemStyle={styles.tab}
-      showCircle
+      showCircle={showCircle}
     />
   );
 };
@@ -50,7 +51,7 @@ const styleSheet = createStyleSheet(appearance => ({
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 50,
+    minWidth: 50,
   },
 }));
 

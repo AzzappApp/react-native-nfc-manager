@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import {
   fetchQuery,
   graphql,
   useFragment,
+  useMutation,
   useRelayEnvironment,
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
@@ -23,7 +24,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import { createProfile } from '#helpers/MobileWebAPI';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
@@ -31,26 +32,19 @@ import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ContinueButton from './ContinueButton';
-import NewProfileScreenPageHeader from './NewProfileScreenPageHeader';
 import type {
   ProfileForm_profileCategory$data,
   ProfileForm_profileCategory$key,
 } from '@azzapp/relay/artifacts/ProfileForm_profileCategory.graphql';
+import type { ProfileFormMutation } from '@azzapp/relay/artifacts/ProfileFormMutation.graphql';
 import type { ProfileFormQuery } from '@azzapp/relay/artifacts/ProfileFormQuery.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
 import type { TextInput as RNTextInput } from 'react-native';
 
 type ProfileFormProps = {
   profileKind: string;
   profileCategory: ProfileForm_profileCategory$key;
-  onBack: () => void;
-  onProfileCreated: (tokenResponse: {
-    token: string;
-    refreshToken: string;
-    profileId: string;
-    profileData: Omit<CreateProfileParams, 'authMethod'>;
-  }) => void;
+  onProfileCreated: (profileId: string, userName: string) => void;
 };
 
 const profileFormSchema = z.object({
@@ -69,7 +63,6 @@ const ProfileForm = ({
   profileKind,
   profileCategory,
   onProfileCreated,
-  onBack,
 }: ProfileFormProps) => {
   const { id: profileCategoryId, companyActivities } = useFragment(
     graphql`
@@ -173,40 +166,114 @@ const ProfileForm = ({
     },
   });
 
-  const onSubmit = handleSubmit(async data => {
+  const [commit] = useMutation<ProfileFormMutation>(graphql`
+    mutation ProfileFormMutation($input: CreateProfileInput!) {
+      createProfile(input: $input) {
+        profile {
+          id
+          userName
+          firstName
+          lastName
+          companyName
+          companyActivity {
+            id
+            label
+          }
+          profileCategory {
+            id
+            label
+            profileKind
+          }
+          profileKind
+          #required data on HomeScreen
+          statsSummary {
+            date
+            scans
+            webcardViews
+            totalLikes
+          }
+          ...ContactCard_profile
+          nbPosts
+          nbFollowings
+          nbFollowers
+          nbLikes
+        }
+      }
+    }
+  `);
+
+  const onSubmit = handleSubmit(data => {
     if (!data.userName) {
       return;
     }
 
-    let response: {
-      token: string;
-      refreshToken: string;
-      profileId: string;
-    };
+    return new Promise<void>((resolve, reject) => {
+      commit({
+        variables: {
+          input: {
+            ...data,
+            profileCategoryId,
+          },
+        },
+        updater: store => {
+          const root = store.getRoot();
+          const user = root.getLinkedRecord('currentUser');
+          const profiles = user?.getLinkedRecords('profiles');
+          if (!profiles) {
+            return;
+          }
 
-    const newProfile = {
-      ...data,
-      profileKind,
-      profileCategoryId,
-    };
+          const newProfile = store
+            .getRootField('createProfile')
+            ?.getLinkedRecord('profile');
 
-    try {
-      response = await createProfile(newProfile);
-    } catch (e) {
-      if (e instanceof Error && e.message === ERRORS.USERNAME_ALREADY_EXISTS) {
-        setError('userName', {
-          type: 'validation',
-          message: userNameAlreadyExistsError,
-        });
-      }
+          if (!newProfile) {
+            return;
+          }
 
-      // TODO
-      return;
-    }
+          user?.setLinkedRecords(
+            profiles
+              ?.concat(newProfile)
+              .sort((a, b) =>
+                ((a.getValue('userName') as string) ?? '').localeCompare(
+                  (b.getValue('userName') as string) ?? '',
+                ),
+              ),
+            'profiles',
+          );
+          root.setLinkedRecord(user, 'currentUser');
+        },
+        onCompleted: (data, errors) => {
+          if (errors?.length) {
+            if (errors[0].message === ERRORS.USERNAME_ALREADY_EXISTS) {
+              setError('userName', {
+                type: 'validation',
+                message: userNameAlreadyExistsError,
+              });
+            }
+            // TODO
+            console.log(errors);
+            reject(errors);
+            return;
+          }
 
-    onProfileCreated({
-      ...response,
-      profileData: newProfile,
+          const { id, userName } = data.createProfile.profile;
+          dispatchGlobalEvent({
+            type: 'PROFILE_CHANGE',
+            payload: {
+              profileId: id,
+            },
+          }).finally(() => {
+            onProfileCreated(id, userName);
+            resolve();
+          });
+        },
+        onError: error => {
+          // TODO
+          console.log(error);
+          reject(error);
+        },
+      });
     });
   });
 
@@ -239,26 +306,12 @@ const ProfileForm = ({
   );
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.root}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.root}
+      keyboardVerticalOffset={250}
+    >
       <Form style={styles.form} onSubmit={onSubmit}>
-        <NewProfileScreenPageHeader
-          onBack={onBack}
-          activeIndex={1}
-          title={
-            profileKind === 'personal' ? (
-              <FormattedMessage
-                defaultMessage="What's your name?"
-                description="Personal profile form - Title"
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Provide more details"
-                description="Company profile form - Title"
-              />
-            )
-          }
-          style={styles.header}
-        />
         {profileKind === 'personal' ? (
           <>
             <Label
@@ -426,7 +479,7 @@ const ProfileForm = ({
                   autoCapitalize="none"
                   autoComplete="off"
                   autoCorrect={false}
-                  returnKeyType="send"
+                  returnKeyType="next"
                   onSubmitEditing={onSubmit}
                 />
               </Label>
@@ -475,23 +528,18 @@ type CompanyActivity = ArrayItemType<
 >;
 
 const styles = StyleSheet.create({
-  selectItemContainerStyle: {
-    marginBottom: 18,
-    paddingHorizontal: 30,
-  },
   root: {
     flex: 1,
-    paddingTop: 50,
   },
   form: {
     flex: 1,
-    justifyContent: 'flex-end',
-  },
-  header: {
-    marginBottom: 40,
   },
   formElement: {
     marginHorizontal: 20,
+  },
+  selectItemContainerStyle: {
+    marginBottom: 18,
+    paddingHorizontal: 30,
   },
   urlContainer: {
     alignItems: 'center',

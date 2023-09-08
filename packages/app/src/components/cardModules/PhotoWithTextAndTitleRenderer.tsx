@@ -1,14 +1,19 @@
 import { useState, useCallback } from 'react';
-import { useIntl } from 'react-intl';
-import { Image, Platform, StyleSheet, Text, View } from 'react-native';
-import { SvgUri } from 'react-native-svg';
-import { graphql, useFragment } from 'react-relay';
-import { PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { colors } from '#theme';
+import { Image, Platform, Text, View } from 'react-native';
+import { graphql, readInlineData } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
   PhotoWithTextAndTitleRenderer_module$key,
 } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {
   ViewProps,
   LayoutChangeEvent,
@@ -17,120 +22,124 @@ import type {
   TextStyle,
 } from 'react-native';
 
+const PhotoWithTextAndTitleRendererFragment = graphql`
+  fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
+  @inline
+  @argumentDefinitions(
+    screenWidth: {
+      type: "Float!"
+      provider: "../providers/ScreenWidth.relayprovider"
+    }
+    pixelRatio: {
+      type: "Float!"
+      provider: "../providers/PixelRatio.relayprovider"
+    }
+  ) {
+    image {
+      id
+      uri(width: $screenWidth, pixelRatio: $pixelRatio)
+    }
+    contentFontFamily
+    contentFontColor
+    contentTextAlign
+    contentFontSize
+    contentVerticalSpacing
+    content
+    titleFontFamily
+    titleFontColor
+    titleTextAlign
+    titleFontSize
+    titleVerticalSpacing
+    title
+    aspectRatio
+    imageMargin
+    verticalArrangement
+    horizontalArrangement
+    gap
+    title
+    borderRadius
+    marginHorizontal
+    marginVertical
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
+
+export const readPhotoWithTextAndTitleData = (
+  module: PhotoWithTextAndTitleRenderer_module$key,
+) => readInlineData(PhotoWithTextAndTitleRendererFragment, module);
+
+export type PhotoWithTextAndTitleRendererData = NullableFields<
+  Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
+>;
+
 export type PhotoWithTextAndTitleRendererProps = ViewProps & {
   /**
-   * A relay fragment reference for a PhotoWithTextAndTitle module
+   * The data for the PhotoWithTextAndTitle module
    */
-  module: PhotoWithTextAndTitleRenderer_module$key;
+  data: PhotoWithTextAndTitleRendererData;
+  /**
+   * The view mode for the module
+   */
+  viewMode?: 'desktop' | 'mobile';
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
 };
 
 /**
  * Render a PhotoWithTextAndTitle module
  */
 const PhotoWithTextAndTitleRenderer = ({
-  module,
-  ...props
-}: PhotoWithTextAndTitleRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment PhotoWithTextAndTitleRenderer_module on CardModule
-      @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-      ) {
-        id
-        ... on CardModulePhotoWithTextAndTitle {
-          image {
-            id
-            uri(width: $screenWidth, pixelRatio: $pixelRatio)
-          }
-          aspectRatio
-          fontFamily
-          fontColor
-          textAlign
-          imageMargin
-          verticalArrangement
-          horizontalArrangement
-          gap
-          fontSize
-          textSize
-          text
-          title
-          borderRadius
-          marginHorizontal
-          marginVertical
-          background {
-            id
-            uri
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-      }
-    `,
-    module,
-  );
-  return <PhotoWithTextAndTitleRendererRaw data={data} {...props} />;
-};
-
-export default PhotoWithTextAndTitleRenderer;
-
-export type PhotoWithTextAndTitleRawData = Omit<
-  PhotoWithTextAndTitleRenderer_module$data,
-  ' $fragmentType'
->;
-
-type PhotoWithTextAndTitleRendererRawProps = ViewProps & {
-  /**
-   * The data for the PhotoWithTextAndTitle module
-   */
-  data: PhotoWithTextAndTitleRawData;
-  /**
-   * The view mode for the module
-   */
-  viewMode?: 'desktop' | 'mobile';
-};
-
-/**
- * Raw implementation of the PhotoWithTextAndTitle module
- * This component takes the data directly instead of a relay fragment reference
- * Useful for edition preview
- */
-export const PhotoWithTextAndTitleRendererRaw = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
   viewMode,
   ...props
-}: PhotoWithTextAndTitleRendererRawProps) => {
+}: PhotoWithTextAndTitleRendererProps) => {
   const {
     image,
-    fontFamily,
-    fontColor,
-    textAlign,
-    text,
+    contentFontFamily,
+    contentFontColor,
+    contentTextAlign,
+    contentFontSize,
+    contentVerticalSpacing,
+    content,
+    titleFontFamily,
+    titleFontColor,
+    titleTextAlign,
+    titleFontSize,
+    titleVerticalSpacing,
     title,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
     gap,
-    fontSize,
-    textSize,
     borderRadius,
     marginHorizontal,
     marginVertical,
-    verticalSpacing,
     aspectRatio,
     background,
     backgroundStyle,
-  } = Object.assign({}, PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES, data);
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  });
 
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
   const onLayout = useCallback(
@@ -165,28 +174,19 @@ export const PhotoWithTextAndTitleRendererRaw = ({
       ? 'column'
       : 'column-reverse';
 
-  const intl = useIntl();
-
   return (
-    <View
+    <CardModuleBackground
       {...props}
-      style={[
-        style,
-        { backgroundColor: backgroundStyle?.backgroundColor ?? colors.white },
-      ]}
+      backgroundUri={background?.uri}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
+      style={style}
       onLayout={onLayout}
     >
-      {background && (
-        <View style={styles.background} pointerEvents="none">
-          <SvgUri
-            uri={background.uri}
-            color={backgroundStyle?.patternColor ?? '#000'}
-            width={layout?.width ?? 0}
-            height={layout?.height ?? 0}
-            preserveAspectRatio="xMidYMid slice"
-          />
-        </View>
-      )}
       <View
         style={{
           marginVertical,
@@ -227,55 +227,46 @@ export const PhotoWithTextAndTitleRendererRaw = ({
           style={{
             width: os === 'web' ? widthMargin / 2 - gap : undefined,
             marginHorizontal: os === 'web' ? 0 : marginHorizontal,
+            justifyContent: viewMode === 'desktop' ? 'center' : undefined,
           }}
         >
-          <Text
-            style={{
-              textAlign: textAlign as TextStyle['textAlign'],
-              fontSize,
-              fontFamily,
-              color: fontColor as ColorValue,
-            }}
-          >
-            {title ||
-              intl.formatMessage({
-                defaultMessage: 'Add section Title here',
-                description: 'PhotoWithTextAndTitle default module title',
-              })}
-          </Text>
-          <Text
-            style={{
-              textAlign: textAlign as TextStyle['textAlign'],
-              fontSize: textSize,
-              fontFamily,
-              marginTop: 7,
-              color: fontColor as ColorValue,
-              lineHeight:
-                fontSize && verticalSpacing
-                  ? fontSize * 1.2 + verticalSpacing
-                  : undefined,
-            }}
-          >
-            {text ||
-              intl.formatMessage({
-                defaultMessage:
-                  "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
-                description: 'PhotoWithTextAndTitle default module text',
-              })}
-          </Text>
+          {title && (
+            <Text
+              style={{
+                textAlign: titleTextAlign as TextStyle['textAlign'],
+                fontSize: titleFontSize,
+                fontFamily: titleFontFamily,
+                color: swapColor(titleFontColor, colorPalette) as ColorValue,
+                lineHeight:
+                  titleFontSize && titleVerticalSpacing
+                    ? titleFontSize * 1.2 + titleVerticalSpacing
+                    : undefined,
+              }}
+            >
+              {title}
+            </Text>
+          )}
+          {content && (
+            <Text
+              style={{
+                textAlign: contentTextAlign as TextStyle['textAlign'],
+                fontSize: contentFontSize,
+                fontFamily: contentFontFamily,
+                marginTop: 7,
+                color: swapColor(contentFontColor, colorPalette) as ColorValue,
+                lineHeight:
+                  contentFontSize && contentVerticalSpacing
+                    ? contentFontSize * 1.2 + contentVerticalSpacing
+                    : undefined,
+              }}
+            >
+              {content}
+            </Text>
+          )}
         </View>
       </View>
-    </View>
+    </CardModuleBackground>
   );
 };
 
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});
+export default PhotoWithTextAndTitleRenderer;

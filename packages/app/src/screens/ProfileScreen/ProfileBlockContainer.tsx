@@ -40,15 +40,31 @@ export type ProfileBlockContainerProps = {
    */
   editing: boolean;
   /**
-   * when true, the animation are disabled
-   */
-  disableAnimation?: boolean;
-  /**
    * If false, the edition buttons are not displayed
    *
    * @default true
    */
   displayEditionButtons?: boolean;
+  /**
+   * prevent the user from deleting the module if false
+   * @default true
+   */
+  canDelete?: boolean;
+  /**
+   * prevent the user from moving the module if false
+   * @default true
+   */
+  canMove?: boolean;
+  /**
+   * prevent the user from toggling the visibility of the module if false
+   * @default true
+   */
+  canToggleVisibility?: boolean;
+  /**
+   * prevent the user from duplicating the module if false
+   * @default true
+   */
+  canDuplicate?: boolean;
   /**
    * Whether the block is visible in the webcard
    * @default true
@@ -114,6 +130,10 @@ const ProfileBlockContainer = ({
   editing,
   visible = true,
   displayEditionButtons = true,
+  canDelete = true,
+  canMove = true,
+  canToggleVisibility = true,
+  canDuplicate = true,
   isLast,
   isFirst,
   selectionMode,
@@ -183,6 +203,7 @@ const ProfileBlockContainer = ({
     },
   );
 
+  const panGestureActive = useSharedValue(false);
   const dragXStartValue = useSharedValue(0);
   const panGesture = useMemo(
     () =>
@@ -190,6 +211,7 @@ const ProfileBlockContainer = ({
         .activeOffsetX([-10, 10])
         .onStart(() => {
           dragXStartValue.value = dragX.value;
+          panGestureActive.value = true;
         })
         .enabled(editing && displayEditionButtons && !selectionMode)
         .onChange(e => {
@@ -199,6 +221,7 @@ const ProfileBlockContainer = ({
           );
         })
         .onEnd(() => {
+          panGestureActive.value = false;
           if (dragX.value > dragRightLimit / 2) {
             dragX.value = withTiming(dragRightLimit, {
               duration: 120,
@@ -220,9 +243,16 @@ const ProfileBlockContainer = ({
       dragX,
       dragXStartValue,
       editing,
+      panGestureActive,
       selectionMode,
     ],
   );
+
+  const onModulePressInner = useCallback(() => {
+    if (!panGestureActive.value && activeSection === 'none' && !selectionMode) {
+      onModulePress();
+    }
+  }, [activeSection, onModulePress, panGestureActive, selectionMode]);
 
   // gap doesn't work on reanimated 2
   const blockStyle = useAnimatedStyle(() => ({
@@ -294,7 +324,7 @@ const ProfileBlockContainer = ({
           {/** this View is only here because ios bug with shadow and overlow hidden */}
           <Animated.View style={moduleInnerContainerStyle}>
             <PressableNative
-              onPress={editing ? onModulePress : undefined}
+              onPress={editing ? onModulePressInner : undefined}
               disabledOpacity={1}
               accessible={editing}
               disabled={!editing || activeSection !== 'none'}
@@ -343,7 +373,7 @@ const ProfileBlockContainer = ({
             >
               <IconButton
                 onPress={onMoveDown}
-                disabled={activeSection !== 'none'}
+                disabled={activeSection !== 'none' || !canMove}
                 icon="arrow_down"
                 size={buttonSize}
                 iconSize={iconSize}
@@ -378,7 +408,7 @@ const ProfileBlockContainer = ({
             >
               <IconButton
                 onPress={onMoveUp}
-                disabled={activeSection !== 'none'}
+                disabled={activeSection !== 'none' || !canMove}
                 icon="arrow_up"
                 size={buttonSize}
                 iconSize={iconSize}
@@ -414,7 +444,11 @@ const ProfileBlockContainer = ({
           >
             <IconButton
               onPress={() => onToggleVisibility?.(!visible)}
-              disabled={activeSection !== 'left' || selectionMode}
+              disabled={
+                activeSection !== 'left' ||
+                selectionMode ||
+                !canToggleVisibility
+              }
               icon={visible ? 'hide' : 'preview'}
               size={buttonSize}
               iconSize={iconSize}
@@ -447,7 +481,9 @@ const ProfileBlockContainer = ({
             />
             <IconButton
               onPress={onDuplicate}
-              disabled={activeSection !== 'left' || selectionMode}
+              disabled={
+                activeSection !== 'left' || selectionMode || !canDuplicate
+              }
               icon="background"
               size={buttonSize}
               iconSize={iconSize}
@@ -512,7 +548,7 @@ const ProfileBlockContainer = ({
           >
             <IconButton
               onPress={onRemove}
-              disabled={activeSection !== 'right'}
+              disabled={activeSection !== 'right' || !canDelete}
               icon="delete"
               size={buttonSize}
               iconSize={iconSize}

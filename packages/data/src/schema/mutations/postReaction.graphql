@@ -1,13 +1,18 @@
+extend type Mutation {
+  """
+  Toggle like on a post
+  """
+  togglePostReaction(input: TogglePostReactionInput!): TogglePostReactionPayload!
+}
+
 input TogglePostReactionInput {
   """
   The post id we want toggle like on
   """
   postId: ID!
-  reactionKind: ReactionKind
-  clientMutationId: String
+  reactionKind: ReactionKind!
 }
 
 type TogglePostReactionPayload {
   post: Post!
-  clientMutationId: String
 }

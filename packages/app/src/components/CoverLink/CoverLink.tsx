@@ -1,33 +1,33 @@
-import { memo } from 'react';
-import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import CoverRenderer from '../CoverRenderer';
-import Link from '../Link';
-import type { CoverLinkProps } from './coverLinkTypes';
+import { graphql, useFragment } from 'react-relay';
+import CoverLinkRenderer from './CoverLinkRenderer';
+import type { CoverLinkRendererProps } from './coverLinkTypes';
+import type { CoverLink_profile$key } from '@azzapp/relay/artifacts/CoverLink_profile.graphql';
 
-/**
- * A cover link is a cover renderer wrapped in a link to the profile page
- */
-const CoverLink = ({ style, coverStyle, ...props }: CoverLinkProps) => (
-  <Link
-    route="PROFILE"
-    params={{
-      userName: props.userName,
-    }}
-  >
-    <PressableScaleHighlight
-      style={[
-        style,
-        {
-          overflow: 'hidden',
-          borderRadius: COVER_CARD_RADIUS * (props.width as number),
-        },
-      ]}
-    >
-      <CoverRenderer {...props} style={coverStyle} />
-    </PressableScaleHighlight>
-  </Link>
-);
+export type CoverLinkProps = Omit<
+  CoverLinkRendererProps,
+  'profile' | 'userName'
+> & {
+  profile: CoverLink_profile$key;
+};
 
-// memo is recommanded as coverlink is used in FlatList
-export default memo(CoverLink);
+const CoverLink = ({ profile: profileKey, ...props }: CoverLinkProps) => {
+  const profile = useFragment(
+    graphql`
+      fragment CoverLink_profile on Profile {
+        userName
+        ...CoverRenderer_profile
+      }
+    `,
+    profileKey,
+  );
+
+  return (
+    <CoverLinkRenderer
+      {...props}
+      userName={profile.userName}
+      profile={profile}
+    />
+  );
+};
+
+export default CoverLink;

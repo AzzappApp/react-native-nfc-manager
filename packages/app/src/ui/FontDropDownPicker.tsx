@@ -44,7 +44,9 @@ const FontDropDownPicker = ({
           defaultMessage: 'Tap to select a font',
           description: 'Hint of the font dropdown button',
         })}
-        onPress={() => setFontPickerOpen(true)}
+        onPress={() => {
+          setFontPickerOpen(true);
+        }}
         {...props}
       >
         <Text

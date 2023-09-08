@@ -31,10 +31,6 @@
     "defaultMessage": "Text top/bottom margin : {size}",
     "description": "Text top/bottom margin message in BlockText edition"
   },
-  "/TIhgi": {
-    "defaultMessage": "Create a new account",
-    "description": "Create a new account button label"
-  },
   "/UDdWv": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in carousel edition screen"
@@ -47,6 +43,10 @@
     "defaultMessage": "Please enter a valid phone number",
     "description": "Signup Screen - Error message for invalid phone number"
   },
+  "/fP6qM": {
+    "defaultMessage": "Contact card scans",
+    "description": "Home statistics - Contact card scans label"
+  },
   "/kY/V9": {
     "defaultMessage": "Add {name} to contacts?",
     "description": "Alert title when adding a profile to contacts"
@@ -54,6 +54,10 @@
   "/lVuhj": {
     "defaultMessage": "Font Size : {size}",
     "description": "fontSize message in BlockText edition"
+  },
+  "/qoajU": {
+    "defaultMessage": "Error",
+    "description": "Error toast title"
   },
   "/u5+bX": {
     "defaultMessage": "Press to edit this section of your profile",
@@ -90,6 +94,14 @@
   "0OPgK9": {
     "defaultMessage": "Save",
     "description": "Edit email address modal save button label"
+  },
+  "0alrwe": {
+    "defaultMessage": "Horizontal margin",
+    "description": "Label of the horizontal margin slider in SocialLinks edition"
+  },
+  "0sGGHs": {
+    "defaultMessage": "Enter a social profile",
+    "description": "Placeholder for social profile inside contact card"
   },
   "106q2H": {
     "defaultMessage": "Background",
@@ -131,6 +143,10 @@
     "defaultMessage": "Links",
     "description": "Title of the Links section in SocialLinks edition"
   },
+  "2+ir4Z": {
+    "defaultMessage": "For me",
+    "description": "Media screen tab bar item label for suggestions tab"
+  },
   "26s2Jf": {
     "defaultMessage": "No followers",
     "description": "Message displayed in the followers screen when the user has no followers"
@@ -150,6 +166,14 @@
   "2OFXNQ": {
     "defaultMessage": "Image Carousel",
     "description": "Module selection list modal Image Carousel module label"
+  },
+  "2cJR0f": {
+    "defaultMessage": "Enter a company name",
+    "description": "Placeholder for company name inside contact card"
+  },
+  "2iAMC8": {
+    "defaultMessage": "Add address",
+    "description": "Add address to the contact card"
   },
   "2je5uN": {
     "defaultMessage": "Image & Text",
@@ -182,6 +206,14 @@
   "3VO3Aq": {
     "defaultMessage": "Title",
     "description": "Title placeholder in PhotoWithTextAndTitle module"
+  },
+  "3cosT4": {
+    "defaultMessage": "Cancel",
+    "description": "Webcard ColorPicker component Cancel button label"
+  },
+  "3oA9Rr": {
+    "defaultMessage": "You can type the code below",
+    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
   },
   "3pMfaY": {
     "defaultMessage": "Preview",
@@ -231,13 +263,17 @@
     "defaultMessage": "Profiles",
     "description": "SearchPage - Result - Global search profiles title"
   },
+  "50a48X": {
+    "defaultMessage": "Enter a last name",
+    "description": "Placeholder for last name contact card"
+  },
   "5VwKcb": {
     "defaultMessage": "Log In",
     "description": "SigninScreen - Login Button Placeholder"
   },
-  "5jGwoy": {
-    "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
-    "description": "Accessibility hint of the rotate button in in the cover edition screen"
+  "5ZzlwR": {
+    "defaultMessage": "Light",
+    "description": "FontPicker component Light label"
   },
   "5xUXWH": {
     "defaultMessage": "Aspect ratio: {size}",
@@ -246,10 +282,6 @@
   "6+YHde": {
     "defaultMessage": "Flip camera",
     "description": "camera flip button accessibility label"
-  },
-  "6/FSaO": {
-    "defaultMessage": "What best describe you?",
-    "description": "NewProfileType User Type Screen - Title"
   },
   "6AiFWY": {
     "defaultMessage": "Configuration",
@@ -287,17 +319,9 @@
     "defaultMessage": "Negative",
     "description": "Negative photo filter name"
   },
-  "6k4Jyd": {
-    "defaultMessage": "Password should contain at least 8 characters with at least 1 number, 1 uppercase letter and 1 lowercase letter",
-    "description": "ChangePasswordS Screen - Accessibility error message password rules"
-  },
   "6nn94+": {
     "defaultMessage": "Done",
     "description": "Done button label in profile edition screen"
-  },
-  "6o2WcD": {
-    "defaultMessage": "{title} - background image",
-    "description": "CoverRenderer - Accessibility cover image"
   },
   "6tePdC": {
     "defaultMessage": "Preview",
@@ -307,10 +331,6 @@
     "defaultMessage": "Your Contact Card is a convenient way to share your contact information.",
     "description": "Description of the contact card screen."
   },
-  "6x/B5C": {
-    "defaultMessage": "Title size : {size}",
-    "description": "Title size message in PhotoWithTextAndTitle edition"
-  },
   "74j5Wg": {
     "defaultMessage": "Access to the photos allows you to create publications.",
     "description": "Camera authorization screen content for photos permission"
@@ -319,29 +339,25 @@
     "defaultMessage": "Button color",
     "description": "Button color title in SimpleButton edition"
   },
-  "7D3W/p": {
-    "defaultMessage": "Get started",
-    "description": "Interests pickers - Get started Button"
-  },
   "7HPaV3": {
     "defaultMessage": "Tint",
     "description": "Tint image edition parameters name"
   },
-  "7XIZlu": {
-    "defaultMessage": "Tap me to show the QR Code fullscreen",
-    "description": "CoverRenderer - Accessibility Qr code button"
-  },
-  "7j6ah2": {
-    "defaultMessage": "Select this cover template template for your profile",
-    "description": "TemplateSelectorTemplateItem accessibilityHint template item"
+  "7ejsLd": {
+    "defaultMessage": "This WebCard{azzappAp} needs a cover",
+    "description": "Home Screen - Missing cover title"
   },
   "7kcyZE": {
     "defaultMessage": "Report this post",
     "description": "PostItem Modal - Likes Label"
   },
-  "7rGmW+": {
-    "defaultMessage": "Tell us more about your company",
-    "description": "NewProfileType Interest Picker Screen - Title"
+  "7ksff6": {
+    "defaultMessage": "My WebCard colors",
+    "description": "Name of the color palette section in color choose"
+  },
+  "7qzuti": {
+    "defaultMessage": "Introduce yourself in a new way by creating your own WebCard.",
+    "description": "Subtitle for welcome screen"
   },
   "87390w": {
     "defaultMessage": "Let's get started with Azzapp!",
@@ -371,6 +387,10 @@
     "defaultMessage": "Forgot your password?",
     "description": "ForgotPasswordScreen - Forgot your password title"
   },
+  "91uOUx": {
+    "defaultMessage": "Enter an email",
+    "description": "Placeholder for email inside contact card"
+  },
   "92LIBk": {
     "defaultMessage": "Left/right margin: {size}",
     "description": "Left/right margin message in Horizontal Photo edition"
@@ -387,6 +407,14 @@
     "defaultMessage": "Edit Settings",
     "description": "SimpleButton bottom menu label for Settings tab"
   },
+  "9DP8Oq": {
+    "defaultMessage": "Rotate the image by 90° clockwise. This will change the crop area.",
+    "description": "Accessibility hint of the rotate button in in media edition screen"
+  },
+  "9JP1Px": {
+    "defaultMessage": "Add birthday",
+    "description": "Add birthday to the contact card"
+  },
   "9PmLw5": {
     "defaultMessage": "color",
     "description": " color title in BlockText edition"
@@ -398,10 +426,6 @@
   "9djJN/": {
     "defaultMessage": "Torch",
     "description": "camera torch button accessibility label"
-  },
-  "9gLFh9": {
-    "defaultMessage": "Done",
-    "description": "FontPIcker component Done button label"
   },
   "9uTr6e": {
     "defaultMessage": "Add a comment",
@@ -415,25 +439,25 @@
     "defaultMessage": "Edit Margins",
     "description": "SimpleButton bottom menu label for Margins tab"
   },
-  "A13zLr": {
-    "defaultMessage": "Please select a photo",
-    "description": "CoverEditionScreen Alert message select photo"
-  },
   "ABAFDF": {
     "defaultMessage": "Recent searchs",
     "description": "ResetSearch - title "
+  },
+  "ACC3/w": {
+    "defaultMessage": "Webcards to follow",
+    "description": "List of suggested profiles"
   },
   "AL14KG": {
     "defaultMessage": "Vertical Space : {size}",
     "description": "vertical Spacing message in BlockText edition"
   },
+  "AUcL2V": {
+    "defaultMessage": "birthday",
+    "description": "Section title for birthday"
+  },
   "AV7xEU": {
     "defaultMessage": "Font size",
     "description": "Label of the font size slider in cover edition"
-  },
-  "AY9kr3": {
-    "defaultMessage": "Open user settings",
-    "description": "Open bottom menu to change user settings, like logout, change password, etc."
   },
   "AsCp0n": {
     "defaultMessage": "Validate",
@@ -467,6 +491,10 @@
     "defaultMessage": "Process",
     "description": "Process photo filter name"
   },
+  "BH/9Bd": {
+    "defaultMessage": "Contact Card",
+    "description": "Contact Card screen header title"
+  },
   "BRodym": {
     "defaultMessage": "Terms of Service",
     "description": "Signup Screen - Terms of Service label for hyperlink"
@@ -479,6 +507,10 @@
     "defaultMessage": "Button Options",
     "description": "Label of the action type selector in SimpleButton Settings edition"
   },
+  "Bmp99x": {
+    "defaultMessage": "Following",
+    "description": "Media screen tab bar item label for followings tab"
+  },
   "BouRHB": {
     "defaultMessage": "Width : {size}",
     "description": "width message in SimpleButton edition"
@@ -490,10 +522,6 @@
   "BsB7cx": {
     "defaultMessage": "Tap to change the Vertical alignment of the text",
     "description": "Hint of the Vertical alignment button"
-  },
-  "Bswpqg": {
-    "defaultMessage": "Posts",
-    "description": "Number of posts"
   },
   "BuqklW": {
     "defaultMessage": "FontSize",
@@ -511,14 +539,6 @@
     "defaultMessage": "Enter your last name",
     "description": "ProfileForm last name textinput placeholder"
   },
-  "CCNK+L": {
-    "defaultMessage": "Confirm password",
-    "description": "ChangePassword Screen - Confirm password"
-  },
-  "CCbp9S": {
-    "defaultMessage": "Trending profiles",
-    "description": "SearchPage - Trending profile title"
-  },
   "CFE9+a": {
     "defaultMessage": "Button",
     "description": "Module selection list modal simple button module label"
@@ -535,6 +555,14 @@
     "defaultMessage": "Border color",
     "description": "Bordercolor color title in SimpleButton edition"
   },
+  "CfMaC7": {
+    "defaultMessage": "Create a new Webcard{azzappAp}",
+    "description": "Home Screen - Create a new WebCard"
+  },
+  "CgyU99": {
+    "defaultMessage": "Hide my content for the moment",
+    "description": "Publish modal publish later button label"
+  },
   "CmkC/M": {
     "defaultMessage": "Slide to change the border size",
     "description": "Hint of the border size slider in carousel edition"
@@ -543,9 +571,17 @@
     "defaultMessage": "Public contact card",
     "description": "When true the contact card is public"
   },
+  "D/FBJk": {
+    "defaultMessage": "Passwords do not match",
+    "description": "Reset password Screen - error message when password and confirm password do not match"
+  },
   "D1GdDl": {
     "defaultMessage": "Cancel",
     "description": "Cancel button label in Simple Button module screen"
+  },
+  "D27QTT": {
+    "defaultMessage": "Something went wrong",
+    "description": "Top level error message for uncaught exceptions"
   },
   "D44+KI": {
     "defaultMessage": "Edit Links",
@@ -558,6 +594,10 @@
   "DLIvhH": {
     "defaultMessage": "Font Size : {size}",
     "description": "Font size message in cover edition"
+  },
+  "DW0mJO": {
+    "defaultMessage": "What WebCard™ would you like to create?",
+    "description": "WebCard kind selection screen title"
   },
   "DWnvYf": {
     "defaultMessage": "Reset password",
@@ -623,13 +663,17 @@
     "defaultMessage": "Slide to change the border Width",
     "description": "Hint of the border Width slider in SimpleButton edition"
   },
+  "EgBk9b": {
+    "defaultMessage": "Ok, publish my WebCard!",
+    "description": "Publish modal publish button label"
+  },
+  "EkLdGU": {
+    "defaultMessage": "Webcards",
+    "description": "SearchPage - Result - Global search profiles title"
+  },
   "EkMdxM": {
     "defaultMessage": "Contact by phone number",
     "description": "Signup Form Connect with phone number section title in country selection list SimpleButton Settings edition"
-  },
-  "ElE0Uo": {
-    "defaultMessage": "Retry",
-    "description": "CoverEditionScreen alert message loading error retry button"
   },
   "Eoy6Sp": {
     "defaultMessage": "Slide to change the vertical spacing",
@@ -650,10 +694,6 @@
   "F1nOOr": {
     "defaultMessage": "Color",
     "description": "Label of the color button in cover edition"
-  },
-  "F2YTe8": {
-    "defaultMessage": "Text size : {size}",
-    "description": "textSize message in PhotoWithTextAndTitle edition"
   },
   "F4CT77": {
     "defaultMessage": "Cancel",
@@ -679,29 +719,45 @@
     "defaultMessage": "Other",
     "description": "\"Other\" value as type for a phone number in Contact Card edition"
   },
+  "FOi3hU": {
+    "defaultMessage": "Webcards",
+    "description": "List of followed profiles"
+  },
   "FPsHDW": {
     "defaultMessage": "Sign Up",
     "description": "Signup Screen - Sign Up button"
+  },
+  "FUhOSf": {
+    "defaultMessage": "Follow",
+    "description": "Follow button label"
   },
   "FbPo0C": {
     "defaultMessage": "Slide to change the Text top/bottom margin",
     "description": "Hint of the Text top/bottom margin slider in BlockText edition"
   },
+  "Fblxe/": {
+    "defaultMessage": "Create new password",
+    "description": "Create new password screen title"
+  },
   "Fd2baV": {
     "defaultMessage": "Log in",
     "description": "Signin Screen - Log in title"
+  },
+  "FgSO8x": {
+    "defaultMessage": "Semi Bold",
+    "description": "FontPicker component SemiBold label"
   },
   "FiW5y4": {
     "defaultMessage": "Button Label",
     "description": "Placeholder for button that has no label yet"
   },
-  "FnmYrQ": {
-    "defaultMessage": "Merge",
-    "description": "Label of the merge switch in cover edition"
-  },
   "FoeiuO": {
     "defaultMessage": "Top/Bottom Margin",
     "description": "Label of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition"
+  },
+  "Fv/Rp9": {
+    "defaultMessage": "Bold",
+    "description": "FontPicker component Bold label"
   },
   "G/hvQI": {
     "defaultMessage": "Posts",
@@ -727,6 +783,10 @@
     "defaultMessage": "I agree to the",
     "description": "Signup Screen - 'I agree to the' Terms of service "
   },
+  "Gjb3m+": {
+    "defaultMessage": "Rotate",
+    "description": "Accessibility label of the rotate button in media edition screen"
+  },
   "Gl+Mcq": {
     "defaultMessage": "Center",
     "description": "Label of the center alignment button"
@@ -734,6 +794,10 @@
   "GpcxYL": {
     "defaultMessage": "Company name",
     "description": "Company name field registered for the contact card"
+  },
+  "GqDXgw": {
+    "defaultMessage": "address",
+    "description": "Section title for address"
   },
   "GsE7SA": {
     "defaultMessage": "Welcome!",
@@ -751,10 +815,6 @@
     "defaultMessage": "Social platforms",
     "description": "SocialLinks text screen title"
   },
-  "HLKVM1": {
-    "defaultMessage": "New password",
-    "description": "ChangePassword Screen - New password"
-  },
   "HMByMw": {
     "defaultMessage": "Mobile",
     "description": "\"Mobile\" value as type for a phone number in Contact Card edition"
@@ -762,6 +822,14 @@
   "HQ/owO": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the font size slider in cover edition"
+  },
+  "HTkAAL": {
+    "defaultMessage": "Slide to change the horizontal margin",
+    "description": "Hint of the horizontal margin slider in SocialLinks edition"
+  },
+  "HWMzhb": {
+    "defaultMessage": "Done",
+    "description": "Webcard ColorPicker component Done button label"
   },
   "HXeYa9": {
     "defaultMessage": "Edit TextBackground",
@@ -779,6 +847,14 @@
     "defaultMessage": "Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case",
     "description": "Signup Screen - Accessibility Label TextInput Password"
   },
+  "IO6nSl": {
+    "defaultMessage": "Ultra Light",
+    "description": "FontPicker component Ultra Light label"
+  },
+  "IeO6K5": {
+    "defaultMessage": "Video",
+    "description": "Cover editor video tab bar item label"
+  },
   "IhMo2f": {
     "defaultMessage": "Edit password",
     "description": "Edit password modal title"
@@ -791,9 +867,9 @@
     "defaultMessage": "Save",
     "description": "Edit password modal save button label"
   },
-  "JGmlYS": {
-    "defaultMessage": "Skip",
-    "description": "NewProfile About Screen - Skip process"
+  "JGlype": {
+    "defaultMessage": "Confirm password",
+    "description": "Confirm password input placeholder"
   },
   "JGsXLB": {
     "defaultMessage": "Border color",
@@ -811,6 +887,10 @@
     "defaultMessage": "Height: {size}",
     "description": "Height message in HorizontalPhoto edition"
   },
+  "JWq52S": {
+    "defaultMessage": "Total Likes",
+    "description": "Home statistics - Total Likes"
+  },
   "JZnfAI": {
     "defaultMessage": "Slide to change the width",
     "description": "Hint of the width slider in SimpleButton edition"
@@ -818,6 +898,10 @@
   "JcQ1BH": {
     "defaultMessage": "Photo",
     "description": "Title of the photo view in image picker wizzard"
+  },
+  "JqNpSD": {
+    "defaultMessage": "Latest Posts",
+    "description": "List of latest posts of followed profiles"
   },
   "K4Uiwb": {
     "defaultMessage": "Preview",
@@ -855,6 +939,10 @@
     "defaultMessage": "Search for profiles, posts...",
     "description": "SearchScreen - search bar placeholder"
   },
+  "KR7gh7": {
+    "defaultMessage": "Loading a new template will remove current contents of your WebCarda and replace them with the new template. Are you ready to start from the scratch?",
+    "description": "Confirmation description for load card template modal"
+  },
   "KVGArG": {
     "defaultMessage": "Margin top/bottom : {size}",
     "description": "Font size message in cover edition"
@@ -867,9 +955,9 @@
     "defaultMessage": "Border size : {size}",
     "description": "Border size message in carousel edition"
   },
-  "KimbRe": {
-    "defaultMessage": "Provide more details",
-    "description": "Company profile form - Title"
+  "KhsZNM": {
+    "defaultMessage": "Password changed successfully",
+    "description": "Toast success message when resetting password"
   },
   "KmFeNl": {
     "defaultMessage": "Invite Friends",
@@ -899,9 +987,9 @@
     "defaultMessage": "Free",
     "description": "Module Selection List - Free label for module"
   },
-  "LGAptw": {
-    "defaultMessage": "Phone number or email address",
-    "description": "ForgotpasswordScreen - Phone number or email address placeholder"
+  "LEEjCY": {
+    "defaultMessage": "Light",
+    "description": "ColorTriptych choose - Light color"
   },
   "LLt2DI": {
     "defaultMessage": "Email address",
@@ -915,9 +1003,17 @@
     "defaultMessage": "Crop",
     "description": "Crop image edition parameters name"
   },
+  "LQZFWU": {
+    "defaultMessage": "Could not add pass to Apple Wallet",
+    "description": "Error toast message"
+  },
   "LV5peF": {
     "defaultMessage": "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
     "description": "PhotoWithTextAndTitle default module text"
+  },
+  "LYB8Js": {
+    "defaultMessage": "Save",
+    "description": "Save header button label"
   },
   "LYTS8u": {
     "defaultMessage": "Save",
@@ -927,21 +1023,29 @@
     "defaultMessage": "Slide to change the Text size",
     "description": "Hint of the textSize slider in PhotoWithTextAndTitle edition"
   },
+  "LccwjY": {
+    "defaultMessage": "Create your WebCard cover",
+    "description": "Home Screen - Missing cover button"
+  },
   "Lls+Xd": {
     "defaultMessage": "Border color",
     "description": "Title of the border color section in carousel edition"
-  },
-  "LnYT8w": {
-    "defaultMessage": "Models",
-    "description": "CoverEditionScreen bottom menu label for models tab"
   },
   "Lp4WhG": {
     "defaultMessage": "Top margin",
     "description": "Label of the marginTop slider in SimpleButton edition"
   },
+  "M/5pen": {
+    "defaultMessage": "Error while changing your password.",
+    "description": "Toast Error message when resetting password fails"
+  },
   "M/YmS/": {
     "defaultMessage": "Border shape",
     "description": "Border shape tab label in HorizontalPhoto edition"
+  },
+  "M1inoY": {
+    "defaultMessage": "Enter a title",
+    "description": "Placeholder for title inside contact card"
   },
   "M32J+R": {
     "defaultMessage": "Next",
@@ -963,9 +1067,17 @@
     "defaultMessage": "Border radius : {size}",
     "description": "borderRadius message in PhotoWithTextAndTitle edition"
   },
+  "MW6m0v": {
+    "defaultMessage": "Preview",
+    "description": "ProfileScreen bottom menu accessibility label for Preview tab"
+  },
   "MYq2d8": {
     "defaultMessage": "Select an activity",
     "description": "ProfileForm - Activity BottomSheet - Title"
+  },
+  "Md9UnQ": {
+    "defaultMessage": "Introduce yourself in a new way by creating your own WebCard{azzappAp}.",
+    "description": "Home Screen - Create a new webcard description"
   },
   "MilZHQ": {
     "defaultMessage": "Edit the background",
@@ -978,10 +1090,6 @@
   "MnNB3+": {
     "defaultMessage": "I'm using Azzapp",
     "description": "Invite subject to share with friends"
-  },
-  "MuonO2": {
-    "defaultMessage": "Loading error",
-    "description": "CoverEditionScreen alert message loading error title"
   },
   "N+GfRg": {
     "defaultMessage": "Work",
@@ -1007,6 +1115,10 @@
     "defaultMessage": "Text",
     "description": "CoverEditionScreen bottom menu label for Text tab"
   },
+  "NJtjrA": {
+    "defaultMessage": "Tap on a section of your WebCard to modify it",
+    "description": "Toast info message that appears when the user is in webcard edit mode for the first time"
+  },
   "NTkvNY": {
     "defaultMessage": "First name",
     "description": "ProfileForm first name textinput label"
@@ -1023,10 +1135,6 @@
     "defaultMessage": "Show password",
     "description": "Password text input - show password button accessibility label"
   },
-  "OHFGCg": {
-    "defaultMessage": "Unknown error while uploading the cover. Please retry",
-    "description": "CoverEditionScreen Alert message unknown error"
-  },
   "OPcjcW": {
     "defaultMessage": "Tap to change the text alignment of the text",
     "description": "Hint of the text alignment button"
@@ -1035,9 +1143,17 @@
     "defaultMessage": "Top/bottom margin size",
     "description": "Label of the Top/bottom margin size slider in HorizontalPhoto edition"
   },
+  "OavmSI": {
+    "defaultMessage": "Delete your current WebCard contents?",
+    "description": "Confirmation title for load card template modal"
+  },
   "Oe7IDs": {
     "defaultMessage": "Border radius",
     "description": "Label of the border radius in carousel edition"
+  },
+  "OeCfbH": {
+    "defaultMessage": "See all",
+    "description": "See all found profiles"
   },
   "OjytWi": {
     "defaultMessage": "Margin left/right : {size}",
@@ -1051,9 +1167,21 @@
     "defaultMessage": "Select",
     "description": "Accessibility label for the select button in the profile edition screen"
   },
+  "P/AAlN": {
+    "defaultMessage": "Provide more details",
+    "description": "Profile creation form title for business profile"
+  },
   "P2PER8": {
     "defaultMessage": "Sepia",
     "description": "Sepia photo filter name"
+  },
+  "P7WCv3": {
+    "defaultMessage": "Add social profile",
+    "description": "Add social profile to the contact card"
+  },
+  "POvY5S": {
+    "defaultMessage": "Remove current contents",
+    "description": "Confirmation button for load card template modal"
   },
   "PTMgPC": {
     "defaultMessage": "Edit email address",
@@ -1099,10 +1227,6 @@
     "defaultMessage": "Account details",
     "description": "Link to open account details form to change email, phone number, etc."
   },
-  "RDYvOJ": {
-    "defaultMessage": "Desktop",
-    "description": "ProfileScreen bottom menu accessibility label for Desktop tab"
-  },
   "REyvTQ": {
     "defaultMessage": "Slide to change the Border size",
     "description": "Hint of the Border size slider in SocialLinks edition"
@@ -1114,6 +1238,10 @@
   "RTqCXo": {
     "defaultMessage": "Tap to accept the terms of service",
     "description": "Signup Screen - Accessibility checkbox terms of service"
+  },
+  "Rh7sMq": {
+    "defaultMessage": "Edit linked coor",
+    "description": "Webcard ColorPicker component header Edit"
   },
   "RiA6pa": {
     "defaultMessage": "Font family",
@@ -1127,17 +1255,21 @@
     "defaultMessage": "Moves the module up",
     "description": "Accessibility hint for the move up button in the profile edition screen"
   },
+  "RzQXIU": {
+    "defaultMessage": "Welcome to Azzap",
+    "description": "Title for welcome screen"
+  },
   "SD0DRz": {
     "defaultMessage": "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
     "description": "Default text for the BlockText module"
   },
+  "SHW2TM": {
+    "defaultMessage": "Edit your cover",
+    "description": "CoverEditionScreen header title"
+  },
   "SKonZe": {
     "defaultMessage": "Social",
     "description": "Module selection list modal Social Links module label"
-  },
-  "SUCRjC": {
-    "defaultMessage": "My Webcards",
-    "description": "Account screen header title where current profile can be changed"
   },
   "SjPeXD": {
     "defaultMessage": "Hex",
@@ -1150,10 +1282,6 @@
   "Slf0gz": {
     "defaultMessage": "Create a new profile",
     "description": "Start new profile creation from account screen"
-  },
-  "SmWLhs": {
-    "defaultMessage": "Trending posts",
-    "description": "SearchPage - Trending posts title"
   },
   "SucweD": {
     "defaultMessage": "Slide to change the Icon Size",
@@ -1195,13 +1323,17 @@
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
     "description": "Account details - error message when password is not compliant with our rules"
   },
-  "TOykA8": {
-    "defaultMessage": "Configuration",
-    "description": "Title of the settings section in Line Divider edition"
+  "TWOsUN": {
+    "defaultMessage": "Webcard colors",
+    "description": "Webcard ColorPicker component hearder title"
   },
   "ThdVEq": {
     "defaultMessage": "Error while creating post",
     "description": "Toast Error message while creating post"
+  },
+  "ThwDNw": {
+    "defaultMessage": "Horizontal margin : {size}",
+    "description": "Horizontal margin message in SocialLinks edition"
   },
   "TiTw6m": {
     "defaultMessage": "Border shape",
@@ -1214,6 +1346,10 @@
   "Ttom1V": {
     "defaultMessage": "Phone number",
     "description": "Signup Screen - phone number input placeholder"
+  },
+  "TvsTSU": {
+    "defaultMessage": "Preview",
+    "description": "label of the button allowing to preview template"
   },
   "Tw2G6K": {
     "defaultMessage": "Shows the module in your webcard",
@@ -1243,10 +1379,6 @@
     "defaultMessage": "Image/Text Gap",
     "description": "Label of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
   },
-  "UPw9Sj": {
-    "defaultMessage": "Create new password",
-    "description": "ChangePasswordScreen - Create new password"
-  },
   "UQaIdM": {
     "defaultMessage": "See {counterComments} comments",
     "description": "PostRendererBottomPanel - Comment Counter"
@@ -1270,6 +1402,10 @@
   "Ul8FtB": {
     "defaultMessage": "Phone number",
     "description": "Section title for phone numbers"
+  },
+  "UnFj39": {
+    "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
+    "description": "Reset password Screen - error message when password is not compliant with our rules"
   },
   "Usqg+8": {
     "defaultMessage": "Slide to change the top margin size",
@@ -1303,6 +1439,10 @@
     "defaultMessage": "Font size : {size}",
     "description": "fontSize message in SimpleButton edition"
   },
+  "VM3X2q": {
+    "defaultMessage": "Please, use one of your own photo to create your cover",
+    "description": "Cover editor save photo required modal text"
+  },
   "VQFKgi": {
     "defaultMessage": "Hides the module in your webcard",
     "description": "Accessibility hint for the hide button in the profile edition screen"
@@ -1311,9 +1451,9 @@
     "defaultMessage": "This username is already used by someone else",
     "description": "NewProfileScreen - Username already taken error"
   },
-  "VaUk5U": {
-    "defaultMessage": "Pick some topics you like.",
-    "description": "NewProfile About User Screen - SubTitle Pick some topics you like."
+  "VWZaKZ": {
+    "defaultMessage": "Add section Title here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
+    "description": "Default text for the simple title module"
   },
   "Vh3DQb": {
     "defaultMessage": "Saturation",
@@ -1330,6 +1470,10 @@
   "VoVt5c": {
     "defaultMessage": "Select a calling code or email",
     "description": "Signup - The accessibility label for the country selector"
+  },
+  "VuGd3D": {
+    "defaultMessage": "Create my first webcard",
+    "description": "Button label for welcome screen"
   },
   "Vw6ZqZ": {
     "defaultMessage": "Unselect",
@@ -1411,6 +1555,10 @@
     "defaultMessage": "Slide to change the textBackground opacity",
     "description": "Hint of the Photo Opacityslider in BlockText edition"
   },
+  "Y4pUO0": {
+    "defaultMessage": "Please retry the whole process.",
+    "description": "Toast Error message when resetting password fails"
+  },
   "Y7007n": {
     "defaultMessage": "Your webcard, your style. Don't forget to explore all the customization options available.",
     "description": "Progress loading modal message 4"
@@ -1419,13 +1567,25 @@
     "defaultMessage": "Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}",
     "description": "Invite message to share with friends"
   },
+  "YBEX2x": {
+    "defaultMessage": "Save my cover",
+    "description": "Cover editor save button label"
+  },
   "YJRxy5": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle input in cover edition"
   },
+  "YK3L08": {
+    "defaultMessage": "This WebCard{azzappAp} has not been published, nobody can see it for the moment.",
+    "description": "Home Screen - webcard not published text"
+  },
   "YM0Ycc": {
     "defaultMessage": "Close",
     "description": "Bottom sheet close button"
+  },
+  "YR8HkH": {
+    "defaultMessage": "Crop your image",
+    "description": "Cover editor crop image modal title"
   },
   "YToMoq": {
     "defaultMessage": "Border radius : {radius}",
@@ -1435,17 +1595,13 @@
     "defaultMessage": "Top Margin size",
     "description": "Label of the top margin size slider in Line Divider edition"
   },
-  "YgcSzd": {
-    "defaultMessage": "Create a new password",
-    "description": "ChangePasswordScreen - create a new password  title"
-  },
   "YkLUxp": {
     "defaultMessage": "Images",
     "description": "Title of the images section in carousel edition"
   },
-  "YrwqNo": {
-    "defaultMessage": "Contact Card",
-    "description": "Title of the contact card screen, displayed in the header."
+  "Ym+NG2": {
+    "defaultMessage": "Main color",
+    "description": "ColorTriptych choose - Main color"
   },
   "YyZiop": {
     "defaultMessage": "Cut Video",
@@ -1463,10 +1619,6 @@
     "defaultMessage": "Please enter your current password",
     "description": "Error message when no current password is provided"
   },
-  "ZNPb7F": {
-    "defaultMessage": "Change account",
-    "description": "Change account modal title"
-  },
   "ZQq/vT": {
     "defaultMessage": "Invite your friends to join Azzapp !",
     "description": "Invite friends to join the app subtitle"
@@ -1483,6 +1635,10 @@
     "defaultMessage": "Done",
     "description": "ColorPicker component Done button label"
   },
+  "ZaH/eB": {
+    "defaultMessage": "What’s your name?",
+    "description": "Profile creation form title for personal profile"
+  },
   "Zf2i/A": {
     "defaultMessage": "Height : {size}",
     "description": "height message in SimpleButton edition"
@@ -1491,6 +1647,14 @@
     "defaultMessage": "Cancel",
     "description": "Screen alert message loading error cancel button"
   },
+  "Zh6v3S": {
+    "defaultMessage": "Other colors",
+    "description": "Name of the color palette section in color choose"
+  },
+  "ZifgFJ": {
+    "defaultMessage": "Stats",
+    "description": "Home Screen menu - Stats"
+  },
   "ZnPyUn": {
     "defaultMessage": "Enter your phone number or email address",
     "description": "SignIn Screen - Accessibility TextInput phone number or email address"
@@ -1498,10 +1662,6 @@
   "Zq9BX5": {
     "defaultMessage": "Margins",
     "description": "Title of the margins section in HorizontalPhoto edition"
-  },
-  "ZswZeP": {
-    "defaultMessage": "Add section Title here",
-    "description": "Default text for the simple title module"
   },
   "ZvFZeW": {
     "defaultMessage": "Schedule",
@@ -1519,6 +1679,10 @@
     "defaultMessage": "Webcard builder",
     "description": "Webcard builder header title"
   },
+  "a4p3hZ": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel button for load card template modal"
+  },
   "a5bH/t": {
     "defaultMessage": "Slide to change the Top/bottom marginsize",
     "description": "Hint of the Top/bottom margin slider in HorizontalPhoto edition"
@@ -1526,10 +1690,6 @@
   "a6YBsH": {
     "defaultMessage": "Left margin : {size}",
     "description": "Margin horizontal label in carousel edition"
-  },
-  "aGgFjV": {
-    "defaultMessage": "Tap to reset your passward",
-    "description": "ChangePassword Screen - AccessibilityLabel Reset password button"
   },
   "aOpC4m": {
     "defaultMessage": "I agree to the",
@@ -1551,10 +1711,6 @@
     "defaultMessage": "Justify",
     "description": "Label of the justify alignment button"
   },
-  "aWyLFo": {
-    "defaultMessage": "Web card color",
-    "description": "Profile screen color picker title"
-  },
   "abCe+w": {
     "defaultMessage": "Edit Style",
     "description": "Simple text bottom menu label for style tab"
@@ -1571,9 +1727,13 @@
     "defaultMessage": "Bottom margin : {size}",
     "description": "Bottom margin message in SocialLinks edition"
   },
-  "b/ugZW": {
-    "defaultMessage": "Followings",
-    "description": "Number of followed profiles"
+  "awZsgE": {
+    "defaultMessage": "We just send you a link to create a new password or you can type the code below",
+    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
+  },
+  "b/w4Dx": {
+    "defaultMessage": "Apply a style",
+    "description": "Card style modal title"
   },
   "b4fFwm": {
     "defaultMessage": "Brightness",
@@ -1591,9 +1751,17 @@
     "defaultMessage": "Privacy Policy",
     "description": "Signup Screen - Privacy Policy Hyperlink Clickable label"
   },
+  "bTWnoL": {
+    "defaultMessage": "Pre-defined colors",
+    "description": "ColorTriptychChoose - predefined colors section title"
+  },
   "be8Hdp": {
     "defaultMessage": "Border size : {size}",
     "description": "borderWidth message in SimpleButton edition"
+  },
+  "bfGNde": {
+    "defaultMessage": "Preview",
+    "description": "Preview modal title"
   },
   "bv6Xu2": {
     "defaultMessage": "Invite with Whatsapp",
@@ -1627,9 +1795,29 @@
     "defaultMessage": "Slide to change the Image/Text Gap",
     "description": "Hint of the Image/Text Gap slider in PhotoWithTextAndTitle edition"
   },
+  "c8LxOJ": {
+    "defaultMessage": "Your WebCard{azzappA} url is:",
+    "description": "Publish modal url label"
+  },
+  "cDfk8A": {
+    "defaultMessage": "Tap to reset your password",
+    "description": "ForgotPassword Screen - AccessibilityLabel Reset password button"
+  },
+  "cI0ZYe": {
+    "defaultMessage": "Posts",
+    "description": "List of suggested posts"
+  },
+  "cMFP35": {
+    "defaultMessage": "Information",
+    "description": "Home Screen menu - Information"
+  },
   "cSQSLt": {
     "defaultMessage": "Text left/right margin : {size}",
     "description": "textMarginHorizontal message in BlockText edition"
+  },
+  "cUfMc8": {
+    "defaultMessage": "Style",
+    "description": "ProfileScreen bottom menu accessibility label for webcard style button"
   },
   "calqIB": {
     "defaultMessage": "Connect with phone number",
@@ -1638,10 +1826,6 @@
   "cp6916": {
     "defaultMessage": "Select a calling code",
     "description": "Account details - The accessibility label for the country selector"
-  },
-  "cvIa5m": {
-    "defaultMessage": "Cancel",
-    "description": "CoverEditionScreen alert message loading error cancel button"
   },
   "d3LNTq": {
     "defaultMessage": "Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter",
@@ -1663,9 +1847,21 @@
     "defaultMessage": "Top/Bottom margin : {size}",
     "description": "Margin vertical label in carousel edition"
   },
+  "dM3HA8": {
+    "defaultMessage": "Save",
+    "description": "Webcard olorPicker component Save Color button label"
+  },
   "dNmlSS": {
     "defaultMessage": "Tap to select a color",
     "description": "Hint of the color button in cover edition"
+  },
+  "dOTFi5": {
+    "defaultMessage": "Posts",
+    "description": "HomeScreen - information panel - Post label"
+  },
+  "dZ8sPj": {
+    "defaultMessage": "Retry",
+    "description": "Retry button for uncaught exceptions"
   },
   "dab/aC": {
     "defaultMessage": "Divider #1",
@@ -1674,6 +1870,14 @@
   "dgu7kP": {
     "defaultMessage": "Vertical Spacing: {size}",
     "description": "Vertical Spacing message in PhotoWithTextAndTitle edition"
+  },
+  "dhu+P+": {
+    "defaultMessage": "Cancel",
+    "description": "Cancel header button label"
+  },
+  "dj9UjK": {
+    "defaultMessage": "Webcard Views",
+    "description": "Home statistics - webcardView label"
   },
   "djBfrw": {
     "defaultMessage": "Simple button",
@@ -1699,17 +1903,21 @@
     "defaultMessage": "Cancel",
     "description": "Edit contact card modal cancel button title"
   },
+  "dxORjc": {
+    "defaultMessage": "Check your messages!",
+    "description": "ForgotPasswordScreen - Check your messages!"
+  },
   "dzmRcf": {
     "defaultMessage": "Transfer",
     "description": "Transfer photo filter name"
   },
+  "e4PqPI": {
+    "defaultMessage": "Current style",
+    "description": "Card style modal current style label"
+  },
   "e5zpd5": {
     "defaultMessage": "Tap to stop recording",
     "description": "Accessibility label for the camera shutter button"
-  },
-  "e9NfAF": {
-    "defaultMessage": "Check your emails or messages!",
-    "description": "ForgotPasswordScreen - Check your emails or messages!"
   },
   "eLqeU7": {
     "defaultMessage": "Moves the module down",
@@ -1719,6 +1927,10 @@
     "defaultMessage": "Move up",
     "description": "Accessibility label for the move up button in the profile edition screen"
   },
+  "eVIPhA": {
+    "defaultMessage": "Text",
+    "description": "Photo with Text and Title - TabBar Text"
+  },
   "eXD2ND": {
     "defaultMessage": "Border radius : {size}",
     "description": "border radius message in SimpleButton edition"
@@ -1727,17 +1939,29 @@
     "defaultMessage": "Display on my webcard",
     "description": "When true the contact card is displayed on the webcard"
   },
+  "ebysAs": {
+    "defaultMessage": "Enter a first name",
+    "description": "Placeholder for first name inside contact card"
+  },
+  "eco+tq": {
+    "defaultMessage": "Apply",
+    "description": "Apply button label in card template preview"
+  },
+  "eiD1yA": {
+    "defaultMessage": "Followers",
+    "description": "HomeScreen - information panel - Followers label"
+  },
   "epg2X1": {
     "defaultMessage": "Slide to change the Font Size",
     "description": "Hint of the fontSize slider in SimpleButton edition"
   },
+  "etUZGe": {
+    "defaultMessage": "Load this template",
+    "description": "label of the button allowing to retry loading card template"
+  },
   "f2KYUh": {
     "defaultMessage": "Subtitle",
     "description": "Label of the subtitle tab in cover edition"
-  },
-  "fCYBEv": {
-    "defaultMessage": "We just send you a link to create a new password",
-    "description": "ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
   },
   "fF/vRd": {
     "defaultMessage": "Press this button to adjust the boundary of the selected image",
@@ -1747,6 +1971,10 @@
     "defaultMessage": "Tap to select a background color",
     "description": "Hint of the color picker button"
   },
+  "fIvDAJ": {
+    "defaultMessage": "Thin",
+    "description": "FontPicker component Thin label"
+  },
   "fKlLCN": {
     "defaultMessage": "{text}...less",
     "description": "ExpendableText  with less keyword to collapse the text"
@@ -1754,6 +1982,10 @@
   "fWSCbG": {
     "defaultMessage": "Tap to sign in",
     "description": "SignIn Screen - AccessibilityLabel Sign In button"
+  },
+  "faLJMw": {
+    "defaultMessage": "Enter a birthday",
+    "description": "Placeholder for birthday inside contact card"
   },
   "fbl908": {
     "defaultMessage": "{nbSelectedModules} selected",
@@ -1774,6 +2006,10 @@
   "fotQfe": {
     "defaultMessage": "Vertical Spacing",
     "description": "Label of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
+  },
+  "fpMEhQ": {
+    "defaultMessage": "Others",
+    "description": "Cover editor others tab bar item label"
   },
   "g67Jzi": {
     "defaultMessage": "Vibrance",
@@ -1822,6 +2058,10 @@
   "gpeHlZ": {
     "defaultMessage": "Main",
     "description": "\"Main\" value as type for an email in Contact Card edition"
+  },
+  "h3TJeN": {
+    "defaultMessage": "Select a photo",
+    "description": "Cover editor save photo required modal button label"
   },
   "h7lmdC": {
     "defaultMessage": "This email address is already registered",
@@ -1887,9 +2127,17 @@
     "defaultMessage": "Main",
     "description": "\"Main\" value as type for a phone number in Contact Card edition"
   },
+  "i2O7AH": {
+    "defaultMessage": "See all",
+    "description": "See all followed profiles"
+  },
   "i4akRg": {
     "defaultMessage": "Edit Margin",
     "description": "Carousel bottom menu label for margin tab"
+  },
+  "i7bEYW": {
+    "defaultMessage": "Title",
+    "description": "Photo with Text and Title - TabBar Title"
   },
   "i9jMTB": {
     "defaultMessage": "{countReactions} likes",
@@ -1898,6 +2146,10 @@
   "iC1CvY": {
     "defaultMessage": "Edit Background",
     "description": "SocialLinks bottom menu label for Background tab"
+  },
+  "iNbvJN": {
+    "defaultMessage": "Check your emails!",
+    "description": "ForgotPasswordScreen - Check your emails or messages!"
   },
   "iPwxyL": {
     "defaultMessage": "Slide to change the height",
@@ -1923,6 +2175,14 @@
     "defaultMessage": "Edit",
     "description": "Edit modules button label in profile edition screen"
   },
+  "iix9+T": {
+    "defaultMessage": "Congratulations!",
+    "description": "Publish modal title"
+  },
+  "ijAAfc": {
+    "defaultMessage": "Publish this WebCard",
+    "description": "Home Screen - webcard not published button"
+  },
   "iuu5Vg": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in carousel edition"
@@ -1939,9 +2199,17 @@
     "defaultMessage": "Slide to change theVertical Spacing",
     "description": "Hint of the Vertical Spacing slider in PhotoWithTextAndTitle edition"
   },
+  "jKxfet": {
+    "defaultMessage": "You can completly change your WebCard by loading a new template",
+    "description": "ProfileScreenBody description to load a new template"
+  },
   "jPNeTz": {
     "defaultMessage": "New password",
     "description": "Account Details - Change password form - new password label"
+  },
+  "jQ6Q7A": {
+    "defaultMessage": "social profile",
+    "description": "Section title for social profile"
   },
   "jUgt3y": {
     "defaultMessage": "Border radius",
@@ -1987,17 +2255,9 @@
     "defaultMessage": "Height",
     "description": "Label of the height slider in Line Divider edition"
   },
-  "kJBZgb": {
-    "defaultMessage": "Connect to existing account",
-    "description": "Connect to existing account button label"
-  },
   "kKfpW5": {
     "defaultMessage": "Please enter a valid email address",
     "description": "Signup Screen - Error message for invalid email address"
-  },
-  "kWx3ez": {
-    "defaultMessage": "Tell us more about you",
-    "description": "NewProfileType Interest Picker Screen - Title for personal profile"
   },
   "kcISgN": {
     "defaultMessage": "Slide to change the Top margin",
@@ -2015,9 +2275,21 @@
     "defaultMessage": "First name",
     "description": "First name registered for the contact card"
   },
+  "ks86TC": {
+    "defaultMessage": "This WebCard{azzappAp} is not published",
+    "description": "Home Screen - webcard not published title"
+  },
   "kuaFQc": {
     "defaultMessage": "Orientation",
     "description": "Label of the orientation button in cover edition"
+  },
+  "l+kgl8": {
+    "defaultMessage": "Done",
+    "description": "FontPicker component Done button label"
+  },
+  "l0IaD6": {
+    "defaultMessage": "Tap to create new password",
+    "description": "Create new password Screen - AccessibilityLabel Create New Password button"
   },
   "l8fBNE": {
     "defaultMessage": "Edit Palette",
@@ -2026,6 +2298,10 @@
   "l8m7U0": {
     "defaultMessage": "{text}... more",
     "description": "ExpendableText  with more keyword to expand the text"
+  },
+  "l9sm9V": {
+    "defaultMessage": "Likes",
+    "description": "HomeScreen - information panel - Likes label"
   },
   "lC1DXs": {
     "defaultMessage": "Retry",
@@ -2046,6 +2322,10 @@
   "lPVOQn": {
     "defaultMessage": "My posts",
     "description": "ProfilePostScreen viewer user title Header"
+  },
+  "lRtjHI": {
+    "defaultMessage": "People",
+    "description": "Cover editor people tab bar item label"
   },
   "lUOLXQ": {
     "defaultMessage": "Top left",
@@ -2082,6 +2362,10 @@
   "m3tMdT": {
     "defaultMessage": "Tap to sign up",
     "description": "Signup Screen - Accessibility Sign Up button"
+  },
+  "m4sams": {
+    "defaultMessage": "Dark",
+    "description": "ColorTriptych choose - Dark color"
   },
   "m6YUMx": {
     "defaultMessage": "Slide to change the Space left/right",
@@ -2123,10 +2407,6 @@
     "defaultMessage": "Top Color",
     "description": "Top Color title in Line Divider module screen"
   },
-  "n8Bdhz": {
-    "defaultMessage": "See all",
-    "description": "CoverList - See all button"
-  },
   "n9GfPA": {
     "defaultMessage": "Share the post",
     "description": "PostRendererActionBar Share post button accessibility"
@@ -2147,9 +2427,9 @@
     "defaultMessage": "IconColor color",
     "description": "IconColor color title in SocialLinks edition"
   },
-  "nXXtnK": {
-    "defaultMessage": "Change background color",
-    "description": "ProfileScreen bottom menu accessibility label for Change background color button"
+  "nV9NhD": {
+    "defaultMessage": "Medium",
+    "description": "FontPicker component Medium label"
   },
   "nYO3n5": {
     "defaultMessage": "Left",
@@ -2163,6 +2443,14 @@
     "defaultMessage": "Cut Video",
     "description": "Accessibility label of the Cut Video tab in image picking wizzard"
   },
+  "nuPEgc": {
+    "defaultMessage": "Enter a URL",
+    "description": "Placeholder for URL inside contact card"
+  },
+  "nv6doU": {
+    "defaultMessage": "Font size : {size}",
+    "description": "Font size message in PhotoWithTextAndTitle edition"
+  },
   "nybB30": {
     "defaultMessage": "Text left/right margin",
     "description": "Label of the Text left/right margin slider in BlockText edition"
@@ -2174,6 +2462,10 @@
   "o5n4Hq": {
     "defaultMessage": "Enter text",
     "description": "Placeholder for text area in simple text edition screen"
+  },
+  "o8Ebdq": {
+    "defaultMessage": "The cover is the first and most visible section of your WebCard{azzappA}",
+    "description": "New profile - cover creation subtitle"
   },
   "oAzffi": {
     "defaultMessage": "Adjust",
@@ -2199,10 +2491,6 @@
     "defaultMessage": "tap to select this media",
     "description": "accessibility hint for media selection buttons in photo gallery"
   },
-  "p042gg": {
-    "defaultMessage": "Profiles you may like",
-    "description": "SearchPage - Profile recommendation title"
-  },
   "p7k7BX": {
     "defaultMessage": "Image",
     "description": "CoverEditionScreen bottom menu label for Image tab"
@@ -2210,10 +2498,6 @@
   "p7vdTv": {
     "defaultMessage": "Move down",
     "description": "Accessibility label for the move down button in the profile edition screen"
-  },
-  "pBRNQI": {
-    "defaultMessage": "Add a module",
-    "description": "ProfileScreen bottom menu accessibility label for Add a module button"
   },
   "pBqrA+": {
     "defaultMessage": "Already have an account?",
@@ -2259,6 +2543,14 @@
     "defaultMessage": "Contrast",
     "description": "Contrast image edition parameters name"
   },
+  "pr7gRe": {
+    "defaultMessage": "Invalid email/phone number or no account found",
+    "description": "ForgotpasswordScreen - Invalid email or phone number error"
+  },
+  "q+WL41": {
+    "defaultMessage": "My posts",
+    "description": "Media screen tab bar item label for my posts tab"
+  },
   "q/LbR5": {
     "defaultMessage": "Background",
     "description": "Label of Background tab in simple text edition"
@@ -2270,6 +2562,10 @@
   "q/ZByJ": {
     "defaultMessage": "Thermal",
     "description": "Thermal photo filter name"
+  },
+  "q14jQ4": {
+    "defaultMessage": "Add to Google Wallet",
+    "description": "Add to Google Wallet button label"
   },
   "q3qdLJ": {
     "defaultMessage": "Delete this post",
@@ -2291,6 +2587,10 @@
     "defaultMessage": "Unlike the post",
     "description": "PostRendererActionBar unlike button accessibility"
   },
+  "qJLWGe": {
+    "defaultMessage": "URL",
+    "description": "Section title for URL"
+  },
   "qbB3xv": {
     "defaultMessage": "Top to bottom",
     "description": "Label of the top to bottom orientation in cover edition"
@@ -2311,10 +2611,6 @@
     "defaultMessage": "Image border radius size",
     "description": "Label of the Border radius size slider in HorizontalPhoto edition"
   },
-  "r+BJn9": {
-    "defaultMessage": "What's your name?",
-    "description": "Personal profile form - Title"
-  },
   "r/msQn": {
     "defaultMessage": "Save",
     "description": "Edit phone number modal save button label"
@@ -2322,6 +2618,10 @@
   "r2XHrR": {
     "defaultMessage": "Middle right",
     "description": "Label of the middle right position in cover edition"
+  },
+  "r2olGP": {
+    "defaultMessage": "Add URL",
+    "description": "Add URL to the contact card"
   },
   "r3LnPL": {
     "defaultMessage": "Filter",
@@ -2339,9 +2639,9 @@
     "defaultMessage": "Top/bottom margin: {size}",
     "description": "Top/bottom margin message in HorizontalPhoto edition"
   },
-  "rbuw1H": {
-    "defaultMessage": "Could not load the cover edition screen",
-    "description": "CoverEditionScreen alert message loading error text"
+  "rXmwrM": {
+    "defaultMessage": "Skip",
+    "description": "label of the button allowing to skil loading card template"
   },
   "rfiLII": {
     "defaultMessage": "Connect with email address",
@@ -2375,13 +2675,25 @@
     "defaultMessage": "Enter your phone number",
     "description": "Signup Screen - Accessibility TextInput phone number"
   },
+  "s3CmD7": {
+    "defaultMessage": "Your WebCard has been published",
+    "description": "Home Screen - webcard published toast"
+  },
   "s5MWk0": {
     "defaultMessage": "TextBackground opacity",
     "description": "Label of the Photo Opacityslider in BlockText edition"
   },
+  "s6WjsK": {
+    "defaultMessage": "Colors",
+    "description": "ProfileScreen bottom menu accessibility label for Colors button"
+  },
   "sIONS1": {
     "defaultMessage": "Adjust",
     "description": "Accessibility label of the Adjust tab in image editing view"
+  },
+  "sIXr0q": {
+    "defaultMessage": "Load a WebCard® template",
+    "description": "WebCard creation screen title"
   },
   "sLCCI/": {
     "defaultMessage": "Text size",
@@ -2415,8 +2727,8 @@
     "defaultMessage": "Email address",
     "description": "The email address option in the country selector for simple button module"
   },
-  "sqy+v3": {
-    "defaultMessage": "Log In",
+  "smeqjF": {
+    "defaultMessage": "Back to Log In",
     "description": "ChangePassword Screen - Back to Log In bottom screen link"
   },
   "tBKg6x": {
@@ -2427,9 +2739,21 @@
     "defaultMessage": "Continue",
     "description": "NewProfileScreen - Continue Button"
   },
+  "tOHDI7": {
+    "defaultMessage": "Followings",
+    "description": "HomeScreen - information panel - Followings label"
+  },
   "tOY0CE": {
     "defaultMessage": "Desktop",
     "description": "Desktop view mode title in web card preview"
+  },
+  "tU7Ls5": {
+    "defaultMessage": "Create new password",
+    "description": "Create new password screen button label"
+  },
+  "tlkkQJ": {
+    "defaultMessage": "Contact card",
+    "description": "Home Screen menu - Contact Card"
   },
   "tuDqJ+": {
     "defaultMessage": "Color #2",
@@ -2447,9 +2771,21 @@
     "defaultMessage": "Bottom margin : {size}",
     "description": "Bottom margin message in SimpleButton edition"
   },
+  "u4ewv6": {
+    "defaultMessage": "Enter a phone number",
+    "description": "Placeholder for phone number inside contact card"
+  },
+  "u7nQXh": {
+    "defaultMessage": "Apply",
+    "description": "Card style modal apply button label"
+  },
   "uAudXH": {
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in PhotoWithTextAndTitle edition"
+  },
+  "uExyDe": {
+    "defaultMessage": "Simple title",
+    "description": "Simple title screen title"
   },
   "uHQfNw": {
     "defaultMessage": "Video Shutter",
@@ -2466,6 +2802,10 @@
   "uQktw0": {
     "defaultMessage": "Left/Right margin",
     "description": "Label of the Left/Right margin slider in PhotoWithTextAndTitle edition"
+  },
+  "uVFyvX": {
+    "defaultMessage": "Load a new WebCard template",
+    "description": "ProfileScreenBody button to load a new template"
   },
   "uaRWqJ": {
     "defaultMessage": "Image",
@@ -2511,10 +2851,6 @@
     "defaultMessage": "Tap to change the Horizontal alignment of the text",
     "description": "Hint of the Horizontal alignment button"
   },
-  "uyQGcW": {
-    "defaultMessage": "Rotate",
-    "description": "Accessibility label of the rotate button in the cover edition screen"
-  },
   "v3CWFe": {
     "defaultMessage": "Username*",
     "description": "ProfileForm username textinput label"
@@ -2535,6 +2871,10 @@
     "defaultMessage": "Delete",
     "description": "Delete email or phone number"
   },
+  "vQ8VeN": {
+    "defaultMessage": "This WebCard{azzappAp} has no cover and can’t be published.",
+    "description": "Home Screen - Missing cover text"
+  },
   "vpm4+X": {
     "defaultMessage": "Edit Settings",
     "description": "BlockText bottom menu label for Settings tab"
@@ -2550,10 +2890,6 @@
   "w6NGI9": {
     "defaultMessage": "Button Label",
     "description": "Label of the buttonLabel input in SimpleButton Settings edition"
-  },
-  "w96WJ0": {
-    "defaultMessage": "Password doesn't match",
-    "description": "ChangePasswordScreen Screen - error passwords doesn't match"
   },
   "wWS00d": {
     "defaultMessage": "Icon Size : {size}",
@@ -2591,6 +2927,10 @@
     "defaultMessage": "Loading error",
     "description": "Screen alert message loading error title"
   },
+  "xIye6S": {
+    "defaultMessage": "Your personal WebCard{azzappA}, visible both in app and online, is created.",
+    "description": "Publish modal subtitle"
+  },
   "xJBeUF": {
     "defaultMessage": "Save",
     "description": "Edit contact card modal save button label"
@@ -2607,6 +2947,14 @@
     "defaultMessage": "Border width",
     "description": "Label of the border Width slider in SimpleButton edition"
   },
+  "xUVkUh": {
+    "defaultMessage": "New password",
+    "description": "New password input placeholder"
+  },
+  "xUknwY": {
+    "defaultMessage": "Select a WebCard template",
+    "description": "WebCard creation screen title"
+  },
   "xV6Ifc": {
     "defaultMessage": "Save",
     "description": "Save button label in carousel edition screen"
@@ -2619,6 +2967,10 @@
     "defaultMessage": "Margins",
     "description": "Title of the Margins section in BlockText edition"
   },
+  "xfxHRE": {
+    "defaultMessage": "Enter an adress",
+    "description": "Placeholder for adress inside contact card"
+  },
   "xo15bY": {
     "defaultMessage": "Slide to change the font size",
     "description": "Hint of the margin size slider in cover edition"
@@ -2626,6 +2978,10 @@
   "xqefEf": {
     "defaultMessage": "Slide to change the Space top/bottom",
     "description": "Hint of the Space top/bottom slider in BlockText edition"
+  },
+  "xvAZak": {
+    "defaultMessage": "Add a photo",
+    "description": "Cover editor save phoyo required modal title"
   },
   "xyV44Y": {
     "defaultMessage": "Cancel",
@@ -2659,10 +3015,6 @@
     "defaultMessage": "Border color",
     "description": "Border color title in HorizontalPhoto edition"
   },
-  "ySeX6t": {
-    "defaultMessage": "Followers",
-    "description": "Number of followers"
-  },
   "yXE1VN": {
     "defaultMessage": "Like the post",
     "description": "PostRendererActionBar like button accessibility"
@@ -2694,6 +3046,10 @@
   "zDelVQ": {
     "defaultMessage": "Rotate",
     "description": "Accessibility label of the rotate button in image edition wizzard"
+  },
+  "zEsn/K": {
+    "defaultMessage": "Add",
+    "description": "ProfileScreen bottom menu accessibility label for Add a module button"
   },
   "zMF822": {
     "defaultMessage": "Height size",

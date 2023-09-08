@@ -11,10 +11,10 @@ import type {
 } from '@azzapp/relay/artifacts/PostList_posts.graphql';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
-import type { StyleProp, ViewStyle, ViewToken } from 'react-native';
+import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
+import type { ViewProps, ViewToken } from 'react-native';
 
-type PostListProps = {
+type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
   canPlay?: boolean;
@@ -22,7 +22,7 @@ type PostListProps = {
   onRefresh?: () => void;
   refreshing?: boolean;
   loading?: boolean;
-  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: ContentStyle;
 };
 
 // TODO docs and tests once this component is production ready
@@ -34,6 +34,7 @@ const PostList = ({
   loading = false,
   onEndReached,
   onRefresh,
+  ...props
 }: PostListProps) => {
   const posts = useFragment(
     graphql`
@@ -120,6 +121,7 @@ const PostList = ({
           //TODO: improve this with review of tester
           itemVisiblePercentThreshold: 60,
         }}
+        {...props}
       />
     </PostListContext.Provider>
   );

@@ -1,20 +1,24 @@
 import { IntlErrorCode } from '@formatjs/intl';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { IntlProvider } from 'react-intl';
-import { View, useColorScheme } from 'react-native';
+import * as Sentry from '@sentry/react-native';
+import {
+  Component,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
+import { useColorScheme } from 'react-native';
+import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import {
-  mainRoutes,
-  newProfileRoute,
-  signInRoutes,
-  signUpRoutes,
-} from '#mobileRoutes';
+import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -29,55 +33,111 @@ import {
   messages,
   useCurrentLocale,
 } from '#helpers/localeHelpers';
-import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import {
+  addEnvironmentListener,
+  getRelayEnvironment,
+} from '#helpers/relayEnvironment';
 import * as RelayQueryManager from '#helpers/RelayQueryManager';
 import { isRelayScreen } from '#helpers/relayScreen';
 import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import waitFor from '#helpers/waitFor';
+import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
-import AccountScreen from '#screens/AccountScreen';
-import CardModuleEditionMobileScreen from '#screens/CardModuleEditionMobileScreen';
-import ChangePasswordScreen from '#screens/ChangePasswordScreen';
+import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import CoverEditionScreen from '#screens/CoverEditionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
+import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
+import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmationScreen';
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
 import ProfileScreen from '#screens/ProfileScreen';
+import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
+import Button from '#ui/Button';
+import Container from '#ui/Container';
+import Text from '#ui/Text';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
+import type { ReactNode } from 'react';
+import type { IntlShape } from 'react-intl';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  enabled: !__DEV__,
+  environment: process.env.DEPLOYMENT_ENVIRONMENT,
+  // TODO better configuration based on environment
+});
+
+/**
+ * Initialize the application
+ * called at first launch before rendering the App component
+ */
+const init = async () => {
+  await initAuthStore();
+  initLocaleHelpers();
+  RelayQueryManager.init();
+};
+
+const initPromise = init();
+
+const App = () => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    initPromise.finally(() => {
+      setReady(true);
+    });
+  }, []);
+
+  if (!ready) {
+    return null;
+  }
+
+  const ErrorBoundary = __DEV__ ? Fragment : AppErrorBoundary;
+
+  return (
+    <AppIntlProvider>
+      <ErrorBoundary>
+        <AppRouter />
+      </ErrorBoundary>
+    </AppIntlProvider>
+  );
+};
+
+export default App;
 
 // #region Routing Definitions
 const screens = {
   SIGN_IN: SignInScreen,
   SIGN_UP: SignupScreen,
   FORGOT_PASSWORD: ForgotPasswordScreen,
-  CHANGE_PASSWORD: ChangePasswordScreen,
+  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
+  RESET_PASSWORD: ResetPasswordScreen,
   HOME: HomeScreen,
+  MEDIA: MediaScreen,
   SEARCH: SearchScreen,
-  ACCOUNT: AccountScreen,
-  ALBUMS: () => <View />,
-  CHAT: () => <View />,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
   NEW_POST: PostCreationScreen,
   NEW_PROFILE: NewProfileScreen,
-  CARD_MODULE_EDITION: CardModuleEditionMobileScreen,
+  CARD_MODULE_EDITION: CardModuleEditionScreen,
+  COVER_EDITION: CoverEditionScreen,
   PROFILE: ProfileScreen,
   FOLLOWINGS: FollowingsScreen,
+  FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
@@ -90,31 +150,20 @@ const tabs = {
 
 // #endregion
 
-/**
- * Initialize the application
- * called at first launch before rendering the App component
- * @see waitFor
- */
-const init = async () => {
-  await initAuthStore();
-  initLocaleHelpers();
-  RelayQueryManager.init();
-};
+const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 
 /**
  * The main application component
  */
-const App = () => {
+const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, profileId, hasBeenSignedIn } = getAuthState();
-    if (!authenticated) {
-      return hasBeenSignedIn ? signInRoutes : signUpRoutes;
-    }
-    if (!profileId) {
-      return newProfileRoute;
-    }
-    return mainRoutes;
+    const { authenticated, hasBeenSignedIn } = getAuthState();
+    return authenticated
+      ? mainRoutes
+      : hasBeenSignedIn
+      ? signInRoutes
+      : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
@@ -126,17 +175,39 @@ const App = () => {
       !unauthenticatedRoutes.includes(router.getCurrentRoute().route)
     ) {
       router.replaceAll(signInRoutes);
+    } else if (
+      authenticated &&
+      unauthenticatedRoutes.includes(router.getCurrentRoute().route)
+    ) {
+      router.replaceAll(mainRoutes);
     }
   }, [authenticated, router]);
 
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
+  const environmentReseted = useRef(false);
+  const [environment, setEnvironment] = useState(getRelayEnvironment());
+  useEffect(
+    () =>
+      addEnvironmentListener(event => {
+        if (event === 'reset') {
+          environmentReseted.current = true;
+        }
+      }),
+    [],
+  );
+
   const screenIdToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
     () =>
-      createScreenPrefetcher(screens as Record<ROUTES, ScreenPrefetchOptions>),
+      createScreenPrefetcher(
+        screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
+        router.getCurrentRoute(),
+        router.getCurrentScreenId(),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -167,31 +238,25 @@ const App = () => {
     [router, screenIdToDispose, screenPrefetcher],
   );
 
+  const slapshScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
+    // We reset the environment only here
+    // To avoid resetting it when old screens are still visible
+    if (environmentReseted.current) {
+      setEnvironment(getRelayEnvironment());
+      environmentReseted.current = false;
+    }
     screenIdToDispose.forEach(screen =>
       RelayQueryManager.disposeQueryFor(screen),
     );
     screenIdToDispose.length = 0;
+    if (!slapshScreenHidden.current) {
+      setTimeout(() => {
+        hideSplashScreen({ fade: true });
+      }, 200);
+    }
   }, [screenIdToDispose]);
   // #endregion
-
-  // #region Internationalization
-  const locale = useCurrentLocale();
-
-  const onIntlError = (err: any) => {
-    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
-      return;
-    }
-    console.error(err);
-  };
-
-  const langMessages = useMemo(() => {
-    let langMessages = messages[DEFAULT_LOCALE];
-    if (locale !== DEFAULT_LOCALE) {
-      langMessages = Object.assign({}, langMessages, messages[locale]);
-    }
-    return langMessages;
-  }, [locale]);
 
   // #endregion
 
@@ -203,36 +268,115 @@ const App = () => {
     };
   }, [colorScheme]);
 
+  // TODO handle errors
+  const [fontLoaded] = useApplicationFonts();
+
+  if (!fontLoaded) {
+    return null;
+  }
+
   return (
-    <RelayEnvironmentProvider environment={getRelayEnvironment()}>
+    <RelayEnvironmentProvider environment={environment}>
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}
           style={safeAreaBackgroundStyle}
         >
-          <IntlProvider
-            locale={locale}
-            defaultLocale={DEFAULT_LOCALE}
-            messages={langMessages}
-            onError={onIntlError}
-          >
-            <RouterProvider value={router}>
-              <ScreensRenderer
-                routerState={routerState}
-                screens={screens}
-                tabs={tabs}
-                onScreenDismissed={onScreenDismissed}
-                onFinishTransitioning={onFinishTransitioning}
-              />
-            </RouterProvider>
-            <Toast />
-          </IntlProvider>
+          <RouterProvider value={router}>
+            <ScreensRenderer
+              routerState={routerState}
+              screens={screens}
+              tabs={tabs}
+              onScreenDismissed={onScreenDismissed}
+              onFinishTransitioning={onFinishTransitioning}
+            />
+          </RouterProvider>
+          <Toast />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>
   );
 };
 
-export default waitFor(App, init());
+const AppIntlProvider = ({ children }: { children: ReactNode }) => {
+  // #region Internationalization
+  const locale = useCurrentLocale();
 
-const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
+  const langMessages = useMemo(() => {
+    let langMessages = messages[DEFAULT_LOCALE];
+    if (locale !== DEFAULT_LOCALE) {
+      langMessages = Object.assign({}, langMessages, messages[locale]);
+    }
+    return langMessages;
+  }, [locale]);
+
+  const onIntlError = (err: any) => {
+    if (__DEV__ && err.code === IntlErrorCode.MISSING_TRANSLATION) {
+      return;
+    }
+    console.error(err);
+  };
+  return (
+    <IntlProvider
+      locale={locale}
+      defaultLocale={DEFAULT_LOCALE}
+      messages={langMessages}
+      onError={onIntlError}
+    >
+      {children}
+    </IntlProvider>
+  );
+};
+
+class _AppErrorBoundary extends Component<{
+  intl: IntlShape;
+  children: ReactNode;
+}> {
+  state = { error: null };
+
+  componentDidCatch(error: Error) {
+    if (!__DEV__) {
+      Sentry.captureException(error);
+    }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  retry = () => {
+    this.setState({ error: null });
+  };
+
+  render() {
+    if (this.state.error) {
+      return (
+        <Container
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 20,
+          }}
+        >
+          <Text variant="large">
+            <FormattedMessage
+              defaultMessage="Something went wrong"
+              description="Top level error message for uncaught exceptions"
+            />
+          </Text>
+          <Button
+            label={this.props.intl.formatMessage({
+              defaultMessage: 'Retry',
+              description: 'Retry button for uncaught exceptions',
+            })}
+            onPress={this.retry}
+          />
+        </Container>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AppErrorBoundary = injectIntl(_AppErrorBoundary);

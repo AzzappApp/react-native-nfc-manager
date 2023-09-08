@@ -14,6 +14,7 @@
     "declaration": true,
     "resolvePackageJsonExports": true,
     "resolveJsonModule": true,
-    "incremental": true
+    "incremental": true,
+    "noErrorTruncation": true
   }
 }

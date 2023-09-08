@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "0.1.1-canary.0",
+  "version": "0.2.0-canary.70",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
@@ -10,6 +10,6 @@
     "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {
-    "@formatjs/cli": "^6.0.4"
+    "@formatjs/cli": "^6.1.3"
   }
 }

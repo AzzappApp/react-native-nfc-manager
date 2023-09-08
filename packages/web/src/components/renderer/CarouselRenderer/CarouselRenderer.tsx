@@ -1,16 +1,19 @@
-import { getMediasByIds, type CardModule } from '@azzapp/data/domains';
+import 'server-only';
+import { getMediasByIds } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { CAROUSEL_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import CloudinaryImage from '#ui/CloudinaryImage';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  CAROUSEL_DEFAULT_VALUES,
+  CAROUSEL_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles from './CarouselRenderer.module.css';
+import Carousel from './Carousel';
+import type { ModuleRendererProps } from '../ModuleRenderer';
+import type { CardModuleCarousel } from '@azzapp/data/domains';
 
-export type CarouselRendererProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'children'
-> & {
-  module: CardModule;
-};
+export type CarouselRendererProps = ModuleRendererProps<CardModuleCarousel> &
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
 
 /**
  * Render a carousel module
@@ -18,12 +21,14 @@ export type CarouselRendererProps = Omit<
 const CarouselRenderer = async ({
   module,
   style,
+  cardStyle,
+  colorPalette,
   ...props
 }: CarouselRendererProps) => {
   const {
     images,
     squareRatio,
-    borderSize,
+    borderWidth,
     borderColor,
     borderRadius,
     marginVertical,
@@ -32,54 +37,45 @@ const CarouselRenderer = async ({
     gap,
     backgroundId,
     backgroundStyle,
-  } = Object.assign({}, CAROUSEL_DEFAULT_VALUES, module.data);
+  } = getModuleDataValues({
+    data: module.data,
+    cardStyle,
+    styleValuesMap: CAROUSEL_STYLE_VALUES,
+    defaultValues: CAROUSEL_DEFAULT_VALUES,
+  });
 
   const height = imageHeight + marginVertical * 2;
   const medias = images
     ? convertToNonNullArray(await getMediasByIds(images))
     : [];
+
   return (
     <CardModuleBackground
       {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
+      colorPalette={colorPalette}
       style={{ ...style, height }}
     >
       <div
         style={{
-          overflowX: 'auto',
-          paddingTop: marginVertical,
-          paddingBottom: marginVertical,
-          paddingLeft: marginHorizontal,
-          paddingRight: marginHorizontal,
-          columnGap: gap,
-          height: '100%',
+          width: '100%',
           display: 'flex',
           flexDirection: 'row',
-          overflow: 'auto',
+          justifyContent: 'center',
         }}
-        className={styles.content}
       >
-        {medias.map(media => {
-          const aspectRatio = media.width / media.height;
-          const width = imageHeight * (squareRatio ? 1 : aspectRatio);
-          return (
-            <CloudinaryImage
-              key={media.id}
-              mediaId={media.id}
-              width={width}
-              height={imageHeight}
-              alt="todo"
-              style={{
-                borderRadius,
-                borderColor,
-                borderWidth: borderSize,
-                borderStyle: 'solid',
-                objectFit: 'cover',
-              }}
-            />
-          );
-        })}
+        <Carousel
+          borderColor={swapColor(borderColor, colorPalette)}
+          borderRadius={borderRadius}
+          borderWidth={borderWidth}
+          gap={gap}
+          imageHeight={imageHeight}
+          marginHorizontal={marginHorizontal}
+          marginVertical={marginVertical}
+          medias={medias}
+          squareRatio={squareRatio}
+        />
       </div>
     </CardModuleBackground>
   );

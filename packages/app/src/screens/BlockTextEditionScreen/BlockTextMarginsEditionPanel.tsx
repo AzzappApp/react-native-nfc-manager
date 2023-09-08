@@ -1,5 +1,11 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  BLOCK_TEXT_MAX_HORIZONTAL_MARGIN,
+  BLOCK_TEXT_MAX_VERTICAL_MARGIN,
+  BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN,
+  BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
@@ -78,7 +84,7 @@ const BlockTextMarginsEditionPanel = ({
           }
           value={textMarginVertical}
           min={0}
-          max={100}
+          max={BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN}
           step={1}
           onChange={onTextMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
@@ -105,7 +111,7 @@ const BlockTextMarginsEditionPanel = ({
           }
           value={textMarginHorizontal}
           min={0}
-          max={100}
+          max={BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN}
           step={1}
           onChange={onTextMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
@@ -133,15 +139,15 @@ const BlockTextMarginsEditionPanel = ({
                 defaultMessage="Space top/bottom : {size}"
                 description="Space top/bottom message in BlockText edition"
                 values={{
-                  size: marginHorizontal,
+                  size: marginVertical,
                 }}
               />
             }
-            value={marginHorizontal}
+            value={marginVertical}
             min={0}
-            max={100}
+            max={BLOCK_TEXT_MAX_VERTICAL_MARGIN}
             step={1}
-            onChange={onMarginHorizontalChange}
+            onChange={onMarginVerticalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space top/bottom',
               description:
@@ -160,15 +166,15 @@ const BlockTextMarginsEditionPanel = ({
                 defaultMessage="Space left/right : {size}"
                 description="Space left/right message in BlockText edition"
                 values={{
-                  size: marginVertical,
+                  size: marginHorizontal,
                 }}
               />
             }
-            value={marginVertical}
+            value={marginHorizontal}
             min={0}
-            max={100}
+            max={BLOCK_TEXT_MAX_HORIZONTAL_MARGIN}
             step={1}
-            onChange={onMarginVerticalChange}
+            onChange={onMarginHorizontalChange}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space left/right',
               description:

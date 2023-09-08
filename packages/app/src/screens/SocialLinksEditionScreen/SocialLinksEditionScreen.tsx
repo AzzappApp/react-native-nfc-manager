@@ -1,4 +1,5 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -6,11 +7,11 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
-import useDataEditor from '#hooks/useDataEditor';
+import WebCardModulePreview from '#components/WebCardModulePreview';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -65,9 +66,11 @@ const SocialLinksEditionScreen = ({
         columnGap
         marginTop
         marginBottom
+        marginHorizontal
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -86,6 +89,14 @@ const SocialLinksEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
+        }
+        profile {
+          cardColors {
+            primary
+            light
+            dark
+          }
         }
       }
     `,
@@ -95,10 +106,28 @@ const SocialLinksEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: socialLinks,
-      defaultValue: SOCIAL_LINKS_DEFAULT_VALUES,
+  const initialValue = useMemo(() => {
+    return {
+      links: socialLinks?.links ?? [],
+      iconColor: socialLinks?.iconColor ?? null,
+      arrangement: socialLinks?.arrangement ?? null,
+      borderWidth: socialLinks?.borderWidth ?? null,
+      columnGap: socialLinks?.columnGap ?? null,
+      marginTop: socialLinks?.marginTop ?? null,
+      iconSize: socialLinks?.iconSize ?? null,
+      marginBottom: socialLinks?.marginBottom ?? null,
+      marginHorizontal: socialLinks?.marginHorizontal ?? null,
+      backgroundId: socialLinks?.background?.id ?? null,
+      backgroundStyle: socialLinks?.backgroundStyle ?? null,
+    };
+  }, [socialLinks]);
+
+  const { data, value, fieldUpdateHandler, updateFields, dirty } =
+    useModuleDataEditor({
+      initialValue,
+      cardStyle: null,
+      styleValuesMap: null,
+      defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
     });
 
   const {
@@ -110,9 +139,18 @@ const SocialLinksEditionScreen = ({
     marginTop,
     iconSize,
     marginBottom,
-    background,
+    marginHorizontal,
+    backgroundId,
     backgroundStyle,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -122,9 +160,9 @@ const SocialLinksEditionScreen = ({
         $input: SaveSocialLinksModuleInput!
       ) {
         saveSocialLinksModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...SocialLinksEditionScreen_module
@@ -142,20 +180,11 @@ const SocialLinksEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const {
-      background: updateBackground,
-      links: updateLinks,
-      ...rest
-    } = updates;
 
     const input: SaveSocialLinksModuleInput = {
+      ...value,
       moduleId: socialLinks?.id,
-      links: updateLinks != null ? updateLinks : socialLinks?.links ?? [],
-      backgroundId:
-        socialLinks?.background?.id !== data.background?.id
-          ? updateBackground?.id ?? null
-          : socialLinks?.background?.id ?? null,
-      ...rest,
+      links: value.links!,
     };
 
     commit({
@@ -174,16 +203,7 @@ const SocialLinksEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    socialLinks?.id,
-    socialLinks?.links,
-    socialLinks?.background?.id,
-    data?.background?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, socialLinks?.id, value, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -211,19 +231,9 @@ const SocialLinksEditionScreen = ({
 
   const onMarginBottomChange = fieldUpdateHandler('marginBottom');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -279,7 +289,9 @@ const SocialLinksEditionScreen = ({
       >
         <SocialLinksPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={data}
+          colorPalette={viewer.profile?.cardColors}
+          cardStyle={null}
+          data={previewData}
         />
         <TabView
           style={{ height: bottomPanelHeight }}
@@ -331,6 +343,8 @@ const SocialLinksEditionScreen = ({
                   onMarginTopChange={onMarginTopChange}
                   marginBottom={marginBottom}
                   onMarginBottomChange={onMarginBottomChange}
+                  onMarginHorizontalChange={onMarginHorizontalChange}
+                  marginHorizontal={marginHorizontal ?? 0}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -344,7 +358,7 @@ const SocialLinksEditionScreen = ({
               element: (
                 <SocialLinksBackgroundEditionPanel
                   viewer={viewer}
-                  backgroundId={background?.id}
+                  backgroundId={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
@@ -370,19 +384,15 @@ const SocialLinksEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={socialLinks?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_SOCIAL_LINKS,
-              data,
+              data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

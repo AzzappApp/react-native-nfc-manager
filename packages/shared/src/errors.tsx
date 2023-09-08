@@ -2,20 +2,77 @@
  * Errors that the API may return in case of invalid call.
  */
 const ERRORS = {
+  /**
+   * The request is invalid.
+   * This may happen if the request is malformed or if the request is missing some required parameters.
+   */
   INVALID_REQUEST: 'INVALID_REQUEST',
+  /**
+   * The email is already used by another user.
+   * This may happen when a user tries to register with an email that is already used by another user.
+   */
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
+  /**
+   * The phone number is already used by another user.
+   * This may happen when a user tries to register with a phone number that is already used by another user.
+   */
   PHONENUMBER_ALREADY_EXISTS: 'PHONENUMBER_ALREADY_EXISTS',
+  /**
+   * The email is not valid.
+   * This may happen when a user tries to register with an email that is not valid.
+   */
   EMAIL_NOT_VALID: 'EMAIL_NOT_VALID',
+  /**
+   * The username is already used by another user.
+   * This may happen when a user tries to create a profile with a username that is already used by another user.
+   */
   USERNAME_ALREADY_EXISTS: 'USERNAME_ALREADY_EXISTS',
-  USER_NOT_FOUND: 'USER_NOT_FOUND',
-  POST_NOT_FOUND: 'POST_NOT_FOUND',
+  /**
+   * The requested resource was not found.
+   * This may happen when a user tries to access a resource that does not exist.
+   */
+  NOT_FOUND: 'NOT_FOUND',
+  /**
+   * The provided credentials are invalid.
+   * This may happen when a user tries to login with invalid credentials.
+   */
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  /**
+   * The provided token is invalid.
+   * This may happen when a user tries to use an invalid or expired token to access a protected resource.
+   */
   INVALID_TOKEN: 'INVALID_TOKEN',
+  /**
+   * Unauthorized access.
+   * This may happen when a user tries to access a protected resource without being authenticated.
+   */
   UNAUTORIZED: 'UNAUTORIZED',
+  /**
+   * Forbidden access.
+   * This may happen when a user tries to access a protected resource without the required permissions.
+   */
   FORBIDDEN: 'FORBIDDEN',
+  // TODO why do we have two different errors for the same thing?
   UNAUTORIZED_INVALID_ACCESS_TOKEN: 'UNAUTORIZED_INVALID_ACCESS_TOKEN',
+  /**
+   * Internal server error.
+   * This may happen when the server encounters an unexpected error.
+   */
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  /**
+   * The JSON decoding failed.
+   * This may happen when we try to decode a JSON string that is not valid.
+   */
   JSON_DECODING_ERROR: 'JSON_DECODING_ERROR',
+  /**
+   * The BLOB decoding failed.
+   * This may happen when we try to decode a BLOB string that is not valid.
+   */
+  BLOB_DECODING_ERROR: 'BLOB_DECODING_ERROR',
+  /**
+   * GraphQL error.
+   * Error message used to wrap GraphQL errors.
+   */
   GRAPHQL_ERROR: 'GRAPHQL_ERROR',
 } as const;
 

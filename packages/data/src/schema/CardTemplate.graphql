@@ -1,0 +1,43 @@
+"""
+Template for a card
+"""
+type CardTemplate implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+  cardStyle: CardStyle!
+  previewMedia: Media
+  modules: [CardModule!]!
+}
+
+"""
+A connection to a list of items.
+"""
+type CardTemplateConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [CardTemplateEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type CardTemplateEdge {
+  """
+  The item at the end of the edge
+  """
+  node: CardTemplate
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}

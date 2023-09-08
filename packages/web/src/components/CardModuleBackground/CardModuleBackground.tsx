@@ -1,7 +1,8 @@
 import cx from 'classnames';
+import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import { convertHexToRGBA } from '#helpers';
-import styles from './CardModuleBackground.module.css';
+import styles from './CardModuleBackground.css';
 
 type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   backgroundId?: string | null;
@@ -12,6 +13,8 @@ type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {
   } | null;
   containerStyle?: React.CSSProperties;
   containerClassName?: string;
+  colorPalette: ColorPalette;
+  resizeModes?: Map<string, string>;
 };
 
 const CardModuleBackground = ({
@@ -21,6 +24,8 @@ const CardModuleBackground = ({
   style,
   containerStyle,
   containerClassName,
+  colorPalette,
+  resizeModes,
   ...props
 }: CardModuleBackgroundProps) => {
   const {
@@ -29,11 +34,27 @@ const CardModuleBackground = ({
     opacity = 100,
   } = backgroundStyle ?? {};
 
+  const resizeMode =
+    backgroundId && resizeModes?.get
+      ? resizeModes?.get?.(backgroundId)
+      : 'cover';
+
+  const classnames = cx(styles.background, {
+    [styles.backgroundCover]: resizeMode === 'cover',
+    [styles.backgroundContain]: resizeMode === 'contain',
+    [styles.backgroundCenter]: resizeMode === 'center',
+    [styles.backgroundRepeat]: resizeMode === 'repeat',
+    [styles.backgroundStretch]: resizeMode === 'stretch',
+  });
+
   return (
     <div
       style={{
         ...style,
-        backgroundColor: convertHexToRGBA(backgroundColor ?? '#FFF', opacity),
+        backgroundColor: convertHexToRGBA(
+          swapColor(backgroundColor, colorPalette) ?? '#FFF',
+          opacity,
+        ),
         position: 'relative',
       }}
       {...props}
@@ -41,11 +62,14 @@ const CardModuleBackground = ({
       {backgroundId && (
         <div
           style={{
-            backgroundColor: convertHexToRGBA(patternColor ?? '#FFF', opacity),
+            backgroundColor: convertHexToRGBA(
+              swapColor(patternColor, colorPalette) ?? '#000',
+              opacity,
+            ),
             WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,
             maskImage: `url(${getImageURL(backgroundId)}.svg)`,
           }}
-          className={styles.background}
+          className={classnames}
         />
       )}
       <div

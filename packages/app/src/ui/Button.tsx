@@ -14,7 +14,8 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
-  variant?: 'primary' | 'secondary';
+  variant?: 'little_round' | 'primary' | 'secondary';
+  appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
 };
@@ -23,6 +24,7 @@ const Button = (
   {
     label,
     variant = 'primary',
+    appearance,
     loading,
     disabled,
     style,
@@ -32,17 +34,23 @@ const Button = (
 ) => {
   const colorScheme = useColorScheme();
 
+  appearance = appearance ?? colorScheme ?? 'light';
+
   const highlightColor =
     variant === 'primary'
-      ? colorScheme === 'light'
+      ? appearance === 'light'
         ? colors.grey900
         : colors.grey100
       : undefined;
-  const variantStyles = useVariantStyleSheet(computedStyles, variant);
+  const variantStyles = useVariantStyleSheet(
+    computedStyles,
+    variant,
+    appearance,
+  );
   const buttonProps = {
     accessibilityRole: 'button',
     children: loading ? (
-      <ActivityIndicator color={colorScheme === 'light' ? 'white' : 'black'} />
+      <ActivityIndicator color={appearance === 'light' ? 'white' : 'black'} />
     ) : (
       <Text variant="button" style={variantStyles.label} numberOfLines={1}>
         {label}
@@ -78,7 +86,7 @@ const Button = (
   } else if (variant === 'primary') {
     return (
       <PressableBackground
-        highlightColor={highlightColor}
+        highlightColor={highlightColor!}
         style={[variantStyles.root, style, disabled && variantStyles.disabled]}
         {...buttonProps}
       />
@@ -94,10 +102,12 @@ const Button = (
 
 export default forwardRef(Button);
 
+export const BUTTON_HEIGHT = 47;
+
 const computedStyles = createVariantsStyleSheet(appearance => ({
   default: {
     root: {
-      height: 47,
+      height: BUTTON_HEIGHT,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
@@ -127,6 +137,24 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       backgroundColor: 'transparent',
       borderColor: appearance === 'light' ? colors.black : colors.white,
       borderWidth: 1,
+    },
+    label: {
+      color: appearance === 'light' ? colors.black : colors.white,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey200 : colors.grey900,
+      borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
+      backgroundColor: 'transparent',
+    },
+  },
+  little_round: {
+    root: {
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+      borderColor: appearance === 'light' ? colors.black : colors.white,
+      borderWidth: 1,
+      height: 29,
+      borderRadius: 29,
+      paddingHorizontal: 15,
     },
     label: {
       color: appearance === 'light' ? colors.black : colors.white,

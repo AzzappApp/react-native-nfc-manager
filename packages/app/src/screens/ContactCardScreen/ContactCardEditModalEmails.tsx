@@ -86,6 +86,10 @@ const ContactCardEditModalPhones = ({
           deleteField={() => remove(index)}
           keyboardType="email-address"
           labelValues={labelValues}
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Enter an email',
+            description: 'Placeholder for email inside contact card',
+          })}
         />
       ))}
       <View>

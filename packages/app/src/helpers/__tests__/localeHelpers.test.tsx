@@ -28,8 +28,8 @@ describe('localeHelpers', () => {
   describe('init', () => {
     test('should set the current locale', () => {
       const { getCurrentLocale, init } = localHelpers;
-      const findBestAvailableLanguageSpy = jest
-        .spyOn(RNLocalize, 'findBestAvailableLanguage')
+      const findBestLanguageTagSpy = jest
+        .spyOn(RNLocalize, 'findBestLanguageTag')
         .mockReturnValueOnce({
           languageTag: 'fr',
           isRTL: false,
@@ -38,16 +38,14 @@ describe('localeHelpers', () => {
       init();
 
       expect(getCurrentLocale()).toBe('fr');
-      expect(findBestAvailableLanguageSpy).toHaveBeenCalledWith(
-        SUPPORTED_LOCALES,
-      );
+      expect(findBestLanguageTagSpy).toHaveBeenCalledWith(SUPPORTED_LOCALES);
     });
 
     test('should listen to AppState and set again the current locale when app goes to foreground', () => {
       const { getCurrentLocale, init } = localHelpers;
 
-      const findBestAvailableLanguageSpy = jest
-        .spyOn(RNLocalize, 'findBestAvailableLanguage')
+      const findBestLanguageTagSpy = jest
+        .spyOn(RNLocalize, 'findBestLanguageTag')
         .mockReturnValueOnce({
           languageTag: 'fr',
           isRTL: false,
@@ -59,13 +57,13 @@ describe('localeHelpers', () => {
 
       init();
       expect(getCurrentLocale()).toBe('fr');
-      expect(findBestAvailableLanguageSpy).toHaveBeenCalledTimes(1);
+      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(1);
 
       mockListener!('background');
-      expect(findBestAvailableLanguageSpy).toHaveBeenCalledTimes(1);
+      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(1);
       mockListener!('active');
       expect(getCurrentLocale()).toBe('en');
-      expect(findBestAvailableLanguageSpy).toHaveBeenCalledTimes(2);
+      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -87,7 +85,7 @@ describe('localeHelpers', () => {
     test('should not warn if called after initialization', () => {
       const { getCurrentLocale, init } = localHelpers;
 
-      jest.spyOn(RNLocalize, 'findBestAvailableLanguage').mockReturnValueOnce({
+      jest.spyOn(RNLocalize, 'findBestLanguageTag').mockReturnValueOnce({
         languageTag: 'fr',
         isRTL: false,
       });
@@ -105,14 +103,14 @@ describe('localeHelpers', () => {
 
   describe('useCurrentLocale', () => {
     beforeAll(() => {
-      const findBestAvailableLanguageMock = jest
-        .spyOn(RNLocalize, 'findBestAvailableLanguage')
+      const findBestLanguageTagMock = jest
+        .spyOn(RNLocalize, 'findBestLanguageTag')
         .mockReturnValueOnce({
           languageTag: 'fr',
           isRTL: false,
         });
       localHelpersModule.init();
-      findBestAvailableLanguageMock.mockRestore();
+      findBestLanguageTagMock.mockRestore();
     });
 
     test('should return the currentLocale', () => {
@@ -128,8 +126,8 @@ describe('localeHelpers', () => {
         localHelpersModule.useCurrentLocale(),
       );
 
-      const findBestAvailableLanguageMock = jest
-        .spyOn(RNLocalize, 'findBestAvailableLanguage')
+      const findBestLanguageTagMock = jest
+        .spyOn(RNLocalize, 'findBestLanguageTag')
         .mockReturnValueOnce({
           languageTag: 'fr',
           isRTL: false,
@@ -140,7 +138,7 @@ describe('localeHelpers', () => {
       });
       expect(result.current).toBe('fr');
 
-      findBestAvailableLanguageMock.mockReturnValueOnce({
+      findBestLanguageTagMock.mockReturnValueOnce({
         languageTag: 'es',
         isRTL: false,
       });

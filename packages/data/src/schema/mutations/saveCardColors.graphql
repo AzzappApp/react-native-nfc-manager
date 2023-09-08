@@ -1,0 +1,17 @@
+extend type Mutation {
+  """
+  Update the card cover of the current profile
+  """
+  saveCardColors(input: SaveCardColorsInput!): SaveCardColorsPayload!
+}
+
+input SaveCardColorsInput {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
+}
+
+type SaveCardColorsPayload {
+  profile: Profile!
+}

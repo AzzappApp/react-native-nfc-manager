@@ -25,6 +25,8 @@ class AVAssetCache: NSObject {
   
   private let assetKeys = ["playable", "tracks", "duration"]
   
+  private var cacheDispatchQueue = DispatchQueue(label: "com.azzapp.azzapp.AVAssetCache")
+  
   override private init() {
     super.init()
     assetCache.countLimit = 10;
@@ -34,82 +36,92 @@ class AVAssetCache: NSObject {
     if url.isFileURL {
       return AVURLAsset(url: url)
     }
-    if let asset = assetCache.object(forKey: url as NSURL) {
-      return asset
+    return cacheDispatchQueue.sync {
+      if let asset = assetCache.object(forKey: url as NSURL) {
+        return asset
+      }
+      return nil
     }
-    return nil
   }
   
   func prefetchAsset(for url: URL) throws -> Bool  {
     if url.isFileURL {
       return false
     }
-    if activeTasks[url] != nil {
+    
+    return cacheDispatchQueue.sync {
+      if activeTasks[url] != nil {
+        return true
+      }
+      if assetCache.object(forKey: url as NSURL) != nil  {
+        return false
+      }
+      
+      let asset = AVURLAsset(url: url)
+      let task = Task<Void, Error> {
+        await asset.loadValues(forKeys: assetKeys)
+        
+        if Task.isCancelled {
+          handleTaskDidFinish(url: url, error: CancellationError());
+          return;
+        }
+        
+        var error: NSError?
+        for key in assetKeys {
+          if asset.statusOfValue(forKey: key, error: &error) == .failed {
+            handleTaskDidFinish(url: url, error: error)
+            return
+          }
+        }
+        handleTaskDidFinish(url: url, error: nil);
+      }
+    
+      activeTasks[url] = task
+      assetCache.setObject(asset, forKey: url as NSURL)
+    
       return true
     }
-    if assetCache.object(forKey: url as NSURL) != nil  {
-      return false
-    }
-    
-    let asset = AVURLAsset(url: url)
-    let task = Task<Void, Error> {
-      await asset.loadValues(forKeys: assetKeys)
-      
-      if Task.isCancelled {
-        handleTaskDidFinish(url: url, error: CancellationError());
-        return;
-      }
-      
-      var error: NSError?
-      for key in assetKeys {
-        if asset.statusOfValue(forKey: key, error: &error) == .failed {
-          handleTaskDidFinish(url: url, error: error)
-          return
-        }
-      }
-      handleTaskDidFinish(url: url, error: nil);
-    }
-  
-    activeTasks[url] = task
-    assetCache.setObject(asset, forKey: url as NSURL)
-    
-    return true
   }
   
   func observePrefetch(for url: URL, onComplete: @escaping () -> Void, onError:  @escaping (Error) -> Void) throws {
-    guard activeTasks[url] != nil else {
-      throw AVAssetCacheError.taskDoesNotExist
+    try cacheDispatchQueue.sync {
+      guard activeTasks[url] != nil else {
+        throw AVAssetCacheError.taskDoesNotExist
+      }
+      var taskObservers = tasksObservers[url] ?? [TaskObserver]()
+
+      taskObservers.append((onComplete, onError))
+      tasksObservers[url] = taskObservers
     }
-    var taskObservers = tasksObservers[url] ?? [TaskObserver]()
-    
-    taskObservers.append((onComplete, onError))
-    
-    tasksObservers[url] = taskObservers
   }
   
   func cancelPrefetch(for url: URL) throws {
-    guard let task = activeTasks[url] else {
-      throw AVAssetCacheError.taskDoesNotExist
+    try cacheDispatchQueue.sync {
+      guard let task = activeTasks[url] else {
+        throw AVAssetCacheError.taskDoesNotExist
+      }
+      task.cancel()
+      tasksObservers.removeValue(forKey: url)
+      activeTasks.removeValue(forKey: url)
+      assetCache.removeObject(forKey: url as NSURL)
     }
-    task.cancel()
-    tasksObservers.removeValue(forKey: url)
-    activeTasks.removeValue(forKey: url)
-    assetCache.removeObject(forKey: url as NSURL)
   }
   
   func handleTaskDidFinish(url: URL, error: Error?) {
-    activeTasks.removeValue(forKey: url)
-    
-    if let observers = tasksObservers[url] {
-      for (onComplete, onError) in observers {
-        if let error = error {
-          onError(error)
-        } else  {
-          onComplete()
+    cacheDispatchQueue.sync {
+      activeTasks.removeValue(forKey: url)
+      
+      if let observers = tasksObservers[url] {
+        for (onComplete, onError) in observers {
+          if let error = error {
+            onError(error)
+          } else  {
+            onComplete()
+          }
         }
       }
+      tasksObservers.removeValue(forKey: url)
     }
-    tasksObservers.removeValue(forKey: url)
   }
 }
 

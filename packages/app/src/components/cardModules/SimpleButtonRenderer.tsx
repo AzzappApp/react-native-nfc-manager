@@ -1,90 +1,92 @@
 import { useCallback } from 'react';
-import { useIntl } from 'react-intl';
 import { Linking, Text, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { SIMPLE_BUTTON_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { graphql, readInlineData } from 'react-relay';
+import { swapColor } from '@azzapp/shared/cardHelpers';
+import {
+  SIMPLE_BUTTON_DEFAULT_VALUES,
+  SIMPLE_BUTTON_STYLE_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
-import type { SimpleButtonEditionValue } from '#screens/SimpleButtonEditionScreen/simpleButtonEditionScreenTypes';
 import type {
   SimpleButtonRenderer_module$data,
   SimpleButtonRenderer_module$key,
 } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
-import type { ViewProps } from 'react-native';
-
-export type SimpleButtonRendererProps = ViewProps & {
-  /**
-   * A relay fragment reference for a SimpleButton module
-   */
-  module: SimpleButtonRenderer_module$key;
-};
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 /**
  * Render a SimpleButton module
  */
-const SimpleButtonRenderer = ({
-  module,
-  ...props
-}: SimpleButtonRendererProps) => {
-  const data = useFragment(
-    graphql`
-      fragment SimpleButtonRenderer_module on CardModule {
-        id
-        ... on CardModuleSimpleButton {
-          buttonLabel
-          actionType
-          actionLink
-          fontFamily
-          fontColor
-          fontSize
-          buttonColor
-          borderColor
-          borderWidth
-          borderRadius
-          marginTop
-          marginBottom
-          width
-          height
-          background {
-            id
-            uri
-          }
-          backgroundStyle {
-            backgroundColor
-            patternColor
-          }
-        }
-      }
-    `,
-    module,
-  );
-  return <SimpleButtonRendererRaw data={data} {...props} />;
-};
+const SimpleButtonRendererFragment = graphql`
+  fragment SimpleButtonRenderer_module on CardModuleSimpleButton @inline {
+    buttonLabel
+    actionType
+    actionLink
+    fontFamily
+    fontColor
+    fontSize
+    buttonColor
+    borderColor
+    borderWidth
+    borderRadius
+    marginTop
+    marginBottom
+    width
+    height
+    background {
+      id
+      uri
+      resizeMode
+    }
+    backgroundStyle {
+      backgroundColor
+      patternColor
+    }
+  }
+`;
 
-export default SimpleButtonRenderer;
+export const readSimpleButtonData = (module: SimpleButtonRenderer_module$key) =>
+  readInlineData(SimpleButtonRendererFragment, module);
 
-export type SimpleButtonRawData = Omit<
-  SimpleButtonRenderer_module$data,
-  ' $fragmentType'
+export type SimpleButtonRendererData = NullableFields<
+  Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
 >;
 
-type SimpleButtonRendererRawProps = ViewProps & {
+export type SimpleButtonRendererProps = ViewProps & {
   /**
    * The data for the SimpleButton module
    */
-  data: SimpleButtonRawData;
+  data: SimpleButtonRendererData;
+  /**
+   * the color palette
+   */
+  colorPalette: ColorPalette | null | undefined;
+  /**
+   * the card style
+   */
+  cardStyle: CardStyle | null | undefined;
+  /**
+   * The wrapped content style
+   */
+  contentStyle?: StyleProp<ViewStyle>;
 };
 
 /**
- * Raw implementation of the SimpleButton module
+ *  implementation of the SimpleButton module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-export const SimpleButtonRendererRaw = ({
+const SimpleButtonRenderer = ({
   data,
+  colorPalette,
+  cardStyle,
   style,
+  contentStyle,
   ...props
-}: SimpleButtonRendererRawProps) => {
+}: SimpleButtonRendererProps) => {
   const {
     buttonLabel,
     actionType,
@@ -102,13 +104,12 @@ export const SimpleButtonRendererRaw = ({
     height,
     background,
     backgroundStyle,
-  } = Object.assign(
-    {},
-    SIMPLE_BUTTON_DEFAULT_VALUES,
+  } = getModuleDataValues({
     data,
-  ) as SimpleButtonEditionValue;
-
-  const intl = useIntl();
+    cardStyle,
+    styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
+    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+  });
 
   const onPress = useCallback(async () => {
     if (actionLink) {
@@ -126,8 +127,12 @@ export const SimpleButtonRendererRaw = ({
     <CardModuleBackground
       {...props}
       backgroundUri={background?.uri}
-      backgroundColor={backgroundStyle?.backgroundColor}
-      patternColor={backgroundStyle?.patternColor}
+      backgroundColor={swapColor(
+        backgroundStyle?.backgroundColor,
+        colorPalette,
+      )}
+      patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
+      resizeMode={background?.resizeMode}
       style={[
         style,
         {
@@ -136,42 +141,37 @@ export const SimpleButtonRendererRaw = ({
         },
       ]}
     >
-      <PressableOpacity onPress={onPress}>
+      <PressableOpacity onPress={onPress} style={[contentStyle]}>
         <View
           style={{
             height,
             width,
             marginBottom,
             marginTop,
-            backgroundColor: buttonColor,
+            backgroundColor: swapColor(buttonColor, colorPalette),
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius,
             borderWidth,
-            borderColor,
+            borderColor: swapColor(borderColor, colorPalette),
             overflow: 'hidden',
           }}
         >
           <Text
             style={{
               fontFamily,
-              color: fontColor,
+              color: swapColor(fontColor, colorPalette),
               fontSize,
               flexWrap: 'nowrap',
             }}
             numberOfLines={1}
           >
-            {
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-              buttonLabel ||
-                intl.formatMessage({
-                  defaultMessage: 'Button Label',
-                  description: 'Placeholder for button that has no label yet',
-                })
-            }
+            {buttonLabel}
           </Text>
         </View>
       </PressableOpacity>
     </CardModuleBackground>
   );
 };
+
+export default SimpleButtonRenderer;

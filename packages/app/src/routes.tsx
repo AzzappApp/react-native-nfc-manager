@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
@@ -7,18 +6,13 @@ export type HomeRoute = {
   params?: never;
 };
 
+export type MediaRoute = {
+  route: 'MEDIA';
+  params?: never;
+};
+
 export type SearchRoute = {
   route: 'SEARCH';
-  params?: never;
-};
-
-export type ChatRoute = {
-  route: 'CHAT';
-  params?: never;
-};
-
-export type AccountRoute = {
-  route: 'ACCOUNT';
   params?: never;
 };
 
@@ -37,15 +31,17 @@ export type ForgotPasswordRoute = {
   params?: never;
 };
 
-export type ChangePasswordRoute = {
-  route: 'CHANGE_PASSWORD';
-  params?: never; //TODO this should coutain a reset token ?
+export type ForgotPasswordConfirmationRoute = {
+  route: 'FORGOT_PASSWORD_CONFIRMATION';
+  params: {
+    issuer: string;
+  };
 };
 
 export type NewProfileRoute = {
   route: 'NEW_PROFILE';
   params?: {
-    goBack: boolean;
+    profileId: string;
   };
 };
 
@@ -53,18 +49,13 @@ export type ProfileRoute = {
   route: 'PROFILE';
   params: {
     userName: string;
-    profileID?: string;
+    profileId?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
+    editing?: boolean;
   };
 };
-
-export type AlbumsRoute = {
-  route: 'ALBUMS';
-  params?: never;
-};
-
 export type PostRoute = {
   route: 'POST';
   params: {
@@ -85,10 +76,15 @@ export type NewPostRoute = {
   params?: { fromProfile: boolean };
 };
 
+export type CoverEditionRoute = {
+  route: 'COVER_EDITION';
+  params?: { isCreation?: boolean; coverKind?: 'others' | 'people' | 'video' };
+};
+
 export type CardModuleEditionRoute = {
   route: 'CARD_MODULE_EDITION';
   params: {
-    module: ModuleKind | 'cover';
+    module: ModuleKind;
     moduleId?: string;
     isNew?: boolean;
   };
@@ -96,6 +92,11 @@ export type CardModuleEditionRoute = {
 
 export type FollowingsRoute = {
   route: 'FOLLOWINGS';
+  params?: never;
+};
+
+export type FollowingsMosaicRoute = {
+  route: 'FOLLOWINGS_MOSAIC';
   params?: never;
 };
 
@@ -119,26 +120,35 @@ export type ContactCardRoute = {
   params?: never;
 };
 
+export type ResetPasswordRoute = {
+  route: 'RESET_PASSWORD';
+  params: {
+    token: string;
+    issuer: string;
+  };
+};
+
 export type Route =
-  | AlbumsRoute
+  | AccountDetailsRoute
+  | CardModuleEditionRoute
+  | ContactCardRoute
+  | CoverEditionRoute
+  | FollowersRoute
+  | FollowingsMosaicRoute
+  | FollowingsRoute
+  | ForgotPasswordConfirmationRoute
+  | ForgotPasswordRoute
   | HomeRoute
-  | SearchRoute
-  | ChatRoute
-  | AccountRoute
-  | ProfileRoute
-  | PostRoute
-  | PostCommentsRoute
+  | InviteFriendsRoute
+  | MediaRoute
   | NewPostRoute
   | NewProfileRoute
-  | ChangePasswordRoute
+  | PostCommentsRoute
+  | PostRoute
+  | ProfileRoute
+  | ResetPasswordRoute
+  | SearchRoute
   | SignInRoute
-  | SignUpRoute
-  | ForgotPasswordRoute
-  | CardModuleEditionRoute
-  | FollowingsRoute
-  | FollowersRoute
-  | AccountDetailsRoute
-  | InviteFriendsRoute
-  | ContactCardRoute;
+  | SignUpRoute;
 
 export type ROUTES = Route['route'];

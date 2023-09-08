@@ -1,0 +1,88 @@
+import crypto from 'crypto';
+import { Octokit } from '@octokit/rest';
+import safeCompare from 'safe-compare';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Readable } from 'node:stream';
+
+const OWNER = 'AzzappApp';
+const REPO = 'azzapp';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const EAS_BUILD_WEBHOOK_SECRET = process.env.EAS_BUILD_WEBHOOK_SECRET;
+
+export default async (req: VercelRequest, res: VercelResponse) => {
+  if (req.method === 'POST') {
+    await handlePostRequest(req, res);
+  } else {
+    res.setHeader('Allow', 'POST');
+    res.status(405).end('Method Not Allowed');
+  }
+};
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const handlePostRequest = async (req: VercelRequest, res: VercelResponse) => {
+  const expoSignature = req.headers['expo-signature'] as string;
+  const buf = await buffer(req);
+  const body = buf.toString('utf8');
+  const hmac = crypto.createHmac('sha1', EAS_BUILD_WEBHOOK_SECRET!);
+  hmac.update(body);
+  const hash = `sha1=${hmac.digest('hex')}`;
+  if (!safeCompare(expoSignature, hash)) {
+    res.status(500).send("Signatures didn't match!");
+  } else {
+    try {
+      const data = JSON.parse(body);
+      await handleBuildEvent(data);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send('Error!');
+    }
+    res.send('OK!');
+  }
+};
+
+const handleBuildEvent = async (body: any) => {
+  const {
+    status,
+    buildDetailsPageUrl,
+    metadata: { gitCommitHash },
+    platform,
+  } = body as {
+    status: 'canceled' | 'errored' | 'finished';
+    buildDetailsPageUrl: string;
+    metadata: {
+      gitCommitHash: string;
+    };
+    platform: 'android' | 'ios';
+  };
+
+  if (status === 'canceled') {
+    return;
+  }
+
+  const octokit = new Octokit({
+    auth: GITHUB_TOKEN,
+  });
+
+  await octokit.repos.createCommitStatus({
+    owner: OWNER,
+    repo: REPO,
+    sha: gitCommitHash,
+    state: status === 'errored' ? 'error' : 'success',
+    context: `Eas build ${platform}`,
+    description: `EAS build - ${platform}`,
+    target_url: buildDetailsPageUrl,
+  });
+};
+
+async function buffer(readable: Readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}

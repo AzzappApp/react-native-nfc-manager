@@ -3,22 +3,21 @@ import {
   json,
   int,
   mysqlEnum,
-  varchar,
   mysqlTable,
+  boolean,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH } from './db';
-import { customLabels, customTinyInt } from './generic';
+import db, { cols } from './db';
 import type { InferModel } from 'drizzle-orm';
 
 export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
-  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  id: cols.cuid('id').primaryKey().notNull(),
   profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
-  labels: customLabels('labels'),
-  medias: json('medias').notNull(),
-  available: customTinyInt('available').default(true).notNull(),
+  labels: cols.labels('labels').notNull(),
+  medias: json('medias').$type<string[]>().notNull(),
   order: int('order').notNull(),
+  enabled: boolean('enabled').default(true).notNull(),
 });
 
 export type ProfileCategory = InferModel<typeof ProfileCategoryTable>;
@@ -35,7 +34,7 @@ export const getProfileCategories = async () =>
   db
     .select()
     .from(ProfileCategoryTable)
-    .where(eq(ProfileCategoryTable.available, true))
+    .where(eq(ProfileCategoryTable.enabled, true))
     .orderBy(asc(ProfileCategoryTable.order));
 
 /**
@@ -48,5 +47,4 @@ export const getProfileCategoryById = async (id: string) =>
     .select()
     .from(ProfileCategoryTable)
     .where(eq(ProfileCategoryTable.id, id))
-
     .then(res => res.pop() ?? null);

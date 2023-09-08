@@ -4,25 +4,19 @@ import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
-import {
-  getUserByEmail,
-  getUserByPhoneNumber,
-  getUsersByIds,
-  updateUser,
-} from '#domains';
+import { getUserByEmail, getUserByPhoneNumber, updateUser } from '#domains';
 import type { User } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateUserMutation: MutationResolvers['updateUser'] = async (
   _,
   args,
-  { auth },
+  { auth, loaders },
 ) => {
-  if (auth.isAnonymous) {
+  const userId = auth.userId;
+  if (!userId) {
     return null;
   }
-
-  const userId = auth.userId;
 
   const { email, phoneNumber, currentPassword, newPassword } = args.input;
 
@@ -46,10 +40,10 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
   }
 
-  const [dbUser] = await getUsersByIds([userId]);
+  const dbUser = await loaders.User.load(userId);
 
   if (!dbUser) {
-    throw new Error(ERRORS.USER_NOT_FOUND);
+    throw new Error(ERRORS.INVALID_REQUEST);
   }
 
   if (newPassword) {
@@ -65,9 +59,9 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   }
 
   try {
-    const result = await updateUser(userId, partialUser);
+    await updateUser(userId, partialUser);
 
-    return { user: { ...dbUser, ...result } };
+    return { user: { ...dbUser, ...partialUser } };
   } catch (error) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }

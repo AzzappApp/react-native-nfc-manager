@@ -1,12 +1,15 @@
-import { Suspense, useCallback, useState } from 'react';
+import { omit } from 'lodash';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, Modal, View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+  PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { GraphQLError } from '@azzapp/shared/createRelayEnvironment';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import ImagePicker, {
@@ -14,11 +17,12 @@ import ImagePicker, {
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
-import WebCardPreview from '#components/WebCardPreview';
+import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import useDataEditor from '#hooks/useDataEditor';
+import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -85,25 +89,30 @@ const PhotoWithTextAndTitleEditionScreen = ({
           height
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
         }
-        fontFamily
-        fontColor
-        textAlign
+        contentFontFamily
+        contentFontColor
+        contentTextAlign
+        contentFontSize
+        contentVerticalSpacing
+        content
+        titleFontFamily
+        titleFontColor
+        titleTextAlign
+        titleFontSize
+        titleVerticalSpacing
+        title
         imageMargin
         verticalArrangement
         horizontalArrangement
         gap
-        fontSize
-        textSize
-        text
-        title
         borderRadius
         marginHorizontal
         marginVertical
         aspectRatio
-        verticalSpacing
         background {
           id
           uri
+          resizeMode
         }
         backgroundStyle {
           backgroundColor
@@ -122,6 +131,26 @@ const PhotoWithTextAndTitleEditionScreen = ({
         moduleBackgrounds {
           id
           uri
+          resizeMode
+        }
+        profile {
+          cardColors {
+            primary
+            dark
+            light
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
         }
       }
     `,
@@ -131,33 +160,77 @@ const PhotoWithTextAndTitleEditionScreen = ({
   // #endregion
 
   // #region Data edition
-  const { data, updates, updateFields, fieldUpdateHandler, dirty } =
-    useDataEditor({
-      initialValue: photoWithTextAndTitle,
-      defaultValue: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+  const initialValue = useMemo(() => {
+    return {
+      contentFontFamily: photoWithTextAndTitle?.contentFontFamily ?? null,
+      contentFontColor: photoWithTextAndTitle?.contentFontColor ?? null,
+      contentTextAlign: photoWithTextAndTitle?.contentTextAlign ?? null,
+      contentFontSize: photoWithTextAndTitle?.contentFontSize ?? null,
+      contentVerticalSpacing:
+        photoWithTextAndTitle?.contentVerticalSpacing ?? null,
+      content: photoWithTextAndTitle?.content ?? null,
+      titleFontFamily: photoWithTextAndTitle?.titleFontFamily ?? null,
+      titleFontColor: photoWithTextAndTitle?.titleFontColor ?? null,
+      titleTextAlign: photoWithTextAndTitle?.titleTextAlign ?? null,
+      titleFontSize: photoWithTextAndTitle?.titleFontSize ?? null,
+      titleVerticalSpacing: photoWithTextAndTitle?.titleVerticalSpacing ?? null,
+      title: photoWithTextAndTitle?.title ?? null,
+      image: photoWithTextAndTitle?.image ?? null,
+      imageMargin: photoWithTextAndTitle?.imageMargin ?? null,
+      verticalArrangement: photoWithTextAndTitle?.verticalArrangement ?? null,
+      horizontalArrangement:
+        photoWithTextAndTitle?.horizontalArrangement ?? null,
+      gap: photoWithTextAndTitle?.gap ?? null,
+      borderRadius: photoWithTextAndTitle?.borderRadius ?? null,
+      marginHorizontal: photoWithTextAndTitle?.marginHorizontal ?? null,
+      marginVertical: photoWithTextAndTitle?.marginVertical ?? null,
+      backgroundId: photoWithTextAndTitle?.background?.id ?? null,
+      backgroundStyle: photoWithTextAndTitle?.backgroundStyle ?? null,
+      aspectRatio: photoWithTextAndTitle?.aspectRatio ?? null,
+    };
+  }, [photoWithTextAndTitle]);
+
+  const { data, value, fieldUpdateHandler, updateFields, dirty } =
+    useModuleDataEditor({
+      initialValue,
+      cardStyle: viewer.profile?.cardStyle,
+      styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
+      defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
 
   const {
     image,
-    fontFamily,
-    fontColor,
-    textAlign,
+    content,
+    contentFontFamily,
+    contentFontColor,
+    contentTextAlign,
+    contentVerticalSpacing,
+    contentFontSize,
+    title,
+    titleFontFamily,
+    titleFontColor,
+    titleTextAlign,
+    titleVerticalSpacing,
+    titleFontSize,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
     gap,
-    text,
-    title,
-    fontSize,
-    textSize,
     borderRadius,
     marginHorizontal,
     marginVertical,
-    background,
+    backgroundId,
     backgroundStyle,
-    verticalSpacing,
     aspectRatio,
   } = data;
+
+  const previewData = {
+    ...omit(data, 'backgroundId'),
+    background:
+      viewer.moduleBackgrounds.find(
+        background => background.id === backgroundId,
+      ) ?? null,
+  };
   // #endregion
 
   // #region Mutations and saving logic
@@ -167,9 +240,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
         $input: SavePhotoWithTextAndTitleModuleInput!
       ) {
         savePhotoWithTextAndTitleModule(input: $input) {
-          card {
+          profile {
             id
-            modules {
+            cardModules {
               kind
               visible
               ...PhotoWithTextAndTitleEditionScreen_module
@@ -178,7 +251,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       }
     `);
-  const isValid = isNotFalsyString(text) && isNotFalsyString(title) && image;
+  const isValid =
+    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
@@ -190,18 +264,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
     if (!canSave) {
       return;
     }
-    const {
-      image: updateImage,
-      background: updateBackground,
-      ...rest
-    } = updates;
+    const { image: updateImage, ...rest } = value;
     let mediaId = updateImage?.id;
 
     if (!mediaId && updateImage?.uri) {
       //we need to save the media first
       const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
-        target: 'cover',
+        target: 'module',
       });
       const fileName = getFileName(updateImage.uri);
       const file: any = {
@@ -218,7 +288,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       setUploadProgress(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
-        mediaId = public_id;
+        mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
         console.log(error);
       } finally {
@@ -228,12 +298,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     const input: SavePhotoWithTextAndTitleModuleInput = {
       moduleId: photoWithTextAndTitle?.id,
-      image: mediaId ?? data.image.id,
       ...rest,
+      image: mediaId ?? value.image!.id,
     };
-
-    if (updateBackground?.id !== photoWithTextAndTitle?.background?.id) {
-      input.backgroundId = updateBackground?.id ?? null;
+    if (value.title) {
+      input.title = value.title;
+    }
+    if (value.content) {
+      input.content = value.content;
     }
 
     commit({
@@ -254,15 +326,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       },
     });
-  }, [
-    canSave,
-    updates,
-    photoWithTextAndTitle?.id,
-    photoWithTextAndTitle?.background?.id,
-    data?.image?.id,
-    commit,
-    router,
-  ]);
+  }, [canSave, value, photoWithTextAndTitle?.id, commit, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -311,15 +375,32 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onImageChange = fieldUpdateHandler('image');
 
-  const onTextChange = fieldUpdateHandler('text');
+  const onTitleFontFamilyChange = fieldUpdateHandler('titleFontFamily');
+
+  const onTitleFontColorChange = fieldUpdateHandler('titleFontColor');
+
+  const onTitleTextAlignChange = fieldUpdateHandler('titleTextAlign');
+
+  const onTitleFontSizeChange = fieldUpdateHandler('titleFontSize');
+
+  const onContentChange = fieldUpdateHandler('content');
+
+  const onTitleVerticalSpacingChange = fieldUpdateHandler(
+    'titleVerticalSpacing',
+  );
+  const onContentFontFamilyChange = fieldUpdateHandler('contentFontFamily');
+
+  const onContentFontColorChange = fieldUpdateHandler('contentFontColor');
+
+  const onContentTextAlignChange = fieldUpdateHandler('contentTextAlign');
+
+  const onContentFontSizeChange = fieldUpdateHandler('contentFontSize');
 
   const onTitleChange = fieldUpdateHandler('title');
 
-  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
-
-  const onFontColorChange = fieldUpdateHandler('fontColor');
-
-  const onTextAlignChange = fieldUpdateHandler('textAlign');
+  const onContentVerticalSpacingChange = fieldUpdateHandler(
+    'contentVerticalSpacing',
+  );
 
   const onImageMarginChange = useCallback(() => {
     updateFields({
@@ -341,35 +422,17 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
   }, [horizontalArrangement, updateFields]);
 
-  const onFontSizeChange = fieldUpdateHandler('fontSize');
-
-  const onTextSizeChange = fieldUpdateHandler('textSize');
-
   const onBorderRadiusChange = fieldUpdateHandler('borderRadius');
 
   const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
 
   const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
 
-  const onVerticalSpacingChange = fieldUpdateHandler('verticalSpacing');
-
   const onAspectRatioChange = fieldUpdateHandler('aspectRatio');
 
   const onGapChange = fieldUpdateHandler('gap');
 
-  const onBackgroundChange = useCallback(
-    (backgroundId: string | null) => {
-      updateFields({
-        background:
-          backgroundId == null
-            ? null
-            : viewer.moduleBackgrounds.find(
-                ({ id }: { id: string }) => id === backgroundId,
-              ),
-      });
-    },
-    [updateFields, viewer.moduleBackgrounds],
-  );
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
@@ -439,7 +502,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
       <PressableOpacity onPress={onPickImage}>
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={data}
+          data={previewData}
+          colorPalette={viewer.profile?.cardColors}
+          cardStyle={viewer.profile?.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -451,23 +516,31 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleSettingsEditionPanel
                 viewer={viewer}
-                fontFamily={fontFamily}
-                onFontFamilyChange={onFontFamilyChange}
-                fontColor={fontColor}
-                onFontColorChange={onFontColorChange}
-                textAlign={textAlign}
-                onTextAlignChange={onTextAlignChange}
-                fontSize={fontSize}
-                onFontSizeChange={onFontSizeChange}
-                textSize={textSize}
-                onTextSizeChange={onTextSizeChange}
-                verticalSpacing={verticalSpacing}
-                onVerticalSpacingChange={onVerticalSpacingChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
                 bottomSheetHeight={bottomPanelHeight}
+                titleFontFamily={titleFontFamily}
+                onTitleFontFamilyChange={onTitleFontFamilyChange}
+                titleFontColor={titleFontColor}
+                onTitleFontColorChange={onTitleFontColorChange}
+                titleTextAlign={titleTextAlign}
+                onTitleTextAlignChange={onTitleTextAlignChange}
+                titleFontSize={titleFontSize}
+                onTitleFontSizeChange={onTitleFontSizeChange}
+                titleVerticalSpacing={titleVerticalSpacing}
+                onTitleVerticalSpacingChange={onTitleVerticalSpacingChange}
+                contentFontFamily={contentFontFamily}
+                onContentFontFamilyChange={onContentFontFamilyChange}
+                contentFontColor={contentFontColor}
+                onContentFontColorChange={onContentFontColorChange}
+                contentTextAlign={contentTextAlign}
+                onContentTextAlignChange={onContentTextAlignChange}
+                contentFontSize={contentFontSize}
+                onContentFontSizeChange={onContentFontSizeChange}
+                contentVerticalSpacing={contentVerticalSpacing}
+                onContentVerticalSpacingChange={onContentVerticalSpacingChange}
               />
             ),
           },
@@ -515,7 +588,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleBackgroundEditionPanel
                 viewer={viewer}
-                backgroundId={background?.id}
+                backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
@@ -531,15 +604,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
       />
       <TextAreaModal
         visible={showContentModal}
-        value={text}
+        value={content ?? ''}
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
           description:
             'Placeholder for text area in simple text edition screen',
         })}
-        maxLength={2200}
+        maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={onContentChange}
         closeOnBlur={false}
         ItemTopComponent={
           <>
@@ -550,16 +623,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 description:
                   'Title placeholder in PhotoWithTextAndTitle module',
               })}
-              value={title}
+              value={title ?? ''}
               onChangeText={onTitleChange}
-              maxLength={300}
+              maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
               style={{ borderWidth: 0 }}
             />
             <Text
               variant="smallbold"
               style={[
                 styles.counter,
-                title.length >= 300 && {
+                (title?.length ?? 0) >= 300 && {
                   color: colors.red400,
                 },
               ]}
@@ -580,19 +653,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
         pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
       >
         <Suspense>
-          <WebCardPreview
+          <WebCardModulePreview
             editedModuleId={photoWithTextAndTitle?.id}
             visible={currentTab === 'preview'}
             editedModuleInfo={{
               kind: MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-              data,
+              data: previewData,
             }}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            height={topPanelHeight + bottomPanelHeight}
+            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
           />
         </Suspense>
       </View>

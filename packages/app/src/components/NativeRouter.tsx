@@ -247,6 +247,7 @@ export type NativeRouter = {
   showModal(route: Route): void;
   back(): void;
   getCurrentRoute(): Route;
+  getCurrentScreenId(): string;
   addRouteWillChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
@@ -437,6 +438,9 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     return {
       getCurrentRoute() {
         return getCurrentRouteFromState(routerStateRef.current).state;
+      },
+      getCurrentScreenId() {
+        return getCurrentRouteFromState(routerStateRef.current).id;
       },
       push(route: Route) {
         if (setTabIfExists(route)) {
@@ -670,6 +674,17 @@ export const useScreenHasFocus = () => {
   return hasFocus;
 };
 
+export const useOnFocus = (handler: (() => void) | null) => {
+  const hasFocus = useScreenHasFocus();
+  const funcRef = useRef(handler);
+  funcRef.current = handler;
+  useEffect(() => {
+    if (hasFocus) {
+      funcRef.current?.();
+    }
+  }, [hasFocus]);
+};
+
 const StackRenderer = ({
   stack,
   screens,
@@ -729,8 +744,9 @@ const StackRenderer = ({
     );
   });
   if (children) {
-    childs.push(children);
+    childs.concat(children);
   }
+
   return (
     <ScreenStack
       style={{ flex: 1 }}
@@ -820,7 +836,7 @@ type NativeNavigationEvent =
   | 'willAppear'
   | 'willDisappear';
 
-const ScreenRendererContext = React.createContext<{
+export const ScreenRendererContext = React.createContext<{
   id: string;
   navigationEventEmitter: EventEmitter;
   hasFocus?: boolean;

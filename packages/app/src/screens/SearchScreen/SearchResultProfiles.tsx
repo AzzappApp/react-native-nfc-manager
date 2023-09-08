@@ -80,7 +80,8 @@ const SearchResultProfiles = ({
       horizontal={false}
       numColums={2}
       initialNumToRender={4}
-      style={{ marginTop: 6, flex: 1 }}
+      columnWrapperStyle={styles.columnStyle}
+      withShadow
     />
   );
 };
@@ -104,7 +105,7 @@ export const SearchResultProfilesPlaceHolder = () => {
   );
 };
 
-const COVER_WIDTH = (Dimensions.get('window').width - 8) / 2;
+const COVER_WIDTH = (Dimensions.get('window').width - 8 * 2) / 2;
 
 const styles = StyleSheet.create({
   viewColumn: {
@@ -120,15 +121,12 @@ const styles = StyleSheet.create({
   },
   coverStyle: {
     width: COVER_WIDTH,
-    paddingLeft: 4,
-    paddingRight: 4,
-    paddingBottom: 4,
-    paddingTop: 4,
-    marginRight: 0, //override default
   },
   containerStyle: {
-    paddingLeft: 4,
-    paddingRight: 4,
+    padding: 4,
+  },
+  columnStyle: {
+    gap: 8,
   },
   profilePlaceHolder: {
     width: COVER_WIDTH - 8,

@@ -1,99 +1,60 @@
 import createPost from './createPost';
 import createPostComment from './createPostComment';
+import createProfile from './createProfile';
 import deleteModules from './deleteModules';
 import duplicateModule from './duplicateModule';
+import loadCardTemplate from './loadCardTemplate';
+import {
+  saveBlockTextModule,
+  saveCarouselModule,
+  saveHorizontalPhotoModule,
+  saveLineDividerModule,
+  savePhotoWithTextAndTitleModule,
+  saveSimpleButtonModule,
+  saveSimpleTextModule,
+  saveSocialLinksModule,
+} from './ModulesMutationsResolvers';
 import togglePostReaction from './postReaction';
+import publishCard from './publishCard';
 import removeFollower from './removeFollower';
-import saveBlockTextModule from './saveBlockTextModule';
-import saveCarouselModule from './saveCarouselModule';
+import reorderModules from './reorderModules';
+import saveCardColors from './saveCardColors';
+import saveCardStyle from './saveCardStyle';
 import saveContactCard from './saveContactCard';
-import saveHorizontalPhotoModule from './saveHorizontalPhotoModule';
-import saveLineDividerModule from './saveLineDividerModule';
-import savePhotoWithTextAndTitleModule from './savePhotoWithTextAndTitleModule';
-import saveSimpleButtonModule from './saveSimpleButtonModule';
-import saveSimpleTextModule from './saveSimpleTextModule';
-import saveSocialLinksModule from './saveSocialLinksModule';
-import swapModules from './swapModules';
+import saveCover from './saveCover';
 import toggleFollowing from './toggleFollowing';
-import updateCard from './updateCard';
-import updateCover from './updateCover';
 import updateModulesVisibility from './updateModulesVisibility';
 import updatePost from './updatePost';
 import updateProfile from './updateProfile';
 import updateUser from './updateUser';
-import type {
-  MutationResolvers,
-  Resolver,
-  ResolverFn,
-} from '#schema/__generated__/types';
-
-const createMutationWithClientMutationId = <
-  TResult extends
-    | Promise<{ clientMutationId?: string | null } | null>
-    | { clientMutationId?: string | null }
-    | null,
-  TParent,
-  TContext,
-  TArgs extends { input: { clientMutationId?: string | null } },
->(
-  fn?: Resolver<TResult, TParent, TContext, TArgs>,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-): Resolver<TResult, TParent, TContext, TArgs> | undefined => {
-  if (fn) {
-    const res: ResolverFn<TResult, TParent, TContext, TArgs> = async (
-      parent,
-      args,
-      context,
-      info,
-    ) => {
-      const { clientMutationId } = args.input;
-      const result =
-        typeof fn === 'function'
-          ? await fn(parent, args, context, info)
-          : await fn.resolve(parent, args, context, info);
-      return result ? { ...result, clientMutationId } : (null as TResult);
-    };
-
-    return typeof fn === 'function' ? res : { ...fn, resolve: res };
-  }
-  return fn;
-};
+import type { MutationResolvers } from '#schema/__generated__/types';
 
 export const Mutation: MutationResolvers = {
-  updateProfile: createMutationWithClientMutationId(updateProfile),
-  updateUser: createMutationWithClientMutationId(updateUser),
-  updateCover: createMutationWithClientMutationId(updateCover),
-  updateCard: createMutationWithClientMutationId(updateCard),
-  createPost: createMutationWithClientMutationId(createPost),
-  updatePost: createMutationWithClientMutationId(updatePost),
-  toggleFollowing: createMutationWithClientMutationId(toggleFollowing),
-  removeFollower: createMutationWithClientMutationId(removeFollower),
-  togglePostReaction: createMutationWithClientMutationId(togglePostReaction),
-  saveSimpleTextModule:
-    createMutationWithClientMutationId(saveSimpleTextModule),
-  saveLineDividerModule: createMutationWithClientMutationId(
-    saveLineDividerModule,
-  ),
-  saveHorizontalPhotoModule: createMutationWithClientMutationId(
-    saveHorizontalPhotoModule,
-  ),
-  saveCarouselModule: createMutationWithClientMutationId(saveCarouselModule),
-  savePhotoWithTextAndTitleModule: createMutationWithClientMutationId(
-    savePhotoWithTextAndTitleModule,
-  ),
-  saveSimpleButtonModule: createMutationWithClientMutationId(
-    saveSimpleButtonModule,
-  ),
-  saveSocialLinksModule: createMutationWithClientMutationId(
-    saveSocialLinksModule,
-  ),
-  saveBlockTextModule: createMutationWithClientMutationId(saveBlockTextModule),
-  swapModules: createMutationWithClientMutationId(swapModules),
-  deleteModules: createMutationWithClientMutationId(deleteModules),
-  duplicateModule: createMutationWithClientMutationId(duplicateModule),
-  updateModulesVisibility: createMutationWithClientMutationId(
-    updateModulesVisibility,
-  ),
-  createPostComment: createMutationWithClientMutationId(createPostComment),
-  saveContactCard: createMutationWithClientMutationId(saveContactCard),
+  updateProfile,
+  updateUser,
+  createPost,
+  createProfile,
+  updatePost,
+  toggleFollowing,
+  removeFollower,
+  togglePostReaction,
+  saveSimpleTextModule,
+  saveLineDividerModule,
+  saveHorizontalPhotoModule,
+  saveCarouselModule,
+  savePhotoWithTextAndTitleModule,
+  saveSimpleButtonModule,
+  saveSocialLinksModule,
+  saveBlockTextModule,
+  reorderModules,
+  deleteModules,
+  duplicateModule,
+  loadCardTemplate,
+  updateModulesVisibility,
+  createPostComment,
+  saveCardColors,
+  saveCardStyle,
+  saveContactCard,
+  saveCover,
+  publishCard,
 };

@@ -1,36 +1,50 @@
+import { connectionFromArray } from 'graphql-relay';
+import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { getColorPalettes } from '#domains';
 import { idResolver } from './utils';
 import type {
-  CardCoverTemplateResolvers,
+  CoverTemplateDataResolvers,
   CoverTemplateResolvers,
 } from './__generated__/types';
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
-  previewMedia: async ({ previewMediaId }, _, { mediaLoader }) => {
-    if (previewMediaId) {
-      return mediaLoader.load(previewMediaId);
-    }
-    return null;
-  },
-  colorPalette: ({ colorPalette }) => {
-    return colorPalette ? colorPalette.split(',') : null;
-  },
-  tags: ({ tags }) => {
-    return tags?.split(',') ?? [];
+  previewMedia: ({ previewMediaId }) => ({
+    media: previewMediaId,
+    assetKind: 'cover',
+  }),
+  colorPalette: async ({ colorPaletteId }, _, { loaders }) =>
+    (await loaders.ColorPalette.load(colorPaletteId))!,
+  colorPalettes: async (
+    { colorPaletteId },
+    { first, after },
+    { auth, loaders, sessionMemoized },
+  ) => {
+    const mainColorPalette = await loaders.ColorPalette.load(colorPaletteId);
+    const colorPalettes = [
+      mainColorPalette,
+      ...shuffle(
+        await sessionMemoized(getColorPalettes),
+        auth.profileId ?? '' + colorPaletteId,
+      ),
+    ];
+    return connectionFromArray(colorPalettes, { first, after });
   },
 };
 
-export const CardCoverTemplate: CardCoverTemplateResolvers = {
-  background: ({ backgroundId }, _, { staticMediaLoader }) => {
-    return backgroundId ? staticMediaLoader.load(backgroundId) : null;
-  },
-  foreground: ({ foregroundId }, _, { staticMediaLoader }) => {
-    return foregroundId ? staticMediaLoader.load(foregroundId) : null;
-  },
-  sourceMedia: ({ sourceMediaId }, _, { mediaLoader }) => {
-    if (sourceMediaId) {
-      return mediaLoader.load(sourceMediaId);
-    }
-    return null;
-  },
+export const CoverTemplateData: CoverTemplateDataResolvers = {
+  background: ({ backgroundId }) =>
+    backgroundId
+      ? {
+          staticMedia: backgroundId,
+          assetKind: 'cover',
+        }
+      : null,
+  foreground: ({ foregroundId }) =>
+    foregroundId
+      ? {
+          staticMedia: foregroundId,
+          assetKind: 'cover',
+        }
+      : null,
 };

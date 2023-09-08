@@ -1,10 +1,12 @@
+extend type Mutation {
+  updateModulesVisibility(input: UpdateModulesVisibilityInput!): UpdateModulesVisibilityPayload!
+}
+
 input UpdateModulesVisibilityInput {
   modulesIds: [ID!]!
   visible: Boolean!
-  clientMutationId: String
 }
 
 type UpdateModulesVisibilityPayload {
-  card: Card!
-  clientMutationId: String
+  profile: Profile!
 }

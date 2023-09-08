@@ -27,5 +27,5 @@ export const obervePrefetchResult: (uri: string) => Promise<void> =
 export const cancelPrefetch: (uri: string) => void =
   AZPMediaVideoRendererManager.cancelPrefetch;
 
-export const addLocalCachedFile: (mediaID: string, path: string) => void =
+export const addLocalCachedFile: (mediaId: string, path: string) => void =
   AZPMediaVideoRendererManager.addLocalCachedFile;

@@ -12,6 +12,7 @@ import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRati
 import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
 import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
 import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -61,7 +62,7 @@ const PostCreationScreen = ({
     profile?.id &&
     ConnectionHandler.getConnectionID(
       profile.id,
-      'ProfilePostsListprofile_connection_posts',
+      'ProfilePostsList_profile_connection_posts',
     );
 
   const router = useRouter();
@@ -73,7 +74,6 @@ const PostCreationScreen = ({
     mutation PostCreationScreenMutation(
       $connections: [ID!]!
       $input: CreatePostInput!
-      $isNative: Boolean!
       $screenWidth: Float!
       $postWith: Float!
       $cappedPixelRatio: Float!
@@ -95,18 +95,16 @@ const PostCreationScreen = ({
             height
             aspectRatio
             largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
-              @include(if: $isNative)
             smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
-              @include(if: $isNative)
             ... on MediaVideo {
               largeThumbnail: thumbnail(
                 width: $screenWidth
                 pixelRatio: $pixelRatio
-              ) @include(if: $isNative)
+              )
               smallThumbnail: thumbnail(
                 width: $postWith
                 pixelRatio: $cappedPixelRatio
-              ) @include(if: $isNative)
+              )
             }
           }
           createdAt
@@ -160,17 +158,11 @@ const PostCreationScreen = ({
     commit({
       variables: {
         input: {
-          media: {
-            kind: kind === 'video' ? 'video' : 'image',
-            id: public_id,
-            width: exportedMedia.size.width,
-            height: exportedMedia.size.height,
-          },
+          mediaId: encodeMediaId(public_id, kind),
           allowComments,
           allowLikes,
           content,
         },
-        isNative: true,
         screenWidth: ScreenWidth(),
         postWith: PostWidth(),
         cappedPixelRatio: CappedPixelRatio(),

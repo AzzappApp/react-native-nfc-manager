@@ -1,32 +1,27 @@
-import { toGlobalId } from 'graphql-relay';
 import { useState, useCallback } from 'react';
-import { View, StyleSheet, SafeAreaView, PixelRatio } from 'react-native';
-import {
-  fetchQuery,
-  graphql,
-  usePreloadedQuery,
-  useRelayEnvironment,
-} from 'react-relay';
+import { useIntl } from 'react-intl';
+import { PixelRatio, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import { prefetchImage } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
-import Container from '#ui/Container';
-import FadeSwitch from '#ui/FadeSwitch';
-import InterestPicker from './InterestPicker';
+import CardEditionStep from './CardEditionStep';
+import CoverEditionStep from './CoverEditionStep';
+import { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
+import WizzardTransitioner from './WizzardTransitioner';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
 import type { NewProfileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileScreenPreloadQuery.graphql';
 import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
-import type { CreateProfileParams } from '@azzapp/shared/WebAPI';
+import type { NewProfileScreenWithProfileQuery } from '@azzapp/relay/artifacts/NewProfileScreenWithProfileQuery.graphql';
 
 const newProfileScreenQuery = graphql`
   query NewProfileScreenQuery {
@@ -36,201 +31,256 @@ const newProfileScreenQuery = graphql`
       ...ProfileKindStep_profileCategories
       ...ProfileForm_profileCategory
     }
-    interests {
-      ...InterestPicker_interests
+  }
+`;
+
+const newProfileScreenQueryWithProfile = graphql`
+  query NewProfileScreenWithProfileQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        id
+        userName
+        profileCategory {
+          id
+        }
+      }
+    }
+    profileCategories {
+      id
+      profileKind
+      ...ProfileKindStep_profileCategories
+      ...ProfileForm_profileCategory
     }
   }
 `;
 
 export const NewProfileScreen = ({
-  preloadedQuery,
   route: { params },
-}: RelayScreenProps<NewProfileRoute, NewProfileScreenQuery>) => {
-  const { profileCategories, interests } = usePreloadedQuery(
-    newProfileScreenQuery,
+  preloadedQuery,
+}: RelayScreenProps<
+  NewProfileRoute,
+  NewProfileScreenQuery | NewProfileScreenWithProfileQuery
+>) => {
+  // #region Data
+  const data = usePreloadedQuery(
+    params?.profileId
+      ? newProfileScreenQueryWithProfile
+      : newProfileScreenQuery,
     preloadedQuery,
   );
-  const [currentPage, setPage] = useState(0);
+  const { profileCategories } = data;
+  const profile = 'profile' in data ? data.profile : null;
 
-  const next = useCallback(() => {
-    setPage(pa => Math.min(pa + 1, 3));
-  }, [setPage]);
+  // #endregion
 
-  const prev = useCallback(() => {
-    setPage(pa => Math.max(0, pa - 1));
-  }, [setPage]);
-
-  const environment = useRelayEnvironment();
-
-  const onProfileCreated = (response: {
-    token: string;
-    refreshToken: string;
-    profileId: string;
-    profileData: Omit<CreateProfileParams, 'authMethod'>;
-  }) => {
-    const { profileData, profileId, token, refreshToken } = response;
-    environment.commitUpdate(updater => {
-      const root = updater.getRoot();
-      const user = root.getLinkedRecord('currentUser');
-      const profiles = user?.getLinkedRecords('profiles');
-      if (!profiles) {
-        return;
-      }
-
-      const newProfile = updater.create(
-        toGlobalId('Profile', profileId),
-        'Profile',
-      );
-
-      typedEntries(profileData).forEach(([key, value]) => {
-        newProfile.setValue(value, key);
-      });
-
-      user?.setLinkedRecords(
-        profiles
-          ?.concat(newProfile)
-          .sort((a, b) =>
-            ((a.getValue('userName') as string) ?? '').localeCompare(
-              (b.getValue('userName') as string) ?? '',
-            ),
-          ),
-        'profiles',
-      );
-
-      root.setLinkedRecord(user, 'currentUser');
-    });
-
-    void dispatchGlobalEvent({
-      type: 'PROFILE_CHANGE',
-      payload: {
-        authTokens: {
-          token,
-          refreshToken,
-        },
-        profileId,
-      },
-    });
-    next();
-  };
-
+  // #region Profile kind selection
   const [profileCategoryId, setProfileCategoryId] = useState<string | null>(
-    profileCategories?.[0]?.id ?? null,
+    profile?.profileCategory?.id ?? profileCategories?.[0]?.id ?? null,
   );
-
-  const onProfileCategoryChange = useCallback((profileCategoryId: string) => {
-    setProfileCategoryId(profileCategoryId);
-  }, []);
-
   const profileCategory = profileCategories?.find(
     pc => pc.id === profileCategoryId,
   );
   const profileKind = profileCategory?.profileKind;
 
+  const onProfileCategoryChange = useCallback((profileCategoryId: string) => {
+    setProfileCategoryId(profileCategoryId);
+  }, []);
+  // #endregion
+
+  // #region Profile creation
+  const [profileInfo, setProfileInfo] = useState<{
+    profileId: string;
+    userName: string;
+  } | null>(
+    profile?.id && profile?.userName
+      ? {
+          profileId: profile.id,
+          userName: profile.userName,
+        }
+      : null,
+  );
+
+  // #region Navigation
+  const [currentStepIndex, setCurrentStepIndex] = useState(profileInfo ? 2 : 0);
+
+  const next = useCallback(() => {
+    setCurrentStepIndex(page => Math.min(page + 1, 4));
+  }, [setCurrentStepIndex]);
+
+  const prev = useCallback(() => {
+    setCurrentStepIndex(page => Math.max(0, page - 1));
+  }, [setCurrentStepIndex]);
+
   const router = useRouter();
-  const onClose = useCallback(() => {
-    if (params?.goBack) {
-      router.back();
+  const onBack = useCallback(() => {
+    if (currentStepIndex === 1) {
+      prev();
     } else {
-      router.replaceAll(mainRoutes);
+      router.back();
     }
-  }, [router, params?.goBack]);
+  }, [currentStepIndex, prev, router]);
+  // #endregion
+
+  const onProfileCreated = async (profileId: string, userName: string) => {
+    setProfileInfo({
+      profileId,
+      userName,
+    });
+    next();
+  };
+  // #endregion
+
+  // #region Card creation
+  const onCoverSaved = useCallback(() => {
+    next();
+  }, [next]);
+
+  const onCoverTemplateApplied = useCallback(() => {
+    router.replace({
+      route: 'PROFILE',
+      params: { ...profileInfo!, editing: true },
+    });
+  }, [profileInfo, router]);
+  // #endregion
+
+  // #region Layout
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const contentHeight =
+    windowHeight - insets.top - insets.bottom - PAGER_HEADER_HEIGHT;
+  // #endregion
+
+  const [headerHidden, setHeaderHiden] = useState(false);
+
+  const intl = useIntl();
+  const steps = [
+    {
+      title: intl.formatMessage({
+        defaultMessage: 'What WebCard™\nwould you like to create?',
+        description: 'WebCard kind selection screen title',
+      }),
+      element: (
+        <ProfileKindStep
+          profileCategories={profileCategories}
+          profileCategoryId={profileCategoryId!}
+          onNext={next}
+          onProfileCategoryChange={onProfileCategoryChange}
+        />
+      ),
+      backIcon: 'arrow_down' as const,
+    },
+    {
+      title:
+        profileKind === 'personal'
+          ? intl.formatMessage({
+              defaultMessage: 'What’s your name?',
+              description: 'Profile creation form title for personal profile',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Provide more details',
+              description: 'Profile creation form title for business profile',
+            }),
+      element: profileCategory ? (
+        <ProfileForm
+          profileKind={profileKind!}
+          profileCategory={profileCategory}
+          onProfileCreated={onProfileCreated}
+        />
+      ) : null,
+      backIcon: 'arrow_left' as const,
+    },
+    {
+      title: intl.formatMessage({
+        defaultMessage: 'Create your cover',
+        description: 'Cover creation screen title',
+      }),
+      element:
+        profileInfo != null ? (
+          <CoverEditionStep
+            profileKind={profileKind!}
+            height={contentHeight}
+            onCoverSaved={onCoverSaved}
+          />
+        ) : null,
+      backIcon: 'arrow_down' as const,
+    },
+    {
+      title: intl.formatMessage({
+        defaultMessage: 'Select a WebCard template',
+        description: 'WebCard creation screen title',
+      }),
+      element:
+        profileInfo !== null ? (
+          <CardEditionStep
+            height={contentHeight}
+            onSkip={onCoverTemplateApplied}
+            onCoverTemplateApplied={onCoverTemplateApplied}
+            hideHeader={() => setHeaderHiden(true)}
+            showHeader={() => setHeaderHiden(false)}
+          />
+        ) : null,
+
+      backIcon: 'arrow_down' as const,
+    },
+  ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Container style={styles.container}>
-        <FadeSwitch transitionDuration={170} currentKey={`${currentPage}`}>
-          {currentPage === 0 && (
-            <View key="0" style={styles.page} collapsable={false}>
-              <ProfileKindStep
-                onBack={params?.goBack ? router.back : null}
-                profileCategories={profileCategories}
-                profileCategoryId={profileCategoryId!}
-                onNext={next}
-                onProfileCategoryChange={onProfileCategoryChange}
-              />
-            </View>
-          )}
-
-          {currentPage === 1 && (
-            <View key="1" style={styles.page} collapsable={false}>
-              <ProfileForm
-                profileKind={profileKind!}
-                profileCategory={profileCategory!}
-                onProfileCreated={onProfileCreated}
-                onBack={prev}
-              />
-            </View>
-          )}
-
-          {currentPage === 2 && (
-            <View key="2" style={styles.page} collapsable={false}>
-              <InterestPicker
-                interests={interests}
-                onClose={onClose}
-                profileKind={profileKind!}
-              />
-            </View>
-          )}
-        </FadeSwitch>
-      </Container>
-    </SafeAreaView>
+    <WizzardTransitioner
+      currentStepIndex={currentStepIndex}
+      steps={steps}
+      width={windowWidth}
+      contentHeight={contentHeight}
+      onBack={onBack}
+      headerHidden={headerHidden}
+      style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
+    />
   );
-};
-
-NewProfileScreen.prefetch = () => {
-  const pixelRatio = Math.min(2, PixelRatio.get());
-  const environment = getRelayEnvironment();
-  return fetchQuery<NewProfileScreenPreloadQuery>(
-    environment,
-    graphql`
-      query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
-        profileCategories {
-          id
-          profileKind
-          ...ProfileKindStep_profileCategories
-          ...ProfileForm_profileCategory
-          medias {
-            preloadURI: uri(width: 300, pixelRatio: $pixelRatio)
-          }
-        }
-        interests {
-          ...InterestPicker_interests
-        }
-      }
-    `,
-    { pixelRatio },
-  ).mergeMap(({ profileCategories }) => {
-    const observables = convertToNonNullArray(
-      profileCategories.flatMap(category =>
-        category.medias?.map(media => prefetchImage(media.preloadURI)),
-      ),
-    );
-    if (observables.length === 0) {
-      return Observable.from(null);
-    }
-    return combineLatest(observables);
-  });
 };
 
 NewProfileScreen.options = {
   replaceAnimation: 'push',
+  stackAnimation: 'slide_from_bottom',
 };
 
 export default relayScreen(NewProfileScreen, {
-  query: newProfileScreenQuery,
-});
+  query: params =>
+    params?.profileId
+      ? newProfileScreenQueryWithProfile
+      : newProfileScreenQuery,
+  getVariables: params =>
+    params?.profileId ? { profileId: params.profileId } : {},
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loaderPage: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  page: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    left: 0,
-    top: 0,
+  prefetchProfileIndependent: true,
+  prefetch: () => {
+    const pixelRatio = Math.min(2, PixelRatio.get());
+    const environment = getRelayEnvironment();
+    return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
+      environment,
+      graphql`
+        query NewProfileScreenPreloadQuery($pixelRatio: Float!) {
+          profileCategories {
+            id
+            profileKind
+            ...ProfileKindStep_profileCategories
+            ...ProfileForm_profileCategory
+            medias {
+              preloadURI: uri(width: 256, pixelRatio: $pixelRatio)
+            }
+          }
+        }
+      `,
+      { pixelRatio },
+    ).mergeMap(({ profileCategories }) => {
+      const observables = convertToNonNullArray(
+        profileCategories.flatMap(
+          category =>
+            category.medias?.map(media => prefetchImage(media.preloadURI)),
+        ),
+      );
+      if (observables.length === 0) {
+        return Observable.from(null);
+      }
+      return combineLatest(observables);
+    });
   },
 });

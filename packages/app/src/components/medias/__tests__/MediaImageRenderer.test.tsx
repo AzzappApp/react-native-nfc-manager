@@ -7,10 +7,12 @@ describe('MediaImageRenderer', () => {
   it('should render a NativeMediaImageRenderer with correct role and label', () => {
     const { root } = render(
       <MediaImageRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.jpg',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.jpg"
         alt="An image"
       />,
     );
@@ -23,10 +25,12 @@ describe('MediaImageRenderer', () => {
     const onReadyForDisplay = jest.fn();
     const { root, update } = render(
       <MediaImageRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.jpg',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.jpg"
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -43,10 +47,12 @@ describe('MediaImageRenderer', () => {
     //don't change the uri
     update(
       <MediaImageRenderer
-        source="id-1"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-1.jpg',
+          mediaId: 'id-1',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-1.jpg"
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -59,10 +65,12 @@ describe('MediaImageRenderer', () => {
     // change the uri
     update(
       <MediaImageRenderer
-        source="id-2"
-        width={200}
+        source={{
+          uri: 'https://fake-uri.com/id-2.jpg',
+          mediaId: 'id-2',
+          requestedSize: 200,
+        }}
         aspectRatio={2}
-        uri="https://fake-uri.com/id-2.jpg"
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,

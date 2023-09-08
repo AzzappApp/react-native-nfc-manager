@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ImageProps } from 'react-native';
@@ -142,6 +142,9 @@ const icons = {
   get down() {
     return require('./assets/down.png');
   },
+  get earth() {
+    return require('./assets/earth.png');
+  },
   get edit() {
     return require('./assets/edit.png');
   },
@@ -231,6 +234,9 @@ const icons = {
   },
   get keyboard() {
     return require('./assets/keyboard.png');
+  },
+  get landscape() {
+    return require('./assets/landscape.png');
   },
   get like() {
     return require('./assets/like.png');
@@ -405,7 +411,7 @@ export type IconProps = Omit<ImageProps, 'source'> & {
 const Icon = ({ icon, ...props }: IconProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <Image
+    <Animated.Image
       {...props}
       style={[
         { resizeMode: 'contain' },

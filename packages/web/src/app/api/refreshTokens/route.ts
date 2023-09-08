@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { refreshTokens } from '@azzapp/auth/tokens';
 import ERRORS from '@azzapp/shared/errors';
 import cors from '#helpers/cors';
+import { refreshTokens } from '#helpers/tokens';
 
 const refreshTokensApi = async (req: Request) => {
   const { refreshToken: oldToken } = await req.json();

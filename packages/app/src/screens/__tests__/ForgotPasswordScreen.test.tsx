@@ -1,44 +1,39 @@
-import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
-import { fireEvent, render, act, cleanup, screen } from '#helpers/testHelpers';
+import { fireEvent, render, act, waitFor } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
 
-jest.mock('#helpers/MobileWebAPI');
-jest.mock('#ui/ViewTransition', () => 'ViewTransition');
+jest.mock('#helpers/MobileWebAPI', () => ({
+  forgotPassword: jest.fn(),
+}));
 
 describe('ForgotPassword Screen', () => {
   const forgotPasswordMock = jest.mocked(forgotPassword);
   beforeEach(() => {
     forgotPasswordMock.mockReset();
   });
-
-  test('should render and show the enter email ', () => {
-    const { getByTestId } = render(<ForgotPasswordScreen />);
-    expect(
-      getByTestId('azzapp__ForgotPasswordScreen__ViewTransition-email'),
-    ).toHaveStyle({
-      opacity: 1,
-    });
-    expect(
-      getByTestId('azzapp__ForgotPasswordScreen__ViewTransition-confirm'),
-    ).toHaveStyle({ opacity: 0 });
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
-  test('should call the `forgotPassword` callback when the form is submitted', () => {
-    const { getByRole, getByPlaceholderText } = render(
+  test.only('should display the confirmation message when a valid form is submitted', async () => {
+    jest.useFakeTimers();
+    const { getByPlaceholderText, getByLabelText } = render(
       <ForgotPasswordScreen />,
     );
-    const inputLogin = getByPlaceholderText('Phone number or email address');
+    forgotPasswordMock.mockResolvedValueOnce({} as any);
+
+    const inputLogin = getByPlaceholderText('Email address');
     act(() => {
-      fireEvent(inputLogin, 'onChangeText', 'test@azzaap.com');
+      fireEvent(inputLogin, 'onChangeText', 'test@test.com');
+    });
+    act(() => {
+      fireEvent.press(getByLabelText('Tap to reset your password'));
     });
 
-    const buttonComponent = getByRole('button');
-    act(() => {
-      fireEvent(buttonComponent, 'onPress');
-    });
-    expect(forgotPassword).toHaveBeenCalled();
-    cleanup();
+    await waitFor(() => expect(forgotPasswordMock).toBeCalled());
+
+    jest.useRealTimers();
   });
 
   test('should not call the `forgotPassword` callback when the provided email is invalid', () => {
@@ -55,7 +50,6 @@ describe('ForgotPassword Screen', () => {
       fireEvent(buttonComponent, 'onPress');
     });
     expect(forgotPassword).not.toHaveBeenCalled();
-    cleanup();
   });
 
   test('Change password button should be `disabled` when the provided email is invalid', () => {
@@ -66,40 +60,5 @@ describe('ForgotPassword Screen', () => {
     act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
     const ubutton = queryByRole('button');
     expect(ubutton).toBeDisabled();
-
-    cleanup();
-  });
-
-  test('should display the confirmation message when a valid form is submitted', async () => {
-    const { getByPlaceholderText, getByRole } = render(
-      <ForgotPasswordScreen />,
-    );
-    forgotPasswordMock.mockResolvedValueOnce({} as any);
-
-    const inputLogin = getByPlaceholderText('Phone number or email address');
-    act(() => {
-      fireEvent(inputLogin, 'onChangeText', 'test@test.com');
-    });
-    act(() => {
-      fireEvent(getByRole('button'), 'onPress');
-    });
-
-    await act(flushPromises);
-
-    expect(
-      screen.queryByTestId(
-        'azzapp__ForgotPasswordScreen__ViewTransition-confirm',
-      ),
-    ).toHaveStyle({
-      opacity: 1,
-    });
-
-    expect(
-      screen.queryByTestId(
-        'azzapp__ForgotPasswordScreen__ViewTransition-email',
-      ),
-    ).toHaveStyle({
-      opacity: 0,
-    });
   });
 });

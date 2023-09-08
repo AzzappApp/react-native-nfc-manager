@@ -1,13 +1,11 @@
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { destroySession, setSession } from '@azzapp/auth/session';
-import { generateTokens } from '@azzapp/auth/tokens';
 import {
   getProfileByUserName,
   getUserByEmail,
   getUserByPhoneNumber,
   getUserProfiles,
-  getUsersByIds,
+  getUserById,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -15,6 +13,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { handleSigninAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import type { Profile, User } from '@azzapp/data/domains';
 
@@ -26,7 +25,7 @@ type SignInBody = {
 
 const signin = async (req: Request) => {
   const bod = await req.json();
-  const { credential, password, authMethod } = <SignInBody>bod || {};
+  const { credential, password } = <SignInBody>bod || {};
 
   if (!credential || !password) {
     return NextResponse.json(
@@ -51,7 +50,7 @@ const signin = async (req: Request) => {
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);
-      [user] = profile ? await getUsersByIds([profile.userId]) : [];
+      user = profile ? await getUserById(profile.userId) : null;
     }
 
     if (!user?.password) {
@@ -61,36 +60,16 @@ const signin = async (req: Request) => {
       );
     }
 
+    //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+    // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (!bcrypt.compareSync(password, user.password)) {
       return NextResponse.json(
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
       );
     }
-
-    if (authMethod === 'token') {
-      const { token, refreshToken } = await generateTokens({
-        userId: user.id,
-        profileId: profile?.id,
-      });
-      return destroySession(
-        NextResponse.json({
-          ok: true,
-          profileId: profile?.id,
-          token,
-          refreshToken,
-        }),
-      );
-    } else {
-      return setSession(NextResponse.json({ profileId: profile?.id }), {
-        userId: user.id,
-        profileId: profile?.id,
-        isAnonymous: false,
-      });
-    }
+    return await handleSigninAuthMethod(user, profile);
   } catch (error) {
-    console.error('Singin error');
-    console.error(typeof error);
     console.error(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },

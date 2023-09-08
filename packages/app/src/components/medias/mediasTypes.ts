@@ -1,15 +1,10 @@
 import type {
   HostComponent,
   NativeSyntheticEvent,
-  StyleProp,
-  ViewStyle,
+  ViewProps,
 } from 'react-native';
 
-export type MediaImageRendererProps = {
-  /**
-   * The media URI to display
-   */
-  uri?: string;
+export type MediaImageRendererProps = ViewProps & {
   /**
    * if true, the MediaImageRenderer will display the first frame of the video
    */
@@ -17,19 +12,19 @@ export type MediaImageRendererProps = {
   /**
    * The media alt text
    */
-  alt: string;
+  alt?: string;
   /**
-   * The source id of the media, used for caching
+   * The source containing the uri of the media, the cacheId and the requestedSize
    */
-  source: string;
-  /**
-   * The media width, should be a number on native, the web version supports vw unit
-   */
-  width: number | `${number}vw`;
+  source: { uri: string; mediaId: string; requestedSize: number };
   /**
    * The media aspect ratio
    */
   aspectRatio: number;
+  /**
+   * The media tintColor
+   */
+  tintColor?: string | null;
   /**
    * A callback called when the media is loaded
    */
@@ -43,37 +38,21 @@ export type MediaImageRendererProps = {
    * A callback called when an error was throw while loading the media
    */
   onError?: (error: Error) => void;
-  /**
-   * @see ViewProps#style
-   */
-  style?: StyleProp<ViewStyle>;
-  /**
-   * @see ViewProps#testID
-   */
-  testID?: string;
 };
 
-export type MediaVideoRendererProps = {
-  /**
-   * The URI of the video to display
-   */
-  uri?: string;
+export type MediaVideoRendererProps = ViewProps & {
   /**
    * The video alt text
    */
-  alt: string;
+  alt?: string;
   /**
    * the thumbnail URI of the video to display while the video is loading
    */
   thumbnailURI?: string;
   /**
-   * The source id of the video, used for caching
+   * The source containing the uri of the media, the cacheId and the requestedSize
    */
-  source: string;
-  /**
-   * The media width, should be a number on native, the web version supports vw unit
-   */
-  width: number | `${number}vw`;
+  source: { uri: string; mediaId: string; requestedSize: number };
   /**
    * The media aspect ratio
    */
@@ -103,14 +82,6 @@ export type MediaVideoRendererProps = {
    * A callback called while the video is playing, allowing to track the current time
    */
   onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
-  /**
-   * @see ViewProps#style
-   */
-  style?: StyleProp<ViewStyle>;
-  /**
-   * @see ViewProps#testID
-   */
-  testID?: string;
 };
 
 /**

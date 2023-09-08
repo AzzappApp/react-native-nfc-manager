@@ -4,41 +4,43 @@ hooks:
     - prettier --write
 ignoreNoDocuments: true
 schema:
-  - "./packages/data/src/schema/**/*.graphql"
+  - './packages/data/src/schema/**/*.graphql'
 generates:
   ./packages/data/src/schema/__generated__/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
-      - "./codegen-typedefs.js"
+      - './codegen-typedefs.js'
     config:
       useTypeImports: true
       enumsAsTypes: true
       useImplementingTypes: true
       mappers:
         Profile: ../../domains#Profile as ProfileModel
-        StaticMedia: ../../domains#StaticMedia as StaticMediaModel
-        CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
+        StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
         ProfileCategory: ../../domains#ProfileCategory as ProfileCategoryModel
-        Card: ../../domains#Card as CardModel
-        MediaImage: ../../domains#Media as MediaModel
-        MediaVideo: ../../domains#Media as MediaModel
+        MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
+        MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
         CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
         Post: ../../domains#Post as PostModel
         PostComment: ../../domains#PostComment as PostCommentModel
-        Interest: ../../domains#Interest as InterestModel
-        CardCoverTemplate: Record<string, any>
-        CardCover: ../../domains#CardCover as CardCoverModel
+        CardTemplate: ../../domains#CardTemplate as CardTemplateModel
+        CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
+        CoverTemplateData: ../../domains#CoverTemplateData as CoverTemplateDataModel
+        CardCover: ../../domains#Profile as ProfileModel
         CardModule: ../../domains#CardModule as CardModuleModel
-        CardModuleCarousel: ../../domains#CardModule as CardModuleCarouselModel
-        CardModuleHorizontalPhoto: ../../domains#CardModule as CardModuleHorizontalPhotoModel
-        CardModuleSimpleText: ../../domains#CardModule as CardModuleSimpleTextModel
-        CardModuleSimpleTitle: ../../domains#CardModule as CardModuleSimpleTitleModel
-        CardModuleSimpleButton: ../../domains#CardModule as CardModuleSimpleButtonModel
-        CardModulePhotoWithTextAndTitle: ../../domains#CardModule as CardModulePhotoWithTextAndTitleModel
-        CardModuleSocialLinks:  ../../domains#CardModule as CardModuleSocialLinksModel
-        CardModuleBlockText: ../../domains#CardModule as CardModuleBlockTextModel
-        ContactCard: ../../domains#ContactCard as ContactCardModel
+        CardModuleCarousel: ../../domains#CardModuleCarousel as CardModuleCarouselModel
+        CardModuleHorizontalPhoto: ../../domains#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
+        CardModuleSimpleText: ../../domains#CardModuleSimpleText as CardModuleSimpleTextModel
+        CardModuleSimpleTitle: ../../domains#CardModuleSimpleText as CardModuleSimpleTitleModel
+        CardModuleSimpleButton: ../../domains#CardModuleSimpleButton as CardModuleSimpleButtonModel
+        CardModulePhotoWithTextAndTitle: ../../domains#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel
+        CardModuleSocialLinks: ../../domains#CardModuleSocialLinks as CardModuleSocialLinksModel
+        CardModuleBlockText: ../../domains#CardModuleBlockText as CardModuleBlockTextModel
+        CardModuleLineDivider: ../../domains#CardModuleLineDivider as CardModuleLineDividerModel
+        CardStyle: ../../domains#CardStyle as CardStyleModel
+        ContactCard: ../../domains#Profile as ProfileModel
+        ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

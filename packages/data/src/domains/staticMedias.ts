@@ -1,18 +1,15 @@
-import { eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import {
   mysqlEnum,
-  datetime,
   varchar,
   mysqlTable,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
   MySqlTableWithColumns as _unused,
+  int,
+  boolean,
 } from 'drizzle-orm/mysql-core';
-import db, {
-  DEFAULT_DATETIME_PRECISION,
-  DEFAULT_DATETIME_VALUE,
-  DEFAULT_VARCHAR_LENGTH,
-} from './db';
-import { customTinyInt, sortEntitiesByIds } from './generic';
+import db, { DEFAULT_VARCHAR_LENGTH } from './db';
+import { sortEntitiesByIds } from './generic';
 import type { InferModel } from 'drizzle-orm';
 
 export const StaticMediaTable = mysqlTable('StaticMedia', {
@@ -22,15 +19,15 @@ export const StaticMediaTable = mysqlTable('StaticMedia', {
     'coverBackground',
     'moduleBackground',
   ]).notNull(),
-  name: varchar('name', { length: DEFAULT_VARCHAR_LENGTH }),
-  available: customTinyInt('available').default(true).notNull(),
-  createdAt: datetime('createdAt', {
-    mode: 'date',
-    fsp: DEFAULT_DATETIME_PRECISION,
-  })
-    .default(DEFAULT_DATETIME_VALUE)
-    .notNull(),
-  tags: varchar('tags', { length: DEFAULT_VARCHAR_LENGTH }),
+  resizeMode: mysqlEnum('resizeMode', [
+    'cover',
+    'contain',
+    'center',
+    'repeat',
+    'stretch',
+  ]).default('cover'),
+  order: int('order').notNull(),
+  enabled: boolean('enabled').default(true).notNull(),
 });
 
 export type StaticMedia = InferModel<typeof StaticMediaTable>;
@@ -54,10 +51,14 @@ export const getStaticMediasByIds = async (ids: readonly string[]) =>
  * Retrieves all cover foregrounds in the database.
  * @returns A list of cover foregrounds.
  */
-export const getStaticMediasByUsage = async (usage: StaticMedia['usage']) => {
-  const res = await db
+export const getStaticMediasByUsage = async (usage: StaticMedia['usage']) =>
+  db
     .select()
     .from(StaticMediaTable)
-    .where(eq(StaticMediaTable.usage, usage));
-  return res;
-};
+    .where(
+      and(
+        eq(StaticMediaTable.usage, usage),
+        eq(StaticMediaTable.enabled, true),
+      ),
+    )
+    .orderBy(asc(StaticMediaTable.order));

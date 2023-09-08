@@ -12,27 +12,24 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  isNotFalsyString,
   isPhoneNumber,
   isValidEmail,
   isValidPassword,
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import Container from '#ui/Container';
-import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
-import PhoneInput from '../components/PhoneInput';
 import type { CheckboxStatus } from '#ui/CheckBox';
-import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { TokensResponse } from '@azzapp/shared/WebAPI';
 import type { CountryCode } from 'libphonenumber-js';
 import type { TextInput as NativeTextInput } from 'react-native';
@@ -41,8 +38,8 @@ const SignupScreen = () => {
   const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
     CountryCode | 'email'
   >('email');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
+  const [emailOrPhoneNumber, setEmailOrPhoneNumber] = useState('');
+
   const [phoneOrEmailError, setPhoneOrEmailError] = useState('');
 
   const [password, setPassword] = useState('');
@@ -57,33 +54,12 @@ const SignupScreen = () => {
   const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
-  const SELECTORS: Array<CountryCodeListOption<'email'>> = [
-    {
-      type: 'email',
-      title: intl.formatMessage({
-        defaultMessage: 'Email address',
-        description: 'The email address option in the country selector',
-      }),
-      icon: 'mail',
-    },
-  ];
-
-  const onPhoneNumberChange = useCallback(
-    (value?: string | null) => {
-      if (!isSubmitting) {
-        setPhoneNumber(value ?? '');
-      }
-    },
-    [isSubmitting],
-  );
-
-  const router = useRouter();
 
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
     let canSignup = true;
     if (countryCodeOrEmail === 'email') {
-      if (!isValidEmail(email)) {
+      if (!isValidEmail(emailOrPhoneNumber)) {
         setPhoneOrEmailError(
           intl.formatMessage({
             defaultMessage: 'Please enter a valid email address',
@@ -93,7 +69,7 @@ const SignupScreen = () => {
         );
         canSignup = false;
       }
-    } else if (!isPhoneNumber(phoneNumber, countryCodeOrEmail)) {
+    } else if (!isPhoneNumber(emailOrPhoneNumber, countryCodeOrEmail)) {
       setPhoneOrEmailError(
         intl.formatMessage({
           defaultMessage: 'Please enter a valid phone number',
@@ -112,19 +88,44 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
-      let tokens: TokensResponse;
+      let tokens: TokensResponse & { profileId?: string; userId?: string };
       try {
         setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
-          tokens = await signup({ email, password });
+          tokens = await signup({ email: emailOrPhoneNumber, password });
         } else {
           tokens = await signup({
             phoneNumber: parsePhoneNumber(
-              phoneNumber,
+              emailOrPhoneNumber,
               countryCodeOrEmail,
             ).formatInternational(),
             password,
           });
+        }
+        if (isNotFalsyString(tokens.userId)) {
+          // Signin process
+          const profileId = tokens.profileId;
+          await dispatchGlobalEvent({
+            type: 'SIGN_IN',
+            payload: {
+              authTokens: {
+                token: tokens.token,
+                refreshToken: tokens.refreshToken,
+              },
+              profileId,
+            },
+          });
+        } else {
+          await dispatchGlobalEvent({
+            type: 'SIGN_UP',
+            payload: {
+              authTokens: {
+                token: tokens.token,
+                refreshToken: tokens.refreshToken,
+              },
+            },
+          });
+          setIsSubmitting(false);
         }
       } catch (error: any) {
         if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
@@ -152,24 +153,15 @@ const SignupScreen = () => {
           );
         }
         setIsSubmitting(false);
-        return;
       }
-
-      await dispatchGlobalEvent({
-        type: 'SIGN_UP',
-        payload: { authTokens: tokens },
-      });
-      router.replace({ route: 'NEW_PROFILE' });
     }
   }, [
     checkedPrivacy,
     checkedTos,
     countryCodeOrEmail,
-    email,
+    emailOrPhoneNumber,
     intl,
     password,
-    phoneNumber,
-    router,
   ]);
 
   const focusPassword = () => {
@@ -187,7 +179,7 @@ const SignupScreen = () => {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={insets.bottom}
+        keyboardVerticalOffset={-insets.bottom}
         style={styles.content}
         pointerEvents={isSubmitting ? 'none' : 'auto'}
       >
@@ -219,84 +211,14 @@ const SignupScreen = () => {
               </Text>
             </View>
 
-            <View style={styles.phoneOrEmailContainer}>
-              <CountryCodeListWithOptions<'email'>
-                otherSectionTitle={intl.formatMessage({
-                  defaultMessage: 'Connect with email address',
-                  description:
-                    'Signup Form Connect with email address section title in country selection list',
-                })}
-                phoneSectionTitle={intl.formatMessage({
-                  defaultMessage: 'Connect with phone number',
-                  description:
-                    'Signup Form Connect with phone number section title in country selection list',
-                })}
-                value={countryCodeOrEmail}
-                options={SELECTORS}
-                onChange={setCountryCodeOrEmail}
-                style={styles.countryCodeOrEmailButton}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Select a calling code or email',
-                  description:
-                    'Signup - The accessibility label for the country selector',
-                })}
-                accessibilityHint={intl.formatMessage({
-                  defaultMessage:
-                    'Opens a list of countries and email address and allows you to select if you want to use your email address or a phone number',
-                  description:
-                    'Signup- The accessibility hint for the country selector',
-                })}
-              />
-              {countryCodeOrEmail === 'email' ? (
-                <TextInput
-                  nativeID="email"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Email address',
-                    description:
-                      'Signup Screen - email address input placeholder',
-                  })}
-                  value={email}
-                  onChangeText={isSubmitting ? undefined : setEmail}
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  autoCorrect={false}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Enter your email address',
-                    description:
-                      'Signup Screen - Accessibility TextInput email address',
-                  })}
-                  isErrored={!!phoneOrEmailError}
-                  onSubmitEditing={focusPassword}
-                  returnKeyType="next"
-                  style={styles.flex}
-                />
-              ) : (
-                <PhoneInput
-                  nativeID="phoneNumber"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Phone number',
-                    description:
-                      'Signup Screen - phone number input placeholder',
-                  })}
-                  value={phoneNumber}
-                  onChange={onPhoneNumberChange}
-                  defaultCountry={countryCodeOrEmail}
-                  autoCapitalize="none"
-                  keyboardType="phone-pad"
-                  autoCorrect={false}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Enter your phone number',
-                    description:
-                      'Signup Screen - Accessibility TextInput phone number',
-                  })}
-                  isErrored={!!phoneOrEmailError}
-                  onSubmitEditing={focusPassword}
-                  returnKeyType="next"
-                  style={styles.flex}
-                />
-              )}
-            </View>
+            <EmailOrPhoneInput
+              value={emailOrPhoneNumber}
+              onChange={setEmailOrPhoneNumber}
+              hasError={!!phoneOrEmailError}
+              onSubmitEditing={focusPassword}
+              countryCodeOrEmail={countryCodeOrEmail}
+              setCountryCodeOrEmail={setCountryCodeOrEmail}
+            />
             <Text style={styles.error} variant="error">
               {phoneOrEmailError}
             </Text>
@@ -393,7 +315,7 @@ const SignupScreen = () => {
                   description: 'Signup Screen - Accessibility Sign Up button',
                 })}
                 style={styles.button}
-                disabled={(!phoneNumber && !email) || !password}
+                disabled={!emailOrPhoneNumber || !password}
                 loading={isSubmitting}
               />
             </Submit>

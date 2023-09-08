@@ -17,7 +17,6 @@ const ContactCardExportVcf = ({
   const contactCard = useFragment(
     graphql`
       fragment ContactCardExportVcf_card on ContactCard {
-        id
         firstName
         lastName
         title

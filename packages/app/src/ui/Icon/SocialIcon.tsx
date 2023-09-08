@@ -31,17 +31,11 @@ const socialIcons = {
   get glassdoor() {
     return require('./assets/social/glassdoor.png');
   },
-  get google() {
-    return require('./assets/social/google.png');
-  },
   get hashnode() {
     return require('./assets/social/hashnode.png');
   },
   get instagram() {
     return require('./assets/social/instagram.png');
-  },
-  get kult() {
-    return require('./assets/social/kult.png');
   },
   get letterboxd() {
     return require('./assets/social/letterboxd.png');

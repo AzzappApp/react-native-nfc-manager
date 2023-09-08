@@ -1,7 +1,9 @@
+import cn from 'classnames';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
+import { themeClass } from '../theme.css';
 import ClientWrapper from './ClientWrapper';
 import './styles.css';
 
@@ -22,7 +24,7 @@ const RootLayout = ({
   const messages = getTranslationMessages(lang);
 
   return (
-    <html lang={lang} className={plusJakarta.className}>
+    <html lang={lang} className={cn(plusJakarta.className, themeClass)}>
       <head>
         <meta
           name="viewport"

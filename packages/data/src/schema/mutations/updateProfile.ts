@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains/profiles';
 import type { Profile } from '#domains';
@@ -9,16 +8,16 @@ import type { GraphQLContext } from '../GraphQLContext';
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
   args,
-  { auth, profileLoader }: GraphQLContext,
+  { auth, loaders }: GraphQLContext,
 ) => {
-  const profileId = getProfileId(auth);
+  const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
   let profile: Profile | null;
   try {
-    profile = await profileLoader.load(profileId);
+    profile = await loaders.Profile.load(profileId);
   } catch (e) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
@@ -26,24 +25,18 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const { colorPalette, interests, ...profileUpdates } = args.input;
+  const { ...profileUpdates } = args.input;
 
   const partialProfile: Partial<
     Omit<Profile, 'createdAt' | 'id' | 'profileKind' | 'updatedAt'>
   > = {
     ...profileUpdates,
   };
-  if (colorPalette) {
-    partialProfile.colorPalette = colorPalette.join(',');
-  }
-  if (interests) {
-    partialProfile.interests = interests.join(',');
-  }
 
   try {
-    const resultProfile = await updateProfile(profile.id, partialProfile);
+    await updateProfile(profile.id, partialProfile);
     return {
-      profile: { ...profile, ...resultProfile },
+      profile: { ...profile, ...partialProfile },
     };
   } catch (error) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

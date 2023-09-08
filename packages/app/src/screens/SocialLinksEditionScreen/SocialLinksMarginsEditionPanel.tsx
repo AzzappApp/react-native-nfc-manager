@@ -1,5 +1,10 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  SOCIAL_LINKS_MAX_MARGIN_BOTTOM,
+  SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL,
+  SOCIAL_LINKS_MAX_MARGIN_TOP,
+} from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
@@ -23,6 +28,14 @@ type SocialLinksMarginsEditionPanelProps = ViewProps & {
    */
   onMarginBottomChange: (marginBottom: number) => void;
   /**
+   * The marginHorizontal currently set on the module
+   */
+  marginHorizontal: number;
+  /**
+   * A callback called when the user update the marginHorizontal
+   */
+  onMarginHorizontalChange: (marginRight: number) => void;
+  /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
@@ -36,6 +49,8 @@ const SocialLinksMarginsEditionPanel = ({
   onMarginTopChange,
   marginBottom,
   onMarginBottomChange,
+  marginHorizontal,
+  onMarginHorizontalChange,
   style,
   ...props
 }: SocialLinksMarginsEditionPanelProps) => {
@@ -61,8 +76,8 @@ const SocialLinksMarginsEditionPanel = ({
             />
           }
           value={marginTop}
-          min={10}
-          max={100}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_TOP}
           step={1}
           onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
@@ -87,8 +102,8 @@ const SocialLinksMarginsEditionPanel = ({
             />
           }
           value={marginBottom}
-          min={10}
-          max={100}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_BOTTOM}
           step={1}
           onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
@@ -100,6 +115,33 @@ const SocialLinksMarginsEditionPanel = ({
             defaultMessage: 'Slide to change the Bottom margin',
             description:
               'Hint of the Bottom margin slider in SocialLinks edition',
+          })}
+          style={styles.slider}
+        />
+        <LabeledDashedSlider
+          label={
+            <FormattedMessage
+              defaultMessage="Horizontal margin : {size}"
+              description="Horizontal margin message in SocialLinks edition"
+              values={{
+                size: marginHorizontal,
+              }}
+            />
+          }
+          value={marginHorizontal}
+          min={0}
+          max={SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL}
+          step={1}
+          onChange={onMarginHorizontalChange}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Horizontal margin',
+            description:
+              'Label of the horizontal margin slider in SocialLinks edition',
+          })}
+          accessibilityHint={intl.formatMessage({
+            defaultMessage: 'Slide to change the horizontal margin',
+            description:
+              'Hint of the horizontal margin slider in SocialLinks edition',
           })}
           style={styles.slider}
         />

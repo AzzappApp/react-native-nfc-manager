@@ -1,0 +1,17 @@
+extend type Mutation {
+  """
+  Remove a follower from the current user
+  """
+  loadCardTemplate(input: LoadCardTemplateInput!): LoadCardTemplatePayload!
+}
+
+input LoadCardTemplateInput {
+  """
+  The id of the card template we want to use the modules of
+  """
+  cardTemplateId: ID!
+}
+
+type LoadCardTemplatePayload {
+  profile: Profile!
+}

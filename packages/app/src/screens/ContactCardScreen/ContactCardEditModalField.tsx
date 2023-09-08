@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Controller,
   type Control,
@@ -9,9 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
-  FadeInDown,
-  FadeOutUp,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -37,15 +34,16 @@ const ContactCardEditModalField = ({
   openDeleteButton,
   deleted,
   deleteButtonRect,
-  closeDeleteButton,
+  closeDeleteButton: _,
   valueKey,
   selectedKey,
   control,
   labelValues,
+  placeholder,
 }: {
   deleted: boolean;
   deleteButtonRect: LayoutRectangle | null;
-  labelKey: FieldPath<ContactCardEditForm>;
+  labelKey?: FieldPath<ContactCardEditForm>;
   keyboardType: TextInputProps['keyboardType'];
   deleteField: () => void;
   openDeleteButton: (changeEvent: LayoutRectangle) => void;
@@ -53,7 +51,8 @@ const ContactCardEditModalField = ({
   valueKey: FieldPath<ContactCardEditForm>;
   selectedKey: FieldPath<ContactCardEditForm>;
   control: Control<ContactCardEditForm>;
-  labelValues: Array<{ key: string; value: string }>;
+  labelValues?: Array<{ key: string; value: string }>;
+  placeholder?: string;
 }) => {
   const deleteMode = useSharedValue(false);
 
@@ -80,15 +79,19 @@ const ContactCardEditModalField = ({
     }
   }, [deleteButtonRect, deleteField, deleteMode, deleted]);
 
-  const callback = useCallback(() => {
-    'worklet';
-    runOnJS(closeDeleteButton)();
-  }, [closeDeleteButton]);
+  // const callback = useCallback(() => {
+  //   'worklet';
+  //   runOnJS(closeDeleteButton)();
+  // }, [closeDeleteButton]);
 
-  const label = useWatch({
-    control,
-    name: labelKey,
-  });
+  const watchable = labelKey
+    ? {
+        control,
+        name: labelKey,
+      }
+    : { control };
+
+  const label = useWatch(watchable);
 
   const [visible, setVisible] = useState(false);
 
@@ -97,10 +100,12 @@ const ContactCardEditModalField = ({
       <Animated.View
         style={[styles.field, style, { backgroundColor: colors.white }]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
-        entering={FadeInDown}
-        exiting={FadeOutUp.withInitialValues({
-          originX: -50,
-        }).withCallback(callback)}
+        // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
+
+        // entering={FadeInDown}
+        // exiting={FadeOutUp.withInitialValues({
+        //   originX: -50,
+        // }).withCallback(callback)}
       >
         <View
           style={{
@@ -120,16 +125,18 @@ const ContactCardEditModalField = ({
               }
             }}
           />
-          <PressableNative
-            style={styles.labelSelector}
-            onPress={() => setVisible(true)}
-          >
-            <Text variant="smallbold">
-              {labelValues.find(l => l.key === label)?.value ??
-                (label as string)}
-            </Text>
-            <Icon icon="arrow_down" />
-          </PressableNative>
+          {labelValues && labelValues.length > 0 && (
+            <PressableNative
+              style={styles.labelSelector}
+              onPress={() => setVisible(true)}
+            >
+              <Text variant="smallbold">
+                {labelValues.find(l => l.key === label)?.value ??
+                  (label as string)}
+              </Text>
+              <Icon icon="arrow_down" />
+            </PressableNative>
+          )}
         </View>
         <Controller
           control={control}
@@ -143,6 +150,7 @@ const ContactCardEditModalField = ({
               keyboardType={keyboardType}
               clearButtonMode="while-editing"
               testID="contact-card-edit-modal-field"
+              placeholder={placeholder}
             />
           )}
         />
@@ -167,29 +175,31 @@ const ContactCardEditModalField = ({
         </PressableNative>
       </Animated.View>
 
-      <BottomSheetModal
-        visible={visible}
-        onRequestClose={() => setVisible(false)}
-      >
-        <View>
-          <Controller
-            name={labelKey}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <SelectList
-                keyExtractor={item => item.key}
-                data={labelValues}
-                onItemSelected={item => {
-                  onChange(item.key);
-                  setVisible(false);
-                }}
-                selectedItemKey={value as string}
-                labelField="value"
-              />
-            )}
-          />
-        </View>
-      </BottomSheetModal>
+      {labelKey && (
+        <BottomSheetModal
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+        >
+          <View>
+            <Controller
+              name={labelKey}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <SelectList
+                  keyExtractor={item => item.key}
+                  data={labelValues}
+                  onItemSelected={item => {
+                    onChange(item.key);
+                    setVisible(false);
+                  }}
+                  selectedItemKey={value as string}
+                  labelField="value"
+                />
+              )}
+            />
+          </View>
+        </BottomSheetModal>
+      )}
     </>
   );
 };

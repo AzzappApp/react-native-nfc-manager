@@ -14,7 +14,7 @@ import Input from '#ui/Input';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { SocialIcons } from '#ui/Icon/SocialIcon';
-import type { SocialLink } from './SocialLinksEditionScreenTypes';
+import type { SocialLinkInput } from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps, LayoutChangeEvent } from 'react-native';
 import type { PanGesture } from 'react-native-gesture-handler';
 
@@ -30,7 +30,7 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the links
    */
-  onLinksChange: (links: Array<SocialLink | null>) => void;
+  onLinksChange: (links: Array<SocialLinkInput | null>) => void;
   /**
    * The height of the bottom sheet
    */

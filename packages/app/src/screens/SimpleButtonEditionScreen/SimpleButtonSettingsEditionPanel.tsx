@@ -4,10 +4,12 @@ import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  DEFAULT_COVER_MIN_FONT_SIZE,
-  DEFAULT_COVER_MAX_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
+  SIMPLE_BUTTON_MAX_FONT_SIZE,
+  SIMPLE_BUTTON_MAX_LABEL_LENGTH,
+  SIMPLE_BUTTON_MIN_FONT_SIZE,
+} from '@azzapp/shared/cardModuleHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import ProfileColorPicker, {
   ProfileColorDropDownPicker,
@@ -122,6 +124,11 @@ const SimpleButtonSettingsEditionPanel = ({
       fragment SimpleButtonSettingsEditionPanel_viewer on Viewer {
         profile {
           ...ProfileColorPicker_profile
+          cardColors {
+            primary
+            dark
+            light
+          }
         }
       }
     `,
@@ -149,11 +156,14 @@ const SimpleButtonSettingsEditionPanel = ({
             description: 'Button color tab label in SimpleButton edition',
           }),
           rightElement: (
-            <ColorPreview color={buttonColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(buttonColor, profile?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [buttonColor, intl],
+    [buttonColor, intl, profile?.cardColors],
   );
 
   const SELECTORS: Array<CountryCodeListOption<'email' | 'link'>> = [
@@ -211,6 +221,7 @@ const SimpleButtonSettingsEditionPanel = ({
           description:
             'Label of the buttonLabel input in SimpleButton Settings edition',
         })}
+        maxLength={SIMPLE_BUTTON_MAX_LABEL_LENGTH}
       />
       <View style={{ rowGap: 15 }}>
         <View style={styles.actionContainer}>
@@ -274,8 +285,8 @@ const SimpleButtonSettingsEditionPanel = ({
             />
           }
           value={fontSize}
-          min={DEFAULT_COVER_MIN_FONT_SIZE}
-          max={DEFAULT_COVER_MAX_FONT_SIZE}
+          min={SIMPLE_BUTTON_MIN_FONT_SIZE}
+          max={SIMPLE_BUTTON_MAX_FONT_SIZE}
           step={1}
           onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({

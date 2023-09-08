@@ -1,70 +1,47 @@
-import { getProfileId } from '@azzapp/auth/viewer';
 import ERRORS from '@azzapp/shared/errors';
-import {
-  buildDefaultContactCard,
-  createContactCard,
-  getContactCard,
-  updateContactCard,
-} from '#domains/contactCards';
+import { buildDefaultContactCard, updateProfile } from '#domains';
+import type { Profile } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
-  { input },
-  { auth, profileLoader, userLoader, cardUpdateListener },
+  { input: { displayedOnWebCard, isPrivate, ...data } },
+  { auth, loaders, cardUpdateListener },
 ) => {
-  const profileId = getProfileId(auth);
-
-  if (!profileId) throw new Error('No profile id found');
-
-  const existingCard = await getContactCard(profileId);
-
-  if (existingCard) {
-    const updatedCard = { ...existingCard, ...input };
-
-    await updateContactCard(updatedCard);
-
-    return { contactCard: updatedCard };
-  } else {
-    const profile = await profileLoader.load(profileId);
-    if (!profile) {
-      throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    const user = await userLoader.load(profile.userId);
-    if (!user) {
-      throw new Error(ERRORS.UNAUTORIZED);
-    }
-
-    const defaultCard = buildDefaultContactCard(profile, user);
-
-    const newCard = {
-      ...defaultCard,
-      ...input,
-    };
-
-    const newCardWithDefaultValues = {
-      ...newCard,
-      firstName: newCard.firstName ?? null,
-      lastName: newCard.lastName ?? null,
-      title: newCard.title ?? null,
-      company: newCard.company ?? null,
-      emails: newCard.emails ?? null,
-      phoneNumbers: newCard.phoneNumbers ?? null,
-      backgroundStyle: newCard.backgroundStyle ?? {
-        backgroundColor: '#000000',
-      },
-      public: newCard.public ?? false,
-      isDisplayedOnWebCard: newCard.isDisplayedOnWebCard ?? false,
-      profileId,
-    };
-
-    await createContactCard(newCardWithDefaultValues);
-
-    cardUpdateListener(profile.userName);
-
-    return { contactCard: newCardWithDefaultValues };
+  const profileId = auth.profileId;
+  if (!profileId) {
+    throw new Error(ERRORS.UNAUTORIZED);
   }
+
+  const profile = await loaders.Profile.load(profileId);
+  if (!profile) {
+    throw new Error(ERRORS.INVALID_REQUEST);
+  }
+
+  const updates: Partial<Profile> = {
+    contactCard: {
+      ...(profile.contactCard ?? (await buildDefaultContactCard(profile))),
+      ...data,
+    },
+    lastContactCardUpdate: new Date(),
+    contactCardIsPrivate: !!isPrivate,
+    contactCardDisplayedOnWebCard: !!displayedOnWebCard,
+  };
+  try {
+    await updateProfile(profileId, updates);
+  } catch (e) {
+    console.error(e);
+    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  cardUpdateListener(profile.userName);
+
+  return {
+    profile: {
+      ...profile,
+      ...updates,
+    } as Profile,
+  };
 };
 
 export default saveContactCard;

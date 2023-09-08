@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import {
-  findBestAvailableLanguage,
+  findBestLanguageTag,
   getLocales as getLocalesRNLocalize,
 } from 'react-native-localize';
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@azzapp/i18n';
-import getRuntimeEnvironment from '@azzapp/shared/getRuntimeEnvironment';
 
 let currentLocale: string | null = null;
 const localeChangeListeners: Array<() => void> = [];
@@ -17,9 +16,6 @@ const localeChangeListeners: Array<() => void> = [];
  * @see https://github.com/zoontek/react-native-localize#getlocales
  */
 export const getLocales = () => {
-  if (getRuntimeEnvironment() === 'node') {
-    return [];
-  }
   return getLocalesRNLocalize();
 };
 
@@ -56,7 +52,7 @@ export const useCurrentLocale = () => {
  * If the user preferred locales are not supported, the default locale is used.
  */
 const guessCurrentLocale = () => {
-  const locale = findBestAvailableLanguage(SUPPORTED_LOCALES);
+  const locale = findBestLanguageTag(SUPPORTED_LOCALES);
   const lang = locale?.languageTag ?? DEFAULT_LOCALE;
   if (currentLocale !== lang) {
     currentLocale = lang;

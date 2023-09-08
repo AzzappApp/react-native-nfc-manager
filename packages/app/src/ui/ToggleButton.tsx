@@ -19,10 +19,11 @@ const ToggleButton = ({
   style = {},
 }: ToggleButtonProps) => {
   const styles = useStyleSheet(styleSheet);
+
   return (
     <PressableBackground
       onPress={onPress}
-      highlightColor={undefined}
+      highlightColor={colors.grey400}
       accessibilityRole="togglebutton"
       accessibilityState={{ checked: toggled }}
       style={[styles.container, toggled && styles.toggleContainer, style]}

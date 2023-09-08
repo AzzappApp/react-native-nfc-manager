@@ -1,0 +1,42 @@
+diff --git a/node_modules/react-native-svg/src/xml.tsx b/node_modules/react-native-svg/src/xml.tsx
+index 9e2352a..8763641 100644
+--- a/node_modules/react-native-svg/src/xml.tsx
++++ b/node_modules/react-native-svg/src/xml.tsx
+@@ -132,13 +132,13 @@ export async function fetchText(uri: string) {
+ 
+ export function SvgUri(props: UriProps) {
+   const { onError = err, uri, onLoad, fallback } = props;
+-  const [xml, setXml] = useState<string | null>(null);
++  const [data, setData] = useState<string | null>(null);
+   const [isError, setIsError] = useState(false);
+   useEffect(() => {
+     uri
+       ? fetchText(uri)
+           .then((data) => {
+-            setXml(data);
++            setData(data);
+             isError && setIsError(false);
+             onLoad?.();
+           })
+@@ -146,12 +146,20 @@ export function SvgUri(props: UriProps) {
+             onError(e);
+             setIsError(true);
+           })
+-      : setXml(null);
++      : setData(null);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [onError, uri, onLoad]);
++  
+   if (isError) {
+     return fallback ?? null;
+   }
++
++  const xml = useMemo(() => {
++    if(!data) return null;
++
++    return typeof props.color === 'string' ? data.replaceAll('currentColor', props.color) : data
++  }, [data, props.color])
++
+   return <SvgXml xml={xml} override={props} fallback={fallback} />;
+ }
+ 

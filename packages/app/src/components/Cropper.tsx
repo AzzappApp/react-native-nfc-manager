@@ -46,6 +46,11 @@ export type CropperProps = Omit<ViewProps, 'children'> & {
    */
   cropEditionMode?: boolean | null;
   /**
+   * if false, the component will not display the outer line of the crop grid
+   * @default true
+   */
+  displayOuterLines?: boolean | null;
+  /**
    * A callback that will be called when the crop data change
    * @param cropData the new crop data
    */
@@ -69,6 +74,7 @@ const Cropper = ({
   pitch,
   yaw,
   cropEditionMode,
+  displayOuterLines = true,
   onCropDataChange,
   onLayout: onLayoutProps,
   children,
@@ -343,12 +349,28 @@ const Cropper = ({
           >
             <View style={[styles.verticalGrid, displayedImageSize]}>
               {range(0, 4).map(index => (
-                <View key={index} style={styles.verticalLine} />
+                <View
+                  key={index}
+                  style={[
+                    styles.verticalLine,
+                    {
+                      opacity: displayOuterLines || index % 3 !== 0 ? 1 : 0,
+                    },
+                  ]}
+                />
               ))}
             </View>
             <View style={[styles.horizontalGrid, displayedImageSize]}>
               {range(0, 4).map(index => (
-                <View key={index} style={styles.horizontalLine} />
+                <View
+                  key={index}
+                  style={[
+                    styles.horizontalLine,
+                    {
+                      opacity: displayOuterLines || index % 3 !== 0 ? 1 : 0,
+                    },
+                  ]}
+                />
               ))}
             </View>
           </View>

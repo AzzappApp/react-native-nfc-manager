@@ -18,8 +18,8 @@ class MediaURICache {
     cache.countLimit = 1000;
   }
   
-  func queryCache(mediaID: NSString, size: NSNumber) -> (URL, NSNumber)? {
-    guard let mediaCache = cache.object(forKey: mediaID) else {
+  func queryCache(mediaId: NSString, size: NSNumber) -> (URL, NSNumber)? {
+    guard let mediaCache = cache.object(forKey: mediaId) else {
       return nil;
     }
     var uri: URL? = nil;
@@ -51,8 +51,8 @@ class MediaURICache {
   };
   
   
-  func getLocaleURI(for mediaID: NSString) -> URL? {
-    guard let mediaCache = cache.object(forKey: mediaID) else {
+  func getLocaleURI(for mediaId: NSString) -> URL? {
+    guard let mediaCache = cache.object(forKey: mediaId) else {
       return nil;
     }
     for (key, value) in mediaCache {
@@ -72,29 +72,29 @@ class MediaURICache {
     return nil
   };
   
-  func addCacheEntry(mediaID: NSString, size: NSNumber, uri: URL) {
-    if (cache.object(forKey: mediaID) == nil) {
-      cache.setObject(NSMutableDictionary(), forKey: mediaID)
+  func addCacheEntry(mediaId: NSString, size: NSNumber, uri: URL) {
+    if (cache.object(forKey: mediaId) == nil) {
+      cache.setObject(NSMutableDictionary(), forKey: mediaId)
     }
-    guard let mediaCache = cache.object(forKey: mediaID) else {
+    guard let mediaCache = cache.object(forKey: mediaId) else {
       return;
     }
     
     mediaCache[size] = uri;
   }
   
-  func addLocaleFileCacheEntry(mediaID: NSString, uri: URL) {
-    addCacheEntry(mediaID: mediaID, size: -1, uri: uri)
+  func addLocaleFileCacheEntry(mediaId: NSString, uri: URL) {
+    addCacheEntry(mediaId: mediaId, size: -1, uri: uri)
   }
   
-  func removeCacheEntry(mediaID: NSString, size: NSNumber) {
-    guard let mediaCache = cache.object(forKey: mediaID) else {
+  func removeCacheEntry(mediaId: NSString, size: NSNumber) {
+    guard let mediaCache = cache.object(forKey: mediaId) else {
       return;
     }
     
     mediaCache.removeObject(forKey: size as NSNumber)
     if (mediaCache.count == 0) {
-      cache.removeObject(forKey: mediaID)
+      cache.removeObject(forKey: mediaId)
     }
   }
 }

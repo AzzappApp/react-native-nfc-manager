@@ -13,6 +13,7 @@ jobs:
     env:
       TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
       TURBO_TEAM: azzapp
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v3
 
