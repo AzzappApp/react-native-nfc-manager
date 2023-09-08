@@ -63,6 +63,19 @@ const main = async () => {
     prerelease,
   });
 
+  const baseBranch = prerelease ? 'main' : 'staging';
+  const targetBranch = prerelease ? 'staging' : 'stable';
+
+  console.log(`Merge to target branch : ${targetBranch}...`);
+
+  await github.repos.merge({
+    repo: 'azzapp',
+    owner: 'AzzappApp',
+    base: targetBranch,
+    head: baseBranch,
+    commit_message: `Merge ${baseBranch} to ${targetBranch}`,
+  });
+
   console.log(`Done! ${release.data.html_url}`);
   process.exit(0);
 };
