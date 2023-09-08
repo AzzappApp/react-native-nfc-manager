@@ -48,21 +48,3 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-
-      - name: Merge staging into stable
-        if: github.ref == 'refs/heads/staging'
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          target_branch: stable
-          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-          label_name: 'chore: merge release'
-
-      - name: Merge main into staging
-        if: github.ref == 'refs/heads/main'
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          target_branch: staging
-          github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-          label_name: 'chore: merge release'
