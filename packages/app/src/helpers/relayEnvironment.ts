@@ -156,7 +156,11 @@ export class GraphQLError extends Error {
   response: GraphQLResponse;
   request: RequestParameters;
   constructor(response: GraphQLResponse, request: RequestParameters) {
-    super('Errors');
+    let message = 'Errors';
+    if (!!response && 'errors' in response) {
+      message = response.errors?.[0]?.message ?? 'Errors';
+    }
+    super(message);
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, GraphQLError);
     }
