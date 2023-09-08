@@ -61,6 +61,7 @@ const HomeScreenFallback = () => {
         source={require('#assets/logo-full.png')}
         style={{
           width: 180,
+          height: 38,
         }}
       />
       <ActivityIndicator

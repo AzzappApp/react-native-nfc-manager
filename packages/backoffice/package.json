@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.2.1-rc.0",
+  "version": "0.2.2-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,8 +13,8 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.2.1-rc.0",
-    "@azzapp/shared": "0.2.1-rc.0",
+    "@azzapp/data": "0.2.2-rc.0",
+    "@azzapp/shared": "0.2.2-rc.0",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
