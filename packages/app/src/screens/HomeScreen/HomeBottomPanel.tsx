@@ -262,7 +262,11 @@ const HomeBottomPanel = ({
             defaultMessage="Create a new Webcard{azzappAp}"
             description="Home Screen - Create a new WebCard"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text variant="azzapp" style={styles.icon}>
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -271,7 +275,11 @@ const HomeBottomPanel = ({
             defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
             description="Home Screen - Create a new webcard description"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text variant="azzapp" style={styles.icon}>
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -438,6 +446,9 @@ const styles = StyleSheet.create({
   },
   informationPanelButton: {
     marginTop: 30,
+  },
+  icon: {
+    color: colors.white,
   },
 });
 
