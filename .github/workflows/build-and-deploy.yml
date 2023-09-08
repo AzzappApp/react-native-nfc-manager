@@ -20,6 +20,7 @@ jobs:
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: "azzapp"
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
+      PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
     steps:
       ############################################
       #
@@ -52,11 +53,21 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
 
+      - uses: phrase/setup-cli@v1
+        with:
+          version: 2.11.0
+
       ############################################
       #
       # JavaScript build and tests
       #
       ############################################
+      - name: Phrase - Pull translations
+        run: phrase pull
+
+      - name: Build translations
+        run: yarn i18n:extract
+
       - name: JavaScript build
         run: yarn build
 
@@ -349,3 +360,11 @@ jobs:
             PROFILE="staging"
           fi
           eas build --platform all --profile $PROFILE --non-interactive --no-wait
+      
+      ############################################
+      #
+      # Deploy translations to Phrase
+      #
+      ############################################
+      - name: Phrase - Push translations
+        run: phrase push

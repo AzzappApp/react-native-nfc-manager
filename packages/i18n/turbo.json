@@ -6,12 +6,19 @@
       "dependsOn": ["build:app", "build:web"]
     },
     "build:app": {
-      "inputs": ["src/app/**/*.json"],
-      "outputs": ["compiled/app/**"]
+      "inputs": ["src/app/*.json"],
+      "outputs": ["compiled/app/**"],
+      "dependsOn": ["prepare"]
     },
     "build:web": {
-      "inputs": ["src/web/**/*.json"],
-      "outputs": ["compiled/web/**"]
+      "inputs": ["src/web/*.json"],
+      "outputs": ["compiled/web/**"],
+      "dependsOn": ["prepare"]
+    },
+    "prepare": {
+      "inputs": ["src/*.json"],
+      "outputs": ["src/app/*.json", "src/web/*.json"],
+      "cache": false
     }
   }
 }
