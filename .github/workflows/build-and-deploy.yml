@@ -263,9 +263,10 @@ jobs:
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ENVIRONMENT="production"
-          elif [["${{github.ref}}" == "refs/heads/main"]; then
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
@@ -275,7 +276,8 @@ jobs:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
           ADDITIONAL_ARGS=""
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
           vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
@@ -300,9 +302,10 @@ jobs:
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ENVIRONMENT="production"
-          elif [["${{github.ref}}" == "refs/heads/main"]; then
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
           vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
@@ -312,7 +315,8 @@ jobs:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
           ADDITIONAL_ARGS=""
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
           vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
@@ -338,9 +342,10 @@ jobs:
         working-directory: ./packages/app
         run: |
           PROFILE="development"
-          if [["${{github.ref}}" == "refs/heads/stable"]; then
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             PROFILE="production"
-          elif [["${{github.ref}}" == "refs/heads/staging"]; then
+          el if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
             PROFILE="staging"
           fi
           eas build --platform all --profile $PROFILE --non-interactive --no-wait
