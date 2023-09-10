@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useCallback, useMemo } from 'react';
 import ExternalToast, {
   BaseToast,
@@ -103,12 +104,34 @@ const Toast = ({
           text1Style={[textStyles.smallbold, styles.toastText]}
         />
       ),
+      info: (infoProps: ToastConfigParams<ToastProps>) => (
+        <LinearGradient
+          colors={
+            infoProps.position === 'bottom'
+              ? ['transparent', 'rgba(0,0,0,0.5)']
+              : ['rgba(0,0,0,0.5)', 'transparent']
+          }
+          style={styles.info}
+        >
+          <BaseToast
+            {...infoProps}
+            style={[styles.baseToast]}
+            contentContainerStyle={styles.contentContainerToast}
+            renderLeadingIcon={() => (
+              <Icon icon="tips" style={styles.successToastIcon} />
+            )}
+            renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
+            text1Style={[textStyles.smallbold, styles.toastText]}
+          />
+        </LinearGradient>
+      ),
     };
   }, [
     renderTrailingIcon,
     styles.baseToast,
     styles.contentContainerToast,
     styles.errorToastIcon,
+    styles.info,
     styles.successToastIcon,
     styles.toastText,
   ]);
@@ -169,5 +192,12 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.black : colors.white,
     textAlign: 'center',
     width: undefined,
+  },
+  info: {
+    height: 200,
+    paddingTop: 90,
+    width: '100%',
+    position: 'relative',
+    bottom: -20,
   },
 }));

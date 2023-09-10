@@ -50,26 +50,34 @@ const ProfileScreenPublishHelper = ({
     `,
   );
 
+  useEffect(() => {
+    if (!cardIsPublished && editMode) {
+      Toast.show({
+        type: 'info',
+        text1: intl.formatMessage({
+          defaultMessage: 'Tap on a section of your WebCard to modify it',
+          description:
+            'Toast info message that appears when the user is in webcard edit mode for the first time',
+        }),
+        bottomOffset: 0,
+        props: {
+          showClose: true,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editMode]);
+
   const [showPublishModal, setShowPublishModal] = useState(false);
 
   const editModeRef = useRef(editMode);
+
   useEffect(() => {
-    if (!cardIsPublished) {
-      if (editMode && !editModeRef.current) {
-        Toast.show({
-          type: 'info',
-          text1: intl.formatMessage({
-            defaultMessage: 'Tap on a section of your WebCard to modify it',
-            description:
-              'Toast info message that appears when the user is in webcard edit mode for the first time',
-          }),
-        });
-      } else if (!editMode && editModeRef.current) {
-        setShowPublishModal(true);
-      }
+    if (cardIsPublished && !editMode && editModeRef.current) {
+      setShowPublishModal(true);
     }
     editModeRef.current = editMode;
-  }, [cardIsPublished, editMode, intl]);
+  }, [cardIsPublished, editMode]);
 
   const onPublish = () => {
     commit({

@@ -361,6 +361,9 @@ const icons = {
   get tint() {
     return require('./assets/tint.png');
   },
+  get tips() {
+    return require('./assets/tips.png');
+  },
   get txt_align_center() {
     return require('./assets/txt_align_center.png');
   },
