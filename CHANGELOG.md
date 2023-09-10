@@ -1,5 +1,6 @@
-## 0.2.3-canary.2
+## 0.2.3-canary.3
 
+* **fix:**  - 🐛 display toasts as expected ([#1008](https://github.com/AzzappApp/azzapp/pull/1008))
 * **fix:**  - pressable native and gestureDetector not working well together ([#1037](https://github.com/AzzappApp/azzapp/pull/1037))
 * **fix:**  - 🐛 display photo full width with no margin ([#1036](https://github.com/AzzappApp/azzapp/pull/1036))
 * **fix:**  - 🐛 export new field from contact card to vcf ([#1035](https://github.com/AzzappApp/azzapp/pull/1035))
