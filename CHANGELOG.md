@@ -1,5 +1,6 @@
-## 0.2.3-canary.9
+## 0.2.3-canary.10
 
+* **feat:**  - Add toast errors messages ([#1051](https://github.com/AzzappApp/azzapp/pull/1051))
 * **fix:**  - eas build
 * **feat:**  - Add popup that invite user to update ([#1040](https://github.com/AzzappApp/azzapp/pull/1040))
 * **feat:**  - 🎸 set fixed width for comments on post detail ([#1050](https://github.com/AzzappApp/azzapp/pull/1050))
