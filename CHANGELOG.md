@@ -1,5 +1,9 @@
-## 0.2.3-canary.3
+## 0.2.3-canary.4
 
+* **fix:**  - Improve splash screen and main tab bar management ([#1046](https://github.com/AzzappApp/azzapp/pull/1046))
+* **feat:**  - **CardModule:** disable carousel click for beta ([#1041](https://github.com/AzzappApp/azzapp/pull/1041))
+* **fix:**  - remove contact card color picker ([#1043](https://github.com/AzzappApp/azzapp/pull/1043))
+* **fix:**  - Permission screen ([#1048](https://github.com/AzzappApp/azzapp/pull/1048))
 * **fix:**  - 🐛 display toasts as expected ([#1008](https://github.com/AzzappApp/azzapp/pull/1008))
 * **fix:**  - pressable native and gestureDetector not working well together ([#1037](https://github.com/AzzappApp/azzapp/pull/1037))
 * **fix:**  - 🐛 display photo full width with no margin ([#1036](https://github.com/AzzappApp/azzapp/pull/1036))
