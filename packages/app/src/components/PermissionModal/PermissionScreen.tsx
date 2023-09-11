@@ -23,7 +23,7 @@ const PermissionScreen = ({
       </Text>
       <Button
         label={intl.formatMessage({
-          defaultMessage: 'Next',
+          defaultMessage: 'Allow access',
           description:
             'Button label of screens asking for camera/micro permissions',
         })}
