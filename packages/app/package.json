@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "0.2.3-canary.4",
+  "version": "0.2.3-canary.5",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
@@ -15,9 +15,9 @@
     "rn:watch"
   ],
   "dependencies": {
-    "@azzapp/i18n": "0.2.3-canary.4",
-    "@azzapp/relay": "0.2.3-canary.4",
-    "@azzapp/shared": "0.2.3-canary.4",
+    "@azzapp/i18n": "0.2.3-canary.5",
+    "@azzapp/relay": "0.2.3-canary.5",
+    "@azzapp/shared": "0.2.3-canary.5",
     "@expo-google-fonts/anton": "^0.2.3",
     "@expo-google-fonts/archivo": "^0.2.3",
     "@expo-google-fonts/cinzel": "^0.2.3",

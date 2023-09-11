@@ -1,5 +1,7 @@
-## 0.2.3-canary.4
+## 0.2.3-canary.5
 
+* **fix:**  - 🐛 display buttons for web posts correctly ([#1049](https://github.com/AzzappApp/azzapp/pull/1049))
+* **fix:**  - Screen layout and fallback ([#1047](https://github.com/AzzappApp/azzapp/pull/1047))
 * **fix:**  - Improve splash screen and main tab bar management ([#1046](https://github.com/AzzappApp/azzapp/pull/1046))
 * **feat:**  - **CardModule:** disable carousel click for beta ([#1041](https://github.com/AzzappApp/azzapp/pull/1041))
 * **fix:**  - remove contact card color picker ([#1043](https://github.com/AzzappApp/azzapp/pull/1043))
