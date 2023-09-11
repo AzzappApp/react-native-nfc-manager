@@ -343,6 +343,10 @@ jobs:
       # EAS Native application Build
       #
       ############################################
+      - name: Prepare Working Directory for EAS
+        working-directory: ./packages/i18n
+        run: rm .gitignore
+
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
