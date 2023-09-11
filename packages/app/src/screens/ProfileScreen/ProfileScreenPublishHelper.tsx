@@ -73,7 +73,7 @@ const ProfileScreenPublishHelper = ({
   const editModeRef = useRef(editMode);
 
   useEffect(() => {
-    if (cardIsPublished && !editMode && editModeRef.current) {
+    if (!cardIsPublished && !editMode && editModeRef.current) {
       setShowPublishModal(true);
     }
     editModeRef.current = editMode;
