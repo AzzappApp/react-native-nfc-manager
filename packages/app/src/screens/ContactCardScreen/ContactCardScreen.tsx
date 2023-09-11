@@ -23,7 +23,6 @@ import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import ProfileColorPicker from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -31,7 +30,6 @@ import useAnimatedState from '#hooks/useAnimatedState';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import ColorPreview from '#ui/ColorPreview';
 import Container from '#ui/Container';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
@@ -53,7 +51,6 @@ const contactCardMobileScreenQuery = graphql`
         userName
         ...ContactCardHeader_profile
         ...AccountHeader_profile
-        ...ProfileColorPicker_profile
         ...ContactCard_profile
         contactCard {
           isPrivate
@@ -101,45 +98,35 @@ const ContactCardScreen = ({
     setTopCardY(topYAfterScale);
   };
 
-  const animatedContactCardStyle = useAnimatedStyle(() => {
-    //calcul the center for Y translation and X translation
-
-    const transform = [
-      {
-        scale: interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [1, fullScreenCardWidth / cardHeight],
-        ),
-      },
-      {
-        translateY: interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
-        ),
-      },
-
-      {
-        rotate: `${interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [0, -90],
-        )}deg`,
-      },
-    ];
-
-    return {
+  const animatedContactCardStyle = useAnimatedStyle(
+    () => ({
       zIndex: 10,
-      // height: interpolate(
-      //   sharedRotationState.value,
-      //   [0, 1],
-      //   [cardHeight, fullScreenCardWidth],
-      // ),
-
-      transform,
-    };
-  }, [sharedRotationState.value, cardWidth, width, topCardY]);
+      transform: [
+        {
+          scale: interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [1, fullScreenCardWidth / cardHeight],
+          ),
+        },
+        {
+          translateY: interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
+          ),
+        },
+        {
+          rotate: `${interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [0, -90],
+          )}deg`,
+        },
+      ],
+    }),
+    [sharedRotationState.value, cardWidth, width, topCardY],
+  );
 
   const footerStyle = useAnimatedStyle(
     () => ({
@@ -183,8 +170,6 @@ const ContactCardScreen = ({
   const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
     viewer.profile?.contactCard?.displayedOnWebCard ?? false,
   );
-
-  const [colorPickerVisible, toggleColorPickerVisible] = useToggle(false);
 
   const [debouncedPublic] = useDebounce(isPublicCard, 500);
   const [debouncedDisplayedOnWebCard] = useDebounce(isDisplayedOnWebCard, 500);
@@ -245,54 +230,6 @@ const ContactCardScreen = ({
             })}
             onPress={toggleContactEditModal}
           />
-
-          <PressableNative
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Background color',
-              description: 'Label of the contact card background color button',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to select a background color',
-              description: 'Hint of the color picker button',
-            })}
-            style={styles.cardColorPicker}
-            onPress={toggleColorPickerVisible}
-          >
-            <ColorPreview
-              color={viewer?.profile?.cardColors?.primary ?? colors.black}
-              colorSize={16}
-            />
-          </PressableNative>
-          {viewer.profile && (
-            <ProfileColorPicker
-              visible={colorPickerVisible}
-              height={400}
-              profile={viewer.profile}
-              title={intl.formatMessage({
-                defaultMessage: ' color',
-                description: ' color title in BlockText edition',
-              })}
-              selectedColor={
-                viewer?.profile?.cardColors?.primary ?? colors.black
-              }
-              onColorChange={color => {
-                commit({
-                  variables: {
-                    input: {
-                      backgroundStyle: {
-                        backgroundColor: color,
-                      },
-                    },
-                  },
-                  onError: err => {
-                    console.log(err);
-                  },
-                });
-              }}
-              onRequestClose={toggleColorPickerVisible}
-            />
-          )}
 
           <View style={{ width: '100%' }}>
             <View style={styles.publicOptions}>
