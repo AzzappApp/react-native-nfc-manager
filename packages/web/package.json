@@ -33,6 +33,7 @@
     "react-dom": "^18.2.0",
     "react-intl": "^6.4.4",
     "resend": "^0.17.2",
+    "semver": "^7.5.4",
     "server-only": "^0.0.1",
     "sharp": "^0.32.5",
     "stream-browserify": "^3.0.0",

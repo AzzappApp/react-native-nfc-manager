@@ -8,6 +8,7 @@ import {
   Observable,
 } from 'relay-runtime';
 import { fetchJSON, isAbortError } from '@azzapp/shared/networkHelpers';
+import { version as APP_VERSION } from '../../package.json';
 import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
@@ -79,7 +80,10 @@ export const createNetwork = () => {
         variables?: Record<string, unknown>;
         profileId?: string;
         locale?: string;
-      } = {};
+        appVersion?: string;
+      } = {
+        appVersion: APP_VERSION,
+      };
 
       const { id, text } = request;
       if (text) {

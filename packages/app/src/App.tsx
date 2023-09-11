@@ -18,6 +18,7 @@ import {
 } from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import ERRORS from '@azzapp/shared/errors';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
@@ -69,6 +70,7 @@ import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
+import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -104,11 +106,35 @@ const App = () => {
     });
   }, []);
 
+  const [needsUpdate, setNeedsUpdate] = useState(false);
+
+  useEffect(
+    () =>
+      addGlobalEventListener('NETWORK_ERROR', ({ payload }) => {
+        const { error } = payload;
+        if (
+          error instanceof Error &&
+          error.message === ERRORS.UPDATE_APP_VERSION
+        ) {
+          setNeedsUpdate(true);
+        }
+      }),
+    [],
+  );
+
   if (!ready) {
     return null;
   }
 
   const ErrorBoundary = __DEV__ ? Fragment : AppErrorBoundary;
+
+  if (needsUpdate) {
+    return (
+      <AppIntlProvider>
+        <UpdateApplicationScreen />
+      </AppIntlProvider>
+    );
+  }
 
   return (
     <AppIntlProvider>

@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { graphql } from 'graphql';
 import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
 import { getProfileById } from '@azzapp/data/domains';
 import {
@@ -12,9 +13,13 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionData } from '#helpers/tokens';
+import { version } from '../../../../package.json';
 import type { SessionData } from '#helpers/tokens';
 import type { Profile } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
+
+const LAST_SUPPORTED_APP_VERSION =
+  process.env.LAST_SUPPORTED_APP_VERSION ?? version;
 
 export const POST = async (req: NextRequest) => {
   let sessionData: SessionData | null;
@@ -39,7 +44,15 @@ export const POST = async (req: NextRequest) => {
   }
 
   const requestParams = await req.json();
-  const { profileId, locale } = requestParams;
+  const { profileId, locale, appVersion } = requestParams;
+
+  if (appVersion && compare(appVersion, LAST_SUPPORTED_APP_VERSION) < 0) {
+    return NextResponse.json(
+      { message: ERRORS.UPDATE_APP_VERSION },
+      { status: 400 },
+    );
+  }
+
   let profile: Profile | null = null;
   if (profileId) {
     profile = await getProfileById(profileId);

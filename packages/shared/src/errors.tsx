@@ -74,6 +74,11 @@ const ERRORS = {
    * Error message used to wrap GraphQL errors.
    */
   GRAPHQL_ERROR: 'GRAPHQL_ERROR',
+  /**
+   * The version of the app is not supported.
+   * This may happen when the user is using an old version of the app that is not supported anymore.
+   */
+  UPDATE_APP_VERSION: 'UPDATE_APP_VERSION',
 } as const;
 
 export default ERRORS;
