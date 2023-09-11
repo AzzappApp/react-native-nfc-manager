@@ -13,13 +13,13 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionData } from '#helpers/tokens';
-import { version } from '../../../../package.json';
+import packageJSON from '../../../../package.json';
 import type { SessionData } from '#helpers/tokens';
 import type { Profile } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
 
 const LAST_SUPPORTED_APP_VERSION =
-  process.env.LAST_SUPPORTED_APP_VERSION ?? version;
+  process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
 
 export const POST = async (req: NextRequest) => {
   let sessionData: SessionData | null;

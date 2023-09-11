@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
@@ -28,6 +28,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -524,18 +525,14 @@ const HorizontalPhotoEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <Modal
-        visible={showImagePicker}
-        animationType={image?.uri ? 'slide' : 'none'}
-        onRequestClose={onImagePickerCancel}
-      >
+      <InnerModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[SelectImageStep, EditImageStep]}
         />
-      </Modal>
+      </InnerModal>
       <UploadProgressModal
         visible={!!uploadProgress}
         progressIndicator={uploadProgress}
