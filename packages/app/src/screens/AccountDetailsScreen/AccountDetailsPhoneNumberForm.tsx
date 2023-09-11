@@ -4,10 +4,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getCountry } from 'react-native-localize';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -75,7 +75,7 @@ const AccountDetailsPhoneNumberForm = ({
 
   const intl = useIntl();
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const [commitMutation] = useUpdateUser();
 

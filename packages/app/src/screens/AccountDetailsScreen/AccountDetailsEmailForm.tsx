@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -44,7 +44,7 @@ const AccountDetailsEmailForm = ({
 
   const intl = useIntl();
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const [commitMutation] = useUpdateUser();
 

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -13,6 +15,8 @@ import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovi
 import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
 import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { colors } from '#theme';
+import { CancelHeaderButton } from '#components/commonsButtons';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -22,6 +26,9 @@ import { useRouter } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
@@ -271,6 +278,27 @@ PostCreationScreen.options = {
   stackAnimation: 'slide_from_bottom',
 };
 
+const PostCreationScreenFallback = () => {
+  const router = useRouter();
+  const onBack = () => {
+    router.back();
+  };
+  return (
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header leftElement={<CancelHeaderButton onPress={onBack} />} />
+        <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <ActivityIndicator />
+        </View>
+      </SafeAreaView>
+    </Container>
+  );
+};
+
 export default relayScreen(PostCreationScreen, {
   query: postCreationcreenQuery,
+  fallback: PostCreationScreenFallback,
 });

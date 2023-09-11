@@ -2,7 +2,7 @@ import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from './ColorChooser';
@@ -161,7 +161,7 @@ const ColorPicker = ({
   }, [colorList, colorsToRemove, onUpdateColorList]);
 
   const intl = useIntl();
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
 
   const { width: windowWidth } = useWindowDimensions();
 

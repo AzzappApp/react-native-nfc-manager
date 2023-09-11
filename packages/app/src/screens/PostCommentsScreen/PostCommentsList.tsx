@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ConnectionHandler,
   graphql,
@@ -20,14 +19,14 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
-import IconButton from '#ui/IconButton';
 import Input from '#ui/Input';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import CommentItem from './CommentItem';
+import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
 import type { PostCommentsList_comments$key } from '@azzapp/relay/artifacts/PostCommentsList_comments.graphql';
@@ -185,7 +184,7 @@ const PostCommentsList = ({
     [data.comments?.edges],
   );
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   return (
     <Container
       style={[
@@ -197,21 +196,7 @@ const PostCommentsList = ({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[styles.keyboardAreaView]}
       >
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Comments',
-            description: 'Post Comments header title',
-          })}
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={30}
-              size={47}
-              style={{ borderWidth: 0 }}
-            />
-          }
-        />
+        <PostCommentsScreenHeader onClose={onClose} />
         <FlatList
           data={postComments}
           renderItem={renderItem}

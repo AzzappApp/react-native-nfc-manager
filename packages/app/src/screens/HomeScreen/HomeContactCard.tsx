@@ -18,12 +18,14 @@ type HomeContacCardProps = {
   user: HomeContactCard_user$key;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
+  currentProfileIndex: number;
 };
 
 const HomeContactCard = ({
   user,
   height,
   currentProfileIndexSharedValue,
+  currentProfileIndex,
 }: HomeContacCardProps) => {
   const { profiles } = useFragment(
     graphql`
@@ -56,6 +58,7 @@ const HomeContactCard = ({
           item={item}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           index={index}
+          prefetch={index === currentProfileIndex}
         />
       ))}
     </View>
@@ -72,6 +75,7 @@ type ContactCardItemProps = {
   item: ProfileType;
   index: number;
   currentProfileIndexSharedValue: SharedValue<number>;
+  prefetch?: boolean;
 };
 
 const ContactCardItem = ({
@@ -80,6 +84,7 @@ const ContactCardItem = ({
   item,
   index,
   currentProfileIndexSharedValue,
+  prefetch = false,
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const positionStyle = useAnimatedStyle(() => ({
@@ -104,7 +109,7 @@ const ContactCardItem = ({
       ]}
     >
       {item.cardIsPublished && (
-        <Link route="CONTACT_CARD">
+        <Link route="CONTACT_CARD" prefetch={prefetch}>
           <PressableNative
             style={{
               width: cardHeight * CONTACT_CARD_RATIO,

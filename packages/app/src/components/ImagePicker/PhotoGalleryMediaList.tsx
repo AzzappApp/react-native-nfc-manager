@@ -13,7 +13,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -21,6 +20,7 @@ import {
   getImageSize,
   getVideoSize,
 } from '#helpers/mediaHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -82,7 +82,7 @@ const PhotoGalleryMediaList = ({
   const isLoading = useRef(false);
   const [hasNext, setHasNext] = useState(false);
   const nextCursor = useRef<string | undefined>();
-  const topPosition = useSafeAreaInsets().top + HEADER_HEIGHT;
+  const topPosition = useScreenInsets().top + HEADER_HEIGHT;
 
   const load = useCallback(
     async (refreshing = false) => {

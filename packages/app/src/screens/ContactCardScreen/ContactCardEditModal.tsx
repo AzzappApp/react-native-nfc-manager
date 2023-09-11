@@ -9,10 +9,10 @@ import {
   useWindowDimensions,
   Pressable,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
@@ -118,7 +118,7 @@ const ContactCardEditModal = ({
 
   const intl = useIntl();
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const { height } = useWindowDimensions();
 
   const [commit] = useMutation(graphql`

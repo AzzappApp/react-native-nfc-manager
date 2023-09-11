@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, View, useColorScheme, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { RotateButton } from '#components/commonsButtons';
@@ -14,6 +13,7 @@ import {
 } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
@@ -84,11 +84,10 @@ const CoverEditorCropModal = ({
   };
 
   const { height: windowHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const top = insets.top;
-  const bottom = Math.min(insets.bottom, 15);
+  const insets = useScreenInsets();
 
-  const coverHeight = windowHeight - top - bottom - HEADER_HEIGHT - 180;
+  const coverHeight =
+    windowHeight - insets.top - insets.bottom - HEADER_HEIGHT - 180;
 
   const appearance = useColorScheme();
 
@@ -98,7 +97,13 @@ const CoverEditorCropModal = ({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <Container style={{ flex: 1, paddingTop: top, paddingBottom: bottom }}>
+      <Container
+        style={{
+          flex: 1,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
         <Header
           middleElement={intl.formatMessage({
             defaultMessage: 'Crop your image',

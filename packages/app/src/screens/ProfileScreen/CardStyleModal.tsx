@@ -3,7 +3,6 @@ import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   graphql,
   useFragment,
@@ -17,6 +16,7 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import WebCardPreview from '#components/WebCardPreview';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -141,17 +141,15 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     });
   }, [cardStyle, commit, onRequestClose]);
 
-  const insets = useSafeAreaInsets();
-
+  const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
+
   const previewHeight =
     windowHeight -
-    topInset -
+    insets.top -
     HEADER_HEIGHT -
     CARD_STYLE_LIST_HEIGHT -
-    bottomInset;
+    insets.bottom;
 
   return (
     <Modal
@@ -163,8 +161,8 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
         style={[
           styles.root,
           {
-            paddingTop: topInset,
-            paddingBottom: bottomInset,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
           },
         ]}
       >

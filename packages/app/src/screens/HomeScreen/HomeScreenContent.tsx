@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSharedValue, useWorkletCallback } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useOnFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
@@ -112,20 +112,18 @@ const HomeScreenContent = ({
   });
 
   // Layout
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, 15);
-  const bottomInset = Math.max(insets.bottom, 15);
+  const insets = useScreenInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const contentHeight =
     windowHeight -
-    topInset -
+    insets.top -
     HOME_HEADER_HEIGHT -
     PROFILE_LINK_HEIGHT -
     PROFILE_LINK_MARGIN_TOP -
     BOTTOM_MENU_GAP -
     BOTTOM_MENU_HEIGHT -
-    bottomInset;
+    insets.bottom;
 
   const bottomPanelHeight =
     (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT;
@@ -142,7 +140,7 @@ const HomeScreenContent = ({
           openPanel={onShowMenu}
           user={user}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          style={{ marginTop: topInset }}
+          style={{ marginTop: insets.top }}
         />
         <HomeProfileLink
           user={user}

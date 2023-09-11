@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -17,6 +16,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -371,11 +371,9 @@ const CardTemplatePreviewModal = ({
   const intl = useIntl();
 
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
+  const insets = useScreenInsets();
 
-  const previewHeight = windowHeight - topInset - HEADER_HEIGHT;
+  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   if (!visible) {
     return null;
@@ -394,7 +392,7 @@ const CardTemplatePreviewModal = ({
         style,
       ]}
     >
-      <Container style={{ flex: 1, paddingTop: topInset }}>
+      <Container style={{ flex: 1, paddingTop: insets.top }}>
         <Header
           leftElement={<CancelHeaderButton onPress={onRequestClose} />}
           middleElement={template?.label ?? ''}
@@ -417,7 +415,7 @@ const CardTemplatePreviewModal = ({
             cardColors={cardColors}
             style={{ flex: 1 }}
             cardModules={cardModules}
-            contentPaddingBottom={bottomInset}
+            contentPaddingBottom={insets.bottom}
           />
         )}
       </Container>

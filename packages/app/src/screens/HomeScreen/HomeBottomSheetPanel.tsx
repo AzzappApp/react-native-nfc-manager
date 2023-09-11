@@ -1,9 +1,9 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
@@ -25,7 +25,7 @@ type HomeBottomSheetPanel = {
 };
 
 const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
   const onDismiss = () => {

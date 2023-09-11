@@ -8,6 +8,7 @@ import AccountHeader from '#components/AccountHeader';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -18,6 +19,7 @@ import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountDetailsRoute } from '#routes';
 import type { AccountDetailsScreenQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenQuery.graphql';
+import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
 
 const accountDetailsScreenQuery = graphql`
   query AccountDetailsScreenQuery {
@@ -49,26 +51,17 @@ const AccountDetailsScreen = ({
     useToggle(false);
   const [passwordVisible, togglePasswordVisible] = useToggle(false);
 
-  const intl = useIntl();
-
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView
         style={{
           flex: 1,
           rowGap: 15,
         }}
       >
-        <AccountHeader
-          profile={viewer.profile}
-          title={intl.formatMessage({
-            defaultMessage: 'Account details',
-            description:
-              'Title of the account details screen where user can change their email, phone number ...',
-          })}
-        />
+        <AccountDetailsHeader profile={profile} />
         <Icon icon="warning" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
@@ -181,10 +174,44 @@ const AccountDetailsScreen = ({
           visible={passwordVisible}
           toggleBottomSheet={togglePasswordVisible}
         />
-      </Container>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Container>
   );
 };
+
+const AccountDetailsHeader = ({
+  profile,
+}: {
+  profile: AccountHeader_profile$key | null;
+}) => {
+  const intl = useIntl();
+  return (
+    <AccountHeader
+      profile={profile}
+      title={intl.formatMessage({
+        defaultMessage: 'Account details',
+        description:
+          'Title of the account details screen where user can change their email, phone number ...',
+      })}
+    />
+  );
+};
+
+const AccountDetailsScreenFallback = () => (
+  <Container style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        rowGap: 15,
+      }}
+    >
+      <AccountDetailsHeader profile={null} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    </SafeAreaView>
+  </Container>
+);
 
 const styleSheet = createStyleSheet(appearance => ({
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
@@ -212,4 +239,5 @@ const styleSheet = createStyleSheet(appearance => ({
 
 export default relayScreen(AccountDetailsScreen, {
   query: accountDetailsScreenQuery,
+  fallback: AccountDetailsScreenFallback,
 });

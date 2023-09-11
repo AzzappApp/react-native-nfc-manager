@@ -1,7 +1,6 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
@@ -15,6 +14,7 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -48,21 +48,17 @@ const CoverEditionScreen = ({
   }, [router]);
 
   const { height: windowHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const editorHeight =
-    windowHeight -
-    HEADER_HEIGHT -
-    Math.max(insets.top, 16) -
-    Math.max(insets.bottom, 16) -
-    20;
+    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom - 20;
 
   return (
     <Container
       style={{
         flex: 1,
-        paddingTop: Math.max(insets.top, 16),
-        paddingBottom: Math.max(insets.bottom, 16) + 20,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom + 20,
       }}
     >
       <Header

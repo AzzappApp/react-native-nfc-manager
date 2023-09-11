@@ -209,9 +209,11 @@ const ItemRenderComponent = ({
     }
   };
 
+  const isCurrent = index === currentUserIndex;
+
   if (!item) {
     return (
-      <Link route="NEW_PROFILE" prefetch>
+      <Link route="NEW_PROFILE" prefetch={isCurrent}>
         <PressableOpacity
           style={[
             styles.newCover,
@@ -251,8 +253,8 @@ const ItemRenderComponent = ({
           width={coverWidth}
           profileId={item.id}
           onPress={onPress}
-          prefetch
-          videoEnabled={currentUserIndex === index}
+          prefetch={isCurrent}
+          videoEnabled={isCurrent}
           onReadyForDisplay={onReady}
         />
       ) : (
@@ -261,6 +263,7 @@ const ItemRenderComponent = ({
           params={{
             profileId: item.id,
           }}
+          prefetch={isCurrent}
         >
           <PressableOpacity
             style={[

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from '#components/NativeRouter';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import SearchBar from '#ui/SearchBar';
@@ -54,7 +54,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
     }
   };
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const timer = useAnimatedState(searchBarHasFocus, {
     duration: ANIMATION_DURATION,

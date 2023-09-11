@@ -8,9 +8,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from './Button';
 import Header from './Header';
 import type { HeaderProps } from './Header';
@@ -119,7 +119,7 @@ const BottomSheetModal = ({
     };
   }, [animation, visible]);
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const intl = useIntl();
 
   if (variant === 'default' && headerRightButton === undefined) {

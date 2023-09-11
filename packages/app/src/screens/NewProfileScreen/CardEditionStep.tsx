@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 
 type CardEditionStepPros = {
@@ -20,7 +20,7 @@ const CardEditionStep = ({
   hideHeader,
   showHeader,
 }: CardEditionStepPros) => {
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const eidtorHeight = height - Math.min(insets.bottom, 16);
 
   const [commit, inFlight] = useLoadCardTemplateMutation();

@@ -22,6 +22,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
+import AccountHeader from '#components/AccountHeader';
 import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
@@ -37,9 +38,9 @@ import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
-import ContactCardHeader from './ContactCardHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardRoute } from '#routes';
+import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
 import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -49,7 +50,6 @@ const contactCardMobileScreenQuery = graphql`
       profile {
         id
         userName
-        ...ContactCardHeader_profile
         ...AccountHeader_profile
         ...ContactCard_profile
         contactCard {
@@ -199,10 +199,10 @@ const ContactCardScreen = ({
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container style={styles.container}>
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
         <Animated.View style={headerStyle}>
-          <ContactCardHeader profileKey={profile} />
+          <ContactCardScreenHeader profile={profile} />
         </Animated.View>
 
         <PressableAnimated
@@ -376,19 +376,50 @@ const ContactCardScreen = ({
             toggleBottomSheet={toggleContactEditModal}
           />
         )}
-      </Container>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Container>
   );
 };
 
+const ContactCardScreenHeader = ({
+  profile,
+}: {
+  profile: AccountHeader_profile$key | null;
+}) => {
+  const intl = useIntl();
+  return (
+    <AccountHeader
+      profile={profile}
+      title={intl.formatMessage({
+        defaultMessage: 'Contact Card',
+        description:
+          'Title of the contact card screen where user can edit their contact card.',
+      })}
+    />
+  );
+};
+
+const ContactCardScreenFallback = () => (
+  <Container style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ContactCardScreenHeader profile={null} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    </SafeAreaView>
+  </Container>
+);
+
 export default relayScreen(ContactCardScreen, {
   query: contactCardMobileScreenQuery,
+  fallback: ContactCardScreenFallback,
 });
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
+    gap: 20,
   },
   contactCard: {
     alignSelf: 'center',

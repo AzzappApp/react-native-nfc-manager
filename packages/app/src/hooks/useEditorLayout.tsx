@@ -1,6 +1,6 @@
 import { useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HEADER_HEIGHT } from '#ui/Header';
+import useScreenInsets from './useScreenInsets';
 
 type EditorLayoutConfig = {
   /**
@@ -30,16 +30,15 @@ type EditorLayoutConfig = {
 };
 
 const useEditorLayout = ({
-  screenMargin = SCREEN_MARGIN,
   bottomPanelMinHeight = BOTTOM_PANEL_MIN_HEIGHT,
   headerHeight = HEADER_HEIGHT,
   topPanelAspectRatio = null,
 }: EditorLayoutConfig = {}) => {
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const inset = useSafeAreaInsets();
+  const inset = useScreenInsets();
 
-  const insetTop = inset.top > 25 ? inset.top : inset.top + screenMargin;
-  const insetBottom = inset.bottom > 0 ? inset.bottom : screenMargin;
+  const insetTop = inset.top;
+  const insetBottom = inset.bottom;
 
   const contentHeight = windowHeight - insetTop - headerHeight;
   const topPanelHeight = Math.min(

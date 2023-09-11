@@ -379,6 +379,7 @@ const HomeBottomPanel = ({
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
                   }
+                  currentProfileIndex={currentProfileIndex}
                 />
               ),
             },

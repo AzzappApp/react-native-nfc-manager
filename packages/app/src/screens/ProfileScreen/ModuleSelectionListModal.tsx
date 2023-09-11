@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, Modal, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -148,7 +148,7 @@ const ModuleSelectionListModal = ({
     [intl],
   );
 
-  const { top, bottom } = useSafeAreaInsets();
+  const { top, bottom } = useScreenInsets();
   const renderItem = useCallback(
     ({ item }: { item: ModuleSelectionListItem }) => (
       <ModuleSelectionListModalItem

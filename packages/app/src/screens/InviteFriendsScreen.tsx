@@ -65,13 +65,8 @@ const InviteFriendsScreen = ({
   }, [whatsappMessage]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container
-        style={{
-          flex: 1,
-          rowGap: 15,
-        }}
-      >
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, rowGap: 15 }}>
         <AccountHeader
           profile={profile}
           title={intl.formatMessage({
@@ -171,8 +166,8 @@ const InviteFriendsScreen = ({
             <Icon icon="arrow_right" />
           </PressableNative>
         </View>
-      </Container>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Container>
   );
 };
 
