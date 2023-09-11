@@ -62,7 +62,7 @@ const AccountDetailsScreen = ({
         }}
       >
         <AccountDetailsHeader profile={profile} />
-        <Icon icon="warning" style={styles.warningIcon} />
+        <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
             <FormattedMessage
