@@ -1,9 +1,15 @@
-import { useMemo, useCallback } from 'react';
+import {
+  useMemo,
+  useCallback,
+  startTransition,
+  useEffect,
+  useRef,
+  Suspense,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
-  ConnectionHandler,
   commitLocalUpdate,
   graphql,
   useFragment,
@@ -16,18 +22,19 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggleFollow from '#hooks/useToggleFollow';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
 import type { MediaSuggestionsProfiles_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsProfiles_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaSuggestionsProfilesProps = {
   viewer: MediaSuggestionsProfiles_viewer$key;
-  style?: StyleProp<ViewStyle>;
+  coverListStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
 };
 
@@ -35,34 +42,80 @@ const NB_PROFILES = 6;
 
 const MediaSuggestionsProfiles = ({
   viewer,
-  style,
+  coverListStyle,
   header,
-}: MediaSuggestionsProfilesProps) => {
-  const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
-    graphql`
-      fragment MediaSuggestionsProfiles_viewer on Viewer
-      @refetchable(queryName: "MediaSuggestionsProfilesListQuery")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 6 }
-      ) {
-        profile {
-          id
-        }
-        recommendedProfiles(after: $after, first: $first)
-          @connection(key: "Viewer_recommendedProfiles") {
-          edges {
-            node {
-              ...CoverList_users
+}: MediaSuggestionsProfilesProps) => (
+  <View>
+    {header}
+    <Suspense
+      fallback={
+        <View
+          style={[
+            { height: 260, alignItems: 'center', justifyContent: 'center' },
+            coverListStyle,
+          ]}
+        >
+          <ActivityIndicator />
+        </View>
+      }
+    >
+      <MediaSuggestionsProfilesInner viewer={viewer} style={coverListStyle} />
+    </Suspense>
+  </View>
+);
+
+const MediaSuggestionsProfilesInner = ({
+  viewer,
+  style,
+}: {
+  viewer: MediaSuggestionsProfiles_viewer$key;
+  style?: StyleProp<ViewStyle>;
+}) => {
+  const { data, refetch, loadNext, hasNext, isLoadingNext } =
+    usePaginationFragment(
+      graphql`
+        fragment MediaSuggestionsProfiles_viewer on Viewer
+        @refetchable(queryName: "MediaSuggestionsProfilesListQuery")
+        @argumentDefinitions(
+          after: { type: String }
+          first: { type: Int, defaultValue: 6 }
+        ) {
+          profile {
+            id
+          }
+          recommendedProfiles(after: $after, first: $first)
+            @connection(key: "Viewer_recommendedProfiles") {
+            edges {
+              node {
+                id
+                ...CoverList_users
+                isFollowing
+              }
             }
           }
         }
-      }
-    `,
-    viewer,
-  );
+      `,
+      viewer,
+    );
 
-  const users: CoverList_users$key = useMemo(() => {
+  const hasFocus = useScreenHasFocus();
+  const hasFocusRef = useRef(hasFocus);
+  useEffect(() => {
+    if (hasFocus && !hasFocusRef.current) {
+      startTransition(() => {
+        refetch(
+          {
+            first: NB_PROFILES,
+            after: null,
+          },
+          { fetchPolicy: 'store-only' },
+        );
+      });
+    }
+    hasFocusRef.current = hasFocus;
+  }, [hasFocus, refetch]);
+
+  const users = useMemo(() => {
     return convertToNonNullArray(
       data.recommendedProfiles?.edges?.map(edge => edge?.node) ?? [],
     );
@@ -74,33 +127,38 @@ const MediaSuggestionsProfiles = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
+  const followingMap = useMemo(() => {
+    return new Map<string, boolean>(
+      users.map(user => [user.id, user.isFollowing]),
+    );
+  }, [users]);
+
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <View>
-      {header}
-      <CoverList
-        users={users}
-        onEndReached={onEndReached}
-        containerStyle={styles.containerStyle}
-        initialNumToRender={NB_PROFILES}
-        style={style}
-        renderItem={({ item }) => (
-          <CoverLinkWithOptions
-            profile={item}
-            profileId={item.id}
-            viewerProfileID={data.profile?.id}
-          />
-        )}
-      />
-    </View>
+    <CoverList
+      users={users}
+      onEndReached={onEndReached}
+      containerStyle={styles.containerStyle}
+      initialNumToRender={NB_PROFILES}
+      style={style}
+      renderItem={({ item }) => (
+        <CoverLinkWithOptions
+          profile={item}
+          isFollowing={followingMap.get(item.id) ?? false}
+          profileId={item.id}
+          viewerProfileID={data.profile?.id}
+        />
+      )}
+    />
   );
 };
 
 const CoverLinkWithOptions = ({
   viewerProfileID,
+  isFollowing,
   ...props
-}: CoverLinkProps & { viewerProfileID?: string }) => {
+}: CoverLinkProps & { viewerProfileID?: string; isFollowing: boolean }) => {
   const styles = useStyleSheet(styleSheet);
 
   const toggleFollow = useToggleFollow(viewerProfileID);
@@ -118,13 +176,22 @@ const CoverLinkWithOptions = ({
       <View style={styles.bottomActions}>
         <Button
           variant="little_round"
-          label={intl.formatMessage({
-            defaultMessage: 'Follow',
-            description: 'Follow button label',
-          })}
+          label={
+            isFollowing
+              ? intl.formatMessage({
+                  defaultMessage: 'Unfollow',
+                  description: 'Unfollow button label in profile suggestions',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Follow',
+                  description: 'Follow button label in profile suggestions',
+                })
+          }
           style={{ flex: 1 }}
           onPress={() => {
-            toggleFollow(props.profileId, userName, true);
+            startTransition(() => {
+              toggleFollow(props.profileId, userName, !isFollowing);
+            });
           }}
         />
         <IconButton
@@ -133,21 +200,7 @@ const CoverLinkWithOptions = ({
           onPress={() => {
             //TODO: implement real update in database
             commitLocalUpdate(environment, store => {
-              const viewer = store.getRoot().getLinkedRecord('viewer');
-              if (viewer) {
-                const connectionRecordSuggestions =
-                  ConnectionHandler.getConnection(
-                    viewer,
-                    'Viewer_recommendedProfiles',
-                  );
-
-                if (connectionRecordSuggestions) {
-                  ConnectionHandler.deleteNode(
-                    connectionRecordSuggestions,
-                    props.profileId,
-                  );
-                }
-              }
+              store.getRoot().getLinkedRecord('viewer');
             });
           }}
         />

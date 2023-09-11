@@ -66,9 +66,7 @@ const updater = (
     const connectionRecord = ConnectionHandler.getConnection(
       viewer,
       'Account_followings',
-      {
-        userName: userNameFilter ?? '',
-      },
+      { userName: userNameFilter ?? '' },
     );
 
     if (connectionRecord) {
@@ -92,15 +90,6 @@ const updater = (
         follow,
         profileId,
       );
-    }
-
-    const connectionRecordSuggestions = ConnectionHandler.getConnection(
-      viewer,
-      'Viewer_recommendedProfiles',
-    );
-
-    if (follow && connectionRecordSuggestions) {
-      ConnectionHandler.deleteNode(connectionRecordSuggestions, profileId);
     }
 
     ConnectionHandler.getConnection(

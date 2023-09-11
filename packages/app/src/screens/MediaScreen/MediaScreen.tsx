@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
@@ -67,7 +67,7 @@ const MediaScreen = ({
                     />
                   </Text>
                 }
-                style={styles.coverList}
+                coverListStyle={styles.coverList}
                 viewer={viewer}
               />
               <Text style={styles.postsTitleStyle} variant="large">
@@ -84,33 +84,35 @@ const MediaScreen = ({
     {
       id: 'FOLLOWINGS',
       element: (
-        <MediaFollowingsScreen
-          viewer={viewer}
-          canPlay={hasFocus && tab === 'FOLLOWINGS'}
-          ListHeaderComponent={
-            <View>
-              <MediaFollowingsProfiles
-                header={
-                  <Text variant="large" style={styles.coversTitleStyle}>
-                    <FormattedMessage
-                      defaultMessage="Webcards"
-                      description="List of followed profiles"
-                    />
-                  </Text>
-                }
-                viewer={viewer}
-                style={styles.coverList}
-              />
-
-              <Text style={styles.postsTitleStyle} variant="large">
-                <FormattedMessage
-                  defaultMessage="Latest Posts"
-                  description="List of latest posts of followed profiles"
+        <Suspense>
+          <MediaFollowingsScreen
+            viewer={viewer}
+            canPlay={hasFocus && tab === 'FOLLOWINGS'}
+            ListHeaderComponent={
+              <View>
+                <MediaFollowingsProfiles
+                  header={
+                    <Text variant="large" style={styles.coversTitleStyle}>
+                      <FormattedMessage
+                        defaultMessage="Webcards"
+                        description="List of followed profiles"
+                      />
+                    </Text>
+                  }
+                  viewer={viewer}
+                  style={styles.coverList}
                 />
-              </Text>
-            </View>
-          }
-        />
+
+                <Text style={styles.postsTitleStyle} variant="large">
+                  <FormattedMessage
+                    defaultMessage="Latest Posts"
+                    description="List of latest posts of followed profiles"
+                  />
+                </Text>
+              </View>
+            }
+          />
+        </Suspense>
       ),
     },
   ];
@@ -120,10 +122,12 @@ const MediaScreen = ({
       id: 'MY_POSTS',
       element: (
         <View style={{ flex: 1 }}>
-          <ProfilePostsList
-            profile={viewer.profile}
-            canPlay={hasFocus && tab === 'MY_POSTS'}
-          />
+          <Suspense>
+            <ProfilePostsList
+              profile={viewer.profile}
+              canPlay={hasFocus && tab === 'MY_POSTS'}
+            />
+          </Suspense>
         </View>
       ),
     });
