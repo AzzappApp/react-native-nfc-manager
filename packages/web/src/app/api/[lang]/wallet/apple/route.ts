@@ -6,16 +6,14 @@ import { getSessionData } from '#helpers/tokens';
 
 // TODO check if auth token is sent in request
 const createPass = async (
-  _: Request,
+  req: Request,
   {
     params,
-    searchParams,
   }: {
     params: { lang: string };
-    searchParams: { profileId: string };
   },
 ) => {
-  const profileId = searchParams.profileId;
+  const profileId = new URL(req.url).searchParams.get('profileId')!;
   try {
     const { userId } = (await getSessionData()) ?? {};
     const profile = await getProfileById(profileId);

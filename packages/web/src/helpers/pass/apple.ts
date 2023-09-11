@@ -68,12 +68,12 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     }
 
     const [logoContent, logo2xContent] = await Promise.all([
-      fetch(
-        `${process.env.NEXT_PUBLIC_URL}${logo.src}`.replace('//', '/'),
-      ).then(res => res.arrayBuffer()),
-      fetch(
-        `${process.env.NEXT_PUBLIC_URL}${logo2x.src}`.replace('//', '/'),
-      ).then(res => res.arrayBuffer()),
+      fetch(`${process.env.NEXT_PUBLIC_URL}${logo.src}`).then(res =>
+        res.arrayBuffer(),
+      ),
+      fetch(`${process.env.NEXT_PUBLIC_URL}${logo2x.src}`).then(res =>
+        res.arrayBuffer(),
+      ),
     ]);
 
     const primary = profile.cardColors?.primary;
