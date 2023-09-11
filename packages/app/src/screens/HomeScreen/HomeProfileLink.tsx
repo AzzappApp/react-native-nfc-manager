@@ -1,7 +1,9 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo } from 'react';
+import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
@@ -41,12 +43,26 @@ const HomeProfileLink = ({
     opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
   }));
 
+  const intl = useIntl();
+  const onPress = () => {
+    Clipboard.setStringAsync(url)
+      .then(() => {
+        Toast.show({
+          type: 'info',
+          text1: intl.formatMessage({
+            defaultMessage: 'Copied to clipboard',
+            description:
+              'Toast info message that appears when the user copies the webcard url to the clipboard',
+          }),
+          bottomOffset: 0,
+        });
+      })
+      .catch(() => void 0);
+  };
+
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
-      <PressableOpacity
-        accessibilityRole="button"
-        onPress={() => Clipboard.setStringAsync(url)}
-      >
+      <PressableOpacity accessibilityRole="button" onPress={onPress}>
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
