@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createId } from '#helpers/idHelpers';
+import useAuthState from '#hooks/useAuthState';
 import BottomMenu from '#ui/BottomMenu';
 import {
   useNativeNavigationEvent,
@@ -79,7 +80,10 @@ const MainTabBar = ({
 
   const [, forceUpdate] = useState(0);
 
-  const visibilityState = mainTabBarVisibilityStates.at(-1)?.state ?? false;
+  const { authenticated } = useAuthState();
+
+  const visibilityState =
+    mainTabBarVisibilityStates.at(-1)?.state ?? authenticated;
 
   const visibilityStyle = useAnimatedStyle(() => {
     const visible =

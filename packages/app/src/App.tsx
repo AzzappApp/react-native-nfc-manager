@@ -28,6 +28,7 @@ import {
 } from '#components/NativeRouter';
 import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
+import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
   init as initLocaleHelpers,
   messages,
@@ -57,6 +58,7 @@ import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmatio
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
@@ -258,6 +260,25 @@ const AppRouter = () => {
   }, [screenIdToDispose]);
   // #endregion
 
+  // #region Loading Screen
+  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+
+  useEffect(
+    () =>
+      addGlobalEventListener('READY', () => {
+        setShowLoadingScreen(false);
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    if (!authenticated) {
+      setTimeout(() => {
+        setShowLoadingScreen(false);
+      }, 500);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // #endregion
 
   const colorScheme = useColorScheme();
@@ -270,7 +291,6 @@ const AppRouter = () => {
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
-
   if (!fontLoaded) {
     return null;
   }
@@ -292,6 +312,7 @@ const AppRouter = () => {
             />
           </RouterProvider>
           <Toast />
+          <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>

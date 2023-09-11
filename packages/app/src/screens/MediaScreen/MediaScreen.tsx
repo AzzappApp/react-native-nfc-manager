@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import ProfilePostsList from '#components/ProfilePostsList';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
@@ -45,7 +44,6 @@ const MediaScreen = ({
   preloadedQuery,
   hasFocus = true,
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
-  useMainTabBarVisiblilityController(true);
   const { viewer } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
   const { top } = useSafeAreaInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');

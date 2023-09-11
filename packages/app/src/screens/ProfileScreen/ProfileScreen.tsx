@@ -8,6 +8,7 @@ import {
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
@@ -42,6 +43,12 @@ const ProfileScreen = ({
   useNativeNavigationEvent('appear', () => {
     setReady(true);
   });
+
+  useEffect(() => {
+    if (ready) {
+      dispatchGlobalEvent({ type: 'READY' });
+    }
+  }, [ready]);
 
   const router = useRouter();
   const onHome = () => {
