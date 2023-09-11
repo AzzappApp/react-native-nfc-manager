@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, Modal, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
@@ -256,6 +257,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
 
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
@@ -290,7 +292,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
-        console.log(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your module, media upload failed, try again later',
+            description:
+              'Error toast message when saving a photo with text and title failed because of a media upload error.',
+          }),
+        });
       } finally {
         setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
@@ -316,17 +326,22 @@ const PhotoWithTextAndTitleEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-
+        console.log(e);
         if (e instanceof GraphQLError) {
           console.log(e.cause);
-        } else {
-          console.log(e);
         }
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your line divider module, try again later',
+            description:
+              'Error toast message when saving a photo with text and title module failed because of an unknown error.',
+          }),
+        });
       },
     });
-  }, [canSave, value, photoWithTextAndTitle?.id, commit, router]);
+  }, [canSave, value, photoWithTextAndTitle?.id, commit, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -467,7 +482,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-  const intl = useIntl();
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>

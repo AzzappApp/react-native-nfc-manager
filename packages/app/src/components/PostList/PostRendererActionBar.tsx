@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 
+import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 
 import { useDebouncedCallback } from 'use-debounce';
@@ -95,6 +96,17 @@ const PostRendererActionBar = ({
             }
             post.setValue(add ? reaction : null, 'viewerPostReaction');
           }
+        },
+        onError: error => {
+          console.error(error);
+
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, we were unable to like this post',
+              description: 'Error toast message when liking a post failed.',
+            }),
+          });
         },
       });
     },

@@ -20,7 +20,7 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
   profile,
   onToggleFollow,
 }: {
-  onToggleFollow?: (id: string) => void;
+  onToggleFollow?: (id: string, userName: string) => void;
   profile: ArrayItemType<ProfileList_users$data>;
 }) {
   const styles = useStyleSheet(styleSheet);
@@ -49,7 +49,7 @@ const ProfileListItemMemoized = memo(function ProfileListItem({
           size={35}
           style={styles.deleteIconButton}
           iconStyle={styles.deleteIcon}
-          onPress={() => onToggleFollow(profile.id)}
+          onPress={() => onToggleFollow(profile.id, profile.userName)}
         />
       ) : null}
     </Animated.View>
@@ -60,7 +60,7 @@ type ProfileListProps = {
   users: ProfileList_users$key;
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
-  onToggleFollow?: (id: string) => void;
+  onToggleFollow?: (id: string, userName: string) => void;
   noProfileFoundLabel: string;
   searchValue: string | undefined;
   setSearchValue: (value: string | undefined) => void;

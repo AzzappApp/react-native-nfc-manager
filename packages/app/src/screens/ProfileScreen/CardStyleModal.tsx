@@ -3,6 +3,7 @@ import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import {
   graphql,
   useFragment,
@@ -138,8 +139,18 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
       onCompleted: () => {
         onRequestClose();
       },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not apply the style',
+            description: 'Card style modal error toast',
+          }),
+        });
+      },
     });
-  }, [cardStyle, commit, onRequestClose]);
+  }, [cardStyle, commit, intl, onRequestClose]);
 
   const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();

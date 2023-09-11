@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
@@ -146,6 +147,17 @@ const PostCommentsList = ({
               post?.setValue(counterComments + 1, 'counterComments');
             }
           }
+        },
+        onError(error) {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your comment, try again later',
+              description: 'Post comment screen - error toast',
+            }),
+          });
         },
       });
     }

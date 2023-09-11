@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
 import type {
   useToggleFollowMutation,
@@ -125,7 +127,13 @@ const useToggleFollow = (
     `,
   );
 
-  const toggleFollow = (profileId: string, follow: boolean) => {
+  const intl = useIntl();
+
+  const toggleFollow = (
+    profileId: string,
+    userName: string,
+    follow: boolean,
+  ) => {
     // TODO do we really want to prevent fast clicking?
     if (toggleFollowingActive) {
       return;
@@ -153,8 +161,18 @@ const useToggleFollow = (
         updater: store =>
           updater(store, currentProfileId, profileId, follow, userNameFilter),
         onError(error) {
-          // TODO: handle error
-          console.log(error);
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage(
+              {
+                defaultMessage: 'Error, could not follow {userName}',
+                description:
+                  'Error toast message when we could not follow a user',
+              },
+              { userName },
+            ),
+          });
         },
       });
     }

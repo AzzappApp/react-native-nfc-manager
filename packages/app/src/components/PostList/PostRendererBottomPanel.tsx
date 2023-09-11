@@ -1,7 +1,8 @@
 /* eslint-disable no-alert */
 import { toGlobalId } from 'graphql-relay';
-import { FormattedMessage, FormattedRelativeTime } from 'react-intl';
+import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -19,7 +20,10 @@ import PostRendererActionBar, {
 import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
 import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
-import type { PostRendererBottomPanelUpdatePostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
+import type {
+  PostRendererBottomPanelUpdatePostMutation,
+  UpdatePostInput,
+} from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
 
 type PostRendererBottomPanelProps = {
   /**
@@ -73,7 +77,7 @@ const PostRendererBottomPanel = ({
         }
         author {
           id
-          # isViewer
+          userName
         }
         createdAt
       }
@@ -139,20 +143,39 @@ const PostRendererBottomPanel = ({
       }
     `);
 
-  const setAllowComments = () => {
+  const intl = useIntl();
+  const updatePost = (input: UpdatePostInput) => {
     commitUpdatePost({
       variables: {
-        input: { postId: post.id, allowComments: !post.allowComments },
+        input,
+      },
+      optimisticResponse: {
+        updatePost: {
+          post: {
+            id: input.postId,
+            allowComments: input.allowComments ?? post.allowComments,
+            allowLikes: input.allowLikes ?? post.allowLikes,
+          },
+        },
+      },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while updating this post, please try again.',
+            description: 'Error toast message when updating post fails.',
+          }),
+        });
       },
     });
   };
+  const setAllowComments = () => {
+    updatePost({ postId: post.id, allowComments: !post.allowComments });
+  };
 
   const setAllowLikes = () => {
-    commitUpdatePost({
-      variables: {
-        input: { postId: post.id, allowLikes: !post.allowLikes },
-      },
-    });
+    updatePost({ postId: post.id, allowLikes: !post.allowLikes });
   };
 
   const auth = useAuthState();
@@ -163,7 +186,7 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow(currentProfileId);
 
   const onToggleFollow = () => {
-    toggleFollow(author.id, !author.isFollowing);
+    toggleFollow(author.id, post.author.userName, !author.isFollowing);
   };
 
   return (

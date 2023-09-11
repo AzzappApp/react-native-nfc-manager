@@ -1,6 +1,5 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { fromGlobalId } from 'graphql-relay';
-
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -183,11 +182,19 @@ const ContactCardScreen = ({
           displayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
         },
       },
-      onError: err => {
-        console.log(err);
+      onError: e => {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not save your contact card. Please try again.',
+            description: 'Error toast message when saving contact card failed',
+          }),
+        });
       },
     });
-  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit]);
+  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit, intl]);
 
   const styles = useStyleSheet(styleSheet);
 

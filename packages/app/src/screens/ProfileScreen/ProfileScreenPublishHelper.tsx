@@ -82,18 +82,19 @@ const ProfileScreenPublishHelper = ({
   const onPublish = () => {
     commit({
       variables: {},
-      onCompleted: (_, error) => {
-        if (error) {
-          // TODO - handle error
-          console.log(error);
-          return;
-        }
-        // TODO - add analytics
+      onCompleted: () => {
         setShowPublishModal(false);
       },
       onError: error => {
-        //TODO - handle error
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not publish your WebCard, try again later',
+            description: 'Publish modal error toast',
+          }),
+        });
       },
     });
   };

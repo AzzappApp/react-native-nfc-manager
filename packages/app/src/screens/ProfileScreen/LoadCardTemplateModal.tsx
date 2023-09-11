@@ -1,6 +1,7 @@
 import { Suspense, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
+import Toast from 'react-native-toast-message';
 import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -41,6 +42,16 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
       onCompleted: () => {
         setCardTemplateId(null);
         onClose();
+      },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not load the template',
+            description: 'Load card template modal error toast',
+          }),
+        });
       },
     });
   };

@@ -116,8 +116,16 @@ const HomeBottomPanel = ({
         });
       },
       onError: error => {
-        //TODO - handle error
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not publish your WebCard, please try again later',
+            description:
+              'Error message displayed when the publication of the webcard failed in Home Screen',
+          }),
+        });
       },
     });
   };

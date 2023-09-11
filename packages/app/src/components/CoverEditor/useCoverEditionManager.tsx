@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Modal, unstable_batchedUpdates } from 'react-native';
 import * as mime from 'react-native-mime-types';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -457,6 +458,8 @@ const useCoverEditionManager = ({
     }
   `);
 
+  const intl = useIntl();
+
   const onSave = useCallback(async () => {
     if (!sourceMedia) {
       setShowMediaRequiredModal(true);
@@ -661,14 +664,7 @@ const useCoverEditionManager = ({
       variables: {
         saveCoverInput,
       },
-      onCompleted: (response, errors) => {
-        if (errors) {
-          // TODO
-          console.error(errors);
-          setSaving(false);
-          setUploadProgress(null);
-          return;
-        }
+      onCompleted: response => {
         if (mediaPath) {
           const mediaId = response.saveCover.profile.cardCover?.media?.id;
           if (mediaId) {
@@ -684,8 +680,15 @@ const useCoverEditionManager = ({
         onCoverSaved();
       },
       onError: error => {
-        // TODO
         console.error(error);
+
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while saving your cover, please try again.',
+            description: 'Error toast message when saving cover fails.',
+          }),
+        });
         setSaving(false);
         setUploadProgress(null);
       },
@@ -695,18 +698,17 @@ const useCoverEditionManager = ({
     coverStyle,
     colorPalette,
     mediaComputation,
+    mediaCropParameter,
     otherColors,
     commit,
-    mediaCropParameter,
     subTitle,
     title,
     cardCover,
-    maskMedia,
     currentCoverStyle,
+    maskMedia,
     onCoverSaved,
+    intl,
   ]);
-
-  const intl = useIntl();
 
   const modals = (
     <>

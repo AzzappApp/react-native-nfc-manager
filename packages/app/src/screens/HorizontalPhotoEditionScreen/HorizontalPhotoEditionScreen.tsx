@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
@@ -21,7 +22,6 @@ import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -206,6 +206,7 @@ const HorizontalPhotoEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -237,7 +238,16 @@ const HorizontalPhotoEditionScreen = ({
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your photo module, media upload failed',
+            description:
+              'Error toast message when saving a horizontal photo module failed because medias upload failed.',
+          }),
+        });
       } finally {
         setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
@@ -257,15 +267,18 @@ const HorizontalPhotoEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-        console.log(e);
-        if (e instanceof GraphQLError) {
-          console.log(e.cause);
-        }
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Could not save your photo module, try again later',
+            description:
+              'Error toast message when saving a horizontal photo module failed because of an unknown error.',
+          }),
+        });
       },
     });
-  }, [canSave, value, horizontalPhoto?.id, commit, router]);
+  }, [canSave, value, horizontalPhoto?.id, commit, intl, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -359,7 +372,6 @@ const HorizontalPhotoEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-  const intl = useIntl();
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>

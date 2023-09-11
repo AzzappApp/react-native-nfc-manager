@@ -6,9 +6,12 @@ import {
   ConnectionHandler,
   commitLocalUpdate,
   graphql,
+  useFragment,
   usePaginationFragment,
   useRelayEnvironment,
 } from 'react-relay';
+import CoverLink_profileFragment from '@azzapp/relay/artifacts/CoverLink_profile.graphql';
+
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
@@ -102,6 +105,8 @@ const CoverLinkWithOptions = ({
 
   const toggleFollow = useToggleFollow(viewerProfileID);
 
+  const { userName } = useFragment(CoverLink_profileFragment, props.profile);
+
   const environment = useRelayEnvironment();
 
   const intl = useIntl();
@@ -119,7 +124,7 @@ const CoverLinkWithOptions = ({
           })}
           style={{ flex: 1 }}
           onPress={() => {
-            toggleFollow(props.profileId, true);
+            toggleFollow(props.profileId, userName, true);
           }}
         />
         <IconButton

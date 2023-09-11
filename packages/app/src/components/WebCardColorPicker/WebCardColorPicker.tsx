@@ -2,6 +2,7 @@ import { pick } from 'lodash';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import {
   graphql,
   useFragment,
@@ -108,18 +109,20 @@ const WebCardColorPicker = ({
         input,
       },
       updater: cardColorsStoreUpdater(profile.id, colorPalette),
-      onCompleted: (_, error) => {
-        if (error) {
-          //TODO: handle error
-          console.log(error);
-          return;
-        }
+      onCompleted: _ => {
         setCurrentPalette(pick(input, ['primary', 'light', 'dark']));
         onRequestClose();
       },
       onError: error => {
-        //TODO: handle error
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while saving colors',
+            description:
+              'Error toast message when we failed to save colors in webcard color picker',
+          }),
+        });
       },
     });
   };

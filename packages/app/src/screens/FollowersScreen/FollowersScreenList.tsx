@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -65,6 +66,8 @@ const FollowersScreenList = ({
     `,
   );
 
+  const intl = useIntl();
+
   const removeFollower = useCallback(
     (profileId: string) => {
       // currentProfileId is undefined when user is anonymous so we can't follow
@@ -87,16 +90,22 @@ const FollowersScreenList = ({
             updater(store, currentProfileId, profileId),
           updater: store => updater(store, currentProfileId, profileId),
           onError(error) {
-            // TODO: handle error
-            console.log(error);
+            console.error(error);
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error, could not remove follower, please try again later',
+                description:
+                  'Error message displayed when the user could not remove a follower',
+              }),
+            });
           },
         });
       }
     },
-    [commit, currentProfileId, data.followers.__id],
+    [commit, currentProfileId, data.followers.__id, intl],
   );
-
-  const intl = useIntl();
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
 

@@ -146,7 +146,9 @@ const ProfileScreen = ({
             onHome={onHome}
             isWebCardDisplayed={!showPost}
             onEdit={toggleEditing}
-            onToggleFollow={follow => onToggleFollow(data.profile!.id, follow)}
+            onToggleFollow={follow =>
+              onToggleFollow(data.profile!.id, data.profile!.userName!, follow)
+            }
             onFlip={toggleFlip}
           />
         </View>

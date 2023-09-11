@@ -1,7 +1,7 @@
-import { GraphQLError } from 'graphql';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -212,6 +212,7 @@ const CarouselEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
 
@@ -226,61 +227,79 @@ const CarouselEditionScreen = ({
       string,
       { id: string; width: number; height: number }
     > = {};
+
     if (images?.length) {
-      const imageToUploads = convertToNonNullArray(
-        await Promise.all(
-          images.map(async image => {
-            if (!('local' in image)) {
-              return null;
-            }
-            const uploadInfos = await uploadSign({
-              kind: 'image',
-              target: 'module',
-            });
-            return {
-              uri: image.uri,
-              ...uploadInfos,
-            };
-          }),
-        ),
-      );
-
-      const uploads = imageToUploads.map(
-        ({ uri, uploadURL, uploadParameters }) => ({
-          uri,
-          ...uploadMedia(
-            {
-              name: getFileName(uri),
-              uri,
-              type: 'image/jpg',
-            } as any,
-            uploadURL,
-            uploadParameters,
+      try {
+        const imageToUploads = convertToNonNullArray(
+          await Promise.all(
+            images.map(async image => {
+              if (!('local' in image)) {
+                return null;
+              }
+              const uploadInfos = await uploadSign({
+                kind: 'image',
+                target: 'module',
+              });
+              return {
+                uri: image.uri,
+                ...uploadInfos,
+              };
+            }),
           ),
-        }),
-      );
+        );
 
-      setUploadProgress(
-        combineLatest(uploads.map(({ progress }) => progress)).map(
-          progresses =>
-            progresses.reduce((a, b) => a + b, 0) / progresses.length,
-        ),
-      );
-
-      const medias = await Promise.all(
-        uploads.map(({ promise, uri }) =>
-          promise.then(uploadResult => ({
-            id: encodeMediaId(uploadResult.public_id as string, 'image'),
+        const uploads = imageToUploads.map(
+          ({ uri, uploadURL, uploadParameters }) => ({
             uri,
-          })),
-        ),
-      );
+            ...uploadMedia(
+              {
+                name: getFileName(uri),
+                uri,
+                type: 'image/jpg',
+              } as any,
+              uploadURL,
+              uploadParameters,
+            ),
+          }),
+        );
 
-      mediasMap = medias.reduce(
-        (acc, media) => ({ ...acc, [media.uri]: media }),
-        {},
-      );
-      setUploadProgress(null);
+        setUploadProgress(
+          combineLatest(uploads.map(({ progress }) => progress)).map(
+            progresses =>
+              progresses.reduce((a, b) => a + b, 0) / progresses.length,
+          ),
+        );
+
+        const medias = await Promise.all(
+          uploads.map(({ promise, uri }) =>
+            promise.then(uploadResult => ({
+              id: encodeMediaId(uploadResult.public_id as string, 'image'),
+              uri,
+            })),
+          ),
+        );
+
+        mediasMap = medias.reduce(
+          (acc, media) => ({ ...acc, [media.uri]: media }),
+          {},
+        );
+
+        setUploadProgress(null);
+      } catch (e) {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your carouse module, medias upload failed',
+            description:
+              'Error toast message when saving a carousel module failed because medias upload failed.',
+          }),
+        });
+        setUploadProgress(null);
+        setSaving(false);
+        return;
+      }
     }
 
     commit({
@@ -300,15 +319,19 @@ const CarouselEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-        console.log(e);
-        if (e instanceof GraphQLError) {
-          console.log(e.cause);
-        }
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your carouse module, an error occured',
+            description:
+              'Error toast message when saving a carousel module failed for an unknown reason.',
+          }),
+        });
       },
     });
-  }, [canSave, value, commit, carousel?.id, router]);
+  }, [canSave, value, commit, carousel?.id, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -405,7 +428,6 @@ const CarouselEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-  const intl = useIntl();
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
