@@ -1,5 +1,9 @@
-## 0.2.3-canary.10
+## 0.2.3-canary.11
 
+* **fix:**  - nblikes counter ([#1057](https://github.com/AzzappApp/azzapp/pull/1057))
+* **fix:**  - MediaSuggestionsProfiles refresh mechanism ([#1054](https://github.com/AzzappApp/azzapp/pull/1054))
+* **fix:**  - Improve color picker behavior in modules ([#1052](https://github.com/AzzappApp/azzapp/pull/1052))
+* **feat:**  - **Home:** display toast message when copy to clipboard ([#1053](https://github.com/AzzappApp/azzapp/pull/1053))
 * **feat:**  - Add toast errors messages ([#1051](https://github.com/AzzappApp/azzapp/pull/1051))
 * **fix:**  - eas build
 * **feat:**  - Add popup that invite user to update ([#1040](https://github.com/AzzappApp/azzapp/pull/1040))
