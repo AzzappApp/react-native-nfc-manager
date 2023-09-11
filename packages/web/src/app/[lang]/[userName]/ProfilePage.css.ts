@@ -89,7 +89,7 @@ const postsBehind = style({
 const switchContent = style({
   position: 'fixed',
   padding: '13px',
-  backgroundColor: 'rgba(14, 18, 22, 0.40);',
+  backgroundColor: 'rgba(14, 18, 22, 0.40)',
   bottom: '15px',
   right: '15px',
   borderRadius: '200px',
