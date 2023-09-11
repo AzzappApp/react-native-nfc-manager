@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { graphql } from 'graphql';
 import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -101,9 +102,15 @@ export const POST = async (req: NextRequest) => {
         );
       }
     }
+    const environment = process.env.NEXT_PUBLIC_PLATFORM || 'development';
+    if (environment !== 'production') {
+      Sentry.captureException(result.errors);
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
       { status: 500 },

@@ -1,4 +1,6 @@
+import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
+
 import { Resend } from 'resend';
 import client from 'twilio';
 import {
@@ -102,6 +104,7 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ issuer });
   } catch (error) {
+    Sentry.captureException(error);
     console.error(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
