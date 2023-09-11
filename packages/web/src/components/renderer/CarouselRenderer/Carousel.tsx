@@ -4,10 +4,10 @@ import { useRef, useState, useEffect } from 'react';
 import { ArrowRightIcon } from '#assets';
 import { useMediaCarousel } from '#hooks';
 import { ButtonIcon } from '#ui';
-import CarouselFullScreen from './CarouselFullScreen';
+// import CarouselFullScreen from './CarouselFullScreen';
 import CarouselMedia from './CarouselMedia';
 import styles from './CarouselRenderer.css';
-import type { CarouselFullScreenActions } from './CarouselFullScreen';
+// import type { CarouselFullScreenActions } from './CarouselFullScreen';
 import type { Media } from '@azzapp/data/domains';
 
 type CarouselProps = {
@@ -44,7 +44,7 @@ const Carousel = (props: CarouselProps) => {
   );
 
   const [displayArrows, setDisplayArrows] = useState(false);
-  const modal = useRef<CarouselFullScreenActions>(null);
+  // const modal = useRef<CarouselFullScreenActions>(null);
 
   const onClickRight = () => {
     const index = getIndexToNextPosition();
@@ -129,7 +129,7 @@ const Carousel = (props: CarouselProps) => {
             />
           </>
         )}
-        {medias.map((media, i) => (
+        {medias.map(media => (
           <CarouselMedia
             key={media.id}
             media={media}
@@ -138,11 +138,11 @@ const Carousel = (props: CarouselProps) => {
             borderWidth={borderWidth}
             imageHeight={imageHeight}
             squareRatio={squareRatio}
-            onClick={() => modal.current?.open(i)}
+            onClick={() => {}}
           />
         ))}
       </div>
-      <CarouselFullScreen
+      {/* <CarouselFullScreen
         ref={modal}
         medias={medias}
         borderWidth={borderWidth}
@@ -152,7 +152,7 @@ const Carousel = (props: CarouselProps) => {
           borderStyle: 'solid',
           objectFit: 'cover',
         }}
-      />
+      /> */}
     </>
   );
 };
