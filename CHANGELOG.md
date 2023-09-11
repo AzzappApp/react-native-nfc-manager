@@ -1,4 +1,4 @@
-## 0.2.3-canary.8
+## 0.2.3-canary.9
 
 * **fix:**  - eas build
 * **feat:**  - Add popup that invite user to update ([#1040](https://github.com/AzzappApp/azzapp/pull/1040))
