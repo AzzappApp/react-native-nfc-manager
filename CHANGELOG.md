@@ -1,5 +1,7 @@
-## 0.2.3-canary.6
+## 0.2.3-canary.7
 
+* **feat:**  - Add popup that invite user to update ([#1040](https://github.com/AzzappApp/azzapp/pull/1040))
+* **feat:**  - 🎸 set fixed width for comments on post detail ([#1050](https://github.com/AzzappApp/azzapp/pull/1050))
 * **fix:**  - 🐛 display buttons for web posts correctly ([#1049](https://github.com/AzzappApp/azzapp/pull/1049))
 * **fix:**  - Screen layout and fallback ([#1047](https://github.com/AzzappApp/azzapp/pull/1047))
 * **fix:**  - Improve splash screen and main tab bar management ([#1046](https://github.com/AzzappApp/azzapp/pull/1046))
