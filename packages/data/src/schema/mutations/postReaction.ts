@@ -33,26 +33,27 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
       const reaction = await getPostReaction(profileId, targetId);
       const removeReaction = reaction?.reactionKind === reactionKind;
 
-      await Promise.all([
-        removeReaction
-          ? deletePostReaction(profileId, targetId, trx)
-          : insertPostReaction(profileId, targetId, reactionKind, trx),
-        trx
-          .update(PostTable)
-          .set({
-            //prettier-ignore
-            counterReactions: sql`${PostTable.counterReactions} ${removeReaction ? '-' : '+'} 1`,
-          })
-          .where(eq(PostTable.id, targetId)),
-        reactionKind === 'like' &&
-          trx
-            .update(ProfileTable)
-            .set({
-              //prettier-ignore
-              nbLikes: sql`${PostTable.counterReactions} ${removeReaction ? '-' : '+'} 1`,
-            })
-            .where(eq(ProfileTable.id, post.authorId)),
-      ]);
+      if (removeReaction) {
+        await deletePostReaction(profileId, targetId, trx);
+      } else {
+        await insertPostReaction(profileId, targetId, reactionKind, trx);
+      }
+
+      await trx
+        .update(PostTable)
+        .set({
+          //prettier-ignore
+          counterReactions:removeReaction? sql`${PostTable.counterReactions} -  1`: sql`${PostTable.counterReactions} +  1`,
+        })
+        .where(eq(PostTable.id, targetId));
+
+      await trx
+        .update(ProfileTable)
+        .set({
+          //prettier-ignore
+          nbLikes: removeReaction? sql`${ProfileTable.nbLikes} - 1`: sql`${ProfileTable.nbLikes} + 1`,
+        })
+        .where(eq(ProfileTable.id, post.authorId));
     });
   } catch (e) {
     console.error(e);
