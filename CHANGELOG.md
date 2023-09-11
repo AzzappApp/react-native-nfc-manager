@@ -1,4 +1,4 @@
-## 0.2.3-canary.5
+## 0.2.3-canary.6
 
 * **fix:**  - 🐛 display buttons for web posts correctly ([#1049](https://github.com/AzzappApp/azzapp/pull/1049))
 * **fix:**  - Screen layout and fallback ([#1047](https://github.com/AzzappApp/azzapp/pull/1047))
