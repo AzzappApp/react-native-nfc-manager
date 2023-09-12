@@ -45,7 +45,6 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import NativeRouterInstrumentation from '#helpers/SentryNativeRouterInstrumentation';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
@@ -80,18 +79,12 @@ import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
-const routingInstrumentation = new NativeRouterInstrumentation();
-
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
-  integrations: [
-    new Sentry.ReactNativeTracing({
-      routingInstrumentation,
-    }),
-  ],
+  integrations: [new Sentry.ReactNativeTracing()],
 });
 
 /**
@@ -226,23 +219,29 @@ const AppRouter = () => {
   }, [profileId]);
 
   useEffect(() => {
-    routingInstrumentation.setRouter(router);
+    Sentry.addBreadcrumb({
+      category: 'navigation',
+      type: 'navigation',
+      message: `Navigation to ${router.getCurrentRoute()?.route}`,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const disposables: Array<{ dispose: () => void }> = [];
-
-    disposables.push(
-      router.addRouteWillChangeListener(() => {
-        routingInstrumentation.routeWillChange();
-      }),
-    );
-
-    disposables.push(
-      router.addRouteDidChangeListener(() => {
-        routingInstrumentation.routeDidChange();
-      }),
-    );
+  useEffect(() => {
+    const previousRoute = router.getCurrentRoute();
+    const disposable = router.addRouteWillChangeListener(route => {
+      Sentry.addBreadcrumb({
+        category: 'navigation',
+        type: 'navigation',
+        message: `Navigation to ${route.route}`,
+        data: {
+          from: previousRoute,
+          to: route,
+        },
+      });
+    });
     return () => {
-      disposables.forEach(({ dispose }) => dispose());
+      disposable.dispose();
     };
   }, [router]);
   // #endregion

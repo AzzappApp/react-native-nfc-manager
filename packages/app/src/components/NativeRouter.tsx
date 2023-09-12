@@ -1010,7 +1010,10 @@ const getActiveTabs = ({ modals, stack }: RouterState): TabsState | null => {
     currentRoute = stack[stack.length - 1];
   }
   let currentTabs: TabsState | null = null;
-  while (currentRoute.kind !== 'route') {
+  while (currentRoute?.kind !== 'route') {
+    if (!currentRoute) {
+      return null;
+    }
     if (currentRoute.kind === 'tabs') {
       currentTabs = currentRoute.state;
       currentRoute = currentRoute.state.tabs[currentRoute.state.currentIndex];
