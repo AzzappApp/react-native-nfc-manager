@@ -1,5 +1,7 @@
-## 0.2.3-canary.11
+## 0.2.3-canary.12
 
+* **fix:**  - webcard background color on desktop ([#1062](https://github.com/AzzappApp/azzapp/pull/1062))
+* **improvement:**  - recentsearch ([#1063](https://github.com/AzzappApp/azzapp/pull/1063))
 * **fix:**  - nblikes counter ([#1057](https://github.com/AzzappApp/azzapp/pull/1057))
 * **fix:**  - MediaSuggestionsProfiles refresh mechanism ([#1054](https://github.com/AzzappApp/azzapp/pull/1054))
 * **fix:**  - Improve color picker behavior in modules ([#1052](https://github.com/AzzappApp/azzapp/pull/1052))
