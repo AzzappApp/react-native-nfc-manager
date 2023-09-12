@@ -6,6 +6,14 @@ const wrapper = style({
   flexDirection: 'row',
 });
 
+const background = style({
+  position: 'fixed',
+  top: '-10vh',
+  left: 0,
+  width: '100%',
+  height: '120vh',
+});
+
 const modules = style({
   height: '100vh',
   transitionTimingFunction: 'ease-out',
@@ -120,6 +128,7 @@ const postNavigationHidden = style({
 
 const styles = {
   wrapper,
+  background,
   modules,
   posts,
   modulesWithPosts,

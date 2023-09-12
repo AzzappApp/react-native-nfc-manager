@@ -11,7 +11,13 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   DEFAULT_CARD_STYLE,
   DEFAULT_COLOR_PALETTE,
+  swapColor,
 } from '@azzapp/shared/cardHelpers';
+import {
+  MODULES_DEFAULT_VALUES,
+  MODULES_STYLES_VALUES,
+  getModuleDataValues,
+} from '@azzapp/shared/cardModuleHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
 import ProfilePageLayout from './ProfilePageLayout';
 
@@ -81,6 +87,30 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
     convertToNonNullArray(backgrounds).map(b => [b.id, b.resizeMode!]),
   );
 
+  const cardColors = profile.cardColors ?? DEFAULT_COLOR_PALETTE;
+
+  const cardBackgroundColor = swapColor(
+    profile.coverData?.backgroundColor ?? cardColors.light,
+    cardColors,
+  );
+  let lastModuleBackgroundColor = cardBackgroundColor;
+  const lastModule = modules.at(-1);
+
+  if (lastModule) {
+    const lastModuleData = getModuleDataValues({
+      data: lastModule.data as any,
+      cardStyle: profile.cardStyle ?? DEFAULT_CARD_STYLE,
+      defaultValues: MODULES_DEFAULT_VALUES[lastModule.kind],
+      styleValuesMap: MODULES_STYLES_VALUES[lastModule.kind],
+    });
+
+    lastModuleBackgroundColor = swapColor(
+      lastModuleData.backgroundStyle?.backgroundColor ??
+        lastModuleData.colorBottom,
+      cardColors,
+    );
+  }
+
   return (
     <ProfilePageLayout
       profile={profile}
@@ -100,6 +130,8 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
       posts={posts}
       media={media}
       cover={<CoverRenderer profile={profile} media={media} />}
+      cardBackgroundColor={cardBackgroundColor}
+      lastModuleBackgroundColor={lastModuleBackgroundColor}
     />
   );
 };
