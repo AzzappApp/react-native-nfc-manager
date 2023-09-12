@@ -112,10 +112,13 @@ class NativeRouterInstrumentation extends RoutingInstrumentation {
       return;
     }
 
-    const route = {
-      ...this._router.getCurrentRoute(),
-      id: this._router.getCurrentScreenId(),
-    };
+    const routerRouter = this._router.getCurrentRoute();
+    const route = routerRouter
+      ? {
+          ...routerRouter,
+          id: this._router.getCurrentScreenId()!,
+        }
+      : undefined;
 
     if (route) {
       if (this._latestTransaction) {

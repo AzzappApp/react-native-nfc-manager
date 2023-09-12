@@ -90,8 +90,8 @@ type ScreenPrefetcher = {
  */
 export const createScreenPrefetcher = (
   screens: Record<ROUTES, ScreenPrefetchOptions<Route>>,
-  initialRoute: Route,
-  initialScreenId: string,
+  initialRoute: Route | null,
+  initialScreenId: string | null,
 ): ScreenPrefetcher => {
   const screenSubscriptions = new Map<
     string,
@@ -182,7 +182,9 @@ export const createScreenPrefetcher = (
     }
   };
 
-  screenWillBePushed(initialScreenId, initialRoute);
+  if (initialRoute && initialScreenId) {
+    screenWillBePushed(initialScreenId, initialRoute);
+  }
 
   let refreshQueryTimeout: any = null;
   const refreshQueries = () => {

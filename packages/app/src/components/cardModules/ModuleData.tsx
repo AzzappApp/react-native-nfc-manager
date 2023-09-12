@@ -112,6 +112,9 @@ export const useModulesData = (
   visible: boolean = false,
 ) => {
   const modules = useFragment(ModulesDataFragment, cardModulesKey);
+  if (!modules) {
+    return [];
+  }
   return convertToNonNullArray(
     modules.map(module => {
       if (module) {

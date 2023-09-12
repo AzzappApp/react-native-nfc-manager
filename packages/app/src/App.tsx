@@ -206,16 +206,16 @@ const AppRouter = () => {
   const { authenticated, profileId } = useAuthState();
 
   useEffect(() => {
-    if (
-      !authenticated &&
-      !unauthenticatedRoutes.includes(router.getCurrentRoute().route)
-    ) {
-      router.replaceAll(signInRoutes);
-    } else if (
-      authenticated &&
-      unauthenticatedRoutes.includes(router.getCurrentRoute().route)
-    ) {
-      router.replaceAll(mainRoutes);
+    const currentRoute = router.getCurrentRoute()?.route;
+    if (currentRoute) {
+      if (!authenticated && !unauthenticatedRoutes.includes(currentRoute)) {
+        router.replaceAll(signInRoutes);
+      } else if (
+        authenticated &&
+        unauthenticatedRoutes.includes(currentRoute)
+      ) {
+        router.replaceAll(mainRoutes);
+      }
     }
   }, [authenticated, router]);
   // #endregion
