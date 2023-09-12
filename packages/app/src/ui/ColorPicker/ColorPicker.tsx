@@ -2,11 +2,11 @@ import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';
+import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from './ColorChooser';
 import ColorList from './ColorsList';
-import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 export type ColorPickerProps = {
   /**
@@ -82,6 +82,8 @@ const ColorPicker = ({
   }, [onRequestClose, state]);
 
   const previouslySelectedColor = useRef<string | null>(selectedColor);
+  const selectedColorValue = swapColor(selectedColor, colorPalette);
+
   const onValidateColor = useCallback(() => {
     previouslySelectedColor.current = selectedColor;
     onRequestClose();
@@ -108,9 +110,10 @@ const ColorPicker = ({
     (color: 'dark' | 'light' | 'primary') => {
       previouslySelectedColor.current = selectedColor;
       editedColorPaletteProperty.current = color;
+      onColorChange(color);
       setState('colorEdition');
     },
-    [selectedColor],
+    [onColorChange, selectedColor],
   );
 
   const onCancelColorEdition = useCallback(() => {
@@ -124,23 +127,28 @@ const ColorPicker = ({
   const onSaveEditedColor = useCallback(() => {
     previouslySelectedColor.current = null;
     if (editedColorPaletteProperty.current) {
+      const colorName = editedColorPaletteProperty.current;
       onUpdateColorPalette({
         ...colorPalette,
-        [editedColorPaletteProperty.current]: selectedColor,
+        [colorName]: selectedColorValue,
       });
       editedColorPaletteProperty.current = null;
+      onColorChange(colorName);
     } else {
       onUpdateColorList(
-        uniq(colorList ? [...colorList, selectedColor] : [selectedColor]),
+        uniq(
+          colorList ? [...colorList, selectedColorValue] : [selectedColorValue],
+        ),
       );
     }
     setState('colorChooser');
   }, [
     colorList,
     colorPalette,
+    onColorChange,
     onUpdateColorList,
     onUpdateColorPalette,
-    selectedColor,
+    selectedColorValue,
   ]);
 
   const [colorsToRemove, setColorsToRemove] = useState(new Set<string>());
@@ -244,7 +252,10 @@ const ColorPicker = ({
           width={windowWidth - 40}
         />
       ) : (
-        <ColorChooser value={selectedColor} onColorChange={onColorChange} />
+        <ColorChooser
+          value={selectedColorValue}
+          onColorChange={onColorChange}
+        />
       )}
     </BottomSheetModal>
   );
