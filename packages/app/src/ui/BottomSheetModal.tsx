@@ -223,11 +223,11 @@ const BottomSheetModal = ({
           {...pan?.current.panHandlers}
           style={[
             styles.bottomSheetContainer,
-            contentContainerStyle,
             {
               height: height + insets.bottom,
               paddingBottom: insets.bottom,
             },
+            contentContainerStyle,
             {
               transform: [
                 {

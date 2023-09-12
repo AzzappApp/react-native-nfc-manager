@@ -2,7 +2,6 @@ import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';
-import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from './ColorChooser';
@@ -74,7 +73,6 @@ const ColorPicker = ({
   const [state, setState] = useState<
     'colorChooser' | 'colorEdition' | 'editing'
   >('colorChooser');
-
   const onClose = useCallback(() => {
     if (state === 'colorChooser') {
       onRequestClose();
@@ -161,7 +159,6 @@ const ColorPicker = ({
   }, [colorList, colorsToRemove, onUpdateColorList]);
 
   const intl = useIntl();
-  const { bottom } = useScreenInsets();
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -231,6 +228,7 @@ const ColorPicker = ({
       disableGestureInteraction={state !== 'colorChooser'}
       showGestureIndicator={false}
       onRequestClose={onClose}
+      contentContainerStyle={{ paddingBottom: 0 }}
     >
       {state !== 'colorEdition' ? (
         <ColorList
@@ -240,7 +238,6 @@ const ColorPicker = ({
           editMode={state === 'editing'}
           canEditPalette={canEditPalette}
           colorPalette={colorPalette}
-          style={{ marginBottom: bottom }}
           onRequestNewColor={onRequestNewColor}
           onRemoveColor={onRemoveColor}
           onEditColor={onEditPaletteColor}
