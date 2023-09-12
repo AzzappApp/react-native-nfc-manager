@@ -14,7 +14,6 @@ import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
-import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
@@ -375,52 +374,31 @@ const HomeBottomPanel = ({
       >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
 
-        <TabView
-          style={{ flex: 1 }}
-          tabs={[
-            {
-              id: 'CONTACT_CARD',
-              element: (
-                <HomeContactCard
-                  user={user}
-                  height={panelHeight}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                  currentProfileIndex={currentProfileIndex}
-                />
-              ),
-            },
-            {
-              id: 'STATS',
-              element: (
-                <HomeStatistics
-                  user={user}
-                  height={panelHeight}
-                  animated={selectedPanel === 'STATS'}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                  currentUserIndex={currentProfileIndex}
-                />
-              ),
-            },
-            {
-              id: 'INFORMATION',
-              element: (
-                <HomeInformations
-                  user={user}
-                  animated={selectedPanel === 'INFORMATION'}
-                  height={panelHeight}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                />
-              ),
-            },
-          ]}
-          currentTab={selectedPanel}
-        />
+        {selectedPanel === 'CONTACT_CARD' && (
+          <HomeContactCard
+            user={user}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            currentProfileIndex={currentProfileIndex}
+          />
+        )}
+        {selectedPanel === 'STATS' && (
+          <HomeStatistics
+            user={user}
+            height={panelHeight}
+            animated={selectedPanel === 'STATS'}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            currentUserIndex={currentProfileIndex}
+          />
+        )}
+        {selectedPanel === 'INFORMATION' && (
+          <HomeInformations
+            user={user}
+            animated={selectedPanel === 'INFORMATION'}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          />
+        )}
       </Animated.View>
     </View>
   );

@@ -45,6 +45,7 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
+import NativeRouterInstrumentation from '#helpers/SentryNativeRouterInstrumentation';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
@@ -79,11 +80,18 @@ import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
+const routingInstrumentation = new NativeRouterInstrumentation();
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+    }),
+  ],
 });
 
 /**
@@ -145,7 +153,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);
 
 // #region Routing Definitions
 const screens = {
@@ -195,7 +203,7 @@ const AppRouter = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated } = useAuthState();
+  const { authenticated, profileId } = useAuthState();
 
   useEffect(() => {
     if (
@@ -210,7 +218,33 @@ const AppRouter = () => {
       router.replaceAll(mainRoutes);
     }
   }, [authenticated, router]);
+  // #endregion
 
+  // #region Sentry Routing Instrumentation
+  useEffect(() => {
+    Sentry.setUser(profileId ? { id: profileId } : null);
+  }, [profileId]);
+
+  useEffect(() => {
+    routingInstrumentation.setRouter(router);
+
+    const disposables: Array<{ dispose: () => void }> = [];
+
+    disposables.push(
+      router.addRouteWillChangeListener(() => {
+        routingInstrumentation.routeWillChange();
+      }),
+    );
+
+    disposables.push(
+      router.addRouteDidChangeListener(() => {
+        routingInstrumentation.routeDidChange();
+      }),
+    );
+    return () => {
+      disposables.forEach(({ dispose }) => dispose());
+    };
+  }, [router]);
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
