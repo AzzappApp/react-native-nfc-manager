@@ -1,5 +1,6 @@
-## 0.2.3-canary.17
+## 0.2.3-canary.18
 
+* **fix:**  - 🐛 temporarily redirect to last screen ([#1067](https://github.com/AzzappApp/azzapp/pull/1067))
 * **fix:**  - 🐛 display only comments related to a post ([#1071](https://github.com/AzzappApp/azzapp/pull/1071))
 * **fix:**  - sentry integration
 * **fix:**  - sentry errors
