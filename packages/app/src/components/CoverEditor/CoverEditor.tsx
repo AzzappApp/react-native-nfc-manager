@@ -93,6 +93,7 @@ const CoverEditor = (
     cardColors,
     modals,
     mediaComputing,
+    mediaVisible,
     // TODO handle
     // mediaComputationError
     setTitle,
@@ -102,6 +103,7 @@ const CoverEditor = (
     toggleCropMode,
     openImagePicker,
     onSave,
+    toggleMediaVisibility,
     updateEditedMediaKind,
   } = useCoverEditionManager({
     initialData: null,
@@ -152,13 +154,6 @@ const CoverEditor = (
   const subTitleInputRef = useRef<NativeTextInput>(null);
   const focusSubTitle = useCallback(() => {
     subTitleInputRef.current?.focus();
-  }, []);
-  // #endregion
-
-  // #region Media visibility
-  const [mediaVisible, setMediaVisible] = useState(true);
-  const toggleMediaVisibility = useCallback(() => {
-    setMediaVisible(mediaVisible => !mediaVisible);
   }, []);
   // #endregion
 

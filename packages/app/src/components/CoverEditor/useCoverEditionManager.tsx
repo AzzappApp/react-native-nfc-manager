@@ -321,6 +321,13 @@ const useCoverEditionManager = ({
   );
   //#endregion
 
+  // #region Media visibility
+  const [mediaVisible, setMediaVisible] = useState(true);
+  const toggleMediaVisibility = useCallback(() => {
+    setMediaVisible(mediaVisible => !mediaVisible);
+  }, []);
+  // #endregion
+
   // #region Color palette
   const [colorPalette, setColorPalette] = useState<ColorPalette>(() => {
     if (initialColorPalette) {
@@ -431,6 +438,7 @@ const useCoverEditionManager = ({
       setMediaCropParameter(extractLayoutParameters(editionParameters)[0]);
       setTimeRange(timeRange ?? null);
       startMediaComputation(result);
+      setMediaVisible(true);
     });
   };
 
@@ -816,6 +824,9 @@ const useCoverEditionManager = ({
     mediaComputing: mediaComputation != null,
     mediaComputationError,
 
+    //media visibility
+    mediaVisible,
+
     // react elements
     modals,
 
@@ -829,6 +840,7 @@ const useCoverEditionManager = ({
     openImagePicker,
     retryMediaComputation,
     updateEditedMediaKind,
+    toggleMediaVisibility,
     onSave,
   };
 };
