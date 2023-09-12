@@ -1,5 +1,8 @@
-## 0.2.3-canary.18
+## 0.2.3-canary.19
 
+* **fix:**  - color picker ([#1073](https://github.com/AzzappApp/azzapp/pull/1073))
+* **fix:**  - 🐛 allow video to be played on safari ([#1078](https://github.com/AzzappApp/azzapp/pull/1078))
+* **feat:**  - suggested media inital ([#989](https://github.com/AzzappApp/azzapp/pull/989))
 * **fix:**  - 🐛 temporarily redirect to last screen ([#1067](https://github.com/AzzappApp/azzapp/pull/1067))
 * **fix:**  - 🐛 display only comments related to a post ([#1071](https://github.com/AzzappApp/azzapp/pull/1071))
 * **fix:**  - sentry integration
