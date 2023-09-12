@@ -139,7 +139,7 @@ export const MODULES_SAVE_RULES: {
     validator: z
       .object({
         image: z.string(),
-        text: z.string().min(1),
+        content: z.string().min(1),
       })
       .or(
         z.object({
