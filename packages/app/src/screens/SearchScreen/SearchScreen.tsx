@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -14,6 +16,8 @@ import useRecentSearch from './useRecentSearch';
 
 export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
   const intl = useIntl();
+  const router = useRouter();
+  const styles = useStyleSheet(styleSheet);
 
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
   const [searchValueSubmitted, setSearchValueSubmitted] = useState<
@@ -56,17 +60,15 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
 
   const insets = useScreenInsets();
 
-  const timer = useAnimatedState(searchBarHasFocus, {
+  const showRecent = useAnimatedState(searchBarHasFocus, {
     duration: ANIMATION_DURATION,
   });
 
   const recentBarAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: timer.value,
+      opacity: showRecent.value,
     };
-  }, [timer]);
-
-  const router = useRouter();
+  }, [showRecent]);
 
   return (
     <Container style={[styles.flexOne, { paddingTop: insets.top }]}>
@@ -97,6 +99,12 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
         </View>
       </View>
       <View style={styles.flexOne}>
+        {showTabView && (
+          <SearchTabContainer
+            searchValue={searchValueSubmitted}
+            hasFocus={hasFocus}
+          />
+        )}
         <Animated.View
           style={[styles.viewTransitionRecent, recentBarAnimatedStyle]}
           pointerEvents={searchBarHasFocus ? 'auto' : 'none'}
@@ -109,12 +117,6 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
             search={onSubmittedSearch}
           />
         </Animated.View>
-        {showTabView && (
-          <SearchTabContainer
-            searchValue={searchValueSubmitted}
-            hasFocus={hasFocus}
-          />
-        )}
       </View>
     </Container>
   );
@@ -123,10 +125,11 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
 export default SearchScreen;
 
 const ANIMATION_DURATION = 300;
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   viewTransitionRecent: {
     height: '100%',
     width: '100%',
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
 
   wallViewTransition: {
@@ -146,4 +149,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButton: { width: 34, height: 34 },
-});
+}));
