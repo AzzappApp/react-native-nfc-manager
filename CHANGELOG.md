@@ -1,5 +1,6 @@
-## 0.2.3-canary.16
+## 0.2.3-canary.17
 
+* **fix:**  - 🐛 display only comments related to a post ([#1071](https://github.com/AzzappApp/azzapp/pull/1071))
 * **fix:**  - sentry integration
 * **fix:**  - sentry errors
 * **fix:**  - webcard background color on desktop ([#1062](https://github.com/AzzappApp/azzapp/pull/1062))
