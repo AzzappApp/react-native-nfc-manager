@@ -1,4 +1,4 @@
-## 0.2.3-canary.15
+## 0.2.3-canary.16
 
 * **fix:**  - sentry integration
 * **fix:**  - sentry errors
