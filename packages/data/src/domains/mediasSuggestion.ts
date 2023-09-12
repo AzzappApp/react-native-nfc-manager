@@ -39,15 +39,19 @@ export const getMediaSuggestions = async (
   const query = sql`
     SELECT *, RAND(${randomSeed}) as cursor
     FROM MediaSuggestion
-    WHERE enabled = 1
   `;
-
   if (profileCategoryId) {
-    query.append(sql`AND profileCategoryId = ${profileCategoryId}`);
+    query.append(sql` WHERE profileCategoryId = ${profileCategoryId}`);
   }
-
   if (companyActivityId) {
-    query.append(sql`AND companyActivityId = ${companyActivityId}`);
+    if (profileCategoryId) {
+      query.append(sql` AND `);
+    } else {
+      query.append(sql` WHERE `);
+    }
+    query.append(
+      sql` (companyActivityId = ${companyActivityId} OR companyActivityId IS NULL)`,
+    );
   }
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
@@ -56,7 +60,6 @@ export const getMediaSuggestions = async (
   if (limit) {
     query.append(sql` LIMIT ${limit} `);
   }
-
   return (await db.execute(query)).rows as Array<
     MediaSuggestion & { cursor: string }
   >;

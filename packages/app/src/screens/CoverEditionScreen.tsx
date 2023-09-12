@@ -142,6 +142,7 @@ const query = graphql`
   query CoverEditionScreenQuery {
     viewer {
       ...CoverEditor_viewer
+      ...CoverEditor_suggested
       profile {
         ...CoverRenderer_profile
         cardCover {

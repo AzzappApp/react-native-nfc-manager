@@ -257,9 +257,10 @@ export const Viewer: ViewerResolvers = {
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
-    if (!profile) {
+    if (!profile || profile.profileKind !== 'business') {
       return emptyConnection;
     }
+
     const limit = first ?? 100;
     const suggestions = await getMediaSuggestions(
       profile.id,

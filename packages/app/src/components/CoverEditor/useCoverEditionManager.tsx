@@ -207,9 +207,12 @@ const useCoverEditionManager = ({
     }
     return null;
   });
-  const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
-    initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
-  );
+
+  const lastSourceMediaBeforeSuggested = useRef<{
+    media: CoverData['sourceMedia'] | null;
+    cropParameter: CoverData['mediaCropParameter'] | null;
+  } | null>(null);
+
   const [mediaCropParameter, setMediaCropParameter] = useState<
     CoverData['mediaCropParameter'] | null
   >(() => {
@@ -221,6 +224,37 @@ const useCoverEditionManager = ({
     }
     return null;
   });
+
+  const [hasSuggestedMedia, setHasSuggestedMedia] = useState(false);
+  const setSuggestedMedia = useCallback(
+    (suggestedMedia: CoverData['sourceMedia'] | null) => {
+      if (suggestedMedia) {
+        setHasSuggestedMedia(true);
+        if (lastSourceMediaBeforeSuggested.current == null) {
+          lastSourceMediaBeforeSuggested.current = {
+            media: sourceMedia,
+            cropParameter: mediaCropParameter,
+          };
+        }
+        unstable_batchedUpdates(() => {
+          setMediaCropParameter(null);
+          setSourceMedia(suggestedMedia);
+        });
+        return;
+      } else if (lastSourceMediaBeforeSuggested.current) {
+        setMediaCropParameter(
+          lastSourceMediaBeforeSuggested.current.cropParameter,
+        );
+        setSourceMedia(lastSourceMediaBeforeSuggested.current.media);
+      }
+      setHasSuggestedMedia(false);
+    },
+    [mediaCropParameter, sourceMedia],
+  );
+
+  const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
+    initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
+  );
 
   const currentCoverStyle = useMemo<CoverStyleData | null>(
     () =>
@@ -473,6 +507,7 @@ const useCoverEditionManager = ({
       setShowMediaRequiredModal(true);
       return;
     }
+
     setSaving(true);
     if (!coverStyle || !colorPalette) {
       // TODO invalid state, should not happens
@@ -581,7 +616,7 @@ const useCoverEditionManager = ({
         uri: string;
         kind: 'image' | 'video';
       } | null> = [
-        sourceMedia && !sourceMedia.id ? sourceMedia : null,
+        !sourceMedia.id ? sourceMedia : null,
         maskMedia && !maskMedia.id
           ? { uri: maskMedia.uri, kind: 'image' }
           : null,
@@ -645,6 +680,9 @@ const useCoverEditionManager = ({
 
         if (sourceMediaId) {
           saveCoverInput.sourceMediaId = sourceMediaId;
+        } else if (profile?.profileKind === 'business' && sourceMedia) {
+          // case when using a suggested media for business
+          saveCoverInput.sourceMediaId = sourceMedia?.id ?? null;
         }
         if (maskMediaId) {
           saveCoverInput.maskMediaId = maskMediaId;
@@ -703,6 +741,7 @@ const useCoverEditionManager = ({
     });
   }, [
     sourceMedia,
+    profile?.profileKind,
     coverStyle,
     colorPalette,
     mediaComputation,
@@ -826,6 +865,8 @@ const useCoverEditionManager = ({
 
     //media visibility
     mediaVisible,
+    // Media Suggestion
+    hasSuggestedMedia,
 
     // react elements
     modals,
@@ -833,6 +874,8 @@ const useCoverEditionManager = ({
     //callbacks
     setTitle,
     setSubTitle,
+    setSuggestedMedia,
+    setSourceMedia,
     setCoverStyle,
     toggleCropMode,
     setColorPalette,
