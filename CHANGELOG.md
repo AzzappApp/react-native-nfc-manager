@@ -1,4 +1,4 @@
-## 0.2.3-canary.12
+## 0.2.3-canary.13
 
 * **fix:**  - webcard background color on desktop ([#1062](https://github.com/AzzappApp/azzapp/pull/1062))
 * **improvement:**  - recentsearch ([#1063](https://github.com/AzzappApp/azzapp/pull/1063))
