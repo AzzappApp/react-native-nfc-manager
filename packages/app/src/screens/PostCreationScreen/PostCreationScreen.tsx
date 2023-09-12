@@ -54,8 +54,7 @@ const postCreationcreenQuery = graphql`
 `;
 
 const PostCreationScreen = ({
-  preloadedQuery,
-  route: { params },
+  preloadedQuery, // route: { params },
 }: RelayScreenProps<NewPostRoute, PostCreationScreenQuery>) => {
   const [allowLikes, setAllowLikes] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
@@ -199,17 +198,17 @@ const PostCreationScreen = ({
             `file://${exportedMedia.uri}`,
           );
           // TODO use fragment instead of response
-          if (params?.fromProfile) {
-            router.back();
-          } else {
-            router.replace({
-              route: 'PROFILE',
-              params: {
-                userName: response.createPost?.post?.author.userName as string,
-                showPosts: true,
-              },
-            });
-          }
+          // if (params?.fromProfile) {
+          router.back();
+          // } else {
+          //   router.replace({
+          //     route: 'PROFILE',
+          //     params: {
+          //       userName: response.createPost?.post?.author.userName as string,
+          //       showPosts: true,
+          //     },
+          //   });
+          // }
         }
       },
       onError() {
