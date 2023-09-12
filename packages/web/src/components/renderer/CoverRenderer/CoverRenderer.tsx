@@ -81,6 +81,8 @@ const CoverRenderer = async ({
               className={styles.coverMedia}
               muted
               fluid
+              playsInline
+              autoPlay
             />
           ))}
         {coverData.foregroundId && (

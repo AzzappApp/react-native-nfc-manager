@@ -60,6 +60,8 @@ const CoverRendererBackground = ({
           className={cn(styles.coverMedia, styles.backgroundMedia)}
           muted
           fluid
+          playsInline
+          autoPlay
         />
       )}
       {coverData?.foregroundId && (
