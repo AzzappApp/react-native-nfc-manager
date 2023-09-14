@@ -165,7 +165,8 @@ const ContactCardScreen = ({
     }
   `);
 
-  const [isPublicCard, setIsPublicCard] = useToggle(false);
+  //TODO: remove for beta
+  const [isPublicCard] = useToggle(false);
   const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
     viewer.profile?.contactCard?.displayedOnWebCard ?? false,
   );
@@ -239,6 +240,8 @@ const ContactCardScreen = ({
           />
 
           <View style={{ width: '100%' }}>
+            {/* 
+            TODO: Disable for the beta
             <View style={styles.publicOptions}>
               <Text variant="large">
                 <FormattedMessage
@@ -251,7 +254,7 @@ const ContactCardScreen = ({
                 value={isPublicCard}
                 onValueChange={setIsPublicCard}
               />
-            </View>
+            </View> */}
             <Text variant="xsmall">
               {isPublicCard ? (
                 <FormattedMessage
