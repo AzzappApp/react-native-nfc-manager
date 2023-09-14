@@ -1,4 +1,4 @@
-## 0.2.3-canary.20
+## 0.2.3-canary.21
 
 * **fix:**  - disable feat public switch contact card for the beta ([#1095](https://github.com/AzzappApp/azzapp/pull/1095))
 * **fix:**  - 🐛 hide post/card toggle button under modals ([#1087](https://github.com/AzzappApp/azzapp/pull/1087))
