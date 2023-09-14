@@ -1,5 +1,7 @@
-## 0.2.3-canary.26
+## 0.2.3-canary.27
 
+* **fix:**  - time post created seconds ([#1112](https://github.com/AzzappApp/azzapp/pull/1112))
+* **fix:**  - rule of disable save button and showing screen select a photo ([#1110](https://github.com/AzzappApp/azzapp/pull/1110))
 * **fix:**  - remove some filter for beta
 * **fix:**  - some darkMode ([#1102](https://github.com/AzzappApp/azzapp/pull/1102))
 * **fix:**  - wrong url ([#1093](https://github.com/AzzappApp/azzapp/pull/1093))
