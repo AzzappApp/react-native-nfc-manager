@@ -1,5 +1,8 @@
-## 0.2.3-canary.23
+## 0.2.3-canary.24
 
+* **fix:**  - some darkMode ([#1102](https://github.com/AzzappApp/azzapp/pull/1102))
+* **fix:**  - wrong url ([#1093](https://github.com/AzzappApp/azzapp/pull/1093))
+* **feat:**  - 🎸 add not found page ([#1086](https://github.com/AzzappApp/azzapp/pull/1086))
 * **fix:**  - response closed due to connection limit
 * **fix:**  - suggestedMedia ([#1089](https://github.com/AzzappApp/azzapp/pull/1089))
 * **fix:**  - disable feat public switch contact card for the beta ([#1095](https://github.com/AzzappApp/azzapp/pull/1095))
