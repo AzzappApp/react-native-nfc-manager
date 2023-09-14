@@ -1,5 +1,8 @@
-## 0.2.3-canary.19
+## 0.2.3-canary.20
 
+* **fix:**  - disable feat public switch contact card for the beta ([#1095](https://github.com/AzzappApp/azzapp/pull/1095))
+* **fix:**  - 🐛 hide post/card toggle button under modals ([#1087](https://github.com/AzzappApp/azzapp/pull/1087))
+* **fix:**  - keyboard was blocking the touch ([#1084](https://github.com/AzzappApp/azzapp/pull/1084))
 * **fix:**  - color picker ([#1073](https://github.com/AzzappApp/azzapp/pull/1073))
 * **fix:**  - 🐛 allow video to be played on safari ([#1078](https://github.com/AzzappApp/azzapp/pull/1078))
 * **feat:**  - suggested media inital ([#989](https://github.com/AzzappApp/azzapp/pull/989))
