@@ -1,5 +1,6 @@
-## 0.2.3-canary.24
+## 0.2.3-canary.25
 
+* **fix:**  - remove some filter for beta
 * **fix:**  - some darkMode ([#1102](https://github.com/AzzappApp/azzapp/pull/1102))
 * **fix:**  - wrong url ([#1093](https://github.com/AzzappApp/azzapp/pull/1093))
 * **feat:**  - 🎸 add not found page ([#1086](https://github.com/AzzappApp/azzapp/pull/1086))
