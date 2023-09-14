@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
-import { createOperationDescriptor, getRequest } from 'relay-runtime';
+import { addAuthStateListener, getAuthState } from './authStore';
 import {
+  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from './relayEnvironment';
 import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
-import type { ReaderLinkedField } from 'relay-runtime';
 
 /**
  * This module is used to load and dispose queries for a given screen.
@@ -22,7 +22,7 @@ const activeQueries = new Map<
     preloadedQuery: PreloadedQuery<any>;
     variables: Variables;
     query: GraphQLTaggedNode;
-    useViewer: boolean;
+    actorId?: string;
   }
 >();
 
@@ -63,48 +63,50 @@ const addListener = (screenId: string, listener: () => void) => {
 export const init = () => {
   addEnvironmentListener(kind => {
     switch (kind) {
-      case 'invalidateViewer':
-        refreshQueries();
-        break;
       case 'reset':
         resetQueries();
         break;
     }
   });
+  let currentProfileId = getAuthState().profileId;
+  addAuthStateListener(({ profileId }) => {
+    if (profileId !== currentProfileId) {
+      currentProfileId = profileId;
+      refreshQueries();
+    }
+  });
 };
 
-let refreshQueryTimeout: any = null;
+let refreshTimeout: any = null;
 const refreshQueries = () => {
-  clearTimeout(refreshQueryTimeout);
-  // avoid some race conditions
-  refreshQueryTimeout = setTimeout(() => {
-    [...activeQueries.entries()].forEach(([screenId, entry]) => {
-      const {
-        query,
-        variables,
-        useViewer,
-        preloadedQuery: previousPreloadedQuery,
-      } = entry;
-
-      if (useViewer) {
-        entry.preloadedQuery = loadQuery(
-          getRelayEnvironment(),
-          query,
-          variables,
+  clearTimeout(refreshTimeout);
+  refreshTimeout = setTimeout(() => {
+    const profileId = getAuthState().profileId;
+    for (const [screenId, entry] of activeQueries.entries()) {
+      if (entry.actorId !== profileId && entry.actorId !== ROOT_ACTOR_ID) {
+        const oldPreloadedQuery = entry.preloadedQuery;
+        const multiActorEnvironment = getRelayEnvironment();
+        const actorId = profileId ?? ROOT_ACTOR_ID;
+        const newPreloadedQuery = loadQuery(
+          multiActorEnvironment.forActor(actorId),
+          entry.query,
+          entry.variables,
         );
+        entry.preloadedQuery = newPreloadedQuery;
+        entry.actorId = actorId;
         listeners.get(screenId)?.forEach(listener => listener());
-        setTimeout(() => {
-          previousPreloadedQuery.dispose();
-        }, 0);
+        requestIdleCallback(() => {
+          oldPreloadedQuery.dispose();
+        });
       }
-    });
-  }, 50);
+    }
+  }, 30);
 };
 
 let resetTimeout: any = null;
 const resetQueries = () => {
   clearTimeout(resetTimeout);
-  clearTimeout(refreshQueryTimeout);
+  clearTimeout(refreshTimeout);
   // avoid some race conditions
   resetTimeout = setTimeout(() => {
     [...activeQueries.entries()].forEach(([, entry]) => {
@@ -114,7 +116,7 @@ const resetQueries = () => {
     for (const screenListeners of listeners.values()) {
       screenListeners.forEach(listener => listener());
     }
-  }, 50);
+  }, 20);
 };
 
 /**
@@ -123,17 +125,20 @@ const resetQueries = () => {
  * @returns a preloaded query or null if the query is not in the cache
  */
 export const useManagedQuery = (screenId: string) => {
-  const [queryInfos, setQueryInfos] = useState(
-    activeQueries.get(screenId)?.preloadedQuery,
-  );
+  const [queryInfos, setQueryInfos] = useState(activeQueries.get(screenId));
   useEffect(
     () =>
       addListener(screenId, () => {
-        setQueryInfos(activeQueries.get(screenId)?.preloadedQuery);
+        setQueryInfos(activeQueries.get(screenId));
       }),
     [screenId],
   );
-  return queryInfos ?? null;
+  return queryInfos
+    ? {
+        preloadedQuery: queryInfos.preloadedQuery,
+        actorId: queryInfos.actorId,
+      }
+    : null;
 };
 
 /**
@@ -151,6 +156,10 @@ export type LoadQueryOptions<TParams> = {
    * @returns the query variables
    */
   getVariables?: (params: TParams) => Variables;
+  /**
+   * If true, the query will be bound to the current profile
+   */
+  profileBound?: boolean;
 };
 
 /**
@@ -173,19 +182,20 @@ export const loadQueryFor = <T>(
         : options.query;
     const variables = options.getVariables?.(params) ?? {};
 
-    const operation = createOperationDescriptor(getRequest(query), variables);
-    const useViewer = operation.fragment.node.selections.some(
-      selection =>
-        selection.kind === 'LinkedField' &&
-        (selection as ReaderLinkedField).name === 'viewer',
-    );
+    const multiActorEnvironment = getRelayEnvironment();
+    const actorId =
+      (options.profileBound && getAuthState().profileId) || ROOT_ACTOR_ID;
 
-    const preloadedQuery = loadQuery(getRelayEnvironment(), query, variables);
+    const preloadedQuery = loadQuery(
+      multiActorEnvironment.forActor(actorId),
+      query,
+      variables,
+    );
     activeQueries.set(screenId, {
       query,
       preloadedQuery,
       variables,
-      useViewer,
+      actorId,
     });
     listeners.get(screenId)?.forEach(listener => listener());
   }
@@ -200,5 +210,6 @@ export const disposeQueryFor = (screenId: string) => {
   if (query) {
     query.preloadedQuery.dispose();
     activeQueries.delete(screenId);
+    listeners.get(screenId)?.forEach(listener => listener());
   }
 };

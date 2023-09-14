@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -27,6 +27,7 @@ import type { ProfileRoute } from '#routes';
 import type { ProfileScreenByIdQuery } from '@azzapp/relay/artifacts/ProfileScreenByIdQuery.graphql';
 import type { ProfileScreenByUserNameQuery } from '@azzapp/relay/artifacts/ProfileScreenByUserNameQuery.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { Disposable } from 'react-relay';
 
 /**
  * Display a profile Web card.
@@ -60,20 +61,27 @@ const ProfileScreen = ({
   const auth = useAuthState();
   const canEdit = auth && auth.profileId === data.profile?.id;
 
+  const environment = useRelayEnvironment();
   useEffect(() => {
+    let disposables: Disposable[];
     if (canEdit) {
       const modules: ModuleKind[] = [...MODULE_KINDS];
-      modules.forEach(module => {
-        prefetchRoute({
-          route: 'CARD_MODULE_EDITION',
-          params: { module },
-        });
-      });
-      prefetchRoute({
-        route: 'COVER_EDITION',
-      });
+      disposables = [
+        prefetchRoute(environment, {
+          route: 'COVER_EDITION',
+        }),
+        ...modules.map(module =>
+          prefetchRoute(environment, {
+            route: 'CARD_MODULE_EDITION',
+            params: { module },
+          }),
+        ),
+      ];
     }
-  }, [prefetchRoute, canEdit]);
+    return () => {
+      disposables?.forEach(disposable => disposable.dispose());
+    };
+  }, [prefetchRoute, canEdit, environment]);
 
   const [showPost, toggleFlip] = useToggle(params.showPosts ?? false);
   const [editing, toggleEditing] = useToggle(canEdit && params.editing);

@@ -36,6 +36,7 @@ import {
   useCurrentLocale,
 } from '#helpers/localeHelpers';
 import {
+  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from '#helpers/relayEnvironment';
@@ -259,14 +260,19 @@ const AppRouter = () => {
     [],
   );
 
+  const getEnvironmentForActor = useCallback(
+    (actorId: string) => {
+      return environment.forActor(actorId);
+    },
+    [environment],
+  );
+
   const screenIdToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
     () =>
       createScreenPrefetcher(
         screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
-        router.getCurrentRoute(),
-        router.getCurrentScreenId(),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -278,11 +284,9 @@ const AppRouter = () => {
       if (isRelayScreen(Component)) {
         RelayQueryManager.loadQueryFor(id, Component, route.params);
       }
-      screenPrefetcher.screenWillBePushed(id, route);
     });
     router.addScreenWillBeRemovedListener(({ id }) => {
       screenIdToDispose.push(id);
-      screenPrefetcher.screenWillBeRemoved(id);
     });
   }, [router, screenIdToDispose, screenPrefetcher]);
 
@@ -294,9 +298,8 @@ const AppRouter = () => {
 
       // TODO should we not handle this in the router?
       screenIdToDispose.push(id);
-      screenPrefetcher.screenWillBeRemoved(id);
     },
-    [router, screenIdToDispose, screenPrefetcher],
+    [router, screenIdToDispose],
   );
 
   const slapshScreenHidden = useRef(false);
@@ -355,7 +358,11 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider environment={environment}>
+    <RelayEnvironmentProvider
+      environment={environment.forActor(ROOT_ACTOR_ID)}
+      // @ts-expect-error not in the types
+      getEnvironmentForActor={getEnvironmentForActor}
+    >
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}

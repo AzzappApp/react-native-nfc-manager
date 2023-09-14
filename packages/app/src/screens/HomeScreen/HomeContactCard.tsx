@@ -6,40 +6,35 @@ import { shadow } from '#theme';
 import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import PressableNative from '#ui/PressableNative';
-import type {
-  HomeContactCard_user$key,
-  HomeContactCard_user$data,
-} from '@azzapp/relay/artifacts/HomeContactCard_user.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { HomeContactCard_profile$key } from '@azzapp/relay/artifacts/HomeContactCard_profile.graphql';
+import type { HomeContactCard_user$key } from '@azzapp/relay/artifacts/HomeContactCard_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeContacCardProps = {
   user: HomeContactCard_user$key;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
-  currentProfileIndex: number;
 };
 
 const HomeContactCard = ({
   user,
   height,
   currentProfileIndexSharedValue,
-  currentProfileIndex,
 }: HomeContacCardProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeContactCard_user on User {
         profiles {
           id
-          userName
-          cardIsPublished
-          ...ContactCard_profile
+          ...HomeContactCard_profile
         }
       }
     `,
     user,
   );
+
   const { width: windowWidth } = useWindowDimensions();
 
   return (
@@ -51,15 +46,15 @@ const HomeContactCard = ({
       }}
     >
       {profiles?.map((item, index) => (
-        <MemoContactCardItem
-          key={item.id}
-          width={windowWidth}
-          height={height}
-          item={item}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          index={index}
-          prefetch={index === currentProfileIndex}
-        />
+        <ProfileBoundRelayEnvironmentProvider key={item.id} profileId={item.id}>
+          <MemoContactCardItem
+            width={windowWidth}
+            height={height}
+            item={item}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            index={index}
+          />
+        </ProfileBoundRelayEnvironmentProvider>
       ))}
     </View>
   );
@@ -67,15 +62,12 @@ const HomeContactCard = ({
 
 export default memo(HomeContactCard);
 
-type ProfileType = ArrayItemType<HomeContactCard_user$data['profiles']>;
-
 type ContactCardItemProps = {
   width: number;
   height: number;
-  item: ProfileType;
+  item: HomeContactCard_profile$key;
   index: number;
   currentProfileIndexSharedValue: SharedValue<number>;
-  prefetch?: boolean;
 };
 
 const ContactCardItem = ({
@@ -84,7 +76,6 @@ const ContactCardItem = ({
   item,
   index,
   currentProfileIndexSharedValue,
-  prefetch = false,
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const positionStyle = useAnimatedStyle(() => ({
@@ -97,6 +88,18 @@ const ContactCardItem = ({
   const maxHeight = maxWidth / CONTACT_CARD_RATIO;
   const cardHeight = Math.min(height, maxHeight);
 
+  const profile = useFragment(
+    graphql`
+      fragment HomeContactCard_profile on Profile {
+        id
+        userName
+        cardIsPublished
+        ...ContactCard_profile
+      }
+    `,
+    item,
+  );
+
   return (
     <Animated.View
       style={[
@@ -108,8 +111,8 @@ const ContactCardItem = ({
         positionStyle,
       ]}
     >
-      {item.cardIsPublished && (
-        <Link route="CONTACT_CARD" prefetch={prefetch}>
+      {profile.cardIsPublished && (
+        <Link route="CONTACT_CARD">
           <PressableNative
             style={{
               width: cardHeight * CONTACT_CARD_RATIO,
@@ -118,7 +121,7 @@ const ContactCardItem = ({
             }}
           >
             <ContactCard
-              profile={item}
+              profile={profile}
               height={Math.min(height, maxHeight)}
               style={styles.card}
             />

@@ -12,7 +12,6 @@ import CoverEditor from '#components/CoverEditor';
 import { prefetchImage, prefetchVideo } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
-import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -158,8 +157,7 @@ const query = graphql`
 
 export default relayScreen(CoverEditionScreen, {
   query,
-  prefetch: () => {
-    const environment = getRelayEnvironment();
+  prefetch: (_, environment) => {
     return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
       environment,
       graphql`

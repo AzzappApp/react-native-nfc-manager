@@ -69,6 +69,7 @@ const HomeScreenFallback = () => {
 
 export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
+  profileBound: false,
   fallback: HomeScreenFallback,
   canGoback: false,
 });

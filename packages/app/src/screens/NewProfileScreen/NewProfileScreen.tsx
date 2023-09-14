@@ -8,7 +8,7 @@ import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { prefetchImage } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
-import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -198,11 +198,15 @@ export const NewProfileScreen = ({
       }),
       element:
         profileInfo != null ? (
-          <CoverEditionStep
-            profileKind={profileKind!}
-            height={contentHeight}
-            onCoverSaved={onCoverSaved}
-          />
+          <ProfileBoundRelayEnvironmentProvider
+            profileId={profileInfo.profileId}
+          >
+            <CoverEditionStep
+              profileKind={profileKind!}
+              height={contentHeight}
+              onCoverSaved={onCoverSaved}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
         ) : null,
       backIcon: 'arrow_down' as const,
     },
@@ -213,13 +217,17 @@ export const NewProfileScreen = ({
       }),
       element:
         profileInfo !== null ? (
-          <CardEditionStep
-            height={contentHeight}
-            onSkip={onCoverTemplateApplied}
-            onCoverTemplateApplied={onCoverTemplateApplied}
-            hideHeader={() => setHeaderHiden(true)}
-            showHeader={() => setHeaderHiden(false)}
-          />
+          <ProfileBoundRelayEnvironmentProvider
+            profileId={profileInfo.profileId}
+          >
+            <CardEditionStep
+              height={contentHeight}
+              onSkip={onCoverTemplateApplied}
+              onCoverTemplateApplied={onCoverTemplateApplied}
+              hideHeader={() => setHeaderHiden(true)}
+              showHeader={() => setHeaderHiden(false)}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
         ) : null,
 
       backIcon: 'arrow_down' as const,
@@ -279,13 +287,12 @@ export default relayScreen(NewProfileScreen, {
       : newProfileScreenQuery,
   getVariables: params =>
     params?.profileId ? { profileId: params.profileId } : {},
+  profileBound: false,
 
   fallback: NewProfileScreenFallback,
 
-  prefetchProfileIndependent: true,
-  prefetch: () => {
+  prefetch: (_, environment) => {
     const pixelRatio = Math.min(2, PixelRatio.get());
-    const environment = getRelayEnvironment();
     return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
       environment,
       graphql`

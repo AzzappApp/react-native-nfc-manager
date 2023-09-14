@@ -17,6 +17,7 @@ import CoverLink from '#components/CoverLink';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import Skeleton from '#components/Skeleton';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -213,7 +214,7 @@ const ItemRenderComponent = ({
 
   if (!item) {
     return (
-      <Link route="NEW_PROFILE" prefetch={isCurrent}>
+      <Link route="NEW_PROFILE">
         <PressableOpacity
           style={[
             styles.newCover,
@@ -236,70 +237,70 @@ const ItemRenderComponent = ({
   }
 
   return (
-    <View
-      style={[
-        styles.coverShadow,
-        styles.coverContainer,
-        {
-          width: coverWidth,
-          height: coverHeight,
-          borderRadius: coverWidth * COVER_CARD_RADIUS,
-        },
-      ]}
-    >
-      {item.cardCover ? (
-        <CoverLink
-          profile={item}
-          width={coverWidth}
-          profileId={item.id}
-          onPress={onPress}
-          prefetch={isCurrent}
-          videoEnabled={isCurrent}
-          onReadyForDisplay={onReady}
-        />
-      ) : (
-        <Link
-          route="NEW_PROFILE"
-          params={{
-            profileId: item.id,
-          }}
-          prefetch={isCurrent}
-        >
-          <PressableOpacity
-            style={[
-              {
-                width: coverWidth,
-                height: coverHeight,
-                borderRadius: coverWidth * COVER_CARD_RADIUS,
-                overflow: 'visible',
-              },
-            ]}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Create a new profile',
-              description: 'Start new profile creation from account screen',
-            })}
-          >
-            <CoverRenderer
-              width={coverWidth}
-              profile={item}
-              onReadyForDisplay={onReady}
-            />
-          </PressableOpacity>
-        </Link>
-      )}
-      {!ready && (
-        <Skeleton
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
+    <ProfileBoundRelayEnvironmentProvider profileId={item.id}>
+      <View
+        style={[
+          styles.coverShadow,
+          styles.coverContainer,
+          {
             width: coverWidth,
             height: coverHeight,
             borderRadius: coverWidth * COVER_CARD_RADIUS,
-          }}
-        />
-      )}
-    </View>
+          },
+        ]}
+      >
+        {item.cardCover ? (
+          <CoverLink
+            profile={item}
+            width={coverWidth}
+            profileId={item.id}
+            onPress={onPress}
+            videoEnabled={isCurrent}
+            onReadyForDisplay={onReady}
+          />
+        ) : (
+          <Link
+            route="NEW_PROFILE"
+            params={{
+              profileId: item.id,
+            }}
+          >
+            <PressableOpacity
+              style={[
+                {
+                  width: coverWidth,
+                  height: coverHeight,
+                  borderRadius: coverWidth * COVER_CARD_RADIUS,
+                  overflow: 'visible',
+                },
+              ]}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Create a new profile',
+                description: 'Start new profile creation from account screen',
+              })}
+            >
+              <CoverRenderer
+                width={coverWidth}
+                profile={item}
+                onReadyForDisplay={onReady}
+              />
+            </PressableOpacity>
+          </Link>
+        )}
+        {!ready && (
+          <Skeleton
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: coverWidth,
+              height: coverHeight,
+              borderRadius: coverWidth * COVER_CARD_RADIUS,
+            }}
+          />
+        )}
+      </View>
+    </ProfileBoundRelayEnvironmentProvider>
   );
 };
 

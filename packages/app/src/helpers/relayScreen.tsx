@@ -2,6 +2,9 @@ import { GraphQLError } from 'graphql';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';
+import { RelayEnvironmentProvider, type PreloadedQuery } from 'react-relay';
+// @ts-expect-error not typed
+import useRelayActorEnvironment from 'react-relay/lib/multi-actor/useRelayActorEnvironment';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -9,12 +12,13 @@ import {
   TIMEOUT_ERROR_MESSAGE,
 } from '@azzapp/shared/networkHelpers';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import useAuthState from '#hooks/useAuthState';
+import { ROOT_ACTOR_ID, getRelayEnvironment } from './relayEnvironment';
 import { loadQueryFor, useManagedQuery } from './RelayQueryManager';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
 import type { ComponentType } from 'react';
-import type { PreloadedQuery } from 'react-relay';
 import type { OperationType } from 'relay-runtime';
 
 export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
@@ -35,6 +39,11 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * @default true
      */
     canGoback?: boolean;
+    /**
+     * If true, the screen will be refetched when the profileId changes.
+     * @default true
+     */
+    profileBound?: boolean;
   };
 
 /**
@@ -74,6 +83,7 @@ function relayScreen<TRoute extends Route>(
     fallback: Fallback,
     errorFallback: ErrorFallback,
     canGoback = true,
+    profileBound = true,
     ...options
   }: RelayScreenOptions<TRoute>,
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
@@ -83,7 +93,13 @@ function relayScreen<TRoute extends Route>(
       screenId,
       route: { params },
     } = props;
-    const preloadedQuery = useManagedQuery((props as any).screenId)!;
+
+    const { profileId } = useAuthState();
+    const actorId = profileBound ? profileId : ROOT_ACTOR_ID;
+    const environment = useRelayActorEnvironment(actorId);
+
+    const { preloadedQuery, actorId: queryActorId } =
+      useManagedQuery((props as any).screenId) ?? {};
     useEffect(() => {
       if (!preloadedQuery) {
         loadQueryFor(screenId, options, params);
@@ -144,12 +160,22 @@ function relayScreen<TRoute extends Route>(
       );
     }, [intl, retry, router]);
 
+    const getEnvironmentForActor = useCallback((actorId: string) => {
+      return getRelayEnvironment().forActor(actorId);
+    }, []);
+
     const inner = (
-      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-        {preloadedQuery && (
-          <Component {...props} preloadedQuery={preloadedQuery} />
-        )}
-      </Suspense>
+      <RelayEnvironmentProvider
+        environment={environment}
+        // @ts-expect-error not in the types
+        getEnvironmentForActor={getEnvironmentForActor}
+      >
+        <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
+          {preloadedQuery && queryActorId === actorId && (
+            <Component {...props} preloadedQuery={preloadedQuery} />
+          )}
+        </Suspense>
+      </RelayEnvironmentProvider>
     );
     if (__DEV__) {
       return inner;
@@ -171,7 +197,7 @@ function relayScreen<TRoute extends Route>(
 
   const displayName = Component.displayName ?? Component.name ?? 'Screen';
   RelayWrapper.displayName = `RelayWrapper(${displayName})`;
-  Object.assign(RelayWrapper, Component, options);
+  Object.assign(RelayWrapper, Component, { ...options, profileBound });
 
   return RelayWrapper as any;
 }

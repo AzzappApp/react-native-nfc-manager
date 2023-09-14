@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSharedValue, useWorkletCallback } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
@@ -6,6 +6,8 @@ import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useOnFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
+import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -21,6 +23,7 @@ import HomeProfileLink, {
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
 import type { HomeScreenContent_user$key } from '@azzapp/relay/artifacts/HomeScreenContent_user.graphql';
+import type { Disposable } from 'react-relay';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
@@ -31,7 +34,7 @@ const HomeScreenContent = ({
   user: userKey,
   onShowMenu,
 }: HomeScreenContentProps) => {
-  // data
+  // #regions data
   const user = useFragment(
     graphql`
       fragment HomeScreenContent_user on User {
@@ -49,7 +52,9 @@ const HomeScreenContent = ({
     `,
     userKey,
   );
+  //#endregion
 
+  //#region profile switch
   const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
@@ -110,8 +115,65 @@ const HomeScreenContent = ({
       carouselRef.current?.scrollToProfileIndex(authProfileIndex, false);
     }
   });
+  //#endregion
 
-  // Layout
+  // #region prefetch
+  const prefetchRoute = usePrefetchRoute();
+
+  useEffect(() => {
+    let disposable: Disposable | undefined;
+    if (currentProfileIndex === -1) {
+      disposable = prefetchRoute(
+        getRelayEnvironment().forActor(ROOT_ACTOR_ID),
+        { route: 'NEW_PROFILE' },
+      );
+    }
+    return () => {
+      disposable?.dispose();
+    };
+  }, [currentProfileIndex, prefetchRoute]);
+
+  // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
+  const profilesRef = useRef(user.profiles);
+  useEffect(() => {
+    profilesRef.current = user.profiles;
+  }, [user.profiles]);
+
+  const profilesDisposables = useRef<Disposable[]>([]).current;
+  useEffect(() => {
+    if (auth.profileId) {
+      const profile = profilesRef.current?.find(
+        profile => profile.id === auth.profileId,
+      );
+      if (profile) {
+        const multiActorEnvironment = getRelayEnvironment();
+        const profileEnvironment = multiActorEnvironment.forActor(profile.id);
+        profilesDisposables.push(
+          prefetchRoute(profileEnvironment, {
+            route: 'PROFILE',
+            params: {
+              profileId: auth.profileId,
+              userName: profile.userName,
+            },
+          }),
+          prefetchRoute(profileEnvironment, {
+            route: 'CONTACT_CARD',
+          }),
+        );
+      }
+    }
+  }, [auth.profileId, profilesDisposables, prefetchRoute]);
+
+  useEffect(
+    () => () => {
+      profilesDisposables.forEach(disposable => disposable.dispose());
+      profilesDisposables.length = 0;
+    },
+    [profilesDisposables],
+  );
+  // #endregion
+
+  // #region Layout
   const insets = useScreenInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
@@ -128,6 +190,7 @@ const HomeScreenContent = ({
   const bottomPanelHeight =
     (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT;
   const carouselHeight = contentHeight - bottomPanelHeight;
+  // #endregion
 
   return (
     <View style={{ flex: 1 }}>
@@ -157,6 +220,7 @@ const HomeScreenContent = ({
           }
           initialProfileIndex={initialProfileIndex}
         />
+
         <HomeBottomPanel
           height={bottomPanelHeight}
           user={user}
