@@ -51,6 +51,7 @@ const RecentSearch = ({
       <FlatList
         testID="recent-search-list"
         accessibilityRole="list"
+        keyboardShouldPersistTaps="always"
         ListHeaderComponent={
           <Text variant="large" style={styles.textStyleRecent}>
             <FormattedMessage
