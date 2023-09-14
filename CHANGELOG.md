@@ -1,5 +1,6 @@
-## 0.2.3-canary.22
+## 0.2.3-canary.23
 
+* **fix:**  - response closed due to connection limit
 * **fix:**  - suggestedMedia ([#1089](https://github.com/AzzappApp/azzapp/pull/1089))
 * **fix:**  - disable feat public switch contact card for the beta ([#1095](https://github.com/AzzappApp/azzapp/pull/1095))
 * **fix:**  - 🐛 hide post/card toggle button under modals ([#1087](https://github.com/AzzappApp/azzapp/pull/1087))
