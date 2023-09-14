@@ -108,7 +108,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         logoText: 'azzapp',
         suppressStripShine: false,
         serialNumber: profile?.id,
-        webServiceURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${locale}/wallet/apple/`,
+        webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,
         authenticationToken: await seal(
           profileId,
           process.env.APPLE_TOKEN_PASSWORD ?? '',
