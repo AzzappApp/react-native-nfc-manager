@@ -60,7 +60,15 @@ const useModuleDataEditor = <
             isEqual(fieldValue, styleValues[field]) ||
             isEqual(fieldValue, defaultValues[field])
           ) {
-            value[field] = null;
+            if (
+              styleValues[field] != null &&
+              fieldValue === defaultValues[field]
+            ) {
+              //we need to set the value, or else the defaultValue will be override by styleValue
+              value[field] = fieldValue ?? null;
+            } else {
+              value[field] = null;
+            }
           } else {
             value[field] = fieldValue ?? null;
           }
