@@ -1,4 +1,4 @@
-## 0.2.3-canary.25
+## 0.2.3-canary.26
 
 * **fix:**  - remove some filter for beta
 * **fix:**  - some darkMode ([#1102](https://github.com/AzzappApp/azzapp/pull/1102))
