@@ -44,7 +44,12 @@ const TabBarMenuItem = ({
       onPress={setSelected}
       accessibilityRole="tab"
     >
-      {icon && <Icon icon={icon} style={styles.icon} />}
+      {icon && (
+        <Icon
+          icon={icon}
+          style={[styles.icon, selected && { tintColor: colors.black }]}
+        />
+      )}
       <Text
         style={[labelStyle, selected && { color: colors.black }]}
         variant="button"

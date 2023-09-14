@@ -183,12 +183,12 @@ const CoverEditor = (
   // #region canSave
   const canSave =
     !mediaComputing &&
-    ((viewer?.profile?.profileKind === 'personal' && mediaVisible) ||
+    (((mediaVisible || sourceMedia == null) &&
+      (viewer?.profile?.profileKind === 'personal' ||
+        templateKind === 'people')) ||
       (viewer?.profile?.profileKind === 'business' &&
-        templateKind === 'people' &&
-        mediaVisible) ||
-      (viewer?.profile?.profileKind === 'business' &&
-        templateKind !== 'people'));
+        templateKind !== 'people' &&
+        (mediaVisible || hasSuggestedMedia)));
 
   useEffect(() => {
     onCanSaveChange(canSave);
