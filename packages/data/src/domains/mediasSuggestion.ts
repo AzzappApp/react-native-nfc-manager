@@ -22,8 +22,8 @@ export type NewMediaSuggestion = InferModel<
 
 /**
  * Return a list of media suggestions. filtered by profile kind and template kind
- * @param profileKind the profile kind to filter by
- * @param templateKind the template kind to filter by
+ * @param profileCategoryId the profile catetgory Id
+ * @param companyActivityId tue company activity
  * @param randomSeed the random seed to use for random ordering
  * @param offset the offset to use for pagination
  * @param limit the limit to use for pagination
@@ -31,26 +31,21 @@ export type NewMediaSuggestion = InferModel<
  */
 export const getMediaSuggestions = async (
   randomSeed: string,
-  profileCategoryId: string | null | undefined,
+  profileCategoryId: string,
   companyActivityId: string | null | undefined,
   offset?: string | null,
   limit?: number | null,
 ) => {
   const query = sql`
-    SELECT *, RAND(${randomSeed}) as cursor
-    FROM MediaSuggestion
-  `;
-  if (profileCategoryId) {
-    query.append(sql` WHERE profileCategoryId = ${profileCategoryId}`);
-  }
-  if (companyActivityId) {
-    if (profileCategoryId) {
-      query.append(sql` AND `);
-    } else {
-      query.append(sql` WHERE `);
-    }
+  SELECT *, RAND(${randomSeed}) as cursor
+  FROM MediaSuggestion `;
+  if (!companyActivityId) {
+    query.append(sql` WHERE profileCategoryId = ${profileCategoryId} `);
+  } else {
     query.append(
-      sql` (companyActivityId = ${companyActivityId} OR companyActivityId IS NULL)`,
+      sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL) 
+      OR (profileCategoryId IS NULL AND companyActivityId = ${companyActivityId} ) 
+      OR (profileCategoryId = ${profileCategoryId} AND companyActivityId = ${companyActivityId})`,
     );
   }
   if (offset) {

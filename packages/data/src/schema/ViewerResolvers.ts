@@ -257,7 +257,11 @@ export const Viewer: ViewerResolvers = {
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
-    if (!profile || profile.profileKind !== 'business') {
+    if (
+      !profile ||
+      profile.profileKind !== 'business' ||
+      profile.profileCategoryId == null //profile category Id is mandatory on busness profile
+    ) {
       return emptyConnection;
     }
 

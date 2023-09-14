@@ -356,7 +356,7 @@ const useCoverEditionManager = ({
   //#endregion
 
   // #region Media visibility
-  const [mediaVisible, setMediaVisible] = useState(true);
+  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
   const toggleMediaVisibility = useCallback(() => {
     setMediaVisible(mediaVisible => !mediaVisible);
   }, []);
@@ -558,6 +558,11 @@ const useCoverEditionManager = ({
       const shouldRecreateMedia =
         !cardCover ||
         sourceMedia?.id == null ||
+        //following condition is required if we have a profile wiht a suggested Media and changing it to another suggestedMedia
+        (hasSuggestedMedia &&
+          sourceMedia &&
+          sourceMedia.id !==
+            lastSourceMediaBeforeSuggested.current?.media?.id) ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
           pick({ ...coverStyle, mediaParameters }, ...mediaStyle),
@@ -741,7 +746,6 @@ const useCoverEditionManager = ({
     });
   }, [
     sourceMedia,
-    profile?.profileKind,
     coverStyle,
     colorPalette,
     mediaComputation,
@@ -753,6 +757,8 @@ const useCoverEditionManager = ({
     cardCover,
     currentCoverStyle,
     maskMedia,
+    profile?.profileKind,
+    hasSuggestedMedia,
     onCoverSaved,
     intl,
   ]);
@@ -867,6 +873,8 @@ const useCoverEditionManager = ({
     mediaVisible,
     // Media Suggestion
     hasSuggestedMedia,
+    hasSourceMediaBeforeSuggested:
+      lastSourceMediaBeforeSuggested.current?.media != null,
 
     // react elements
     modals,

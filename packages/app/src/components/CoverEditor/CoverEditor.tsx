@@ -99,6 +99,7 @@ const CoverEditor = (
     mediaComputing,
     mediaVisible,
     hasSuggestedMedia,
+    hasSourceMediaBeforeSuggested,
     // TODO handle
     // mediaComputationError
     setTitle,
@@ -169,10 +170,15 @@ const CoverEditor = (
   );
 
   useEffect(() => {
-    if (mediaVisible && hasSuggestedMedia) {
+    if (mediaVisible && hasSuggestedMedia && hasSourceMediaBeforeSuggested) {
       setSuggestedMedia(null);
     }
-  }, [hasSuggestedMedia, mediaVisible, setSuggestedMedia]);
+  }, [
+    hasSourceMediaBeforeSuggested,
+    hasSuggestedMedia,
+    mediaVisible,
+    setSuggestedMedia,
+  ]);
 
   // #region canSave
   const canSave =
@@ -270,6 +276,7 @@ const CoverEditor = (
     [templateKind],
   );
 
+  // #region Suggested Media
   const {
     data: suggestedMediaData,
     loadNext: loadNextSuggestion,
@@ -304,13 +311,6 @@ const CoverEditor = (
   const [selectedSuggestedMediaIndex, setSelectedSuggestedMediaIndex] =
     useState(0);
 
-  const showSuggestedMedia = useMemo(
-    () =>
-      templateKind !== 'people' &&
-      (!mediaVisible || !sourceMedia) &&
-      viewer.profile?.profileKind === 'business',
-    [sourceMedia, mediaVisible, templateKind, viewer.profile?.profileKind],
-  );
   //media: CoverData['sourceMedia'] | null
   const suggestedMedias = useMemo(() => {
     if (
@@ -342,32 +342,39 @@ const CoverEditor = (
     viewer?.profile?.profileKind,
   ]);
 
-  const onPressSuggestedMedia = useCallback(() => {
-    if (suggestedMedias && showSuggestedMedia) {
+  const showSuggestedMedia = useMemo(
+    () =>
+      templateKind !== 'people' &&
+      (!mediaVisible || sourceMedia == null) &&
+      viewer.profile?.profileKind === 'business',
+    [sourceMedia, mediaVisible, templateKind, viewer.profile?.profileKind],
+  );
+
+  const selectSuggestedMedia = useCallback(() => {
+    let newIndex = 0;
+    if (selectedSuggestedMediaIndex + 1 < (suggestedMedias?.length ?? 0)) {
+      newIndex = selectedSuggestedMediaIndex + 1;
+    }
+
+    setSelectedSuggestedMediaIndex(newIndex);
+    if (suggestedMedias?.[newIndex]) {
+      setSuggestedMedia({
+        id: suggestedMedias[newIndex].id,
+        uri: suggestedMedias[newIndex].uri,
+        kind:
+          suggestedMedias[newIndex].__typename === 'MediaImage'
+            ? 'image'
+            : 'video',
+        width: suggestedMedias[newIndex].width,
+        height: suggestedMedias[newIndex].height,
+      });
+
       if (
         !isLoadingNextSuggestion &&
         selectedSuggestedMediaIndex > (suggestedMedias?.length ?? 0) - 3 &&
         hasNextSuggestion
       ) {
         loadNextSuggestion(50);
-      }
-      let newIndex = 0;
-      if (selectedSuggestedMediaIndex + 1 < (suggestedMedias?.length ?? 0)) {
-        newIndex = selectedSuggestedMediaIndex + 1;
-      }
-
-      setSelectedSuggestedMediaIndex(newIndex);
-      if (suggestedMedias[newIndex]) {
-        setSuggestedMedia({
-          id: suggestedMedias[newIndex].id,
-          uri: suggestedMedias[newIndex].uri,
-          kind:
-            suggestedMedias[newIndex].__typename === 'MediaImage'
-              ? 'image'
-              : 'video',
-          width: suggestedMedias[newIndex].width,
-          height: suggestedMedias[newIndex].height,
-        });
       }
     }
   }, [
@@ -376,9 +383,23 @@ const CoverEditor = (
     loadNextSuggestion,
     selectedSuggestedMediaIndex,
     setSuggestedMedia,
-    showSuggestedMedia,
     suggestedMedias,
   ]);
+
+  const onPressSuggestedMedia = useCallback(() => {
+    if (showSuggestedMedia) {
+      selectSuggestedMedia();
+    }
+  }, [selectSuggestedMedia, showSuggestedMedia]);
+
+  useEffect(() => {
+    // creating a new cover
+    if (sourceMedia == null && showSuggestedMedia) {
+      selectSuggestedMedia();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // #endregion
 
   return (
     <>

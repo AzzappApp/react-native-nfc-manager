@@ -76,6 +76,7 @@ const CoverEditionStep = ({
           height={eidtorHeight}
           onCoverSaved={onCoverSaved}
           onCanSaveChange={setCanSave}
+          initialTemplateKind={profileKind === 'business' ? 'others' : 'people'}
         />
         <Button
           label={intl.formatMessage({
