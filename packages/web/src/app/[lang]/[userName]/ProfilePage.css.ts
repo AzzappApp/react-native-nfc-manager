@@ -101,7 +101,7 @@ const switchContent = style({
   bottom: '15px',
   right: '15px',
   borderRadius: '200px',
-  zIndex: 999,
+  zIndex: 3,
   '@media': {
     [MediaQuery.Desktop]: {
       display: 'none',
