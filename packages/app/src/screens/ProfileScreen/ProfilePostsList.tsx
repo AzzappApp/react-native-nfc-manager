@@ -29,7 +29,7 @@ const ProfilePostsList = ({
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: '#fff' }}
+      style={{ flex: 1 }}
       edges={{ bottom: 'off', top: 'additive' }}
     >
       <Header

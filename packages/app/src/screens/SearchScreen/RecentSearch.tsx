@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableBackground from '#ui/PressableBackground';
 import PressableNative from '#ui/PressableNative';
@@ -21,7 +22,7 @@ const RecentSearch = ({
   search,
 }: RecentSearchProps) => {
   const [data, setData] = useState<string[]>([]);
-
+  const styles = useStyleSheet(styleSheet);
   useEffect(() => {
     if (isNotFalsyString(searchValue)) {
       const filteredSearch = searchValue!.toLocaleLowerCase().trim();
@@ -90,6 +91,7 @@ const SearchRecentItem = ({
   search,
 }: SearchRecentItemProps) => {
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
   const onRemove = async () => {
     await removeItem(item);
   };
@@ -135,7 +137,7 @@ const SearchRecentItem = ({
 
 export default RecentSearch;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   root: { flex: 1 },
   textStyleRecent: {
     paddingTop: 5,
@@ -150,11 +152,11 @@ const styles = StyleSheet.create({
     color: colors.grey400,
   },
   pressableRecentRow: {
-    backgroundColor: '#fff',
+    backgroundColor: appearance === 'light' ? colors.white : colors.black, //required to have a bg color for pressable
     height: 39,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-});
+}));

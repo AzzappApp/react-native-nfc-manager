@@ -45,7 +45,10 @@ const TabBarMenuItem = ({
       accessibilityRole="tab"
     >
       {icon && <Icon icon={icon} style={styles.icon} />}
-      <Text style={labelStyle} variant="button">
+      <Text
+        style={[labelStyle, selected && { color: colors.black }]}
+        variant="button"
+      >
         {children}
       </Text>
     </PressableAnimated>

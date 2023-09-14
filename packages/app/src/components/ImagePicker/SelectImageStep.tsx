@@ -267,7 +267,7 @@ const SelectImageStep = ({
             })
           ) : (
             intl.formatMessage({
-              defaultMessage: 'video',
+              defaultMessage: 'Video',
               description: 'Title of the photo view in image picker wizzard',
             })
           )
