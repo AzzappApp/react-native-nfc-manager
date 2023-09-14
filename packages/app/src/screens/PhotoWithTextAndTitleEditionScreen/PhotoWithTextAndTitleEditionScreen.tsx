@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
+  MODULE_IMAGE_MAX_WIDTH,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
@@ -13,6 +14,7 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { exportImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -20,11 +22,11 @@ import ImagePicker, {
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -359,24 +361,31 @@ const PhotoWithTextAndTitleEditionScreen = ({
   };
 
   const onMediaSelected = async ({
-    kind,
     uri,
-    aspectRatio,
     editionParameters,
     filter,
+    width,
+    height,
   }: ImagePickerResult) => {
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          filters: filter ? [filter] : [],
+        },
+      ],
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportedMedia.uri,
-      width: exportedMedia.size.width,
-      height: exportedMedia.size.height,
+      uri: exportUri,
+      width: size.width,
+      height: size.height,
       kind: 'image',
     });
   };
