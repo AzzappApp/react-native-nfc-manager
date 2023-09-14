@@ -175,15 +175,15 @@ export const useFilterList = (): Array<{
         }),
         ios: true,
       },
-      {
-        filter: 'noir',
-        label: intl.formatMessage({
-          defaultMessage: 'Noir',
-          description: 'Noir photo filter name',
-        }),
-        ios: true,
-        android: true,
-      },
+      // {
+      //   filter: 'noir',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'Noir',
+      //     description: 'Noir photo filter name',
+      //   }),
+      //   ios: true,
+      //   android: true,
+      // },
       {
         filter: 'process',
         label: intl.formatMessage({
@@ -209,31 +209,31 @@ export const useFilterList = (): Array<{
         }),
         ios: true,
       },
-      {
-        filter: 'sepia',
-        label: intl.formatMessage({
-          defaultMessage: 'Sepia',
-          description: 'Sepia photo filter name',
-        }),
-        ios: true,
-        android: true,
-      },
-      {
-        filter: 'thermal',
-        label: intl.formatMessage({
-          defaultMessage: 'Thermal',
-          description: 'Thermal photo filter name',
-        }),
-        ios: true,
-      },
-      {
-        filter: 'xray',
-        label: intl.formatMessage({
-          defaultMessage: 'X-ray',
-          description: 'X-ray photo filter name',
-        }),
-        ios: true,
-      },
+      // {
+      //   filter: 'sepia',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'Sepia',
+      //     description: 'Sepia photo filter name',
+      //   }),
+      //   ios: true,
+      //   android: true,
+      // },
+      // {
+      //   filter: 'thermal',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'Thermal',
+      //     description: 'Thermal photo filter name',
+      //   }),
+      //   ios: true,
+      // },
+      // {
+      //   filter: 'xray',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'X-ray',
+      //     description: 'X-ray photo filter name',
+      //   }),
+      //   ios: true,
+      // },
       {
         filter: 'documentary',
         label: intl.formatMessage({
