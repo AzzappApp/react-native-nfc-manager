@@ -1,4 +1,4 @@
-## 0.2.3-canary.27
+## 0.2.3-canary.28
 
 * **fix:**  - time post created seconds ([#1112](https://github.com/AzzappApp/azzapp/pull/1112))
 * **fix:**  - rule of disable save button and showing screen select a photo ([#1110](https://github.com/AzzappApp/azzapp/pull/1110))
