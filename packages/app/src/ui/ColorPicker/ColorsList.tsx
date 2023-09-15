@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
     gap: ITEM_MARGIN,
+    paddingLeft: 5,
   },
   itemContainer: {
     justifyContent: 'center',
