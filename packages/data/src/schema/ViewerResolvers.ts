@@ -192,12 +192,22 @@ export const Viewer: ViewerResolvers = {
       },
     };
   },
-  cardTemplates: async (_, { after, first }, { auth: { profileId } }) => {
-    if (!profileId) {
+  cardTemplates: async (
+    _,
+    { after, first },
+    { auth: { profileId }, loaders },
+  ) => {
+    const profile = profileId ? await loaders.Profile.load(profileId) : null;
+    if (!profile) {
       return emptyConnection;
     }
     const limit = first ?? 100;
-    const cardTemplates = await getCardTemplates(profileId, after, limit + 1);
+    const cardTemplates = await getCardTemplates(
+      profile.profileKind,
+      profile.id,
+      after,
+      limit + 1,
+    );
     const sizedCardtemplate = cardTemplates.slice(0, limit);
     return {
       edges: sizedCardtemplate.map(cardTemplate => ({
