@@ -130,13 +130,17 @@ const StaticMediaList = ({
     ],
   );
 
-  const data = useMemo(() => [null, ...staticMedias], [staticMedias]);
+  const data = useMemo(() => {
+    if (itemDimension.height !== 0) {
+      return [null, ...staticMedias];
+    }
+  }, [itemDimension.height, staticMedias]);
 
   const getItemLayout = useCallback(
     (_data: any, index: number) => {
       return {
-        length: itemDimension.width,
-        offset: itemDimension.width * index + 10, //20 is initial offset (should have use inset)
+        length: itemDimension.width + 10,
+        offset: itemDimension.width * index,
         index,
       };
     },
@@ -150,18 +154,20 @@ const StaticMediaList = ({
       horizontal
       showsHorizontalScrollIndicator={false}
       style={[styles.flatListStyle, style]}
-      contentContainerStyle={styles.container}
       renderItem={renderItem}
       testID={testID}
       accessibilityRole="list"
       keyExtractor={keyExtractor}
       getItemLayout={getItemLayout}
-      contentInsetAdjustmentBehavior="never"
+      ItemSeparatorComponent={ItemSeparatorComponent}
       contentInset={{ left: 30 }}
       contentOffset={{ x: -30, y: 0 }}
+      maxToRenderPerBatch={2}
     />
   );
 };
+
+const ItemSeparatorComponent = () => <View style={{ width: 10 }} />;
 
 const keyExtractor = (
   item: ArrayItemType<StaticMediaList_staticMedias$data> | null,
@@ -171,10 +177,7 @@ export default StaticMediaList;
 
 const styleSheet = createStyleSheet(appearance => ({
   flatListStyle: { overflow: 'visible' },
-  container: {
-    columnGap: 10,
-    alignItems: 'center',
-  },
+
   button: [
     {
       flex: 1,
