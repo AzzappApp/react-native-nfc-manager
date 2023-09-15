@@ -1,5 +1,6 @@
-## 0.2.3-canary.30
+## 0.2.3-canary.31
 
+* **fix:**  - 🐛 fetch up-to-date enabled templates ([#1106](https://github.com/AzzappApp/azzapp/pull/1106))
 * **fix:**  - toast padding
 * **feat:**  - add profile background ([#1117](https://github.com/AzzappApp/azzapp/pull/1117))
 * **feat:**  - 🎸 display preview video ([#1108](https://github.com/AzzappApp/azzapp/pull/1108))
