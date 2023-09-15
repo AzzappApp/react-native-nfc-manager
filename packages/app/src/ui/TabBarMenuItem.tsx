@@ -9,6 +9,56 @@ import type { Icons } from './Icon';
 import type { PropsWithChildren } from 'react';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
+type TabBarMenuItemProps = PropsWithChildren<{
+  /**
+   * determine is the item is selected
+   *
+   * @type {boolean}
+   */
+  selected: boolean;
+  /**
+   * callback to select the time
+   *
+   */
+  setSelected: () => void;
+  /**
+   * style of the label
+   *
+   * @type {StyleProp<TextStyle>}
+   */
+  labelStyle?: StyleProp<TextStyle>;
+  /**
+   * container style
+   *
+   * @type {StyleProp<ViewStyle>}
+   */
+  containerStyle?: StyleProp<ViewStyle>;
+  /**
+   * optional props to define the selectedBackgroundColor
+   *
+   * @type {string}
+   */
+  selectedBackgroundColor?: string;
+  /**
+   * optional props to define the selectedTextColor. This will for now be applied also to the icon if use
+   *
+   * @type {string}
+   */
+  selectedLabelColor?: string;
+  /**
+   * backgroundColor
+   *
+   * @type {string}
+   */
+  backgroundColor?: string;
+  /**
+   * icons
+   *
+   * @type {Icons}
+   */
+  icon?: Icons;
+}>;
+
 const TabBarMenuItem = ({
   selected,
   setSelected,
@@ -16,17 +66,10 @@ const TabBarMenuItem = ({
   labelStyle,
   containerStyle,
   selectedBackgroundColor = colors.grey50,
+  selectedLabelColor = colors.black,
   backgroundColor = `${colors.grey50}00`,
   icon,
-}: PropsWithChildren<{
-  selected: boolean;
-  setSelected: () => void;
-  labelStyle?: StyleProp<TextStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
-  selectedBackgroundColor?: string;
-  backgroundColor?: string;
-  icon?: Icons;
-}>) => {
+}: TabBarMenuItemProps) => {
   const state = useAnimatedState(selected);
   const style = useAnimatedStyle(() => {
     return {
@@ -47,11 +90,11 @@ const TabBarMenuItem = ({
       {icon && (
         <Icon
           icon={icon}
-          style={[styles.icon, selected && { tintColor: colors.black }]}
+          style={[styles.icon, selected && { tintColor: selectedLabelColor }]}
         />
       )}
       <Text
-        style={[labelStyle, selected && { color: colors.black }]}
+        style={[labelStyle, selected && { color: selectedLabelColor }]}
         variant="button"
       >
         {children}
