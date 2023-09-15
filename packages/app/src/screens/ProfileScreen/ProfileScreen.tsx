@@ -15,6 +15,7 @@ import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CardFlipSwitch from './CardFlipSwitch';
+import ProfileBackground from './ProfileBackground';
 import ProfilePostsList from './ProfilePostsList';
 import ProfileScreenButtonBar from './ProfileScreenButtonBar';
 import ProfileScreenContactDownloader from './ProfileScreenContactDownloader';
@@ -114,6 +115,9 @@ const ProfileScreen = ({
 
   return (
     <>
+      <Suspense>
+        <ProfileBackground profile={data.profile} />
+      </Suspense>
       <ProfileScreenTransitionsProvider
         editing={editing}
         selectionMode={selectionMode}
@@ -187,6 +191,7 @@ const profileScreenByIdQuery = graphql`
       ...PostRendererFragment_author
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
+      ...ProfileBackground_profile
     }
   }
 `;
@@ -201,6 +206,7 @@ const profileScreenByNameQuery = graphql`
       ...PostRendererFragment_author
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
+      ...ProfileBackground_profile
     }
   }
 `;
