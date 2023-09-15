@@ -11,7 +11,6 @@ import {
 } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
-  Image,
   Keyboard,
   Modal,
   StyleSheet,
@@ -22,6 +21,7 @@ import {
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
@@ -495,13 +495,20 @@ const CoverEditor = (
               style={[styles.mediaHideButton]}
               onPress={toggleMediaVisibility}
             >
-              <Image
-                source={{ uri: sourceMedia.uri }}
+              <GPUImageView
                 style={[
                   styles.mediaHideButtonImage,
                   !mediaVisible && { opacity: 0.5 },
+                  { overflow: 'hidden' },
                 ]}
-              />
+                testID="image-picker-media-video"
+              >
+                {sourceMedia.kind === 'image' ? (
+                  <ImageLayer uri={sourceMedia.uri} />
+                ) : (
+                  <VideoFrame uri={sourceMedia.uri} time={0} />
+                )}
+              </GPUImageView>
               <Icon
                 style={styles.mediaHideButtonIcon}
                 icon={mediaVisible ? 'display' : 'hide'}
