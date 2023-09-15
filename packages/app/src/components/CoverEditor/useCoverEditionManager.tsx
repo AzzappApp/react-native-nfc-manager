@@ -356,6 +356,7 @@ const useCoverEditionManager = ({
   //#endregion
 
   // #region Media visibility
+  const isCoverCreation = useRef(sourceMedia == null);
   const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
   const toggleMediaVisibility = useCallback(() => {
     setMediaVisible(mediaVisible => !mediaVisible);
@@ -473,6 +474,8 @@ const useCoverEditionManager = ({
       setTimeRange(timeRange ?? null);
       startMediaComputation(result);
       setMediaVisible(true);
+      setHasSuggestedMedia(false);
+      lastSourceMediaBeforeSuggested.current = null;
     });
   };
 
@@ -872,6 +875,7 @@ const useCoverEditionManager = ({
     //media visibility
     mediaVisible,
     // Media Suggestion
+    isCoverCreation: isCoverCreation.current,
     hasSuggestedMedia,
     hasSourceMediaBeforeSuggested:
       lastSourceMediaBeforeSuggested.current?.media != null,

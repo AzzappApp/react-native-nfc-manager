@@ -36,17 +36,20 @@ export const getMediaSuggestions = async (
   offset?: string | null,
   limit?: number | null,
 ) => {
+  console.log(profileCategoryId, companyActivityId);
   const query = sql`
   SELECT *, RAND(${randomSeed}) as cursor
   FROM MediaSuggestion `;
-  if (!companyActivityId) {
-    query.append(sql` WHERE profileCategoryId = ${profileCategoryId} `);
+  if (companyActivityId == null) {
+    query.append(sql` WHERE profileCategoryId = ${profileCategoryId}`);
   } else {
-    query.append(
-      sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL) 
-      OR (profileCategoryId IS NULL AND companyActivityId = ${companyActivityId} ) 
-      OR (profileCategoryId = ${profileCategoryId} AND companyActivityId = ${companyActivityId})`,
-    );
+    query.append(sql` WHERE companyActivityId = ${companyActivityId}`);
+    //keep it for futur usage
+    // query.append(
+    //   sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL)
+    //   OR (profileCategoryId IS NULL AND companyActivityId = ${companyActivityId} )
+    //   OR (profileCategoryId = ${profileCategoryId} AND companyActivityId = ${companyActivityId})`,
+    // );
   }
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
@@ -59,3 +62,7 @@ export const getMediaSuggestions = async (
     MediaSuggestion & { cursor: string }
   >;
 };
+//keep it. this request should group to make the search they want
+// SELECT mediaId, GROUP_CONCAT(DISTINCT profileCategoryId) as profileCategoryIds, GROUP_CONCAT(DISTINCT companyActivityId) as companyActivityIds
+// FROM MediaSuggestion
+// GROUP BY mediaId;

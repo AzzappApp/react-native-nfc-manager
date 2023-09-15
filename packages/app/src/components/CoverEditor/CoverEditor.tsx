@@ -99,6 +99,7 @@ const CoverEditor = (
     mediaComputing,
     mediaVisible,
     hasSuggestedMedia,
+    isCoverCreation,
     hasSourceMediaBeforeSuggested,
     // TODO handle
     // mediaComputationError
@@ -168,17 +169,6 @@ const CoverEditor = (
     },
     [hasSuggestedMedia, setSuggestedMedia, updateEditedMediaKind],
   );
-
-  useEffect(() => {
-    if (mediaVisible && hasSuggestedMedia && hasSourceMediaBeforeSuggested) {
-      setSuggestedMedia(null);
-    }
-  }, [
-    hasSourceMediaBeforeSuggested,
-    hasSuggestedMedia,
-    mediaVisible,
-    setSuggestedMedia,
-  ]);
 
   // #region canSave
   const canSave =
@@ -393,12 +383,32 @@ const CoverEditor = (
   }, [selectSuggestedMedia, showSuggestedMedia]);
 
   useEffect(() => {
+    if (mediaVisible && hasSuggestedMedia) {
+      setSuggestedMedia(null);
+    } else if (!mediaVisible && showSuggestedMedia && !hasSuggestedMedia) {
+      selectSuggestedMedia();
+    }
+  }, [
+    isCoverCreation,
+    hasSuggestedMedia,
+    mediaVisible,
+    setSuggestedMedia,
+    selectSuggestedMedia,
+    showSuggestedMedia,
+  ]);
+
+  useEffect(() => {
     // creating a new cover
-    if (sourceMedia == null && showSuggestedMedia) {
+    if (
+      isCoverCreation &&
+      templateKind !== 'people' &&
+      !sourceMedia &&
+      !hasSuggestedMedia
+    ) {
       selectSuggestedMedia();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isCoverCreation, templateKind]);
   // #endregion
 
   return (
@@ -490,7 +500,10 @@ const CoverEditor = (
         <View style={styles.controlPanel}>
           <FloatingIconButton icon="camera" onPress={openImagePicker} />
           <FloatingIconButton icon="text" onPress={openTitleModal} />
-          {sourceMedia && (
+          {((sourceMedia && !hasSuggestedMedia) ||
+            (sourceMedia &&
+              hasSuggestedMedia &&
+              hasSourceMediaBeforeSuggested)) && (
             <PressableOpacity
               style={[styles.mediaHideButton]}
               onPress={toggleMediaVisibility}
@@ -509,6 +522,7 @@ const CoverEditor = (
                   <VideoFrame uri={sourceMedia.uri} time={0} />
                 )}
               </GPUImageView>
+
               <Icon
                 style={styles.mediaHideButtonIcon}
                 icon={mediaVisible ? 'display' : 'hide'}
