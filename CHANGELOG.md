@@ -1,4 +1,4 @@
-## 0.2.3-canary.32
+## 0.2.3-canary.33
 
 * **fix:**  - background on profile posts list
 * **fix:**  - 🐛 fetch up-to-date enabled templates ([#1106](https://github.com/AzzappApp/azzapp/pull/1106))

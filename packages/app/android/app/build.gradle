@@ -102,7 +102,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2003
-        versionName "0.2.3-canary.32"
+        versionName "0.2.3-canary.33"
     }
 
     splits {
