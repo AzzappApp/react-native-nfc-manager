@@ -49,6 +49,11 @@ const MediaScreen = ({
   const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
 
+  // viewer might be briefly null when the user logs out or by switching accounts
+  if (!viewer) {
+    return null;
+  }
+
   const tabs: Array<{ id: TAB; element: ReactElement }> = [
     {
       id: 'SUGGESTIONS',

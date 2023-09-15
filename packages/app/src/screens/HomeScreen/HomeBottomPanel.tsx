@@ -198,7 +198,7 @@ const HomeBottomPanel = ({
       ],
     );
 
-    const bottomPanelVisible = interpolate(
+    let bottomPanelVisible = interpolate(
       currentProfileIndexSharedValue.value,
       [prev, next],
       [
@@ -206,6 +206,11 @@ const HomeBottomPanel = ({
         nextWebCardPublished ? 1 : 0,
       ],
     );
+
+    // on the last profile, sometimes the value doesn't reach 1
+    if (bottomPanelVisible > 0.99) {
+      bottomPanelVisible = 1;
+    }
 
     return {
       newProfilePanelVisible,

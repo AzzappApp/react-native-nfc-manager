@@ -14,6 +14,7 @@ import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
+import Container from '#ui/Container';
 import CardFlipSwitch from './CardFlipSwitch';
 import ProfileBackground from './ProfileBackground';
 import ProfilePostsList from './ProfilePostsList';
@@ -129,7 +130,7 @@ const ProfileScreen = ({
             disabled={editing}
             onFlip={toggleFlip}
             front={
-              <View style={{ flex: 1, backgroundColor: 'white' }}>
+              <Container style={{ flex: 1 }}>
                 <ProfileScreenContent
                   ready={ready}
                   profile={data.profile}
@@ -140,7 +141,7 @@ const ProfileScreen = ({
                   onToggleSelectionMode={toggleSelectionMode}
                   onContentPositionChange={onContentPositionChange}
                 />
-              </View>
+              </Container>
             }
             back={
               <Suspense>
