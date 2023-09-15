@@ -1,5 +1,7 @@
 import { pick } from 'lodash';
 import { useCallback, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   DEFAULT_COLOR_LIST,
@@ -94,6 +96,8 @@ export const useProfileCardColors = (
     }
   `);
 
+  const intl = useIntl();
+
   const updateCardColors = useCallback(
     (updates: Partial<SaveCardColorsInput>) => {
       const input = {
@@ -119,10 +123,19 @@ export const useProfileCardColors = (
             },
           },
         },
-        // TODO add error handling
+        onError: () => {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error while updating your colors, please try again.',
+              description: 'Error toast message when updating colors fails.',
+            }),
+          });
+        },
       });
     },
-    [commit, profile.cardColors, profile.id],
+    [commit, intl, profile.cardColors, profile.id],
   );
 
   const onUpdateColorList = useCallback(

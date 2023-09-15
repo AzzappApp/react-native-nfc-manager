@@ -18,6 +18,7 @@ import {
 } from 'react-native-safe-area-context';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import ERRORS from '@azzapp/shared/errors';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
@@ -28,12 +29,14 @@ import {
 } from '#components/NativeRouter';
 import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
+import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
   init as initLocaleHelpers,
   messages,
   useCurrentLocale,
 } from '#helpers/localeHelpers';
 import {
+  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from '#helpers/relayEnvironment';
@@ -57,6 +60,7 @@ import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmatio
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
@@ -67,6 +71,7 @@ import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
+import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -80,6 +85,7 @@ Sentry.init({
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
+  integrations: [new Sentry.ReactNativeTracing()],
 });
 
 /**
@@ -102,11 +108,35 @@ const App = () => {
     });
   }, []);
 
+  const [needsUpdate, setNeedsUpdate] = useState(false);
+
+  useEffect(
+    () =>
+      addGlobalEventListener('NETWORK_ERROR', ({ payload }) => {
+        const { error } = payload;
+        if (
+          error instanceof Error &&
+          error.message === ERRORS.UPDATE_APP_VERSION
+        ) {
+          setNeedsUpdate(true);
+        }
+      }),
+    [],
+  );
+
   if (!ready) {
     return null;
   }
 
   const ErrorBoundary = __DEV__ ? Fragment : AppErrorBoundary;
+
+  if (needsUpdate) {
+    return (
+      <AppIntlProvider>
+        <UpdateApplicationScreen />
+      </AppIntlProvider>
+    );
+  }
 
   return (
     <AppIntlProvider>
@@ -117,7 +147,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);
 
 // #region Routing Definitions
 const screens = {
@@ -167,22 +197,54 @@ const AppRouter = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated } = useAuthState();
+  const { authenticated, profileId } = useAuthState();
 
   useEffect(() => {
-    if (
-      !authenticated &&
-      !unauthenticatedRoutes.includes(router.getCurrentRoute().route)
-    ) {
-      router.replaceAll(signInRoutes);
-    } else if (
-      authenticated &&
-      unauthenticatedRoutes.includes(router.getCurrentRoute().route)
-    ) {
-      router.replaceAll(mainRoutes);
+    const currentRoute = router.getCurrentRoute()?.route;
+    if (currentRoute) {
+      if (!authenticated && !unauthenticatedRoutes.includes(currentRoute)) {
+        router.replaceAll(signInRoutes);
+      } else if (
+        authenticated &&
+        unauthenticatedRoutes.includes(currentRoute)
+      ) {
+        router.replaceAll(mainRoutes);
+      }
     }
   }, [authenticated, router]);
+  // #endregion
 
+  // #region Sentry Routing Instrumentation
+  useEffect(() => {
+    Sentry.setUser(profileId ? { id: profileId } : null);
+  }, [profileId]);
+
+  useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: 'navigation',
+      type: 'navigation',
+      message: `Navigation to ${router.getCurrentRoute()?.route}`,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const previousRoute = router.getCurrentRoute();
+    const disposable = router.addRouteWillChangeListener(route => {
+      Sentry.addBreadcrumb({
+        category: 'navigation',
+        type: 'navigation',
+        message: `Navigation to ${route.route}`,
+        data: {
+          from: previousRoute,
+          to: route,
+        },
+      });
+    });
+    return () => {
+      disposable.dispose();
+    };
+  }, [router]);
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
@@ -198,14 +260,19 @@ const AppRouter = () => {
     [],
   );
 
+  const getEnvironmentForActor = useCallback(
+    (actorId: string) => {
+      return environment.forActor(actorId);
+    },
+    [environment],
+  );
+
   const screenIdToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
     () =>
       createScreenPrefetcher(
         screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
-        router.getCurrentRoute(),
-        router.getCurrentScreenId(),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -217,11 +284,9 @@ const AppRouter = () => {
       if (isRelayScreen(Component)) {
         RelayQueryManager.loadQueryFor(id, Component, route.params);
       }
-      screenPrefetcher.screenWillBePushed(id, route);
     });
     router.addScreenWillBeRemovedListener(({ id }) => {
       screenIdToDispose.push(id);
-      screenPrefetcher.screenWillBeRemoved(id);
     });
   }, [router, screenIdToDispose, screenPrefetcher]);
 
@@ -233,9 +298,8 @@ const AppRouter = () => {
 
       // TODO should we not handle this in the router?
       screenIdToDispose.push(id);
-      screenPrefetcher.screenWillBeRemoved(id);
     },
-    [router, screenIdToDispose, screenPrefetcher],
+    [router, screenIdToDispose],
   );
 
   const slapshScreenHidden = useRef(false);
@@ -258,6 +322,25 @@ const AppRouter = () => {
   }, [screenIdToDispose]);
   // #endregion
 
+  // #region Loading Screen
+  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+
+  useEffect(
+    () =>
+      addGlobalEventListener('READY', () => {
+        setShowLoadingScreen(false);
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    if (!authenticated) {
+      setTimeout(() => {
+        setShowLoadingScreen(false);
+      }, 500);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // #endregion
 
   const colorScheme = useColorScheme();
@@ -270,13 +353,16 @@ const AppRouter = () => {
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
-
   if (!fontLoaded) {
     return null;
   }
 
   return (
-    <RelayEnvironmentProvider environment={environment}>
+    <RelayEnvironmentProvider
+      environment={environment.forActor(ROOT_ACTOR_ID)}
+      // @ts-expect-error not in the types
+      getEnvironmentForActor={getEnvironmentForActor}
+    >
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}
@@ -292,6 +378,7 @@ const AppRouter = () => {
             />
           </RouterProvider>
           <Toast />
+          <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>

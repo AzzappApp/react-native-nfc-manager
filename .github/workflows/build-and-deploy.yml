@@ -20,6 +20,7 @@ jobs:
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: "azzapp"
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
+      PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
     steps:
       ############################################
       #
@@ -52,11 +53,21 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
 
+      - uses: phrase/setup-cli@v1
+        with:
+          version: 2.11.0
+
       ############################################
       #
       # JavaScript build and tests
       #
       ############################################
+      - name: Phrase - Pull translations
+        run: phrase pull
+
+      - name: Build translations
+        run: yarn i18n:extract
+
       - name: JavaScript build
         run: yarn build
 
@@ -269,7 +280,7 @@ jobs:
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
-          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel build
         env:
@@ -308,7 +319,7 @@ jobs:
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
-          vercel pull --yes --environment=$environment --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel build
         env:
@@ -332,6 +343,10 @@ jobs:
       # EAS Native application Build
       #
       ############################################
+      - name: Prepare Working Directory for EAS
+        working-directory: ./packages/i18n
+        run: rm .gitignore
+
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
@@ -349,3 +364,11 @@ jobs:
             PROFILE="staging"
           fi
           eas build --platform all --profile $PROFILE --non-interactive --no-wait
+      
+      ############################################
+      #
+      # Deploy translations to Phrase
+      #
+      ############################################
+      - name: Phrase - Push translations
+        run: phrase push

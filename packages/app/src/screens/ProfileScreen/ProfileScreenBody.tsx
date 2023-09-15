@@ -11,6 +11,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useIntl } from 'react-intl';
+import Toast from 'react-native-toast-message';
 import {
   graphql,
   useFragment,
@@ -215,6 +217,7 @@ const ProfileScreenBody = (
     `);
 
   // #endregion
+  const intl = useIntl();
 
   // #region Modules reordering
   const [commitReorderModules, reorderModulesActive] =
@@ -286,10 +289,20 @@ const ProfileScreenBody = (
               optimisticUpdate.current = null;
             }
           },
+          onError(error) {
+            console.error(error);
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error, could not reorder the modules',
+                description: 'Reorder modules error toast',
+              }),
+            });
+          },
         });
       }, 2000);
     },
-    [commitReorderModules, moduleOrderUpdater],
+    [commitReorderModules, moduleOrderUpdater, intl],
   );
 
   const environment = useRelayEnvironment();
@@ -366,9 +379,19 @@ const ProfileScreenBody = (
         },
         updater,
         optimisticUpdater: updater,
+        onError(error) {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not delete the modules',
+              description: 'Delete modules error toast',
+            }),
+          });
+        },
       });
     },
-    [canDelete, commitDeleteModules, profileId],
+    [canDelete, commitDeleteModules, profileId, intl],
   );
 
   const onRemoveModule = useCallback(
@@ -437,9 +460,19 @@ const ProfileScreenBody = (
         optimisticUpdater(store) {
           updater(store, `temp-${createId()}`);
         },
+        onError(error) {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not duplicate the module',
+              description: 'Duplicate module error toast',
+            }),
+          });
+        },
       });
     },
-    [canDuplicate, commitDuplicateModule, profileId],
+    [canDuplicate, commitDuplicateModule, intl, profileId],
   );
   // #endregion
 
@@ -468,9 +501,19 @@ const ProfileScreenBody = (
         },
         updater,
         optimisticUpdater: updater,
+        onError(error) {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not update the modules visibility',
+              description: 'Update modules visibility error toast',
+            }),
+          });
+        },
       });
     },
-    [canUpdateVisibility, commitUpdateModulesVisibility],
+    [canUpdateVisibility, commitUpdateModulesVisibility, intl],
   );
 
   const onToggleModuleVisibility = useCallback(

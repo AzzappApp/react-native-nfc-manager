@@ -46,7 +46,8 @@ const columns: GridColDef[] = [
     headerName: 'ID',
     width: 250,
     renderCell: params => (
-      <Link href={`/cardTemplates/${params.id}`}>${params.row.id}</Link>
+      // Bypass cache to avoid getting out-of-date data
+      <a href={`/cardTemplates/${params.id}`}>${params.row.id}</a>
     ),
   },
   {

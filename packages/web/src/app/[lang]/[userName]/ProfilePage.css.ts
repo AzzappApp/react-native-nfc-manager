@@ -6,6 +6,14 @@ const wrapper = style({
   flexDirection: 'row',
 });
 
+const background = style({
+  position: 'fixed',
+  top: '-10vh',
+  left: 0,
+  width: '100%',
+  height: '120vh',
+});
+
 const modules = style({
   height: '100vh',
   transitionTimingFunction: 'ease-out',
@@ -89,11 +97,11 @@ const postsBehind = style({
 const switchContent = style({
   position: 'fixed',
   padding: '13px',
-  backgroundColor: 'rgba(14, 18, 22, 0.40);',
+  backgroundColor: 'rgba(14, 18, 22, 0.40)',
   bottom: '15px',
   right: '15px',
   borderRadius: '200px',
-  zIndex: 999,
+  zIndex: 3,
   '@media': {
     [MediaQuery.Desktop]: {
       display: 'none',
@@ -120,6 +128,7 @@ const postNavigationHidden = style({
 
 const styles = {
   wrapper,
+  background,
   modules,
   posts,
   modulesWithPosts,

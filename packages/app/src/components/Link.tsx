@@ -1,9 +1,11 @@
-import { cloneElement, useEffect } from 'react';
+import { cloneElement, useContext, useEffect } from 'react';
+import { ReactRelayContext } from 'react-relay';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useRouter } from './NativeRouter';
 import type { Route } from '#routes';
 import type { ReactElement } from 'react';
 import type { GestureResponderEvent } from 'react-native';
+import type { Disposable } from 'react-relay';
 
 type LinkProps<T extends Route> = T & {
   /**
@@ -48,11 +50,19 @@ const Link = <T extends Route>({
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
 
+  const context = useContext(ReactRelayContext);
   useEffect(() => {
-    if (prefetch) {
-      prefetchScreen({ route, params } as Route);
+    let disposable: Disposable | null = null;
+    if (prefetch && context?.environment) {
+      disposable = prefetchScreen(context.environment, {
+        route,
+        params,
+      } as Route);
     }
-  }, [prefetch, prefetchScreen, route, params]);
+    return () => {
+      disposable?.dispose();
+    };
+  }, [prefetch, prefetchScreen, route, params, context]);
 
   const onLinkPress = (event?: GestureResponderEvent) => {
     children.props.onPress?.(event);

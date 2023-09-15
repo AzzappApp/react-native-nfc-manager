@@ -4,10 +4,12 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 
 const webMessages: { readonly [lang: string]: Record<string, string> } = {
   get en() {
-    return require('@azzapp/i18n/compiled/web/en.json');
+    // no english translation yet
+    return {}; //require('@azzapp/i18n/compiled/web/en.json');
   },
   get fr() {
-    return require('@azzapp/i18n/compiled/web/fr.json');
+    // no french translation yet
+    return {}; //require('@azzapp/i18n/compiled/web/fr.json');
   },
 };
 

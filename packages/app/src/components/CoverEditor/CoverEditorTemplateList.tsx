@@ -26,6 +26,8 @@ import {
 } from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CarouselSelectList from '#ui/CarouselSelectList';
+import Container from '#ui/Container';
+import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
@@ -68,6 +70,7 @@ export type CoverEditorProps = {
   mediaComputing: boolean;
   showTemplatesMedias: boolean;
   initialSelectedIndex: number;
+  showSuggestedMedia: boolean;
   onSelectedIndexChange: (index: number) => void;
   onCoverStyleChange: (data: CoverStyleData) => void;
   onColorPaletteChange: (palette: ColorPalette) => void;
@@ -77,6 +80,7 @@ export type CoverEditorProps = {
     width: number;
     height: number;
   }) => void;
+  onSelectSuggestedMedia: () => void;
 };
 
 const CoverEditorTemplateList = ({
@@ -95,10 +99,12 @@ const CoverEditorTemplateList = ({
   mediaComputing,
   showTemplatesMedias,
   initialSelectedIndex,
+  showSuggestedMedia,
   onCoverStyleChange,
   onColorPaletteChange,
   onPreviewMediaChange,
   onSelectedIndexChange,
+  onSelectSuggestedMedia,
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
@@ -112,6 +118,10 @@ const CoverEditorTemplateList = ({
               light
             }
           }
+        }
+        profile {
+          id
+          profileKind
         }
         ...CoverEditorTemplateList_templates
       }
@@ -239,15 +249,18 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
-        media: displayTemplateMedia
-          ? {
-              uri: previewMedia.uri,
-              kind:
-                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-              width: previewMedia.width,
-              height: previewMedia.height,
-            }
-          : media,
+        media:
+          showSuggestedMedia && media
+            ? media
+            : displayTemplateMedia
+            ? {
+                uri: previewMedia.uri,
+                kind:
+                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+                width: previewMedia.width,
+                height: previewMedia.height,
+              }
+            : media,
         mediaFilter,
         mediaParameters: displayTemplateMedia
           ? (templateEditionParameters as EditionParameters | null) ?? {}
@@ -311,11 +324,12 @@ const CoverEditorTemplateList = ({
   }, [
     coverTemplates?.edges,
     currentCoverStyle,
+    media,
     colorPalettes,
     showTemplatesMedias,
-    media,
     title,
     subTitle,
+    showSuggestedMedia,
     mediaCropParameters,
     maskUri,
     cardColors,
@@ -503,7 +517,7 @@ const CoverEditorTemplateList = ({
       );
     },
     [
-      selectedItem,
+      selectedItem?.id,
       templateWidth,
       timeRange?.startTime,
       timeRange?.duration,
@@ -571,34 +585,73 @@ const CoverEditorTemplateList = ({
         onSelectedIndexChange={onSelectedIndexChangeInner}
         onEndReached={onEndTemplateReached}
       />
-      <MaskedView
-        style={[
-          styles.colorPaletteListcontainer,
-          { width: templateWidth + 92 },
-        ]}
-        maskElement={
-          <LinearGradient
-            colors={['transparent', 'black', 'black', 'transparent']}
-            style={{ height: 30, width: templateWidth + 92 }}
-            locations={[0.0, 0.05, 0.95, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
-        }
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 30,
+          marginTop: GAP,
+        }}
       >
-        <FlatList
-          ref={colorPalletesListRef}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ height: 30, width: templateWidth + 92 }}
-          data={selectedItem?.colorPalettes ?? []}
-          keyExtractor={paletteKeyExtract}
-          renderItem={renderTryptich}
-          contentContainerStyle={styles.colorPalettContainer}
-          onViewableItemsChanged={onViewableItemsChanged}
-          windowSize={templateKind === 'video' ? 5 : 11} //21 is the default value.
-        />
-      </MaskedView>
+        <MaskedView
+          style={[
+            styles.colorPaletteListcontainer,
+            { width: templateWidth + 92 },
+          ]}
+          maskElement={
+            <LinearGradient
+              colors={['transparent', 'black', 'black', 'transparent']}
+              style={{
+                height: 30,
+                width: templateWidth + 92,
+              }}
+              locations={[0.0, 0.05, 0.95, 1]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+          }
+        >
+          <FlatList
+            ref={colorPalletesListRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{
+              height: 30,
+              width: templateWidth + 92,
+            }}
+            data={selectedItem?.colorPalettes ?? []}
+            keyExtractor={paletteKeyExtract}
+            renderItem={renderTryptich}
+            contentContainerStyle={[
+              styles.colorPalettContainer,
+              { marginRight: 100, marginBottom: 100 },
+            ]}
+            onViewableItemsChanged={onViewableItemsChanged}
+            windowSize={templateKind === 'video' ? 5 : 11} //21 is the default value.
+          />
+        </MaskedView>
+        {showSuggestedMedia && (
+          <Container
+            style={{
+              position: 'absolute',
+              right: (width - templateWidth - 92) / 2,
+              bottom: 3,
+              height: 30,
+              width: 60,
+            }}
+          >
+            <IconButton
+              icon={
+                templateKind === 'video' ? 'suggested_video' : 'suggested_photo'
+              }
+              variant="icon"
+              iconSize={36}
+              onPress={onSelectSuggestedMedia}
+            />
+          </Container>
+        )}
+      </View>
     </>
   );
 };
@@ -791,7 +844,8 @@ const styleSheet = createStyleSheet(theme => ({
   },
   colorPaletteListcontainer: {
     alignSelf: 'center',
-    marginTop: GAP,
+
+    alignItems: 'center',
     height: PALETTE_LIST_HEIGHT,
   },
   colorPalettContainer: {

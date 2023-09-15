@@ -42,6 +42,7 @@ const FontPicker = ({
           variant="primary"
         />
       }
+      contentContainerStyle={{ paddingBottom: 0 }}
     >
       <SelectList
         data={APPLICATIONS_FONTS}

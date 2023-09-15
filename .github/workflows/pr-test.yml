@@ -39,6 +39,9 @@ jobs:
   
 
       # Testing
+      - name: Build translations
+        run: yarn i18n:extract
+
       - name: JavaScript build
         run: yarn build
 

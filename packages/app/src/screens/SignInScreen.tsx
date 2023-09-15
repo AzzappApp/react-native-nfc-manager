@@ -9,16 +9,17 @@ import {
   StyleSheet,
   Keyboard,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
+import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
@@ -67,7 +68,7 @@ const SignInScreen = () => {
   };
 
   const intl = useIntl();
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   return (
     <View style={styles.root}>
@@ -146,13 +147,15 @@ const SignInScreen = () => {
             />
 
             <View style={styles.forgotPasswordContainer}>
-              <Link modal route="FORGOT_PASSWORD">
-                <Text style={styles.greyText} variant="small">
-                  <FormattedMessage
-                    defaultMessage="Forgot your password?"
-                    description="SigninScreen - Forgot your password?"
-                  />
-                </Text>
+              <Link route="FORGOT_PASSWORD">
+                <PressableOpacity>
+                  <Text style={styles.greyText} variant="small">
+                    <FormattedMessage
+                      defaultMessage="Forgot your password?"
+                      description="SigninScreen - Forgot your password?"
+                    />
+                  </Text>
+                </PressableOpacity>
               </Link>
             </View>
             <Submit>

@@ -1,9 +1,10 @@
 import { Suspense, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -23,11 +24,9 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
 
   const intl = useIntl();
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
-  const height = windowHeight - topInset - bottomInset - HEADER_HEIGHT;
+  const height = windowHeight - insets.top - insets.bottom - HEADER_HEIGHT;
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
@@ -44,6 +43,16 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
         setCardTemplateId(null);
         onClose();
       },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not load the template',
+            description: 'Load card template modal error toast',
+          }),
+        });
+      },
     });
   };
 
@@ -52,8 +61,8 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
       <Container
         style={{
           flex: 1,
-          paddingBottom: bottomInset,
-          paddingTop: topInset,
+          paddingBottom: insets.bottom,
+          paddingTop: insets.top,
         }}
       >
         <Header

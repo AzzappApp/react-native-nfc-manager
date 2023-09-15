@@ -1,13 +1,16 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSharedValue, useWorkletCallback } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useOnFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
+import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
+import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
@@ -21,6 +24,7 @@ import HomeProfileLink, {
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
 import type { HomeScreenContent_user$key } from '@azzapp/relay/artifacts/HomeScreenContent_user.graphql';
+import type { Disposable } from 'react-relay';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
@@ -31,7 +35,7 @@ const HomeScreenContent = ({
   user: userKey,
   onShowMenu,
 }: HomeScreenContentProps) => {
-  // data
+  // #regions data
   const user = useFragment(
     graphql`
       fragment HomeScreenContent_user on User {
@@ -49,7 +53,9 @@ const HomeScreenContent = ({
     `,
     userKey,
   );
+  //#endregion
 
+  //#region profile switch
   const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
@@ -110,26 +116,82 @@ const HomeScreenContent = ({
       carouselRef.current?.scrollToProfileIndex(authProfileIndex, false);
     }
   });
+  //#endregion
 
-  // Layout
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, 15);
-  const bottomInset = Math.max(insets.bottom, 15);
+  // #region prefetch
+  const prefetchRoute = usePrefetchRoute();
+
+  useEffect(() => {
+    let disposable: Disposable | undefined;
+    if (currentProfileIndex === -1) {
+      disposable = prefetchRoute(
+        getRelayEnvironment().forActor(ROOT_ACTOR_ID),
+        { route: 'NEW_PROFILE' },
+      );
+    }
+    return () => {
+      disposable?.dispose();
+    };
+  }, [currentProfileIndex, prefetchRoute]);
+
+  // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
+  const profilesRef = useRef(user.profiles);
+  useEffect(() => {
+    profilesRef.current = user.profiles;
+  }, [user.profiles]);
+
+  const profilesDisposables = useRef<Disposable[]>([]).current;
+  useEffect(() => {
+    if (auth.profileId) {
+      const profile = profilesRef.current?.find(
+        profile => profile.id === auth.profileId,
+      );
+      if (profile) {
+        const multiActorEnvironment = getRelayEnvironment();
+        const profileEnvironment = multiActorEnvironment.forActor(profile.id);
+        profilesDisposables.push(
+          prefetchRoute(profileEnvironment, {
+            route: 'PROFILE',
+            params: {
+              profileId: auth.profileId,
+              userName: profile.userName,
+            },
+          }),
+          prefetchRoute(profileEnvironment, {
+            route: 'CONTACT_CARD',
+          }),
+        );
+      }
+    }
+  }, [auth.profileId, profilesDisposables, prefetchRoute]);
+
+  useEffect(
+    () => () => {
+      profilesDisposables.forEach(disposable => disposable.dispose());
+      profilesDisposables.length = 0;
+    },
+    [profilesDisposables],
+  );
+  // #endregion
+
+  // #region Layout
+  const insets = useScreenInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const contentHeight =
     windowHeight -
-    topInset -
+    insets.top -
     HOME_HEADER_HEIGHT -
     PROFILE_LINK_HEIGHT -
     PROFILE_LINK_MARGIN_TOP -
     BOTTOM_MENU_GAP -
     BOTTOM_MENU_HEIGHT -
-    bottomInset;
+    insets.bottom;
 
   const bottomPanelHeight =
     (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT;
   const carouselHeight = contentHeight - bottomPanelHeight;
+  // #endregion
 
   return (
     <View style={{ flex: 1 }}>
@@ -142,7 +204,7 @@ const HomeScreenContent = ({
           openPanel={onShowMenu}
           user={user}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          style={{ marginTop: topInset }}
+          style={{ marginTop: insets.top }}
         />
         <HomeProfileLink
           user={user}
@@ -159,6 +221,7 @@ const HomeScreenContent = ({
           }
           initialProfileIndex={initialProfileIndex}
         />
+
         <HomeBottomPanel
           height={bottomPanelHeight}
           user={user}
@@ -166,7 +229,11 @@ const HomeScreenContent = ({
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <HomeContactCardLandscape profile={currentProfile ?? null} />
+      <ProfileBoundRelayEnvironmentProvider
+        profileId={currentProfile?.id ?? null}
+      >
+        <HomeContactCardLandscape profile={currentProfile ?? null} />
+      </ProfileBoundRelayEnvironmentProvider>
     </View>
   );
 };

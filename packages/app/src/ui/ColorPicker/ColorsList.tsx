@@ -273,7 +273,7 @@ const ITEM_MARGIN = 10;
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    overflow: 'visible',
+    overflow: 'hidden',
   },
   container: {
     gap: 10,
@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
     gap: ITEM_MARGIN,
+    paddingLeft: 5,
   },
   itemContainer: {
     justifyContent: 'center',

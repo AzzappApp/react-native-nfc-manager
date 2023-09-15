@@ -9,7 +9,6 @@ import {
   Image,
   Keyboard,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -22,6 +21,7 @@ import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import Container from '#ui/Container';
@@ -168,7 +168,7 @@ const SignupScreen = () => {
     passwordRef?.current?.focus();
   };
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   return (
     <View style={styles.root}>
       <View style={styles.background}>

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import {
@@ -103,6 +104,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ ok: true, token, refreshToken });
   } catch (error) {
     console.error(error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
       { status: 500 },

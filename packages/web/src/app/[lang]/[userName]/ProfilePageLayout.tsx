@@ -19,82 +19,107 @@ type ProfilePageLayoutProps = {
   cover: React.ReactNode;
   posts: PostWithCommentAndAuthor[];
   media: Media;
+  cardBackgroundColor: string;
+  lastModuleBackgroundColor: string;
 };
 
 const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
-  const { profile, modules, cover, posts, media } = props;
+  const {
+    profile,
+    modules,
+    cover,
+    posts,
+    media,
+    cardBackgroundColor,
+    lastModuleBackgroundColor,
+  } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
 
   const hasPosts = posts.length > 0;
 
   return (
-    <div className={styles.wrapper}>
-      {posts.length > 0 && (
-        <ProfilePostNavigation
-          postsCount={profile.nbPosts}
-          onClickCover={() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onClickPosts={() => setPostsOpen(true)}
-          className={cn(styles.postNavigation, {
-            [styles.postNavigationHidden]: postsOpen,
-          })}
-          cover={media}
-          username={profile.userName}
-        />
-      )}
-      <main
-        // TODO card.backgroundColor
-        style={{ backgroundColor: '#FFF' }}
-        className={cn(styles.modules, {
-          [styles.modulesBehind]: display === 'posts' && hasPosts,
-          [styles.modulesWithPosts]: hasPosts && postsOpen,
-        })}
-      >
-        {cover}
-        <div
-          style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
-        >
-          {modules}
-        </div>
-      </main>
-      {hasPosts && (
-        <aside
-          className={cn(styles.posts, {
-            [styles.postsBehind]: display === 'card',
-            [styles.postsClosed]: !postsOpen,
-          })}
-        >
-          <PostFeed
-            postsCount={profile.nbPosts}
-            defaultPosts={posts}
-            media={media}
-            profile={profile}
-            onClose={() => setPostsOpen(false)}
-          />
-        </aside>
-      )}
-
-      <ButtonIcon
-        Icon={FlipIcon}
-        size={24}
-        height={50}
-        width={50}
-        className={styles.switchContent}
-        color="white"
-        onClick={() => {
-          setDisplay(prevDisplay =>
-            prevDisplay === 'card' ? 'posts' : 'card',
-          );
+    <>
+      <div
+        className={styles.background}
+        style={{
+          background: `
+          linear-gradient(
+            180deg,
+            ${cardBackgroundColor} 0%,
+            ${cardBackgroundColor} 50%,
+            ${lastModuleBackgroundColor} 50%
+          )
+        `,
         }}
       />
-      <DownloadVCard
-        profileId={profile.id}
-        userName={profile.userName}
-        profile={profile}
-      />
-    </div>
+      <div className={styles.wrapper}>
+        {posts.length > 0 && (
+          <ProfilePostNavigation
+            postsCount={profile.nbPosts}
+            onClickCover={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onClickPosts={() => setPostsOpen(true)}
+            className={cn(styles.postNavigation, {
+              [styles.postNavigationHidden]: postsOpen,
+            })}
+            cover={media}
+            username={profile.userName}
+          />
+        )}
+        <main
+          // TODO card.backgroundColor
+          style={{ backgroundColor: '#FFF' }}
+          className={cn(styles.modules, {
+            [styles.modulesBehind]: display === 'posts' && hasPosts,
+            [styles.modulesWithPosts]: hasPosts && postsOpen,
+          })}
+        >
+          {cover}
+          <div
+            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+          >
+            {modules}
+          </div>
+        </main>
+        {hasPosts && (
+          <aside
+            className={cn(styles.posts, {
+              [styles.postsBehind]: display === 'card',
+              [styles.postsClosed]: !postsOpen,
+            })}
+          >
+            <PostFeed
+              postsCount={profile.nbPosts}
+              defaultPosts={posts}
+              media={media}
+              profile={profile}
+              onClose={() => setPostsOpen(false)}
+            />
+          </aside>
+        )}
+
+        <ButtonIcon
+          Icon={FlipIcon}
+          size={24}
+          height={50}
+          width={50}
+          className={styles.switchContent}
+          color="white"
+          onClick={() => {
+            setDisplay(prevDisplay =>
+              prevDisplay === 'card' ? 'posts' : 'card',
+            );
+          }}
+        />
+        <DownloadVCard
+          profileId={profile.id}
+          userName={profile.userName}
+          profile={profile}
+        />
+      </div>
+    </>
   );
 };
 

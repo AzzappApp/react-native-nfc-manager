@@ -145,3 +145,5 @@ schema.graphql
 packages/backoffice/.vscode/settings.json
 
 .vscode/launch.json
+app-lang-keys.csv
+web-lang-keys.csv

@@ -8,8 +8,9 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createId } from '#helpers/idHelpers';
+import useAuthState from '#hooks/useAuthState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import {
   useNativeNavigationEvent,
@@ -73,13 +74,15 @@ const MainTabBar = ({
     router.push({ route: key as any });
   };
 
-  const inset = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const { width } = useWindowDimensions();
-  const bottom = inset.bottom > 0 ? inset.bottom : 10;
 
   const [, forceUpdate] = useState(0);
 
-  const visibilityState = mainTabBarVisibilityStates.at(-1)?.state ?? false;
+  const { authenticated } = useAuthState();
+
+  const visibilityState =
+    mainTabBarVisibilityStates.at(-1)?.state ?? authenticated;
 
   const visibilityStyle = useAnimatedStyle(() => {
     const visible =
@@ -124,7 +127,7 @@ const MainTabBar = ({
     <Animated.View
       style={[
         {
-          bottom,
+          bottom: insets.bottom,
           position: 'absolute',
           left: MARGIN_HORIZONTAL,
           width: width - 2 * MARGIN_HORIZONTAL,

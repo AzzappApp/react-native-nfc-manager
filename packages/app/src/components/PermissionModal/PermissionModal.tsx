@@ -84,7 +84,7 @@ const PermissionModal = ({
           <Header
             leftElement={
               <IconButton
-                icon="arrow_left"
+                icon="arrow_down"
                 onPress={onRequestClose}
                 variant="icon"
               />

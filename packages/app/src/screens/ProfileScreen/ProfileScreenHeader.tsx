@@ -1,8 +1,8 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -69,11 +69,11 @@ const ProfileScreenHeader = ({
   onUnSelectAllModules,
 }: ProfileScreenHeaderProps) => {
   const editTransition = useEditTransition();
-  const inset = useSafeAreaInsets();
+  const inset = useScreenInsets();
   const intl = useIntl();
 
   const editHeaderStyle = useAnimatedStyle(() => ({
-    height: editTransition.value * HEADER_HEIGHT,
+    height: editTransition.value * (HEADER_HEIGHT + 4),
     marginTop: editTransition.value * inset.top,
     opacity: editTransition.value,
   }));
@@ -157,7 +157,7 @@ const ProfileScreenHeader = ({
               />
             )
           }
-          style={{ backgroundColor: 'transparent' }}
+          style={{ backgroundColor: 'transparent', paddingBottom: 4 }}
         />
       </Animated.View>
       <Animated.View

@@ -367,7 +367,7 @@ const CoverEditorCustom = ({
         <CECHeader
           // TODO
           isCreation={false}
-          canSave={!!sourceMedia}
+          canSave={!mediaComputing}
           onCancel={onCancel}
           onSave={onSave}
           editedParameter={editedParameter}

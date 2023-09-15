@@ -332,6 +332,7 @@ const styles = StyleSheet.create({
   },
   smallText: {
     color: colors.white,
+    textAlign: 'center',
   },
 });
 

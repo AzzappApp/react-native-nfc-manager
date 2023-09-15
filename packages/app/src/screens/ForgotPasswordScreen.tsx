@@ -7,13 +7,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useRouter } from '#components/NativeRouter';
 import { getLocales } from '#helpers/localeHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
@@ -74,7 +74,7 @@ const ForgotPasswordScreen = () => {
     router.back();
   };
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   return (
     <Container style={styles.flex}>

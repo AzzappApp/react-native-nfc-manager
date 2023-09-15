@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import {
@@ -71,6 +72,7 @@ const signin = async (req: Request) => {
     return await handleSigninAuthMethod(user, profile);
   } catch (error) {
     console.error(error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
       { status: 500 },

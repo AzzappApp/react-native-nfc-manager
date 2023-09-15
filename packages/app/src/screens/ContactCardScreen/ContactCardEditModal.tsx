@@ -9,10 +9,10 @@ import {
   useWindowDimensions,
   Pressable,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
@@ -116,11 +116,6 @@ const ContactCardEditModal = ({
     contactCardKey,
   );
 
-  const intl = useIntl();
-
-  const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
-
   const [commit] = useMutation(graphql`
     mutation ContactCardEditModalMutation($input: SaveContactCardInput!) {
       saveContactCard(input: $input) {
@@ -132,6 +127,8 @@ const ContactCardEditModal = ({
       }
     }
   `);
+
+  const intl = useIntl();
 
   const {
     control,
@@ -182,8 +179,17 @@ const ContactCardEditModal = ({
         onCompleted: () => {
           toggleBottomSheet();
         },
-        onError: () => {
-          toggleBottomSheet();
+        onError: e => {
+          console.error(e);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact card. Please try again.',
+              description:
+                'Error toast message when saving contact card failed',
+            }),
+          });
         },
       });
     },
@@ -191,6 +197,9 @@ const ContactCardEditModal = ({
       console.log(error);
     },
   );
+
+  const insets = useScreenInsets();
+  const { height } = useWindowDimensions();
 
   return (
     <BottomSheetModal

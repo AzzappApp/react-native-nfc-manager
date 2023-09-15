@@ -246,8 +246,8 @@ export type NativeRouter = {
   replace(route: Route): void;
   showModal(route: Route): void;
   back(): void;
-  getCurrentRoute(): Route;
-  getCurrentScreenId(): string;
+  getCurrentRoute(): Route | null;
+  getCurrentScreenId(): string | null;
   addRouteWillChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
@@ -345,7 +345,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     const currentRoute = getCurrentRouteFromState(state);
     const newState = routerReducer(state, action);
     const nextRoute = getCurrentRouteFromState(newState);
-    if (nextRoute !== currentRoute) {
+    if (nextRoute !== currentRoute && nextRoute) {
       dispatchToListeners(routeWillChangeListeners, nextRoute.state);
     }
     setRouterState(newState);
@@ -356,7 +356,10 @@ export const useNativeRouter = (init: NativeRouterInit) => {
 
   useEffect(() => {
     // TODO should we dispatch after transition end ?
-    dispatchToListeners(routeDidChangeListeners, currentRoute.state);
+    const route = currentRoute?.state;
+    if (route) {
+      dispatchToListeners(routeDidChangeListeners, route);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoute]);
 
@@ -437,10 +440,10 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     // so until we needs it we won't implement that
     return {
       getCurrentRoute() {
-        return getCurrentRouteFromState(routerStateRef.current).state;
+        return getCurrentRouteFromState(routerStateRef.current)?.state ?? null;
       },
       getCurrentScreenId() {
-        return getCurrentRouteFromState(routerStateRef.current).id;
+        return getCurrentRouteFromState(routerStateRef.current)?.id ?? null;
       },
       push(route: Route) {
         if (setTabIfExists(route)) {
@@ -459,11 +462,13 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         }
         const id = (route as any).id ?? createId();
         const currentRoute = getCurrentRoute();
-        // TODO incorrect if replaced screen is a tab
-        dispatchToListeners(screenWillBeRemovedListeners, {
-          id: currentRoute.id,
-          route: currentRoute.state,
-        });
+        if (currentRoute) {
+          // TODO incorrect if replaced screen is a tab
+          dispatchToListeners(screenWillBeRemovedListeners, {
+            id: currentRoute.id,
+            route: currentRoute.state,
+          });
+        }
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'REPLACE',
@@ -481,10 +486,12 @@ export const useNativeRouter = (init: NativeRouterInit) => {
       back() {
         const currentRoute = getCurrentRoute();
         // TODO incorrect if replaced screen is a tab
-        dispatchToListeners(screenWillBeRemovedListeners, {
-          id: currentRoute.id,
-          route: currentRoute.state,
-        });
+        if (currentRoute) {
+          dispatchToListeners(screenWillBeRemovedListeners, {
+            id: currentRoute.id,
+            route: currentRoute.state,
+          });
+        }
         dispatch({
           type: 'BACK',
         });
@@ -949,14 +956,17 @@ const ScreenRenderer = ({
 const getCurrentRouteFromState = ({
   modals,
   stack,
-}: RouterState): BasicRoute => {
-  let currentRoute: RouteInstance;
+}: RouterState): BasicRoute | null => {
+  let currentRoute: RouteInstance | null = null;
   if (modals.length) {
     currentRoute = modals[modals.length - 1];
   } else {
     currentRoute = stack[stack.length - 1];
   }
-  while (currentRoute.kind !== 'route') {
+  while (currentRoute?.kind !== 'route') {
+    if (!currentRoute) {
+      return null;
+    }
     if (currentRoute.kind === 'tabs') {
       currentRoute = currentRoute.state.tabs[currentRoute.state.currentIndex];
     }
@@ -1000,7 +1010,10 @@ const getActiveTabs = ({ modals, stack }: RouterState): TabsState | null => {
     currentRoute = stack[stack.length - 1];
   }
   let currentTabs: TabsState | null = null;
-  while (currentRoute.kind !== 'route') {
+  while (currentRoute?.kind !== 'route') {
+    if (!currentRoute) {
+      return null;
+    }
     if (currentRoute.kind === 'tabs') {
       currentTabs = currentRoute.state;
       currentRoute = currentRoute.state.tabs[currentRoute.state.currentIndex];

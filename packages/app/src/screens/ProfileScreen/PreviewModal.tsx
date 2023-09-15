@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import WebCardPreview from '#components/WebCardPreview';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -64,16 +64,14 @@ const PreviewModal = ({
     profileKey,
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? []);
+  const cardModules = useModulesData(profile?.cardModules ?? [], true);
 
   const intl = useIntl();
 
   const { height: windowHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
+  const insets = useScreenInsets();
 
-  const previewHeight = windowHeight - topInset - HEADER_HEIGHT;
+  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   return (
     <Modal
@@ -81,7 +79,7 @@ const PreviewModal = ({
       animationType="slide"
       onRequestClose={onRequestClose}
     >
-      <Container style={{ flex: 1, paddingTop: topInset }}>
+      <Container style={{ flex: 1, paddingTop: insets.top }}>
         <Header
           leftElement={
             <IconButton
@@ -110,7 +108,7 @@ const PreviewModal = ({
             cardColors={profile.cardColors}
             style={{ flex: 1 }}
             cardModules={cardModules}
-            contentPaddingBottom={bottomInset}
+            contentPaddingBottom={insets.bottom}
           />
         </Suspense>
       </Container>

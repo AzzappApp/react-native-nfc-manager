@@ -7,11 +7,11 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -28,7 +28,7 @@ const ForgotPasswordConfirmationScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const [code, setCode] = useState('');
   const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });

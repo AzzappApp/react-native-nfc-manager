@@ -1,13 +1,16 @@
 import { fromGlobalId } from 'graphql-relay';
 import {
-  Environment,
-  RecordSource,
   ROOT_TYPE,
-  Store,
   Network,
   Observable,
+  Store,
+  RecordSource,
 } from 'relay-runtime';
+import { MultiActorEnvironment } from 'relay-runtime/lib/multi-actor-environment';
+// @ts-expect-error not typed
+import { create as createRelayOptimisticRecordSource } from 'relay-runtime/lib/store/RelayOptimisticRecordSource';
 import { fetchJSON, isAbortError } from '@azzapp/shared/networkHelpers';
+import { version as APP_VERSION } from '../../package.json';
 import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
@@ -19,9 +22,11 @@ import type {
   RequestParameters,
 } from 'relay-runtime';
 
-let environment: Environment | null;
+export const ROOT_ACTOR_ID = 'ROOT_ACTOR_ID';
 
-type RelayEnvironmentListener = (event: 'invalidateViewer' | 'reset') => void;
+let environment: MultiActorEnvironment | null;
+
+type RelayEnvironmentListener = (event: 'reset') => void;
 const listeners: RelayEnvironmentListener[] = [];
 
 export const getRelayEnvironment = () => {
@@ -45,9 +50,6 @@ const init = () => {
   createEnvironment();
   let authState = getAuthState();
   addAuthStateListener(newAuthState => {
-    if (newAuthState.profileId !== authState.profileId) {
-      profileChanged();
-    }
     if (!newAuthState.authenticated && authState.authenticated) {
       resetEnvironment();
     }
@@ -56,17 +58,26 @@ const init = () => {
 };
 
 const createEnvironment = () => {
-  environment = new Environment({
-    network: createNetwork(),
-    store: new Store(new RecordSource()),
-    isServer: false,
+  const rootStore = new Store(RecordSource.create());
+
+  environment = new MultiActorEnvironment({
+    createNetworkForActor: (actorId: string) => createNetwork(actorId),
+    createStoreForActor: (actorId: string) => {
+      if (actorId === ROOT_ACTOR_ID) {
+        return rootStore;
+      }
+      return new Store(
+        createRelayOptimisticRecordSource(rootStore.getSource()),
+      );
+    },
     missingFieldHandlers,
+    isServer: false,
   });
 };
 
 const GRAPHQL_ENDPOINT = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/graphql`;
 
-export const createNetwork = () => {
+export const createNetwork = (actorId: string) => {
   const fetchFunction = fetchWithGlobalEvents(fetchWithAuthTokens(fetchJSON));
 
   const fetchGraphQL: FetchFunction = (request, variables) =>
@@ -79,7 +90,10 @@ export const createNetwork = () => {
         variables?: Record<string, unknown>;
         profileId?: string;
         locale?: string;
-      } = {};
+        appVersion?: string;
+      } = {
+        appVersion: APP_VERSION,
+      };
 
       const { id, text } = request;
       if (text) {
@@ -90,7 +104,7 @@ export const createNetwork = () => {
       }
       params.variables = variables;
 
-      const profileId = getAuthState().profileId;
+      const profileId = actorId === ROOT_ACTOR_ID ? null : actorId;
       if (profileId) {
         const { id } = fromGlobalId(profileId);
         params.profileId = id;
@@ -191,11 +205,4 @@ const missingFieldHandlers: MissingFieldHandler[] = [
 const resetEnvironment = () => {
   createEnvironment();
   listeners.forEach(listener => listener('reset'));
-};
-
-const profileChanged = () => {
-  environment?.commitUpdate(store => {
-    store.getRoot().getLinkedRecord('viewer')?.invalidateRecord();
-  });
-  listeners.forEach(listener => listener('invalidateViewer'));
 };

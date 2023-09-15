@@ -3,7 +3,7 @@ import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import {
   graphql,
   useFragment,
@@ -17,6 +17,7 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import WebCardPreview from '#components/WebCardPreview';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -138,20 +139,28 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
       onCompleted: () => {
         onRequestClose();
       },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not apply the style',
+            description: 'Card style modal error toast',
+          }),
+        });
+      },
     });
-  }, [cardStyle, commit, onRequestClose]);
+  }, [cardStyle, commit, intl, onRequestClose]);
 
-  const insets = useSafeAreaInsets();
-
+  const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
+
   const previewHeight =
     windowHeight -
-    topInset -
+    insets.top -
     HEADER_HEIGHT -
     CARD_STYLE_LIST_HEIGHT -
-    bottomInset;
+    insets.bottom;
 
   return (
     <Modal
@@ -163,8 +172,8 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
         style={[
           styles.root,
           {
-            paddingTop: topInset,
-            paddingBottom: bottomInset,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
           },
         ]}
       >
@@ -252,11 +261,7 @@ const CardStylePreview = ({
     profileKey as CardStyleModal_profile$key | null,
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? []);
-  const visibileCardModules = useMemo(
-    () => cardModules.filter(module => module.visible),
-    [cardModules],
-  );
+  const cardModules = useModulesData(profile?.cardModules ?? [], true);
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -275,7 +280,7 @@ const CardStylePreview = ({
       cardStyle={cardStyle}
       cardColors={profile.cardColors}
       style={{ flex: 1 }}
-      cardModules={visibileCardModules}
+      cardModules={cardModules}
     />
   );
 };
@@ -336,10 +341,10 @@ const CardStyleList = ({
     () => [
       currentCardStyle,
       ...convertToNonNullArray(
-        cardStyles.edges?.map(edge => edge?.node ?? null) ?? [],
+        cardStyles?.edges?.map(edge => edge?.node ?? null) ?? [],
       ),
     ],
-    [cardStyles.edges, currentCardStyle],
+    [cardStyles?.edges, currentCardStyle],
   );
 
   const onEndReached = useCallback(() => {

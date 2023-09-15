@@ -15,5 +15,5 @@ export const getElapsedTime = (sinceTimestamp: number) => {
     return { kind: 'hour', value: Math.floor(elapsed / hour) };
   if (elapsed > minute)
     return { kind: 'minute', value: Math.floor(elapsed / minute) };
-  return { kind: 'second', value: elapsed };
+  return { kind: 'second', value: Math.floor(elapsed) };
 };

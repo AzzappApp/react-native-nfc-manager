@@ -45,6 +45,12 @@ export const serializeContactCard = (
   profileId: string,
   card: ContactCard | null,
 ) => {
+  const urls = [`azzapp,${buildUserUrl(username)}`];
+  if (card?.urls)
+    urls.push(
+      ...card.urls.filter(url => url.selected).map(url => `,${url.address}`),
+    );
+
   const serializedContactCard = [
     profileId,
     card?.firstName ?? '',
@@ -59,7 +65,19 @@ export const serializeContactCard = (
       ?.filter(e => e.selected)
       .map(e => `${e.label},${e.address}`)
       .join(';') ?? '',
-    `azzapp,${buildUserUrl(username)}`,
+    urls.join(';'),
+    card?.addresses
+      ?.filter(address => address.selected)
+      .map(address => `${address.label},${address.address}`)
+      .join(';'),
+    card?.birthdays
+      ?.filter(birthday => birthday.selected)
+      .map(birthday => birthday.birthday)
+      .join(';'),
+    card?.socials
+      ?.filter(social => social.selected)
+      .map(social => social.social)
+      .join(';'),
   ].join('|');
 
   return serializedContactCard;
@@ -80,6 +98,9 @@ export const parseContactCard = (contactCardData: string) => {
     phoneNumbers,
     emails,
     urls,
+    addresses,
+    birthdays,
+    socials,
   ] = contactCardData.split('|');
 
   return {
@@ -112,5 +133,15 @@ export const parseContactCard = (contactCardData: string) => {
           url: address,
         };
       }) ?? [],
+    adresses:
+      addresses?.split(';').map(addr => {
+        const [label, address] = addr.split(',');
+        return {
+          label,
+          address,
+        };
+      }) ?? [],
+    birthdays: birthdays?.split(';'),
+    socials: socials?.split(';'),
   };
 };

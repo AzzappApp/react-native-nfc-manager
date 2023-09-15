@@ -349,6 +349,12 @@ const icons = {
   get structure() {
     return require('./assets/structure.png');
   },
+  get suggested_photo() {
+    return require('./assets/suggested_photo.png');
+  },
+  get suggested_video() {
+    return require('./assets/suggested_video.png');
+  },
   get temperature() {
     return require('./assets/temperature.png');
   },
@@ -360,6 +366,9 @@ const icons = {
   },
   get tint() {
     return require('./assets/tint.png');
+  },
+  get tips() {
+    return require('./assets/tips.png');
   },
   get txt_align_center() {
     return require('./assets/txt_align_center.png');

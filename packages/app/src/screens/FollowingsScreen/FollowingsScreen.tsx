@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -10,6 +12,7 @@ import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { FollowingsRoute } from '#routes';
 import type { FollowingsScreenQuery } from '@azzapp/relay/artifacts/FollowingsScreenQuery.graphql';
+import type { PreloadedQuery } from 'react-relay';
 
 const followingsScreenQuery = graphql`
   query FollowingsScreenQuery {
@@ -25,14 +28,12 @@ const followingsScreenQuery = graphql`
 const FollowingsScreen = ({
   preloadedQuery,
 }: RelayScreenProps<FollowingsRoute, FollowingsScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
-
   const router = useRouter();
   const intl = useIntl();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container style={{ flex: 1 }}>
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
           leftElement={
             <IconButton
@@ -47,15 +48,40 @@ const FollowingsScreen = ({
             description: 'Title of the screen listing followed profiles',
           })}
         />
-        <FollowingsScreenList
-          currentProfileId={viewer.profile?.id ?? ''}
-          viewer={viewer}
-        />
-      </Container>
-    </SafeAreaView>
+        <Suspense
+          fallback={
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          }
+        >
+          <FollowingScreenInner preloadedQuery={preloadedQuery} />
+        </Suspense>
+      </SafeAreaView>
+    </Container>
   );
 };
 
+const FollowingScreenInner = ({
+  preloadedQuery,
+}: {
+  preloadedQuery: PreloadedQuery<FollowingsScreenQuery>;
+}) => {
+  const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+
+  return (
+    <FollowingsScreenList
+      currentProfileId={viewer.profile?.id ?? ''}
+      viewer={viewer}
+    />
+  );
+};
 export default relayScreen(FollowingsScreen, {
   query: followingsScreenQuery,
 });

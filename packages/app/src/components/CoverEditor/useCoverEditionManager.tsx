@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Modal, unstable_batchedUpdates } from 'react-native';
 import * as mime from 'react-native-mime-types';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -206,9 +207,12 @@ const useCoverEditionManager = ({
     }
     return null;
   });
-  const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
-    initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
-  );
+
+  const lastSourceMediaBeforeSuggested = useRef<{
+    media: CoverData['sourceMedia'] | null;
+    cropParameter: CoverData['mediaCropParameter'] | null;
+  } | null>(null);
+
   const [mediaCropParameter, setMediaCropParameter] = useState<
     CoverData['mediaCropParameter'] | null
   >(() => {
@@ -220,6 +224,37 @@ const useCoverEditionManager = ({
     }
     return null;
   });
+
+  const [hasSuggestedMedia, setHasSuggestedMedia] = useState(false);
+  const setSuggestedMedia = useCallback(
+    (suggestedMedia: CoverData['sourceMedia'] | null) => {
+      if (suggestedMedia) {
+        setHasSuggestedMedia(true);
+        if (lastSourceMediaBeforeSuggested.current == null) {
+          lastSourceMediaBeforeSuggested.current = {
+            media: sourceMedia,
+            cropParameter: mediaCropParameter,
+          };
+        }
+        unstable_batchedUpdates(() => {
+          setMediaCropParameter(null);
+          setSourceMedia(suggestedMedia);
+        });
+        return;
+      } else if (lastSourceMediaBeforeSuggested.current) {
+        setMediaCropParameter(
+          lastSourceMediaBeforeSuggested.current.cropParameter,
+        );
+        setSourceMedia(lastSourceMediaBeforeSuggested.current.media);
+      }
+      setHasSuggestedMedia(false);
+    },
+    [mediaCropParameter, sourceMedia],
+  );
+
+  const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
+    initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
+  );
 
   const currentCoverStyle = useMemo<CoverStyleData | null>(
     () =>
@@ -319,6 +354,14 @@ const useCoverEditionManager = ({
     [setMediaCropParameter],
   );
   //#endregion
+
+  // #region Media visibility
+  const isCoverCreation = useRef(sourceMedia == null);
+  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
+  const toggleMediaVisibility = useCallback(() => {
+    setMediaVisible(mediaVisible => !mediaVisible);
+  }, []);
+  // #endregion
 
   // #region Color palette
   const [colorPalette, setColorPalette] = useState<ColorPalette>(() => {
@@ -430,6 +473,9 @@ const useCoverEditionManager = ({
       setMediaCropParameter(extractLayoutParameters(editionParameters)[0]);
       setTimeRange(timeRange ?? null);
       startMediaComputation(result);
+      setMediaVisible(true);
+      setHasSuggestedMedia(false);
+      lastSourceMediaBeforeSuggested.current = null;
     });
   };
 
@@ -457,11 +503,14 @@ const useCoverEditionManager = ({
     }
   `);
 
+  const intl = useIntl();
+
   const onSave = useCallback(async () => {
     if (!sourceMedia) {
       setShowMediaRequiredModal(true);
       return;
     }
+
     setSaving(true);
     if (!coverStyle || !colorPalette) {
       // TODO invalid state, should not happens
@@ -512,6 +561,11 @@ const useCoverEditionManager = ({
       const shouldRecreateMedia =
         !cardCover ||
         sourceMedia?.id == null ||
+        //following condition is required if we have a profile wiht a suggested Media and changing it to another suggestedMedia
+        (hasSuggestedMedia &&
+          sourceMedia &&
+          sourceMedia.id !==
+            lastSourceMediaBeforeSuggested.current?.media?.id) ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
           pick({ ...coverStyle, mediaParameters }, ...mediaStyle),
@@ -570,7 +624,7 @@ const useCoverEditionManager = ({
         uri: string;
         kind: 'image' | 'video';
       } | null> = [
-        sourceMedia && !sourceMedia.id ? sourceMedia : null,
+        !sourceMedia.id ? sourceMedia : null,
         maskMedia && !maskMedia.id
           ? { uri: maskMedia.uri, kind: 'image' }
           : null,
@@ -634,6 +688,9 @@ const useCoverEditionManager = ({
 
         if (sourceMediaId) {
           saveCoverInput.sourceMediaId = sourceMediaId;
+        } else if (profile?.profileKind === 'business' && sourceMedia) {
+          // case when using a suggested media for business
+          saveCoverInput.sourceMediaId = sourceMedia?.id ?? null;
         }
         if (maskMediaId) {
           saveCoverInput.maskMediaId = maskMediaId;
@@ -661,14 +718,7 @@ const useCoverEditionManager = ({
       variables: {
         saveCoverInput,
       },
-      onCompleted: (response, errors) => {
-        if (errors) {
-          // TODO
-          console.error(errors);
-          setSaving(false);
-          setUploadProgress(null);
-          return;
-        }
+      onCompleted: response => {
         if (mediaPath) {
           const mediaId = response.saveCover.profile.cardCover?.media?.id;
           if (mediaId) {
@@ -684,8 +734,15 @@ const useCoverEditionManager = ({
         onCoverSaved();
       },
       onError: error => {
-        // TODO
         console.error(error);
+
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while saving your cover, please try again.',
+            description: 'Error toast message when saving cover fails.',
+          }),
+        });
         setSaving(false);
         setUploadProgress(null);
       },
@@ -695,18 +752,19 @@ const useCoverEditionManager = ({
     coverStyle,
     colorPalette,
     mediaComputation,
+    mediaCropParameter,
     otherColors,
     commit,
-    mediaCropParameter,
     subTitle,
     title,
     cardCover,
-    maskMedia,
     currentCoverStyle,
+    maskMedia,
+    profile?.profileKind,
+    hasSuggestedMedia,
     onCoverSaved,
+    intl,
   ]);
-
-  const intl = useIntl();
 
   const modals = (
     <>
@@ -814,12 +872,22 @@ const useCoverEditionManager = ({
     mediaComputing: mediaComputation != null,
     mediaComputationError,
 
+    //media visibility
+    mediaVisible,
+    // Media Suggestion
+    isCoverCreation: isCoverCreation.current,
+    hasSuggestedMedia,
+    hasSourceMediaBeforeSuggested:
+      lastSourceMediaBeforeSuggested.current?.media != null,
+
     // react elements
     modals,
 
     //callbacks
     setTitle,
     setSubTitle,
+    setSuggestedMedia,
+    setSourceMedia,
     setCoverStyle,
     toggleCropMode,
     setColorPalette,
@@ -827,6 +895,7 @@ const useCoverEditionManager = ({
     openImagePicker,
     retryMediaComputation,
     updateEditedMediaKind,
+    toggleMediaVisibility,
     onSave,
   };
 };

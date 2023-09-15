@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -8,12 +8,14 @@ import {
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CardFlipSwitch from './CardFlipSwitch';
+import ProfileBackground from './ProfileBackground';
 import ProfilePostsList from './ProfilePostsList';
 import ProfileScreenButtonBar from './ProfileScreenButtonBar';
 import ProfileScreenContactDownloader from './ProfileScreenContactDownloader';
@@ -26,6 +28,7 @@ import type { ProfileRoute } from '#routes';
 import type { ProfileScreenByIdQuery } from '@azzapp/relay/artifacts/ProfileScreenByIdQuery.graphql';
 import type { ProfileScreenByUserNameQuery } from '@azzapp/relay/artifacts/ProfileScreenByUserNameQuery.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { Disposable } from 'react-relay';
 
 /**
  * Display a profile Web card.
@@ -43,6 +46,12 @@ const ProfileScreen = ({
     setReady(true);
   });
 
+  useEffect(() => {
+    if (ready) {
+      dispatchGlobalEvent({ type: 'READY' });
+    }
+  }, [ready]);
+
   const router = useRouter();
   const onHome = () => {
     router.backToTop();
@@ -53,20 +62,27 @@ const ProfileScreen = ({
   const auth = useAuthState();
   const canEdit = auth && auth.profileId === data.profile?.id;
 
+  const environment = useRelayEnvironment();
   useEffect(() => {
+    let disposables: Disposable[];
     if (canEdit) {
       const modules: ModuleKind[] = [...MODULE_KINDS];
-      modules.forEach(module => {
-        prefetchRoute({
-          route: 'CARD_MODULE_EDITION',
-          params: { module },
-        });
-      });
-      prefetchRoute({
-        route: 'COVER_EDITION',
-      });
+      disposables = [
+        prefetchRoute(environment, {
+          route: 'COVER_EDITION',
+        }),
+        ...modules.map(module =>
+          prefetchRoute(environment, {
+            route: 'CARD_MODULE_EDITION',
+            params: { module },
+          }),
+        ),
+      ];
     }
-  }, [prefetchRoute, canEdit]);
+    return () => {
+      disposables?.forEach(disposable => disposable.dispose());
+    };
+  }, [prefetchRoute, canEdit, environment]);
 
   const [showPost, toggleFlip] = useToggle(params.showPosts ?? false);
   const [editing, toggleEditing] = useToggle(canEdit && params.editing);
@@ -99,6 +115,9 @@ const ProfileScreen = ({
 
   return (
     <>
+      <Suspense>
+        <ProfileBackground profile={data.profile} />
+      </Suspense>
       <ProfileScreenTransitionsProvider
         editing={editing}
         selectionMode={selectionMode}
@@ -110,16 +129,18 @@ const ProfileScreen = ({
             disabled={editing}
             onFlip={toggleFlip}
             front={
-              <ProfileScreenContent
-                ready={ready}
-                profile={data.profile}
-                editing={editing}
-                isViewer={isViewer}
-                selectionMode={selectionMode}
-                onToggleEditing={toggleEditing}
-                onToggleSelectionMode={toggleSelectionMode}
-                onContentPositionChange={onContentPositionChange}
-              />
+              <View style={{ flex: 1, backgroundColor: 'white' }}>
+                <ProfileScreenContent
+                  ready={ready}
+                  profile={data.profile}
+                  editing={editing}
+                  isViewer={isViewer}
+                  selectionMode={selectionMode}
+                  onToggleEditing={toggleEditing}
+                  onToggleSelectionMode={toggleSelectionMode}
+                  onContentPositionChange={onContentPositionChange}
+                />
+              </View>
             }
             back={
               <Suspense>
@@ -139,7 +160,9 @@ const ProfileScreen = ({
             onHome={onHome}
             isWebCardDisplayed={!showPost}
             onEdit={toggleEditing}
-            onToggleFollow={follow => onToggleFollow(data.profile!.id, follow)}
+            onToggleFollow={follow =>
+              onToggleFollow(data.profile!.id, data.profile!.userName!, follow)
+            }
             onFlip={toggleFlip}
           />
         </View>
@@ -170,6 +193,7 @@ const profileScreenByIdQuery = graphql`
       ...PostRendererFragment_author
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
+      ...ProfileBackground_profile
     }
   }
 `;
@@ -184,6 +208,7 @@ const profileScreenByNameQuery = graphql`
       ...PostRendererFragment_author
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
+      ...ProfileBackground_profile
     }
   }
 `;

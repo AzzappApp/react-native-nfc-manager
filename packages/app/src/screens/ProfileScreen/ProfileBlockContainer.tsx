@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  interpolate,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -18,7 +19,6 @@ import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import {
   BUTTON_SIZE,
   EDIT_TRANSITION_DURATION,
@@ -205,6 +205,7 @@ const ProfileBlockContainer = ({
 
   const panGestureActive = useSharedValue(false);
   const dragXStartValue = useSharedValue(0);
+
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
@@ -221,7 +222,6 @@ const ProfileBlockContainer = ({
           );
         })
         .onEnd(() => {
-          panGestureActive.value = false;
           if (dragX.value > dragRightLimit / 2) {
             dragX.value = withTiming(dragRightLimit, {
               duration: 120,
@@ -235,6 +235,9 @@ const ProfileBlockContainer = ({
               duration: 120,
             });
           }
+        })
+        .onFinalize(() => {
+          panGestureActive.value = false;
         }),
     [
       displayEditionButtons,
@@ -248,11 +251,22 @@ const ProfileBlockContainer = ({
     ],
   );
 
-  const onModulePressInner = useCallback(() => {
-    if (!panGestureActive.value && activeSection === 'none' && !selectionMode) {
-      onModulePress();
-    }
-  }, [activeSection, onModulePress, panGestureActive, selectionMode]);
+  const touchActive = useSharedValue(0);
+  const tapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .enabled(editing && activeSection === 'none')
+        .onBegin(() => {
+          touchActive.value = withTiming(1);
+        })
+        .onStart(() => {
+          runOnJS(onModulePress)();
+        })
+        .onFinalize(() => {
+          touchActive.value = withTiming(0);
+        }),
+    [activeSection, editing, onModulePress, touchActive],
+  );
 
   // gap doesn't work on reanimated 2
   const blockStyle = useAnimatedStyle(() => ({
@@ -269,6 +283,7 @@ const ProfileBlockContainer = ({
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
     borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
     overflow: 'hidden',
+    opacity: interpolate(touchActive.value, [0, 1], [1, 0.2]),
   }));
 
   const actionSectionBaseStyle = {
@@ -316,46 +331,41 @@ const ProfileBlockContainer = ({
           },
       ]}
     >
-      <GestureDetector gesture={panGesture}>
+      <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
           style={[moduleContainerStyle, editing && shadow(appearance)]}
           onLayout={onLayout}
         >
           {/** this View is only here because ios bug with shadow and overlow hidden */}
-          <Animated.View style={moduleInnerContainerStyle}>
-            <PressableNative
-              onPress={editing ? onModulePressInner : undefined}
-              disabledOpacity={1}
-              accessible={editing}
-              disabled={!editing || activeSection !== 'none'}
-              accessibilityHint={
-                editing
-                  ? intl.formatMessage({
-                      defaultMessage: `Press to edit this section of your profile`,
-                      description: `Accessibility hint for the profile block container`,
-                    })
-                  : undefined
-              }
-            >
-              <View pointerEvents={editing ? 'none' : 'box-none'}>
-                {children}
+          <Animated.View
+            style={moduleInnerContainerStyle}
+            accessibilityHint={
+              editing
+                ? intl.formatMessage({
+                    defaultMessage: `Press to edit this section of your profile`,
+                    description: `Accessibility hint for the profile block container`,
+                  })
+                : undefined
+            }
+          >
+            <View pointerEvents={editing ? 'none' : 'box-none'}>
+              {children}
+            </View>
+            {!visible && (
+              <View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: `${colors.white}99`,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon
+                  icon="hide"
+                  style={{ width: iconSize, height: iconSize * 2 }}
+                />
               </View>
-              {!visible && (
-                <View
-                  style={{
-                    ...StyleSheet.absoluteFillObject,
-                    backgroundColor: `${colors.white}99`,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon
-                    icon="hide"
-                    style={{ width: iconSize, height: iconSize * 2 }}
-                  />
-                </View>
-              )}
-            </PressableNative>
+            )}
           </Animated.View>
         </Animated.View>
       </GestureDetector>

@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { PixelRatio, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PixelRatio, View, useWindowDimensions } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -9,11 +8,14 @@ import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { prefetchImage } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
-import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
 import CardEditionStep from './CardEditionStep';
 import CoverEditionStep from './CoverEditionStep';
-import { PAGER_HEADER_HEIGHT } from './PagerHeader';
+import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
 import WizzardTransitioner from './WizzardTransitioner';
@@ -144,7 +146,7 @@ export const NewProfileScreen = ({
   // #endregion
 
   // #region Layout
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const contentHeight =
     windowHeight - insets.top - insets.bottom - PAGER_HEADER_HEIGHT;
@@ -196,11 +198,15 @@ export const NewProfileScreen = ({
       }),
       element:
         profileInfo != null ? (
-          <CoverEditionStep
-            profileKind={profileKind!}
-            height={contentHeight}
-            onCoverSaved={onCoverSaved}
-          />
+          <ProfileBoundRelayEnvironmentProvider
+            profileId={profileInfo.profileId}
+          >
+            <CoverEditionStep
+              profileKind={profileKind!}
+              height={contentHeight}
+              onCoverSaved={onCoverSaved}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
         ) : null,
       backIcon: 'arrow_down' as const,
     },
@@ -211,13 +217,17 @@ export const NewProfileScreen = ({
       }),
       element:
         profileInfo !== null ? (
-          <CardEditionStep
-            height={contentHeight}
-            onSkip={onCoverTemplateApplied}
-            onCoverTemplateApplied={onCoverTemplateApplied}
-            hideHeader={() => setHeaderHiden(true)}
-            showHeader={() => setHeaderHiden(false)}
-          />
+          <ProfileBoundRelayEnvironmentProvider
+            profileId={profileInfo.profileId}
+          >
+            <CardEditionStep
+              height={contentHeight}
+              onSkip={onCoverTemplateApplied}
+              onCoverTemplateApplied={onCoverTemplateApplied}
+              hideHeader={() => setHeaderHiden(true)}
+              showHeader={() => setHeaderHiden(false)}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
         ) : null,
 
       backIcon: 'arrow_down' as const,
@@ -242,6 +252,34 @@ NewProfileScreen.options = {
   stackAnimation: 'slide_from_bottom',
 };
 
+/**
+ * Fallback screen displayed while the profile categories are loading
+ * Displayed in case of slow connection
+ */
+const NewProfileScreenFallback = () => {
+  const router = useRouter();
+  const onBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  const insets = useScreenInsets();
+
+  return (
+    <Container style={{ flex: 1, paddingTop: insets.top }}>
+      <PagerHeader
+        nbPages={4}
+        currentPage={0}
+        onBack={onBack}
+        title=""
+        backIcon="arrow_down"
+      />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    </Container>
+  );
+};
+
 export default relayScreen(NewProfileScreen, {
   query: params =>
     params?.profileId
@@ -249,11 +287,12 @@ export default relayScreen(NewProfileScreen, {
       : newProfileScreenQuery,
   getVariables: params =>
     params?.profileId ? { profileId: params.profileId } : {},
+  profileBound: false,
 
-  prefetchProfileIndependent: true,
-  prefetch: () => {
+  fallback: NewProfileScreenFallback,
+
+  prefetch: (_, environment) => {
     const pixelRatio = Math.min(2, PixelRatio.get());
-    const environment = getRelayEnvironment();
     return fetchQueryAndRetain<NewProfileScreenPreloadQuery>(
       environment,
       graphql`

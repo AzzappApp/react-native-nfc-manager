@@ -184,6 +184,7 @@ const EditorLayerSelectorPanel = ({
       title,
     ],
   );
+
   return (
     <View {...props}>
       <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />

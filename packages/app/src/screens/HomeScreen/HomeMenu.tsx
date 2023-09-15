@@ -1,5 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { colors } from '#theme';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 
 export type HOME_TAB = 'CONTACT_CARD' | 'INFORMATION' | 'STATS';
@@ -18,6 +19,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
+        selectedLabelColor={colors.white}
       >
         <FormattedMessage
           defaultMessage="Contact card"
@@ -30,6 +32,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
+        selectedLabelColor={colors.white}
       >
         <FormattedMessage
           defaultMessage="Stats"
@@ -42,6 +45,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
+        selectedLabelColor={colors.white}
       >
         <FormattedMessage
           defaultMessage="Information"

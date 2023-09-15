@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { textStyles } from '#theme';
 
 export const DELETE_BUTTON_WIDTH = 60;
 
@@ -14,13 +14,14 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: 7,
-    backgroundColor: colors.white,
   },
   input: {
     flex: 1,
     padding: 0,
     backgroundColor: 'transparent',
     borderWidth: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
     textAlign: 'right',
     ...textStyles.medium,
   },

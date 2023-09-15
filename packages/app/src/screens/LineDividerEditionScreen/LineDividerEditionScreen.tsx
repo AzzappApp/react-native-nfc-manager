@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   LINE_DIVIDER_DEFAULT_VALUES,
@@ -9,7 +10,6 @@ import {
 import { useRouter } from '#components/NativeRouter';
 import ProfileColorPicker from '#components/ProfileColorPicker';
 import WebCardModulePreview from '#components/WebCardModulePreview';
-import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -142,6 +142,7 @@ const LineDividerEditionScreen = ({
   const canSave = (dirty || lineDivider == null) && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
   const onSave = useCallback(() => {
     if (!canSave) {
       return;
@@ -158,15 +159,19 @@ const LineDividerEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-        console.log(e);
-        if (e instanceof GraphQLError) {
-          console.log(e.cause);
-        }
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your line divider module, try again later',
+            description:
+              'Error toast message when saving a line divider module failed because of an unknown error.',
+          }),
+        });
       },
     });
-  }, [canSave, commit, lineDivider?.id, value, router]);
+  }, [canSave, commit, lineDivider?.id, value, intl, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -225,7 +230,6 @@ const LineDividerEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-  const intl = useIntl();
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>

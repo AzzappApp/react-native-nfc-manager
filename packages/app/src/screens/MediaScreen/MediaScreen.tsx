@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import ProfilePostsList from '#components/ProfilePostsList';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -45,9 +45,8 @@ const MediaScreen = ({
   preloadedQuery,
   hasFocus = true,
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
-  useMainTabBarVisiblilityController(true);
   const { viewer } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
-  const { top } = useSafeAreaInsets();
+  const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
 
   const tabs: Array<{ id: TAB; element: ReactElement }> = [
@@ -68,7 +67,7 @@ const MediaScreen = ({
                     />
                   </Text>
                 }
-                style={styles.coverList}
+                coverListStyle={styles.coverList}
                 viewer={viewer}
               />
               <Text style={styles.postsTitleStyle} variant="large">
@@ -85,33 +84,35 @@ const MediaScreen = ({
     {
       id: 'FOLLOWINGS',
       element: (
-        <MediaFollowingsScreen
-          viewer={viewer}
-          canPlay={hasFocus && tab === 'FOLLOWINGS'}
-          ListHeaderComponent={
-            <View>
-              <MediaFollowingsProfiles
-                header={
-                  <Text variant="large" style={styles.coversTitleStyle}>
-                    <FormattedMessage
-                      defaultMessage="Webcards"
-                      description="List of followed profiles"
-                    />
-                  </Text>
-                }
-                viewer={viewer}
-                style={styles.coverList}
-              />
-
-              <Text style={styles.postsTitleStyle} variant="large">
-                <FormattedMessage
-                  defaultMessage="Latest Posts"
-                  description="List of latest posts of followed profiles"
+        <Suspense>
+          <MediaFollowingsScreen
+            viewer={viewer}
+            canPlay={hasFocus && tab === 'FOLLOWINGS'}
+            ListHeaderComponent={
+              <View>
+                <MediaFollowingsProfiles
+                  header={
+                    <Text variant="large" style={styles.coversTitleStyle}>
+                      <FormattedMessage
+                        defaultMessage="Webcards"
+                        description="List of followed profiles"
+                      />
+                    </Text>
+                  }
+                  viewer={viewer}
+                  style={styles.coverList}
                 />
-              </Text>
-            </View>
-          }
-        />
+
+                <Text style={styles.postsTitleStyle} variant="large">
+                  <FormattedMessage
+                    defaultMessage="Latest Posts"
+                    description="List of latest posts of followed profiles"
+                  />
+                </Text>
+              </View>
+            }
+          />
+        </Suspense>
       ),
     },
   ];
@@ -121,10 +122,12 @@ const MediaScreen = ({
       id: 'MY_POSTS',
       element: (
         <View style={{ flex: 1 }}>
-          <ProfilePostsList
-            profile={viewer.profile}
-            canPlay={hasFocus && tab === 'MY_POSTS'}
-          />
+          <Suspense>
+            <ProfilePostsList
+              profile={viewer.profile}
+              canPlay={hasFocus && tab === 'MY_POSTS'}
+            />
+          </Suspense>
         </View>
       ),
     });
@@ -184,6 +187,23 @@ const MediaScreenTabBar = ({
   );
 };
 
+const MediaScreenFallback = () => {
+  const { top } = useScreenInsets();
+
+  return (
+    <Container
+      style={{
+        flex: 1,
+        marginTop: top,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <ActivityIndicator />
+    </Container>
+  );
+};
+
 const styles = StyleSheet.create({
   tabsContainer: { flex: 1, paddingTop: 20 },
   tabBarContainer: {
@@ -217,4 +237,5 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MediaScreen, {
   query: mediaScreenQuery,
+  fallback: MediaScreenFallback,
 });

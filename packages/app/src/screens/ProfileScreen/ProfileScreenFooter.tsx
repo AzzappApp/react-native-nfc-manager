@@ -2,11 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { useProfileCardColors } from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -76,7 +76,7 @@ const ProfileScreenFooter = ({
 }: ProfileScreenFooterProps) => {
   const { colorPalette } = useProfileCardColors(profileKey);
 
-  const inset = useSafeAreaInsets();
+  const insets = useScreenInsets();
 
   const onItemPress = useCallback(
     (key: string) => {
@@ -165,9 +165,6 @@ const ProfileScreenFooter = ({
   const editTransition = useEditTransition();
   const selectionModeTransition = useSelectionModeTransition();
 
-  // TODO factorize this with editorLayout
-  const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
-
   const bottomMenuStyle = useAnimatedStyle(() => ({
     opacity: editTransition.value - selectionModeTransition.value,
   }));
@@ -182,7 +179,7 @@ const ProfileScreenFooter = ({
             position: 'absolute',
             left: '5%',
             width: '90%',
-            bottom: bottomMargin,
+            bottom: insets.bottom,
           },
           bottomMenuStyle,
         ]}
@@ -200,8 +197,8 @@ const ProfileScreenFooter = ({
         style={[
           styles.selectionFooter,
           {
-            paddingBottom: bottomMargin,
-            height: BOTTOM_MENU_HEIGHT + bottomMargin,
+            paddingBottom: insets.bottom,
+            height: BOTTOM_MENU_HEIGHT + insets.bottom,
           },
           selectionMenuStyle,
         ]}

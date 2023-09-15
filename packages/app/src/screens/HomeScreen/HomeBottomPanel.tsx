@@ -8,19 +8,22 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import { commitMutation, graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { getAuthState } from '#helpers/authStore';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
-import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import HomeStatistics from './HomeStatistics';
 import type { HOME_TAB } from './HomeMenu';
+import type { HomeBottomPanel_profiles$key } from '@azzapp/relay/artifacts/HomeBottomPanel_profiles.graphql';
 import type { HomeBottomPanel_user$key } from '@azzapp/relay/artifacts/HomeBottomPanel_user.graphql';
 import type { HomeBottomPanelPublishMutation } from '@azzapp/relay/artifacts/HomeBottomPanelPublishMutation.graphql';
 import type { SharedValue } from 'react-native-reanimated';
@@ -58,45 +61,61 @@ const HomeBottomPanel = ({
         ...HomeStatistics_user
         profiles {
           id
-          userName
-          cardIsPublished
-          cardCover {
-            title
-          }
-          profileCategory {
-            id
-          }
+          ...HomeBottomPanel_profiles
         }
       }
     `,
     userKey,
   );
 
-  const { profiles } = user;
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeBottomPanel_profiles on Profile {
+        id
+        userName
+        cardIsPublished
+        cardCover {
+          title
+        }
+        profileCategory {
+          id
+        }
+      }
+    `,
+    (profile: any) => profile.id,
+    user.profiles as readonly HomeBottomPanel_profiles$key[],
+  );
+
   const currentProfile = profiles?.[currentProfileIndex];
 
   const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
   //#endregion
 
   //#region card publication
-  const [commit] = useMutation<HomeBottomPanelPublishMutation>(graphql`
-    mutation HomeBottomPanelPublishMutation {
-      publishCard {
-        profile {
-          id
-          cardIsPublished
-        }
-      }
-    }
-  `);
 
   const onPublish = () => {
-    commit({
+    const profileId = getAuthState().profileId;
+    if (!profileId || profileId !== currentProfile?.id) {
+      return;
+    }
+    const environment = getRelayEnvironment().forActor(profileId);
+    const publishMutation = graphql`
+      mutation HomeBottomPanelPublishMutation @raw_response_type {
+        publishCard {
+          profile {
+            id
+            cardIsPublished
+          }
+        }
+      }
+    `;
+    commitMutation<HomeBottomPanelPublishMutation>(environment, {
+      mutation: publishMutation,
       variables: {},
       optimisticResponse: {
         publishCard: {
           profile: {
-            id: currentProfile?.id,
+            id: profileId,
             cardIsPublished: true,
           },
         },
@@ -116,8 +135,16 @@ const HomeBottomPanel = ({
         });
       },
       onError: error => {
-        //TODO - handle error
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not publish your WebCard, please try again later',
+            description:
+              'Error message displayed when the publication of the webcard failed in Home Screen',
+          }),
+        });
       },
     });
   };
@@ -125,12 +152,12 @@ const HomeBottomPanel = ({
 
   //#region panels visibility
   const profilesHasCover = useMemo(
-    () => profiles?.map(profile => (profile.cardCover ? 1 : 0)) ?? [],
+    () => profiles?.map(profile => (profile?.cardCover ? 1 : 0)) ?? [],
     [profiles],
   );
 
   const profilesWebcCardPublished = useMemo(
-    () => profiles?.map(profile => (profile.cardIsPublished ? 1 : 0)) ?? [],
+    () => profiles?.map(profile => (profile?.cardIsPublished ? 1 : 0)) ?? [],
     [profiles],
   );
 
@@ -367,51 +394,30 @@ const HomeBottomPanel = ({
       >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
 
-        <TabView
-          style={{ flex: 1 }}
-          tabs={[
-            {
-              id: 'CONTACT_CARD',
-              element: (
-                <HomeContactCard
-                  user={user}
-                  height={panelHeight}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                />
-              ),
-            },
-            {
-              id: 'STATS',
-              element: (
-                <HomeStatistics
-                  user={user}
-                  height={panelHeight}
-                  animated={selectedPanel === 'STATS'}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                  currentUserIndex={currentProfileIndex}
-                />
-              ),
-            },
-            {
-              id: 'INFORMATION',
-              element: (
-                <HomeInformations
-                  user={user}
-                  animated={selectedPanel === 'INFORMATION'}
-                  height={panelHeight}
-                  currentProfileIndexSharedValue={
-                    currentProfileIndexSharedValue
-                  }
-                />
-              ),
-            },
-          ]}
-          currentTab={selectedPanel}
-        />
+        {selectedPanel === 'CONTACT_CARD' && (
+          <HomeContactCard
+            user={user}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          />
+        )}
+        {selectedPanel === 'STATS' && (
+          <HomeStatistics
+            user={user}
+            height={panelHeight}
+            animated={selectedPanel === 'STATS'}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            currentUserIndex={currentProfileIndex}
+          />
+        )}
+        {selectedPanel === 'INFORMATION' && (
+          <HomeInformations
+            user={user}
+            animated={selectedPanel === 'INFORMATION'}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          />
+        )}
       </Animated.View>
     </View>
   );

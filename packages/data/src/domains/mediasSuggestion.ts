@@ -22,8 +22,8 @@ export type NewMediaSuggestion = InferModel<
 
 /**
  * Return a list of media suggestions. filtered by profile kind and template kind
- * @param profileKind the profile kind to filter by
- * @param templateKind the template kind to filter by
+ * @param profileCategoryId the profile catetgory Id
+ * @param companyActivityId tue company activity
  * @param randomSeed the random seed to use for random ordering
  * @param offset the offset to use for pagination
  * @param limit the limit to use for pagination
@@ -31,23 +31,25 @@ export type NewMediaSuggestion = InferModel<
  */
 export const getMediaSuggestions = async (
   randomSeed: string,
-  profileCategoryId: string | null | undefined,
+  profileCategoryId: string,
   companyActivityId: string | null | undefined,
   offset?: string | null,
   limit?: number | null,
 ) => {
+  console.log(profileCategoryId, companyActivityId);
   const query = sql`
-    SELECT *, RAND(${randomSeed}) as cursor
-    FROM MediaSuggestion
-    WHERE enabled = 1
-  `;
-
-  if (profileCategoryId) {
-    query.append(sql`AND profileCategoryId = ${profileCategoryId}`);
-  }
-
-  if (companyActivityId) {
-    query.append(sql`AND companyActivityId = ${companyActivityId}`);
+  SELECT *, RAND(${randomSeed}) as cursor
+  FROM MediaSuggestion `;
+  if (companyActivityId == null) {
+    query.append(sql` WHERE profileCategoryId = ${profileCategoryId}`);
+  } else {
+    query.append(sql` WHERE companyActivityId = ${companyActivityId}`);
+    //keep it for futur usage
+    // query.append(
+    //   sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL)
+    //   OR (profileCategoryId IS NULL AND companyActivityId = ${companyActivityId} )
+    //   OR (profileCategoryId = ${profileCategoryId} AND companyActivityId = ${companyActivityId})`,
+    // );
   }
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
@@ -56,8 +58,11 @@ export const getMediaSuggestions = async (
   if (limit) {
     query.append(sql` LIMIT ${limit} `);
   }
-
   return (await db.execute(query)).rows as Array<
     MediaSuggestion & { cursor: string }
   >;
 };
+//keep it. this request should group to make the search they want
+// SELECT mediaId, GROUP_CONCAT(DISTINCT profileCategoryId) as profileCategoryIds, GROUP_CONCAT(DISTINCT companyActivityId) as companyActivityIds
+// FROM MediaSuggestion
+// GROUP BY mediaId;

@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { type SimpleTextEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
-import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -213,6 +213,8 @@ const SimpleTextEditionScreen = ({
             cardModules {
               visible
               ...SimpleTextEditionScreen_module
+              ...SimpleTextRenderer_simpleTextModule
+              ...SimpleTextRenderer_simpleTitleModule
             }
           }
         }
@@ -223,6 +225,7 @@ const SimpleTextEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
   const onSave = useCallback(() => {
     if (!canSave) {
       return;
@@ -241,15 +244,17 @@ const SimpleTextEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-        console.log(e);
-        if (e instanceof GraphQLError) {
-          console.log(e.cause);
-        }
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not save your module',
+            description: 'Error toast when saving a module',
+          }),
+        });
       },
     });
-  }, [canSave, commit, value, moduleData?.id, moduleKind, router]);
+  }, [canSave, commit, value, moduleData?.id, moduleKind, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -310,8 +315,6 @@ const SimpleTextEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-
-  const intl = useIntl();
 
   const middleElement =
     moduleKind === 'simpleText'

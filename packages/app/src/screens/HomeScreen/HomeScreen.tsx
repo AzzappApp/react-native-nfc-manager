@@ -1,10 +1,11 @@
-import { Image, View, useWindowDimensions } from 'react-native';
+import { useEffect } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import { ACTIVITY_INDICATOR_WIDTH } from '#ui/ActivityIndicator/ActivityIndicator';
+import Container from '#ui/Container';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeScreenContent from './HomeScreenContent';
 import WelcomeScreen from './WelcomeScreen';
@@ -25,10 +26,17 @@ export const homeScreenQuery = graphql`
 
 const HomeScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   // data
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
   const hasProfiles = !!currentUser.profiles?.length;
+
+  useEffect(() => {
+    if (hasFocus) {
+      dispatchGlobalEvent({ type: 'READY' });
+    }
+  }, [hasFocus]);
 
   const [showMenu, toggleShowMenu] = useToggle(false);
   return (
@@ -44,39 +52,24 @@ const HomeScreen = ({
 };
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisiblilityController(false, true);
-
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  useMainTabBarVisiblilityController(false);
 
   return (
-    <View
+    <Container
       style={{
         flex: 1,
-        gap: 20,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Image
-        source={require('#assets/logo-full.png')}
-        style={{
-          width: 180,
-          height: 38,
-        }}
-      />
-      <ActivityIndicator
-        style={{
-          position: 'absolute',
-          top: windowHeight / 2 + 40,
-          left: (windowWidth - ACTIVITY_INDICATOR_WIDTH) / 2,
-        }}
-      />
-    </View>
+      <ActivityIndicator />
+    </Container>
   );
 };
 
 export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
+  profileBound: false,
   fallback: HomeScreenFallback,
   canGoback: false,
 });

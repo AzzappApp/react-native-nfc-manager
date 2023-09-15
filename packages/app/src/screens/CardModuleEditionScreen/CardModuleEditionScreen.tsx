@@ -1,3 +1,5 @@
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import BlockTextEditionMobileScreenNode from '@azzapp/relay/artifacts/BlockTextEditionMobileScreenQuery.graphql';
 import CarouselEditionMobileScreenQueryNode from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
 import HorizontalPhotoEditionMobileScreenNode from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
@@ -6,7 +8,12 @@ import PhotoWithTextAndTitleEditionMobileScreenNode from '@azzapp/relay/artifact
 import SimpleButtonEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import SocialLinksEditionMobileScreenNode from '@azzapp/relay/artifacts/SocialLinksEditionMobileScreenQuery.graphql';
+import { CancelHeaderButton } from '#components/commonsButtons';
+import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
 import BlockTextEditionMobileScreen from './BlockTextEditionMobileScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import HorizontalPhotoEditionMobileScreen from './HorizontalPhotoEditionMobileScreen';
@@ -134,6 +141,32 @@ const getQuery = (params: CardModuleEditionRoute['params']) => {
   }
 };
 
+/**
+ * Fallback screen for the card module edition screen
+ * While most of the time the screen will be preloaded, it can happen that
+ * on slow network the screen is not preloaded and we need to display a fallback
+ * That at least display a header that allow to go back to the previous screen
+ */
+const CardModuleEditionScreenFallback = () => {
+  const router = useRouter();
+  const onCancel = () => {
+    router.back();
+  };
+  return (
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header leftElement={<CancelHeaderButton onPress={onCancel} />} />
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <ActivityIndicator />
+        </View>
+      </SafeAreaView>
+    </Container>
+  );
+};
+
 export default relayScreen(CardModuleEditionScreen, {
   query: getQuery,
+  fallback: CardModuleEditionScreenFallback,
 });

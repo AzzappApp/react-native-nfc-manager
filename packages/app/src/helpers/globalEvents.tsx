@@ -57,9 +57,18 @@ export type TOKENS_REFRESHED = {
   };
 };
 
+/**
+ * Events dispatched when the first screen is ready to be displayed
+ */
+export type READY = {
+  type: 'READY';
+  payload?: undefined;
+};
+
 export type GlobalEvents =
   | NETWORK_ERROR
   | PROFILE_CHANGE
+  | READY
   | SIGN_OUT
   | SIGN_UP_EVENTS
   | SINGN_IN

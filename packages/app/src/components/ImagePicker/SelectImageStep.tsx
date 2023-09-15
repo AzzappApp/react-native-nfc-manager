@@ -94,7 +94,6 @@ const SelectImageStep = ({
       onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
-      onBack();
       setPermissionDenied(true);
     }
   };
@@ -268,7 +267,7 @@ const SelectImageStep = ({
             })
           ) : (
             intl.formatMessage({
-              defaultMessage: 'video',
+              defaultMessage: 'Video',
               description: 'Title of the photo view in image picker wizzard',
             })
           )
@@ -338,12 +337,13 @@ const SelectImageStep = ({
       />
       <PermissionModal
         visible={
-          (pickerMode === 'gallery' &&
+          !permissionDenied &&
+          ((pickerMode === 'gallery' &&
             mediaLibraryPermission != null &&
             !mediaLibraryPermission.granted) ||
-          (pickerMode === 'photo' && !hasCameraPermission) ||
-          (pickerMode === 'video' &&
-            (!hasCameraPermission || !hasMicrophonePermission))
+            (pickerMode === 'photo' && !hasCameraPermission) ||
+            (pickerMode === 'video' &&
+              (!hasCameraPermission || !hasMicrophonePermission)))
         }
         permissionsFor={pickerMode}
         onRequestClose={onCameraPermissionModalClose}

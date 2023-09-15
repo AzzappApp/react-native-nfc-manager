@@ -2,7 +2,7 @@ import { connect } from '@planetscale/database';
 import { sql as sqlDrizzle } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import { createConcurrentQueue } from '@azzapp/shared/asyncHelpers';
+import pLimit from 'p-limit';
 import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
 import type { SQL } from 'drizzle-orm';
 
@@ -14,13 +14,9 @@ const sql = <T>(strings: TemplateStringsArray, ...params: any[]): SQL<T> => {
 const fetchFunction =
   process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
 
-const MAX_CONCURRENT_QUERIES = 6;
+const MAX_CONCURRENT_QUERIES = 5;
 
-const concurrentQueue = createConcurrentQueue(MAX_CONCURRENT_QUERIES, () => {
-  console.warn(
-    `Maximum number of concurrent queries (${MAX_CONCURRENT_QUERIES}) reached`,
-  );
-});
+const limit = pLimit(MAX_CONCURRENT_QUERIES);
 
 export const ConnectionMonitorer = {
   concurrentRequestsCount: 0,
@@ -56,9 +52,7 @@ const connection = connect({
       if (process.env.NODE_ENV !== 'production') {
         response = await fetchFunction(input, init);
       } else {
-        response = (await concurrentQueue(() =>
-          fetchFunction(input, init),
-        )) as any;
+        response = await limit(() => fetchFunction(input, init));
       }
     } catch (e) {
       throw e as any;

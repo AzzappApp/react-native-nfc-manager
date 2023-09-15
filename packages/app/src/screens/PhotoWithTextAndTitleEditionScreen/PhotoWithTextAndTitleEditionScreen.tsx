@@ -1,9 +1,11 @@
 import { omit } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, Modal, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
+  MODULE_IMAGE_MAX_WIDTH,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
@@ -12,6 +14,7 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { exportImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -19,15 +22,16 @@ import ImagePicker, {
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
+import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import exportMedia from '#screens/PostCreationScreen/exportMedia';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
@@ -256,6 +260,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
+  const intl = useIntl();
 
   const [uploadProgress, setUploadProgress] =
     useState<Observable<number> | null>(null);
@@ -290,7 +295,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
       } catch (error) {
-        console.log(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your module, media upload failed, try again later',
+            description:
+              'Error toast message when saving a photo with text and title failed because of a media upload error.',
+          }),
+        });
       } finally {
         setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
@@ -316,17 +329,22 @@ const PhotoWithTextAndTitleEditionScreen = ({
         router.back();
       },
       onError(e) {
-        // eslint-disable-next-line no-alert
-        // TODO better error handling
-
+        console.log(e);
         if (e instanceof GraphQLError) {
           console.log(e.cause);
-        } else {
-          console.log(e);
         }
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your line divider module, try again later',
+            description:
+              'Error toast message when saving a photo with text and title module failed because of an unknown error.',
+          }),
+        });
       },
     });
-  }, [canSave, value, photoWithTextAndTitle?.id, commit, router]);
+  }, [canSave, value, photoWithTextAndTitle?.id, commit, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -343,24 +361,31 @@ const PhotoWithTextAndTitleEditionScreen = ({
   };
 
   const onMediaSelected = async ({
-    kind,
     uri,
-    aspectRatio,
     editionParameters,
     filter,
+    width,
+    height,
   }: ImagePickerResult) => {
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          filters: filter ? [filter] : [],
+        },
+      ],
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportedMedia.uri,
-      width: exportedMedia.size.width,
-      height: exportedMedia.size.height,
+      uri: exportUri,
+      width: size.width,
+      height: size.height,
       kind: 'image',
     });
   };
@@ -467,7 +492,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
     insetTop,
     windowWidth,
   } = useEditorLayout();
-  const intl = useIntl();
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
@@ -673,18 +697,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <Modal
-        visible={showImagePicker}
-        animationType={image?.uri ? 'slide' : 'none'}
-        onRequestClose={onImagePickerCancel}
-      >
+      <InnerModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[SelectImageStep, EditImageStep]}
         />
-      </Modal>
+      </InnerModal>
       <UploadProgressModal
         visible={!!uploadProgress}
         progressIndicator={uploadProgress}

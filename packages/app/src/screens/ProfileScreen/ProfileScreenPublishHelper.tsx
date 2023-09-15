@@ -2,12 +2,12 @@ import { noop } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Modal, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -50,42 +50,52 @@ const ProfileScreenPublishHelper = ({
     `,
   );
 
+  useEffect(() => {
+    if (!cardIsPublished && editMode) {
+      Toast.show({
+        type: 'info',
+        text1: intl.formatMessage({
+          defaultMessage: 'Tap on a section of your WebCard to modify it',
+          description:
+            'Toast info message that appears when the user is in webcard edit mode for the first time',
+        }),
+        bottomOffset: 0,
+        autoHide: false,
+        props: {
+          showClose: true,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editMode]);
+
   const [showPublishModal, setShowPublishModal] = useState(false);
 
   const editModeRef = useRef(editMode);
+
   useEffect(() => {
-    if (!cardIsPublished) {
-      if (editMode && !editModeRef.current) {
-        Toast.show({
-          type: 'info',
-          text1: intl.formatMessage({
-            defaultMessage: 'Tap on a section of your WebCard to modify it',
-            description:
-              'Toast info message that appears when the user is in webcard edit mode for the first time',
-          }),
-        });
-      } else if (!editMode && editModeRef.current) {
-        setShowPublishModal(true);
-      }
+    if (!cardIsPublished && !editMode && editModeRef.current) {
+      setShowPublishModal(true);
     }
     editModeRef.current = editMode;
-  }, [cardIsPublished, editMode, intl]);
+  }, [cardIsPublished, editMode]);
 
   const onPublish = () => {
     commit({
       variables: {},
-      onCompleted: (_, error) => {
-        if (error) {
-          // TODO - handle error
-          console.log(error);
-          return;
-        }
-        // TODO - add analytics
+      onCompleted: () => {
         setShowPublishModal(false);
       },
       onError: error => {
-        //TODO - handle error
-        console.log(error);
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not publish your WebCard, try again later',
+            description: 'Publish modal error toast',
+          }),
+        });
       },
     });
   };
@@ -97,9 +107,7 @@ const ProfileScreenPublishHelper = ({
 
   const styles = useStyleSheet(stylesheet);
 
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, 16);
-  const bottomInset = Math.max(insets.bottom, 16);
+  const insets = useScreenInsets();
   return (
     <Modal
       animationType="fade"
@@ -110,8 +118,8 @@ const ProfileScreenPublishHelper = ({
         style={[
           styles.container,
           {
-            paddingTop: topInset,
-            paddingBottom: bottomInset,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
           },
         ]}
       >

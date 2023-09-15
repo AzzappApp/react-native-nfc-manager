@@ -1,6 +1,5 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { fromGlobalId } from 'graphql-relay';
-
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -22,8 +21,8 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
+import AccountHeader from '#components/AccountHeader';
 import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import ProfileColorPicker from '#components/ProfileColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -31,7 +30,6 @@ import useAnimatedState from '#hooks/useAnimatedState';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import ColorPreview from '#ui/ColorPreview';
 import Container from '#ui/Container';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
@@ -39,9 +37,9 @@ import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
-import ContactCardHeader from './ContactCardHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardRoute } from '#routes';
+import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
 import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -51,9 +49,7 @@ const contactCardMobileScreenQuery = graphql`
       profile {
         id
         userName
-        ...ContactCardHeader_profile
         ...AccountHeader_profile
-        ...ProfileColorPicker_profile
         ...ContactCard_profile
         contactCard {
           isPrivate
@@ -101,45 +97,35 @@ const ContactCardScreen = ({
     setTopCardY(topYAfterScale);
   };
 
-  const animatedContactCardStyle = useAnimatedStyle(() => {
-    //calcul the center for Y translation and X translation
-
-    const transform = [
-      {
-        scale: interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [1, fullScreenCardWidth / cardHeight],
-        ),
-      },
-      {
-        translateY: interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
-        ),
-      },
-
-      {
-        rotate: `${interpolate(
-          sharedRotationState.value,
-          [0, 1],
-          [0, -90],
-        )}deg`,
-      },
-    ];
-
-    return {
+  const animatedContactCardStyle = useAnimatedStyle(
+    () => ({
       zIndex: 10,
-      // height: interpolate(
-      //   sharedRotationState.value,
-      //   [0, 1],
-      //   [cardHeight, fullScreenCardWidth],
-      // ),
-
-      transform,
-    };
-  }, [sharedRotationState.value, cardWidth, width, topCardY]);
+      transform: [
+        {
+          scale: interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [1, fullScreenCardWidth / cardHeight],
+          ),
+        },
+        {
+          translateY: interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
+          ),
+        },
+        {
+          rotate: `${interpolate(
+            sharedRotationState.value,
+            [0, 1],
+            [0, -90],
+          )}deg`,
+        },
+      ],
+    }),
+    [sharedRotationState.value, cardWidth, width, topCardY],
+  );
 
   const footerStyle = useAnimatedStyle(
     () => ({
@@ -179,12 +165,11 @@ const ContactCardScreen = ({
     }
   `);
 
-  const [isPublicCard, setIsPublicCard] = useToggle(false);
+  //TODO: remove for beta
+  const [isPublicCard] = useToggle(false);
   const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
     viewer.profile?.contactCard?.displayedOnWebCard ?? false,
   );
-
-  const [colorPickerVisible, toggleColorPickerVisible] = useToggle(false);
 
   const [debouncedPublic] = useDebounce(isPublicCard, 500);
   const [debouncedDisplayedOnWebCard] = useDebounce(isDisplayedOnWebCard, 500);
@@ -198,11 +183,19 @@ const ContactCardScreen = ({
           displayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
         },
       },
-      onError: err => {
-        console.log(err);
+      onError: e => {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not save your contact card. Please try again.',
+            description: 'Error toast message when saving contact card failed',
+          }),
+        });
       },
     });
-  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit]);
+  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit, intl]);
 
   const styles = useStyleSheet(styleSheet);
 
@@ -214,10 +207,10 @@ const ContactCardScreen = ({
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container style={styles.container}>
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
         <Animated.View style={headerStyle}>
-          <ContactCardHeader profileKey={profile} />
+          <ContactCardScreenHeader profile={profile} />
         </Animated.View>
 
         <PressableAnimated
@@ -246,55 +239,9 @@ const ContactCardScreen = ({
             onPress={toggleContactEditModal}
           />
 
-          <PressableNative
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Background color',
-              description: 'Label of the contact card background color button',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to select a background color',
-              description: 'Hint of the color picker button',
-            })}
-            style={styles.cardColorPicker}
-            onPress={toggleColorPickerVisible}
-          >
-            <ColorPreview
-              color={viewer?.profile?.cardColors?.primary ?? colors.black}
-              colorSize={16}
-            />
-          </PressableNative>
-          {viewer.profile && (
-            <ProfileColorPicker
-              visible={colorPickerVisible}
-              height={400}
-              profile={viewer.profile}
-              title={intl.formatMessage({
-                defaultMessage: ' color',
-                description: ' color title in BlockText edition',
-              })}
-              selectedColor={
-                viewer?.profile?.cardColors?.primary ?? colors.black
-              }
-              onColorChange={color => {
-                commit({
-                  variables: {
-                    input: {
-                      backgroundStyle: {
-                        backgroundColor: color,
-                      },
-                    },
-                  },
-                  onError: err => {
-                    console.log(err);
-                  },
-                });
-              }}
-              onRequestClose={toggleColorPickerVisible}
-            />
-          )}
-
           <View style={{ width: '100%' }}>
+            {/* 
+            TODO: Disable for the beta
             <View style={styles.publicOptions}>
               <Text variant="large">
                 <FormattedMessage
@@ -307,7 +254,7 @@ const ContactCardScreen = ({
                 value={isPublicCard}
                 onValueChange={setIsPublicCard}
               />
-            </View>
+            </View> */}
             <Text variant="xsmall">
               {isPublicCard ? (
                 <FormattedMessage
@@ -439,19 +386,50 @@ const ContactCardScreen = ({
             toggleBottomSheet={toggleContactEditModal}
           />
         )}
-      </Container>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Container>
   );
 };
 
+const ContactCardScreenHeader = ({
+  profile,
+}: {
+  profile: AccountHeader_profile$key | null;
+}) => {
+  const intl = useIntl();
+  return (
+    <AccountHeader
+      profile={profile}
+      title={intl.formatMessage({
+        defaultMessage: 'Contact Card',
+        description:
+          'Title of the contact card screen where user can edit their contact card.',
+      })}
+    />
+  );
+};
+
+const ContactCardScreenFallback = () => (
+  <Container style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ContactCardScreenHeader profile={null} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    </SafeAreaView>
+  </Container>
+);
+
 export default relayScreen(ContactCardScreen, {
   query: contactCardMobileScreenQuery,
+  fallback: ContactCardScreenFallback,
 });
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
+    gap: 20,
   },
   contactCard: {
     alignSelf: 'center',

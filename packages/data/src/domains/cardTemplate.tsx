@@ -103,6 +103,7 @@ export const updateCardTemplate = async (
  * Return a list of card template
  */
 export const getCardTemplates = async (
+  profileKind: 'business' | 'personal',
   randomSeed: string,
   offset?: string | null,
   limit?: number | null,
@@ -110,6 +111,11 @@ export const getCardTemplates = async (
   const query = sql`
     SELECT *, RAND(${randomSeed}) as cursor
     FROM CardTemplate
+    WHERE ${
+      profileKind === 'business'
+        ? CardTemplateTable.businessEnabled
+        : CardTemplateTable.personalEnabled
+    } = 1
    `;
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);

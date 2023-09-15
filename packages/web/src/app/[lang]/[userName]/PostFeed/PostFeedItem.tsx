@@ -96,8 +96,12 @@ const PostFeedItem = (
         )}
         <div className={styles.postFooter}>
           <div className={styles.postActions}>
-            <ButtonIcon Icon={HearthIcon} onClick={onDownload} />
-            <ButtonIcon Icon={CommentIcon} onClick={onDownload} />
+            {post.allowLikes && (
+              <ButtonIcon Icon={HearthIcon} onClick={onDownload} />
+            )}
+            {post.allowComments && (
+              <ButtonIcon Icon={CommentIcon} onClick={onDownload} />
+            )}
             <ButtonIcon
               Icon={ShareIcon}
               onClick={() => share.current?.open()}

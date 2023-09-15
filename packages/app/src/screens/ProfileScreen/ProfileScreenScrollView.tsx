@@ -11,7 +11,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
 import { useProfileEditScale } from './profileScreenHelpers';
@@ -76,11 +76,11 @@ const ProfileScreenScrollView = ({
     });
   }, [editScale, editing]);
 
-  const inset = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const editTransiton = useEditTransition();
   const containerStyle = useAnimatedStyle(() => {
     return {
-      top: editTransiton.value * (inset.top + HEADER_HEIGHT),
+      top: editTransiton.value * (insets.top + HEADER_HEIGHT),
     };
   });
 
@@ -114,7 +114,7 @@ const ProfileScreenScrollView = ({
         style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom: inset.bottom + BOTTOM_MENU_HEIGHT * (editing ? 2 : 1),
+          paddingBottom: insets.bottom + BOTTOM_MENU_HEIGHT * (editing ? 2 : 1),
         }}
         contentInsetAdjustmentBehavior="never"
         ref={scrollViewRef}

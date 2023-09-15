@@ -1,6 +1,6 @@
 import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import ContactCard from '#components/ContactCard';
+import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
 
@@ -23,6 +23,7 @@ const HomeContactCardLandscape = ({
     graphql`
       fragment HomeContactCardLandscape_profile on Profile {
         ...ContactCard_profile
+        id
         cardIsPublished
       }
     `,
@@ -71,6 +72,9 @@ const HomeContactCardLandscape = ({
     return null;
   }
 
+  const smallContactCardHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
+  const scale = (windowWidth - 40) / smallContactCardHeight;
+
   return (
     <Animated.View
       style={[
@@ -89,7 +93,13 @@ const HomeContactCardLandscape = ({
       ]}
       pointerEvents="none"
     >
-      <ContactCard profile={profile} height={windowWidth - 40} />
+      <View
+        style={{
+          transform: [{ scale }],
+        }}
+      >
+        <ContactCard profile={profile} height={smallContactCardHeight} />
+      </View>
     </Animated.View>
   );
 };

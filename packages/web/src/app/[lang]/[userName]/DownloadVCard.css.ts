@@ -16,7 +16,7 @@ const openedOverlay = style([
     position: 'fixed',
     top: 0,
     opacity: 1,
-    zIndex: 2,
+    zIndex: 5,
   },
 ]);
 

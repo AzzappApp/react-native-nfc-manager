@@ -3,8 +3,8 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
-import { themeClass } from '../theme.css';
 import ClientWrapper from './ClientWrapper';
+import { themeClass } from './theme.css';
 import './styles.css';
 
 const plusJakarta = Plus_Jakarta_Sans({

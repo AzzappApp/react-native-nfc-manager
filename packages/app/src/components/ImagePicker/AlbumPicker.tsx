@@ -3,8 +3,8 @@ import { getAlbumsAsync, getAssetsAsync } from 'expo-media-library';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, Modal, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -125,7 +125,7 @@ const AlbumPickerScreen = ({
     [onSelectAlbum],
   );
 
-  const { top, bottom } = useSafeAreaInsets();
+  const { top, bottom } = useScreenInsets();
   return (
     <Container style={{ paddingTop: top, flex: 1 }}>
       <Header

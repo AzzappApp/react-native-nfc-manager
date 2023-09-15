@@ -1,10 +1,10 @@
 import { Suspense, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
 import CoverEditor from '#components/CoverEditor';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Text from '#ui/Text';
@@ -28,6 +28,7 @@ const CoverEditionStep = ({
       query CoverEditionStepQuery {
         viewer {
           ...CoverEditor_viewer
+          ...CoverEditor_suggested
         }
       }
     `,
@@ -45,7 +46,7 @@ const CoverEditionStep = ({
 
   const intl = useIntl();
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const eidtorHeight =
     height - SUBTITLE_HEIGHT - BUTTON_HEIGHT - 16 - Math.min(insets.bottom, 16);
 
@@ -75,6 +76,7 @@ const CoverEditionStep = ({
           height={eidtorHeight}
           onCoverSaved={onCoverSaved}
           onCanSaveChange={setCanSave}
+          initialTemplateKind={profileKind === 'business' ? 'others' : 'people'}
         />
         <Button
           label={intl.formatMessage({

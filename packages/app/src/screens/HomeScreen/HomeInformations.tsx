@@ -11,8 +11,10 @@ import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Link from '#components/Link';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import type { HomeInformations_profile$key } from '@azzapp/relay/artifacts/HomeInformations_profile.graphql';
 import type { HomeInformations_user$key } from '@azzapp/relay/artifacts/HomeInformations_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
@@ -37,21 +39,32 @@ const HomeInformations = ({
   user,
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
-  const { profiles } = useFragment(
+  const { profiles: profilesKey } = useFragment(
     graphql`
       fragment HomeInformations_user on User {
         profiles {
           id
-          userName
-          firstName
-          nbPosts
-          nbFollowings
-          nbFollowers
-          nbLikes
+          ...HomeInformations_profile
         }
       }
     `,
     user,
+  );
+
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeInformations_profile on Profile {
+        id
+        userName
+        firstName
+        nbPosts
+        nbFollowings
+        nbFollowers
+        nbLikes
+      }
+    `,
+    (profile: any) => profile.id,
+    profilesKey as unknown as HomeInformations_profile$key[],
   );
 
   // using relay result direclty inside animated hook cause crash

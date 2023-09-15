@@ -7,7 +7,6 @@ import {
   KeyboardAvoidingView,
   useWindowDimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   fetchQuery,
   graphql,
@@ -25,6 +24,7 @@ import {
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
@@ -297,7 +297,7 @@ const ProfileForm = ({
     userNameInputRef.current?.focus();
   };
 
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
 
   const companyActivityKeyExtractor = useCallback(

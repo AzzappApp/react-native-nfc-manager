@@ -68,12 +68,12 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     }
 
     const [logoContent, logo2xContent] = await Promise.all([
-      fetch(
-        `${process.env.NEXT_PUBLIC_URL}${logo.src}`.replace('//', '/'),
-      ).then(res => res.arrayBuffer()),
-      fetch(
-        `${process.env.NEXT_PUBLIC_URL}${logo2x.src}`.replace('//', '/'),
-      ).then(res => res.arrayBuffer()),
+      fetch(`${process.env.NEXT_PUBLIC_URL}${logo.src}`).then(res =>
+        res.arrayBuffer(),
+      ),
+      fetch(`${process.env.NEXT_PUBLIC_URL}${logo2x.src}`).then(res =>
+        res.arrayBuffer(),
+      ),
     ]);
 
     const primary = profile.cardColors?.primary;
@@ -108,7 +108,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         logoText: 'azzapp',
         suppressStripShine: false,
         serialNumber: profile?.id,
-        webServiceURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${locale}/wallet/apple/`,
+        webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,
         authenticationToken: await seal(
           profileId,
           process.env.APPLE_TOKEN_PASSWORD ?? '',

@@ -64,8 +64,8 @@ const FollowingsScreenList = ({
   }, [debouncedSearch, refetch]);
 
   const onToggleFollow = useCallback(
-    (profileId: string) => {
-      toggleFollow(profileId, false);
+    (profileId: string, profileUserName: string) => {
+      toggleFollow(profileId, profileUserName, false);
     },
     [toggleFollow],
   );

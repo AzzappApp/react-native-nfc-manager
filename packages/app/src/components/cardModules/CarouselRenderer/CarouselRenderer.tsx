@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+// import { useRef } from 'react';
 import { Image, ScrollView } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -7,10 +7,10 @@ import {
   CAROUSEL_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import PressableNative from '#ui/PressableNative';
+// import PressableNative from '#ui/PressableNative';
 import CardModuleBackground from '../CardModuleBackground';
-import CarouselFullscreen from './CarouselFullscreen';
-import type { CarouselFullscrenActions } from './CarouselFullscreen';
+// import CarouselFullscreen from './CarouselFullscreen';
+// import type { CarouselFullscrenActions } from './CarouselFullscreen';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
@@ -113,7 +113,7 @@ const CarouselRenderer = ({
   });
 
   const height = imageHeight + marginVertical * 2 + borderWidth * 2;
-  const modal = useRef<CarouselFullscrenActions>(null);
+  // const modal = useRef<CarouselFullscrenActions>(null);
 
   return (
     <CardModuleBackground
@@ -138,7 +138,8 @@ const CarouselRenderer = ({
           height: '100%',
         }}
       >
-        {images?.map((image, i) => (
+        {/** Disabled For beta */}
+        {/* {images?.map((image, i) => (
           <PressableNative
             key={image.id}
             onPress={() => modal.current?.open(i)}
@@ -157,16 +158,31 @@ const CarouselRenderer = ({
               }}
             />
           </PressableNative>
+        ))} */}
+        {images?.map(image => (
+          <Image
+            key={image.id}
+            source={{ uri: image.uri }}
+            style={{
+              height: imageHeight + borderWidth * 2,
+              borderRadius,
+              borderColor: swapColor(borderColor, colorPalette),
+              borderWidth,
+              aspectRatio: squareRatio ? 1 : image.aspectRatio,
+              resizeMode: 'cover',
+            }}
+          />
         ))}
       </ScrollView>
-      <CarouselFullscreen
+      {/** Disabled for beta */}
+      {/* <CarouselFullscreen
         ref={modal}
         images={images}
         borderColor={borderColor}
         borderRadius={borderRadius}
         borderWidth={borderWidth}
         squareRatio={squareRatio}
-      />
+      /> */}
     </CardModuleBackground>
   );
 };

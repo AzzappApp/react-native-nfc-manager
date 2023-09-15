@@ -50,8 +50,8 @@ const AccountHeader = ({
             onPress={router.back}
             accessibilityRole="link"
             accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Go back to account screen',
-              description: 'Shortcut to go back to account screen',
+              defaultMessage: 'Go back',
+              description: 'Go back button in account header',
             })}
           >
             <CoverRenderer

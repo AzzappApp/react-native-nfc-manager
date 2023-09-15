@@ -5,11 +5,11 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import FloatingButton from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -70,8 +70,7 @@ const ProfileScreenButtonBar = ({
   style,
   ...props
 }: ProfileScreenButtonBarProps) => {
-  const inset = useSafeAreaInsets();
-  const bottomMargin = inset.bottom > 0 ? inset.bottom : 15;
+  const inset = useScreenInsets();
   const editTransition = useEditTransition();
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -85,7 +84,7 @@ const ProfileScreenButtonBar = ({
 
   return (
     <Animated.View
-      style={[styles.buttonBar, animatedStyle, { bottom: bottomMargin }, style]}
+      style={[styles.buttonBar, animatedStyle, { bottom: inset.bottom }, style]}
       {...props}
       pointerEvents={editing ? 'none' : 'box-none'}
     >

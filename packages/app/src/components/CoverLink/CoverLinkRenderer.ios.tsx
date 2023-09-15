@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -6,6 +7,7 @@ import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 import type { GestureResponderEvent, View } from 'react-native';
+import type { Disposable } from 'react-relay';
 
 /**
  * iOS version of the cover link, it dispatches a push to the profile screen with
@@ -51,9 +53,11 @@ const CoverLink = ({
     });
   };
 
+  const environment = useRelayEnvironment();
   useEffect(() => {
+    let disposable: Disposable | null = null;
     if (prefetch) {
-      prefetchScreen({
+      disposable = prefetchScreen(environment, {
         route: 'PROFILE',
         params: {
           userName,
@@ -61,7 +65,10 @@ const CoverLink = ({
         },
       });
     }
-  }, [prefetch, prefetchScreen, userName, profileId]);
+    return () => {
+      disposable?.dispose();
+    };
+  }, [prefetch, prefetchScreen, userName, profileId, environment]);
 
   return (
     <PressableScaleHighlight

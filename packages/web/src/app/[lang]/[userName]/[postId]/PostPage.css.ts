@@ -46,14 +46,14 @@ const wrapper = style({
 });
 
 const postSection = style({
-  height: '100%',
   '@media': {
     [MediaQuery.Desktop]: {
-      width: '70%',
+      flex: 1,
       paddingTop: '75px',
       paddingBottom: '75px',
     },
     [MediaQuery.Mobile]: {
+      height: '100%',
       width: '100%',
     },
   },

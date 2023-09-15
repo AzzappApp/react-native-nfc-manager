@@ -90,8 +90,13 @@ export const getPostCommentsWithProfile = async (
         before ? sql`${PostCommentTable.createdAt} < ${before}` : undefined,
       ),
     )
-    .innerJoin(ProfileTable, eq(ProfileTable.id, PostCommentTable.profileId))
-    .where(eq(ProfileTable.cardIsPublished, true))
+    .innerJoin(
+      ProfileTable,
+      and(
+        eq(ProfileTable.id, PostCommentTable.profileId),
+        eq(ProfileTable.cardIsPublished, true),
+      ),
+    )
     .orderBy(desc(PostCommentTable.createdAt))
     .limit(limit);
 

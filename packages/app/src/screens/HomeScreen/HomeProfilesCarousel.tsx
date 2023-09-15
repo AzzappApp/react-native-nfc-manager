@@ -17,6 +17,7 @@ import CoverLink from '#components/CoverLink';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import Skeleton from '#components/Skeleton';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -25,6 +26,7 @@ import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
 } from '@azzapp/relay/artifacts/HomeProfilesCarousel_user.graphql';
+import type { HomeProfilesCarouselItem_profile$key } from '@azzapp/relay/artifacts/HomeProfilesCarouselItem_profile.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { GestureResponderEvent, ListRenderItemInfo } from 'react-native';
@@ -72,12 +74,7 @@ const HomeProfilesCarousel = (
       fragment HomeProfilesCarousel_user on User {
         profiles {
           id
-          userName
-          cardCover {
-            title
-          }
-          ...CoverLink_profile
-          ...CoverRenderer_profile
+          ...HomeProfilesCarouselItem_profile
         }
       }
     `,
@@ -121,14 +118,16 @@ const HomeProfilesCarousel = (
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => (
-      <ItemRender
-        item={item}
-        coverHeight={coverHeight}
-        coverWidth={coverWidth}
-        index={index}
-        scrollToIndex={scrollToIndex}
-        currentUserIndex={selectedIndex}
-      />
+      <ProfileBoundRelayEnvironmentProvider profileId={item?.id ?? null}>
+        <ItemRender
+          item={item}
+          coverHeight={coverHeight}
+          coverWidth={coverWidth}
+          index={index}
+          scrollToIndex={scrollToIndex}
+          currentUserIndex={selectedIndex}
+        />
+      </ProfileBoundRelayEnvironmentProvider>
     ),
     [coverHeight, coverWidth, selectedIndex, scrollToIndex],
   );
@@ -196,7 +195,22 @@ const ItemRenderComponent = ({
 }: ItemRenderProps) => {
   const intl = useIntl();
 
-  const [ready, setReady] = useState(!item?.cardCover);
+  const profile = useFragment(
+    graphql`
+      fragment HomeProfilesCarouselItem_profile on Profile {
+        id
+        userName
+        cardCover {
+          title
+        }
+        ...CoverLink_profile
+        ...CoverRenderer_profile
+      }
+    `,
+    item as HomeProfilesCarouselItem_profile$key | null,
+  );
+
+  const [ready, setReady] = useState(!profile?.cardCover);
 
   const onReady = useCallback(() => {
     setReady(true);
@@ -209,9 +223,11 @@ const ItemRenderComponent = ({
     }
   };
 
-  if (!item) {
+  const isCurrent = index === currentUserIndex;
+
+  if (!profile) {
     return (
-      <Link route="NEW_PROFILE" prefetch>
+      <Link route="NEW_PROFILE">
         <PressableOpacity
           style={[
             styles.newCover,
@@ -245,21 +261,20 @@ const ItemRenderComponent = ({
         },
       ]}
     >
-      {item.cardCover ? (
+      {profile.cardCover ? (
         <CoverLink
-          profile={item}
+          profile={profile}
           width={coverWidth}
-          profileId={item.id}
+          profileId={profile.id}
           onPress={onPress}
-          prefetch
-          videoEnabled={currentUserIndex === index}
+          videoEnabled={isCurrent}
           onReadyForDisplay={onReady}
         />
       ) : (
         <Link
           route="NEW_PROFILE"
           params={{
-            profileId: item.id,
+            profileId: profile.id,
           }}
         >
           <PressableOpacity
@@ -278,7 +293,7 @@ const ItemRenderComponent = ({
           >
             <CoverRenderer
               width={coverWidth}
-              profile={item}
+              profile={profile}
               onReadyForDisplay={onReady}
             />
           </PressableOpacity>

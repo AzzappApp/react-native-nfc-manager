@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
@@ -57,7 +57,7 @@ const TextAreaModal = ({
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
-  const { top: insetTop } = useSafeAreaInsets();
+  const { top: insetTop } = useScreenInsets();
 
   const [text, setText] = useState(value);
 

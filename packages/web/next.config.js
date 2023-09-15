@@ -1,4 +1,5 @@
 const path = require('path');
+const { withSentryConfig } = require('@sentry/nextjs');
 const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
 const relayArtifactDirectory = path.join(
   path.dirname(require.resolve('@azzapp/relay/package.json')),
@@ -56,6 +57,33 @@ const config = {
     serverActions: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
+  sentry: {
+    // Upload a larger set of source maps for prettier stack traces (increases build time)
+    widenClientFileUpload: true,
+
+    // Transpiles SDK to be compatible with IE11 (increases bundle size)
+    transpileClientSDK: false,
+
+    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+    tunnelRoute: '/monitoring',
+
+    // Hides source maps from generated client bundles
+    hideSourceMaps: true,
+  },
 };
 
-module.exports = withVanillaExtract(config);
+const sentryWebpackPluginOptions = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  // Suppresses source map uploading logs during build
+  silent: true,
+
+  org: 'azzapp',
+  project: 'web',
+};
+
+module.exports = withSentryConfig(
+  withVanillaExtract(config),
+  sentryWebpackPluginOptions,
+);

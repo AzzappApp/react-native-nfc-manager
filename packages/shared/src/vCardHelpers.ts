@@ -42,5 +42,17 @@ export const buildVCard = (contactCardData: string) => {
     vcard.addURL(url.url, url.label);
   });
 
+  contactCard.adresses.forEach(address => {
+    vcard.addAddress(address.label, address.address);
+  });
+
+  contactCard.birthdays.forEach(birthday => {
+    vcard.addBirthday(birthday);
+  });
+
+  contactCard.socials.forEach(social => {
+    vcard.addSocial(social, '');
+  });
+
   return vcard;
 };

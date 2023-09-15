@@ -18,16 +18,14 @@ import type {
 } from 'google-wallet/lib/cjs/generic';
 
 const getGoogleWalletPass = async (
-  _: Request,
+  req: Request,
   {
     params: { lang },
-    searchParams,
   }: {
     params: { lang: string };
-    searchParams: { profileId: string };
   },
 ) => {
-  const profileId = searchParams.profileId;
+  const profileId = new URL(req.url).searchParams.get('profileId')!;
   try {
     const { userId } = (await getSessionData()) ?? {};
     const profile = await getProfileById(profileId);

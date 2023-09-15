@@ -7,10 +7,10 @@ import {
   forwardRef,
   startTransition,
   useEffect,
+  useMemo,
 } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
-  Image,
   Keyboard,
   Modal,
   StyleSheet,
@@ -18,8 +18,10 @@ import {
   unstable_batchedUpdates,
   useWindowDimensions,
 } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
+import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
@@ -34,12 +36,13 @@ import CoverEditorTemplateList from './CoverEditorTemplateList';
 import useCoverEditionManager from './useCoverEditionManager';
 import type { ColorPalette, TemplateKind } from './coverEditorTypes';
 import type { CoverData } from './useCoverEditionManager';
+import type { CoverEditor_suggested$key } from '@azzapp/relay/artifacts/CoverEditor_suggested.graphql';
 import type { CoverEditor_viewer$key } from '@azzapp/relay/artifacts/CoverEditor_viewer.graphql';
 import type { ForwardedRef } from 'react';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 export type CoverEditorProps = {
-  viewer: CoverEditor_viewer$key;
+  viewer: CoverEditor_suggested$key & CoverEditor_viewer$key;
   height: number;
   initialTemplateKind?: TemplateKind;
   onCoverSaved: () => void;
@@ -65,13 +68,14 @@ const CoverEditor = (
     graphql`
       fragment CoverEditor_viewer on Viewer {
         profile {
+          profileKind
           ...useCoverEditionManager_profile
         }
         ...CoverEditorCustom_viewer
         ...CoverEditorTemplateList_viewer
       }
     `,
-    viewerKey,
+    viewerKey as CoverEditor_viewer$key,
   );
 
   // #endregion
@@ -93,15 +97,21 @@ const CoverEditor = (
     cardColors,
     modals,
     mediaComputing,
+    mediaVisible,
+    hasSuggestedMedia,
+    isCoverCreation,
+    hasSourceMediaBeforeSuggested,
     // TODO handle
     // mediaComputationError
     setTitle,
     setSubTitle,
     setCoverStyle,
     setColorPalette,
+    setSuggestedMedia,
     toggleCropMode,
     openImagePicker,
     onSave,
+    toggleMediaVisibility,
     updateEditedMediaKind,
   } = useCoverEditionManager({
     initialData: null,
@@ -111,19 +121,6 @@ const CoverEditor = (
     profile: viewer.profile ?? null,
   });
 
-  const onSwitchTemplateKind = useCallback(
-    async (kind: TemplateKind) => {
-      startTransition(() => {
-        // We try to take advantage of the transition to reduce the flickering
-        // but it's not perfect, and we would need to use react 18 concurrent mode
-        unstable_batchedUpdates(() => {
-          setTemplateKind(kind);
-          updateEditedMediaKind(kind === 'video' ? 'video' : 'image');
-        });
-      });
-    },
-    [updateEditedMediaKind],
-  );
   // #endregion
 
   // #region Preview media
@@ -155,15 +152,33 @@ const CoverEditor = (
   }, []);
   // #endregion
 
-  // #region Media visibility
-  const [mediaVisible, setMediaVisible] = useState(true);
-  const toggleMediaVisibility = useCallback(() => {
-    setMediaVisible(mediaVisible => !mediaVisible);
-  }, []);
-  // #endregion
+  // #region Template Kind
+  const onSwitchTemplateKind = useCallback(
+    async (kind: TemplateKind) => {
+      startTransition(() => {
+        // We try to take advantage of the transition to reduce the flickering
+        // but it's not perfect, and we would need to use react 18 concurrent mode
+        unstable_batchedUpdates(() => {
+          setTemplateKind(kind);
+          updateEditedMediaKind(kind === 'video' ? 'video' : 'image');
+          if (hasSuggestedMedia) {
+            setSuggestedMedia(null);
+          }
+        });
+      });
+    },
+    [hasSuggestedMedia, setSuggestedMedia, updateEditedMediaKind],
+  );
 
   // #region canSave
-  const canSave = !mediaComputing && mediaVisible;
+  const canSave =
+    !mediaComputing &&
+    (((mediaVisible || sourceMedia == null) &&
+      (viewer?.profile?.profileKind === 'personal' ||
+        templateKind === 'people')) ||
+      (viewer?.profile?.profileKind === 'business' &&
+        templateKind !== 'people' &&
+        (mediaVisible || hasSuggestedMedia)));
 
   useEffect(() => {
     onCanSaveChange(canSave);
@@ -251,6 +266,151 @@ const CoverEditor = (
     [templateKind],
   );
 
+  // #region Suggested Media
+  const {
+    data: suggestedMediaData,
+    loadNext: loadNextSuggestion,
+    isLoadingNext: isLoadingNextSuggestion,
+    hasNext: hasNextSuggestion,
+  } = usePaginationFragment(
+    graphql`
+      fragment CoverEditor_suggested on Viewer
+      @refetchable(queryName: "CoverEditor_suggested_query")
+      @argumentDefinitions(
+        after: { type: String }
+        first: { type: Int, defaultValue: 50 }
+      ) {
+        suggestedMedias(after: $after, first: $first)
+          @connection(key: "CoverEditor_connection_suggestedMedias") {
+          edges {
+            node {
+              __typename
+              id
+              # we use arbitrary values here, but it should be good enough (arguments in refetchable fragment)
+              uri(width: 300, pixelRatio: 2)
+              width
+              height
+            }
+          }
+        }
+      }
+    `,
+    viewerKey as CoverEditor_suggested$key,
+  );
+
+  const [selectedSuggestedMediaIndex, setSelectedSuggestedMediaIndex] =
+    useState(0);
+
+  //media: CoverData['sourceMedia'] | null
+  const suggestedMedias = useMemo(() => {
+    if (
+      suggestedMediaData.suggestedMedias &&
+      viewer?.profile?.profileKind === 'business' &&
+      templateKind !== 'people'
+    ) {
+      return suggestedMediaData.suggestedMedias.edges
+        ? convertToNonNullArray(
+            suggestedMediaData.suggestedMedias.edges
+              .map(edge => {
+                return edge?.node;
+              })
+              .filter(mediaFilter =>
+                mediaFilter
+                  ? templateKind === 'video'
+                    ? mediaFilter.__typename === 'MediaVideo'
+                    : mediaFilter.__typename === 'MediaImage'
+                  : false,
+              ),
+          )
+        : [];
+    } else {
+      return undefined;
+    }
+  }, [
+    suggestedMediaData.suggestedMedias,
+    templateKind,
+    viewer?.profile?.profileKind,
+  ]);
+
+  const showSuggestedMedia = useMemo(
+    () =>
+      templateKind !== 'people' &&
+      (!mediaVisible || sourceMedia == null) &&
+      viewer.profile?.profileKind === 'business',
+    [sourceMedia, mediaVisible, templateKind, viewer.profile?.profileKind],
+  );
+
+  const selectSuggestedMedia = useCallback(() => {
+    let newIndex = 0;
+    if (selectedSuggestedMediaIndex + 1 < (suggestedMedias?.length ?? 0)) {
+      newIndex = selectedSuggestedMediaIndex + 1;
+    }
+
+    setSelectedSuggestedMediaIndex(newIndex);
+    if (suggestedMedias?.[newIndex]) {
+      setSuggestedMedia({
+        id: suggestedMedias[newIndex].id,
+        uri: suggestedMedias[newIndex].uri,
+        kind:
+          suggestedMedias[newIndex].__typename === 'MediaImage'
+            ? 'image'
+            : 'video',
+        width: suggestedMedias[newIndex].width,
+        height: suggestedMedias[newIndex].height,
+      });
+
+      if (
+        !isLoadingNextSuggestion &&
+        selectedSuggestedMediaIndex > (suggestedMedias?.length ?? 0) - 3 &&
+        hasNextSuggestion
+      ) {
+        loadNextSuggestion(50);
+      }
+    }
+  }, [
+    hasNextSuggestion,
+    isLoadingNextSuggestion,
+    loadNextSuggestion,
+    selectedSuggestedMediaIndex,
+    setSuggestedMedia,
+    suggestedMedias,
+  ]);
+
+  const onPressSuggestedMedia = useCallback(() => {
+    if (showSuggestedMedia) {
+      selectSuggestedMedia();
+    }
+  }, [selectSuggestedMedia, showSuggestedMedia]);
+
+  useEffect(() => {
+    if (mediaVisible && hasSuggestedMedia) {
+      setSuggestedMedia(null);
+    } else if (!mediaVisible && showSuggestedMedia && !hasSuggestedMedia) {
+      selectSuggestedMedia();
+    }
+  }, [
+    isCoverCreation,
+    hasSuggestedMedia,
+    mediaVisible,
+    setSuggestedMedia,
+    selectSuggestedMedia,
+    showSuggestedMedia,
+  ]);
+
+  useEffect(() => {
+    // creating a new cover
+    if (
+      isCoverCreation &&
+      templateKind !== 'people' &&
+      !sourceMedia &&
+      !hasSuggestedMedia
+    ) {
+      selectSuggestedMedia();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCoverCreation, templateKind]);
+  // #endregion
+
   return (
     <>
       <Container style={styles.root}>
@@ -331,25 +491,38 @@ const CoverEditor = (
               onCoverStyleChange={setCoverStyle}
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
+              onSelectSuggestedMedia={onPressSuggestedMedia}
               mediaComputing={mediaComputing}
+              showSuggestedMedia={showSuggestedMedia}
             />
           </Suspense>
         </View>
         <View style={styles.controlPanel}>
           <FloatingIconButton icon="camera" onPress={openImagePicker} />
           <FloatingIconButton icon="text" onPress={openTitleModal} />
-          {sourceMedia && (
+          {((sourceMedia && !hasSuggestedMedia) ||
+            (sourceMedia &&
+              hasSuggestedMedia &&
+              hasSourceMediaBeforeSuggested)) && (
             <PressableOpacity
               style={[styles.mediaHideButton]}
               onPress={toggleMediaVisibility}
             >
-              <Image
-                source={{ uri: sourceMedia.uri }}
+              <GPUImageView
                 style={[
                   styles.mediaHideButtonImage,
                   !mediaVisible && { opacity: 0.5 },
+                  { overflow: 'hidden' },
                 ]}
-              />
+                testID="image-picker-media-video"
+              >
+                {sourceMedia.kind === 'image' ? (
+                  <ImageLayer uri={sourceMedia.uri} />
+                ) : (
+                  <VideoFrame uri={sourceMedia.uri} time={0} />
+                )}
+              </GPUImageView>
+
               <Icon
                 style={styles.mediaHideButtonIcon}
                 icon={mediaVisible ? 'display' : 'hide'}
@@ -360,7 +533,7 @@ const CoverEditor = (
             <FloatingIconButton
               icon="crop"
               onPress={toggleCropMode}
-              disabled={!mediaVisible}
+              disabled={!mediaVisible && !hasSuggestedMedia}
             />
           )}
           <FloatingIconButton icon="settings" onPress={onCustomEdition} />

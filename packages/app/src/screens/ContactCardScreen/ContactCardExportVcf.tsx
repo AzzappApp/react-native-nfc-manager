@@ -31,6 +31,23 @@ const ContactCardExportVcf = ({
           number
           selected
         }
+        urls {
+          address
+          selected
+        }
+        addresses {
+          address
+          label
+          selected
+        }
+        birthdays {
+          birthday
+          selected
+        }
+        socials {
+          social
+          selected
+        }
         serializedContactCard {
           data
         }

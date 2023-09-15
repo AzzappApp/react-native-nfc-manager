@@ -6,7 +6,7 @@ import {
   useWatch,
 } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -21,6 +21,7 @@ import PressableNative from '#ui/PressableNative';
 import SelectList from '#ui/SelectList';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
 import contactModalStyles, {
   DELETE_BUTTON_WIDTH,
 } from './ContactCardEditModalStyles';
@@ -98,7 +99,7 @@ const ContactCardEditModalField = ({
   return (
     <>
       <Animated.View
-        style={[styles.field, style, { backgroundColor: colors.white }]}
+        style={[styles.field, style]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
         // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
 

@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.2.2-rc.0",
+  "version": "0.2.3-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,36 +13,39 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.2.2-rc.0",
-    "@azzapp/i18n": "0.2.2-rc.0",
-    "@azzapp/relay": "0.2.2-rc.0",
-    "@azzapp/shared": "0.2.2-rc.0",
+    "@azzapp/data": "0.2.3-rc.0",
+    "@azzapp/i18n": "0.2.3-rc.0",
+    "@azzapp/relay": "0.2.3-rc.0",
+    "@azzapp/shared": "0.2.3-rc.0",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@sentry/nextjs": "^7.68.0",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
+    "encoding": "^0.1.13",
+    "google-wallet": "^1.0.16",
+    "jsonwebtoken": "^9.0.1",
     "lodash": "^4.17.21",
     "next": "^13.4.19",
+    "os-browserify": "^0.3.0",
+    "p-limit": "^4.0.0",
+    "passkit-generator": "^3.1.11",
+    "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.4.4",
     "resend": "^0.17.2",
-    "sharp": "^0.32.5",
+    "semver": "^7.5.4",
     "server-only": "^0.0.1",
-    "passkit-generator": "^3.1.11",
+    "sharp": "^0.32.5",
     "stream-browserify": "^3.0.0",
-    "path-browserify": "^1.0.1",
-    "os-browserify": "^0.3.0",
-    "google-wallet": "^1.0.16",
-    "encoding": "^0.1.13",
-    "jsonwebtoken": "^9.0.1",
     "twilio": "^4.15.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.15.11",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "@vanilla-extract/next-plugin": "^2.3.0",
     "@vanilla-extract/dynamic": "^2.0.3",
-    "@types/jsonwebtoken": "^9.0.2"
+    "@vanilla-extract/next-plugin": "^2.3.0"
   }
 }

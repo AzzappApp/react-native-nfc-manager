@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -10,6 +12,7 @@ import FollowersScreenList from './FollowersScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { FollowersRoute } from '#routes';
 import type { FollowersScreenQuery } from '@azzapp/relay/artifacts/FollowersScreenQuery.graphql';
+import type { PreloadedQuery } from 'react-relay';
 
 const followersScreenQuery = graphql`
   query FollowersScreenQuery {
@@ -30,13 +33,11 @@ const FollowersScreen = ({
 }: RelayScreenProps<FollowersRoute, FollowersScreenQuery>) => {
   const intl = useIntl();
 
-  const { viewer } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
-
   const router = useRouter();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container style={{ flex: 1 }}>
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
           leftElement={
             <IconButton
@@ -51,13 +52,39 @@ const FollowersScreen = ({
             description: 'Title of the screen listing followers',
           })}
         />
-        <FollowersScreenList
-          isPublic={!viewer?.profile?.contactCard?.isPrivate ?? false}
-          currentProfileId={viewer.profile?.id ?? ''}
-          viewer={viewer}
-        />
-      </Container>
-    </SafeAreaView>
+        <Suspense
+          fallback={
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          }
+        >
+          <FollowerScreenInner preloadedQuery={preloadedQuery} />
+        </Suspense>
+      </SafeAreaView>
+    </Container>
+  );
+};
+
+const FollowerScreenInner = ({
+  preloadedQuery,
+}: {
+  preloadedQuery: PreloadedQuery<FollowersScreenQuery>;
+}) => {
+  const { viewer } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
+
+  return (
+    <FollowersScreenList
+      isPublic={!viewer?.profile?.contactCard?.isPrivate ?? false}
+      currentProfileId={viewer.profile?.id ?? ''}
+      viewer={viewer}
+    />
   );
 };
 

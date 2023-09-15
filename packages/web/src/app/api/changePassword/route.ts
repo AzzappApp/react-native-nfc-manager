@@ -42,7 +42,7 @@ export const POST = async (req: Request) => {
   }
 
   return NextResponse.json(
-    { message: ERRORS.INTERNAL_SERVER_ERROR },
-    { status: 500 },
+    { message: ERRORS.INVALID_REQUEST },
+    { status: 400 },
   );
 };
