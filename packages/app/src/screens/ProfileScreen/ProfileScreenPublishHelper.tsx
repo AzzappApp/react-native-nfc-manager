@@ -60,6 +60,7 @@ const ProfileScreenPublishHelper = ({
             'Toast info message that appears when the user is in webcard edit mode for the first time',
         }),
         bottomOffset: 0,
+        autoHide: false,
         props: {
           showClose: true,
         },
