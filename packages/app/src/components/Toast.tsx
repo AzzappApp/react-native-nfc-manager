@@ -158,6 +158,7 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     paddingLeft: 10,
     paddingRight: 10,
+    marginHorizontal: 20,
     flex: 0,
     width: undefined,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
