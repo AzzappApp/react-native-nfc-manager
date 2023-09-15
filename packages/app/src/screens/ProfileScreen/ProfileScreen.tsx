@@ -129,16 +129,18 @@ const ProfileScreen = ({
             disabled={editing}
             onFlip={toggleFlip}
             front={
-              <ProfileScreenContent
-                ready={ready}
-                profile={data.profile}
-                editing={editing}
-                isViewer={isViewer}
-                selectionMode={selectionMode}
-                onToggleEditing={toggleEditing}
-                onToggleSelectionMode={toggleSelectionMode}
-                onContentPositionChange={onContentPositionChange}
-              />
+              <View style={{ flex: 1, backgroundColor: 'white' }}>
+                <ProfileScreenContent
+                  ready={ready}
+                  profile={data.profile}
+                  editing={editing}
+                  isViewer={isViewer}
+                  selectionMode={selectionMode}
+                  onToggleEditing={toggleEditing}
+                  onToggleSelectionMode={toggleSelectionMode}
+                  onContentPositionChange={onContentPositionChange}
+                />
+              </View>
             }
             back={
               <Suspense>
