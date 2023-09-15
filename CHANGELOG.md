@@ -1,5 +1,6 @@
-## 0.2.3-canary.28
+## 0.2.3-canary.29
 
+* **fix:**  - **Home:** carousel cache for new profile ([#1119](https://github.com/AzzappApp/azzapp/pull/1119))
 * **fix:**  - time post created seconds ([#1112](https://github.com/AzzappApp/azzapp/pull/1112))
 * **fix:**  - rule of disable save button and showing screen select a photo ([#1110](https://github.com/AzzappApp/azzapp/pull/1110))
 * **fix:**  - remove some filter for beta
