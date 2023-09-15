@@ -1,5 +1,9 @@
-## 0.2.3-canary.33
+## 0.2.3-canary.34
 
+* **fix:**  - colorList ([#1131](https://github.com/AzzappApp/azzapp/pull/1131))
+* **fix:**  - 🐛 don't autohide toast ([#1130](https://github.com/AzzappApp/azzapp/pull/1130))
+* **fix:**  - try to fix layout and perf ([#1127](https://github.com/AzzappApp/azzapp/pull/1127))
+* **fix:**  - **Home:** informations not updated ([#1126](https://github.com/AzzappApp/azzapp/pull/1126))
 * **fix:**  - background on profile posts list
 * **fix:**  - 🐛 fetch up-to-date enabled templates ([#1106](https://github.com/AzzappApp/azzapp/pull/1106))
 * **fix:**  - toast padding
