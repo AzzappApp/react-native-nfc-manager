@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from '#components/NativeRouter';
 import PostList from '#components/ProfilePostsList';
+import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
@@ -28,37 +29,39 @@ const ProfilePostsList = ({
   };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1 }}
-      edges={{ bottom: 'off', top: 'additive' }}
-    >
-      <Header
-        middleElement={
-          isViewer
-            ? intl.formatMessage({
-                defaultMessage: 'My posts',
-                description: 'ProfilePostScreen viewer user title Header',
-              })
-            : intl.formatMessage(
-                {
-                  defaultMessage: '{userName} posts',
-                  description: 'ProfilePostScreen title Header',
-                },
-                { userName },
-              )
-        }
-        leftElement={
-          <IconButton
-            icon="arrow_down"
-            onPress={onClose}
-            iconSize={30}
-            size={47}
-            variant="icon"
-          />
-        }
-      />
-      <PostList profile={profile} canPlay={hasFocus} />
-    </SafeAreaView>
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={{ bottom: 'off', top: 'additive' }}
+      >
+        <Header
+          middleElement={
+            isViewer
+              ? intl.formatMessage({
+                  defaultMessage: 'My posts',
+                  description: 'ProfilePostScreen viewer user title Header',
+                })
+              : intl.formatMessage(
+                  {
+                    defaultMessage: '{userName} posts',
+                    description: 'ProfilePostScreen title Header',
+                  },
+                  { userName },
+                )
+          }
+          leftElement={
+            <IconButton
+              icon="arrow_down"
+              onPress={onClose}
+              iconSize={30}
+              size={47}
+              variant="icon"
+            />
+          }
+        />
+        <PostList profile={profile} canPlay={hasFocus} />
+      </SafeAreaView>
+    </Container>
   );
 };
 
