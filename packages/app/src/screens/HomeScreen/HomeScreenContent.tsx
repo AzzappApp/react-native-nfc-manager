@@ -6,6 +6,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useOnFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
@@ -228,7 +229,11 @@ const HomeScreenContent = ({
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <HomeContactCardLandscape profile={currentProfile ?? null} />
+      <ProfileBoundRelayEnvironmentProvider
+        profileId={currentProfile?.id ?? null}
+      >
+        <HomeContactCardLandscape profile={currentProfile ?? null} />
+      </ProfileBoundRelayEnvironmentProvider>
     </View>
   );
 };

@@ -118,7 +118,10 @@ const ContactCard = ({
           <View style={styles.webcardText}>
             <Text
               variant="large"
-              style={[styles.webCardLabel, { color: readableColor }]}
+              style={[
+                styles.webCardLabel,
+                { color: readableColor, fontSize: 14 },
+              ]}
               numberOfLines={1}
             >
               {formatDisplayName(contactCard?.firstName, contactCard?.lastName)}
