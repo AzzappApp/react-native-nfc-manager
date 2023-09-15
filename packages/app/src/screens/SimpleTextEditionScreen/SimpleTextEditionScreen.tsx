@@ -213,6 +213,8 @@ const SimpleTextEditionScreen = ({
             cardModules {
               visible
               ...SimpleTextEditionScreen_module
+              ...SimpleTextRenderer_simpleTextModule
+              ...SimpleTextRenderer_simpleTitleModule
             }
           }
         }
