@@ -1,30 +1,25 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-
-import { Resend } from 'resend';
-import client from 'twilio';
-import {
-  getUserByEmail,
-  getUserByPhoneNumber,
-  getToken,
-  deleteToken,
-  createToken,
-} from '@azzapp/data/domains';
+import { Twilio } from 'twilio';
+import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { ForgotPassword } from '#components/email/ForgotPassword';
 
 type ForgotPasswordBody = {
   credential: string;
   locale: string;
 };
 
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID!;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
+const TWILIO_ACCOUNT_VERIFY_SERVICE_SID =
+  process.env.TWILIO_ACCOUNT_VERIFY_SERVICE_SID!;
+
 export const POST = async (req: Request) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const { credential } = (await req.json()) as ForgotPasswordBody;
+  const { credential, locale } = (await req.json()) as ForgotPasswordBody;
   if (!credential) {
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
@@ -33,76 +28,37 @@ export const POST = async (req: Request) => {
   }
   try {
     let user;
-    const code = Math.random().toString().substring(2, 8);
     let issuer: string | undefined;
+    let channel: 'email' | 'sms' | undefined;
+
     if (isValidEmail(credential)) {
       user = await getUserByEmail(credential);
-
-      if (user?.email) {
-        const existingToken = await getToken(user.id);
-
-        if (existingToken) {
-          await deleteToken(existingToken.userId);
-        }
-
-        await createToken({
-          userId: user.id,
-          issuer: user.email,
-          value: code,
-        });
-
-        await resend.emails.send({
-          from: 'azzapp <onboarding@resend.dev>', //todo change email with no-reply (domain configuration needed)
-          to: [user.email],
-          subject: 'Azzapp - Reset your password', //todo i18n
-          react: ForgotPassword({
-            code,
-            email: user.email,
-          }) as React.ReactElement,
-        });
-
-        issuer = user.email;
+      if (user) {
+        issuer = user.email!;
+        channel = 'email';
       }
-    }
-    if (user == null && isInternationalPhoneNumber(credential)) {
+    } else if (isInternationalPhoneNumber(credential)) {
       user = await getUserByPhoneNumber(credential);
-
-      if (user?.phoneNumber) {
-        const existingToken = await getToken(user.id);
-
-        if (existingToken) {
-          await deleteToken(existingToken.userId);
-        }
-
-        await createToken({
-          userId: user.id,
-          issuer: user.phoneNumber,
-          value: code,
-        });
-
-        const twilioClient = new client.Twilio(
-          process.env.TWILIO_ACCOUNT_SID ?? '',
-          process.env.TWILIO_AUTH_TOKEN ?? '',
-        );
-
-        await twilioClient.messages.create({
-          body: `Please enter the follow code to reset your password: ${code}`, //todo i18n
-          from: process.env.TWILIO_PHONE_NUMBER ?? '',
-          to: user.phoneNumber,
-        });
-        issuer = user.phoneNumber;
+      if (user) {
+        issuer = user.phoneNumber!;
+        channel = 'sms';
       }
     }
-    if (user == null || issuer === undefined) {
-      // TODO we should not leak the fact that the user does not exist
-      // this is a security risk
-      return NextResponse.json(
-        { message: ERRORS.INVALID_REQUEST },
-        { status: 400 },
-      );
+
+    if (!issuer || !channel) {
+      // even if the user does not exist, we answer with a 200 to avoid leaking information
+      return NextResponse.json({ issuer: credential }, { status: 200 });
     }
 
-    return NextResponse.json({ issuer });
+    const client = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    const verification = await client.verify.v2
+      .services(TWILIO_ACCOUNT_VERIFY_SERVICE_SID)
+      .verifications.create({ to: issuer, channel, locale });
+
+    if (verification && verification.status === 'canceled') {
+      throw new Error('Verification canceled');
+    }
+    return NextResponse.json({ issuer: credential });
   } catch (error) {
     Sentry.captureException(error);
     console.error(error);
