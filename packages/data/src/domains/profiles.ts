@@ -40,9 +40,7 @@ export const ProfileTable = mysqlTable(
     companyName: cols.defaultVarchar('companyName'),
     companyActivityId: cols.cuid('companyActivityId'),
     createdAt: cols.dateTime('createdAt', true).notNull(),
-    // reenable after beta, we made a mistake and forgot to add this column
-    // and I don't want to migrate the db for now
-    // updatedAt: cols.dateTime('updatedAt', true).notNull(),
+    updatedAt: cols.dateTime('updatedAt', true).notNull(),
 
     /* Cards infos */
     cardColors: json('cardColors').$type<{
