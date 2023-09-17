@@ -51,21 +51,23 @@ const ForgotPasswordScreen = () => {
   const onSubmit = async () => {
     if (isValidMailOrPhone) {
       if (!isSubmitted) {
+        setIsSubmitted(true);
+        let issuer: string;
         try {
-          const { issuer } = await forgotPassword({
+          ({ issuer } = await forgotPassword({
             locale: intl.locale,
             credential: emailOrPhone,
-          });
-
-          router.push({
-            route: 'FORGOT_PASSWORD_CONFIRMATION',
-            params: { issuer },
-          });
-
-          setIsSubmitted(true);
+          }));
         } catch (e) {
+          setIsSubmitted(false);
           setError(true);
+          return;
         }
+
+        router.push({
+          route: 'FORGOT_PASSWORD_CONFIRMATION',
+          params: { issuer },
+        });
       }
     }
   };
@@ -134,6 +136,7 @@ const ForgotPasswordScreen = () => {
                 style={styles.button}
                 onPress={onSubmit}
                 disabled={!isValidMailOrPhone}
+                loading={isSubmitted}
               />
             </Submit>
           </Form>
