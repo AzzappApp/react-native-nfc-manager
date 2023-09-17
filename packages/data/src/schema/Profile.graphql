@@ -1,0 +1,194 @@
+"""
+Represent an Azzapp Profile
+"""
+type Profile implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  The user name of the profile
+  """
+  userName: String!
+  """
+  The kind of the profile (business, personal)
+  """
+  profileKind: ProfileKind
+  """
+  The profile category
+  """
+  profileCategory: ProfileCategory
+  """
+  The first name of the profile, will only be set for personal profile
+  """
+  firstName: String
+  """
+  The last name of the profile, will only be set for personal profile
+  """
+  lastName: String
+  """
+  The company name of the profile, will only be set for business profile
+  """
+  companyName: String
+  """
+  The company activity of the profile, will only be set for business profile
+  """
+  companyActivity: CompanyActivity
+  """
+  The colors used by the webcard and the contact card of the profile
+  """
+  cardColors: CardColors
+  """
+  The profile WebCard cover
+  """
+  cardCover: CardCover
+  """
+  the profile WebCar style
+  """
+  cardStyle: ProfileCardStyle
+  """
+  the profle WebCard modules
+  """
+  cardModules: [CardModule!]!
+  """
+  Is the profile webcard published
+  """
+  cardIsPublished: Boolean!
+  """
+  The profile contact card
+  """
+  contactCard: ContactCard
+  """
+  True if the current viewer is following this profile
+  """
+  isFollowing: Boolean!
+  """
+  the number of likes received by the profile posts
+  """
+  nbLikes: Int!
+  """
+  the number of profile followed by this profile
+  """
+  nbFollowings: Int!
+  """
+  the number of followers of the profile
+  """
+  nbFollowers: Int!
+  """
+  the number of posts of the profile
+  """
+  nbPosts: Int!
+  """
+  return the list of the profile posts
+  """
+  posts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection
+
+  #TODO
+  statsSummary: [DailyStatsSumary]!
+}
+
+type ProfileCardStyle {
+  fontFamily: String!
+  fontSize: Int!
+  titleFontFamily: String!
+  titleFontSize: Int!
+  buttonRadius: Int!
+  borderRadius: Int!
+  borderWidth: Int!
+  borderColor: String!
+  buttonColor: String!
+  gap: Int!
+}
+
+"""
+Represent the daily stats summary of a profile
+"""
+type DailyStatsSumary {
+  date: String!
+  scans: Int!
+  webcardViews: Int!
+  totalLikes: Int!
+}
+
+"""
+A connection to a list of items.
+"""
+type ProfileConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ProfileEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type ProfileEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Profile
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+Represent a Profile Kind
+"""
+enum ProfileKind {
+  business
+  personal
+}
+
+"""
+Represent a Profile Category
+"""
+type ProfileCategory implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  profileKind: ProfileKind!
+  label: String
+  medias: [MediaImage!]
+  companyActivities: [CompanyActivity!]!
+}
+
+"""
+Represent a Company Activity
+"""
+type CompanyActivity implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+}
+
+"""
+A set of colors used by the webcard and the contact card of attached profiles
+"""
+type CardColors {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
+}

@@ -1,0 +1,466 @@
+import { useState, memo, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedProps,
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
+import { commitMutation, graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
+import Link from '#components/Link';
+import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { getAuthState } from '#helpers/authStore';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
+import Button from '#ui/Button';
+import Icon from '#ui/Icon';
+import Text from '#ui/Text';
+import HomeContactCard from './HomeContactCard';
+import HomeInformations from './HomeInformations';
+import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
+import HomeStatistics from './HomeStatistics';
+import type { HOME_TAB } from './HomeMenu';
+import type { HomeBottomPanel_profiles$key } from '@azzapp/relay/artifacts/HomeBottomPanel_profiles.graphql';
+import type { HomeBottomPanel_user$key } from '@azzapp/relay/artifacts/HomeBottomPanel_user.graphql';
+import type { HomeBottomPanelPublishMutation } from '@azzapp/relay/artifacts/HomeBottomPanelPublishMutation.graphql';
+import type { SharedValue } from 'react-native-reanimated';
+
+type HomeBottomPanelProps = {
+  /**
+   * the height unit determined at main screen to have a adaptable layout based on screen size
+   *
+   * @type {number}
+   */
+  height: number;
+  user: HomeBottomPanel_user$key;
+  /**
+   * current position of the scrolling profile (based on profile index and not scrollValue )
+   *
+   * @type {SharedValue<number>}
+   */
+  currentProfileIndexSharedValue: SharedValue<number>;
+
+  currentProfileIndex: number;
+};
+
+const HomeBottomPanel = ({
+  user: userKey,
+  currentProfileIndexSharedValue,
+  currentProfileIndex,
+  height,
+}: HomeBottomPanelProps) => {
+  //#region data
+  const user = useFragment(
+    graphql`
+      fragment HomeBottomPanel_user on User {
+        ...HomeContactCard_user
+        ...HomeInformations_user
+        ...HomeStatistics_user
+        profiles {
+          id
+          ...HomeBottomPanel_profiles
+        }
+      }
+    `,
+    userKey,
+  );
+
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeBottomPanel_profiles on Profile {
+        id
+        userName
+        cardIsPublished
+        cardCover {
+          title
+        }
+        profileCategory {
+          id
+        }
+      }
+    `,
+    (profile: any) => profile.id,
+    user.profiles as readonly HomeBottomPanel_profiles$key[],
+  );
+
+  const currentProfile = profiles?.[currentProfileIndex];
+
+  const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
+  //#endregion
+
+  //#region card publication
+
+  const onPublish = () => {
+    const profileId = getAuthState().profileId;
+    if (!profileId || profileId !== currentProfile?.id) {
+      return;
+    }
+    const environment = getRelayEnvironment().forActor(profileId);
+    const publishMutation = graphql`
+      mutation HomeBottomPanelPublishMutation @raw_response_type {
+        publishCard {
+          profile {
+            id
+            cardIsPublished
+          }
+        }
+      }
+    `;
+    commitMutation<HomeBottomPanelPublishMutation>(environment, {
+      mutation: publishMutation,
+      variables: {},
+      optimisticResponse: {
+        publishCard: {
+          profile: {
+            id: profileId,
+            cardIsPublished: true,
+          },
+        },
+      },
+      onCompleted: (_, error) => {
+        if (error) {
+          // TODO - handle error
+          console.log(error);
+          return;
+        }
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'Your WebCard has been published',
+            description: 'Home Screen - webcard published toast',
+          }),
+        });
+      },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not publish your WebCard, please try again later',
+            description:
+              'Error message displayed when the publication of the webcard failed in Home Screen',
+          }),
+        });
+      },
+    });
+  };
+  //#endregion
+
+  //#region panels visibility
+  const profilesHasCover = useMemo(
+    () => profiles?.map(profile => (profile?.cardCover ? 1 : 0)) ?? [],
+    [profiles],
+  );
+
+  const profilesWebcCardPublished = useMemo(
+    () => profiles?.map(profile => (profile?.cardIsPublished ? 1 : 0)) ?? [],
+    [profiles],
+  );
+
+  const panelVisibilities = useDerivedValue(() => {
+    const currentProfileIndex = currentProfileIndexSharedValue.value;
+    const prev = Math.floor(currentProfileIndex);
+    const next = Math.ceil(currentProfileIndex);
+
+    const prevHasWebCover = !!profilesHasCover[prev];
+    const nextHasWebCover = !!profilesHasCover[next];
+    const prevWebCardPublished = !!profilesWebcCardPublished[prev];
+    const nextWebCardPublished = !!profilesWebcCardPublished[next];
+    const prevIsNewProfile = prev === -1;
+
+    const newProfilePanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [-1, 0],
+      [1, 0],
+    );
+
+    const missingCoverPanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, prev + 0.2, next - 0.2, next],
+      [
+        prevIsNewProfile || prevHasWebCover ? 0 : 1,
+        0,
+        0,
+        nextHasWebCover ? 0 : 1,
+      ],
+    );
+
+    const webCardPublishPanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, next],
+      [
+        prevIsNewProfile || prevWebCardPublished || !prevHasWebCover ? 0 : 1,
+        nextWebCardPublished || !nextHasWebCover ? 0 : 1,
+      ],
+    );
+
+    let bottomPanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, next],
+      [
+        prevIsNewProfile || !prevWebCardPublished ? 0 : 1,
+        nextWebCardPublished ? 1 : 0,
+      ],
+    );
+
+    // on the last profile, sometimes the value doesn't reach 1
+    if (bottomPanelVisible > 0.99) {
+      bottomPanelVisible = 1;
+    }
+
+    return {
+      newProfilePanelVisible,
+      missingCoverPanelVisible,
+      webCardPublishPanelVisible,
+      bottomPanelVisible,
+    };
+  });
+
+  const newCardPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.newProfilePanelVisible,
+    zIndex: panelVisibilities.value.newProfilePanelVisible,
+  }));
+  const newCardPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.newProfilePanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
+
+  const missingCoverPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.missingCoverPanelVisible,
+    zIndex: panelVisibilities.value.missingCoverPanelVisible,
+  }));
+  const missingCoverPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.missingCoverPanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
+
+  const webCardPublishPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.webCardPublishPanelVisible,
+    zIndex: panelVisibilities.value.webCardPublishPanelVisible,
+  }));
+  const webCardPublishPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.webCardPublishPanelVisible === 1
+            ? 'auto'
+            : 'none',
+      }) as const,
+  );
+
+  const bottomPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.bottomPanelVisible,
+  }));
+  const bottomPanelProps = useAnimatedProps(
+    () =>
+      ({
+        pointerEvents:
+          panelVisibilities.value.bottomPanelVisible === 1 ? 'auto' : 'none',
+      }) as const,
+  );
+
+  const mainTabBarVisible = useDerivedValue(
+    () => panelVisibilities.value.bottomPanelVisible,
+  );
+  useMainTabBarVisiblilityController(mainTabBarVisible);
+  //#endregion
+
+  const intl = useIntl();
+
+  const panelHeight = height - HOME_MENU_HEIGHT;
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        style={[styles.informationPanel, newCardPanelStyle]}
+        animatedProps={newCardPanelProps}
+      >
+        <Text variant="large" style={{ color: colors.white }}>
+          <FormattedMessage
+            defaultMessage="Create a new Webcard{azzappAp}"
+            description="Home Screen - Create a new WebCard"
+            values={{
+              azzappAp: (
+                <Text variant="azzapp" style={styles.icon}>
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            description="Home Screen - Create a new webcard description"
+            values={{
+              azzappAp: (
+                <Text variant="azzapp" style={styles.icon}>
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+      </Animated.View>
+
+      <Animated.View
+        style={[styles.informationPanel, missingCoverPanelStyle]}
+        animatedProps={missingCoverPanelProps}
+      >
+        <Icon icon="warning" style={styles.warningIcon} />
+        <Text variant="large" style={{ color: colors.white }}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappAp} needs a cover"
+            description="Home Screen - Missing cover title"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappAp} has no cover and can’t be published."
+            description="Home Screen - Missing cover text"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Link
+          route="NEW_PROFILE"
+          params={
+            currentProfile?.id ? { profileId: currentProfile.id } : undefined
+          }
+        >
+          <Button
+            variant="secondary"
+            appearance="dark"
+            label={intl.formatMessage({
+              defaultMessage: 'Create your WebCard cover',
+              description: 'Home Screen - Missing cover button',
+            })}
+            style={styles.informationPanelButton}
+          />
+        </Link>
+      </Animated.View>
+
+      <Animated.View
+        style={[styles.informationPanel, webCardPublishPanelStyle]}
+        animatedProps={webCardPublishPanelProps}
+      >
+        <Icon icon="warning" style={styles.warningIcon} />
+        <Text variant="large" style={{ color: colors.white }}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappAp} is not published"
+            description="Home Screen - webcard not published title"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappAp} has not been published, nobody can see it for the moment."
+            description="Home Screen - webcard not published text"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Button
+          variant="secondary"
+          appearance="dark"
+          label={intl.formatMessage({
+            defaultMessage: 'Publish this WebCard',
+            description: 'Home Screen - webcard not published button',
+          })}
+          style={styles.informationPanelButton}
+          onPress={onPublish}
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={[styles.bottomPanel, bottomPanelStyle]}
+        animatedProps={bottomPanelProps}
+      >
+        <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
+
+        {selectedPanel === 'CONTACT_CARD' && (
+          <HomeContactCard
+            user={user}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          />
+        )}
+        {selectedPanel === 'STATS' && (
+          <HomeStatistics
+            user={user}
+            height={panelHeight}
+            animated={selectedPanel === 'STATS'}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            currentUserIndex={currentProfileIndex}
+          />
+        )}
+        {selectedPanel === 'INFORMATION' && (
+          <HomeInformations
+            user={user}
+            animated={selectedPanel === 'INFORMATION'}
+            height={panelHeight}
+            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          />
+        )}
+      </Animated.View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  informationPanel: {
+    overflow: 'visible',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  informationText: {
+    textAlign: 'center',
+    color: colors.white,
+    marginHorizontal: 50,
+    marginTop: 10,
+  },
+  warningIcon: {
+    tintColor: colors.white,
+    marginBottom: 20,
+    width: 20,
+    height: 20,
+  },
+  bottomPanel: {
+    overflow: 'visible',
+    flex: 1,
+  },
+  informationPanelButton: {
+    marginTop: 30,
+  },
+  icon: {
+    color: colors.white,
+  },
+});
+
+export default memo(HomeBottomPanel);

@@ -1,0 +1,19 @@
+"""
+Represent an Application User
+"""
+type User {
+  """
+  Returns the email of the user
+  """
+  email: String
+
+  """
+  Returns the phone number of the user
+  """
+  phoneNumber: String
+
+  """
+  Returns a list of Profiles of the user
+  """
+  profiles: [Profile!]
+}

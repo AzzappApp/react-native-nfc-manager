@@ -1,0 +1,17 @@
+extend type Mutation {
+  createProfile(input: CreateProfileInput!): CreateProfilePayload!
+}
+
+
+input CreateProfileInput {
+  userName: String!
+  firstName: String
+  lastName: String
+  companyName: String
+  profileCategoryId: ID!
+  companyActivityId: ID
+}
+
+type CreateProfilePayload {
+  profile: Profile!
+}

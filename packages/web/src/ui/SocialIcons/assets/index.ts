@@ -1,0 +1,17 @@
+export { default as AppleIcon } from './apple.svg';
+export { default as BehanceIcon } from './behance.svg';
+export { default as DevIcon } from './dev.svg';
+export { default as DiscordIcon } from './discord.svg';
+export { default as DribbleIcon } from './dribbble.svg';
+export { default as FacebookIcon } from './facebook.svg';
+export { default as FigmaIcon } from './figma.svg';
+export { default as GitHubIcon } from './github.svg';
+export { default as GitLabIcon } from './gitlab.svg';
+export { default as GlassdoorIcon } from './glassdoor.svg';
+export { default as HashNodeIcon } from './hashnode.svg';
+export { default as InstagramIcon } from './instagram.svg';
+export { default as LetterboxdIcon } from './letterboxd.svg';
+export { default as LinkedInIcon } from './linkedin.svg';
+export { default as MastodonIcon } from './mastodon.svg';
+export { default as TwitterIcon } from './twitter.svg';
+export { default as WhatsAppIcon } from './whatsapp.svg';

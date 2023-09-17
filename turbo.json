@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["//#relay:build"]
+    },
+    "//#relay:build": {
+      "dependsOn": ["relay:prepare", "graphql-codegen"],
+      "inputs": ["packages/**/*.{js,jsx,ts,tsx}", "schema.graphql"],
+      "outputs": [
+        "packages/relay/artifacts/**",
+        "packages/relay/query-map.json"
+      ]
+    },
+    "//#relay:prepare": {
+      "dependsOn": [],
+      "inputs": [],
+      "cache": false
+    },
+    "//#graphql-codegen": {
+      "dependsOn": [],
+      "inputs": ["packages/**/*.graphql"],
+      "cache": false
+    }
+  },
+  "globalDependencies": ["patches/*.patch"]
+}

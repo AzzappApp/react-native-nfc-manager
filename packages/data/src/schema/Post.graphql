@@ -1,0 +1,162 @@
+"""
+Represent a Azzapp publication
+"""
+type Post implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+
+  """
+  The author of the publication
+  """
+  author: Profile!
+
+  """
+  The media of the publication
+  """
+  media: Media!
+
+  """
+  The text content of the publication
+  """
+  content: String!
+
+  """
+  Does this post allow comments
+  """
+  allowComments: Boolean!
+
+  """
+  Does this post allow likes
+  """
+  allowLikes: Boolean!
+
+  """
+  Reaction of the viewer on this post
+  """
+  viewerPostReaction: ReactionKind
+  counterReactions: Int!
+  counterComments: Int!
+
+  """
+  Creation date ot the post
+  """
+  createdAt: DateTime!
+
+  """
+  Return the recommended comment for the post (for now the last one)
+  """
+  previewComment: PostComment
+
+  """
+  Return a list of comments for the post
+  """
+  comments(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostCommentConnection
+  relatedPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection!
+}
+
+enum ReactionKind {
+  like
+}
+
+"""
+Represent a Azzapp publication
+"""
+type PostComment implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+
+  """
+  The author of the publication
+  """
+  author: Profile!
+  comment: String!
+
+  """
+  Creation date ot the post
+  """
+  createdAt: DateTime!
+}
+
+"""
+A connection to a list of items.
+"""
+type PostCommentConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [PostCommentEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type PostCommentEdge {
+  """
+  The item at the end of the edge
+  """
+  node: PostComment
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+An edge in a connection.
+"""
+type PostEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Post
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type PostConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [PostEdge]
+}

@@ -1,20 +1,6 @@
 {
-  "compilerOptions": {
-    "noEmit": true,
-    "declaration": false,
-    "allowJs": true,
-    "target": "ESNext",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "isolatedModules": true,
-    "strict": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true
-  },
-  "exclude": ["node_modules", "**/packages/**/node_modules"]
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "noEmit": true },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+  "exclude": ["node_modules", "packages/**/*.*"]
 }

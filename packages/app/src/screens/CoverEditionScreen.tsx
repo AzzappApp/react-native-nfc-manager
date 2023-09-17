@@ -1,0 +1,199 @@
+import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { View, useWindowDimensions } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { combineLatest } from '@azzapp/shared/observableHelpers';
+import {
+  CancelHeaderButton,
+  SaveHeaderButton,
+} from '#components/commonsButtons';
+import CoverEditor from '#components/CoverEditor';
+import { prefetchImage, prefetchVideo } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
+import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
+import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
+import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { CoverEditionRoute } from '#routes';
+import type { CoverEditionScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionScreenPrefetchQuery.graphql';
+import type { CoverEditionScreenQuery } from '@azzapp/relay/artifacts/CoverEditionScreenQuery.graphql';
+import type { Ref } from 'react';
+import type { PreloadedQuery } from 'react-relay';
+
+const CoverEditionScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<CoverEditionRoute, CoverEditionScreenQuery>) => {
+  const intl = useIntl();
+  const router = useRouter();
+
+  const coverEditorRef = useRef<CoverEditorHandle>(null);
+  const [canSave, setCanSave] = useState(true);
+
+  const onSave = useCallback(() => {
+    coverEditorRef.current?.save();
+  }, []);
+
+  const onCoverSaved = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  const onCancel = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useScreenInsets();
+
+  const editorHeight =
+    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom - 20;
+
+  return (
+    <Container
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom + 20,
+      }}
+    >
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit your cover',
+          description: 'CoverEditionScreen header title',
+        })}
+        leftElement={<CancelHeaderButton onPress={onCancel} />}
+        rightElement={<SaveHeaderButton onPress={onSave} disabled={!canSave} />}
+      />
+      <Suspense
+        fallback={
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        }
+      >
+        <CoverEditionScreenCoverEditor
+          preloadedQuery={preloadedQuery}
+          coverEditorRef={coverEditorRef}
+          editorHeight={editorHeight}
+          onCoverSaved={onCoverSaved}
+          onCanSaveChange={setCanSave}
+        />
+      </Suspense>
+    </Container>
+  );
+};
+
+type CoverEditionScreenCoverEditorProps = {
+  preloadedQuery: PreloadedQuery<CoverEditionScreenQuery>;
+  coverEditorRef: Ref<CoverEditorHandle>;
+  editorHeight: number;
+  onCoverSaved: () => void;
+  onCanSaveChange: (canSave: boolean) => void;
+};
+
+const CoverEditionScreenCoverEditor = ({
+  preloadedQuery,
+  coverEditorRef,
+  editorHeight,
+  onCoverSaved,
+  onCanSaveChange,
+}: CoverEditionScreenCoverEditorProps) => {
+  const { viewer } = usePreloadedQuery<CoverEditionScreenQuery>(
+    query,
+    preloadedQuery,
+  );
+
+  const templateKind = useMemo(
+    () =>
+      viewer.profile?.cardCover?.media?.__typename === 'MediaVideo'
+        ? 'video'
+        : viewer.profile?.cardCover?.segmented === false
+        ? 'others'
+        : 'people',
+    // we only want to recompute the template kind the first time
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  return (
+    <CoverEditor
+      ref={coverEditorRef}
+      viewer={viewer}
+      height={editorHeight}
+      onCoverSaved={onCoverSaved}
+      onCanSaveChange={onCanSaveChange}
+      initialTemplateKind={templateKind}
+    />
+  );
+};
+
+const query = graphql`
+  query CoverEditionScreenQuery {
+    viewer {
+      ...CoverEditor_viewer
+      ...CoverEditor_suggested
+      profile {
+        ...CoverRenderer_profile
+        cardCover {
+          media {
+            __typename
+          }
+          segmented
+        }
+      }
+    }
+  }
+`;
+
+export default relayScreen(CoverEditionScreen, {
+  query,
+  prefetch: (_, environment) => {
+    return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
+      environment,
+      graphql`
+        query CoverEditionScreenPrefetchQuery {
+          viewer {
+            ...CoverEditorCustom_viewer
+            profile {
+              ...CoverRenderer_profile
+              ...useCoverEditionManager_profile @relay(mask: false)
+            }
+          }
+        }
+      `,
+      {},
+    ).mergeMap(({ viewer }) => {
+      if (!viewer.profile?.cardCover) {
+        return [];
+      }
+      const { background, foreground, sourceMedia, maskMedia } =
+        viewer.profile.cardCover;
+      const medias = convertToNonNullArray([
+        background && { kind: 'image', uri: background.uri },
+        foreground && { kind: 'image', uri: foreground.uri },
+        sourceMedia && {
+          kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
+          uri: sourceMedia.uri,
+        },
+        maskMedia && { kind: 'image', uri: maskMedia.uri },
+      ]);
+      return combineLatest(
+        medias.map(media => {
+          const prefetch =
+            media.kind === 'image' ? prefetchImage : prefetchVideo;
+          return prefetch(media.uri);
+        }),
+      );
+    });
+  },
+});

@@ -1,4 +1,14 @@
 {
   "name": "azzapp",
-  "displayName": "azzapp"
+  "displayName": "azzapp",
+  "owner": "azzapp",
+  "slug": "azzapp",
+  "extra": {
+    "eas": {
+      "projectId": "6f4f8646-b45c-4cc0-85ae-a5aa04a7bebb"
+    }
+  },
+  "ios": {
+    "bundleIdentifier": "com.azzapp.azzapp"
+  }
 }

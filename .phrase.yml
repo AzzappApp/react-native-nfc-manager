@@ -1,0 +1,21 @@
+phrase:
+  project_id: ea5e2fbec3cb45076c196c70888f3065
+  push:
+    sources:
+    - file: "./app-lang-keys.csv"
+      params:
+        file_format: csv
+        locale_id: en-dev
+        update_translations: true
+        update_descriptions: true
+        locale_mapping:
+          en-dev: 2
+        format_options:
+          key_index: 1
+          comment_index: 3
+          first_content_row: 0
+  pull:
+    targets:
+    - file: ./packages/i18n/src/app/<locale_name>.json
+      params:
+        file_format: react_simple_json

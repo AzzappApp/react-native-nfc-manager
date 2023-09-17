@@ -1,0 +1,52 @@
+overwrite: true
+hooks:
+  afterAllFileWrite:
+    - prettier --write
+ignoreNoDocuments: true
+schema:
+  - './packages/data/src/schema/**/*.graphql'
+generates:
+  ./packages/data/src/schema/__generated__/types.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
+      - './codegen-typedefs.js'
+    config:
+      useTypeImports: true
+      enumsAsTypes: true
+      useImplementingTypes: true
+      mappers:
+        Profile: ../../domains#Profile as ProfileModel
+        StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
+        ProfileCategory: ../../domains#ProfileCategory as ProfileCategoryModel
+        MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
+        MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
+        CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
+        Post: ../../domains#Post as PostModel
+        PostComment: ../../domains#PostComment as PostCommentModel
+        CardTemplate: ../../domains#CardTemplate as CardTemplateModel
+        CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
+        CoverTemplateData: ../../domains#CoverTemplateData as CoverTemplateDataModel
+        CardCover: ../../domains#Profile as ProfileModel
+        CardModule: ../../domains#CardModule as CardModuleModel
+        CardModuleCarousel: ../../domains#CardModuleCarousel as CardModuleCarouselModel
+        CardModuleHorizontalPhoto: ../../domains#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
+        CardModuleSimpleText: ../../domains#CardModuleSimpleText as CardModuleSimpleTextModel
+        CardModuleSimpleTitle: ../../domains#CardModuleSimpleText as CardModuleSimpleTitleModel
+        CardModuleSimpleButton: ../../domains#CardModuleSimpleButton as CardModuleSimpleButtonModel
+        CardModulePhotoWithTextAndTitle: ../../domains#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel
+        CardModuleSocialLinks: ../../domains#CardModuleSocialLinks as CardModuleSocialLinksModel
+        CardModuleBlockText: ../../domains#CardModuleBlockText as CardModuleBlockTextModel
+        CardModuleLineDivider: ../../domains#CardModuleLineDivider as CardModuleLineDividerModel
+        CardStyle: ../../domains#CardStyle as CardStyleModel
+        ContactCard: ../../domains#Profile as ProfileModel
+        ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
+      defaultMapper: 'Partial<{T}>'
+      maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
+      scalars:
+        JSON: Record<string, unknown>
+        ID: string
+      contextType: ../GraphQLContext#GraphQLContext
+  ./schema.graphql:
+    plugins:
+      - schema-ast

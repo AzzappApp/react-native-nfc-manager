@@ -1,0 +1,14 @@
+extend type Mutation {
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+}
+
+input UpdatePostInput {
+  postId: String!
+  content: String
+  allowComments: Boolean
+  allowLikes: Boolean
+}
+
+type UpdatePostPayload {
+  post: Post
+}

@@ -1,0 +1,61 @@
+input ContactCardEmailInput {
+  address: String!
+  label: String!
+  selected: Boolean!
+}
+extend type Mutation {
+  """
+  Save the current user's contact card.
+  """
+  saveContactCard(input: SaveContactCardInput!): SaveContactCardPayload!
+}
+
+input ContactCardPhoneNumberInput {
+  number: String!
+  label: String!
+  selected: Boolean!
+}
+
+input ContactCardUrlInput {
+  address: String!
+  selected: Boolean!
+}
+
+input ContactCardAddressInput {
+  address: String!
+  label: String!
+  selected: Boolean!
+}
+
+input ContactCardBirthdayInput {
+  birthday: String!
+  selected: Boolean!
+}
+
+input ContactCardSocialInput {
+  social: String!
+  selected: Boolean!
+}
+
+input ContactCardStyleInput {
+  backgroundColor: String!
+}
+
+input SaveContactCardInput {
+  firstName: String
+  lastName: String
+  title: String
+  company: String
+  emails: [ContactCardEmailInput!]
+  phoneNumbers: [ContactCardPhoneNumberInput!]
+  urls: [ContactCardUrlInput!]
+  addresses: [ContactCardAddressInput!]
+  birthdays: [ContactCardBirthdayInput!]
+  socials: [ContactCardSocialInput!]
+  isPrivate: Boolean
+  displayedOnWebCard: Boolean
+}
+
+type SaveContactCardPayload {
+  profile: Profile!
+}

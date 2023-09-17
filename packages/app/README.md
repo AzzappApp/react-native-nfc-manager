@@ -22,15 +22,6 @@ The typescript source code has the following directory structure :
 - `mobileScreens`: contains the specialized version of `screens` component used only by the native application
 
 
-# React native web 
-
-Since the screens of the application are used by the `@azzapp/web` package to create a web client, with the help of [React Native Web](https://necolas.github.io/react-native-web/), the code should be either compatible with rnweb rendering.
-If a component needs to use native only API, a web version of the component should be created, by creating a component with the same name but with the extention `.web.tsx`, for example the `ViewTransition` component use `react-native-reanimated` on mobile and css transitions on web.
-
-# Platform environment
-
-Platform specific behavior (routing, link implementation and request authentification methods) are injected by each client at top level through context. The context definition can be found in the `lib/PlatformEnvironment.tsx` file.
-
 # Native Routing
 
 The native routing application is based [`react-native-screens`](https://github.com/software-mansion/react-native-screens) but unlike most RN applications we use a custom router instead of [React Navigation](https://reactnavigation.org/). It has been made to improove the integration with [React Relay](https://relay.dev/) and to improve the way azzapp aplication specific use case are implemented.

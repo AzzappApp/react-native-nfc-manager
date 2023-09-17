@@ -1,0 +1,30 @@
+extend type Mutation {
+  createPost(input: CreatePostInput!): CreatePostPayload!
+}
+
+input CreatePostInput {
+  """
+  The media of the publication
+  """
+  mediaId: String
+
+  """
+  The text content of the publication
+  """
+  content: String!
+
+  """
+  Does this post allow comments
+  """
+  allowComments: Boolean!
+
+  """
+  Does this post allow likes
+  """
+  allowLikes: Boolean!
+}
+
+type CreatePostPayload {
+  post: Post
+}
+

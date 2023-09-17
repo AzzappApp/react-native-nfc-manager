@@ -1,0 +1,81 @@
+{
+  "artificialDelayMilliseconds": 700,
+  "keepExistingTerminalsOpen": false,
+  "runOnStartup": false,
+  "terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "mobile metro",
+          "commands": ["cd packages/app", "yarn rn:watch"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "rn watch",
+          "commands": ["cd packages/app", "yarn typecheck --watch"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "backoffice",
+          "commands": ["cd packages/backoffice", "yarn dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "data compile",
+          "commands": ["cd packages/data", "yarn compile:watch"]
+        },
+        {
+          "name": "data definition",
+          "commands": ["cd packages/data", "yarn definition:watch"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "relay watch",
+          "commands": [
+            "yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
+          ]
+        },
+        {
+          "name": "graphQL codegen",
+          "commands": ["yarn graphql-codegen  --watch"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "shared",
+          "commands": ["cd packages/shared", "yarn dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "web",
+          "commands": ["cd packages/web", "yarn dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "pscale",
+          "commands": ["pscale connect --org azzapp azzapp main"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+name: Attach planet-scale deploy request to PR
+on: issue_comment
+jobs:
+  attach-planescale-deploy-request:
+    if: github.event.issue.pull_request != null 
+    name: Create planet-scale deploy request comment
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/github-script@v6.3.0
+        env:
+          COMMENT: ${{ github.event.comment.body }}
+          ISSUE: ${{ github.event.issue.number }}
+        with:
+          script: |
+            const comment = process.env.COMMENT;
+            const issue_number = process.env.ISSUE
+            const { owner, repo } = context.repo;
+
+            const regex = /\/ps-attach\s+([0-9]+)/g;
+            const match = regex.exec(comment);
+            const requestNumber = match && match[1];
+            if (requestNumber != null) {
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body: `Attached PlanetScale request [#${requestNumber}](https://app.planetscale.com/azzapp/azzapp/deploy-requests/${requestNumber})`
+              });
+            }

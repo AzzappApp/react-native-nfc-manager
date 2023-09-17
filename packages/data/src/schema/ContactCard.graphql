@@ -1,0 +1,54 @@
+type ContactCard {
+  firstName: String
+  lastName: String
+  title: String
+  company: String
+  emails: [ContactCardEmail!]
+  phoneNumbers: [ContactCardPhoneNumber!]
+  urls: [ContactCardUrl!]
+  addresses: [ContactCardAddress!]
+  birthdays: [ContactCardBirthday!]
+  socials: [ContactCardSocial!]
+  urls: [ContactCardUrl]
+  isPrivate: Boolean!
+  displayedOnWebCard: Boolean!
+  serializedContactCard: SerializedContactCard!
+}
+
+type ContactCardEmail {
+  address: String!
+  label: String!
+  selected: Boolean!
+}
+
+type ContactCardPhoneNumber {
+  number: String!
+  label: String!
+  selected: Boolean!
+}
+
+type ContactCardUrl {
+  address: String!
+  selected: Boolean!
+}
+
+type ContactCardAddress {
+  address: String!
+  label: String!
+  selected: Boolean!
+}
+
+type ContactCardBirthday {
+  birthday: String!
+  selected: Boolean!
+}
+
+type ContactCardSocial {
+  social: String!
+  selected: Boolean!
+}
+
+type SerializedContactCard {
+  data: String!
+  signature: String!
+}

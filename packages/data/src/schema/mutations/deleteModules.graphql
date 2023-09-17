@@ -1,0 +1,11 @@
+extend type Mutation {
+  deleteModules(input: DeleteModulesInput!): DeleteModulesPayload!
+}
+
+input DeleteModulesInput {
+  modulesIds: [ID!]!
+}
+
+type DeleteModulesPayload {
+  profile: Profile!
+}

@@ -1,0 +1,386 @@
+
+"""
+User Card module
+"""
+interface CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+}
+
+"""
+User Card module kind
+"""
+enum CardModuleKind {
+  blockText
+  carousel
+  horizontalPhoto
+  lineDivider
+  openingHours
+  photoWithTextAndTitle
+  simpleButton
+  simpleText
+  simpleTitle
+  socialLinks
+  webCardsCarousel
+}
+
+
+"""
+User Card module : BlockText
+"""
+type CardModuleBlockText implements CardModule {"""
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The text of the BlockText module, cannot be null
+  """
+  text: String!
+  fontFamily: String
+  fontColor: String
+  textAlign: TextAlignment
+  fontSize: Int
+  verticalSpacing: Int
+  textMarginVertical: Int
+  textMarginHorizontal: Int
+  marginHorizontal: Int
+  marginVertical: Int
+  textBackgroundStyle: ModuleTextBackgroundStyle
+  textBackground: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+  background: StaticMedia
+}
+
+"""
+User Card module : Carousel
+"""
+type CardModuleCarousel implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  images: [MediaImage!]!
+  squareRatio: Boolean
+  borderWidth: Int
+  borderColor: String
+  borderRadius: Int
+  marginVertical: Int
+  marginHorizontal: Int
+  imageHeight: Int
+  gap: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+
+"""
+User Card module : HorizontalPhoto
+"""
+type CardModuleHorizontalPhoto implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The Media image of the horizontal photo module, cannot be null
+  """
+  image: MediaImage!
+  borderWidth: Int
+  borderColor: String
+  borderRadius: Int
+  marginVertical: Int
+  marginHorizontal: Int
+  imageHeight: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+"""
+User Card module : LineDivider
+"""
+type CardModuleLineDivider implements CardModule { """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  orientation: LineDividerOrientation
+  marginBottom: Int
+  marginTop: Int
+  height: Int
+  colorTop: String
+  colorBottom: String
+}
+
+"""
+User Card module : OpeningHours
+"""
+type CardModuleOpeningHours implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+}
+"""
+User Card module : SimpleButton
+"""
+type CardModuleSimpleButton implements CardModule {"""
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  buttonLabel: String!
+  actionType: String!
+  actionLink: String!
+  fontFamily: String
+  fontColor: String
+  fontSize: Int
+  buttonColor: String
+  borderColor: String
+  borderWidth: Int
+  borderRadius: Int
+  marginTop: Int
+  marginBottom: Int
+  width: Int
+  height: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+"""
+User Card module : SimpleText
+"""
+type CardModuleSimpleText implements CardModule { """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  text: String!
+  fontFamily: String
+  fontSize: Int
+  fontColor: String
+  verticalSpacing: Int
+  textAlign: TextAlignment
+  marginHorizontal: Int
+  marginVertical: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+
+"""
+User Card module : SimpleTitle
+"""
+type CardModuleSimpleTitle implements CardModule {"""
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  text: String!
+  fontFamily: String
+  fontSize: Int
+  fontColor: String
+  verticalSpacing: Int
+  textAlign: TextAlignment
+  marginHorizontal: Int
+  marginVertical: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+"""
+User Card module : PhotoWithTextAndTitle
+"""
+type CardModulePhotoWithTextAndTitle implements CardModule {
+   """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  visible: Boolean!
+  """
+  The Media image of the horizontal photo module, cannot be null
+  """
+  image: MediaImage!
+  
+  imageMargin: CardModulePhotoWithTextAndTitleImageMargin
+  horizontalArrangement: HorizontalArrangement
+  verticalArrangement: VerticalArrangement
+  gap: Int
+  titleFontFamily: String
+  titleFontColor: String
+  titleTextAlign: TextAlignment
+  titleFontSize: Int
+  titleVerticalSpacing: Int
+  title: String
+  contentFontFamily: String
+  contentFontColor: String
+  contentTextAlign: TextAlignment
+  contentFontSize: Int
+  contentVerticalSpacing: Int
+  content: String
+  borderRadius: Int
+  marginHorizontal: Int
+  marginVertical: Int
+  aspectRatio: Float
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+
+"""
+User Card module : CardModuleSocialLinks
+"""
+type CardModuleSocialLinks implements CardModule {"""
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  links: [CardModuleSocialLinkItem!]!
+  iconColor: String
+  arrangement: CardModuleSocialLinksArrangement
+  iconSize: Int
+  borderWidth: Int
+  columnGap: Int
+  marginTop: Int
+  marginBottom: Int
+  marginHorizontal: Int
+  background: StaticMedia
+  backgroundStyle: ModuleBackgroundStyle
+}
+
+
+type CardModuleSocialLinkItem {
+  socialId: String!
+  link: String!
+  position: Int!
+}
+
+enum CardModuleSocialLinksArrangement {
+  inline
+  multiline
+}
+
+enum LineDividerOrientation {
+  topLeft
+  bottomRight
+}
+
+enum CardModulePhotoWithTextAndTitleImageMargin {
+  width_limited
+  width_full
+}
+
+enum HorizontalArrangement {
+  left
+  right
+}
+
+enum VerticalArrangement {
+  top
+  bottom
+}
+
+enum TextAlignment {
+  left
+  center
+  right
+  justify
+}
+
+"""
+Style of the background of a module
+"""
+type ModuleBackgroundStyle {
+  backgroundColor: String!
+  patternColor: String!
+}
+
+type ModuleTextBackgroundStyle {
+  backgroundColor: String!
+  patternColor: String!
+  opacity: Int!
+}

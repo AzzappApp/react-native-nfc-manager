@@ -1,0 +1,11 @@
+extend type Mutation {
+  reorderModules(input: ReorderModulesInput!): ReorderModulesPayload!
+}
+
+input ReorderModulesInput {
+  moduleIds: [ID!]!
+}
+
+type ReorderModulesPayload {
+  profile: Profile!
+}

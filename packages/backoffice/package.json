@@ -1,5 +1,40 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.0.1",
-  "private": true
+  "version": "0.4.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3005",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.next.json --noEmit",
+    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
+  },
+  "devScripts": [
+    "dev"
+  ],
+  "dependencies": {
+    "@azzapp/data": "0.4.0",
+    "@azzapp/shared": "0.4.0",
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
+    "@mui/icons-material": "latest",
+    "@mui/material": "latest",
+    "@mui/x-data-grid": "latest",
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
+    "@dnd-kit/utilities": "^3.2.1",
+    "classnames": "^2.3.2",
+    "drizzle-orm": "0.27.0",
+    "lodash": "^4.17.21",
+    "next": "^13.4.19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7"
+  }
 }

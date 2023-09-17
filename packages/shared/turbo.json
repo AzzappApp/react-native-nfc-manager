@@ -1,0 +1,16 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "inputs": ["src/**"],
+      "outputs": ["lib/**"]
+    },
+    "typecheck": {
+      "inputs": ["src/**"]
+    },
+    "test": {
+      "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"]
+    }
+  }
+}

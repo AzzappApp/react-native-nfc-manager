@@ -1,0 +1,216 @@
+"""
+Represent an Application Viewer
+"""
+type Viewer {
+  profile: Profile
+
+  """
+  Return a list of suggested profiles for current user
+  """
+  suggestedProfiles(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): ProfileConnection!
+
+  """
+  Return a list of Profiles that the current user is following
+  """
+  followings(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
+  ): ProfileConnection!
+
+  """
+  Return a list of Profiles that follow the current user
+  """
+  followers(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+
+    """
+    Filter by userName
+    """
+    userName: String
+  ): ProfileConnection!
+
+  """
+  Return a list of Post that the current user is following author
+  """
+  followingsPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection!
+
+  """
+  Return a list of Profile that this user might possibility be interested in (following Profile or promoted one)
+  """
+  trendingProfiles(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): ProfileConnection!
+
+  """
+  Return a list of tranding posts (public ?) at the time of the request
+  """
+  trendingPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection!
+
+  """
+  Return a list of profiles the current user can be interested in
+  """
+  recommendedProfiles(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): ProfileConnection!
+
+  """
+  Return a list of posts that match the search query
+  """
+  searchPosts(
+    search: String!
+    useLocation: Boolean!
+
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection!
+
+  """
+  Return a list of profiles that match the search query
+  """
+  searchProfiles(
+    search: String!
+    useLocation: Boolean!
+
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): ProfileConnection!
+
+  """
+  Return a list of cover backgrounds
+  """
+  coverBackgrounds: [StaticMedia!]!
+
+  """
+  Return a list of cover foregrounds
+  """
+  coverForegrounds: [StaticMedia!]!
+
+  """
+  Return a list of module backgrounds
+  """
+  moduleBackgrounds: [StaticMedia!]!
+
+  """
+  Fetches cover templates for a given kind
+  """
+  coverTemplates(
+    kind: CoverTemplateKind!
+    first: Int
+    after: String
+  ): CoverTemplateConnection!
+
+  """
+  Fetches card styles
+  """
+  cardStyles(first: Int, after: String): CardStyleConnection!
+
+  """
+  Fetches card styles
+  """
+  cardTemplates(first: Int, after: String): CardTemplateConnection!
+
+  """
+  Fetches color palettes
+  """
+  colorPalettes(first: Int, after: String): ColorPaletteConnection!
+
+  """
+  Fetches suggested medias
+  """
+  suggestedMedias(first: Int, after: String): MediaConnection!
+}
+
+"""
+A cover template by category
+"""
+type CoverTemplateCategory {
+  """
+  The category name
+  """
+  category: String!
+
+  """
+  The category templates
+  """
+  templates: [CoverTemplate!]!
+}

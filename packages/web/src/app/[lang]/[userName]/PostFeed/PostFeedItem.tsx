@@ -1,0 +1,142 @@
+import Link from 'next/link';
+import { useRef, forwardRef } from 'react';
+import { getElapsedTime } from '@azzapp/shared/timeHelpers';
+import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
+import { generateSharePostLink } from '#helpers';
+import { ButtonIcon } from '#ui';
+import ShareModal from '#components/ShareModal';
+import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
+import styles from './PostFeedItem.css';
+import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
+import type { ModalActions } from '#ui/Modal';
+import type {
+  Media,
+  PostWithCommentAndAuthor,
+  Profile,
+} from '@azzapp/data/domains';
+import type { ForwardedRef } from 'react';
+
+type PostFeedItemProps = {
+  post: PostWithCommentAndAuthor;
+  media: Media;
+  profile: Profile;
+  onDownload: () => void;
+  onPlay: () => void;
+  onMuteChanged: (muted: boolean) => void;
+};
+
+const PostFeedItem = (
+  props: PostFeedItemProps,
+  ref: ForwardedRef<CloudinaryVideoPlayerActions>,
+) => {
+  const { post, media, profile, onDownload, onPlay, onMuteChanged } = props;
+  const share = useRef<ModalActions>(null);
+
+  const elapsedTime = getElapsedTime(new Date(post.createdAt).getTime());
+  const [postMedia] = post.medias;
+
+  return (
+    <>
+      <div className={styles.post}>
+        <div className={styles.postHeader}>
+          {media && (
+            <CloudinaryImage
+              mediaId={media.id}
+              assetKind="cover"
+              videoThumbnail={media.kind === 'video'}
+              alt="cover"
+              width={20}
+              height={32}
+              style={{
+                objectFit: 'cover',
+                marginRight: 5,
+                borderRadius: 3,
+              }}
+            />
+          )}
+          <span>{profile.userName}</span>
+        </div>
+        {postMedia && (
+          <div
+            className={styles.postMedias}
+            style={{
+              aspectRatio: `${postMedia.width / postMedia.height}`,
+            }}
+          >
+            {postMedia.kind === 'video' ? (
+              <>
+                <CloudinaryVideoPlayer
+                  ref={ref}
+                  assetKind="post"
+                  media={postMedia}
+                  alt="cover"
+                  fluid
+                  style={{
+                    objectFit: 'cover',
+                    width: '100%',
+                  }}
+                  onPlay={onPlay}
+                  onMuteChanged={onMuteChanged}
+                  autoPlay={false}
+                />
+              </>
+            ) : (
+              <CloudinaryImage
+                mediaId={postMedia.id}
+                assetKind="post"
+                alt="cover"
+                fill
+                style={{
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+          </div>
+        )}
+        <div className={styles.postFooter}>
+          <div className={styles.postActions}>
+            {post.allowLikes && (
+              <ButtonIcon Icon={HearthIcon} onClick={onDownload} />
+            )}
+            {post.allowComments && (
+              <ButtonIcon Icon={CommentIcon} onClick={onDownload} />
+            )}
+            <ButtonIcon
+              Icon={ShareIcon}
+              onClick={() => share.current?.open()}
+            />
+          </div>
+          <span className={styles.postCounterReactions}>
+            {post.counterReactions} likes
+          </span>
+        </div>
+        <div className={styles.postMore}>
+          {post.comment && (
+            <p className={styles.postComment}>
+              <span className={styles.postCommentName}>
+                {post.comment.author.userName}
+              </span>{' '}
+              {post.comment.comment}
+            </p>
+          )}
+          <Link
+            className={styles.postSeeMore}
+            href={`/${profile.userName}/${post.id}`}
+          >
+            See more
+          </Link>
+          <span className={styles.postElapsedTime}>
+            {elapsedTime.value} {elapsedTime.kind} ago
+          </span>
+        </div>
+      </div>
+      <ShareModal
+        ref={share}
+        link={generateSharePostLink(profile.userName, post.id)}
+      />
+    </>
+  );
+};
+
+export default forwardRef(PostFeedItem);

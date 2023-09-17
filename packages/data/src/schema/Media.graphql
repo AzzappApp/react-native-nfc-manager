@@ -1,0 +1,94 @@
+"""
+A video media
+"""
+type MediaVideo implements Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+  thumbnail(
+    pixelRatio: Float
+    height: Float
+    width: Float
+    time: Float
+  ): String!
+}
+
+interface Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+}
+
+"""
+An image media
+"""
+type MediaImage implements Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float): String!
+}
+
+"""
+Media used in web card edition provided by azzapp
+"""
+type StaticMedia {
+  id: ID!
+  uri(width: Float, pixelRatio: Float): String!
+  usage: StaticMediaUsage!
+  resizeMode: StaticMediaResizeMode!
+}
+
+enum StaticMediaUsage {
+  coverBackground
+  coverForeground
+  moduleBackground
+}
+
+enum StaticMediaResizeMode {
+  cover
+  contain
+  center
+  repeat
+  stretch
+}
+
+enum MediaKind {
+  video
+  image
+}
+
+"""
+A connection to a list of items.
+"""
+type MediaConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [MediaEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type MediaEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Media
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}

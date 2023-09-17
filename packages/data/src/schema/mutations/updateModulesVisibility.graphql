@@ -1,0 +1,12 @@
+extend type Mutation {
+  updateModulesVisibility(input: UpdateModulesVisibilityInput!): UpdateModulesVisibilityPayload!
+}
+
+input UpdateModulesVisibilityInput {
+  modulesIds: [ID!]!
+  visible: Boolean!
+}
+
+type UpdateModulesVisibilityPayload {
+  profile: Profile!
+}

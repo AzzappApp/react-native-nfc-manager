@@ -1,0 +1,19 @@
+extend type Mutation {
+  """
+  Remove a follower from the current user
+  """
+  removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload!
+}
+
+
+input RemoveFollowerInput {
+  """
+  The id of the user we want remove as follower
+  """
+  profileId: ID!
+}
+
+type RemoveFollowerPayload {
+  viewer: Viewer!
+  removedFollowerId: ID!
+}

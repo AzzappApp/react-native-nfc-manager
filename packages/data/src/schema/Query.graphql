@@ -1,0 +1,46 @@
+"""
+GraphQL Schema Root Query object
+"""
+type Query {
+  viewer: Viewer!
+
+  """
+  User infos of the authenticated user
+  """
+  currentUser: User!
+
+  """
+  Fetches an object given its ID
+  """
+  node(
+    """
+    The ID of an object
+    """
+    id: ID!
+  ): Node
+
+  """
+  Fetches objects given their IDs
+  """
+  nodes(
+    """
+    The IDs of objects
+    """
+    ids: [ID!]!
+  ): [Node]!
+
+  """
+  Fetches a profile given its user name
+  """
+  profile(
+    """
+    The user name of the profile
+    """
+    userName: String!
+  ): Profile
+
+  """
+  Return a list of profile categories
+  """
+  profileCategories: [ProfileCategory!]!
+}

@@ -1,20 +1,57 @@
 {
   "name": "@azzapp/data",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "private": true,
-  "main": "./lib",
-  "devDependencies": {
-    "@types/lodash": "^4.14.181",
-    "@types/uuid": "^8.3.4"
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    },
+    "./domains": {
+      "types": "./lib/domains/index.d.ts",
+      "default": "./lib/domains/index.js"
+    }
   },
+  "scripts": {
+    "build": "yarn compile && yarn definition",
+    "dev": "yarn compile:watch & yarn definition:watch",
+    "typecheck": "yarn definition",
+    "generate-migration": "drizzle-kit generate:mysql --config ./src/drizzle.config.ts",
+    "push-migration": "drizzle-kit push:mysql --config ./src/drizzle.config.ts",
+    "introspect": "drizzle-kit introspect:mysql --config ./src/drizzle.config.ts",
+    "definition": "tsc -p tsconfig.build.json",
+    "definition:watch": "yarn definition --watch",
+    "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
+    "compile:watch": "yarn compile --watch",
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
+    "studio": "drizzle-kit studio --config ./src/drizzle.config.ts"
+  },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
   "dependencies": {
-    "@azzapp/shared": "*",
-    "@azzapp/relay": "*",
-    "cassandra-driver": "^4.6.3",
-    "cuid": "^2.1.8",
-    "graphql": "^16.6.0",
+    "@azzapp/i18n": "0.4.0",
+    "@azzapp/relay": "0.4.0",
+    "@azzapp/shared": "0.4.0",
+    "@graphql-tools/schema": "^10.0.0",
+    "@paralleldrive/cuid2": "^2.2.0",
+    "@planetscale/database": "^1.10.0",
+    "dataloader": "^2.2.2",
+    "drizzle-orm": "0.27.0",
+    "graphql": "^16.8.0",
     "graphql-relay": "^0.10.0",
+    "graphql-scalars": "^1.22.2",
+    "graphql-tag": "^2.12.6",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.14.197",
+    "drizzle-kit": "0.19.3"
   }
 }

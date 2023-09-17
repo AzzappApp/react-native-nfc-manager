@@ -1,59 +1,89 @@
+const path = require('path');
+const { withSentryConfig } = require('@sentry/nextjs');
+const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
+const relayArtifactDirectory = path.join(
+  path.dirname(require.resolve('@azzapp/relay/package.json')),
+  'artifacts',
+);
+
+const withVanillaExtract = createVanillaExtractPlugin();
+
 /** @type {import('next').NextConfig} */
-
-const i18nConfig = require('@azzapp/i18n');
-
 const config = {
-  swcMinify: true,
-  productionBrowserSourceMaps: true,
-  images: {
-    disableStaticImages: true,
-  },
-  i18n: {
-    locales: i18nConfig.SUPPORTED_LOCALES,
-    defaultLocale: i18nConfig.DEFAULT_LOCALE,
-  },
-  webpack: config => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'react-native$': 'react-native-web',
-      'react-native-linear-gradient': 'react-native-web-linear-gradient',
-    };
-    config.resolve.extensions = [
-      '.web.js',
-      '.web.jsx',
-      '.web.ts',
-      '.web.tsx',
-      ...config.resolve.extensions,
-    ];
+  webpack(config, { nextRuntime }) {
     config.module.rules.push({
-      test: /\.(png|jpe?g|gif)$/,
-      options: {
-        name: '/static/media/[name].[hash:8].[ext]',
-        esModule: false,
-        scalings: { '@2x': 2, '@3x': 3 },
-      },
-      loader: 'react-native-web-image-loader',
-    });
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
+      test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
 
+    if (nextRuntime === 'edge') {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        stream: require.resolve('stream-browserify'),
+        path: require.resolve('path-browserify'),
+        os: require.resolve('os-browserify/browser'),
+      };
+    }
+
     return config;
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    tsconfigPath: './tsconfig.next.json',
+    ignoreBuildErrors: true,
+  },
+  compiler: {
+    relay: {
+      src: './src',
+      artifactDirectory: relayArtifactDirectory,
+      language: 'typescript',
+      eagerEsModules: false,
+    },
+  },
+  experimental: {
+    // TODO wait https://github.com/formatjs/formatjs/issues/3589 or switch back to babel
+    // swcPlugins: [
+    //   [
+    //     '@formatjs/swc-plugin-experimental',
+    //     {
+    //       removeDefaultMessage: process.env.NODE_ENV === 'production',
+    //       idInterpolationPattern: '[sha1:contenthash:base64:6]',
+    //     },
+    //   ],
+    // ],
+    serverActions: true,
+  },
+  transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
+  sentry: {
+    // Upload a larger set of source maps for prettier stack traces (increases build time)
+    widenClientFileUpload: true,
+
+    // Transpiles SDK to be compatible with IE11 (increases bundle size)
+    transpileClientSDK: false,
+
+    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+    tunnelRoute: '/monitoring',
+
+    // Hides source maps from generated client bundles
+    hideSourceMaps: true,
   },
 };
 
-const withTM = require('next-transpile-modules')([
-  '@azzapp/shared',
-  '@azzapp/data',
-  '@azzapp/app',
-  '@azzapp/relay',
-  'react-native-web-linear-gradient',
-  'react-native-safe-area-context',
-  'react-native-tab-view',
-  'react-native-svg',
-  'validator',
-]);
+const sentryWebpackPluginOptions = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
 
-module.exports = withTM(config);
+  // Suppresses source map uploading logs during build
+  silent: true,
+
+  org: 'azzapp',
+  project: 'web',
+};
+
+module.exports = withSentryConfig(
+  withVanillaExtract(config),
+  sentryWebpackPluginOptions,
+);

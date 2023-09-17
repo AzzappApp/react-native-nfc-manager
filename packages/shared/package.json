@@ -1,13 +1,31 @@
 {
   "name": "@azzapp/shared",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "private": true,
+  "exports": {
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    }
+  },
+  "scripts": {
+    "test": "jest",
+    "dev": "tsc --watch",
+    "build": "tsc -p tsconfig.lib.json",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo"
+  },
+  "devScripts": [
+    "dev"
+  ],
   "dependencies": {
-    "react-relay": "^14.1.0",
-    "validator": "13.7.0"
+    "libphonenumber-js": "^1.10.41",
+    "validator": "^13.11.0",
+    "vcard-creator": "^0.6.0",
+    "iron-webcrypto": "^0.8.0"
   },
   "devDependencies": {
-    "@types/react-relay": "^13.0.2",
-    "@types/validator": "^13.7.6"
+    "@types/relay-runtime": "^14.1.12",
+    "@types/validator": "^13.11.1"
   }
 }

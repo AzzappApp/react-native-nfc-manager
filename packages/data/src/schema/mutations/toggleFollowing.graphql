@@ -1,0 +1,23 @@
+extend type Mutation {
+  """
+  Toggle following a user
+  """
+  toggleFollowing(input: ToggleFollowingInput!): ToggleFollowingPayload!
+}
+
+input ToggleFollowingInput {
+  """
+  The id of the user we want toggle following on
+  """
+  profileId: ID!
+
+  """
+  Should we follow or unfollow the user
+  """
+  follow: Boolean!
+}
+
+type ToggleFollowingPayload {
+  viewer: Viewer!
+  profile: Profile!
+}

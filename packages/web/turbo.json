@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["//#relay:build", "^build"],
+      "inputs": ["src/**", "public/**"],
+      "outputs": [".next/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["//#relay:build", "^build"]
+    }
+  }
+}

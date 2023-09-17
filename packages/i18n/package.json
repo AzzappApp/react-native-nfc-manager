@@ -1,15 +1,16 @@
 {
   "name": "@azzapp/i18n",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
   "scripts": {
-    "build:app": "formatjs compile-folder --ast src/app compiled/app",
-    "build:web": "formatjs compile-folder --ast src/web compiled/web",
-    "build": "yarn build:app && yarn build:web"
+    "prepare": "node ./scripts/prepare.js",
+    "build:app": "formatjs compile-folder --format simple --ast src/app compiled/app",
+    "build:web": "formatjs compile-folder --format simple --ast src/web compiled/web",
+    "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {
-    "@formatjs/cli": "^5.1.0"
+    "@formatjs/cli": "^6.1.3"
   }
 }

@@ -1,0 +1,27 @@
+import type { CoverRendererProps } from '#components/CoverRenderer';
+import type { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
+
+export type CoverLinkRendererProps = CoverRendererProps & {
+  /**
+   * The username of the profile, used to navigate to the profile
+   */
+  userName: string;
+  /**
+   * The profile ID of the user, used to animate the cover when opening the profile
+   * on iOS
+   */
+  profileId: string;
+  /**
+   * style of the wrapped CoverRenderer
+   */
+  coverStyle?: StyleProp<ViewStyle>;
+  /**
+   * should the webcard be prefetched
+   * @default false
+   */
+  prefetch?: boolean;
+  /**
+   * onPress callback, can be used to prevent the default navigation
+   */
+  onPress?: (e: GestureResponderEvent) => void;
+};

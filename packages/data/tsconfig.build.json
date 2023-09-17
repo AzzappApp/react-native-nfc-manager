@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "./lib",
+    "paths": {
+      "#*": ["./*"]
+    }
+  },
+  "exclude": [
+    "lib",
+    "node_modules",
+    "package.json",
+    "tsconfig.json",
+    "tsconfig.build.json",
+    "./drizzle/*",
+    "babel.config.js",
+    "**/__mocks__/*",
+    "**/__tests__/*"
+  ]
+}

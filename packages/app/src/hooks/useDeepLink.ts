@@ -1,0 +1,40 @@
+import { useCallback, useEffect } from 'react';
+import { Linking } from 'react-native';
+import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
+import type { NativeRouter } from '#components/NativeRouter';
+
+export const useDeepLink = (router: NativeRouter) => {
+  const deeplinkHandler = useCallback(
+    async (url: string) => {
+      const route = await matchUrlWithRoute(url);
+      if (route) {
+        router.push(route);
+      }
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    const listener = Linking.addEventListener('url', ({ url }) => {
+      deeplinkHandler(url).catch(err => {
+        console.error(err);
+      });
+    });
+
+    return listener.remove;
+  }, [deeplinkHandler]);
+
+  useEffect(() => {
+    Linking.getInitialURL()
+      .then(url => {
+        if (url) {
+          deeplinkHandler(url).catch(err => {
+            console.error(err);
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, [deeplinkHandler]);
+};

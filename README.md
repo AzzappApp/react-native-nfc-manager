@@ -32,12 +32,6 @@ The path to yout node binary can be obtained with the command :
 which node
 ```
 
-To use relay, one should first generate the query map file (required only the first time) :
-
-```sh
-yarn create-query-map-file
-```
-
 ### Dependencies
 
 JavaScript dependencies of the project are installed using `yarn`.
@@ -64,6 +58,12 @@ yarn pod-install
 ### Development Scripts
 
 > All the development / build related scripts should be launched using `yarn`.
+
+Before you can start developping, you should build the whole workspace once : 
+
+```
+yarn build
+```
 
 To launch the application server and react native bundler in dev mode use the `dev` script at the top level sources directory.
 
@@ -100,7 +100,6 @@ To launch the application source code test use the `test` script
 ```sh
 yarn test
 ```
-
 ## Sources structure
 
 The sources of the project are organized as a monorepo. Dependencies are managed through the `yarn` [workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) feature.
@@ -121,9 +120,9 @@ The sources code of the application is mainly written using [TypeScript](https:/
 
 ### Database
 
-The main database used by this project is [Scylladb](https://www.scylladb.com/) with an [Apache Cassandra](https://cassandra.apache.org/_/index.html) compatible API. The database infrastructure is based on [Scylla cloud](https://www.scylladb.com/product/scylla-cloud/).
+The main database used by this project is [PlanetScale](https://planetscale.com/) a MySQL-compatible serverless database platform. 
 
-In the future the application should use [ElasticSearch](https://www.elastic.co/fr/elasticsearch/) for search request in the application, and mighht use [JanusGraph](https://janusgraph.org/) or [Neo4j](https://neo4j.com/) for recommandations.
+In the future the application should use [ElasticSearch](https://www.elastic.co/fr/elasticsearch/) for search request in the application, and might use [JanusGraph](https://janusgraph.org/) or [Neo4j](https://neo4j.com/) for recommandations.
 
 ### Web server
 
@@ -136,7 +135,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 - [React](https://reactjs.org/) Main client framework
 - [React Native](https://reactnative.dev/) main mobile application framework
 - [ReactRelay](https://relay.dev/) client data layer
-- [React Native Web](https://necolas.github.io/react-native-web/) used to render react native components on the web application
 
 ### Code Quality
 
@@ -147,46 +145,41 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Miscellaneous
 
-- The authentification process of the mobile applications is based on [JWT](https://jwt.io/) tokens
-- The authentification process of the web application is based on [Iron session](https://github.com/vvo/iron-session)
-- [Microsoft App Center](https://appcenter.ms/) is used of Code Push, crash reporting and distribution of staging and development version of the application
+- The authentification process of the mobile applications is based on tokens
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
 
-The application is build using [Github Actions](https://github.com/features/actions) and [FastLane](https://fastlane.tools/).
-A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the application certificate.
+- The workspace build system is based on [Turbo Repo](https://turbo.build/)
+- The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
+- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate.
 
-List of environement variables during the build process:
+### List of environement variables during the build process:
 
 - `FASTLANE_APPSTORE_API_KEY`: a base 64 encoded of a [Faslane JSON API Key](https://docs.fastlane.tools/app-store-connect-api/)
 - `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
 - `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
-- `APPCENTER_DEV_IOS_API_TOKEN`: the api token of the ios dev appcenter app
-- `APPCENTER_DEV_IOS_APP_NAME`: the name the ios dev appcenter app
-- `APPCENTER_DEV_IOS_APP_SECRET`: the app secret the ios dev appcenter app
-- `APPCENTER_STAGING_IOS_API_TOKEN`: the api token of the ios staging appcenter app
-- `APPCENTER_STAGING_IOS_APP_NAME`: the name of the ios staging appcenter app
-- `APPCENTER_STAGING_IOS_APP_SECRET`: the app secret of the ios staging appcenter app
 
-List of environement variables used at runtime by the application server:
+Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
+Valid platforms are  `IOS` and `ANDROID`. 
 
-- `DB_CONTACT_POINT`: comma separated list of contact point for scylladb connection
-- `DB_DATACENTER`: scylladb datacenter name
-- `DB_USERNAME`: scylladb user name
-- `DB_PASSWORD`: scylladb password
-- `DB_KEYSPACE`: scylladb keyspace
+### List of environement variables used at runtime by the application server:
+
+- `DATABASE_HOST`: Host of the planetscale database
+- `DATABASE_USERNAME`: Username of the planetscale database
+- `DATABASE_PASSWORD`: Password of the planetscale database 
 - `CLOUDINARY_API_SECRET`: cloudinary api secret
+- `CLOUDINARY_API_KEY`: the cloudinary api key 
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`:  the cloudinary cloud name (also used by web application client)
 - `SECRET_COOKIE_PASSWORD`: password used to encrypt web cookie
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
 - `REFRESH_TOKEN_SECRET`: password used to encrypt jwt refresh tokens
 
-List of environement variables used at runtime by the application clients:
+### List of environement variables used at runtime by the application clients:
 
 - `NEXT_PUBLIC_API_ENDPOINT`: the endpoint of api (generated at build time for mobile clients, set to `/api` for web client)
-- `NEXT_PUBLIC_CLOUDINARY_API_KEY`: the cloudinary api key
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name (only used on WEB)
 
 ## Resources
 

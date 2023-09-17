@@ -1,0 +1,12 @@
+extend type Mutation {
+  duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload!
+}
+
+input DuplicateModuleInput {
+  moduleId: ID!
+}
+
+type DuplicateModulePayload {
+  profile: Profile!
+  createdModuleId: ID!
+}
