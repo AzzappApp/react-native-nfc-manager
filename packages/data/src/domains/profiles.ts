@@ -40,7 +40,7 @@ export const ProfileTable = mysqlTable(
     companyName: cols.defaultVarchar('companyName'),
     companyActivityId: cols.cuid('companyActivityId'),
     createdAt: cols.dateTime('createdAt', true).notNull(),
-    updatedAt: cols.dateTime('createdAt', true).notNull(),
+    updatedAt: cols.dateTime('updatedAt', true).notNull(),
 
     /* Cards infos */
     cardColors: json('cardColors').$type<{
