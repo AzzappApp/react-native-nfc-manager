@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,10 +13,10 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.3.0",
-    "@azzapp/i18n": "0.3.0",
-    "@azzapp/relay": "0.3.0",
-    "@azzapp/shared": "0.3.0",
+    "@azzapp/data": "0.4.0",
+    "@azzapp/i18n": "0.4.0",
+    "@azzapp/relay": "0.4.0",
+    "@azzapp/shared": "0.4.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.68.0",
     "bcrypt-ts": "^4.0.0",
