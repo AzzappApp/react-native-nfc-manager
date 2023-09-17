@@ -291,6 +291,8 @@ export const updateProfile = async (
   tx: DbTransaction = db,
 ) => {
   const updatedProfile = {
+    // reenable after beta, we made a mistake and forgot to add this column
+    // updatedAt: new Date(),
     ...updates,
   };
 

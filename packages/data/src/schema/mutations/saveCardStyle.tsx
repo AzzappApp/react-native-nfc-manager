@@ -18,7 +18,8 @@ const saveCardStyle: MutationResolvers['saveCardStyle'] = async (
 
   const updates = {
     cardStyle: input,
-    updatedAt: new Date(),
+    // reenable after beta, we made a mistake and forgot to add this column
+    // updatedAt: new Date(),
     lastCardUpdate: new Date(),
     lastContactCardUpdate: new Date(),
   };

@@ -53,7 +53,8 @@ const saveCover: MutationResolvers['saveCover'] = async (
 
   let updatedProfile = {
     ...profile,
-    updatedAt: new Date(),
+    // reenable after beta, we made a mistake and forgot to add this column
+    // updatedAt: new Date(),
   };
   try {
     if (newMedias.length > 0) {
