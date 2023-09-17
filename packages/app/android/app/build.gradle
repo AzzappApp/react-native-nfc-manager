@@ -101,8 +101,8 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2005
-        versionName "0.2.5-rc.0"
+        versionCode 3000
+        versionName "0.3.0"
     }
 
     splits {
