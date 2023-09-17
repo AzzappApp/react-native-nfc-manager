@@ -297,7 +297,12 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -336,7 +341,12 @@ jobs:
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }}
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
       
       ############################################
       #
