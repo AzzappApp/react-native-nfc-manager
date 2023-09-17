@@ -291,7 +291,6 @@ export const updateProfile = async (
   tx: DbTransaction = db,
 ) => {
   const updatedProfile = {
-    updatedAt: new Date(),
     ...updates,
   };
 
