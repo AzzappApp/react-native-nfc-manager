@@ -2,7 +2,7 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, unstable_batchedUpdates } from 'react-native';
+import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -11,6 +11,7 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray, shuffle } from '@azzapp/shared/arrayHelpers';
+import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
@@ -232,6 +233,7 @@ const CoverEditorTemplateList = ({
         colorPaletteIndex,
         colorPalettes[colorPaletteIndex] ?? null,
         colorPalettes,
+        cardColors,
       );
 
       const templateEditionParameters =
@@ -300,6 +302,7 @@ const CoverEditorTemplateList = ({
         colorPaletteIndex,
         colorPalette,
         colorPalettes,
+        cardColors,
       );
 
       const coverStyleParameters = extractLayoutParameters(
@@ -340,7 +343,7 @@ const CoverEditorTemplateList = ({
   );
   const [colorPalettesIndexes, setColorPalettesIndexes] = useState<
     Record<string, number>
-  >({});
+  >({ cover: cardColors ? -1 : 0 });
 
   const carouselRef = useRef<CarouselSelectListHandle>(null);
   const colorPalletesListRef = useRef<FlatList<ColorPalette> | null>(null);
@@ -348,14 +351,15 @@ const CoverEditorTemplateList = ({
     (index: number) => {
       onSelectedIndexChange?.(index);
       const selectedItem = items[index];
-      unstable_batchedUpdates(() => {
-        setSelectedItem(selectedItem);
+      setSelectedItem(selectedItem);
+      const colorPaletteIndex = colorPalettesIndexes[selectedItem.id] ?? 0;
+      if (colorPaletteIndex !== -1) {
         colorPalletesListRef.current?.scrollToIndex({
-          index: colorPalettesIndexes[selectedItem.id] ?? 0,
+          index: colorPaletteIndex,
           viewOffset: 16,
           animated: false,
         });
-      });
+      }
     },
     [colorPalettesIndexes, items, onSelectedIndexChange],
   );
@@ -444,8 +448,18 @@ const CoverEditorTemplateList = ({
       return;
     }
     const index = colorPalettesIndexes[selectedItem.id] ?? 0;
-    onColorPaletteChange(selectedItem.colorPalettes[index]);
-  }, [colorPalettesIndexes, onColorPaletteChange, selectedItem]);
+    onColorPaletteChange(
+      index === -1
+        ? cardColors ?? DEFAULT_COLOR_PALETTE
+        : selectedItem.colorPalettes[index],
+    );
+  }, [
+    cardColors,
+    colorPalettesIndexes,
+    items,
+    onColorPaletteChange,
+    selectedItem,
+  ]);
 
   const onSelectColorPalette = useCallback(
     (index: number) => {
@@ -475,6 +489,8 @@ const CoverEditorTemplateList = ({
         }
       };
       const { uri, kind } = item.media;
+      const colorPaletteIndex = colorPalettesIndexes[item.id] ?? 0;
+
       return (
         <PressableScaleHighlight
           style={{
@@ -506,7 +522,9 @@ const CoverEditorTemplateList = ({
             textPosition={item.textPosition}
             // other props
             colorPalette={
-              item.colorPalettes[colorPalettesIndexes[item.id] ?? 0]
+              colorPaletteIndex === -1
+                ? cardColors!
+                : item.colorPalettes[colorPaletteIndex]
             }
             computing={mediaComputing}
             height={carouselHeight}
@@ -518,10 +536,11 @@ const CoverEditorTemplateList = ({
     },
     [
       selectedItem?.id,
+      colorPalettesIndexes,
       templateWidth,
       timeRange?.startTime,
       timeRange?.duration,
-      colorPalettesIndexes,
+      cardColors,
       mediaComputing,
       carouselHeight,
       styles.templateItemContainer,
@@ -531,12 +550,13 @@ const CoverEditorTemplateList = ({
   );
 
   const renderTryptich = useCallback(
-    ({ item, index }: ListRenderItemInfo<ColorPalette>) => {
-      const currentColorPalette =
-        selectedItem?.colorPalettes[
-          colorPalettesIndexes[selectedItem?.id] ?? 0
-        ];
-      const selected = isEqual(item, currentColorPalette);
+    ({ item, index }: Omit<ListRenderItemInfo<ColorPalette>, 'separators'>) => {
+      const currentColorPaletteIndex = selectedItem
+        ? colorPalettesIndexes[selectedItem?.id] ?? 0
+        : 0;
+
+      const selected = currentColorPaletteIndex === index;
+
       return (
         <View
           style={{
@@ -544,6 +564,7 @@ const CoverEditorTemplateList = ({
             height: 30,
             alignItems: 'center',
             justifyContent: 'center',
+            flexDirection: 'row',
           }}
         >
           <PressableOpacity
@@ -561,9 +582,9 @@ const CoverEditorTemplateList = ({
     [
       colorPalettesIndexes,
       onSelectColorPalette,
-      selectedItem?.colorPalettes,
-      selectedItem?.id,
-      styles,
+      selectedItem,
+      styles.colorPaletteContainer,
+      styles.colorPaletteSelected,
     ],
   );
 
@@ -587,24 +608,39 @@ const CoverEditorTemplateList = ({
       />
       <View
         style={{
+          height: PALETTE_LIST_HEIGHT,
+          width: templateWidth + 92,
           flexDirection: 'row',
-          justifyContent: 'center',
           alignItems: 'center',
-          height: 30,
+          alignSelf: 'center',
           marginTop: GAP,
         }}
       >
+        {cardColors && (
+          <>
+            {renderTryptich({ item: cardColors!, index: -1 })}
+            <View
+              style={{
+                width: 5,
+                height: 5,
+                backgroundColor: colors.black,
+                borderRadius: 5,
+                marginLeft: GAP,
+              }}
+            />
+          </>
+        )}
         <MaskedView
-          style={[
-            styles.colorPaletteListcontainer,
-            { width: templateWidth + 92 },
-          ]}
+          style={{
+            flex: 1,
+            height: PALETTE_LIST_HEIGHT,
+          }}
           maskElement={
             <LinearGradient
               colors={['transparent', 'black', 'black', 'transparent']}
               style={{
                 height: 30,
-                width: templateWidth + 92,
+                flex: 1,
               }}
               locations={[0.0, 0.05, 0.95, 1]}
               start={{ x: 0, y: 0 }}
@@ -617,27 +653,25 @@ const CoverEditorTemplateList = ({
             horizontal
             showsHorizontalScrollIndicator={false}
             style={{
-              height: 30,
-              width: templateWidth + 92,
+              height: PALETTE_LIST_HEIGHT,
+              flex: 1,
             }}
             data={selectedItem?.colorPalettes ?? []}
             keyExtractor={paletteKeyExtract}
             renderItem={renderTryptich}
-            contentContainerStyle={[
-              styles.colorPalettContainer,
-              { marginRight: 100, marginBottom: 100 },
-            ]}
+            contentContainerStyle={styles.colorPalettContainer}
             onViewableItemsChanged={onViewableItemsChanged}
-            windowSize={templateKind === 'video' ? 5 : 11} //21 is the default value.
+            getItemLayout={(_, index) => ({
+              length: 30 + GAP,
+              offset: index * 30 + Math.max(GAP * index - 1, 0),
+              index,
+            })}
           />
         </MaskedView>
         {showSuggestedMedia && (
           <Container
             style={{
-              position: 'absolute',
-              right: (width - templateWidth - 92) / 2,
-              bottom: 3,
-              height: 30,
+              height: PALETTE_LIST_HEIGHT,
               width: 60,
             }}
           >
@@ -783,6 +817,7 @@ const computeTemplatesPalettes = (
   colorPaletteIndex: number,
   colorPlalette: ColorPalette | null,
   colorPalettes: ColorPalette[],
+  currentColorPalette: ColorPalette | null,
 ) => {
   let result = colorPalettes.slice();
   if (colorPaletteIndex !== -1) {
@@ -792,6 +827,18 @@ const computeTemplatesPalettes = (
   if (colorPlalette !== null) {
     result.unshift(colorPlalette);
   }
+
+  if (currentColorPalette) {
+    result = result.filter(palette => {
+      const isSame =
+        palette.primary === currentColorPalette.primary &&
+        palette.dark === currentColorPalette.dark &&
+        palette.light === currentColorPalette.light;
+
+      return !isSame;
+    });
+  }
+
   return result;
 };
 
@@ -841,12 +888,6 @@ const styleSheet = createStyleSheet(theme => ({
   templateItemContainer: {
     backgroundColor: theme === 'light' ? '#fff' : '#000',
     ...shadow(theme, 'center'),
-  },
-  colorPaletteListcontainer: {
-    alignSelf: 'center',
-
-    alignItems: 'center',
-    height: PALETTE_LIST_HEIGHT,
   },
   colorPalettContainer: {
     paddingHorizontal: GAP,
