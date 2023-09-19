@@ -234,7 +234,7 @@ function CarouselSelectList<TItem = any>(
       snapToInterval={itemWidth}
       decelerationRate="fast"
       snapToAlignment="start"
-      removeClippedSubviews={false}
+      removeClippedSubviews
       pagingEnabled
       bounces={false}
       onScroll={scrollHandler}
@@ -242,6 +242,8 @@ function CarouselSelectList<TItem = any>(
       showsVerticalScrollIndicator={false}
       style={[{ width, height }, style as any]}
       onMomentumScrollEnd={onMomentumScrollEnd}
+      initialNumToRender={3}
+      windowSize={11}
       contentContainerStyle={[
         {
           height,

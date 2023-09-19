@@ -51,44 +51,48 @@ const CoverEditionStep = ({
     height - SUBTITLE_HEIGHT - BUTTON_HEIGHT - 16 - Math.min(insets.bottom, 16);
 
   return (
-    <Suspense
-      fallback={
-        <View style={styles.activityIndicatorContainer}>
-          <ActivityIndicator />
+    <View style={{ height }}>
+      <Suspense
+        fallback={
+          <View style={styles.activityIndicatorContainer}>
+            <ActivityIndicator />
+          </View>
+        }
+      >
+        <View style={styles.subTitleContainer}>
+          <Text variant="medium" style={styles.subTitle}>
+            <FormattedMessage
+              defaultMessage="The cover is the first and most visible section of your WebCard{azzappA}"
+              description="New profile - cover creation subtitle"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          </Text>
         </View>
-      }
-    >
-      <View style={styles.subTitleContainer}>
-        <Text variant="medium" style={styles.subTitle}>
-          <FormattedMessage
-            defaultMessage="The cover is the first and most visible section of your WebCard{azzappA}"
-            description="New profile - cover creation subtitle"
-            values={{
-              azzappA: <Text variant="azzapp">a</Text>,
-            }}
+        <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
+          <CoverEditor
+            ref={ref}
+            viewer={data.viewer}
+            height={eidtorHeight}
+            onCoverSaved={onCoverSaved}
+            onCanSaveChange={setCanSave}
+            initialTemplateKind={
+              profileKind === 'business' ? 'others' : 'people'
+            }
           />
-        </Text>
-      </View>
-      <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
-        <CoverEditor
-          ref={ref}
-          viewer={data.viewer}
-          height={eidtorHeight}
-          onCoverSaved={onCoverSaved}
-          onCanSaveChange={setCanSave}
-          initialTemplateKind={profileKind === 'business' ? 'others' : 'people'}
-        />
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Save my cover',
-            description: 'Cover editor save button label',
-          })}
-          style={styles.saveButton}
-          onPress={onSave}
-          disabled={!canSave}
-        />
-      </View>
-    </Suspense>
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Save my cover',
+              description: 'Cover editor save button label',
+            })}
+            style={styles.saveButton}
+            onPress={onSave}
+            disabled={!canSave}
+          />
+        </View>
+      </Suspense>
+    </View>
   );
 };
 
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
   activityIndicatorContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 200,
+    justifyContent: 'center',
   },
   subTitleContainer: {
     height: SUBTITLE_HEIGHT,
