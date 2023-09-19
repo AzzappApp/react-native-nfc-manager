@@ -2,6 +2,7 @@ import { toGlobalId } from 'graphql-relay';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
+import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
 import { addGlobalEventListener } from './globalEvents';
 
 /**
@@ -83,6 +84,7 @@ export const init = async () => {
 
   addGlobalEventListener('SIGN_OUT', async () => {
     storage.delete(MMKVS_PROFILE_ID);
+    clearRecentSearch();
     await EncryptedStorage.clear();
     authTokens = null;
     emitAuthState();
