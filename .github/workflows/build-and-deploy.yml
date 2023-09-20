@@ -100,6 +100,7 @@ jobs:
           git add .
           git commit -m "chore: bump version [skip ci]"
           git push origin main
+          yarn install --frozen-lockfile  --immutable
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
         
@@ -292,7 +293,6 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          rm -fr ./packages/web/.next
           vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel deployment
