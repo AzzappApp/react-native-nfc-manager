@@ -1,5 +1,6 @@
-## 0.4.1-canary.4
+## 0.4.1-canary.5
 
+* **feat:**  - change the logo for the futur dead social network ([#1156](https://github.com/AzzappApp/azzapp/pull/1156))
 * **feat:**  - 🎸 replace home tab bar icon with webcard renderer ([#1151](https://github.com/AzzappApp/azzapp/pull/1151))
 * **fix:**  - update next cache ([#1149](https://github.com/AzzappApp/azzapp/pull/1149))
 * **fix:**  - missing remove recent search on signout ([#1152](https://github.com/AzzappApp/azzapp/pull/1152))
