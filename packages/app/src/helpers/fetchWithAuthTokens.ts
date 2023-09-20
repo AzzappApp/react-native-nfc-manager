@@ -28,7 +28,19 @@ const fetchWithAuthTokens =
     }
     const { token, refreshToken } = tokens;
     try {
-      return await fetchFunction(input, injectToken(token, init));
+      const res = await fetchFunction(input, injectToken(token, init));
+
+      if (
+        (
+          res as {
+            errors?: Array<{ extensions: { code: string } }>;
+          }
+        ).errors?.some(e => e.extensions.code === ERRORS.INVALID_TOKEN)
+      ) {
+        throw new Error(ERRORS.INVALID_TOKEN);
+      }
+
+      return res;
     } catch (e) {
       if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
         let refreshedTokens: TokensResponse;

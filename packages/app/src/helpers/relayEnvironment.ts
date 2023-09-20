@@ -88,12 +88,7 @@ export const createNetwork = (actorId: string) => {
         query?: string;
         id?: string;
         variables?: Record<string, unknown>;
-        profileId?: string;
-        locale?: string;
-        appVersion?: string;
-      } = {
-        appVersion: APP_VERSION,
-      };
+      } = {};
 
       const { id, text } = request;
       if (text) {
@@ -104,23 +99,27 @@ export const createNetwork = (actorId: string) => {
       }
       params.variables = variables;
 
+      const headers: HeadersInit = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'azzapp-appVersion': APP_VERSION,
+      };
+
       const profileId = actorId === ROOT_ACTOR_ID ? null : actorId;
+
       if (profileId) {
         const { id } = fromGlobalId(profileId);
-        params.profileId = id;
+        headers['azzapp-profileId'] = id;
       }
 
       const locale = getCurrentLocale();
       if (locale) {
-        params.locale = locale;
+        headers['azzapp-locale'] = locale;
       }
 
       fetchFunction<GraphQLResponse>(GRAPHQL_ENDPOINT, {
         method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(params),
         signal: abortController.signal,
       })

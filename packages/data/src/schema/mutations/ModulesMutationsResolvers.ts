@@ -38,7 +38,7 @@ const createModuleSavingMutation =
         moduleId?: string | null;
       };
     },
-    { auth, loaders, cardUpdateListener }: GraphQLContext,
+    { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
   ) => {
     const profileId = auth.profileId;
     if (!profileId) {
@@ -107,7 +107,7 @@ const createModuleSavingMutation =
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    cardUpdateListener(profile.userName);
+    cardUsernamesToRevalidate.add(profile.userName);
 
     return { profile };
   };

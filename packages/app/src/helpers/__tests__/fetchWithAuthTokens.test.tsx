@@ -36,6 +36,7 @@ describe('fetchWithAuthTokens', () => {
 
   test('should not amend the request if there is no tokens in the store', () => {
     getTokensMock.mockReturnValueOnce(null);
+    fetchJSONMock.mockResolvedValueOnce({ data: 'fakeData' });
     void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
       method: 'POST',
     });
@@ -49,6 +50,7 @@ describe('fetchWithAuthTokens', () => {
       token: 'fakeToken',
       refreshToken: 'fakeRefreshToken',
     });
+    fetchJSONMock.mockResolvedValueOnce({ data: 'fakeData' });
     void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
       method: 'POST',
     });
@@ -103,6 +105,51 @@ describe('fetchWithAuthTokens', () => {
     });
   });
 
+  test('should refresh the token if the token is invalid - graphql error case', async () => {
+    getTokensMock.mockReturnValueOnce({
+      token: 'fakeToken',
+      refreshToken: 'fakeRefreshToken',
+    });
+    getTokensMock.mockReturnValueOnce({
+      token: 'fakeToken2',
+      refreshToken: 'fakeRefreshToken2',
+    });
+    fetchJSONMock.mockResolvedValue({
+      errors: [{ extensions: { code: ERRORS.INVALID_TOKEN } }],
+    });
+    refreshTokensMock.mockResolvedValueOnce({
+      token: 'fakeToken2',
+      refreshToken: 'fakeRefreshToken2',
+    });
+
+    void fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
+      method: 'POST',
+    });
+    await flushPromises();
+
+    expect(fetchJSONMock).toHaveBeenNthCalledWith(1, 'https://example.com', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer fakeToken',
+      },
+    });
+    expect(fetchJSONMock).toHaveBeenNthCalledWith(2, 'https://example.com', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer fakeToken2',
+      },
+    });
+    expect(dispatchGlobalEvent).toHaveBeenCalledWith({
+      type: 'TOKENS_REFRESHED',
+      payload: {
+        authTokens: {
+          token: 'fakeToken2',
+          refreshToken: 'fakeRefreshToken2',
+        },
+      },
+    });
+  });
+
   test('should throw an error if the refresh token is invalid', () => {
     expect.assertions(3);
     getTokensMock.mockReturnValueOnce({
@@ -110,6 +157,7 @@ describe('fetchWithAuthTokens', () => {
       refreshToken: 'fakeRefreshToken',
     });
     fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
+
     refreshTokensMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_TOKEN));
 
     fetchWithAuthTokens(fetchJSONMock)('https://example.com', {

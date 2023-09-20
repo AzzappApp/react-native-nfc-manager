@@ -1,133 +1,184 @@
-import * as Sentry from '@sentry/nextjs';
-import { graphql } from 'graphql';
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useLogger } from '@envelop/core';
+import { useDisableIntrospection } from '@envelop/disable-introspection';
+import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
+import { useSentry } from '@envelop/sentry';
+import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import { createYoga } from 'graphql-yoga';
 import { revalidateTag } from 'next/cache';
-import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
-import { getProfileById } from '@azzapp/data/domains';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data/domains/databaseMonitorer';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-import type { SessionData } from '#helpers/tokens';
+import type { GraphQLContext } from '@azzapp/data';
 import type { Profile } from '@azzapp/data/domains';
-import type { NextRequest } from 'next/server';
+import type { Plugin } from '@envelop/types';
+import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
   process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
 
-export const POST = async (req: NextRequest) => {
-  let sessionData: SessionData | null;
-  try {
-    sessionData = await getSessionData();
-  } catch (e) {
-    if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
-      return NextResponse.json(
-        { message: ERRORS.INVALID_TOKEN },
-        { status: 401 },
-      );
-    } else {
-      return NextResponse.json(
-        { message: ERRORS.INVALID_REQUEST },
-        { status: 400 },
-      );
-    }
-  }
-
-  if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
-    startDatabaseConnectionMonitoring();
-  }
-
-  const requestParams = await req.json();
-  const { profileId, locale, appVersion } = requestParams;
-
-  if (appVersion && compare(appVersion, LAST_SUPPORTED_APP_VERSION) < 0) {
-    return NextResponse.json(
-      { message: ERRORS.UPDATE_APP_VERSION },
-      { status: 400 },
-    );
-  }
-
-  let profile: Profile | null = null;
-  if (profileId) {
-    profile = await getProfileById(profileId);
-    if (!profile || profile.userId !== sessionData?.userId) {
-      return NextResponse.json(
-        { message: ERRORS.UNAUTORIZED },
-        { status: 401 },
-      );
-    }
-  }
-
-  const cardUsernamesToRevalidate = new Set<string>();
-
-  const cardUpdateListener = (username: string) => {
-    cardUsernamesToRevalidate.add(username);
+function useRevalidateTag(): Plugin<GraphQLContext> {
+  return {
+    onExecute: () => {
+      return {
+        onExecuteDone(payload) {
+          payload.args.contextValue.cardUsernamesToRevalidate.forEach(
+            username => {
+              console.info(`Revalidating webcard for user ${username}`);
+              revalidateTag(username);
+            },
+          );
+        },
+      };
+    },
   };
+}
 
-  try {
-    const graphqlRequest = requestParams.id
-      ? (queryMap as any)[requestParams.id]
-      : requestParams.query;
-
-    const result = await graphql({
-      schema,
-      rootValue: {},
-      source: graphqlRequest,
-      variableValues: requestParams.variables,
-      contextValue: createGraphQLContext(
-        cardUpdateListener,
-        sessionData?.userId,
-        profile,
-        locale ?? DEFAULT_LOCALE,
-      ),
-    });
-    if (
-      (process.env.NODE_ENV !== 'production' ||
-        process.env.DEPLOYMENT_ENVIRONMENT === 'development') &&
-      !!result.errors?.length
-    ) {
-      console.warn('GraphQL errors:');
-      console.warn(result.errors);
-      console.warn(result.errors[0].stack);
-    }
-
-    cardUsernamesToRevalidate.forEach(username => {
-      console.info(`Revalidating webcard for user ${username}`);
-      revalidateTag(username);
-    });
-    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
-      const infos = await getDatabaseConnectionsInfos();
-      if (infos) {
-        const gqlName = /query\s*(\S+)\s*[{(]/g.exec(graphqlRequest)?.[1];
-        console.log(
-          `-------------------- Graphql Query : ${gqlName}--------------------`,
-        );
-        console.log('Number database requests', infos.nbRequests);
-        console.log('Max concurrent requests', infos.maxConcurrentRequests);
-        console.log('Queries:\n---\n', infos.queries.join('\n---\n'));
-        console.log(
-          '----------------------------------------------------------------',
+function useAppVersion(): YogaPlugin {
+  return {
+    onRequest({ request, fetchAPI, endResponse }) {
+      const appVersion = request.headers.get('azzapp-appVersion');
+      if (appVersion && compare(appVersion, LAST_SUPPORTED_APP_VERSION) < 0) {
+        endResponse(
+          new fetchAPI.Response(
+            JSON.stringify({ message: ERRORS.UPDATE_APP_VERSION }),
+            {
+              status: 400,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            },
+          ),
         );
       }
-    }
-    const environment = process.env.NEXT_PUBLIC_PLATFORM || 'development';
-    if (environment !== 'production') {
-      Sentry.captureException(result.errors);
-    }
+    },
+  };
+}
 
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error(error);
-    Sentry.captureException(error);
-    return NextResponse.json(
-      { message: ERRORS.INTERNAL_SERVER_ERROR },
-      { status: 500 },
-    );
+const SUPPORTED_LOG_LEVELS = ['debug', 'info', 'warn', 'error', 'silent'];
+
+const getLoggingLevel = () => {
+  const logLevel = process.env.API_LOG_LEVEL;
+
+  if (logLevel === 'silent') {
+    return false;
   }
+
+  if (logLevel) {
+    if (SUPPORTED_LOG_LEVELS.includes(logLevel)) {
+      return logLevel as LogLevel;
+    }
+  }
+
+  return process.env.NODE_ENV !== 'production' ? 'debug' : 'error';
 };
+
+const { handleRequest } = createYoga({
+  graphqlEndpoint: '/api/graphql',
+  schema,
+  fetchAPI: {
+    Request,
+    Response,
+  },
+  logging: getLoggingLevel(),
+  graphiql: process.env.NODE_ENV !== 'production',
+  plugins: [
+    useAppVersion(),
+    useLogger({
+      logFn: (eventName, { args }) => {
+        if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+          if (eventName === 'execute-start') {
+            startDatabaseConnectionMonitoring();
+          }
+          if (eventName === 'execute-end') {
+            const infos = getDatabaseConnectionsInfos();
+            if (infos) {
+              const gqlName = /query\s*(\S+)\s*[{(]/g.exec(
+                args.contextValue.params.query,
+              )?.[1];
+              console.log(
+                `-------------------- Graphql Query : ${gqlName} --------------------`,
+              );
+              console.log('Number database requests', infos.nbRequests);
+              console.log(
+                'Max concurrent requests',
+                infos.maxConcurrentRequests,
+              );
+              console.log('Queries:\n---\n', infos.queries.join('\n---\n'));
+              console.log(
+                '----------------------------------------------------------------',
+              );
+            }
+          }
+        }
+      },
+    }),
+    usePersistedOperations({
+      extractPersistedOperationId: params => {
+        return 'id' in params && params.id ? (params.id as string) : null;
+      },
+      getPersistedOperation(id: string) {
+        return (queryMap as any)[id];
+      },
+      allowArbitraryOperations: process.env.NODE_ENV !== 'production',
+    }),
+    useGenericAuth({
+      resolveUserFn: async (context: GraphQLContext) => {
+        try {
+          const res = await getSessionData();
+
+          const profileId = headers().get('azzapp-profileId');
+          let profile: Profile | null = null;
+          if (profileId) {
+            profile = await context.loaders.Profile.load(profileId);
+            if (profile?.userId !== res?.userId) {
+              return null;
+            }
+          }
+
+          return {
+            ...res,
+            profileId,
+          };
+        } catch (e) {
+          console.log('error', e);
+          return null;
+        }
+      },
+      contextFieldName: 'auth',
+      validateUser: params => {
+        if (!params.user?.userId) {
+          return new UnauthenticatedError(`Unauthenticated`, {
+            extensions: {
+              code: ERRORS.INVALID_TOKEN,
+            },
+          });
+        }
+      },
+      mode: 'protect-all',
+    }),
+    useRevalidateTag(),
+    useDisableIntrospection({
+      disableIf: () => process.env.NODE_ENV === 'production',
+    }),
+    useSentry({
+      includeRawResult: false,
+      includeExecuteVariables: true,
+    }),
+  ],
+  context: ({ request }) => {
+    const locale = request.headers.get('azzapp-locale');
+
+    return createGraphQLContext(locale ?? undefined);
+  },
+});
+
+export { handleRequest as GET, handleRequest as POST };

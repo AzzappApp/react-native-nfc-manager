@@ -1,5 +1,6 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
+import { fromGlobalId } from 'graphql-relay';
 import {
   Component,
   Fragment,
@@ -80,12 +81,18 @@ import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
+const routingInstrumentation = new Sentry.RoutingInstrumentation();
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
-  integrations: [new Sentry.ReactNativeTracing()],
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+    }),
+  ],
 });
 
 /**
@@ -216,28 +223,30 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser(profileId ? { id: profileId } : null);
+    Sentry.setUser(profileId ? { id: fromGlobalId(profileId).id } : null);
   }, [profileId]);
 
   useEffect(() => {
-    Sentry.addBreadcrumb({
-      category: 'navigation',
-      type: 'navigation',
-      message: `Navigation to ${router.getCurrentRoute()?.route}`,
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const previousRoute = router.getCurrentRoute();
+    const previous = router.getCurrentRoute();
     const disposable = router.addRouteWillChangeListener(route => {
-      Sentry.addBreadcrumb({
-        category: 'navigation',
-        type: 'navigation',
-        message: `Navigation to ${route.route}`,
+      routingInstrumentation.onRouteWillChange({
+        name: route.route,
+        op: 'navigation',
         data: {
-          from: previousRoute,
-          to: route,
+          route: {
+            name: route.route,
+            params: route.params,
+          },
+          previousRoute: previous
+            ? {
+                name: previous.route,
+                params: previous.params,
+              }
+            : null,
         },
       });
     });

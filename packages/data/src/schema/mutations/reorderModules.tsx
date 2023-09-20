@@ -10,7 +10,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const reorderModules: MutationResolvers['reorderModules'] = async (
   _,
   { input: { moduleIds } },
-  { auth, loaders, cardUpdateListener },
+  { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
@@ -39,7 +39,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  cardUpdateListener(profile.userName);
+  cardUsernamesToRevalidate.add(profile.userName);
 
   return { profile };
 };

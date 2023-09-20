@@ -5,7 +5,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const saveCardColors: MutationResolvers['saveCardColors'] = async (
   _,
   { input },
-  { auth, loaders, cardUpdateListener },
+  { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
@@ -27,7 +27,7 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
   } catch (e) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
-  cardUpdateListener(profile.userName);
+  cardUsernamesToRevalidate.add(profile.userName);
   return {
     profile: {
       ...profile,

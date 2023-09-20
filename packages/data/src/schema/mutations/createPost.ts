@@ -12,7 +12,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const createPostMutation: MutationResolvers['createPost'] = async (
   _,
   { input: { mediaId, content, allowComments, allowLikes } },
-  { auth, loaders, cardUpdateListener },
+  { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -59,7 +59,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
       };
     });
 
-    cardUpdateListener(profile.userName);
+    cardUsernamesToRevalidate.add(profile.userName);
     return { post };
   } catch (error) {
     console.error(error);

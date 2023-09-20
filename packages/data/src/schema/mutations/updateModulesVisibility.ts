@@ -4,7 +4,7 @@ import { CardModuleTable, db, getCardModulesByIds } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
-  async (_source, args, { auth, loaders, cardUpdateListener }) => {
+  async (_source, args, { auth, loaders, cardUsernamesToRevalidate }) => {
     const profileId = auth.profileId;
     if (!profileId) {
       throw new Error(ERRORS.UNAUTORIZED);
@@ -35,7 +35,7 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    cardUpdateListener(profile.userName);
+    cardUsernamesToRevalidate.add(profile.userName);
 
     return { profile };
   };

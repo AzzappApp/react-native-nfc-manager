@@ -37,7 +37,7 @@ import type {
 } from '#domains';
 
 export type GraphQLContext = {
-  cardUpdateListener: (username: string) => void;
+  cardUsernamesToRevalidate: Set<string>;
   auth: {
     userId?: string;
     profileId?: string;
@@ -48,15 +48,9 @@ export type GraphQLContext = {
 };
 
 export const createGraphQLContext = (
-  cardUpdateListener: (username: string) => void,
-  userId?: string,
-  profile?: Profile,
   locale: string = DEFAULT_LOCALE,
-): GraphQLContext => {
+): Omit<GraphQLContext, 'auth'> => {
   const loaders = createLoaders();
-  if (profile && loaders.Profile) {
-    loaders.Profile.prime(profile.id, profile);
-  }
 
   const sessionMemoizedCache = new Map<any, any>();
   const sessionMemoized = <T>(fn: () => T): T => {
@@ -69,12 +63,8 @@ export const createGraphQLContext = (
   };
 
   return {
-    auth: {
-      userId,
-      profileId: profile?.id,
-    },
     locale,
-    cardUpdateListener,
+    cardUsernamesToRevalidate: new Set<string>(),
     loaders,
     sessionMemoized,
   };

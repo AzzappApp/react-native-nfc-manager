@@ -11,7 +11,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
   { input: { modulesIds } },
-  { auth, loaders, cardUpdateListener },
+  { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -41,7 +41,7 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   }
 
   const profile = (await loaders.Profile.load(profileId))!;
-  cardUpdateListener(profile.userName);
+  cardUsernamesToRevalidate.add(profile.userName);
 
   return { profile };
 };

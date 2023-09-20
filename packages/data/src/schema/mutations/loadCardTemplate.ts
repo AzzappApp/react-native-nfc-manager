@@ -18,7 +18,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
   { input: { cardTemplateId } },
-  { auth, loaders, cardUpdateListener },
+  { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -93,7 +93,7 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  cardUpdateListener(profile.userName);
+  cardUsernamesToRevalidate.add(profile.userName);
   return { profile };
 };
 
