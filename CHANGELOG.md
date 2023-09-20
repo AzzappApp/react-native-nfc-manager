@@ -1,5 +1,6 @@
-## 0.4.1-canary.5
+## 0.4.1-canary.6
 
+* **fix:**  - ignore _vt_HOLD tables ([#1157](https://github.com/AzzappApp/azzapp/pull/1157))
 * **feat:**  - change the logo for the futur dead social network ([#1156](https://github.com/AzzappApp/azzapp/pull/1156))
 * **feat:**  - 🎸 replace home tab bar icon with webcard renderer ([#1151](https://github.com/AzzappApp/azzapp/pull/1151))
 * **fix:**  - update next cache ([#1149](https://github.com/AzzappApp/azzapp/pull/1149))
