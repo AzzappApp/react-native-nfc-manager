@@ -21,6 +21,7 @@ jobs:
       TURBO_TEAM: "azzapp"
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
+      SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
     steps:
       ############################################
       #
@@ -346,6 +347,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
+          rm -fr ./packages/web/.next
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
       
       ############################################
