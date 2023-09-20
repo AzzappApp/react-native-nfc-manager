@@ -1,5 +1,6 @@
-## 0.4.1-canary.8
+## 0.4.1-canary.9
 
+* **build:**  - remove .next cache between builds ([#1161](https://github.com/AzzappApp/azzapp/pull/1161))
 * **build:**  - upgrade to next 13.5 ([#1160](https://github.com/AzzappApp/azzapp/pull/1160))
 * **build:**  - add auth token to upload source maps to sentry ([#1159](https://github.com/AzzappApp/azzapp/pull/1159))
 * **fix:**  - ignore _vt_HOLD tables ([#1157](https://github.com/AzzappApp/azzapp/pull/1157))
