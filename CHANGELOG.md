@@ -1,5 +1,6 @@
-## 0.4.1-canary.6
+## 0.4.1-canary.7
 
+* **build:**  - add auth token to upload source maps to sentry ([#1159](https://github.com/AzzappApp/azzapp/pull/1159))
 * **fix:**  - ignore _vt_HOLD tables ([#1157](https://github.com/AzzappApp/azzapp/pull/1157))
 * **feat:**  - change the logo for the futur dead social network ([#1156](https://github.com/AzzappApp/azzapp/pull/1156))
 * **feat:**  - 🎸 replace home tab bar icon with webcard renderer ([#1151](https://github.com/AzzappApp/azzapp/pull/1151))
