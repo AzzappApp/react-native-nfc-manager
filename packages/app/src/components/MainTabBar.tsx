@@ -12,6 +12,7 @@ import { createId } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
+import { HomeIcon } from './HomeIcon';
 import {
   useNativeNavigationEvent,
   useRouter,
@@ -123,6 +124,15 @@ const MainTabBar = ({
     };
   }, []);
 
+  const tabs = [
+    {
+      key: 'HOME',
+      label: 'Webcards',
+      IconComponent: <HomeIcon />,
+    },
+    ...TABS,
+  ];
+
   return (
     <Animated.View
       style={[
@@ -140,7 +150,7 @@ const MainTabBar = ({
       <BottomMenu
         currentTab={['HOME', 'MEDIA'][currentIndex]}
         iconSize={28}
-        tabs={TABS}
+        tabs={tabs}
         onItemPress={onItemPress}
         showLabel
         showCircle={false}
@@ -153,11 +163,6 @@ const MARGIN_HORIZONTAL = 30;
 
 const TABS: FooterBarItem[] = [
   {
-    key: 'HOME',
-    label: 'Webcards',
-    icon: 'home',
-  },
-  {
     key: 'NEW_POST',
     label: 'New Post',
     icon: 'add_filled',
@@ -168,5 +173,4 @@ const TABS: FooterBarItem[] = [
     icon: 'media',
   },
 ];
-
 export default MainTabBar;
