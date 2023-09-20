@@ -30,6 +30,8 @@ type ProfilePageProps = {
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
   const { profile, modules, media, posts, backgrounds } = await unstable_cache(
     async () => {
+      console.info(`Caching webcard for user ${userName}`);
+
       const profile = await getProfileByUserName(userName);
 
       try {
@@ -139,3 +141,5 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
 export default ProfilePage;
 
 export const dynamic = 'force-static';
+
+export const revalidate = 3600;

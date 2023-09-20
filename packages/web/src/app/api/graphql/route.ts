@@ -98,6 +98,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     cardUsernamesToRevalidate.forEach(username => {
+      console.info(`Revalidating webcard for user ${username}`);
       revalidateTag(username);
     });
     if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
