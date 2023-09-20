@@ -1,5 +1,7 @@
-## 0.4.1-canary.3
+## 0.4.1-canary.4
 
+* **feat:**  - 🎸 replace home tab bar icon with webcard renderer ([#1151](https://github.com/AzzappApp/azzapp/pull/1151))
+* **fix:**  - update next cache ([#1149](https://github.com/AzzappApp/azzapp/pull/1149))
 * **fix:**  - missing remove recent search on signout ([#1152](https://github.com/AzzappApp/azzapp/pull/1152))
 * **fix:**  - improve cover editor initial render perf ([#1143](https://github.com/AzzappApp/azzapp/pull/1143))
 * **feat:**  - 🎸 display expected UI + current tryptich first ([#1099](https://github.com/AzzappApp/azzapp/pull/1099))
