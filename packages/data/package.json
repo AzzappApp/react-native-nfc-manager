@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.4.1-canary.10",
+  "version": "0.4.1-canary.11",
   "private": true,
   "exports": {
     ".": {
@@ -35,9 +35,9 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/i18n": "0.4.1-canary.10",
-    "@azzapp/relay": "0.4.1-canary.10",
-    "@azzapp/shared": "0.4.1-canary.10",
+    "@azzapp/i18n": "0.4.1-canary.11",
+    "@azzapp/relay": "0.4.1-canary.11",
+    "@azzapp/shared": "0.4.1-canary.11",
     "@graphql-tools/schema": "^10.0.0",
     "@paralleldrive/cuid2": "^2.2.0",
     "@planetscale/database": "^1.11.0",

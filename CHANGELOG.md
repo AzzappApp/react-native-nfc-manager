@@ -1,5 +1,6 @@
-## 0.4.1-canary.10
+## 0.4.1-canary.11
 
+* **build:**  - try to install version after bump to avoid vercel cli does it - and forgets patches ([#1166](https://github.com/AzzappApp/azzapp/pull/1166))
 * **build:**  - remove .next cache between builds ([#1161](https://github.com/AzzappApp/azzapp/pull/1161))
 * **build:**  - upgrade to next 13.5 ([#1160](https://github.com/AzzappApp/azzapp/pull/1160))
 * **build:**  - add auth token to upload source maps to sentry ([#1159](https://github.com/AzzappApp/azzapp/pull/1159))
