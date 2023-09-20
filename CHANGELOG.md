@@ -1,5 +1,6 @@
-## 0.4.1-canary.7
+## 0.4.1-canary.8
 
+* **build:**  - upgrade to next 13.5 ([#1160](https://github.com/AzzappApp/azzapp/pull/1160))
 * **build:**  - add auth token to upload source maps to sentry ([#1159](https://github.com/AzzappApp/azzapp/pull/1159))
 * **fix:**  - ignore _vt_HOLD tables ([#1157](https://github.com/AzzappApp/azzapp/pull/1157))
 * **feat:**  - change the logo for the futur dead social network ([#1156](https://github.com/AzzappApp/azzapp/pull/1156))
