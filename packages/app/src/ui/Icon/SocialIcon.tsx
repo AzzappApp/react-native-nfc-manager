@@ -74,7 +74,7 @@ const socialIcons = {
     return require('./assets/social/twitch.png');
   },
   get twitter() {
-    return require('./assets/social/twitter.png');
+    return require('./assets/social/twitter-x.png');
   },
   get typefully() {
     return require('./assets/social/typefully.png');
