@@ -11,7 +11,7 @@ import {
 } from '@azzapp/data/domains';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
-import type { MediaSuggestion } from '@azzapp/data/domains';
+import type { MediaSuggestion, NewMediaSuggestion } from '@azzapp/data/domains';
 
 export const addSuggestions = async ({
   medias,
@@ -89,15 +89,13 @@ export const setSuggestionsForMedia = async ({
 
   try {
     await db.transaction(async trx => {
-      const suggestions: MediaSuggestion[] = [
+      const suggestions: NewMediaSuggestion[] = [
         ...categories.map(categoryId => ({
-          id: createId(),
           mediaId,
           profileCategoryId: categoryId,
           companyActivityId: null,
         })),
         ...activities.map(activityId => ({
-          id: createId(),
           mediaId,
           profileCategoryId: null,
           companyActivityId: activityId,

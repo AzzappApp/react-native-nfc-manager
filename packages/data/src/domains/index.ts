@@ -18,4 +18,3 @@ export * from './profileCategories';
 export * from './profiles';
 export * from './staticMedias';
 export * from './users';
-export * from './tokens';

@@ -7,8 +7,6 @@ import {
   index,
   mysqlTable,
   boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
@@ -18,12 +16,12 @@ import { getTopPostsComment } from './postComments';
 import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
 import type { Profile } from './profiles';
-import type { InferModel, SQL } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 
 export const PostTable = mysqlTable(
   'Post',
   {
-    id: cols.cuid('id').primaryKey().notNull(),
+    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     authorId: cols.cuid('authorId').notNull(),
     content: text('content'),
     allowComments: boolean('allowComments').notNull(),
@@ -31,8 +29,8 @@ export const PostTable = mysqlTable(
     medias: json('medias').$type<string[]>().notNull(),
     counterReactions: int('counterReactions').default(0).notNull(),
     counterComments: int('counterComments').default(0).notNull(),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
-    updatedAt: cols.dateTime('updatedAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
+    updatedAt: cols.dateTime('updatedAt').notNull(),
   },
   table => {
     return {
@@ -41,8 +39,8 @@ export const PostTable = mysqlTable(
   },
 );
 
-export type Post = InferModel<typeof PostTable>;
-export type NewPost = Omit<InferModel<typeof PostTable, 'insert'>, 'id'>;
+export type Post = InferSelectModel<typeof PostTable>;
+export type NewPost = InferInsertModel<typeof PostTable>;
 export type PostWithMedias = Omit<Post, 'medias'> & { medias: Media[] };
 export type PostWithCommentAndAuthor = PostWithMedias & {
   comment: (PostComment & { author: Profile }) | null;
@@ -244,20 +242,9 @@ export const getFollowingsPostsCount = async (profileId: string) =>
  * @returns The created post
  */
 export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
-  const addedPost = {
-    ...values,
-    id: createId(),
-  };
-  await tx.insert(PostTable).values(addedPost);
-  // TODO should we return the post from the database instead? createdAt might be different
-  return {
-    ...addedPost,
-    content: addedPost.content ?? null,
-    counterReactions: 0,
-    counterComments: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
+  const id = createId();
+  await tx.insert(PostTable).values({ ...values, id });
+  return id;
 };
 
 /**
@@ -267,10 +254,7 @@ export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
  * @param {(Partial<Omit<Post, 'createdAt' | 'id'>>)} data
  * @return {*}  {Promise<Partial<Post>>}
  */
-export const updatePost = async (
-  postId: string,
-  data: Partial<Omit<Post, 'createdAt' | 'id' | 'media'>>,
-) => {
+export const updatePost = async (postId: string, data: Partial<NewPost>) => {
   await db
     .update(PostTable)
     .set({ ...data, updatedAt: new Date() })

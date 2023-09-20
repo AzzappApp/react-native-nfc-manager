@@ -1,24 +1,20 @@
 import { createId } from '@paralleldrive/cuid2';
-import { type InferModel, eq, and } from 'drizzle-orm';
-import {
-  mysqlTable,
-  boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { eq, and } from 'drizzle-orm';
+import { mysqlTable, boolean } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const ColorPaletteTable = mysqlTable('ColorPalette', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   primary: cols.color('primary').notNull(),
   dark: cols.color('dark').notNull(),
   light: cols.color('light').notNull(),
   enabled: boolean('enabled').default(true).notNull(),
 });
 
-export type ColorPalette = InferModel<typeof ColorPaletteTable>;
-export type NewColorPalette = InferModel<typeof ColorPaletteTable, 'insert'>;
+export type ColorPalette = InferSelectModel<typeof ColorPaletteTable>;
+export type NewColorPalette = InferInsertModel<typeof ColorPaletteTable>;
 
 /**
  * Retrieve a colorPalette by its id.
@@ -64,12 +60,12 @@ export const getColorPaletteByColors = (
  * @returns The created colorPalette
  */
 export const createColorPalette = async (
-  newColorPalette: Omit<NewColorPalette, 'id'>,
+  newColorPalette: NewColorPalette,
   tx: DbTransaction = db,
 ) => {
   const id = createId();
   await tx.insert(ColorPaletteTable).values({ ...newColorPalette, id });
-  return { ...newColorPalette, id };
+  return id;
 };
 
 /**

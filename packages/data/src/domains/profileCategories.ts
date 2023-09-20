@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2';
 import { eq, asc } from 'drizzle-orm';
 import {
   json,
@@ -5,14 +6,12 @@ import {
   mysqlEnum,
   mysqlTable,
   boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
-  id: cols.cuid('id').primaryKey().notNull(),
+  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
   labels: cols.labels('labels').notNull(),
   medias: json('medias').$type<string[]>().notNull(),
@@ -20,11 +19,8 @@ export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
   enabled: boolean('enabled').default(true).notNull(),
 });
 
-export type ProfileCategory = InferModel<typeof ProfileCategoryTable>;
-export type NewProfileCategory = InferModel<
-  typeof ProfileCategoryTable,
-  'insert'
->;
+export type ProfileCategory = InferSelectModel<typeof ProfileCategoryTable>;
+export type NewProfileCategory = InferInsertModel<typeof ProfileCategoryTable>;
 
 /**
  * Retrieves a list of all profile categories

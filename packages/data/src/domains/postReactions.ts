@@ -4,12 +4,10 @@ import {
   primaryKey,
   mysqlEnum,
   mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const PostReactionTable = mysqlTable(
   'PostReaction',
@@ -17,7 +15,7 @@ export const PostReactionTable = mysqlTable(
     profileId: cols.cuid('profileId').notNull(),
     postId: cols.cuid('postId').notNull(),
     reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
   },
   table => {
     return {
@@ -34,8 +32,8 @@ export const PostReactionTable = mysqlTable(
   },
 );
 
-export type PostReaction = InferModel<typeof PostReactionTable>;
-export type NewPostReaction = InferModel<typeof PostReactionTable, 'insert'>;
+export type PostReaction = InferSelectModel<typeof PostReactionTable>;
+export type NewPostReaction = InferInsertModel<typeof PostReactionTable>;
 
 /**
  * insert a post reaction

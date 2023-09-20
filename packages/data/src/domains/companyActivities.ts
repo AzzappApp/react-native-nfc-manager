@@ -1,13 +1,7 @@
 import { eq } from 'drizzle-orm';
-import {
-  int,
-  mysqlTable,
-  primaryKey,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { int, mysqlTable, primaryKey } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = mysqlTable('CompanyActivity', {
   id: cols.cuid('id').notNull().primaryKey(),
@@ -28,11 +22,8 @@ export const ProfileCategoryCompanyActivityTable = mysqlTable(
   },
 );
 
-export type CompanyActivity = InferModel<typeof CompanyActivityTable>;
-export type NewCompanyActivity = InferModel<
-  typeof CompanyActivityTable,
-  'insert'
->;
+export type CompanyActivity = InferSelectModel<typeof CompanyActivityTable>;
+export type NewCompanyActivity = InferInsertModel<typeof CompanyActivityTable>;
 
 /**
  * Retrieves a list of all company activities

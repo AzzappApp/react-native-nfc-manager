@@ -1,15 +1,9 @@
 import { connect } from '@planetscale/database';
-import { sql as sqlDrizzle } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import pLimit from 'p-limit';
 import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
-import type { SQL } from 'drizzle-orm';
-
-// see https://github.com/drizzle-team/drizzle-orm/issues/656
-const sql = <T>(strings: TemplateStringsArray, ...params: any[]): SQL<T> => {
-  return sqlDrizzle(strings, ...params);
-};
 
 const fetchFunction =
   process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
@@ -67,9 +61,9 @@ const db = drizzle(connection);
 
 export const DEFAULT_VARCHAR_LENGTH = 191;
 
-export const DEFAULT_DATETIME_PRECISION = 3;
+const DEFAULT_DATETIME_PRECISION = 3;
 
-export const DEFAULT_DATETIME_VALUE = sql`(CURRENT_TIMESTAMP(3))`;
+const DEFAULT_DATETIME_VALUE = sql`CURRENT_TIMESTAMP(3)`;
 
 export const cols = {
   cuid: (name: string) => char(name, { length: 24 }),
@@ -77,13 +71,11 @@ export const cols = {
   defaultVarchar: (name: string) =>
     varchar(name, { length: DEFAULT_VARCHAR_LENGTH }),
   color: (name: string) => char(name, { length: 9 }),
-  dateTime: (name: string, defaultNow: boolean) => {
-    const col = datetime(name, {
+  dateTime: (name: string) =>
+    datetime(name, {
       mode: 'date',
       fsp: DEFAULT_DATETIME_PRECISION,
-    });
-    return defaultNow ? col.default(DEFAULT_DATETIME_VALUE) : col;
-  },
+    }).default(DEFAULT_DATETIME_VALUE),
   labels: (name: string) => json(name).$type<{ [key: string]: string }>(),
 };
 

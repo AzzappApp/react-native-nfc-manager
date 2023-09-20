@@ -38,11 +38,11 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
           ),
         );
 
-      const newModule = await createCardModule(
+      const newModuleId = await createCardModule(
         { ...omit(module, 'id'), position: module.position + 1 },
         trx,
       );
-      createdModuleId = newModule.id;
+      createdModuleId = newModuleId;
     });
   } catch (e) {
     console.error(e);

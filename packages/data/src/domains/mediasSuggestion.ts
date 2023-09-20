@@ -1,24 +1,18 @@
+import { createId } from '@paralleldrive/cuid2';
 import { sql } from 'drizzle-orm';
-import {
-  mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   mediaId: cols.mediaId('mediaId').notNull(),
   profileCategoryId: cols.cuid('profileCategoryId'),
   companyActivityId: cols.cuid('companyActivityId'),
 });
 
-export type MediaSuggestion = InferModel<typeof MediaSuggestionTable>;
-export type NewMediaSuggestion = InferModel<
-  typeof MediaSuggestionTable,
-  'insert'
->;
+export type MediaSuggestion = InferSelectModel<typeof MediaSuggestionTable>;
+export type NewMediaSuggestion = InferInsertModel<typeof MediaSuggestionTable>;
 
 /**
  * Return a list of media suggestions. filtered by profile kind and template kind

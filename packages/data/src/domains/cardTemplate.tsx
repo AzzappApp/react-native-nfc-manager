@@ -1,21 +1,15 @@
 import { createId } from '@paralleldrive/cuid2';
-import { type InferModel, eq, sql } from 'drizzle-orm';
-import {
-  mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-  json,
-  boolean,
-  primaryKey,
-} from 'drizzle-orm/mysql-core';
+import { eq, sql } from 'drizzle-orm';
+import { mysqlTable, json, boolean, primaryKey } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { CardModule } from './cardModules';
 import type { DbTransaction } from './db';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
 
 export const CardTemplateTable = mysqlTable('CardTemplate', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labels: cols.labels('labels').notNull(),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
   previewMediaId: cols.mediaId('previewMediaId'),
@@ -50,8 +44,8 @@ export const CardTemplateProfileCategoryTable = mysqlTable(
   },
 );
 
-export type CardTemplate = InferModel<typeof CardTemplateTable>;
-export type NewCardTemplate = InferModel<typeof CardTemplateTable, 'insert'>;
+export type CardTemplate = InferSelectModel<typeof CardTemplateTable>;
+export type NewCardTemplate = InferInsertModel<typeof CardTemplateTable>;
 
 /**
  * Retrieve a cardTemplate by its id.
@@ -73,12 +67,12 @@ export const getCardTemplateById = (id: string) =>
  * @returns The created cardTemplate
  */
 export const createCardTemplate = async (
-  newCardTemplate: Omit<NewCardTemplate, 'id'>,
+  newCardTemplate: NewCardTemplate,
   tx: DbTransaction = db,
 ) => {
   const id = createId();
   await tx.insert(CardTemplateTable).values({ ...newCardTemplate, id });
-  return { ...newCardTemplate, id };
+  return id;
 };
 
 /**

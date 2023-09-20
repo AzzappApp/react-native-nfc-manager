@@ -1298,10 +1298,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@drizzle-team/studio@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@drizzle-team/studio/-/studio-0.0.1.tgz#7f71ae7b9c306c1a5989f007178419ba152dc8fb"
-  integrity sha512-cHgGezy2ojBFMaU6PZyBkksgFsg2CQ8IRN4mS7WdbA/Zv6xUK6fCNmpEWS/FftbxoA4B8Z0XGnuKsaTJEZsGgA==
+"@drizzle-team/studio@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@drizzle-team/studio/-/studio-0.0.5.tgz#d2488ab4e8e755cc69287e2267cc4033a0e6ca35"
+  integrity sha512-ps5qF0tMxWRVu+V5gvCRrQNqlY92aTnIKdq27gm9LZMSdaKYZt6AVvSK1dlUMzs6Rt0Jm80b+eWct6xShBKhIw==
 
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
@@ -3555,7 +3555,7 @@
     picocolors "^1.0.0"
     tslib "^2.6.0"
 
-"@planetscale/database@^1.10.0":
+"@planetscale/database@^1.11.0":
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/@planetscale/database/-/database-1.11.0.tgz#690fddbb828c39f5e117db11641dafccd9cf4222"
   integrity sha512-aWbU+D/IRHoDE9975y+Q4c+EwwAWxCPwFId+N1AhQVFXzbeJMkj6KN2iQtoi03elcLMRdfT+V3i9Z4WRw+/oIA==
@@ -6898,12 +6898,12 @@ dreamopt@~0.8.0:
   dependencies:
     wordwrap ">=0.0.2"
 
-drizzle-kit@0.19.3:
-  version "0.19.3"
-  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.19.3.tgz#eaa640b972e0b2d7dd18702e66b6134e733e0b94"
-  integrity sha512-G3Es+gPbQcTka0eKdDyzhgyDAWP5nfZpRXtKEND8Cl1Ww0Tn71yV/CYNbYk+gxg5x5+jeBIN7kM/bZ/agGBxYw==
+drizzle-kit@0.19.13:
+  version "0.19.13"
+  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.19.13.tgz#f459be8233e8f893aad48fe803abb644e71dbc61"
+  integrity sha512-Rba5VW1O2JfJlwVBeZ8Zwt2E2us5oZ08PQBDiVSGlug53TOc8hzXjblZFuF+dnll9/RQEHrkzBmJFgqTvn5Rxg==
   dependencies:
-    "@drizzle-team/studio" "^0.0.1"
+    "@drizzle-team/studio" "^0.0.5"
     "@esbuild-kit/esm-loader" "^2.5.5"
     camelcase "^7.0.1"
     chalk "^5.2.0"
@@ -6916,10 +6916,10 @@ drizzle-kit@0.19.3:
     minimatch "^7.4.3"
     zod "^3.20.2"
 
-drizzle-orm@0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.27.0.tgz#497691fc5b73fb8828400389cb4e0c77961387ba"
-  integrity sha512-LGiJ0icB+wQwgbSCOvAjONY8Ec6G/EDzQQP5PmUaQYeI9OqgpVKHC2T1fFIbvk5dabWsbokJ5NOciVAxriStig==
+drizzle-orm@^0.28.6:
+  version "0.28.6"
+  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.28.6.tgz#9c28ace432e826e3c21ea923530df0d1e76810be"
+  integrity sha512-yBe+F9htrlYER7uXgDJUQsTHFoIrI5yMm5A0bg0GiZ/kY5jNXTWoEy4KQtg35cE27sw1VbgzoMWHAgCckUUUww==
 
 dset@^3.1.2:
   version "3.1.2"

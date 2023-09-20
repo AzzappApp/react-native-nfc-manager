@@ -91,7 +91,7 @@ export const POST = async (req: Request) => {
       }
     }
 
-    const user = await createUser({
+    const userId = await createUser({
       email: email ?? null,
       phoneNumber: phoneNumber?.replace(/\s/g, '') ?? null,
       password: bcrypt.hashSync(password, 12),
@@ -99,7 +99,7 @@ export const POST = async (req: Request) => {
     });
 
     const { token, refreshToken } = await generateTokens({
-      userId: user.id,
+      userId,
     });
     return NextResponse.json({ ok: true, token, refreshToken });
   } catch (error) {

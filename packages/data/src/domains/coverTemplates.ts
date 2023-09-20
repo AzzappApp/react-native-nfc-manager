@@ -1,19 +1,13 @@
+import { createId } from '@paralleldrive/cuid2';
 import { eq, sql } from 'drizzle-orm';
-import {
-  mysqlTable,
-  mysqlEnum,
-  boolean,
-  json,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable, mysqlEnum, boolean, json } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type {
   TextOrientation,
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export type CoverTemplateData = {
   titleStyle?: TextStyle | null;
@@ -31,7 +25,7 @@ export type CoverTemplateData = {
 };
 
 export const CoverTemplateTable = mysqlTable('CoverTemplate', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
   kind: mysqlEnum('kind', ['people', 'video', 'others']).notNull(),
   previewMediaId: cols.mediaId('previewMediaId').notNull(),
@@ -41,8 +35,8 @@ export const CoverTemplateTable = mysqlTable('CoverTemplate', {
   personalEnabled: boolean('personalEnabled').default(true).notNull(),
 });
 
-export type CoverTemplate = InferModel<typeof CoverTemplateTable>;
-export type NewCoverTemplate = InferModel<typeof CoverTemplateTable, 'insert'>;
+export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
+export type NewCoverTemplate = InferInsertModel<typeof CoverTemplateTable>;
 
 /**
  * Retrieve a coverTemplate by its id.

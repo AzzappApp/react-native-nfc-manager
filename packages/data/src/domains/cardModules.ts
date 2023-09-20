@@ -7,8 +7,6 @@ import {
   mysqlTable,
   json,
   boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
@@ -34,12 +32,12 @@ import type {
   MODULE_KIND_SOCIAL_LINKS,
   MODULE_KIND_WEB_CARDS_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CardModuleTable = mysqlTable(
   'CardModule',
   {
-    id: cols.cuid('id').notNull().primaryKey(),
+    id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
     profileId: cols.cuid('profileId').notNull(),
     kind: mysqlEnum('kind', [
       'blockText',
@@ -66,7 +64,7 @@ export const CardModuleTable = mysqlTable(
 );
 
 export type CardModuleBase = Omit<
-  InferModel<typeof CardModuleTable>,
+  InferSelectModel<typeof CardModuleTable>,
   'data' | 'kind'
 >;
 
@@ -132,7 +130,7 @@ export type CardModule =
   | CardModuleSocialLinks
   | CardModuleWebCardsCarousel;
 
-export type NewCardModule = Omit<CardModule, 'id'>;
+export type NewCardModule = InferInsertModel<typeof CardModuleTable>;
 
 /**
  * Retrieve a list of card modules by their ids
@@ -198,12 +196,9 @@ export const createCardModule = async (
   values: NewCardModule,
   tx: DbTransaction = db,
 ) => {
-  const addedCardModule = {
-    ...values,
-    id: createId(),
-  };
-  await tx.insert(CardModuleTable).values(addedCardModule);
-  return { ...addedCardModule, visible: addedCardModule.visible ?? true };
+  const id = createId();
+  await tx.insert(CardModuleTable).values({ ...values, id });
+  return id;
 };
 
 /**

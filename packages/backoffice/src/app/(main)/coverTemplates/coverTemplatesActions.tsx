@@ -17,7 +17,7 @@ import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateSchema } from './coverTemplateSchema';
 import type { CoverTemplateFormValue } from './coverTemplateSchema';
-import type { CoverTemplate } from '@azzapp/data/domains';
+import type { NewCoverTemplate } from '@azzapp/data/domains';
 
 export const saveCoverTemplate = async (
   data: CoverTemplateFormValue & { id?: string },
@@ -36,7 +36,7 @@ export const saveCoverTemplate = async (
   await checkMedias([data.previewMedia.id]);
 
   const coverTemplateId = await db.transaction(async trx => {
-    const coverTemplateData: Omit<CoverTemplate, 'id'> = {
+    const coverTemplateData: NewCoverTemplate = {
       name: data.name,
       kind: data.kind,
       previewMediaId: data.previewMedia.id,

@@ -60,10 +60,9 @@ export const saveProfileCategory = async (
           .where(eq(ProfileCategoryTable.id, id));
       } else {
         profileCategoryId = createId();
-        await trx.insert(ProfileCategoryTable).values({
-          id: profileCategoryId,
-          ...profileCategoryData,
-        });
+        await trx
+          .insert(ProfileCategoryTable)
+          .values({ ...profileCategoryData, id: profileCategoryId });
       }
 
       await referencesMedias(profileCategoryData.medias, previousMedias, trx);

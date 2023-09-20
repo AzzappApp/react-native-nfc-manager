@@ -1,17 +1,12 @@
 import { createId } from '@paralleldrive/cuid2';
-import { sql, type InferModel, eq } from 'drizzle-orm';
-import {
-  mysqlTable,
-  boolean,
-  smallint,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { sql, eq } from 'drizzle-orm';
+import { mysqlTable, boolean, smallint } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CardStyleTable = mysqlTable('CardStyle', {
-  id: cols.cuid('id').primaryKey().notNull(),
+  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   labels: cols.labels('labels').notNull(),
   fontFamily: cols.defaultVarchar('fontFamily').notNull(),
   fontSize: smallint('fontSize').notNull(),
@@ -26,8 +21,8 @@ export const CardStyleTable = mysqlTable('CardStyle', {
   enabled: boolean('enabled').default(true).notNull(),
 });
 
-export type CardStyle = InferModel<typeof CardStyleTable>;
-export type NewCardStyle = InferModel<typeof CardStyleTable, 'insert'>;
+export type CardStyle = InferSelectModel<typeof CardStyleTable>;
+export type NewCardStyle = InferInsertModel<typeof CardStyleTable>;
 
 /**
  * Retrieve a cardStyle by its id.
@@ -49,12 +44,12 @@ export const getCardStyleById = (id: string) =>
  * @returns The created cardStyle
  */
 export const createCardStyle = async (
-  newCardStyle: Omit<NewCardStyle, 'id'>,
+  newCardStyle: NewCardStyle,
   tx: DbTransaction = db,
 ) => {
   const id = createId();
   await tx.insert(CardStyleTable).values({ ...newCardStyle, id });
-  return { ...newCardStyle, id };
+  return id;
 };
 
 /**

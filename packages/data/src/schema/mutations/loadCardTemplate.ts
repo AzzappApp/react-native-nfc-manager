@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import { inArray } from 'drizzle-orm';
 import { fromGlobalId } from 'graphql-relay';
 import { omit } from 'lodash';
@@ -74,7 +73,6 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
 
       await trx.insert(CardModuleTable).values(
         cardTemplate.modules.map(({ kind, data }, index) => ({
-          id: createId(),
           kind,
           data,
           profileId,

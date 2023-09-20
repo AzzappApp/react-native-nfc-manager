@@ -2,7 +2,7 @@
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { updatePost } from '#domains';
-import type { Post } from '#domains';
+import type { NewPost } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
@@ -25,9 +25,11 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
     throw new Error(ERRORS.UNAUTORIZED);
   }
 
-  const partialPost: Partial<Omit<Post, 'createdAt' | 'id'>> = {
+  const partialPost: Partial<NewPost> = {
     ...postInput,
-  } as Post;
+    allowComments: postInput.allowComments ?? false,
+    allowLikes: postInput.allowLikes ?? false,
+  };
 
   try {
     await updatePost(post.id, partialPost);

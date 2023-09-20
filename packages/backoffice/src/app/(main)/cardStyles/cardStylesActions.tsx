@@ -24,8 +24,8 @@ export const saveCardStyle = async (data: CardStyle | NewCardStyle) => {
     await updateCardStyle(id, updates);
     cardStyleId = id;
   } else {
-    const cardStyle = await createCardStyle(data);
-    cardStyleId = cardStyle.id;
+    const id = await createCardStyle(data);
+    cardStyleId = id;
   }
 
   revalidatePath(`/cardStyles/[id]`);

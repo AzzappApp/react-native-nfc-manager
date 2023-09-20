@@ -8,8 +8,6 @@ import {
   mysqlTable,
   json,
   boolean,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
   int,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
@@ -24,13 +22,13 @@ import type {
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const ProfileTable = mysqlTable(
   'Profile',
   {
     /* Profile infos */
-    id: cols.cuid('id').primaryKey().notNull(),
+    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
     userName: cols.defaultVarchar('userName').notNull(),
     profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
@@ -39,8 +37,8 @@ export const ProfileTable = mysqlTable(
     lastName: cols.defaultVarchar('lastName'),
     companyName: cols.defaultVarchar('companyName'),
     companyActivityId: cols.cuid('companyActivityId'),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
-    updatedAt: cols.dateTime('updatedAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
+    updatedAt: cols.dateTime('updatedAt').notNull(),
 
     /* Cards infos */
     cardColors: json('cardColors').$type<{
@@ -52,7 +50,7 @@ export const ProfileTable = mysqlTable(
     cardStyle: json('cardStyle').$type<CardStyle>(),
     cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
     cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
-    lastCardUpdate: cols.dateTime('lastCardUpdate', true).notNull(),
+    lastCardUpdate: cols.dateTime('lastCardUpdate').notNull(),
 
     /* Covers infos */
     coverTitle: cols.defaultVarchar('coverTitle'),
@@ -84,10 +82,7 @@ export const ProfileTable = mysqlTable(
     contactCardDisplayedOnWebCard: boolean('contactCardDisplayedOnWebCard')
       .default(false)
       .notNull(),
-    lastContactCardUpdate: cols
-      .dateTime('lastContactCardUpdate', true)
-      .notNull(),
-
+    lastContactCardUpdate: cols.dateTime('lastContactCardUpdate').notNull(),
     nbFollowers: int('nbFollowers').default(0).notNull(),
     nbFollowings: int('nbFollowings').default(0).notNull(),
     nbPosts: int('nbPosts').default(0).notNull(),
@@ -102,8 +97,8 @@ export const ProfileTable = mysqlTable(
   },
 );
 
-export type Profile = InferModel<typeof ProfileTable>;
-export type NewProfile = Omit<InferModel<typeof ProfileTable, 'insert'>, 'id'>;
+export type Profile = InferSelectModel<typeof ProfileTable>;
+export type NewProfile = InferInsertModel<typeof ProfileTable>;
 
 /**
  * Retrieves a profile by its id
@@ -275,12 +270,9 @@ export const getFollowingsProfiles = async (
  * @returns The newly created profile
  */
 export const createProfile = async (data: NewProfile): Promise<string> => {
-  const profileId = createId();
-  await db.insert(ProfileTable).values({
-    id: profileId,
-    ...data,
-  });
-  return profileId;
+  const id = createId();
+  await db.insert(ProfileTable).values({ ...data, id });
+  return id;
 };
 
 export const updateProfile = async (

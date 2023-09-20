@@ -26,8 +26,8 @@ export const saveColorPalette = async (
     await updateColorPalette(id, updates);
     colorPaletteId = id;
   } else {
-    const colorPalette = await createColorPalette(data);
-    colorPaletteId = colorPalette.id;
+    const id = await createColorPalette(data);
+    colorPaletteId = id;
   }
   revalidatePath(`/colorPalettes/[id]`);
   return { success: true, colorPaletteId } as const;

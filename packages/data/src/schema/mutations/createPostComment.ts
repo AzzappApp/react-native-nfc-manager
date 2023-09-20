@@ -18,9 +18,20 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
   try {
-    const postComment = await insertPostComment(profileId, targetId, comment);
+    const postComment = {
+      profileId,
+      postId: targetId,
+      comment,
+    };
+    const postCommentId = await insertPostComment(postComment);
 
-    return { postComment };
+    return {
+      postComment: {
+        id: postCommentId,
+        ...postComment,
+        createdAt: new Date(),
+      },
+    };
   } catch (error) {
     console.error(error);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

@@ -77,8 +77,8 @@ export const saveCardTemplate = async (
 
       await updateCardTemplate(id, template);
     } else {
-      const cardTemplate = await createCardTemplate(template);
-      cardTemplateId = cardTemplate.id;
+      const id = await createCardTemplate(template);
+      cardTemplateId = id;
     }
     if (validation.data.companyActivities?.length) {
       await trx.insert(CardTemplateCompanyActivityTable).values(

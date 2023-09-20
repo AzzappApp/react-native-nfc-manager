@@ -1,19 +1,11 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
-import {
-  mysqlEnum,
-  varchar,
-  mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-  int,
-  boolean,
-} from 'drizzle-orm/mysql-core';
-import db, { DEFAULT_VARCHAR_LENGTH } from './db';
+import { mysqlEnum, mysqlTable, int, boolean } from 'drizzle-orm/mysql-core';
+import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const StaticMediaTable = mysqlTable('StaticMedia', {
-  id: varchar('id', { length: DEFAULT_VARCHAR_LENGTH }).primaryKey().notNull(),
+  id: cols.defaultVarchar('id').primaryKey().notNull(),
   usage: mysqlEnum('usage', [
     'coverForeground',
     'coverBackground',
@@ -30,8 +22,8 @@ export const StaticMediaTable = mysqlTable('StaticMedia', {
   enabled: boolean('enabled').default(true).notNull(),
 });
 
-export type StaticMedia = InferModel<typeof StaticMediaTable>;
-export type NewStaticMedia = InferModel<typeof StaticMediaTable, 'insert'>;
+export type StaticMedia = InferSelectModel<typeof StaticMediaTable>;
+export type NewStaticMedia = InferInsertModel<typeof StaticMediaTable>;
 
 /**
  * Retrieve a list of medias by their ids.

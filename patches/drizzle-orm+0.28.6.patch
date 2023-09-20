@@ -1,0 +1,129 @@
+diff --git a/node_modules/drizzle-orm/mysql-core/index.cjs b/node_modules/drizzle-orm/mysql-core/index.cjs
+index a60b959..4f990d0 100644
+--- a/node_modules/drizzle-orm/mysql-core/index.cjs
++++ b/node_modules/drizzle-orm/mysql-core/index.cjs
+@@ -35,22 +35,24 @@ function check(name, value) {
+ 
+ var _a$2, _b$1, _c;
+ class IndexBuilderOn {
+-    constructor(name, unique) {
++    constructor(name, unique, fulltext) {
+         this.name = name;
+         this.unique = unique;
++        this.fulltext = fulltext;
+     }
+     on(...columns) {
+-        return new IndexBuilder(this.name, columns, this.unique);
++        return new IndexBuilder(this.name, columns, this.unique, this.fulltext);
+     }
+ }
+ _a$2 = index$1.entityKind;
+ IndexBuilderOn[_a$2] = 'MySqlIndexBuilderOn';
+ class IndexBuilder {
+-    constructor(name, columns, unique) {
++    constructor(name, columns, unique, fulltext) {
+         this.config = {
+             name,
+             columns,
+             unique,
++            fulltext,
+         };
+     }
+     using(using) {
+@@ -70,6 +72,7 @@ class IndexBuilder {
+         return new Index(this.config, table);
+     }
+ }
++
+ _b$1 = index$1.entityKind;
+ IndexBuilder[_b$1] = 'MySqlIndexBuilder';
+ class Index {
+@@ -86,6 +89,10 @@ function uniqueIndex(name) {
+     return new IndexBuilderOn(name, true);
+ }
+ 
++function fulltextIndex(name) {
++    return new IndexBuilderOn(name, false, true);
++}
++
+ var _a$1, _b;
+ function primaryKey(...columns) {
+     return new PrimaryKeyBuilder(columns);
+@@ -336,4 +343,5 @@ exports.mysqlDatabase = mysqlDatabase;
+ exports.mysqlSchema = mysqlSchema;
+ exports.primaryKey = primaryKey;
+ exports.uniqueIndex = uniqueIndex;
++exports.fulltextIndex = fulltextIndex;
+ //# sourceMappingURL=index.cjs.map
+diff --git a/node_modules/drizzle-orm/mysql-core/index.mjs b/node_modules/drizzle-orm/mysql-core/index.mjs
+index 75a6d97..b4e896d 100644
+--- a/node_modules/drizzle-orm/mysql-core/index.mjs
++++ b/node_modules/drizzle-orm/mysql-core/index.mjs
+@@ -796,24 +796,27 @@ function check(name, value) {
+ class IndexBuilderOn {
+     name;
+     unique;
++    fulltext;
+     static [entityKind] = 'MySqlIndexBuilderOn';
+-    constructor(name, unique) {
++    constructor(name, unique, fulltext) {
+         this.name = name;
+         this.unique = unique;
++        this.fulltext = fulltext;
+     }
+     on(...columns) {
+-        return new IndexBuilder(this.name, columns, this.unique);
++        return new IndexBuilder(this.name, columns, this.unique, this.fulltext);
+     }
+ }
+ class IndexBuilder {
+     static [entityKind] = 'MySqlIndexBuilder';
+     /** @internal */
+     config;
+-    constructor(name, columns, unique) {
++    constructor(name, columns, unique, fulltext) {
+         this.config = {
+             name,
+             columns,
+             unique,
++            fulltext,
+         };
+     }
+     using(using) {
+@@ -846,6 +849,9 @@ function index(name) {
+ function uniqueIndex(name) {
+     return new IndexBuilderOn(name, true);
+ }
++function fulltextIndex(name) {
++    return new IndexBuilderOn(name, false, true);
++}
+ 
+ function primaryKey(...columns) {
+     return new PrimaryKeyBuilder(columns);
+@@ -957,5 +963,5 @@ function getViewConfig(view) {
+     };
+ }
+ 
+-export { Check, CheckBuilder, ForeignKeyBuilder, Index, IndexBuilder, IndexBuilderOn, MySqlBigInt53, MySqlBigInt53Builder, MySqlBigInt64, MySqlBigInt64Builder, MySqlBinary, MySqlBinaryBuilder, MySqlBoolean, MySqlBooleanBuilder, MySqlChar, MySqlCharBuilder, MySqlColumn, MySqlColumnBuilder, MySqlColumnBuilderWithAutoIncrement, MySqlColumnWithAutoIncrement, MySqlCustomColumn, MySqlCustomColumnBuilder, MySqlDate, MySqlDateBuilder, MySqlDateString, MySqlDateStringBuilder, MySqlDateTime, MySqlDateTimeBuilder, MySqlDateTimeString, MySqlDateTimeStringBuilder, MySqlDecimal, MySqlDecimalBuilder, MySqlDouble, MySqlDoubleBuilder, MySqlEnumColumn, MySqlEnumColumnBuilder, MySqlFloat, MySqlFloatBuilder, MySqlInt, MySqlIntBuilder, MySqlJson, MySqlJsonBuilder, MySqlMediumInt, MySqlMediumIntBuilder, MySqlReal, MySqlRealBuilder, MySqlSchema, MySqlSerial, MySqlSerialBuilder, MySqlSmallInt, MySqlSmallIntBuilder, MySqlTable, MySqlText, MySqlTextBuilder, MySqlTime, MySqlTimeBuilder, MySqlTimestamp, MySqlTimestampBuilder, MySqlTimestampString, MySqlTimestampStringBuilder, MySqlTinyInt, MySqlTinyIntBuilder, MySqlVarBinary, MySqlVarBinaryBuilder, MySqlVarChar, MySqlVarCharBuilder, MySqlViewConfig, MySqlYear, MySqlYearBuilder, PrimaryKey, PrimaryKeyBuilder, UniqueConstraintBuilder, alias, bigint, binary, boolean, char, check, customType, date, datetime, decimal, double, float, getTableConfig, getViewConfig, index, int, isMySqlSchema, json, longtext, mediumint, mediumtext, mysqlDatabase, mysqlEnum, mysqlSchema, mysqlTableWithSchema, mysqlViewWithSchema, primaryKey, real, serial, smallint, text, time, timestamp, tinyint, tinytext, uniqueIndex, varbinary, varchar, year };
++export { Check, CheckBuilder, ForeignKeyBuilder, Index, IndexBuilder, IndexBuilderOn, MySqlBigInt53, MySqlBigInt53Builder, MySqlBigInt64, MySqlBigInt64Builder, MySqlBinary, MySqlBinaryBuilder, MySqlBoolean, MySqlBooleanBuilder, MySqlChar, MySqlCharBuilder, MySqlColumn, MySqlColumnBuilder, MySqlColumnBuilderWithAutoIncrement, MySqlColumnWithAutoIncrement, MySqlCustomColumn, MySqlCustomColumnBuilder, MySqlDate, MySqlDateBuilder, MySqlDateString, MySqlDateStringBuilder, MySqlDateTime, MySqlDateTimeBuilder, MySqlDateTimeString, MySqlDateTimeStringBuilder, MySqlDecimal, MySqlDecimalBuilder, MySqlDouble, MySqlDoubleBuilder, MySqlEnumColumn, MySqlEnumColumnBuilder, MySqlFloat, MySqlFloatBuilder, MySqlInt, MySqlIntBuilder, MySqlJson, MySqlJsonBuilder, MySqlMediumInt, MySqlMediumIntBuilder, MySqlReal, MySqlRealBuilder, MySqlSchema, MySqlSerial, MySqlSerialBuilder, MySqlSmallInt, MySqlSmallIntBuilder, MySqlTable, MySqlText, MySqlTextBuilder, MySqlTime, MySqlTimeBuilder, MySqlTimestamp, MySqlTimestampBuilder, MySqlTimestampString, MySqlTimestampStringBuilder, MySqlTinyInt, MySqlTinyIntBuilder, MySqlVarBinary, MySqlVarBinaryBuilder, MySqlVarChar, MySqlVarCharBuilder, MySqlViewConfig, MySqlYear, MySqlYearBuilder, PrimaryKey, PrimaryKeyBuilder, UniqueConstraintBuilder, alias, bigint, binary, boolean, char, check, customType, date, datetime, decimal, double, float, getTableConfig, getViewConfig, index, int, isMySqlSchema, json, longtext, mediumint, mediumtext, mysqlDatabase, mysqlEnum, mysqlSchema, mysqlTableWithSchema, mysqlViewWithSchema, primaryKey, real, serial, smallint, text, time, timestamp, tinyint, tinytext, uniqueIndex, fulltextIndex, varbinary, varchar, year };
+ //# sourceMappingURL=index.mjs.map
+diff --git a/node_modules/drizzle-orm/mysql-core/indexes.d.mts b/node_modules/drizzle-orm/mysql-core/indexes.d.mts
+index af9a6c5..e20ac0c 100644
+--- a/node_modules/drizzle-orm/mysql-core/indexes.d.mts
++++ b/node_modules/drizzle-orm/mysql-core/indexes.d.mts
+@@ -56,4 +56,5 @@ export type GetColumnsTableName<TColumns> = TColumns extends AnyMySqlColumn<{
+ }>[] ? TTableName : never;
+ export declare function index(name: string): IndexBuilderOn;
+ export declare function uniqueIndex(name: string): IndexBuilderOn;
++export declare function fulltextIndex(name: string): IndexBuilderOn;
+ export {};
+diff --git a/node_modules/drizzle-orm/mysql-core/indexes.d.ts b/node_modules/drizzle-orm/mysql-core/indexes.d.ts
+index af9a6c5..e20ac0c 100644
+--- a/node_modules/drizzle-orm/mysql-core/indexes.d.ts
++++ b/node_modules/drizzle-orm/mysql-core/indexes.d.ts
+@@ -56,4 +56,5 @@ export type GetColumnsTableName<TColumns> = TColumns extends AnyMySqlColumn<{
+ }>[] ? TTableName : never;
+ export declare function index(name: string): IndexBuilderOn;
+ export declare function uniqueIndex(name: string): IndexBuilderOn;
++export declare function fulltextIndex(name: string): IndexBuilderOn;
+ export {};

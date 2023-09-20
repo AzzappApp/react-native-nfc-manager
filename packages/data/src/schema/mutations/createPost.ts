@@ -38,20 +38,25 @@ const createPostMutation: MutationResolvers['createPost'] = async (
           nbPosts: sql`nbPosts + 1`,
         })
         .where(eq(ProfileTable.id, profileId));
-      const post = await createPost(
-        {
-          authorId: profileId,
-          content,
-          allowComments,
-          allowLikes,
-          medias: [mediaId],
-          counterReactions: 0,
-          counterComments: 0,
-        },
-        trx,
-      );
 
-      return post;
+      const newPost = {
+        authorId: profileId,
+        content,
+        allowComments,
+        allowLikes,
+        medias: [mediaId],
+        counterReactions: 0,
+        counterComments: 0,
+      };
+
+      const postId = await createPost(newPost, trx);
+
+      return {
+        ...newPost,
+        id: postId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
     });
 
     cardUpdateListener(profile.userName);

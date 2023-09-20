@@ -1,19 +1,12 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import {
-  mysqlEnum,
-  double,
-  mysqlTable,
-  int,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { mysqlEnum, double, mysqlTable, int } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import { encodeMediaId, decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const MediaTable = mysqlTable('Media', {
   id: cols.mediaId('id').notNull().primaryKey(),
@@ -21,11 +14,11 @@ export const MediaTable = mysqlTable('Media', {
   height: double('height').notNull(),
   width: double('width').notNull(),
   refCount: int('refCount').default(0).notNull(),
-  createdAt: cols.dateTime('createdAt', true).notNull(),
+  createdAt: cols.dateTime('createdAt').notNull(),
 });
 
-export type Media = InferModel<typeof MediaTable>;
-export type NewMedia = InferModel<typeof MediaTable, 'insert'>;
+export type Media = InferSelectModel<typeof MediaTable>;
+export type NewMedia = InferInsertModel<typeof MediaTable>;
 
 /**
  * Retrieve a list of media by their ids.
@@ -61,7 +54,7 @@ export const createMedia = async (
   await tx
     .insert(MediaTable)
     .values({ ...newMedia, id: encodeMediaId(mediaId, kind) });
-  return newMedia;
+  return mediaId;
 };
 
 /**
@@ -73,24 +66,10 @@ export const createMedia = async (
  */
 export const updateMedia = async (
   mediaId: string,
-  updates: Partial<Omit<Media, 'createdAt' | 'id'>>,
+  updates: NewMedia,
   tx: DbTransaction = db,
 ) => {
   await tx.update(MediaTable).set(updates).where(eq(MediaTable.id, mediaId));
-};
-
-/**
- * Create multiple media.
- * @param newMedias
- * @param tx
- * @returns
- */
-export const createMedias = async (
-  newMedias: NewMedia[],
-  tx: DbTransaction = db,
-) => {
-  await tx.insert(MediaTable).values(newMedias);
-  return newMedias;
 };
 
 /**

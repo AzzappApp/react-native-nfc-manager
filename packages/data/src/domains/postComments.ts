@@ -1,12 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
-import {
-  text,
-  index,
-  mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { text, index, mysqlTable } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
 import { getMediasByIds } from './medias';
@@ -14,16 +8,16 @@ import { PostTable } from './posts';
 import { ProfileTable } from './profiles';
 import type { Media } from './medias';
 import type { Profile } from './profiles';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const PostCommentTable = mysqlTable(
   'PostComment',
   {
-    id: cols.cuid('id').notNull().primaryKey(),
+    id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
     profileId: cols.cuid('profileId').notNull(),
     postId: cols.cuid('postId').notNull(),
     comment: text('comment').notNull(),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
   },
   table => {
     return {
@@ -32,42 +26,30 @@ export const PostCommentTable = mysqlTable(
   },
 );
 
-export type PostComment = InferModel<typeof PostCommentTable>;
-export type NewPostComment = InferModel<typeof PostCommentTable, 'insert'>;
+export type PostComment = InferSelectModel<typeof PostCommentTable>;
+export type NewPostComment = InferInsertModel<typeof PostCommentTable>;
 export type PostCommentWithProfile = Pick<Profile, 'firstName' | 'lastName'> &
   PostComment & { media: Media };
 
 /**
- * insert a post reaction
- *
- * @param {string} profileId
- * @param {string} comment
- * @param {string} postId
- * @return {*}  {Promise<void>}
+ * insert a post comment
+ * @param postComment - The post comment to insert
+ * @return {*}  {Promise<string>}
  */
-export const insertPostComment = async (
-  profileId: string,
-  postId: string,
-  comment: string,
-) =>
+export const insertPostComment = async (postComment: NewPostComment) =>
   db.transaction(async trx => {
     const id = createId();
-    const addedPostComment = {
-      id,
-      profileId,
-      postId,
-      comment,
-    };
-    await trx.insert(PostCommentTable).values(addedPostComment);
+
+    await trx.insert(PostCommentTable).values({ ...postComment, id });
 
     await trx
       .update(PostTable)
       .set({
         counterComments: sql`${PostTable.counterComments} + 1`,
       })
-      .where(eq(PostTable.id, postId));
+      .where(eq(PostTable.id, postComment.postId));
 
-    return { ...addedPostComment, createdAt: new Date() };
+    return id;
   });
 
 /**

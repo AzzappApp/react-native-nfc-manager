@@ -1,24 +1,18 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
-import {
-  uniqueIndex,
-  mysqlTable,
-  json,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { uniqueIndex, mysqlTable, json } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const UserTable = mysqlTable(
   'User',
   {
-    id: cols.cuid('id').primaryKey(),
+    id: cols.cuid('id').primaryKey().$defaultFn(createId),
     email: cols.defaultVarchar('email'),
     password: cols.defaultVarchar('password'),
     phoneNumber: cols.defaultVarchar('phoneNumber'),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
-    updatedAt: cols.dateTime('updatedAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
+    updatedAt: cols.dateTime('updatedAt').notNull(),
     roles: json('roles').$type<string[]>(),
   },
   table => {
@@ -28,8 +22,8 @@ export const UserTable = mysqlTable(
     };
   },
 );
-export type User = InferModel<typeof UserTable>;
-export type NewUser = Omit<InferModel<typeof UserTable, 'insert'>, 'id'>;
+export type User = InferSelectModel<typeof UserTable>;
+export type NewUser = InferInsertModel<typeof UserTable>;
 
 /**
  * Retrieve a list of user by their ids
@@ -53,7 +47,6 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     .select()
     .from(UserTable)
     .where(eq(UserTable.email, email))
-
     .then(user => user.pop() ?? null);
 };
 
@@ -78,22 +71,10 @@ export const getUserByPhoneNumber = async (
  * @param data - The user fields, excluding the id
  * @returns The newly created user
  */
-export const createUser = async (data: NewUser): Promise<User> => {
-  const addedUser = {
-    id: createId(),
-    ...data,
-  };
-  await db.insert(UserTable).values(addedUser);
-
-  return {
-    ...addedUser,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    email: addedUser.email ?? null,
-    phoneNumber: addedUser.phoneNumber ?? null,
-    password: addedUser.password ?? null,
-    roles: addedUser.roles ?? null,
-  };
+export const createUser = async (data: NewUser) => {
+  const id = createId();
+  await db.insert(UserTable).values({ ...data, id });
+  return id;
 };
 
 export const updateUser = async (

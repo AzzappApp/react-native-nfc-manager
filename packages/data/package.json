@@ -40,9 +40,9 @@
     "@azzapp/shared": "0.4.1-canary.3",
     "@graphql-tools/schema": "^10.0.0",
     "@paralleldrive/cuid2": "^2.2.0",
-    "@planetscale/database": "^1.10.0",
+    "@planetscale/database": "^1.11.0",
     "dataloader": "^2.2.2",
-    "drizzle-orm": "0.27.0",
+    "drizzle-orm": "^0.28.6",
     "graphql": "^16.8.0",
     "graphql-relay": "^0.10.0",
     "graphql-scalars": "^1.22.2",
@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.197",
-    "drizzle-kit": "0.19.3"
+    "drizzle-kit": "0.19.13"
   }
 }

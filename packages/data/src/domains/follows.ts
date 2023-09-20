@@ -1,21 +1,15 @@
 import { eq, and } from 'drizzle-orm';
-import {
-  index,
-  primaryKey,
-  mysqlTable,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- see https://github.com/drizzle-team/drizzle-orm/issues/656
-  MySqlTableWithColumns as _unused,
-} from 'drizzle-orm/mysql-core';
+import { index, primaryKey, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
-import type { InferModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const FollowTable = mysqlTable(
   'Follow',
   {
     followerId: cols.cuid('followerId').notNull(),
     followingId: cols.cuid('followingId').notNull(),
-    createdAt: cols.dateTime('createdAt', true).notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
   },
   table => {
     return {
@@ -29,8 +23,8 @@ export const FollowTable = mysqlTable(
   },
 );
 
-export type Follow = InferModel<typeof FollowTable>;
-export type NewFollow = InferModel<typeof FollowTable, 'insert'>;
+export type Follow = InferSelectModel<typeof FollowTable>;
+export type NewFollow = InferInsertModel<typeof FollowTable>;
 
 /**
  * Checks if a profile is following another one.
