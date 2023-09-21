@@ -1,5 +1,6 @@
-## 0.4.1-canary.13
+## 0.4.1-canary.14
 
+* **fix:**  - 🐛 display background correctly for all cases ([#1162](https://github.com/AzzappApp/azzapp/pull/1162))
 * **fix:**  - 🐛 generate vcard with first birthday ([#1144](https://github.com/AzzappApp/azzapp/pull/1144))
 * **fix:**  - background on loading webcard confirmation
 * **build:**  - try to install version after bump to avoid vercel cli does it - and forgets patches ([#1166](https://github.com/AzzappApp/azzapp/pull/1166))
