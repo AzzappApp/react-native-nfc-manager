@@ -24,7 +24,13 @@ const HomeCoverIcon = ({ profileId }: HomeIconProps) => {
     { fetchPolicy: 'store-only' },
   );
 
-  return <CoverRenderer profile={data.node} width={COVER_WIDTH} />;
+  return (
+    <CoverRenderer
+      profile={data.node}
+      width={COVER_WIDTH}
+      style={{ marginBottom: -1 }}
+    />
+  );
 };
 
 export const HomeIcon = () => {
@@ -39,4 +45,4 @@ export const HomeIcon = () => {
   );
 };
 
-const COVER_WIDTH = 29;
+const COVER_WIDTH = 18;
