@@ -194,6 +194,7 @@ jobs:
           yarn generate-migration
           HAS_CHANGE="false"
           if compgen -G "drizzle/0001*" > /dev/null; then
+              cat $(compgen -G "drizzle/0001*")
               HAS_CHANGE="true"
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
