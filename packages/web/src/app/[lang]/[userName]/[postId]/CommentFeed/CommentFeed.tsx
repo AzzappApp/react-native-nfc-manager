@@ -29,7 +29,12 @@ const CommentFeed = (props: CommentFeedProps) => {
           media={media}
         />
         <CommentFeedHeader profile={profile} media={media} />
-        <CommentFeedItems post={post} defaultComments={comments} />
+        <CommentFeedItems
+          author={profile}
+          post={post}
+          defaultComments={comments}
+          media={media}
+        />
       </div>
     </>
   );

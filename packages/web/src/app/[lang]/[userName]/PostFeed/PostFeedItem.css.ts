@@ -43,6 +43,11 @@ const postMore = style({
 
 const postComment = style({
   margin: 0,
+  lineClamp: 5,
+  WebkitLineClamp: 5,
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
 });
 
 const postCommentName = style({

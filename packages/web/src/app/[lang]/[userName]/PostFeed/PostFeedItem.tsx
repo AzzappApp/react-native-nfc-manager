@@ -112,7 +112,13 @@ const PostFeedItem = (
           </span>
         </div>
         <div className={styles.postMore}>
-          {post.comment && (
+          {post.content && (
+            <p className={styles.postComment}>
+              <span className={styles.postCommentName}>{profile.userName}</span>{' '}
+              {post.content}
+            </p>
+          )}
+          {!post.content && post.comment && (
             <p className={styles.postComment}>
               <span className={styles.postCommentName}>
                 {post.comment.author.userName}
