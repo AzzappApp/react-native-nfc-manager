@@ -1,5 +1,6 @@
-## 0.4.1-canary.14
+## 0.4.1-canary.15
 
+* **fix:**  - 🐛 reduce cover as icon size and aling text ([#1178](https://github.com/AzzappApp/azzapp/pull/1178))
 * **fix:**  - 🐛 display background correctly for all cases ([#1162](https://github.com/AzzappApp/azzapp/pull/1162))
 * **fix:**  - 🐛 generate vcard with first birthday ([#1144](https://github.com/AzzappApp/azzapp/pull/1144))
 * **fix:**  - background on loading webcard confirmation
