@@ -23,6 +23,7 @@ import ProfileScreenContactDownloader from './ProfileScreenContactDownloader';
 import ProfileScreenContent from './ProfileScreenContent';
 import ProfileScreenPublishHelper from './ProfileScreenPublishHelper';
 import { ProfileScreenTransitionsProvider } from './ProfileScreenTransitions';
+import ProfileWebCardModal from './ProfileWebcardModal';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ProfileRoute } from '#routes';
@@ -42,6 +43,7 @@ const ProfileScreen = ({
   ProfileScreenByIdQuery | ProfileScreenByUserNameQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
+
   const [ready, setReady] = useState(false);
   useNativeNavigationEvent('appear', () => {
     setReady(true);
@@ -88,6 +90,7 @@ const ProfileScreen = ({
   const [showPost, toggleFlip] = useToggle(params.showPosts ?? false);
   const [editing, toggleEditing] = useToggle(canEdit && params.editing);
   const [selectionMode, toggleSelectionMode] = useToggle(false);
+  const [showWebcardModal, toggleWebcardModal] = useToggle(false);
 
   const [isAtTop, setIsAtTop] = useState(true);
   const onContentPositionChange = useCallback((atTop: boolean) => {
@@ -165,6 +168,7 @@ const ProfileScreen = ({
               onToggleFollow(data.profile!.id, data.profile!.userName!, follow)
             }
             onFlip={toggleFlip}
+            onShowWebcardModal={toggleWebcardModal}
           />
         </View>
       </ProfileScreenTransitionsProvider>
@@ -174,6 +178,12 @@ const ProfileScreen = ({
       />
       <Suspense fallback={null}>
         <ProfileScreenPublishHelper profile={data.profile} editMode={editing} />
+        <ProfileWebCardModal
+          visible={showWebcardModal}
+          profile={data.profile}
+          close={toggleWebcardModal}
+          onToggleFollow={onToggleFollow}
+        />
       </Suspense>
     </>
   );
@@ -195,6 +205,7 @@ const profileScreenByIdQuery = graphql`
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
       ...ProfileBackground_profile
+      ...ProfileWebcardModal_profile
     }
   }
 `;
@@ -210,6 +221,7 @@ const profileScreenByNameQuery = graphql`
       ...ProfileScreenButtonBar_profile
       ...ProfileScreenPublishHelper_profile
       ...ProfileBackground_profile
+      ...ProfileWebcardModal_profile
     }
   }
 `;

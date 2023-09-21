@@ -1,4 +1,5 @@
 /* eslint-disable no-alert */
+import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
@@ -105,12 +106,15 @@ const PostRendererBottomPanel = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        message: 'Azzapp | An app made for your business',
+        message: intl.formatMessage({
+          defaultMessage: 'Azzapp | An app made for your business',
+          description:
+            'Post Botom Panel : Predefined Message used in sharing a Post ',
+        }),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
-      //TODO error
-      console.log(error.message);
+      Sentry.captureException(error);
     }
   };
 

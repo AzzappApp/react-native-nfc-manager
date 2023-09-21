@@ -51,3 +51,7 @@ jest.mock('#components/gpu/GPUNativeMethods');
 //#region flashlist
 require('@shopify/flash-list/jestSetup');
 //#endregion
+
+//#region Sentry
+jest.mock('@sentry/react-native', () => ({ init: () => jest.fn() }));
+//#endRegion

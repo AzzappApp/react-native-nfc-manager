@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -51,6 +51,10 @@ type ProfileScreenButtonBarProps = ViewProps & {
    * A callback called when the user press flip button
    */
   onFlip: () => void;
+  /**
+   * A callback called when the user press the more ... button
+   */
+  onShowWebcardModal: () => void;
 };
 
 /**
@@ -65,6 +69,7 @@ const ProfileScreenButtonBar = ({
   onEdit,
   onHome,
   onToggleFollow,
+  onShowWebcardModal,
   onFlip,
   isWebCardDisplayed,
   style,
@@ -110,6 +115,7 @@ const ProfileScreenButtonBar = ({
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
           onToggleFollow={onToggleFollow}
+          onShowWebcardModal={onShowWebcardModal}
         />
       </Suspense>
       <FloatingIconButton
@@ -132,6 +138,10 @@ type ProfileScreenButtonActionButtonProps = {
   isWebCardDisplayed: boolean;
   onEdit: () => void;
   onToggleFollow: (follow: boolean) => void;
+  /**
+   * A callback called when the user press the more ... button
+   */
+  onShowWebcardModal: () => void;
 };
 
 const ProfileScreenButtonActionButton = ({
@@ -140,6 +150,7 @@ const ProfileScreenButtonActionButton = ({
   isWebCardDisplayed,
   onEdit,
   onToggleFollow,
+  onShowWebcardModal,
 }: ProfileScreenButtonActionButtonProps) => {
   const profile = useFragment(
     graphql`
@@ -220,29 +231,42 @@ const ProfileScreenButtonActionButton = ({
       </FloatingButton>
     )
   ) : (
-    <FloatingButton
-      onPress={toggleFollowing}
-      style={styles.mainButton}
-      variant="grey"
-      accessibilityLabel={intl.formatMessage({
-        defaultMessage: 'Tap to follow the profile',
-        description: 'UserScreenButtonBar follow profile accessibility label',
-      })}
-    >
-      <Text variant="button" style={styles.textButton}>
-        {isFollowing ? (
-          <FormattedMessage
-            defaultMessage="Unfollow"
-            description="Unfollow button label in Profile Screen Button Bar"
-          />
-        ) : (
-          <FormattedMessage
-            defaultMessage="Follow"
-            description="Follow button label in Profile Screen Button Bar"
-          />
-        )}
-      </Text>
-    </FloatingButton>
+    <View style={{ flexDirection: 'row', flex: 1 }}>
+      <FloatingButton
+        onPress={toggleFollowing}
+        style={styles.mainButton}
+        variant="grey"
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to follow the profile',
+          description: 'UserScreenButtonBar follow profile accessibility label',
+        })}
+      >
+        <Text variant="button" style={styles.textButton}>
+          {isFollowing ? (
+            <FormattedMessage
+              defaultMessage="Unfollow"
+              description="Unfollow button label in Profile Screen Button Bar"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Follow"
+              description="Follow button label in Profile Screen Button Bar"
+            />
+          )}
+        </Text>
+      </FloatingButton>
+      <FloatingIconButton
+        icon="more"
+        variant="grey"
+        onPress={onShowWebcardModal}
+        iconStyle={{ tintColor: colors.white }}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to show the webcard informations',
+          description:
+            'ProfileScreenButtonBar show webcard informations button accessibility label',
+        })}
+      />
+    </View>
   );
 };
 
@@ -260,9 +284,10 @@ const styles = StyleSheet.create({
   textButton: { color: colors.white },
   mainButton: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 10,
+    marginRight: 10,
   },
   userPostsButton: {
-    marginLeft: 15,
+    marginLeft: 10,
   },
 });
