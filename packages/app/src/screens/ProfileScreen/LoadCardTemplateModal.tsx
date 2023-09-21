@@ -101,7 +101,7 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
         visible={visible && !!cardTemplateId && !inFlight}
         style={{ zIndex: 1000 }}
       >
-        <View style={styles.confirmation}>
+        <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
           <Text variant="large" style={{ marginTop: 10 }}>
             {intl.formatMessage({
@@ -142,7 +142,7 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
               onPress={() => setCardTemplateId(null)}
             />
           </View>
-        </View>
+        </Container>
       </Modal>
     </Modal>
   );
