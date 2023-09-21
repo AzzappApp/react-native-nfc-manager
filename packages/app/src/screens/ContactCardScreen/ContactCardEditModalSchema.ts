@@ -32,12 +32,12 @@ export const contactCardEditSchema = z.object({
       selected: z.boolean(),
     }),
   ),
-  birthdays: z.array(
-    z.object({
+  birthday: z
+    .object({
       birthday: z.string(),
       selected: z.boolean(),
-    }),
-  ),
+    })
+    .nullable(),
   socials: z.array(
     z.object({
       social: z.string(),

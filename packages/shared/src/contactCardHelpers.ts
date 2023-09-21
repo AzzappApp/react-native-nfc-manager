@@ -27,10 +27,10 @@ export type ContactCard = {
     address: string;
     selected: boolean;
   }> | null;
-  birthdays?: Array<{
+  birthday?: {
     birthday: string;
     selected: boolean;
-  }> | null;
+  };
   socials?: Array<{
     social: string;
     selected: boolean;
@@ -70,10 +70,7 @@ export const serializeContactCard = (
       ?.filter(address => address.selected)
       .map(address => `${address.label},${address.address}`)
       .join(';'),
-    card?.birthdays
-      ?.filter(birthday => birthday.selected)
-      .map(birthday => birthday.birthday)
-      .join(';'),
+    card?.birthday?.selected ? card?.birthday.birthday : undefined,
     card?.socials
       ?.filter(social => social.selected)
       .map(social => social.social)
@@ -99,7 +96,7 @@ export const parseContactCard = (contactCardData: string) => {
     emails,
     urls,
     addresses,
-    birthdays,
+    birthday,
     socials,
   ] = contactCardData.split('|');
 
@@ -141,7 +138,7 @@ export const parseContactCard = (contactCardData: string) => {
           address,
         };
       }) ?? [],
-    birthdays: birthdays?.split(';'),
+    birthday,
     socials: socials?.split(';'),
   };
 };

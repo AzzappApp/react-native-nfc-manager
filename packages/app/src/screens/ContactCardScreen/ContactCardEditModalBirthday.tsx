@@ -1,4 +1,4 @@
-import { useFieldArray } from 'react-hook-form';
+import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, type LayoutRectangle } from 'react-native';
 import { colors } from '#theme';
@@ -23,49 +23,52 @@ const ContactCardEditModalBirthdays = ({
   deleteButtonRect: LayoutRectangle | null;
   closeDeleteButton: () => void;
 }) => {
-  const { fields, append, remove } = useFieldArray({
+  const { field } = useController({
     control,
-    name: 'birthdays',
+    name: 'birthday',
   });
 
   const intl = useIntl();
 
+  console.log({ field });
+
   return (
     <>
-      {fields.map((birthday, index) => (
+      {field.value && (
         <ContactCardEditModalField
           deleteButtonRect={deleteButtonRect}
           deleted={deleted}
           openDeleteButton={openDeleteButton}
           closeDeleteButton={closeDeleteButton}
-          key={birthday.id}
           control={control}
-          valueKey={`birthdays.${index}.birthday`}
-          selectedKey={`birthdays.${index}.selected`}
-          deleteField={() => remove(index)}
+          valueKey={`birthday.birthday`}
+          selectedKey={`birthday.selected`}
+          deleteField={() => field.onChange(null)}
           keyboardType="default"
           placeholder={intl.formatMessage({
             defaultMessage: 'Enter a birthday',
             description: 'Placeholder for birthday inside contact card',
           })}
         />
-      ))}
-      <View>
-        <PressableNative
-          style={styles.addButton}
-          onPress={() => {
-            append({ birthday: '', selected: true });
-          }}
-        >
-          <Icon icon="add_filled" style={{ tintColor: colors.green }} />
-          <Text variant="smallbold">
-            <FormattedMessage
-              defaultMessage="Add birthday"
-              description="Add birthday to the contact card"
-            />
-          </Text>
-        </PressableNative>
-      </View>
+      )}
+      {!field.value && (
+        <View>
+          <PressableNative
+            style={styles.addButton}
+            onPress={() => {
+              field.onChange({ birthday: '', selected: true });
+            }}
+          >
+            <Icon icon="add_filled" style={{ tintColor: colors.green }} />
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Add birthday"
+                description="Add birthday to the contact card"
+              />
+            </Text>
+          </PressableNative>
+        </View>
+      )}
     </>
   );
 };

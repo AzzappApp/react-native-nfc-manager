@@ -177,12 +177,10 @@ describe('ContactCardEditModal', () => {
           selected: false,
         },
       ],
-      birthdays: [
-        {
-          birthday: '<mock-value-for-field-"birthday">',
-          selected: false,
-        },
-      ],
+      birthday: {
+        birthday: '<mock-value-for-field-"birthday">',
+        selected: false,
+      },
       socials: [
         {
           selected: false,

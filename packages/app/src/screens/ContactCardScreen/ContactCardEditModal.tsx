@@ -99,7 +99,7 @@ const ContactCardEditModal = ({
           label
           selected
         }
-        birthdays {
+        birthday {
           birthday
           selected
         }
@@ -143,7 +143,7 @@ const ContactCardEditModal = ({
       phoneNumbers: contactCard.phoneNumbers?.map(p => ({ ...p })) ?? [],
       urls: contactCard.urls?.map(p => ({ ...p })) ?? [],
       addresses: contactCard.addresses?.map(p => ({ ...p })) ?? [],
-      birthdays: contactCard.birthdays?.map(p => ({ ...p })) ?? [],
+      birthday: contactCard.birthday,
       socials: contactCard.socials?.map(p => ({ ...p })) ?? [],
     },
   });
@@ -172,7 +172,7 @@ const ContactCardEditModal = ({
             ),
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
-            birthdays: data.birthdays.filter(birthday => birthday.birthday),
+            birthday: data.birthday,
             socials: data.socials.filter(social => social.social),
           },
         },

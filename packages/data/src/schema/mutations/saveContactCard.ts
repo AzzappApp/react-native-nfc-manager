@@ -22,6 +22,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     contactCard: {
       ...(profile.contactCard ?? (await buildDefaultContactCard(profile))),
       ...data,
+      birthday: data.birthday ?? undefined,
     },
     lastContactCardUpdate: new Date(),
     contactCardIsPrivate: !!isPrivate,

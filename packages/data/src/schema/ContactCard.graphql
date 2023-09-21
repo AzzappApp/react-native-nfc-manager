@@ -7,7 +7,7 @@ type ContactCard {
   phoneNumbers: [ContactCardPhoneNumber!]
   urls: [ContactCardUrl!]
   addresses: [ContactCardAddress!]
-  birthdays: [ContactCardBirthday!]
+  birthday: ContactCardBirthday
   socials: [ContactCardSocial!]
   urls: [ContactCardUrl]
   isPrivate: Boolean!

@@ -40,7 +40,7 @@ const ContactCardExportVcf = ({
           label
           selected
         }
-        birthdays {
+        birthday {
           birthday
           selected
         }
