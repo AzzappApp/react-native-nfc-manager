@@ -30,7 +30,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
 
   const handleSvgLayout = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
-    if (width && height) setSvgSize({ width, height });
+    if (width && height && !svgSize) setSvgSize({ width, height });
   };
 
   const [svg, style, pattern] = useMemo(() => {
@@ -41,18 +41,25 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
     const width = layout?.width ?? 0;
     const height = layout?.height ?? 0;
 
-    if (resizeMode === 'cover') {
-      const size = Math.max(width, height);
-      svgProps.width = size;
-      svgProps.height = size;
+    if (resizeMode === 'cover' && svgSize) {
+      svgProps.width = '100%';
+      svgProps.height = '100%';
       containerStyle.justifyContent = 'center';
       containerStyle.alignItems = 'center';
     }
 
-    if (resizeMode === 'contain') {
-      const size = Math.min(width, height);
-      svgProps.width = size;
-      svgProps.height = size;
+    if (resizeMode === 'contain' && svgSize) {
+      if (width > height) {
+        const ratio = svgSize.width / svgSize.height;
+
+        svgProps.height = height;
+        svgProps.width = height * ratio;
+      } else {
+        const ratio = svgSize.height / svgSize.width;
+
+        svgProps.height = width * ratio;
+        svgProps.width = width;
+      }
     }
 
     if (['center', 'contain', 'stretch'].includes(resizeMode!)) {
@@ -79,7 +86,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
     }
 
     return [svgProps, containerStyle, patternProps];
-  }, [layout?.width, layout?.height, resizeMode, svgSize]);
+  }, [layout, resizeMode, svgSize]);
 
   if (!backgroundUri) return null;
 
