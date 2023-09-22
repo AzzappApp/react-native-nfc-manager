@@ -1,5 +1,12 @@
-## 0.4.1-canary.18
+## 0.4.1-canary.19
 
+* **fix:**  - go back to home case ([#1203](https://github.com/AzzappApp/azzapp/pull/1203))
+* **fix:**  - **onboarding:** [#1186](https://github.com/AzzappApp/azzapp/pull/1186) use router instead of replacing screen to show onboarding ([#1196](https://github.com/AzzappApp/azzapp/pull/1196))
+* **fix:**  - **post:** [#1181](https://github.com/AzzappApp/azzapp/pull/1181) remove comments and likes in web page when disabled ([#1197](https://github.com/AzzappApp/azzapp/pull/1197))
+* **fix:**  - **modules:** [#1180](https://github.com/AzzappApp/azzapp/pull/1180) disable buttons in edit mode ([#1199](https://github.com/AzzappApp/azzapp/pull/1199))
+* **fix:**  - **profile:** [#1193](https://github.com/AzzappApp/azzapp/pull/1193) pagination issue on following list ([#1200](https://github.com/AzzappApp/azzapp/pull/1200))
+* **fix:**  - [#1177](https://github.com/AzzappApp/azzapp/pull/1177) 🎨 don’t darken in dark mode ([#1201](https://github.com/AzzappApp/azzapp/pull/1201))
+* **fix:**  - [#1189](https://github.com/AzzappApp/azzapp/pull/1189) 🎨 set default button color to primary ([#1202](https://github.com/AzzappApp/azzapp/pull/1202))
 * **fix:**  - 🐛 redirect to home from other webcards ([#1195](https://github.com/AzzappApp/azzapp/pull/1195))
 * **feat:**  - 🎸 add author description to feed ([#1176](https://github.com/AzzappApp/azzapp/pull/1176))
 * **build:**  - show file content of generated drizzle file ([#1182](https://github.com/AzzappApp/azzapp/pull/1182))
