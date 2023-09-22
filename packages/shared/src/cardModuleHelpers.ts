@@ -510,7 +510,7 @@ export const SIMPLE_BUTTON_STYLE_VALUES = {
  */
 export const SIMPLE_BUTTON_DEFAULT_VALUES = {
   fontColor: 'dark',
-  buttonColor: 'light',
+  buttonColor: 'primary',
   height: 54,
   width: 200,
   marginTop: 20,
