@@ -3,6 +3,7 @@ import { Dimensions, Platform, View } from 'react-native';
 import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { mainRoutes } from '#mobileRoutes';
 import {
   useNativeNavigationEvent,
   useRouter,
@@ -57,7 +58,8 @@ const ProfileScreen = ({
 
   const router = useRouter();
   const onHome = () => {
-    router.backToTop();
+    if (isViewer) router.backToTop();
+    else router.replaceAll(mainRoutes);
   };
 
   const prefetchRoute = usePrefetchRoute();
