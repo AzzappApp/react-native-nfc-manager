@@ -59,7 +59,7 @@ const ProfileScreen = ({
   const router = useRouter();
   const onHome = () => {
     if (isViewer) router.backToTop();
-    else router.replaceAll(mainRoutes);
+    else router.replaceAll(mainRoutes(false));
   };
 
   const prefetchRoute = usePrefetchRoute();
