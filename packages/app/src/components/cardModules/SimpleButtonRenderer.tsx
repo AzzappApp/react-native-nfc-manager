@@ -72,6 +72,10 @@ export type SimpleButtonRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * Whether the button is disabled
+   */
+  disabled?: boolean;
 };
 
 /**
@@ -85,6 +89,7 @@ const SimpleButtonRenderer = ({
   cardStyle,
   style,
   contentStyle,
+  disabled,
   ...props
 }: SimpleButtonRendererProps) => {
   const {
@@ -141,7 +146,12 @@ const SimpleButtonRenderer = ({
         },
       ]}
     >
-      <PressableOpacity onPress={onPress} style={[contentStyle]}>
+      <PressableOpacity
+        onPress={onPress}
+        style={[contentStyle]}
+        disabled={disabled}
+        disabledOpacity={1}
+      >
         <View
           style={{
             height,

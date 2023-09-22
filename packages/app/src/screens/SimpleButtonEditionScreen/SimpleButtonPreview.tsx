@@ -51,6 +51,7 @@ const SimpleButtonPreview = ({
         cardStyle={cardStyle}
         colorPalette={colorPalette}
         data={moduleData}
+        disabled
       />
     </EditorScaledPreview>
   );

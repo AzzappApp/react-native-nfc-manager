@@ -71,6 +71,11 @@ export type SocialLinksRendererProps = ViewProps & {
    * The wrapped content style
    */
   multilineStyle?: StyleProp<ViewStyle>;
+
+  /**
+   * Whether the social links are disabled
+   */
+  disabled?: boolean;
 };
 
 /**
@@ -84,6 +89,7 @@ const SocialLinksRenderer = ({
   cardStyle,
   style,
   multilineStyle,
+  disabled,
   ...props
 }: SocialLinksRendererProps) => {
   const {
@@ -202,6 +208,8 @@ const SocialLinksRenderer = ({
                 justifyContent: 'center',
               }}
               onPress={() => onPressSocialLink(link)}
+              disabled={disabled}
+              disabledOpacity={1}
             >
               <SocialIcon
                 icon={link.socialId as SocialIcons}

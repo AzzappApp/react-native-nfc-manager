@@ -39,6 +39,7 @@ const SocialLinksPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
+        disabled
       />
     </EditorScaledPreview>
   );
