@@ -60,6 +60,7 @@ import FollowingsScreen from '#screens/FollowingsScreen';
 import ForgotPasswordConfirmationScreen from '#screens/ForgotPasswordConfirmationScreen';
 import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
+import WelcomeScreen from '#screens/HomeScreen/WelcomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
@@ -179,6 +180,7 @@ const screens = {
   ACCOUNT_DETAILS: AccountDetailsScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
   CONTACT_CARD: ContactCardScreen,
+  ONBOARDING: WelcomeScreen,
 };
 
 const tabs = {
@@ -195,9 +197,9 @@ const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn } = getAuthState();
+    const { authenticated, hasBeenSignedIn, profileId } = getAuthState();
     return authenticated
-      ? mainRoutes
+      ? mainRoutes(!profileId)
       : hasBeenSignedIn
       ? signInRoutes
       : signUpRoutes;
@@ -215,10 +217,10 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes);
+        router.replaceAll(mainRoutes(!profileId));
       }
     }
-  }, [authenticated, router]);
+  }, [authenticated, profileId, router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation

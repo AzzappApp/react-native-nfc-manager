@@ -1,21 +1,41 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { textStyles } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useRouter } from '#components/NativeRouter';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useAuthState from '#hooks/useAuthState';
+import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 
-type WelcomeScreenProps = {
-  onShowMenu: () => void;
-};
-
-const WelcomeScreen = ({ onShowMenu }: WelcomeScreenProps) => {
+const WelcomeScreen = () => {
   const intl = useIntl();
   useMainTabBarVisiblilityController(false, true);
+
+  const [showMenu, toggleShowMenu] = useToggle(false);
+
+  useEffect(() => {
+    dispatchGlobalEvent({ type: 'READY' });
+  }, []);
+
+  const { profileId } = useAuthState();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (profileId) {
+      router.replace({
+        route: 'HOME',
+      });
+    }
+  }, [profileId, router]);
 
   return (
     <Container style={{ flex: 1 }}>
@@ -31,7 +51,7 @@ const WelcomeScreen = ({ onShowMenu }: WelcomeScreenProps) => {
         icon="menu"
         style={styles.menu}
         iconStyle={{ tintColor: 'white' }}
-        onPress={onShowMenu}
+        onPress={toggleShowMenu}
       />
 
       <View style={styles.content}>
@@ -57,6 +77,7 @@ const WelcomeScreen = ({ onShowMenu }: WelcomeScreenProps) => {
           />
         </Link>
       </View>
+      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
     </Container>
   );
 };

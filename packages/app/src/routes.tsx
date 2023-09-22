@@ -128,6 +128,11 @@ export type ResetPasswordRoute = {
   };
 };
 
+export type OnboardingRoute = {
+  route: 'ONBOARDING';
+  params?: never;
+};
+
 export type Route =
   | AccountDetailsRoute
   | CardModuleEditionRoute
@@ -143,6 +148,7 @@ export type Route =
   | MediaRoute
   | NewPostRoute
   | NewProfileRoute
+  | OnboardingRoute
   | PostCommentsRoute
   | PostRoute
   | ProfileRoute

@@ -8,7 +8,6 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeScreenContent from './HomeScreenContent';
-import WelcomeScreen from './WelcomeScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeRoute } from '#routes';
 import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
@@ -30,7 +29,6 @@ const HomeScreen = ({
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   // data
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
-  const hasProfiles = !!currentUser.profiles?.length;
 
   useEffect(() => {
     if (hasFocus) {
@@ -41,11 +39,7 @@ const HomeScreen = ({
   const [showMenu, toggleShowMenu] = useToggle(false);
   return (
     <>
-      {hasProfiles ? (
-        <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
-      ) : (
-        <WelcomeScreen onShowMenu={toggleShowMenu} />
-      )}
+      <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
       <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
     </>
   );

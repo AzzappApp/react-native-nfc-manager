@@ -3,10 +3,16 @@ import type { NativeRouterInit } from '#components/NativeRouter';
 /**
  * Main stack of the app
  */
-export const mainRoutes: NativeRouterInit = {
-  id: 'MAIN_ROUTES',
-  stack: [
-    {
+export const mainRoutes = (withOnboarding: boolean): NativeRouterInit => {
+  const stack: NativeRouterInit['stack'] = [];
+
+  if (withOnboarding) {
+    stack.push({
+      id: 'ONBOARDING',
+      route: 'ONBOARDING',
+    });
+  } else {
+    stack.push({
       id: 'MAIN_TAB',
       currentIndex: 0,
       tabs: [
@@ -19,8 +25,13 @@ export const mainRoutes: NativeRouterInit = {
           route: 'MEDIA',
         },
       ],
-    },
-  ],
+    });
+  }
+
+  return {
+    id: 'MAIN_ROUTES',
+    stack,
+  };
 };
 
 /**

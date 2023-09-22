@@ -171,9 +171,11 @@ function relayScreen<TRoute extends Route>(
         getEnvironmentForActor={getEnvironmentForActor}
       >
         <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-          {preloadedQuery && queryActorId === actorId && (
-            <Component {...props} preloadedQuery={preloadedQuery} />
-          )}
+          {preloadedQuery &&
+            (queryActorId === actorId ||
+              (queryActorId === ROOT_ACTOR_ID && !actorId)) && (
+              <Component {...props} preloadedQuery={preloadedQuery} />
+            )}
         </Suspense>
       </RelayEnvironmentProvider>
     );
