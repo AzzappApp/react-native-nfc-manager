@@ -1,5 +1,6 @@
-## 0.4.1-canary.17
+## 0.4.1-canary.18
 
+* **fix:**  - 🐛 redirect to home from other webcards ([#1195](https://github.com/AzzappApp/azzapp/pull/1195))
 * **feat:**  - 🎸 add author description to feed ([#1176](https://github.com/AzzappApp/azzapp/pull/1176))
 * **build:**  - show file content of generated drizzle file ([#1182](https://github.com/AzzappApp/azzapp/pull/1182))
 * **fix:**  - 🐛 reduce cover as icon size and aling text ([#1178](https://github.com/AzzappApp/azzapp/pull/1178))
