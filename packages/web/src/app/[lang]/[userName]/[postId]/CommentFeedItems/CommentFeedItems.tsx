@@ -82,7 +82,7 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
         {comments.map(comment => {
           return <CommentFeedItem key={comment.id} comment={comment} />;
         })}
-        {comments.length === 0 && (
+        {post.allowComments && comments.length === 0 && (
           <div className={styles.empty}>
             <CommentIcon height={48} width={48} color={vars.color.grey100} />
             <span className={styles.emptyText}>No comment</span>

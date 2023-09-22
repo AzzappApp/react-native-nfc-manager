@@ -107,9 +107,11 @@ const PostFeedItem = (
               onClick={() => share.current?.open()}
             />
           </div>
-          <span className={styles.postCounterReactions}>
-            {post.counterReactions} likes
-          </span>
+          {post.allowLikes && (
+            <span className={styles.postCounterReactions}>
+              {post.counterReactions} likes
+            </span>
+          )}
         </div>
         <div className={styles.postMore}>
           {post.content && (

@@ -39,25 +39,31 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
       <div className={styles.wrapper}>
         <div className={styles.actions}>
           <div className={styles.buttons}>
-            <ButtonIcon
-              Icon={HearthIcon}
-              onClick={() => download.current?.open()}
-            />
+            {post.allowLikes && (
+              <ButtonIcon
+                Icon={HearthIcon}
+                onClick={() => download.current?.open()}
+              />
+            )}
             <ButtonIcon
               Icon={ShareIcon}
               onClick={() => share.current?.open()}
             />
           </div>
-          <span className={styles.likes}>{post.counterReactions} Likes</span>
+          {post.allowLikes && (
+            <span className={styles.likes}>{post.counterReactions} Likes</span>
+          )}
         </div>
         <span className={styles.elapsed}>
           {elapsedTime.value} {elapsedTime.kind} ago
         </span>
-        <div className={styles.comment}>
-          <Button size="small" onClick={() => download.current?.open()}>
-            Add a comment
-          </Button>
-        </div>
+        {post.allowComments && (
+          <div className={styles.comment}>
+            <Button size="small" onClick={() => download.current?.open()}>
+              Add a comment
+            </Button>
+          </div>
+        )}
       </div>
       <ShareModal
         ref={share}
