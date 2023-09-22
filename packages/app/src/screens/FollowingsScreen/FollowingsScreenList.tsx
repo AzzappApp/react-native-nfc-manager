@@ -39,11 +39,13 @@ const FollowingsScreenList = ({
       viewerKey,
     );
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const onEndReached = useCallback(() => {
-    if (!isLoadingNext && hasNext) {
+    if (!isLoadingNext && hasNext && !isRefreshing) {
       loadNext(10);
     }
-  }, [isLoadingNext, hasNext, loadNext]);
+  }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
   const intl = useIntl();
 
@@ -54,13 +56,19 @@ const FollowingsScreenList = ({
   const toggleFollow = useToggleFollow(currentProfileId, debouncedSearch);
 
   useEffect(() => {
-    const { dispose } = refetch(
-      { first: 10, userName: debouncedSearch, after: null },
-      {
-        fetchPolicy: 'store-and-network',
-      },
-    );
-    return dispose;
+    if (debouncedSearch) {
+      setIsRefreshing(true);
+      const { dispose } = refetch(
+        { first: 10, userName: debouncedSearch, after: null },
+        {
+          fetchPolicy: 'store-and-network',
+          onComplete() {
+            setIsRefreshing(false);
+          },
+        },
+      );
+      return dispose;
+    }
   }, [debouncedSearch, refetch]);
 
   const onToggleFollow = useCallback(

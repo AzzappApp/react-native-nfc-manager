@@ -47,11 +47,13 @@ const FollowersScreenList = ({
       viewerKey,
     );
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const onEndReached = useCallback(() => {
-    if (!isLoadingNext && hasNext) {
+    if (!isLoadingNext && hasNext && !isRefreshing) {
       loadNext(10);
     }
-  }, [isLoadingNext, hasNext, loadNext]);
+  }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
   const [commit] = useMutation<FollowersScreenList_removeFollowerMutation>(
     graphql`
@@ -112,13 +114,19 @@ const FollowersScreenList = ({
   const [debouncedSearch] = useDebounce(searchValue, 300);
 
   useEffect(() => {
-    const { dispose } = refetch(
-      { first: 10, userName: debouncedSearch, after: null },
-      {
-        fetchPolicy: 'store-and-network',
-      },
-    );
-    return dispose;
+    if (debouncedSearch) {
+      setIsRefreshing(true);
+      const { dispose } = refetch(
+        { first: 10, userName: debouncedSearch, after: null },
+        {
+          fetchPolicy: 'store-and-network',
+          onComplete() {
+            setIsRefreshing(false);
+          },
+        },
+      );
+      return dispose;
+    }
   }, [debouncedSearch, refetch]);
 
   const onToggleFollow = useMemo(
