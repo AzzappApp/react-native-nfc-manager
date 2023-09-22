@@ -177,7 +177,10 @@ const ColorListItem = ({
   }, [editMode, onRemove, onEdit, onSelect]);
 
   const colorScheme = useColorScheme();
-  const borderColor = chroma(color).darken(0.8).hex();
+  const borderColor =
+    colorScheme === 'light'
+      ? chroma(color).darken(0.8).hex()
+      : chroma(color).brighten(1.8).hex();
 
   const selectedSharedValue = useAnimatedState(selected, { duration: 120 });
   const selectionBorder = useAnimatedStyle(() => {
