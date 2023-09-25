@@ -1,4 +1,4 @@
-import { like } from 'drizzle-orm';
+import { desc, like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -109,11 +109,20 @@ export const Viewer: ViewerResolvers = {
   },
   trendingProfiles: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(ProfileTable), args);
+    return connectionFromArray(
+      await db
+        .select()
+        .from(ProfileTable)
+        .orderBy(desc(ProfileTable.createdAt)),
+      args,
+    );
   },
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(PostTable), args);
+    return connectionFromArray(
+      await db.select().from(PostTable).orderBy(desc(PostTable.createdAt)),
+      args,
+    );
   },
   recommendedProfiles: async (_, args, { auth }) => {
     const { profileId, userId } = auth;
