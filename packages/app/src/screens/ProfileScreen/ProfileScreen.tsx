@@ -58,7 +58,7 @@ const ProfileScreen = ({
 
   const router = useRouter();
   const onHome = () => {
-    if (isViewer) router.backToTop();
+    if (isViewer) router.back();
     else router.replaceAll(mainRoutes(false));
   };
 

@@ -366,10 +366,16 @@ export const useNativeRouter = (init: NativeRouterInit) => {
   const replaceAll = useCallback(
     (init: NativeRouterInit) => {
       const { stack, modals } = routerStateRef.current;
+
+      const routesInInit = getAllRoutesFromInit(init);
+
       const screenRemoved = [
         ...getAllRoutesFromStack(modals),
         ...getAllRoutesFromStack(stack),
-      ];
+      ].filter(
+        route => !routesInInit.find(initRoute => initRoute === route.id),
+      );
+
       screenRemoved.forEach(({ id, state: route }) =>
         dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
       );
@@ -1002,6 +1008,23 @@ const getAllRoutesFromStack = (
   return routes;
 };
 
+const getAllRoutesFromInit = (init: NativeRouterInit) => {
+  const routes: string[] = [];
+
+  init.stack.forEach(stack => {
+    if ('tabs' in stack) {
+      stack.tabs.forEach(tab => {
+        if ('id' in tab) {
+          routes.push(tab.id);
+        }
+      });
+    } else {
+      routes.push(stack.id);
+    }
+  });
+
+  return routes;
+};
 const getActiveTabs = ({ modals, stack }: RouterState): TabsState | null => {
   let currentRoute: RouteInstance;
   if (modals.length) {
