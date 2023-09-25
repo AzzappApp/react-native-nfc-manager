@@ -1,4 +1,4 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 import android.content.Context
 import android.graphics.SurfaceTexture
@@ -7,7 +7,6 @@ import android.media.effect.EffectFactory
 import android.opengl.EGL14
 import android.opengl.EGLExt
 import android.opengl.GLES20
-import android.opengl.Matrix
 import android.view.Surface
 import com.facebook.react.bridge.ReadableMap
 import com.google.android.exoplayer2.util.*
@@ -32,7 +31,7 @@ class GLExoPlayerFrameProcessor(
   private val eglConfig: EGLConfig,
   private val listener: FrameProcessor.Listener,
   private val coroutineDispatcher: ExecutorCoroutineDispatcher,
-  private val parameters: ReadableMap?,
+  private val parameters: GPULayer.EditionParameters?,
   private val filters: ArrayList<String>?
 ) : FrameProcessor {
 
@@ -229,7 +228,7 @@ class GLExoPlayerFrameProcessor(
 
     var outputImage = image
     if (surfaceInfo.orientationDegrees != 0) {
-      outputImage = AZPTransformations.applyEffect(
+      outputImage = GLFrameTransformations.applyEffect(
         image,
         null,
         EffectFactory.EFFECT_ROTATE,
@@ -239,7 +238,7 @@ class GLExoPlayerFrameProcessor(
     }
 
     if (parameters != null) {
-      val croppedImage = AZPTransformations.applyEditorTransform(
+      val croppedImage = GLFrameTransformations.applyEditorTransform(
         outputImage,
         parameters,
         effectContext!!.factory
@@ -252,7 +251,7 @@ class GLExoPlayerFrameProcessor(
 
     if (filters != null) {
       for (filter in filters) {
-        val transform = AZPTransformations.transformationForName(filter)
+        val transform = GLFrameTransformations.transformationForName(filter)
         if (transform != null) {
           val transformedImage = transform(
             outputImage,
@@ -285,7 +284,7 @@ class GLExoPlayerFrameProcessor(
   class Factory(
     private val outputWidth: Int,
     private val outputHeight: Int,
-    private val parameters: ReadableMap?,
+    private val parameters: GPULayer.EditionParameters?,
     private val filters: ArrayList<String>?,
   ) : FrameProcessor.Factory {
     override fun create(

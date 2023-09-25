@@ -1,4 +1,4 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 import android.opengl.GLES11Ext
 import android.opengl.GLES20

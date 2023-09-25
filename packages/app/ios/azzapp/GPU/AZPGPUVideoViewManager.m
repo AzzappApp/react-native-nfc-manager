@@ -22,24 +22,4 @@ RCT_EXPORT_VIEW_PROPERTY(onProgress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
 
 
-RCT_EXTERN_METHOD(
-  exportViewVideo:(nonnull NSNumber *)node
-  size:(CGSize) size
-  bitRate:(nonnull NSNumber *)node
-  removeSound:(BOOL)removeSound
-  resolve:(RCTPromiseResolveBlock)resolve
-  reject:(RCTPromiseRejectBlock)reject
-);
-
-RCT_EXTERN_METHOD(
-  exportLayers:(nonnull NSArray *)layers
-  backgroundColor:(UIColor *)backgroundColor
-  size:(CGSize) size
-  bitRate:(nonnull NSNumber *)node
-  removeSound:(BOOL)removeSound
-  resolve:(RCTPromiseResolveBlock)resolve
-  reject:(RCTPromiseRejectBlock)reject
-);
-
-
 @end

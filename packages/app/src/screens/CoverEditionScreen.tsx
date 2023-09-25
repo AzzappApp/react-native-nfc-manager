@@ -9,9 +9,9 @@ import {
   SaveHeaderButton,
 } from '#components/commonsButtons';
 import CoverEditor from '#components/CoverEditor';
-import { prefetchImage, prefetchVideo } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
+import { prefetchImage, prefetchVideo } from '#helpers/mediaHelpers';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';

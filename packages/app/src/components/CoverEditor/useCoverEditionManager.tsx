@@ -26,9 +26,9 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
-  exportImage,
+  exportLayersToImage,
   type EditionParameters,
-  exportVideo,
+  exportLayersToVideo,
   extractLayoutParameters,
 } from '#components/gpu';
 import ImagePicker, {
@@ -36,9 +36,13 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
   VideoTimeRangeStep,
 } from '#components/ImagePicker';
-import { addLocalCachedMediaFile } from '#components/medias';
 import { getFileName } from '#helpers/fileHelpers';
-import { downScaleImage, isPNG, segmentImage } from '#helpers/mediaHelpers';
+import {
+  addLocalCachedMediaFile,
+  downScaleImage,
+  isPNG,
+  segmentImage,
+} from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -46,7 +50,7 @@ import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
-import type { ExportImageOptions } from '#components/gpu/GPUNativeMethods';
+import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
@@ -594,7 +598,7 @@ const useCoverEditionManager = ({
               format: 'png',
             };
           }
-          mediaPath = await exportImage({
+          mediaPath = await exportLayersToImage({
             ...exportOptions,
             layers: [
               {
@@ -605,7 +609,7 @@ const useCoverEditionManager = ({
             ],
           });
         } else {
-          mediaPath = await exportVideo({
+          mediaPath = await exportLayersToVideo({
             size,
             bitRate: COVER_VIDEO_BITRATE,
             removeSound: true,
@@ -962,13 +966,13 @@ const createMediaComputation = ({
       const newSize = downScaleImage(width, height, maxSize);
       const resizePath =
         kind === 'image'
-          ? await exportImage({
+          ? await exportLayersToImage({
               layers: [{ kind: 'image', uri }],
               size: newSize,
               format: 'auto',
               quality: 95,
             })
-          : await exportVideo({
+          : await exportLayersToVideo({
               layers: [
                 {
                   kind: 'video',

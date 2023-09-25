@@ -1,17 +1,24 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
-import android.content.Context
 import android.graphics.SurfaceTexture
 import android.media.effect.EffectContext
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Surface
-import com.facebook.react.bridge.ReadableMap
+import android.widget.FrameLayout
+import com.azzapp.media.MediaVideoRendererManager
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.LifecycleEventListener
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.video.VideoSize
 import java.util.concurrent.atomic.AtomicBoolean
@@ -20,17 +27,17 @@ import javax.microedition.khronos.opengles.GL10
 import kotlin.math.round
 
 
-class GLVideoView(context: Context) :
-  GLSurfaceView(context),
+class GPUVideoView(private val reactContext: ThemedReactContext) :
+  FrameLayout(reactContext),
+  LifecycleEventListener,
   GLSurfaceView.Renderer,
   Player.Listener {
 
-  private var uri: String? = null
+  private val surfaceView = GLSurfaceView(context)
+  private var layer: GPULayer? = null
   private var videoSizeChanged: Boolean = false
   private var videoSize: VideoSize? = null
   private var player: ExoPlayer? = null
-  private var parameters: ReadableMap? = null
-  private var filters: ArrayList<String>? = null
   private var surfaceWidth = 0
   private var surfaceHeight = 0
   private val mainHandler = Handler(Looper.getMainLooper())
@@ -46,53 +53,79 @@ class GLVideoView(context: Context) :
   private var textureRenderer: TextureRenderer? = null
   private var effectContext: EffectContext? = null
 
-
   init {
-    setEGLContextClientVersion(2)
-    setEGLConfigChooser(8, 8, 8, 8, 0, 0)
-    setRenderer(this)
-    preserveEGLContextOnPause = true
-    renderMode = RENDERMODE_WHEN_DIRTY
+    addView(surfaceView)
+    reactContext.addLifecycleEventListener(this)
+    surfaceView.setEGLContextClientVersion(2)
+    surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
+    surfaceView.setRenderer(this)
+    surfaceView. preserveEGLContextOnPause = true
+    surfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
   }
 
-  fun setUri(value: String?) {
-    if (uri == value) {
+  private var _paused = false
+  var paused: Boolean
+    get() {
+      return this._paused
+    }
+    set(value) {
+      this._paused = value
+      if (_paused) {
+        player?.pause()
+      } else {
+        player?.play()
+      }
+    }
+
+  fun getLayers(): List<GPULayer>? {
+    val layer = this.layer
+    if (layer === null) {
+      return null
+    }
+    //layer
+    val layers = mutableListOf<GPULayer>()
+    layers.add(layer)
+    return layers
+  }
+
+  fun setLayers(layers: List<GPULayer>?) {
+    if (layers !=null && layers.size > 1) {
+      Log.w(TAG, "GPUVideoView does not support multiple layers on android")
+    }
+    val newLayer = layers?.last { it.source.kind === GPULayer.GPULayerKind.VIDEO }
+    var oldUri = layer?.source?.uri
+    layer = newLayer;
+    if (oldUri == layer?.source?.uri) {
       return
     }
-    uri = value
-    videoSize = null
+    this.initPlayer()
+  }
 
-    if (uri == null) {
-      releasePlayer()
-      return
+  fun release() {
+    mainHandler.post {
+      player?.setVideoSurface(null)
+      player?.release()
+      if (surface != null) {
+        releaseSurface(surfaceTexture, surface)
+        surfaceTexture = null
+        surface = null
+      }
     }
+    reactContext.removeLifecycleEventListener(this)
+  }
 
-    if (player == null) {
-      initPlayer()
-    }
-
-    val player = this.player ?: return
-
-    if (player.mediaItemCount != 0) {
-      player.stop()
-      player.removeMediaItem(0)
-    }
-    val mediaItem = MediaItem.fromUri(uri!!)
-    player.addMediaItem(mediaItem)
-    player.prepare()
-
-    if (surface != null) {
-      player.setVideoSurface(surface)
-      player.play()
+  override fun onHostResume() {
+    if (!paused) {
+      player?.play()
     }
   }
 
-  fun setParameters(parameters: ReadableMap?) {
-    this.parameters = parameters
+  override fun onHostPause() {
+    player?.pause()
   }
 
-  fun setFilters(value: ArrayList<String>?) {
-    this.filters = value
+  override fun onHostDestroy() {
+    release()
   }
 
   override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -102,7 +135,7 @@ class GLVideoView(context: Context) :
     val surfaceTexture = SurfaceTexture(externalTexture!!)
     surfaceTexture.setOnFrameAvailableListener {
       frameAvailable.set(true)
-      requestRender()
+      surfaceView.requestRender()
     }
 
     if (image == null) {
@@ -172,6 +205,7 @@ class GLVideoView(context: Context) :
         frameBuffer!!
       )
 
+      val parameters = layer?.parameters
       if (parameters != null) {
         if (effectContext == null) {
           effectContext = EffectContext.createWithCurrentGlContext()
@@ -181,7 +215,7 @@ class GLVideoView(context: Context) :
         this.transformedImage = null
 
 
-        this.transformedImage = AZPTransformations.applyEditorTransform(
+        this.transformedImage = GLFrameTransformations.applyEditorTransform(
           image,
           parameters,
           effectContext!!.factory
@@ -189,9 +223,10 @@ class GLVideoView(context: Context) :
         image = this.transformedImage ?: image
       }
 
+      val filters = layer?.filters
       if (filters != null) {
         for (filter in filters!!) {
-          val transform = AZPTransformations.transformationForName(filter)
+          val transform = GLFrameTransformations.transformationForName(filter)
           if (transform != null) {
             this.transformedImage = transform(
               image,
@@ -218,44 +253,6 @@ class GLVideoView(context: Context) :
       surfaceHeight
     )
   }
-
-  fun pause() {
-    player?.pause()
-  }
-
-  fun resume() {
-    player?.play()
-  }
-
-  fun release() {
-    mainHandler.post {
-      player?.setVideoSurface(null)
-      player?.release()
-      if (surface != null) {
-        releaseSurface(surfaceTexture, surface)
-        surfaceTexture = null
-        surface = null
-      }
-    }
-  }
-
-  private fun initPlayer() {
-    val player = ExoPlayer.Builder(context)
-      .setRenderersFactory(
-        // see https://github.com/google/ExoPlayer/issues/6168
-        DefaultRenderersFactory(context).setEnableDecoderFallback(true)
-      ).build()
-    player.repeatMode = Player.REPEAT_MODE_ONE
-    player.volume = 0f
-    player.addListener(this)
-    this.player = player
-  }
-
-  private fun releasePlayer() {
-    this.player?.release()
-    this.player = null
-  }
-
   override fun onVideoSizeChanged(videoSize: VideoSize) {
     if (videoSize.width > 0 && videoSize.height > 0) {
       this.videoSize = videoSize
@@ -263,8 +260,101 @@ class GLVideoView(context: Context) :
     }
   }
 
+  private var lastPlayerPosition = 0L
+  private val updateProgressAction = Runnable { dispatchProgress() }
+  private val handler = Handler(context.mainLooper)
+  private fun dispatchProgress() {
+    val player = this.player
+    if (player === null) {
+      return
+    }
+    val currentPosition = player.currentPosition
+    if (lastPlayerPosition !== currentPosition) {
+      lastPlayerPosition = currentPosition;
+      val eventListener = (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
+      val event = Arguments.createMap()
+      event.putDouble("currentTime", currentPosition / 1000.0)
+      eventListener.receiveEvent(
+        this.id,
+        MediaVideoRendererManager.ON_PROGRESS,
+        event
+      )
+    }
+    handler.postDelayed(updateProgressAction, 200)
+  }
+
+  override fun onPlaybackStateChanged(playbackState: Int) {
+    val eventListener = (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
+    if (playbackState == Player.STATE_READY) {
+      eventListener.receiveEvent(
+        this.id,
+        GPUVideoViewManager.ON_PLAYER_READY,
+        null
+      )
+      handler.post(updateProgressAction)
+    } else  if (playbackState == Player.STATE_BUFFERING) {
+      eventListener.receiveEvent(
+        this.id,
+        GPUVideoViewManager.ON_PLAYER_START_BUFFERING,
+        null
+      )
+    }
+  }
+
+  override fun onPlayerError(error: PlaybackException) {
+    val eventListener = (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
+    eventListener.receiveEvent(
+      this.id,
+      GPUVideoViewManager.ON_ERROR,
+      null
+    )
+  }
+
+  private fun initPlayer() {
+    val uri = layer?.source?.uri
+    if (uri == null) {
+      releasePlayer()
+      return
+    }
+
+    var player = this.player
+    if (player == null) {
+      player = ExoPlayer.Builder(context)
+        .setRenderersFactory(
+          // see https://github.com/google/ExoPlayer/issues/6168
+          DefaultRenderersFactory(context).setEnableDecoderFallback(true)
+        ).build()
+      player.repeatMode = Player.REPEAT_MODE_ONE
+      player.volume = 0f
+      player.addListener(this)
+      this.player = player
+    }
+
+    if (player.mediaItemCount != 0) {
+      player.stop()
+      player.removeMediaItem(0)
+    }
+    val mediaItem = MediaItem.fromUri(uri)
+    player.addMediaItem(mediaItem)
+    player.prepare()
+
+    if (surface != null) {
+      player.setVideoSurface(surface)
+      player.play()
+    }
+  }
+
+  private fun releasePlayer() {
+    this.player?.release()
+    this.player = null
+  }
+
   private fun releaseSurface(oldSurfaceTexture: SurfaceTexture?, oldSurface: Surface?) {
     oldSurfaceTexture?.release()
     oldSurface?.release()
+  }
+
+  companion object {
+    private const val TAG = "GPUVideoView"
   }
 }

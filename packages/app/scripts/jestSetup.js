@@ -45,7 +45,7 @@ jest.mock('#components/medias/NativeMediaVideoRenderer');
 // we completely mock the medias module for problems related to querying the wrapper around the native module
 jest.mock('#components/medias');
 
-jest.mock('#components/gpu/GPUNativeMethods');
+jest.mock('#components/gpu/GPUHelpers');
 //#endregion
 
 //#region flashlist

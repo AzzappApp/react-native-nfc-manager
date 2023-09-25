@@ -13,7 +13,7 @@ export const getPlayerCurrentTime: (reactTag: number) => number = jest.fn();
 
 export const prefetch: (uri: string) => Promise<boolean> = jest.fn();
 
-export const obervePrefetchResult: (uri: string) => Promise<void> = jest.fn();
+export const observePrefetchResult: (uri: string) => Promise<void> = jest.fn();
 
 export const cancelPrefetch: (uri: string) => void = jest.fn();
 

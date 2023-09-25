@@ -11,25 +11,4 @@ RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onPlaceHolderImageLoad, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onError, RCTDirectEventBlock)
 
-RCT_EXTERN_METHOD(
-  prefetch:(NSURL *)uri
-  resolve:(RCTPromiseResolveBlock)resolve
-  reject:(RCTPromiseRejectBlock)reject
-)
-
-RCT_EXTERN_METHOD(
-  obervePrefetchResult:(NSURL *)uri
-  resolve:(RCTPromiseResolveBlock)resolve
-  reject:(RCTPromiseRejectBlock)reject
-)
-
-RCT_EXTERN_METHOD(
-  cancelPrefetch:(NSURL *)uri
-)
-
-RCT_EXTERN_METHOD(
-  addLocalCachedFile:(NSString *)mediaId
-  url:(NSURL *)url
-)
-
 @end

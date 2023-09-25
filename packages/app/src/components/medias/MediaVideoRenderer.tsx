@@ -88,6 +88,9 @@ const MediaVideoRenderer = (
       },
       async getPlayerCurrentTime() {
         if (videoRef.current) {
+          if (NativeModules.AZPMediaVideoRendererManager == null) {
+            return null;
+          }
           const data =
             await NativeModules.AZPMediaVideoRendererManager.getPlayerCurrentTime(
               findNodeHandle(videoRef.current),

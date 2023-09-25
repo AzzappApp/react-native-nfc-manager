@@ -1,4 +1,4 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 import android.opengl.GLES20
 import java.util.concurrent.atomic.AtomicInteger

@@ -1,38 +1,37 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.MediaMetadataRetriever
 import android.media.effect.EffectContext
-import android.net.Uri
-import android.opengl.*
+import android.opengl.GLES20
+import android.opengl.GLSurfaceView
 import android.util.Log
-import android.webkit.URLUtil
-import com.azzapp.RNHelpers
-import com.facebook.react.bridge.ReadableMap
-import java.io.UnsupportedEncodingException
-import java.net.URL
-import java.net.URLDecoder
-import java.util.*
+import android.widget.FrameLayout
+import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.util.concurrent.atomic.AtomicInteger
-import javax.microedition.khronos.egl.*
+import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
 import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.opengles.GL10
-import kotlin.collections.ArrayList
 import kotlin.math.round
 
+class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Renderer {
 
-class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Renderer {
-  private var source: GPUImageViewSource? = null
+  private val surfaceView = GLSurfaceView(context)
+
+  private var layer: GPULayer? = null
+
+  private var sourceBitmap: Bitmap? = null
   private var sourceChanged = false
-  private var sourceImage: GLFrame? = null
 
-  private var parameters: ReadableMap? = null
-  private var filters: ArrayList<String>? = null
-  private var shouldApplyTransform = true
+
+  private var sourceImage: GLFrame? = null
   private var editKey: String? = null
   private var editedImage: GLFrame? = null
   private var transformedImage: GLFrame? = null
@@ -43,40 +42,58 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
   private var surfaceWidth = 0
   private var surfaceHeight = 0
 
+
   init {
-    setEGLContextFactory(EGLSharedContextFactory(this))
-    setEGLConfigChooser(8, 8, 8, 8, 0, 0)
-    setEGLContextClientVersion(2)
-    setRenderer(this)
-    preserveEGLContextOnPause = true
-    renderMode = RENDERMODE_WHEN_DIRTY
+
+    surfaceView.setEGLContextFactory(EGLSharedContextFactory(this))
+    surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
+    surfaceView.setEGLContextClientVersion(2)
+    surfaceView.setRenderer(this)
+    surfaceView.preserveEGLContextOnPause = true
+    surfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+
+    addView(surfaceView)
   }
 
-  fun setSource(value: GPUImageViewSource?) {
-    if (value == source) {
-      return
+  fun getLayers(): List<GPULayer>? {
+    val layer = this.layer
+    if (layer === null) {
+      return null
     }
-    source = value
-    sourceChanged = true
-    requestRender()
+    //layer
+    val layers = mutableListOf<GPULayer>()
+    layers.add(layer)
+    return layers
   }
 
-  fun setParameters(value: ReadableMap?) {
-    if (parameters == value) {
-      return
+  fun setLayers(layers: List<GPULayer>?) {
+    if (layers !=null && layers.size > 1) {
+      Log.w(TAG, "GPUImageView does not support multiple layers on android")
     }
-    parameters = value
-    shouldApplyTransform = true
-    requestRender()
+    setLayer(layers?.last())
   }
 
-  fun setFilters(value: ArrayList<String>?) {
-    if (filters == value) {
-      return
+  private fun dispatchEvent(event: String, e: Exception?) {
+    val context = context as ThemedReactContext
+    val eventListener = context.getJSModule(RCTEventEmitter::class.java)
+    val params = WritableNativeMap()
+    if (e != null) {
+      params.putString("error", e?.message)
     }
-    filters = value
-    shouldApplyTransform = true
-    requestRender()
+    eventListener.receiveEvent(
+      this.id,
+      event,
+      params
+    )
+  }
+
+  fun setLayer(value: GPULayer?) {
+    sourceChanged = layer?.source !== value?.source
+    layer = value;
+    if (sourceChanged) {
+      loadSource()
+    }
+    surfaceView.requestRender()
   }
 
   override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -102,7 +119,13 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
     }
 
     if (sourceImage == null) {
-      sourceImage = gpuImageFromSource(context, source)
+      val bitmap = this.sourceBitmap ?:return
+      val layerKey = this.layer?.source?.stringRepresentation() ?:return
+      sourceImage = GLFrame.sharedFrame(layerKey) {
+        val glFrame = GLFrame.create(bitmap.width, bitmap.height)
+        ShaderUtils.bindImageTexture(glFrame.texture, bitmap)
+        glFrame
+      }
     }
 
     var image = this.sourceImage ?: return
@@ -113,14 +136,15 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
     transformedImage?.release()
     transformedImage = null
 
+    val parameters = layer?.parameters
     if (parameters != null) {
-      synchronized(GLImageView) {
-        val editKey = "${source}-${RNHelpers.readableMapToString(parameters!!)}"
+      synchronized(GPUImageView) {
+        val editKey = "${layer!!.source.hashCode()}-${parameters.hashCode()}"
         if (editKey != this.editKey) {
           this.editKey = editKey
           editedImage?.release()
           editedImage = GLFrame.sharedFrame(editKey) {
-            AZPTransformations.applyEditorTransform(
+            GLFrameTransformations.applyEditorTransform(
               image,
               parameters,
               effectContext!!.factory
@@ -131,9 +155,10 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
       }
     }
 
+    val filters = layer?.filters
     if (filters != null) {
-      for (filter in filters!!) {
-        val transform = AZPTransformations.transformationForName(filter)
+      for (filter in filters) {
+        val transform = GLFrameTransformations.transformationForName(filter)
         if (transform != null) {
           this.transformedImage = transform(
             image,
@@ -156,7 +181,31 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
     )
   }
 
+  private var loadSourceJob: Deferred<Any>? = null
+  private fun loadSource() {
+    loadSourceJob?.cancel()
+    this.sourceBitmap = null
+    var source = layer?.source ?:return
+    dispatchEvent(GPUImageViewManager.ON_LOAD_START, null)
+    loadSourceJob = GlobalScope.async {
+      try {
+        val bitmap =  GPULayerImageLoader.loadGPULayerSource(source)
+        if (source == layer?.source) {
+          dispatchEvent(GPUImageViewManager.ON_LOAD, null)
+          sourceBitmap = bitmap
+          surfaceView.requestRender()
+        }
+      } catch (e: Exception) {
+        if (source == layer?.source) {
+          dispatchEvent(GPUImageViewManager.ON_ERROR, e)
+        }
+      }
+    }
+  }
+
   private fun clean() {
+    loadSourceJob?.cancel()
+    loadSourceJob = null
     sourceImage?.release()
     sourceImage = null
     editedImage?.release()
@@ -167,27 +216,9 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
     effectContext = null
   }
 
-  class GPUImageViewSource(
-    val uri: String,
-    val kind: String,
-    val videoTime: Int?,
-  ) {
-    override fun toString() =
-      if (kind == "video") "video-$uri-${videoTime ?: 0}" else "image-$uri"
-
-    override fun equals(other: Any?): Boolean {
-      return other === this ||
-          (other is GPUImageViewSource &&
-              other.uri == uri &&
-              other.kind == kind &&
-              other.videoTime == videoTime)
-    }
-
-    override fun hashCode(): Int =
-      Objects.hash(uri, kind, videoTime)
-  }
-
   companion object {
+    private const val TAG = "GPUImageView"
+
     private var sharedContext: EGLContext? = null
     private var sharedContextDisplay: EGLDisplay? = null
     private var contextRefCount = AtomicInteger(0)
@@ -197,7 +228,8 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
     fun getSharedContext(): EGLContext = sharedContext ?: EGL10.EGL_NO_CONTEXT
 
 
-    private class EGLSharedContextFactory(private val view: GLImageView) : EGLContextFactory {
+    private class EGLSharedContextFactory(private val view: GPUImageView) :
+      GLSurfaceView.EGLContextFactory {
 
       override fun createContext(
         egl: EGL10,
@@ -211,7 +243,7 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
           EGL10.EGL_NONE
         )
 
-        synchronized(GLImageView) {
+        synchronized(GPUImageView) {
           if (sharedContext == null) {
             sharedContextDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
             sharedContext = egl.eglCreateContext(
@@ -242,7 +274,7 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
         view.clean()
         destroyContextInner(egl, display, context)
 
-        synchronized(GLImageView) {
+        synchronized(GPUImageView) {
           if (contextRefCount.decrementAndGet() < 0 && sharedContext != null) {
             destroyContextInner(egl, sharedContextDisplay!!, sharedContext!!)
             sharedContext = null
@@ -263,56 +295,6 @@ class GLImageView(context: Context) : GLSurfaceView(context), GLSurfaceView.Rend
           throw RuntimeException("Error while destroying egl context $error")
         }
       }
-    }
-
-    private fun gpuImageFromSource(context: Context, source: GPUImageViewSource?): GLFrame? {
-      if (source == null) {
-        return null
-      }
-      synchronized(GLImageView) {
-        return GLFrame.sharedFrame(source.toString()) {
-          val bitmap: Bitmap? = if (source.kind == "video") {
-            getBitmapAtTime(context, source.uri, source.videoTime ?: 0)
-          } else {
-            BitmapFactory.decodeStream(URL(source.uri).openConnection().getInputStream())
-          }
-          if (bitmap == null) {
-            return@sharedFrame null
-          }
-
-          val image = GLFrame.create(bitmap.width, bitmap.height)
-          ShaderUtils.bindImageTexture(image.texture, bitmap)
-          image
-        }
-      }
-    }
-
-    private fun getBitmapAtTime(
-      context: Context,
-      filePath: String,
-      time: Int,
-    ): Bitmap? {
-      val retriever = MediaMetadataRetriever()
-      if (URLUtil.isFileUrl(filePath)) {
-        val decodedPath = try {
-          URLDecoder.decode(filePath, "UTF-8")
-        } catch (e: UnsupportedEncodingException) {
-          filePath
-        }
-        retriever.setDataSource(decodedPath.replace("file://", ""))
-      } else if (filePath.contains("content://")) {
-        retriever.setDataSource(context, Uri.parse(filePath))
-      } else {
-        Log.w("GPUImageView", "Remote videos are not supported")
-        return null
-      }
-      val image =
-        retriever.getFrameAtTime(
-          (time * 1000).toLong(),
-          MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-        )
-      retriever.release()
-      return image
     }
   }
 }

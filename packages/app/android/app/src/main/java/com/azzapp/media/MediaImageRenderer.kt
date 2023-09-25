@@ -1,8 +1,8 @@
-package com.azzapp
+package com.azzapp.media
 
 import android.content.Context
+import android.graphics.PorterDuff.Mode
 import android.graphics.drawable.Drawable
-import android.util.LruCache
 import androidx.appcompat.widget.AppCompatImageView
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
@@ -16,25 +16,32 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import kotlin.math.abs
 
 
-class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
+class MediaImageRenderer(context: Context) : AppCompatImageView(context) {
   private var mNeedsReload = false
   private var mSource: MediaImageSource? = null
 
   fun setSource(source: ReadableMap?) {
     var newSource: MediaImageSource? = null;
     if (source != null) {
-      val mediaID = source.getString("mediaID")
+      val mediaId = source.getString("mediaId")
       val uri = source.getString("uri")
       val requestedSize = source.getDouble("requestedSize")
-      if (mediaID != null && uri != null && requestedSize != null) {
-        newSource = MediaImageSource(mediaID, uri, requestedSize)
+      if (mediaId != null && uri != null && requestedSize != null) {
+        newSource = MediaImageSource(mediaId, uri, requestedSize)
       }
     }
     mNeedsReload = newSource != mSource
     mSource = newSource;
+  }
+
+  fun setTintColor(color: Int?) {
+    if (color == null) {
+      this.clearColorFilter();
+    } else {
+      this.setColorFilter(color, Mode.SRC_IN);
+    }
   }
 
   fun onAfterUpdate(requestManager: RequestManager) {
@@ -48,7 +55,7 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
       return
     }
 
-    val cacheEntry = queryURICache(mSource!!.mediaID, mSource!!.requestedSize)
+    val cacheEntry = ImageURICache.queryURICache(mSource!!.mediaId, mSource!!.requestedSize)
 
     val context = context as ThemedReactContext
     val viewId = this.id
@@ -57,6 +64,7 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
     if (cacheEntry != null && cacheEntry!!.second !== mSource!!.requestedSize) {
       thumbnail = requestManager
         .load(cacheEntry.first)
+        .onlyRetrieveFromCache(true)
         .listener(object : RequestListener<Drawable> {
           override fun onResourceReady(
             resource: Drawable?,
@@ -68,7 +76,7 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
             val eventListener = context.getJSModule(RCTEventEmitter::class.java)
             eventListener.receiveEvent(
               viewId,
-              AZPMediaImageRendererManager.ON_PLACE_HOLDER_IMAGE_LOAD,
+              MediaImageRendererManager.ON_PLACE_HOLDER_IMAGE_LOAD,
               WritableNativeMap()
             )
             return false
@@ -98,9 +106,13 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
           isFirstResource: Boolean
         ): Boolean {
           val eventListener = context.getJSModule(RCTEventEmitter::class.java)
+          val source = mSource
+          if (source != null) {
+            ImageURICache.addCacheEntry(source.mediaId, source.requestedSize, source.uri)
+          }
           eventListener.receiveEvent(
             viewId,
-            AZPMediaImageRendererManager.ON_LOAD,
+            MediaImageRendererManager.ON_LOAD,
             WritableNativeMap()
           )
           return false
@@ -117,7 +129,7 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
           params.putString("error", e?.message)
           eventListener.receiveEvent(
             viewId,
-            AZPMediaImageRendererManager.ON_ERROR,
+            MediaImageRendererManager.ON_ERROR,
             params
           )
           return false
@@ -134,7 +146,7 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
   }
 
   private inner class MediaImageSource(
-    val mediaID: String,
+    val mediaId: String,
     val uri: String,
     val requestedSize: Double
   ) {
@@ -142,46 +154,8 @@ class AZPMediaImageRenderer(context: Context) : AppCompatImageView(context) {
       return other === this ||
           (other is MediaImageSource &&
               other.uri == uri &&
-              other.mediaID == mediaID &&
+              other.mediaId == mediaId &&
               other.requestedSize == requestedSize)
-    }
-  }
-
-  companion object {
-
-    private val uriCache = LruCache<String, MutableMap<Double, String>>(1000)
-
-    fun queryURICache(mediaID: String, requestedSize: Double): Pair<String, Double>? {
-      val mediaCache = uriCache[mediaID] ?: return null;
-      var uri: String? = null;
-      var currentUriSize = 0.0
-      mediaCache.map {
-        if (abs(it.key - requestedSize) < abs(currentUriSize - requestedSize)) {
-          uri = it.value
-          currentUriSize = it.key
-        }
-      }
-
-      if (uri == null) {
-        return null
-      }
-      return Pair(uri!!, currentUriSize)
-    };
-
-    fun addURICacheEntry(mediaID: String, size: Double, uri: String) {
-      if (uriCache[mediaID] == null) {
-        uriCache.put(mediaID, mutableMapOf(size to uri))
-      } else {
-        uriCache[mediaID]!!.put(size, uri)
-      }
-    }
-
-    fun removeURICacheEntry(mediaID: String, size: Double) {
-      val mediaCache = uriCache[mediaID] ?: return;
-      mediaCache.remove(size)
-      if (mediaCache.isEmpty()) {
-        uriCache.remove(mediaID)
-      }
     }
   }
 }

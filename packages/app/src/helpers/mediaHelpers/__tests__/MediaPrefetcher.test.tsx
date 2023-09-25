@@ -4,17 +4,17 @@ import { createPrefetecher } from '../MediaPrefetcher';
 
 describe('MediaPrefetcher', () => {
   const prefetch = jest.fn();
-  const obervePrefetchResult = jest.fn();
+  const observePrefetchResult = jest.fn();
   const cancelPrefetch = jest.fn();
 
   beforeEach(() => {
     prefetch.mockReset();
-    obervePrefetchResult.mockReset();
+    observePrefetchResult.mockReset();
     cancelPrefetch.mockReset();
   });
   const prefetcher = createPrefetecher(
     prefetch,
-    obervePrefetchResult,
+    observePrefetchResult,
     cancelPrefetch,
   );
 
@@ -32,12 +32,12 @@ describe('MediaPrefetcher', () => {
     expect.assertions(7);
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(true);
-    obervePrefetchResult.mockResolvedValueOnce(undefined);
+    observePrefetchResult.mockResolvedValueOnce(undefined);
 
     const observable = prefetcher(uri);
     await flushPromises();
     expect(prefetch).not.toHaveBeenCalled();
-    expect(obervePrefetchResult).not.toHaveBeenCalled();
+    expect(observePrefetchResult).not.toHaveBeenCalled();
 
     observable.subscribe({
       next: result => {
@@ -52,7 +52,7 @@ describe('MediaPrefetcher', () => {
     });
     await flushPromises();
     expect(prefetch).toHaveBeenCalledWith(uri);
-    expect(obervePrefetchResult).toHaveBeenCalledWith(uri);
+    expect(observePrefetchResult).toHaveBeenCalledWith(uri);
     expect(cancelPrefetch).not.toHaveBeenCalled();
 
     // make sure that a promise is not still pending
@@ -63,8 +63,8 @@ describe('MediaPrefetcher', () => {
     expect.assertions(2);
     const uri = 'https://www.example.com/image.png';
     prefetch.mockRejectedValue(new Error('prefetch error'));
-    obervePrefetchResult.mockRejectedValue(
-      new Error('obervePrefetchResult error'),
+    observePrefetchResult.mockRejectedValue(
+      new Error('observePrefetchResult error'),
     );
 
     const observable = prefetcher(uri);
@@ -85,12 +85,12 @@ describe('MediaPrefetcher', () => {
     await flushPromises();
   });
 
-  test('should dispatch an error when the `obervePrefetchResult` promise reject', async () => {
+  test('should dispatch an error when the `observePrefetchResult` promise reject', async () => {
     expect.assertions(2);
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(true);
-    obervePrefetchResult.mockRejectedValue(
-      new Error('obervePrefetchResult error'),
+    observePrefetchResult.mockRejectedValue(
+      new Error('observePrefetchResult error'),
     );
 
     const observable = prefetcher(uri);
@@ -103,7 +103,7 @@ describe('MediaPrefetcher', () => {
       },
       error: (error: any) => {
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe('obervePrefetchResult error');
+        expect(error.message).toBe('observePrefetchResult error');
       },
     });
 
@@ -115,7 +115,7 @@ describe('MediaPrefetcher', () => {
     expect.assertions(5);
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(false);
-    obervePrefetchResult.mockResolvedValueOnce(undefined);
+    observePrefetchResult.mockResolvedValueOnce(undefined);
 
     const observable = prefetcher(uri);
     observable.subscribe({
@@ -128,7 +128,7 @@ describe('MediaPrefetcher', () => {
     });
     await flushPromises();
     expect(prefetch).toHaveBeenCalledWith(uri);
-    expect(obervePrefetchResult).not.toHaveBeenCalled();
+    expect(observePrefetchResult).not.toHaveBeenCalled();
     expect(cancelPrefetch).not.toHaveBeenCalled();
   });
 
@@ -137,7 +137,7 @@ describe('MediaPrefetcher', () => {
     const prefetchDeferred = createDeffered();
     prefetch.mockReturnValueOnce(prefetchDeferred);
     prefetch.mockResolvedValueOnce(true);
-    obervePrefetchResult.mockResolvedValueOnce(undefined);
+    observePrefetchResult.mockResolvedValueOnce(undefined);
 
     const observable = prefetcher(uri);
     const subscription = observable.subscribe({
@@ -155,15 +155,15 @@ describe('MediaPrefetcher', () => {
     prefetchDeferred.resolve(true);
     await flushPromises();
     expect(cancelPrefetch).toHaveBeenCalledWith(uri);
-    expect(obervePrefetchResult).not.toHaveBeenCalled();
+    expect(observePrefetchResult).not.toHaveBeenCalled();
     await flushPromises();
   });
 
-  test('should cancel the prefetch when the observable is unsubscribed before the `obervePrefetchResult` promise resolves', async () => {
+  test('should cancel the prefetch when the observable is unsubscribed before the `observePrefetchResult` promise resolves', async () => {
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(true);
     const observerPrefetchDeferred = createDeffered();
-    obervePrefetchResult.mockReturnValueOnce(observerPrefetchDeferred.promise);
+    observePrefetchResult.mockReturnValueOnce(observerPrefetchDeferred.promise);
 
     const observable = prefetcher(uri);
     const subscription = observable.subscribe({
@@ -188,7 +188,7 @@ describe('MediaPrefetcher', () => {
     expect.assertions(3);
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(false);
-    obervePrefetchResult.mockResolvedValueOnce(undefined);
+    observePrefetchResult.mockResolvedValueOnce(undefined);
 
     const observable = prefetcher(uri);
     const subscription = observable.subscribe({
@@ -203,7 +203,7 @@ describe('MediaPrefetcher', () => {
     await flushPromises();
 
     expect(prefetch).toHaveBeenCalledWith(uri);
-    expect(obervePrefetchResult).not.toHaveBeenCalled();
+    expect(observePrefetchResult).not.toHaveBeenCalled();
     expect(cancelPrefetch).not.toHaveBeenCalled();
     await flushPromises();
   });

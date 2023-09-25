@@ -38,51 +38,6 @@ class MediaVideoRendererManager: RCTViewManager  {
     
     resolve(["currentTime": currentTime])
   }
-   
-  @objc
-  private func prefetch(
-    _ uri: NSURL,
-    resolve: @escaping RCTPromiseResolveBlock,
-    reject: @escaping RCTPromiseRejectBlock
-  ) {
-    do {
-      let prefetchCreated = try AVAssetCache.shared.prefetchAsset(for: uri as URL)
-      resolve(prefetchCreated)
-    } catch {
-      reject("FAILURE", "Could not prefetch task", error)
-    }
-  }
-  
-  @objc
-  func obervePrefetchResult(
-     _ uri: NSURL,
-    resolve: @escaping RCTPromiseResolveBlock,
-    reject: @escaping RCTPromiseRejectBlock
-  ) {
-    do {
-      try AVAssetCache.shared.observePrefetch(for: uri as URL, onComplete: {
-        resolve(nil)
-      }, onError: { error in
-        reject("DOWNLOAD_ERROR", "Failed to prefetch asset", error)
-      })
-    } catch {
-      reject("TASK_DOES_NOT_EXISTS", "Could not prefetch task", error)
-    }
-  }
-  
-  @objc
-  func cancelPrefetch(_ uri: NSURL) {
-    do {
-      try AVAssetCache.shared.cancelPrefetch(for: uri as URL)
-    } catch {
-      return
-    }
-  }
-  
-  @objc
-  func addLocalCachedFile(_ mediaId: NSString, url: NSURL) {
-    MediaURICache.videoCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
-  }
 }
 
 

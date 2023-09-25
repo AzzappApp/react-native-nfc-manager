@@ -12,7 +12,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { exportImage } from '#components/gpu';
+import { exportLayersToImage } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
@@ -365,7 +365,7 @@ const CarouselEditionScreen = ({
       const aspectRatio = width / height;
       const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
-      const localPath = await exportImage({
+      const localPath = await exportLayersToImage({
         size: { width: exportWidth, height: exportHeight },
         quality: 95,
         format: 'auto',

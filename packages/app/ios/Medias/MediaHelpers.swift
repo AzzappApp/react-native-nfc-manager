@@ -115,14 +115,131 @@ class MediaHelpers: NSObject {
     }
   }
   
+  
+  // Image Cache
+  
+  private var prefetchImageTasks = [NSURL:Nuke.AsyncImageTask]()
+  
   @objc
-  func getAvailableFonts(_ callback: RCTResponseSenderBlock) {
-    var fontFamilyNames = [String]()
-
-    for familyName in UIFont.familyNames {
-      fontFamilyNames.append(familyName)
+  private func prefetchImage(
+    _ uri: NSURL,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    if uri.isFileURL {
+      resolve(false)
+      return
     }
-    callback([fontFamilyNames]);
+    if prefetchImageTasks[uri] != nil {
+      resolve(true)
+      return
+    }
+    
+    let request = ImageRequest(url: uri as URL)
+    let pipeline = MediaPipeline.pipeline;
+    
+    if pipeline.cache.cachedImage(for: request) != nil {
+      resolve(false)
+      return
+    }
+    
+    let task = pipeline.imageTask(with: request)
+    prefetchImageTasks[uri] = task;
+    
+    Task {
+      _ = try? await task.image
+      prefetchImageTasks.removeValue(forKey: uri)
+    }
+    
+    resolve(true)
   }
+  
+  @objc
+  func observeImagePrefetchResult(
+     _ uri: NSURL,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    guard let task = prefetchImageTasks[uri] else {
+      reject("TASK_DOES_NOT_EXISTS", "No task registered for url \(uri)", nil)
+      return
+    }
+    Task {
+      do {
+        _ = try await task.image
+      } catch {
+        if (error is CancellationError) {
+          resolve(nil)
+        } else {
+          reject("FAILED_TO_LOAD", "Task with uri: \(uri) failed", error)
+        }
+        return
+      }
+      resolve(nil)
+    }
+  }
+  
+  @objc
+  func cancelImagePrefetch(_ uri: NSURL) {
+    guard let task = prefetchImageTasks[uri] else {
+      return
+    }
+    task.cancel()
+    prefetchImageTasks.removeValue(forKey: uri)
+  }
+  
+  @objc
+  func addLocalCachedImage(_ mediaId: NSString, url: NSURL) {
+    MediaURICache.imageCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
+  }
+  
+  
+  // Video Cache
+  
+  @objc
+  private func prefetchVideo(
+    _ uri: NSURL,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    do {
+      let prefetchCreated = try AVAssetCache.shared.prefetchAsset(for: uri as URL)
+      resolve(prefetchCreated)
+    } catch {
+      reject("FAILURE", "Could not prefetch task", error)
+    }
+  }
+  
+  @objc
+  func observeVideoPrefetchResult(
+     _ uri: NSURL,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    do {
+      try AVAssetCache.shared.observePrefetch(for: uri as URL, onComplete: {
+        resolve(nil)
+      }, onError: { error in
+        reject("DOWNLOAD_ERROR", "Failed to prefetch asset", error)
+      })
+    } catch {
+      reject("TASK_DOES_NOT_EXISTS", "Could not prefetch task", error)
+    }
+  }
+  
+  @objc
+  func cancelVideoPrefetch(_ uri: NSURL) {
+    do {
+      try AVAssetCache.shared.cancelPrefetch(for: uri as URL)
+    } catch {
+      return
+    }
+  }
+  
+  @objc
+  func addLocalCachedMediaFile(_ mediaId: NSString, url: NSURL) {
+    MediaURICache.videoCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
+  }
+  
 }
 

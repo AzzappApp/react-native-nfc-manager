@@ -29,7 +29,47 @@ RCT_EXTERN_METHOD(
   reject:(RCTPromiseRejectBlock)reject
 )
 
-RCT_EXTERN_METHOD(getAvailableFonts:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(
+  prefetchImage:(NSURL *)uri
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+  observeImagePrefetchResult:(NSURL *)uri
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+  cancelImagePrefetch:(NSURL *)uri
+)
+
+RCT_EXTERN_METHOD(
+  addLocalCachedImage:(NSString *)mediaId
+  url:(NSURL *)url
+)
+
+RCT_EXTERN_METHOD(
+  prefetchVideo:(NSURL *)uri
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+  observeVideoPrefetchResult:(NSURL *)uri
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+  cancelVideoPrefetch:(NSURL *)uri
+)
+
+RCT_EXTERN_METHOD(
+  addLocalCachedVideo:(NSString *)mediaId
+  url:(NSURL *)url
+)
 
 
 @end

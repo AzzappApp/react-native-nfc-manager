@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
   GPUImageView,
@@ -7,14 +7,9 @@ import {
   Video,
   VideoFrame,
 } from '#components/gpu';
-import { prefetchVideo } from '#components/medias';
 import { isFileURL } from '#helpers/fileHelpers';
-import type {
-  EditionParameters,
-  GPUImageViewHandle,
-  GPUVideoViewHandle,
-} from '#components/gpu';
-import type { ForwardedRef } from 'react';
+import { prefetchVideo } from '#helpers/mediaHelpers';
+import type { EditionParameters } from '#components/gpu';
 import type { NativeSyntheticEvent } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 import type { Subscription } from 'relay-runtime';
@@ -94,29 +89,26 @@ export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
 /**
  * A component that displays a cover media preview on a GPUView
  */
-const CoverMediaPreview = (
-  {
-    uri,
-    kind,
-    time,
-    startTime,
-    duration,
-    backgroundColor,
-    maskUri,
-    backgroundImageUri,
-    backgroundImageTintColor,
-    backgroundMultiply,
-    editionParameters,
-    filter,
-    paused = false,
-    style,
-    onLoadingStart,
-    onLoadingEnd,
-    onLoadingError,
-    ...props
-  }: CoverMediaPreviewProps,
-  viewRef: ForwardedRef<GPUImageViewHandle | GPUVideoViewHandle>,
-) => {
+const CoverMediaPreview = ({
+  uri,
+  kind,
+  time,
+  startTime,
+  duration,
+  backgroundColor,
+  maskUri,
+  backgroundImageUri,
+  backgroundImageTintColor,
+  backgroundMultiply,
+  editionParameters,
+  filter,
+  paused = false,
+  style,
+  onLoadingStart,
+  onLoadingEnd,
+  onLoadingError,
+  ...props
+}: CoverMediaPreviewProps) => {
   const pausedOnFirstLoad = useRef(paused).current;
 
   useEffect(() => {
@@ -220,7 +212,6 @@ const CoverMediaPreview = (
         <GPUView
           {...loadingHandlers}
           paused={paused}
-          ref={viewRef as any}
           style={{
             flex: 1,
             opacity: kind !== 'video' || playerReady ? 1 : 0,
@@ -249,4 +240,4 @@ const CoverMediaPreview = (
   );
 };
 
-export default forwardRef(CoverMediaPreview);
+export default CoverMediaPreview;

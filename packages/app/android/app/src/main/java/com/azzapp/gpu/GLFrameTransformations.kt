@@ -1,4 +1,4 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 
 import android.media.effect.EffectFactory
@@ -13,7 +13,7 @@ typealias AZPTransformation = (
   factory: EffectFactory
 ) -> GLFrame
 
-object AZPTransformations {
+object GLFrameTransformations {
   private val transformations = mutableMapOf<String, AZPTransformation>()
 
   init {
@@ -51,7 +51,7 @@ object AZPTransformations {
 
   fun applyEditorTransform(
     inputImage: GLFrame,
-    parameters: ReadableMap?,
+    parameters: GPULayer.EditionParameters?,
     effectFactory: EffectFactory
   ): GLFrame? {
     if (parameters == null) {
@@ -62,10 +62,10 @@ object AZPTransformations {
     var shouldRelease = false;
 
     val orientationAngle =
-      when (parameters.getString("orientation")) {
-        "RIGHT" -> 90
-        "DOWN" -> 180
-        "LEFT" -> 270
+      when (parameters.orientation) {
+        GPULayer.ImageOrientation.RIGHT -> 90
+        GPULayer.ImageOrientation.DOWN -> 180
+        GPULayer.ImageOrientation.LEFT -> 270
         else -> 0
       }
 
@@ -87,12 +87,12 @@ object AZPTransformations {
     }
 
 
-    val cropData = parameters.getMap("cropData")
+    val cropData = parameters.cropData
     if (cropData != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_CROP)) {
-      var originX = round(cropData.getDouble("originX")).toInt()
-      var originY = round(cropData.getDouble("originY")).toInt()
-      var width = round(cropData.getDouble("width")).toInt()
-      var height = round(cropData.getDouble("height")).toInt()
+      var originX = round(cropData.originX).toInt()
+      var originY = round(cropData.originY).toInt()
+      var width = round(cropData.width).toInt()
+      var height = round(cropData.height).toInt()
 
       if (width != 0 && height != 0) {
         var x = 0
@@ -143,7 +143,7 @@ object AZPTransformations {
     /* TODO roll on Android and IOS works differently since EFFECT_STRAIGHTEN not only
         roll but also crop the image, that's why on android we apply the roll after the crop,
         but this might lead to imprecise calculation of the image size on js part */
-    val roll = if (parameters.hasKey("roll")) parameters.getInt("roll") else 0
+    val roll = if (parameters.roll != null) round(parameters.roll) else 0
     if (roll != 0 && EffectFactory.isEffectSupported(EffectFactory.EFFECT_STRAIGHTEN)) {
       outputImage = applyEffect(
         currentImage,
@@ -164,67 +164,67 @@ object AZPTransformations {
 
     // MAY DO highlights, shadow, structure, tint, vibrance
 
-    if (parameters.hasKey("brightness")) {
+    if (parameters.brightness != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_BRIGHTNESS,
-        mapOf("brightness" to parameters.getDouble("brightness").toFloat()),
+        mapOf("brightness" to parameters.brightness.toFloat()),
         effectFactory
       )
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("contrast")) {
+    if (parameters.contrast != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_CONTRAST,
-        mapOf("contrast" to parameters.getDouble("contrast").toFloat()),
+        mapOf("contrast" to parameters.contrast.toFloat()),
         effectFactory
       )
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("saturation")) {
+    if (parameters.saturation != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_SATURATE,
-        mapOf("scale" to parameters.getDouble("saturation").toFloat()),
+        mapOf("scale" to parameters.saturation.toFloat()),
         effectFactory
       )
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("sharpness")) {
+    if (parameters.sharpness != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_SHARPEN,
-        mapOf("scale" to parameters.getDouble("sharpness").toFloat()),
+        mapOf("scale" to parameters.sharpness.toFloat()),
         effectFactory
       )
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("temperature")) {
+    if (parameters.temperature != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_TEMPERATURE,
-        mapOf("scale" to parameters.getDouble("temperature").toFloat()),
+        mapOf("scale" to parameters.temperature.toFloat()),
         effectFactory
       )
       currentImage = outputImage
     }
 
-    if (parameters.hasKey("vignetting")) {
+    if (parameters.vignetting != null) {
       outputImage = applyEffect(
         currentImage,
         outputImage,
         EffectFactory.EFFECT_VIGNETTE,
-        mapOf("scale" to parameters.getDouble("vignetting").toFloat()),
+        mapOf("scale" to parameters.vignetting.toFloat()),
         effectFactory
       )
     }

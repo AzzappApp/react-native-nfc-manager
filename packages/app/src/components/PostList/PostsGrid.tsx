@@ -11,7 +11,7 @@ import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import PostLink from '#components/PostLink';
 import { createId } from '#helpers/idHelpers';
-import useScrollToTopInterceptor from '#hooks/useScrollToTopInterceptor/useScrollToTopInterceptor.ios';
+import useScrollToTopInterceptor from '#hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,

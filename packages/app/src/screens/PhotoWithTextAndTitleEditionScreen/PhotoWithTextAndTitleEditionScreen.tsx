@@ -14,7 +14,7 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import { exportImage } from '#components/gpu';
+import { exportLayersToImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -368,7 +368,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     height,
   }: ImagePickerResult) => {
     const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportImage({
+    const exportUri = await exportLayersToImage({
       size,
       quality: 95,
       format: 'auto',

@@ -1,4 +1,4 @@
-package com.azzapp
+package com.azzapp.helpers
 
 import android.util.Log
 import com.facebook.react.bridge.ReadableArray
@@ -24,6 +24,13 @@ object RNHelpers {
 
   fun readableMapToString(value: ReadableMap): String =
     sortHashMapDeep(value.toHashMap()).toString()
+
+  fun readDoubleIfHasKey(readableMap: ReadableMap, key: String): Double? {
+    if (readableMap.hasKey(key)) {
+      return readableMap.getDouble(key)
+    }
+    return null
+  }
 
 
   private fun sortHashMapDeep(value: Map<String, Any>): Map<String, Any> =

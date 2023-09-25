@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -21,9 +21,9 @@ import ImagePicker, {
   SelectImageStep,
   EditImageStep,
 } from '#components/ImagePicker';
-import { addLocalCachedMediaFile } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -141,24 +141,28 @@ const PostCreationScreen = ({
       ...timeRange,
     });
 
-    const { uploadURL, uploadParameters } = await uploadSign({
-      kind: kind === 'video' ? 'video' : 'image',
-      target: 'post',
-    });
-    const fileName = getFileName(exportedMedia.uri);
+    const fileName = getFileName(exportedMedia.path);
     const file: any = {
       name: fileName,
-      uri: `file://${exportedMedia.uri}`,
+      uri: `file://${exportedMedia.path}`,
       type:
         mime.lookup(fileName) ||
         (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
     };
+
+    const { uploadURL, uploadParameters } = await uploadSign({
+      kind: kind === 'video' ? 'video' : 'image',
+      target: 'post',
+    });
     const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
       file,
       uploadURL,
       uploadParameters,
     );
-    setUploadProgress(uploadProgress);
+    // TODO uploadProgressModal crash on android
+    if (Platform.OS === 'ios') {
+      setUploadProgress(uploadProgress);
+    }
     const { public_id } = await uploadPromise;
     setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
     commit({
@@ -195,7 +199,7 @@ const PostCreationScreen = ({
           addLocalCachedMediaFile(
             public_id,
             kind === 'video' ? 'video' : 'image',
-            `file://${exportedMedia.uri}`,
+            `file://${exportedMedia.path}`,
           );
           // TODO use fragment instead of response
           // if (params?.fromProfile) {

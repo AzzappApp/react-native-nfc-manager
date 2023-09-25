@@ -1,11 +1,10 @@
-package com.azzapp.gl
+package com.azzapp.gpu
 
 import android.graphics.Bitmap
 import android.opengl.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
-import javax.microedition.khronos.egl.EGL10
 
 internal object ShaderUtils {
 

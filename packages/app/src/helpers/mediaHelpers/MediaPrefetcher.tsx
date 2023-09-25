@@ -3,7 +3,7 @@ import { shareReplay } from '@azzapp/shared/observableHelpers';
 
 const createPrefetecher = (
   prefetch: (uri: string) => Promise<boolean>,
-  obervePrefetchResult: (uri: string) => Promise<void>,
+  observePrefetchResult: (uri: string) => Promise<void>,
   cancelPrefetch: (uri: string) => void,
 ) => {
   const observables = new Map<string, Observable<string>>();
@@ -63,7 +63,7 @@ const createPrefetecher = (
             return;
           }
           try {
-            await obervePrefetchResult(uri);
+            await observePrefetchResult(uri);
           } catch (error) {
             if (canceled) {
               return;

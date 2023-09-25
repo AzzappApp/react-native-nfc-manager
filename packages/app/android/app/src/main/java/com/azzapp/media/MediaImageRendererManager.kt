@@ -1,11 +1,13 @@
-package com.azzapp
+package com.azzapp.media
 
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.net.Uri
 import android.os.Build
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
@@ -14,24 +16,29 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
 
-class AZPMediaImageRendererManager(
+class MediaImageRendererManager(
   private val callerContext: ReactApplicationContext
-) : SimpleViewManager<AZPMediaImageRenderer>() {
+) : SimpleViewManager<MediaImageRenderer>() {
 
   private var requestManager: RequestManager? = null
 
   override fun getName() = REACT_CLASS
 
-  override fun createViewInstance(context: ThemedReactContext): AZPMediaImageRenderer {
+  override fun createViewInstance(context: ThemedReactContext): MediaImageRenderer {
     if (isValidContextForGlide(context)) {
       requestManager = Glide.with(context);
     }
-    return AZPMediaImageRenderer(context);
+    return MediaImageRenderer(context);
   }
 
   @ReactProp(name = "source")
-  fun setSource(view: AZPMediaImageRenderer, source: ReadableMap?) {
+  fun setSource(view: MediaImageRenderer, source: ReadableMap?) {
     view.setSource(source)
+  }
+
+  @ReactProp(name = "tintColor", customType = "Color")
+  fun  setTintColor(view: MediaImageRenderer, tintColor: Int?) {
+    view.setTintColor(tintColor)
   }
 
   override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> {
@@ -40,7 +47,7 @@ class AZPMediaImageRendererManager(
         "registrationName" to ON_LOAD
       ),
       ON_PLACE_HOLDER_IMAGE_LOAD to mutableMapOf(
-        "registrationName" to ON_LOAD
+        "registrationName" to ON_PLACE_HOLDER_IMAGE_LOAD
       ),
       ON_ERROR to mutableMapOf(
         "registrationName" to ON_ERROR
@@ -48,22 +55,16 @@ class AZPMediaImageRendererManager(
     );
   }
 
-  @ReactMethod
-  fun addCacheEntry(mediaID: String, size: Double, uri: String) {
-    AZPMediaImageRenderer.addURICacheEntry(mediaID, size, uri)
-  }
-
-  override fun onAfterUpdateTransaction(view: AZPMediaImageRenderer) {
+  override fun onAfterUpdateTransaction(view: MediaImageRenderer) {
     super.onAfterUpdateTransaction(view)
     view.onAfterUpdate(requestManager!!)
   }
 
-  override fun onDropViewInstance(view: AZPMediaImageRenderer) {
+  override fun onDropViewInstance(view: MediaImageRenderer) {
     // This will cancel existing requests.
     view.clearView(requestManager)
     super.onDropViewInstance(view)
   }
-
 
   companion object {
     const val REACT_CLASS = "AZPMediaImageRenderer"
@@ -82,7 +83,7 @@ class AZPMediaImageRendererManager(
         return context
       }
       if (context is ThemedReactContext) {
-        val baseContext: Context = (context as ThemedReactContext).baseContext
+        val baseContext = (context as ThemedReactContext).baseContext
         if (baseContext is Activity) {
           return baseContext
         }

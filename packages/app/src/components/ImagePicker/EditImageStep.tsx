@@ -3,13 +3,13 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { useEditionParametersDisplayInfos } from '#components/gpu';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
 import FilterSelectionList from '../FilterSelectionList';
-import { useEditionParametersDisplayInfos } from '../gpu';
 import ImageEditionFooter from '../ImageEditionFooter';
 import ImageEditionParameterControl from '../ImageEditionParameterControl';
 import ImageEditionParametersList from '../ImageEditionParametersList';
@@ -17,9 +17,9 @@ import VideoTimelineEditor from '../VideoTimelineEditor';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
+import type { EditionParameters, ImageOrientation } from '#components/gpu';
 import type { FooterBarItem } from '#ui/FooterBar';
 import type { MediaVideo } from './imagePickerTypes';
-import type { EditionParameters, ImageOrientation } from '../gpu';
 /**
  * A step of the Image Picker that allows the user to edit the selected image
  * (crop, filter, brightness, contrast etc.)

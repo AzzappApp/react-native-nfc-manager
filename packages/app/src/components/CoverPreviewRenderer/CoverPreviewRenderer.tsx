@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -13,7 +13,6 @@ import Delay from '#ui/Delay';
 import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
-import type { GPUImageViewHandle, GPUVideoViewHandle } from '#components/gpu';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
 
 type CoverPreviewRendererProps = CoverTextRendererProps &
@@ -106,7 +105,6 @@ const CoverPreviewRenderer = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
-  const mediaRef = useRef<GPUImageViewHandle | GPUVideoViewHandle | null>(null);
 
   const intl = useIntl();
 
@@ -197,7 +195,6 @@ const CoverPreviewRenderer = ({
             {uri && (
               <CoverMediaPreview
                 key={uri}
-                ref={mediaRef}
                 uri={uri}
                 kind={kind}
                 time={time}

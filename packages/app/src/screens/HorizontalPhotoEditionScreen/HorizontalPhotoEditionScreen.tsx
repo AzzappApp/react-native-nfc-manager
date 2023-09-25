@@ -12,7 +12,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
-import { exportImage } from '#components/gpu';
+import { exportLayersToImage } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -306,7 +306,7 @@ const HorizontalPhotoEditionScreen = ({
     filter,
   }: ImagePickerResult) => {
     const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportImage({
+    const exportUri = await exportLayersToImage({
       size,
       quality: 95,
       format: 'auto',

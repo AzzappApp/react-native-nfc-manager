@@ -17,6 +17,25 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
+
+    private static MainApplication instance;
+
+    public static Context getMainApplicationContext() {
+        return instance.getApplicationContext();
+    }
+
+    /*init {
+        instance = this
+    }
+
+    companion object {
+        private var instance: MainApplication? = null
+
+        fun applicationContext() : Context {
+            return instance!!.applicationContext
+        }
+    }*/
+
     private final ReactNativeHost mReactNativeHost =
       new ReactNativeHostWrapper(this, new DefaultReactNativeHost(this) {
         @Override
@@ -30,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+          packages.add(new AzzappPackage());
           return packages;
         }
 
@@ -57,6 +77,7 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+    MainApplication.instance = this;
     SoLoader.init(this, /* native exopackage */ false);
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
