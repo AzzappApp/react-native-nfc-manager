@@ -1,5 +1,6 @@
-## 0.4.1-canary.20
+## 0.4.1-canary.21
 
+* **feat:**  - Basic android native ([#1204](https://github.com/AzzappApp/azzapp/pull/1204))
 * **fix:**  - **signup:** [#1208](https://github.com/AzzappApp/azzapp/pull/1208) always redirect to home on focus ([#1211](https://github.com/AzzappApp/azzapp/pull/1211))
 * **fix:**  - go back to home case ([#1203](https://github.com/AzzappApp/azzapp/pull/1203))
 * **fix:**  - **onboarding:** [#1186](https://github.com/AzzappApp/azzapp/pull/1186) use router instead of replacing screen to show onboarding ([#1196](https://github.com/AzzappApp/azzapp/pull/1196))
