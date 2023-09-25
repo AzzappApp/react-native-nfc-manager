@@ -71,7 +71,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
-    color: appearance === 'light' ? colors.black : colors.grey400,
+    color: appearance === 'light' ? colors.black : colors.white,
   },
   focused: {
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,

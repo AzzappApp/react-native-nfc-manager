@@ -8,7 +8,7 @@ import {
   Share,
   SafeAreaView,
 } from 'react-native';
-import { openComposer } from 'react-native-email-link';
+// import { openComposer } from 'react-native-email-link';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import AccountHeader from '#components/AccountHeader';
 import relayScreen from '#helpers/relayScreen';
@@ -49,10 +49,10 @@ const InviteFriendsScreen = ({
     { userName: profile?.userName, url: 'https://azzapp.com' },
   );
 
-  const subject = intl.formatMessage({
-    defaultMessage: "I'm using Azzapp",
-    description: 'Invite subject to share with friends',
-  });
+  // const subject = intl.formatMessage({
+  //   defaultMessage: "I'm using Azzapp",
+  //   description: 'Invite subject to share with friends',
+  // });
 
   const [hasWhatsapp, setHasWhatsapp] = useState(false);
 
@@ -125,7 +125,8 @@ const InviteFriendsScreen = ({
             </Text>
             <Icon icon="arrow_right" />
           </PressableNative>
-          <PressableNative
+          {/* TODO: uncomment when ready */}
+          {/* <PressableNative
             style={styles.inviteOption}
             onPress={() => {
               openComposer({
@@ -145,7 +146,7 @@ const InviteFriendsScreen = ({
               />
             </Text>
             <Icon icon="arrow_right" />
-          </PressableNative>
+          </PressableNative> */}
           <PressableNative
             style={styles.inviteOption}
             onPress={() => {

@@ -275,7 +275,8 @@ const ProfileBlockContainer = ({
 
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
-    borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
+    borderRadius:
+      editingTransition.value * (COVER_CARD_RADIUS + 1) * windowWith,
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
@@ -355,7 +356,8 @@ const ProfileBlockContainer = ({
               <View
                 style={{
                   ...StyleSheet.absoluteFillObject,
-                  backgroundColor: `${colors.white}99`,
+                  //prettier-ignore
+                  backgroundColor: `${appearance === 'dark' ? colors.black : colors.white}99`,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}

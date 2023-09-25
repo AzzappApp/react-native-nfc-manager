@@ -1,9 +1,10 @@
 import { Suspense, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
 import CoverEditor from '#components/CoverEditor';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
@@ -49,6 +50,8 @@ const CoverEditionStep = ({
   const insets = useScreenInsets();
   const eidtorHeight =
     height - SUBTITLE_HEIGHT - BUTTON_HEIGHT - 16 - Math.min(insets.bottom, 16);
+
+  const styles = useStyleSheet(stylesheet);
 
   return (
     <View style={{ height }}>
@@ -100,7 +103,7 @@ export default CoverEditionStep;
 
 const SUBTITLE_HEIGHT = 56;
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
   activityIndicatorContainer: {
     flex: 1,
     alignItems: 'center',
@@ -113,10 +116,10 @@ const styles = StyleSheet.create({
   subTitle: {
     textAlign: 'center',
     marginHorizontal: 40,
-    color: colors.grey900,
+    color: appearance === 'dark' ? colors.white : colors.grey900,
   },
   saveButton: {
     marginTop: 16,
     marginHorizontal: 25,
   },
-});
+}));

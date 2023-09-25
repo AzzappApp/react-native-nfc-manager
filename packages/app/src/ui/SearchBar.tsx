@@ -154,10 +154,7 @@ const SearchBar = ({
               >
                 <Icon
                   icon="search"
-                  style={[
-                    styles.lensIcon,
-                    isFocused ? { tintColor: colors.black } : {},
-                  ]}
+                  style={[styles.lensIcon, isFocused && styles.lensIconFocuses]}
                 />
                 <TextInput
                   testID="azzapp__searchbar__textInput"
@@ -255,6 +252,9 @@ const styleSheet = createStyleSheet(appearance => ({
     marginLeft: 16,
     marginRight: 11,
     tintColor: colors.grey200,
+  },
+  lensIconFocuses: {
+    tintColor: appearance === 'dark' ? colors.white : colors.black,
   },
   cancelPressable: {
     paddingRight: 10,

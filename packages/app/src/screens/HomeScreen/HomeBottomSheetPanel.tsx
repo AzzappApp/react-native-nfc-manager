@@ -48,44 +48,46 @@ const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
       onRequestClose={close}
     >
       <View style={styles.bottomSheetOptionsContainer}>
-        <Link route="ACCOUNT_DETAILS">
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={close}
-          >
-            <View style={styles.bottomSheetOptionContainer}>
-              <View style={styles.bottomSheetOptionIconLabel}>
-                <Icon icon="information" />
-                <Text>
-                  <FormattedMessage
-                    defaultMessage="Account details"
-                    description="Link to open account details form to change email, phone number, etc."
-                  />
-                </Text>
+        <>
+          <Link route="ACCOUNT_DETAILS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="information" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Account details"
+                      description="Link to open account details form to change email, phone number, etc."
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" />
               </View>
-              <Icon icon="arrow_right" />
-            </View>
-          </PressableNative>
-        </Link>
-        <Link route="INVITE_FRIENDS">
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={close}
-          >
-            <View style={styles.bottomSheetOptionContainer}>
-              <View style={styles.bottomSheetOptionIconLabel}>
-                <Icon icon="invite" />
-                <Text>
-                  <FormattedMessage
-                    defaultMessage="Invite friends"
-                    description="Invite friends to join the app"
-                  />
-                </Text>
+            </PressableNative>
+          </Link>
+          <Link route="INVITE_FRIENDS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="invite" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Invite friends"
+                      description="Invite friends to join the app"
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" />
               </View>
-              <Icon icon="arrow_right" />
-            </View>
-          </PressableNative>
-        </Link>
+            </PressableNative>
+          </Link>
+        </>
         <PressableNative
           onPress={onLogout}
           style={styles.bottomSheetOptionButton}

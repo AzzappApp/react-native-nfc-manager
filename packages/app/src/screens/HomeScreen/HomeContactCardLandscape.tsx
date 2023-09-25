@@ -1,6 +1,6 @@
 import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
@@ -66,6 +67,7 @@ const HomeContactCardLandscape = ({
     tabBarVisibleSharedValue,
     Math.abs(orientation) === 90,
   );
+  const appearance = useColorScheme();
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   if (!profile || !profile.cardIsPublished) {
@@ -82,7 +84,7 @@ const HomeContactCardLandscape = ({
           position: 'absolute',
           top: (windowHeight - windowWidth) / 2,
           left: (windowWidth - windowHeight) / 2,
-          backgroundColor: 'white',
+          backgroundColor: appearance === 'dark' ? colors.black : colors.white,
           transform: [{ rotate: `${orientation}deg` }],
           height: windowWidth,
           width: windowHeight,

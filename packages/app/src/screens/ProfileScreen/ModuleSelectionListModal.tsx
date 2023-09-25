@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, Modal, StyleSheet } from 'react-native';
+import { FlatList, Modal, StyleSheet, View } from 'react-native';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -110,17 +110,17 @@ const ModuleSelectionListModal = ({
           image_dark: require('./../../assets/module/photoWithTextAndTitle_dark.png'),
           ready: true,
         },
-        {
-          moduleKind: 'openingHours',
-          label: intl.formatMessage({
-            defaultMessage: 'Schedule',
-            description:
-              'Module selection list modal Opening Hours module label',
-          }),
-          image_light: require('./../../assets/module/openingHours_light.png'),
-          image_dark: require('./../../assets/module/openingHours_dark.png'),
-          ready: false,
-        },
+        // {
+        //   moduleKind: 'openingHours',
+        //   label: intl.formatMessage({
+        //     defaultMessage: 'Schedule',
+        //     description:
+        //       'Module selection list modal Opening Hours module label',
+        //   }),
+        //   image_light: require('./../../assets/module/openingHours_light.png'),
+        //   image_dark: require('./../../assets/module/openingHours_dark.png'),
+        //   ready: false,
+        // },
         {
           moduleKind: 'socialLinks',
           label: intl.formatMessage({
@@ -150,14 +150,28 @@ const ModuleSelectionListModal = ({
 
   const { top, bottom } = useScreenInsets();
   const renderItem = useCallback(
-    ({ item }: { item: ModuleSelectionListItem }) => (
-      <ModuleSelectionListModalItem
-        module={item}
-        key={item.moduleKind}
-        onSelect={onSelectModuleKind}
-      />
-    ),
+    ({ item }: { item: ModuleSelectionListItem | null }) =>
+      item ? (
+        <ModuleSelectionListModalItem
+          module={item}
+          key={item.moduleKind}
+          onSelect={onSelectModuleKind}
+        />
+      ) : (
+        <View
+          key="empty"
+          style={{
+            flex: 1,
+            padding: 15,
+          }}
+        />
+      ),
     [onSelectModuleKind],
+  );
+
+  const data = useMemo(
+    () => (modules.length % 2 === 1 ? [...modules, null] : modules),
+    [modules],
   );
 
   return (
@@ -174,7 +188,7 @@ const ModuleSelectionListModal = ({
         />
         <FlatList
           numColumns={2}
-          data={modules}
+          data={data}
           renderItem={renderItem}
           contentContainerStyle={{
             rowGap: 10,

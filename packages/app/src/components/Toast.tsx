@@ -161,11 +161,13 @@ const styleSheet = createStyleSheet(appearance => ({
     marginHorizontal: 20,
     flex: 0,
     width: undefined,
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    // TODO UI
+    backgroundColor: colors.white, // appearance === 'light' ? colors.white : colors.black,
     ...shadow(appearance, 'center'),
   },
   successToastIcon: {
-    tintColor: appearance === 'light' ? colors.black : colors.white,
+    // TODO UI
+    tintColor: colors.black, // appearance === 'light' ? colors.black : colors.white,
     width: 18,
     height: 18,
     borderWidth: 0,
@@ -177,10 +179,12 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 0,
   },
   leftToastIconContainer: {
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    // TODO UI
+    backgroundColor: colors.black, // appearance === 'light' ? colors.black : colors.white,
   },
   closeToastIcon: {
-    tintColor: appearance === 'dark' ? colors.black : colors.white,
+    // TODO UI
+    tintColor: colors.white, // appearance === 'dark' ? colors.black : colors.white,
   },
   contentContainerToast: {
     borderWidth: 0,
@@ -190,7 +194,8 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 0,
   },
   toastText: {
-    color: appearance === 'light' ? colors.black : colors.white,
+    // TODO UI
+    color: colors.black, //appearance === 'light' ? colors.black : colors.white,
     textAlign: 'center',
     width: undefined,
   },

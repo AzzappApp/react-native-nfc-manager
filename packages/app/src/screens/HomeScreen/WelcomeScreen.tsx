@@ -2,8 +2,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { textStyles } from '#theme';
+import { Image, StyleSheet, View } from 'react-native';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -13,6 +12,7 @@ import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 
 const WelcomeScreen = () => {
@@ -55,7 +55,7 @@ const WelcomeScreen = () => {
       />
 
       <View style={styles.content}>
-        <Text style={styles.title}>
+        <Text variant="xlarge" style={styles.title}>
           {intl.formatMessage({
             defaultMessage: 'Welcome to Azzap',
             description: 'Title for welcome screen',
@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    ...textStyles.xlarge,
     marginBottom: 14,
   },
   subtitle: {

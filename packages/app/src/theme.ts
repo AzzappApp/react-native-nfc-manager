@@ -83,12 +83,12 @@ export const shadow = (
   direction: 'bottom' | 'center' | 'top' = 'bottom',
 ) =>
   <const>{
-    shadowColor: appearence === 'dark' ? '#636363' : '#000',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
     },
-    shadowOpacity: 0.2,
+    shadowOpacity: appearence === 'dark' ? 0.4 : 0.2,
     shadowRadius: 10,
     elevation: 1,
   };

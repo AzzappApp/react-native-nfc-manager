@@ -1,10 +1,11 @@
 import { memo } from 'react';
 import { FormattedRelativeTime } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import Link from '#components/Link';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import Text from '#ui/Text';
 
@@ -30,6 +31,8 @@ const CommentItem = ({ item }: CommentItemProps) => {
     `,
     item,
   );
+
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <View style={styles.commentContainer}>
@@ -64,7 +67,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
 
 export default memo(CommentItem);
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   relativeTime: { color: colors.grey400, paddingTop: 5 },
   commentCartouche: { paddingTop: 0, paddingBottom: 0 },
   commentContainer: {
@@ -76,6 +79,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grey50,
+    borderBottomColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
   },
-});
+}));

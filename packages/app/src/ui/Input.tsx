@@ -128,7 +128,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexGrow: 1,
     paddingHorizontal: 15,
     paddingTop: 0,
-    color: appearance === 'light' ? colors.black : colors.grey400,
+    color: appearance === 'light' ? colors.black : colors.white,
   },
   focused: {
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,

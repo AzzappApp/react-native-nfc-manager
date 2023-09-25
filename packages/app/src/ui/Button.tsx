@@ -88,6 +88,7 @@ const Button = (
       <PressableBackground
         highlightColor={highlightColor!}
         style={[variantStyles.root, style, disabled && variantStyles.disabled]}
+        disabledOpacity={1}
         {...buttonProps}
       />
     );

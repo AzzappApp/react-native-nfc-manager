@@ -224,22 +224,13 @@ const ColorTriptychChooser = ({
           >
             <ColorTriptychRenderer width={20} height={20} {...currentPalette} />
           </PressableOpacity>
-          <View
-            style={{
-              marginLeft: 5,
-              width: 4,
-              height: 4,
-              borderRadius: 2,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.black,
-            }}
-          />
+          <View style={styles.separatingDot} />
         </View>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           style={{ height: 30 }}
+          contentContainerStyle={{ columnGap: 5 }}
           data={colorPalettesList}
           keyExtractor={paletteKeyExtract}
           renderItem={renderTryptich}
@@ -366,9 +357,18 @@ const stylesheet = createStyleSheet(appearance => ({
     height: PALETTE_LIST_HEIGHT,
     borderRadius: PALETTE_LIST_HEIGHT / 2,
     borderWidth: 3,
-    borderColor: colors.grey100,
+    borderColor: appearance === 'dark' ? colors.grey900 : colors.grey100,
     transform: [{ scale: 0.8 }],
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  separatingDot: {
+    marginLeft: 5,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: appearance === 'dark' ? colors.white : colors.black,
   },
 }));

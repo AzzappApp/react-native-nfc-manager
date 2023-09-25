@@ -2,16 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useReducer } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-  Pressable,
-} from 'react-native';
+import { ScrollView, View, useWindowDimensions, Pressable } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -200,6 +195,7 @@ const ContactCardEditModal = ({
 
   const insets = useScreenInsets();
   const { height } = useWindowDimensions();
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <BottomSheetModal
@@ -483,16 +479,19 @@ const ContactCardEditModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   sectionTitleContainer: {
-    backgroundColor: colors.grey100,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
     height: 28,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sectionTitle: { color: colors.grey600, textTransform: 'uppercase' },
+  sectionTitle: {
+    textAlign: 'center',
+    textTransform: 'uppercase',
+  },
   sectionsContainer: {
     paddingHorizontal: 10,
     rowGap: 20,
@@ -506,6 +505,6 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   ...ContactCardEditModalStyles,
-});
+}));
 
 export default ContactCardEditModal;

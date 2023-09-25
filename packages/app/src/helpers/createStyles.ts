@@ -13,11 +13,11 @@ type ComposableNamedStyles<T> = {
 /**
  * It takes a function that returns a style object.
  * It returns a style sheet object that has a light and dark version of the style object
- * @param factory - (appeareance: ColorSchemeName) => T
+ * @param factory - (appearance: ColorSchemeName) => T
  * @returns An object container a light and dark version of the style object
  */
 export const createStyleSheet = <T extends ComposableNamedStyles<T>>(
-  factory: (appeareance: ColorSchemeName) => T,
+  factory: (appearance: ColorSchemeName) => T,
 ): ColorSchemeStyleSheet<T> => {
   return {
     light: StyleSheet.create(composeStyles(factory('light')) as any),

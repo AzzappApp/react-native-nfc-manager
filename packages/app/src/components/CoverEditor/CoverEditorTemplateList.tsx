@@ -882,12 +882,12 @@ type TemplateListItem = {
 const PALETTE_LIST_HEIGHT = 30;
 const GAP = 16;
 
-const styleSheet = createStyleSheet(theme => ({
+const styleSheet = createStyleSheet(appearance => ({
   carousel: { flexGrow: 0, overflow: 'visible', alignSelf: 'center' },
   carouselContentContainer: { flexGrow: 0, overflow: 'visible' },
   templateItemContainer: {
-    backgroundColor: theme === 'light' ? '#fff' : '#000',
-    ...shadow(theme, 'center'),
+    backgroundColor: appearance === 'light' ? '#fff' : '#000',
+    ...shadow(appearance, 'center'),
   },
   colorPalettContainer: {
     paddingHorizontal: GAP,
@@ -898,13 +898,13 @@ const styleSheet = createStyleSheet(theme => ({
     height: PALETTE_LIST_HEIGHT,
     borderRadius: PALETTE_LIST_HEIGHT / 2,
     borderWidth: 3,
-    borderColor: colors.grey100,
+    borderColor: appearance === 'dark' ? colors.grey900 : colors.grey100,
     transform: [{ scale: 0.8 }],
     alignItems: 'center',
     justifyContent: 'center',
   },
   colorPaletteSelected: {
-    borderColor: colors.black,
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
     transform: [{ scale: 1 }],
   },
 }));
