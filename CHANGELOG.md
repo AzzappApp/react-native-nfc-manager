@@ -1,5 +1,7 @@
-## 0.4.1-canary.21
+## 0.4.1-canary.22
 
+* **feat:**  - 🎸 sort trending posts and profiles by desc data ([#1215](https://github.com/AzzappApp/azzapp/pull/1215))
+* **fix:**  - media empty ([#1209](https://github.com/AzzappApp/azzapp/pull/1209))
 * **feat:**  - Basic android native ([#1204](https://github.com/AzzappApp/azzapp/pull/1204))
 * **fix:**  - **signup:** [#1208](https://github.com/AzzappApp/azzapp/pull/1208) always redirect to home on focus ([#1211](https://github.com/AzzappApp/azzapp/pull/1211))
 * **fix:**  - go back to home case ([#1203](https://github.com/AzzappApp/azzapp/pull/1203))
