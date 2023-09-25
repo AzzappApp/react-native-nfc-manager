@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
 import Link from '#components/Link';
@@ -8,6 +8,7 @@ import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
+import { useFocusEffect } from '#hooks/useFocusEffect';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -29,13 +30,15 @@ const WelcomeScreen = () => {
 
   const router = useRouter();
 
-  useEffect(() => {
+  const goBackToHome = useCallback(() => {
     if (profileId) {
       router.replace({
         route: 'HOME',
       });
     }
   }, [profileId, router]);
+
+  useFocusEffect(goBackToHome);
 
   return (
     <Container style={{ flex: 1 }}>
