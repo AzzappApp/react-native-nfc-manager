@@ -22,6 +22,10 @@ export type TextAreaModalProps = Omit<
    */
   placeholder?: string;
   /**
+   * The title of the header modal
+   */
+  headerTitle?: string;
+  /**
    * The maximum length of the textarea
    */
   maxLength?: number;
@@ -50,6 +54,7 @@ const TextAreaModal = ({
   placeholder,
   value,
   maxLength,
+  headerTitle,
   onChangeText,
   onClose,
   ItemTopComponent,
@@ -89,10 +94,13 @@ const TextAreaModal = ({
               onPress={onCancel}
             />
           }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Description',
-            description: 'Post creation screen textarea modal title',
-          })}
+          middleElement={
+            headerTitle ??
+            intl.formatMessage({
+              defaultMessage: 'Description',
+              description: 'Post creation screen textarea modal title',
+            })
+          }
           rightElement={
             <HeaderButton
               label={intl.formatMessage({
