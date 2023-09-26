@@ -1,6 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq, sql } from 'drizzle-orm';
-import { mysqlTable, json, boolean, primaryKey } from 'drizzle-orm/mysql-core';
+import { mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { CardModule } from './cardModules';
 import type { DbTransaction } from './db';
@@ -12,37 +12,12 @@ export const CardTemplateTable = mysqlTable('CardTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labels: cols.labels('labels').notNull(),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
+  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   previewMediaId: cols.mediaId('previewMediaId'),
   modules: json('modules').$type<CardModuleTemplate[]>().notNull(),
   businessEnabled: boolean('businessEnabled').default(true).notNull(),
   personalEnabled: boolean('personalEnabled').default(true).notNull(),
 });
-
-export const CardTemplateCompanyActivityTable = mysqlTable(
-  'CardTemplateCompanyActivity',
-  {
-    cardTemplateId: cols.cuid('cardTemplateId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId').notNull(),
-  },
-  table => {
-    return {
-      pk: primaryKey(table.cardTemplateId, table.companyActivityId),
-    };
-  },
-);
-
-export const CardTemplateProfileCategoryTable = mysqlTable(
-  'CardTemplateProfileCategory',
-  {
-    cardTemplateId: cols.cuid('cardTemplateId').notNull(),
-    profileCategoryId: cols.cuid('profileCategoryId').notNull(),
-  },
-  table => {
-    return {
-      pk: primaryKey(table.cardTemplateId, table.profileCategoryId),
-    };
-  },
-);
 
 export type CardTemplate = InferSelectModel<typeof CardTemplateTable>;
 export type NewCardTemplate = InferInsertModel<typeof CardTemplateTable>;
@@ -98,6 +73,7 @@ export const updateCardTemplate = async (
  */
 export const getCardTemplates = async (
   profileKind: 'business' | 'personal',
+  cardTemplateTypeId: string | null | undefined,
   randomSeed: string,
   offset?: string | null,
   limit?: number | null,
@@ -111,6 +87,9 @@ export const getCardTemplates = async (
         : CardTemplateTable.personalEnabled
     } = 1
    `;
+  if (cardTemplateTypeId) {
+    query.append(sql` AND cardTemplateTypeId = ${cardTemplateTypeId} `);
+  }
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
   }

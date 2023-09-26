@@ -8,6 +8,7 @@ export const profileCategorySchema = z.object({
   activities: z
     .array(z.union([z.string(), z.object({ id: z.string() })]))
     .optional(),
+  cardTemplateTypeId: z.string().optional().nullable(),
   enabled: z.boolean(),
 });
 

@@ -5,6 +5,7 @@ export { db };
 export * from './cardModules';
 export * from './cardStyles';
 export * from './cardTemplate';
+export * from './cardTemplateType';
 export * from './colorPalettes';
 export * from './companyActivities';
 export * from './coverTemplates';

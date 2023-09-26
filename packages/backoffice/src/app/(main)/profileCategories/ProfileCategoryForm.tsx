@@ -25,14 +25,20 @@ import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
 import { intParser, labelsOptions, useForm } from '#helpers/formHelpers';
+import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
 import ActivityListInput from './ActivityListInput';
 import { saveProfileCategory } from './profileCategoriesActions';
 import type { ProfileCategoryErrors } from './profileCategorySchema';
-import type { CompanyActivity, ProfileCategory } from '@azzapp/data/domains';
+import type {
+  CardTemplateType,
+  CompanyActivity,
+  ProfileCategory,
+} from '@azzapp/data/domains';
 
 type ProfileCategoryFormProps = {
   profileCategory?: ProfileCategory | null;
   companyActivities: CompanyActivity[];
+  cardTemplateTypes: CardTemplateType[];
   categoryCompanyActivities?: string[];
   saved?: boolean;
 };
@@ -40,11 +46,13 @@ type ProfileCategoryFormProps = {
 type FormValue = Omit<ProfileCategory, 'medias'> & {
   medias: Array<File | string>;
   activities: Array<CompanyActivity | string>;
+  cardTemplateType: CardTemplateType | string;
 };
 
 const ProfileCategoryForm = ({
   profileCategory,
   companyActivities,
+  cardTemplateTypes,
   categoryCompanyActivities,
   saved = false,
 }: ProfileCategoryFormProps) => {
@@ -66,6 +74,11 @@ const ProfileCategoryForm = ({
                 id =>
                   companyActivities.find(activity => activity.id === id) ?? id,
               ) ?? [],
+            cardTemplateType: profileCategory?.cardTemplateTypeId
+              ? cardTemplateTypes?.find(item => {
+                  return item.id === profileCategory?.cardTemplateTypeId;
+                })
+              : undefined,
           }
         : { enabled: true },
     formErrors?.fieldErrors,
@@ -178,7 +191,6 @@ const ProfileCategoryForm = ({
           required
           {...fieldProps('labels', labelsOptions)}
         />
-
         <FormControl fullWidth error={profileKindProps.error}>
           <InputLabel id="profileKind-label">Profile Kind</InputLabel>
           <Select
@@ -194,7 +206,6 @@ const ProfileCategoryForm = ({
           </Select>
           <FormHelperText>{profileKindProps.helperText}</FormHelperText>
         </FormControl>
-
         <TextField
           name="fontSize"
           type="number"
@@ -202,6 +213,12 @@ const ProfileCategoryForm = ({
           disabled={saving}
           required
           {...fieldProps('order', { parse: intParser })}
+        />
+        <WebCardTemplateTypeListInput
+          label="Webcard template type"
+          name="cardTemplateType"
+          options={cardTemplateTypes}
+          {...fieldProps('cardTemplateType')}
         />
         {data.profileKind === 'business' && (
           <ActivityListInput
@@ -211,14 +228,12 @@ const ProfileCategoryForm = ({
             {...fieldProps('activities')}
           />
         )}
-
         <MediasListInput
           label="Medias"
           name="medias"
           kind="image"
           {...fieldProps('medias')}
         />
-
         <FormControlLabel
           control={
             <Switch
@@ -234,7 +249,6 @@ const ProfileCategoryForm = ({
           }
           label="Enabled"
         />
-
         <Button
           type="submit"
           variant="contained"

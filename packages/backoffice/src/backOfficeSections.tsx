@@ -14,6 +14,11 @@ const backOfficeSections = [
     roles: [ADMIN],
   },
   {
+    text: 'Company Activities',
+    href: '/companyActivities',
+    roles: [ADMIN],
+  },
+  {
     text: 'Medias',
     href: '/staticMedias',
     roles: [ADMIN],
@@ -31,6 +36,11 @@ const backOfficeSections = [
   {
     text: 'Card Templates',
     href: '/cardTemplates',
+    roles: [ADMIN],
+  },
+  {
+    text: 'Card Template Types',
+    href: '/cardTemplateTypes',
     roles: [ADMIN],
   },
 ];

@@ -1,22 +1,23 @@
 import { memo, useCallback } from 'react';
-import { FlatList } from 'react-native';
+import { SectionList } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-
+import Container from './Container';
 import PressableNative from './PressableNative';
 import type {
+  SectionListData,
   StyleProp,
   ViewStyle,
   ListRenderItemInfo,
-  FlatListProps,
+  SectionListProps,
 } from 'react-native';
 
-export type SelectListProps<ItemT> = Omit<
-  FlatListProps<ItemT>,
+export type SelectSectionListProps<ItemT, SectionT> = Omit<
+  SectionListProps<ItemT, SectionT>,
   'children' | 'keyExtractor' | 'renderItem'
 > &
-  SelectListItemCommonProps<ItemT> & {
+  SelectSectionListItemCommonProps<ItemT> & {
     /**
      * Used to extract a unique key for a given item at the specified index. Key is used for caching
      * and as the react key to track item re-ordering. The default extractor checks `item.key`, then
@@ -28,36 +29,32 @@ export type SelectListProps<ItemT> = Omit<
      * The selected item key
      */
     selectedItemKey?: string | null | undefined;
-    /**
-     * should use a SectionList instead of FlatList
-     *
-     * @type {boolean} default = false
-     */
-    section?: boolean;
   };
 
 /**
  * A component that display a list of items to an user and allow him to select one of them
  */
-function SelectList<ItemT>({
-  data,
+function SelectSectionList<ItemT, SectionT>({
+  sections,
   selectedItemKey,
   onItemSelected,
   keyExtractor,
-  labelField = 'label' as keyof ItemT,
+  labelField = 'title' as keyof ItemT,
   renderItem,
+  renderSectionHeader,
   itemContainerStyle,
   selectedItemContainerStyle,
   ...props
-}: SelectListProps<ItemT>) {
+}: SelectSectionListProps<ItemT, SectionT>) {
   const renderListItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ItemT>) => {
       const isSelected = keyExtractor(item, index) === selectedItemKey;
+
       return (
-        <MemoSelectListItem
-          isSelected={isSelected}
+        <MemoSelectSectionListItem
           selectedItemContainerStyle={selectedItemContainerStyle}
           renderItem={renderItem}
+          isSelected={isSelected}
           onItemSelected={onItemSelected}
           itemContainerStyle={itemContainerStyle}
           item={item}
@@ -76,20 +73,36 @@ function SelectList<ItemT>({
       labelField,
     ],
   );
+
+  const renderHeaderSection = useCallback(
+    (info: { section: SectionListData<ItemT, SectionT> }) => {
+      if (renderSectionHeader) {
+        return renderSectionHeader(info as any);
+      } else {
+        return (
+          <Container style={{ paddingHorizontal: 20, height: 32 }}>
+            <Text variant="large">{(info.section as any)[labelField]}</Text>
+          </Container>
+        );
+      }
+    },
+    [labelField, renderSectionHeader],
+  );
   return (
-    <FlatList
+    <SectionList
       accessibilityRole="list"
-      data={data}
+      sections={sections}
       keyExtractor={keyExtractor}
       renderItem={renderListItem}
+      renderSectionHeader={renderHeaderSection}
       {...props}
     />
   );
 }
 
-export default SelectList;
+export default SelectSectionList;
 
-type SelectListItemCommonProps<ItemT> = {
+type SelectSectionListItemCommonProps<ItemT> = {
   /**
    * Callback called when an item is selected
    */
@@ -99,7 +112,7 @@ type SelectListItemCommonProps<ItemT> = {
    * Render the item in the list
    */
   renderItem?: (
-    itemInfo: SelectListItemInfo<ItemT>,
+    itemInfo: SelectSectionListItemInfo<ItemT>,
   ) => React.ReactElement | null;
 
   /**
@@ -116,7 +129,7 @@ type SelectListItemCommonProps<ItemT> = {
   labelField?: keyof ItemT;
 };
 
-export type SelectListItemInfo<ItemT> = {
+export type SelectSectionListItemInfo<ItemT> = {
   /**
    * The item to render
    */
@@ -131,9 +144,10 @@ export type SelectListItemInfo<ItemT> = {
   isSelected: boolean;
 };
 
-type SelectListItemProps<ItemT> = SelectListItemCommonProps<ItemT> &
-  SelectListItemInfo<ItemT>;
-function SelectListItem<ItemT>({
+type SelectSectionListItemProps<ItemT> =
+  SelectSectionListItemCommonProps<ItemT> & SelectSectionListItemInfo<ItemT>;
+
+function SelectSectionListItem<ItemT>({
   isSelected,
   selectedItemContainerStyle,
   itemContainerStyle,
@@ -142,7 +156,7 @@ function SelectListItem<ItemT>({
   item,
   index,
   labelField,
-}: SelectListItemProps<ItemT>) {
+}: SelectSectionListItemProps<ItemT>) {
   const onPress = useCallback(() => {
     onItemSelected(item);
   }, [item, onItemSelected]);
@@ -160,7 +174,7 @@ function SelectListItem<ItemT>({
       onPress={onPress}
     >
       {renderItem?.({ item, isSelected, index }) ?? (
-        <Text variant="button" style={styles.defaultItemRenderer}>
+        <Text variant="medium" style={styles.defaultItemRenderer}>
           {(item as any)?.[labelField]}
         </Text>
       )}
@@ -168,9 +182,9 @@ function SelectListItem<ItemT>({
   );
 }
 
-const MemoSelectListItem = memo(
-  SelectListItem,
-) as unknown as typeof SelectListItem;
+const MemoSelectSectionListItem = memo(
+  SelectSectionListItem,
+) as unknown as typeof SelectSectionListItem;
 
 const styleSheet = createStyleSheet(appearance => ({
   defaultItemRenderer: {

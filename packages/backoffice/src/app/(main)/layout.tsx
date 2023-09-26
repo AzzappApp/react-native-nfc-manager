@@ -9,7 +9,9 @@ import {
   Style,
 } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MergeTypeIcon from '@mui/icons-material/MergeType';
 import {
   AppBar,
   Box,
@@ -119,4 +121,6 @@ const SectionIcons: Record<string, React.ComponentType> = {
   '/suggestedMedias': ImageAspectRatio,
   '/coverTemplates': CardGiftcard,
   '/cardTemplates': AddCard,
+  '/cardTemplateTypes': MergeTypeIcon,
+  '/companyActivities': LocalActivityIcon,
 };

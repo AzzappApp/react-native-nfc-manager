@@ -5,6 +5,7 @@ import type { GraphQLContext } from './GraphQLContext';
 const cardStyleSymbol = Symbol('CardStyle');
 const colorPaletteSymbol = Symbol('ColorPalette');
 const cardTemplateSymbol = Symbol('CardTemplate');
+const cardTemplateTypeSymbol = Symbol('CardTemplateType');
 const coverTemplateSymbol = Symbol('CoverTemplate');
 const postSymbol = Symbol('Post');
 const postCommentSymbol = Symbol('PostComment');
@@ -30,6 +31,11 @@ export const fetchNode = async (
       return withTypeSymbol(
         await loaders.CardTemplate.load(id),
         cardTemplateSymbol,
+      );
+    case 'CardTemplateType':
+      return withTypeSymbol(
+        await loaders.CardTemplateType.load(id),
+        cardTemplateTypeSymbol,
       );
     case 'CoverTemplate':
       return withTypeSymbol(
@@ -71,6 +77,9 @@ const resolveNode = (value: any) => {
   }
   if (value[cardTemplateSymbol]) {
     return 'CardTemplate';
+  }
+  if (value[cardTemplateTypeSymbol]) {
+    return 'CardTemplateType';
   }
   if (value[coverTemplateSymbol]) {
     return 'CoverTemplate';

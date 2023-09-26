@@ -7,6 +7,12 @@ export const CardTemplate: CardTemplateResolvers = {
   cardStyle: async ({ cardStyleId }, _, { loaders }) =>
     loaders.CardStyle.load(cardStyleId) as Promise<CardStyle>,
   label: getLabel,
+  cardTemplateType: async ({ cardTemplateTypeId }, _, { loaders }) => {
+    if (!cardTemplateTypeId) {
+      return null;
+    }
+    return loaders.CardTemplateType.load(cardTemplateTypeId);
+  },
   previewMedia: async ({ previewMediaId }) =>
     previewMediaId
       ? {

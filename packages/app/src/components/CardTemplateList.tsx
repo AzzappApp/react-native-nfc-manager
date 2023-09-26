@@ -1,12 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { Image } from 'expo-image';
+import { fromGlobalId } from 'graphql-relay';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  View,
-  FlatList,
-  useWindowDimensions,
-  Image,
-  ScrollView,
-} from 'react-native';
+import { View, FlatList, useWindowDimensions, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -22,6 +19,7 @@ import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import PressableNative from '#ui/PressableNative';
+import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
@@ -66,6 +64,14 @@ const CardTemplateList = ({
       query CardTemplateListQuery {
         viewer {
           ...CardTemplateList_cardTemplates
+          cardTemplateTypes {
+            id
+            label
+            profileCategory {
+              id
+              label
+            }
+          }
           profile {
             id
             ...CoverRenderer_profile
@@ -82,48 +88,52 @@ const CardTemplateList = ({
     {},
   );
 
-  const { profile } = viewer;
-
-  const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
-    graphql`
-      fragment CardTemplateList_cardTemplates on Viewer
-      @refetchable(queryName: "CardTemplateList_cardTemplates_Query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 20 }
-      ) {
-        cardTemplates(first: $first, after: $after)
-          @connection(key: "CardTemplateList_connection_cardTemplates") {
-          edges {
-            node {
-              id
-              label
-              previewMedia {
-                uri(width: 1024)
-                aspectRatio
-              }
-              cardStyle {
-                borderColor
-                borderRadius
-                borderWidth
-                buttonColor
-                fontFamily
-                fontSize
-                gap
-                titleFontFamily
-                titleFontSize
-                buttonRadius
-              }
-              modules {
-                ...ModuleData_cardModules
+  const { profile, cardTemplateTypes } = viewer;
+  const { data, loadNext, hasNext, isLoadingNext, refetch } =
+    usePaginationFragment(
+      graphql`
+        fragment CardTemplateList_cardTemplates on Viewer
+        @refetchable(queryName: "CardTemplateList_cardTemplates_Query")
+        @argumentDefinitions(
+          cardTemplateTypeId: { type: String, defaultValue: null }
+          after: { type: String }
+          first: { type: Int, defaultValue: 20 }
+        ) {
+          cardTemplates(
+            cardTemplateTypeId: $cardTemplateTypeId
+            first: $first
+            after: $after
+          ) @connection(key: "CardTemplateList_connection_cardTemplates") {
+            edges {
+              node {
+                id
+                label
+                previewMedia {
+                  uri(width: 1024)
+                  aspectRatio
+                }
+                cardStyle {
+                  borderColor
+                  borderRadius
+                  borderWidth
+                  buttonColor
+                  fontFamily
+                  fontSize
+                  gap
+                  titleFontFamily
+                  titleFontSize
+                  buttonRadius
+                }
+                modules {
+                  ...ModuleData_cardModules
+                }
               }
             }
           }
         }
-      }
-    `,
-    viewer as CardTemplateList_cardTemplates$key,
-  );
+      `,
+      viewer as CardTemplateList_cardTemplates$key,
+    );
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -209,12 +219,19 @@ const CardTemplateList = ({
     GAP -
     BUTTON_HEIGHT * 2 -
     BUTTON_GAP -
+    SELECT_INPUT_HEIGHT -
     (canSkip ? SKIP_BUTTON_HEIGHT + BUTTON_GAP : 0);
 
   const intl = useIntl();
 
+  const getItemLayout = (_data: any, index: number) => ({
+    length: itemWidth,
+    offset: itemWidth * index + GAP * (index - 1),
+    index,
+  });
+
   const renderItem = useCallback<ListRenderItem<CardTemplateItem>>(
-    ({ item }) => {
+    ({ item, index }) => {
       const imageHeight = item.previewMedia
         ? itemWidth / item.previewMedia.aspectRatio
         : null;
@@ -228,6 +245,7 @@ const CardTemplateList = ({
           <View style={styles.labelContainerHeight}>
             <Text variant="smallbold">{item.label}</Text>
           </View>
+
           <View
             style={[
               styles.webCardContainer,
@@ -243,11 +261,16 @@ const CardTemplateList = ({
             >
               {item.previewMedia && (
                 <Image
-                  source={{ uri: item.previewMedia.uri }}
+                  source={{
+                    uri: item.previewMedia.uri,
+                    width: itemWidth,
+                    height: imageHeight!,
+                  }}
                   style={{
                     width: itemWidth,
                     height: imageHeight!,
                   }}
+                  priority={index === 0 ? 'high' : 'normal'}
                 />
               )}
             </ScrollView>
@@ -264,10 +287,101 @@ const CardTemplateList = ({
     ],
   );
 
+  // #region Section List card category
+  const sectionKeyExtractor = (item: { id: string }) => {
+    return item.id;
+  };
+
+  const { height: windowHeight } = useWindowDimensions();
+  const { top } = useSafeAreaInsets();
+
+  const [selectedCardTemplateType, setSelectedCaredtemplateType] = useState<
+    { id: string; title: string } | undefined
+  >(undefined);
+
+  const templateTypesByProfileCategory = useMemo(() => {
+    return (
+      cardTemplateTypes?.reduce(
+        (
+          acc: Array<{
+            title: string;
+            data: [
+              {
+                id: string;
+                title: string;
+                data: Array<{ id: string; title: string } | null>;
+              },
+            ];
+          }>,
+          curr,
+        ) => {
+          if (!curr) {
+            return acc;
+          }
+          const label = curr.profileCategory?.label ?? '-';
+
+          const existingSection = acc.find(section => section.title === label);
+
+          if (existingSection) {
+            existingSection.data.push({
+              id: curr.id,
+              title: curr.label ?? '-',
+              data: [],
+            });
+          } else {
+            acc.push({
+              title: label,
+              data: [{ id: curr.id, title: curr.label ?? '-', data: [] }],
+            });
+          }
+
+          return acc;
+        },
+        [],
+      ) ?? []
+    );
+  }, [cardTemplateTypes]);
+
+  const onSelectSection = (item: { id: string; title: string }) => {
+    setSelectedCaredtemplateType(item);
+    refetch(
+      { cardTemplateTypeId: fromGlobalId(item.id).id, after: null },
+      { fetchPolicy: 'store-and-network' },
+    );
+  };
+
+  useEffect(() => {
+    if (!selectedCardTemplateType && templates?.length > 0) {
+      setSelectedCaredtemplateType({
+        id: templates[0].id,
+        title: templates[0].label ?? '-',
+      });
+    }
+  }, [selectedCardTemplateType, templates]);
+  // #endregion
+
   return (
     <>
       <View style={[styles.root, style]} {...props}>
         <View style={{ flex: 1 }}>
+          <SelectSection
+            nativeID="activities"
+            accessibilityLabelledBy="activitiesLabel"
+            sections={templateTypesByProfileCategory}
+            inputLabel={selectedCardTemplateType?.title}
+            selectedItemKey={selectedCardTemplateType?.id}
+            keyExtractor={sectionKeyExtractor as any}
+            bottomSheetHeight={windowHeight - top - 30}
+            onItemSelected={onSelectSection}
+            itemContainerStyle={styles.selectItemContainerStyle}
+            placeHolder={intl.formatMessage({
+              defaultMessage: 'Select a type of template',
+              description:
+                'Card Template list - Accessibility TextInput Placeholder to select a type of template',
+            })}
+            style={{ marginHorizontal: 20 }}
+          />
+
           {templates && (
             <FlatList
               data={templates}
@@ -284,6 +398,8 @@ const CardTemplateList = ({
               decelerationRate="fast"
               scrollEventThrottle={16}
               nestedScrollEnabled
+              ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
+              getItemLayout={getItemLayout}
             />
           )}
         </View>
@@ -335,6 +451,7 @@ const CardTemplateList = ({
     </>
   );
 };
+
 export default CardTemplateList;
 
 type CardTemplateItem = {
@@ -429,7 +546,8 @@ const GAP = 20;
 const ITEM_RADIUS = 20;
 const BUTTON_GAP = 10;
 const SKIP_BUTTON_HEIGHT = 18;
-const LABEL_CONTAINER_HEIGHT = 55;
+const LABEL_CONTAINER_HEIGHT = 40;
+const SELECT_INPUT_HEIGHT = 43;
 
 const stylesheet = createStyleSheet(theme => ({
   root: {
@@ -442,7 +560,6 @@ const stylesheet = createStyleSheet(theme => ({
   },
   cardTemplateListContentContainer: {
     paddingHorizontal: 50,
-    gap: GAP,
     overflow: 'visible',
   },
   buttons: {
@@ -478,5 +595,9 @@ const stylesheet = createStyleSheet(theme => ({
   },
   webCardList: {
     flex: 1,
+  },
+  selectItemContainerStyle: {
+    paddingLeft: 30,
+    height: 32,
   },
 }));

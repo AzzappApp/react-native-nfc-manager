@@ -14,6 +14,7 @@ import {
   getCoverTemplates,
   getCardTemplates,
   getColorPalettes,
+  getCardTemplateTypes,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
@@ -203,34 +204,60 @@ export const Viewer: ViewerResolvers = {
   },
   cardTemplates: async (
     _,
-    { after, first },
+    { cardTemplateTypeId, after, first },
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
     if (!profile) {
       return emptyConnection;
     }
-    const limit = first ?? 100;
+    let typeId = cardTemplateTypeId;
+    if (cardTemplateTypeId == null) {
+      if (profile.companyActivityId) {
+        const compActivity = await loaders.CompanyActivity.load(
+          profile.companyActivityId,
+        );
+        if (compActivity) {
+          typeId = compActivity.cardTemplateTypeId;
+        }
+      }
+    }
+    if (typeId == null) {
+      if (profile.profileCategoryId) {
+        const profileCategory = await loaders.ProfileCategory.load(
+          profile.profileCategoryId,
+        );
+        if (profileCategory) {
+          typeId = profileCategory.cardTemplateTypeId;
+        }
+      }
+    }
+    const limit = first ?? 20;
     const cardTemplates = await getCardTemplates(
       profile.profileKind,
+      typeId,
       profile.id,
       after,
       limit + 1,
     );
-    const sizedCardtemplate = cardTemplates.slice(0, limit);
-    return {
-      edges: sizedCardtemplate.map(cardTemplate => ({
-        node: cardTemplate,
-        cursor: cardTemplate.cursor,
-      })),
-      pageInfo: {
-        hasNextPage: cardTemplates.length > limit,
-        hasPreviousPage: false,
-        startCursor: cardTemplates[0]?.cursor,
-        endCursor: sizedCardtemplate[sizedCardtemplate.length - 1].cursor,
-      },
-    };
+    if (cardTemplates.length > 0) {
+      const sizedCardtemplate = cardTemplates.slice(0, limit);
+      return {
+        edges: sizedCardtemplate.map(cardTemplate => ({
+          node: cardTemplate,
+          cursor: cardTemplate.cursor,
+        })),
+        pageInfo: {
+          hasNextPage: cardTemplates.length > limit,
+          hasPreviousPage: false,
+          startCursor: cardTemplates[0]?.cursor,
+          endCursor: sizedCardtemplate[sizedCardtemplate.length - 1].cursor,
+        },
+      };
+    }
+    return emptyConnection;
   },
+  cardTemplateTypes: async () => getCardTemplateTypes(),
   cardStyles: async (_, { after, first }, { auth: { profileId } }) => {
     if (!profileId) {
       return emptyConnection;

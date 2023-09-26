@@ -2,6 +2,7 @@ import * as CardCoverResolvers from './CardCoverResolvers';
 import * as CardModuleResolvers from './CardModuleResolvers';
 import * as CardStyleResolvers from './CardStyleResolvers';
 import * as CardTemplateResolvers from './CardTemplateResolver';
+import * as CardTemplateTypeResolvers from './CardTemplateTypeResolver';
 import * as ColorPaletteResolvers from './ColorPaletteResolvers';
 import * as ContactCardResolvers from './ContactCardResolvers';
 import * as CoverTemplateResolvers from './CoverTemplateResolvers';
@@ -30,6 +31,7 @@ const resolvers: Resolvers = {
   ...UserResolvers,
   ...ViewerResolvers,
   ...CardTemplateResolvers,
+  ...CardTemplateTypeResolvers,
   Node,
 };
 
