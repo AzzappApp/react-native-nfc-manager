@@ -1,13 +1,11 @@
 import * as Sentry from '@sentry/react-native';
-import { useRef, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions, StyleSheet, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
-import { useDebounce } from 'use-debounce';
+import { useDebouncedCallback } from 'use-debounce';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -83,33 +81,9 @@ const ProfileWebCardModal = ({
     }
   };
 
-  //we want to prevent debounced effect when following profiles is updated elsewhere
-  const isFollowingValue = useRef(Boolean(profile?.isFollowing));
-
-  const [isFollowing, toggleFollowing, setFollowing] = useToggle(
-    Boolean(profile?.isFollowing),
-  );
-
-  const [debouncedIsFollowing] = useDebounce(isFollowing, 600);
-
-  useEffect(() => {
-    if (isFollowingValue.current === Boolean(profile?.isFollowing)) {
-      if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
-        onToggleFollow(profile.id, profile.userName, debouncedIsFollowing);
-      }
-    } else {
-      isFollowingValue.current = Boolean(profile?.isFollowing);
-      setFollowing(Boolean(profile?.isFollowing));
-    }
-  }, [
-    debouncedIsFollowing,
-    onToggleFollow,
-    profile.id,
-    profile?.isFollowing,
-    profile.userName,
-    setFollowing,
-    toggleFollowing,
-  ]);
+  const debouncedToggleFollowing = useDebouncedCallback(() => {
+    onToggleFollow(profile.id, profile.userName, !profile.isFollowing);
+  }, 600);
 
   return (
     <BottomSheetModal
@@ -195,12 +169,14 @@ const ProfileWebCardModal = ({
           </PressableNative>
           <PressableNative
             style={styles.bottomSheetOptionButton}
-            onPress={toggleFollowing}
+            onPress={debouncedToggleFollowing}
           >
             <View style={styles.bottomSheetOptionIconLabel}>
-              <Icon icon={isFollowing ? 'delete_filled' : 'add_circle'} />
+              <Icon
+                icon={profile.isFollowing ? 'delete_filled' : 'add_circle'}
+              />
               <Text>
-                {isFollowing ? (
+                {profile.isFollowing ? (
                   <FormattedMessage
                     defaultMessage="Unfollow"
                     description="Unfollow button label in Profile webcard modal Button"

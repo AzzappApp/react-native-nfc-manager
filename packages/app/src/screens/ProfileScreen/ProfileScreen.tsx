@@ -166,9 +166,7 @@ const ProfileScreen = ({
             onHome={onHome}
             isWebCardDisplayed={!showPost}
             onEdit={toggleEditing}
-            onToggleFollow={follow =>
-              onToggleFollow(data.profile!.id, data.profile!.userName!, follow)
-            }
+            onToggleFollow={onToggleFollow}
             onFlip={toggleFlip}
             onShowWebcardModal={toggleWebcardModal}
           />
