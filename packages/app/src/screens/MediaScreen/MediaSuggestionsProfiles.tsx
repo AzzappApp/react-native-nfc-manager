@@ -9,6 +9,7 @@ import {
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import {
   commitLocalUpdate,
   graphql,
@@ -189,6 +190,17 @@ const CoverLinkWithOptions = ({
           }
           style={{ flex: 1 }}
           onPress={() => {
+            Toast.show({
+              text1: isFollowing
+                ? intl.formatMessage({
+                    defaultMessage: 'You no longer follow this Webcard™',
+                    description: 'Toast message when user unfollows a profile',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'You started to follow this Webcard™',
+                    description: 'Toast message when user follows a profile',
+                  }),
+            });
             startTransition(() => {
               toggleFollow(props.profileId, userName, !isFollowing);
             });
