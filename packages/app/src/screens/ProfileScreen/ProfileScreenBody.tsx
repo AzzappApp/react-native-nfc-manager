@@ -560,6 +560,7 @@ const ProfileScreenBody = (
     () =>
       memoize((id: string, kind: ModuleKind) => ({
         onModulePress() {
+          Toast.hide();
           onEditModule(kind, id);
         },
         onDuplicate() {
