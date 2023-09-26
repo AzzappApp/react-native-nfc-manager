@@ -21,6 +21,7 @@ import {
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors } from '#theme';
 import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -630,11 +631,17 @@ const styles = StyleSheet.create({
     width: FLOATING_BUTTON_SIZE,
     height: FLOATING_BUTTON_SIZE,
     borderRadius: FLOATING_BUTTON_SIZE / 2,
+    borderColor: colors.black,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mediaHideButtonImage: {
-    width: FLOATING_BUTTON_SIZE,
-    height: FLOATING_BUTTON_SIZE,
-    borderRadius: FLOATING_BUTTON_SIZE / 2,
+    width: FLOATING_BUTTON_SIZE - 6,
+    height: FLOATING_BUTTON_SIZE - 6,
+    borderRadius: (FLOATING_BUTTON_SIZE - 4) / 2,
   },
   mediaHideButtonIcon: {
     position: 'absolute',
