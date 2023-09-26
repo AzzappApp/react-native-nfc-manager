@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
     gap: 15,
   },
   squareRatioButton: {
@@ -171,6 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexGrow: 1,
+    paddingHorizontal: 20,
   },
   settingsContainer: {
     flexDirection: 'row',
