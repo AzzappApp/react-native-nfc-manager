@@ -1,5 +1,10 @@
-## 0.4.2-canary.5
+## 0.4.2-canary.6
 
+* **fix:**  - toggleFollow without useEffect ([#1245](https://github.com/AzzappApp/azzapp/pull/1245))
+* **fix:**  - **module:** [#890](https://github.com/AzzappApp/azzapp/pull/890) 💅 fix padding on carousel ([#1242](https://github.com/AzzappApp/azzapp/pull/1242))
+* **build:**  - remove node version - not found ([#1247](https://github.com/AzzappApp/azzapp/pull/1247))
+* **fix:**  - 🐛 display cover edition hide button correctly ([#1244](https://github.com/AzzappApp/azzapp/pull/1244))
+* **fix:**  - saving cardTemplateTypeId ([#1246](https://github.com/AzzappApp/azzapp/pull/1246))
 * **fix:**  - **image_picker:** [#1158](https://github.com/AzzappApp/azzapp/pull/1158) fix pointer events on bottom menu ([#1240](https://github.com/AzzappApp/azzapp/pull/1240))
 * **fix:**  - 🐛 don't show and add comments when not allowed ([#1239](https://github.com/AzzappApp/azzapp/pull/1239))
 * **fix:**  - **webcard:** [#1169](https://github.com/AzzappApp/azzapp/pull/1169) toast message should be hidden when user does what is written in it ([#1238](https://github.com/AzzappApp/azzapp/pull/1238))
