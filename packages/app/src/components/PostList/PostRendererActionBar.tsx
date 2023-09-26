@@ -135,7 +135,10 @@ const PostRendererActionBar = ({
   }, [counterReactions]);
 
   const goToComments = () => {
-    router.push({ route: 'POST_COMMENTS', params: { postId } });
+    router.push({
+      route: 'POST_COMMENTS',
+      params: { postId },
+    });
   };
 
   const onShare = async () => {

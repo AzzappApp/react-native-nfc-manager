@@ -43,6 +43,7 @@ describe('Link', () => {
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: null,
       route: 'PROFILE',
       params: { userName: 'hello' },
     });
@@ -98,6 +99,7 @@ describe('Link', () => {
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: null,
       route: 'PROFILE',
       params: { userName: 'hello' },
     });

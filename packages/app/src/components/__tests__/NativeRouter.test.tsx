@@ -229,6 +229,11 @@ describe('NativeRouter', () => {
             route: 'PROFILE',
             params: { userName: 'user-0' },
           });
+          //check that it doesn't push twice
+          result.current.router.push({
+            route: 'PROFILE',
+            params: { userName: 'user-0' },
+          });
         });
 
         expect(result.current.routerState).toMatchInlineSnapshot(`
@@ -265,7 +270,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "created-id",
+                "id": "PROFILE_userName-user-0",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -341,7 +346,7 @@ describe('NativeRouter', () => {
                           },
                         },
                         {
-                          "id": "created-id",
+                          "id": "PROFILE_userName-user-0",
                           "kind": "route",
                           "state": {
                             "params": {
@@ -505,7 +510,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "created-id",
+                "id": "FOLLOWINGS",
                 "kind": "route",
                 "state": {
                   "route": "FOLLOWINGS",
@@ -553,7 +558,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "created-id",
+                "id": "PROFILE_userName-user-0",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -888,7 +893,7 @@ describe('NativeRouter', () => {
             "modals": [],
             "stack": [
               {
-                "id": "created-id",
+                "id": "PROFILE_userName-user-0",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -957,7 +962,7 @@ describe('NativeRouter', () => {
                       "kind": "stack",
                       "state": [
                         {
-                          "id": "created-id",
+                          "id": "PROFILE_userName-user-0",
                           "kind": "route",
                           "state": {
                             "params": {
@@ -1114,7 +1119,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "created-id",
+                "id": "FOLLOWINGS",
                 "kind": "route",
                 "state": {
                   "route": "FOLLOWINGS",
@@ -1155,7 +1160,7 @@ describe('NativeRouter', () => {
           {
             "modals": [
               {
-                "id": "created-id",
+                "id": "PROFILE_userName-user-0",
                 "kind": "route",
                 "state": {
                   "params": {
@@ -1201,7 +1206,7 @@ describe('NativeRouter', () => {
           {
             "modals": [
               {
-                "id": "created-id",
+                "id": "FOLLOWINGS",
                 "kind": "route",
                 "state": {
                   "route": "FOLLOWINGS",
@@ -1254,7 +1259,7 @@ describe('NativeRouter', () => {
                 },
               },
               {
-                "id": "created-id",
+                "id": "FOLLOWINGS",
                 "kind": "route",
                 "state": {
                   "route": "FOLLOWINGS",

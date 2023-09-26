@@ -119,7 +119,10 @@ const PostRendererBottomPanel = ({
   };
 
   const goToComments = () => {
-    router.push({ route: 'POST_COMMENTS', params: { postId: post.id } });
+    router.push({
+      route: 'POST_COMMENTS',
+      params: { postId: post.id },
+    });
   };
   const addComment = () => {
     goToComments();

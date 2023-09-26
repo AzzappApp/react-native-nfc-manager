@@ -82,6 +82,7 @@ describe('PostLink', () => {
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: 'fakeId',
       route: 'POST',
       params: { postId: 'fakeId' },
     });
@@ -112,6 +113,7 @@ describe('PostLink', () => {
 
     expect(mockRouter.push).toHaveBeenCalledWith({
       route: 'POST',
+      id: 'fakeId',
       params: {
         postId: 'fakeId',
         videoTime: 3.4,

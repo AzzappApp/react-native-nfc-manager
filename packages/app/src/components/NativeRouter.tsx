@@ -322,6 +322,32 @@ export const initRouterState = (init: NativeRouterInit): RouterState => {
   };
 };
 
+const extractIdAndRoute = (route: Route) => {
+  const defaultId = `${route.route}${
+    route.params
+      ? `_${Object.entries(route.params)
+          .map(
+            ([key, value]) =>
+              `${key}-${
+                value === null ||
+                typeof value === 'boolean' ||
+                typeof value === 'string'
+                  ? value
+                  : '' //LayoutRectangle is not sufficient for diffing
+              }`,
+          )
+          .join('_')}`
+      : ''
+  }`;
+  if ('id' in route) {
+    const { id, ...state } = route;
+    return { id: typeof id === 'string' ? id : defaultId, route: state };
+  } else {
+    const id = defaultId;
+    return { id, route };
+  }
+};
+
 export const useNativeRouter = (init: NativeRouterInit) => {
   // We can't use useReducer since we need to dispatch event before
   // the state change takes effect
@@ -345,10 +371,18 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     const currentRoute = getCurrentRouteFromState(state);
     const newState = routerReducer(state, action);
     const nextRoute = getCurrentRouteFromState(newState);
-    if (nextRoute !== currentRoute && nextRoute) {
+
+    if (nextRoute?.id !== currentRoute?.id && nextRoute) {
       dispatchToListeners(routeWillChangeListeners, nextRoute.state);
     }
-    setRouterState(newState);
+
+    if (
+      nextRoute?.id !== currentRoute?.id ||
+      action.type === 'SCREEN_DISMISSED'
+    ) {
+      setRouterState(newState);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -451,22 +485,25 @@ export const useNativeRouter = (init: NativeRouterInit) => {
       getCurrentScreenId() {
         return getCurrentRouteFromState(routerStateRef.current)?.id ?? null;
       },
-      push(route: Route) {
-        if (setTabIfExists(route)) {
+      push(_route: Route) {
+        if (setTabIfExists(_route)) {
           return;
         }
-        const id = (route as any).id ?? createId();
+
+        const { id, route } = extractIdAndRoute(_route);
+
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'PUSH',
           payload: { state: route, kind: 'route', id },
         });
       },
-      replace(route: Route) {
-        if (setTabIfExists(route)) {
+      replace(_route: Route) {
+        if (setTabIfExists(_route)) {
           return;
         }
-        const id = (route as any).id ?? createId();
+        const { id, route } = extractIdAndRoute(_route);
+
         const currentRoute = getCurrentRoute();
         if (currentRoute) {
           // TODO incorrect if replaced screen is a tab
@@ -481,8 +518,8 @@ export const useNativeRouter = (init: NativeRouterInit) => {
           payload: { id, kind: 'route', state: route },
         });
       },
-      showModal(route: Route) {
-        const id = (route as any).id ?? createId();
+      showModal(_route: Route) {
+        const { id, route } = extractIdAndRoute(_route);
         dispatchToListeners(screenWillBePushedListeners, { id, route });
         dispatch({
           type: 'SHOW_MODAL',

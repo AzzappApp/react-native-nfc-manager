@@ -26,6 +26,7 @@ const PostLink = ({
     if (!post || !container) {
       router.push({
         route: 'POST',
+        id: postId,
         params: { postId },
       });
       return;
@@ -36,6 +37,7 @@ const PostLink = ({
         const videoTime = await postRef.current?.getCurrentVideoTime();
         router.push({
           route: 'POST',
+          id: postId, //we set an id to avoid double opening due to video time change
           params: {
             postId,
             videoTime,
