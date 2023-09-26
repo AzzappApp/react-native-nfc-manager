@@ -1,5 +1,6 @@
-## 0.4.2-canary.4
+## 0.4.2-canary.5
 
+* **fix:**  - **image_picker:** [#1158](https://github.com/AzzappApp/azzapp/pull/1158) fix pointer events on bottom menu ([#1240](https://github.com/AzzappApp/azzapp/pull/1240))
 * **fix:**  - 🐛 don't show and add comments when not allowed ([#1239](https://github.com/AzzappApp/azzapp/pull/1239))
 * **fix:**  - **webcard:** [#1169](https://github.com/AzzappApp/azzapp/pull/1169) toast message should be hidden when user does what is written in it ([#1238](https://github.com/AzzappApp/azzapp/pull/1238))
 * **fix:**  - **post:** [#1179](https://github.com/AzzappApp/azzapp/pull/1179) 🌘 wrong bg color in dark mode ([#1228](https://github.com/AzzappApp/azzapp/pull/1228))
