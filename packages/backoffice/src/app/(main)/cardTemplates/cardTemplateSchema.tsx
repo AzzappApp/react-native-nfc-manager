@@ -7,7 +7,6 @@ export const cardTemplateSchema = z.object({
   previewMediaId: z.string().nonempty(),
   businessEnabled: z.boolean(),
   personalEnabled: z.boolean(),
-  cardTemplateTypeId: z.string().nullable().optional(),
 });
 
 export type CardTemplateFormValue = z.infer<typeof cardTemplateSchema>;

@@ -59,7 +59,10 @@ export const saveProfileCategory = async (
         profileCategoryId = id;
         await trx
           .update(ProfileCategoryTable)
-          .set({ ...profileCategoryData })
+          .set({
+            ...profileCategoryData,
+            cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+          })
           .where(eq(ProfileCategoryTable.id, id));
       } else {
         profileCategoryId = createId();

@@ -55,7 +55,7 @@ const WebCardTemplateTypeListInput = ({
           <TextField
             {...params}
             inputRef={inputRef}
-            label="Add a Webcard template type"
+            label="Add a default webcard template type"
             variant="outlined"
           />
         )}
