@@ -217,20 +217,22 @@ const PostRendererBottomPanel = ({
               {post.previewComment.comment}
             </Text>
           )}
-          <Text
-            variant="medium"
-            style={styles.textCommentCounter}
-            numberOfLines={3}
-            ellipsizeMode="tail"
-          >
-            <FormattedMessage
-              defaultMessage="See {counterComments} comments"
-              description="PostRendererBottomPanel - Comment Counter"
-              values={{
-                counterComments: post.counterComments,
-              }}
-            />
-          </Text>
+          {post.allowComments && (
+            <Text
+              variant="medium"
+              style={styles.textCommentCounter}
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
+              <FormattedMessage
+                defaultMessage="See {counterComments} comments"
+                description="PostRendererBottomPanel - Comment Counter"
+                values={{
+                  counterComments: post.counterComments,
+                }}
+              />
+            </Text>
+          )}
         </PressableOpacity>
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
@@ -242,7 +244,7 @@ const PostRendererBottomPanel = ({
       </View>
       <BottomSheetModal
         visible={showModal}
-        height={284}
+        height={post.allowComments ? MODAL_HEIGHT : SMALL_MODAL_HEIGHT}
         variant="modal"
         onRequestClose={toggleModal}
       >
@@ -294,14 +296,16 @@ const PostRendererBottomPanel = ({
               />
             </Text>
           </PressableOpacity>
-          <PressableOpacity onPress={addComment} style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Add a comment"
-                description="PostItem Modal - Add a comment Label"
-              />
-            </Text>
-          </PressableOpacity>
+          {post.allowComments && (
+            <PressableOpacity onPress={addComment} style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Add a comment"
+                  description="PostItem Modal - Add a comment Label"
+                />
+              </Text>
+            </PressableOpacity>
+          )}
           {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
               {author?.isFollowing ? (
@@ -383,3 +387,6 @@ export const PostRendererBottomPanelSkeleton = () => {
     </View>
   );
 };
+
+const MODAL_HEIGHT = 284;
+const SMALL_MODAL_HEIGHT = 200;

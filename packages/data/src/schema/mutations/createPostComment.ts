@@ -1,6 +1,6 @@
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { insertPostComment } from '#domains';
+import { getPostByIdWithMedia, insertPostComment } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostComment: MutationResolvers['createPostComment'] = async (
@@ -18,6 +18,9 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
   try {
+    const post = await getPostByIdWithMedia(targetId);
+    if (!post?.allowComments) throw new Error(ERRORS.INVALID_REQUEST);
+
     const postComment = {
       profileId,
       postId: targetId,
