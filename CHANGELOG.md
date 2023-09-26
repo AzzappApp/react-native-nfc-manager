@@ -1,5 +1,8 @@
-## 0.4.2-canary.7
+## 0.4.2-canary.8
 
+* **fix:**  - [#810](https://github.com/AzzappApp/azzapp/pull/810) ([#1248](https://github.com/AzzappApp/azzapp/pull/1248))
+* **fix:**  - **webcard:** [#1074](https://github.com/AzzappApp/azzapp/pull/1074) 📽️ video should be enabled on preview ([#1241](https://github.com/AzzappApp/azzapp/pull/1241))
+* **build:**  - set latest node 18 version ([#1249](https://github.com/AzzappApp/azzapp/pull/1249))
 * **fix:**  - toggleFollow without useEffect ([#1245](https://github.com/AzzappApp/azzapp/pull/1245))
 * **fix:**  - **module:** [#890](https://github.com/AzzappApp/azzapp/pull/890) 💅 fix padding on carousel ([#1242](https://github.com/AzzappApp/azzapp/pull/1242))
 * **build:**  - remove node version - not found ([#1247](https://github.com/AzzappApp/azzapp/pull/1247))
