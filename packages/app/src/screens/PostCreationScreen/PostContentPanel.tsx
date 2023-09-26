@@ -1,8 +1,9 @@
 import { memo, useContext, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
@@ -42,6 +43,8 @@ const PostContentPanel = ({
     defaultMessage: 'Describe your post',
     description: 'Post creation screen textarea placeholder',
   });
+
+  const styles = useStyleSheet(styleSheet);
 
   return (
     <>
@@ -102,7 +105,7 @@ export default memo(PostContentPanel);
 
 const MAX_CONTENT_LENGHT = 2200;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     paddingHorizontal: 10,
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderRadius: 12,
-    backgroundColor: colors.grey50,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     flex: 1,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -143,4 +146,4 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
-});
+}));
