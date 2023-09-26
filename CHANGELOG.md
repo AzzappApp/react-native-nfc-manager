@@ -1,4 +1,4 @@
-## 0.4.2-canary.6
+## 0.4.2-canary.7
 
 * **fix:**  - toggleFollow without useEffect ([#1245](https://github.com/AzzappApp/azzapp/pull/1245))
 * **fix:**  - **module:** [#890](https://github.com/AzzappApp/azzapp/pull/890) 💅 fix padding on carousel ([#1242](https://github.com/AzzappApp/azzapp/pull/1242))
