@@ -11,6 +11,8 @@ export type CoverRendererPreviewDesktopProps = ViewProps & {
    * The relay reference to the cover
    */
   profile: CoverRenderer_profile$key;
+
+  videoEnabled?: boolean;
 };
 
 /**
@@ -18,6 +20,7 @@ export type CoverRendererPreviewDesktopProps = ViewProps & {
  */
 const CoverRendererPreviewDesktop = ({
   profile: coverKey,
+  videoEnabled,
   ...props
 }: CoverRendererPreviewDesktopProps) => {
   const { cardCover } = useFragment(CoverRendererFragment, coverKey) ?? {};
@@ -47,6 +50,7 @@ const CoverRendererPreviewDesktop = ({
         profile={coverKey}
         width={windowWidth}
         hideBorderRadius
+        videoEnabled={videoEnabled}
       />
     </View>
   );

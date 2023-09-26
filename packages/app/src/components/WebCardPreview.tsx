@@ -171,12 +171,13 @@ const WebCardPreview = (
               }}
             />
             {viewMode === 'desktop' ? (
-              <CoverRendererPreviewDesktop profile={profile} />
+              <CoverRendererPreviewDesktop profile={profile} videoEnabled />
             ) : (
               <CoverRenderer
                 profile={profile}
                 width={windowWidth}
                 hideBorderRadius
+                videoEnabled
               />
             )}
             {cardModules.map((module, index) => (
