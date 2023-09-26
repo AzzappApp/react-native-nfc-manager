@@ -237,7 +237,7 @@ class MediaHelpers: NSObject {
   }
   
   @objc
-  func addLocalCachedMediaFile(_ mediaId: NSString, url: NSURL) {
+  func addLocalCachedVideo(_ mediaId: NSString, url: NSURL) {
     MediaURICache.videoCache.addLocaleFileCacheEntry(mediaId: mediaId, uri: url as URL)
   }
   
