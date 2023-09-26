@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
+import { mainRoutes } from '#mobileRoutes';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -32,9 +33,7 @@ const WelcomeScreen = () => {
 
   const goBackToHome = useCallback(() => {
     if (profileId) {
-      router.replace({
-        route: 'HOME',
-      });
+      router.replaceAll(mainRoutes(false));
     }
   }, [profileId, router]);
 
