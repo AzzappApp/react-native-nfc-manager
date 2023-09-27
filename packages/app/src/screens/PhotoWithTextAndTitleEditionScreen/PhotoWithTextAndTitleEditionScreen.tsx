@@ -632,7 +632,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
           description:
-            'Placeholder for text area in simple text edition screen',
+            'Placeholder for text area in photo with text edition screen',
+        })}
+        headerTitle={intl.formatMessage({
+          defaultMessage: 'Edit text',
+          description:
+            'Text area modal title in photo with text edition screen',
         })}
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
