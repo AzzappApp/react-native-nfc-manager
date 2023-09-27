@@ -1,4 +1,4 @@
-## 0.4.2-canary.9
+## 0.4.2-canary.10
 
 * **feat:**  - **webcard:** [#918](https://github.com/AzzappApp/azzapp/pull/918) 👯 duplicate modules ([#1252](https://github.com/AzzappApp/azzapp/pull/1252))
 * **fix:**  - [#810](https://github.com/AzzappApp/azzapp/pull/810) ([#1248](https://github.com/AzzappApp/azzapp/pull/1248))
