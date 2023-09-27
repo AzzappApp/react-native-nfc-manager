@@ -1,5 +1,8 @@
-## 0.4.2-canary.10
+## 0.4.2-canary.11
 
+* **style:**  - **webcard:** [#1194](https://github.com/AzzappApp/azzapp/pull/1194) change toggle desktop/mobile buttons ([#1257](https://github.com/AzzappApp/azzapp/pull/1257))
+* **fix:**  - **webcard:** [#600](https://github.com/AzzappApp/azzapp/pull/600) wrong title in text area modal on modules ([#1260](https://github.com/AzzappApp/azzapp/pull/1260))
+* **ui:**  - [#1079](https://github.com/AzzappApp/azzapp/pull/1079) display toast on every follow/unfollow actions ([#1254](https://github.com/AzzappApp/azzapp/pull/1254))
 * **feat:**  - **webcard:** [#918](https://github.com/AzzappApp/azzapp/pull/918) 👯 duplicate modules ([#1252](https://github.com/AzzappApp/azzapp/pull/1252))
 * **fix:**  - [#810](https://github.com/AzzappApp/azzapp/pull/810) ([#1248](https://github.com/AzzappApp/azzapp/pull/1248))
 * **fix:**  - **webcard:** [#1074](https://github.com/AzzappApp/azzapp/pull/1074) 📽️ video should be enabled on preview ([#1241](https://github.com/AzzappApp/azzapp/pull/1241))
