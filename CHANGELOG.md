@@ -1,5 +1,6 @@
-## 0.4.2-canary.8
+## 0.4.2-canary.9
 
+* **feat:**  - **webcard:** [#918](https://github.com/AzzappApp/azzapp/pull/918) 👯 duplicate modules ([#1252](https://github.com/AzzappApp/azzapp/pull/1252))
 * **fix:**  - [#810](https://github.com/AzzappApp/azzapp/pull/810) ([#1248](https://github.com/AzzappApp/azzapp/pull/1248))
 * **fix:**  - **webcard:** [#1074](https://github.com/AzzappApp/azzapp/pull/1074) 📽️ video should be enabled on preview ([#1241](https://github.com/AzzappApp/azzapp/pull/1241))
 * **build:**  - set latest node 18 version ([#1249](https://github.com/AzzappApp/azzapp/pull/1249))
