@@ -1,5 +1,6 @@
-## 0.4.2-canary.11
+## 0.4.2-canary.12
 
+* **fix:**  - wrong management on composite keys ([#1265](https://github.com/AzzappApp/azzapp/pull/1265))
 * **style:**  - **webcard:** [#1194](https://github.com/AzzappApp/azzapp/pull/1194) change toggle desktop/mobile buttons ([#1257](https://github.com/AzzappApp/azzapp/pull/1257))
 * **fix:**  - **webcard:** [#600](https://github.com/AzzappApp/azzapp/pull/600) wrong title in text area modal on modules ([#1260](https://github.com/AzzappApp/azzapp/pull/1260))
 * **ui:**  - [#1079](https://github.com/AzzappApp/azzapp/pull/1079) display toast on every follow/unfollow actions ([#1254](https://github.com/AzzappApp/azzapp/pull/1254))
