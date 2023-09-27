@@ -46,6 +46,7 @@ function SelectSectionList<ItemT, SectionT>({
   selectedItemContainerStyle,
   ...props
 }: SelectSectionListProps<ItemT, SectionT>) {
+  const styles = useStyleSheet(styleSheet);
   const renderListItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ItemT>) => {
       const isSelected = keyExtractor(item, index) === selectedItemKey;
@@ -80,13 +81,15 @@ function SelectSectionList<ItemT, SectionT>({
         return renderSectionHeader(info as any);
       } else {
         return (
-          <Container style={{ paddingHorizontal: 20, height: 32 }}>
-            <Text variant="large">{(info.section as any)[labelField]}</Text>
+          <Container style={styles.sectionTitleContainer}>
+            <Text variant="xsmall" style={styles.titleSection}>
+              {(info.section as any)[labelField]}
+            </Text>
           </Container>
         );
       }
     },
-    [labelField, renderSectionHeader],
+    [labelField, renderSectionHeader, styles],
   );
   return (
     <SectionList
@@ -188,7 +191,6 @@ const MemoSelectSectionListItem = memo(
 
 const styleSheet = createStyleSheet(appearance => ({
   defaultItemRenderer: {
-    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -197,5 +199,15 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   itemContainer: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+  sectionTitleContainer: {
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
+    height: 28,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  titleSection: {
+    color: appearance === 'light' ? colors.grey100 : colors.grey300,
   },
 }));

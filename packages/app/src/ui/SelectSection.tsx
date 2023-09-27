@@ -165,6 +165,7 @@ const SelectSection = <ItemT, SectionT>({
           selectedItemContainerStyle={selectedItemContainerStyle}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           SectionSeparatorComponent={() => <View style={{ height: 15 }} />}
+          style={{ marginTop: 20, marginHorizontal: 30 }}
         />
       </BottomSheetModal>
     </>

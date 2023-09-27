@@ -6,11 +6,7 @@ import { View, FlatList, useWindowDimensions, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import {
-  DEFAULT_COLOR_PALETTE,
-  type CardStyle,
-  type ColorPalette,
-} from '@azzapp/shared/cardHelpers';
+import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -29,6 +25,11 @@ import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplate
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
 import type { ModuleData_cardModules$key } from '@azzapp/relay/artifacts/ModuleData_cardModules.graphql';
 import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
+import type {
+  CardStyle,
+  ColorPalette,
+  CardTemplateType,
+} from '@azzapp/shared/cardHelpers';
 import type { ReactNode } from 'react';
 import type {
   ListRenderItem,
@@ -124,6 +125,10 @@ const CardTemplateList = ({
                   titleFontSize
                   buttonRadius
                 }
+                cardTemplateType {
+                  id
+                  label
+                }
                 modules {
                   ...ModuleData_cardModules
                 }
@@ -163,13 +168,21 @@ const CardTemplateList = ({
           if (!edge?.node || !profile) {
             return null;
           }
-          const { id, previewMedia, label, cardStyle, modules } = edge.node;
+          const {
+            id,
+            previewMedia,
+            label,
+            cardStyle,
+            modules,
+            cardTemplateType,
+          } = edge.node;
           return {
             id,
             previewMedia,
             label,
             cardStyle,
             modules,
+            cardTemplateType,
           };
         }) ?? [],
       ),
@@ -353,8 +366,8 @@ const CardTemplateList = ({
   useEffect(() => {
     if (!selectedCardTemplateType && templates?.length > 0) {
       setSelectedCaredtemplateType({
-        id: templates[0].id,
-        title: templates[0].label ?? '-',
+        id: templates[0].cardTemplateType?.id ?? '-',
+        title: templates[0].cardTemplateType?.label ?? '-',
       });
     }
   }, [selectedCardTemplateType, templates]);
@@ -459,6 +472,7 @@ type CardTemplateItem = {
   previewMedia: { uri: string; aspectRatio: number } | null;
   label: string | null;
   cardStyle: CardStyle;
+  cardTemplateType: CardTemplateType;
   modules: ModuleData_cardModules$key;
 };
 
@@ -597,7 +611,7 @@ const stylesheet = createStyleSheet(theme => ({
     flex: 1,
   },
   selectItemContainerStyle: {
-    paddingLeft: 30,
-    height: 32,
+    paddingLeft: 6,
+    height: 20,
   },
 }));
