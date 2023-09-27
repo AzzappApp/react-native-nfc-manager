@@ -3,10 +3,15 @@ extend type Mutation {
 }
 
 input DuplicateModuleInput {
-  moduleId: ID!
+  moduleIds: [ID!]!
 }
 
 type DuplicateModulePayload {
   profile: Profile!
-  createdModuleId: ID!
+  createdModules: [CreatedModule!]!
+}
+
+type CreatedModule {
+  originalModuleId: ID!
+  newModuleId: ID!
 }

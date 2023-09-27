@@ -26,7 +26,10 @@ import { createId } from '#helpers/idHelpers';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import type { ProfileScreenBody_profile$key } from '@azzapp/relay/artifacts/ProfileScreenBody_profile.graphql';
 import type { ProfileScreenBodyDeleteModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDeleteModuleMutation.graphql';
-import type { ProfileScreenBodyDuplicateModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDuplicateModuleMutation.graphql';
+import type {
+  ProfileScreenBodyDuplicateModuleMutation,
+  ProfileScreenBodyDuplicateModuleMutation$data,
+} from '@azzapp/relay/artifacts/ProfileScreenBodyDuplicateModuleMutation.graphql';
 import type { ProfileScreenBodySwapModulesMutation } from '@azzapp/relay/artifacts/ProfileScreenBodySwapModulesMutation.graphql';
 import type { ProfileScreenBodyUpdateModulesVisibilityMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyUpdateModulesVisibilityMutation.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -78,6 +81,7 @@ export type ProfileScreenBodyProps = {
 
 export type ProfileBodyHandle = {
   deleteSelectedModules: () => void;
+  duplicateSelectedModules: () => void;
   toggleSelectedModulesVisibility: (visible: boolean) => void;
   selectAllModules: () => void;
   unselectAllModules: () => void;
@@ -198,7 +202,10 @@ const ProfileScreenBody = (
         $input: DuplicateModuleInput!
       ) {
         duplicateModule(input: $input) {
-          createdModuleId
+          createdModules {
+            originalModuleId
+            newModuleId
+          }
         }
       }
     `);
@@ -410,55 +417,61 @@ const ProfileScreenBody = (
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
 
-  const onDuplicateModule = useCallback(
-    (moduleId: string) => {
+  const duplicateModules = useCallback(
+    (moduleIds: string[]) => {
       if (!canDuplicate) {
         return;
       }
 
       const updater = (
         store: RecordSourceSelectorProxy,
-        newModuleId: string,
+        createdModules: ProfileScreenBodyDuplicateModuleMutation$data['duplicateModule']['createdModules'],
       ) => {
         const profileRecord = store.get(profileId);
         if (!profileRecord) {
           return;
         }
         let modules = profileRecord.getLinkedRecords('cardModules') ?? [];
-        const moduleRecordIndex = modules.findIndex(
-          moduleRecord => moduleRecord?.getDataID() === moduleId,
-        );
-        if (moduleRecordIndex === -1) {
-          return;
-        }
-        const moduleRecord = modules[moduleRecordIndex];
-        const newModuleRecord = store.create(
-          newModuleId,
-          moduleRecord.getType(),
-        );
-        newModuleRecord.copyFieldsFrom(moduleRecord);
-        newModuleRecord.setValue(newModuleId, 'id');
-        modules = [...modules];
-        modules.splice(moduleRecordIndex + 1, 0, newModuleRecord);
+
+        createdModules.forEach(({ originalModuleId, newModuleId }) => {
+          const moduleRecordIndex = modules.findIndex(
+            moduleRecord => moduleRecord?.getDataID() === originalModuleId,
+          );
+          if (moduleRecordIndex === -1) {
+            return;
+          }
+          const moduleRecord = modules[moduleRecordIndex];
+          const newModuleRecord = store.create(
+            newModuleId,
+            moduleRecord.getType(),
+          );
+          newModuleRecord.copyFieldsFrom(moduleRecord);
+          newModuleRecord.setValue(newModuleId, 'id');
+          modules = [...modules];
+          modules.splice(moduleRecordIndex + 1, 0, newModuleRecord);
+        });
         profileRecord.setLinkedRecords(modules, 'cardModules');
       };
 
       commitDuplicateModule({
         variables: {
           input: {
-            moduleId,
+            moduleIds,
           },
         },
         updater(store, response) {
-          const createdModuleId = response.duplicateModule?.createdModuleId;
-          if (!createdModuleId) {
-            //TODO
-            return;
-          }
-          updater(store, createdModuleId);
+          const createdModules = response.duplicateModule?.createdModules;
+
+          updater(store, createdModules);
         },
         optimisticUpdater(store) {
-          updater(store, `temp-${createId()}`);
+          updater(
+            store,
+            moduleIds.map(mId => ({
+              originalModuleId: mId,
+              newModuleId: `temp-${createId()}`,
+            })),
+          );
         },
         onError(error) {
           console.error(error);
@@ -473,6 +486,13 @@ const ProfileScreenBody = (
       });
     },
     [canDuplicate, commitDuplicateModule, intl, profileId],
+  );
+
+  const onDuplicateModule = useCallback(
+    (moduleId: string) => {
+      duplicateModules([moduleId]);
+    },
+    [duplicateModules],
   );
   // #endregion
 
@@ -532,6 +552,10 @@ const ProfileScreenBody = (
         deleteModules(Object.keys(selectedModules));
         setSelectedModules({});
       },
+      duplicateSelectedModules() {
+        duplicateModules(Object.keys(selectedModules));
+        setSelectedModules({});
+      },
       toggleSelectedModulesVisibility(visible) {
         updateModulesVisibility(Object.keys(selectedModules), visible);
         setSelectedModules({});
@@ -551,7 +575,13 @@ const ProfileScreenBody = (
         setSelectedModules({});
       },
     }),
-    [deleteModules, cardModules, selectedModules, updateModulesVisibility],
+    [
+      deleteModules,
+      duplicateModules,
+      cardModules,
+      selectedModules,
+      updateModulesVisibility,
+    ],
   );
   //#endregion
 

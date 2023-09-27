@@ -211,6 +211,11 @@ const ProfileScreenContent = ({
     onToggleSelectionMode();
   }, [onToggleSelectionMode]);
 
+  const onDuplicateSelectedModules = useCallback(() => {
+    profileBodyRef.current?.duplicateSelectedModules();
+    onToggleSelectionMode();
+  }, [onToggleSelectionMode]);
+
   const onToggleSelectedModulesVisibility = useCallback(
     (visible: boolean) => {
       profileBodyRef.current?.toggleSelectedModulesVisibility(visible);
@@ -349,6 +354,7 @@ const ProfileScreenContent = ({
             onRequestWebcardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
+            onDuplicate={onDuplicateSelectedModules}
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>

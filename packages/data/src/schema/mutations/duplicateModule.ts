@@ -4,58 +4,69 @@ import ERRORS from '@azzapp/shared/errors';
 import {
   db,
   createCardModule,
-  getCardModulesByIds,
   CardModuleTable,
+  getCardModulesSortedByPosition,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
   _,
-  { input: { moduleId } },
+  { input: { moduleIds } },
   { auth, loaders, cardUsernamesToRevalidate },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
     throw new Error(ERRORS.UNAUTORIZED);
   }
-  const [module] = await getCardModulesByIds([moduleId]);
-  if (!module || module.profileId !== profileId) {
+  const modules = await getCardModulesSortedByPosition(moduleIds);
+  if (modules.some(m => m.profileId !== profileId)) {
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
-  let createdModuleId: string | null = null;
+  const createdModules: Array<{
+    originalModuleId: string;
+    newModuleId: string;
+  }> = [];
   try {
     await db.transaction(async trx => {
-      await trx
-        .update(CardModuleTable)
-        .set({
-          position: sql`${CardModuleTable.position} + 1`,
-        })
-        .where(
-          and(
-            gt(CardModuleTable.position, module.position),
-            eq(CardModuleTable.profileId, profileId),
-          ),
-        );
+      for (const module of modules) {
+        await trx
+          .update(CardModuleTable)
+          .set({
+            position: sql`${CardModuleTable.position} + 1`,
+          })
+          .where(
+            and(
+              gt(CardModuleTable.position, module.position),
+              eq(CardModuleTable.profileId, profileId),
+            ),
+          );
 
-      const newModuleId = await createCardModule(
-        { ...omit(module, 'id'), position: module.position + 1 },
-        trx,
-      );
-      createdModuleId = newModuleId;
+        const newModuleId = await createCardModule(
+          {
+            ...omit(module, 'id'),
+            position:
+              module.position +
+              modules.filter(m => m && m.position < module.position).length +
+              1,
+          },
+          trx,
+        );
+        createdModules.push({
+          originalModuleId: module.id,
+          newModuleId,
+        });
+      }
     });
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-  }
-  if (!createdModuleId) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   const profile = (await loaders.Profile.load(profileId))!;
   cardUsernamesToRevalidate.add(profile.userName);
 
-  return { profile, createdModuleId };
+  return { profile, createdModules };
 };
 
 export default duplicateModule;

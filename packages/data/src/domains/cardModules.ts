@@ -146,6 +146,13 @@ export const getCardModulesByIds = async (ids: string[]) =>
       .where(inArray(CardModuleTable.id, ids)),
   );
 
+export const getCardModulesSortedByPosition = (ids: string[]) =>
+  db
+    .select()
+    .from(CardModuleTable)
+    .where(inArray(CardModuleTable.id, ids))
+    .orderBy(asc(CardModuleTable.position));
+
 /**
 /**
  * Retrieve all card modules for a given card
