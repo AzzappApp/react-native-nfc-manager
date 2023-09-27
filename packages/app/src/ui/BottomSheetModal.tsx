@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { colors, shadow } from '#theme';
+import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from './Button';
@@ -254,6 +255,7 @@ const BottomSheetModal = ({
           {children}
         </Animated.View>
       </KeyboardAvoidingView>
+      <Toast />
     </Modal>
   );
 };

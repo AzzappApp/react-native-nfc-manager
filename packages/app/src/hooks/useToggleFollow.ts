@@ -128,6 +128,18 @@ const useToggleFollow = (
       return;
     }
 
+    Toast.show({
+      text1: follow
+        ? intl.formatMessage({
+            defaultMessage: 'You started to follow this Webcard™',
+            description: 'Toast message when user follows a profile',
+          })
+        : intl.formatMessage({
+            defaultMessage: 'You no longer follow this Webcard™',
+            description: 'Toast message when user unfollows a profile',
+          }),
+    });
+
     // currentProfileId is undefined when user is anonymous so we can't follow
     if (currentProfileId) {
       commit({
