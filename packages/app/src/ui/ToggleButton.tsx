@@ -1,13 +1,17 @@
 import { memo } from 'react';
+import { useColorScheme, type StyleProp, type ViewStyle } from 'react-native';
 import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
 import PressableBackground from '#ui/PressableBackground';
 import Text from '#ui/Text';
-import type { StyleProp, ViewStyle } from 'react-native';
 
 type ToggleButtonProps = {
   label: string | null | undefined;
   toggled: boolean;
+  variant?: 'primary' | 'rounded_menu';
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
 };
@@ -16,9 +20,16 @@ const ToggleButton = ({
   label,
   toggled,
   onPress,
+  variant = 'primary',
   style = {},
 }: ToggleButtonProps) => {
-  const styles = useStyleSheet(styleSheet);
+  const colorScheme = useColorScheme();
+
+  const styles = useVariantStyleSheet(
+    styleSheet,
+    variant,
+    colorScheme ?? 'light',
+  );
 
   return (
     <PressableBackground
@@ -48,23 +59,41 @@ export default memo(ToggleButton);
 
 export const TOGGLE_BUTTON_HEIGHT = 35;
 
-const styleSheet = createStyleSheet(appearance => ({
-  container: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    height: TOGGLE_BUTTON_HEIGHT,
-    borderRadius: 100,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    borderColor: appearance === 'light' ? colors.black : colors.white,
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+const styleSheet = createVariantsStyleSheet(appearance => ({
+  default: {
+    container: {
+      paddingLeft: 20,
+      paddingRight: 20,
+      height: TOGGLE_BUTTON_HEIGHT,
+      borderRadius: 100,
+      borderWidth: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
   },
-  toggleContainer: {
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+  primary: {
+    container: {
+      borderColor: appearance === 'light' ? colors.black : colors.white,
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    },
+    toggleContainer: {
+      backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    },
+    toggleLabel: {
+      color: appearance === 'light' ? colors.white : colors.black,
+    },
   },
-  toggleLabel: {
-    color: appearance === 'light' ? colors.white : colors.black,
+  rounded_menu: {
+    container: {
+      borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+      backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    },
+    toggleContainer: {
+      backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    },
+    toggleLabel: {
+      color: appearance === 'light' ? colors.black : colors.white,
+    },
   },
 }));

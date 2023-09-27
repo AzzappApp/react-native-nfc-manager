@@ -1,10 +1,10 @@
 import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import ToggleButton from '#ui/ToggleButton';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
-import SwitchToggle from './SwitchToggle';
 import WebCardBackground from './WebCardBackground';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
@@ -108,33 +108,29 @@ const WebCardPreview = (
       }}
       {...props}
     >
-      <View
-        style={{
-          paddingHorizontal: 20,
-          height: SWITCH_TOGGLE_SECTION_HEIGHT,
-          justifyContent: 'center',
-        }}
-      >
-        <SwitchToggle
-          value={viewMode}
-          onChange={setViewMode}
-          values={[
-            {
-              value: 'mobile',
-              label: intl.formatMessage({
-                defaultMessage: 'Mobile',
-                description: 'Mobile view mode title in web card preview',
-              }),
-            },
-            {
-              value: 'desktop',
-              label: intl.formatMessage({
-                defaultMessage: 'Desktop',
-                description: 'Desktop view mode title in web card preview',
-              }),
-            },
-          ]}
-        />
+      <View style={styles.toggleContainer}>
+        <View style={{ flex: 1 }}>
+          <ToggleButton
+            variant="rounded_menu"
+            label={intl.formatMessage({
+              defaultMessage: 'Mobile',
+              description: 'Mobile view mode title in web card preview',
+            })}
+            toggled={viewMode === 'mobile'}
+            onPress={() => setViewMode('mobile')}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ToggleButton
+            variant="rounded_menu"
+            label={intl.formatMessage({
+              defaultMessage: 'Desktop',
+              description: 'Desktop view mode title in web card preview',
+            })}
+            toggled={viewMode === 'desktop'}
+            onPress={() => setViewMode('desktop')}
+          />
+        </View>
       </View>
       <View
         style={{
@@ -198,6 +194,16 @@ const WebCardPreview = (
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  toggleContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+});
 
 export default forwardRef(WebCardPreview);
 
