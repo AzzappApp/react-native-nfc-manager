@@ -1,5 +1,8 @@
-## 0.4.2-canary.13
+## 0.4.2-canary.14
 
+* **fix:**  - 🐛 allow change of profile kind during creation ([#1272](https://github.com/AzzappApp/azzapp/pull/1272))
+* **fix:**  - **profile:** [#801](https://github.com/AzzappApp/azzapp/pull/801) change card rotation behaviour ([#1250](https://github.com/AzzappApp/azzapp/pull/1250))
+* **fix:**  - **follow:** [#1164](https://github.com/AzzappApp/azzapp/pull/1164) inverse button color when followed ([#1251](https://github.com/AzzappApp/azzapp/pull/1251))
 * **fix:**  - section title in light mode ([#1271](https://github.com/AzzappApp/azzapp/pull/1271))
 * **fix:**  - rework managmeent of suggested media ([#1268](https://github.com/AzzappApp/azzapp/pull/1268))
 * **fix:**  - wrong management on composite keys ([#1265](https://github.com/AzzappApp/azzapp/pull/1265))
