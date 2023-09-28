@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/monorepo",
-  "version": "0.4.2-canary.16",
+  "version": "0.4.2-canary.15",
   "private": true,
   "packageManager": "yarn@1.22.19",
   "workspaces": {
@@ -96,6 +96,7 @@
   },
   "resolutions": {
     "@types/react": "^18.2.20",
-    "graphql": "^16.8.0"
+    "graphql": "^16.8.0",
+    "node-pty": "1.0.0"
   }
 }
