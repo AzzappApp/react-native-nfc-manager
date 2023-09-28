@@ -80,13 +80,20 @@ const HorizontalPhotoMarginsEditionPanel = ({
         />
         <LabeledDashedSlider
           label={
-            <FormattedMessage
-              defaultMessage="Left/right margin: {size}"
-              description="Left/right margin message in Horizontal Photo edition"
-              values={{
-                size: marginHorizontal,
-              }}
-            />
+            marginHorizontal === 0 ? (
+              <FormattedMessage
+                defaultMessage="Left/right margin: 0 - Full Width"
+                description="Left/right margin message in Horizontal Photo edition"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Left/right margin: {size}"
+                description="Left/right margin message in Horizontal Photo edition"
+                values={{
+                  size: marginHorizontal,
+                }}
+              />
+            )
           }
           value={marginHorizontal}
           min={0}
