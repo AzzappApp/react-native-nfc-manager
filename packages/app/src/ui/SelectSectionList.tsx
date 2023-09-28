@@ -208,6 +208,6 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
   },
   titleSection: {
-    color: appearance === 'light' ? colors.grey100 : colors.grey300,
+    color: appearance === 'light' ? colors.grey600 : colors.grey300,
   },
 }));
