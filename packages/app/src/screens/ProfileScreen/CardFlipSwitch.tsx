@@ -29,6 +29,7 @@ const CardFlipSwitch = ({
   ...props
 }: CardFlipSwitchProps) => {
   const flip = useSharedValue(flipped ? 1 : 0);
+  const currentFlip = useSharedValue(flipped ? 1 : 0);
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -39,7 +40,9 @@ const CardFlipSwitch = ({
       duration: 1300,
       easing: Easing.out(Easing.back(1)),
     });
-  }, [flipped, flip]);
+
+    currentFlip.value = flipped ? 1 : 0;
+  }, [flipped, flip, currentFlip]);
 
   const frontStyle = useAnimatedStyle(() => ({
     borderRadius: interpolate(
@@ -50,7 +53,11 @@ const CardFlipSwitch = ({
     transform: [
       { perspective: 900 },
       {
-        rotateY: `${interpolate(flip.value, [0, 1], [0, 180])}deg`,
+        rotateY: `${interpolate(
+          flip.value,
+          [0, 1],
+          [currentFlip.value === 1 ? -360 : 0, -180],
+        )}deg`,
       },
       {
         scale: interpolate(flip.value, [0, 0.5, 1], [1, 0.7, 1]),
@@ -58,19 +65,27 @@ const CardFlipSwitch = ({
     ],
   }));
 
-  const backStyle = useAnimatedStyle(() => ({
-    borderRadius: interpolate(
-      flip.value,
-      [0, 0.1, 0.9, 1],
-      [0, cardRadius, cardRadius, 0],
-    ),
-    transform: [
-      { rotateY: `${interpolate(flip.value, [0, 1], [180, 360])}deg` },
-      {
-        scale: interpolate(flip.value, [0, 0.5, 1], [1, 0.7, 1]),
-      },
-    ],
-  }));
+  const backStyle = useAnimatedStyle(() => {
+    return {
+      borderRadius: interpolate(
+        flip.value,
+        [0, 0.1, 0.9, 1],
+        [0, cardRadius, cardRadius, 0],
+      ),
+      transform: [
+        {
+          rotateY: `${interpolate(
+            flip.value,
+            [0, 1],
+            [currentFlip.value === 1 ? 540 : 180, 360],
+          )}deg`,
+        },
+        {
+          scale: interpolate(flip.value, [0, 0.5, 1], [1, 0.7, 1]),
+        },
+      ],
+    };
+  });
 
   const flipStartValue = useSharedValue(flip.value);
   const pan = Gesture.Pan()
