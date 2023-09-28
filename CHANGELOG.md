@@ -1,5 +1,6 @@
-## 0.4.2-canary.14
+## 0.4.2-canary.15
 
+* **build:**  - upgrade to react native 0.72 ([#1267](https://github.com/AzzappApp/azzapp/pull/1267))
 * **fix:**  - 🐛 allow change of profile kind during creation ([#1272](https://github.com/AzzappApp/azzapp/pull/1272))
 * **fix:**  - **profile:** [#801](https://github.com/AzzappApp/azzapp/pull/801) change card rotation behaviour ([#1250](https://github.com/AzzappApp/azzapp/pull/1250))
 * **fix:**  - **follow:** [#1164](https://github.com/AzzappApp/azzapp/pull/1164) inverse button color when followed ([#1251](https://github.com/AzzappApp/azzapp/pull/1251))
