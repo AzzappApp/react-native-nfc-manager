@@ -431,25 +431,36 @@ const ProfileScreenBody = (
         if (!profileRecord) {
           return;
         }
-        let modules = profileRecord.getLinkedRecords('cardModules') ?? [];
+        const modules = profileRecord.getLinkedRecords('cardModules') ?? [];
 
-        createdModules.forEach(({ originalModuleId, newModuleId }) => {
-          const moduleRecordIndex = modules.findIndex(
-            moduleRecord => moduleRecord?.getDataID() === originalModuleId,
-          );
-          if (moduleRecordIndex === -1) {
-            return;
-          }
-          const moduleRecord = modules[moduleRecordIndex];
-          const newModuleRecord = store.create(
-            newModuleId,
-            moduleRecord.getType(),
-          );
-          newModuleRecord.copyFieldsFrom(moduleRecord);
-          newModuleRecord.setValue(newModuleId, 'id');
-          modules = [...modules];
-          modules.splice(moduleRecordIndex + 1, 0, newModuleRecord);
-        });
+        [...createdModules]
+          .sort((a, b) => {
+            const aModuleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === a.originalModuleId,
+            );
+
+            const bModuleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === b.originalModuleId,
+            );
+
+            return aModuleRecordIndex - bModuleRecordIndex;
+          })
+          .forEach(({ originalModuleId, newModuleId }) => {
+            const moduleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === originalModuleId,
+            );
+            if (moduleRecordIndex === -1) {
+              return;
+            }
+            const moduleRecord = modules[moduleRecordIndex];
+            const newModuleRecord = store.create(
+              newModuleId,
+              moduleRecord.getType(),
+            );
+            newModuleRecord.copyFieldsFrom(moduleRecord);
+            newModuleRecord.setValue(newModuleId, 'id');
+            modules.push(newModuleRecord);
+          });
         profileRecord.setLinkedRecords(modules, 'cardModules');
       };
 

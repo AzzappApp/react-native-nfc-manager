@@ -208,6 +208,15 @@ export const createCardModule = async (
   return id;
 };
 
+export const createCardModules = async (
+  values: NewCardModule[],
+  tx: DbTransaction = db,
+) => {
+  const createdModules = values.map(v => ({ ...v, id: createId() }));
+  await tx.insert(CardModuleTable).values(createdModules);
+  return createdModules.map(m => m.id);
+};
+
 /**
  * Create a cardmodule.
  *
