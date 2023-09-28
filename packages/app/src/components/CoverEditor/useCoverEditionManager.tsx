@@ -27,9 +27,9 @@ import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
   exportLayersToImage,
-  type EditionParameters,
   exportLayersToVideo,
   extractLayoutParameters,
+  type EditionParameters,
 } from '#components/gpu';
 import ImagePicker, {
   ImagePickerCardMediaWrapper,
@@ -50,15 +50,21 @@ import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
+import useSuggestedMediaManager from './useSuggestedMediaManager';
 import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
-import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
+import type {
+  ColorPalette,
+  CoverStyleData,
+  TemplateKind,
+} from './coverEditorTypes';
 import type { useCoverEditionManager_profile$key } from '@azzapp/relay/artifacts/useCoverEditionManager_profile.graphql';
 import type {
   SaveCoverInput,
   useCoverEditionManagerMutation,
 } from '@azzapp/relay/artifacts/useCoverEditionManagerMutation.graphql';
+import type { useSuggestedMediaManager_suggested$key } from '@azzapp/relay/artifacts/useSuggestedMediaManager_suggested.graphql';
 import type { Observable } from 'relay-runtime';
 
 export type CoverData = {
@@ -85,17 +91,19 @@ export type CoverData = {
 
 type UserCoverEditorUpdaterOptions = {
   profile: useCoverEditionManager_profile$key | null;
+  viewer?: useSuggestedMediaManager_suggested$key | null;
   initialData: CoverData | null;
   initialColorPalette: ColorPalette | null;
-  initialTemplateKind?: 'image' | 'mixed' | 'video';
+  initialTemplateKind?: TemplateKind;
   onCoverSaved: () => void;
 };
 
 const useCoverEditionManager = ({
   profile: profileKey,
+  viewer: viewerKey,
   initialData,
   initialColorPalette,
-  initialTemplateKind = 'mixed',
+  initialTemplateKind = 'people',
   onCoverSaved,
 }: UserCoverEditorUpdaterOptions) => {
   const profile = useFragment(
@@ -163,6 +171,9 @@ const useCoverEditionManager = ({
     profileKey,
   );
 
+  const [templateKind, setTemplateKind] =
+    useState<TemplateKind>(initialTemplateKind);
+
   const cardCover = profile?.cardCover;
   const cardColors = profile?.cardColors;
 
@@ -212,10 +223,9 @@ const useCoverEditionManager = ({
     return null;
   });
 
-  const lastSourceMediaBeforeSuggested = useRef<{
-    media: CoverData['sourceMedia'] | null;
-    cropParameter: CoverData['mediaCropParameter'] | null;
-  } | null>(null);
+  const lastCroppedBeforeSuggested = useRef<
+    CoverData['mediaCropParameter'] | null
+  >(null);
 
   const [mediaCropParameter, setMediaCropParameter] = useState<
     CoverData['mediaCropParameter'] | null
@@ -229,32 +239,36 @@ const useCoverEditionManager = ({
     return null;
   });
 
-  const [hasSuggestedMedia, setHasSuggestedMedia] = useState(false);
+  // #region Media visibility
+  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
+  const toggleMediaVisibility = useCallback(() => {
+    setMediaVisible(mediaVisible => !mediaVisible);
+  }, []);
+  // #endregion
+
+  const { suggestedMedia, selectSuggestedMedia } =
+    useSuggestedMediaManager(viewerKey);
+
   const setSuggestedMedia = useCallback(
-    (suggestedMedia: CoverData['sourceMedia'] | null) => {
-      if (suggestedMedia) {
-        setHasSuggestedMedia(true);
-        if (lastSourceMediaBeforeSuggested.current == null) {
-          lastSourceMediaBeforeSuggested.current = {
-            media: sourceMedia,
-            cropParameter: mediaCropParameter,
-          };
-        }
-        unstable_batchedUpdates(() => {
-          setMediaCropParameter(null);
-          setSourceMedia(suggestedMedia);
-        });
-        return;
-      } else if (lastSourceMediaBeforeSuggested.current) {
-        setMediaCropParameter(
-          lastSourceMediaBeforeSuggested.current.cropParameter,
-        );
-        setSourceMedia(lastSourceMediaBeforeSuggested.current.media);
+    (kind: 'others' | 'people' | 'video') => {
+      if (lastCroppedBeforeSuggested.current == null) {
+        lastCroppedBeforeSuggested.current = mediaCropParameter;
       }
-      setHasSuggestedMedia(false);
+      unstable_batchedUpdates(() => {
+        selectSuggestedMedia(kind);
+        setMediaCropParameter(null);
+      });
     },
-    [mediaCropParameter, sourceMedia],
+    [mediaCropParameter, selectSuggestedMedia],
   );
+
+  const clearSuggestedMedia = useCallback(() => {
+    setMediaCropParameter(lastCroppedBeforeSuggested.current);
+  }, []);
+
+  const hasSuggestedMedia = useMemo(() => {
+    return !mediaVisible && templateKind !== 'people' && suggestedMedia != null;
+  }, [suggestedMedia, templateKind, mediaVisible]);
 
   const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
     initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
@@ -298,7 +312,7 @@ const useCoverEditionManager = ({
 
   // #region Media kind
   const [mediaKind, setMediaKind] = useState<'image' | 'mixed' | 'video'>(
-    initialTemplateKind,
+    templateKind === 'video' ? 'video' : 'image',
   );
   type MediaInfos = {
     sourceMedia: CoverData['sourceMedia'] | null;
@@ -358,14 +372,6 @@ const useCoverEditionManager = ({
     [setMediaCropParameter],
   );
   //#endregion
-
-  // #region Media visibility
-  const isCoverCreation = useRef(sourceMedia == null);
-  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
-  const toggleMediaVisibility = useCallback(() => {
-    setMediaVisible(mediaVisible => !mediaVisible);
-  }, []);
-  // #endregion
 
   // #region Color palette
   const [colorPalette, setColorPalette] = useState<ColorPalette>(() => {
@@ -469,19 +475,22 @@ const useCoverEditionManager = ({
     }
   }, [startMediaComputation]);
 
-  const onMediaSelected = (result: ImagePickerResult) => {
-    unstable_batchedUpdates(async () => {
-      const { uri, kind, width, height, editionParameters, timeRange } = result;
-      setShowImagePicker(false);
-      setSourceMedia({ uri, kind, width, height });
-      setMediaCropParameter(extractLayoutParameters(editionParameters)[0]);
-      setTimeRange(timeRange ?? null);
-      startMediaComputation(result);
-      setMediaVisible(true);
-      setHasSuggestedMedia(false);
-      lastSourceMediaBeforeSuggested.current = null;
-    });
-  };
+  const onMediaSelected = useCallback(
+    (result: ImagePickerResult) => {
+      unstable_batchedUpdates(async () => {
+        const { uri, kind, width, height, editionParameters, timeRange } =
+          result;
+        setShowImagePicker(false);
+        setSourceMedia({ uri, kind, width, height });
+        setMediaCropParameter(extractLayoutParameters(editionParameters)[0]);
+        setTimeRange(timeRange ?? null);
+        startMediaComputation(result);
+        setMediaVisible(true);
+        clearSuggestedMedia();
+      });
+    },
+    [clearSuggestedMedia, startMediaComputation],
+  );
 
   // #region Cover saving
   const [saving, setSaving] = useState(false);
@@ -510,7 +519,16 @@ const useCoverEditionManager = ({
   const intl = useIntl();
 
   const onSave = useCallback(async () => {
-    if (!sourceMedia) {
+    const activeSourceMedia =
+      hasSuggestedMedia && suggestedMedia
+        ? {
+            uri: suggestedMedia.uri,
+            kind: suggestedMedia.kind,
+            width: suggestedMedia.width,
+            height: suggestedMedia.height,
+          }
+        : sourceMedia;
+    if (!activeSourceMedia) {
       setShowMediaRequiredModal(true);
       return;
     }
@@ -564,12 +582,7 @@ const useCoverEditionManager = ({
 
       const shouldRecreateMedia =
         !cardCover ||
-        sourceMedia?.id == null ||
-        //following condition is required if we have a profile wiht a suggested Media and changing it to another suggestedMedia
-        (hasSuggestedMedia &&
-          sourceMedia &&
-          sourceMedia.id !==
-            lastSourceMediaBeforeSuggested.current?.media?.id) ||
+        activeSourceMedia?.id == null ||
         !isEqual(
           pick(currentCoverStyle, ...mediaStyle),
           pick({ ...coverStyle, mediaParameters }, ...mediaStyle),
@@ -586,7 +599,7 @@ const useCoverEditionManager = ({
           maskUri: isSegmented ? maskMedia?.uri ?? null : null,
           filters: coverStyle.mediaFilter ? [coverStyle.mediaFilter] : null,
         };
-        if (sourceMedia.kind === 'image') {
+        if (activeSourceMedia.kind === 'image') {
           let exportOptions: ExportImageOptions = {
             size,
             format: 'auto',
@@ -603,7 +616,7 @@ const useCoverEditionManager = ({
             layers: [
               {
                 kind: 'image',
-                uri: sourceMedia.uri,
+                uri: activeSourceMedia.uri,
                 ...layerOptions,
               },
             ],
@@ -616,7 +629,7 @@ const useCoverEditionManager = ({
             layers: [
               {
                 kind: 'video',
-                uri: sourceMedia.uri,
+                uri: activeSourceMedia.uri,
                 ...layerOptions,
               },
             ],
@@ -628,11 +641,11 @@ const useCoverEditionManager = ({
         uri: string;
         kind: 'image' | 'video';
       } | null> = [
-        !sourceMedia.id ? sourceMedia : null,
+        !activeSourceMedia.id ? activeSourceMedia : null,
         maskMedia && !maskMedia.id
           ? { uri: maskMedia.uri, kind: 'image' }
           : null,
-        mediaPath ? { uri: mediaPath, kind: sourceMedia.kind } : null,
+        mediaPath ? { uri: mediaPath, kind: activeSourceMedia.kind } : null,
       ];
 
       if (Object.values(mediaToUploads).some(media => !!media)) {
@@ -728,7 +741,7 @@ const useCoverEditionManager = ({
           if (mediaId) {
             addLocalCachedMediaFile(
               mediaId,
-              sourceMedia.kind,
+              activeSourceMedia.kind,
               `file://${mediaPath}`,
             );
           }
@@ -752,6 +765,8 @@ const useCoverEditionManager = ({
       },
     });
   }, [
+    hasSuggestedMedia,
+    suggestedMedia,
     sourceMedia,
     coverStyle,
     colorPalette,
@@ -765,90 +780,120 @@ const useCoverEditionManager = ({
     currentCoverStyle,
     maskMedia,
     profile?.profileKind,
-    hasSuggestedMedia,
     onCoverSaved,
     intl,
   ]);
 
-  const modals = (
-    <>
-      <Modal
-        visible={showImagePicker}
-        animationType="slide"
-        onRequestClose={closeImagePicker}
-      >
-        <ImagePicker
-          kind={mediaKind}
-          forceAspectRatio={COVER_RATIO}
-          maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
-          onFinished={onMediaSelected}
-          onCancel={closeImagePicker}
-          steps={[SelectImageStepWithFrontCameraByDefault, VideoTimeRangeStep]}
-          TopPanelWrapper={ImagePickerCardMediaWrapper}
-        />
-      </Modal>
-      <Modal
-        visible={showMediaRequiredModal}
-        animationType="none"
-        onRequestClose={() => setShowMediaRequiredModal(false)}
-      >
-        <Container
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
+  const modals = useMemo(
+    () => (
+      <>
+        <Modal
+          visible={showImagePicker}
+          animationType="slide"
+          onRequestClose={closeImagePicker}
         >
-          <Icon
-            icon="camera"
-            style={{ width: 60, height: 60, marginBottom: 10 }}
+          <ImagePicker
+            kind={mediaKind}
+            forceAspectRatio={COVER_RATIO}
+            maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
+            onFinished={onMediaSelected}
+            onCancel={closeImagePicker}
+            steps={[
+              SelectImageStepWithFrontCameraByDefault,
+              VideoTimeRangeStep,
+            ]}
+            TopPanelWrapper={ImagePickerCardMediaWrapper}
           />
-          <Text variant="large" style={{ marginBottom: 20 }}>
-            <FormattedMessage
-              defaultMessage="Add a photo"
-              description="Cover editor save phoyo required modal title"
-            />
-          </Text>
-          <Text style={{ marginBottom: 20 }}>
-            <FormattedMessage
-              defaultMessage="Please, use one of your own photo to create your cover"
-              description="Cover editor save photo required modal text"
-            />
-          </Text>
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Select a photo',
-              description:
-                'Cover editor save photo required modal button label',
-            })}
-            onPress={() => {
-              setShowMediaRequiredModal(false);
-              openImagePicker();
+        </Modal>
+        <Modal
+          visible={showMediaRequiredModal}
+          animationType="none"
+          onRequestClose={() => setShowMediaRequiredModal(false)}
+        >
+          <Container
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 20,
             }}
+          >
+            <Icon
+              icon="camera"
+              style={{ width: 60, height: 60, marginBottom: 10 }}
+            />
+            <Text variant="large" style={{ marginBottom: 20 }}>
+              <FormattedMessage
+                defaultMessage="Add a photo"
+                description="Cover editor save phoyo required modal title"
+              />
+            </Text>
+            <Text style={{ marginBottom: 20 }}>
+              <FormattedMessage
+                defaultMessage="Please, use one of your own photo to create your cover"
+                description="Cover editor save photo required modal text"
+              />
+            </Text>
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Select a photo',
+                description:
+                  'Cover editor save photo required modal button label',
+              })}
+              onPress={() => {
+                setShowMediaRequiredModal(false);
+                openImagePicker();
+              }}
+            />
+          </Container>
+        </Modal>
+        {cropMode && (
+          <CoverEditorCropModal
+            visible
+            media={
+              hasSuggestedMedia && suggestedMedia ? suggestedMedia : sourceMedia
+            }
+            maskMedia={coverStyle.segmented ? maskMedia : null}
+            title={title}
+            subTitle={subTitle}
+            timeRange={timeRange}
+            coverStyle={coverStyle}
+            mediaParameters={mediaCropParameter}
+            colorPalette={colorPalette}
+            onClose={toggleCropMode}
+            onSave={onSaveCropData}
           />
-        </Container>
-      </Modal>
-      {cropMode && (
-        <CoverEditorCropModal
-          visible
-          media={sourceMedia}
-          maskMedia={coverStyle.segmented ? maskMedia : null}
-          title={title}
-          subTitle={subTitle}
-          timeRange={timeRange}
-          coverStyle={coverStyle}
-          mediaParameters={mediaCropParameter}
-          colorPalette={colorPalette}
-          onClose={toggleCropMode}
-          onSave={onSaveCropData}
+        )}
+        <UploadProgressModal
+          visible={saving}
+          progressIndicator={uploadProgress}
         />
-      )}
-      <UploadProgressModal
-        visible={saving}
-        progressIndicator={uploadProgress}
-      />
-    </>
+      </>
+    ),
+    [
+      closeImagePicker,
+      colorPalette,
+      coverStyle,
+      cropMode,
+      hasSuggestedMedia,
+      intl,
+      maskMedia,
+      mediaCropParameter,
+      mediaKind,
+      onMediaSelected,
+      onSaveCropData,
+      openImagePicker,
+      saving,
+      showImagePicker,
+      showMediaRequiredModal,
+      sourceMedia,
+      subTitle,
+      suggestedMedia,
+      timeRange,
+      title,
+      toggleCropMode,
+      uploadProgress,
+    ],
   );
 
   return {
@@ -877,20 +922,18 @@ const useCoverEditionManager = ({
     mediaComputationError,
 
     //media visibility
+    templateKind,
     mediaVisible,
     // Media Suggestion
-    isCoverCreation: isCoverCreation.current,
+    suggestedMedia,
+    selectSuggestedMedia: setSuggestedMedia,
     hasSuggestedMedia,
-    hasSourceMediaBeforeSuggested:
-      lastSourceMediaBeforeSuggested.current?.media != null,
-
     // react elements
     modals,
 
     //callbacks
     setTitle,
     setSubTitle,
-    setSuggestedMedia,
     setSourceMedia,
     setCoverStyle,
     toggleCropMode,
@@ -900,6 +943,7 @@ const useCoverEditionManager = ({
     retryMediaComputation,
     updateEditedMediaKind,
     toggleMediaVisibility,
+    setTemplateKind,
     onSave,
   };
 };

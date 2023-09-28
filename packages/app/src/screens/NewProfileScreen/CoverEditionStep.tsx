@@ -29,7 +29,7 @@ const CoverEditionStep = ({
       query CoverEditionStepQuery {
         viewer {
           ...CoverEditor_viewer
-          ...CoverEditor_suggested
+          ...useSuggestedMediaManager_suggested
         }
       }
     `,

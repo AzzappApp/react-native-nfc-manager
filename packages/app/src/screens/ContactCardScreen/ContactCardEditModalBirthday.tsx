@@ -30,8 +30,6 @@ const ContactCardEditModalBirthdays = ({
 
   const intl = useIntl();
 
-  console.log({ field });
-
   return (
     <>
       {field.value && (

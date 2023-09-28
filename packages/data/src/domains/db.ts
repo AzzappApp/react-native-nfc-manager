@@ -26,7 +26,6 @@ export const ConnectionMonitorer = {
   },
   increaseConcurrentRequestsCount() {
     this.concurrentRequestsCount++;
-    console.log('concurrentRequestsCount', this.concurrentRequestsCount);
   },
   decreaseConcurrentRequestsCount() {
     this.concurrentRequestsCount--;

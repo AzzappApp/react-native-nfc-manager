@@ -141,7 +141,7 @@ const query = graphql`
   query CoverEditionScreenQuery {
     viewer {
       ...CoverEditor_viewer
-      ...CoverEditor_suggested
+      ...useSuggestedMediaManager_suggested
       profile {
         ...CoverRenderer_profile
         cardCover {
@@ -164,6 +164,7 @@ export default relayScreen(CoverEditionScreen, {
         query CoverEditionScreenPrefetchQuery {
           viewer {
             ...CoverEditorCustom_viewer
+            ...useSuggestedMediaManager_suggested
             profile {
               ...CoverRenderer_profile
               ...useCoverEditionManager_profile @relay(mask: false)

@@ -30,7 +30,6 @@ export const getMediaSuggestions = async (
   offset?: string | null,
   limit?: number | null,
 ) => {
-  console.log(profileCategoryId, companyActivityId);
   const query = sql`
   SELECT *, RAND(${randomSeed}) as cursor
   FROM MediaSuggestion `;

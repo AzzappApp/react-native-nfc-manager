@@ -71,6 +71,12 @@ export type CoverEditorProps = {
   mediaComputing: boolean;
   showTemplatesMedias: boolean;
   initialSelectedIndex: number;
+  suggestedMedia: {
+    uri: string;
+    kind: 'image' | 'video';
+    width: number;
+    height: number;
+  } | null;
   showSuggestedMedia: boolean;
   onSelectedIndexChange: (index: number) => void;
   onCoverStyleChange: (data: CoverStyleData) => void;
@@ -100,6 +106,7 @@ const CoverEditorTemplateList = ({
   mediaComputing,
   showTemplatesMedias,
   initialSelectedIndex,
+  suggestedMedia,
   showSuggestedMedia,
   onCoverStyleChange,
   onColorPaletteChange,
@@ -252,8 +259,8 @@ const CoverEditorTemplateList = ({
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
         media:
-          showSuggestedMedia && media
-            ? media
+          showSuggestedMedia && suggestedMedia
+            ? suggestedMedia
             : displayTemplateMedia
             ? {
                 uri: previewMedia.uri,
@@ -329,13 +336,14 @@ const CoverEditorTemplateList = ({
     currentCoverStyle,
     media,
     colorPalettes,
+    cardColors,
     showTemplatesMedias,
     title,
     subTitle,
     showSuggestedMedia,
+    suggestedMedia,
     mediaCropParameters,
     maskUri,
-    cardColors,
   ]);
 
   const [selectedItem, setSelectedItem] = useState<TemplateListItem | null>(
