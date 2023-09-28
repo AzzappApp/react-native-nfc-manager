@@ -1,6 +1,5 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -10,14 +9,13 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackground';
 import WebCardColorPicker from '#components/WebCardColorPicker';
-import Button from '#ui/Button';
-import Text from '#ui/Text';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
+import ProfileScreenEditModeFooter from './ProfileScreenEditModeFooter';
 import ProfileScreenFooter from './ProfileScreenFooter';
 import ProfileScreenHeader from './ProfileScreenHeader';
 import ProfileScreenScrollView from './ProfileScreenScrollView';
@@ -271,8 +269,6 @@ const ProfileScreenContent = ({
     };
   }, []);
 
-  const intl = useIntl();
-
   return (
     <>
       <View style={{ flex: 1 }}>
@@ -318,27 +314,7 @@ const ProfileScreenContent = ({
               onModulesCountChange={setModulesCount}
             />
             {editing && (
-              <>
-                <View style={styles.loadTemplate}>
-                  <Text style={styles.loadDescription}>
-                    {intl.formatMessage({
-                      defaultMessage:
-                        'You can completly change your WebCard by loading a new template',
-                      description:
-                        'ProfileScreenBody description to load a new template',
-                    })}
-                  </Text>
-                  <Button
-                    variant="secondary"
-                    label={intl.formatMessage({
-                      defaultMessage: 'Load a new WebCard template',
-                      description:
-                        'ProfileScreenBody button to load a new template',
-                    })}
-                    onPress={() => setLoadTemplate(true)}
-                  />
-                </View>
-              </>
+              <ProfileScreenEditModeFooter setLoadTemplate={setLoadTemplate} />
             )}
           </Suspense>
         </ProfileScreenScrollView>
@@ -419,19 +395,5 @@ const ProfileScreenContent = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  loadTemplate: {
-    marginTop: 30,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 20,
-    alignItems: 'center',
-  },
-  loadDescription: {
-    textAlign: 'center',
-    color: colors.grey700,
-  },
-});
 
 export default ProfileScreenContent;
