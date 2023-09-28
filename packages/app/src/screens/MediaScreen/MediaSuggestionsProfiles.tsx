@@ -175,7 +175,7 @@ const CoverLinkWithOptions = ({
       <CoverLink {...props} width={135} />
       <View style={styles.bottomActions}>
         <Button
-          variant="little_round"
+          variant={isFollowing ? 'little_round_inverted' : 'little_round'}
           label={
             isFollowing
               ? intl.formatMessage({
@@ -231,4 +231,5 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     alignItems: 'center',
   },
+  followButton: {},
 }));

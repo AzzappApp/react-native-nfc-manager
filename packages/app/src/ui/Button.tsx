@@ -14,7 +14,7 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: string;
-  variant?: 'little_round' | 'primary' | 'secondary';
+  variant?: 'little_round_inverted' | 'little_round' | 'primary' | 'secondary';
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
@@ -163,6 +163,24 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     disabled: {
       color: appearance === 'light' ? colors.grey200 : colors.grey900,
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
+      backgroundColor: 'transparent',
+    },
+  },
+  little_round_inverted: {
+    root: {
+      backgroundColor: appearance === 'light' ? colors.black : colors.white,
+      borderColor: appearance === 'light' ? colors.white : colors.black,
+      borderWidth: 1,
+      height: 29,
+      borderRadius: 29,
+      paddingHorizontal: 15,
+    },
+    label: {
+      color: appearance === 'light' ? colors.white : colors.black,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey900 : colors.grey200,
+      borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
       backgroundColor: 'transparent',
     },
   },
