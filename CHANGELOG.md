@@ -1,5 +1,7 @@
-## 0.4.2-canary.15
+## 0.4.2-canary.16
 
+* **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) push duplicated module at the end ([#1275](https://github.com/AzzappApp/azzapp/pull/1275))
+* **fix:**  - apply revert scale to the profileScreenEditModeFooter, remove ar… ([#1274](https://github.com/AzzappApp/azzapp/pull/1274))
 * **build:**  - upgrade to react native 0.72 ([#1267](https://github.com/AzzappApp/azzapp/pull/1267))
 * **fix:**  - 🐛 allow change of profile kind during creation ([#1272](https://github.com/AzzappApp/azzapp/pull/1272))
 * **fix:**  - **profile:** [#801](https://github.com/AzzappApp/azzapp/pull/801) change card rotation behaviour ([#1250](https://github.com/AzzappApp/azzapp/pull/1250))
