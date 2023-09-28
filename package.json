@@ -96,7 +96,6 @@
   },
   "resolutions": {
     "@types/react": "^18.2.20",
-    "graphql": "^16.8.0",
-    "node-pty": "1.0.0"
+    "graphql": "^16.8.0"
   }
 }
