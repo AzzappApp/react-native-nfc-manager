@@ -9,7 +9,7 @@ require('@testing-library/jest-native/extend-expect');
 
 //#region Native Dependencies mock
 // Reanimated Mock
-require('react-native-reanimated/lib/reanimated2/jestUtils').setUpTests();
+require('react-native-reanimated/lib/module/reanimated2/jestUtils').setUpTests();
 global.ReanimatedDataMock = {
   now: () => Date.now(),
 };

@@ -1,18 +1,13 @@
 import Lottie from 'lottie-react-native';
 import { useColorScheme } from 'react-native';
-import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 export type ActivityIndicatorProps = {
   style?: StyleProp<ViewStyle>;
-  containerProps?: ViewProps;
   color?: 'black' | 'white';
 };
 
-function ActivityIndicator({
-  style,
-  containerProps,
-  color,
-}: ActivityIndicatorProps) {
+function ActivityIndicator({ style, color }: ActivityIndicatorProps) {
   const colorScheme = useColorScheme() ?? 'light';
   color = color ?? (colorScheme === 'dark' ? 'white' : 'black');
   return (
@@ -27,7 +22,6 @@ function ActivityIndicator({
       autoPlay
       loop
       hardwareAccelerationAndroid
-      containerProps={containerProps}
       style={[style, { width: 51, height: 40 }]}
     />
   );

@@ -80,13 +80,13 @@ const ProfileScreenScrollView = ({
   const editTransiton = useEditTransition();
   const containerStyle = useAnimatedStyle(() => {
     return {
-      top: editTransiton.value * (insets.top + HEADER_HEIGHT),
+      top: (editTransiton?.value ?? 0) * (insets.top + HEADER_HEIGHT),
     };
   });
 
   const contentContainerStyle = useAnimatedStyle(() => {
     return {
-      paddingTop: editTransiton.value * 20,
+      paddingTop: (editTransiton?.value ?? 0) * 20,
     };
   });
 
@@ -96,13 +96,13 @@ const ProfileScreenScrollView = ({
       transform: [
         {
           translateY: interpolate(
-            editTransiton.value,
+            editTransiton?.value ?? 0,
             [0, 1],
             [0, (contentHeight * editScale) / 2 - contentHeight / 2],
           ),
         },
         {
-          scale: interpolate(editTransiton.value, [0, 1], [1, editScale]),
+          scale: interpolate(editTransiton?.value ?? 0, [0, 1], [1, editScale]),
         },
       ],
     };

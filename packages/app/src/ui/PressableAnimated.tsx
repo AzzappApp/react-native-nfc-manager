@@ -3,17 +3,18 @@ import { Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import type { ForwardedRef } from 'react';
-import type { PressableProps, View, ViewStyle } from 'react-native';
+import type { PressableProps, StyleProp, View, ViewStyle } from 'react-native';
 import type {
-  AnimateProps,
+  AnimatedProps,
+  AnimatedStyle,
   BaseAnimationBuilder,
   EntryExitAnimationFunction,
   LayoutAnimationFunction,
 } from 'react-native-reanimated';
 
 export type PressableAnimatedProps = Exclude<PressableProps, 'style'> & {
-  style?: Animated.AnimateStyle<ViewStyle>;
-  animatedProps?: Partial<AnimateProps<PressableProps>>;
+  style?: StyleProp<AnimatedStyle<ViewStyle>>;
+  animatedProps?: Partial<AnimatedProps<PressableProps>>;
   layout?:
     | BaseAnimationBuilder
     | LayoutAnimationFunction

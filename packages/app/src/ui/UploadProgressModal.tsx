@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressBarWidth: { width: '75°%' },
+  progressBarWidth: { width: '75%' },
   text: {
     color: colors.white,
     width: '75%',

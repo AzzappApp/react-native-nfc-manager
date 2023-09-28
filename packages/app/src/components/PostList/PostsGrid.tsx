@@ -90,15 +90,16 @@ const PostsGrid = ({
       StyleSheet.flatten(postsContainerStyle ?? {});
 
     let offsetTop = paddingTop ?? paddingVertical ?? padding ?? 0;
+
     let offsetBottom = paddingBottom ?? paddingVertical ?? padding ?? 0;
-    if (typeof offsetTop === 'string' || typeof offsetBottom === 'string') {
+    if (typeof offsetTop !== 'number' || typeof offsetBottom !== 'number') {
       console.warn(
         'PostGrid: percent padding are not supported in postsContainerStyle',
       );
-      if (typeof offsetTop === 'string') {
+      if (typeof offsetTop !== 'number') {
         offsetTop = 0;
       }
-      if (typeof offsetBottom === 'string') {
+      if (typeof offsetBottom !== 'number') {
         offsetBottom = 0;
       }
     }

@@ -73,13 +73,13 @@ const ProfileScreenHeader = ({
   const intl = useIntl();
 
   const editHeaderStyle = useAnimatedStyle(() => ({
-    height: editTransition.value * (HEADER_HEIGHT + 4),
-    marginTop: editTransition.value * inset.top,
-    opacity: editTransition.value,
+    height: (editTransition?.value ?? 0) * (HEADER_HEIGHT + 4),
+    marginTop: (editTransition?.value ?? 0) * inset.top,
+    opacity: editTransition?.value ?? 0,
   }));
 
   const closeStyle = useAnimatedStyle(() => ({
-    opacity: 1 - editTransition.value,
+    opacity: 1 - (editTransition?.value ?? 0),
   }));
 
   return (

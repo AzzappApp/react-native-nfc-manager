@@ -14,9 +14,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
 import { createId } from '#helpers/idHelpers';
 import type { Route, ROUTES } from '#routes';
-import type { ComponentType, ReactNode, Provider } from 'react';
+import type { ComponentType, ReactNode, Provider, Ref } from 'react';
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native';
-import type { ScreenProps } from 'react-native-screens';
+import type { NativeScreen, ScreenProps } from 'react-native-screens';
 
 // TODO some use case of TABS usage and screen listener might be wrong
 
@@ -594,7 +594,7 @@ export type ScreenOptions = Omit<
   | 'onTransitionProgress'
   | 'onWillAppear'
   | 'onWillDisappear'
->;
+> & { ref?: Ref<NativeScreen> };
 
 export type NativeScreenProps<T extends Route> = {
   screenId: string;
@@ -611,7 +611,7 @@ type ScreensRendererProps = {
   routerState: RouterState;
   screens: ScreenMap;
   tabs?: TabsMap;
-  defaultScreenOptions?: ScreenOptions;
+  defaultScreenOptions?: ScreenOptions | null;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 };
@@ -749,7 +749,7 @@ const StackRenderer = ({
   stack: StackState;
   screens: ScreenMap;
   tabsRenderers: TabsMap;
-  defaultScreenOptions?: ScreenOptions;
+  defaultScreenOptions?: ScreenOptions | null;
   isModal?: boolean;
   hasFocus?: boolean;
   children?: ReactNode;
@@ -821,7 +821,7 @@ const TabsRenderer = ({
   tabState: TabsState;
   tabsRenderers: TabsMap;
   screens: ScreenMap;
-  defaultScreenOptions?: ScreenOptions;
+  defaultScreenOptions?: ScreenOptions | null;
   hasFocus?: boolean;
   onScreenDismissed?: (id: string) => void;
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
@@ -907,7 +907,7 @@ type ScreenRendererProps = Route & {
   screens: ScreenMap;
   activityState?: 0 | 1 | 2;
   isNativeStack?: boolean;
-  defaultScreenOptions?: ScreenOptions;
+  defaultScreenOptions?: ScreenOptions | null;
   isModal?: boolean;
   hasFocus?: boolean;
   onDismissed?: () => void;

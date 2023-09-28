@@ -14,7 +14,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import type { ForwardedRef, ReactElement, Ref } from 'react';
+import type { ForwardedRef, PropsWithChildren, ReactElement, Ref } from 'react';
 import type {
   ListRenderItem,
   StyleProp,
@@ -171,11 +171,10 @@ function CarouselSelectList<TItem = any>(
       children,
       style: _,
       ...props
-    }: {
+    }: PropsWithChildren<{
       index: number;
       style: StyleProp<ViewStyle>;
-      children: React.ReactElement;
-    }) => {
+    }>) => {
       const inputRange = [index - 1, index, index + 1];
       const offset = (itemWidth - itemWidth * scaleRatio) / 2;
       const offetCenter = (width - itemWidth) / 2 - itemWidth * scaleRatio;
@@ -194,16 +193,8 @@ function CarouselSelectList<TItem = any>(
           Extrapolate.EXTEND,
         );
 
-        const zIndex = interpolate(
-          scrollX.value / itemWidth,
-          [index - 1, index, index + 1],
-          [0, 2, 0],
-          Extrapolate.CLAMP,
-        );
-
         return {
           transform: [{ translateX }, { scale }],
-          zIndex,
         };
       }, [scrollX]);
 

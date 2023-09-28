@@ -83,12 +83,12 @@ const ProfileScreenButtonBar = ({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: interpolate(
-        editTransition.value,
+        editTransition?.value ?? 0,
         [0, 0.2, 0.8, 1],
         [1, 0.1, 0.0, 0],
       ),
     };
-  }, [editTransition.value]);
+  }, [editTransition?.value]);
 
   return (
     <Animated.View

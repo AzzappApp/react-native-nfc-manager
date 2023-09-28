@@ -53,7 +53,7 @@ const CountrySelector = ({
         if (localesCountries.has(a.code) && localesCountries.has(b.code)) {
           return localesCountries.get(a.code)! - localesCountries.get(b.code)!;
         }
-        return a.name.localeCompare(b.name);
+        return a.name ? (b.name ? a.name.localeCompare(b.name) : 1) : -1;
       });
   }, [locale]);
 
@@ -83,7 +83,7 @@ export default CountrySelector;
 
 type CountryItem = {
   callingCode: string;
-  name: string;
+  name?: string;
   code: CountryCode;
 };
 

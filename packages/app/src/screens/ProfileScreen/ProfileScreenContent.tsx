@@ -267,7 +267,7 @@ const ProfileScreenContent = ({
 
   const backgroundStyle = useAnimatedStyle(() => {
     return {
-      opacity: 1 - editTransiton.value,
+      opacity: 1 - (editTransiton?.value ?? 0),
     };
   }, []);
 

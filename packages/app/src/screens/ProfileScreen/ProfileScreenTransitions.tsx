@@ -9,19 +9,12 @@ import { EDIT_TRANSITION_DURATION } from './profileScreenHelpers';
 const EditTranstionContext = createContext<{
   edit: SharedValue<number>;
   selection: SharedValue<number>;
-}>({
-  edit: {
-    value: 0,
-  },
-  selection: {
-    value: 0,
-  },
-});
+} | null>(null);
 
-export const useEditTransition = () => useContext(EditTranstionContext).edit;
+export const useEditTransition = () => useContext(EditTranstionContext)?.edit;
 
 export const useSelectionModeTransition = () =>
-  useContext(EditTranstionContext).selection;
+  useContext(EditTranstionContext)?.selection;
 
 export type ProfileScreenEditTransitionProviderProps = {
   editing: boolean;

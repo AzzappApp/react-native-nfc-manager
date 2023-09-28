@@ -171,10 +171,11 @@ const ProfileScreenFooter = ({
   const selectionModeTransition = useSelectionModeTransition();
 
   const bottomMenuStyle = useAnimatedStyle(() => ({
-    opacity: editTransition.value - selectionModeTransition.value,
+    opacity:
+      (editTransition?.value ?? 0) - (selectionModeTransition?.value ?? 0),
   }));
   const selectionMenuStyle = useAnimatedStyle(() => ({
-    opacity: editing ? selectionModeTransition.value : 0,
+    opacity: editing ? selectionModeTransition?.value ?? 0 : 0,
   }));
   return (
     <>

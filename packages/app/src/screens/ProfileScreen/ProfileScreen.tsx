@@ -103,7 +103,7 @@ const ProfileScreen = ({
   useEffect(() => {
     const animation: ScreenOptions =
       showPost || !isAtTop
-        ? { stackAnimation: 'slide_from_bottom' }
+        ? ({ stackAnimation: 'slide_from_bottom' } as const)
         : animatedTransitionFactory(params);
     setOptions({
       gestureEnabled: !editing && !showPost,

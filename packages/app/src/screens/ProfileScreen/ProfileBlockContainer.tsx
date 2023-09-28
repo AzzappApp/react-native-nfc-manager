@@ -270,19 +270,20 @@ const ProfileBlockContainer = ({
 
   // gap doesn't work on reanimated 2
   const blockStyle = useAnimatedStyle(() => ({
-    marginVertical: editingTransition.value * 20,
+    marginVertical: (editingTransition?.value ?? 0) * 20,
   }));
 
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      editingTransition.value * (COVER_CARD_RADIUS + 1) * windowWith,
+      (editingTransition?.value ?? 0) * (COVER_CARD_RADIUS + 1) * windowWith,
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
 
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
-    borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
+    borderRadius:
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith,
     overflow: 'hidden',
     opacity: interpolate(touchActive.value, [0, 1], [1, 0.2]),
   }));
@@ -298,19 +299,19 @@ const ProfileBlockContainer = ({
   const moveButtonStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      editingTransition.value - Math.abs(dragX.value) / dragRightLimit,
+      (editingTransition?.value ?? 0) - Math.abs(dragX.value) / dragRightLimit,
     ),
   }));
 
   const leftSectionStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      dragX.value / dragRightLimit - selectionModeTransition.value,
+      dragX.value / dragRightLimit - (selectionModeTransition?.value ?? 0),
     ),
   }));
 
   const selectionSectionStyle = useAnimatedStyle(() => ({
-    opacity: selectionModeTransition.value,
+    opacity: selectionModeTransition?.value ?? 0,
   }));
 
   const rightSectionStyle = useAnimatedStyle(() => ({

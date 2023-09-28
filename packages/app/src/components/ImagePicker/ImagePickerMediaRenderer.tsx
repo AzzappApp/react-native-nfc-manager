@@ -50,8 +50,8 @@ const ImagePickerMediaRenderer = ({
     // Displaying edited video and exporting is too much for android
     const sizeStyles =
       aspectRatio > 1
-        ? { aspectRatio, width: '100%' }
-        : { aspectRatio, height: '100%' };
+        ? ({ aspectRatio, width: '100%' } as const)
+        : ({ aspectRatio, height: '100%' } as const);
 
     return (
       <View
