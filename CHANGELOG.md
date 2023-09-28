@@ -1,5 +1,7 @@
-## 0.4.2-canary.12
+## 0.4.2-canary.13
 
+* **fix:**  - section title in light mode ([#1271](https://github.com/AzzappApp/azzapp/pull/1271))
+* **fix:**  - rework managmeent of suggested media ([#1268](https://github.com/AzzappApp/azzapp/pull/1268))
 * **fix:**  - wrong management on composite keys ([#1265](https://github.com/AzzappApp/azzapp/pull/1265))
 * **style:**  - **webcard:** [#1194](https://github.com/AzzappApp/azzapp/pull/1194) change toggle desktop/mobile buttons ([#1257](https://github.com/AzzappApp/azzapp/pull/1257))
 * **fix:**  - **webcard:** [#600](https://github.com/AzzappApp/azzapp/pull/600) wrong title in text area modal on modules ([#1260](https://github.com/AzzappApp/azzapp/pull/1260))
