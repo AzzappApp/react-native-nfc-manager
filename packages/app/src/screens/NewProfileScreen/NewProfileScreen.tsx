@@ -182,13 +182,14 @@ export const NewProfileScreen = ({
               defaultMessage: 'Provide more details',
               description: 'Profile creation form title for business profile',
             }),
-      element: profileCategory ? (
-        <ProfileForm
-          profileKind={profileKind!}
-          profileCategory={profileCategory}
-          onProfileCreated={onProfileCreated}
-        />
-      ) : null,
+      element:
+        profileCategory && currentStepIndex === 1 ? (
+          <ProfileForm
+            profileKind={profileKind!}
+            profileCategory={profileCategory}
+            onProfileCreated={onProfileCreated}
+          />
+        ) : null,
       backIcon: 'arrow_left' as const,
     },
     {
