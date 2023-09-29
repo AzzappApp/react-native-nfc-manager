@@ -201,7 +201,7 @@ const ItemRenderComponent = ({
         id
         userName
         cardCover {
-          title
+          isCreated
         }
         ...CoverLink_profile
         ...CoverRenderer_profile
@@ -261,7 +261,7 @@ const ItemRenderComponent = ({
         },
       ]}
     >
-      {profile.cardCover ? (
+      {profile.cardCover?.isCreated ? (
         <CoverLink
           profile={profile}
           width={coverWidth}

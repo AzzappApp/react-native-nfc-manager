@@ -31,7 +31,7 @@ export const Profile: ProfileResolvers = {
     if (!profile.cardIsPublished && auth.userId !== profile.userId) {
       return null;
     }
-    if (!profile.coverData || !profile.coverTitle) {
+    if (!profile.coverData) {
       return null;
     }
     return profile;

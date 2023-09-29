@@ -2,6 +2,10 @@
 Web Card Cover
 """
 type CardCover {
+  """ 
+  if the card exist(has at least a mediaId)
+  """
+  isCreated: Boolean!
   """
   The title of the card
   """

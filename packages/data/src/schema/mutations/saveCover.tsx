@@ -68,11 +68,11 @@ const saveCover: MutationResolvers['saveCover'] = async (
       };
       const { title, subTitle, ...coverData } = input;
       let hasUpdates = false;
-      if (title) {
+      if (title != null) {
         updates.coverTitle = title;
         hasUpdates = true;
       }
-      if (subTitle) {
+      if (subTitle != null) {
         updates.coverSubTitle = subTitle;
         hasUpdates = true;
       }
@@ -122,13 +122,13 @@ const saveCover: MutationResolvers['saveCover'] = async (
 export default saveCover;
 
 const creationValidator = z.object({
-  title: z.string().min(1).max(191),
+  title: z.string().min(0).max(191).nullable(),
   mediaId: z.string(),
   sourceMediaId: z.string(),
 });
 
 const updateValidator = z.object({
-  title: z.string().min(1).max(191).optional(),
+  title: z.string().min(0).max(191).optional().nullable(),
   mediaId: z.string().optional(),
   sourceMediaId: z.string().optional(),
 });
