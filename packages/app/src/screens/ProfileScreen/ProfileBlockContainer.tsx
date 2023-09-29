@@ -276,14 +276,15 @@ const ProfileBlockContainer = ({
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      (editingTransition?.value ?? 0) * (COVER_CARD_RADIUS + 1) * windowWith,
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith,
+    overflow: 'hidden',
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
 
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith,
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith - 2,
     overflow: 'hidden',
     opacity: interpolate(touchActive.value, [0, 1], [1, 0.2]),
   }));
