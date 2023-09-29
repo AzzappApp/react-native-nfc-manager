@@ -1,4 +1,4 @@
-## 0.4.2-canary.22
+## 0.4.2-canary.23
 
 * **fix:**  - [#1294](https://github.com/AzzappApp/azzapp/pull/1294) start progress indicator on save action ([#1299](https://github.com/AzzappApp/azzapp/pull/1299))
 * **fix:**  - lint issue ([#1293](https://github.com/AzzappApp/azzapp/pull/1293))
