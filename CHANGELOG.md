@@ -1,5 +1,6 @@
-## 0.4.2-canary.21
+## 0.4.2-canary.22
 
+* **fix:**  - [#1294](https://github.com/AzzappApp/azzapp/pull/1294) start progress indicator on save action ([#1299](https://github.com/AzzappApp/azzapp/pull/1299))
 * **fix:**  - lint issue ([#1293](https://github.com/AzzappApp/azzapp/pull/1293))
 * **perf:**  - [#801](https://github.com/AzzappApp/azzapp/pull/801) 🐌 slow card flip ([#1292](https://github.com/AzzappApp/azzapp/pull/1292))
 * **fix:**  - [#1079](https://github.com/AzzappApp/azzapp/pull/1079) toast is hidden when opened previously behind modal ([#1286](https://github.com/AzzappApp/azzapp/pull/1286))
