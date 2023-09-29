@@ -277,7 +277,7 @@ const ProfileBlockContainer = ({
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
       (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith,
-    overflow: 'hidden',
+    overflow: 'visible',
     backgroundColor,
     transform: [{ translateX: dragX.value }],
   }));
