@@ -328,9 +328,11 @@ const useCoverEditionManager = ({
   });
 
   const updateEditedMediaKind = useCallback(
-    (kind: 'image' | 'mixed' | 'video') => {
+    (kind: TemplateKind) => {
       unstable_batchedUpdates(() => {
-        if (kind === 'video' && mediaKind === 'image') {
+        setTemplateKind(kind);
+        const newMediaKind = kind === 'video' ? 'video' : 'image';
+        if (newMediaKind === 'video' && mediaKind === 'image') {
           mediaInfosRef.current.image = {
             sourceMedia,
             maskMedia,
@@ -340,7 +342,8 @@ const useCoverEditionManager = ({
           setSourceMedia(videoInfos?.sourceMedia ?? null);
           setMaskMedia(null);
           setMediaCropParameter(videoInfos?.mediaCropParameter ?? null);
-        } else if (kind === 'image' && mediaKind === 'video') {
+          setMediaVisible(videoInfos?.sourceMedia != null);
+        } else if (newMediaKind === 'image' && mediaKind === 'video') {
           mediaInfosRef.current.video = {
             sourceMedia,
             maskMedia,
@@ -350,11 +353,22 @@ const useCoverEditionManager = ({
           setSourceMedia(imageInfos?.sourceMedia ?? null);
           setMaskMedia(imageInfos?.maskMedia ?? null);
           setMediaCropParameter(imageInfos?.mediaCropParameter ?? null);
+          setMediaVisible(imageInfos?.sourceMedia != null);
         }
-        setMediaKind(kind);
+        if (profile?.profileKind === 'business') {
+          selectSuggestedMedia(kind);
+        }
+        setMediaKind(newMediaKind);
       });
     },
-    [maskMedia, mediaCropParameter, mediaKind, sourceMedia],
+    [
+      maskMedia,
+      mediaCropParameter,
+      mediaKind,
+      profile?.profileKind,
+      selectSuggestedMedia,
+      sourceMedia,
+    ],
   );
   //#endregion
 
@@ -518,7 +532,12 @@ const useCoverEditionManager = ({
 
   const intl = useIntl();
 
+  const activeSourceMedia = useMemo(() => {
+    return hasSuggestedMedia && suggestedMedia ? suggestedMedia : sourceMedia;
+  }, [hasSuggestedMedia, sourceMedia, suggestedMedia]);
+
   const onSave = useCallback(async () => {
+    //we defined it again because we need to remove the id
     const activeSourceMedia =
       hasSuggestedMedia && suggestedMedia
         ? {
@@ -705,9 +724,9 @@ const useCoverEditionManager = ({
 
         if (sourceMediaId) {
           saveCoverInput.sourceMediaId = sourceMediaId;
-        } else if (profile?.profileKind === 'business' && sourceMedia) {
+        } else if (profile?.profileKind === 'business' && activeSourceMedia) {
           // case when using a suggested media for business
-          saveCoverInput.sourceMediaId = sourceMedia?.id ?? null;
+          saveCoverInput.sourceMediaId = activeSourceMedia?.id ?? null;
         }
         if (maskMediaId) {
           saveCoverInput.maskMediaId = maskMediaId;
@@ -765,6 +784,7 @@ const useCoverEditionManager = ({
       },
     });
   }, [
+    activeSourceMedia,
     hasSuggestedMedia,
     suggestedMedia,
     sourceMedia,
@@ -900,7 +920,7 @@ const useCoverEditionManager = ({
     // Cover data
     title,
     subTitle,
-    sourceMedia,
+    sourceMedia: activeSourceMedia,
     maskMedia,
     mediaCropParameter,
     coverStyle,

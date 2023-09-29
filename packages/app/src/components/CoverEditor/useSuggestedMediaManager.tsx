@@ -70,7 +70,7 @@ const useSuggestedMediaManager = (
     }
   }, [suggestedMediaData?.suggestedMedias]);
 
-  const [selectedSuggestedIndex, setSelectedSuggestedVideoIndex] = useState({
+  const [selectedSuggestedIndex, setSelectedSuggestedIndex] = useState({
     video: 0,
     others: 0,
     people: 0,
@@ -93,7 +93,6 @@ const useSuggestedMediaManager = (
       if (templateKind === 'people') {
         return null;
       }
-
       const newIndex =
         selectedSuggestedIndex[templateKind] >=
         suggestedMedias[templateKind].length - 1
@@ -117,7 +116,7 @@ const useSuggestedMediaManager = (
         ) {
           loadNextSuggestion(50);
         }
-        setSelectedSuggestedVideoIndex(prev => ({
+        setSelectedSuggestedIndex(prev => ({
           ...prev,
           [templateKind]: newIndex,
         }));

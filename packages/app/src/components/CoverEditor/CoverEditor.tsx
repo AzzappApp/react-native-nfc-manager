@@ -254,19 +254,11 @@ const CoverEditor = (
         // but it's not perfect, and we would need to use react 18 concurrent mode
         unstable_batchedUpdates(() => {
           setTemplateKind(kind);
-          updateEditedMediaKind(kind === 'video' ? 'video' : 'image');
-          if (showSuggestedMedia) {
-            selectSuggestedMedia(kind);
-          }
+          updateEditedMediaKind(kind);
         });
       });
     },
-    [
-      selectSuggestedMedia,
-      setTemplateKind,
-      showSuggestedMedia,
-      updateEditedMediaKind,
-    ],
+    [setTemplateKind, updateEditedMediaKind],
   );
 
   // #region canSave
