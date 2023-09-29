@@ -5,6 +5,7 @@ import { Modal, unstable_batchedUpdates } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   DEFAULT_COLOR_LIST,
@@ -535,6 +536,7 @@ const useCoverEditionManager = ({
   const { setProgressIndicator } = useProgressModal();
 
   const onSave = useCallback(async () => {
+    setProgressIndicator(Observable.from(0));
     //we defined it again because we need to remove the id
     const activeSourceMedia =
       hasSuggestedMedia && suggestedMedia

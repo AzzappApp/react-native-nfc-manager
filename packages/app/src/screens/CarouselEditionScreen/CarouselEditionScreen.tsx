@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
@@ -188,9 +189,8 @@ const CarouselEditionScreen = ({
   };
 
   // #region Mutations and saving logic
-  const [saving, setSaving] = useState(false);
-  const [commit] = useMutation<CarouselEditionScreenUpdateModuleMutation>(
-    graphql`
+  const [commit, saving] =
+    useMutation<CarouselEditionScreenUpdateModuleMutation>(graphql`
       mutation CarouselEditionScreenUpdateModuleMutation(
         $input: SaveCarouselModuleInput!
       ) {
@@ -205,8 +205,7 @@ const CarouselEditionScreen = ({
           }
         }
       }
-    `,
-  );
+    `);
 
   const isValid = images.length > 0;
   const canSave = dirty && isValid && !saving;
@@ -219,7 +218,7 @@ const CarouselEditionScreen = ({
     if (!canSave) {
       return;
     }
-    setSaving(true);
+    setProgressIndicator(Observable.from(0));
     const { images, ...rest } = value;
 
     let mediasMap: Record<
@@ -294,7 +293,6 @@ const CarouselEditionScreen = ({
           }),
         });
         setProgressIndicator(null);
-        setSaving(false);
         return;
       }
     }

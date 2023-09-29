@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
@@ -214,6 +215,7 @@ const HorizontalPhotoEditionScreen = ({
     if (!canSave) {
       return;
     }
+    setProgressIndicator(Observable.from(0));
     const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
