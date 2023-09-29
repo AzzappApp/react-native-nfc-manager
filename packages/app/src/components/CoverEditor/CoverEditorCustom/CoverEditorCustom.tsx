@@ -115,7 +115,6 @@ const CoverEditorCustom = ({
     title,
     subTitle,
     maskMedia,
-    sourceMedia,
     activeSourceMedia,
     mediaCropParameter,
     coverStyle,
