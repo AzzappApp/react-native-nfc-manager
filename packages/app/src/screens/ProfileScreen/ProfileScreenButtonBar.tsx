@@ -53,7 +53,7 @@ type ProfileScreenButtonBarProps = ViewProps & {
   /**
    * A callback called when the user press flip button
    */
-  onFlip: () => void;
+  onFlip?: () => void;
   /**
    * A callback called when the user press the more ... button
    */

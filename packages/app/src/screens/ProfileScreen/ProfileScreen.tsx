@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
@@ -29,6 +29,7 @@ import ProfileWebCardModal from './ProfileWebcardModal';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ProfileRoute } from '#routes';
+import type { CardFlipSwitchRef } from './CardFlipSwitch';
 import type { ProfileScreenByIdQuery } from '@azzapp/relay/artifacts/ProfileScreenByIdQuery.graphql';
 import type { ProfileScreenByUserNameQuery } from '@azzapp/relay/artifacts/ProfileScreenByUserNameQuery.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -118,6 +119,7 @@ const ProfileScreen = ({
   }, [setOptions, showPost, editing, params, isAtTop]);
 
   const onToggleFollow = useToggleFollow(auth.profileId);
+  const ref = useRef<CardFlipSwitchRef>(null);
 
   if (!data.profile) {
     return null;
@@ -136,6 +138,7 @@ const ProfileScreen = ({
       >
         <View style={{ flex: 1 }}>
           <CardFlipSwitch
+            ref={ref}
             style={{ flex: 1 }}
             flipped={showPost}
             disabled={editing}
@@ -173,7 +176,7 @@ const ProfileScreen = ({
             isWebCardDisplayed={!showPost}
             onEdit={toggleEditing}
             onToggleFollow={onToggleFollow}
-            onFlip={toggleFlip}
+            onFlip={ref.current?.triggerFlip}
             onShowWebcardModal={onShowWebcardModal}
           />
         </View>
