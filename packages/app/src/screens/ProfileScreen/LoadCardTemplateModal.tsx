@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -16,11 +16,14 @@ import Text from '#ui/Text';
 type LoadCardTemplateModalProps = {
   onClose: () => void;
   visible: boolean;
+  showWarning: boolean;
 };
 
-const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
-  const { visible, onClose } = props;
-
+const LoadCardTemplateModal = ({
+  onClose,
+  visible,
+  showWarning,
+}: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
 
   const intl = useIntl();
@@ -30,31 +33,47 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
-  const onSubmit = () => {
-    if (!cardTemplateId) return;
-
-    commit({
-      variables: {
-        loadCardTemplateInput: {
-          cardTemplateId,
+  const commitCardTemplate = useCallback(
+    (id: string) => {
+      commit({
+        variables: {
+          loadCardTemplateInput: {
+            cardTemplateId: id,
+          },
         },
-      },
-      onCompleted: () => {
-        setCardTemplateId(null);
-        onClose();
-      },
-      onError: error => {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could not load the template',
-            description: 'Load card template modal error toast',
-          }),
-        });
-      },
-    });
-  };
+        onCompleted: () => {
+          setCardTemplateId(null);
+          onClose();
+        },
+        onError: error => {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not load the template',
+              description: 'Load card template modal error toast',
+            }),
+          });
+        },
+      });
+    },
+    [commit, intl, onClose],
+  );
+
+  const onSubmit = useCallback(() => {
+    if (!cardTemplateId) return;
+    commitCardTemplate(cardTemplateId);
+  }, [cardTemplateId, commitCardTemplate]);
+
+  const applyTemplate = useCallback(
+    (templateId: string) => {
+      setCardTemplateId(templateId);
+      if (!showWarning) {
+        commitCardTemplate(templateId);
+      }
+    },
+    [commitCardTemplate, showWarning],
+  );
 
   return (
     <Modal animationType="none" visible={visible}>
@@ -88,9 +107,7 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
         >
           <CardTemplateList
             height={height}
-            onApplyTemplate={(cardTemplateId: string) =>
-              setCardTemplateId(cardTemplateId)
-            }
+            onApplyTemplate={applyTemplate}
             loading={inFlight}
           />
         </Suspense>
@@ -98,7 +115,7 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
 
       <Modal
         animationType="none"
-        visible={visible && !!cardTemplateId && !inFlight}
+        visible={visible && !!cardTemplateId && !inFlight && showWarning}
         style={{ zIndex: 1000 }}
       >
         <Container style={styles.confirmation}>

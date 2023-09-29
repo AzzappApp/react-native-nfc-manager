@@ -93,6 +93,9 @@ const ProfileScreenContent = ({
         cardCover {
           backgroundColor
         }
+        cardModules {
+          id
+        }
         cardColors {
           primary
           dark
@@ -383,6 +386,7 @@ const ProfileScreenContent = ({
             <LoadCardTemplateModal
               onClose={() => setLoadTemplate(false)}
               visible={loadTemplate}
+              showWarning={profile.cardModules?.length > 0}
             />
             <WebCardColorPicker
               profile={profile}
