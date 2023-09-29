@@ -26,10 +26,10 @@ import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import { useProgressModal } from '#hooks/useProgressModal';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
@@ -38,7 +38,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewPostRoute } from '#routes';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
 import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
-import type { Observable } from 'relay-runtime';
 
 const POST_MAX_DURATION = 15;
 
@@ -119,9 +118,8 @@ const PostCreationScreen = ({
     }
   `);
 
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
-  const [saving, setSaving] = useState(false);
+  const { progressIndicator, setProgressIndicator } = useProgressModal();
+
   const onFinished = async ({
     kind,
     uri,
@@ -130,8 +128,6 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
-    setSaving(true);
-
     const exportedMedia = await exportMedia({
       uri,
       kind,
@@ -161,10 +157,10 @@ const PostCreationScreen = ({
     );
     // TODO uploadProgressModal crash on android
     if (Platform.OS === 'ios') {
-      setUploadProgress(uploadProgress);
+      setProgressIndicator(uploadProgress);
     }
     const { public_id } = await uploadPromise;
-    setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
+    setProgressIndicator(null); //force to null to avoid a blink effect on uploadProgressModal
     commit({
       variables: {
         input: {
@@ -203,7 +199,7 @@ const PostCreationScreen = ({
           );
           // TODO use fragment instead of response
           // if (params?.fromProfile) {
-          router.back();
+          router.pop(2);
           // } else {
           //   router.replace({
           //     route: 'PROFILE',
@@ -265,13 +261,9 @@ const PostCreationScreen = ({
         forceCameraRatio={1}
         onCancel={onCancel}
         onFinished={onFinished}
-        busy={saving}
+        busy={!!progressIndicator}
         steps={[SelectImageStep, EditImageStep, PostContentStep]}
-        exporting={saving}
-      />
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
+        exporting={!!progressIndicator}
       />
     </PostCreationScreenContext.Provider>
   );

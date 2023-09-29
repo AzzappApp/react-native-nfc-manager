@@ -8,7 +8,7 @@ import React, {
   useContext,
   createContext,
 } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
@@ -41,9 +41,11 @@ type ShowModalAction = {
   payload: Exclude<RouteInstance, StackRoute>;
 };
 
-type BackAction = {
-  type: 'BACK';
-  payload?: undefined;
+type PopAction = {
+  type: 'POP';
+  payload: {
+    count: number;
+  };
 };
 
 type BackToTopAction = {
@@ -67,8 +69,8 @@ type ReplaceAllAction = {
 };
 
 type RouterAction =
-  | BackAction
   | BackToTopAction
+  | PopAction
   | PushAction
   | ReplaceAction
   | ReplaceAllAction
@@ -95,8 +97,10 @@ const stackReducer = (
   switch (type) {
     case 'PUSH':
       return [...stack, payload];
-    case 'BACK':
-      return stack.slice(0, stack.length - 1);
+    case 'POP':
+      return payload.count === 0
+        ? stack
+        : stack.slice(0, stack.length - payload.count);
     case 'REPLACE':
       return [...stack.slice(0, stack.length - 1), payload];
     case 'SCREEN_DISMISSED':
@@ -127,13 +131,14 @@ const applyActionToDeepestStack = (
     const { tabs, currentIndex } = lastScreen.state;
     const tabScreen = tabs[currentIndex];
     const isBackAction =
-      action.type === 'BACK' || action.type === 'SCREEN_DISMISSED';
+      action.type === 'POP' || action.type === 'SCREEN_DISMISSED';
+    const count = action.type === 'POP' ? action.payload.count : 1;
     if (
       tabScreen.kind === 'stack' &&
-      (!isBackAction || tabScreen.state.length >= 2)
+      (!isBackAction || tabScreen.state.length >= count + 1)
     ) {
       return [
-        ...stack.slice(0, stack.length - 1),
+        ...stack.slice(0, stack.length - count),
         {
           ...lastScreen,
           state: {
@@ -189,15 +194,50 @@ const routerReducer = (
 ): RouterState => {
   switch (action.type) {
     case 'PUSH':
-    case 'BACK':
-    case 'REPLACE':
-    case 'SCREEN_DISMISSED': {
-      if (state.modals.length) {
+    case 'REPLACE': {
+      const length = state.modals.length;
+      if (length) {
         return {
           ...state,
           modals: applyActionToDeepestStack(state.modals, action),
         };
       }
+      return {
+        ...state,
+        stack: applyActionToDeepestStack(state.stack, action),
+      };
+    }
+    case 'POP':
+    case 'SCREEN_DISMISSED': {
+      const length = state.modals.length;
+      if (length) {
+        return {
+          ...state,
+          modals: applyActionToDeepestStack(
+            state.modals,
+            action.type === 'POP'
+              ? {
+                  ...action,
+                  payload: {
+                    count: Math.min(action.payload.count, length),
+                  },
+                }
+              : action,
+          ),
+          stack: applyActionToDeepestStack(
+            state.stack,
+            action.type === 'POP'
+              ? {
+                  ...action,
+                  payload: {
+                    count: Math.max(action.payload.count - length, 0),
+                  },
+                }
+              : action,
+          ),
+        };
+      }
+
       return {
         ...state,
         stack: applyActionToDeepestStack(state.stack, action),
@@ -246,6 +286,7 @@ export type NativeRouter = {
   replace(route: Route): void;
   showModal(route: Route): void;
   back(): void;
+  pop(num: number): void;
   getCurrentRoute(): Route | null;
   getCurrentScreenId(): string | null;
   addRouteWillChangeListener: (listener: RouteListener) => {
@@ -536,7 +577,27 @@ export const useNativeRouter = (init: NativeRouterInit) => {
           });
         }
         dispatch({
-          type: 'BACK',
+          type: 'POP',
+          payload: {
+            count: 1,
+          },
+        });
+      },
+      pop(num: number) {
+        const { stack, modals } = routerStateRef.current;
+        const screenRemoved = [
+          ...getAllRoutesFromStack(modals),
+          ...getAllRoutesFromStack(stack),
+        ].slice(0, num);
+
+        screenRemoved.forEach(({ id, state: route }) =>
+          dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
+        );
+        dispatch({
+          type: 'POP',
+          payload: {
+            count: num,
+          },
         });
       },
       // Native Router specific methods
@@ -663,7 +724,19 @@ export const ScreensRenderer = ({
   onScreenDismissed,
 }: ScreensRendererProps) => {
   const { stack, modals } = routerState;
-  return (
+
+  return modals.length ? (
+    <StackRenderer
+      stack={modals}
+      screens={screens}
+      tabsRenderers={tabs}
+      defaultScreenOptions={defaultScreenOptions}
+      onFinishTransitioning={onFinishTransitioning}
+      onScreenDismissed={onScreenDismissed}
+      hasFocus
+      isModal
+    />
+  ) : (
     <StackRenderer
       stack={stack}
       screens={screens}
@@ -672,22 +745,7 @@ export const ScreensRenderer = ({
       onFinishTransitioning={onFinishTransitioning}
       onScreenDismissed={onScreenDismissed}
       hasFocus
-    >
-      {!!modals.length && (
-        <Screen isNativeStack stackPresentation="fullScreenModal">
-          <StackRenderer
-            stack={modals}
-            screens={screens}
-            tabsRenderers={tabs}
-            defaultScreenOptions={defaultScreenOptions}
-            onFinishTransitioning={onFinishTransitioning}
-            onScreenDismissed={onScreenDismissed}
-            hasFocus
-            isModal
-          />
-        </Screen>
-      )}
-    </StackRenderer>
+    />
   );
 };
 
@@ -982,15 +1040,10 @@ const ScreenRenderer = ({
       onDisappear={() => navigationEventEmitter.emit('disappear')}
       onWillDisappear={() => navigationEventEmitter.emit('willDisappear')}
       onDismissed={onDismissed}
+      stackPresentation={isModal ? 'fullScreenModal' : 'push'}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {isModal ? (
-          <View style={{ flex: 1, backgroundColor: 'white' }}>
-            {screenView}
-          </View>
-        ) : (
-          screenView
-        )}
+        {screenView}
       </GestureHandlerRootView>
     </Screen>
   );

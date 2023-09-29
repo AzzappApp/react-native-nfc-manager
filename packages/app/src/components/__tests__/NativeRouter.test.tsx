@@ -1602,6 +1602,53 @@ describe('NativeRouter', () => {
           }
         `);
       });
+
+      test('should pop into the modals then into the stack', () => {
+        const { result } = renderHook(() => {
+          return useNativeRouter({
+            id: 'test',
+            stack: [
+              {
+                id: 'HOME',
+                route: 'HOME',
+              },
+              {
+                id: 'CHAT',
+                route: 'NEW_POST',
+              },
+            ],
+            modals: [
+              {
+                id: 'SIGN_IN',
+                route: 'SIGN_IN',
+              },
+              {
+                id: 'FOLLOWINGS',
+                route: 'FOLLOWINGS',
+              },
+            ],
+          });
+        });
+
+        act(() => {
+          result.current.router.pop(3);
+        });
+
+        expect(result.current.routerState).toMatchInlineSnapshot(`
+          {
+            "modals": [],
+            "stack": [
+              {
+                "id": "HOME",
+                "kind": "route",
+                "state": {
+                  "route": "HOME",
+                },
+              },
+            ],
+          }
+        `);
+      });
     });
 
     /// TODO backToTop is not used for the moment in the application

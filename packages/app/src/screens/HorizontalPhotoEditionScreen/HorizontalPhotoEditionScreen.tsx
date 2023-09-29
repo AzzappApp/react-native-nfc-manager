@@ -24,6 +24,7 @@ import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import { useProgressModal } from '#hooks/useProgressModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -31,7 +32,6 @@ import HeaderButton from '#ui/HeaderButton';
 import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
-import UploadProgressModal from '#ui/UploadProgressModal';
 import HorizontalPhotoBackgroundEditionPanel from './HorizontalPhotoBackgroundEditionPanel';
 import HorizontalPhotoBorderEditionPanel from './HorizontalPhotoBorderEditionPanel';
 import HorizontalPhotoEditionBottomMenu from './HorizontalPhotoEditionBottomMenu';
@@ -46,7 +46,6 @@ import type {
   SaveHorizontalPhotoModuleInput,
 } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
@@ -209,6 +208,8 @@ const HorizontalPhotoEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
+  const { setProgressIndicator } = useProgressModal();
+
   const onSave = useCallback(async () => {
     if (!canSave) {
       return;
@@ -234,7 +235,7 @@ const HorizontalPhotoEditionScreen = ({
         uploadURL,
         uploadParameters,
       );
-      setUploadProgress(uploadProgress);
+      setProgressIndicator(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
@@ -249,8 +250,6 @@ const HorizontalPhotoEditionScreen = ({
               'Error toast message when saving a horizontal photo module failed because medias upload failed.',
           }),
         });
-      } finally {
-        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 
@@ -265,7 +264,7 @@ const HorizontalPhotoEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.back();
+        router.pop(2);
       },
       onError(e) {
         console.error(e);
@@ -279,7 +278,15 @@ const HorizontalPhotoEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, horizontalPhoto?.id, commit, intl, router]);
+  }, [
+    canSave,
+    value,
+    horizontalPhoto?.id,
+    commit,
+    setProgressIndicator,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -294,9 +301,6 @@ const HorizontalPhotoEditionScreen = ({
   const onPickImage = () => {
     setShowImagePicker(true);
   };
-
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
 
   const onMediaSelected = async ({
     uri,
@@ -533,10 +537,6 @@ const HorizontalPhotoEditionScreen = ({
           steps={[SelectImageStep, EditImageStep]}
         />
       </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
     </Container>
   );
 };

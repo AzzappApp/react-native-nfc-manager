@@ -1,21 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 import { colors } from '#theme';
+import { useProgressModal } from '#hooks/useProgressModal';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
-import type { Subscription, Observable } from 'relay-runtime';
+import type { Subscription } from 'relay-runtime';
 
-type UploadProgressModalProps = {
-  visible: boolean;
-  progressIndicator?: Observable<number> | null;
-};
-
-const UploadProgressModal = ({
-  visible,
-  progressIndicator,
-}: UploadProgressModalProps) => {
+const UploadProgressModal = () => {
+  const { progressIndicator } = useProgressModal();
   const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
@@ -85,19 +79,22 @@ const UploadProgressModal = ({
   );
 
   return (
-    <Modal visible={visible} animationType="fade" onRequestClose={() => void 0}>
-      <View style={styles.container}>
-        <Text variant="xlarge" style={styles.text}>
-          {text}
-        </Text>
-        <ProgressBar
-          progress={progress ?? 0}
-          style={[styles.progressBarWidth, progress === null && { opacity: 0 }]}
-        />
-      </View>
-    </Modal>
+    <View style={styles.container}>
+      <Text variant="xlarge" style={styles.text}>
+        {text}
+      </Text>
+      <ProgressBar
+        progress={progress ?? 0}
+        style={[styles.progressBarWidth, progress === null && { opacity: 0 }]}
+      />
+    </View>
   );
 };
+
+UploadProgressModal.options = () => ({
+  stackAnimation: 'fade',
+  animationDuration: 500,
+});
 
 export default UploadProgressModal;
 

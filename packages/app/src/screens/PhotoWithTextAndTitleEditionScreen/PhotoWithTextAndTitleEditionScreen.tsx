@@ -27,6 +27,7 @@ import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import { useProgressModal } from '#hooks/useProgressModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -37,7 +38,6 @@ import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import TextAreaModal from '#ui/TextAreaModal';
 import TextInput from '#ui/TextInput';
-import UploadProgressModal from '#ui/UploadProgressModal';
 import PhotoWithTextAndTitleBackgroundEditionPanel from './PhotoWithTextAndTitleBackgroundEditionPanel';
 import PhotoWithTextAndTitleEditionBottomMenu from './PhotoWithTextAndTitleEditionBottomMenu';
 import PhotoWithTextAndTitleImageEditionPanel from './PhotoWithTextAndTitleImageEditionPanel';
@@ -52,7 +52,6 @@ import type {
   SavePhotoWithTextAndTitleModuleInput,
 } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
   /**
@@ -261,9 +260,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
+  const { setProgressIndicator } = useProgressModal();
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -290,7 +287,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         uploadURL,
         uploadParameters,
       );
-      setUploadProgress(uploadProgress);
+      setProgressIndicator(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
@@ -304,8 +301,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
               'Error toast message when saving a photo with text and title failed because of a media upload error.',
           }),
         });
-      } finally {
-        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 
@@ -326,7 +321,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.back();
+        router.pop(2);
       },
       onError(e) {
         console.log(e);
@@ -344,7 +339,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, photoWithTextAndTitle?.id, commit, router, intl]);
+  }, [
+    canSave,
+    value,
+    photoWithTextAndTitle?.id,
+    commit,
+    setProgressIndicator,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -710,10 +713,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
           steps={[SelectImageStep, EditImageStep]}
         />
       </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
     </Container>
   );
 };

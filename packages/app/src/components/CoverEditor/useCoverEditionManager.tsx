@@ -44,11 +44,11 @@ import {
   segmentImage,
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { useProgressModal } from '#hooks/useProgressModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
 import useSuggestedMediaManager from './useSuggestedMediaManager';
 import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
@@ -65,7 +65,6 @@ import type {
   useCoverEditionManagerMutation,
 } from '@azzapp/relay/artifacts/useCoverEditionManagerMutation.graphql';
 import type { useSuggestedMediaManager_suggested$key } from '@azzapp/relay/artifacts/useSuggestedMediaManager_suggested.graphql';
-import type { Observable } from 'relay-runtime';
 
 export type CoverData = {
   title: string | null;
@@ -507,10 +506,8 @@ const useCoverEditionManager = ({
   );
 
   // #region Cover saving
-  const [saving, setSaving] = useState(false);
   const [showMediaRequiredModal, setShowMediaRequiredModal] = useState(false);
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
+
   const onSaveRetryCount = useRef(0);
 
   const [commit] = useMutation<useCoverEditionManagerMutation>(graphql`
@@ -535,6 +532,7 @@ const useCoverEditionManager = ({
   const activeSourceMedia = useMemo(() => {
     return hasSuggestedMedia && suggestedMedia ? suggestedMedia : sourceMedia;
   }, [hasSuggestedMedia, sourceMedia, suggestedMedia]);
+  const { setProgressIndicator } = useProgressModal();
 
   const onSave = useCallback(async () => {
     //we defined it again because we need to remove the id
@@ -552,7 +550,6 @@ const useCoverEditionManager = ({
       return;
     }
 
-    setSaving(true);
     if (!coverStyle || !colorPalette) {
       // TODO invalid state, should not happens
       if (onSaveRetryCount.current >= 3) {
@@ -706,7 +703,7 @@ const useCoverEditionManager = ({
         const observables = convertToNonNullArray(
           uploads.map(upload => upload?.progress),
         );
-        setUploadProgress(
+        setProgressIndicator(
           combineLatest(observables).map(
             progresses =>
               progresses.reduce((a, b) => a + b, 0) / progresses.length,
@@ -738,8 +735,8 @@ const useCoverEditionManager = ({
     } catch (error) {
       // TODO
       console.error(error);
-      setUploadProgress(null);
-      setSaving(false);
+      setProgressIndicator(null);
+
       return;
     }
 
@@ -765,8 +762,6 @@ const useCoverEditionManager = ({
             );
           }
         }
-        setSaving(false);
-        setUploadProgress(null);
         onCoverSaved();
       },
       onError: error => {
@@ -779,12 +774,11 @@ const useCoverEditionManager = ({
             description: 'Error toast message when saving cover fails.',
           }),
         });
-        setSaving(false);
-        setUploadProgress(null);
+
+        setProgressIndicator(null);
       },
     });
   }, [
-    activeSourceMedia,
     hasSuggestedMedia,
     suggestedMedia,
     sourceMedia,
@@ -799,6 +793,7 @@ const useCoverEditionManager = ({
     cardCover,
     currentCoverStyle,
     maskMedia,
+    setProgressIndicator,
     profile?.profileKind,
     onCoverSaved,
     intl,
@@ -884,10 +879,6 @@ const useCoverEditionManager = ({
             onSave={onSaveCropData}
           />
         )}
-        <UploadProgressModal
-          visible={saving}
-          progressIndicator={uploadProgress}
-        />
       </>
     ),
     [
@@ -903,7 +894,6 @@ const useCoverEditionManager = ({
       onMediaSelected,
       onSaveCropData,
       openImagePicker,
-      saving,
       showImagePicker,
       showMediaRequiredModal,
       sourceMedia,
@@ -912,7 +902,6 @@ const useCoverEditionManager = ({
       timeRange,
       title,
       toggleCropMode,
-      uploadProgress,
     ],
   );
 

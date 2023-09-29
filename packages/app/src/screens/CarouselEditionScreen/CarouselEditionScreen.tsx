@@ -20,13 +20,13 @@ import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import { useProgressModal } from '#hooks/useProgressModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import InnerModal from '#ui/InnerModal';
 import TabView from '#ui/TabView';
-import UploadProgressModal from '#ui/UploadProgressModal';
 import CarouselEditionBackgroundPanel from './CarouselEditionBackgroundPanel';
 import CarouselEditionBorderPanel from './CarouselEditionBorderPanel';
 import CarouselEditionBottomMenu from './CarouselEditionBottomMenu';
@@ -38,7 +38,6 @@ import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/C
 import type { CarouselEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_viewer.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type CarouselEditionScreenProps = ViewProps & {
   /**
@@ -214,8 +213,7 @@ const CarouselEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
+  const { setProgressIndicator } = useProgressModal();
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -264,7 +262,7 @@ const CarouselEditionScreen = ({
           }),
         );
 
-        setUploadProgress(
+        setProgressIndicator(
           combineLatest(uploads.map(({ progress }) => progress)).map(
             progresses =>
               progresses.reduce((a, b) => a + b, 0) / progresses.length,
@@ -284,8 +282,6 @@ const CarouselEditionScreen = ({
           (acc, media) => ({ ...acc, [media.uri]: media }),
           {},
         );
-
-        setUploadProgress(null);
       } catch (e) {
         console.error(e);
         Toast.show({
@@ -297,7 +293,7 @@ const CarouselEditionScreen = ({
               'Error toast message when saving a carousel module failed because medias upload failed.',
           }),
         });
-        setUploadProgress(null);
+        setProgressIndicator(null);
         setSaving(false);
         return;
       }
@@ -317,7 +313,7 @@ const CarouselEditionScreen = ({
         },
       },
       onCompleted() {
-        router.back();
+        router.pop(2);
       },
       onError(e) {
         console.error(e);
@@ -583,10 +579,6 @@ const CarouselEditionScreen = ({
           onCancel={onCloseImagePicker}
         />
       </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
     </Container>
   );
 };

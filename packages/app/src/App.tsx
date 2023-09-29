@@ -29,6 +29,7 @@ import {
   RouterProvider,
 } from '#components/NativeRouter';
 import Toast from '#components/Toast';
+import { UploadModalProvider } from '#components/UploadModalProvider';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
@@ -77,6 +78,7 @@ import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
+import UploadProgressModal from '#ui/UploadProgressModal';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
@@ -181,6 +183,7 @@ const screens = {
   INVITE_FRIENDS: InviteFriendsScreen,
   CONTACT_CARD: ContactCardScreen,
   ONBOARDING: WelcomeScreen,
+  PROGRESS_MODAL: UploadProgressModal,
 };
 
 const tabs = {
@@ -380,13 +383,15 @@ const AppRouter = () => {
           style={safeAreaBackgroundStyle}
         >
           <RouterProvider value={router}>
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onScreenDismissed={onScreenDismissed}
-              onFinishTransitioning={onFinishTransitioning}
-            />
+            <UploadModalProvider>
+              <ScreensRenderer
+                routerState={routerState}
+                screens={screens}
+                tabs={tabs}
+                onScreenDismissed={onScreenDismissed}
+                onFinishTransitioning={onFinishTransitioning}
+              />
+            </UploadModalProvider>
           </RouterProvider>
           <Toast />
           <LoadingScreen visible={showLoadingScreen} />

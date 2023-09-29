@@ -133,6 +133,11 @@ export type OnboardingRoute = {
   params?: never;
 };
 
+export type ProgressModal = {
+  route: 'PROGRESS_MODAL';
+  params?: never;
+};
+
 export type Route =
   | AccountDetailsRoute
   | CardModuleEditionRoute
@@ -152,6 +157,7 @@ export type Route =
   | PostCommentsRoute
   | PostRoute
   | ProfileRoute
+  | ProgressModal
   | ResetPasswordRoute
   | SearchRoute
   | SignInRoute
