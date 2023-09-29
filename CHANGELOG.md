@@ -1,4 +1,4 @@
-## 0.4.2-canary.20
+## 0.4.2-canary.21
 
 * **fix:**  - lint issue ([#1293](https://github.com/AzzappApp/azzapp/pull/1293))
 * **perf:**  - [#801](https://github.com/AzzappApp/azzapp/pull/801) 🐌 slow card flip ([#1292](https://github.com/AzzappApp/azzapp/pull/1292))
