@@ -1,5 +1,6 @@
-## 0.4.2-canary.18
+## 0.4.2-canary.19
 
+* **fix:**  - [#898](https://github.com/AzzappApp/azzapp/pull/898) hide redirection after modal loader ([#1284](https://github.com/AzzappApp/azzapp/pull/1284))
 * **feat:**  - add label full width ([#1285](https://github.com/AzzappApp/azzapp/pull/1285))
 * **feat:**  - add label full width ([#1283](https://github.com/AzzappApp/azzapp/pull/1283))
 * **fix:**  - yarn.lock ([#1276](https://github.com/AzzappApp/azzapp/pull/1276))
