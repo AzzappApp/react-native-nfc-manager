@@ -73,6 +73,7 @@ const CardFlipSwitch = ({
         [0, cardRadius, cardRadius, 0],
       ),
       transform: [
+        { perspective: -900 },
         {
           rotateY: `${interpolate(
             flip.value,
@@ -145,7 +146,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   back: {
-    position: 'absolute',
     height: '100%',
     width: '100%',
     backfaceVisibility: 'hidden',
