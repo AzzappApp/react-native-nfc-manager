@@ -1,5 +1,11 @@
-## 0.4.2-canary.19
+## 0.4.2-canary.20
 
+* **fix:**  - lint issue ([#1293](https://github.com/AzzappApp/azzapp/pull/1293))
+* **perf:**  - [#801](https://github.com/AzzappApp/azzapp/pull/801) 🐌 slow card flip ([#1292](https://github.com/AzzappApp/azzapp/pull/1292))
+* **fix:**  - [#1079](https://github.com/AzzappApp/azzapp/pull/1079) toast is hidden when opened previously behind modal ([#1286](https://github.com/AzzappApp/azzapp/pull/1286))
+* **feat:**  - 🎸 add website to social icons section ([#1288](https://github.com/AzzappApp/azzapp/pull/1288))
+* **fix:**  - **profile:** [#1280](https://github.com/AzzappApp/azzapp/pull/1280) 💅 missing perspective ([#1289](https://github.com/AzzappApp/azzapp/pull/1289))
+* **fix:**  - suggestion again ([#1291](https://github.com/AzzappApp/azzapp/pull/1291))
 * **fix:**  - [#898](https://github.com/AzzappApp/azzapp/pull/898) hide redirection after modal loader ([#1284](https://github.com/AzzappApp/azzapp/pull/1284))
 * **feat:**  - add label full width ([#1285](https://github.com/AzzappApp/azzapp/pull/1285))
 * **feat:**  - add label full width ([#1283](https://github.com/AzzappApp/azzapp/pull/1283))
