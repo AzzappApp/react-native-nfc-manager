@@ -114,8 +114,9 @@ const CoverEditorCustom = ({
   const {
     title,
     subTitle,
-    sourceMedia,
     maskMedia,
+    sourceMedia,
+    activeSourceMedia,
     mediaCropParameter,
     coverStyle,
     colorPalette,
@@ -154,13 +155,13 @@ const CoverEditorCustom = ({
     if (Platform.OS !== 'ios') {
       return false;
     }
-    if (sourceMedia?.kind === 'video') {
+    if (activeSourceMedia?.kind === 'video') {
       return false;
     }
     //get the ios version
     const version = parseInt(Platform.Version, 10);
     return version >= 15;
-  }, [sourceMedia?.kind]);
+  }, [activeSourceMedia?.kind]);
   //#endregion
 
   const onFilterChange = useCallback(
@@ -312,9 +313,8 @@ const CoverEditorCustom = ({
     setCurrentTab(menu);
   }, []);
   //#endregion
-
-  const currentMedia = sourceMedia ?? previewMedia;
-  const isPreview = sourceMedia == null && previewMedia != null;
+  const currentMedia = activeSourceMedia ?? previewMedia;
+  const isPreview = activeSourceMedia == null && previewMedia != null;
 
   const kind = currentMedia?.kind ?? 'image';
   const uri = currentMedia?.uri ?? null;
@@ -403,7 +403,7 @@ const CoverEditorCustom = ({
               colorPalette={colorPalette}
             />
           </PressableNative>
-          {sourceMedia && !editedParameter && (
+          {activeSourceMedia && !editedParameter && (
             <CropButton
               onPress={toggleCropMode}
               style={{

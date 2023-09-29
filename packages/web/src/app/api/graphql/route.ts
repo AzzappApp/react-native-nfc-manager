@@ -32,7 +32,6 @@ function useRevalidateTag(): Plugin<GraphQLContext> {
         onExecuteDone(payload) {
           payload.args.contextValue.cardUsernamesToRevalidate.forEach(
             username => {
-              console.info(`Revalidating webcard for user ${username}`);
               revalidateTag(username);
             },
           );

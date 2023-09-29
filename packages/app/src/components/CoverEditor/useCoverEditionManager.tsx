@@ -909,7 +909,8 @@ const useCoverEditionManager = ({
     // Cover data
     title,
     subTitle,
-    sourceMedia: activeSourceMedia,
+    activeSourceMedia,
+    sourceMedia,
     maskMedia,
     mediaCropParameter,
     coverStyle,

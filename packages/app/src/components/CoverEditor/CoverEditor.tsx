@@ -85,6 +85,7 @@ const CoverEditor = (
   const {
     title,
     subTitle,
+    activeSourceMedia,
     sourceMedia,
     maskMedia,
     mediaCropParameter,
@@ -166,7 +167,7 @@ const CoverEditor = (
       initialData: {
         title,
         subTitle,
-        sourceMedia,
+        sourceMedia: activeSourceMedia,
         maskMedia,
         mediaCropParameter,
         coverStyle,
@@ -176,14 +177,14 @@ const CoverEditor = (
     });
   }, [
     mediaComputing,
-    colorPalette,
-    coverStyle,
+    title,
+    subTitle,
+    activeSourceMedia,
     maskMedia,
     mediaCropParameter,
+    coverStyle,
+    colorPalette,
     previewMedia,
-    sourceMedia,
-    subTitle,
-    title,
   ]);
 
   const onCustomEditionCancel = useCallback(() => {
@@ -237,9 +238,14 @@ const CoverEditor = (
   const showSuggestedMedia = useMemo(
     () =>
       templateKind !== 'people' &&
-      (!mediaVisible || sourceMedia == null) &&
+      (!mediaVisible || activeSourceMedia == null) &&
       viewer.profile?.profileKind === 'business',
-    [sourceMedia, mediaVisible, templateKind, viewer.profile?.profileKind],
+    [
+      activeSourceMedia,
+      mediaVisible,
+      templateKind,
+      viewer.profile?.profileKind,
+    ],
   );
 
   const onPressSuggestedMedia = useCallback(() => {
@@ -336,7 +342,7 @@ const CoverEditor = (
               key={templateKind}
               viewer={viewer}
               templateKind={templateKind}
-              media={sourceMedia}
+              media={activeSourceMedia}
               maskUri={
                 templateKind === 'people' ? maskMedia?.uri ?? null : null
               }
