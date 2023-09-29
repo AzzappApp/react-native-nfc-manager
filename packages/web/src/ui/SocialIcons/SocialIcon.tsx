@@ -23,6 +23,7 @@ import tripadvisor from './assets/tripadvisor.svg';
 import twitch from './assets/twitch.svg';
 import twitter from './assets/twitter.svg';
 import typefully from './assets/typefully.svg';
+import website from './assets/website.svg';
 import whatsapp from './assets/whatsapp.svg';
 import yelp from './assets/yelp.svg';
 import youtube from './assets/youtube.svg';
@@ -70,6 +71,7 @@ const socialIcons = {
   whatsapp,
   yelp,
   youtube,
+  website,
 };
 
 export type SocialIcons = keyof typeof socialIcons;

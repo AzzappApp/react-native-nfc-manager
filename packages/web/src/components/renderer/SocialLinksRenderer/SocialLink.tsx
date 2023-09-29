@@ -80,6 +80,7 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'whatsapp', mask: 'wa.me/' },
   { id: 'yelp', mask: 'yelp.com/' },
   { id: 'youtube', mask: 'youtube.com/' },
+  { id: 'website', mask: '' },
 ];
 
 const SOCIAL_LINKS_URL_MAP = new Map(

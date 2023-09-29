@@ -88,6 +88,9 @@ const socialIcons = {
   get youtube() {
     return require('./assets/social/youtube.png');
   },
+  get website() {
+    return require('./assets/social/website.png');
+  },
 } as const;
 
 export type SocialIcons = keyof typeof socialIcons;
