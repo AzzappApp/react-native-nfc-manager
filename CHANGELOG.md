@@ -1,5 +1,6 @@
-## 0.4.2-canary.17
+## 0.4.2-canary.18
 
+* **feat:**  - add label full width ([#1285](https://github.com/AzzappApp/azzapp/pull/1285))
 * **feat:**  - add label full width ([#1283](https://github.com/AzzappApp/azzapp/pull/1283))
 * **fix:**  - yarn.lock ([#1276](https://github.com/AzzappApp/azzapp/pull/1276))
 * **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) push duplicated module at the end ([#1275](https://github.com/AzzappApp/azzapp/pull/1275))
