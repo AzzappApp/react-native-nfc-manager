@@ -1,5 +1,6 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -94,6 +95,11 @@ const ProfileScreen = ({
   const [selectionMode, toggleSelectionMode] = useToggle(false);
   const [showWebcardModal, toggleWebcardModal] = useToggle(false);
 
+  const onShowWebcardModal = useCallback(() => {
+    Toast.hide();
+    toggleWebcardModal();
+  }, [toggleWebcardModal]);
+
   const [isAtTop, setIsAtTop] = useState(true);
   const onContentPositionChange = useCallback((atTop: boolean) => {
     setIsAtTop(atTop);
@@ -168,7 +174,7 @@ const ProfileScreen = ({
             onEdit={toggleEditing}
             onToggleFollow={onToggleFollow}
             onFlip={toggleFlip}
-            onShowWebcardModal={toggleWebcardModal}
+            onShowWebcardModal={onShowWebcardModal}
           />
         </View>
       </ProfileScreenTransitionsProvider>
