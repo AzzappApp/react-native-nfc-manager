@@ -5,13 +5,16 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
+import BlurredFloatingButton, {
+  BlurredFloatingIconButton,
+} from '#ui/BlurredFloatingButton';
 import FloatingButton from '#ui/FloatingButton';
-import FloatingIconButton from '#ui/FloatingIconButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './ProfileScreenTransitions';
 import type { ProfileScreenButtonBar_profile$key } from '@azzapp/relay/artifacts/ProfileScreenButtonBar_profile.graphql';
@@ -96,7 +99,7 @@ const ProfileScreenButtonBar = ({
       {...props}
       pointerEvents={editing ? 'none' : 'box-none'}
     >
-      <FloatingIconButton
+      <BlurredFloatingIconButton
         icon="azzapp"
         onPress={onHome}
         iconSize={26}
@@ -121,7 +124,7 @@ const ProfileScreenButtonBar = ({
           onShowWebcardModal={onShowWebcardModal}
         />
       </Suspense>
-      <FloatingIconButton
+      <BlurredFloatingIconButton
         icon="flip"
         iconSize={26}
         iconStyle={{ tintColor: colors.white }}
@@ -183,7 +186,7 @@ const ProfileScreenButtonActionButton = ({
 
   return isViewer ? (
     isWebCardDisplayed ? (
-      <FloatingButton
+      <BlurredFloatingButton
         onPress={onEdit}
         style={styles.mainButton}
         variant="grey"
@@ -198,9 +201,9 @@ const ProfileScreenButtonActionButton = ({
             description="Build my webcard button label in Profile Screen Button Bar"
           />
         </Text>
-      </FloatingButton>
+      </BlurredFloatingButton>
     ) : (
-      <FloatingButton
+      <BlurredFloatingButton
         variant="grey"
         onPress={onCreateNewPost}
         style={styles.mainButton}
@@ -215,11 +218,11 @@ const ProfileScreenButtonActionButton = ({
             description="Profile post create a new post"
           />
         </Text>
-      </FloatingButton>
+      </BlurredFloatingButton>
     )
   ) : (
     <View style={{ flexDirection: 'row', flex: 1 }}>
-      <FloatingButton
+      <BlurredFloatingButton
         onPress={debouncedToggleFollowing}
         style={styles.mainButton}
         variant="grey"
@@ -241,8 +244,8 @@ const ProfileScreenButtonActionButton = ({
             />
           )}
         </Text>
-      </FloatingButton>
-      <FloatingIconButton
+      </BlurredFloatingButton>
+      <BlurredFloatingIconButton
         icon="more"
         variant="grey"
         onPress={onShowWebcardModal}

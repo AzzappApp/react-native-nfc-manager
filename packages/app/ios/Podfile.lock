@@ -20,6 +20,8 @@ PODS:
     - ExpoModulesCore
   - Expo (49.0.11):
     - ExpoModulesCore
+  - ExpoBlur (12.6.0):
+    - ExpoModulesCore
   - ExpoClipboard (4.3.1):
     - ExpoModulesCore
   - ExpoHaptics (12.4.0):
@@ -662,6 +664,7 @@ DEPENDENCIES:
   - EXMediaLibrary (from `../../../node_modules/expo-media-library/ios`)
   - EXPermissions (from `../../../node_modules/expo-permissions/ios`)
   - Expo (from `../../../node_modules/expo`)
+  - ExpoBlur (from `../../../node_modules/expo-blur/ios`)
   - ExpoClipboard (from `../../../node_modules/expo-clipboard/ios`)
   - ExpoHaptics (from `../../../node_modules/expo-haptics/ios`)
   - ExpoImage (from `../../../node_modules/expo-image/ios`)
@@ -805,6 +808,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-permissions/ios"
   Expo:
     :path: "../../../node_modules/expo"
+  ExpoBlur:
+    :path: "../../../node_modules/expo-blur/ios"
   ExpoClipboard:
     :path: "../../../node_modules/expo-clipboard/ios"
   ExpoHaptics:
@@ -953,6 +958,7 @@ SPEC CHECKSUMS:
   EXMediaLibrary: 8ac14ce76f266026b10cac2ab049debe032d7ae7
   EXPermissions: 4f80cf527001aa408a22eddf076e61465ea71d5a
   Expo: 8a2d2c235bcbe4f41774562a0635bd74c174858c
+  ExpoBlur: 9e6da7c2bd4a0c5de7e57124694d0a380d7962f7
   ExpoClipboard: 695f274f8e028cd113837f917da40c76850877eb
   ExpoHaptics: 360af6898407ee4e8265d30a1a8fb16491a660eb
   ExpoImage: e0182814c62f40dd4e2e74324ebbbbbc2a4464c9

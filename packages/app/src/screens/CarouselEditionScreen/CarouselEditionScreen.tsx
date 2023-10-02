@@ -326,7 +326,15 @@ const CarouselEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, commit, carousel?.id, router, intl]);
+  }, [
+    canSave,
+    setProgressIndicator,
+    value,
+    commit,
+    carousel?.id,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
