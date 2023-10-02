@@ -10,6 +10,7 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
 import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
@@ -128,6 +129,7 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
+    setProgressIndicator(Observable.from(0));
     const exportedMedia = await exportMedia({
       uri,
       kind,
