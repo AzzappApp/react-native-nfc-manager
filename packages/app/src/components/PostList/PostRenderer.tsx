@@ -105,7 +105,6 @@ const PostRenderer = (
     graphql`
       fragment PostRendererFragment_author on Profile {
         ...AuthorCartoucheFragment_profile
-        ...PostRendererBottomPanelFragment_author
       }
     `,
     authorKey,
@@ -176,7 +175,6 @@ const PostRenderer = (
         <PostRendererBottomPanel
           toggleModal={toggleModal}
           showModal={showModal}
-          author={author}
           post={post}
         />
       </Suspense>

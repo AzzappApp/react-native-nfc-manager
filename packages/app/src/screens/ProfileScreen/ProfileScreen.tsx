@@ -118,7 +118,7 @@ const ProfileScreen = ({
     });
   }, [setOptions, showPost, editing, params, isAtTop]);
 
-  const onToggleFollow = useToggleFollow(auth.profileId);
+  const onToggleFollow = useToggleFollow();
   const ref = useRef<CardFlipSwitchRef>(null);
 
   if (!data.profile) {
@@ -196,6 +196,7 @@ const ProfileScreen = ({
           profile={data.profile}
           close={toggleWebcardModal}
           onToggleFollow={onToggleFollow}
+          isViewer={isViewer}
         />
       </Suspense>
     </>

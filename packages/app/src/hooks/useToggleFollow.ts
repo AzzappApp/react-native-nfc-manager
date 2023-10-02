@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
+import useAuthState from './useAuthState';
 import type {
   useToggleFollowMutation,
   useToggleFollowMutation$data,
@@ -99,10 +100,8 @@ const updater = (
   }
 };
 
-const useToggleFollow = (
-  currentProfileId?: string | null,
-  userNameFilter?: string,
-) => {
+const useToggleFollow = (userNameFilter?: string) => {
+  const { profileId: currentProfileId } = useAuthState();
   const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
     graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {

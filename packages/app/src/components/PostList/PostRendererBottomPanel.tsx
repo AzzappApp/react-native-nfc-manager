@@ -1,6 +1,5 @@
 /* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
-import { toGlobalId } from 'graphql-relay';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -19,7 +18,6 @@ import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
 import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
 import type {
   PostRendererBottomPanelUpdatePostMutation,
@@ -40,12 +38,6 @@ type PostRendererBottomPanelProps = {
    */
   toggleModal: () => void;
   /**
-   *
-   *
-   * @type {PostRendererBottomPanelFragment_author$key}
-   */
-  author: PostRendererBottomPanelFragment_author$key;
-  /**
    * The post to display
    *
    * @type { PostRendererActionBar_post$key & PostRendererBottomPanelFragment_post$key}
@@ -57,7 +49,6 @@ type PostRendererBottomPanelProps = {
 const PostRendererBottomPanel = ({
   showModal,
   toggleModal,
-  author: authorKey,
   post: postKey,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
@@ -79,21 +70,12 @@ const PostRendererBottomPanel = ({
         author {
           id
           userName
+          isFollowing
         }
         createdAt
       }
     `,
     postKey as PostRendererBottomPanelFragment_post$key,
-  );
-
-  const author = useFragment(
-    graphql`
-      fragment PostRendererBottomPanelFragment_author on Profile {
-        id
-        isFollowing
-      }
-    `,
-    authorKey,
   );
 
   const copyLink = () => {
@@ -185,15 +167,18 @@ const PostRendererBottomPanel = ({
     updatePost({ postId: post.id, allowLikes: !post.allowLikes });
   };
 
-  const auth = useAuthState();
+  const { profileId } = useAuthState();
 
-  const currentProfileId = toGlobalId('Profile', auth.profileId ?? '');
-  const isViewer = author.id === currentProfileId;
+  const isViewer = profileId === post.author.id;
 
-  const toggleFollow = useToggleFollow(currentProfileId);
+  const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    toggleFollow(author.id, post.author.userName, !author.isFollowing);
+    toggleFollow(
+      post.author.id,
+      post.author.userName,
+      !post.author.isFollowing,
+    );
   };
 
   return (
@@ -308,7 +293,7 @@ const PostRendererBottomPanel = ({
           )}
           {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
-              {author?.isFollowing ? (
+              {post.author?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
                     defaultMessage="Unfollow"

@@ -147,7 +147,6 @@ const MediaSuggestionsProfilesInner = ({
           profile={item}
           isFollowing={followingMap.get(item.id) ?? false}
           profileId={item.id}
-          viewerProfileID={data.profile?.id}
         />
       )}
     />
@@ -155,13 +154,12 @@ const MediaSuggestionsProfilesInner = ({
 };
 
 const CoverLinkWithOptions = ({
-  viewerProfileID,
   isFollowing,
   ...props
-}: CoverLinkProps & { viewerProfileID?: string; isFollowing: boolean }) => {
+}: CoverLinkProps & { isFollowing: boolean }) => {
   const styles = useStyleSheet(styleSheet);
 
-  const toggleFollow = useToggleFollow(viewerProfileID);
+  const toggleFollow = useToggleFollow();
 
   const { userName } = useFragment(CoverLink_profileFragment, props.profile);
 

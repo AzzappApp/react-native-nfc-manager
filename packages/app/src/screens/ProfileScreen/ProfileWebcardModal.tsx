@@ -28,6 +28,12 @@ type ProfileWebCardModalProps = {
    *
    * @type {boolean}
    */
+  isViewer: boolean;
+  /**
+   *
+   *
+   * @type {boolean}
+   */
   visible: boolean;
   /**
    * callback to follow/unfollow
@@ -45,6 +51,7 @@ const ProfileWebCardModal = ({
   onToggleFollow,
   visible,
   close,
+  isViewer,
 }: ProfileWebCardModalProps) => {
   const profile = useFragment(
     graphql`
@@ -167,29 +174,31 @@ const ProfileWebCardModal = ({
               </View>
             </View>
           </PressableNative>
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={debouncedToggleFollowing}
-          >
-            <View style={styles.bottomSheetOptionIconLabel}>
-              <Icon
-                icon={profile.isFollowing ? 'delete_filled' : 'add_circle'}
-              />
-              <Text>
-                {profile.isFollowing ? (
-                  <FormattedMessage
-                    defaultMessage="Unfollow"
-                    description="Unfollow button label in Profile webcard modal Button"
-                  />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Follow"
-                    description="Follow button label in Profile webcard modal Button"
-                  />
-                )}
-              </Text>
-            </View>
-          </PressableNative>
+          {!isViewer && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={debouncedToggleFollowing}
+            >
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon
+                  icon={profile.isFollowing ? 'delete_filled' : 'add_circle'}
+                />
+                <Text>
+                  {profile.isFollowing ? (
+                    <FormattedMessage
+                      defaultMessage="Unfollow"
+                      description="Unfollow button label in Profile webcard modal Button"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="Follow"
+                      description="Follow button label in Profile webcard modal Button"
+                    />
+                  )}
+                </Text>
+              </View>
+            </PressableNative>
+          )}
         </View>
       </Container>
     </BottomSheetModal>

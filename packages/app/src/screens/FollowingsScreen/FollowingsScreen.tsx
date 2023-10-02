@@ -75,12 +75,7 @@ const FollowingScreenInner = ({
 }) => {
   const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
 
-  return (
-    <FollowingsScreenList
-      currentProfileId={viewer.profile?.id ?? ''}
-      viewer={viewer}
-    />
-  );
+  return <FollowingsScreenList viewer={viewer} />;
 };
 export default relayScreen(FollowingsScreen, {
   query: followingsScreenQuery,
