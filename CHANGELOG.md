@@ -1,5 +1,6 @@
-## 0.4.2-canary.26
+## 0.4.2-canary.27
 
+* **fix:**  - **webcard:** [#1315](https://github.com/AzzappApp/azzapp/pull/1315) disable button while animation is running ([#1319](https://github.com/AzzappApp/azzapp/pull/1319))
 * **fix:**  - missing created flag ([#1316](https://github.com/AzzappApp/azzapp/pull/1316))
 * **fix:**  - don’t show progress modal until media is set ([#1314](https://github.com/AzzappApp/azzapp/pull/1314))
 * **fix:**  - navigation issue on new profile creation ([#1312](https://github.com/AzzappApp/azzapp/pull/1312))
