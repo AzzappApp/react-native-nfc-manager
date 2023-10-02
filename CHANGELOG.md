@@ -1,5 +1,7 @@
-## 0.4.2-canary.25
+## 0.4.2-canary.26
 
+* **fix:**  - missing created flag ([#1316](https://github.com/AzzappApp/azzapp/pull/1316))
+* **fix:**  - don’t show progress modal until media is set ([#1314](https://github.com/AzzappApp/azzapp/pull/1314))
 * **fix:**  - navigation issue on new profile creation ([#1312](https://github.com/AzzappApp/azzapp/pull/1312))
 * **fix:**  - 🐛 correctly display blurred element position ([#1310](https://github.com/AzzappApp/azzapp/pull/1310))
 * **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) 💃 change orientation when manually flipped ([#1308](https://github.com/AzzappApp/azzapp/pull/1308))
