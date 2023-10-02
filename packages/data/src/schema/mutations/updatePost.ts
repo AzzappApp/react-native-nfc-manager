@@ -27,8 +27,8 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
 
   const partialPost: Partial<NewPost> = {
     ...postInput,
-    allowComments: postInput.allowComments ?? false,
-    allowLikes: postInput.allowLikes ?? false,
+    allowComments: postInput.allowComments ?? post.allowComments,
+    allowLikes: postInput.allowLikes ?? post.allowLikes,
   };
 
   try {
