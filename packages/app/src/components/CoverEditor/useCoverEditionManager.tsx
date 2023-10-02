@@ -522,6 +522,7 @@ const useCoverEditionManager = ({
             media {
               id
             }
+            isCreated
           }
         }
       }
