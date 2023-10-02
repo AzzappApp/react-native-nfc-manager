@@ -725,27 +725,32 @@ export const ScreensRenderer = ({
 }: ScreensRendererProps) => {
   const { stack, modals } = routerState;
 
-  return modals.length ? (
-    <StackRenderer
-      stack={modals}
-      screens={screens}
-      tabsRenderers={tabs}
-      defaultScreenOptions={defaultScreenOptions}
-      onFinishTransitioning={onFinishTransitioning}
-      onScreenDismissed={onScreenDismissed}
-      hasFocus
-      isModal
-    />
-  ) : (
-    <StackRenderer
-      stack={stack}
-      screens={screens}
-      tabsRenderers={tabs}
-      defaultScreenOptions={defaultScreenOptions}
-      onFinishTransitioning={onFinishTransitioning}
-      onScreenDismissed={onScreenDismissed}
-      hasFocus
-    />
+  return (
+    <>
+      <StackRenderer
+        stack={stack}
+        screens={screens}
+        tabsRenderers={tabs}
+        defaultScreenOptions={defaultScreenOptions}
+        onFinishTransitioning={onFinishTransitioning}
+        onScreenDismissed={onScreenDismissed}
+        hasFocus
+      />
+      {!!modals.length && (
+        <Screen isNativeStack style={StyleSheet.absoluteFill}>
+          <StackRenderer
+            stack={modals}
+            screens={screens}
+            tabsRenderers={tabs}
+            defaultScreenOptions={defaultScreenOptions}
+            onFinishTransitioning={onFinishTransitioning}
+            onScreenDismissed={onScreenDismissed}
+            hasFocus
+            isModal
+          />
+        </Screen>
+      )}
+    </>
   );
 };
 
