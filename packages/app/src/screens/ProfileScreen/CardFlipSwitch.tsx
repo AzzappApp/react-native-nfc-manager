@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type CardFlipSwitchProps = ViewProps & {
   flipped: boolean;
@@ -22,11 +23,15 @@ type CardFlipSwitchProps = ViewProps & {
 
 export type CardFlipSwitchRef = {
   triggerFlip: () => void;
+  animationRunning: SharedValue<boolean>;
 };
 
 const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
   ({ flipped, disabled, front, back, onFlip, ...props }, ref) => {
     const flip = useSharedValue(flipped ? 1 : 0);
+
+    const animationRunning = useSharedValue(false);
+
     const currentFlip = useSharedValue(!!flipped);
 
     const clockFlipDirection = useSharedValue(!!flipped);
@@ -40,6 +45,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
       () => {
         return {
           triggerFlip: () => {
+            animationRunning.value = true;
             const nextValue = !currentFlip.value;
             clockFlipDirection.value = false;
             flip.value = withTiming(
@@ -53,14 +59,23 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
                   runOnJS(onFlip)();
                 }
                 clockFlipDirection.value = nextValue;
+                animationRunning.value = false;
               },
             );
 
             currentFlip.value = nextValue;
           },
+          animationRunning,
         };
       },
-      [clockFlipDirection, flip, currentFlip, flipped, onFlip],
+      [
+        animationRunning,
+        currentFlip,
+        clockFlipDirection,
+        flip,
+        flipped,
+        onFlip,
+      ],
     );
 
     const frontStyle = useAnimatedStyle(() => ({
@@ -132,6 +147,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
       })
       .onEnd(e => {
         if (Math.abs(e.translationX) > windowWidth / 3) {
+          animationRunning.value = true;
           flip.value = withTiming(
             currentFlip.value ? 0 : 1,
             {
@@ -142,16 +158,24 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
               if (animated) {
                 runOnJS(onFlip)();
               }
+              animationRunning.value = false;
             },
           );
           const nextValue = !currentFlip.value;
           currentFlip.value = nextValue;
           clockFlipDirection.value = nextValue;
         } else {
-          flip.value = withTiming(flipStartValue.value, {
-            duration: 300,
-            easing: Easing.out(Easing.back(1)),
-          });
+          animationRunning.value = true;
+          flip.value = withTiming(
+            flipStartValue.value,
+            {
+              duration: 300,
+              easing: Easing.out(Easing.back(1)),
+            },
+            () => {
+              animationRunning.value = false;
+            },
+          );
         }
       });
 

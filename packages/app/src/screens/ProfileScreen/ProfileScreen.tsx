@@ -174,7 +174,11 @@ const ProfileScreen = ({
             editing={editing}
             onHome={onHome}
             isWebCardDisplayed={!showPost}
-            onEdit={toggleEditing}
+            onEdit={() => {
+              if (!ref.current?.animationRunning.value) {
+                toggleEditing();
+              }
+            }}
             onToggleFollow={onToggleFollow}
             onFlip={ref.current?.triggerFlip}
             onShowWebcardModal={onShowWebcardModal}
