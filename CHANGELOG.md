@@ -1,5 +1,6 @@
-## 0.4.2-canary.24
+## 0.4.2-canary.25
 
+* **fix:**  - navigation issue on new profile creation ([#1312](https://github.com/AzzappApp/azzapp/pull/1312))
 * **fix:**  - 🐛 correctly display blurred element position ([#1310](https://github.com/AzzappApp/azzapp/pull/1310))
 * **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) 💃 change orientation when manually flipped ([#1308](https://github.com/AzzappApp/azzapp/pull/1308))
 * **fix:**  - **post:** [#1294](https://github.com/AzzappApp/azzapp/pull/1294) display progress modal sooner on post creation ([#1309](https://github.com/AzzappApp/azzapp/pull/1309))
