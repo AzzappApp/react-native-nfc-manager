@@ -536,7 +536,6 @@ const useCoverEditionManager = ({
   const { setProgressIndicator } = useProgressModal();
 
   const onSave = useCallback(async () => {
-    setProgressIndicator(Observable.from(0));
     //we defined it again because we need to remove the id
     const activeSourceMedia =
       hasSuggestedMedia && suggestedMedia
@@ -552,6 +551,7 @@ const useCoverEditionManager = ({
       return;
     }
 
+    setProgressIndicator(Observable.from(0));
     if (!coverStyle || !colorPalette) {
       // TODO invalid state, should not happens
       if (onSaveRetryCount.current >= 3) {
