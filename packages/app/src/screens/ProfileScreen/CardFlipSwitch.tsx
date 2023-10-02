@@ -27,7 +27,9 @@ export type CardFlipSwitchRef = {
 const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
   ({ flipped, disabled, front, back, onFlip, ...props }, ref) => {
     const flip = useSharedValue(flipped ? 1 : 0);
-    const currentFlip = useSharedValue(flipped ? 1 : 0);
+    const currentFlip = useSharedValue(!!flipped);
+
+    const clockFlipDirection = useSharedValue(!!flipped);
 
     const { width: windowWidth } = useWindowDimensions();
 
@@ -38,6 +40,8 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
       () => {
         return {
           triggerFlip: () => {
+            const nextValue = !currentFlip.value;
+            clockFlipDirection.value = false;
             flip.value = withTiming(
               currentFlip.value ? 0 : 1,
               {
@@ -45,17 +49,18 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
                 easing: Easing.out(Easing.back(1)),
               },
               animated => {
-                if (animated && Boolean(currentFlip.value) !== flipped) {
+                if (animated && currentFlip.value !== flipped) {
                   runOnJS(onFlip)();
                 }
+                clockFlipDirection.value = nextValue;
               },
             );
 
-            currentFlip.value = currentFlip.value ? 0 : 1;
+            currentFlip.value = nextValue;
           },
         };
       },
-      [flip, onFlip, currentFlip, flipped],
+      [clockFlipDirection, flip, currentFlip, flipped, onFlip],
     );
 
     const frontStyle = useAnimatedStyle(() => ({
@@ -70,7 +75,9 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
           rotateY: `${interpolate(
             flip.value,
             [0, 1],
-            [currentFlip.value === 1 ? -360 : 0, -180],
+            clockFlipDirection.value
+              ? [0, -180]
+              : [currentFlip.value ? -360 : 0, -180],
           )}deg`,
         },
         {
@@ -92,7 +99,9 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
             rotateY: `${interpolate(
               flip.value,
               [0, 1],
-              [currentFlip.value === 1 ? 540 : 180, 360],
+              clockFlipDirection.value
+                ? [180, 360]
+                : [currentFlip.value ? 540 : 180, 360],
             )}deg`,
           },
           {
@@ -103,6 +112,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
     });
 
     const flipStartValue = useSharedValue(flip.value);
+
     const pan = Gesture.Pan()
       .enabled(!disabled)
       .hitSlop({
@@ -122,9 +132,8 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
       })
       .onEnd(e => {
         if (Math.abs(e.translationX) > windowWidth / 3) {
-          currentFlip.value = currentFlip.value ? 0 : 1;
           flip.value = withTiming(
-            currentFlip.value,
+            currentFlip.value ? 0 : 1,
             {
               duration: 1000,
               easing: Easing.out(Easing.back(1)),
@@ -135,6 +144,9 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
               }
             },
           );
+          const nextValue = !currentFlip.value;
+          currentFlip.value = nextValue;
+          clockFlipDirection.value = nextValue;
         } else {
           flip.value = withTiming(flipStartValue.value, {
             duration: 300,
