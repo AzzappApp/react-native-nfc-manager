@@ -1,5 +1,9 @@
-## 0.4.2-canary.23
+## 0.4.2-canary.24
 
+* **fix:**  - 🐛 correctly display blurred element position ([#1310](https://github.com/AzzappApp/azzapp/pull/1310))
+* **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) 💃 change orientation when manually flipped ([#1308](https://github.com/AzzappApp/azzapp/pull/1308))
+* **fix:**  - **post:** [#1294](https://github.com/AzzappApp/azzapp/pull/1294) display progress modal sooner on post creation ([#1309](https://github.com/AzzappApp/azzapp/pull/1309))
+* **fix:**  - **webcard:** [#1290](https://github.com/AzzappApp/azzapp/pull/1290) don’t loose context on modal ([#1307](https://github.com/AzzappApp/azzapp/pull/1307))
 * **fix:**  - [#1294](https://github.com/AzzappApp/azzapp/pull/1294) start progress indicator on save action ([#1299](https://github.com/AzzappApp/azzapp/pull/1299))
 * **fix:**  - lint issue ([#1293](https://github.com/AzzappApp/azzapp/pull/1293))
 * **perf:**  - [#801](https://github.com/AzzappApp/azzapp/pull/801) 🐌 slow card flip ([#1292](https://github.com/AzzappApp/azzapp/pull/1292))
