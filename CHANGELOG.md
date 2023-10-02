@@ -1,5 +1,6 @@
-## 0.4.2-canary.27
+## 0.4.2-canary.28
 
+* **fix:**  - **post:** [#1320](https://github.com/AzzappApp/azzapp/pull/1320) toggling one param modifies the other ([#1322](https://github.com/AzzappApp/azzapp/pull/1322))
 * **fix:**  - **webcard:** [#1315](https://github.com/AzzappApp/azzapp/pull/1315) disable button while animation is running ([#1319](https://github.com/AzzappApp/azzapp/pull/1319))
 * **fix:**  - missing created flag ([#1316](https://github.com/AzzappApp/azzapp/pull/1316))
 * **fix:**  - don’t show progress modal until media is set ([#1314](https://github.com/AzzappApp/azzapp/pull/1314))
