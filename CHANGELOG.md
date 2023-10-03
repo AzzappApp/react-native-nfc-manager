@@ -1,5 +1,8 @@
-## 0.4.2-canary.28
+## 0.4.2-canary.29
 
+* **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) misunderstanding on lowest section requirement on duplication ([#1329](https://github.com/AzzappApp/azzapp/pull/1329))
+* **fix:**  - **post:** [#1328](https://github.com/AzzappApp/azzapp/pull/1328) don’t return comments preview when comments are disabled ([#1330](https://github.com/AzzappApp/azzapp/pull/1330))
+* **fix:**  - **webcard:** [#1327](https://github.com/AzzappApp/azzapp/pull/1327) share url of the webcard ([#1331](https://github.com/AzzappApp/azzapp/pull/1331))
 * **fix:**  - **post:** [#1320](https://github.com/AzzappApp/azzapp/pull/1320) toggling one param modifies the other ([#1322](https://github.com/AzzappApp/azzapp/pull/1322))
 * **fix:**  - **webcard:** [#1315](https://github.com/AzzappApp/azzapp/pull/1315) disable button while animation is running ([#1319](https://github.com/AzzappApp/azzapp/pull/1319))
 * **fix:**  - missing created flag ([#1316](https://github.com/AzzappApp/azzapp/pull/1316))
