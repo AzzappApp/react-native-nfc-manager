@@ -4,6 +4,7 @@ import { View, useWindowDimensions, StyleSheet, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -75,13 +76,23 @@ const ProfileWebCardModal = ({
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
-      await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description:
-            'Profile WebcardModal, message use when sharing the contact card',
-        }),
-      });
+      await Share.share(
+        {
+          url: buildUserUrl(profile.userName),
+        },
+        {
+          dialogTitle: intl.formatMessage({
+            defaultMessage: 'Azzapp | An app made for your business',
+            description:
+              'Profile WebcardModal, message use when sharing the contact card',
+          }),
+          subject: intl.formatMessage({
+            defaultMessage: 'Azzapp | An app made for your business',
+            description:
+              'Profile WebcardModal, message use when sharing the contact card',
+          }),
+        },
+      );
       //TODO: handle result of the share when specified
     } catch (error: any) {
       Sentry.captureException(error);
