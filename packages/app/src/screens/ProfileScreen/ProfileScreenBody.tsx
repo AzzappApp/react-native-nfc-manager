@@ -433,6 +433,14 @@ const ProfileScreenBody = (
         }
         const modules = profileRecord.getLinkedRecords('cardModules') ?? [];
 
+        const maxPosition = Math.max(
+          ...[...createdModules].map(c =>
+            modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === c.originalModuleId,
+            ),
+          ),
+        );
+
         [...createdModules]
           .sort((a, b) => {
             const aModuleRecordIndex = modules.findIndex(
@@ -445,7 +453,7 @@ const ProfileScreenBody = (
 
             return aModuleRecordIndex - bModuleRecordIndex;
           })
-          .forEach(({ originalModuleId, newModuleId }) => {
+          .forEach(({ originalModuleId, newModuleId }, index) => {
             const moduleRecordIndex = modules.findIndex(
               moduleRecord => moduleRecord?.getDataID() === originalModuleId,
             );
@@ -459,7 +467,7 @@ const ProfileScreenBody = (
             );
             newModuleRecord.copyFieldsFrom(moduleRecord);
             newModuleRecord.setValue(newModuleId, 'id');
-            modules.push(newModuleRecord);
+            modules.splice(maxPosition + index + 1, 0, newModuleRecord);
           });
         profileRecord.setLinkedRecords(modules, 'cardModules');
       };

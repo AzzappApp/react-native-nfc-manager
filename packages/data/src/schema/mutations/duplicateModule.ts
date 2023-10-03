@@ -1,10 +1,11 @@
+import { sql, and, gt, eq, notInArray } from 'drizzle-orm';
 import omit from 'lodash/omit';
 import ERRORS from '@azzapp/shared/errors';
 import {
   db,
   getCardModulesSortedByPosition,
-  getCardModuleCount,
   createCardModules,
+  CardModuleTable,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
@@ -22,24 +23,40 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
     throw new Error(ERRORS.INVALID_REQUEST);
   }
 
-  const moduleCount = await getCardModuleCount(profileId);
-
   let createdModuleIds: string[] = [];
-  try {
-    await db.transaction(async trx => {
-      createdModuleIds = await createCardModules(
-        modules.map(
-          (module, index) => ({
-            ...omit(module, 'id'),
-            position: moduleCount + index,
-          }),
-          trx,
-        ),
-      );
-    });
-  } catch (e) {
-    console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+  if (modules.length) {
+    try {
+      await db.transaction(async trx => {
+        createdModuleIds = await createCardModules(
+          modules.map(
+            (module, index) => ({
+              ...omit(module, 'id'),
+              position: modules[modules.length - 1].position + index + 1,
+            }),
+            trx,
+          ),
+        );
+
+        await trx
+          .update(CardModuleTable)
+          .set({
+            position: sql`${CardModuleTable.position} + ${modules.length}`,
+          })
+          .where(
+            and(
+              gt(
+                CardModuleTable.position,
+                modules[modules.length - 1].position,
+              ),
+              eq(CardModuleTable.profileId, profileId),
+              notInArray(CardModuleTable.id, createdModuleIds),
+            ),
+          );
+      });
+    } catch (e) {
+      console.error(e);
+      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    }
   }
 
   const profile = (await loaders.Profile.load(profileId))!;
