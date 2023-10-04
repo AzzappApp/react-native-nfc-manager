@@ -60,6 +60,9 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
               animated => {
                 if (animated && currentFlip.value !== flipped) {
                   runOnJS(onFlip)();
+                }
+                if (animated) {
+                  currentFlip.value = nextValue;
                   clockFlipDirection.value = nextValue;
                 }
 
@@ -121,7 +124,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
               [0, 1],
               clockFlipDirection.value
                 ? [startLeft.value ? 180 : 540, 360]
-                : [currentFlip.value ? 540 : 180, 360],
+                : [currentFlip.value ? 540 : 180, startLeft.value ? 0 : 360],
             )}deg`,
           },
           {
@@ -134,7 +137,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
     const flipStartValue = useSharedValue(flip.value);
 
     const pan = Gesture.Pan()
-      .enabled(!disabled)
+      .enabled(!disabled && !animationRunning.value)
 
       .onStart(event => {
         startLeft.value = event.absoluteX < windowWidth / 2;
@@ -161,16 +164,15 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
               duration: 1000,
               easing: Easing.out(Easing.back(1)),
             },
-            animated => {
-              if (animated) {
-                runOnJS(onFlip)();
-              }
+            () => {
+              runOnJS(onFlip)();
+
+              const nextValue = !currentFlip.value;
+              currentFlip.value = nextValue;
+              clockFlipDirection.value = nextValue;
               animationRunning.value = false;
             },
           );
-          const nextValue = !currentFlip.value;
-          currentFlip.value = nextValue;
-          clockFlipDirection.value = nextValue;
         } else {
           animationRunning.value = true;
           flip.value = withTiming(
