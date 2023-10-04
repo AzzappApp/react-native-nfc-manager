@@ -35,7 +35,9 @@ const PostPage = async (props: PostPageProps) => {
         author && post
           ? await getProfilesPostsWithMedias(author.id, 3, 0, post.id)
           : [];
-      const comments = post ? await getPostCommentsWithProfile(post.id, 5) : [];
+      const comments = post?.allowComments
+        ? await getPostCommentsWithProfile(post.id, 5)
+        : [];
 
       const [media] = author?.coverData?.mediaId
         ? await getMediasByIds([author.coverData.mediaId])
