@@ -37,6 +37,8 @@ jest.mock('expo-media-library', () => ({
   getAssetInfoAsync: jest
     .fn()
     .mockReturnValue({ localUri: 'localUri', mediaType: 'image' }),
+  addListener: jest.fn(),
+  removeAllListeners: jest.fn(),
 }));
 
 describe('PhotoGalleryMediaList', () => {
