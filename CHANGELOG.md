@@ -1,5 +1,8 @@
-## 0.4.2-canary.34
+## 0.4.2-canary.35
 
+* **fix:**  - Don't fetch comment if comment not allowed ([#1343](https://github.com/AzzappApp/azzapp/pull/1343))
+* **fix:**  - Toast dragging the shadow ([#1342](https://github.com/AzzappApp/azzapp/pull/1342))
+* **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) fix rotation animation ([#1340](https://github.com/AzzappApp/azzapp/pull/1340))
 * **test:**  - 💍 mock necessary methods for media ([#1344](https://github.com/AzzappApp/azzapp/pull/1344))
 * **fix:**  - 🐛 display media and ask permission ([#1341](https://github.com/AzzappApp/azzapp/pull/1341))
 * **fix:**  - **video:** [#1332](https://github.com/AzzappApp/azzapp/pull/1332) non local video loading never ends ([#1336](https://github.com/AzzappApp/azzapp/pull/1336))
