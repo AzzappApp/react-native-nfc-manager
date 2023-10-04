@@ -1,3 +1,4 @@
+import { addListener, removeAllListeners } from 'expo-media-library';
 import React, {
   useCallback,
   useEffect,
@@ -57,6 +58,18 @@ const SelectImageStep = ({
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
     'gallery',
   );
+
+  const [validatedPermission, setValidatedPermission] = useState(false);
+
+  useEffect(() => {
+    addListener(() => {
+      setValidatedPermission(true);
+    });
+
+    return () => {
+      removeAllListeners();
+    };
+  }, []);
 
   const onAspectRatioToggle = () => {
     if (!media) {
@@ -340,7 +353,11 @@ const SelectImageStep = ({
           !permissionDenied &&
           ((pickerMode === 'gallery' &&
             mediaLibraryPermission != null &&
-            !mediaLibraryPermission.granted) ||
+            !(
+              mediaLibraryPermission.granted ||
+              mediaLibraryPermission.accessPrivileges !== 'limited' ||
+              validatedPermission
+            )) ||
             (pickerMode === 'photo' && !hasCameraPermission) ||
             (pickerMode === 'video' &&
               (!hasCameraPermission || !hasMicrophonePermission)))

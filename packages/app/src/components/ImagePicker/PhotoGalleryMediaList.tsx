@@ -1,6 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { getAssetInfoAsync, getAssetsAsync } from 'expo-media-library';
+import {
+  addListener,
+  getAssetInfoAsync,
+  getAssetsAsync,
+  removeAllListeners,
+} from 'expo-media-library';
 import { useCallback, useRef, useState, useEffect, memo } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions, View } from 'react-native';
@@ -299,6 +304,16 @@ const PhotoGalleryMediaList = ({
       void onMediaPress(medias[0]);
     }
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaID]);
+
+  useEffect(() => {
+    addListener(() => {
+      load(true);
+    });
+
+    return () => {
+      removeAllListeners();
+    };
+  }, [load]);
 
   return (
     <PanGestureHandler onGestureEvent={eventHandler} ref={panRef}>
