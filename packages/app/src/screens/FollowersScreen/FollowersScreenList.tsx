@@ -107,7 +107,7 @@ const FollowersScreenList = ({
         });
       }
     },
-    [commit, currentProfileId, data.followers.__id, intl],
+    [commit, currentProfileId, data.followers, intl],
   );
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');

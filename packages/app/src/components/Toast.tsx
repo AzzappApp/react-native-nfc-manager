@@ -112,6 +112,7 @@ const Toast = ({
               : ['rgba(0,0,0,0.5)', 'transparent']
           }
           style={styles.info}
+          pointerEvents="none"
         >
           <BaseToast
             {...infoProps}
