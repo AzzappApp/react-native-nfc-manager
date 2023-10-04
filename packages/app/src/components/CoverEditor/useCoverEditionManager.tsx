@@ -449,8 +449,8 @@ const useCoverEditionManager = ({
         });
         setMediaComputation(mediaComputation);
 
-        mediaComputation.promise.then(
-          result => {
+        mediaComputation.promise
+          .then(result => {
             if (result === 'canceled') {
               return;
             }
@@ -466,11 +466,10 @@ const useCoverEditionManager = ({
               setMediaComputation(null);
               setTimeRange(null);
             });
-          },
-          error => {
-            setMediaComputationError(error);
-          },
-        );
+          })
+          .catch(err => {
+            setMediaComputationError(err);
+          });
       } else {
         setMaskMedia(null);
       }

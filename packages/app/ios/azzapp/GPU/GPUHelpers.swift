@@ -285,16 +285,13 @@ class GPUHelpers: NSObject {
     }
     
     var asset: AVAsset;
-    if (uri.isFileURL) {
-      asset = AVAsset(url: uri)
-    } else {
-      do {
-        let location = try await downloadFile(url: uri)
-        asset = AVAsset(url: location)
-      } catch {
-        reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not download file", error)
-        return
-      }
+   
+    do {
+      let location = try await downloadFile(url: uri)
+      asset = AVAsset(url: location)
+    } catch {
+      reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not download file", error)
+      return
     }
     
     guard let videoTrack = asset.tracks(withMediaType: .video).first else {
@@ -337,7 +334,7 @@ class GPUHelpers: NSObject {
       // TODO do we need to test canAddInput ??
       writer.add(videoWriterInput)
     } catch {
-      reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetWriter", error)
+      reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetWriter \(error)", error)
       return
     }
     
@@ -385,7 +382,7 @@ class GPUHelpers: NSObject {
       // TODO should we use canAddOutput ?
       videoReader.add(videoOutput)
     } catch {
-      reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetReader", error)
+      reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetReader \(error) \(asset)", error)
       return
     }
     videoReader.timeRange = timeRange
@@ -416,7 +413,7 @@ class GPUHelpers: NSObject {
         audioReader!.timeRange = timeRange
         audioReader!.add(audioOutput!)
       } catch {
-        reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetReader", error)
+        reject(GPUViewError.FAILED_TO_EXPORT_CODE, "Could not instanciate AVAssetReader on audio \(error) \(asset)", error)
         return
       }
     }
