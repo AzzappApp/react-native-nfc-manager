@@ -1,5 +1,7 @@
-## 0.4.2-canary.33
+## 0.4.2-canary.34
 
+* **test:**  - 💍 mock necessary methods for media ([#1344](https://github.com/AzzappApp/azzapp/pull/1344))
+* **fix:**  - 🐛 display media and ask permission ([#1341](https://github.com/AzzappApp/azzapp/pull/1341))
 * **fix:**  - **video:** [#1332](https://github.com/AzzappApp/azzapp/pull/1332) non local video loading never ends ([#1336](https://github.com/AzzappApp/azzapp/pull/1336))
 * **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) rotate for anywhere ([#1337](https://github.com/AzzappApp/azzapp/pull/1337))
 * **feat:**  - new profile and cover creation design change ([#1334](https://github.com/AzzappApp/azzapp/pull/1334))
