@@ -1,4 +1,4 @@
-## 0.4.2-canary.32
+## 0.4.2-canary.33
 
 * **fix:**  - **video:** [#1332](https://github.com/AzzappApp/azzapp/pull/1332) non local video loading never ends ([#1336](https://github.com/AzzappApp/azzapp/pull/1336))
 * **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) rotate for anywhere ([#1337](https://github.com/AzzappApp/azzapp/pull/1337))
