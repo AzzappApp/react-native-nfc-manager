@@ -1,6 +1,14 @@
 import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { View, FlatList, useWindowDimensions, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,7 +38,7 @@ import type {
   ColorPalette,
   CardTemplateType,
 } from '@azzapp/shared/cardHelpers';
-import type { ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 import type {
   ListRenderItem,
   NativeScrollEvent,
@@ -49,17 +57,24 @@ type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   previewModalStyle?: ViewProps['style'];
 };
 
-const CardTemplateList = ({
-  height,
-  onApplyTemplate,
-  onSkip,
-  loading,
-  style,
-  previewModalStyle,
-  onPreviewModal,
-  onPreviewModalClose,
-  ...props
-}: CardTemplateListProps) => {
+export type CardTemplatelistHandle = {
+  onSubmit: () => void;
+};
+
+const CardTemplateList = (
+  {
+    height,
+    onApplyTemplate,
+    onSkip,
+    loading,
+    style,
+    previewModalStyle,
+    onPreviewModal,
+    onPreviewModalClose,
+    ...props
+  }: CardTemplateListProps,
+  forwardRef: ForwardedRef<CardTemplatelistHandle>,
+) => {
   const { viewer } = useLazyLoadQuery<CardTemplateListQuery>(
     graphql`
       query CardTemplateListQuery {
@@ -196,6 +211,10 @@ const CardTemplateList = ({
 
     onApplyTemplate(templates[selectedIndexRef.current].id);
   };
+
+  useImperativeHandle(forwardRef, () => ({
+    onSubmit,
+  }));
 
   const [previewTemplate, setPreviewTemplate] =
     useState<CardTemplateItem | null>(null);
@@ -465,7 +484,7 @@ const CardTemplateList = ({
   );
 };
 
-export default CardTemplateList;
+export default forwardRef(CardTemplateList);
 
 type CardTemplateItem = {
   id: string;

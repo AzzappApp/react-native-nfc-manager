@@ -27,8 +27,6 @@ import {
 } from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import CarouselSelectList from '#ui/CarouselSelectList';
-import Container from '#ui/Container';
-import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
@@ -71,13 +69,6 @@ export type CoverEditorProps = {
   mediaComputing: boolean;
   showTemplatesMedias: boolean;
   initialSelectedIndex: number;
-  suggestedMedia: {
-    uri: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
-  } | null;
-  showSuggestedMedia: boolean;
   onSelectedIndexChange: (index: number) => void;
   onCoverStyleChange: (data: CoverStyleData) => void;
   onColorPaletteChange: (palette: ColorPalette) => void;
@@ -87,7 +78,7 @@ export type CoverEditorProps = {
     width: number;
     height: number;
   }) => void;
-  onSelectSuggestedMedia: () => void;
+  showSuggestedMedia: boolean;
 };
 
 const CoverEditorTemplateList = ({
@@ -106,13 +97,11 @@ const CoverEditorTemplateList = ({
   mediaComputing,
   showTemplatesMedias,
   initialSelectedIndex,
-  suggestedMedia,
   showSuggestedMedia,
   onCoverStyleChange,
   onColorPaletteChange,
   onPreviewMediaChange,
   onSelectedIndexChange,
-  onSelectSuggestedMedia,
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
@@ -259,8 +248,8 @@ const CoverEditorTemplateList = ({
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
         media:
-          showSuggestedMedia && suggestedMedia
-            ? suggestedMedia
+          showSuggestedMedia && media
+            ? media
             : displayTemplateMedia
             ? {
                 uri: previewMedia.uri,
@@ -341,7 +330,6 @@ const CoverEditorTemplateList = ({
     title,
     subTitle,
     showSuggestedMedia,
-    suggestedMedia,
     mediaCropParameters,
     maskUri,
   ]);
@@ -676,23 +664,6 @@ const CoverEditorTemplateList = ({
             })}
           />
         </MaskedView>
-        {showSuggestedMedia && (
-          <Container
-            style={{
-              height: PALETTE_LIST_HEIGHT,
-              width: 60,
-            }}
-          >
-            <IconButton
-              icon={
-                templateKind === 'video' ? 'suggested_video' : 'suggested_photo'
-              }
-              variant="icon"
-              iconSize={36}
-              onPress={onSelectSuggestedMedia}
-            />
-          </Container>
-        )}
       </View>
     </>
   );

@@ -118,6 +118,7 @@ const useCoverEditionManager = ({
           label
         }
         cardCover {
+          kind
           title
           subTitle
           mediaParameters
@@ -171,11 +172,12 @@ const useCoverEditionManager = ({
     profileKey,
   );
 
-  const [templateKind, setTemplateKind] =
-    useState<TemplateKind>(initialTemplateKind);
-
   const cardCover = profile?.cardCover;
   const cardColors = profile?.cardColors;
+
+  const [templateKind, setTemplateKind] = useState<TemplateKind>(
+    (cardCover?.kind as TemplateKind) ?? initialTemplateKind,
+  );
 
   // #region Cover data
   const [title, setTitle] = useState<string | null>(() => {
@@ -266,9 +268,13 @@ const useCoverEditionManager = ({
     setMediaCropParameter(lastCroppedBeforeSuggested.current);
   }, []);
 
+  const showSuggestedMedia = useMemo(() => {
+    return templateKind !== 'people' && profile?.profileKind === 'business';
+  }, [templateKind, profile?.profileKind]);
+
   const hasSuggestedMedia = useMemo(() => {
-    return !mediaVisible && templateKind !== 'people' && suggestedMedia != null;
-  }, [suggestedMedia, templateKind, mediaVisible]);
+    return showSuggestedMedia && !mediaVisible && suggestedMedia != null;
+  }, [showSuggestedMedia, mediaVisible, suggestedMedia]);
 
   const [maskMedia, setMaskMedia] = useState<CoverData['maskMedia'] | null>(
     initialData ? initialData?.maskMedia : cardCover?.maskMedia ?? null,
@@ -321,53 +327,42 @@ const useCoverEditionManager = ({
   };
   const mediaInfosRef = useRef<{
     video: MediaInfos | null;
-    image: MediaInfos | null;
+    others: MediaInfos | null;
+    people: MediaInfos | null;
   }>({
     video: null,
-    image: null,
+    others: null,
+    people: null,
   });
 
   const updateEditedMediaKind = useCallback(
     (kind: TemplateKind) => {
       unstable_batchedUpdates(() => {
-        setTemplateKind(kind);
-        const newMediaKind = kind === 'video' ? 'video' : 'image';
-        if (newMediaKind === 'video' && mediaKind === 'image') {
-          mediaInfosRef.current.image = {
-            sourceMedia,
-            maskMedia,
-            mediaCropParameter,
-          };
-          const videoInfos = mediaInfosRef.current.video;
-          setSourceMedia(videoInfos?.sourceMedia ?? null);
-          setMaskMedia(null);
-          setMediaCropParameter(videoInfos?.mediaCropParameter ?? null);
-          setMediaVisible(videoInfos?.sourceMedia != null);
-        } else if (newMediaKind === 'image' && mediaKind === 'video') {
-          mediaInfosRef.current.video = {
-            sourceMedia,
-            maskMedia,
-            mediaCropParameter,
-          };
-          const imageInfos = mediaInfosRef.current.image;
-          setSourceMedia(imageInfos?.sourceMedia ?? null);
-          setMaskMedia(imageInfos?.maskMedia ?? null);
-          setMediaCropParameter(imageInfos?.mediaCropParameter ?? null);
-          setMediaVisible(imageInfos?.sourceMedia != null);
-        }
+        mediaInfosRef.current[templateKind] = {
+          sourceMedia,
+          maskMedia,
+          mediaCropParameter,
+        };
+        const newMediaInfos = mediaInfosRef.current[kind];
+        setSourceMedia(newMediaInfos?.sourceMedia ?? null);
+        setMaskMedia(null);
+        setMediaCropParameter(newMediaInfos?.mediaCropParameter ?? null);
+        setMediaVisible(newMediaInfos?.sourceMedia != null);
+
         if (profile?.profileKind === 'business') {
           selectSuggestedMedia(kind);
         }
-        setMediaKind(newMediaKind);
+        setMediaKind(kind === 'video' ? 'video' : 'image');
+        setTemplateKind(kind);
       });
     },
     [
       maskMedia,
       mediaCropParameter,
-      mediaKind,
       profile?.profileKind,
       selectSuggestedMedia,
       sourceMedia,
+      templateKind,
     ],
   );
   //#endregion
@@ -519,6 +514,7 @@ const useCoverEditionManager = ({
           ...CoverRenderer_profile
           ...useCoverEditionManager_profile
           cardCover {
+            kind
             media {
               id
             }
@@ -590,6 +586,7 @@ const useCoverEditionManager = ({
         textPosition: coverStyle.textPosition,
         title,
         titleStyle: coverStyle.titleStyle,
+        kind: templateKind,
       };
 
       const mediaStyle = [
@@ -629,6 +626,7 @@ const useCoverEditionManager = ({
               size,
               format: 'png',
             };
+            saveCoverInput.kind = 'people';
           }
           mediaPath = await exportLayersToImage({
             ...exportOptions,
@@ -785,6 +783,7 @@ const useCoverEditionManager = ({
     hasSuggestedMedia,
     suggestedMedia,
     sourceMedia,
+    setProgressIndicator,
     coverStyle,
     colorPalette,
     mediaComputation,
@@ -793,10 +792,10 @@ const useCoverEditionManager = ({
     commit,
     subTitle,
     title,
+    templateKind,
     cardCover,
     currentCoverStyle,
     maskMedia,
-    setProgressIndicator,
     profile?.profileKind,
     onCoverSaved,
     intl,
@@ -937,10 +936,12 @@ const useCoverEditionManager = ({
     //media visibility
     templateKind,
     mediaVisible,
+
     // Media Suggestion
     suggestedMedia,
-    selectSuggestedMedia: setSuggestedMedia,
     hasSuggestedMedia,
+    showSuggestedMedia,
+
     // react elements
     modals,
 
@@ -958,6 +959,7 @@ const useCoverEditionManager = ({
     toggleMediaVisibility,
     setTemplateKind,
     onSave,
+    selectSuggestedMedia: setSuggestedMedia,
   };
 };
 

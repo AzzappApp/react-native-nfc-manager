@@ -7,6 +7,10 @@ extend type Mutation {
 
 input SaveCoverInput {
   """
+  The kind of the card
+  """
+  kind: CardCoverKind
+  """
   The title of the card
   """
   title: String

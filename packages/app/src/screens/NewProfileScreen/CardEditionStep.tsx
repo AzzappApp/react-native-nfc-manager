@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, forwardRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -6,6 +6,8 @@ import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { ForwardedRef } from 'react';
 
 type CardEditionStepPros = {
   height: number;
@@ -15,13 +17,16 @@ type CardEditionStepPros = {
   showHeader: () => void;
 };
 
-const CardEditionStep = ({
-  height,
-  onSkip,
-  onCoverTemplateApplied,
-  hideHeader,
-  showHeader,
-}: CardEditionStepPros) => {
+const CardEditionStep = (
+  {
+    height,
+    onSkip,
+    onCoverTemplateApplied,
+    hideHeader,
+    showHeader,
+  }: CardEditionStepPros,
+  forwardRef: ForwardedRef<CardTemplatelistHandle>,
+) => {
   const insets = useScreenInsets();
   const eidtorHeight = height - Math.min(insets.bottom, 16);
 
@@ -69,12 +74,13 @@ const CardEditionStep = ({
         previewModalStyle={{
           transform: [{ translateY: -insets.top }],
         }}
+        ref={forwardRef}
       />
     </Suspense>
   );
 };
 
-export default CardEditionStep;
+export default forwardRef(CardEditionStep);
 
 const styles = StyleSheet.create({
   activityIndicatorContainer: {

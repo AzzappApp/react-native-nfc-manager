@@ -221,7 +221,14 @@ const ProfileKindStep = ({
           showsVerticalScrollIndicator={false}
         />
       </MaskedView>
-      <ContinueButton onPress={onNext} />
+      <ContinueButton
+        onPress={onNext}
+        label={intl.formatMessage({
+          defaultMessage: "Let's go!",
+          description:
+            'Create New Cover - Button Let"s go for choosing a webcard type',
+        })}
+      />
     </View>
   );
 };

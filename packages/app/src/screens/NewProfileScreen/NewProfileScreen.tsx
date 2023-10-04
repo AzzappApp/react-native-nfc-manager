@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { PixelRatio, View, useWindowDimensions } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { prefetchImage } from '#helpers/mediaHelpers';
@@ -13,14 +14,18 @@ import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import Text from '#ui/Text';
 import CardEditionStep from './CardEditionStep';
 import CoverEditionStep from './CoverEditionStep';
 import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import ProfileForm from './ProfileForm';
 import ProfileKindStep from './ProfileKindStep';
 import WizzardTransitioner from './WizzardTransitioner';
+import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewProfileRoute } from '#routes';
+import type { ProfileFormHandle } from './ProfileForm';
 import type { NewProfileScreenPreloadQuery } from '@azzapp/relay/artifacts/NewProfileScreenPreloadQuery.graphql';
 import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
 import type { NewProfileScreenWithProfileQuery } from '@azzapp/relay/artifacts/NewProfileScreenWithProfileQuery.graphql';
@@ -149,19 +154,37 @@ export const NewProfileScreen = ({
   // #region Layout
   const insets = useScreenInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const contentHeight =
-    windowHeight - insets.top - insets.bottom - PAGER_HEADER_HEIGHT;
+  const contentHeight = windowHeight - insets.top - PAGER_HEADER_HEIGHT;
   // #endregion
 
   const [headerHidden, setHeaderHiden] = useState(false);
+  const profileFormRef = useRef<ProfileFormHandle>(null);
+  const onSubmitProfileForm = () => {
+    profileFormRef.current?.onSubmit();
+  };
+  const [canSave, setCanSave] = useState(false);
+  const coverEditionRef = useRef<CoverEditorHandle>(null);
+  const onCoverEditionRef = () => {
+    coverEditionRef.current?.save();
+  };
+
+  const webcardTemplateRef = useRef<CardTemplatelistHandle>(null);
+  const onWebcardTemplateRef = () => {
+    coverEditionRef.current?.save();
+  };
 
   const intl = useIntl();
   const steps = [
     {
-      title: intl.formatMessage({
-        defaultMessage: 'What WebCard™\nwould you like to create?',
-        description: 'WebCard kind selection screen title',
-      }),
+      title: intl.formatMessage(
+        {
+          defaultMessage: 'Select a WebCard{azzappAp} type',
+          description: 'WebCard kind selection screen title',
+        },
+        {
+          azzappAp: <Text variant="azzapp">a</Text>,
+        },
+      ) as string,
       element: (
         <ProfileKindStep
           profileCategories={profileCategories}
@@ -189,9 +212,17 @@ export const NewProfileScreen = ({
             profileKind={profileKind!}
             profileCategory={profileCategory}
             onProfileCreated={onProfileCreated}
+            ref={profileFormRef}
           />
         ) : null,
       backIcon: 'arrow_left' as const,
+      rightElement: (
+        <NextHeaderButton
+          style={{ width: 70, marginRight: 10 }}
+          onPress={onSubmitProfileForm}
+        />
+      ),
+      rightElementWidth: 80,
     },
     {
       title: intl.formatMessage({
@@ -206,11 +237,21 @@ export const NewProfileScreen = ({
             <CoverEditionStep
               profileKind={profileKind!}
               height={contentHeight}
+              setCanSave={setCanSave}
               onCoverSaved={onCoverSaved}
+              ref={coverEditionRef}
             />
           </ProfileBoundRelayEnvironmentProvider>
         ) : null,
       backIcon: 'arrow_down' as const,
+      rightElement: (
+        <NextHeaderButton
+          style={{ width: 70, marginRight: 10 }}
+          onPress={onCoverEditionRef}
+          disabled={!canSave}
+        />
+      ),
+      rightElementWidth: 80,
     },
     {
       title: intl.formatMessage({
@@ -228,11 +269,19 @@ export const NewProfileScreen = ({
               onCoverTemplateApplied={onCoverTemplateApplied}
               hideHeader={() => setHeaderHiden(true)}
               showHeader={() => setHeaderHiden(false)}
+              ref={webcardTemplateRef}
             />
           </ProfileBoundRelayEnvironmentProvider>
         ) : null,
 
       backIcon: 'arrow_down' as const,
+      rightElement: (
+        <NextHeaderButton
+          style={{ width: 70, marginRight: 10 }}
+          onPress={onWebcardTemplateRef}
+        />
+      ),
+      rightElementWidth: 80,
     },
   ];
 
@@ -244,7 +293,10 @@ export const NewProfileScreen = ({
       contentHeight={contentHeight}
       onBack={onBack}
       headerHidden={headerHidden}
-      style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+      }}
     />
   );
 };

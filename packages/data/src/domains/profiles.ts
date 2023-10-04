@@ -56,6 +56,7 @@ export const ProfileTable = mysqlTable(
     coverTitle: cols.defaultVarchar('coverTitle'),
     coverSubTitle: cols.defaultVarchar('coverSubTitle'),
     coverData: json('coverData').$type<{
+      kind: 'others' | 'people' | 'video' | null;
       titleStyle: TextStyle;
       subTitleStyle: TextStyle;
       textOrientation: TextOrientation;

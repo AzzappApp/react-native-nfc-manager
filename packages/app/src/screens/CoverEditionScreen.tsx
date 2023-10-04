@@ -50,14 +50,13 @@ const CoverEditionScreen = ({
   const insets = useScreenInsets();
 
   const editorHeight =
-    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom - 20;
+    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom;
 
   return (
     <Container
       style={{
         flex: 1,
         paddingTop: insets.top,
-        paddingBottom: insets.bottom + 20,
       }}
     >
       <Header

@@ -98,6 +98,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
           sourceMediaId: coverDataUpdated.sourceMediaId,
           merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
+          kind: coverDataUpdated.kind ?? null,
         };
         if (input.cardColors) {
           updates.cardColors = input.cardColors;

@@ -102,3 +102,17 @@ export const SaveHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
     />
   );
 };
+
+export const NextHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="primary"
+      label={intl.formatMessage({
+        defaultMessage: 'Next',
+        description: 'Next header button label',
+      })}
+      {...props}
+    />
+  );
+};

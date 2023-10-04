@@ -6,6 +6,10 @@ type CardCover {
   if the card exist(has at least a mediaId)
   """
   isCreated: Boolean!
+  """ 
+  type of the card Cover for simple edition mode
+  """
+  kind: CardCoverKind
   """
   The title of the card
   """
@@ -80,6 +84,14 @@ type CardCover {
   merged: Boolean!
 }
 
+"""
+Kind of card Cover
+"""
+enum CardCoverKind {
+  people
+  others
+  video
+}
 
 """
 Style of the text in a card cover

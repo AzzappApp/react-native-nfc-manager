@@ -1,5 +1,5 @@
-import { Suspense, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Suspense, forwardRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
@@ -7,23 +7,24 @@ import CoverEditor from '#components/CoverEditor';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import Button, { BUTTON_HEIGHT } from '#ui/Button';
+import { BUTTON_HEIGHT } from '#ui/Button';
 import Text from '#ui/Text';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { CoverEditionStepQuery } from '@azzapp/relay/artifacts/CoverEditionStepQuery.graphql';
 import type { ProfileKind } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
+import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
   profileKind: ProfileKind;
   height: number;
   onCoverSaved: () => void;
+  setCanSave: (value: boolean) => void;
 };
 
-const CoverEditionStep = ({
-  profileKind,
-  height,
-  onCoverSaved,
-}: CoverEditionStepProps) => {
+const CoverEditionStep = (
+  { profileKind, height, onCoverSaved, setCanSave }: CoverEditionStepProps,
+  forwardRef: ForwardedRef<CoverEditorHandle>,
+) => {
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
     graphql`
       query CoverEditionStepQuery {
@@ -37,15 +38,6 @@ const CoverEditionStep = ({
       initialTemplateKind: profileKind === 'business' ? 'others' : 'people',
     },
   );
-
-  const [canSave, setCanSave] = useState(true);
-
-  const ref = useRef<CoverEditorHandle>(null);
-  const onSave = () => {
-    ref.current?.save();
-  };
-
-  const intl = useIntl();
 
   const insets = useScreenInsets();
   const eidtorHeight =
@@ -75,7 +67,7 @@ const CoverEditionStep = ({
         </View>
         <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
           <CoverEditor
-            ref={ref}
+            ref={forwardRef}
             viewer={data.viewer}
             height={eidtorHeight}
             onCoverSaved={onCoverSaved}
@@ -84,24 +76,15 @@ const CoverEditionStep = ({
               profileKind === 'business' ? 'others' : 'people'
             }
           />
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Save my cover',
-              description: 'Cover editor save button label',
-            })}
-            style={styles.saveButton}
-            onPress={onSave}
-            disabled={!canSave}
-          />
         </View>
       </Suspense>
     </View>
   );
 };
 
-export default CoverEditionStep;
+export default forwardRef(CoverEditionStep);
 
-const SUBTITLE_HEIGHT = 56;
+const SUBTITLE_HEIGHT = 42;
 
 const stylesheet = createStyleSheet(appearance => ({
   activityIndicatorContainer: {

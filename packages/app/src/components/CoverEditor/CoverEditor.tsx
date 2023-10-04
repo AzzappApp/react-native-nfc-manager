@@ -9,7 +9,7 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useIntl } from 'react-intl';
 import {
   Keyboard,
   Modal,
@@ -18,23 +18,22 @@ import {
   unstable_batchedUpdates,
   useWindowDimensions,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
-import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import { FLOATING_BUTTON_SIZE } from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
-import TabBarMenuItem, { TAB_BAR_MENU_ITEM_HEIGHT } from '#ui/TabBarMenuItem';
 import TextInput from '#ui/TextInput';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
+import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
 import useCoverEditionManager from './useCoverEditionManager';
-import type { ColorPalette, TemplateKind } from './coverEditorTypes';
+import type { TemplateKind, ColorPalette } from './coverEditorTypes';
 import type { CoverData } from './useCoverEditionManager';
 import type { CoverEditor_viewer$key } from '@azzapp/relay/artifacts/CoverEditor_viewer.graphql';
 import type { useSuggestedMediaManager_suggested$key } from '@azzapp/relay/artifacts/useSuggestedMediaManager_suggested.graphql';
@@ -63,12 +62,13 @@ const CoverEditor = (
   }: CoverEditorProps,
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
+  const intl = useIntl();
   // #region Data
   const viewer = useFragment(
     graphql`
       fragment CoverEditor_viewer on Viewer {
         profile {
-          profileKind
+          ...CoverEditorSuggestionButton_profile
           ...useCoverEditionManager_profile
         }
         ...CoverEditorCustom_viewer
@@ -97,7 +97,7 @@ const CoverEditor = (
     modals,
     mediaComputing,
     mediaVisible,
-    suggestedMedia,
+    showSuggestedMedia,
     hasSuggestedMedia,
     templateKind,
     // TODO handle
@@ -136,6 +136,7 @@ const CoverEditor = (
   );
 
   // #region Title modal
+  const { bottom: insetBottom } = useScreenInsets();
   const [titleModalOpen, setTitleModalOpen] = useState(false);
   const openTitleModal = useCallback(() => {
     setTitleModalOpen(true);
@@ -202,10 +203,10 @@ const CoverEditor = (
   const templateListHeight = Math.min(
     height -
       (SMALL_GAP +
-        TAB_BAR_MENU_ITEM_HEIGHT +
+        BOTTOM_MENU_HEIGHT +
         SMALL_GAP +
         GAP +
-        FLOATING_BUTTON_SIZE),
+        (FLOATING_BUTTON_SIZE * 2 + 10)),
     windowWidth / (COVER_RATIO * 1.5),
   );
   // #endregion
@@ -234,48 +235,50 @@ const CoverEditor = (
   );
 
   // #region Suggested Media
-
-  const showSuggestedMedia = useMemo(
-    () =>
-      templateKind !== 'people' &&
-      (!mediaVisible || activeSourceMedia == null) &&
-      viewer.profile?.profileKind === 'business',
-    [
-      activeSourceMedia,
-      mediaVisible,
-      templateKind,
-      viewer.profile?.profileKind,
-    ],
-  );
-
   const onPressSuggestedMedia = useCallback(() => {
     selectSuggestedMedia(templateKind);
   }, [selectSuggestedMedia, templateKind]);
 
   // #region Template Kind
   const onSwitchTemplateKind = useCallback(
-    async (kind: TemplateKind) => {
+    async (kind: string) => {
       startTransition(() => {
         // We try to take advantage of the transition to reduce the flickering
         // but it's not perfect, and we would need to use react 18 concurrent mode
         unstable_batchedUpdates(() => {
-          setTemplateKind(kind);
-          updateEditedMediaKind(kind);
+          setTemplateKind(kind as TemplateKind);
+          updateEditedMediaKind(kind as TemplateKind);
         });
       });
+      const tostMessage =
+        kind === 'people'
+          ? intl.formatMessage({
+              defaultMessage: "Remove background behind people's photo",
+              description:
+                'Toast message while switching to people in cover creation',
+            })
+          : kind === 'others'
+          ? intl.formatMessage({
+              defaultMessage: 'Add a photo yo your cover',
+              description:
+                'Toast message while switching to others in cover creation',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Add a video to your cover',
+              description:
+                'Toast message while switching to viode in cover creation',
+            });
+      Toast.show({
+        type: 'success',
+        text1: tostMessage,
+        bottomOffset: BOTTOM_MENU_HEIGHT + insetBottom,
+      });
     },
-    [setTemplateKind, updateEditedMediaKind],
+    [insetBottom, intl, setTemplateKind, updateEditedMediaKind],
   );
 
   // #region canSave
   const canSave = !mediaComputing;
-
-  // (((mediaVisible || sourceMedia == null) &&
-  //   (viewer?.profile?.profileKind === 'personal' ||
-  //     templateKind === 'people')) ||
-  //   (viewer?.profile?.profileKind === 'business' &&
-  //     templateKind !== 'people' &&
-  //     mediaVisible)); //
 
   useEffect(() => {
     onCanSaveChange(canSave);
@@ -284,45 +287,13 @@ const CoverEditor = (
 
   return (
     <>
-      <Container style={styles.root}>
-        <View style={styles.tabBarContainer} accessibilityRole="tablist">
-          <TabBarMenuItem
-            selected={templateKind === 'people'}
-            setSelected={() => onSwitchTemplateKind('people')}
-            icon="silhouette"
-          >
-            <FormattedMessage
-              defaultMessage="People"
-              description="Cover editor people tab bar item label"
-            />
-          </TabBarMenuItem>
-          <TabBarMenuItem
-            selected={templateKind === 'video'}
-            setSelected={() => onSwitchTemplateKind('video')}
-            icon="video"
-          >
-            <FormattedMessage
-              defaultMessage="Video"
-              description="Cover editor video tab bar item label"
-            />
-          </TabBarMenuItem>
-
-          <TabBarMenuItem
-            selected={templateKind === 'others'}
-            setSelected={() => onSwitchTemplateKind('others')}
-            icon="landscape"
-          >
-            <FormattedMessage
-              defaultMessage="Others"
-              description="Cover editor others tab bar item label"
-            />
-          </TabBarMenuItem>
-        </View>
+      <Container style={[styles.root]}>
         <View
           style={{
             height: templateListHeight,
             width: templateListWidth,
             alignSelf: 'center',
+            marginTop: 30,
           }}
         >
           <Suspense
@@ -362,41 +333,30 @@ const CoverEditor = (
               onCoverStyleChange={setCoverStyle}
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
-              onSelectSuggestedMedia={onPressSuggestedMedia}
               mediaComputing={mediaComputing}
-              suggestedMedia={suggestedMedia}
               showSuggestedMedia={showSuggestedMedia}
             />
           </Suspense>
         </View>
-        <View style={styles.controlPanel}>
+        <View
+          style={[
+            styles.controlPanel,
+            {
+              marginBottom: BOTTOM_MENU_HEIGHT + insetBottom,
+            },
+          ]}
+        >
           <FloatingIconButton icon="camera" onPress={openImagePicker} />
           <FloatingIconButton icon="text" onPress={openTitleModal} />
-          {sourceMedia && (
-            <PressableOpacity
-              style={[styles.mediaHideButton]}
-              onPress={toggleMediaVisibility}
-            >
-              <GPUImageView
-                style={[
-                  styles.mediaHideButtonImage,
-                  !mediaVisible && { opacity: 0.5 },
-                  { overflow: 'hidden' },
-                ]}
-                testID="image-picker-media-video"
-              >
-                {sourceMedia.kind === 'image' ? (
-                  <ImageLayer uri={sourceMedia.uri} />
-                ) : (
-                  <VideoFrame uri={sourceMedia.uri} time={0} />
-                )}
-              </GPUImageView>
-
-              <Icon
-                style={styles.mediaHideButtonIcon}
-                icon={mediaVisible ? 'display' : 'hide'}
-              />
-            </PressableOpacity>
+          {viewer?.profile && (
+            <CoverEditorSuggestionButton
+              profile={viewer.profile}
+              sourceMedia={sourceMedia}
+              templateKind={templateKind}
+              mediaVisible={mediaVisible}
+              toggleMediaVisibility={toggleMediaVisibility}
+              onSelectSuggestedMedia={onPressSuggestedMedia}
+            />
           )}
           {(sourceMedia || hasSuggestedMedia) && (
             <FloatingIconButton
@@ -407,6 +367,47 @@ const CoverEditor = (
           )}
           <FloatingIconButton icon="settings" onPress={onCustomEdition} />
         </View>
+        <BottomMenu
+          currentTab={templateKind}
+          onItemPress={onSwitchTemplateKind}
+          tabs={useMemo(
+            () => [
+              {
+                key: 'people',
+                icon: 'silhouette',
+                label: intl.formatMessage({
+                  defaultMessage: 'People',
+                  description: 'Cover editor people tab bar item label',
+                }),
+              },
+              {
+                key: 'video',
+                icon: 'video',
+                label: intl.formatMessage({
+                  defaultMessage: 'Video',
+                  description: 'Cover editor video tab bar item label',
+                }),
+              },
+              {
+                key: 'others',
+                icon: 'landscape',
+                label: intl.formatMessage({
+                  defaultMessage: 'Others',
+                  description: 'Cover editor others tab bar item label',
+                }),
+              },
+            ],
+            [intl],
+          )}
+          showLabel={true}
+          style={[
+            {
+              position: 'absolute',
+              alignSelf: 'center',
+            },
+            { bottom: insetBottom, width: 210 },
+          ]}
+        />
       </Container>
 
       <BottomSheetModal
@@ -483,39 +484,15 @@ const styles = StyleSheet.create({
     height: 22,
   },
   controlPanel: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
-    marginTop: GAP,
   },
   modalContent: {
     height: MODAL_HEIGHT,
     justifyContent: 'space-around',
     padding: 20,
-  },
-  mediaHideButton: {
-    width: FLOATING_BUTTON_SIZE,
-    height: FLOATING_BUTTON_SIZE,
-    borderRadius: FLOATING_BUTTON_SIZE / 2,
-    borderColor: colors.black,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mediaHideButtonImage: {
-    width: FLOATING_BUTTON_SIZE - 6,
-    height: FLOATING_BUTTON_SIZE - 6,
-    borderRadius: (FLOATING_BUTTON_SIZE - 4) / 2,
-  },
-  mediaHideButtonIcon: {
-    position: 'absolute',
-    top: (FLOATING_BUTTON_SIZE - 24) / 2,
-    left: (FLOATING_BUTTON_SIZE - 24) / 2,
-    width: 24,
-    height: 24,
   },
 });
