@@ -1,4 +1,4 @@
-## 0.4.2-canary.30
+## 0.4.2-canary.31
 
 * **feat:**  - new profile and cover creation design change ([#1334](https://github.com/AzzappApp/azzapp/pull/1334))
 * **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) misunderstanding on lowest section requirement on duplication ([#1329](https://github.com/AzzappApp/azzapp/pull/1329))
