@@ -225,7 +225,7 @@ function CarouselSelectList<TItem = any>(
       snapToInterval={itemWidth}
       decelerationRate="fast"
       snapToAlignment="start"
-      removeClippedSubviews
+      //removeClippedSubviews removing this to avoid blank (was use to improve perf)
       pagingEnabled
       bounces={false}
       onScroll={scrollHandler}
@@ -235,6 +235,7 @@ function CarouselSelectList<TItem = any>(
       onMomentumScrollEnd={onMomentumScrollEnd}
       initialNumToRender={3}
       windowSize={11}
+      maxToRenderPerBatch={11}
       contentContainerStyle={[
         {
           height,
