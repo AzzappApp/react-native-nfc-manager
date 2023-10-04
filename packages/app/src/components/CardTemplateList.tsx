@@ -162,6 +162,7 @@ const CardTemplateList = (
   }, [hasNext, isLoadingNext, loadNext]);
 
   const { width: windowWidth } = useWindowDimensions();
+  const { bottom } = useScreenInsets();
   const itemWidth = windowWidth - 100;
 
   const selectedIndexRef = useRef(0);
@@ -204,16 +205,13 @@ const CardTemplateList = (
     [data?.cardTemplates?.edges, profile],
   );
 
-  const onSubmit = () => {
-    if (!templates) {
-      return;
-    }
-
-    onApplyTemplate(templates[selectedIndexRef.current].id);
-  };
-
   useImperativeHandle(forwardRef, () => ({
-    onSubmit,
+    onSubmit: () => {
+      if (!templates) {
+        return;
+      }
+      onApplyTemplate(templates[selectedIndexRef.current].id);
+    },
   }));
 
   const [previewTemplate, setPreviewTemplate] =
@@ -435,7 +433,7 @@ const CardTemplateList = (
             />
           )}
         </View>
-        <View style={styles.buttons}>
+        <View style={[styles.buttons, { marginBottom: bottom }]}>
           <Button
             label={intl.formatMessage({
               defaultMessage: 'Preview',
@@ -443,15 +441,6 @@ const CardTemplateList = (
             })}
             onPress={onPreview}
             variant="secondary"
-          />
-          <Button
-            onPress={onSubmit}
-            label={intl.formatMessage({
-              defaultMessage: 'Load this template',
-              description:
-                'label of the button allowing to retry loading card template',
-            })}
-            loading={loading}
           />
           {canSkip && (
             <PressableNative

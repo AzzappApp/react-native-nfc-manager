@@ -144,6 +144,7 @@ export const NewProfileScreen = ({
   }, [next, router]);
 
   const onCoverTemplateApplied = useCallback(() => {
+    console.log('onCoverTemplateApplied', profileInfo);
     router.replace({
       route: 'PROFILE',
       params: { ...profileInfo!, editing: true },
@@ -170,7 +171,7 @@ export const NewProfileScreen = ({
 
   const webcardTemplateRef = useRef<CardTemplatelistHandle>(null);
   const onWebcardTemplateRef = () => {
-    coverEditionRef.current?.save();
+    webcardTemplateRef.current?.onSubmit();
   };
 
   const intl = useIntl();
@@ -255,7 +256,7 @@ export const NewProfileScreen = ({
     },
     {
       title: intl.formatMessage({
-        defaultMessage: 'Select a WebCard template',
+        defaultMessage: 'Select a template',
         description: 'WebCard creation screen title',
       }),
       element:

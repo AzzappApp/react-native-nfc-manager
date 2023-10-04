@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -9,9 +9,11 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import type { CardTemplatelistHandle } from '#components/CardTemplateList';
 
 type LoadCardTemplateModalProps = {
   onClose: () => void;
@@ -60,6 +62,7 @@ const LoadCardTemplateModal = ({
     [commit, intl, onClose],
   );
 
+  const cardTemplatehandle = useRef<CardTemplatelistHandle>(null);
   const onSubmit = useCallback(() => {
     if (!cardTemplateId) return;
     commitCardTemplate(cardTemplateId);
@@ -94,9 +97,20 @@ const LoadCardTemplateModal = ({
             />
           }
           middleElement={intl.formatMessage({
-            defaultMessage: 'Load a WebCard® template',
+            defaultMessage: 'Load a template',
             description: 'WebCard creation screen title',
           })}
+          rightElement={
+            <HeaderButton
+              onPress={() => cardTemplatehandle.current?.onSubmit()}
+              label={intl.formatMessage({
+                defaultMessage: 'Apply',
+                description: 'Apply button label in card template preview',
+              })}
+              loading={inFlight}
+            />
+          }
+          style={{ marginBottom: 10 }}
         />
         <Suspense
           fallback={
@@ -109,6 +123,7 @@ const LoadCardTemplateModal = ({
             height={height}
             onApplyTemplate={applyTemplate}
             loading={inFlight}
+            ref={cardTemplatehandle}
           />
         </Suspense>
       </Container>
