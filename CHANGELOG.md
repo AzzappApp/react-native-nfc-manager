@@ -1,5 +1,6 @@
-## 0.4.2-canary.29
+## 0.4.2-canary.30
 
+* **feat:**  - new profile and cover creation design change ([#1334](https://github.com/AzzappApp/azzapp/pull/1334))
 * **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) misunderstanding on lowest section requirement on duplication ([#1329](https://github.com/AzzappApp/azzapp/pull/1329))
 * **fix:**  - **post:** [#1328](https://github.com/AzzappApp/azzapp/pull/1328) don’t return comments preview when comments are disabled ([#1330](https://github.com/AzzappApp/azzapp/pull/1330))
 * **fix:**  - **webcard:** [#1327](https://github.com/AzzappApp/azzapp/pull/1327) share url of the webcard ([#1331](https://github.com/AzzappApp/azzapp/pull/1331))
