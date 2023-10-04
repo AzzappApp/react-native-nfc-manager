@@ -1,5 +1,7 @@
-## 0.4.2-canary.31
+## 0.4.2-canary.32
 
+* **fix:**  - **video:** [#1332](https://github.com/AzzappApp/azzapp/pull/1332) non local video loading never ends ([#1336](https://github.com/AzzappApp/azzapp/pull/1336))
+* **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) rotate for anywhere ([#1337](https://github.com/AzzappApp/azzapp/pull/1337))
 * **feat:**  - new profile and cover creation design change ([#1334](https://github.com/AzzappApp/azzapp/pull/1334))
 * **fix:**  - **webcard:** [#1273](https://github.com/AzzappApp/azzapp/pull/1273) misunderstanding on lowest section requirement on duplication ([#1329](https://github.com/AzzappApp/azzapp/pull/1329))
 * **fix:**  - **post:** [#1328](https://github.com/AzzappApp/azzapp/pull/1328) don’t return comments preview when comments are disabled ([#1330](https://github.com/AzzappApp/azzapp/pull/1330))
