@@ -231,7 +231,7 @@ export const NewProfileScreen = ({
         description: 'Cover creation screen title',
       }),
       element:
-        profileInfo != null ? (
+        profileInfo != null && currentStepIndex === 2 ? (
           <ProfileBoundRelayEnvironmentProvider
             profileId={profileInfo.profileId}
           >
@@ -260,7 +260,7 @@ export const NewProfileScreen = ({
         description: 'WebCard creation screen title',
       }),
       element:
-        profileInfo !== null ? (
+        profileInfo !== null && currentStepIndex === 3 ? (
           <ProfileBoundRelayEnvironmentProvider
             profileId={profileInfo.profileId}
           >

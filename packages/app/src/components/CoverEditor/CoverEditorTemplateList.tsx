@@ -692,7 +692,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         peopleCoverTemplates: coverTemplates(
           kind: people
@@ -719,7 +719,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         videosCoverTemplates: coverTemplates(
           kind: video
@@ -746,7 +746,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         othersCoverTemplates: coverTemplates(
           kind: others
