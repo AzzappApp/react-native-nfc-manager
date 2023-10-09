@@ -1,5 +1,6 @@
-## 0.4.2-canary.35
+## 0.4.2-canary.36
 
+* **fix:**  - **webcard:** [#1326](https://github.com/AzzappApp/azzapp/pull/1326) query on cardModules has broken animation ([#1349](https://github.com/AzzappApp/azzapp/pull/1349))
 * **fix:**  - Don't fetch comment if comment not allowed ([#1343](https://github.com/AzzappApp/azzapp/pull/1343))
 * **fix:**  - Toast dragging the shadow ([#1342](https://github.com/AzzappApp/azzapp/pull/1342))
 * **fix:**  - **webcard:** [#1305](https://github.com/AzzappApp/azzapp/pull/1305) fix rotation animation ([#1340](https://github.com/AzzappApp/azzapp/pull/1340))
