@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -43,33 +44,23 @@ const HomeHeader = ({
     userKey,
   );
 
+  const inputRange = _.range(0, profiles?.length);
   const readableColors = useMemo(
     () =>
       profiles?.map(profile => {
-        if (profile.cardColors?.primary) {
-          return getTextColor(profile.cardColors.primary);
-        }
-        return colors.white;
-      }),
+        return profile?.cardColors?.primary
+          ? getTextColor(profile?.cardColors?.primary)
+          : colors.white;
+      }) ?? [],
     [profiles],
   );
-
   const colorValue = useDerivedValue<ColorValue>(() => {
-    if (readableColors && readableColors.length > 0) {
-      const currentProfileIndex = currentProfileIndexSharedValue.value;
-      const prev = Math.floor(currentProfileIndex);
-      const next = Math.ceil(currentProfileIndex);
-      return interpolateColor(
-        currentProfileIndex,
-        [prev, next],
-        [
-          readableColors[prev] ?? colors.white,
-          readableColors[next] ?? colors.white,
-        ],
-      );
+    const currentProfileIndex = currentProfileIndexSharedValue.value;
+    if (inputRange.length > 1) {
+      return interpolateColor(currentProfileIndex, inputRange, readableColors);
     }
-    return colors.white;
-  }, [currentProfileIndexSharedValue, readableColors]);
+    return readableColors[0];
+  }, [currentProfileIndexSharedValue]);
 
   const svgProps = useAnimatedProps(() => ({ color: colorValue.value }));
 

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import { useSharedValue, useWorkletCallback } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard';
@@ -53,6 +53,7 @@ const HomeScreenContent = ({
     `,
     userKey,
   );
+
   //#endregion
 
   //#region profile switch
@@ -92,16 +93,16 @@ const HomeScreenContent = ({
         switchProfile(newProfileId);
       }
     },
-    [switchProfile, user.profiles],
+    [setCurrentProfileIndex, switchProfile, user.profiles],
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
-  const onCurrentProfileIndexChangeAnimated = useWorkletCallback(
+  const onCurrentProfileIndexChangeAnimated = useCallback(
     (index: number) => {
       'worklet';
       currentProfileIndexSharedValue.value = index;
     },
-    [],
+    [currentProfileIndexSharedValue],
   );
 
   useOnFocus(() => {

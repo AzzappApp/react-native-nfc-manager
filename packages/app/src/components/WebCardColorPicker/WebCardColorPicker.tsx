@@ -73,6 +73,10 @@ const WebCardColorPicker = ({
       saveCardColors(input: $input) {
         profile {
           id
+          cardColors {
+            primary
+            dark
+          }
         }
       }
     }
@@ -291,7 +295,7 @@ const cardColorsStoreUpdater =
     let colors = profileRecord.getLinkedRecord('cardColors');
 
     if (!colors) {
-      colors = store.create(`${profileId}:cardColors`, 'CardColors');
+      colors = store.create(`${profileId}:cardColors`, 'cardColors');
       profileRecord.setLinkedRecord(colors, 'cardColors');
     }
     colors.setValue(newPalette.primary, 'primary');

@@ -9,7 +9,6 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions, StyleSheet } from 'react-native';
-import { useWorkletCallback } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -96,9 +95,9 @@ const HomeProfilesCarousel = (
     [onCurrentProfileIndexChange],
   );
 
-  const onSelectedIndexChangeAnimated = useWorkletCallback(
+  const onSelectedIndexChangeAnimated = useCallback(
     (index: number) => {
-      'worlket';
+      'worklet';
       onCurrentProfileIndexChangeAnimated(index - 1);
     },
     [onCurrentProfileIndexChangeAnimated],

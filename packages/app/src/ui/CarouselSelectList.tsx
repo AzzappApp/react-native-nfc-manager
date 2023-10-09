@@ -140,7 +140,6 @@ function CarouselSelectList<TItem = any>(
   // Animation
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
-      'worklet';
       scrollX.value = event.contentOffset.x;
       const index = event.contentOffset.x / itemWidth;
       onSelectedIndexChangeAnimated?.(index);
@@ -234,8 +233,8 @@ function CarouselSelectList<TItem = any>(
       style={[{ width, height }, style as any]}
       onMomentumScrollEnd={onMomentumScrollEnd}
       initialNumToRender={3}
-      windowSize={11}
-      maxToRenderPerBatch={11}
+      windowSize={21}
+      maxToRenderPerBatch={21}
       contentContainerStyle={[
         {
           height,
