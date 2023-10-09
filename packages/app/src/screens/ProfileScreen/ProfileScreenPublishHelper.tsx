@@ -8,6 +8,7 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -50,6 +51,8 @@ const ProfileScreenPublishHelper = ({
     `,
   );
 
+  const { bottom } = useScreenInsets();
+
   useEffect(() => {
     if (!cardIsPublished && editMode) {
       Toast.show({
@@ -59,7 +62,7 @@ const ProfileScreenPublishHelper = ({
           description:
             'Toast info message that appears when the user is in webcard edit mode for the first time',
         }),
-        bottomOffset: 0,
+        bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
         autoHide: false,
         props: {
           showClose: true,

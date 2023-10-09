@@ -112,8 +112,8 @@ const Toast = ({
                 ? ['transparent', 'rgba(0,0,0,0.5)']
                 : ['rgba(0,0,0,0.5)', 'transparent']
             }
-            style={styles.info}
-            pointerEvents="none"
+            style={[styles.info, { bottom: -bottomOffset - TOAST_HEIGHT }]}
+            pointerEvents="box-none"
           />
           <BaseToast
             {...infoProps}
@@ -124,11 +124,13 @@ const Toast = ({
             )}
             renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
             text1Style={[textStyles.smallbold, styles.toastText]}
+            onPress={ExternalToast.hide}
           />
         </>
       ),
     };
   }, [
+    bottomOffset,
     renderTrailingIcon,
     styles.baseToast,
     styles.contentContainerToast,
@@ -152,9 +154,11 @@ const Toast = ({
 
 export default memo(Toast);
 
+const TOAST_HEIGHT = 44;
+
 const styleSheet = createStyleSheet(appearance => ({
   baseToast: {
-    height: 44,
+    height: TOAST_HEIGHT,
     borderRadius: 15,
     borderLeftWidth: 0,
     alignItems: 'center',

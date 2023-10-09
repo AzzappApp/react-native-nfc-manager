@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
@@ -161,6 +162,8 @@ const ProfileScreenContent = ({
         // unhanded module kind could be a future addition
         return;
       }
+      //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
+      Toast.hide();
       router.push({
         route: 'CARD_MODULE_EDITION',
         params: {
@@ -173,6 +176,8 @@ const ProfileScreenContent = ({
   );
 
   const onEditCover = useCallback(() => {
+    //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
+    Toast.hide();
     router.push({
       route: 'COVER_EDITION',
     });
