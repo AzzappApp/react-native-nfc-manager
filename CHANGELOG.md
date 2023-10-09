@@ -1,5 +1,6 @@
-## 0.4.2-canary.36
+## 0.4.2-canary.37
 
+* **fix:**  - warning rea3 ([#1354](https://github.com/AzzappApp/azzapp/pull/1354))
 * **fix:**  - **webcard:** [#1326](https://github.com/AzzappApp/azzapp/pull/1326) query on cardModules has broken animation ([#1349](https://github.com/AzzappApp/azzapp/pull/1349))
 * **fix:**  - Don't fetch comment if comment not allowed ([#1343](https://github.com/AzzappApp/azzapp/pull/1343))
 * **fix:**  - Toast dragging the shadow ([#1342](https://github.com/AzzappApp/azzapp/pull/1342))
