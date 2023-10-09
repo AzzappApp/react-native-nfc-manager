@@ -1,5 +1,6 @@
-## 0.4.2-canary.39
+## 0.4.2-canary.40
 
+* **fix:**  - **posts:** [#1232](https://github.com/AzzappApp/azzapp/pull/1232) switch off video when profile is not focused ([#1363](https://github.com/AzzappApp/azzapp/pull/1363))
 * **fix:**  - 🐛 close toast on press and leave builder ([#1359](https://github.com/AzzappApp/azzapp/pull/1359))
 * **fix:**  - **router:** [#1346](https://github.com/AzzappApp/azzapp/pull/1346) blank screen on dismiss ([#1357](https://github.com/AzzappApp/azzapp/pull/1357))
 * **fix:**  - warning rea3 ([#1354](https://github.com/AzzappApp/azzapp/pull/1354))
