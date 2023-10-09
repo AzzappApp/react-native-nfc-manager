@@ -6,6 +6,7 @@ import ExternalToast, {
 } from 'react-native-toast-message';
 import { textStyles, shadow, colors } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import type {
@@ -112,12 +113,15 @@ const Toast = ({
                 ? ['transparent', 'rgba(0,0,0,0.5)']
                 : ['rgba(0,0,0,0.5)', 'transparent']
             }
-            style={[styles.info, { bottom: -bottomOffset - TOAST_HEIGHT }]}
+            style={[
+              styles.info,
+              { bottom: -bottomOffset - BOTTOM_MENU_HEIGHT },
+            ]}
             pointerEvents="box-none"
           />
           <BaseToast
             {...infoProps}
-            style={[styles.baseToast, styles.infoToast]}
+            style={styles.baseToast}
             contentContainerStyle={styles.contentContainerToast}
             renderLeadingIcon={() => (
               <Icon icon="tips" style={styles.successToastIcon} />
@@ -136,7 +140,6 @@ const Toast = ({
     styles.contentContainerToast,
     styles.errorToastIcon,
     styles.info,
-    styles.infoToast,
     styles.successToastIcon,
     styles.toastText,
   ]);
@@ -212,9 +215,5 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     position: 'absolute',
     bottom: -20,
-  },
-  infoToast: {
-    position: 'absolute',
-    bottom: 60,
   },
 }));
