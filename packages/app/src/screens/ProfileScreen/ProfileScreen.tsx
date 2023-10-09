@@ -40,6 +40,7 @@ import type { Disposable } from 'react-relay';
  */
 const ProfileScreen = ({
   preloadedQuery,
+  hasFocus,
   route: { params },
 }: RelayScreenProps<
   ProfileRoute,
@@ -162,7 +163,7 @@ const ProfileScreen = ({
                 <ProfilePostsList
                   isViewer={isViewer}
                   profile={data.profile}
-                  hasFocus={showPost && ready}
+                  hasFocus={hasFocus && showPost && ready}
                   userName={data.profile.userName!}
                 />
               </Suspense>
