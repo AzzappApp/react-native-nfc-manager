@@ -1,5 +1,6 @@
-## 0.4.2-canary.38
+## 0.4.2-canary.39
 
+* **fix:**  - 🐛 close toast on press and leave builder ([#1359](https://github.com/AzzappApp/azzapp/pull/1359))
 * **fix:**  - **router:** [#1346](https://github.com/AzzappApp/azzapp/pull/1346) blank screen on dismiss ([#1357](https://github.com/AzzappApp/azzapp/pull/1357))
 * **fix:**  - warning rea3 ([#1354](https://github.com/AzzappApp/azzapp/pull/1354))
 * **fix:**  - **webcard:** [#1326](https://github.com/AzzappApp/azzapp/pull/1326) query on cardModules has broken animation ([#1349](https://github.com/AzzappApp/azzapp/pull/1349))
