@@ -2,6 +2,7 @@ import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { graphql, useFragment } from 'react-relay';
 import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -14,19 +15,31 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { LoadCardTemplateModal_profile$key } from '@azzapp/relay/artifacts/LoadCardTemplateModal_profile.graphql';
 
 type LoadCardTemplateModalProps = {
   onClose: () => void;
   visible: boolean;
-  showWarning: boolean;
+  profile: LoadCardTemplateModal_profile$key;
 };
 
 const LoadCardTemplateModal = ({
   onClose,
   visible,
-  showWarning,
+  profile: profileKey,
 }: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
+
+  const profile = useFragment(
+    graphql`
+      fragment LoadCardTemplateModal_profile on Profile {
+        cardModules {
+          id
+        }
+      }
+    `,
+    profileKey,
+  );
 
   const intl = useIntl();
   const insets = useScreenInsets();
@@ -67,6 +80,8 @@ const LoadCardTemplateModal = ({
     if (!cardTemplateId) return;
     commitCardTemplate(cardTemplateId);
   }, [cardTemplateId, commitCardTemplate]);
+
+  const showWarning = Boolean(profile.cardModules?.length);
 
   const applyTemplate = useCallback(
     (templateId: string) => {

@@ -381,9 +381,11 @@ const ProfileBlockContainer = ({
               style={[
                 moveButtonStyle,
                 actionSectionBaseStyle,
-                { left: -buttonSize - 20 },
+                {
+                  left: -buttonSize - 20,
+                  pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
+                },
               ]}
-              pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
             >
               <IconButton
                 onPress={onMoveDown}
