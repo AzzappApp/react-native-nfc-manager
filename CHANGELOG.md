@@ -1,5 +1,6 @@
-## 0.4.2-canary.41
+## 0.4.2-canary.42
 
+* **fix:**  - Toast with position absolute does not work properly ([#1366](https://github.com/AzzappApp/azzapp/pull/1366))
 * **fix:**  - **Toast:** toast blocking touch after disappearing (don't use absolute position for toast). ([#1364](https://github.com/AzzappApp/azzapp/pull/1364))
 * **fix:**  - **posts:** [#1232](https://github.com/AzzappApp/azzapp/pull/1232) switch off video when profile is not focused ([#1363](https://github.com/AzzappApp/azzapp/pull/1363))
 * **fix:**  - 🐛 close toast on press and leave builder ([#1359](https://github.com/AzzappApp/azzapp/pull/1359))
