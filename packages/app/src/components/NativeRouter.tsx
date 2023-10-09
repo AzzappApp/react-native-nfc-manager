@@ -363,6 +363,7 @@ export const initRouterState = (init: NativeRouterInit): RouterState => {
   };
 };
 
+// TODO: find a better solution for double opening of routes
 const extractIdAndRoute = (route: Route) => {
   const defaultId = `${route.route}${
     route.params

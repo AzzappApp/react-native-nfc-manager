@@ -311,9 +311,9 @@ const AppRouter = () => {
       router.screenDismissed(id);
 
       // TODO should we not handle this in the router?
-      screenIdToDispose.push(id);
+      RelayQueryManager.disposeQueryFor(id);
     },
-    [router, screenIdToDispose],
+    [router],
   );
 
   const slapshScreenHidden = useRef(false);
