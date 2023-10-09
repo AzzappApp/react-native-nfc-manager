@@ -105,18 +105,19 @@ const Toast = ({
         />
       ),
       info: (infoProps: ToastConfigParams<ToastProps>) => (
-        <LinearGradient
-          colors={
-            infoProps.position === 'bottom'
-              ? ['transparent', 'rgba(0,0,0,0.5)']
-              : ['rgba(0,0,0,0.5)', 'transparent']
-          }
-          style={styles.info}
-          pointerEvents="none"
-        >
+        <>
+          <LinearGradient
+            colors={
+              infoProps.position === 'bottom'
+                ? ['transparent', 'rgba(0,0,0,0.5)']
+                : ['rgba(0,0,0,0.5)', 'transparent']
+            }
+            style={styles.info}
+            pointerEvents="none"
+          />
           <BaseToast
             {...infoProps}
-            style={[styles.baseToast]}
+            style={[styles.baseToast, styles.infoToast]}
             contentContainerStyle={styles.contentContainerToast}
             renderLeadingIcon={() => (
               <Icon icon="tips" style={styles.successToastIcon} />
@@ -124,7 +125,7 @@ const Toast = ({
             renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
             text1Style={[textStyles.smallbold, styles.toastText]}
           />
-        </LinearGradient>
+        </>
       ),
     };
   }, [
@@ -133,6 +134,7 @@ const Toast = ({
     styles.contentContainerToast,
     styles.errorToastIcon,
     styles.info,
+    styles.infoToast,
     styles.successToastIcon,
     styles.toastText,
   ]);
@@ -204,7 +206,11 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 200,
     paddingTop: 90,
     width: '100%',
-    position: 'relative',
+    position: 'absolute',
     bottom: -20,
+  },
+  infoToast: {
+    position: 'absolute',
+    bottom: 60,
   },
 }));
