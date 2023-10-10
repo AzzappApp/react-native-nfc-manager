@@ -144,7 +144,6 @@ export const NewProfileScreen = ({
   }, [next, router]);
 
   const onCoverTemplateApplied = useCallback(() => {
-    console.log('onCoverTemplateApplied', profileInfo);
     router.replace({
       route: 'PROFILE',
       params: { ...profileInfo!, editing: true },

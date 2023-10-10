@@ -241,13 +241,6 @@ const useCoverEditionManager = ({
     return null;
   });
 
-  // #region Media visibility
-  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
-  const toggleMediaVisibility = useCallback(() => {
-    setMediaVisible(mediaVisible => !mediaVisible);
-  }, []);
-  // #endregion
-
   const { suggestedMedia, selectSuggestedMedia } =
     useSuggestedMediaManager(viewerKey);
 
@@ -257,8 +250,8 @@ const useCoverEditionManager = ({
         lastCroppedBeforeSuggested.current = mediaCropParameter;
       }
       unstable_batchedUpdates(() => {
-        selectSuggestedMedia(kind);
         setMediaCropParameter(null);
+        selectSuggestedMedia(kind);
       });
     },
     [mediaCropParameter, selectSuggestedMedia],
@@ -271,6 +264,20 @@ const useCoverEditionManager = ({
   const showSuggestedMedia = useMemo(() => {
     return templateKind !== 'people' && profile?.profileKind === 'business';
   }, [templateKind, profile?.profileKind]);
+
+  // #region Media visibility
+  const [mediaVisible, setMediaVisible] = useState(sourceMedia != null);
+  const toggleMediaVisibility = useCallback(() => {
+    if (
+      sourceMedia != null &&
+      profile?.profileKind === 'business' &&
+      templateKind !== 'people'
+    ) {
+      setSuggestedMedia(templateKind);
+    }
+    setMediaVisible(mediaVisible => !mediaVisible);
+  }, [profile?.profileKind, setSuggestedMedia, sourceMedia, templateKind]);
+  // #endregion
 
   const hasSuggestedMedia = useMemo(() => {
     return showSuggestedMedia && !mediaVisible && suggestedMedia != null;
@@ -345,7 +352,7 @@ const useCoverEditionManager = ({
         };
         const newMediaInfos = mediaInfosRef.current[kind];
         setSourceMedia(newMediaInfos?.sourceMedia ?? null);
-        setMaskMedia(null);
+        setMaskMedia(newMediaInfos?.maskMedia ?? null);
         setMediaCropParameter(newMediaInfos?.mediaCropParameter ?? null);
         setMediaVisible(newMediaInfos?.sourceMedia != null);
 
