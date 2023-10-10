@@ -9,8 +9,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
-import { getTextColor } from '#helpers/colorsHelper';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { HomeHeader_user$key } from '@azzapp/relay/artifacts/HomeHeader_user.graphql';

@@ -1,5 +1,4 @@
-import { colors } from '#theme';
-import { getTextColor } from '../colorsHelper';
+import { colors, getTextColor } from '../colorsHelpers';
 
 describe('getTextColor', () => {
   it('should return black for a light background color', () => {

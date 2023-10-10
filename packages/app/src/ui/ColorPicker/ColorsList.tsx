@@ -10,8 +10,8 @@ import {
   COLOR_PALETTE_COLORS,
   type ColorPalette,
 } from '@azzapp/shared/cardHelpers';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
-import { getTextColor } from '#helpers/colorsHelper';
 import useAnimatedState from '#hooks/useAnimatedState';
 import Icon from '#ui/Icon/Icon';
 import PressableNative from '#ui/PressableNative';

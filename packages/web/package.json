@@ -25,6 +25,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.70.0",
     "@sentry/tracing": "^7.70.0",
+    "@vercel/og": "^0.5.17",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
     "encoding": "^0.1.13",

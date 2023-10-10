@@ -1,5 +1,9 @@
 import chroma from 'chroma-js';
-import { colors } from '#theme';
+
+export const colors = {
+  white: '#FFFFFF',
+  black: '#0E1216',
+};
 
 export const getTextColor = (backgroundColor: string) => {
   const rgba = chroma(backgroundColor).rgba();
