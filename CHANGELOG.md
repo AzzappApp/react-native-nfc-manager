@@ -1,5 +1,8 @@
-## 0.4.2-canary.43
+## 0.4.2-canary.44
 
+* **fix:**  - **webcard:** [#1222](https://github.com/AzzappApp/azzapp/pull/1222) add field validation on button and social links ([#1373](https://github.com/AzzappApp/azzapp/pull/1373))
+* **fix:**  - home animation ([#1325](https://github.com/AzzappApp/azzapp/pull/1325))
+* **fix:**  - 🐛 correctly use phone link when needed ([#1361](https://github.com/AzzappApp/azzapp/pull/1361))
 * **Fix:**  - selecting an initial template to reset crop data ([#1368](https://github.com/AzzappApp/azzapp/pull/1368))
 * **fix:**  - android permissions for media ([#1371](https://github.com/AzzappApp/azzapp/pull/1371))
 * **feat:**  - **contactCard:** [#1191](https://github.com/AzzappApp/azzapp/pull/1191) update wallet pass appearance ([#1367](https://github.com/AzzappApp/azzapp/pull/1367))
