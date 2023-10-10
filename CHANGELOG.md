@@ -1,5 +1,6 @@
-## 0.4.2-canary.44
+## 0.4.2-canary.45
 
+* **fix:**  - **router:** [#1234](https://github.com/AzzappApp/azzapp/pull/1234) backToTop to go back to home ([#1377](https://github.com/AzzappApp/azzapp/pull/1377))
 * **fix:**  - **webcard:** [#1222](https://github.com/AzzappApp/azzapp/pull/1222) add field validation on button and social links ([#1373](https://github.com/AzzappApp/azzapp/pull/1373))
 * **fix:**  - home animation ([#1325](https://github.com/AzzappApp/azzapp/pull/1325))
 * **fix:**  - 🐛 correctly use phone link when needed ([#1361](https://github.com/AzzappApp/azzapp/pull/1361))
