@@ -1,5 +1,8 @@
-## 0.4.2-canary.42
+## 0.4.2-canary.43
 
+* **Fix:**  - selecting an initial template to reset crop data ([#1368](https://github.com/AzzappApp/azzapp/pull/1368))
+* **fix:**  - android permissions for media ([#1371](https://github.com/AzzappApp/azzapp/pull/1371))
+* **feat:**  - **contactCard:** [#1191](https://github.com/AzzappApp/azzapp/pull/1191) update wallet pass appearance ([#1367](https://github.com/AzzappApp/azzapp/pull/1367))
 * **fix:**  - Toast with position absolute does not work properly ([#1366](https://github.com/AzzappApp/azzapp/pull/1366))
 * **fix:**  - **Toast:** toast blocking touch after disappearing (don't use absolute position for toast). ([#1364](https://github.com/AzzappApp/azzapp/pull/1364))
 * **fix:**  - **posts:** [#1232](https://github.com/AzzappApp/azzapp/pull/1232) switch off video when profile is not focused ([#1363](https://github.com/AzzappApp/azzapp/pull/1363))
