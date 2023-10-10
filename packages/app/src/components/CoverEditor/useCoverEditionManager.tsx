@@ -769,6 +769,7 @@ const useCoverEditionManager = ({
             );
           }
         }
+        setProgressIndicator(null);
         onCoverSaved();
       },
       onError: error => {

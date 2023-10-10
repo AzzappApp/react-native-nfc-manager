@@ -110,14 +110,14 @@ const Toast = ({
           <LinearGradient
             colors={
               infoProps.position === 'bottom'
-                ? ['transparent', 'rgba(0,0,0,0.5)']
-                : ['rgba(0,0,0,0.5)', 'transparent']
+                ? ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.5)']
+                : ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.4)', 'transparent']
             }
             style={[
               styles.info,
-              { bottom: -bottomOffset - BOTTOM_MENU_HEIGHT },
+              { bottom: -bottomOffset - BOTTOM_MENU_HEIGHT - 100 },
             ]}
-            pointerEvents="box-none"
+            pointerEvents="none"
           />
           <BaseToast
             {...infoProps}
@@ -210,10 +210,9 @@ const styleSheet = createStyleSheet(appearance => ({
     width: undefined,
   },
   info: {
-    height: 200,
+    height: 300,
     paddingTop: 90,
     width: '100%',
     position: 'absolute',
-    bottom: -20,
   },
 }));
