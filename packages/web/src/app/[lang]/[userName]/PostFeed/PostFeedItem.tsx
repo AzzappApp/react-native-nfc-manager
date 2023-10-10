@@ -4,6 +4,7 @@ import { getElapsedTime } from '@azzapp/shared/timeHelpers';
 import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
 import { ButtonIcon } from '#ui';
+import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
 import ShareModal from '#components/ShareModal';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -41,19 +42,17 @@ const PostFeedItem = (
       <div className={styles.post}>
         <div className={styles.postHeader}>
           {media && (
-            <CloudinaryImage
-              mediaId={media.id}
-              assetKind="cover"
-              videoThumbnail={media.kind === 'video'}
-              alt="cover"
-              width={20}
-              height={32}
+            <div
               style={{
-                objectFit: 'cover',
                 marginRight: 5,
                 borderRadius: 3,
+                overflow: 'hidden',
+                width: '20px',
+                height: '32px',
               }}
-            />
+            >
+              <CoverPreview media={media} profile={profile} />
+            </div>
           )}
           <span>{profile.userName}</span>
         </div>

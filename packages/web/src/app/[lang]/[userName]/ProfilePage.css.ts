@@ -15,7 +15,6 @@ const background = style({
 });
 
 const modules = style({
-  height: '100vh',
   transitionTimingFunction: 'ease-out',
   '@media': {
     [MediaQuery.Desktop]: {
@@ -24,23 +23,23 @@ const modules = style({
       flex: 1,
     },
     [MediaQuery.Mobile]: {
-      transformStyle: 'preserve-3d',
       zIndex: 2,
       width: '100%',
+      /*
+      transformStyle: 'preserve-3d',
       transition: 'transform 1s ease',
       position: 'absolute',
-      overflowY: 'scroll',
-      transform: 'perspective(1000px) rotateY(0deg) rotateX(0deg)',
+      transform: 'rotateY(0deg) rotateX(0deg)',
       backfaceVisibility: 'hidden',
       // Fix backface-visibility on Chrome and Edge
       opacity: 0.999,
+      */
     },
   },
 });
 
 const posts = style({
   transitionTimingFunction: 'ease-out',
-  height: '100vh',
   '@media': {
     [MediaQuery.Desktop]: {
       transition: 'width 0.3s',
@@ -49,13 +48,16 @@ const posts = style({
       right: 0,
     },
     [MediaQuery.Mobile]: {
+      width: '100%',
+
+      /*
       transition: 'transform 1s ease',
       position: 'absolute',
-      transform: 'perspective(1000px) rotateY(0deg) rotateX(0deg)',
+      transform: 'rotateY(0deg) rotateX(0deg)',
       backfaceVisibility: 'hidden',
-      width: '100%',
       // Fix backface-visibility on Chrome and Edge
       opacity: 0.999,
+      */
     },
   },
   zIndex: 2,
@@ -80,7 +82,8 @@ const modulesWithPosts = style({
 const modulesBehind = style({
   '@media': {
     [MediaQuery.Mobile]: {
-      transform: 'perspective(1000px) rotateY(179.9deg)',
+      // transform: 'rotateY(179.9deg)',
+      display: 'none',
     },
   },
 });
@@ -88,8 +91,9 @@ const modulesBehind = style({
 const postsBehind = style({
   '@media': {
     [MediaQuery.Mobile]: {
-      transform: 'perspective(1000px) rotateY(-179.9deg)',
+      // transform: 'rotateY(-179.9deg)',
       zIndex: 1,
+      display: 'none',
     },
   },
 });

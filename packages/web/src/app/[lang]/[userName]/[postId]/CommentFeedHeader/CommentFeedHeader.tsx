@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRef } from 'react';
 import { Button } from '#ui';
 import DownloadAppModal from '#components/DownloadAppModal';
-import CloudinaryImage from '#ui/CloudinaryImage';
+import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
 import styles from './CommentFeedHeader.css';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, Profile } from '@azzapp/data/domains';
@@ -26,19 +26,17 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
           className={styles.feedHeaderProfile}
         >
           {media && (
-            <CloudinaryImage
-              mediaId={media.id}
-              assetKind="cover"
-              videoThumbnail={media.kind === 'video'}
-              alt="cover"
-              width={20}
-              height={32}
+            <div
               style={{
-                objectFit: 'cover',
                 marginRight: 5,
                 borderRadius: 3,
+                overflow: 'hidden',
+                width: '20px',
+                height: '32px',
               }}
-            />
+            >
+              <CoverPreview media={media} profile={profile} />
+            </div>
           )}
           <span>{profile.userName}</span>
         </Link>

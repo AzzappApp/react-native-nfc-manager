@@ -40,10 +40,11 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
 
   return (
     <>
-      <div
-        className={styles.background}
-        style={{
-          background: `
+      <div className={styles.wrapper}>
+        <div
+          className={styles.background}
+          style={{
+            background: `
           linear-gradient(
             180deg,
             ${cardBackgroundColor} 0%,
@@ -51,12 +52,11 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
             ${lastModuleBackgroundColor} 50%
           )
         `,
-        }}
-      />
-      <div className={styles.wrapper}>
+          }}
+        />
         {posts.length > 0 && (
           <ProfilePostNavigation
-            postsCount={profile.nbPosts}
+            profile={profile}
             onClickCover={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
@@ -65,7 +65,6 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
               [styles.postNavigationHidden]: postsOpen,
             })}
             cover={media}
-            username={profile.userName}
           />
         )}
         <main
