@@ -200,13 +200,13 @@ const SimpleButtonSettingsEditionPanel = ({
 
   const onFocus = () => {
     if (actionType === 'link' && !isNotFalsyString(actionLink)) {
-      onActionLinkChange('http://');
+      onActionLinkChange('https://');
     }
   };
 
   const onBlur = () => {
     if (actionType === 'link' && !actionLink.startsWith('http')) {
-      onActionLinkChange(`http://${actionLink}`);
+      onActionLinkChange(`https://${actionLink}`);
     }
   };
 

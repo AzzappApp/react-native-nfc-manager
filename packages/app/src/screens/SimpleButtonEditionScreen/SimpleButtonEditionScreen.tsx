@@ -4,11 +4,13 @@ import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import * as z from 'zod';
 import {
   MODULE_KIND_SIMPLE_BUTTON,
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import { URL_REGEX, isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -30,6 +32,7 @@ import type {
   SimpleButtonEditionScreenUpdateModuleMutation,
   SaveSimpleButtonModuleInput,
 } from '@azzapp/relay/artifacts/SimpleButtonEditionScreenUpdateModuleMutation.graphql';
+import type { CountryCode } from 'libphonenumber-js';
 import type { ViewProps } from 'react-native';
 
 export type SimpleButtonEditionScreenProps = ViewProps & {
@@ -42,6 +45,30 @@ export type SimpleButtonEditionScreenProps = ViewProps & {
    */
   module: SimpleButtonEditionScreen_module$key | null;
 };
+
+const actionTypeSchema = z.intersection(
+  z.object({ buttonLabel: z.string().nonempty() }),
+  z.union([
+    z.object({
+      actionType: z.literal('email'),
+      actionLink: z.string().email().nonempty(),
+    }),
+    z.object({
+      actionType: z.literal('link'),
+      actionLink: z.string().regex(URL_REGEX).nonempty(),
+    }),
+    z
+      .object({
+        actionType: z.custom<string>(
+          value => value !== 'link' && value !== 'email',
+        ),
+        actionLink: z.string().nonempty(),
+      })
+      .refine(({ actionType, actionLink }) => {
+        return isPhoneNumber(actionLink, actionType as CountryCode);
+      }),
+  ]),
+);
 
 /**
  * A component that allows to create or update the SimpleButton Webcard module.
@@ -195,8 +222,7 @@ const SimpleButtonEditionScreen = ({
         }
       }
     `);
-  const isValid =
-    !!value.buttonLabel && !!value.actionType && !!value.actionLink;
+  const isValid = actionTypeSchema.safeParse(value).success;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
