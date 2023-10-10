@@ -4,7 +4,6 @@ import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import {
   useNativeNavigationEvent,
   useRouter,
@@ -60,10 +59,6 @@ const ProfileScreen = ({
   }, [ready]);
 
   const router = useRouter();
-  const onHome = () => {
-    if (isViewer) router.back();
-    else router.replaceAll(mainRoutes(false));
-  };
 
   const prefetchRoute = usePrefetchRoute();
 
@@ -173,7 +168,7 @@ const ProfileScreen = ({
             profile={data.profile}
             isViewer={isViewer}
             editing={editing}
-            onHome={onHome}
+            onHome={router.backToTop}
             isWebCardDisplayed={!showPost}
             onEdit={() => {
               if (!ref.current?.animationRunning.value) {

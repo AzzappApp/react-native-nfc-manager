@@ -264,11 +264,17 @@ const routerReducer = (
         ...state,
         modals: [...state.modals, action.payload],
       };
-    case 'BACK_TO_TOP':
+    case 'BACK_TO_TOP': {
+      const firstRoute = state.stack[0];
       return {
-        stack: [state.stack[0]],
+        stack: [
+          firstRoute.kind === 'tabs'
+            ? { ...firstRoute, state: { ...firstRoute.state, currentIndex: 0 } }
+            : firstRoute,
+        ],
         modals: [],
       };
+    }
     case 'REPLACE_ALL':
       return action.payload;
     default:
@@ -607,7 +613,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         const { stack, modals } = routerStateRef.current;
         const screenRemoved = [
           ...getAllRoutesFromStack(modals),
-          ...getAllRoutesFromStack(stack),
+          ...getAllRoutesFromStack(stack.slice(1)),
         ];
         screenRemoved.forEach(({ id, state: route }) =>
           dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
