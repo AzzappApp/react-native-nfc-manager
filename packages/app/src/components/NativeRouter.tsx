@@ -292,6 +292,7 @@ export type NativeRouter = {
   replace(route: Route): void;
   showModal(route: Route): void;
   back(): void;
+  canGoBack(): boolean;
   pop(num: number): void;
   getCurrentRoute(): Route | null;
   getCurrentScreenId(): string | null;
@@ -589,6 +590,10 @@ export const useNativeRouter = (init: NativeRouterInit) => {
             count: 1,
           },
         });
+      },
+      canGoBack() {
+        const { stack, modals } = routerStateRef.current;
+        return stack.length > 1 || modals.length > 0;
       },
       pop(num: number) {
         const { stack, modals } = routerStateRef.current;

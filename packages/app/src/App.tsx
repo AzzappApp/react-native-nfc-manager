@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { useColorScheme } from 'react-native';
+import { BackHandler, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import {
   initialWindowMetrics,
@@ -224,6 +224,22 @@ const AppRouter = () => {
       }
     }
   }, [authenticated, profileId, router]);
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (router.canGoBack()) {
+          router.back();
+          return true;
+        }
+
+        return false;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
