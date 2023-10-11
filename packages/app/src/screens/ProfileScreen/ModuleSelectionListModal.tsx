@@ -124,7 +124,7 @@ const ModuleSelectionListModal = ({
         {
           moduleKind: 'socialLinks',
           label: intl.formatMessage({
-            defaultMessage: 'Social',
+            defaultMessage: 'Links',
             description:
               'Module selection list modal Social Links module label',
           }),
