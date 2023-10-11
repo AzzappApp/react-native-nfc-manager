@@ -1,5 +1,6 @@
-## 0.4.2-canary.47
+## 0.4.2-canary.48
 
+* **fix:**  - profile on viewer can be null ([#1391](https://github.com/AzzappApp/azzapp/pull/1391))
 * **fix:**  - rename Social platform to links ([#1382](https://github.com/AzzappApp/azzapp/pull/1382))
 * **fix:**  - 🐛 copy link and display toast ([#1383](https://github.com/AzzappApp/azzapp/pull/1383))
 * **fix:**  - progress indicator need to be reset for the next use on post ([#1380](https://github.com/AzzappApp/azzapp/pull/1380))
