@@ -50,6 +50,10 @@ const text = style({
       marginTop: '0!important',
       maxWidth: '100%!important',
     },
+    [MediaQuery.Mobile]: {
+      paddingRight: '0!important',
+      paddingLeft: '0!important',
+    },
   },
 });
 

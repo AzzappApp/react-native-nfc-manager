@@ -99,19 +99,21 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
           </aside>
         )}
 
-        <ButtonIcon
-          Icon={FlipIcon}
-          size={24}
-          height={50}
-          width={50}
-          className={styles.switchContent}
-          color="white"
-          onClick={() => {
-            setDisplay(prevDisplay =>
-              prevDisplay === 'card' ? 'posts' : 'card',
-            );
-          }}
-        />
+        {hasPosts && (
+          <ButtonIcon
+            Icon={FlipIcon}
+            size={24}
+            height={50}
+            width={50}
+            className={styles.switchContent}
+            color="white"
+            onClick={() => {
+              setDisplay(prevDisplay =>
+                prevDisplay === 'card' ? 'posts' : 'card',
+              );
+            }}
+          />
+        )}
         <DownloadVCard
           profileId={profile.id}
           userName={profile.userName}

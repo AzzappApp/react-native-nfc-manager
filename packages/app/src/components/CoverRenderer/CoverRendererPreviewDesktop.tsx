@@ -39,7 +39,7 @@ const CoverRendererPreviewDesktop = ({
         style={StyleSheet.absoluteFill}
         source={{ uri: mediaUri }}
         contentFit="cover"
-        contentPosition="center"
+        contentPosition="bottom"
         blurRadius={Platform.select({
           ios: 5,
           android: 2,
