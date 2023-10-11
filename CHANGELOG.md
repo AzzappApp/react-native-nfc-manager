@@ -1,5 +1,7 @@
-## 0.4.2-canary.48
+## 0.4.2-canary.49
 
+* **feat:**  - **android:** add back handler support on router ([#1379](https://github.com/AzzappApp/azzapp/pull/1379))
+* **fix:**  - preview web ([#1390](https://github.com/AzzappApp/azzapp/pull/1390))
 * **fix:**  - profile on viewer can be null ([#1391](https://github.com/AzzappApp/azzapp/pull/1391))
 * **fix:**  - rename Social platform to links ([#1382](https://github.com/AzzappApp/azzapp/pull/1382))
 * **fix:**  - 🐛 copy link and display toast ([#1383](https://github.com/AzzappApp/azzapp/pull/1383))
