@@ -409,6 +409,9 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
+  get trash() {
+    return require('./assets/trash.png');
+  },
 } as const;
 
 export type Icons = keyof typeof icons;

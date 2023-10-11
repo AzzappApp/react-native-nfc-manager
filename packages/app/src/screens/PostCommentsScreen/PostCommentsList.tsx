@@ -20,6 +20,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Input from '#ui/Input';
@@ -27,6 +28,7 @@ import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import CommentItem from './CommentItem';
+import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
@@ -69,6 +71,7 @@ const PostCommentsList = ({
 
   const router = useRouter();
   const intl = useIntl();
+  const auth = useAuthState();
   const onClose = () => {
     router.back();
   };
@@ -87,7 +90,11 @@ const PostCommentsList = ({
             edges {
               node {
                 id
+                author {
+                  id
+                }
                 ...CommentItemFragment_comment
+                ...DeletableCommentItemFragment_comment
               }
             }
           }
@@ -196,6 +203,20 @@ const PostCommentsList = ({
     [data.comments?.edges],
   );
 
+  const renderItem = useCallback(
+    ({
+      item,
+    }: {
+      item: CommentItemFragment_comment$key & { author: { id: string } };
+    }) => {
+      if (auth.profileId !== item.author.id) {
+        return <CommentItem item={item} />;
+      }
+      return <DeletableCommentItem item={item} />;
+    },
+    [auth.profileId],
+  );
+
   const insets = useScreenInsets();
   return (
     <Container
@@ -265,10 +286,6 @@ const PostCommentsList = ({
 
 export default PostCommentsList;
 const MAX_COMMENT_LENGHT = 2200;
-
-const renderItem = ({ item }: { item: CommentItemFragment_comment$key }) => {
-  return <CommentItem item={item} />;
-};
 
 const styles = StyleSheet.create({
   inputContainer: {

@@ -1,0 +1,18 @@
+extend type Mutation {
+  """
+  Update a post comment
+  """
+  updatePostComment(input: UpdatePostCommentInput!): UpdatePostCommentPayload!
+}
+
+input UpdatePostCommentInput {
+  """
+  The post id we want toggle like on
+  """
+  commentId: ID!
+  comment: String!
+}
+
+type UpdatePostCommentPayload {
+  postComment: PostComment
+}

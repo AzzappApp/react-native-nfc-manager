@@ -2,6 +2,7 @@ import createPost from './createPost';
 import createPostComment from './createPostComment';
 import createProfile from './createProfile';
 import deleteModules from './deleteModules';
+import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
 import loadCardTemplate from './loadCardTemplate';
 import {
@@ -48,6 +49,7 @@ export const Mutation: MutationResolvers = {
   saveBlockTextModule,
   reorderModules,
   deleteModules,
+  deletePostComment,
   duplicateModule,
   loadCardTemplate,
   updateModulesVisibility,
