@@ -394,7 +394,6 @@ const AppRouter = () => {
             </UploadModalProvider>
           </RouterProvider>
           <Toast />
-
           <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>

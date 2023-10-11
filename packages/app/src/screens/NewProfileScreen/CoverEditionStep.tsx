@@ -31,6 +31,9 @@ const CoverEditionStep = (
         viewer {
           ...CoverEditor_viewer
           ...useSuggestedMediaManager_suggested
+          profile {
+            id
+          }
         }
       }
     `,
@@ -66,16 +69,18 @@ const CoverEditionStep = (
           </Text>
         </View>
         <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
-          <CoverEditor
-            ref={forwardRef}
-            viewer={data.viewer}
-            height={eidtorHeight}
-            onCoverSaved={onCoverSaved}
-            onCanSaveChange={setCanSave}
-            initialTemplateKind={
-              profileKind === 'business' ? 'others' : 'people'
-            }
-          />
+          {data.viewer.profile?.id != null && ( //the profile from CoverEditor_viewer is null  in some case (this condition fix https://github.com/AzzappApp/azzapp/issues/1384. )
+            <CoverEditor
+              ref={forwardRef}
+              viewer={data.viewer}
+              height={eidtorHeight}
+              onCoverSaved={onCoverSaved}
+              onCanSaveChange={setCanSave}
+              initialTemplateKind={
+                profileKind === 'business' ? 'others' : 'people'
+              }
+            />
+          )}
         </View>
       </Suspense>
     </View>
