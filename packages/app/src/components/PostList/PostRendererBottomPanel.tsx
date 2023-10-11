@@ -1,9 +1,11 @@
 /* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
+import * as Clipboard from 'expo-clipboard';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
@@ -79,20 +81,36 @@ const PostRendererBottomPanel = ({
   );
 
   const copyLink = () => {
-    //TODO
-    alert('TODO');
     toggleModal();
+
+    Clipboard.setStringAsync(buildUserUrl(post.author.userName)).then(() => {
+      /* 
+        Modals and Toasts are known to interfere with each other
+        We need to wait for the modal to be hidden before displaying the toast, or he will get hidden too
+      */
+      setTimeout(() => {
+        Toast.show({
+          type: 'info',
+          bottomOffset: TOAST_BOTTOM_OFFSET,
+          position: 'bottom',
+          props: {
+            showClose: true,
+          },
+          text1: intl.formatMessage({
+            defaultMessage: 'Link copied to the clipboard',
+            description:
+              'Toast info message that appears when the user copy the link of a post',
+          }),
+        });
+      }, MODAL_ANIMATION_TIME);
+    });
   };
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description:
-            'Post Botom Panel : Predefined Message used in sharing a Post ',
-        }),
+        url: buildUserUrl(post.author.userName),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -373,5 +391,7 @@ export const PostRendererBottomPanelSkeleton = () => {
   );
 };
 
+const TOAST_BOTTOM_OFFSET = 50;
+const MODAL_ANIMATION_TIME = 800;
 const MODAL_HEIGHT = 284;
 const SMALL_MODAL_HEIGHT = 200;

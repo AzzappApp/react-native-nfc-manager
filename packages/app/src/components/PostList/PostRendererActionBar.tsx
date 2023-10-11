@@ -5,6 +5,7 @@ import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -32,6 +33,7 @@ const PostRendererActionBar = ({
     allowLikes,
     allowComments,
     counterReactions,
+    author,
   } = useFragment(
     graphql`
       fragment PostRendererActionBar_post on Post {
@@ -41,6 +43,9 @@ const PostRendererActionBar = ({
         allowLikes
         counterReactions
         content
+        author {
+          userName
+        }
       }
     `,
     postKey,
@@ -145,10 +150,7 @@ const PostRendererActionBar = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description: 'Post Item : Predefined Message used in sharing a Post ',
-        }),
+        url: buildUserUrl(author.userName),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
