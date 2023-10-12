@@ -9,7 +9,6 @@ import { FlatList } from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
-  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -143,7 +142,6 @@ function CarouselSelectList<TItem = any>(
       scrollX.value = event.contentOffset.x;
       const index = event.contentOffset.x / itemWidth;
       onSelectedIndexChangeAnimated?.(index);
-      runOnJS(onSelectIndexChangeInner)(Math.round(index));
     },
   });
 
@@ -163,6 +161,10 @@ function CarouselSelectList<TItem = any>(
     }),
     [itemWidth],
   );
+
+  const onScrollEnd = useCallback(() => {
+    onSelectIndexChangeInner(Math.round(scrollX.value / itemWidth));
+  }, [onSelectIndexChangeInner, scrollX, itemWidth]);
 
   const CellRenderer = useMemo(() => {
     const CellRenderer = ({
@@ -228,6 +230,7 @@ function CarouselSelectList<TItem = any>(
       pagingEnabled
       bounces={false}
       onScroll={scrollHandler}
+      onScrollAnimationEnd={onScrollEnd}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       style={[{ width, height }, style as any]}
