@@ -1,5 +1,9 @@
-## 0.4.2-canary.50
+## 0.4.2-canary.51
 
+* **perf:**  - reduce frame dropping on home carousel ([#1388](https://github.com/AzzappApp/azzapp/pull/1388))
+* **feat:**  - new permission ([#1401](https://github.com/AzzappApp/azzapp/pull/1401))
+* **fix:**  - link behavior ([#1404](https://github.com/AzzappApp/azzapp/pull/1404))
+* **fix:**  - [#1222](https://github.com/AzzappApp/azzapp/pull/1222) domain name extension can be bigger - at most 63 characters ([#1397](https://github.com/AzzappApp/azzapp/pull/1397))
 * **fix:**  - **android:** 💥 on modal appearing due to error in react-native-screens ([#1396](https://github.com/AzzappApp/azzapp/pull/1396))
 * **feat:**  - **android:** add back handler support on router ([#1379](https://github.com/AzzappApp/azzapp/pull/1379))
 * **fix:**  - preview web ([#1390](https://github.com/AzzappApp/azzapp/pull/1390))

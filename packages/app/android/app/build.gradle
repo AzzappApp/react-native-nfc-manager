@@ -82,7 +82,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4002
-        versionName "0.4.2-canary.50"
+        versionName "0.4.2-canary.51"
     }
 
     flavorDimensions "env"
