@@ -1,38 +1,90 @@
-import * as MediaLibrary from 'expo-media-library';
 import { useState, useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
+import { request, check, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import type { Permission, PermissionStatus } from 'react-native-permissions';
 
-import { Linking } from 'react-native';
-import type { PermissionInfo } from 'expo-permissions';
-/**
- * ask for medial library permission
- *
- * @export
- * @returns {[boolean, () => void]} true if granted, method to ask or open settings
- */
+const storagePermission = new MMKV();
 
-export function usePermissionMediaLibrary(): [boolean, boolean, () => void] {
-  const [permission, setPermission] = useState<PermissionInfo>();
-  const [loading, setLoading] = useState(true);
+export function useMediaPermission(): {
+  mediaPermission: PermissionStatus | undefined;
+  askMediaPermission: () => void;
+} {
+  const { status, ask } = usePermission(
+    Platform.OS === 'ios'
+      ? PERMISSIONS.IOS.PHOTO_LIBRARY
+      : PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+  );
+
+  return {
+    mediaPermission: status,
+    askMediaPermission: ask,
+  };
+}
+
+export function useCameraPermission(): {
+  cameraPermission: PermissionStatus;
+  askCameraPermission: () => Promise<void>;
+} {
+  const { status, ask } = usePermission(
+    Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA,
+  );
+
+  return {
+    cameraPermission: status,
+    askCameraPermission: ask,
+  };
+}
+
+export function useAudioPermission(): {
+  audioPermission: PermissionStatus;
+  askAudioPermission: () => Promise<void>;
+} {
+  const { status, ask } = usePermission(PERMISSIONS.IOS.MICROPHONE);
+
+  return {
+    audioPermission: Platform.OS === 'ios' ? status : RESULTS.GRANTED,
+    askAudioPermission: ask,
+  };
+}
+
+type PermissionHookResult = {
+  status: PermissionStatus;
+  ask: () => Promise<void>;
+};
+
+const usePermission = (permission: Permission): PermissionHookResult => {
+  const [status, setStatus] = useState<PermissionStatus>('unavailable');
+  const ask = useCallback(async () => {
+    const newStatus = await request(permission);
+    setStatus(newStatus);
+  }, [permission]);
 
   useEffect(() => {
-    if (!permission) {
-      MediaLibrary.getPermissionsAsync()
-        .then(response => {
-          setPermission(response);
-          setLoading(false);
-        })
-        .catch(console.error);
-    }
+    const checkStatus = async () => {
+      const newStatus = await check(permission);
+      setStatus(newStatus);
+    };
+    checkStatus();
   }, [permission]);
 
-  const ask = useCallback(async () => {
-    if (permission != null && !permission?.canAskAgain) {
-      void Linking.openSettings();
-    } else {
-      const response = await MediaLibrary.requestPermissionsAsync();
-      setPermission(response);
-    }
+  useEffect(() => {
+    storagePermission.set(`permission.${permission}`, status);
+  }, [permission, status]);
+
+  useEffect(() => {
+    const listener = storagePermission.addOnValueChangedListener(changedKey => {
+      if (changedKey === `permission.${permission}`) {
+        const newValue = storagePermission.getString(
+          `permission.${permission}`,
+        );
+        if (newValue !== 'unavailable') {
+          setStatus(newValue as PermissionStatus);
+        }
+      }
+    });
+    return () => listener.remove();
   }, [permission]);
 
-  return [loading, permission?.granted ?? false, ask];
-}
+  return { status, ask };
+};

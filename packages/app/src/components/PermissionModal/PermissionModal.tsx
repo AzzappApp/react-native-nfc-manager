@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, Modal, SafeAreaView } from 'react-native';
-import useCameraPermissions, {
-  requestCameraPermission,
-  requestMicrophonePermission,
-} from '#hooks/useCameraPermissions';
-import { requestMediaLibraryPermission } from '#hooks/useMediaLibraryPermission';
+import { StyleSheet, View, Modal, SafeAreaView, Linking } from 'react-native';
+import { RESULTS } from 'react-native-permissions';
+import {
+  useMediaPermission,
+  useCameraPermission,
+  useAudioPermission,
+} from '#hooks/usePermissions';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -31,11 +32,30 @@ type CameraModalProps = {
  */
 const PermissionModal = ({
   permissionsFor,
-  visible,
   onRequestClose,
 }: CameraModalProps) => {
   const intl = useIntl();
-  const { cameraPermission } = useCameraPermissions();
+  const { mediaPermission, askMediaPermission } = useMediaPermission();
+  const { cameraPermission, askCameraPermission } = useCameraPermission();
+  const { audioPermission, askAudioPermission } = useAudioPermission();
+
+  const showPermissionModal = useMemo(() => {
+    switch (permissionsFor) {
+      case 'gallery':
+        return (
+          mediaPermission !== RESULTS.GRANTED &&
+          mediaPermission !== RESULTS.LIMITED
+        );
+      case 'photo':
+        return cameraPermission !== RESULTS.GRANTED;
+
+      case 'video':
+        return !(
+          cameraPermission === RESULTS.GRANTED &&
+          audioPermission === RESULTS.GRANTED
+        );
+    }
+  }, [audioPermission, cameraPermission, mediaPermission, permissionsFor]);
 
   const currentPermission = useMemo(() => {
     switch (permissionsFor) {
@@ -44,10 +64,7 @@ const PermissionModal = ({
       case 'photo':
         return 'camera';
       case 'video':
-        if (
-          cameraPermission === 'not-determined' ||
-          cameraPermission === 'denied'
-        ) {
+        if (cameraPermission !== RESULTS.GRANTED) {
           return 'camera';
         }
         return 'microphone';
@@ -55,27 +72,28 @@ const PermissionModal = ({
   }, [cameraPermission, permissionsFor]);
 
   const onAllowsCamera = async () => {
-    const permission = await requestCameraPermission();
-
-    if (permission === 'denied') {
-      return;
-    }
-    if (permissionsFor === 'video') {
-      void requestMicrophonePermission();
+    if (cameraPermission === RESULTS.DENIED) {
+      askCameraPermission();
+    } else {
+      Linking.openSettings();
     }
   };
 
   const onAllowsMicrophone = () => {
-    void requestMicrophonePermission();
+    if (audioPermission === RESULTS.DENIED) {
+      askAudioPermission();
+    } else {
+      Linking.openSettings();
+    }
   };
 
   const onAllowsGallery = async () => {
-    void requestMediaLibraryPermission();
+    askMediaPermission();
   };
 
   return (
     <Modal
-      visible={visible}
+      visible={showPermissionModal}
       onRequestClose={onRequestClose}
       animationType="slide"
     >
@@ -94,8 +112,7 @@ const PermissionModal = ({
             <View style={styles.content}>
               <PermissionScreen
                 title={intl.formatMessage({
-                  defaultMessage:
-                    'Allow Azzapp to access your camera and your microphone',
+                  defaultMessage: 'Allow Azzapp to access your camera',
                   description:
                     'Camera authorization screen title for camera permission',
                 })}

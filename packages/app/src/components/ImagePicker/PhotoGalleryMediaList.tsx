@@ -35,7 +35,6 @@ import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
 import type { Album, Asset } from 'expo-media-library';
 import type { LayoutChangeEvent } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-
 type PhotoGalleryMediaListProps = Omit<
   FlashListProps<Asset>,
   'children' | 'data' | 'onEndReached' | 'renderItem'

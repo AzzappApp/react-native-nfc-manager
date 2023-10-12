@@ -26,7 +26,6 @@ export const buildApplePass = async (profileId: string, locale: string) => {
 
     const thumbnails: Record<string, Buffer> = {};
 
-    console.log(getCoverUrl(profile.userName, 90));
     if (media) {
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] =
         await Promise.allSettled([
