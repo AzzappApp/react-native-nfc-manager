@@ -1,5 +1,6 @@
-## 0.4.2-canary.49
+## 0.4.2-canary.50
 
+* **fix:**  - **android:** 💥 on modal appearing due to error in react-native-screens ([#1396](https://github.com/AzzappApp/azzapp/pull/1396))
 * **feat:**  - **android:** add back handler support on router ([#1379](https://github.com/AzzappApp/azzapp/pull/1379))
 * **fix:**  - preview web ([#1390](https://github.com/AzzappApp/azzapp/pull/1390))
 * **fix:**  - profile on viewer can be null ([#1391](https://github.com/AzzappApp/azzapp/pull/1391))
