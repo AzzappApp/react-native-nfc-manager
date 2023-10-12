@@ -8,7 +8,7 @@ import React, {
   useContext,
   createContext,
 } from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
@@ -748,20 +748,39 @@ export const ScreensRenderer = ({
         onScreenDismissed={onScreenDismissed}
         hasFocus
       />
-      {!!modals.length && (
-        <Screen isNativeStack style={StyleSheet.absoluteFill}>
-          <StackRenderer
-            stack={modals}
-            screens={screens}
-            tabsRenderers={tabs}
-            defaultScreenOptions={defaultScreenOptions}
-            onFinishTransitioning={onFinishTransitioning}
-            onScreenDismissed={onScreenDismissed}
-            hasFocus
-            isModal
-          />
-        </Screen>
-      )}
+      {!!modals.length &&
+        (Platform.OS === 'android' ? (
+          <ScreenContainer
+            style={[StyleSheet.absoluteFill, { position: 'absolute' }]}
+            hasTwoStates
+          >
+            <Screen isNativeStack style={StyleSheet.absoluteFill}>
+              <StackRenderer
+                stack={modals}
+                screens={screens}
+                tabsRenderers={tabs}
+                defaultScreenOptions={defaultScreenOptions}
+                onFinishTransitioning={onFinishTransitioning}
+                onScreenDismissed={onScreenDismissed}
+                hasFocus
+                isModal
+              />
+            </Screen>
+          </ScreenContainer>
+        ) : (
+          <Screen isNativeStack style={StyleSheet.absoluteFill}>
+            <StackRenderer
+              stack={modals}
+              screens={screens}
+              tabsRenderers={tabs}
+              defaultScreenOptions={defaultScreenOptions}
+              onFinishTransitioning={onFinishTransitioning}
+              onScreenDismissed={onScreenDismissed}
+              hasFocus
+              isModal
+            />
+          </Screen>
+        ))}
     </>
   );
 };
