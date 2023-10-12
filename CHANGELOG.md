@@ -1,5 +1,6 @@
-## 0.4.2-canary.51
+## 0.4.2-canary.52
 
+* **fix:**  -  go to setting when media permission is denied
 * **perf:**  - reduce frame dropping on home carousel ([#1388](https://github.com/AzzappApp/azzapp/pull/1388))
 * **feat:**  - new permission ([#1401](https://github.com/AzzappApp/azzapp/pull/1401))
 * **fix:**  - link behavior ([#1404](https://github.com/AzzappApp/azzapp/pull/1404))
