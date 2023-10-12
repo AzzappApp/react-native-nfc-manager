@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/react-native';
+import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -150,7 +151,7 @@ const PostRendererActionBar = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildUserUrl(author.userName),
+        url: buildPostUrl(author.userName, fromGlobalId(postId).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {

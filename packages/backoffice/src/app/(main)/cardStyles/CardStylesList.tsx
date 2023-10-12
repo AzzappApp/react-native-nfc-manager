@@ -47,10 +47,13 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'labels.en',
+    field: 'labels',
     headerName: 'Label',
     flex: 1,
     renderCell: params => params.row.labels?.en,
+    sortComparator: (a, b) => {
+      return a.en.localeCompare(b.en);
+    },
   },
   {
     field: 'fontFamily',

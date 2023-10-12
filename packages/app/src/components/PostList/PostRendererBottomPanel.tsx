@@ -1,11 +1,12 @@
 /* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
+import { fromGlobalId } from 'graphql-relay';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildPostUrl, buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
@@ -83,7 +84,9 @@ const PostRendererBottomPanel = ({
   const copyLink = () => {
     toggleModal();
 
-    Clipboard.setStringAsync(buildUserUrl(post.author.userName)).then(() => {
+    Clipboard.setStringAsync(
+      buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+    ).then(() => {
       /* 
         Modals and Toasts are known to interfere with each other
         We need to wait for the modal to be hidden before displaying the toast, or he will get hidden too
