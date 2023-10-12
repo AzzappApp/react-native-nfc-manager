@@ -88,7 +88,11 @@ const PermissionModal = ({
   };
 
   const onAllowsGallery = async () => {
-    askMediaPermission();
+    if (mediaPermission === RESULTS.DENIED) {
+      askMediaPermission();
+    } else {
+      Linking.openSettings();
+    }
   };
 
   return (
