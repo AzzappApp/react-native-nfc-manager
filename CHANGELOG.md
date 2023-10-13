@@ -1,5 +1,6 @@
-## 0.4.2-canary.53
+## 0.4.2-canary.54
 
+* **fix:**  - userPermissions for android and expo-library (should handle android 13 new perm request) ([#1421](https://github.com/AzzappApp/azzapp/pull/1421))
 * **fix:**  - 🐛 use azzapp logo following WebCard text everywhere ([#1412](https://github.com/AzzappApp/azzapp/pull/1412))
 * **fix:**  -  go to setting when media permission is denied
 * **perf:**  - reduce frame dropping on home carousel ([#1388](https://github.com/AzzappApp/azzapp/pull/1388))
