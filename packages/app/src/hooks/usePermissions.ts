@@ -1,7 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
-import { request, check, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import {
+  request,
+  requestMultiple,
+  checkMultiple,
+  check,
+  PERMISSIONS,
+  RESULTS,
+} from 'react-native-permissions';
 import type { Permission, PermissionStatus } from 'react-native-permissions';
 
 const storagePermission = new MMKV();
@@ -13,7 +20,12 @@ export function useMediaPermission(): {
   const { status, ask } = usePermission(
     Platform.OS === 'ios'
       ? PERMISSIONS.IOS.PHOTO_LIBRARY
-      : PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+      : [
+          PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
+          PERMISSIONS.ANDROID.READ_MEDIA_VIDEO,
+          PERMISSIONS.ANDROID.READ_MEDIA_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+        ],
   );
 
   return {
@@ -53,38 +65,81 @@ type PermissionHookResult = {
   ask: () => Promise<void>;
 };
 
-const usePermission = (permission: Permission): PermissionHookResult => {
+const usePermission = (
+  permission: Permission | Permission[],
+): PermissionHookResult => {
   const [status, setStatus] = useState<PermissionStatus>('unavailable');
+  const mmkvKey = useMemo(
+    () =>
+      typeof permission === 'object'
+        ? `permission.${permission.join('-')}`
+        : `permission.${permission}`,
+    [permission],
+  );
+
   const ask = useCallback(async () => {
-    const newStatus = await request(permission);
-    setStatus(newStatus);
+    if (typeof permission === 'object') {
+      const newStatus = await requestMultiple(permission);
+      for (let index = 0; index < permission.length; index += 1) {
+        const element = permission[index];
+        if (newStatus[element] === 'blocked') {
+          setStatus('blocked');
+          return;
+        } else if (newStatus[element] === 'denied') {
+          setStatus('denied');
+          return;
+        } else if (newStatus[element] === 'granted') {
+          setStatus('granted');
+        }
+      }
+      return;
+    } else {
+      const newStatus = await request(permission);
+      setStatus(newStatus);
+    }
   }, [permission]);
 
   useEffect(() => {
     const checkStatus = async () => {
-      const newStatus = await check(permission);
-      setStatus(newStatus);
+      if (typeof permission === 'object') {
+        const newStatus = await checkMultiple(permission);
+        let definedStatus: PermissionStatus = 'unavailable';
+        for (let index = 0; index < permission.length; index += 1) {
+          const element = permission[index];
+          if (newStatus[element] === 'blocked') {
+            definedStatus = 'blocked';
+            break;
+          } else if (newStatus[element] === 'denied') {
+            definedStatus = 'denied';
+            break;
+          } else if (newStatus[element] === 'granted') {
+            definedStatus = 'granted';
+          }
+        }
+        setStatus(definedStatus);
+      } else {
+        const newStatus = await check(permission);
+        setStatus(newStatus);
+      }
     };
     checkStatus();
-  }, [permission]);
+  }, [mmkvKey, permission]);
 
   useEffect(() => {
-    storagePermission.set(`permission.${permission}`, status);
-  }, [permission, status]);
+    storagePermission.set(`permission.${mmkvKey}`, status);
+  }, [mmkvKey, status]);
 
   useEffect(() => {
     const listener = storagePermission.addOnValueChangedListener(changedKey => {
-      if (changedKey === `permission.${permission}`) {
-        const newValue = storagePermission.getString(
-          `permission.${permission}`,
-        );
+      if (changedKey === mmkvKey) {
+        const newValue = storagePermission.getString(mmkvKey);
         if (newValue !== 'unavailable') {
           setStatus(newValue as PermissionStatus);
         }
       }
     });
     return () => listener.remove();
-  }, [permission]);
+  }, [mmkvKey]);
 
   return { status, ask };
 };
