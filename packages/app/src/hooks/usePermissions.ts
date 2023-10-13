@@ -126,7 +126,7 @@ const usePermission = (
   }, [mmkvKey, permission]);
 
   useEffect(() => {
-    storagePermission.set(`permission.${mmkvKey}`, status);
+    storagePermission.set(mmkvKey, status);
   }, [mmkvKey, status]);
 
   useEffect(() => {
