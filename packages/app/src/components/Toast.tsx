@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useCallback, useMemo } from 'react';
+import { Text } from 'react-native';
 import ExternalToast, {
   BaseToast,
   ErrorToast,
@@ -9,6 +10,7 @@ import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import type { ReactNode } from 'react';
 import type {
   ToastProps as ExternalToastProps,
   ToastConfigParams,
@@ -26,6 +28,7 @@ type ToastProps = {
    *
    */
   retry?: () => void;
+  customText?: ReactNode;
 };
 
 /**
@@ -126,7 +129,22 @@ const Toast = ({
             renderLeadingIcon={() => (
               <Icon icon="tips" style={styles.successToastIcon} />
             )}
-            renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
+            renderTrailingIcon={() => (
+              <>
+                {infoProps.props.customText && (
+                  <Text
+                    style={[
+                      textStyles.smallbold,
+                      styles.toastText,
+                      styles.customText,
+                    ]}
+                  >
+                    {infoProps.props.customText}
+                  </Text>
+                )}
+                {renderTrailingIcon(infoProps.props)}
+              </>
+            )}
             text1Style={[textStyles.smallbold, styles.toastText]}
             onPress={ExternalToast.hide}
           />
@@ -138,6 +156,7 @@ const Toast = ({
     renderTrailingIcon,
     styles.baseToast,
     styles.contentContainerToast,
+    styles.customText,
     styles.errorToastIcon,
     styles.info,
     styles.successToastIcon,
@@ -214,5 +233,9 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingTop: 90,
     width: '100%',
     position: 'absolute',
+  },
+  customText: {
+    marginLeft: -10,
+    marginRight: 10,
   },
 }));

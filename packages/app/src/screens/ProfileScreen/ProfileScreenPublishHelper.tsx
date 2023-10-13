@@ -57,15 +57,19 @@ const ProfileScreenPublishHelper = ({
     if (!cardIsPublished && editMode) {
       Toast.show({
         type: 'info',
-        text1: intl.formatMessage({
-          defaultMessage: 'Tap on a section of your WebCard to modify it',
-          description:
-            'Toast info message that appears when the user is in webcard edit mode for the first time',
-        }),
         bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
         autoHide: false,
         props: {
           showClose: true,
+          customText: (
+            <FormattedMessage
+              defaultMessage="Tap on a section of your WebCard{azzappA} to modify it"
+              description="Toast info message that appears when the user is in webcard edit mode for the first time"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          ),
         },
       });
     }
@@ -97,11 +101,17 @@ const ProfileScreenPublishHelper = ({
         console.error(error);
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not publish your WebCard, try again later',
-            description: 'Publish modal error toast',
-          }),
+          props: {
+            customText: (
+              <FormattedMessage
+                defaultMessage="Error, could not publish your WebCard{azzappA}, try again later"
+                description="Publish modal error toast"
+                values={{
+                  azzappA: <Text variant="azzapp">a</Text>,
+                }}
+              />
+            ),
+          },
         });
       },
     });
@@ -163,10 +173,15 @@ const ProfileScreenPublishHelper = ({
         <View style={styles.buttonGroup}>
           <Button
             onPress={onPublish}
-            label={intl.formatMessage({
-              defaultMessage: 'Ok, publish my WebCard!',
-              description: 'Publish modal publish button label',
-            })}
+            label={
+              <FormattedMessage
+                defaultMessage="Ok, publish my WebCard{azzappApp}!"
+                description="Publish modal publish button label"
+                values={{
+                  azzappApp: <Text variant="azzapp">a</Text>,
+                }}
+              />
+            }
             loading={publishing}
           />
           <Button

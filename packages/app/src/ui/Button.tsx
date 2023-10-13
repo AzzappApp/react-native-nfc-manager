@@ -9,11 +9,11 @@ import Text from '#ui/Text';
 import ActivityIndicator from './ActivityIndicator';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
-  label: string;
+  label: ReactNode;
   variant?: 'little_round_inverted' | 'little_round' | 'primary' | 'secondary';
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;

@@ -1,5 +1,5 @@
 import { useState, memo, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -128,22 +128,34 @@ const HomeBottomPanel = ({
         }
         Toast.show({
           type: 'success',
-          text1: intl.formatMessage({
-            defaultMessage: 'Your WebCard has been published',
-            description: 'Home Screen - webcard published toast',
-          }),
+          props: {
+            customText: (
+              <FormattedMessage
+                defaultMessage="Your WebCard{azzappAp} has been published."
+                description="Home Screen - webcard published toast"
+                values={{
+                  azzappAp: <Text variant="azzapp">a</Text>,
+                }}
+              />
+            ),
+          },
         });
       },
       onError: error => {
         console.error(error);
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not publish your WebCard, please try again later',
-            description:
-              'Error message displayed when the publication of the webcard failed in Home Screen',
-          }),
+          props: {
+            customText: (
+              <FormattedMessage
+                defaultMessage="Error, could not publish your WebCard{azzappAp}, please try again later"
+                description="Error message displayed when the publication of the webcard failed in Home Screen"
+                values={{
+                  azzappAp: <Text variant="azzapp">a</Text>,
+                }}
+              />
+            ),
+          },
         });
       },
     });
@@ -279,8 +291,6 @@ const HomeBottomPanel = ({
   useMainTabBarVisiblilityController(mainTabBarVisible);
   //#endregion
 
-  const intl = useIntl();
-
   const panelHeight = height - HOME_MENU_HEIGHT;
 
   return (
@@ -291,7 +301,7 @@ const HomeBottomPanel = ({
       >
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="Create a new Webcard{azzappAp}"
+            defaultMessage="Create a new WebCard{azzappAp}"
             description="Home Screen - Create a new WebCard"
             values={{
               azzappAp: (
@@ -327,7 +337,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} needs a cover"
             description="Home Screen - Missing cover title"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -349,10 +363,19 @@ const HomeBottomPanel = ({
           <Button
             variant="secondary"
             appearance="dark"
-            label={intl.formatMessage({
-              defaultMessage: 'Create your WebCard cover',
-              description: 'Home Screen - Missing cover button',
-            })}
+            label={
+              <FormattedMessage
+                defaultMessage="Create your WebCard{azzappAp} cover"
+                description="Home Screen - Missing cover button"
+                values={{
+                  azzappAp: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            }
             style={styles.informationPanelButton}
           />
         </Link>
@@ -384,10 +407,15 @@ const HomeBottomPanel = ({
         <Button
           variant="secondary"
           appearance="dark"
-          label={intl.formatMessage({
-            defaultMessage: 'Publish this WebCard',
-            description: 'Home Screen - webcard not published button',
-          })}
+          label={
+            <FormattedMessage
+              defaultMessage="Publish this WebCard{azzappAp}"
+              description="Home Screen - webcard not published button"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          }
           style={styles.informationPanelButton}
           onPress={onPublish}
         />

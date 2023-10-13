@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -151,10 +151,13 @@ const LoadCardTemplateModal = ({
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
           <Text variant="large" style={{ marginTop: 10 }}>
-            {intl.formatMessage({
-              defaultMessage: 'Delete your current WebCard contents?',
-              description: 'Confirmation title for load card template modal',
-            })}
+            <FormattedMessage
+              defaultMessage="Delete your current WebCard{azzappAp} contents?"
+              description="Confirmation title for load card template modal"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
           </Text>
           <Text
             style={{
@@ -163,12 +166,13 @@ const LoadCardTemplateModal = ({
               paddingHorizontal: 20,
             }}
           >
-            {intl.formatMessage({
-              defaultMessage:
-                'Loading a new template will remove current contents of your WebCarda and replace them with the new template. Are you ready to start from the scratch?',
-              description:
-                'Confirmation description for load card template modal',
-            })}
+            <FormattedMessage
+              defaultMessage="Loading a new template will remove current contents of your WebCard{azzappAp} and replace them with the new template. Are you ready to start from the scratch?"
+              description="Confirmation description for load card template modal"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
           </Text>
           <View style={styles.buttons}>
             <Button

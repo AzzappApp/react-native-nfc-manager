@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
 import { mainRoutes } from '#mobileRoutes';
 import Link from '#components/Link';
@@ -64,11 +64,13 @@ const WelcomeScreen = () => {
           })}
         </Text>
         <Text style={styles.subtitle}>
-          {intl.formatMessage({
-            defaultMessage:
-              'Introduce yourself in a new way by creating your own WebCard.',
-            description: 'Subtitle for welcome screen',
-          })}
+          <FormattedMessage
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            description="Subtitle for welcome screen"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
         </Text>
         <Link route="NEW_PROFILE" prefetch>
           <Button
