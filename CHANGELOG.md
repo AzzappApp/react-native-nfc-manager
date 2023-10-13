@@ -1,5 +1,6 @@
-## 0.4.2-canary.55
+## 0.4.2-canary.56
 
+* **fix:**  - **permissions:** [#1432](https://github.com/AzzappApp/azzapp/pull/1432) wrong prefix for permission ([#1434](https://github.com/AzzappApp/azzapp/pull/1434))
 * **fix:**  - **home:** [#1408](https://github.com/AzzappApp/azzapp/pull/1408) wrong initial index makes cover not openable ([#1409](https://github.com/AzzappApp/azzapp/pull/1409))
 * **fix:**  - userPermissions for android and expo-library (should handle android 13 new perm request) ([#1421](https://github.com/AzzappApp/azzapp/pull/1421))
 * **fix:**  - 🐛 use azzapp logo following WebCard text everywhere ([#1412](https://github.com/AzzappApp/azzapp/pull/1412))
