@@ -85,8 +85,7 @@ const HomeProfilesCarousel = (
   const coverWidth = Math.trunc(coverHeight * COVER_RATIO);
 
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex + 1);
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       setSelectedIndex(index);

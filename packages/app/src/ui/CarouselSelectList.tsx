@@ -116,17 +116,6 @@ function CarouselSelectList<TItem = any>(
 
   const scrollX = useSharedValue(0);
 
-  const onSelectIndexChangeInner = useMemo(() => {
-    let lastIndex = -1;
-    return (index: number) => {
-      if (index === lastIndex) {
-        return;
-      }
-      lastIndex = index;
-      onSelectedIndexChange?.(index);
-    };
-  }, [onSelectedIndexChange]);
-
   useImperativeHandle(ref, () => ({
     scrollToIndex: (index: number, animated = true) => {
       listRef.current?.scrollToOffset({
@@ -161,10 +150,6 @@ function CarouselSelectList<TItem = any>(
     }),
     [itemWidth],
   );
-
-  const onScrollEnd = useCallback(() => {
-    onSelectIndexChangeInner(Math.round(scrollX.value / itemWidth));
-  }, [onSelectIndexChangeInner, scrollX, itemWidth]);
 
   const CellRenderer = useMemo(() => {
     const CellRenderer = ({
@@ -230,7 +215,6 @@ function CarouselSelectList<TItem = any>(
       pagingEnabled
       bounces={false}
       onScroll={scrollHandler}
-      onScrollAnimationEnd={onScrollEnd}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       style={[{ width, height }, style as any]}
