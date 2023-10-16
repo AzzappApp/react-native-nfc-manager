@@ -25,6 +25,13 @@ type CameraModalProps = {
    * @see https://reactnative.dev/docs/modal#onrequestclose
    */
   onRequestClose(): void;
+  /**
+   * allow the popup to auto focus based on condition
+   *
+   * @type {boolean}
+   * @default true
+   */
+  autoFocus?: boolean;
 };
 
 /**
@@ -33,6 +40,7 @@ type CameraModalProps = {
 const PermissionModal = ({
   permissionsFor,
   onRequestClose,
+  autoFocus = true,
 }: CameraModalProps) => {
   const intl = useIntl();
   const { mediaPermission, askMediaPermission } = useMediaPermission();
@@ -97,7 +105,7 @@ const PermissionModal = ({
 
   return (
     <Modal
-      visible={showPermissionModal}
+      visible={showPermissionModal && autoFocus}
       onRequestClose={onRequestClose}
       animationType="slide"
     >

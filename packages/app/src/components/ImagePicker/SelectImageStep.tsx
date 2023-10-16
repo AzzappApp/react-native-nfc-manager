@@ -25,7 +25,6 @@ import type { CameraRuntimeError } from 'react-native-vision-camera';
 
 export type SelectImageStepProps = {
   onNext(): void;
-  onBack(): void;
   initialCameraPosition?: 'back' | 'front';
 };
 
@@ -34,7 +33,6 @@ export type SelectImageStepProps = {
  * from the gallery or take a photo/video with the camera.
  */
 const SelectImageStep = ({
-  onBack,
   onNext,
   initialCameraPosition,
 }: SelectImageStepProps) => {
@@ -56,6 +54,8 @@ const SelectImageStep = ({
     'gallery',
   );
 
+  const [permissionModalRejected, setPermissionModalRejected] = useState(false);
+
   const onAspectRatioToggle = () => {
     if (!media) {
       return;
@@ -76,9 +76,10 @@ const SelectImageStep = ({
       if (pickerMode === 'gallery') {
         clearMedia();
       }
+      setPermissionModalRejected(false);
       setPickerMode(mode);
     },
-    [clearMedia, pickerMode],
+    [clearMedia, setPermissionModalRejected, pickerMode],
   );
 
   // #region camera logic
@@ -234,7 +235,7 @@ const SelectImageStep = ({
       onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
-      onBack();
+      setPermissionModalRejected(true);
     }
   };
 
@@ -327,6 +328,7 @@ const SelectImageStep = ({
       <PermissionModal
         permissionsFor={pickerMode}
         onRequestClose={onCameraPermissionModalClose}
+        autoFocus={!permissionModalRejected}
       />
     </>
   );
