@@ -1,4 +1,4 @@
-## 0.5.1-canary.3
+## 0.5.1-canary.4
 
 * **fix:**  - 🐛 scroll to top when changing post/card view ([#1440](https://github.com/AzzappApp/azzapp/pull/1440))
 * **fix:**  - 🐛 use right text margin ([#1439](https://github.com/AzzappApp/azzapp/pull/1439))
