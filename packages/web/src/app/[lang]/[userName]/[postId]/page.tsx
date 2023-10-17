@@ -59,7 +59,7 @@ const PostPage = async (props: PostPageProps) => {
     redirect(`/${author.userName}/${post.id}`);
   }
 
-  if (!author || !post || !media) return notFound();
+  if (!author || !post || !media || !author.cardIsPublished) return notFound();
 
   const [postMedia] = post.medias;
 

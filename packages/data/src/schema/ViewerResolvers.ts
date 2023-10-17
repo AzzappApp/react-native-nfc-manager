@@ -1,4 +1,4 @@
-import { desc, like } from 'drizzle-orm';
+import { and, desc, eq, like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -121,7 +121,18 @@ export const Viewer: ViewerResolvers = {
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
-      await db.select().from(PostTable).orderBy(desc(PostTable.createdAt)),
+      await db
+        .select()
+        .from(PostTable)
+        .innerJoin(
+          ProfileTable,
+          and(
+            eq(PostTable.authorId, ProfileTable.id),
+            eq(ProfileTable.cardIsPublished, true),
+          ),
+        )
+        .orderBy(desc(PostTable.createdAt))
+        .then(res => res.map(({ Post }) => Post)),
       args,
     );
   },
