@@ -259,4 +259,7 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'yelp', mask: 'yelp.com/' },
   { id: 'youtube', mask: 'youtube.com/' },
   { id: 'website', mask: '' },
+  { id: 'phone', mask: '' },
+  { id: 'mail', mask: '' },
+  { id: 'sms', mask: '' },
 ];

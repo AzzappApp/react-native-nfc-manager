@@ -21,7 +21,7 @@ const SocialLink = (props: SocialLinkProps) => {
       }}
     >
       <a
-        href={`https://${mask}${link.link}`}
+        href={generateLink(mask, link.link, id)}
         style={{
           display: 'flex',
           width: iconSize,
@@ -49,6 +49,16 @@ export type SocialLinkType = {
   socialId: SocialIcons;
   link: string;
   position: number;
+};
+
+const generateLink = (mask: string, content: string, type: string) => {
+  let link = 'https://';
+
+  if (type === 'phone') link = `tel:`;
+  if (type === 'sms') link = 'sms:';
+  if (type === 'mail') link = 'mailto:';
+
+  return `${link}${mask}${content}`;
 };
 
 export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
@@ -81,6 +91,9 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'yelp', mask: 'yelp.com/' },
   { id: 'youtube', mask: 'youtube.com/' },
   { id: 'website', mask: '' },
+  { id: 'sms', mask: '' },
+  { id: 'phone', mask: '' },
+  { id: 'mail', mask: '' },
 ];
 
 const SOCIAL_LINKS_URL_MAP = new Map(
