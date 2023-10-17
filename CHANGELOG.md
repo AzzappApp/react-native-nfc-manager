@@ -1,5 +1,9 @@
-## 0.5.1-canary.6
+## 0.5.1-canary.7
 
+* **fix:**  - 🐛 Only display post from published profiles ([#1454](https://github.com/AzzappApp/azzapp/pull/1454))
+* **feat:**  - 🎸 add phone/sms/mail social link ([#1466](https://github.com/AzzappApp/azzapp/pull/1466))
+* **fix:**  - blur post ([#1449](https://github.com/AzzappApp/azzapp/pull/1449))
+* **perf:**  - small optimisations after whydidyourender checks ([#1424](https://github.com/AzzappApp/azzapp/pull/1424))
 * **fix:**  - delete comment ([#1441](https://github.com/AzzappApp/azzapp/pull/1441))
 * **build:**  - remove vision camera patch ([#1448](https://github.com/AzzappApp/azzapp/pull/1448))
 * **fix:**  - 🐛 scroll to top when changing post/card view ([#1440](https://github.com/AzzappApp/azzapp/pull/1440))
