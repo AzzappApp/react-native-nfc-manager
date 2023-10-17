@@ -1,5 +1,5 @@
-import { forwardRef, memo, useRef } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { forwardRef, memo, useMemo, useRef } from 'react';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -214,7 +214,7 @@ const CoverRenderer = (
   //#endregion
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
-  const isSmallCover = width === COVER_BASE_WIDTH;
+  const isSmallCover = width <= COVER_BASE_WIDTH;
   const isVideoMedia = __typename === 'MediaVideo';
 
   const mediaUri = isSmallCover
@@ -227,6 +227,11 @@ const CoverRenderer = (
 
   const MediaRenderer =
     isVideoMedia && videoEnabled ? MediaVideoRenderer : MediaImageRenderer;
+
+  const requestedSize = useMemo(
+    () => (isSmallCover ? COVER_BASE_WIDTH : Dimensions.get('window').width),
+    [isSmallCover],
+  );
 
   return (
     <View
@@ -248,12 +253,9 @@ const CoverRenderer = (
             <MediaImageRenderer
               testID="CoverRenderer_background"
               source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? background.smallURI
-                    : background.largeURI,
+                uri: isSmallCover ? background.smallURI : background.largeURI,
                 mediaId: background.id,
-                requestedSize: width,
+                requestedSize,
               }}
               tintColor={swapColor(backgroundPatternColor, cardColors)}
               aspectRatio={COVER_RATIO}
@@ -263,7 +265,7 @@ const CoverRenderer = (
           )}
           <MediaRenderer
             testID="CoverRenderer_media"
-            source={{ uri: mediaUri!, requestedSize: width, mediaId: media.id }}
+            source={{ uri: mediaUri!, requestedSize, mediaId: media.id }}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
             aspectRatio={COVER_RATIO}
             onReadyForDisplay={onMediaReadyForDisplay}
@@ -273,12 +275,9 @@ const CoverRenderer = (
             <MediaImageRenderer
               testID="CoverRenderer_foreground"
               source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? foreground.smallURI
-                    : foreground.largeURI,
+                uri: isSmallCover ? foreground.smallURI : foreground.largeURI,
                 mediaId: foreground.id,
-                requestedSize: width,
+                requestedSize,
               }}
               tintColor={swapColor(foregroundColor, cardColors)}
               aspectRatio={COVER_RATIO}
