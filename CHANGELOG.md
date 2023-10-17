@@ -1,5 +1,6 @@
-## 0.5.1-canary.5
+## 0.5.1-canary.6
 
+* **fix:**  - delete comment ([#1441](https://github.com/AzzappApp/azzapp/pull/1441))
 * **build:**  - remove vision camera patch ([#1448](https://github.com/AzzappApp/azzapp/pull/1448))
 * **fix:**  - 🐛 scroll to top when changing post/card view ([#1440](https://github.com/AzzappApp/azzapp/pull/1440))
 * **fix:**  - 🐛 use right text margin ([#1439](https://github.com/AzzappApp/azzapp/pull/1439))
