@@ -668,7 +668,14 @@ const useCoverEditionManager = ({
         maskMedia && !maskMedia.id
           ? { uri: maskMedia.uri, kind: 'image' }
           : null,
-        mediaPath ? { uri: mediaPath, kind: activeSourceMedia.kind } : null,
+        mediaPath
+          ? {
+              uri: mediaPath.startsWith('file')
+                ? mediaPath
+                : `file://${mediaPath}`,
+              kind: activeSourceMedia.kind,
+            }
+          : null,
       ];
 
       if (Object.values(mediaToUploads).some(media => !!media)) {
@@ -1070,7 +1077,9 @@ const createMediaComputation = ({
     let maskURI: string | null = null;
     if (computeMask) {
       const maskPath = await segmentImage(uri);
-      maskURI = `file://${maskPath}`;
+      if (maskPath) {
+        maskURI = `file://${maskPath}`;
+      }
     }
     if (canceled) {
       return 'canceled';
