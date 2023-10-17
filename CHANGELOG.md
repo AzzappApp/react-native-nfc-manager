@@ -1,5 +1,6 @@
-## 0.5.1-canary.4
+## 0.5.1-canary.5
 
+* **build:**  - remove vision camera patch ([#1448](https://github.com/AzzappApp/azzapp/pull/1448))
 * **fix:**  - 🐛 scroll to top when changing post/card view ([#1440](https://github.com/AzzappApp/azzapp/pull/1440))
 * **fix:**  - 🐛 use right text margin ([#1439](https://github.com/AzzappApp/azzapp/pull/1439))
 * **fix:**  - 🐛 use right blur and fore/background desktop preview ([#1420](https://github.com/AzzappApp/azzapp/pull/1420))
