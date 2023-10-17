@@ -34,6 +34,8 @@ const CommentItem = ({ item }: CommentItemProps) => {
 
   const styles = useStyleSheet(styleSheet);
 
+  if (!postComment) return null;
+
   return (
     <View style={styles.commentContainer}>
       <AuthorCartouche

@@ -10,12 +10,13 @@ import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/Co
 import type { DeletableCommentItemDeleteCommentMutation } from '@azzapp/relay/artifacts/DeletableCommentItemDeleteCommentMutation.graphql';
 type DeletableCommentItemProps = {
   item: CommentItemFragment_comment$key;
+  postId: string;
 };
 
 const DeletableCommentItem = (props: DeletableCommentItemProps) => {
-  const { item } = props;
+  const { item, postId } = props;
 
-  const { id } = useFragment(
+  const comment = useFragment(
     graphql`
       fragment DeletableCommentItemFragment_comment on PostComment {
         id
@@ -36,6 +37,8 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
     `,
   );
 
+  if (!comment) return null;
+
   const DeletableCommenItemActions = ({
     progress,
     onClose,
@@ -44,11 +47,21 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
       commit({
         variables: {
           input: {
-            commentId: id,
+            commentId: comment.id,
           },
         },
         onCompleted() {
           onClose();
+        },
+        updater: store => {
+          const post = store.get<{ counterComments: number }>(postId);
+          if (post) {
+            const counterComments = post?.getValue('counterComments');
+
+            if (typeof counterComments === 'number') {
+              post?.setValue(counterComments - 1, 'counterComments');
+            }
+          }
         },
       });
     };

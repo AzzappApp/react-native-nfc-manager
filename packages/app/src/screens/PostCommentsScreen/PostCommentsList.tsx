@@ -212,9 +212,9 @@ const PostCommentsList = ({
       if (auth.profileId !== item.author.id) {
         return <CommentItem item={item} />;
       }
-      return <DeletableCommentItem item={item} />;
+      return <DeletableCommentItem item={item} postId={postId} />;
     },
-    [auth.profileId],
+    [auth.profileId, postId],
   );
 
   const insets = useScreenInsets();

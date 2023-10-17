@@ -35,7 +35,10 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
 
       await removeComment(targetId, trx);
     });
-    return { commentId };
+
+    return {
+      commentId,
+    };
   } catch (error) {
     console.error(error);
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
