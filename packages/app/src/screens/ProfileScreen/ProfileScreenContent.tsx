@@ -16,7 +16,9 @@ import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
-import ProfileScreenEditModeFooter from './ProfileScreenEditModeFooter';
+import ProfileScreenEditModeFooter, {
+  PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
+} from './ProfileScreenEditModeFooter';
 import ProfileScreenFooter from './ProfileScreenFooter';
 import ProfileScreenHeader from './ProfileScreenHeader';
 import ProfileScreenScrollView from './ProfileScreenScrollView';
@@ -156,6 +158,11 @@ const ProfileScreenContent = ({
   // #endregion
 
   // #region Module edition
+  const [allBlockLoaded, setAllBlockLoaded] = useState(false);
+  const onProfileBodyLoad = useCallback(() => {
+    setAllBlockLoaded(true);
+  }, []);
+
   const onEditModule = useCallback(
     (module: ModuleKind, moduleId: string) => {
       if (!MODULE_KINDS.includes(module)) {
@@ -251,8 +258,6 @@ const ProfileScreenContent = ({
   }, []);
   // #endregion
 
-  const [modulesCount, setModulesCount] = useState(1);
-
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const atTop = event.nativeEvent.contentOffset.y < 5;
@@ -292,11 +297,16 @@ const ProfileScreenContent = ({
         />
         <ProfileScreenScrollView
           editing={editing}
-          ready={ready}
-          blocksCount={modulesCount + 1}
+          allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
+          editFooter={
+            <ProfileScreenEditModeFooter setLoadTemplate={setLoadTemplate} />
+          }
+          editFooterHeight={PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
         >
           <ProfileBlockContainer
+            id="cover"
+            index={0}
             backgroundColor={coverBackgroundColor}
             editing={editing}
             displayEditionButtons={false}
@@ -317,11 +327,8 @@ const ProfileScreenContent = ({
               selectionMode={selectionMode}
               onEditModule={onEditModule}
               onSelectionStateChange={onSelectionStateChange}
-              onModulesCountChange={setModulesCount}
+              onLoad={onProfileBodyLoad}
             />
-            {editing && (
-              <ProfileScreenEditModeFooter setLoadTemplate={setLoadTemplate} />
-            )}
           </Suspense>
         </ProfileScreenScrollView>
         <Suspense fallback={null}>

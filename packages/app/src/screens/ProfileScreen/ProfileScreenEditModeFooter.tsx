@@ -4,7 +4,6 @@ import { View, StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
-import { useProfileEditScale } from './profileScreenHelpers';
 
 type ProfileScreenEditModeFooter = {
   setLoadTemplate: (value: boolean) => void;
@@ -16,12 +15,9 @@ const ProfileScreenEditModeFooter = ({
   const onPress = useCallback(() => {
     setLoadTemplate(true);
   }, [setLoadTemplate]);
-  const editScale = useProfileEditScale();
   const intl = useIntl();
   return (
-    <View
-      style={[styles.loadTemplate, { transform: [{ scale: 1 / editScale }] }]}
-    >
+    <View style={styles.root}>
       <Text variant="small" style={styles.loadDescription}>
         {intl.formatMessage(
           {
@@ -53,18 +49,21 @@ const ProfileScreenEditModeFooter = ({
   );
 };
 
+export const PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT = 110;
+
 const styles = StyleSheet.create({
-  loadTemplate: {
-    marginTop: 30,
+  root: {
+    paddingTop: 30,
     display: 'flex',
     flexDirection: 'column',
-    gap: 20,
     alignItems: 'center',
+    justifyContent: 'space-between',
+    height: PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
   },
   loadDescription: {
     textAlign: 'center',
     color: colors.grey700,
-    marginHorizontal: 20,
+    marginHorizontal: 40,
   },
 });
 

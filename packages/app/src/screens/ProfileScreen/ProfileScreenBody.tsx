@@ -66,10 +66,6 @@ export type ProfileScreenBodyProps = {
    */
   selectionMode: boolean;
   /**
-   * A callback called when the number of rendered modules change
-   */
-  onModulesCountChange: (count: number) => void;
-  /**
    * A callback called when the user press a module block in edit mode
    */
   onEditModule: (module: ModuleKind, moduleId: string) => void;
@@ -77,6 +73,10 @@ export type ProfileScreenBodyProps = {
    * A callback called when the selection state change
    */
   onSelectionStateChange: (info: ModuleSelectionInfos) => void;
+  /**
+   * A callback called when the body is loaded
+   */
+  onLoad: () => void;
 };
 
 export type ProfileBodyHandle = {
@@ -96,9 +96,9 @@ const ProfileScreenBody = (
     profile,
     editing,
     selectionMode,
-    onModulesCountChange,
     onEditModule,
     onSelectionStateChange,
+    onLoad,
   }: ProfileScreenBodyProps,
   forwardedRef: ForwardedRef<ProfileBodyHandle>,
 ): any => {
@@ -138,6 +138,9 @@ const ProfileScreenBody = (
     `,
     profile,
   );
+  useEffect(() => {
+    onLoad();
+  }, [onLoad]);
   // #endregion
 
   // #region Selection
@@ -176,10 +179,6 @@ const ProfileScreenBody = (
       ),
     });
   }, [selectedModules, onSelectionStateChange, cardModules]);
-
-  useEffect(() => {
-    onModulesCountChange(cardModules?.length ?? 0);
-  }, [cardModules?.length, onModulesCountChange]);
   // #endregion
 
   // #region Modules mutations
@@ -417,6 +416,8 @@ const ProfileScreenBody = (
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
 
+  const duplicatedBlocks = useRef<Record<string, string>>({});
+
   const duplicateModules = useCallback(
     (moduleIds: string[]) => {
       if (!canDuplicate) {
@@ -472,6 +473,18 @@ const ProfileScreenBody = (
         profileRecord.setLinkedRecords(modules, 'cardModules');
       };
 
+      const optimisticModuleIds = moduleIds.map(mId => ({
+        originalModuleId: mId,
+        newModuleId: `temp-${createId()}`,
+      }));
+      const duplicatedBlockTempIds = optimisticModuleIds.reduce(
+        (acc, { originalModuleId, newModuleId }) => {
+          acc[originalModuleId] = newModuleId;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
       commitDuplicateModule({
         variables: {
           input: {
@@ -480,17 +493,14 @@ const ProfileScreenBody = (
         },
         updater(store, response) {
           const createdModules = response.duplicateModule?.createdModules;
-
+          createdModules.forEach(({ originalModuleId, newModuleId }) => {
+            duplicatedBlocks.current[newModuleId] =
+              duplicatedBlockTempIds[originalModuleId];
+          });
           updater(store, createdModules);
         },
         optimisticUpdater(store) {
-          updater(
-            store,
-            moduleIds.map(mId => ({
-              originalModuleId: mId,
-              newModuleId: `temp-${createId()}`,
-            })),
-          );
+          updater(store, optimisticModuleIds);
         },
         onError(error) {
           console.error(error);
@@ -643,35 +653,41 @@ const ProfileScreenBody = (
 
   const modulesData = useModulesData(cardModules);
 
-  return modulesData.map((module, index) => (
-    <ProfileBlockContainerMemo
-      key={module.id}
-      editing={editing}
-      canMove={canReorder}
-      canDelete={canDelete}
-      canDuplicate={canDuplicate}
-      canToggleVisibility={canUpdateVisibility}
-      isFirst={index === 0}
-      isLast={index === cardModules.length - 1}
-      visible={module.visible}
-      selectionMode={selectionMode}
-      selected={!!selectedModules[module.id]}
-      backgroundColor={cardColors?.light ?? '#fff'}
-      // @ts-expect-error this extraData is used to trigger a re-render when the module data change
-      extraData={{
-        cardStyle,
-        cardColors,
-        module,
-      }}
-      {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
-    >
-      <CardModuleRenderer
-        module={module}
-        colorPalette={cardColors}
-        cardStyle={cardStyle}
-      />
-    </ProfileBlockContainerMemo>
-  ));
+  return modulesData.map((module, index) => {
+    // prevent duplicated blocks from being re-rendered
+    const blockId = duplicatedBlocks.current[module.id] ?? module.id;
+    return (
+      <ProfileBlockContainerMemo
+        key={blockId}
+        id={blockId}
+        index={index}
+        editing={editing}
+        canMove={canReorder}
+        canDelete={canDelete}
+        canDuplicate={canDuplicate}
+        canToggleVisibility={canUpdateVisibility}
+        isFirst={index === 0}
+        isLast={index === cardModules.length - 1}
+        visible={module.visible}
+        selectionMode={selectionMode}
+        selected={!!selectedModules[module.id]}
+        backgroundColor={cardColors?.light ?? '#fff'}
+        // @ts-expect-error this extraData is used to trigger a re-render when the module data change
+        extraData={{
+          cardStyle,
+          cardColors,
+          module,
+        }}
+        {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
+      >
+        <CardModuleRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
+      </ProfileBlockContainerMemo>
+    );
+  });
 };
 
 export default memo(forwardRef(ProfileScreenBody));

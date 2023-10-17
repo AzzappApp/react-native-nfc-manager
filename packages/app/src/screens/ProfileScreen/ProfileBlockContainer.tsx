@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useMemo } from 'react';
+import { useCallback, useState, useEffect, useMemo, useContext } from 'react';
 import { useIntl } from 'react-intl';
 import {
   StyleSheet,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  FadeIn,
+  FadeOut,
   interpolate,
   runOnJS,
   useAnimatedReaction,
@@ -24,6 +26,7 @@ import {
   EDIT_TRANSITION_DURATION,
   useProfileEditScale,
 } from './profileScreenHelpers';
+import { ProfileScreenScrollViewContext } from './ProfileScreenScrollView';
 import {
   useEditTransition,
   useSelectionModeTransition,
@@ -31,6 +34,14 @@ import {
 import type { LayoutChangeEvent } from 'react-native';
 
 export type ProfileBlockContainerProps = {
+  /**
+   * id of the block
+   */
+  id: string;
+  /**
+   * the index of the block in the list
+   */
+  index: number;
   /**
    * The children of the container
    */
@@ -127,6 +138,8 @@ export type ProfileBlockContainerProps = {
  * it also handles the interaction with the modules in edit mode
  */
 const ProfileBlockContainer = ({
+  id,
+  index,
   editing,
   visible = true,
   displayEditionButtons = true,
@@ -150,12 +163,13 @@ const ProfileBlockContainer = ({
 }: ProfileBlockContainerProps) => {
   const intl = useIntl();
 
-  const { width: windowWith } = useWindowDimensions();
+  const { width: windowWidth } = useWindowDimensions();
 
   const [measuredHeight, setMeasuredHeight] = useState(0);
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
-    setMeasuredHeight(event.nativeEvent.layout.height);
+    const height = event.nativeEvent.layout.height;
+    setMeasuredHeight(height);
   }, []);
 
   const editScale = useProfileEditScale();
@@ -163,14 +177,74 @@ const ProfileBlockContainer = ({
   const buttonSize = BUTTON_SIZE / editScale;
   const iconSize = 24 / editScale;
 
-  const height =
-    editing && measuredHeight < buttonSize ? buttonSize : measuredHeight;
+  const editingHeight =
+    measuredHeight < buttonSize ? buttonSize : measuredHeight;
 
   const editingTransition = useEditTransition();
 
+  const {
+    registerBlock,
+    addLayoutChangedListener,
+    getBlockPositions,
+    setBlockInfos,
+  } = useContext(ProfileScreenScrollViewContext)!;
+
+  useEffect(
+    () =>
+      registerBlock(id, {
+        index,
+        visible,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id, registerBlock],
+  );
+
+  useEffect(() => {
+    if (measuredHeight === 0) {
+      return;
+    }
+    setBlockInfos(id, {
+      index,
+      visible,
+      height: measuredHeight,
+    });
+  }, [measuredHeight, id, index, setBlockInfos, visible]);
+
+  const { position, editPosition } = getBlockPositions(id) ?? {};
+  const positionSharedValue = useSharedValue(position);
+  const editPositionSharedValue = useSharedValue(editPosition);
+  useEffect(
+    () =>
+      addLayoutChangedListener(() => {
+        const positions = getBlockPositions(id);
+        if (
+          !positions ||
+          positionSharedValue.value === undefined ||
+          editPositionSharedValue.value === undefined
+        ) {
+          positionSharedValue.value = positions?.position;
+          editPositionSharedValue.value = positions?.editPosition;
+          return;
+        }
+        positionSharedValue.value = withTiming(positions.position, {
+          duration: EDIT_TRANSITION_DURATION,
+        });
+        editPositionSharedValue.value = withTiming(positions.editPosition, {
+          duration: EDIT_TRANSITION_DURATION,
+        });
+      }),
+    [
+      addLayoutChangedListener,
+      editPositionSharedValue,
+      getBlockPositions,
+      id,
+      positionSharedValue,
+    ],
+  );
+
   const dragX = useSharedValue(0);
-  const dragRightLimit = (windowWith * (1 - editScale)) / 2;
-  const dragLeftLimit = (windowWith * (editScale - 1)) / 2;
+  const dragRightLimit = (windowWidth * (1 - editScale)) / 2;
+  const dragLeftLimit = (windowWidth * (editScale - 1)) / 2;
 
   useEffect(() => {
     if (selectionMode && editing) {
@@ -268,30 +342,58 @@ const ProfileBlockContainer = ({
     [activeSection, editing, onModulePress, touchActive],
   );
 
-  // gap doesn't work on reanimated 2
-  const blockStyle = useAnimatedStyle(() => ({
-    marginVertical: (editingTransition?.value ?? 0) * 20,
-  }));
+  const blockStyle = useAnimatedStyle(() => {
+    const position = positionSharedValue.value;
+    const editPosition = editPositionSharedValue.value;
+    if (position === undefined || editPosition === undefined) {
+      return {
+        position: 'absolute',
+        width: windowWidth,
+        opacity: 0,
+        zIndex: -1,
+        top: -1000,
+      };
+    }
+    const editTransitionValue = editingTransition?.value ?? 0;
+    return {
+      position: 'absolute',
+      width: windowWidth,
+      height: interpolate(
+        editingTransition?.value ?? 0,
+        [0, 1],
+        [measuredHeight, editingHeight],
+      ),
+      opacity: visible ? 1 : editTransitionValue,
+      zIndex: visible ? 0 : editTransitionValue > 0 ? 0 : -1,
+      top: interpolate(
+        editingTransition?.value ?? 0,
+        [0, 1],
+        [position, editPosition],
+      ),
+    };
+  });
 
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith,
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWidth,
     overflow: 'visible',
     backgroundColor,
     transform: [{ translateX: dragX.value }],
+    position: 'absolute',
+    width: windowWidth,
   }));
 
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWith - 2,
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWidth - 2,
     overflow: 'hidden',
     opacity: interpolate(touchActive.value, [0, 1], [1, 0.2]),
   }));
 
   const actionSectionBaseStyle = {
     position: 'absolute',
-    top: height / 2 - buttonSize / 2,
+    top: Math.max(0, measuredHeight / 2 - buttonSize / 2),
     alignItems: 'center',
     flexDirection: 'row',
     gap: 20,
@@ -319,20 +421,11 @@ const ProfileBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
-  if (!visible && !editing) {
-    return null;
-  }
-
   return (
     <Animated.View
-      style={[
-        blockStyle,
-        editing &&
-          measuredHeight < buttonSize && {
-            minHeight: buttonSize,
-            justifyContent: 'center',
-          },
-      ]}
+      style={blockStyle}
+      exiting={id !== 'cover' ? FadeOut : undefined}
+      entering={id !== 'cover' ? FadeIn : undefined}
     >
       <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
