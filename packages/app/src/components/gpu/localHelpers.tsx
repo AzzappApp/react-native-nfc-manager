@@ -109,7 +109,7 @@ export const editionParametersSettings: ParametersInfo<{
   max: number;
   step: number;
   interval?: number;
-  displayOriginalValue?: boolean;
+  displayedValues?: [number, number];
 }> = {
   brightness: {
     defaultValue: 0,
@@ -117,18 +117,36 @@ export const editionParametersSettings: ParametersInfo<{
     max: 0.5,
     step: 0.025,
   },
-  contrast: { defaultValue: 1, min: 0.5, max: 1.5, step: 0.025 },
-  highlights: { defaultValue: 1, min: 0, max: 1, step: 0.05 },
-  saturation: { defaultValue: 1, min: 0, max: 2, step: 0.05 },
-  shadow: { defaultValue: 0, min: 0, max: 1, step: 0.05 },
+  contrast: {
+    defaultValue: 1,
+    min: 0.5,
+    max: 1.5,
+    step: 0.025,
+    displayedValues: [-100, 100],
+  },
+  highlights: {
+    defaultValue: 1,
+    min: 0,
+    max: 1,
+    step: 0.025,
+    displayedValues: [-100, 100],
+  },
+  saturation: {
+    defaultValue: 1,
+    min: 0,
+    max: 2,
+    step: 0.05,
+    displayedValues: [-100, 100],
+  },
+  shadow: { defaultValue: 0, min: -1, max: 1, step: 0.05 },
   sharpness: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   structure: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   temperature: {
     defaultValue: 6500,
-    min: 3500,
-    max: 12500,
-    step: 50,
-    displayOriginalValue: true,
+    min: 2000,
+    max: 11000,
+    step: 225,
+    displayedValues: [-100, 100],
   },
   tint: { defaultValue: 0, min: -150, max: 150, step: 5 },
   vibrance: { defaultValue: 0, min: -1, max: 1, step: 0.05 },
@@ -138,7 +156,6 @@ export const editionParametersSettings: ParametersInfo<{
     min: -20,
     max: 20,
     step: 1,
-    displayOriginalValue: true,
   },
 };
 

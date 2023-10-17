@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { range } from '#helpers/mathHelper';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import { editionParametersSettings } from './gpu';
 import type { EditionParameters } from './gpu';
@@ -33,20 +34,16 @@ const ImageEditionParameterControl = ({
   if (!parameterSettings) {
     return null;
   }
-  const {
-    defaultValue,
-    min,
-    max,
-    step,
-    interval,
-    displayOriginalValue = false,
-  } = parameterSettings;
+  const { defaultValue, min, max, step, interval, displayedValues } =
+    parameterSettings;
 
   const value = propsValue ?? defaultValue;
 
   let displayedValue: number;
-  if (displayOriginalValue) {
-    displayedValue = value;
+  if (displayedValues) {
+    displayedValue = Math.round(
+      range(min, max, displayedValues[0], displayedValues[1], value),
+    );
   } else if (min < 0) {
     displayedValue =
       value >= 0
