@@ -7,7 +7,7 @@ const wrapper = style({
   left: '-4%',
   width: '110%',
   height: '110%',
-  willChange: 'transform',
+  willChange: 'blur',
 });
 
 const coverMedia = style({
