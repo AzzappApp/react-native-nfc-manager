@@ -111,6 +111,7 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
               setDisplay(prevDisplay =>
                 prevDisplay === 'card' ? 'posts' : 'card',
               );
+              window.scrollTo({ top: 0 });
             }}
           />
         )}
