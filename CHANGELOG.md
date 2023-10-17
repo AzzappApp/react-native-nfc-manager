@@ -1,5 +1,6 @@
-## 0.5.1-canary.7
+## 0.5.1-canary.8
 
+* **feat:**  - **WebCard:** improve edit animation ([#1445](https://github.com/AzzappApp/azzapp/pull/1445))
 * **fix:**  - 🐛 Only display post from published profiles ([#1454](https://github.com/AzzappApp/azzapp/pull/1454))
 * **feat:**  - 🎸 add phone/sms/mail social link ([#1466](https://github.com/AzzappApp/azzapp/pull/1466))
 * **fix:**  - blur post ([#1449](https://github.com/AzzappApp/azzapp/pull/1449))
