@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -23,14 +23,15 @@ import ImagePicker, {
   EditImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
-import { useProgressModal } from '#hooks/useProgressModal';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import UploadProgressModal from '#ui/UploadProgressModal';
 import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
@@ -119,7 +120,8 @@ const PostCreationScreen = ({
     }
   `);
 
-  const { progressIndicator, setProgressIndicator } = useProgressModal();
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
 
   const onFinished = async ({
     kind,
@@ -157,12 +159,8 @@ const PostCreationScreen = ({
       uploadURL,
       uploadParameters,
     );
-    // TODO uploadProgressModal crash on android
-    if (Platform.OS === 'ios') {
-      setProgressIndicator(uploadProgress);
-    }
+    setProgressIndicator(uploadProgress);
     const { public_id } = await uploadPromise;
-    setProgressIndicator(null); //force to null to avoid a blink effect on uploadProgressModal
     commit({
       variables: {
         input: {
@@ -201,7 +199,7 @@ const PostCreationScreen = ({
           );
           // TODO use fragment instead of response
           // if (params?.fromProfile) {
-          router.pop(2);
+          router.back();
           // } else {
           //   router.replace({
           //     route: 'PROFILE',
@@ -221,6 +219,7 @@ const PostCreationScreen = ({
             description: 'Toast Error message while creating post',
           }),
         });
+        setProgressIndicator(null);
       },
       updater: store => {
         if (profile?.id) {
@@ -257,17 +256,25 @@ const PostCreationScreen = ({
   }
 
   return (
-    <PostCreationScreenContext.Provider value={contextValue}>
-      <ImagePicker
-        maxVideoDuration={POST_MAX_DURATION}
-        forceCameraRatio={1}
-        onCancel={onCancel}
-        onFinished={onFinished}
-        busy={!!progressIndicator}
-        steps={[SelectImageStep, EditImageStep, PostContentStep]}
-        exporting={!!progressIndicator}
-      />
-    </PostCreationScreenContext.Provider>
+    <>
+      <PostCreationScreenContext.Provider value={contextValue}>
+        <ImagePicker
+          maxVideoDuration={POST_MAX_DURATION}
+          forceCameraRatio={1}
+          onCancel={onCancel}
+          onFinished={onFinished}
+          busy={!!progressIndicator}
+          steps={[SelectImageStep, EditImageStep, PostContentStep]}
+          exporting={!!progressIndicator}
+        />
+      </PostCreationScreenContext.Provider>
+
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
+    </>
   );
 };
 

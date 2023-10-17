@@ -63,20 +63,6 @@ describe('Link', () => {
     expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
-  test('should show modal  when pressed and modal is true', () => {
-    render(
-      <Link route="PROFILE" modal params={{ userName: 'hello' }}>
-        <Pressable testID="pressable" />
-      </Link>,
-    );
-    fireEvent.press(screen.getByTestId('pressable'));
-    expect(mockRouter.showModal).toHaveBeenCalledWith({
-      route: 'PROFILE',
-      params: { userName: 'hello' },
-    });
-    expect(mockRouter.push).not.toHaveBeenCalled();
-  });
-
   test('should replace router  when pressed and replace is true', () => {
     render(
       <Link route="PROFILE" replace params={{ userName: 'hello' }}>

@@ -19,20 +19,20 @@ import ImagePicker, {
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import { useProgressModal } from '#hooks/useProgressModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
+import UploadProgressModal from '#ui/UploadProgressModal';
 import HorizontalPhotoBackgroundEditionPanel from './HorizontalPhotoBackgroundEditionPanel';
 import HorizontalPhotoBorderEditionPanel from './HorizontalPhotoBorderEditionPanel';
 import HorizontalPhotoEditionBottomMenu from './HorizontalPhotoEditionBottomMenu';
@@ -209,7 +209,8 @@ const HorizontalPhotoEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
-  const { setProgressIndicator } = useProgressModal();
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -266,7 +267,7 @@ const HorizontalPhotoEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.pop(2);
+        router.back();
       },
       onError(e) {
         console.error(e);
@@ -531,14 +532,19 @@ const HorizontalPhotoEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <InnerModal visible={showImagePicker}>
+      <ScreenModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[SelectImageStep, EditImageStep]}
         />
-      </InnerModal>
+      </ScreenModal>
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

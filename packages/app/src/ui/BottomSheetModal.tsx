@@ -189,9 +189,9 @@ const BottomSheetModal = ({
     <Modal
       animationType="none"
       visible={isVisible}
+      transparent
       onRequestClose={onRequestClose}
       {...props}
-      transparent
     >
       <TouchableWithoutFeedback
         style={styles.absoluteFill}

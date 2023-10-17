@@ -13,10 +13,6 @@ type LinkProps<T extends Route> = T & {
    */
   replace?: boolean;
   /**
-   * If true, the new screen will be opened as a modal.
-   */
-  modal?: boolean;
-  /**
    * If true, the Screen prefetcher will be used to prefetch the route.
    */
   prefetch?: boolean;
@@ -48,7 +44,6 @@ const Link = <T extends Route>({
   route,
   params,
   replace,
-  modal,
   prefetch,
   children,
   routeKey,
@@ -77,8 +72,6 @@ const Link = <T extends Route>({
     }
     if (replace) {
       router.replace({ route, params } as Route);
-    } else if (modal) {
-      router.showModal({ route, params } as Route);
     } else {
       router.push({ id: routeKey ?? null, route, params } as Route);
     }

@@ -70,6 +70,7 @@ const TextAreaModal = ({
     setText(value);
     onClose();
   };
+
   const onBlur = () => {
     if (closeOnBlur) {
       onClose();
@@ -77,7 +78,7 @@ const TextAreaModal = ({
   };
 
   return (
-    <Modal transparent animationType="fade" onRequestClose={onClose} {...props}>
+    <Modal onRequestClose={onClose} transparent animationType="fade" {...props}>
       <View style={styles.modal}>
         <Header
           style={{

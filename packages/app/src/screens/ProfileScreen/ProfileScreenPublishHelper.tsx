@@ -1,11 +1,11 @@
-import { noop } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Modal, View } from 'react-native';
+import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -126,11 +126,7 @@ const ProfileScreenPublishHelper = ({
 
   const insets = useScreenInsets();
   return (
-    <Modal
-      animationType="fade"
-      visible={showPublishModal}
-      onRequestClose={noop}
-    >
+    <ScreenModal animationType="fade" visible={showPublishModal}>
       <Container
         style={[
           styles.container,
@@ -194,7 +190,7 @@ const ProfileScreenPublishHelper = ({
           />
         </View>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 

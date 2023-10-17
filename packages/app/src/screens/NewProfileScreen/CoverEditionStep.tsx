@@ -43,7 +43,7 @@ const CoverEditionStep = (
   );
 
   const insets = useScreenInsets();
-  const eidtorHeight =
+  const editorHeight =
     height - SUBTITLE_HEIGHT - BUTTON_HEIGHT - 16 - Math.min(insets.bottom, 16);
 
   const styles = useStyleSheet(stylesheet);
@@ -73,7 +73,7 @@ const CoverEditionStep = (
             <CoverEditor
               ref={forwardRef}
               viewer={data.viewer}
-              height={eidtorHeight}
+              height={editorHeight}
               onCoverSaved={onCoverSaved}
               onCanSaveChange={setCanSave}
               initialTemplateKind={

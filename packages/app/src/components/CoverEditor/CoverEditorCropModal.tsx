@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, View, useColorScheme, useWindowDimensions } from 'react-native';
+import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { RotateButton } from '#components/commonsButtons';
@@ -13,6 +13,7 @@ import {
 } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
+import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
@@ -96,7 +97,7 @@ const CoverEditorCropModal = ({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <ScreenModal visible={visible} animationType="slide">
       <Container
         style={{
           flex: 1,
@@ -177,7 +178,7 @@ const CoverEditorCropModal = ({
           <ImageEditionFooter onSave={onSaveInner} onCancel={onClose} />
         </View>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 

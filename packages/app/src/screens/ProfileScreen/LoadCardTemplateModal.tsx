@@ -1,9 +1,10 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import CardTemplateList from '#components/CardTemplateList';
+import ScreenModal from '#components/ScreenModal';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -94,59 +95,59 @@ const LoadCardTemplateModal = ({
   );
 
   return (
-    <Modal animationType="none" visible={visible}>
-      <Container
-        style={{
-          flex: 1,
-          paddingBottom: insets.bottom,
-          paddingTop: insets.top,
-        }}
-      >
-        <Header
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={28}
-              variant="icon"
-            />
-          }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Load a template',
-            description: 'WebCard creation screen title',
-          })}
-          rightElement={
-            <HeaderButton
-              onPress={() => cardTemplatehandle.current?.onSubmit()}
-              label={intl.formatMessage({
-                defaultMessage: 'Apply',
-                description: 'Apply button label in card template preview',
-              })}
-              loading={inFlight}
-            />
-          }
-          style={{ marginBottom: 10 }}
-        />
-        <Suspense
-          fallback={
-            <View style={styles.activityIndicatorContainer}>
-              <ActivityIndicator />
-            </View>
-          }
+    <>
+      <ScreenModal animationType="none" visible={visible}>
+        <Container
+          style={{
+            flex: 1,
+            paddingBottom: insets.bottom,
+            paddingTop: insets.top,
+          }}
         >
-          <CardTemplateList
-            height={height}
-            onApplyTemplate={applyTemplate}
-            loading={inFlight}
-            ref={cardTemplatehandle}
+          <Header
+            leftElement={
+              <IconButton
+                icon="arrow_down"
+                onPress={onClose}
+                iconSize={28}
+                variant="icon"
+              />
+            }
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Load a template',
+              description: 'WebCard creation screen title',
+            })}
+            rightElement={
+              <HeaderButton
+                onPress={() => cardTemplatehandle.current?.onSubmit()}
+                label={intl.formatMessage({
+                  defaultMessage: 'Apply',
+                  description: 'Apply button label in card template preview',
+                })}
+                loading={inFlight}
+              />
+            }
+            style={{ marginBottom: 10 }}
           />
-        </Suspense>
-      </Container>
-
-      <Modal
+          <Suspense
+            fallback={
+              <View style={styles.activityIndicatorContainer}>
+                <ActivityIndicator />
+              </View>
+            }
+          >
+            <CardTemplateList
+              height={height}
+              onApplyTemplate={applyTemplate}
+              loading={inFlight}
+              ref={cardTemplatehandle}
+            />
+          </Suspense>
+        </Container>
+      </ScreenModal>
+      <ScreenModal
         animationType="none"
         visible={visible && !!cardTemplateId && !inFlight && showWarning}
-        style={{ zIndex: 1000 }}
       >
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
@@ -194,8 +195,8 @@ const LoadCardTemplateModal = ({
             />
           </View>
         </Container>
-      </Modal>
-    </Modal>
+      </ScreenModal>
+    </>
   );
 };
 

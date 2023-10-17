@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-
 import { colors } from '#theme';
-import { useProgressModal } from '#hooks/useProgressModal';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
-import type { Subscription } from 'relay-runtime';
+import type { Subscription, Observable } from 'relay-runtime';
 
-const UploadProgressModal = () => {
-  const { progressIndicator } = useProgressModal();
+const UploadProgressModal = ({
+  progressIndicator,
+}: {
+  progressIndicator: Observable<number>;
+}) => {
   const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
@@ -133,11 +134,6 @@ export type OnboardingRoute = {
   params?: never;
 };
 
-export type ProgressModal = {
-  route: 'PROGRESS_MODAL';
-  params?: never;
-};
-
 export type Route =
   | AccountDetailsRoute
   | CardModuleEditionRoute
@@ -157,10 +153,25 @@ export type Route =
   | PostCommentsRoute
   | PostRoute
   | ProfileRoute
-  | ProgressModal
   | ResetPasswordRoute
   | SearchRoute
   | SignInRoute
   | SignUpRoute;
 
 export type ROUTES = Route['route'];
+
+export const isRouteEqual = (route: Route, compareRoute: Route) => {
+  if (route.route !== compareRoute.route) {
+    return false;
+  }
+  if (route.route === 'POST' && compareRoute.route === 'POST') {
+    return route.params.postId === compareRoute.params.postId;
+  }
+  if (route.route === 'PROFILE' && compareRoute.route === 'PROFILE') {
+    return (
+      route.params.userName === compareRoute.params.userName &&
+      route.params.profileId === compareRoute.params.profileId
+    );
+  }
+  return isEqual(route.params, compareRoute.params);
+};

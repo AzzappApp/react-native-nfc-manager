@@ -1,7 +1,7 @@
 import { isEqual, mapValues, pick } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Modal, unstable_batchedUpdates } from 'react-native';
+import { unstable_batchedUpdates } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -37,6 +37,7 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
   VideoTimeRangeStep,
 } from '#components/ImagePicker';
+import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import {
   addLocalCachedMediaFile,
@@ -45,11 +46,11 @@ import {
   segmentImage,
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useProgressModal } from '#hooks/useProgressModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
+import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
 import useSuggestedMediaManager from './useSuggestedMediaManager';
 import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
@@ -536,7 +537,9 @@ const useCoverEditionManager = ({
   const activeSourceMedia = useMemo(() => {
     return hasSuggestedMedia && suggestedMedia ? suggestedMedia : sourceMedia;
   }, [hasSuggestedMedia, sourceMedia, suggestedMedia]);
-  const { setProgressIndicator } = useProgressModal();
+
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
 
   const onSave = useCallback(async () => {
     //we defined it again because we need to remove the id
@@ -818,11 +821,7 @@ const useCoverEditionManager = ({
   const modals = useMemo(
     () => (
       <>
-        <Modal
-          visible={showImagePicker}
-          animationType="slide"
-          onRequestClose={closeImagePicker}
-        >
+        <ScreenModal visible={showImagePicker} animationType="slide">
           <ImagePicker
             kind={mediaKind}
             forceAspectRatio={COVER_RATIO}
@@ -835,12 +834,8 @@ const useCoverEditionManager = ({
             ]}
             TopPanelWrapper={ImagePickerCardMediaWrapper}
           />
-        </Modal>
-        <Modal
-          visible={showMediaRequiredModal}
-          animationType="none"
-          onRequestClose={() => setShowMediaRequiredModal(false)}
-        >
+        </ScreenModal>
+        <ScreenModal visible={showMediaRequiredModal} animationType="none">
           <Container
             style={{
               flex: 1,
@@ -877,7 +872,7 @@ const useCoverEditionManager = ({
               }}
             />
           </Container>
-        </Modal>
+        </ScreenModal>
         {cropMode && (
           <CoverEditorCropModal
             visible
@@ -895,6 +890,11 @@ const useCoverEditionManager = ({
             onSave={onSaveCropData}
           />
         )}
+        <ScreenModal visible={!!progressIndicator}>
+          {progressIndicator && (
+            <UploadProgressModal progressIndicator={progressIndicator} />
+          )}
+        </ScreenModal>
       </>
     ),
     [
@@ -910,6 +910,7 @@ const useCoverEditionManager = ({
       onMediaSelected,
       onSaveCropData,
       openImagePicker,
+      progressIndicator,
       showImagePicker,
       showMediaRequiredModal,
       sourceMedia,

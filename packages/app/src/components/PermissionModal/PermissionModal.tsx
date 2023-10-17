@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, Modal, SafeAreaView, Linking } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Linking, Modal } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import {
   useMediaPermission,

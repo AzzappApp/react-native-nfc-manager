@@ -39,7 +39,7 @@ const CoverEditionScreen = ({
   }, []);
 
   const onCoverSaved = useCallback(() => {
-    router.pop(2);
+    router.back();
   }, [router]);
 
   const onCancel = useCallback(() => {

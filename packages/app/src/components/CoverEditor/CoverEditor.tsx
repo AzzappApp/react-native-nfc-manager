@@ -12,7 +12,6 @@ import {
 import { useIntl } from 'react-intl';
 import {
   Keyboard,
-  Modal,
   StyleSheet,
   View,
   unstable_batchedUpdates,
@@ -21,6 +20,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -434,12 +434,7 @@ const CoverEditor = (
         </View>
       </BottomSheetModal>
       {modals}
-      <Modal
-        visible={customEditionProps != null}
-        transparent
-        animationType="fade"
-        onRequestClose={onCustomEditionCancel}
-      >
+      <ScreenModal visible={customEditionProps != null} animationType="fade">
         {customEditionProps && (
           <CoverEditorCustom
             initialData={customEditionProps.initialData}
@@ -450,7 +445,7 @@ const CoverEditor = (
             viewer={viewer}
           />
         )}
-      </Modal>
+      </ScreenModal>
     </>
   );
 };

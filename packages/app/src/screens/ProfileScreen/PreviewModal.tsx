@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
+import ScreenModal from '#components/ScreenModal';
 import WebCardPreview from '#components/WebCardPreview';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -74,11 +75,7 @@ const PreviewModal = ({
   const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      onRequestClose={onRequestClose}
-    >
+    <ScreenModal visible={visible} animationType="slide">
       <Container style={{ flex: 1, paddingTop: insets.top }}>
         <Header
           leftElement={
@@ -112,7 +109,7 @@ const PreviewModal = ({
           />
         </Suspense>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 
