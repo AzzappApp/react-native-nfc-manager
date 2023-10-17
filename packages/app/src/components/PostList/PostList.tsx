@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostRenderer from '#components/PostList/PostRenderer';
@@ -23,6 +23,11 @@ type PostListProps = ViewProps & {
   refreshing?: boolean;
   loading?: boolean;
   contentContainerStyle?: ContentStyle;
+};
+
+const viewabilityConfig = {
+  //TODO: improve this with review of tester
+  itemVisiblePercentThreshold: 60,
 };
 
 // TODO docs and tests once this component is production ready
@@ -104,6 +109,13 @@ const PostList = ({
     [author, windowWidth],
   );
 
+  const extraData = useMemo(() => ({ canPlay }), [canPlay]);
+
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={loading} />,
+    [loading],
+  );
+
   return (
     <PostListContext.Provider value={{ visibleVideoPostIds: visiblePostIds }}>
       <FlashList<Post>
@@ -112,15 +124,12 @@ const PostList = ({
         onEndReached={onEndReached}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        ListFooterComponent={<ListLoadingFooter loading={loading} />}
+        ListFooterComponent={ListFooterComponent}
         estimatedItemSize={300}
         onViewableItemsChanged={onViewableItemsChanged}
         onEndReachedThreshold={1}
-        extraData={{ canPlay }}
-        viewabilityConfig={{
-          //TODO: improve this with review of tester
-          itemVisiblePercentThreshold: 60,
-        }}
+        extraData={extraData}
+        viewabilityConfig={viewabilityConfig}
         {...props}
       />
     </PostListContext.Provider>

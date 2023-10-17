@@ -55,7 +55,7 @@ const PostContentPanel = ({
         <AuthorCartouche
           author={profile!}
           variant="createPost"
-          style={{ paddingLeft: 0 }}
+          style={styles.authorCartouche}
         />
         <View style={styles.settingsContainer}>
           <View style={styles.switchContainer}>
@@ -106,6 +106,9 @@ export default memo(PostContentPanel);
 const MAX_CONTENT_LENGHT = 2200;
 
 const styleSheet = createStyleSheet(appearance => ({
+  authorCartouche: {
+    paddingLeft: 0,
+  },
   container: {
     flex: 1,
     paddingHorizontal: 10,

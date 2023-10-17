@@ -169,11 +169,11 @@ const PostsGrid = ({
     return [contentHeight, postsMap];
   }, [scrollViewHeight, postsContainerStyle, windowWidth, posts, maxVideos]);
 
-  const onScrollStart = () => {
+  const onScrollStart = useCallback(() => {
     clearTimeout(scrollEndTimeout.current);
     scrollEndTimeout.current = null;
     setIsScrolling(true);
-  };
+  }, []);
 
   const scrollEndTimeout = useRef<any>(null);
 
@@ -345,6 +345,12 @@ const PostsGrid = ({
     setHeaderSize?.(e.nativeEvent.layout.height);
   };
 
+  const refreshControl = useMemo(() => {
+    return (
+      <RefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
+    );
+  }, [refreshing, onRefresh]);
+
   return (
     <ScrollView
       accessibilityRole="list"
@@ -354,12 +360,7 @@ const PostsGrid = ({
       style={style}
       stickyHeaderIndices={stickyHeaderIndices}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing ?? false}
-          onRefresh={onRefresh}
-        />
-      }
+      refreshControl={refreshControl}
       scrollEventThrottle={16}
       onScroll={e => onScroll?.(e.nativeEvent.contentOffset.y)}
       onScrollBeginDrag={onScrollStart}

@@ -148,7 +148,7 @@ const SimpleButtonRenderer = ({
     >
       <PressableOpacity
         onPress={onPress}
-        style={[contentStyle]}
+        style={contentStyle}
         disabled={disabled}
         disabledOpacity={1}
       >

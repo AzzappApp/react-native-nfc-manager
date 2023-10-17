@@ -90,16 +90,21 @@ const MediaFollowingsScreen = ({
     refetch({ after: null, first: 10 });
   });
 
+  const ListFooterComponent = useMemo(
+    () => (
+      <View style={{ height: 80 }}>
+        <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
+      </View>
+    ),
+    [showLoadingIndicatorDebounced],
+  );
+
   return (
     <PostsGrid
       posts={posts}
       canPlay={canPlay}
       ListHeaderComponent={ListHeaderComponent}
-      ListFooterComponent={
-        <View style={{ height: 80 }}>
-          <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
-        </View>
-      }
+      ListFooterComponent={ListFooterComponent}
       refreshing={refreshing}
       onRefresh={onRefresh}
       onEndReached={onEndReached}

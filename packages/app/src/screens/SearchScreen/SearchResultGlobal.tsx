@@ -113,6 +113,11 @@ const SearchResultGlobal = ({
     setShowLoadingIndicator(!refreshing && isLoadingNext);
   }, [isLoadingNext, refreshing]);
 
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={showLoadingIndicatorDebounced} />,
+    [showLoadingIndicatorDebounced],
+  );
+
   return (
     <PostsGrid
       posts={posts}
@@ -123,9 +128,7 @@ const SearchResultGlobal = ({
           goToProfilesTab={goToProfilesTab}
         />
       }
-      ListFooterComponent={
-        <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
-      }
+      ListFooterComponent={ListFooterComponent}
       onRefresh={onRefresh}
       onEndReached={onEndReached}
     />

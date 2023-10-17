@@ -6,7 +6,7 @@ import {
   getAssetsAsync,
   removeAllListeners,
 } from 'expo-media-library';
-import { useCallback, useRef, useState, useEffect, memo } from 'react';
+import { useCallback, useRef, useState, useEffect, memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions, View } from 'react-native';
 import { ScrollView, PanGestureHandler } from 'react-native-gesture-handler';
@@ -314,6 +314,13 @@ const PhotoGalleryMediaList = ({
     };
   }, [load]);
 
+  const simultaneousHandlers = useMemo(
+    () => ({
+      simultaneousHandlers: panRef,
+    }),
+    [panRef],
+  );
+
   return (
     <PanGestureHandler onGestureEvent={eventHandler} ref={panRef}>
       <Animated.View
@@ -328,9 +335,7 @@ const PhotoGalleryMediaList = ({
       >
         <AnimatedFlashList
           ref={scrollViewRef}
-          overrideProps={{
-            simultaneousHandlers: panRef,
-          }}
+          overrideProps={simultaneousHandlers}
           numColumns={numColumns}
           data={medias}
           showsVerticalScrollIndicator={false}
@@ -341,9 +346,7 @@ const PhotoGalleryMediaList = ({
           onEndReached={onEndReached}
           accessibilityRole="list"
           contentContainerStyle={contentContainerStyle}
-          ItemSeparatorComponent={() => (
-            <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
-          )}
+          ItemSeparatorComponent={ItemSeparatorComponent}
           {...props}
           estimatedItemSize={itemHeight}
           renderScrollComponent={ScrollView}
@@ -415,6 +418,10 @@ const PhotoGalleyMediaItem = ({
     </PressableNative>
   );
 };
+
+const ItemSeparatorComponent = () => (
+  <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
+);
 
 const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
 

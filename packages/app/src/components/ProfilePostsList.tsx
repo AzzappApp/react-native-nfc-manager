@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostList from './PostList';
@@ -76,7 +77,7 @@ const ProfilePostList = ({
       refreshing={refreshing}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
-      contentContainerStyle={{ paddingBottom: FOOTER_ICONS_HEIGHT }}
+      contentContainerStyle={styles.container}
     />
   );
 };
@@ -84,3 +85,9 @@ const ProfilePostList = ({
 export default ProfilePostList;
 
 const FOOTER_ICONS_HEIGHT = 50;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingBottom: FOOTER_ICONS_HEIGHT,
+  },
+});

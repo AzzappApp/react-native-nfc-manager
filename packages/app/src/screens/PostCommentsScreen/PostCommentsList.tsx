@@ -218,6 +218,18 @@ const PostCommentsList = ({
   );
 
   const insets = useScreenInsets();
+
+  const refreshControl = useMemo(() => {
+    return (
+      <RefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
+    );
+  }, [refreshing, onRefresh]);
+
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={isLoadingNext} />,
+    [isLoadingNext],
+  );
+
   return (
     <Container
       style={[
@@ -236,15 +248,10 @@ const PostCommentsList = ({
           onEndReached={onEndReached}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+          ListFooterComponent={ListFooterComponent}
           onEndReachedThreshold={0.5}
-          style={{ flex: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing ?? false}
-              onRefresh={onRefresh}
-            />
-          }
+          style={styles.list}
+          refreshControl={refreshControl}
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
@@ -311,4 +318,5 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
+  list: { flex: 1 },
 });

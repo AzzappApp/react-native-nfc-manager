@@ -161,7 +161,7 @@ const PostRenderer = (
           style={{ marginRight: 20 }}
         />
       </View>
-      <View style={[styles.mediaContainer]}>
+      <View style={styles.mediaContainer}>
         <PostRendererMedia
           post={post}
           width={width}
@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
   headerView: { flexDirection: 'row', alignItems: 'center', height: 56 },
   pressableLink: { flex: 1 },
   authorCartoucheStyle: { marginLeft: 10, flex: 1 },
-
   mediaContainer: {
     backgroundColor: colors.grey100,
     overflow: 'hidden',

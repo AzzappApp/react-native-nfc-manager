@@ -98,13 +98,15 @@ const SearchResultPosts = ({
     );
   }, [data.searchPosts?.edges]);
 
+  const ListFooterComponent = useMemo(() => {
+    return <ListLoadingFooter loading={showLoadingIndicatorDebounced} />;
+  }, [showLoadingIndicatorDebounced]);
+
   return (
     <PostsGrid
       posts={posts}
       canPlay={hasFocus}
-      ListFooterComponent={
-        <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
-      }
+      ListFooterComponent={ListFooterComponent}
       refreshing={undefined}
       onRefresh={onRefresh}
       onEndReached={onEndReached}
