@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRef, forwardRef } from 'react';
-import { getElapsedTime } from '@azzapp/shared/timeHelpers';
+import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
 import { ButtonIcon } from '#ui';
@@ -34,7 +34,9 @@ const PostFeedItem = (
   const { post, media, profile, onDownload, onPlay, onMuteChanged } = props;
   const share = useRef<ModalActions>(null);
 
-  const elapsedTime = getElapsedTime(new Date(post.createdAt).getTime());
+  const elapsedTime = getFormatedElapsedTime(
+    new Date(post.createdAt).getTime(),
+  );
   const [postMedia] = post.medias;
 
   return (
@@ -133,9 +135,7 @@ const PostFeedItem = (
           >
             See more
           </Link>
-          <span className={styles.postElapsedTime}>
-            {elapsedTime.value} {elapsedTime.kind} ago
-          </span>
+          <span className={styles.postElapsedTime}>{elapsedTime}</span>
         </div>
       </div>
       <ShareModal

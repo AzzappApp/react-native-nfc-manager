@@ -47,6 +47,18 @@ export type PostWithCommentAndAuthor = PostWithMedias & {
 };
 
 /**
+ * Retrieve a post by its id.
+ * @param id - The id of the post to retrieve
+ * @returns A post
+ */
+export const getPostById = async (id: string) => {
+  const res = await db.select().from(PostTable).where(eq(PostTable.id, id));
+
+  if (res.length === 0) return null;
+  return res[0];
+};
+
+/**
  * Retrieve a post by its ids.
  * @param id - The id of the post to retrieve
  * @param profileId - The id of the attached profile
@@ -154,7 +166,9 @@ export const getProfilesPostsWithTopComment = async (
 
   if (posts.length === 0) return [];
 
-  const comments = await getTopPostsComment(posts.map(post => post.id));
+  const comments = await getTopPostsComment(
+    posts.filter(post => post.allowComments).map(post => post.id),
+  );
 
   const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
     return [...mediasIds, ...post.medias];
