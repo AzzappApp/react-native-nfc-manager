@@ -1,5 +1,8 @@
-## 0.5.1-canary.11
+## 0.5.1-canary.12
 
+* **fix:**  - 🐛 open right link from mobile ([#1475](https://github.com/AzzappApp/azzapp/pull/1475))
+* **feat:**  - add option to export png in android ([#1468](https://github.com/AzzappApp/azzapp/pull/1468))
+* **fix:**  - web posts display ([#1426](https://github.com/AzzappApp/azzapp/pull/1426))
 * **fix:**  - create video cover without crash ([#1473](https://github.com/AzzappApp/azzapp/pull/1473))
 * **fix:**  - avoid uising customProps that is used in trailing toast part instead of center text. Text component was not the correct one ([#1472](https://github.com/AzzappApp/azzapp/pull/1472))
 * **feat:**  - **WebCard:** improve edit animation ([#1445](https://github.com/AzzappApp/azzapp/pull/1445))
