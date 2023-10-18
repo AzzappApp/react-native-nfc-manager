@@ -1,4 +1,4 @@
-## 0.5.1-canary.12
+## 0.5.1-canary.13
 
 * **fix:**  - 🐛 open right link from mobile ([#1475](https://github.com/AzzappApp/azzapp/pull/1475))
 * **feat:**  - add option to export png in android ([#1468](https://github.com/AzzappApp/azzapp/pull/1468))
