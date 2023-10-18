@@ -1,10 +1,19 @@
 package com.azzapp.media
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.media3.common.util.UnstableApi
 import com.facebook.react.bridge.*
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.segmentation.Segmentation
+import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
+import java.io.File
+import java.io.FileOutputStream
 
 
 @UnstableApi class MediaHelpers(private val reactContext: ReactApplicationContext) :
@@ -40,10 +49,60 @@ import com.facebook.react.bridge.*
     promise.resolve(map)
   }
 
+
+
   @ReactMethod
   fun segmentImage(uri: String, promise: Promise) {
-    // TODO
-    promise.resolve(null)
+
+    val options =
+        SelfieSegmenterOptions.Builder()
+            .setDetectorMode(SelfieSegmenterOptions.SINGLE_IMAGE_MODE)
+            .build()
+    val segmenter = Segmentation.getClient(options)
+    val imagePath = try { Uri.parse(uri) } catch(e: NullPointerException) {
+      promise.reject("INVALID_URI", "provided uri is invalid")
+      return;
+    }
+
+    val inputImage =  InputImage.fromFilePath(reactContext, imagePath)
+    val maskedImageFile = File(reactContext.cacheDir, "masked_image.png")
+    segmenter.process(inputImage)
+    .addOnSuccessListener { segmentationResult ->
+      val mask = segmentationResult.buffer.asFloatBuffer()
+      val maskWidth = segmentationResult.width
+      val maskHeight = segmentationResult.height
+
+      val maskBitmap = Bitmap.createBitmap(maskWidth, maskHeight, Bitmap.Config.ARGB_8888)
+      for (y in 0 until maskHeight) {
+          for (x in 0 until maskWidth) {
+              val foregroundConfidence = mask.get().coerceIn(0.0f, 1.0f)
+              //interpolate [0.2, 1]  to [ 0 ,255]
+              val alpha = ((foregroundConfidence - 0.2f) / (1.0f - 0.2f) * 255).toInt()
+              if (foregroundConfidence <= 0.2){
+                maskBitmap.setPixel(x, y, Color.BLACK)
+              }
+              else {maskBitmap.setPixel(x, y, Color.argb(alpha, 255, 255, 255))}
+          }
+      }
+
+      val scaleWidth = inputImage.width.toFloat() / maskWidth
+      val scaleHeight = inputImage.height.toFloat() / maskHeight
+      val matrix = Matrix()
+      matrix.postScale(scaleWidth, scaleHeight)
+
+      val outputBitmap = Bitmap.createBitmap(inputImage.width, inputImage.height, Bitmap.Config.ARGB_8888)
+      val canvas = Canvas(outputBitmap)
+      val paint = Paint(Paint.FILTER_BITMAP_FLAG)
+      canvas.drawBitmap(maskBitmap, matrix, paint)
+
+      val outputStream = FileOutputStream(maskedImageFile)
+      outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+      outputStream.flush()
+      outputStream.close()
+    }
+    .addOnFailureListener { e ->
+        promise.reject("ERROR_SEGMENTATION", e.localizedMessage)
+    }
   }
 
   @ReactMethod

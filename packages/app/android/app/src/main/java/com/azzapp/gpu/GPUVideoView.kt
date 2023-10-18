@@ -60,8 +60,8 @@ import kotlin.math.round
     surfaceView.setEGLContextClientVersion(2)
     surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
     surfaceView.setRenderer(this)
-    surfaceView. preserveEGLContextOnPause = true
-    surfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+    surfaceView.setPreserveEGLContextOnPause(true)
+    surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY)
   }
 
   private var _paused = false
