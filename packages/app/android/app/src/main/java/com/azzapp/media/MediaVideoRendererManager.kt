@@ -1,6 +1,7 @@
 package com.azzapp.media
 
 import android.net.Uri
+import androidx.media3.common.util.UnstableApi
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
@@ -9,7 +10,7 @@ import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
-class MediaVideoRendererManager(
+@UnstableApi class MediaVideoRendererManager(
   private val callerContext: ReactApplicationContext
 ) : SimpleViewManager<MediaVideoRenderer>() {
   override fun getName() = REACT_CLASS

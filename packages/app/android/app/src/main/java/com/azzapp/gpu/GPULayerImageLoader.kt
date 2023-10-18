@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import com.azzapp.MainApplication
 import com.bumptech.glide.Glide
@@ -61,7 +62,7 @@ object GPULayerImageLoader {
         if (source.kind == GPULayer.GPULayerKind.VIDEO) {
           Log.w("GPULayerLoader", "Unsupported Video layer passed to GPUImageView treating it as VideoFrame")
         }
-        loadVideFrame(source.uri, source.startTime?.toLong() ?: 0L)
+        loadVideoFrame(source.uri, source.startTime?.toLong() ?: 0L)
       }
     }
 
@@ -70,7 +71,7 @@ object GPULayerImageLoader {
       getBitmapFromImage(uri)
     }
 
-  private suspend fun loadVideFrame(uri: Uri, time: Long) =
+  private suspend fun loadVideoFrame(uri: Uri, time: Long) =
     loadImageWithCache("${uri.toString()}-${time.toString()}") {
       getBitmapFromVideoFrame(uri, time)
     }
@@ -158,7 +159,13 @@ object GPULayerImageLoader {
     time: Long,
   ) = withContext(Dispatchers.IO) {
       val retriever = MediaMetadataRetriever()
-      retriever.setDataSource(MainApplication.getMainApplicationContext(), uri)
+
+      if(uri.scheme == "file" || Build.VERSION.SDK_INT < 14) {
+        retriever.setDataSource(MainApplication.getMainApplicationContext(), uri)
+      } else {
+        retriever.setDataSource(uri.toString(), HashMap<String, String>())
+      }
+     
       val image =
         retriever.getFrameAtTime(
           time,

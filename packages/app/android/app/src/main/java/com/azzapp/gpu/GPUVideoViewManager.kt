@@ -6,20 +6,21 @@ import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.annotations.ReactProp
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.transformer.DefaultEncoderFactory
-import com.google.android.exoplayer2.transformer.EncoderSelector
-import com.google.android.exoplayer2.transformer.TransformationException
-import com.google.android.exoplayer2.transformer.TransformationResult
-import com.google.android.exoplayer2.transformer.Transformer
-import com.google.android.exoplayer2.transformer.VideoEncoderSettings
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.transformer.DefaultEncoderFactory
+import androidx.media3.transformer.EncoderSelector
+import androidx.media3.transformer.TransformationException
+import androidx.media3.transformer.TransformationResult
+import androidx.media3.transformer.Transformer
+import androidx.media3.transformer.VideoEncoderSettings
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.GlobalScope
 import java.io.File
 import java.util.UUID
 
 
-class GPUVideoViewManager(
+@UnstableApi class GPUVideoViewManager(
   private val callerContext: ReactApplicationContext
 ) : SimpleViewManager<GPUVideoView>() {
 

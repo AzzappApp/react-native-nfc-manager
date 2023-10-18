@@ -3,10 +3,11 @@ package com.azzapp.media
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import androidx.media3.common.util.UnstableApi
 import com.facebook.react.bridge.*
 
 
-class MediaHelpers(private val reactContext: ReactApplicationContext) :
+@UnstableApi class MediaHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "AZPMediaHelpers"
 
@@ -33,7 +34,10 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
       promise.reject("failure", "Error while retrieving metadata", e)
       return;
     }
-    promise.resolve(mapOf("width" to width, "height" to height))
+    val map = WritableNativeMap();
+    map.putInt("width", width);
+    map.putInt("height", height);
+    promise.resolve(map)
   }
 
   @ReactMethod

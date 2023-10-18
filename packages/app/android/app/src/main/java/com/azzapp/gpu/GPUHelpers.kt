@@ -6,6 +6,18 @@ import android.media.effect.EffectContext
 import android.opengl.EGL14
 import android.opengl.GLES20
 import android.opengl.GLUtils
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.transformer.Composition
+import androidx.media3.transformer.DefaultEncoderFactory
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EncoderSelector
+import androidx.media3.transformer.ExportException
+import androidx.media3.transformer.ExportResult
+import androidx.media3.transformer.TransformationRequest
+import androidx.media3.transformer.TransformationRequest.HDR_MODE_KEEP_HDR
+import androidx.media3.transformer.Transformer
+import androidx.media3.transformer.VideoEncoderSettings
 import com.azzapp.MainApplication
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -14,13 +26,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.UIManagerHelper
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.transformer.DefaultEncoderFactory
-import com.google.android.exoplayer2.transformer.EncoderSelector
-import com.google.android.exoplayer2.transformer.TransformationException
-import com.google.android.exoplayer2.transformer.TransformationResult
-import com.google.android.exoplayer2.transformer.Transformer
-import com.google.android.exoplayer2.transformer.VideoEncoderSettings
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -37,7 +42,8 @@ import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.egl.EGLSurface
 import kotlin.math.round
 
-class GPUHelpers(private val reactContext: ReactApplicationContext) :
+
+@UnstableApi class GPUHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "AZPGPUHelpers"
 
@@ -101,9 +107,10 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
     removeAudio: Boolean,
     promise: Promise
   ) {
-    val transformer = Transformer.Builder(reactContext)
-      .setRemoveAudio(removeAudio)
-      .setFrameProcessorFactory(
+    val transformerRequestBuilder = TransformationRequest.Builder().setHdrMode(HDR_MODE_KEEP_HDR).build()
+    val transformer =
+    Transformer.Builder(reactContext).setTransformationRequest(transformerRequestBuilder)
+      .setVideoFrameProcessorFactory(
         GLExoPlayerFrameProcessor.Factory(
           size.getInt("width"),
           size.getInt("height"),
@@ -122,42 +129,40 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
       )
       .build()
 
-    val inputMediaItem = MediaItem.fromUri(layer.source.uri)
+    // val startMs = layer.source.startTime?.toLong()?.times(1000L)
+    // val endMS = layer.source.startTime?.toLong()?.plus(layer.source.duration?.toLong()?.times(1000L) ?: 0)
+    val sourceMediaItem = MediaItem.Builder().setUri(layer.source.uri)
 
-    /*val startMs = startTime * 1000L
-    val endMS = startTime + duration * 1000L
-    MediaItem.Builder()
-      .setUri(uri)
-      .setClippingConfiguration(
-        MediaItem.ClippingConfiguration.Builder()
-          .setStartPositionMs(startMs)
-          .setEndPositionMs(endMS)
-          .build()
-      ).build()*/
+    /*.setClippingConfiguration(MediaItem.ClippingConfiguration.Builder()
+            .setStartPositionMs(startMs ?: 0)
+            .setEndPositionMs(endMS ?: 0)
+            .build())*/
 
+    val editedMediaItem = EditedMediaItem.Builder(sourceMediaItem.build()).setRemoveAudio(removeAudio).build();
 
-    val file = File.createTempFile(UUID.randomUUID().toString(), ".mp4", reactContext.cacheDir)
-    if (file.exists()) file.delete()
+    val file = File( reactContext.cacheDir, UUID.randomUUID().toString() + ".mp4")
+    check(!(file.exists() && !file.delete())) { "Could not delete the previous export output file" }
+    check(file.createNewFile()) { "Could not create the export output file" }
 
     transformer.addListener(object : Transformer.Listener {
-      override fun onTransformationCompleted(
-        inputMediaItem: MediaItem,
-        transformationResult: TransformationResult
+      override fun onCompleted(
+        composition: Composition,
+        exportResult: ExportResult
       ) {
-        super.onTransformationCompleted(inputMediaItem, transformationResult)
+        super.onCompleted(composition, exportResult)
         promise.resolve(file.absolutePath)
       }
 
-      override fun onTransformationError(
-        inputMediaItem: MediaItem,
-        exception: TransformationException
-      ) {
-        super.onTransformationError(inputMediaItem, exception)
-        promise.reject(exception)
+      override fun onError(
+               composition: Composition, 
+               exportResult:ExportResult, 
+               exportException: ExportException) {
+        super.onError(composition, exportResult, exportException)
+        promise.reject(exportException)
       }
     })
 
-    transformer.startTransformation(inputMediaItem, file.absolutePath)
+    transformer.start(editedMediaItem, file.absolutePath)
   }
 
   @ReactMethod
@@ -393,7 +398,7 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
 
   private object ExcludingEncoderSelector : EncoderSelector {
 
-    private val EXCLUDED_ENCODERS = arrayListOf("OMX.qcom.video.encoder.avc")
+    private val EXCLUDED_ENCODERS = ArrayList<String>(0)
 
     override fun selectEncoderInfos(mimeType: String): ImmutableList<MediaCodecInfo> {
       return  ImmutableList.copyOf(

@@ -1,5 +1,6 @@
 package com.azzapp
 
+import androidx.media3.common.util.UnstableApi
 import com.azzapp.gpu.GPUHelpers
 import com.azzapp.gpu.GPUImageViewManager
 import com.azzapp.gpu.GPUVideoViewManager
@@ -11,7 +12,7 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 
 
-class AzzappPackage : ReactPackage {
+@UnstableApi class AzzappPackage : ReactPackage {
 
   override fun createViewManagers(
     reactContext: ReactApplicationContext

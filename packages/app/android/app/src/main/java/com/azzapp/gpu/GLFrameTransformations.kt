@@ -253,6 +253,7 @@ object GLFrameTransformations {
     parameters?.forEach { entry ->
       effect.setParameter(entry.key, entry.value)
     }
+
     effect.apply(
       inputImage.texture,
       inputImage.width,
