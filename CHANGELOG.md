@@ -1,4 +1,4 @@
-## 0.5.1-canary.9
+## 0.5.1-canary.10
 
 * **fix:**  - avoid uising customProps that is used in trailing toast part instead of center text. Text component was not the correct one ([#1472](https://github.com/AzzappApp/azzapp/pull/1472))
 * **feat:**  - **WebCard:** improve edit animation ([#1445](https://github.com/AzzappApp/azzapp/pull/1445))
