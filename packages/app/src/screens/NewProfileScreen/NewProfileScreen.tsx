@@ -139,9 +139,8 @@ export const NewProfileScreen = ({
 
   // #region Card creation
   const onCoverSaved = useCallback(() => {
-    router.back();
     next();
-  }, [next, router]);
+  }, [next]);
 
   const onCoverTemplateApplied = useCallback(() => {
     router.replace({
