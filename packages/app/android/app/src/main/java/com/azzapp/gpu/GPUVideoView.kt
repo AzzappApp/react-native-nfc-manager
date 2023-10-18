@@ -95,10 +95,15 @@ import kotlin.math.round
     }
     val newLayer = layers?.last { it.source.kind === GPULayer.GPULayerKind.VIDEO }
     var oldUri = layer?.source?.uri
+    var oldStartTime = layer?.source?.startTime
+    var oldDuration = layer?.source?.duration
+
     layer = newLayer;
-    if (oldUri == layer?.source?.uri) {
+
+    if (oldUri == layer?.source?.uri &&  oldDuration == layer?.source?.duration && oldStartTime == layer?.source?.startTime) {
       return
     }
+
     this.initPlayer()
   }
 
@@ -335,8 +340,16 @@ import kotlin.math.round
       player.stop()
       player.removeMediaItem(0)
     }
-    val mediaItem = MediaItem.fromUri(uri)
-    player.addMediaItem(mediaItem)
+    val mediaItemBuilder = MediaItem.Builder().setUri(uri)
+    if(layer?.source?.startTime != null){
+      val start = layer!!.source.startTime!!.toLong() * 1000L;
+      mediaItemBuilder.setClippingConfiguration(
+              MediaItem.ClippingConfiguration.Builder().setStartPositionMs(start).setEndPositionMs(start + layer!!.source.duration!!.toLong() * 1000L).build()
+      )
+    }
+
+    player.addMediaItem(mediaItemBuilder.build())
+
     player.prepare()
 
     if (surface != null) {

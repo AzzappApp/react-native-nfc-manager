@@ -6,11 +6,13 @@ import android.media.effect.EffectContext
 import android.opengl.EGL14
 import android.opengl.GLES20
 import android.opengl.GLUtils
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.DefaultEncoderFactory
 import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.EncoderSelector
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
@@ -129,16 +131,21 @@ import kotlin.math.round
       )
       .build()
 
-    // val startMs = layer.source.startTime?.toLong()?.times(1000L)
-    // val endMS = layer.source.startTime?.toLong()?.plus(layer.source.duration?.toLong()?.times(1000L) ?: 0)
-    val sourceMediaItem = MediaItem.Builder().setUri(layer.source.uri)
+    val startMs = layer.source.startTime?.toLong()?.times(1000L) ?: C.TIME_UNSET
+    val endMs =  layer.source.startTime?.toLong()?.times(1000L)?.plus(layer.source.duration?.toLong()?.times(1000L) ?: 0) ?: C.TIME_UNSET
+    val sourceMediaItem = MediaItem.Builder().setUri(layer.source.uri);
 
-    /*.setClippingConfiguration(MediaItem.ClippingConfiguration.Builder()
-            .setStartPositionMs(startMs ?: 0)
-            .setEndPositionMs(endMS ?: 0)
-            .build())*/
+    if(startMs != C.TIME_UNSET && endMs !=C.TIME_UNSET) {
+      sourceMediaItem.setClippingConfiguration(
+              MediaItem.ClippingConfiguration.Builder()
+                      .setStartPositionMs(startMs)
+                      .setEndPositionMs(endMs)
+                      .build()
+      );
+    }
 
-    val editedMediaItem = EditedMediaItem.Builder(sourceMediaItem.build()).setRemoveAudio(removeAudio).build();
+
+    val editedMediaItem = EditedMediaItem.Builder(sourceMediaItem.build()).setRemoveAudio(removeAudio);
 
     val file = File( reactContext.cacheDir, UUID.randomUUID().toString() + ".mp4")
     check(!(file.exists() && !file.delete())) { "Could not delete the previous export output file" }
@@ -154,15 +161,15 @@ import kotlin.math.round
       }
 
       override fun onError(
-               composition: Composition, 
-               exportResult:ExportResult, 
+               composition: Composition,
+               exportResult: ExportResult,
                exportException: ExportException) {
         super.onError(composition, exportResult, exportException)
         promise.reject(exportException)
       }
     })
 
-    transformer.start(editedMediaItem, file.absolutePath)
+    transformer.start(editedMediaItem.build(), file.absolutePath)
   }
 
   @ReactMethod
