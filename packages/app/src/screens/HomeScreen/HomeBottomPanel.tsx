@@ -1,5 +1,5 @@
 import { useState, memo, useMemo } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -67,6 +67,7 @@ const HomeBottomPanel = ({
     `,
     userKey,
   );
+  const intl = useIntl();
 
   const profiles = useMultiActorEnvironmentPluralFragment(
     graphql`
@@ -92,7 +93,6 @@ const HomeBottomPanel = ({
   //#endregion
 
   //#region card publication
-
   const onPublish = () => {
     const profileId = getAuthState().profileId;
     if (!profileId || profileId !== currentProfile?.id) {
@@ -128,34 +128,32 @@ const HomeBottomPanel = ({
         }
         Toast.show({
           type: 'success',
-          props: {
-            customText: (
-              <FormattedMessage
-                defaultMessage="Your WebCard{azzappAp} has been published."
-                description="Home Screen - webcard published toast"
-                values={{
-                  azzappAp: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            ),
-          },
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'Your WebCard{azzappAp} has been published.',
+              description: 'Home Screen - webcard published toast',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
       onError: error => {
         console.error(error);
         Toast.show({
           type: 'error',
-          props: {
-            customText: (
-              <FormattedMessage
-                defaultMessage="Error, could not publish your WebCard{azzappAp}, please try again later"
-                description="Error message displayed when the publication of the webcard failed in Home Screen"
-                values={{
-                  azzappAp: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            ),
-          },
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not publish your WebCard{azzappAp}, please try again later',
+              description:
+                'Error message displayed when the publication of the webcard failed in Home Screen',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
     });

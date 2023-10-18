@@ -59,17 +59,19 @@ const ProfileScreenPublishHelper = ({
         type: 'info',
         bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
         autoHide: false,
+        text1: intl.formatMessage(
+          {
+            defaultMessage:
+              'Tap on a section of your WebCard{azzappAp} to modify it',
+            description:
+              'Toast info message that appears when the user is in webcard edit mode for the first time',
+          },
+          {
+            azzappAp: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
         props: {
           showClose: true,
-          customText: (
-            <FormattedMessage
-              defaultMessage="Tap on a section of your WebCard{azzappA} to modify it"
-              description="Toast info message that appears when the user is in webcard edit mode for the first time"
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
-            />
-          ),
         },
       });
     }
@@ -101,17 +103,16 @@ const ProfileScreenPublishHelper = ({
         console.error(error);
         Toast.show({
           type: 'error',
-          props: {
-            customText: (
-              <FormattedMessage
-                defaultMessage="Error, could not publish your WebCard{azzappA}, try again later"
-                description="Publish modal error toast"
-                values={{
-                  azzappA: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            ),
-          },
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not publish your WebCard{azzappAp}, try again later',
+              description: 'Publish modal error toast',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
     });
