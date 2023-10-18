@@ -121,7 +121,16 @@ const SocialLinksRenderer = ({
     readonly socialId: string;
   }) => {
     const url = SOCIAL_LINKS.find(l => l.id === link.socialId)?.mask;
-    await Linking.openURL(`http://${url}${link.link}`);
+
+    const linkIncludeMethod =
+      link.link?.startsWith('http://') || link.link?.startsWith('https://');
+    let method = linkIncludeMethod ? '' : 'http://';
+
+    if (link.socialId === 'phone') method = `tel:`;
+    if (link.socialId === 'sms') method = 'sms:';
+    if (link.socialId === 'mail') method = 'mailto:';
+
+    await Linking.openURL(`${method}${url}${link.link}`);
   };
 
   return (
