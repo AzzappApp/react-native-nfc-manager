@@ -223,7 +223,7 @@ import kotlin.math.round
 
   private fun exportImageLayer(
     layer: GPULayer,
-    format: String,
+    format: String, //'auto' | 'jpg' | 'png'
     quality: Double,
     size: ReadableMap,
     promise: Promise
@@ -350,11 +350,19 @@ import kotlin.math.round
       }
 
       var bitmap = saveTexture(sourceImage.texture, sourceImage.width, sourceImage.height)
-      val file = File.createTempFile(UUID.randomUUID().toString(), ".jpg", MainApplication.getMainApplicationContext().cacheDir)
+      val fileExtension = when (format) {
+        "png" -> ".png"
+        else -> ".jpg"  // Default to JPEG if the format is not recognized
+    }
+      val file = File.createTempFile(UUID.randomUUID().toString(), fileExtension, MainApplication.getMainApplicationContext().cacheDir)
       if (file.exists()) file.delete()
       val out = FileOutputStream(file)
       bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
-      bitmap.compress(Bitmap.CompressFormat.JPEG, round(quality).toInt(), out)
+      val compressFormat = when (format) {
+        "png" -> Bitmap.CompressFormat.PNG
+        else -> Bitmap.CompressFormat.JPEG  // Default to JPEG if the format is not recognized
+    }
+      bitmap.compress(compressFormat, round(quality).toInt(), out)
       out.flush()
       out.close()
       promise.resolve(file.absolutePath)
