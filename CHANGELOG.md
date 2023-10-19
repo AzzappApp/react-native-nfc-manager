@@ -1,5 +1,6 @@
-## 0.5.1-canary.15
+## 0.5.1-canary.16
 
+* **feat:**  - 🎸 order profiles by desc creation date ([#1498](https://github.com/AzzappApp/azzapp/pull/1498))
 * **fix:**  - 🐛 correctly encode/parse contact card address ([#1462](https://github.com/AzzappApp/azzapp/pull/1462))
 * **feat:**  - remove close button ([#1488](https://github.com/AzzappApp/azzapp/pull/1488))
 * **fix:**  - 🐛 open right link from mobile ([#1475](https://github.com/AzzappApp/azzapp/pull/1475))
