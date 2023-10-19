@@ -1,5 +1,6 @@
-## 0.5.1-canary.19
+## 0.5.1-canary.20
 
+* **fix:**  - comment label plural ([#1497](https://github.com/AzzappApp/azzapp/pull/1497))
 * **fix:**  - remove id on suggested media when fetching ([#1485](https://github.com/AzzappApp/azzapp/pull/1485))
 * **fix:**  - post counter display on createPost ([#1491](https://github.com/AzzappApp/azzapp/pull/1491))
 * **feat:**  - 🎸 order profiles by desc creation date ([#1498](https://github.com/AzzappApp/azzapp/pull/1498))
