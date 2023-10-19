@@ -92,6 +92,8 @@ const PostCreationScreen = ({
           content
           allowLikes
           allowComments
+          counterComments
+          counterReactions
           author {
             id
             userName

@@ -36,7 +36,13 @@ type Post implements Node {
   Reaction of the viewer on this post
   """
   viewerPostReaction: ReactionKind
+  """
+  Number of reactions associated to this post
+  """
   counterReactions: Int!
+  """
+  Number of comments associated to this post
+  """
   counterComments: Int!
 
   """

@@ -337,6 +337,12 @@ const CoverEditorTemplateList = ({
   const [selectedItem, setSelectedItem] = useState<TemplateListItem | null>(
     items[0] ?? null,
   );
+  useEffect(() => {
+    //refreshing the selectedItem when switching between templateKind
+    //fix: https://github.com/AzzappApp/azzapp/issues/1458
+    setSelectedItem(items[initialSelectedIndex] ?? null);
+  }, [initialSelectedIndex, items]);
+
   const [colorPalettesIndexes, setColorPalettesIndexes] = useState<
     Record<string, number>
   >({ cover: cardColors ? -1 : 0 });
@@ -411,6 +417,8 @@ const CoverEditorTemplateList = ({
     templateKind,
   ]);
 
+  const selectedItemId = useMemo(() => selectedItem?.id, [selectedItem?.id]);
+
   const viewableIndexRef = useRef<number[]>([]);
 
   const onViewableItemsChanged = useCallback(
@@ -474,9 +482,10 @@ const CoverEditorTemplateList = ({
   const templateWidth = COVER_RATIO * carouselHeight;
 
   const styles = useStyleSheet(styleSheet);
+
   const renderTemplate = useCallback(
     ({ item, index }: ListRenderItemInfo<TemplateListItem>) => {
-      const isSelectedItem = item.id === selectedItem?.id;
+      const isSelectedItem = item.id === selectedItemId;
       const onPress = () => {
         if (isSelectedItem) {
           onNextColorPalette();
@@ -531,7 +540,7 @@ const CoverEditorTemplateList = ({
       );
     },
     [
-      selectedItem?.id,
+      selectedItemId,
       colorPalettesIndexes,
       templateWidth,
       timeRange?.startTime,
@@ -547,8 +556,8 @@ const CoverEditorTemplateList = ({
 
   const renderTryptich = useCallback(
     ({ item, index }: Omit<ListRenderItemInfo<ColorPalette>, 'separators'>) => {
-      const currentColorPaletteIndex = selectedItem
-        ? colorPalettesIndexes[selectedItem?.id] ?? 0
+      const currentColorPaletteIndex = selectedItemId
+        ? colorPalettesIndexes[selectedItemId] ?? 0
         : 0;
 
       const selected = currentColorPaletteIndex === index;
@@ -578,7 +587,7 @@ const CoverEditorTemplateList = ({
     [
       colorPalettesIndexes,
       onSelectColorPalette,
-      selectedItem,
+      selectedItemId,
       styles.colorPaletteContainer,
       styles.colorPaletteSelected,
     ],
@@ -601,6 +610,7 @@ const CoverEditorTemplateList = ({
         initialScrollIndex={initialSelectedIndex}
         onSelectedIndexChange={onSelectedIndexChangeInner}
         onEndReached={onEndTemplateReached}
+        extraData={selectedItemId}
       />
       <View
         style={{

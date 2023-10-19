@@ -78,6 +78,13 @@ type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
    * Callback called when the user scroll between two items, the index is rounded
    */
   onSelectedIndexChange?: (index: number) => void;
+  /**
+   * Imported from RN Flatlist doc
+   * A marker property for telling the list to re-render (since it implements PureComponent).
+   * If any of your `renderItem`, Header, Footer, etc. functions depend on anything outside of the `data` prop,
+   * stick it here and treat it immutably.
+   */
+  extraData?: any | undefined;
 };
 
 export type CarouselSelectListHandle = {
@@ -106,6 +113,7 @@ function CarouselSelectList<TItem = any>(
     itemContainerStyle,
     contentContainerStyle,
     scaleRatio,
+    extraData,
     onSelectedIndexChangeAnimated,
     onSelectedIndexChange,
     ...props
@@ -222,6 +230,7 @@ function CarouselSelectList<TItem = any>(
       initialNumToRender={3}
       windowSize={21}
       maxToRenderPerBatch={21}
+      extraData={extraData}
       contentContainerStyle={[
         {
           height,
