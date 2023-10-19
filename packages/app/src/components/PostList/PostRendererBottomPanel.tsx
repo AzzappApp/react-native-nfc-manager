@@ -231,10 +231,14 @@ const PostRendererBottomPanel = ({
               ellipsizeMode="tail"
             >
               <FormattedMessage
-                defaultMessage="See {counterComments} comments"
-                description="PostRendererBottomPanel - Comment Counter"
+                defaultMessage="See {counterComments, plural,
+                                    =0 {0 comment}
+                                    one {1 comment}
+                                    other {# comments}
+                                }"
+                description="PostRendererBottomPanel - Comments Counter"
                 values={{
-                  counterComments: post.counterComments,
+                  counterComments: post.counterComments ?? 0,
                 }}
               />
             </Text>
