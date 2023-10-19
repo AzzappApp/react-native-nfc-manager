@@ -6799,6 +6799,11 @@ csv-stringify@^6.4.2:
   resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.4.2.tgz#209cb17ab5520f51bd5a7edeb06ed6d4c322fce3"
   integrity sha512-DXIdnnCUQYjDKTu6TgCSzRDiAuLxDjhl4ErFP9FGMF3wzBGOVMg9bZTLaUcYtuvhXgNbeXPKeaRfpgyqE4xySw==
 
+csv42@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/csv42/-/csv42-5.0.0.tgz#02715c9450cacee7b4b52f2780db5677ac4851bc"
+  integrity sha512-CUniGKBgHkEkpcPJYC41r8b5PJO1J80W2QmrSeuVDWkiH+bt3wcz16odu62DT/9V6AbfwnCojf1QcPOH2ibfhQ==
+
 currently-unhandled@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
