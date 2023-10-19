@@ -1,4 +1,4 @@
-## 0.5.1-canary.17
+## 0.5.1-canary.18
 
 * **fix:**  - post counter display on createPost ([#1491](https://github.com/AzzappApp/azzapp/pull/1491))
 * **feat:**  - 🎸 order profiles by desc creation date ([#1498](https://github.com/AzzappApp/azzapp/pull/1498))
