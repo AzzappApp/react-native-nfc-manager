@@ -187,7 +187,8 @@ export const getRecommendedProfiles = async (
         isNull(FollowTable.followerId),
         eq(ProfileTable.cardIsPublished, true),
       ),
-    );
+    )
+    .orderBy(desc(ProfileTable.createdAt));
 
   return result.map(({ Profile }) => Profile);
 };
