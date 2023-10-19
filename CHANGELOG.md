@@ -1,5 +1,6 @@
-## 0.5.1-canary.14
+## 0.5.1-canary.15
 
+* **fix:**  - 🐛 correctly encode/parse contact card address ([#1462](https://github.com/AzzappApp/azzapp/pull/1462))
 * **feat:**  - remove close button ([#1488](https://github.com/AzzappApp/azzapp/pull/1488))
 * **fix:**  - 🐛 open right link from mobile ([#1475](https://github.com/AzzappApp/azzapp/pull/1475))
 * **feat:**  - add option to export png in android ([#1468](https://github.com/AzzappApp/azzapp/pull/1468))
