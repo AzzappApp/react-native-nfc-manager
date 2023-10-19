@@ -9,13 +9,7 @@ import {
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
-import {
-  commitLocalUpdate,
-  graphql,
-  useFragment,
-  usePaginationFragment,
-  useRelayEnvironment,
-} from 'react-relay';
+import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import CoverLink_profileFragment from '@azzapp/relay/artifacts/CoverLink_profile.graphql';
 
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -27,7 +21,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggleFollow from '#hooks/useToggleFollow';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
 import type { MediaSuggestionsProfiles_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsProfiles_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -163,8 +156,6 @@ const CoverLinkWithOptions = ({
 
   const { userName } = useFragment(CoverLink_profileFragment, props.profile);
 
-  const environment = useRelayEnvironment();
-
   const intl = useIntl();
 
   return (
@@ -188,16 +179,6 @@ const CoverLinkWithOptions = ({
           onPress={() => {
             startTransition(() => {
               toggleFollow(props.profileId, userName, !isFollowing);
-            });
-          }}
-        />
-        <IconButton
-          icon="close"
-          size={29}
-          onPress={() => {
-            //TODO: implement real update in database
-            commitLocalUpdate(environment, store => {
-              store.getRoot().getLinkedRecord('viewer');
             });
           }}
         />
