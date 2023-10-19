@@ -542,16 +542,6 @@ const useCoverEditionManager = ({
     useState<Observable<number> | null>(null);
 
   const onSave = useCallback(async () => {
-    //we defined it again because we need to remove the id
-    const activeSourceMedia =
-      hasSuggestedMedia && suggestedMedia
-        ? {
-            uri: suggestedMedia.uri,
-            kind: suggestedMedia.kind,
-            width: suggestedMedia.width,
-            height: suggestedMedia.height,
-          }
-        : sourceMedia;
     if (!activeSourceMedia) {
       setShowMediaRequiredModal(true);
       return;
@@ -797,10 +787,7 @@ const useCoverEditionManager = ({
       },
     });
   }, [
-    hasSuggestedMedia,
-    suggestedMedia,
-    sourceMedia,
-    setProgressIndicator,
+    activeSourceMedia,
     coverStyle,
     colorPalette,
     mediaComputation,

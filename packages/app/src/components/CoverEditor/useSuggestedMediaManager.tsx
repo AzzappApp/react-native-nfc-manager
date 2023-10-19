@@ -25,7 +25,6 @@ const useSuggestedMediaManager = (
           edges {
             node {
               __typename
-              id
               # we use arbitrary values here, but it should be good enough (arguments in refetchable fragment)
               uri(width: 300, pixelRatio: 2)
               width
@@ -102,7 +101,6 @@ const useSuggestedMediaManager = (
       const media = suggestedMedias[templateKind]?.[newIndex];
       if (media) {
         setSuggestedMedia({
-          id: media.id,
           uri: media.uri,
           kind: media.__typename === 'MediaImage' ? 'image' : 'video',
           width: media.width,
