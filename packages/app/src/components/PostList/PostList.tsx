@@ -102,14 +102,14 @@ const PostList = ({
           post={item}
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
-          author={item.author ?? author!}
+          author={item.author ?? extraData.author!}
         />
       );
     },
-    [author, windowWidth],
+    [windowWidth],
   );
 
-  const extraData = useMemo(() => ({ canPlay }), [canPlay]);
+  const extraData = useMemo(() => ({ canPlay, author }), [canPlay, author]);
 
   const ListFooterComponent = useMemo(
     () => <ListLoadingFooter loading={loading} />,
