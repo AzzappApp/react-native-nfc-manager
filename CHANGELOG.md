@@ -1,5 +1,6 @@
-## 0.5.1-canary.18
+## 0.5.1-canary.19
 
+* **fix:**  - remove id on suggested media when fetching ([#1485](https://github.com/AzzappApp/azzapp/pull/1485))
 * **fix:**  - post counter display on createPost ([#1491](https://github.com/AzzappApp/azzapp/pull/1491))
 * **feat:**  - 🎸 order profiles by desc creation date ([#1498](https://github.com/AzzappApp/azzapp/pull/1498))
 * **fix:**  - 🐛 correctly encode/parse contact card address ([#1462](https://github.com/AzzappApp/azzapp/pull/1462))
