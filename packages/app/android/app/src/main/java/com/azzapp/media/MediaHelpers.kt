@@ -14,6 +14,7 @@ import com.google.mlkit.vision.segmentation.Segmentation
 import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 
 @UnstableApi class MediaHelpers(private val reactContext: ReactApplicationContext) :
@@ -65,7 +66,7 @@ import java.io.FileOutputStream
     }
 
     val inputImage =  InputImage.fromFilePath(reactContext, imagePath)
-    val maskedImageFile = File(reactContext.cacheDir, "masked_image.png")
+    val maskedImageFile = File(reactContext.cacheDir, UUID.randomUUID().toString() + ".png")
     segmenter.process(inputImage)
     .addOnSuccessListener { segmentationResult ->
       val mask = segmentationResult.buffer.asFloatBuffer()
@@ -99,6 +100,7 @@ import java.io.FileOutputStream
       outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
       outputStream.flush()
       outputStream.close()
+      promise.resolve(maskedImageFile)
     }
     .addOnFailureListener { e ->
         promise.reject("ERROR_SEGMENTATION", e.localizedMessage)
