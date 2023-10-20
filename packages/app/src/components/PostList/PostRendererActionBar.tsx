@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -105,6 +105,10 @@ const PostRendererActionBar = ({
         onError: error => {
           console.error(error);
 
+          setCountReactions(prevReactions =>
+            add ? prevReactions + 1 : prevReactions - 1,
+          );
+
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -117,6 +121,7 @@ const PostRendererActionBar = ({
     },
     // delay in ms
     600,
+    { trailing: true, leading: false },
   );
   // toggle the value locally
   const toggleReaction = useCallback(() => {
@@ -130,15 +135,6 @@ const PostRendererActionBar = ({
       debouncedCommit(true);
     }
   }, [countReactions, debouncedCommit, reaction]);
-
-  //refresh the value based on the GraphQL response
-  useEffect(() => {
-    setReaction(viewerPostReaction);
-  }, [viewerPostReaction]);
-
-  useEffect(() => {
-    setCountReactions(counterReactions);
-  }, [counterReactions]);
 
   const goToComments = () => {
     router.push({
