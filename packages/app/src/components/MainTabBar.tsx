@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import {
   useWindowDimensions,
   type StyleProp,
@@ -12,6 +13,7 @@ import { createId } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
+import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import {
   useNativeNavigationEvent,
@@ -124,10 +126,20 @@ const MainTabBar = ({
     };
   }, []);
 
+  const intl = useIntl();
+
   const tabs = [
     {
       key: 'HOME',
-      label: 'Webcards',
+      label: intl.formatMessage(
+        {
+          defaultMessage: 'Webcards{azzappAp}',
+          description: 'Main tab bar title for webcards',
+        },
+        {
+          azzappAp: <Text variant="azzapp">a</Text>,
+        },
+      ),
       IconComponent: <HomeIcon />,
     },
     ...TABS,

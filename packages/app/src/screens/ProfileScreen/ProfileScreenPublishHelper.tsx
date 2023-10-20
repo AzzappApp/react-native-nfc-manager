@@ -175,7 +175,11 @@ const ProfileScreenPublishHelper = ({
                 defaultMessage="Ok, publish my WebCard{azzappApp}!"
                 description="Publish modal publish button label"
                 values={{
-                  azzappApp: <Text variant="azzapp">a</Text>,
+                  azzappApp: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
                 }}
               />
             }
@@ -231,5 +235,8 @@ const stylesheet = createStyleSheet(appearance => ({
     tintColor: appearance === 'dark' ? colors.white : colors.black,
     height: 17,
     width: 17,
+  },
+  icon: {
+    color: appearance === 'dark' ? colors.black : colors.white,
   },
 }));

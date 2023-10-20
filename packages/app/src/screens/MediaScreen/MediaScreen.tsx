@@ -67,8 +67,11 @@ const MediaScreen = ({
                 header={
                   <Text variant="large" style={styles.coversTitleStyle}>
                     <FormattedMessage
-                      defaultMessage="Webcards to follow"
+                      defaultMessage="Webcards{azzappAp} to follow"
                       description="List of suggested profiles"
+                      values={{
+                        azzappAp: <Text variant="azzapp">a</Text>,
+                      }}
                     />
                   </Text>
                 }

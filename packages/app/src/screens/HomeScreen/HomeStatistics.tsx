@@ -206,10 +206,21 @@ const HomeStatistics = ({
       >
         <StatisticItems
           value={totalViews}
-          title={intl.formatMessage({
-            defaultMessage: 'Webcard Views',
-            description: 'Home statistics - webcardView label',
-          })}
+          title={
+            intl.formatMessage(
+              {
+                defaultMessage: 'Webcard{azzappAp} Views',
+                description: 'Home statistics - webcardView label',
+              },
+              {
+                azzappAp: (
+                  <Text style={styles.icon} variant="azzapp">
+                    a
+                  </Text>
+                ),
+              },
+            ) as string
+          }
           scrollIndex={scrollIndexOffset}
           index={0}
           onSelect={onSelectStat}
@@ -333,6 +344,9 @@ const styles = StyleSheet.create({
   smallText: {
     color: colors.white,
     textAlign: 'center',
+  },
+  icon: {
+    color: colors.white,
   },
 });
 

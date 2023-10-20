@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
+import Text from '#ui/Text';
 import useAuthState from './useAuthState';
 import type {
   useToggleFollowMutation,
@@ -128,15 +129,25 @@ const useToggleFollow = (userNameFilter?: string) => {
     }
 
     Toast.show({
-      text1: follow
-        ? intl.formatMessage({
-            defaultMessage: 'You started to follow this Webcard™',
-            description: 'Toast message when user follows a profile',
-          })
-        : intl.formatMessage({
-            defaultMessage: 'You no longer follow this Webcard™',
-            description: 'Toast message when user unfollows a profile',
-          }),
+      text1: (follow
+        ? intl.formatMessage(
+            {
+              defaultMessage: 'You started to follow this Webcard{azzappAp}',
+              description: 'Toast message when user follows a profile',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          )
+        : intl.formatMessage(
+            {
+              defaultMessage: 'You no longer follow this Webcard{azzappAp}',
+              description: 'Toast message when user unfollows a profile',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          )) as string,
     });
 
     // currentProfileId is undefined when user is anonymous so we can't follow

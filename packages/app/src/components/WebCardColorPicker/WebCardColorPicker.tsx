@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
@@ -18,6 +18,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
+import Text from '#ui/Text';
 import ColorTriptychChooser from './ColorTriptychChooser';
 import type { WebCardColorPicker_profile$key } from '@azzapp/relay/artifacts/WebCardColorPicker_profile.graphql';
 import type { WebCardColorPickerMutation } from '@azzapp/relay/artifacts/WebCardColorPickerMutation.graphql';
@@ -205,15 +206,22 @@ const WebCardColorPicker = ({
       height={height}
       visible={visible}
       headerTitle={
-        editedColor
-          ? intl.formatMessage({
-              defaultMessage: 'Edit linked coor',
-              description: 'Webcard ColorPicker component header Edit',
-            })
-          : intl.formatMessage({
-              defaultMessage: 'Webcard colors',
-              description: 'Webcard ColorPicker component hearder title',
-            })
+        <Text>
+          {editedColor ? (
+            <FormattedMessage
+              defaultMessage="Edit linked coor"
+              description="Webcard ColorPicker component header Edit"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Webcard{azzappAp} colors"
+              description="Webcard ColorPicker component hearder title"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          )}
+        </Text>
       }
       headerLeftButton={
         <Button

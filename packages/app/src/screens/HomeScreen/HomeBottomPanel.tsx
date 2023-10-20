@@ -348,7 +348,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} has no cover and can’t be published."
             description="Home Screen - Missing cover text"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -389,7 +393,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} is not published"
             description="Home Screen - webcard not published title"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -398,7 +406,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} has not been published, nobody can see it for the moment."
             description="Home Screen - webcard not published text"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -410,7 +422,11 @@ const HomeBottomPanel = ({
               defaultMessage="Publish this WebCard{azzappAp}"
               description="Home Screen - webcard not published button"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappAp: (
+                  <Text style={styles.icon} variant="azzapp">
+                    a
+                  </Text>
+                ),
               }}
             />
           }
