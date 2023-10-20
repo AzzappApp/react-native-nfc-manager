@@ -132,6 +132,10 @@
 		FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
 		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
+		FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
+		FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
+		FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
+		FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FDA79D3229DD99D500E16407 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
@@ -277,6 +281,7 @@
 		FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaVideoRendererManager.m; sourceTree = "<group>"; };
 		FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPCustomReavealTransition.h; path = azzapp/AZPCustomReavealTransition.h; sourceTree = "<group>"; };
 		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPCustomReavealTransition.m; path = azzapp/AZPCustomReavealTransition.m; sourceTree = "<group>"; };
+		FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImagePropertyOrientation+init_uiOrientation.swift"; sourceTree = "<group>"; };
 		FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaHelpers.m; sourceTree = "<group>"; };
 		FDA79D3129DD99D500E16407 /* GPULayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayer.swift; sourceTree = "<group>"; };
 		FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayerImageLoader.swift; sourceTree = "<group>"; };
@@ -530,6 +535,7 @@
 				FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */,
 				FDA79D6129E4891100E16407 /* UIColor.swift */,
 				FD14042C29FA841300CCA6B9 /* CIImage+invertY.swift */,
+				FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */,
 			);
 			name = Extensions;
 			path = azzapp/Extensions;
@@ -1239,6 +1245,7 @@
 				FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FDA79D6629E596F400E16407 /* AZPGPUImageViewManager.m in Sources */,
 				FDA79D5D29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */,
+				FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FDA79D6C29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */,
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
@@ -1277,6 +1284,7 @@
 				FDA79D3C29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
+				FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				FDA79D7429EE844000E16407 /* GPUViewError.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
@@ -1315,6 +1323,7 @@
 				FD39DAA82A52AB5F00C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD39DAA92A52AB5F00C49A82 /* AZPSnapshot.m in Sources */,
 				FD39DAAA2A52AB5F00C49A82 /* AZPSnapshotManager.m in Sources */,
+				FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD39DAAB2A52AB5F00C49A82 /* AppDelegate.mm in Sources */,
 				FD39DAAC2A52AB5F00C49A82 /* GPUViewError.swift in Sources */,
 				FD39DAAD2A52AB5F00C49A82 /* main.m in Sources */,
@@ -1353,6 +1362,7 @@
 				FD39DADF2A52AC2100C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD39DAE02A52AC2100C49A82 /* AZPSnapshot.m in Sources */,
 				FD39DAE12A52AC2100C49A82 /* AZPSnapshotManager.m in Sources */,
+				FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD39DAE22A52AC2100C49A82 /* AppDelegate.mm in Sources */,
 				FD39DAE32A52AC2100C49A82 /* GPUViewError.swift in Sources */,
 				FD39DAE42A52AC2100C49A82 /* main.m in Sources */,
@@ -1571,11 +1581,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-					"-Wl -ld_classic ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -1645,11 +1651,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-					"-Wl -ld_classic ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

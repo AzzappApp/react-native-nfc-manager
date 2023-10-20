@@ -135,9 +135,8 @@ class GPULayerImageLoader {
   
   private func loadImage(_ url: URL) async throws -> CIImage? {
     return try await loadImageIfNotCached(key: url.absoluteString) {
-      let (data, _) = try await MediaPipeline.pipeline.data(for: url)
-      let image = CIImage(data: data, options: [.applyOrientationProperty: true])
-      return image
+      let image = try await MediaPipeline.pipeline.image(for: url)
+      return CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation));
     }
   }
   
