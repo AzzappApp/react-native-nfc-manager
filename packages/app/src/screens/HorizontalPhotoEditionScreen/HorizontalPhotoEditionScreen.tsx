@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { Observable } from 'relay-runtime';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
@@ -47,6 +46,7 @@ import type {
   SaveHorizontalPhotoModuleInput,
 } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
+import type { Observable } from 'relay-runtime';
 
 export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
@@ -216,7 +216,6 @@ const HorizontalPhotoEditionScreen = ({
     if (!canSave) {
       return;
     }
-    setProgressIndicator(Observable.from(0));
     const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
@@ -267,10 +266,12 @@ const HorizontalPhotoEditionScreen = ({
         input,
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
         console.error(e);
+        setShowImagePicker(false);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({

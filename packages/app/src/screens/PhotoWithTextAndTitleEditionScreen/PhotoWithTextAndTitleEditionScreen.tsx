@@ -323,9 +323,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
         input,
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
+        setShowImagePicker(false);
         console.log(e);
         if (e instanceof GraphQLError) {
           console.log(e.cause);

@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
@@ -39,6 +38,7 @@ import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/C
 import type { CarouselEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_viewer.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
+import type { Observable } from 'relay-runtime';
 
 export type CarouselEditionScreenProps = ViewProps & {
   /**
@@ -219,7 +219,6 @@ const CarouselEditionScreen = ({
     if (!canSave) {
       return;
     }
-    setProgressIndicator(Observable.from(0));
     const { images, ...rest } = value;
 
     let mediasMap: Record<
@@ -312,10 +311,12 @@ const CarouselEditionScreen = ({
         },
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
         console.error(e);
+        setShowImagePicker(false);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
