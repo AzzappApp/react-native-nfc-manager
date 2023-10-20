@@ -1,5 +1,7 @@
-## 0.5.1-canary.23
+## 0.5.1-canary.24
 
+* **fix:**  - 🐛 display right reaction counter ([#1506](https://github.com/AzzappApp/azzapp/pull/1506))
+* **fix:**  - homescreen can have wrong sizeing ([#1512](https://github.com/AzzappApp/azzapp/pull/1512))
 * **fix:**  - **ImagePicker:** image with JFIF encoding takes long time to be drawn ([#1482](https://github.com/AzzappApp/azzapp/pull/1482))
 * **fix:**  - 🐛 generate link to post instead of profile ([#1507](https://github.com/AzzappApp/azzapp/pull/1507))
 * **fix:**  - modal are not closed after upload ([#1502](https://github.com/AzzappApp/azzapp/pull/1502))
