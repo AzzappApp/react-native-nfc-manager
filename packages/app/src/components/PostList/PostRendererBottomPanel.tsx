@@ -6,7 +6,7 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { buildPostUrl, buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
@@ -113,7 +113,7 @@ const PostRendererBottomPanel = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildUserUrl(post.author.userName),
+        url: buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
