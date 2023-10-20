@@ -1,5 +1,6 @@
-## 0.5.1-canary.24
+## 0.5.1-canary.25
 
+* **fix:**  - on android TextAreaModal doesn’t open the keyboard with autofocus ([#1503](https://github.com/AzzappApp/azzapp/pull/1503))
 * **fix:**  - 🐛 display right reaction counter ([#1506](https://github.com/AzzappApp/azzapp/pull/1506))
 * **fix:**  - homescreen can have wrong sizeing ([#1512](https://github.com/AzzappApp/azzapp/pull/1512))
 * **fix:**  - **ImagePicker:** image with JFIF encoding takes long time to be drawn ([#1482](https://github.com/AzzappApp/azzapp/pull/1482))
