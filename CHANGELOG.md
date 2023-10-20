@@ -1,5 +1,6 @@
-## 0.5.1-canary.25
+## 0.5.1-canary.26
 
+* **fix:**  - 🐛 add missing azzapp logo ([#1510](https://github.com/AzzappApp/azzapp/pull/1510))
 * **fix:**  - on android TextAreaModal doesn’t open the keyboard with autofocus ([#1503](https://github.com/AzzappApp/azzapp/pull/1503))
 * **fix:**  - 🐛 display right reaction counter ([#1506](https://github.com/AzzappApp/azzapp/pull/1506))
 * **fix:**  - homescreen can have wrong sizeing ([#1512](https://github.com/AzzappApp/azzapp/pull/1512))
