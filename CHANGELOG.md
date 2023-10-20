@@ -1,5 +1,6 @@
-## 0.5.1-canary.22
+## 0.5.1-canary.23
 
+* **fix:**  - **ImagePicker:** image with JFIF encoding takes long time to be drawn ([#1482](https://github.com/AzzappApp/azzapp/pull/1482))
 * **fix:**  - 🐛 generate link to post instead of profile ([#1507](https://github.com/AzzappApp/azzapp/pull/1507))
 * **fix:**  - modal are not closed after upload ([#1502](https://github.com/AzzappApp/azzapp/pull/1502))
 * **fix:**  - comment label plural ([#1497](https://github.com/AzzappApp/azzapp/pull/1497))
