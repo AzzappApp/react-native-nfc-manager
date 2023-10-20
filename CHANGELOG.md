@@ -1,5 +1,6 @@
-## 0.5.1-canary.21
+## 0.5.1-canary.22
 
+* **fix:**  - 🐛 generate link to post instead of profile ([#1507](https://github.com/AzzappApp/azzapp/pull/1507))
 * **fix:**  - modal are not closed after upload ([#1502](https://github.com/AzzappApp/azzapp/pull/1502))
 * **fix:**  - comment label plural ([#1497](https://github.com/AzzappApp/azzapp/pull/1497))
 * **fix:**  - remove id on suggested media when fetching ([#1485](https://github.com/AzzappApp/azzapp/pull/1485))
