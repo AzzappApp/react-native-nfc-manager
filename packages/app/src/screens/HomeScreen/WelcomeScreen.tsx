@@ -4,7 +4,6 @@ import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
 import { mainRoutes } from '#mobileRoutes';
-import { colors } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -75,19 +74,10 @@ const WelcomeScreen = () => {
         </Text>
         <Link route="NEW_PROFILE" prefetch>
           <Button
-            label={intl.formatMessage(
-              {
-                defaultMessage: 'Create my first webcard{azzappAp}',
-                description: 'Button label for welcome screen',
-              },
-              {
-                azzappAp: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              },
-            )}
+            label={intl.formatMessage({
+              defaultMessage: 'Create my first webcard',
+              description: 'Button label for welcome screen',
+            })}
           />
         </Link>
       </View>
@@ -136,9 +126,6 @@ const styles = StyleSheet.create({
     top: 39,
     right: 25,
     borderWidth: 0,
-  },
-  icon: {
-    color: colors.white,
   },
 });
 

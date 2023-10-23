@@ -66,36 +66,23 @@ const AccountDetailsScreen = ({
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
             <FormattedMessage
-              defaultMessage="Your account details are linked to all your webcards{azzappAp}."
+              defaultMessage="Your account details are linked to all your webcards."
               description="Warning label displayed at the top on the screen to indicate that updates go through all profiles"
-              values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
-              }}
             />
           </Text>
           <View style={styles.section}>
             <Text variant="xsmall" style={styles.sectionTitle}>
               <FormattedMessage
-                defaultMessage="Webcard{azzappAp} details"
+                defaultMessage="Webcard details"
                 description="Title of the section where user can view their webcard details"
-                values={{
-                  azzappAp: (
-                    <Text style={styles.icon} variant="azzapp">
-                      a
-                    </Text>
-                  ),
-                }}
               />
             </Text>
           </View>
           <View style={styles.sectionField}>
             <Text variant="smallbold">
               <FormattedMessage
-                defaultMessage="Webcard{azzappAp} name"
-                description="Webcard name field in the account details screen"
-                values={{
-                  azzappAp: <Text variant="azzapp">a</Text>,
-                }}
+                defaultMessage="Username"
+                description="Username field in the account details screen"
               />
             </Text>
             <Text variant="medium">{profile?.userName}</Text>
@@ -247,9 +234,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   sectionFieldPlaceholder: {
     color: colors.grey200,
-  },
-  icon: {
-    textTransform: 'lowercase',
   },
 }));
 

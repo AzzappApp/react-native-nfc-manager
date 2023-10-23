@@ -32,99 +32,45 @@ const UploadProgressModal = ({
   const intl = useIntl();
   const messages = useMemo(() => {
     return [
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Nothing better than a nice transition between the sections of your webcard{azzappAp}',
-          description: 'Progress loading modal message 1',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
+      intl.formatMessage({
+        defaultMessage:
+          'Nothing better than a nice transition between the sections of your webcard',
+        description: 'Progress loading modal message 1',
+      }),
       intl.formatMessage({
         defaultMessage: 'Did you know that videos are now supported for covers',
         description: 'Progress loading modal message 2',
       }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Did you know you can customize each section of your webcard{azzappAp}? Make it a unique experience!',
-          description: 'Progress loading modal message 3',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Your webcard{azzappAp}, your style. Don't forget to explore all the customization options available.",
-          description: 'Progress loading modal message 4',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Take a deep breath and envision your perfect webcard{azzappAp}. It's coming soon!",
-          description: 'Progress loading modal message 5',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
+      intl.formatMessage({
+        defaultMessage:
+          'Did you know you can customize each section of your webcard? Make it a unique experience!',
+        description: 'Progress loading modal message 3',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          "Your webcard, your style. Don't forget to explore all the customization options available.",
+        description: 'Progress loading modal message 4',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          "Take a deep breath and envision your perfect webcard. It's coming soon!",
+        description: 'Progress loading modal message 5',
+      }),
       intl.formatMessage({
         defaultMessage:
           "A little secret: Bright colors and attractive fonts grab your visitors' attention. Give them a try!",
         description: 'Progress loading modal message 6',
       }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'As the pixels come together, think about using transition effects to add dynamism to your webcard{azzappAp}',
-          description: 'Progress loading modal message 7',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'The most beautiful things take time to come to life. Your webcard{azzappAp} is taking shape.',
-          description: 'Progress loading modal message 8',
-        },
-        {
-          azzappAp: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
+      intl.formatMessage({
+        defaultMessage:
+          'As the pixels come together, think about using transition effects to add dynamism to your webcard',
+        description: 'Progress loading modal message 7',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'The most beautiful things take time to come to life. Your webcard is taking shape.',
+        description: 'Progress loading modal message 8',
+      }),
     ];
   }, [intl]);
 
@@ -167,8 +113,5 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
     lineHeight: 36,
-  },
-  icon: {
-    color: colors.white,
   },
 });
