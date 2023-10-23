@@ -1,12 +1,12 @@
 {
   "name": "@azzapp/relay",
-  "version": "0.5.1-canary.26",
+  "version": "0.5.1-canary.27",
   "private": true,
   "scripts": {
     "clean": "rm -rf artifacts"
   },
   "dependencies": {
     "relay-runtime": "^14.1.0",
-    "@azzapp/shared": "0.5.1-canary.26"
+    "@azzapp/shared": "0.5.1-canary.27"
   }
 }
