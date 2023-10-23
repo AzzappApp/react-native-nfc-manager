@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
+import useEditorLayout from '#hooks/useEditorLayout';
 import {
   useAudioPermission,
   useCameraPermission,
@@ -239,6 +240,15 @@ const SelectImageStep = ({
     }
   };
 
+  const { insetBottom } = useEditorLayout();
+
+  const galleryContainerStyle = useMemo(
+    () => ({
+      paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+    }),
+    [insetBottom],
+  );
+
   return (
     <>
       <ImagePickerStep
@@ -289,7 +299,7 @@ const SelectImageStep = ({
             />
           ) : null
         }
-        bottomPanel={({ insetBottom }) =>
+        bottomPanel={
           pickerMode === 'gallery' ? (
             mediaPermission === RESULTS.GRANTED ||
             mediaPermission === RESULTS.LIMITED ? (
@@ -298,9 +308,7 @@ const SelectImageStep = ({
                 album={selectedAlbum}
                 onMediaSelected={onMediaChange}
                 kind={kind}
-                contentContainerStyle={{
-                  paddingBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
               />
             ) : null
