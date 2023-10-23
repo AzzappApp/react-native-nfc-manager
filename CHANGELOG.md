@@ -1,5 +1,6 @@
-## 0.5.1-canary.27
+## 0.5.1-canary.28
 
+* **feat:**  - 🎸 complete use of azzapp logo
 * **perf:**  - stop rerendering at every media selection - too slow on android ([#1504](https://github.com/AzzappApp/azzapp/pull/1504))
 * **fix:**  - 🐛 add missing azzapp logo ([#1510](https://github.com/AzzappApp/azzapp/pull/1510))
 * **fix:**  - on android TextAreaModal doesn’t open the keyboard with autofocus ([#1503](https://github.com/AzzappApp/azzapp/pull/1503))
