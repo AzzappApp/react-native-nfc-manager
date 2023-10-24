@@ -1,5 +1,6 @@
-## 0.5.1-canary.31
+## 0.5.1-canary.32
 
+* **feat:**  - **Android:** missing cover features ([#1524](https://github.com/AzzappApp/azzapp/pull/1524))
 * **fix:**  - restore link to webcard builder on createdf profile ([#1520](https://github.com/AzzappApp/azzapp/pull/1520))
 * **perf:**  - android - enhance dashed sliders ([#1501](https://github.com/AzzappApp/azzapp/pull/1501))
 * **feat:**  - 🎸 complete use of azzapp logo ([#1516](https://github.com/AzzappApp/azzapp/pull/1516))
