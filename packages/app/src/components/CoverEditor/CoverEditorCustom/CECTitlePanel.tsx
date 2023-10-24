@@ -250,9 +250,8 @@ const CECTitlePanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Font size : {fontSize}"
+              defaultMessage="Font size :"
               description="Font size message in cover edition"
-              values={{ fontSize }}
             />
           }
           value={fontSize}

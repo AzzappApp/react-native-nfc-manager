@@ -115,11 +115,8 @@ const HorizontalPhotoBorderEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border size: {size}"
+              defaultMessage="Border size:"
               description="Border size message in Horizontal Photo edition"
-              values={{
-                size: borderWidth,
-              }}
             />
           }
           value={borderWidth}
@@ -142,11 +139,8 @@ const HorizontalPhotoBorderEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border radius: {size}"
+              defaultMessage="Border radius:"
               description="Border radius message in Horizontal Photo edition"
-              values={{
-                size: borderRadius,
-              }}
             />
           }
           value={borderRadius}

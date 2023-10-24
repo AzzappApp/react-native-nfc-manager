@@ -121,9 +121,8 @@ const CarouselEditionBorderPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border size : {size}"
+              defaultMessage="Border size :"
               description="Border size message in carousel edition"
-              values={{ size: borderWidth }}
             />
           }
           value={borderWidth}
@@ -144,9 +143,8 @@ const CarouselEditionBorderPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border radius : {radius}"
+              defaultMessage="Border radius :"
               description="Border radius in carousel edition"
-              values={{ radius: borderRadius }}
             />
           }
           value={borderRadius}

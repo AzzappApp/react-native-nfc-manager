@@ -73,15 +73,10 @@ const BlockTextMarginsEditionPanel = ({
       />
       <View style={styles.paramContainer}>
         <LabeledDashedSlider
-          label={
-            <FormattedMessage
-              defaultMessage="Text top/bottom margin : {size}"
-              description="Text top/bottom margin message in BlockText edition"
-              values={{
-                size: textMarginVertical,
-              }}
-            />
-          }
+          label={intl.formatMessage({
+            defaultMessage: 'Text margin :',
+            description: 'Text margin message in BlockText edition',
+          })}
           value={textMarginVertical}
           min={0}
           max={BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN}
@@ -102,11 +97,8 @@ const BlockTextMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Text left/right margin : {size}"
+              defaultMessage="Text left/right margin :"
               description="textMarginHorizontal message in BlockText edition"
-              values={{
-                size: textMarginHorizontal,
-              }}
             />
           }
           value={textMarginHorizontal}
@@ -136,11 +128,8 @@ const BlockTextMarginsEditionPanel = ({
           <LabeledDashedSlider
             label={
               <FormattedMessage
-                defaultMessage="Space top/bottom : {size}"
+                defaultMessage="Space top/bottom :"
                 description="Space top/bottom message in BlockText edition"
-                values={{
-                  size: marginVertical,
-                }}
               />
             }
             value={marginVertical}
@@ -163,11 +152,8 @@ const BlockTextMarginsEditionPanel = ({
           <LabeledDashedSlider
             label={
               <FormattedMessage
-                defaultMessage="Space left/right : {size}"
+                defaultMessage="Space left/right :"
                 description="Space left/right message in BlockText edition"
-                values={{
-                  size: marginHorizontal,
-                }}
               />
             }
             value={marginHorizontal}

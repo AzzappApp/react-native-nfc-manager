@@ -43,11 +43,8 @@ const HorizontalPhotoSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Height: {size}"
+              defaultMessage="Height:"
               description="Height message in HorizontalPhoto edition"
-              values={{
-                size: height,
-              }}
             />
           }
           value={height}

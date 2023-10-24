@@ -133,9 +133,8 @@ const CarouselImagesEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Images height : {size}"
+              defaultMessage="Images height :"
               description="Images height label in carousel edition"
-              values={{ size: imageHeight }}
             />
           }
           value={imageHeight}

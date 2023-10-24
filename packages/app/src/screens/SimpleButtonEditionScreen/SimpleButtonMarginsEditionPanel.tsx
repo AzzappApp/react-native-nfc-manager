@@ -76,11 +76,8 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Top margin : {size}"
+            defaultMessage="Top margin :"
             description="marginTop message in SimpleButton edition"
-            values={{
-              size: marginTop,
-            }}
           />
         }
         value={marginTop}
@@ -101,11 +98,8 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Bottom margin : {size}"
+            defaultMessage="Bottom margin :"
             description="Bottom margin message in SimpleButton edition"
-            values={{
-              size: marginBottom,
-            }}
           />
         }
         value={marginBottom}
@@ -135,11 +129,8 @@ const SimpleButtonMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Width : {size}"
+              defaultMessage="Width :"
               description="width message in SimpleButton edition"
-              values={{
-                size: width,
-              }}
             />
           }
           value={width}

@@ -59,11 +59,8 @@ const SimpleTextMarginEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Margin top/bottom : {size}"
+              defaultMessage="Margin top/bottom :"
               description="Font size message in cover edition"
-              values={{
-                size: marginVertical,
-              }}
             />
           }
           value={marginVertical}
@@ -88,11 +85,8 @@ const SimpleTextMarginEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Margin left/right : {size}"
+              defaultMessage="Margin left/right :"
               description="margin size message in cover edition"
-              values={{
-                size: marginHorizontal,
-              }}
             />
           }
           value={marginHorizontal}

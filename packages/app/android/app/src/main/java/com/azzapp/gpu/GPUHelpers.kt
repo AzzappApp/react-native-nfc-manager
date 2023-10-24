@@ -372,7 +372,8 @@ import kotlin.math.round
       bitmap.compress(compressFormat, round(quality).toInt(), out)
       out.flush()
       out.close()
-      promise.resolve(file.absolutePath)
+      val absolutePath = file.absolutePath
+      promise.resolve("file://$absolutePath")
     } catch (e: Exception) {
       promise.reject(e)
     } finally {

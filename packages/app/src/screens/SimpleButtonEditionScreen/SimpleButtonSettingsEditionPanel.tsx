@@ -277,11 +277,8 @@ const SimpleButtonSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Font size : {size}"
+              defaultMessage="Font size :"
               description="fontSize message in SimpleButton edition"
-              values={{
-                size: fontSize,
-              }}
             />
           }
           value={fontSize}

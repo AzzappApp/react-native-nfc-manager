@@ -222,12 +222,8 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
           <LabeledDashedSlider
             label={
               <FormattedMessage
-                defaultMessage="Font size : {size}"
+                defaultMessage="Font size :"
                 description="Font size message in PhotoWithTextAndTitle edition"
-                values={{
-                  size:
-                    currentTab === 'title' ? titleFontSize : contentFontSize,
-                }}
               />
             }
             value={currentTab === 'title' ? titleFontSize : contentFontSize}
@@ -279,14 +275,8 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Vertical Spacing: {size}"
+              defaultMessage="Vertical Spacing:"
               description="Vertical Spacing message in PhotoWithTextAndTitle edition"
-              values={{
-                size:
-                  currentTab === 'title'
-                    ? titleVerticalSpacing
-                    : contentVerticalSpacing,
-              }}
             />
           }
           value={

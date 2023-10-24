@@ -140,11 +140,8 @@ const SimpleTextStyleEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Font Size : {size}"
+            defaultMessage="Font Size :"
             description="Font size message in cover edition"
-            values={{
-              size: fontSize,
-            }}
           />
         }
         value={fontSize}
@@ -173,9 +170,8 @@ const SimpleTextStyleEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Vertical Spacing : {verticalSpacing}"
+            defaultMessage="Vertical Spacing :"
             description="Vertical Spacing message in simple text edition"
-            values={{ verticalSpacing }}
           />
         }
         value={verticalSpacing}

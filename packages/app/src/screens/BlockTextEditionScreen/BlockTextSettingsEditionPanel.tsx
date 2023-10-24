@@ -133,11 +133,8 @@ const BlockTextSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Font Size : {size}"
+              defaultMessage="Font Size :"
               description="fontSize message in BlockText edition"
-              values={{
-                size: fontSize,
-              }}
             />
           }
           value={fontSize}
@@ -158,11 +155,8 @@ const BlockTextSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Vertical Space : {size}"
+              defaultMessage="Vertical Space :"
               description="vertical Spacing message in BlockText edition"
-              values={{
-                size: verticalSpacing,
-              }}
             />
           }
           value={verticalSpacing}

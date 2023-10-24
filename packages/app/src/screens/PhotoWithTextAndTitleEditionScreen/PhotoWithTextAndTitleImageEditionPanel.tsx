@@ -133,11 +133,8 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border radius : {size}"
+              defaultMessage="Border radius :"
               description="borderRadius message in PhotoWithTextAndTitle edition"
-              values={{
-                size: borderRadius,
-              }}
             />
           }
           value={borderRadius}
@@ -160,11 +157,8 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Aspect ratio: {size}"
+              defaultMessage="Aspect ratio:"
               description="Aspect ratio message in PhotoWithTextAndTitle edition"
-              values={{
-                size: aspectRatio.toFixed(2),
-              }}
             />
           }
           value={aspectRatio}

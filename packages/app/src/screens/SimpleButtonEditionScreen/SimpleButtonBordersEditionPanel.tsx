@@ -122,11 +122,8 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border size : {size}"
+              defaultMessage="Border size :"
               description="borderWidth message in SimpleButton edition"
-              values={{
-                size: borderWidth,
-              }}
             />
           }
           value={borderWidth}
@@ -150,11 +147,8 @@ const SimpleButtonBordersEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border radius : {size}"
+              defaultMessage="Border radius :"
               description="border radius message in SimpleButton edition"
-              values={{
-                size: borderRadius,
-              }}
             />
           }
           value={borderRadius}
