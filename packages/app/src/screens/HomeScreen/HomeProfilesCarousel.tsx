@@ -114,18 +114,47 @@ const HomeProfilesCarousel = (
     [scrollToIndex],
   );
 
+  const intl = useIntl();
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ProfileType | null>) => (
-      <ItemRender
-        item={item}
-        coverHeight={coverHeight}
-        coverWidth={coverWidth}
-        index={index}
-        scrollToIndex={scrollToIndex}
-        currentUserIndex={selectedIndex}
-      />
-    ),
-    [coverHeight, coverWidth, selectedIndex, scrollToIndex],
+    ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
+      if (item) {
+        return (
+          <ProfileBoundRelayEnvironmentProvider profileId={item?.id}>
+            <ItemRender
+              item={item}
+              coverHeight={coverHeight}
+              coverWidth={coverWidth}
+              index={index}
+              scrollToIndex={scrollToIndex}
+              currentUserIndex={selectedIndex}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
+        );
+      }
+
+      return (
+        <Link route="NEW_PROFILE">
+          <PressableOpacity
+            style={[
+              styles.newCover,
+              styles.coverShadow,
+              {
+                width: coverWidth,
+                height: coverHeight,
+                borderRadius: coverWidth * COVER_CARD_RADIUS,
+              },
+            ]}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Create a new profile',
+              description: 'Start new profile creation from account screen',
+            })}
+          >
+            <Icon icon="add" style={styles.icon} />
+          </PressableOpacity>
+        </Link>
+      );
+    },
+    [coverWidth, coverHeight, intl, scrollToIndex, selectedIndex],
   );
 
   const data = useMemo(
@@ -174,7 +203,7 @@ type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 
 type ItemRenderProps = {
   index: number;
-  item: ProfileType | null;
+  item: ProfileType;
   coverWidth: number;
   coverHeight: number;
   scrollToIndex: (index: number) => void;
@@ -203,7 +232,7 @@ const ItemRenderComponent = ({
         ...CoverRenderer_profile
       }
     `,
-    item as HomeProfilesCarouselItem_profile$key | null,
+    item as HomeProfilesCarouselItem_profile$key,
   );
 
   const [ready, setReady] = useState(!profile?.cardCover);
@@ -221,95 +250,69 @@ const ItemRenderComponent = ({
 
   const isCurrent = index === currentUserIndex;
 
-  if (!profile) {
-    return (
-      <Link route="NEW_PROFILE">
-        <PressableOpacity
-          style={[
-            styles.newCover,
-            styles.coverShadow,
-            {
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: coverWidth * COVER_CARD_RADIUS,
-            },
-          ]}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Create a new profile',
-            description: 'Start new profile creation from account screen',
-          })}
-        >
-          <Icon icon="add" style={styles.icon} />
-        </PressableOpacity>
-      </Link>
-    );
-  }
-
   return (
-    <ProfileBoundRelayEnvironmentProvider profileId={profile.id}>
-      <View
-        style={[
-          styles.coverShadow,
-          styles.coverContainer,
-          {
+    <View
+      style={[
+        styles.coverShadow,
+        styles.coverContainer,
+        {
+          width: coverWidth,
+          height: coverHeight,
+          borderRadius: coverWidth * COVER_CARD_RADIUS,
+        },
+      ]}
+    >
+      {profile.cardCover?.isCreated ? (
+        <CoverLink
+          profile={profile}
+          width={coverWidth}
+          profileId={profile.id}
+          onPress={onPress}
+          videoEnabled={isCurrent}
+          onReadyForDisplay={onReady}
+        />
+      ) : (
+        <Link
+          route="NEW_PROFILE"
+          params={{
+            profileId: profile.id,
+          }}
+        >
+          <PressableOpacity
+            style={[
+              {
+                width: coverWidth,
+                height: coverHeight,
+                borderRadius: coverWidth * COVER_CARD_RADIUS,
+                overflow: 'visible',
+              },
+            ]}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Create a new profile',
+              description: 'Start new profile creation from account screen',
+            })}
+          >
+            <CoverRenderer
+              width={coverWidth}
+              profile={profile}
+              onReadyForDisplay={onReady}
+            />
+          </PressableOpacity>
+        </Link>
+      )}
+      {!ready && (
+        <Skeleton
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
             width: coverWidth,
             height: coverHeight,
             borderRadius: coverWidth * COVER_CARD_RADIUS,
-          },
-        ]}
-      >
-        {profile.cardCover?.isCreated ? (
-          <CoverLink
-            profile={profile}
-            width={coverWidth}
-            profileId={profile.id}
-            onPress={onPress}
-            videoEnabled={isCurrent}
-            onReadyForDisplay={onReady}
-          />
-        ) : (
-          <Link
-            route="NEW_PROFILE"
-            params={{
-              profileId: profile.id,
-            }}
-          >
-            <PressableOpacity
-              style={[
-                {
-                  width: coverWidth,
-                  height: coverHeight,
-                  borderRadius: coverWidth * COVER_CARD_RADIUS,
-                  overflow: 'visible',
-                },
-              ]}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Create a new profile',
-                description: 'Start new profile creation from account screen',
-              })}
-            >
-              <CoverRenderer
-                width={coverWidth}
-                profile={profile}
-                onReadyForDisplay={onReady}
-              />
-            </PressableOpacity>
-          </Link>
-        )}
-        {!ready && (
-          <Skeleton
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: coverWidth * COVER_CARD_RADIUS,
-            }}
-          />
-        )}
-      </View>
-    </ProfileBoundRelayEnvironmentProvider>
+          }}
+        />
+      )}
+    </View>
   );
 };
 
