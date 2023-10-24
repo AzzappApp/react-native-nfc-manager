@@ -456,10 +456,17 @@ const ProfileForm = (
           <>
             <Label
               labelID="userNameLabel"
-              label={intl.formatMessage({
-                defaultMessage: 'Username*',
-                description: 'ProfileForm username textinput label',
-              })}
+              label={
+                intl.formatMessage(
+                  {
+                    defaultMessage: 'Webcard{azzappAp} name*',
+                    description: 'ProfileForm username textinput label',
+                  },
+                  {
+                    azzappAp: <Text variant="azzapp">a</Text>,
+                  },
+                ) as string
+              }
               error={error?.message}
               style={styles.formElement}
               errorStyle={{ minHeight: 25 }}
