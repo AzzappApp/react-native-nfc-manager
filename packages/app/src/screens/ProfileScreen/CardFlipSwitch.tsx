@@ -58,7 +58,7 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
                 easing: Easing.out(Easing.back(1)),
               },
               animated => {
-                if (animated && currentFlip.value !== flipped) {
+                if (animated) {
                   runOnJS(onFlip)();
                 }
                 if (animated) {
@@ -81,7 +81,6 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
         startLeft,
         clockFlipDirection,
         flip,
-        flipped,
         onFlip,
       ],
     );
@@ -187,14 +186,10 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
           );
         }
       });
-
     return (
       <GestureDetector gesture={pan}>
         <View {...props}>
-          <Animated.View
-            style={[styles.front, frontStyle]}
-            pointerEvents={flipped ? 'none' : 'box-none'}
-          >
+          <Animated.View style={[styles.front, frontStyle]}>
             {front}
           </Animated.View>
           <Animated.View
