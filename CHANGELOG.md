@@ -1,5 +1,8 @@
-## 0.5.1-canary.28
+## 0.5.1-canary.29
 
+* **feat:**  - 🎸 complete use of azzapp logo ([#1516](https://github.com/AzzappApp/azzapp/pull/1516))
+* **fix:**  - 🐛 use same margin as mobile cover renderer ([#1519](https://github.com/AzzappApp/azzapp/pull/1519))
+* **fix:**  - loosing the touch on the correct screen ([#1522](https://github.com/AzzappApp/azzapp/pull/1522))
 * **feat:**  - 🎸 complete use of azzapp logo
 * **perf:**  - stop rerendering at every media selection - too slow on android ([#1504](https://github.com/AzzappApp/azzapp/pull/1504))
 * **fix:**  - 🐛 add missing azzapp logo ([#1510](https://github.com/AzzappApp/azzapp/pull/1510))
