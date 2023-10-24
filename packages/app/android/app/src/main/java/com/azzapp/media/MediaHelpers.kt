@@ -57,8 +57,9 @@ import java.util.UUID
 
     val options =
         SelfieSegmenterOptions.Builder()
-            .setDetectorMode(SelfieSegmenterOptions.SINGLE_IMAGE_MODE)
-            .build()
+          .setDetectorMode(SelfieSegmenterOptions.SINGLE_IMAGE_MODE)
+          .enableRawSizeMask()
+          .build()
     val segmenter = Segmentation.getClient(options)
     val imagePath = try { Uri.parse(uri) } catch(e: NullPointerException) {
       promise.reject("INVALID_URI", "provided uri is invalid")
@@ -78,29 +79,23 @@ import java.util.UUID
           for (x in 0 until maskWidth) {
               val foregroundConfidence = mask.get().coerceIn(0.0f, 1.0f)
               //interpolate [0.2, 1]  to [ 0 ,255]
-              val alpha = ((foregroundConfidence - 0.2f) / (1.0f - 0.2f) * 255).toInt()
+              val alpha = (((foregroundConfidence - 0.2f) / (1.0f - 0.2f)) * 255).toInt()
               if (foregroundConfidence <= 0.2){
                 maskBitmap.setPixel(x, y, Color.BLACK)
               }
-              else {maskBitmap.setPixel(x, y, Color.argb(alpha, 255, 255, 255))}
+              else {
+                maskBitmap.setPixel(x, y, Color.argb(alpha, 255, 255, 255))
+              }
           }
       }
 
-      val scaleWidth = inputImage.width.toFloat() / maskWidth
-      val scaleHeight = inputImage.height.toFloat() / maskHeight
-      val matrix = Matrix()
-      matrix.postScale(scaleWidth, scaleHeight)
 
-      val outputBitmap = Bitmap.createBitmap(inputImage.width, inputImage.height, Bitmap.Config.ARGB_8888)
-      val canvas = Canvas(outputBitmap)
-      val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-      canvas.drawBitmap(maskBitmap, matrix, paint)
 
       val outputStream = FileOutputStream(maskedImageFile)
-      outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+      maskBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
       outputStream.flush()
       outputStream.close()
-      promise.resolve(maskedImageFile)
+      promise.resolve(maskedImageFile.absolutePath)
     }
     .addOnFailureListener { e ->
         promise.reject("ERROR_SEGMENTATION", e.localizedMessage)

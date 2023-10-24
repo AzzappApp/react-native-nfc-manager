@@ -66,7 +66,7 @@ object GPULayerImageLoader {
       }
     }
 
-  private suspend fun loadImage(uri: Uri) =
+  public suspend fun loadImage(uri: Uri) =
     loadImageWithCache(uri.toString()) {
       getBitmapFromImage(uri)
     }

@@ -265,7 +265,7 @@ import kotlin.math.round
         EGL10.EGL_GREEN_SIZE, 8,
         EGL10.EGL_BLUE_SIZE, 8,
         EGL10.EGL_ALPHA_SIZE, 8,
-        EGL10.EGL_DEPTH_SIZE, 16,
+        EGL10.EGL_DEPTH_SIZE, 0,
         EGL10.EGL_STENCIL_SIZE, 0,
         EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
         EGL10.EGL_SURFACE_TYPE, EGL10.EGL_PBUFFER_BIT,
@@ -316,9 +316,11 @@ import kotlin.math.round
       }
 
       var loadedBitmap: Bitmap? = null
+      var loadedMaskBitmap: Bitmap? = null
       runBlocking {
         try {
           loadedBitmap = GPULayerImageLoader.loadGPULayerSource(layer.source)
+          loadedMaskBitmap = if (layer.maskUri != null) GPULayerImageLoader.loadImage(layer.maskUri!!) else null
         } catch (e: Exception) {
           promise.reject(e)
         }
@@ -326,6 +328,19 @@ import kotlin.math.round
       val inputBitmap = loadedBitmap ?:return
       sourceImage = GLFrame.create(inputBitmap.width, inputBitmap.height)
       ShaderUtils.bindImageTexture(sourceImage.texture, inputBitmap)
+
+      val maskBitmap = loadedMaskBitmap
+      if (maskBitmap != null) {
+        val maskImage = GLFrame.create(maskBitmap.width, maskBitmap.height)
+        ShaderUtils.bindImageTexture(maskImage.texture, maskBitmap)
+
+        var blendEffect = BlendEffect()
+        val imageWithMask = blendEffect.applyBlend(sourceImage, maskImage!!)
+        if (imageWithMask != null) {
+          sourceImage.release()
+          sourceImage = imageWithMask
+        }
+      }
 
       val parameters = layer.parameters
       if (parameters != null) {
@@ -360,7 +375,7 @@ import kotlin.math.round
       val fileExtension = when (format) {
         "png" -> ".png"
         else -> ".jpg"  // Default to JPEG if the format is not recognized
-    }
+      }
       val file = File.createTempFile(UUID.randomUUID().toString(), fileExtension, MainApplication.getMainApplicationContext().cacheDir)
       if (file.exists()) file.delete()
       val out = FileOutputStream(file)
@@ -368,7 +383,7 @@ import kotlin.math.round
       val compressFormat = when (format) {
         "png" -> Bitmap.CompressFormat.PNG
         else -> Bitmap.CompressFormat.JPEG  // Default to JPEG if the format is not recognized
-    }
+      }
       bitmap.compress(compressFormat, round(quality).toInt(), out)
       out.flush()
       out.close()
@@ -388,29 +403,32 @@ import kotlin.math.round
     }
   }
 
-  private fun saveTexture(texture: Int, width: Int, height: Int): Bitmap {
-    val frame = IntArray(1)
-    GLES20.glGenFramebuffers(1, frame, 0)
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frame[0])
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture,
-      0
-    )
-    val buffer: ByteBuffer = ByteBuffer.allocate(width * height * 4)
-    GLES20.glReadPixels(
-      0, 0, width, height, GLES20.GL_RGBA,
-      GLES20.GL_UNSIGNED_BYTE, buffer
-    )
-    val bitmap = Bitmap.createBitmap(
-      width, height,
-      Bitmap.Config.ARGB_8888
-    )
-    bitmap.copyPixelsFromBuffer(buffer)
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
-    GLES20.glDeleteFramebuffers(1, frame, 0)
-    return bitmap
+  companion object{
+    fun saveTexture(texture: Int, width: Int, height: Int): Bitmap {
+      val frame = IntArray(1)
+      GLES20.glGenFramebuffers(1, frame, 0)
+      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frame[0])
+      GLES20.glFramebufferTexture2D(
+        GLES20.GL_FRAMEBUFFER,
+        GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture,
+        0
+      )
+      val buffer: ByteBuffer = ByteBuffer.allocate(width * height * 4)
+      GLES20.glReadPixels(
+        0, 0, width, height, GLES20.GL_RGBA,
+        GLES20.GL_UNSIGNED_BYTE, buffer
+      )
+      val bitmap = Bitmap.createBitmap(
+        width, height,
+        Bitmap.Config.ARGB_8888
+      )
+      bitmap.copyPixelsFromBuffer(buffer)
+      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+      GLES20.glDeleteFramebuffers(1, frame, 0)
+      return bitmap
+    }
   }
+
 
   private object ExcludingEncoderSelector : EncoderSelector {
 

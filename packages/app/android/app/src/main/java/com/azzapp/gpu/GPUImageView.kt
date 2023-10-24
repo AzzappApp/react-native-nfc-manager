@@ -2,7 +2,10 @@ package com.azzapp.gpu
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.PixelFormat
 import android.media.effect.EffectContext
+import android.net.Uri
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Log
@@ -10,9 +13,12 @@ import android.widget.FrameLayout
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import java.util.concurrent.atomic.AtomicInteger
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
@@ -25,18 +31,15 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
 
     private val surfaceView = GLSurfaceView(context)
 
-    private var layer: GPULayer? = null
+    private var layers: List<GPULayer>? = null
 
-    private var sourceBitmap: Bitmap? = null
-    private var sourceChanged = false
+    private var bitmaps = mutableMapOf<String, Bitmap>()
+    private var frames = mutableMapOf<String, GLFrame>()
 
+    private var readyToDraw  = false
 
-    private var sourceImage: GLFrame? = null
-    private var editKey: String? = null
-    private var editedImage: GLFrame? = null
-    private var transformedImage: GLFrame? = null
-
-
+    private var blendEffect: BlendEffect? = null
+    private var tintColorEffect: TintColorEffect? = null
     private var effectContext: EffectContext? = null
 
     private var surfaceWidth = 0
@@ -46,33 +49,28 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
 
 
     init {
-
         surfaceView.setEGLContextFactory(EGLSharedContextFactory(this))
         surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
         surfaceView.setEGLContextClientVersion(2)
         surfaceView.setRenderer(this)
         surfaceView.preserveEGLContextOnPause = true
         surfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+        surfaceView.holder.setFormat(PixelFormat.TRANSLUCENT);
 
         addView(surfaceView)
     }
 
     fun getLayers(): List<GPULayer>? {
-        val layer = this.layer
-        if (layer === null) {
-            return null
-        }
-        //layer
-        val layers = mutableListOf<GPULayer>()
-        layers.add(layer)
         return layers
     }
 
     fun setLayers(layers: List<GPULayer>?) {
-        if (layers != null && layers.size > 1) {
-            Log.w(TAG, "GPUImageView does not support multiple layers on android")
+        if (layers == this.layers) {
+            return;
         }
-        setLayer(layers?.last())
+        this.layers = layers;
+        loadSourcesIfNecessary()
+        surfaceView.requestRender()
     }
 
     private fun dispatchEvent(event: String, e: Exception?) {
@@ -89,18 +87,22 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
         )
     }
 
-    fun setLayer(value: GPULayer?) {
-        sourceChanged = layer?.source !== value?.source
-        layer = value;
-        if (sourceChanged) {
-            loadSource()
+    private var _backgroundColor: Int = Color.BLACK
+    override fun setBackgroundColor(color: Int) {
+        if (_backgroundColor == color) {
+            return;
         }
+        this._backgroundColor = color
         surfaceView.requestRender()
     }
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         // nothing
         created = true
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -109,101 +111,214 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        if (created) {
-            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        if (!created) {
+            return
+        }
 
-            if (sourceChanged) {
-                sourceImage?.release()
-                editedImage?.release()
-                transformedImage?.release()
-                sourceImage = null
-                transformedImage = null
-                sourceChanged = false
+        val bgColor = _backgroundColor
+        GLES20.glClearColor(
+            (bgColor shr 16 and 0xff) / 255.0f,
+            (bgColor shr 8 and 0xff) / 255.0f,
+            (bgColor and 0xff) / 255.0f,
+            1.0f //(color shr 24 and 0xff) / 255.0f
+        )
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+        var unusedFramesKey = mutableListOf<String>()
+        for (key in frames.keys) {
+            if (!bitmaps.contains(key)) {
+                unusedFramesKey.add(key)
             }
+        }
+        unusedFramesKey.forEach {
+            frames[it]?.release()
+            frames.remove(it)
+        }
 
-            if (sourceImage == null) {
-                val bitmap = this.sourceBitmap ?: return
-                val layerKey = this.layer?.source?.stringRepresentation() ?: return
-                sourceImage = GLFrame.sharedFrame(layerKey) {
+        if (!readyToDraw) {
+            return;
+        }
+
+        for ((key, bitmap) in bitmaps) (
+            if (!frames.contains(key)) {
+                val frame = GLFrame.sharedFrame(key) {
                     val glFrame = GLFrame.create(bitmap.width, bitmap.height)
                     ShaderUtils.bindImageTexture(glFrame.texture, bitmap)
                     glFrame
+                } ?: return
+                frames[key] = frame
+            }
+        )
+
+        var layers = layers ?: return
+
+        for (layer in layers) {
+            val sourceImage = frames[layer.source.stringRepresentation()] ?: continue
+            var image = sourceImage
+
+            fun setImage(value: GLFrame) {
+                if (image !== sourceImage) {
+                    image.release()
                 }
+                image = value
             }
 
-            var image = this.sourceImage ?: return
-
-            if (effectContext == null) {
-                effectContext = EffectContext.createWithCurrentGlContext()
+            if (layer.backgroundColor != null && layer.backgroundColor.lowercase() != "transparent") {
+                val color = try { Color.parseColor(layer.backgroundColor)} catch (e: IllegalArgumentException){ Color.BLACK }
+                val r = (color shr 16 and 0xff) / 255.0f
+                val g = (color shr 8 and 0xff) / 255.0f
+                val b = (color and 0xff) / 255.0f
+                val a = (color shr 24 and 0xff) / 255.0f
+                GLES20.glClearColor(r, g, b, a)
+                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
             }
-            transformedImage?.release()
-            transformedImage = null
 
-            val parameters = layer?.parameters
+            val maskImage = if (layer.maskUri != null)
+                frames[layer.maskUri.toString()] ?: continue
+            else null
+
+            if (maskImage != null) {
+                var blendEffect = this.blendEffect
+                if (blendEffect == null) {
+                    blendEffect = BlendEffect()
+                    this.blendEffect = blendEffect
+                }
+                setImage(blendEffect.applyBlend(image, maskImage) ?: image)
+            }
+
+            if (layer.tintColor != null) {
+                val color = try { Color.parseColor(layer.tintColor) } catch (e: IllegalArgumentException){ Color.BLACK }
+                var tintColorEffect = this.tintColorEffect
+                if (tintColorEffect == null) {
+                    tintColorEffect = TintColorEffect()
+                    this.tintColorEffect = tintColorEffect
+                }
+                setImage(tintColorEffect.apply(image, color) ?: image)
+            }
+
+            val parameters = layer.parameters
             if (parameters != null) {
-                synchronized(GPUImageView) {
-                    val editKey = "${layer!!.source.hashCode()}-${parameters.hashCode()}"
-                    if (editKey != this.editKey) {
-                        this.editKey = editKey
-                        editedImage?.release()
-                        editedImage = GLFrame.sharedFrame(editKey) {
-                            GLFrameTransformations.applyEditorTransform(
-                                    image,
-                                    parameters,
-                                    effectContext!!.factory
-                            )
-                        }
-                    }
-                    image = editedImage ?: image
+                if (effectContext == null) {
+                    effectContext = EffectContext.createWithCurrentGlContext()
                 }
+                setImage(GLFrameTransformations.applyEditorTransform(
+                    image,
+                    parameters,
+                    effectContext!!.factory
+                ) ?: image)
+
+                GLES20.glEnable(GLES20.GL_BLEND)
+                GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
             }
 
-            val filters = layer?.filters
+            val filters = layer.filters
             if (filters != null) {
                 for (filter in filters) {
                     val transform = GLFrameTransformations.transformationForName(filter)
                     if (transform != null) {
-                        this.transformedImage = transform(
-                                image,
-                                this.transformedImage,
-                                null,
-                                effectContext!!.factory
-                        )
-                        image = this.transformedImage ?: image
+                        setImage(transform(
+                            image,
+                            null,
+                            null,
+                            effectContext!!.factory
+                        ))
+
+                        GLES20.glEnable(GLES20.GL_BLEND)
+                        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
                     }
                 }
             }
 
             textureRenderer?.renderTexture(
-                    image.texture,
-                    ShaderUtils.IDENT_MATRIX,
-                    round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
-                    -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
-                    surfaceWidth,
-                    surfaceHeight
+                image.texture,
+                ShaderUtils.IDENT_MATRIX,
+                round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
+                -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
+                surfaceWidth,
+                surfaceHeight
             )
+
+            if (image !== sourceImage) {
+                image.release()
+            }
         }
     }
 
     private var loadSourceJob: Deferred<Any>? = null
-    private fun loadSource() {
+    private fun loadSourcesIfNecessary() {
         loadSourceJob?.cancel()
-        this.sourceBitmap = null
-        var source = layer?.source ?: return
+
+        val layers = this.layers ?: return
+
+        val bitmapToLoads = mutableListOf<Any>()
+        val usedKeys = mutableSetOf<String>()
+
+        for (layer in layers) {
+            val key = layer.source.stringRepresentation()
+            usedKeys.add(key)
+            if (!bitmaps.contains(key)) {
+                bitmapToLoads.add(layer.source)
+            }
+            val maskUri = layer.maskUri
+            if (maskUri != null) {
+                val key = layer.maskUri.toString()
+                usedKeys.add(key)
+                if (!bitmaps.contains(key)) {
+                    bitmapToLoads.add(layer.maskUri)
+                }
+            }
+        }
+
+        val unusedKeys = mutableListOf<String>()
+        for (key in bitmaps.keys) {
+            if(!usedKeys.contains(key)) {
+                unusedKeys.add(key)
+            }
+        }
+        unusedKeys.forEach {
+            bitmaps[it]?.recycle()
+            bitmaps.remove(it)
+        }
+
+        readyToDraw = bitmapToLoads.size == 0;
+
+        if (readyToDraw) {
+            return;
+        }
+
         dispatchEvent(GPUImageViewManager.ON_LOAD_START, null)
         loadSourceJob = GlobalScope.async {
             try {
-                val bitmap = GPULayerImageLoader.loadGPULayerSource(source)
-                if (source == layer?.source) {
-                    dispatchEvent(GPUImageViewManager.ON_LOAD, null)
-                    sourceBitmap = bitmap
-                    surfaceView.requestRender()
-                }
+                bitmapToLoads
+                    .map { uriOrSource ->
+                        async(Dispatchers.IO) {
+                            if (uriOrSource is Uri) {
+                                Pair(uriOrSource, GPULayerImageLoader.loadImage(uriOrSource))
+                            } else if (uriOrSource is GPULayer.GPULayerSource) {
+                                Pair(uriOrSource, GPULayerImageLoader.loadGPULayerSource(uriOrSource))
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                    .awaitAll()
+                    .filterNotNull()
+                    .forEach {(uriOrSource, bitmap) ->
+                        val key = if (uriOrSource is GPULayer.GPULayerSource) {
+                            uriOrSource.stringRepresentation()
+                        } else {
+                            uriOrSource.toString()
+                        }
+                        bitmaps[key] = bitmap
+
+                    }
+                readyToDraw = true
+                dispatchEvent(GPUImageViewManager.ON_LOAD, null)
+                surfaceView.requestRender()
+            } catch (e: CancellationException) {
+                // do nothing
             } catch (e: Exception) {
-                if (source == layer?.source) {
-                    dispatchEvent(GPUImageViewManager.ON_ERROR, e)
-                }
+                dispatchEvent(GPUImageViewManager.ON_ERROR, e)
             }
         }
     }
@@ -211,12 +326,8 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     private fun clean() {
         loadSourceJob?.cancel()
         loadSourceJob = null
-        sourceImage?.release()
-        sourceImage = null
-        editedImage?.release()
-        editedImage = null
-        transformedImage?.release()
-        transformedImage = null
+        frames.values.forEach{ it.release() }
+        frames.clear()
         effectContext?.release()
         effectContext = null
     }

@@ -193,12 +193,15 @@ const CoverMediaPreview = ({
   const GPUView = kind === 'video' ? GPUVideoView : GPUImageView;
 
   return (
-    <View
-      style={[style, backgroundColor != null && { backgroundColor }]}
-      {...props}
-    >
+    <View style={style} {...props}>
       {kind === 'video' && (
-        <GPUImageView {...loadingHandlers} style={StyleSheet.absoluteFill}>
+        <GPUImageView
+          {...loadingHandlers}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: backgroundColor ?? '#000' },
+          ]}
+        >
           {backgroundImageUri && (
             <Image
               uri={backgroundImageUri}
@@ -212,10 +215,13 @@ const CoverMediaPreview = ({
         <GPUView
           {...loadingHandlers}
           paused={paused}
-          style={{
-            flex: 1,
-            opacity: kind !== 'video' || playerReady ? 1 : 0,
-          }}
+          style={[
+            {
+              flex: 1,
+              opacity: kind !== 'video' || playerReady ? 1 : 0,
+            },
+            { backgroundColor: backgroundColor ?? '#FFF' },
+          ]}
         >
           {backgroundImageUri && (
             <Image

@@ -49,14 +49,11 @@ class TextureRenderer(
     y: Int,
     width: Int,
     height: Int,
-    frameBuffer: Int = 0
+    frameBuffer: Int? = null
   ) {
-    if (frameBuffer != -1) {
-      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-    }
+    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer ?: 0)
     GLES20.glUseProgram(program)
     GLES20.glViewport(x, y, width, height)
-    GLES20.glDisable(GLES20.GL_BLEND)
 
     GLES20.glUniformMatrix4fv(uTexTransformLoc, 1, false, transformMatrix, 0)
 
