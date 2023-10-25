@@ -33,7 +33,8 @@ const connection = connect({
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    monitorRequest(init);
+    return fetchFunction(input, init);
+    /* monitorRequest(init);
 
     let response: Response;
     try {
@@ -47,7 +48,7 @@ const connection = connect({
     } finally {
       monitorRequestEnd();
     }
-    return response;
+    return response;*/
   },
 });
 
