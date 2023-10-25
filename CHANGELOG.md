@@ -1,5 +1,6 @@
-## 0.5.1-canary.32
+## 0.5.1-canary.33
 
+* **fix:**  - 🐛 avoid freeze on cover edition ([#1532](https://github.com/AzzappApp/azzapp/pull/1532))
 * **feat:**  - **Android:** missing cover features ([#1524](https://github.com/AzzappApp/azzapp/pull/1524))
 * **fix:**  - restore link to webcard builder on createdf profile ([#1520](https://github.com/AzzappApp/azzapp/pull/1520))
 * **perf:**  - android - enhance dashed sliders ([#1501](https://github.com/AzzappApp/azzapp/pull/1501))
