@@ -4,12 +4,9 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
+import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
-import {
-  useAudioPermission,
-  useCameraPermission,
-  useMediaPermission,
-} from '#hooks/usePermissions';
+
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import CameraControlPanel from '../CameraControlPanel';
@@ -65,11 +62,8 @@ const SelectImageStep = ({
   };
 
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
-
-  // #region permissions logic
-  const { mediaPermission } = useMediaPermission();
-  const { cameraPermission } = useCameraPermission();
-  const { audioPermission } = useAudioPermission();
+  const { mediaPermission, cameraPermission, audioPermission } =
+    usePermissionContext();
 
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {

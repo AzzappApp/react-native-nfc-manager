@@ -81,13 +81,25 @@ jest.mock('#helpers/mediaHelpers', () => ({
   getVideoSize: () => ({ width: 1080, height: 1920 }),
 }));
 
+jest.mock('#helpers/PermissionContext', () => ({
+  usePermissionContext: jest.fn().mockReturnValue({
+    mediaPermission: 'granted',
+    cameraPermission: 'granted',
+    audioPermission: 'granted',
+  }),
+}));
+
 const withPermissionStatus = async (
   status: string,
   callback: () => Promise<any>,
 ) => {
-  (useCameraPermission as jest.Mock).mockReturnValue(status);
+  (useCameraPermission as jest.Mock).mockReturnValue({
+    cameraPermission: status,
+  });
   await callback();
-  (useCameraPermission as jest.Mock).mockReturnValue('granted');
+  (useCameraPermission as jest.Mock).mockReturnValue({
+    cameraPermission: 'granted',
+  });
 };
 
 const renderImagePicker = async (props?: Partial<ImagePickerProps>) => {
@@ -263,6 +275,7 @@ describe('ImagePicker', () => {
         fireEvent.press(screen.getByLabelText('Take a video'));
       });
       const cameraControlPanel = screen.getByTestId('camera-control-panel');
+      console.log(mockCameraViewRef);
       mockCameraViewRef.startRecording.mockReturnValueOnce({
         end: () =>
           Promise.resolve({

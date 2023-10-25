@@ -36,6 +36,7 @@ import {
   messages,
   useCurrentLocale,
 } from '#helpers/localeHelpers';
+import { PermissionProvider } from '#helpers/PermissionContext';
 import {
   ROOT_ACTOR_ID,
   addEnvironmentListener,
@@ -149,7 +150,9 @@ const App = () => {
   return (
     <AppIntlProvider>
       <ErrorBoundary>
-        <AppRouter />
+        <PermissionProvider>
+          <AppRouter />
+        </PermissionProvider>
       </ErrorBoundary>
     </AppIntlProvider>
   );

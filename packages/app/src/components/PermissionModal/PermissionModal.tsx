@@ -2,11 +2,8 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, SafeAreaView, Linking, Modal } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
-import {
-  useMediaPermission,
-  useCameraPermission,
-  useAudioPermission,
-} from '#hooks/usePermissions';
+
+import { usePermissionContext } from '#helpers/PermissionContext';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -43,9 +40,14 @@ const PermissionModal = ({
   autoFocus = true,
 }: CameraModalProps) => {
   const intl = useIntl();
-  const { mediaPermission, askMediaPermission } = useMediaPermission();
-  const { cameraPermission, askCameraPermission } = useCameraPermission();
-  const { audioPermission, askAudioPermission } = useAudioPermission();
+  const {
+    mediaPermission,
+    requestMediaPermission,
+    cameraPermission,
+    requestCameraPermission,
+    audioPermission,
+    requestAudioPermission,
+  } = usePermissionContext();
 
   const showPermissionModal = useMemo(() => {
     switch (permissionsFor) {
@@ -81,7 +83,7 @@ const PermissionModal = ({
 
   const onAllowsCamera = async () => {
     if (cameraPermission === RESULTS.DENIED) {
-      askCameraPermission();
+      requestCameraPermission();
     } else {
       Linking.openSettings();
     }
@@ -89,7 +91,7 @@ const PermissionModal = ({
 
   const onAllowsMicrophone = () => {
     if (audioPermission === RESULTS.DENIED) {
-      askAudioPermission();
+      requestAudioPermission();
     } else {
       Linking.openSettings();
     }
@@ -97,7 +99,7 @@ const PermissionModal = ({
 
   const onAllowsGallery = async () => {
     if (mediaPermission === RESULTS.DENIED) {
-      askMediaPermission();
+      requestMediaPermission();
     } else {
       Linking.openSettings();
     }
