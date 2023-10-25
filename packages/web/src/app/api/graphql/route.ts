@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useLogger } from '@envelop/core';
+import { useLogger, useErrorHandler } from '@envelop/core';
 import { useDisableIntrospection } from '@envelop/disable-introspection';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
@@ -20,6 +20,7 @@ import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
 import type { Profile } from '@azzapp/data/domains';
 import type { Plugin } from '@envelop/types';
+import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -119,6 +120,14 @@ const { handleRequest } = createYoga({
           }
         }
       },
+    }),
+    useErrorHandler(({ errors }) => {
+      errors
+        .filter(
+          err =>
+            (err as GraphQLError).extensions?.code !== ERRORS.INVALID_TOKEN,
+        )
+        .map(err => console.error(err));
     }),
     usePersistedOperations({
       extractPersistedOperationId: params => {

@@ -2,15 +2,10 @@ import { connect } from '@planetscale/database';
 import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import pLimit from 'p-limit';
-import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
+// import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
 
 const fetchFunction =
   process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
-
-const MAX_CONCURRENT_QUERIES = 5;
-
-const limit = pLimit(MAX_CONCURRENT_QUERIES);
 
 export const ConnectionMonitorer = {
   concurrentRequestsCount: 0,
