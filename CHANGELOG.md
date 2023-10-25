@@ -1,5 +1,6 @@
-## 0.5.1-canary.34
+## 0.5.1-canary.35
 
+* **feat:**  - improve permission with useContext ([#1529](https://github.com/AzzappApp/azzapp/pull/1529))
 * **fix:**  - remove limit used in database connection
 * **fix:**  - 🐛 avoid freeze on cover edition ([#1532](https://github.com/AzzappApp/azzapp/pull/1532))
 * **feat:**  - **Android:** missing cover features ([#1524](https://github.com/AzzappApp/azzapp/pull/1524))
