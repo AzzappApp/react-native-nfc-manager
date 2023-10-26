@@ -265,7 +265,11 @@ const CoverRenderer = (
           )}
           <MediaRenderer
             testID="CoverRenderer_media"
-            source={{ uri: mediaUri!, requestedSize, mediaId: media.id }}
+            source={{
+              uri: (mediaUri ?? uri)!,
+              requestedSize,
+              mediaId: media.id,
+            }}
             thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
             aspectRatio={COVER_RATIO}
             onReadyForDisplay={onMediaReadyForDisplay}
