@@ -255,6 +255,20 @@ import javax.microedition.khronos.egl.*
     }
 
     var outputImage = image
+
+
+    if (parameters != null) {
+      val croppedImage = GLFrameTransformations.applyEditorTransform(
+              outputImage,
+              parameters,
+              effectContext!!.factory
+      ) ?: image
+      if (outputImage !== image) {
+        outputImage.release()
+      }
+      outputImage = croppedImage
+    }
+
     if (surfaceInfo.orientationDegrees != 0) {
       outputImage = GLFrameTransformations.applyEffect(
         image,
@@ -265,17 +279,7 @@ import javax.microedition.khronos.egl.*
       )
     }
 
-    if (parameters != null) {
-      val croppedImage = GLFrameTransformations.applyEditorTransform(
-        outputImage,
-        parameters,
-        effectContext!!.factory
-      ) ?: image
-      if (outputImage !== image) {
-        outputImage.release()
-      }
-      outputImage = croppedImage
-    }
+
 
     if (filters != null) {
       for (filter in filters) {
