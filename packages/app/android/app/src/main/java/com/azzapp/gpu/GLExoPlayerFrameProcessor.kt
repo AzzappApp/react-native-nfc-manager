@@ -271,7 +271,7 @@ import javax.microedition.khronos.egl.*
 
     if (surfaceInfo.orientationDegrees != 0) {
       outputImage = GLFrameTransformations.applyEffect(
-        image,
+        outputImage,
         null,
         EffectFactory.EFFECT_ROTATE,
         mapOf("angle" to -surfaceInfo.orientationDegrees),
