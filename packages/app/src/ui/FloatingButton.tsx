@@ -31,12 +31,12 @@ const FloatingButton = (
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={!disabled ? onPress : undefined}
       style={({ pressed }) => [
         { minWidth: size, height: size, borderRadius: size / 2 },
         appearanceStyle.root,
         disabled && appearanceStyle.disabled,
-        pressed && appearanceStyle.pressed,
+        pressed && !disabled && appearanceStyle.pressed,
         style,
       ]}
       ref={ref}
