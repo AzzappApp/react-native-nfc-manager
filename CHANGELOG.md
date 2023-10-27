@@ -1,5 +1,6 @@
-## 0.5.1-canary.38
+## 0.5.1-canary.39
 
+* **fix:**  - 🐛 actually disable floating button ([#1514](https://github.com/AzzappApp/azzapp/pull/1514))
 * **fix:**  - android - crop has been dropped on video ([#1550](https://github.com/AzzappApp/azzapp/pull/1550))
 * **fix:**  - 🐛 use right uri for video cover to play ([#1548](https://github.com/AzzappApp/azzapp/pull/1548))
 * **fix:**  - ratio issue on videos that are cropped for cover ([#1538](https://github.com/AzzappApp/azzapp/pull/1538))
