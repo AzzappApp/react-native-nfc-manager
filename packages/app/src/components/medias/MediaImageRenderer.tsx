@@ -57,10 +57,7 @@ const MediaImageRenderer = (
       accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
-      style={[
-        { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
-        style,
-      ]}
+      style={[{ aspectRatio, overflow: 'hidden' }, style]}
       tintColor={tintColor}
       {...props}
     />

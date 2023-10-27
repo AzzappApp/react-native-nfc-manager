@@ -18,7 +18,7 @@ describe('MediaImageRenderer', () => {
     );
     expect(root).toHaveProp('accessibilityRole', 'image');
     expect(root).toHaveProp('accessibilityLabel', 'An image');
-    expect(root).toHaveStyle({ width: 200, aspectRatio: 2 });
+    expect(root).toHaveStyle({ aspectRatio: 2 });
   });
 
   it('should dispatch onReadyForDisplay only once for each requested media', () => {

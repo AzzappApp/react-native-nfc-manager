@@ -115,10 +115,7 @@ const MediaVideoRenderer = (
 
   return (
     <View
-      style={[
-        style,
-        { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
-      ]}
+      style={[style, { aspectRatio, overflow: 'hidden' }]}
       ref={containerRef}
       {...props}
     >
