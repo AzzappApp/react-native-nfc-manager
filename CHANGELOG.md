@@ -1,5 +1,7 @@
-## 0.5.1-canary.39
+## 0.5.1-canary.40
 
+* **fix:**  - **cover:** [#1489](https://github.com/AzzappApp/azzapp/pull/1489) set actual size of the cover ([#1547](https://github.com/AzzappApp/azzapp/pull/1547))
+* **fix:**  - crash on android due to video running in previous screens ([#1553](https://github.com/AzzappApp/azzapp/pull/1553))
 * **fix:**  - 🐛 actually disable floating button ([#1514](https://github.com/AzzappApp/azzapp/pull/1514))
 * **fix:**  - android - crop has been dropped on video ([#1550](https://github.com/AzzappApp/azzapp/pull/1550))
 * **fix:**  - 🐛 use right uri for video cover to play ([#1548](https://github.com/AzzappApp/azzapp/pull/1548))
