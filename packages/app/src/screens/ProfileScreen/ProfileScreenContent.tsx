@@ -7,7 +7,7 @@ import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackground';
 import WebCardColorPicker from '#components/WebCardColorPicker';
 import CardStyleModal from './CardStyleModal';
@@ -280,6 +280,8 @@ const ProfileScreenContent = ({
     };
   }, []);
 
+  const hasFocus = useScreenHasFocus();
+
   return (
     <>
       <View style={{ flex: 1 }}>
@@ -315,7 +317,7 @@ const ProfileScreenContent = ({
             <CoverRenderer
               profile={profile}
               width={windowSize}
-              videoEnabled={ready}
+              videoEnabled={ready && hasFocus}
               hideBorderRadius
             />
           </ProfileBlockContainer>

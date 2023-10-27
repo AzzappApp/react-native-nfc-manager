@@ -130,6 +130,7 @@ android {
 
 ext {
     REACT_NATIVE_NODE_MODULES_DIR = reactNativePath
+    MEDIA3_VERSION = "1.1.1"
 }
 
 apply plugin: "kotlin-android"
@@ -164,10 +165,10 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:4.14.2"
 
     // exoplayer dependencies
-    implementation 'androidx.media3:media3-exoplayer:1.1.1'
-    implementation 'androidx.media3:media3-transformer:1.1.1'
-    implementation 'androidx.media3:media3-datasource:1.1.1'
-    implementation 'androidx.media3:media3-effect:1.1.1'
+    implementation "androidx.media3:media3-exoplayer:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-transformer:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-datasource:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-effect:${MEDIA3_VERSION}"
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {

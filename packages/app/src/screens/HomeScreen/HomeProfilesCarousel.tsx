@@ -15,6 +15,7 @@ import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import Skeleton from '#components/Skeleton';
 import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
@@ -250,6 +251,8 @@ const ItemRenderComponent = ({
 
   const isCurrent = index === currentUserIndex;
 
+  const hasFocus = useScreenHasFocus();
+
   return (
     <View
       style={[
@@ -268,7 +271,7 @@ const ItemRenderComponent = ({
           width={coverWidth}
           profileId={profile.id}
           onPress={onPress}
-          videoEnabled={isCurrent}
+          videoEnabled={isCurrent && hasFocus}
           onReadyForDisplay={onReady}
         />
       ) : (
