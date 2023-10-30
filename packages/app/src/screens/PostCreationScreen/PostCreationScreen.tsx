@@ -133,52 +133,88 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
-    setProgressIndicator(Observable.from(0));
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
-      ...timeRange,
-    });
+    try {
+      setProgressIndicator(Observable.from(0));
+      const exportedMedia = await exportMedia({
+        uri,
+        kind,
+        editionParameters,
+        aspectRatio,
+        filter,
+        ...timeRange,
+      });
 
-    const fileName = getFileName(exportedMedia.path);
-    const file: any = {
-      name: fileName,
-      uri: `file://${exportedMedia.path}`,
-      type:
-        mime.lookup(fileName) ||
-        (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
-    };
+      const fileName = getFileName(exportedMedia.path);
+      const file: any = {
+        name: fileName,
+        uri: `file://${exportedMedia.path}`,
+        type:
+          mime.lookup(fileName) ||
+          (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
+      };
 
-    const { uploadURL, uploadParameters } = await uploadSign({
-      kind: kind === 'video' ? 'video' : 'image',
-      target: 'post',
-    });
-    const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-      file,
-      uploadURL,
-      uploadParameters,
-    );
-    setProgressIndicator(uploadProgress);
-    const { public_id } = await uploadPromise;
-    commit({
-      variables: {
-        input: {
-          mediaId: encodeMediaId(public_id, kind),
-          allowComments,
-          allowLikes,
-          content,
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: kind === 'video' ? 'video' : 'image',
+        target: 'post',
+      });
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
+      setProgressIndicator(uploadProgress);
+      const { public_id } = await uploadPromise;
+      commit({
+        variables: {
+          input: {
+            mediaId: encodeMediaId(public_id, kind),
+            allowComments,
+            allowLikes,
+            content,
+          },
+          screenWidth: ScreenWidth(),
+          postWith: PostWidth(),
+          cappedPixelRatio: CappedPixelRatio(),
+          pixelRatio: PixelRatio(),
+          connections: [connectionID!],
         },
-        screenWidth: ScreenWidth(),
-        postWith: PostWidth(),
-        cappedPixelRatio: CappedPixelRatio(),
-        pixelRatio: PixelRatio(),
-        connections: [connectionID!],
-      },
-      onCompleted(response, error) {
-        if (error) {
+        onCompleted(response, error) {
+          if (error) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error while creating post',
+                description: 'Toast Error message while creating post',
+              }),
+            });
+          } else {
+            Toast.show({
+              type: 'success',
+              text1: intl.formatMessage({
+                defaultMessage: 'Post created',
+                description: 'Toast Success message while creating post',
+              }),
+            });
+            addLocalCachedMediaFile(
+              public_id,
+              kind === 'video' ? 'video' : 'image',
+              `file://${exportedMedia.path}`,
+            );
+            // TODO use fragment instead of response
+            // if (params?.fromProfile) {
+            router.back();
+            // } else {
+            //   router.replace({
+            //     route: 'PROFILE',
+            //     params: {
+            //       userName: response.createPost?.post?.author.userName as string,
+            //       showPosts: true,
+            //     },
+            //   });
+            // }
+          }
+        },
+        onError() {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -186,57 +222,32 @@ const PostCreationScreen = ({
               description: 'Toast Error message while creating post',
             }),
           });
-        } else {
-          Toast.show({
-            type: 'success',
-            text1: intl.formatMessage({
-              defaultMessage: 'Post created',
-              description: 'Toast Success message while creating post',
-            }),
-          });
-          addLocalCachedMediaFile(
-            public_id,
-            kind === 'video' ? 'video' : 'image',
-            `file://${exportedMedia.path}`,
-          );
-          // TODO use fragment instead of response
-          // if (params?.fromProfile) {
-          router.back();
-          // } else {
-          //   router.replace({
-          //     route: 'PROFILE',
-          //     params: {
-          //       userName: response.createPost?.post?.author.userName as string,
-          //       showPosts: true,
-          //     },
-          //   });
-          // }
-        }
-      },
-      onError() {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error while creating post',
-            description: 'Toast Error message while creating post',
-          }),
-        });
-        setProgressIndicator(null);
-      },
-      updater: store => {
-        if (profile?.id) {
-          const currentProfile = store.get(profile.id);
+          setProgressIndicator(null);
+        },
+        updater: store => {
+          if (profile?.id) {
+            const currentProfile = store.get(profile.id);
 
-          if (currentProfile) {
-            const nbPosts = currentProfile?.getValue('nbPosts');
+            if (currentProfile) {
+              const nbPosts = currentProfile?.getValue('nbPosts');
 
-            if (typeof nbPosts === 'number') {
-              currentProfile.setValue(nbPosts + 1, 'nbPosts');
+              if (typeof nbPosts === 'number') {
+                currentProfile.setValue(nbPosts + 1, 'nbPosts');
+              }
             }
           }
-        }
-      },
-    });
+        },
+      });
+    } catch (e) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while creating post',
+          description: 'Toast Error message while creating post',
+        }),
+      });
+      setProgressIndicator(null);
+    }
   };
 
   const contextValue = useMemo(
