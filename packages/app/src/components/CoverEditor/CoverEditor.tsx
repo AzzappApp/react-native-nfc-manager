@@ -443,6 +443,7 @@ const CoverEditor = (
             onCancel={onCustomEditionCancel}
             onCoverSaved={onCustomCoverSaved}
             viewer={viewer}
+            templateKind={templateKind}
           />
         )}
       </ScreenModal>

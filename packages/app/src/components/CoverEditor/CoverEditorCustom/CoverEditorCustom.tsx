@@ -28,7 +28,11 @@ import CECTitlePanel from './CECTitlePanel';
 import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
 import type { EditionParameters } from '#components/gpu';
-import type { ColorPalette, CoverStyleData } from '../coverEditorTypes';
+import type {
+  ColorPalette,
+  CoverStyleData,
+  TemplateKind,
+} from '../coverEditorTypes';
 import type { CoverData } from '../useCoverEditionManager';
 import type { CoverEditorCustom_viewer$key } from '@azzapp/relay/artifacts/CoverEditorCustom_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -70,6 +74,10 @@ export type CoverEditorCustomProps = {
    * callback called when the user cancel the cover edition
    */
   onCancel: () => void;
+  /**
+   * Currently selected template kind
+   */
+  templateKind: TemplateKind;
 };
 
 /**
@@ -85,6 +93,7 @@ const CoverEditorCustom = ({
   onError,
   onCoverSaved,
   onCancel,
+  templateKind,
 }: CoverEditorCustomProps) => {
   //#region Data dependencies
   const viewer = useFragment(
@@ -137,6 +146,7 @@ const CoverEditorCustom = ({
     initialColorPalette,
     onCoverSaved,
     profile: viewer.profile ?? null,
+    initialTemplateKind: templateKind,
   });
   //#endregion
 

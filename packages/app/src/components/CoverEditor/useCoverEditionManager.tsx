@@ -215,10 +215,15 @@ const useCoverEditionManager = ({
     }
     const sourceMedia = cardCover?.sourceMedia;
     if (sourceMedia) {
+      const kind = sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image';
+
+      const allowedKind = TEMPLATE_KIND_ALLOW_MEDIA_KIND[initialTemplateKind];
+      if (kind !== allowedKind) return null;
+
       return {
         id: sourceMedia.id,
         uri: sourceMedia.uri,
-        kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
+        kind,
         width: sourceMedia.width,
         height: sourceMedia.height,
       };
@@ -1090,3 +1095,10 @@ const createMediaComputation = ({
     },
   };
 };
+
+const TEMPLATE_KIND_ALLOW_MEDIA_KIND: Record<TemplateKind, 'image' | 'video'> =
+  {
+    others: 'image',
+    people: 'image',
+    video: 'video',
+  };
