@@ -1,5 +1,6 @@
-## 0.5.1-canary.41
+## 0.5.1-canary.42
 
+* **fix:**  - 🐛 display right cover when switching template kind ([#1554](https://github.com/AzzappApp/azzapp/pull/1554))
 * **fix:**  - 🐛 catch and display error on post creation ([#1541](https://github.com/AzzappApp/azzapp/pull/1541))
 * **fix:**  - **cover:** [#1489](https://github.com/AzzappApp/azzapp/pull/1489) set actual size of the cover ([#1547](https://github.com/AzzappApp/azzapp/pull/1547))
 * **fix:**  - crash on android due to video running in previous screens ([#1553](https://github.com/AzzappApp/azzapp/pull/1553))
