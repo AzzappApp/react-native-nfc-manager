@@ -1,5 +1,6 @@
-## 0.5.1-canary.43
+## 0.5.1-canary.44
 
+* **feat:**  - lut filter system ([#1559](https://github.com/AzzappApp/azzapp/pull/1559))
 * **fix:**  - remove message if no comment Bug-20231012-10 - post comment counter - incorrect texts [#1417](https://github.com/AzzappApp/azzapp/pull/1417) ([#1556](https://github.com/AzzappApp/azzapp/pull/1556))
 * **feat:**  - update the ui for video duration editor ([#1555](https://github.com/AzzappApp/azzapp/pull/1555))
 * **fix:**  - 🐛 display right cover when switching template kind ([#1554](https://github.com/AzzappApp/azzapp/pull/1554))
