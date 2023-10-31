@@ -89,7 +89,7 @@ const ImagePickerMediaRenderer = ({
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.grey100,
+        backgroundColor: colors.grey500,
       }}
     >
       <Cropper
