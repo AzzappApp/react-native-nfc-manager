@@ -1,8 +1,14 @@
 package com.azzapp.gpu
 
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.effect.EffectFactory
+import android.opengl.GLES20
 import com.facebook.react.bridge.ReadableMap
+import java.io.IOException
+import java.io.InputStream
 import kotlin.math.round
 
 
@@ -14,40 +20,6 @@ typealias AZPTransformation = (
 ) -> GLFrame
 
 object GLFrameTransformations {
-  private val transformations = mutableMapOf<String, AZPTransformation>()
-
-  init {
-    transformations["noir"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_SATURATE, mapOf("scale" to -1f), factory)
-    }
-    transformations["process"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_CROSSPROCESS, null, factory)
-    }
-    transformations["documentary"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_DOCUMENTARY, null, factory)
-    }
-    transformations["lomoish"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_LOMOISH, null, factory)
-    }
-    transformations["negative"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_NEGATIVE, null, factory)
-    }
-    transformations["posterize"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_POSTERIZE, null, factory)
-    }
-    transformations["sepia"] = { image, output, _, factory ->
-      applyEffect(image, output, EffectFactory.EFFECT_SEPIA, null, factory)
-    }
-  }
-
-  fun registerTransformation(name: String, transformation: AZPTransformation) {
-    transformations[name] = transformation
-  }
-
-  fun transformationForName(name: String): AZPTransformation? {
-    return transformations[name]
-  }
-
 
   fun applyEditorTransform(
     inputImage: GLFrame,
@@ -263,5 +235,3 @@ object GLFrameTransformations {
     return result
   }
 }
-
-

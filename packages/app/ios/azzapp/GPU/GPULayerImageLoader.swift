@@ -10,19 +10,61 @@ import Nuke
 import AVFoundation
 
 
+class SourceImage {
+  private var _ciImage: CIImage?
+  private var _uiImage: UIImage?
+  
+  init(ciImage: CIImage) {
+    _ciImage = ciImage
+  }
+  
+  init(uiImage: UIImage) {
+    _uiImage = uiImage
+  }
+  
+  var uiImage: UIImage? {
+    get {
+      return _uiImage
+    }
+  }
+  
+  var ciImage: CIImage? {
+    get {
+      if (_ciImage == nil) {
+        if let image = _uiImage {
+          _ciImage = CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation));
+        }
+      }
+      return _ciImage
+    }
+  }
+  
+  func inverseY() -> SourceImage? {
+    guard let image = ciImage else {
+      return nil
+    }
+    return SourceImage(
+      ciImage: image
+        .transformed(by: CGAffineTransform(scaleX: 1, y: -1))
+        .transformed(by: CGAffineTransform(translationX: 0, y: image.extent.height))
+    )
+  }
+}
+
+
 class GPULayerImageLoader {
   
   static let shared = GPULayerImageLoader()
   
   private class CacheEntry {
-    var task: Task<CIImage?, Error>?
-    weak var image: CIImage?
+    var task: Task<SourceImage?, Error>?
+    weak var image: SourceImage?
     
-    init(task: Task<CIImage?, Error>) {
+    init(task: Task<SourceImage?, Error>) {
       self.task = task
     }
     
-    func setResult(image: CIImage) {
+    func setResult(image: SourceImage) {
       self.task = nil
       self.image = image;
     }
@@ -76,8 +118,8 @@ class GPULayerImageLoader {
     }
   }
   
-  func loadLayerImage(_ layerSource: GPULayerSource) async throws -> CIImage? {
-    var image: CIImage? = nil
+  func loadLayerImage(_ layerSource: GPULayerSource) async throws -> SourceImage? {
+    var image: SourceImage? = nil
     switch(layerSource) {
       case .image(uri: let uri):
         image = try await loadImage(uri)
@@ -102,8 +144,8 @@ class GPULayerImageLoader {
   
   private func loadImageIfNotCached(
     key: String,
-    loader: @escaping () async throws -> CIImage?
-  ) async throws -> CIImage? {
+    loader: @escaping () async throws -> SourceImage?
+  ) async throws -> SourceImage? {
     startCleanTimer()
     if let entry = getCacheEntry(forKey: key) {
       if let image = entry.image {
@@ -133,14 +175,14 @@ class GPULayerImageLoader {
     }
   }
   
-  private func loadImage(_ url: URL) async throws -> CIImage? {
+  private func loadImage(_ url: URL) async throws -> SourceImage? {
     return try await loadImageIfNotCached(key: url.absoluteString) {
       let image = try await MediaPipeline.pipeline.image(for: url)
-      return CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation));
+      return SourceImage(uiImage: image)
     }
   }
   
-  private func loadImageFromVideo(_ url: URL, time: CMTime) async throws -> CIImage? {
+  private func loadImageFromVideo(_ url: URL, time: CMTime) async throws -> SourceImage? {
     let key = String(format: "%@-%lld", url.absoluteString, time.value)
     return try await loadImageIfNotCached(key: key) {
       let asset = AVAsset(url: url)
@@ -158,7 +200,7 @@ class GPULayerImageLoader {
           translationX: -image.extent.origin.x,
           y: -image.extent.origin.y
         ))
-        return image
+        return SourceImage(ciImage: image)
       }
       
       return try await task.value

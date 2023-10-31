@@ -2,11 +2,13 @@ import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import {
+  FILTERS,
   GPUImageView,
   GPUVideoView,
   Image,
   Video,
   VideoFrame,
+  isFilter,
 } from '#components/gpu';
 import { useImagePickerState } from './ImagePickerContext';
 
@@ -122,7 +124,9 @@ const ImagePickerMediaRenderer = ({
               <Image
                 uri={media.uri}
                 parameters={{ ...editionParameters, cropData }}
-                filters={mediaFilter ? [mediaFilter] : null}
+                lutFilterUri={
+                  isFilter(mediaFilter) ? FILTERS[mediaFilter] : null
+                }
               />
             </GPUImageView>
           ) : (
@@ -133,7 +137,9 @@ const ImagePickerMediaRenderer = ({
               <Video
                 uri={media.uri}
                 parameters={{ ...editionParameters, cropData }}
-                filters={mediaFilter ? [mediaFilter] : null}
+                lutFilterUri={
+                  isFilter(mediaFilter) ? FILTERS[mediaFilter] : null
+                }
                 startTime={timeRange?.startTime}
                 duration={timeRange?.duration}
               />

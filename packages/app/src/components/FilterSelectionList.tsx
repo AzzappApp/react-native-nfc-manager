@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View, Platform } from 'react-native';
+import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import { GPUImageView, useFilterList } from './gpu';
+import { FILTERS, GPUImageView, isFilter, useFilterLabels } from './gpu';
 import type { ImageLayer, VideoFrameLayer } from './gpu';
 import type { ScrollViewProps, LayoutChangeEvent } from 'react-native';
 
@@ -27,10 +28,7 @@ const FilterSelectionList = ({
   ...props
 }: FilterSelectionListProps) => {
   const intl = useIntl();
-  const filters = useFilterList().filter(
-    ({ ios, android }) =>
-      (Platform.OS === 'ios' && ios) || (Platform.OS === 'android' && android),
-  );
+  const filters = typedEntries(useFilterLabels());
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
@@ -47,16 +45,16 @@ const FilterSelectionList = ({
         cardRadius={cardRadius}
         onPress={() => onChange(null)}
       />
-      {filters.map(({ filter, label }) => (
+      {filters.map(([id, label]) => (
         <FilterButton
-          key={filter}
+          key={id}
           layer={layer}
           aspectRatio={aspectRatio}
-          selected={filter === selectedFilter}
+          selected={id === selectedFilter}
           label={label}
-          filter={filter}
+          filter={id}
           cardRadius={cardRadius}
-          onPress={() => onChange(filter)}
+          onPress={() => onChange(id)}
         />
       ))}
     </ScrollView>
@@ -114,7 +112,12 @@ const FilterButton = ({
         <View style={[styles.imageWrapper, { borderRadius }]}>
           <GPUImageView
             style={[styles.filterImage, { aspectRatio, borderRadius }]}
-            layers={[{ ...layer, filters: filter ? [filter] : [] }]}
+            layers={[
+              {
+                ...layer,
+                lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+              },
+            ]}
           />
         </View>
       </View>

@@ -39,6 +39,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     private var readyToDraw  = false
 
     private var blendEffect: BlendEffect? = null
+    private var colorLutEffect: ColorLUTEffect? = null
     private var tintColorEffect: TintColorEffect? = null
     private var effectContext: EffectContext? = null
 
@@ -211,22 +212,18 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
                 GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
             }
 
-            val filters = layer.filters
-            if (filters != null) {
-                for (filter in filters) {
-                    val transform = GLFrameTransformations.transformationForName(filter)
-                    if (transform != null) {
-                        setImage(transform(
-                            image,
-                            null,
-                            null,
-                            effectContext!!.factory
-                        ))
+            val lutImage = if (layer.lutFilterUri != null)
+                frames[layer.lutFilterUri.toString()] ?: continue
+            else null
 
-                        GLES20.glEnable(GLES20.GL_BLEND)
-                        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-                    }
+            if (lutImage != null) {
+                if (colorLutEffect == null) {
+                    colorLutEffect = ColorLUTEffect()
                 }
+                setImage(colorLutEffect?.apply(
+                    image,
+                    lutImage,
+                )?: image)
             }
 
             textureRenderer?.renderTexture(
@@ -261,10 +258,18 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             }
             val maskUri = layer.maskUri
             if (maskUri != null) {
-                val key = layer.maskUri.toString()
+                val key = maskUri.toString()
                 usedKeys.add(key)
                 if (!bitmaps.contains(key)) {
-                    bitmapToLoads.add(layer.maskUri)
+                    bitmapToLoads.add(maskUri)
+                }
+            }
+            val lutFilterUri = layer.lutFilterUri
+            if (lutFilterUri != null) {
+                val key = lutFilterUri.toString()
+                usedKeys.add(key)
+                if (!bitmaps.contains(key)) {
+                    bitmapToLoads.add(lutFilterUri)
                 }
             }
         }

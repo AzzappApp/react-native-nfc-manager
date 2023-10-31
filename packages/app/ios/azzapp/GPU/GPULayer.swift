@@ -149,7 +149,7 @@ enum GPULayerSource: Equatable, Hashable {
 struct GPULayer: Equatable {
   let source: GPULayerSource
   let parameters: GPULayerEditionParameters?
-  let filters: [String]?
+  let lutFilterUri: URL?
   let maskUri: URL?
   let backgroundColor: UIColor?
   let tintColor: UIColor?
@@ -172,18 +172,10 @@ struct GPULayer: Equatable {
   
   static func fromDict(_ dict: [String: Any]) -> GPULayer? {
     let parameters = GPULayerEditionParameters.fromDict(dict["parameters"] as? [String: Any])
-    var filters: [String]?
-    if let filtersArrays = dict["filters"] as? [String] {
-      filters = filtersArrays
-    } else if let filtersDict = dict["filters"] as? [String:String] {
-      // reanimated sometimes transform arrays to object
-      filters = [String]()
-      for filter in filtersDict.values {
-        filters?.append(filter)
-      }
-    }
     let maskUriStr = dict["maskUri"] as? String
     let maskUri = maskUriStr != nil ? URL(string: maskUriStr!) : nil
+    let lutFilterUriStr = dict["lutFilterUri"] as? String
+    let lutFilterUri = lutFilterUriStr != nil ? URL(string: lutFilterUriStr!) : nil
     let backgroundColorStr = dict["backgroundColor"] as? String
     let backgroundColor = backgroundColorStr != nil ? UIColor(stringRepresentation: backgroundColorStr!) : nil
     let tintColorStr = dict["tintColor"] as? String
@@ -224,7 +216,7 @@ struct GPULayer: Equatable {
     return GPULayer(
       source: source,
       parameters: parameters,
-      filters: filters,
+      lutFilterUri: lutFilterUri,
       maskUri: maskUri,
       backgroundColor: backgroundColor,
       tintColor: tintColor,
@@ -236,9 +228,9 @@ struct GPULayer: Equatable {
     layer: GPULayer,
     withSize size: CGSize,
     onTopOf underlayImage: CIImage?,
-    withImages layerImages: [GPULayerSource: CIImage]?
+    withImages layerImages: [GPULayerSource: SourceImage]?
   ) -> CIImage? {
-    guard var image = layerImages?[layer.source] else {
+    guard var image = layerImages?[layer.source]?.ciImage else {
       return underlayImage
     }
     
@@ -255,7 +247,7 @@ struct GPULayer: Equatable {
       image = blendFilter.outputImage!
     }
     
-    if let maskUri = layer.maskUri, let maskImage = layerImages?[.image(uri: maskUri)]  {
+    if let maskUri = layer.maskUri, let maskImage = layerImages?[.image(uri: maskUri)]?.ciImage  {
       let blendFilter = CIFilter.blendWithMask()
       blendFilter.inputImage = image
       blendFilter.backgroundImage = transparentImage
@@ -355,20 +347,15 @@ struct GPULayer: Equatable {
       image = ciVignetteFilter.outputImage!
     }
     
-    if let filters = layer.filters {
-      for filter in filters {
-        guard let filterTransform = GPUFilterRegistry.shared.getFilter(forName: filter) else {
-          // TODO log error
-          continue
-        }
-        image = filterTransform(image)
-      }
-    }
-
+    
     if let backgroundColor = layer.backgroundColor {
       let backgroundImage = CIImage(color: CIColor(color: backgroundColor))
         .cropped(to: CGRectMake(0, 0, size.width, size.height))
       image = image.composited(over: backgroundImage)
+    }
+    
+    if let lutFilterUri = layer.lutFilterUri, let lutImage = layerImages?[.image(uri: lutFilterUri)]?.uiImage   {
+      image = applyColorLut(image: image, lut: lutImage)
     }
     
     if let underlayImage = underlayImage {
@@ -402,6 +389,86 @@ struct GPULayer: Equatable {
       y:  -result.extent.minY
     ))
     return result
+  }
+  
+  
+  private static func applyColorLut(image: CIImage, lut: UIImage) -> CIImage {
+      
+    let filter = CIFilter.colorCubeWithColorSpace()
+    var data: Data
+    do {
+      data = try createColorCubeData(
+        lutImage: lut,
+        cubeDimension: 64
+      )
+    } catch {
+      return image
+    }
+    filter.cubeData = data
+    filter.inputImage = image
+    filter.cubeDimension = 64
+    filter.colorSpace = CGColorSpace(name: CGColorSpace.sRGB)
+    
+    guard let res = filter.outputImage else {
+      return image
+    }
+    return res
+  }
+
+  
+    
+  private enum ColorCubeError: Error {
+      case incorrectImageSize
+      case missingImageData
+      case unableToCreateDataProvider
+      case unableToGetBitmpaDataBuffer
+  }
+    
+  private static func createColorCubeData(lutImage image: UIImage, cubeDimension: Int) throws -> Data {
+    // Set up some variables for calculating memory size.
+    let imageSize = image.size
+    let dim = Int(imageSize.width)
+    let pixels = dim * dim
+    let channels = 4
+    
+    // If the number of pixels doesn't match what's needed for the supplied cube dimension, abort.
+    guard pixels == cubeDimension * cubeDimension * cubeDimension else {
+        throw ColorCubeError.incorrectImageSize
+    }
+    
+    // We don't need a sizeof() because uint_8t is explicitly 1 byte.
+    let memSize = pixels * channels
+    
+    // Get the UIImage's backing CGImageRef
+    guard let img = image.cgImage else {
+        throw ColorCubeError.missingImageData
+    }
+    
+    // Get a reference to the CGImage's data provider.
+    guard let inProvider = img.dataProvider else {
+        throw ColorCubeError.unableToCreateDataProvider
+    }
+    
+    let inBitmapData = inProvider.data
+    guard let inBuffer = CFDataGetBytePtr(inBitmapData) else {
+        throw ColorCubeError.unableToGetBitmpaDataBuffer
+    }
+    
+    // Calculate the size of the float buffer and allocate it.
+    let floatSize = memSize * MemoryLayout<Float>.size
+    let finalBuffer = unsafeBitCast(malloc(floatSize), to:UnsafeMutablePointer<Float>.self)
+    
+    // Convert the uint_8t to float. Note: a uint of 255 will convert to 255.0f.
+    vDSP_vfltu8(inBuffer, 1, finalBuffer, 1, UInt(memSize))
+    
+    // Divide each float by 255.0 to get the 0-1 range we are looking for.
+    var divisor = Float(255.0)
+    vDSP_vsdiv(finalBuffer, 1, &divisor, finalBuffer, 1, UInt(memSize))
+    
+    // Don't copy the bytes, just have the NSData take ownership of the buffer.
+    let cubeData = NSData(bytesNoCopy: finalBuffer, length: floatSize, freeWhenDone: true)
+    
+    return cubeData as Data
   }
 }
 

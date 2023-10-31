@@ -14,7 +14,7 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import { exportLayersToImage } from '#components/gpu';
+import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -384,7 +384,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           kind: 'image',
           uri,
           parameters: editionParameters,
-          filters: filter ? [filter] : [],
+          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
         },
       ],
     });

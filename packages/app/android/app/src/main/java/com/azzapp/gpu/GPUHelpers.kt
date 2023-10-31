@@ -12,7 +12,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.DefaultEncoderFactory
 import androidx.media3.transformer.EditedMediaItem
-import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.EncoderSelector
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
@@ -51,33 +50,6 @@ import kotlin.math.round
 
 
   @ReactMethod
-  fun exportVideoFromView(
-    viewId: Int,
-    size: ReadableMap,
-    bitRate: Int,
-    removeAudio: Boolean,
-    promise: Promise
-  ) {
-    val view = UIManagerHelper.getUIManager(reactContext, viewId)?.resolveView(viewId) as GPUVideoView?
-    if (view == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView is not ready for export")
-      return
-    }
-    val layer = view.getLayers()?.get(0)
-    if (layer == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView does not render layer")
-      return
-    }
-    exportVideoLayer(
-      layer,
-      size,
-      bitRate,
-      removeAudio,
-      promise
-    )
-  }
-
-  @ReactMethod
   fun exportLayersToVideo(
     layers: ReadableArray,
     backgroundColor: Double,
@@ -110,6 +82,14 @@ import kotlin.math.round
     promise: Promise
   ) {
     val transformerRequestBuilder = TransformationRequest.Builder().setHdrMode(HDR_MODE_KEEP_HDR).build()
+    var loadedLutFilterBitmap: Bitmap? = null
+    runBlocking {
+      try {
+        loadedLutFilterBitmap = if (layer.lutFilterUri != null) GPULayerImageLoader.loadImage(layer.lutFilterUri!!) else null
+      } catch (e: Exception) {
+        promise.reject(e)
+      }
+    }
     val transformer =
     Transformer.Builder(reactContext).setTransformationRequest(transformerRequestBuilder)
       .setVideoFrameProcessorFactory(
@@ -117,7 +97,7 @@ import kotlin.math.round
           size.getInt("width"),
           size.getInt("height"),
           layer.parameters,
-          layer.filters
+          loadedLutFilterBitmap
         )
       )
       .setEncoderFactory(
@@ -170,35 +150,6 @@ import kotlin.math.round
     })
 
     transformer.start(editedMediaItem.build(), file.absolutePath)
-  }
-
-  @ReactMethod
-  fun exportImageFromView(
-    viewId: Int,
-    format: String,
-    quality: Double,
-    size: ReadableMap,
-    promise: Promise
-  ) {
-    val view = UIManagerHelper.getUIManager(reactContext, viewId)?.resolveView(viewId) as GPUImageView?
-    if (view == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView is not ready for export")
-      return
-    }
-    val layer = view.getLayers()?.get(0)
-    if (layer == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView does not render layer")
-      return
-    }
-    GlobalScope.launch(Dispatchers.Main) {
-      exportImageLayer(
-        layer,
-        format,
-        quality,
-        size,
-        promise
-      )
-    }
   }
 
   @ReactMethod
@@ -317,10 +268,12 @@ import kotlin.math.round
 
       var loadedBitmap: Bitmap? = null
       var loadedMaskBitmap: Bitmap? = null
+      var loadedLutFilterBitmap: Bitmap? = null
       runBlocking {
         try {
           loadedBitmap = GPULayerImageLoader.loadGPULayerSource(layer.source)
           loadedMaskBitmap = if (layer.maskUri != null) GPULayerImageLoader.loadImage(layer.maskUri!!) else null
+          loadedLutFilterBitmap = if (layer.lutFilterUri != null) GPULayerImageLoader.loadImage(layer.lutFilterUri!!) else null
         } catch (e: Exception) {
           promise.reject(e)
         }
@@ -340,6 +293,7 @@ import kotlin.math.round
           sourceImage.release()
           sourceImage = imageWithMask
         }
+        maskImage.release()
       }
 
       val parameters = layer.parameters
@@ -354,26 +308,26 @@ import kotlin.math.round
           sourceImage.release()
           sourceImage = croppedImage
         }
+      }
 
-        val filters = layer.filters
-        if (filters != null) {
-          for (filter in filters!!) {
-            val transform = GLFrameTransformations.transformationForName(filter)
-            if (transform != null) {
-              transform(
-                sourceImage,
-                sourceImage,
-                null,
-                effectContext.factory
-              )
-            }
-          }
+      val lutFilterBitmap = loadedLutFilterBitmap
+      if (lutFilterBitmap != null) {
+        val lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
+        ShaderUtils.bindImageTexture(lutImage.texture, lutFilterBitmap)
+
+        var colorLUTEffect = ColorLUTEffect()
+        val imageWithLut = colorLUTEffect.apply(sourceImage, lutImage!!)
+        if (imageWithLut != null) {
+          sourceImage.release()
+          sourceImage = imageWithLut
         }
+        lutImage.release()
       }
 
       var bitmap = saveTexture(sourceImage.texture, sourceImage.width, sourceImage.height)
       val fileExtension = when (format) {
         "png" -> ".png"
+        "auto" -> if (bitmap.hasAlpha())  ".png" else ".jpg"
         else -> ".jpg"  // Default to JPEG if the format is not recognized
       }
       val file = File.createTempFile(UUID.randomUUID().toString(), fileExtension, MainApplication.getMainApplicationContext().cacheDir)
@@ -382,13 +336,13 @@ import kotlin.math.round
       bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
       val compressFormat = when (format) {
         "png" -> Bitmap.CompressFormat.PNG
+        "auto" -> if (bitmap.hasAlpha())  Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
         else -> Bitmap.CompressFormat.JPEG  // Default to JPEG if the format is not recognized
       }
       bitmap.compress(compressFormat, round(quality).toInt(), out)
       out.flush()
       out.close()
-      val absolutePath = file.absolutePath
-      promise.resolve("file://$absolutePath")
+      promise.resolve(file.absolutePath)
     } catch (e: Exception) {
       promise.reject(e)
     } finally {

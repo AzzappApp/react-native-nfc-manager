@@ -41,7 +41,7 @@ import javax.microedition.khronos.egl.*
         private val listener: VideoFrameProcessor.Listener,
         private val coroutineDispatcher: ExecutorCoroutineDispatcher,
         private val parameters: GPULayer.EditionParameters?,
-        private val filters: ArrayList<String>?
+        private val lutFilterBitmap: Bitmap?
 ) : VideoFrameProcessor {
 
   private var pendingFrames = ConcurrentLinkedQueue<FrameInfo>()
@@ -69,6 +69,8 @@ import javax.microedition.khronos.egl.*
 
 
   private var textureRenderer: TextureRenderer
+  private var colorLUTEffect: ColorLUTEffect? = null
+  private var lutImage: GLFrame?  = null
 
 
   init {
@@ -79,12 +81,19 @@ import javax.microedition.khronos.egl.*
       maybeQueueFrame()
     }
 
+
     inputSurface = Surface(surfaceTexture)
     externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
     image = GLFrame.create()
     textureRenderer = TextureRenderer(external = false, flipTexY = true)
 
     frameBuffer = ShaderUtils.createFrameBuffer()
+
+    if (lutFilterBitmap != null) {
+      colorLUTEffect = ColorLUTEffect()
+      lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
+      ShaderUtils.bindImageTexture(lutImage!!.texture, lutFilterBitmap)
+    }
 
   }
 
@@ -269,6 +278,16 @@ import javax.microedition.khronos.egl.*
       outputImage = croppedImage
     }
 
+    if (lutImage != null) {
+      val imageWithLut = colorLUTEffect?.apply(outputImage, lutImage!!)
+      if (imageWithLut != null) {
+        if (outputImage !== image) {
+          outputImage.release()
+        }
+        outputImage = imageWithLut
+      }
+    }
+
     if (surfaceInfo.orientationDegrees != 0) {
       outputImage = GLFrameTransformations.applyEffect(
         outputImage,
@@ -277,26 +296,6 @@ import javax.microedition.khronos.egl.*
         mapOf("angle" to -surfaceInfo.orientationDegrees),
         effectContext!!.factory
       )
-    }
-
-
-
-    if (filters != null) {
-      for (filter in filters) {
-        val transform = GLFrameTransformations.transformationForName(filter)
-        if (transform != null) {
-          val transformedImage = transform(
-            outputImage,
-            null,
-            null,
-            effectContext!!.factory
-          )
-          if (outputImage !== image) {
-            outputImage.release()
-          }
-          outputImage = transformedImage
-        }
-      }
     }
 
     textureRenderer.renderTexture(
@@ -317,7 +316,7 @@ import javax.microedition.khronos.egl.*
     private val outputWidth: Int,
     private val outputHeight: Int,
     private val parameters: GPULayer.EditionParameters?,
-    private val filters: ArrayList<String>?,
+    private val lutFilterBitmap: Bitmap?,
   ) : VideoFrameProcessor.Factory {
 
     override fun create(
@@ -408,7 +407,7 @@ import javax.microedition.khronos.egl.*
         listener,
         coroutineDispatcher,
         parameters,
-        filters
+        lutFilterBitmap
       )
     }
   }

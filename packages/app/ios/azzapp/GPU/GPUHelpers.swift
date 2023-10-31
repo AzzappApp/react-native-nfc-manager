@@ -13,6 +13,9 @@ import Foundation
 @objc(AZPGPUHelpers)
 class GPUHelpers: NSObject {
   
+  @objc static func requiresMainQueueSetup() -> Bool {
+    return true
+  }
   
   @objc
   final func exportLayersToImage(
@@ -26,9 +29,9 @@ class GPUHelpers: NSObject {
    
     let gpuLayers = GPULayer.fromNSarray(layers)
     Task.detached {
-      var layersImages =  [GPULayerSource:CIImage]()
+      var layersImages =  [GPULayerSource:SourceImage]()
       do {
-        try await withThrowingTaskGroup(of: (GPULayerSource, CIImage).self) {
+        try await withThrowingTaskGroup(of: (GPULayerSource, SourceImage).self) {
           group in
             for gpuLayer in gpuLayers {
               let layerSource = gpuLayer.source
@@ -40,6 +43,15 @@ class GPUHelpers: NSObject {
               }
               if let maskUri = gpuLayer.maskUri {
                 let layerSource = GPULayerSource.image(uri: maskUri)
+                group.addTask {
+                  guard let image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
+                    throw GPUViewError.failedToLoad(layerSource)
+                  }
+                  return (layerSource, image)
+                }
+              }
+              if let lutFilterUri = gpuLayer.lutFilterUri {
+                let layerSource = GPULayerSource.image(uri: lutFilterUri)
                 group.addTask {
                   guard let image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
                     throw GPUViewError.failedToLoad(layerSource)
@@ -74,7 +86,7 @@ class GPUHelpers: NSObject {
   
   private final func exportGPULayersToImage(
     _ gpuLayers: [GPULayer],
-    layersImages: [GPULayerSource:CIImage],
+    layersImages: [GPULayerSource:SourceImage],
     backgroundColor: UIColor?,
     format: String,
     quality: Double,
@@ -190,9 +202,9 @@ class GPUHelpers: NSObject {
    
     let gpuLayers = GPULayer.fromNSarray(layers)
     Task.detached {
-      var layersImages =  [GPULayerSource:CIImage]()
+      var layersImages =  [GPULayerSource:SourceImage]()
       do {
-        try await withThrowingTaskGroup(of: (GPULayerSource, CIImage).self) {
+        try await withThrowingTaskGroup(of: (GPULayerSource, SourceImage).self) {
           group in
             for gpuLayer in gpuLayers {
               switch gpuLayer.source {
@@ -213,6 +225,15 @@ class GPUHelpers: NSObject {
               
               if let maskUri = gpuLayer.maskUri {
                 let layerSource = GPULayerSource.image(uri: maskUri)
+                group.addTask {
+                  guard let image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
+                    throw GPUViewError.failedToLoad(layerSource)
+                  }
+                  return (layerSource, image)
+                }
+              }
+              if let lutFilterUri = gpuLayer.lutFilterUri {
+                let layerSource = GPULayerSource.image(uri: lutFilterUri)
                 group.addTask {
                   guard let image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
                     throw GPUViewError.failedToLoad(layerSource)
@@ -247,7 +268,7 @@ class GPUHelpers: NSObject {
   
   private final func exportGPULayersToVideo(
     _ gpuLayers: [GPULayer],
-    layersImages: [GPULayerSource:CIImage],
+    layersImages: [GPULayerSource:SourceImage],
     backgroundColor: UIColor?,
     size: CGSize,
     bitRate: NSNumber,
@@ -342,7 +363,7 @@ class GPUHelpers: NSObject {
       request in
         let videoImage = request.sourceImage
         var layersImages = layersImages
-        layersImages[videoLayer.source] = videoImage
+        layersImages[videoLayer.source] = SourceImage(ciImage: videoImage)
         
         let size = request.renderSize
         var image: CIImage? = nil

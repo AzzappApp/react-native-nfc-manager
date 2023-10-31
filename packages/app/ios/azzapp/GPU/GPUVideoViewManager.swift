@@ -75,7 +75,7 @@ class GPUVideoView: UIView {
     }
   }
   
-  internal var layersImages: [GPULayerSource:CIImage]?
+  internal var layersImages: [GPULayerSource:SourceImage]?
   
   internal var imagesLoadingTask: Task<Void, Never>?
   
@@ -142,7 +142,7 @@ class GPUVideoView: UIView {
     }
     
     var layerSourceToLoad: [GPULayerSource] = []
-    var loadedLayersImages = [GPULayerSource:CIImage]()
+    var loadedLayersImages = [GPULayerSource:SourceImage]()
     var videoSources: [(URL, CMTime?, CMTime?)] = []
     for gpuLayer in gpuLayers {
       switch gpuLayer.source {
@@ -158,6 +158,14 @@ class GPUVideoView: UIView {
       }
       if let maskUri = gpuLayer.maskUri {
         let source = GPULayerSource.image(uri: maskUri)
+        if let image = layersImages?[source] {
+          loadedLayersImages[source] = image
+        } else {
+          layerSourceToLoad.append(source)
+        }
+      }
+      if let lutFilterUri = gpuLayer.lutFilterUri {
+        let source = GPULayerSource.image(uri: lutFilterUri)
         if let image = layersImages?[source] {
           loadedLayersImages[source] = image
         } else {
@@ -196,7 +204,7 @@ class GPUVideoView: UIView {
         do {
           player?.pause()
           onImagesLoadingStart?(nil)
-          try await withThrowingTaskGroup(of: (GPULayerSource, CIImage).self) {
+          try await withThrowingTaskGroup(of: (GPULayerSource, SourceImage).self) {
             group in
               for layerSource in layerSourceToLoad {
                 group.addTask {
@@ -266,7 +274,7 @@ class GPUVideoView: UIView {
           }
         
           var layersImages = videoView.layersImages ?? [:]
-          layersImages[videoLayer.source] = videoImage
+          layersImages[videoLayer.source] = SourceImage(ciImage: videoImage)
           
           let size = request.renderSize
           var image: CIImage? = nil

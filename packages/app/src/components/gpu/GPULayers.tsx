@@ -40,9 +40,9 @@ export type Blending = 'multiply' | 'none';
 
 export type GPULayerBase = {
   parameters?: EditionParameters | null;
-  filters?: string[] | null;
   blending?: Blending | null;
   maskUri?: string | null;
+  lutFilterUri?: string | null;
   backgroundColor?: string | null;
   tintColor?: string | null;
 };

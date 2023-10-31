@@ -59,7 +59,7 @@ class GPUImageView: UIView, MTKViewDelegate {
     }
   }
   
-  internal var layersImages: [GPULayerSource:CIImage]? {
+  internal var layersImages: [GPULayerSource:SourceImage]? {
     didSet {
       _imageView.setNeedsDisplay()
     }
@@ -158,20 +158,28 @@ class GPUImageView: UIView, MTKViewDelegate {
       return
     }
      
-    var layerSourceToLoad: [GPULayerSource] = []
-    var loadedLayersImages = [GPULayerSource:CIImage]()
+    var layerSourceToLoad: [(GPULayerSource, Bool)] = []
+    var loadedLayersImages = [GPULayerSource:SourceImage]()
     for gpuLayer in gpuLayers {
       if let image = layersImages?[gpuLayer.source] {
         loadedLayersImages[gpuLayer.source] = image
       } else {
-        layerSourceToLoad.append(gpuLayer.source)
+        layerSourceToLoad.append((gpuLayer.source, true))
       }
       if let maskUri = gpuLayer.maskUri {
         let source = GPULayerSource.image(uri: maskUri)
         if let image = layersImages?[source] {
           loadedLayersImages[source] = image
         } else {
-          layerSourceToLoad.append(source)
+          layerSourceToLoad.append((source, true))
+        }
+      }
+      if let lutFilterUri = gpuLayer.lutFilterUri {
+        let source = GPULayerSource.image(uri: lutFilterUri)
+        if let image = layersImages?[source] {
+          loadedLayersImages[source] = image
+        } else {
+          layerSourceToLoad.append((source, false))
         }
       }
     }
@@ -179,15 +187,17 @@ class GPUImageView: UIView, MTKViewDelegate {
       imagesLoadingTask = Task {
         do {
           onLoadStart?(nil)
-          try await withThrowingTaskGroup(of: (GPULayerSource, CIImage).self) {
+          try await withThrowingTaskGroup(of: (GPULayerSource, SourceImage).self) {
             group in
-              for layerSource in layerSourceToLoad {
+              for (layerSource, inverseYOnSimulator) in layerSourceToLoad {
                 group.addTask {
                   guard var image = try await GPULayerImageLoader.shared.loadLayerImage(layerSource) else {
                     throw GPUViewError.failedToLoad(layerSource)
                   }
                   #if targetEnvironment(simulator)
-                  image = image.inverseY()
+                  if (inverseYOnSimulator) {
+                    image = image.inverseY() ?? image
+                  }
                   #endif
                   return (layerSource, image)
                 }

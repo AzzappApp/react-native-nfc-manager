@@ -31,6 +31,8 @@ import {
   exportLayersToVideo,
   extractLayoutParameters,
   type EditionParameters,
+  isFilter,
+  FILTERS,
 } from '#components/gpu';
 import ImagePicker, {
   ImagePickerCardMediaWrapper,
@@ -617,7 +619,9 @@ const useCoverEditionManager = ({
         const layerOptions = {
           parameters: mediaParameters,
           maskUri: isSegmented ? maskMedia?.uri ?? null : null,
-          filters: coverStyle.mediaFilter ? [coverStyle.mediaFilter] : null,
+          lutFilterUri: isFilter(coverStyle.mediaFilter)
+            ? FILTERS[coverStyle.mediaFilter]
+            : null,
         };
         if (activeSourceMedia.kind === 'image') {
           let exportOptions: ExportImageOptions = {
