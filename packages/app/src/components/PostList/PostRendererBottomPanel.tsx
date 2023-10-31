@@ -223,7 +223,7 @@ const PostRendererBottomPanel = ({
               {post.previewComment.comment}
             </Text>
           )}
-          {post.allowComments && (
+          {post.allowComments && post.counterComments > 0 && (
             <Text
               variant="medium"
               style={styles.textCommentCounter}
