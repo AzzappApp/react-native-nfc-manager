@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
@@ -14,29 +14,26 @@ const CoverLink = ({
   prefetch = false,
   onPress,
   ...props
-}: CoverLinkRendererProps) => (
-  <Link
-    route="PROFILE"
-    params={{
-      userName: props.userName,
-    }}
-    prefetch={prefetch}
-    onPress={onPress}
-  >
-    <PressableScaleHighlight
-      style={[
-        style,
-        {
-          overflow: 'hidden',
-          borderRadius: COVER_CARD_RADIUS * (props.width as number),
-          aspectRatio: COVER_RATIO,
-        },
-      ]}
-    >
-      <CoverRenderer {...props} style={coverStyle} />
-    </PressableScaleHighlight>
-  </Link>
-);
+}: CoverLinkRendererProps) => {
+  const containerStyle = useMemo(
+    () => [
+      style,
+      {
+        overflow: 'hidden' as const,
+        borderRadius: COVER_CARD_RADIUS * (props.width as number),
+        aspectRatio: COVER_RATIO,
+      },
+    ],
+    [style, props.width],
+  );
+  return (
+    <Link route="PROFILE" params={props} prefetch={prefetch} onPress={onPress}>
+      <PressableScaleHighlight style={containerStyle}>
+        <CoverRenderer {...props} style={coverStyle} />
+      </PressableScaleHighlight>
+    </Link>
+  );
+};
 
 // memo is recommanded as coverlink is used in FlatList
 export default memo(CoverLink);

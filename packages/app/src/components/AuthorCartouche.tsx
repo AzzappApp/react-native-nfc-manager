@@ -12,6 +12,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import Link from './Link';
 import MediaImageRenderer from './medias/MediaImageRenderer';
+import type { MediaImageRendererProps } from './medias';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -94,72 +95,43 @@ const AuthorCartouche = ({
   const { cardCover, cardColors } = author ?? {};
   const { media, foreground, foregroundColor } = cardCover ?? {};
 
-  const content = useMemo(() => {
-    return (
-      <>
-        {media?.id != null ? (
-          <View style={{}}>
-            <MediaImageRenderer
-              aspectRatio={COVER_RATIO}
-              source={{
-                uri: media.avatarURI!,
-                mediaId: media.id,
-                requestedSize: MEDIA_WIDTH,
-              }}
-              alt={'avatar'}
-              style={styles.image}
-            />
-            {foreground && (
-              <MediaImageRenderer
-                testID="CoverPreview_foreground"
-                source={{
-                  uri: foreground.uri,
-                  mediaId: foreground.id,
-                  requestedSize: MEDIA_WIDTH,
-                }}
-                tintColor={swapColor(foregroundColor, cardColors)}
-                aspectRatio={COVER_RATIO}
-                style={[
-                  styles.layer,
-                  styles.image,
-                  { backgroundColor: 'transaprent' },
-                ]}
-                alt={'Cover edition foreground'}
-              />
-            )}
-          </View>
-        ) : (
-          media?.id == null && <View style={[styles.image]} />
-        )}
-        {!hideUserName && (
-          <Text
-            variant={variant === 'post' ? 'button' : 'smallbold'}
-            style={styles.userName}
-          >
-            {author?.userName}
-          </Text>
-        )}
-      </>
-    );
-  }, [
-    media?.id,
-    media?.avatarURI,
-    styles.image,
-    styles.layer,
-    styles.userName,
-    foreground,
-    foregroundColor,
-    cardColors,
-    hideUserName,
-    variant,
-    author?.userName,
-  ]);
+  const mediaSource = useMemo(
+    () =>
+      media?.id
+        ? {
+            uri: media.avatarURI!,
+            mediaId: media.id,
+            requestedSize: MEDIA_WIDTH,
+          }
+        : null,
+    [media?.avatarURI, media?.id],
+  );
+
+  const foregroundSource = useMemo(
+    () =>
+      foreground?.id
+        ? {
+            uri: foreground.uri!,
+            mediaId: foreground.id,
+            requestedSize: MEDIA_WIDTH,
+          }
+        : null,
+    [foreground?.id, foreground?.uri],
+  );
 
   if (activeLink) {
     return (
       <Link route="PROFILE" params={{ userName: author.userName }}>
         <PressableOpacity style={[styles.container, style]} {...props}>
-          {content}
+          <AuthorCartoucheContent
+            mediaSource={mediaSource}
+            foregroundSource={foregroundSource}
+            foregroundColor={foregroundColor}
+            hideUserName={hideUserName}
+            variant={variant}
+            cardColors={cardColors}
+            author={author}
+          />
         </PressableOpacity>
       </Link>
     );
@@ -167,8 +139,78 @@ const AuthorCartouche = ({
 
   return (
     <View style={[styles.container, style]} {...props}>
-      {content}
+      <AuthorCartoucheContent
+        mediaSource={mediaSource}
+        foregroundSource={foregroundSource}
+        foregroundColor={foregroundColor}
+        hideUserName={hideUserName}
+        variant={variant}
+        cardColors={cardColors}
+        author={author}
+      />
     </View>
+  );
+};
+
+const AuthorCartoucheContent = ({
+  mediaSource,
+  foregroundSource,
+  foregroundColor,
+  hideUserName,
+  variant = 'post',
+  cardColors,
+  author,
+}: {
+  mediaSource?: MediaImageRendererProps['source'] | null;
+  foregroundSource?: MediaImageRendererProps['source'] | null;
+  foregroundColor?: string | null;
+  hideUserName?: boolean;
+  variant?: AuthorCartoucheProps['variant'];
+  cardColors?: {
+    primary: string;
+    light: string;
+    dark: string;
+  } | null;
+  author?: { userName: string | null };
+}) => {
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
+  const foregroundStyle = useMemo(
+    () => [styles.layer, styles.image, { backgroundColor: 'transparent' }],
+    [styles.layer, styles.image],
+  );
+
+  return (
+    <>
+      {mediaSource != null ? (
+        <View>
+          <MediaImageRenderer
+            source={mediaSource}
+            alt="avatar"
+            style={styles.image}
+          />
+          {foregroundSource?.mediaId && (
+            <MediaImageRenderer
+              testID="CoverPreview_foreground"
+              source={foregroundSource}
+              tintColor={swapColor(foregroundColor, cardColors)}
+              style={foregroundStyle}
+              alt={'Cover edition foreground'}
+            />
+          )}
+        </View>
+      ) : (
+        mediaSource && <View style={styles.image} />
+      )}
+      {!hideUserName && (
+        <Text
+          variant={variant === 'post' ? 'button' : 'smallbold'}
+          style={styles.userName}
+        >
+          {author?.userName}
+        </Text>
+      )}
+    </>
   );
 };
 
@@ -196,6 +238,7 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       borderRadius: 3,
       marginRight: 10,
       backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey200,
+      aspectRatio: COVER_RATIO,
     },
   },
   post: {

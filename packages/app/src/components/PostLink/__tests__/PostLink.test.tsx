@@ -90,7 +90,6 @@ describe('PostLink', () => {
 
   test('should push to post screen with animation if Post handle is present', async () => {
     mockPostHandle = {
-      getCurrentMediaRenderer: jest.fn(),
       getCurrentVideoTime: jest.fn().mockReturnValue(3.4),
       snapshot: jest.fn(),
     };

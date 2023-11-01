@@ -10,7 +10,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import android.widget.FrameLayout
-import com.azzapp.media.MediaVideoRendererManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
@@ -299,7 +298,7 @@ import kotlin.math.round
       event.putDouble("currentTime", currentPosition / 1000.0)
       eventListener.receiveEvent(
         this.id,
-        MediaVideoRendererManager.ON_PROGRESS,
+        GPUVideoViewManager.ON_PROGRESS,
         event
       )
     }

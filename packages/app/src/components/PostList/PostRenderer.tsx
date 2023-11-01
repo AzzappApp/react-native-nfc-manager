@@ -70,7 +70,6 @@ export type PostRendererProps = ViewProps & {
 };
 
 export type PostRendererHandle = {
-  getCurrentMediaRenderer(): HostComponent<any> | null;
   getCurrentVideoTime(): Promise<number | null>;
   snapshot(): Promise<void>;
 };
@@ -117,16 +116,6 @@ const PostRenderer = (
   useImperativeHandle(
     forwardedRef,
     () => ({
-      getCurrentMediaRenderer() {
-        if (!mediaRef.current) {
-          return null;
-        }
-        if ('getContainer' in mediaRef.current) {
-          return mediaRef.current.getContainer();
-        } else {
-          return mediaRef.current;
-        }
-      },
       async getCurrentVideoTime() {
         if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
           return mediaRef.current.getPlayerCurrentTime();
@@ -143,7 +132,8 @@ const PostRenderer = (
   );
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
-  const shouldPlayVideo = context.visibleVideoPostIds.includes(post.id);
+  const shouldPlayVideo = context.played === post.id;
+  const shouldPauseVideo = context.paused.includes(post.id);
 
   return (
     <View {...props}>
@@ -168,7 +158,9 @@ const PostRenderer = (
           muted={muted}
           paused={paused || !shouldPlayVideo}
           initialTime={initialTime}
-          videoDisabled={videoDisabled}
+          videoDisabled={
+            videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
+          }
         />
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>

@@ -53,7 +53,6 @@ export type PostRendererFeedProps = ViewProps & {
 };
 
 export type PostRendererFeedHandle = {
-  getCurrentMediaRenderer(): HostComponent<any> | null;
   getCurrentVideoTime(): Promise<number | null>;
   snapshot(): Promise<void>;
 };
@@ -91,16 +90,6 @@ const PostRendererFeed = (
   useImperativeHandle(
     forwardedRef,
     () => ({
-      getCurrentMediaRenderer() {
-        if (!mediaRef.current) {
-          return null;
-        }
-        if ('getContainer' in mediaRef.current) {
-          return mediaRef.current.getContainer();
-        } else {
-          return mediaRef.current;
-        }
-      },
       async getCurrentVideoTime() {
         if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
           return mediaRef.current.getPlayerCurrentTime();

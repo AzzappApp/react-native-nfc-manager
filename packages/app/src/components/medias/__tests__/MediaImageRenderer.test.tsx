@@ -12,7 +12,9 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
+        style={{
+          aspectRatio: 2,
+        }}
         alt="An image"
       />,
     );
@@ -30,7 +32,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -52,7 +53,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -70,7 +70,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-2',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,

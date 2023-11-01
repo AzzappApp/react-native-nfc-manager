@@ -1,8 +1,4 @@
-import type {
-  HostComponent,
-  NativeSyntheticEvent,
-  ViewProps,
-} from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type MediaImageRendererProps = ViewProps & {
   /**
@@ -17,10 +13,6 @@ export type MediaImageRendererProps = ViewProps & {
    * The source containing the uri of the media, the cacheId and the requestedSize
    */
   source: { uri: string; mediaId: string; requestedSize: number };
-  /**
-   * The media aspect ratio
-   */
-  aspectRatio: number;
   /**
    * The media tintColor
    */
@@ -54,10 +46,6 @@ export type MediaVideoRendererProps = ViewProps & {
    */
   source: { uri: string; mediaId: string; requestedSize: number };
   /**
-   * The media aspect ratio
-   */
-  aspectRatio: number;
-  /**
    * if true, the video will be paused
    */
   paused?: boolean;
@@ -81,17 +69,17 @@ export type MediaVideoRendererProps = ViewProps & {
   /**
    * A callback called while the video is playing, allowing to track the current time
    */
-  onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
+  onProgress?: (event: { currentTime: number }) => void;
+  /**
+   * true if the video is enabled
+   */
+  videoEnabled?: boolean;
 };
 
 /**
  * The type of the MediaVideoRenderer ref
  */
 export type MediaVideoRendererHandle = {
-  /**
-   * Returns the container of the video
-   */
-  getContainer(): HostComponent<any> | null;
   /**
    * Returns the current time of the video
    */

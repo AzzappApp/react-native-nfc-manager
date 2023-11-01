@@ -1,10 +1,7 @@
 package com.azzapp.media
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
-import android.graphics.Paint
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.media3.common.util.UnstableApi
@@ -148,18 +145,5 @@ import java.util.UUID
   fun cancelVideoPrefetch(uriStr: String) {
     val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) { return }
     VideoCache.cancelPrefetch(uri)
-  }
-
-  @ReactMethod
-  fun addLocalCachedImage(mediaId: String, uri: String) {
-    ImageURICache.addLocalCacheEntry(
-      mediaId,
-      uri
-    )
-  }
-
-  @ReactMethod
-  fun addLocalCachedVideo(mediaId: String, uri: String) {
-    MediaVideoRenderer.addLocalCachedFile(mediaId, uri)
   }
 }

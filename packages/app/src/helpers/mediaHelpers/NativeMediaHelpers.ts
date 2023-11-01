@@ -1,4 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
+import * as AndroidLocalMediaCache from './AndroidLocalMediaCache';
 import { createPrefetecher } from './MediaPrefetcher';
 
 const { AZPMediaHelpers } = NativeModules;
@@ -73,7 +74,9 @@ export const addLocalCachedMediaFile = (
   kind: 'image' | 'video',
   localURI: string,
 ) => {
-  if (kind === 'video') {
+  if (Platform.OS === 'android') {
+    AndroidLocalMediaCache.addLocalCachedMediaFile(mediaId, kind, localURI);
+  } else if (kind === 'video') {
     AZPMediaHelpers.addLocalCachedVideo(mediaId, localURI);
   } else {
     AZPMediaHelpers.addLocalCachedImage(mediaId, localURI);

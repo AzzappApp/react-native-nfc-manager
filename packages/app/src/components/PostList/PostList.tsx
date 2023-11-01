@@ -62,7 +62,10 @@ const PostList = ({
     postKey,
   );
 
-  const [visiblePostIds, setVisiblePostIds] = useState<string[]>([]);
+  const [visiblePostIds, setVisiblePostIds] = useState<{
+    played: string | null;
+    paused: string[];
+  }>({ played: null, paused: [] });
 
   const onViewableItemsChanged = useCallback(
     (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
@@ -80,15 +83,53 @@ const PostList = ({
       if (videoIds.length > 0) {
         //we need to make a specia case for the first and last video which could not be view depeding on configuration
         //look for index 0 and last index
-        if (videoIds[0].index === 0) {
-          setVisiblePostIds([videoIds[0].id]);
-        } else if (videoIds[videoIds.length - 1].index === posts.length - 1) {
-          setVisiblePostIds([videoIds[videoIds.length - 1].id]);
+        if (videoIds[videoIds.length - 1].index === posts.length - 1) {
+          setVisiblePostIds(before =>
+            before.played === videoIds[videoIds.length - 1].id
+              ? before
+              : {
+                  played: videoIds[videoIds.length - 1].id,
+                  paused: before.played
+                    ? [before.played]
+                    : before.paused.length > 1
+                    ? before.paused.includes(videoIds[videoIds.length - 1].id)
+                      ? before.paused.filter(
+                          paused => paused !== videoIds[videoIds.length - 1].id,
+                        )
+                      : before.paused.slice(1)
+                    : before.paused,
+                },
+          );
         } else {
-          setVisiblePostIds([videoIds[0].id]);
+          setVisiblePostIds(before =>
+            before.played === videoIds[0].id
+              ? before
+              : {
+                  played: videoIds[0].id,
+                  paused: before.played
+                    ? [before.played]
+                    : before.paused.length > 1
+                    ? before.paused.includes(videoIds[0].id)
+                      ? before.paused.filter(
+                          paused => paused !== videoIds[0].id,
+                        )
+                      : before.paused.slice(1)
+                    : before.paused,
+                },
+          );
         }
       } else {
-        setVisiblePostIds([]);
+        setVisiblePostIds(before =>
+          before.played === null
+            ? before
+            : {
+                played: null,
+                paused:
+                  before.paused.length > 1
+                    ? before.paused.slice(1).concat(before.played)
+                    : before.paused.concat(before.played),
+              },
+        );
       }
     },
     [posts.length],
@@ -117,7 +158,7 @@ const PostList = ({
   );
 
   return (
-    <PostListContext.Provider value={{ visibleVideoPostIds: visiblePostIds }}>
+    <PostListContext.Provider value={visiblePostIds}>
       <FlashList<Post>
         data={posts}
         renderItem={renderItem}

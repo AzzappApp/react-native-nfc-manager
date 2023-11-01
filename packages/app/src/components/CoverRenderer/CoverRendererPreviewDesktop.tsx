@@ -55,7 +55,6 @@ const CoverRendererPreviewDesktop = ({
             requestedSize: COVER_BASE_WIDTH,
           }}
           tintColor={swapColor(backgroundPatternColor, cardColors)}
-          aspectRatio={COVER_RATIO}
           style={styles.layer}
         />
       )}
@@ -78,7 +77,6 @@ const CoverRendererPreviewDesktop = ({
             requestedSize: COVER_BASE_WIDTH,
           }}
           tintColor={swapColor(foregroundColor, cardColors)}
-          aspectRatio={COVER_RATIO}
           style={styles.layer}
         />
       )}

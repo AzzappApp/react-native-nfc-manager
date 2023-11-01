@@ -37,7 +37,11 @@ function useCameraPermission(): {
   cameraPermission: PermissionStatus;
   requestCameraPermission: () => Promise<void>;
 } {
-  const { status, ask } = usePermission(PERMISSIONS.IOS.CAMERA);
+  const { status, ask } = usePermission(
+    Platform.OS === 'android'
+      ? PERMISSIONS.ANDROID.CAMERA
+      : PERMISSIONS.IOS.CAMERA,
+  );
 
   return {
     cameraPermission: status ?? 'unavailable',
@@ -49,7 +53,11 @@ function useAudioPermission(): {
   audioPermission: PermissionStatus;
   requestAudioPermission: () => Promise<void>;
 } {
-  const { status, ask } = usePermission(PERMISSIONS.IOS.MICROPHONE);
+  const { status, ask } = usePermission(
+    Platform.OS === 'android'
+      ? PERMISSIONS.ANDROID.RECORD_AUDIO
+      : PERMISSIONS.IOS.MICROPHONE,
+  );
 
   return {
     audioPermission: Platform.OS === 'ios' ? status : RESULTS.GRANTED,

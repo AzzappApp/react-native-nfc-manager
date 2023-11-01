@@ -1,21 +1,20 @@
-import { forwardRef, useRef } from 'react';
+import { forwardRef, useCallback, useRef } from 'react';
+import { type HostComponent } from 'react-native';
 import NativeMediaImageRenderer from './NativeMediaImageRenderer';
 import type { MediaImageRendererProps } from './mediasTypes';
 import type { ForwardedRef } from 'react';
-import type { HostComponent } from 'react-native';
 
 /**
  * A native component that allows to display an image, it also implements
  * an aggressive cache system to allow to display images as fast as possible.
- * Uses the [nuke](https://github.com/kean/Nuke) on iOS and [Glide](https://github.com/bumptech/glide)
- * On Android.
+ * Uses the [nuke](https://github.com/kean/Nuke) on iOS.
+ *
  * If a version of the image in a different size is already in cache it will be used as a placeholder.
  */
 const MediaImageRenderer = (
   {
     alt,
     source,
-    aspectRatio,
     onLoad,
     onReadyForDisplay,
     style,
@@ -34,20 +33,20 @@ const MediaImageRenderer = (
     isReady.current = false;
   }
 
-  const onImageLoad = () => {
+  const onImageLoad = useCallback(() => {
     if (!isReady.current) {
       onReadyForDisplay?.();
       isReady.current = true;
     }
     onLoad?.();
-  };
+  }, [onLoad, onReadyForDisplay]);
 
-  const onPlaceHolderImageLoad = () => {
+  const onPlaceHolderImageLoad = useCallback(() => {
     if (!isReady.current) {
       onReadyForDisplay?.();
       isReady.current = true;
     }
-  };
+  }, [onReadyForDisplay]);
 
   return (
     <NativeMediaImageRenderer
@@ -57,7 +56,7 @@ const MediaImageRenderer = (
       accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
-      style={[{ aspectRatio, overflow: 'hidden' }, style]}
+      style={style}
       tintColor={tintColor}
       {...props}
     />
