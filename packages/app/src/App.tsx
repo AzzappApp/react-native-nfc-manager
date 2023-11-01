@@ -63,6 +63,7 @@ import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import WelcomeScreen from '#screens/HomeScreen/WelcomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
@@ -184,6 +185,7 @@ const screens = {
   INVITE_FRIENDS: InviteFriendsScreen,
   CONTACT_CARD: ContactCardScreen,
   ONBOARDING: WelcomeScreen,
+  LIKED_POSTS: LikedPostsScreen,
 };
 
 const tabs = {

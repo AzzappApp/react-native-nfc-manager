@@ -12,6 +12,7 @@ import { Node } from './NodeResolvers';
 import * as PostResolvers from './PostResolvers';
 import * as ProfileResolvers from './ProfileResolvers';
 import * as QueryResolvers from './QueryResolvers';
+import * as StatisticResolvers from './StatisticResolvers';
 import * as UserResolvers from './UserResolvers';
 import * as ViewerResolvers from './ViewerResolvers';
 import type { Resolvers } from './__generated__/types';
@@ -32,6 +33,7 @@ const resolvers: Resolvers = {
   ...ViewerResolvers,
   ...CardTemplateResolvers,
   ...CardTemplateTypeResolvers,
+  ...StatisticResolvers,
   Node,
 };
 

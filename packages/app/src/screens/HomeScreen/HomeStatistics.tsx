@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
@@ -21,7 +22,6 @@ import { colors, fontFamilies } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Text from '#ui/Text';
 import HomeStatisticsChart from './HomeStatisticsChart';
-import type { StatsData, StatsDataGroup } from './HomeStatisticsChart';
 import type { HomeStatistics_user$key } from '@azzapp/relay/artifacts/HomeStatistics_user.graphql';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -42,126 +42,79 @@ const HomeStatistics = ({
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
   //TODO: backend part .
-  const { profiles } = useFragment(
+  const data = useFragment(
     graphql`
       fragment HomeStatistics_user on User {
         profiles {
           id
-          statsSummary {
-            date
-            scans
-            webcardViews
-            totalLikes
-          }
+          nbLikes
+          nbWebcardViews
+          nbContactCardScans
         }
+        ...HomeStatisticsChart_user
       }
     `,
     user,
   );
 
-  // Convert to have the correct type for matrix animation chart
-  const chartsData = useMemo(() => {
-    const result: Array<{ date: string; data: StatsData[] }> = [];
-    if (profiles) {
-      profiles.forEach(profile => {
-        if (profile.statsSummary) {
-          profile.statsSummary.forEach(stats => {
-            if (stats) {
-              const index = result.findIndex(item => item.date === stats.date);
-
-              if (index === -1) {
-                result.push({ date: stats.date, data: [stats] });
-              } else {
-                result[index].data.push(stats);
-              }
-            }
-          });
-        }
-      });
-      return result;
-    }
-    return [];
-  }, [profiles]);
-
   const { width } = useWindowDimensions();
   const intl = useIntl();
-
-  //TODO: use real data.Sum the value of the charts waiting for real data
-  const sumValues = useMemo(
-    () =>
-      chartsData.reduce((acc: StatsData[], group: StatsDataGroup) => {
-        group.data.forEach((data, index) => {
-          if (!acc[index]) {
-            acc[index] = { scans: 0, webcardViews: 0, totalLikes: 0 };
-          }
-
-          acc[index].scans += data.scans;
-          acc[index].webcardViews += data.webcardViews;
-          acc[index].totalLikes += data.totalLikes;
-        });
-
-        return acc;
-      }, []),
-    [chartsData],
-  );
-
-  const shareSums = useSharedValue(sumValues);
 
   const scrollIndexOffset = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
 
-  const totalLikes = useSharedValue(
-    format(sumValues[currentUserIndex]?.totalLikes ?? 0),
+  const totalLikes = useSharedValue(format(0));
+  const totalScans = useSharedValue(format(0));
+  const totalViews = useSharedValue(format(0));
+
+  const inputRange = _.range(0, data.profiles?.length);
+  const { profiles } = data;
+  const likes = useMemo(
+    () => profiles?.map(profile => profile.nbLikes) ?? [],
+    [profiles],
   );
-  const totalScans = useSharedValue(
-    format(sumValues[currentUserIndex]?.scans ?? 0),
+  const contactcardScans = useMemo(
+    () => profiles?.map(profile => profile.nbContactCardScans) ?? [],
+    [profiles],
   );
-  const totalViews = useSharedValue(
-    format(sumValues[currentUserIndex]?.webcardViews ?? 0),
+  const webcardViews = useMemo(
+    () => profiles?.map(profile => profile.nbWebcardViews) ?? [],
+    [profiles],
   );
 
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      const prevIndex = Math.floor(actual);
-      if (actual >= 0 && animated) {
-        const nextIndex = Math.ceil(actual);
-        const previous = shareSums.value[prevIndex] ?? 0;
-        const next =
-          shareSums.value[Math.min(nextIndex, shareSums.value.length - 1)] ?? 0;
-
+      if (profiles && profiles?.length > 1 && actual >= 0 && animated) {
         totalLikes.value = format(
-          interpolate(
-            currentProfileIndexSharedValue.value,
-            [prevIndex, nextIndex],
-            [previous.totalLikes, next.totalLikes],
-          ),
+          interpolate(currentProfileIndexSharedValue.value, inputRange, likes),
         );
         totalScans.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
-            [prevIndex, nextIndex],
-            [previous.scans, next.scans],
+            inputRange,
+            contactcardScans,
           ),
         );
         totalViews.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
-            [prevIndex, nextIndex],
-            [previous.webcardViews, next.webcardViews],
+            inputRange,
+            webcardViews,
           ),
         );
       } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
-        totalLikes.value = format(shareSums.value[prevIndex]?.totalLikes ?? 0);
-        totalScans.value = format(shareSums.value[prevIndex]?.scans ?? 0);
-        totalViews.value = format(
-          shareSums.value[prevIndex]?.webcardViews ?? 0,
-        );
+        //use to hide animation if not show. few perf gain
+        const prevIndex = Math.floor(actual);
+        totalLikes.value = format(likes[prevIndex] ?? 0);
+        totalScans.value = format(contactcardScans[prevIndex] ?? 0);
+        totalViews.value = format(webcardViews[prevIndex] ?? 0);
       }
     },
-    [currentProfileIndexSharedValue.value, animated],
+
+    [currentProfileIndexSharedValue.value, animated, profiles, inputRange],
   );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
@@ -180,7 +133,7 @@ const HomeStatistics = ({
         animated={animated}
         currentUserIndex={currentUserIndex}
         currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-        chartsData={chartsData}
+        user={data}
       />
       <AnimatedScrollView
         ref={scrollViewRef}

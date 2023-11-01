@@ -8,29 +8,82 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
+import type { HomeStatisticsChart_user$key } from '@azzapp/relay/artifacts/HomeStatisticsChart_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeStatisticsChartProps = {
+  user: HomeStatisticsChart_user$key;
   width: number;
   height: number;
   statsScrollIndex: SharedValue<number>;
   animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
-  chartsData: StatsDataGroup[];
 };
 // * TODO: using SKIA here would have been great, but need to be validated by dev team.
 // Until we have reanimated3, some part of skia a running on JS thread , so can wait
 const HomeStatisticsChart = ({
+  user,
   width,
   height,
   statsScrollIndex,
   animated,
   currentProfileIndexSharedValue,
   currentUserIndex,
-  chartsData,
 }: HomeStatisticsChartProps) => {
+  const { profiles } = useFragment(
+    graphql`
+      fragment HomeStatisticsChart_user on User {
+        profiles {
+          statsSummary {
+            day
+            contactcardScans
+            webcardViews
+            likes
+          }
+        }
+      }
+    `,
+    user,
+  );
+
+  // Convert to have the correct type for matrix animation chart
+  const chartsData = useMemo(() => {
+    if (profiles) {
+      const result = Array.from({ length: 30 }, (_, i) => {
+        const d = new Date(new Date().toISOString().split('T')[0]);
+        d.setDate(d.getDate() - 30 + i + 1);
+
+        return {
+          day: d.toISOString(),
+          data: Array(profiles?.length ?? 0).fill({
+            contactcardScans: 0,
+            webcardViews: 0,
+            likes: 0,
+          }),
+        };
+      });
+      profiles.forEach(profile => {
+        if (profile.statsSummary) {
+          profile.statsSummary.forEach((stats, indexProfile) => {
+            if (stats) {
+              const index = result.findIndex(item => item.day === stats.day);
+              if (index === -1) {
+                result.push({ day: stats.day, data: [stats] });
+              } else {
+                result[index].data[indexProfile] = stats;
+              }
+            }
+          });
+        }
+      });
+      return result;
+    }
+    return [];
+  }, [profiles]);
+
   const chartBarWidth = useMemo(() => {
     return width / 30;
   }, [width]);
@@ -39,26 +92,26 @@ const HomeStatisticsChart = ({
     const filtered = chartsData.reduce((acc: StatsData[], group) => {
       group.data.forEach((data, index) => {
         if (!acc[index]) {
-          acc[index] = { scans: 0, webcardViews: 0, totalLikes: 0 };
+          acc[index] = { contactcardScans: 0, webcardViews: 0, likes: 0 };
         }
 
-        acc[index].scans = Math.max(acc[index].scans, data.scans);
+        acc[index].contactcardScans = Math.max(
+          acc[index].contactcardScans,
+          data.contactcardScans,
+        );
         acc[index].webcardViews = Math.max(
           acc[index].webcardViews,
           data.webcardViews,
         );
-        acc[index].totalLikes = Math.max(
-          acc[index].totalLikes,
-          data.totalLikes,
-        );
+        acc[index].likes = Math.max(acc[index].likes, data.likes);
       });
 
       return acc;
     }, []);
     return filtered.flatMap(obj => [
       obj.webcardViews,
-      obj.scans,
-      obj.totalLikes,
+      obj.contactcardScans,
+      obj.likes,
     ]);
   }, [chartsData]);
 
@@ -144,8 +197,8 @@ const AnimatedBarChartItem = ({
   //we need to flatten the matrixTransform, cannot find a way to interpolate a matrix
   const flattenedData = item.data.flatMap(obj => [
     obj.webcardViews,
-    obj.scans,
-    obj.totalLikes,
+    obj.contactcardScans,
+    obj.likes,
   ]);
   const animatedStyle = useAnimatedStyle(() => {
     const currentValue = flattenedData[currentUserIndex * 3 + statsIndex];
@@ -199,13 +252,14 @@ const AnimatedBarChartItem = ({
         ],
       );
 
-      const max = maxValuePanel + maxValueProfile - currentMax;
+      const max = Math.max(1, maxValuePanel + maxValueProfile - currentMax); //Avoid max =0, division by zero what broke animation transition
 
       return {
         height: `${
           ((interpolateValueProfile + interpolateValuePanel - currentValue) /
             max) *
-          100
+            95 +
+          5
         }%`,
       };
     } else {
@@ -228,6 +282,18 @@ const AnimatedBarChartItem = ({
             backgroundColor: colors.white,
             borderTopLeftRadius: chartBarWidth / 2,
             borderTopRightRadius: chartBarWidth / 2,
+            height: '5%',
+            position: 'absolute',
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          {
+            width: chartBarWidth - CHART_BAR_SEPARATOR,
+            backgroundColor: colors.white,
+            borderTopLeftRadius: chartBarWidth / 2,
+            borderTopRightRadius: chartBarWidth / 2,
           },
           animatedStyle,
         ]}
@@ -238,12 +304,12 @@ const AnimatedBarChartItem = ({
 const AnimatedBarChart = memo(AnimatedBarChartItem);
 
 export type StatsData = {
-  scans: number;
+  contactcardScans: number;
   webcardViews: number;
-  totalLikes: number;
+  likes: number;
 };
 
 export type StatsDataGroup = {
-  date: string;
+  day: string;
   data: StatsData[];
 };

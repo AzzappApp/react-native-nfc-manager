@@ -106,6 +106,11 @@ export type FollowersRoute = {
   params?: never;
 };
 
+export type LikedPostsRoute = {
+  route: 'LIKED_POSTS';
+  params?: never;
+};
+
 export type AccountDetailsRoute = {
   route: 'ACCOUNT_DETAILS';
   params?: never;
@@ -146,6 +151,7 @@ export type Route =
   | ForgotPasswordRoute
   | HomeRoute
   | InviteFriendsRoute
+  | LikedPostsRoute
   | MediaRoute
   | NewPostRoute
   | NewProfileRoute

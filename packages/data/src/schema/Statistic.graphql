@@ -1,0 +1,30 @@
+"""
+Template for a cover
+"""
+type Statistic implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  The profile ID of an object
+  """
+  profileId: ID!
+  """
+  The Date for the daily stats
+  """
+  day: String!
+  """
+  Number of webcardsView for the day
+  """
+  webcardViews: Int!
+  """
+  Number of contactcardScans for the day
+  """
+  contactcardScans:Int!
+  """
+  Number of likes (post....) recevied for the day
+  """
+  likes: Int!
+
+}

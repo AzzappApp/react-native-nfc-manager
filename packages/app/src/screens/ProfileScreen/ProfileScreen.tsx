@@ -13,6 +13,7 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
+import { useWebcardViewStatistic } from '#hooks/useStatistics';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
@@ -46,7 +47,7 @@ const ProfileScreen = ({
   ProfileScreenByIdQuery | ProfileScreenByUserNameQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
-
+  useWebcardViewStatistic(params.profileId ?? data.profile?.id);
   const [ready, setReady] = useState(false);
   useNativeNavigationEvent('appear', () => {
     setReady(true);

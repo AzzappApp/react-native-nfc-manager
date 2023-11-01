@@ -186,10 +186,10 @@ const ProfileForm = (
           profileKind
           #required data on HomeScreen
           statsSummary {
-            date
-            scans
+            day
+            contactcardScans
             webcardViews
-            totalLikes
+            likes
           }
           ...ContactCard_profile
           nbPosts

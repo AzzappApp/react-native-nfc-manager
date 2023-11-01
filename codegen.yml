@@ -42,6 +42,7 @@ generates:
         CardStyle: ../../domains#CardStyle as CardStyleModel
         ContactCard: ../../domains#Profile as ProfileModel
         ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
+        Statistic: ../../domains#Statistic as StatisticModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { PostTable, ProfileTable, db } from '#domains';
+import { PostTable, ProfileTable, db, updateStatistics } from '#domains';
 import {
   deletePostReaction,
   getPostReaction,
@@ -54,6 +54,14 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           nbLikes: removeReaction? sql`${ProfileTable.nbLikes} - 1`: sql`${ProfileTable.nbLikes} + 1`,
         })
         .where(eq(ProfileTable.id, post.authorId));
+      await trx
+        .update(ProfileTable)
+        .set({
+          //prettier-ignore
+          nbPostsLiked: removeReaction? sql`${ProfileTable.nbPostsLiked} - 1`: sql`${ProfileTable.nbPostsLiked} + 1`,
+        })
+        .where(eq(ProfileTable.id, profileId));
+      await updateStatistics(post.authorId, 'likes', !removeReaction, trx);
     });
   } catch (e) {
     console.error(e);

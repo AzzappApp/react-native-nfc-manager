@@ -1,8 +1,9 @@
 'use client';
 import cn from 'classnames';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
+import { updateWebcardViews } from '#app/actions/statisticsAction';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './ProfilePage.css';
@@ -37,6 +38,13 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
   const [postsOpen, setPostsOpen] = useState(false);
 
   const hasPosts = posts.length > 0;
+
+  useEffect(() => {
+    if (profile?.id) {
+      updateWebcardViews(profile?.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

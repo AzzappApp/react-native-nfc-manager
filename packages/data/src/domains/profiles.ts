@@ -87,7 +87,10 @@ export const ProfileTable = mysqlTable(
     nbFollowers: int('nbFollowers').default(0).notNull(),
     nbFollowings: int('nbFollowings').default(0).notNull(),
     nbPosts: int('nbPosts').default(0).notNull(),
-    nbLikes: int('nbLikes').default(0).notNull(),
+    nbPostsLiked: int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
+    nbLikes: int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
+    nbWebcardViews: int('nbWebcardViews').default(0).notNull(),
+    nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
   },
   table => {
     return {

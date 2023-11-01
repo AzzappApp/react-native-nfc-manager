@@ -6,8 +6,13 @@ import {
   getProfilesPosts,
   isFollowing,
   getCardModules,
+  getLastStatisticsFor,
+  getLikedPosts,
 } from '#domains';
-import { generateFakeInsightsData } from '#helpers/fakerHelper';
+import {
+  connectionFromDateSortedItems,
+  cursorToDate,
+} from '#helpers/connectionsHelpers';
 import { getLabel, idResolver } from './utils';
 import type {
   CompanyActivityResolvers,
@@ -70,8 +75,21 @@ export const Profile: ProfileResolvers = {
       },
     );
   },
-  statsSummary: async () => {
-    return generateFakeInsightsData(30);
+  statsSummary: async profile => {
+    //get data for the last 30 day
+    const result = await getLastStatisticsFor(profile.id, 30);
+    return result;
+  },
+  likedPosts: async (profile, args) => {
+    const limit = args.first ?? 100;
+    const offset = args.after ? cursorToDate(args.after) : null;
+    const posts = await getLikedPosts(profile.id, limit + 1, offset);
+    const sizedPosts = posts.slice(0, limit);
+    return connectionFromDateSortedItems(sizedPosts, {
+      getDate: post => post.createdAt,
+      hasNextPage: posts.length > limit,
+      hasPreviousPage: offset !== null,
+    });
   },
 };
 
