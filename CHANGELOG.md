@@ -1,4 +1,4 @@
-## 0.5.1-canary.46
+## 0.5.1-canary.47
 
 * **feat:**  - implements real stats ([#1549](https://github.com/AzzappApp/azzapp/pull/1549))
 * **feat:**  - lut filter system ([#1559](https://github.com/AzzappApp/azzapp/pull/1559))
