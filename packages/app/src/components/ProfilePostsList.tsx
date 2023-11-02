@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import { StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -82,7 +82,8 @@ const ProfilePostList = ({
   );
 };
 
-export default ProfilePostList;
+//TODO: should be tested in real condition, on dev android, it feels better
+export default memo(ProfilePostList);
 
 const FOOTER_ICONS_HEIGHT = 50;
 

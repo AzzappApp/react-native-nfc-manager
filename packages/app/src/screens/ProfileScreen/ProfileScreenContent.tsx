@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useRef, useState } from 'react';
+import { Suspense, memo, useCallback, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -412,4 +412,4 @@ const ProfileScreenContent = ({
   );
 };
 
-export default ProfileScreenContent;
+export default memo(ProfileScreenContent);
