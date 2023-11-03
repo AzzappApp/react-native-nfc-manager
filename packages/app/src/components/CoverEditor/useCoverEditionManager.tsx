@@ -778,7 +778,7 @@ const useCoverEditionManager = ({
             );
           }
         }
-        onCoverSaved();
+        setProgressIndicator(null);
       },
       onError: error => {
         console.error(error);
@@ -809,7 +809,6 @@ const useCoverEditionManager = ({
     currentCoverStyle,
     maskMedia,
     profile?.profileKind,
-    onCoverSaved,
     intl,
   ]);
 
@@ -885,7 +884,7 @@ const useCoverEditionManager = ({
             onSave={onSaveCropData}
           />
         )}
-        <ScreenModal visible={!!progressIndicator}>
+        <ScreenModal visible={!!progressIndicator} onDisappear={onCoverSaved}>
           {progressIndicator && (
             <UploadProgressModal progressIndicator={progressIndicator} />
           )}
@@ -902,6 +901,7 @@ const useCoverEditionManager = ({
       maskMedia,
       mediaCropParameter,
       mediaKind,
+      onCoverSaved,
       onMediaSelected,
       onSaveCropData,
       openImagePicker,

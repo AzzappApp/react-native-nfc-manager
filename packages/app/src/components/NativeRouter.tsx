@@ -566,10 +566,16 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         });
       },
       hideModal(modalId: string) {
+        const modal = routerStateRef.current.modals.find(
+          modal => modal.id === modalId,
+        );
+
         dispatch({
           type: 'HIDE_MODAL',
           payload: { modalId },
         });
+
+        modal?.onDisappear?.();
       },
       back() {
         const currentRoute = getCurrentRoute();
