@@ -1,5 +1,6 @@
-## 0.5.1-canary.48
+## 0.5.1-canary.49
 
+* **fix:**  - 🐛 save cover correctly ([#1562](https://github.com/AzzappApp/azzapp/pull/1562))
 * **feat:**  - implements real stats ([#1549](https://github.com/AzzappApp/azzapp/pull/1549))
 * **feat:**  - lut filter system ([#1559](https://github.com/AzzappApp/azzapp/pull/1559))
 * **fix:**  - remove message if no comment Bug-20231012-10 - post comment counter - incorrect texts [#1417](https://github.com/AzzappApp/azzapp/pull/1417) ([#1556](https://github.com/AzzappApp/azzapp/pull/1556))
