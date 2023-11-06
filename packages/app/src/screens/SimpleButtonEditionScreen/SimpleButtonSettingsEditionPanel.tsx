@@ -259,6 +259,7 @@ const SimpleButtonSettingsEditionPanel = ({
             style={{ flex: 1 }}
             onFocus={onFocus}
             onBlur={onBlur}
+            autoCapitalize="none"
           />
         </View>
         <View style={styles.buttonContainer}>
