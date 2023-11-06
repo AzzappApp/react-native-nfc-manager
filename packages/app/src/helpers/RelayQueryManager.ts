@@ -6,7 +6,12 @@ import {
   addEnvironmentListener,
   getRelayEnvironment,
 } from './relayEnvironment';
-import type { GraphQLTaggedNode, PreloadedQuery, Variables } from 'react-relay';
+import type {
+  FetchPolicy,
+  GraphQLTaggedNode,
+  PreloadedQuery,
+  Variables,
+} from 'react-relay';
 
 /**
  * This module is used to load and dispose queries for a given screen.
@@ -160,6 +165,10 @@ export type LoadQueryOptions<TParams> = {
    * If true, the query will be bound to the current profile
    */
   profileBound?: boolean;
+  /**
+   * The request fetch policy
+   */
+  fetchPolicy?: FetchPolicy | null | undefined;
 };
 
 /**
@@ -190,6 +199,7 @@ export const loadQueryFor = <T>(
       multiActorEnvironment.forActor(actorId),
       query,
       variables,
+      { fetchPolicy: options.fetchPolicy },
     );
     activeQueries.set(screenId, {
       query,

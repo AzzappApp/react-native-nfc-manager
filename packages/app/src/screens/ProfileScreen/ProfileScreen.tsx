@@ -418,6 +418,7 @@ export default relayScreen(ProfileScreen, {
   query: getQuery,
   getVariables: ({ userName, profileId }) =>
     profileId ? { profileId } : { userName },
+  fetchPolicy: 'store-and-network',
 });
 
 const styles = StyleSheet.create({
