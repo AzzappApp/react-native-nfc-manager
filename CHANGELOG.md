@@ -1,5 +1,6 @@
-## 0.5.1-canary.54
+## 0.5.1-canary.55
 
+* **fix:**  - **CoverEdition:** complete refactoring ([#1575](https://github.com/AzzappApp/azzapp/pull/1575))
 * **feat:**  - 🎸 refresh medias ([#1581](https://github.com/AzzappApp/azzapp/pull/1581))
 * **fix:**  - **android:** [#1561](https://github.com/AzzappApp/azzapp/pull/1561) pause video during export to avoid crash on android ([#1577](https://github.com/AzzappApp/azzapp/pull/1577))
 * **feat:**  - 🎸 add option to fetch with network for profile ([#1567](https://github.com/AzzappApp/azzapp/pull/1567))
