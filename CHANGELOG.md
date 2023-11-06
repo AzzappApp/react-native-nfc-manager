@@ -1,5 +1,6 @@
-## 0.5.1-canary.49
+## 0.5.1-canary.50
 
+* **Android:**  - Home && fix ([#1565](https://github.com/AzzappApp/azzapp/pull/1565))
 * **fix:**  - 🐛 save cover correctly ([#1562](https://github.com/AzzappApp/azzapp/pull/1562))
 * **feat:**  - implements real stats ([#1549](https://github.com/AzzappApp/azzapp/pull/1549))
 * **feat:**  - lut filter system ([#1559](https://github.com/AzzappApp/azzapp/pull/1559))
