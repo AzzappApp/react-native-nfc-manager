@@ -2,6 +2,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { sql } from 'drizzle-orm';
 import { mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
+import type { Media } from './medias';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
@@ -25,18 +26,27 @@ export type NewMediaSuggestion = InferInsertModel<typeof MediaSuggestionTable>;
  */
 export const getMediaSuggestions = async (
   randomSeed: string,
+  kind: 'image' | 'video',
   profileCategoryId: string,
   companyActivityId: string | null | undefined,
   offset?: string | null,
   limit?: number | null,
 ) => {
+  // TODO perhaps we should have a property `kind` on MediaSuggestion
   const query = sql`
-  SELECT *, RAND(${randomSeed}) as cursor
-  FROM MediaSuggestion `;
+  SELECT Media.*, RAND(${randomSeed}) as cursor
+  FROM MediaSuggestion 
+  INNER JOIN Media ON MediaSuggestion.mediaId = Media.id
+  WHERE Media.kind = ${kind} `;
+
   if (companyActivityId == null) {
-    query.append(sql` WHERE profileCategoryId = ${profileCategoryId}`);
+    query.append(
+      sql` AND MediaSuggestion.profileCategoryId = ${profileCategoryId}`,
+    );
   } else {
-    query.append(sql` WHERE companyActivityId = ${companyActivityId}`);
+    query.append(
+      sql` AND MediaSuggestion.companyActivityId = ${companyActivityId}`,
+    );
     //keep it for futur usage
     // query.append(
     //   sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL)
@@ -51,9 +61,8 @@ export const getMediaSuggestions = async (
   if (limit) {
     query.append(sql` LIMIT ${limit} `);
   }
-  return (await db.execute(query)).rows as Array<
-    MediaSuggestion & { cursor: string }
-  >;
+  const rows = (await db.execute(query)).rows;
+  return rows as Array<Media & { cursor: string }>;
 };
 //keep it. this request should group to make the search they want
 // SELECT mediaId, GROUP_CONCAT(DISTINCT profileCategoryId) as profileCategoryIds, GROUP_CONCAT(DISTINCT companyActivityId) as companyActivityIds

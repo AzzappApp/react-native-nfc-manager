@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { ReactRelayContext, RelayEnvironmentProvider } from 'react-relay';
 import { createId } from '#helpers/idHelpers';
+import useLatestCallback from '#hooks/useLatestCallback';
 import { useRouter } from './NativeRouter';
 import type { ReactNode } from 'react';
 
@@ -22,13 +23,9 @@ const ScreenModal = ({
   const id = useMemo(() => createId(), []);
   const relayContext = useContext(ReactRelayContext);
 
-  const descriptor = useMemo(
-    () => ({
-      id,
-      animationType,
-      onWillAppear,
-      onDisappear,
-      children: children ? (
+  const content = useMemo(
+    () =>
+      children ? (
         relayContext ? (
           <RelayEnvironmentProvider {...relayContext}>
             {children}
@@ -37,8 +34,20 @@ const ScreenModal = ({
           children
         )
       ) : null,
+    [children, relayContext],
+  );
+
+  const onWillAppearRef = useLatestCallback(onWillAppear);
+  const onDisappearRef = useLatestCallback(onDisappear);
+
+  const descriptor = useMemo(
+    () => ({
+      id,
+      animationType,
+      onWillAppearRef,
+      onDisappearRef,
     }),
-    [id, animationType, onWillAppear, onDisappear, children, relayContext],
+    [id, animationType, onWillAppearRef, onDisappearRef],
   );
 
   const router = useRouter();
@@ -49,11 +58,16 @@ const ScreenModal = ({
   }, [router]);
 
   useEffect(() => {
+    routerRef.current.setModalContent(id, content);
+  }, [id, content]);
+
+  useEffect(() => {
     if (visible) {
-      routerRef.current.showModal(descriptor);
+      routerRef.current.showModal(descriptor, content);
     } else {
       routerRef.current.hideModal(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, descriptor, visible]);
 
   useEffect(

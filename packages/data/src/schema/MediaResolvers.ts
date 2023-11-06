@@ -124,16 +124,18 @@ const uriResolver =
       width,
       height,
       pixelRatio,
+      raw,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
+      raw?: boolean | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
     media = getDefferedMedia(media);
     const id = decodeMediaId(typeof media === 'string' ? media : media.id);
-    if (assetKind === 'coverSource') {
+    if (assetKind === 'coverSource' || raw) {
       return getCloudinaryAssetURL(id, kind);
     }
     const pregeneratedSizes =

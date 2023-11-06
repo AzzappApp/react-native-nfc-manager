@@ -30,7 +30,6 @@ type RouteInstance = BasicRoute | StackRoute | TabsRoute;
 type ModalDescriptor = {
   id: string;
   ownerId: string;
-  children: ReactNode | null;
   animationType: 'fade' | 'none' | 'slide';
   onWillAppear?: () => void;
   onDisappear?: () => void;
@@ -48,12 +47,20 @@ type ReplaceAction = {
 
 type ShowModalAction = {
   type: 'SHOW_MODAL';
-  payload: Omit<ModalDescriptor, 'ownerId'>;
+  payload: {
+    descriptor: Omit<ModalDescriptor, 'ownerId'>;
+    initialContent: ReactNode;
+  };
 };
 
 type HideModalAction = {
   type: 'HIDE_MODAL';
   payload: { modalId: string };
+};
+
+type SetModalContentAction = {
+  type: 'SET_MODAL_CONTENT';
+  payload: { modalId: string; content: ReactNode };
 };
 
 type PopAction = {
@@ -91,6 +98,7 @@ type RouterAction =
   | ReplaceAction
   | ReplaceAllAction
   | ScreenDismissedAction
+  | SetModalContentAction
   | SetTabAction
   | ShowModalAction;
 
@@ -103,7 +111,7 @@ type TabsState = {
 
 export type RouterState = {
   stack: StackState;
-  modals: ModalDescriptor[];
+  modals: Array<ModalDescriptor & { children: ReactNode }>;
 };
 
 const stackReducer = (
@@ -278,23 +286,42 @@ const routerReducerWithModal = (
   switch (action.type) {
     case 'SHOW_MODAL': {
       const index = state.modals.findIndex(
-        modal => modal.id === action.payload.id,
+        modal => modal.id === action.payload.descriptor.id,
       );
+      const modal = {
+        ...action.payload.descriptor,
+        children: action.payload.initialContent,
+        ownerId: currentRoute.id,
+      };
       if (index !== -1) {
         return {
           stack: state.stack,
           modals: [
             ...state.modals.slice(0, index),
-            { ...action.payload, ownerId: currentRoute.id },
+            modal,
             ...state.modals.slice(index + 1),
           ],
         };
       }
       return {
         stack: state.stack,
+        modals: [...state.modals, modal],
+      };
+    }
+    case 'SET_MODAL_CONTENT': {
+      const index = state.modals.findIndex(
+        modal => modal.id === action.payload.modalId,
+      );
+      if (index === -1) {
+        return state;
+      }
+      const modal = state.modals[index];
+      return {
+        stack: state.stack,
         modals: [
-          ...state.modals,
-          { ...action.payload, ownerId: currentRoute.id },
+          ...state.modals.slice(0, index),
+          { ...modal, children: action.payload.content },
+          ...state.modals.slice(index + 1),
         ],
       };
     }
@@ -320,7 +347,11 @@ export type NativeRouter = {
   back(): void;
   canGoBack(): boolean;
   pop(num: number): void;
-  showModal(route: Omit<ModalDescriptor, 'ownerId'>): void;
+  showModal(
+    route: Omit<ModalDescriptor, 'ownerId'>,
+    initialContent: ReactNode,
+  ): void;
+  setModalContent(id: string, content: ReactNode): void;
   hideModal(id: string): void;
   getCurrentRoute(): Route | null;
   getCurrentScreenId(): string | null;
@@ -418,8 +449,8 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         dispatchToListeners(routeWillChangeListeners, nextRoute.state);
       }
 
-      setRouterState(newState);
       routerStateRef.current = newState;
+      setRouterState(newState);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -559,10 +590,16 @@ export const useNativeRouter = (init: NativeRouterInit) => {
           payload: { id, kind: 'route', state: route },
         });
       },
-      showModal(descriptor: Omit<ModalDescriptor, 'ownerId'>) {
+      showModal(descriptor: Omit<ModalDescriptor, 'ownerId'>, initialContent) {
         dispatch({
           type: 'SHOW_MODAL',
-          payload: descriptor,
+          payload: { descriptor, initialContent },
+        });
+      },
+      setModalContent(modalId: string, content: ReactNode) {
+        dispatch({
+          type: 'SET_MODAL_CONTENT',
+          payload: { modalId, content },
         });
       },
       hideModal(modalId: string) {

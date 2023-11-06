@@ -310,7 +310,7 @@ export const Viewer: ViewerResolvers = {
   },
   suggestedMedias: async (
     _,
-    { after, first },
+    { kind, after, first },
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
@@ -325,14 +325,15 @@ export const Viewer: ViewerResolvers = {
     const limit = first ?? 100;
     const suggestions = await getMediaSuggestions(
       profile.id,
+      kind,
       profile.profileCategoryId,
       profile.companyActivityId,
       after,
       (first ?? 100) + 1,
     );
     const sizedSuggestion = suggestions.slice(0, limit);
-    const edges = sizedSuggestion.map(({ mediaId, cursor }) => ({
-      node: mediaId,
+    const edges = sizedSuggestion.map(({ cursor, ...media }) => ({
+      node: media,
       cursor,
     })) as any[];
 

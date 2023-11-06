@@ -91,13 +91,9 @@ const CoverRenderer = (
               id
               __typename
               uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
               ... on MediaVideo {
                 thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-              }
-              ... on MediaImage {
-                smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-              }
-              ... on MediaVideo {
                 smallThumbnail: thumbnail(
                   width: 125
                   pixelRatio: $cappedPixelRatio

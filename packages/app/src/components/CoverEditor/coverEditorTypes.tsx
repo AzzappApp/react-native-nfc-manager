@@ -8,13 +8,6 @@ import type {
 
 export type TemplateKind = 'others' | 'people' | 'video';
 
-export type ColorPalette = {
-  readonly id?: string | undefined;
-  readonly primary: string;
-  readonly dark: string;
-  readonly light: string;
-};
-
 export type CoverStyleData = {
   titleStyle: TextStyle;
   subTitleStyle: TextStyle;
@@ -29,4 +22,19 @@ export type CoverStyleData = {
   foregroundColor: string | null;
   merged: boolean;
   segmented: boolean;
+};
+
+export type SourceMedia = {
+  id?: string;
+  uri: string;
+  rawUri?: string;
+  kind: 'image' | 'video';
+  width: number;
+  height: number;
+};
+
+export type MaskMedia = {
+  id?: string;
+  uri: string;
+  source?: string;
 };

@@ -31,7 +31,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
+import type { CoverStyleData, SourceMedia } from './coverEditorTypes';
 import type { CoverEditorTemplateList_templates$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templates.graphql';
 import type { CoverEditorTemplateList_templatesOthers$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesOthers.graphql';
 import type { CoverEditorTemplateList_templatesPeople$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesPeople.graphql';
@@ -41,6 +41,7 @@ import type {
   CoverEditorTemplateListItem_coverTemplate$key,
   CoverTemplateKind,
 } from '@azzapp/relay/artifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   TextOrientation,
   TextPosition,
@@ -51,35 +52,25 @@ import type { ListRenderItemInfo, ViewToken } from 'react-native';
 export type CoverEditorProps = {
   viewer: CoverEditorTemplateList_viewer$key;
   templateKind: CoverTemplateKind;
-  media: {
-    uri: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
-  } | null;
+  media: SourceMedia | null;
   maskUri: string | null;
   title: string | null;
   subTitle: string | null;
-  width: number;
-  height: number;
   mediaCropParameters: EditionParameters | null;
-  timeRange: TimeRange | null;
   currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
+  timeRange: TimeRange | null;
   mediaComputing: boolean;
-  showTemplatesMedias: boolean;
+  width: number;
+  height: number;
   initialSelectedIndex: number;
-  onSelectedIndexChange: (index: number) => void;
-  onCoverStyleChange: (data: CoverStyleData) => void;
-  onColorPaletteChange: (palette: ColorPalette) => void;
-  onPreviewMediaChange: (media: {
-    uri: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
-  }) => void;
-  showSuggestedMedia: boolean;
   videoPaused: boolean;
+  onSelectedIndexChange: (index: number) => void;
+  onSelectedItemChange: (template: {
+    style: CoverStyleData;
+    media: SourceMedia;
+  }) => void;
+  onColorPaletteChange: (palette: ColorPalette) => void;
 };
 
 const CoverEditorTemplateList = ({
@@ -96,12 +87,9 @@ const CoverEditorTemplateList = ({
   currentCoverStyle,
   cardColors,
   mediaComputing,
-  showTemplatesMedias,
   initialSelectedIndex,
-  showSuggestedMedia,
-  onCoverStyleChange,
+  onSelectedItemChange,
   onColorPaletteChange,
-  onPreviewMediaChange,
   onSelectedIndexChange,
   videoPaused,
 }: CoverEditorProps) => {
@@ -187,6 +175,7 @@ const CoverEditorTemplateList = ({
               __typename
               id
               uri(width: 256, pixelRatio: $cappedPixelRatio)
+              rawUri: uri(raw: true)
               width
               height
             }
@@ -237,7 +226,6 @@ const CoverEditorTemplateList = ({
       const templateEditionParameters =
         mediaParameters as EditionParameters | null;
 
-      const displayTemplateMedia = showTemplatesMedias || !media;
       const templateStyleParameters = templateEditionParameters
         ? extractLayoutParameters(templateEditionParameters)[1]
         : null;
@@ -249,26 +237,24 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
-        media:
-          showSuggestedMedia && media
-            ? media
-            : displayTemplateMedia
-            ? {
-                uri: previewMedia.uri,
-                kind:
-                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-                width: previewMedia.width,
-                height: previewMedia.height,
-              }
-            : media,
-        mediaFilter,
-        mediaParameters: displayTemplateMedia
-          ? (templateEditionParameters as EditionParameters | null) ?? {}
+        media: media
+          ? media
           : {
+              uri: previewMedia.uri,
+              rawUri: previewMedia.rawUri,
+              kind:
+                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+              width: previewMedia.width,
+              height: previewMedia.height,
+            },
+        mediaFilter,
+        mediaParameters: media
+          ? {
               ...templateStyleParameters,
               ...mediaCropParameters,
-            },
-        maskUri: kind === 'people' && !showTemplatesMedias ? maskUri : null,
+            }
+          : (templateEditionParameters as EditionParameters | null) ?? {},
+        maskUri: kind === 'people' ? maskUri : null,
         background: background ?? null,
         backgroundColor,
         backgroundPatternColor,
@@ -328,10 +314,8 @@ const CoverEditorTemplateList = ({
     media,
     colorPalettes,
     cardColors,
-    showTemplatesMedias,
     title,
     subTitle,
-    showSuggestedMedia,
     mediaCropParameters,
     maskUri,
   ]);
@@ -392,32 +376,25 @@ const CoverEditorTemplateList = ({
       merged,
     } = selectedItem;
 
-    onCoverStyleChange({
-      titleStyle,
-      subTitleStyle,
-      textOrientation,
-      textPosition,
-      mediaFilter,
-      mediaParameters,
-      background: background ?? null,
-      backgroundColor,
-      backgroundPatternColor,
-      foreground: foreground ?? null,
-      foregroundColor,
-      merged,
-      segmented: segmented ?? templateKind === 'people',
+    onSelectedItemChange({
+      style: {
+        titleStyle,
+        subTitleStyle,
+        textOrientation,
+        textPosition,
+        mediaFilter,
+        mediaParameters,
+        background: background ?? null,
+        backgroundColor,
+        backgroundPatternColor,
+        foreground: foreground ?? null,
+        foregroundColor,
+        merged,
+        segmented: segmented ?? templateKind === 'people',
+      },
+      media: selectedItem.media,
     });
-
-    if (!media) {
-      onPreviewMediaChange(selectedItem.media);
-    }
-  }, [
-    media,
-    onCoverStyleChange,
-    onPreviewMediaChange,
-    selectedItem,
-    templateKind,
-  ]);
+  }, [media, onSelectedItemChange, selectedItem, templateKind]);
 
   const selectedItemId = useMemo(() => selectedItem?.id, [selectedItem?.id]);
 
@@ -836,7 +813,8 @@ const computeTemplatesPalettes = (
 
 const templateKeyExtractor = (item: TemplateListItem) => item.id;
 
-const paletteKeyExtract = (item: ColorPalette) => item.id ?? 'cover';
+const paletteKeyExtract = (item: ColorPalette & { id?: string }) =>
+  item.id ?? 'cover';
 
 type TemplateListItem = {
   id: string;
@@ -844,6 +822,7 @@ type TemplateListItem = {
   titleStyle: TextStyle;
   media: {
     uri: string;
+    rawUri?: string;
     kind: 'image' | 'video';
     width: number;
     height: number;
@@ -868,7 +847,7 @@ type TemplateListItem = {
   foregroundColor: string | null;
   merged: boolean;
   segmented?: boolean;
-  colorPalettes: ColorPalette[];
+  colorPalettes: Array<ColorPalette & { id?: string }>;
 };
 
 const PALETTE_LIST_HEIGHT = 30;

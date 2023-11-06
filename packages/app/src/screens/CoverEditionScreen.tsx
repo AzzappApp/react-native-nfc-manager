@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
@@ -112,18 +112,6 @@ const CoverEditionScreenCoverEditor = ({
     preloadedQuery,
   );
 
-  const templateKind = useMemo(
-    () =>
-      viewer.profile?.cardCover?.media?.__typename === 'MediaVideo'
-        ? 'video'
-        : viewer.profile?.cardCover?.segmented === false
-        ? 'others'
-        : 'people',
-    // we only want to recompute the template kind the first time
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   return (
     <CoverEditor
       ref={coverEditorRef}
@@ -131,7 +119,6 @@ const CoverEditionScreenCoverEditor = ({
       height={editorHeight}
       onCoverSaved={onCoverSaved}
       onCanSaveChange={onCanSaveChange}
-      initialTemplateKind={templateKind}
     />
   );
 };
@@ -140,16 +127,6 @@ const query = graphql`
   query CoverEditionScreenQuery {
     viewer {
       ...CoverEditor_viewer
-      ...useSuggestedMediaManager_suggested
-      profile {
-        ...CoverRenderer_profile
-        cardCover {
-          media {
-            __typename
-          }
-          segmented
-        }
-      }
     }
   }
 `;
@@ -162,12 +139,7 @@ export default relayScreen(CoverEditionScreen, {
       graphql`
         query CoverEditionScreenPrefetchQuery {
           viewer {
-            ...CoverEditorCustom_viewer
-            ...useSuggestedMediaManager_suggested
-            profile {
-              ...CoverRenderer_profile
-              ...useCoverEditionManager_profile @relay(mask: false)
-            }
+            ...CoverEditor_viewer @relay(mask: false)
           }
         }
       `,

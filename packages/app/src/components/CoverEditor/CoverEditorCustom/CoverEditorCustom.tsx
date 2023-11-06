@@ -1,8 +1,9 @@
 import { memoize } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, StyleSheet, View, Platform } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
 import {
   COVER_RATIO,
   textOrientationOrDefaut,
@@ -12,12 +13,17 @@ import { CameraButton, CropButton } from '#components/commonsButtons';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
+import ScreenModal from '#components/ScreenModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import PressableNative from '#ui/PressableNative';
 import SwitchLabel from '#ui/SwitchLabel';
 import TabView from '#ui/TabView';
-import useCoverEditionManager from '../useCoverEditionManager';
+import UploadProgressModal from '#ui/UploadProgressModal';
+import CoverEditorCropModal from '../CoverEditorCropModal';
+import CoverEditiorImagePicker from '../CoverEditorImagePicker';
+import useCoverMediaEditor from '../useCoverMediaEditor';
+import useSaveCover from '../useSaveCover';
 import CoverEditorCustomBackgroundPanel from './CECBackgroundPanel';
 import CoverEditorCustomBottomMenu from './CECBottomMenut';
 import { TOP_PANEL_GAP, TOP_PANEL_PADDING } from './cecConstants';
@@ -28,13 +34,14 @@ import CECTitlePanel from './CECTitlePanel';
 import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
 import type { EditionParameters } from '#components/gpu';
+import type { ImagePickerResult } from '#components/ImagePicker';
 import type {
-  ColorPalette,
   CoverStyleData,
-  TemplateKind,
+  MaskMedia,
+  SourceMedia,
 } from '../coverEditorTypes';
-import type { CoverData } from '../useCoverEditionManager';
 import type { CoverEditorCustom_viewer$key } from '@azzapp/relay/artifacts/CoverEditorCustom_viewer.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 export type CoverEditorCustomProps = {
@@ -45,15 +52,18 @@ export type CoverEditorCustomProps = {
   /**
    * The cover initial data
    */
-  initialData: CoverData;
+  initialData: {
+    title?: string | null;
+    subTitle?: string | null;
+    sourceMedia: SourceMedia;
+    maskMedia?: MaskMedia | null;
+    mediaCropParameters?: EditionParameters | null;
+    coverStyle: CoverStyleData;
+  };
   /**
    * colorPalette
    */
   initialColorPalette: ColorPalette;
-  /**
-   * colorPalette
-   */
-  previewMedia: CoverData['sourceMedia'] | null;
   /**
    * style of the screen
    */
@@ -74,10 +84,6 @@ export type CoverEditorCustomProps = {
    * callback called when the user cancel the cover edition
    */
   onCancel: () => void;
-  /**
-   * Currently selected template kind
-   */
-  templateKind: TemplateKind;
 };
 
 /**
@@ -87,13 +93,11 @@ const CoverEditorCustom = ({
   viewer: viewerKey,
   initialData,
   initialColorPalette,
-  previewMedia,
   style,
   // onReady,
   onError,
   onCoverSaved,
   onCancel,
-  templateKind,
 }: CoverEditorCustomProps) => {
   //#region Data dependencies
   const viewer = useFragment(
@@ -102,7 +106,10 @@ const CoverEditorCustom = ({
         ...CECBackgroundPanel_viewer
         ...CECForegroundPanel_viewer
         profile {
-          ...useCoverEditionManager_profile
+          ...useSaveCover_profile
+          cardColors {
+            otherColors
+          }
         }
         coverBackgrounds {
           id
@@ -117,61 +124,36 @@ const CoverEditorCustom = ({
     viewerKey,
   );
   const { coverBackgrounds, coverForegrounds } = viewer ?? {};
+  const cardColors = viewer?.profile?.cardColors;
   //#endregion
 
   //#region Updates management
+  const [title, setTitle] = useState(initialData?.title ?? null);
+  const [subTitle, setSubTitle] = useState(initialData?.subTitle ?? null);
+  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(
+    () => initialData.coverStyle,
+  );
+
   const {
-    title,
-    subTitle,
+    sourceMedia,
     maskMedia,
-    activeSourceMedia,
-    mediaCropParameter,
-    coverStyle,
-    colorPalette,
-    otherColors,
+    timeRange,
+    mediaCropParameters,
+
+    setMediaCropParameters,
+    setSourceMediaFromImagePicker,
     mediaComputing,
-    // TODO handle
-    // mediaComputationError
-    modals,
-    setTitle,
-    setSubTitle,
-    setCoverStyle,
-    toggleCropMode,
-    setColorPalette,
-    setOtherColors,
-    openImagePicker,
-    onSave,
-    progressIndicator,
-  } = useCoverEditionManager({
-    initialData,
-    initialColorPalette,
-    onCoverSaved,
-    profile: viewer.profile ?? null,
-    initialTemplateKind: templateKind,
-  });
-  //#endregion
+    // TODO handle those case
+    // mediaComputationError,
+    // retryMediaComputation,
+  } = useCoverMediaEditor(initialData);
 
-  //#region Displayed values computation;
+  const [colorPalette, setColorPalette] =
+    useState<ColorPalette>(initialColorPalette);
 
-  const errorDispatched = useRef(false);
-  const onMediaError = useCallback(() => {
-    if (!errorDispatched.current) {
-      errorDispatched.current = true;
-      onError?.();
-    }
-  }, [onError]);
-
-  const clippingEnabled = useMemo(() => {
-    if (Platform.OS !== 'ios') {
-      return false;
-    }
-    if (activeSourceMedia?.kind === 'video') {
-      return false;
-    }
-    //get the ios version
-    const version = parseInt(Platform.Version, 10);
-    return version >= 15;
-  }, [activeSourceMedia?.kind]);
+  const [otherColors, setOtherColors] = useState<string[]>(
+    cardColors?.otherColors?.slice() ?? DEFAULT_COLOR_LIST,
+  );
   //#endregion
 
   const onFilterChange = useCallback(
@@ -233,25 +215,6 @@ const CoverEditorCustom = ({
     setEditedParameter(null);
   }, [setCoverStyle]);
 
-  //#endregion
-
-  //#region Segmentation and merge
-  // const onToggleMerge = useCallback(() => {
-  //   setCoverStyle(coverStyle => ({
-  //     ...coverStyle,
-  //     merged: !coverStyle.merged,
-  //   }));
-  // }, [setCoverStyle]);
-
-  const onToggleSegmentation = useCallback(() => {
-    setCoverStyle(coverStyle => ({
-      ...coverStyle,
-      segmented: !coverStyle.segmented,
-    }));
-  }, [setCoverStyle]);
-  //#endregion
-
-  //#region Content edition
   const createStyleFieldUpdater = useMemo<
     <T extends keyof CoverStyleData>(
       field: T,
@@ -278,9 +241,7 @@ const CoverEditorCustom = ({
   const onTextOrientationChange = createStyleFieldUpdater('textOrientation');
 
   const onTextPositionChange = createStyleFieldUpdater('textPosition');
-  //#endregion
 
-  //#region Background
   const onBackgroundChange = useCallback(
     (id: string | null) => {
       setCoverStyle(coverStyle => ({
@@ -299,9 +260,6 @@ const CoverEditorCustom = ({
     'backgroundPatternColor',
   );
 
-  //#endregion
-
-  //#region Foreground
   const onForegroundChange = useCallback(
     (id: string | null) => {
       setCoverStyle(coverStyle => ({
@@ -317,23 +275,122 @@ const CoverEditorCustom = ({
   const onForegroundColorChange = createStyleFieldUpdater('foregroundColor');
   //#endregion
 
-  //#region Tab
+  // #region Save cover
+  const { progressIndicator, saveCover } = useSaveCover(
+    viewer.profile,
+    onCoverSaved,
+  );
+
+  const onSave = useCallback(() => {
+    if (mediaComputing || !sourceMedia) {
+      return;
+    }
+
+    saveCover(
+      title,
+      subTitle,
+      coverStyle,
+      maskMedia,
+      mediaCropParameters ?? {},
+      sourceMedia,
+      colorPalette,
+      cardColors?.otherColors ?? DEFAULT_COLOR_LIST,
+    );
+  }, [
+    cardColors?.otherColors,
+    colorPalette,
+    coverStyle,
+    maskMedia,
+    mediaComputing,
+    mediaCropParameters,
+    saveCover,
+    sourceMedia,
+    subTitle,
+    title,
+  ]);
+  // #endregion
+
+  // #region Image picker
+  const [showImagePicker, setShowImagePicker] = useState(false);
+  const openImagePicker = useCallback(() => {
+    setShowImagePicker(true);
+  }, []);
+
+  const closeImagePicker = useCallback(() => {
+    setShowImagePicker(false);
+  }, []);
+
+  const onMediaSelected = useCallback(
+    (result: ImagePickerResult) => {
+      setSourceMediaFromImagePicker(result);
+      setShowImagePicker(false);
+    },
+    [setSourceMediaFromImagePicker],
+  );
+
+  const errorDispatched = useRef(false);
+  const onMediaError = useCallback(() => {
+    if (!errorDispatched.current) {
+      errorDispatched.current = true;
+      onError?.();
+    }
+  }, [onError]);
+  // #endregion
+
+  // #region Crop mode
+  const [showCropModal, setShowCropModal] = useState(false);
+  const openCropModal = useCallback(() => {
+    setShowCropModal(true);
+  }, []);
+
+  const closeCropModal = useCallback(() => {
+    setShowCropModal(false);
+  }, []);
+
+  const onSaveCropData = useCallback(
+    (editionParameters: EditionParameters) => {
+      setMediaCropParameters(editionParameters);
+      setShowCropModal(false);
+    },
+    [setMediaCropParameters],
+  );
+  // #endregion
+
+  //#region Segmentation and merge
+  const segmentationEnabled = useMemo(
+    () => sourceMedia?.kind !== 'video' && (mediaComputing || maskMedia),
+    [maskMedia, mediaComputing, sourceMedia?.kind],
+  );
+
+  const onToggleSegmentation = useCallback(() => {
+    setCoverStyle(coverStyle => ({
+      ...coverStyle,
+      segmented: !coverStyle.segmented,
+    }));
+  }, [setCoverStyle]);
+
+  // TODO reenable merge when we support it again
+  // const onToggleMerge = useCallback(() => {
+  //   setCoverStyle(coverStyle => ({
+  //     ...coverStyle,
+  //     merged: !coverStyle.merged,
+  //   }));
+  // }, [setCoverStyle]);
+  //#endregion
+
   const [currentTab, setCurrentTab] = useState('image');
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
   }, []);
-  //#endregion
-  const currentMedia = activeSourceMedia ?? previewMedia;
-  const isPreview = activeSourceMedia == null && previewMedia != null;
 
-  const kind = currentMedia?.kind ?? 'image';
-  const uri = currentMedia?.uri ?? null;
+  const kind = sourceMedia?.kind ?? 'image';
+  const uri = sourceMedia?.uri ?? null;
   const editionParameters = useMemo<EditionParameters>(
     () => ({
       ...coverStyle.mediaParameters,
-      ...mediaCropParameter,
+      ...mediaCropParameters,
     }),
-    [coverStyle.mediaParameters, mediaCropParameter],
+    [coverStyle.mediaParameters, mediaCropParameters],
   );
 
   const {
@@ -414,9 +471,9 @@ const CoverEditorCustom = ({
               paused={!!progressIndicator}
             />
           </PressableNative>
-          {activeSourceMedia && !editedParameter && (
+          {sourceMedia && !editedParameter && (
             <CropButton
-              onPress={toggleCropMode}
+              onPress={openCropModal}
               style={{
                 position: 'absolute',
                 top: topPanelButtonsTop,
@@ -436,7 +493,7 @@ const CoverEditorCustom = ({
           )}
 
           <CECToolBar>
-            {clippingEnabled && !isPreview && (
+            {segmentationEnabled && (
               <SwitchLabel
                 variant="small"
                 value={segmented ?? false}
@@ -447,7 +504,7 @@ const CoverEditorCustom = ({
                 })}
               />
             )}
-            {/* 
+            {/*
               We for the moment disable merging since we don't supporting it anymore with
               background extraction
             */}
@@ -586,7 +643,31 @@ const CoverEditorCustom = ({
           </Container>
         )}
       </KeyboardAvoidingView>
-      {modals}
+      <ScreenModal visible={showImagePicker} animationType="slide">
+        <CoverEditiorImagePicker
+          kind="mixed"
+          onFinished={onMediaSelected}
+          onCancel={closeImagePicker}
+        />
+      </ScreenModal>
+      <CoverEditorCropModal
+        visible={showCropModal}
+        media={sourceMedia}
+        maskMedia={coverStyle?.segmented ? maskMedia : null}
+        title={title}
+        subTitle={subTitle}
+        timeRange={timeRange}
+        coverStyle={coverStyle}
+        mediaParameters={mediaCropParameters}
+        colorPalette={colorPalette}
+        onClose={closeCropModal}
+        onSave={onSaveCropData}
+      />
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

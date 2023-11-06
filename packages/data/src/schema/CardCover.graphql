@@ -2,14 +2,6 @@
 Web Card Cover
 """
 type CardCover {
-  """ 
-  if the card exist(has at least a mediaId)
-  """
-  isCreated: Boolean!
-  """ 
-  type of the card Cover for simple edition mode
-  """
-  kind: CardCoverKind
   """
   The title of the card
   """
@@ -82,15 +74,6 @@ type CardCover {
   if true, the card cover media is merged with the background using multiply blending
   """
   merged: Boolean!
-}
-
-"""
-Kind of card Cover
-"""
-enum CardCoverKind {
-  people
-  others
-  video
 }
 
 """

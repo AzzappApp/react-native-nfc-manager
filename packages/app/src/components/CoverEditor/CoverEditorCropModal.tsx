@@ -18,7 +18,8 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
-import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
+import type { CoverStyleData } from './coverEditorTypes';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 type CoverEditorCropModalProps = {
   visible: boolean;

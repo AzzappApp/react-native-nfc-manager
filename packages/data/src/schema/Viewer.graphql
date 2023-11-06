@@ -202,7 +202,7 @@ type Viewer {
   """
   Fetches suggested medias
   """
-  suggestedMedias(first: Int, after: String): MediaConnection!
+  suggestedMedias(kind: MediaKind!, first: Int, after: String): MediaConnection!
 }
 
 """

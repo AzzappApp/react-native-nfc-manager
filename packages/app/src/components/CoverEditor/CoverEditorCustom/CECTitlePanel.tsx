@@ -18,7 +18,7 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
-import type { ColorPalette } from '../coverEditorTypes';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   TextOrientation,
   TextPosition,

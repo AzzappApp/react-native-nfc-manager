@@ -2,13 +2,6 @@
 import type { CardCoverResolvers } from './__generated__/types';
 
 export const CardCover: CardCoverResolvers = {
-  isCreated: profile => profile.coverData?.mediaId != null, // mediaId and sourceMediaId are the only required field. Some screen used the title to know if the cover exist
-  kind: profile => {
-    if (profile.coverData?.kind) {
-      return profile.coverData?.kind;
-    }
-    return profile.profileKind === 'personal' ? 'people' : 'others';
-  },
   title: profile => profile.coverTitle ?? null,
   titleStyle: profile => profile.coverData?.titleStyle ?? null,
   subTitle: profile => profile.coverSubTitle ?? null,

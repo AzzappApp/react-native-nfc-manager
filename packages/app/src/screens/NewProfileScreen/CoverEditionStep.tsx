@@ -30,7 +30,6 @@ const CoverEditionStep = (
       query CoverEditionStepQuery {
         viewer {
           ...CoverEditor_viewer
-          ...useSuggestedMediaManager_suggested
           profile {
             id
           }
@@ -76,9 +75,6 @@ const CoverEditionStep = (
               height={editorHeight}
               onCoverSaved={onCoverSaved}
               onCanSaveChange={setCanSave}
-              initialTemplateKind={
-                profileKind === 'business' ? 'others' : 'people'
-              }
             />
           )}
         </View>
