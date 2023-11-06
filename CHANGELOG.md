@@ -1,5 +1,6 @@
-## 0.5.1-canary.51
+## 0.5.1-canary.52
 
+* **feat:**  - 🎸 add option to fetch with network for profile ([#1567](https://github.com/AzzappApp/azzapp/pull/1567))
 * **fix:**  - **cover:** [#1222](https://github.com/AzzappApp/azzapp/pull/1222) remove autoCapitalize on url typing ([#1578](https://github.com/AzzappApp/azzapp/pull/1578))
 * **Android:**  - Home && fix ([#1565](https://github.com/AzzappApp/azzapp/pull/1565))
 * **fix:**  - 🐛 save cover correctly ([#1562](https://github.com/AzzappApp/azzapp/pull/1562))
