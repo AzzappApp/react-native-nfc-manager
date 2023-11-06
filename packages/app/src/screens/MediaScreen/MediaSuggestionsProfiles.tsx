@@ -101,7 +101,7 @@ const MediaSuggestionsProfilesInner = ({
             first: NB_PROFILES,
             after: null,
           },
-          { fetchPolicy: 'store-only' },
+          { fetchPolicy: 'store-and-network' },
         );
       });
     }
