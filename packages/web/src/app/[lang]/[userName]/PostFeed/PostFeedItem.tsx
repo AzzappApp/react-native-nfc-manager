@@ -14,14 +14,14 @@ import type { ModalActions } from '#ui/Modal';
 import type {
   Media,
   PostWithCommentAndAuthor,
-  Profile,
+  WebCard,
 } from '@azzapp/data/domains';
 import type { ForwardedRef } from 'react';
 
 type PostFeedItemProps = {
   post: PostWithCommentAndAuthor;
   media: Media;
-  profile: Profile;
+  webCard: WebCard;
   onDownload: () => void;
   onPlay: () => void;
   onMuteChanged: (muted: boolean) => void;
@@ -31,7 +31,7 @@ const PostFeedItem = (
   props: PostFeedItemProps,
   ref: ForwardedRef<CloudinaryVideoPlayerActions>,
 ) => {
-  const { post, media, profile, onDownload, onPlay, onMuteChanged } = props;
+  const { post, media, webCard, onDownload, onPlay, onMuteChanged } = props;
   const share = useRef<ModalActions>(null);
 
   const elapsedTime = getFormatedElapsedTime(
@@ -53,10 +53,10 @@ const PostFeedItem = (
                 height: '32px',
               }}
             >
-              <CoverPreview media={media} profile={profile} />
+              <CoverPreview media={media} webCard={webCard} />
             </div>
           )}
-          <span>{profile.userName}</span>
+          <span>{webCard.userName}</span>
         </div>
         {postMedia && (
           <div
@@ -117,7 +117,7 @@ const PostFeedItem = (
         <div className={styles.postMore}>
           {post.content && (
             <p className={styles.postComment}>
-              <span className={styles.postCommentName}>{profile.userName}</span>{' '}
+              <span className={styles.postCommentName}>{webCard.userName}</span>{' '}
               {post.content}
             </p>
           )}
@@ -131,7 +131,7 @@ const PostFeedItem = (
           )}
           <Link
             className={styles.postSeeMore}
-            href={`/${profile.userName}/${post.id}`}
+            href={`/${webCard.userName}/${post.id}`}
           >
             See more
           </Link>
@@ -140,7 +140,7 @@ const PostFeedItem = (
       </div>
       <ShareModal
         ref={share}
-        link={generateSharePostLink(profile.userName, post.id)}
+        link={generateSharePostLink(webCard.userName, post.id)}
       />
     </>
   );

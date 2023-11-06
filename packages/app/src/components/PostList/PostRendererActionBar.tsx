@@ -6,6 +6,7 @@ import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
@@ -35,7 +36,7 @@ const PostRendererActionBar = ({
     allowLikes,
     allowComments,
     counterReactions,
-    author,
+    webCard,
   } = useFragment(
     graphql`
       fragment PostRendererActionBar_post on Post {
@@ -45,7 +46,7 @@ const PostRendererActionBar = ({
         allowLikes
         counterReactions
         content
-        author {
+        webCard {
           userName
         }
       }
@@ -78,7 +79,7 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
-  const { profileId } = useAuthState();
+  const { webCardId, profileRole } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
     (add: boolean) => {
       commit({
@@ -107,11 +108,11 @@ const PostRendererActionBar = ({
             }
             post.setValue(add ? reaction : null, 'viewerPostReaction');
           }
-          if (profileId) {
-            const profile = store.get(profileId);
-            const counter = profile?.getValue('nbPostsLiked');
+          if (webCardId) {
+            const webCard = store.get(webCardId);
+            const counter = webCard?.getValue('nbPostsLiked');
             if (typeof counter === 'number') {
-              profile?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+              webCard?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
             }
           }
         },
@@ -140,16 +141,27 @@ const PostRendererActionBar = ({
   );
   // toggle the value locally
   const toggleReaction = useCallback(() => {
-    if (reaction) {
-      setCountReactions(countReactions - 1);
-      setReaction(null);
-      debouncedCommit(false);
+    if (profileRole && isEditor(profileRole)) {
+      if (reaction) {
+        setCountReactions(countReactions - 1);
+        setReaction(null);
+        debouncedCommit(false);
+      } else {
+        setCountReactions(countReactions + 1);
+        setReaction('like');
+        debouncedCommit(true);
+      }
     } else {
-      setCountReactions(countReactions + 1);
-      setReaction('like');
-      debouncedCommit(true);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins can like a post',
+          description:
+            'Error message when trying to like a post without being an admin',
+        }),
+      });
     }
-  }, [countReactions, debouncedCommit, reaction]);
+  }, [countReactions, debouncedCommit, intl, profileRole, reaction]);
 
   const goToComments = () => {
     router.push({
@@ -162,7 +174,7 @@ const PostRendererActionBar = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildPostUrl(author.userName, fromGlobalId(postId).id),
+        url: buildPostUrl(webCard.userName, fromGlobalId(postId).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {

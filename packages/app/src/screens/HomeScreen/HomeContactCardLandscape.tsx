@@ -9,8 +9,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import ContactCard, {
+  CONTACT_CARD_RATIO,
+} from '#components/ContactCard/ContactCard';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
 
 type HomeContactCardLandscapeProps = {
@@ -25,7 +27,9 @@ const HomeContactCardLandscape = ({
       fragment HomeContactCardLandscape_profile on Profile {
         ...ContactCard_profile
         id
-        cardIsPublished
+        webCard {
+          cardIsPublished
+        }
       }
     `,
     profileKey,
@@ -63,14 +67,14 @@ const HomeContactCardLandscape = ({
     opacity: visibleSharedValue.value,
   }));
 
-  useMainTabBarVisiblilityController(
+  useMainTabBarVisibilityController(
     tabBarVisibleSharedValue,
     Math.abs(orientation) === 90,
   );
   const appearance = useColorScheme();
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  if (!profile || !profile.cardIsPublished) {
+  if (!profile || !profile.webCard.cardIsPublished) {
     return null;
   }
 

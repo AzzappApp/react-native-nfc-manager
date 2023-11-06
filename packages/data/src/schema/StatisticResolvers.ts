@@ -1,7 +1,19 @@
 import { toGlobalId } from 'graphql-relay';
-import type { StatisticResolvers } from './__generated__/types';
+import type {
+  ProfileStatisticResolvers,
+  WebCardStatisticResolvers,
+} from './__generated__/types';
 
-export const Statistic: StatisticResolvers = {
+export const WebCardStatistic: WebCardStatisticResolvers = {
+  id: post => {
+    return toGlobalId('WebCard', post.webCardId) + '-' + post.day;
+  },
+  day: post => {
+    return post.day.toISOString();
+  },
+};
+
+export const ProfileStatistic: ProfileStatisticResolvers = {
   id: post => {
     return toGlobalId('Profile', post.profileId) + '-' + post.day;
   },

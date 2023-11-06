@@ -1,8 +1,8 @@
 import { PKPass } from 'passkit-generator';
 import {
-  getProfileById,
   getMediasByIds,
   buildDefaultContactCard,
+  getProfileWithWebCardById,
 } from '@azzapp/data/domains';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal } from '@azzapp/shared/crypto';
@@ -18,10 +18,10 @@ const getCoverUrl = (userName: string, size: number) =>
   `${process.env.NEXT_PUBLIC_URL}api/cover/${userName}?width=${size}&height=${size}&keepAspectRatio=left_pad`;
 
 export const buildApplePass = async (profileId: string, locale: string) => {
-  const profile = await getProfileById(profileId);
-  if (profile) {
-    const [media] = profile.coverData?.mediaId
-      ? await getMediasByIds([profile.coverData?.mediaId])
+  const res = await getProfileWithWebCardById(profileId);
+  if (res) {
+    const [media] = res.WebCard.coverData?.mediaId
+      ? await getMediasByIds([res.WebCard.coverData?.mediaId])
       : [];
 
     const thumbnails: Record<string, Buffer> = {};
@@ -29,13 +29,13 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     if (media) {
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] =
         await Promise.allSettled([
-          fetch(getCoverUrl(profile.userName, 90)).then(res =>
+          fetch(getCoverUrl(res.WebCard.userName, 90)).then(res =>
             res.arrayBuffer(),
           ),
-          fetch(getCoverUrl(profile.userName, 90 * 2)).then(res =>
+          fetch(getCoverUrl(res.WebCard.userName, 90 * 2)).then(res =>
             res.arrayBuffer(),
           ),
-          fetch(getCoverUrl(profile.userName, 90 * 3)).then(res =>
+          fetch(getCoverUrl(res.WebCard.userName, 90 * 3)).then(res =>
             res.arrayBuffer(),
           ),
         ]);
@@ -51,10 +51,13 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       }
     }
 
-    let contactCard = profile.contactCard;
+    let contactCard = res.Profile.contactCard;
 
-    if (!contactCard && profile) {
-      contactCard = await buildDefaultContactCard(profile);
+    if (!contactCard) {
+      contactCard = await buildDefaultContactCard(
+        res.WebCard,
+        res.Profile.userId,
+      );
     }
 
     const [iconContent, icon2xContent, logoContent, logo2xContent] =
@@ -73,7 +76,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         ),
       ]);
 
-    const primary = profile.cardColors?.primary;
+    const primary = res.WebCard.cardColors?.primary;
 
     const backgroundColor = primary
       ? convertHexToRGBA(primary)
@@ -108,7 +111,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         backgroundColor,
         labelColor: convertHexToRGBA(getTextColor(backgroundColor)),
         suppressStripShine: false,
-        serialNumber: profile?.id,
+        serialNumber: profileId,
         webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,
         authenticationToken: await seal(
           profileId,
@@ -117,16 +120,18 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       },
     );
 
-    if (contactCard && profile) {
+    if (contactCard) {
       const { data, signature } = await serializeAndSignContactCard(
-        profile.id,
-        profile.userName,
+        res.WebCard.userName,
+        profileId,
+        res.WebCard.id,
         contactCard,
+        res.WebCard.commonInformation,
       );
 
       pass.setBarcodes({
         message: buildUserUrlWithContactCard(
-          profile?.userName ?? '',
+          res.WebCard?.userName ?? '',
           data,
           signature,
         ),

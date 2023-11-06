@@ -22,7 +22,10 @@ import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
+import ContactCard, {
+  CONTACT_CARD_RATIO,
+} from '#components/ContactCard/ContactCard';
+import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -39,7 +42,7 @@ import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardRoute } from '#routes';
-import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
+import type { AccountHeader_webCard$key } from '@azzapp/relay/artifacts/AccountHeader_webCard.graphql';
 import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -47,19 +50,19 @@ const contactCardMobileScreenQuery = graphql`
   query ContactCardScreenQuery {
     viewer {
       profile {
-        id
-        userName
-        ...AccountHeader_profile
+        webCard {
+          id
+          userName
+          ...AccountHeader_webCard
+          cardColors {
+            primary
+          }
+        }
+        contactCardIsPrivate
+        contactCardDisplayedOnWebCard
         ...ContactCard_profile
-        contactCard {
-          isPrivate
-          displayedOnWebCard
-          ...ContactCardEditModal_card
-          ...ContactCardExportVcf_card
-        }
-        cardColors {
-          primary
-        }
+        ...ContactCardExportVcf_card
+        ...ContactCardEditModal_card
       }
     }
   }
@@ -78,7 +81,7 @@ const ContactCardScreen = ({
     preloadedQuery,
   );
   const { width, height } = useWindowDimensions();
-  const profile = viewer?.profile;
+  const webCard = viewer?.profile?.webCard;
   const intl = useIntl();
 
   const [fullScreen, setFullscreen] = useToggle(false);
@@ -155,11 +158,8 @@ const ContactCardScreen = ({
     mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
       saveContactCard(input: $input) {
         profile {
-          contactCard {
-            isPrivate
-            displayedOnWebCard
-            ...ContactCardEditModal_card
-          }
+          contactCardIsPrivate
+          contactCardDisplayedOnWebCard
         }
       }
     }
@@ -168,7 +168,7 @@ const ContactCardScreen = ({
   //TODO: remove for beta
   const [isPublicCard] = useToggle(false);
   const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
-    viewer.profile?.contactCard?.displayedOnWebCard ?? false,
+    viewer.profile?.contactCardDisplayedOnWebCard ?? false,
   );
 
   const [debouncedPublic] = useDebounce(isPublicCard, 500);
@@ -202,7 +202,7 @@ const ContactCardScreen = ({
   const [loadingPass, setLoadingPass] = useState(false);
 
   const colorScheme = useColorScheme();
-  if (!profile) {
+  if (!webCard) {
     return null;
   }
 
@@ -210,7 +210,7 @@ const ContactCardScreen = ({
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <Animated.View style={headerStyle}>
-          <ContactCardScreenHeader profile={profile} />
+          <ContactCardScreenHeader webCard={webCard} />
         </Animated.View>
 
         <PressableAnimated
@@ -218,7 +218,7 @@ const ContactCardScreen = ({
           style={[styles.contactCard, animatedContactCardStyle]}
           onLayout={onLayout}
         >
-          <ContactCard profile={profile} height={cardHeight} />
+          <ContactCard profile={viewer.profile} height={cardHeight} />
         </PressableAnimated>
 
         <Animated.View style={[footerStyle, styles.footer]}>
@@ -309,7 +309,7 @@ const ContactCardScreen = ({
                   setLoadingPass(true);
                   if (Platform.OS === 'ios') {
                     const pass = await getAppleWalletPass({
-                      profileId: fromGlobalId(profile.id).id,
+                      webCardId: fromGlobalId(webCard.id).id,
                       locale: intl.locale,
                     });
 
@@ -320,7 +320,7 @@ const ContactCardScreen = ({
                     await addPass(base64Pass);
                   } else if (Platform.OS === 'android') {
                     const pass = await getGoogleWalletPass({
-                      profileId: fromGlobalId(profile.id).id,
+                      webCardId: fromGlobalId(webCard.id).id,
                       locale: intl.locale,
                     });
 
@@ -369,36 +369,36 @@ const ContactCardScreen = ({
               </Text>
             </PressableNative>
 
-            {profile?.contactCard && (
+            {webCard && (
               <ContactCardExportVcf
-                userName={profile.userName}
-                contactCard={profile.contactCard}
+                userName={webCard.userName}
+                profile={viewer.profile}
               />
             )}
           </View>
         </Animated.View>
-        {viewer.profile.contactCard && (
+        <ScreenModal visible={contactCardEditModal} animationType="slide">
           <ContactCardEditModal
-            key={viewer.profile.id}
-            contactCard={viewer.profile.contactCard}
+            key={webCard.id}
+            profile={viewer.profile}
             visible={contactCardEditModal}
             toggleBottomSheet={toggleContactEditModal}
           />
-        )}
+        </ScreenModal>
       </SafeAreaView>
     </Container>
   );
 };
 
 const ContactCardScreenHeader = ({
-  profile,
+  webCard,
 }: {
-  profile: AccountHeader_profile$key | null;
+  webCard: AccountHeader_webCard$key | null;
 }) => {
   const intl = useIntl();
   return (
     <AccountHeader
-      profile={profile}
+      webCard={webCard}
       title={intl.formatMessage({
         defaultMessage: 'Contact Card',
         description:
@@ -411,7 +411,7 @@ const ContactCardScreenHeader = ({
 const ContactCardScreenFallback = () => (
   <Container style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 1 }}>
-      <ContactCardScreenHeader profile={null} />
+      <ContactCardScreenHeader webCard={null} />
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
       </View>

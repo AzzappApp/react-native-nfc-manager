@@ -1,8 +1,10 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Platform, StyleSheet, View } from 'react-native';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -33,6 +35,8 @@ const HomeBottomSheetPanel = ({
   close,
   withProfile,
 }: HomeBottomSheetPanel) => {
+  const { profileRole } = useAuthState();
+
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
@@ -102,6 +106,27 @@ const HomeBottomSheetPanel = ({
               </View>
             </PressableNative>
           </Link>
+          {profileRole && isAdmin(profileRole) ? (
+            <Link route="MULTI_USER">
+              <PressableNative
+                style={styles.bottomSheetOptionButton}
+                onPress={close}
+              >
+                <View style={styles.bottomSheetOptionContainer}>
+                  <View style={styles.bottomSheetOptionIconLabel}>
+                    <Icon icon="shared_webcard" />
+                    <Text>
+                      <FormattedMessage
+                        defaultMessage="Multi user"
+                        description="Multi user menu option"
+                      />
+                    </Text>
+                  </View>
+                  <Icon icon="arrow_right" />
+                </View>
+              </PressableNative>
+            </Link>
+          ) : null}
         </>
         <PressableNative
           onPress={onLogout}

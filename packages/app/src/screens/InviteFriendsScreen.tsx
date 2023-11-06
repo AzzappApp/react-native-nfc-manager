@@ -24,8 +24,10 @@ const inviteFriendsScreenQuery = graphql`
   query InviteFriendsScreenQuery {
     viewer {
       profile {
-        userName
-        ...AccountHeader_profile
+        webCard {
+          userName
+          ...AccountHeader_webCard
+        }
       }
     }
   }
@@ -46,7 +48,7 @@ const InviteFriendsScreen = ({
         'Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}',
       description: 'Invite message to share with friends',
     },
-    { userName: profile?.userName, url: 'https://azzapp.com' },
+    { userName: profile?.webCard?.userName, url: 'https://azzapp.com' },
   );
 
   // const subject = intl.formatMessage({
@@ -68,7 +70,7 @@ const InviteFriendsScreen = ({
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, rowGap: 15 }}>
         <AccountHeader
-          profile={profile}
+          webCard={profile?.webCard ?? null}
           title={intl.formatMessage({
             defaultMessage: 'Invite Friends',
             description:

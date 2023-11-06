@@ -1,0 +1,22 @@
+input SaveCommonInformationInput {
+  company: String
+  emails: [ContactCardEmailInput!]
+  phoneNumbers: [ContactCardPhoneNumberInput!]
+  urls: [ContactCardUrlInput!]
+  addresses: [ContactCardAddressInput!]
+  birthday: ContactCardBirthdayInput
+  socials: [ContactCardSocialInput!]
+}
+
+type SaveCommonInformationPayload {
+  webCard: WebCard!
+}
+
+extend type Mutation {
+  """
+  Mutation to save common information of a profile
+  """
+  saveCommonInformation(
+    input: SaveCommonInformationInput!
+  ): SaveCommonInformationPayload!
+}

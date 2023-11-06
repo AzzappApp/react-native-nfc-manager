@@ -101,7 +101,6 @@ const SocialLinksEditionScreen = ({
   const viewer = useFragment(
     graphql`
       fragment SocialLinksEditionScreen_viewer on Viewer {
-        ...SocialLinksSettingsEditionPanel_viewer
         ...SocialLinksBackgroundEditionPanel_viewer
         moduleBackgrounds {
           id
@@ -109,10 +108,13 @@ const SocialLinksEditionScreen = ({
           resizeMode
         }
         profile {
-          cardColors {
-            primary
-            light
-            dark
+          webCard {
+            cardColors {
+              primary
+              light
+              dark
+            }
+            ...SocialLinksSettingsEditionPanel_webCard
           }
         }
       }
@@ -177,7 +179,7 @@ const SocialLinksEditionScreen = ({
         $input: SaveSocialLinksModuleInput!
       ) {
         saveSocialLinksModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -309,7 +311,7 @@ const SocialLinksEditionScreen = ({
       >
         <SocialLinksPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          colorPalette={viewer.profile?.cardColors}
+          colorPalette={viewer.profile?.webCard.cardColors}
           cardStyle={null}
           data={previewData}
         />
@@ -336,7 +338,7 @@ const SocialLinksEditionScreen = ({
               id: 'settings',
               element: (
                 <SocialLinksSettingsEditionPanel
-                  viewer={viewer}
+                  webCard={viewer.profile?.webCard ?? null}
                   iconColor={iconColor}
                   onIconColorChange={onIconColorChange}
                   arrangement={arrangement}

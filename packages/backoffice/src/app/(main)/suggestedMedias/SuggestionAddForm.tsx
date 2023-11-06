@@ -10,12 +10,12 @@ import {
 import { useEffect, useState } from 'react';
 import MediasListInput from '#components/MediasListInput';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
-import type { CompanyActivity, ProfileCategory } from '@azzapp/data/domains';
+import type { CompanyActivity, WebCardCategory } from '@azzapp/data/domains';
 
 type SuggesionAddFormProps = {
   open: boolean;
   error: any;
-  categories: ProfileCategory[];
+  categories: WebCardCategory[];
   activities: CompanyActivity[];
   onClose: () => void;
   onAdd: (medias: File[], categories: string[], activities: string[]) => void;

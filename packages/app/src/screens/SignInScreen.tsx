@@ -39,10 +39,11 @@ const SignInScreen = () => {
 
     let token: string;
     let refreshToken: string;
-    let profileId: string | undefined;
+    let webCardId: string | undefined;
+    let profileRole: string | undefined;
     try {
       setIsSubmitting(true);
-      ({ token, refreshToken, profileId } = await signin({
+      ({ token, refreshToken, webCardId, profileRole } = await signin({
         credential: intlPhoneNumber ?? credential,
         password,
       }));
@@ -54,7 +55,7 @@ const SignInScreen = () => {
     }
     await dispatchGlobalEvent({
       type: 'SIGN_IN',
-      payload: { authTokens: { token, refreshToken }, profileId },
+      payload: { authTokens: { token, refreshToken }, webCardId, profileRole },
     });
   }, [credential, password]);
 

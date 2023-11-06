@@ -1,121 +1,124 @@
-import { and, desc, eq, like } from 'drizzle-orm';
+import { and, desc, eq, inArray, like, notInArray, or } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
-  getFollowerProfiles,
-  getFollowingsPosts,
   db,
   getStaticMediasByUsage,
-  ProfileTable,
   PostTable,
-  getFollowingsProfiles,
-  getRecommendedProfiles,
   getCoverTemplates,
   getCardTemplates,
   getColorPalettes,
   getCardTemplateTypes,
+  getRecommendedWebCards,
+  WebCardTable,
+  UserTable,
+  ProfileTable,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
-import {
-  cursorToDate,
-  connectionFromDateSortedItems,
-  emptyConnection,
-} from '#helpers/connectionsHelpers';
+import { emptyConnection } from '#helpers/connectionsHelpers';
+import type { WebCard } from '#domains';
 import type { ViewerResolvers } from './__generated__/types';
 
 export const Viewer: ViewerResolvers = {
   profile: async (_root, _, { auth, loaders }) => {
     const profileId = auth.profileId;
+
     if (!profileId) {
       return null;
     }
     return loaders.Profile.load(profileId);
   },
-  followings: async (_root, args, { auth }) => {
-    const profileId = auth.profileId;
+  contacts: async (_root, args, { auth, loaders }) => {
+    const { userId } = auth;
 
-    if (!profileId) {
-      return connectionFromArray([], args);
+    if (!userId) return null;
+
+    const user = await loaders.User.load(userId);
+
+    if (!user) return null;
+
+    if (args.phoneNumbers.length === 0 && args.emails.length === 0) return [];
+
+    const conditions = [];
+
+    if (args.phoneNumbers.length > 0) {
+      conditions.push(inArray(UserTable.phoneNumber, args.phoneNumbers));
     }
-    const first = args.first ?? 50;
-    const offset = args.after ? cursorToDate(args.after) : null;
+    if (args.emails.length > 0) {
+      conditions.push(inArray(UserTable.email, args.emails));
+    }
 
-    const followingsProfiles = await getFollowingsProfiles(profileId, {
-      limit: first + 1,
-      after: offset,
-      userName: args.userName,
-    });
+    const filters = [
+      conditions.length === 1
+        ? conditions[0]
+        : or(conditions[0], conditions[1]),
+    ];
 
-    const sizedProfile = followingsProfiles.slice(0, first);
-    return connectionFromDateSortedItems(
-      sizedProfile.map(p => ({
-        ...p.Profile,
-        followCreatedAt: p.followCreatedAt,
-      })),
-      {
-        getDate: user => user.followCreatedAt,
-        // approximations that should be good enough, and avoid a query
-        hasNextPage: followingsProfiles.length > first,
-        hasPreviousPage: offset !== null,
+    if (user.phoneNumber) {
+      filters.push(notInArray(UserTable.phoneNumber, [user.phoneNumber]));
+    }
+
+    if (user.email) {
+      filters.push(notInArray(UserTable.email, [user.email]));
+    }
+
+    const result = await db
+      .select()
+      .from(UserTable)
+      .innerJoin(ProfileTable, eq(UserTable.id, ProfileTable.userId))
+      .innerJoin(
+        WebCardTable,
+        and(
+          eq(WebCardTable.id, ProfileTable.webCardId),
+          eq(WebCardTable.cardIsPublished, true),
+        ),
+      )
+      .where(and(...filters));
+
+    const indexedProfiles = result.reduce(
+      (accumulator, currentValue) => {
+        const { User, WebCard } = currentValue;
+
+        if (accumulator[User.id]) {
+          accumulator[User.id].publishedWebCards.push(WebCard);
+        } else {
+          accumulator[User.id] = {
+            email:
+              User.email && args.emails.includes(User.email)
+                ? User.email
+                : undefined,
+            phoneNumber:
+              User.phoneNumber && args.phoneNumbers.includes(User.phoneNumber)
+                ? User.phoneNumber
+                : undefined,
+            publishedWebCards: [WebCard],
+          };
+        }
+
+        return accumulator;
       },
+      {} as Record<
+        string,
+        {
+          email?: string;
+          phoneNumber?: string;
+          publishedWebCards: WebCard[];
+        }
+      >,
     );
+
+    return Object.values(indexedProfiles);
   },
-  followers: async (_root, args, { auth }) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      return connectionFromArray([], args);
-    }
-
-    const first = args.first ?? 50;
-    const offset = args.after ? cursorToDate(args.after) : null;
-
-    const followersProfiles = await getFollowerProfiles(profileId, {
-      limit: first + 1,
-      after: offset,
-      userName: args.userName,
-    });
-
-    return connectionFromDateSortedItems(
-      followersProfiles.map(p => ({
-        ...p.Profile,
-        followCreatedAt: p.followCreatedAt,
-      })),
-      {
-        getDate: post => post.followCreatedAt,
-        // approximations that should be good enough, and avoid a query
-        hasNextPage: followersProfiles.length > first,
-        hasPreviousPage: offset !== null,
-      },
-    );
-  },
-  followingsPosts: async (_root, args, { auth }) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      return connectionFromArray([], args);
-    }
-
-    const limit = args.first ?? 100;
-    const offset = args.after ? cursorToDate(args.after) : null;
-
-    const posts = await getFollowingsPosts(profileId, limit + 1, offset);
-
-    return connectionFromDateSortedItems(posts.slice(0, limit), {
-      getDate: post => post.createdAt,
-      // approximations that should be good enough, and avoid a query
-      hasNextPage: posts.length > limit,
-      hasPreviousPage: offset !== null,
-    });
-  },
-  trendingProfiles: async (_, args) => {
+  trendingWebCards: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
       await db
         .select()
-        .from(ProfileTable)
-        .where(eq(ProfileTable.cardIsPublished, true))
-        .orderBy(desc(ProfileTable.createdAt)),
+        .from(WebCardTable)
+        .where(eq(WebCardTable.cardIsPublished, true))
+        .orderBy(desc(WebCardTable.createdAt)),
       args,
     );
   },
@@ -126,10 +129,10 @@ export const Viewer: ViewerResolvers = {
         .select()
         .from(PostTable)
         .innerJoin(
-          ProfileTable,
+          WebCardTable,
           and(
-            eq(PostTable.authorId, ProfileTable.id),
-            eq(ProfileTable.cardIsPublished, true),
+            eq(PostTable.webCardId, WebCardTable.id),
+            eq(WebCardTable.cardIsPublished, true),
           ),
         )
         .orderBy(desc(PostTable.createdAt))
@@ -137,26 +140,23 @@ export const Viewer: ViewerResolvers = {
       args,
     );
   },
-  recommendedProfiles: async (_, args, { auth }) => {
-    const { profileId, userId } = auth;
-    if (!profileId || !userId) {
+  recommendedWebCards: async (_, args, { auth }) => {
+    const { profileId } = auth;
+    if (!profileId) {
       return connectionFromArray([], args);
     }
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await getRecommendedProfiles(profileId, userId),
-      args,
-    );
+    return connectionFromArray(await getRecommendedWebCards(profileId), args);
   },
   searchPosts: async (_, args) => {
     const posts = await db
       .select()
       .from(PostTable)
-      .innerJoin(ProfileTable, eq(PostTable.authorId, ProfileTable.id))
+      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
       .where(
         and(
           like(PostTable.content, `%${args.search}%`),
-          eq(ProfileTable.cardIsPublished, true),
+          eq(WebCardTable.cardIsPublished, true),
         ),
       );
     return connectionFromArray(
@@ -164,16 +164,16 @@ export const Viewer: ViewerResolvers = {
       args,
     );
   },
-  searchProfiles: async (_, args) => {
+  searchWebCards: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
       await db
         .select()
-        .from(ProfileTable)
+        .from(WebCardTable)
         .where(
           and(
-            eq(ProfileTable.cardIsPublished, true),
-            like(ProfileTable.userName, `%${args.search}%`),
+            eq(WebCardTable.cardIsPublished, true),
+            like(WebCardTable.userName, `%${args.search}%`),
           ),
         ),
       args,
@@ -200,14 +200,17 @@ export const Viewer: ViewerResolvers = {
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
     if (!profile) {
       return emptyConnection;
     }
     const limit = first ?? 100;
     const templates = await getCoverTemplates(
-      profile.profileKind,
+      webCard?.webCardKind ?? 'business',
       kind,
-      profile.id,
+      profile.webCardId,
       after,
       limit + 1,
     );
@@ -231,14 +234,17 @@ export const Viewer: ViewerResolvers = {
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
     if (!profile) {
       return emptyConnection;
     }
     let typeId = cardTemplateTypeId;
     if (cardTemplateTypeId == null) {
-      if (profile.companyActivityId) {
+      if (webCard?.companyActivityId) {
         const compActivity = await loaders.CompanyActivity.load(
-          profile.companyActivityId,
+          webCard.companyActivityId,
         );
         if (compActivity) {
           typeId = compActivity.cardTemplateTypeId;
@@ -246,20 +252,20 @@ export const Viewer: ViewerResolvers = {
       }
     }
     if (typeId == null) {
-      if (profile.profileCategoryId) {
-        const profileCategory = await loaders.ProfileCategory.load(
-          profile.profileCategoryId,
+      if (webCard?.webCardCategoryId) {
+        const webCardCategory = await loaders.WebCardCategory.load(
+          webCard.webCardCategoryId,
         );
-        if (profileCategory) {
-          typeId = profileCategory.cardTemplateTypeId;
+        if (webCardCategory) {
+          typeId = webCardCategory.cardTemplateTypeId;
         }
       }
     }
     const limit = first ?? 20;
     const cardTemplates = await getCardTemplates(
-      profile.profileKind,
+      webCard?.webCardKind ?? 'business',
       typeId,
-      profile.id,
+      profile.webCardId,
       after,
       limit + 1,
     );
@@ -326,20 +332,24 @@ export const Viewer: ViewerResolvers = {
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
+
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
     if (
       !profile ||
-      profile.profileKind !== 'business' ||
-      profile.profileCategoryId == null //profile category Id is mandatory on busness profile
+      webCard?.webCardKind !== 'business' ||
+      webCard.webCardCategoryId == null //profile category Id is mandatory on busness profile
     ) {
       return emptyConnection;
     }
 
     const limit = first ?? 100;
     const suggestions = await getMediaSuggestions(
-      profile.id,
+      profile.webCardId,
       kind,
-      profile.profileCategoryId,
-      profile.companyActivityId,
+      webCard.webCardCategoryId,
+      webCard.companyActivityId,
       after,
       (first ?? 100) + 1,
     );

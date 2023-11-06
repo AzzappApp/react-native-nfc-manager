@@ -29,7 +29,7 @@ const SimpleButtonEditionMobileScreen = ({
   let module: SimpleButtonEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_SIMPLE_BUTTON,
       ) ?? null;
@@ -46,10 +46,12 @@ const SimpleButtonQuery = graphql`
     viewer {
       ...SimpleButtonEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...SimpleButtonEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...SimpleButtonEditionScreen_module
+          }
         }
       }
     }

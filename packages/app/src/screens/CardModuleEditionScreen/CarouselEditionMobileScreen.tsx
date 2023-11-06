@@ -28,7 +28,7 @@ const CarouselEditionMobileScreen = ({
   let module: CarouselEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module => module?.id === moduleId,
       ) ?? null;
     if (!module) {
@@ -44,10 +44,12 @@ const CarouselQuery = graphql`
     viewer {
       ...CarouselEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...CarouselEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...CarouselEditionScreen_module
+          }
         }
       }
     }

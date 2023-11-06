@@ -3,16 +3,18 @@ import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
+import ContactCard, {
+  CONTACT_CARD_RATIO,
+} from '#components/ContactCard/ContactCard';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
+import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import PressableNative from '#ui/PressableNative';
 import type { HomeContactCard_profile$key } from '@azzapp/relay/artifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '@azzapp/relay/artifacts/HomeContactCard_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
-type HomeContacCardProps = {
+type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
@@ -22,12 +24,14 @@ const HomeContactCard = ({
   user,
   height,
   currentProfileIndexSharedValue,
-}: HomeContacCardProps) => {
+}: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeContactCard_user on User {
         profiles {
-          id
+          webCard {
+            id
+          }
           ...HomeContactCard_profile
         }
       }
@@ -46,7 +50,10 @@ const HomeContactCard = ({
       }}
     >
       {profiles?.map((item, index) => (
-        <ProfileBoundRelayEnvironmentProvider key={item.id} profileId={item.id}>
+        <WebCardBoundRelayEnvironmentProvider
+          key={item.webCard.id}
+          webCardId={item.webCard.id}
+        >
           <MemoContactCardItem
             width={windowWidth}
             height={height}
@@ -54,7 +61,7 @@ const HomeContactCard = ({
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             index={index}
           />
-        </ProfileBoundRelayEnvironmentProvider>
+        </WebCardBoundRelayEnvironmentProvider>
       ))}
     </View>
   );
@@ -92,9 +99,10 @@ const ContactCardItem = ({
   const profile = useFragment(
     graphql`
       fragment HomeContactCard_profile on Profile {
-        id
-        userName
-        cardIsPublished
+        webCard {
+          userName
+          cardIsPublished
+        }
         ...ContactCard_profile
       }
     `,
@@ -112,7 +120,7 @@ const ContactCardItem = ({
         positionStyle,
       ]}
     >
-      {profile.cardIsPublished && (
+      {profile.webCard.cardIsPublished && (
         <Link route="CONTACT_CARD">
           <PressableNative
             style={{

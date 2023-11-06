@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Toast from 'react-native-toast-message';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import ProfileList from '#components/ProfileList';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import WebCardList from '#components/WebCardList';
+import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
-import type { FollowingsScreenList_viewer$key } from '@azzapp/relay/artifacts/FollowingsScreenList_viewer.graphql';
+import type { FollowingsScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowingsScreenList_webCard.graphql';
 
 type FollowingsListProps = {
-  viewer: FollowingsScreenList_viewer$key;
+  webCard: FollowingsScreenList_webCard$key | null;
 };
 
-const FollowingsScreenList = ({ viewer: viewerKey }: FollowingsListProps) => {
+const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment FollowingsScreenList_viewer on Viewer
+        fragment FollowingsScreenList_webCard on WebCard
         @refetchable(queryName: "FollowingsListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -26,13 +29,13 @@ const FollowingsScreenList = ({ viewer: viewerKey }: FollowingsListProps) => {
             @connection(key: "Account_followings") {
             edges {
               node {
-                ...ProfileList_users
+                ...WebCardList_webCard
               }
             }
           }
         }
       `,
-      viewerKey,
+      webCardKey,
     );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -67,15 +70,28 @@ const FollowingsScreenList = ({ viewer: viewerKey }: FollowingsListProps) => {
     }
   }, [debouncedSearch, refetch]);
 
+  const { profileRole } = useAuthState();
+
   const onToggleFollow = useCallback(
     (profileId: string, profileUserName: string) => {
-      toggleFollow(profileId, profileUserName, false);
+      if (profileRole && isEditor(profileRole)) {
+        toggleFollow(profileId, profileUserName, false);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Only admins can stop following a WebCard',
+            description:
+              'Error message when trying to unfollow a WebCard without being an admin',
+          }),
+        });
+      }
     },
-    [toggleFollow],
+    [profileRole, intl, toggleFollow],
   );
 
   return (
-    <ProfileList
+    <WebCardList
       searchValue={searchValue}
       setSearchValue={setSearchValue}
       noProfileFoundLabel={intl.formatMessage({
@@ -84,7 +100,7 @@ const FollowingsScreenList = ({ viewer: viewerKey }: FollowingsListProps) => {
           'Message displayed in the followed profiles screen when the user is not following anyone',
       })}
       users={convertToNonNullArray(
-        data.followings?.edges?.map(edge => edge?.node) ?? [],
+        data?.followings?.edges?.map(edge => edge?.node) ?? [],
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}

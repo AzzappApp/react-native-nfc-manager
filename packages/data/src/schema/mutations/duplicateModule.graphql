@@ -7,7 +7,6 @@ input DuplicateModuleInput {
 }
 
 type DuplicateModulePayload {
-  profile: Profile!
   createdModules: [CreatedModule!]!
 }
 

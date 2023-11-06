@@ -5,16 +5,16 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import CommentFeedMoreMedia from './CommentFeedMoreMedia';
 import styles from './CommentFeedSeeMore.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, PostWithMedias, Profile } from '@azzapp/data/domains';
+import type { Media, PostWithMedias, WebCard } from '@azzapp/data/domains';
 
 type CommentFeedSeeMoreProps = {
   posts: PostWithMedias[];
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
 const CommentFeedSeeMore = (props: CommentFeedSeeMoreProps) => {
-  const { profile, media, posts } = props;
+  const { webCard, media, posts } = props;
   const download = useRef<ModalActions>(null);
 
   return (
@@ -28,20 +28,20 @@ const CommentFeedSeeMore = (props: CommentFeedSeeMoreProps) => {
         <div className={styles.publications}>
           <p className={styles.publicationsText}>
             More publication from{' '}
-            <span className={styles.name}>{profile.userName}</span>
+            <span className={styles.name}>{webCard.userName}</span>
           </p>
           <div className={styles.medias}>
             {posts.map(post => (
               <CommentFeedMoreMedia
                 key={post.id}
                 post={post}
-                profile={profile}
+                webCard={webCard}
               />
             ))}
           </div>
         </div>
       </div>
-      <DownloadAppModal ref={download} profile={profile} media={media} />
+      <DownloadAppModal ref={download} webCard={webCard} media={media} />
     </>
   );
 };

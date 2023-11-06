@@ -10,20 +10,20 @@ import CommentFeedItem from './CommentFeedItem';
 import styles from './CommentFeedItems.css';
 import type {
   Media,
-  PostCommentWithProfile,
+  PostCommentWithWebCard,
   PostWithMedias,
-  Profile,
+  WebCard,
 } from '@azzapp/data/domains';
 
 type CommentFeedItemsProps = {
   post: PostWithMedias;
-  defaultComments: PostCommentWithProfile[];
-  author: Profile;
+  defaultComments: PostCommentWithWebCard[];
+  webCard: WebCard;
   media: Media;
 };
 
 const CommentFeedItems = (props: CommentFeedItemsProps) => {
-  const { post, defaultComments, author, media } = props;
+  const { post, defaultComments, webCard, media } = props;
   const [isPending, startTransition] = useTransition();
   const [comments, setComments] = useState(defaultComments);
 
@@ -69,10 +69,10 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
               id: '',
               comment: post.content,
               createdAt: post.createdAt,
-              firstName: author.firstName,
-              lastName: author.lastName,
+              firstName: webCard.firstName,
+              lastName: webCard.lastName,
               postId: post.id,
-              profileId: author.id,
+              webCardId: webCard.id,
               media,
             }}
           />

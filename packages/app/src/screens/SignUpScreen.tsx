@@ -83,7 +83,7 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
-      let tokens: TokensResponse & { profileId?: string; userId?: string };
+      let tokens: TokensResponse & { webCardId?: string; userId?: string };
       try {
         setIsSubmitting(true);
         if (countryCodeOrEmail === 'email') {
@@ -99,7 +99,7 @@ const SignupScreen = () => {
         }
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
-          const profileId = tokens.profileId;
+          const webCardId = tokens.webCardId;
           await dispatchGlobalEvent({
             type: 'SIGN_IN',
             payload: {
@@ -107,7 +107,7 @@ const SignupScreen = () => {
                 token: tokens.token,
                 refreshToken: tokens.refreshToken,
               },
-              profileId,
+              webCardId,
             },
           });
         } else {

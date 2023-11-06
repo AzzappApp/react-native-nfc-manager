@@ -1,0 +1,14 @@
+extend type Mutation {
+  declineOwnership(input: DeclineOwnershipInput!): DeclineOwnershipPayload!
+}
+
+input DeclineOwnershipInput {
+  """
+  profile id
+  """
+  profileId: ID!
+}
+
+type DeclineOwnershipPayload {
+  profile: Profile!
+}

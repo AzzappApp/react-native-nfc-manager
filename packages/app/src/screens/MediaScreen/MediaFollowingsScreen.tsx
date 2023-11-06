@@ -10,17 +10,17 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { MediaFollowingsScreen_viewer$key } from '@azzapp/relay/artifacts/MediaFollowingsScreen_viewer.graphql';
+import type { MediaFollowingsScreen_webCard$key } from '@azzapp/relay/artifacts/MediaFollowingsScreen_webCard.graphql';
 import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
 
 type MediaFollowingsScreenScreenProps = {
-  viewer: MediaFollowingsScreen_viewer$key;
+  webCard: MediaFollowingsScreen_webCard$key;
   canPlay: boolean;
   ListHeaderComponent?: React.ReactNode;
 };
 
 const MediaFollowingsScreen = ({
-  viewer,
+  webCard,
   canPlay,
   ListHeaderComponent,
 }: MediaFollowingsScreenScreenProps) => {
@@ -28,14 +28,14 @@ const MediaFollowingsScreen = ({
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment MediaFollowingsScreen_viewer on Viewer
+        fragment MediaFollowingsScreen_webCard on WebCard
         @refetchable(queryName: "MediaFollowingsScreenListQuery")
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
         ) {
           followingsPosts(after: $after, first: $first)
-            @connection(key: "Viewer_followingsPosts") {
+            @connection(key: "WebCard_followingsPosts") {
             __id
             edges {
               node {
@@ -45,7 +45,7 @@ const MediaFollowingsScreen = ({
           }
         }
       `,
-      viewer,
+      webCard,
     );
 
   const onRefresh = useCallback(() => {

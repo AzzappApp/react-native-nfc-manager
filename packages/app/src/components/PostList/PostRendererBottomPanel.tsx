@@ -6,6 +6,7 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -66,11 +67,11 @@ const PostRendererBottomPanel = ({
         previewComment {
           id
           comment
-          author {
+          webCard {
             userName
           }
         }
-        author {
+        webCard {
           id
           userName
           isFollowing
@@ -85,7 +86,7 @@ const PostRendererBottomPanel = ({
     toggleModal();
 
     Clipboard.setStringAsync(
-      buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+      buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
     ).then(() => {
       /* 
         Modals and Toasts are known to interfere with each other
@@ -113,7 +114,7 @@ const PostRendererBottomPanel = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+        url: buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -188,18 +189,38 @@ const PostRendererBottomPanel = ({
     updatePost({ postId: post.id, allowLikes: !post.allowLikes });
   };
 
-  const { profileId } = useAuthState();
+  const { webCardId, profileRole } = useAuthState();
 
-  const isViewer = profileId === post.author.id;
+  const isViewer = webCardId === post.webCard.id;
 
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    toggleFollow(
-      post.author.id,
-      post.author.userName,
-      !post.author.isFollowing,
-    );
+    if (profileRole && isEditor(profileRole)) {
+      toggleFollow(
+        post.webCard.id,
+        post.webCard.userName,
+        !post.webCard.isFollowing,
+      );
+    } else if (post.webCard.isFollowing) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins can stop following a WebCard',
+          description:
+            'Error message when trying to unfollow a WebCard without being an admin',
+        }),
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins can follow a WebCard',
+          description:
+            'Error message when trying to follow a WebCard without being an admin',
+        }),
+      });
+    }
   };
 
   return (
@@ -218,7 +239,7 @@ const PostRendererBottomPanel = ({
           {post.previewComment && (
             <Text variant="small">
               <Text variant="smallbold">
-                {post.previewComment.author.userName}{' '}
+                {post.previewComment.webCard.userName}{' '}
               </Text>
               {post.previewComment.comment}
             </Text>
@@ -318,7 +339,7 @@ const PostRendererBottomPanel = ({
           )}
           {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
-              {post.author?.isFollowing ? (
+              {post.webCard?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
                     defaultMessage="Unfollow"

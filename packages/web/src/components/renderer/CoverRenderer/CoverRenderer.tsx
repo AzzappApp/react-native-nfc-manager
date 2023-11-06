@@ -6,23 +6,23 @@ import CoverPreview from './CoverPreview';
 import styles from './CoverRenderer.css';
 import CoverRendererBackground from './CoverRendererBackground';
 import CoverTextRenderer from './CoverTextRenderer';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
   'children' | 'media'
 > & {
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
 const CoverRenderer = async ({
-  profile,
+  webCard,
   media,
   style,
   ...props
 }: CoverRendererProps) => {
-  const { coverData, coverTitle, coverSubTitle, cardColors } = profile;
+  const { coverData, coverTitle, coverSubTitle, cardColors } = webCard;
 
   if (!coverData) {
     return null;
@@ -33,7 +33,7 @@ const CoverRenderer = async ({
       {...props}
       style={{ position: 'relative', overflow: 'hidden', ...style }}
     >
-      <CoverRendererBackground media={media} profile={profile} />
+      <CoverRendererBackground media={media} webCard={webCard} />
       <div
         {...props}
         style={{
@@ -41,7 +41,7 @@ const CoverRenderer = async ({
         }}
         className={styles.content}
       >
-        <CoverPreview profile={profile} media={media} {...props} />
+        <CoverPreview webCard={webCard} media={media} {...props} />
         <CoverTextRenderer
           title={coverTitle}
           titleStyle={coverData.titleStyle}

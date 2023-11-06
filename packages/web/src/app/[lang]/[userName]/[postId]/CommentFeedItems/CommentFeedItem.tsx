@@ -1,10 +1,10 @@
 import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './CommentFeedItems.css';
-import type { PostCommentWithProfile } from '@azzapp/data/domains';
+import type { PostCommentWithWebCard } from '@azzapp/data/domains';
 
 type CommentFeedItemProps = {
-  comment: PostCommentWithProfile;
+  comment: PostCommentWithWebCard;
 };
 
 const CommentFeedItem = (props: CommentFeedItemProps) => {

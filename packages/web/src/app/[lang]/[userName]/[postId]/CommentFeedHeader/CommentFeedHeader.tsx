@@ -7,22 +7,22 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
 import styles from './CommentFeedHeader.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CommentFeedHeaderProps = {
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
 const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
-  const { profile, media } = props;
+  const { webCard, media } = props;
   const download = useRef<ModalActions>(null);
 
   return (
     <>
       <div className={styles.feedHeader}>
         <Link
-          href={`/${profile.userName}`}
+          href={`/${webCard.userName}`}
           className={styles.feedHeaderProfile}
         >
           {media && (
@@ -35,16 +35,16 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
                 height: '32px',
               }}
             >
-              <CoverPreview media={media} profile={profile} />
+              <CoverPreview media={media} webCard={webCard} />
             </div>
           )}
-          <span>{profile.userName}</span>
+          <span>{webCard.userName}</span>
         </Link>
         <Button onClick={() => download.current?.open()} size="small">
           Follow
         </Button>
       </div>
-      <DownloadAppModal ref={download} media={media} profile={profile} />
+      <DownloadAppModal ref={download} media={media} webCard={webCard} />
     </>
   );
 };

@@ -4,10 +4,10 @@ import type { CardTemplateTypeResolvers } from './__generated__/types';
 export const CardTemplateType: CardTemplateTypeResolvers = {
   id: idResolver('CardTemplateType'),
   label: getLabel,
-  profileCategory: async ({ profileCategoryId }, _, { loaders }) => {
-    if (!profileCategoryId) {
+  webCardCategory: async ({ webCardCategoryId }, _, { loaders }) => {
+    if (!webCardCategoryId) {
       return null;
     }
-    return loaders.ProfileCategory.load(profileCategoryId);
+    return loaders.WebCardCategory.load(webCardCategoryId);
   },
 };

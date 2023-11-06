@@ -110,7 +110,7 @@ const SectionIcons: Record<string, React.ComponentType> = {
   '/users': Person,
   '/colorPalettes': Colorize,
   '/cardStyles': Style,
-  '/profileCategories': Person2,
+  '/webCardCategories': Person2,
   '/staticMedias': Image,
   '/suggestedMedias': ImageAspectRatio,
   '/coverTemplates': CardGiftcard,

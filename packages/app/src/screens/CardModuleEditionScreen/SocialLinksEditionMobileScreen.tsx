@@ -29,7 +29,7 @@ const SocialLinksEditionMobileScreen = ({
   let module: SocialLinksEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_SOCIAL_LINKS,
       ) ?? null;
@@ -46,10 +46,12 @@ const SocialLinksQuery = graphql`
     viewer {
       ...SocialLinksEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...SocialLinksEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...SocialLinksEditionScreen_module
+          }
         }
       }
     }

@@ -37,21 +37,21 @@ describe('Link', () => {
 
   test('should push route when pressed', () => {
     render(
-      <Link route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="WEBCARD" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
       id: null,
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: { userName: 'hello' },
     });
   });
 
   test('should not push route if event is default prevented', () => {
     render(
-      <Link route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="WEBCARD" params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </Link>,
     );
@@ -65,13 +65,13 @@ describe('Link', () => {
 
   test('should replace router  when pressed and replace is true', () => {
     render(
-      <Link route="PROFILE" replace params={{ userName: 'hello' }}>
+      <Link route="WEBCARD" replace params={{ userName: 'hello' }}>
         <Pressable testID="pressable" />
       </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.replace).toHaveBeenCalledWith({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: { userName: 'hello' },
     });
     expect(mockRouter.push).not.toHaveBeenCalled();
@@ -79,14 +79,14 @@ describe('Link', () => {
 
   test('should push route when children is a view', () => {
     render(
-      <Link route="PROFILE" params={{ userName: 'hello' }}>
+      <Link route="WEBCARD" params={{ userName: 'hello' }}>
         <View testID="pressable" />
       </Link>,
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
       id: null,
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: { userName: 'hello' },
     });
   });

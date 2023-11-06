@@ -29,8 +29,10 @@ const accountDetailsScreenWithProfileQuery = graphql`
     }
     viewer {
       profile {
-        userName
-        ...AccountHeader_profile
+        webCard {
+          userName
+          ...AccountHeader_webCard
+        }
       }
     }
   }
@@ -78,7 +80,7 @@ const AccountDetailsScreen = ({
           rowGap: 15,
         }}
       >
-        <AccountDetailsHeader profile={profile ?? null} />
+        <AccountDetailsHeader webCard={profile?.webCard ?? null} />
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
@@ -90,7 +92,7 @@ const AccountDetailsScreen = ({
               }}
             />
           </Text>
-          {profile?.userName ? (
+          {profile?.webCard?.userName ? (
             <>
               <View style={styles.section}>
                 <Text variant="xsmall" style={styles.sectionTitle}>
@@ -117,7 +119,7 @@ const AccountDetailsScreen = ({
                     }}
                   />
                 </Text>
-                <Text variant="medium">{profile.userName}</Text>
+                <Text variant="medium">{profile.webCard.userName}</Text>
               </View>
             </>
           ) : null}
@@ -245,6 +247,6 @@ export default relayScreen(AccountDetailsScreen, {
     params.withProfile
       ? accountDetailsScreenWithProfileQuery
       : accountDetailsScreenWithoutProfileQuery,
-  profileBound: params => params.withProfile,
+  webCardBound: params => params.withProfile,
   fallback: AccountDetailsScreenFallback,
 });

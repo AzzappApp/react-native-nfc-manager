@@ -3,9 +3,10 @@ import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import {
   createUser,
+  getProfilesOfUser,
   getUserByEmail,
   getUserByPhoneNumber,
-  getUserProfiles,
+  updateUser,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -13,13 +14,44 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { handleSigninAuthMethod } from '#helpers/auth';
+import { handleSignInAuthMethod } from '#helpers/auth';
 import { generateTokens } from '#helpers/tokens';
+import type { User } from '@azzapp/data/domains';
 
 type SignupBody = {
   email?: string | null;
   phoneNumber?: string | null;
   password?: string;
+};
+
+const handleExistingUser = async (user: User, password: string) => {
+  //try to login the user
+  try {
+    //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+    // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
+    if (user?.password && bcrypt.compareSync(password, user.password)) {
+      // we can log the user
+      const profiles = await getProfilesOfUser(user.id);
+      return await handleSignInAuthMethod(user, profiles.shift());
+    } else if (user.invited) {
+      await updateUser(user.id, {
+        password: bcrypt.hashSync(password, 12),
+        roles: null,
+      });
+
+      const profiles = await getProfilesOfUser(user.id);
+      return await handleSignInAuthMethod(user, profiles.shift());
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { message: ERRORS.EMAIL_ALREADY_EXISTS },
+      { status: 400 },
+    );
+  }
+  return NextResponse.json(
+    { message: ERRORS.EMAIL_ALREADY_EXISTS },
+    { status: 400 },
+  );
 };
 
 export const POST = async (req: Request) => {
@@ -44,50 +76,14 @@ export const POST = async (req: Request) => {
       }
       const user = await getUserByEmail(email);
       if (user != null) {
-        //try to login the user
-        try {
-          //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
-          // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
-          if (user?.password && bcrypt.compareSync(password, user.password)) {
-            // we can log the user
-            const [profile] = await getUserProfiles(user.id);
-            return await handleSigninAuthMethod(user, profile);
-          }
-        } catch (error) {
-          return NextResponse.json(
-            { message: ERRORS.EMAIL_ALREADY_EXISTS },
-            { status: 400 },
-          );
-        }
-        return NextResponse.json(
-          { message: ERRORS.EMAIL_ALREADY_EXISTS },
-          { status: 400 },
-        );
+        return handleExistingUser(user, password);
       }
     }
 
     if (isInternationalPhoneNumber(phoneNumber)) {
       const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!));
       if (user != null) {
-        //try to login the user
-        try {
-          //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
-          // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
-          if (user?.password && bcrypt.compareSync(password, user.password)) {
-            // we can log the user
-            const [profile] = await getUserProfiles(user.id);
-            await handleSigninAuthMethod(user, profile);
-          }
-        } catch (error) {
-          return NextResponse.json(
-            { message: ERRORS.PHONENUMBER_ALREADY_EXISTS },
-            { status: 400 },
-          );
-        }
-        return NextResponse.json(
-          { message: ERRORS.PHONENUMBER_ALREADY_EXISTS },
-          { status: 400 },
-        );
+        return handleExistingUser(user, password);
       }
     }
 
@@ -101,6 +97,7 @@ export const POST = async (req: Request) => {
     const { token, refreshToken } = await generateTokens({
       userId,
     });
+
     return NextResponse.json({ ok: true, token, refreshToken });
   } catch (error) {
     console.error(error);

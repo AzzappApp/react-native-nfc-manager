@@ -1,0 +1,16 @@
+extend type Mutation {
+  updateWebCard(input: UpdateWebCardInput!): UpdateWebCardPayload
+}
+
+input UpdateWebCardInput {
+  firstName: String
+  lastName: String
+  profileKind: WebCardKind
+  companyName: String
+  profileCategoryId: ID
+  companyActivityId: ID
+}
+
+type UpdateWebCardPayload {
+  webCard: WebCard
+}

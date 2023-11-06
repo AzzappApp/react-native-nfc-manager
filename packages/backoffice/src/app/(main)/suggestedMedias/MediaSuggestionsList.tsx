@@ -24,11 +24,11 @@ import {
   setSuggestionsForMedia,
 } from './suggestedMediasActions';
 import SuggesionAddForm from './SuggestionAddForm';
-import type { CompanyActivity, ProfileCategory } from '@azzapp/data/domains';
+import type { CompanyActivity, WebCardCategory } from '@azzapp/data/domains';
 
 type MediaSuggestionsListProps = {
   activities: CompanyActivity[];
-  categories: ProfileCategory[];
+  categories: WebCardCategory[];
   mediasSuggestions: Record<
     string,
     {
@@ -47,7 +47,7 @@ const MediaSuggestionsList = ({
   const itemsPerPage = 15;
   const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] =
-    useState<ProfileCategory | null>(null);
+    useState<WebCardCategory | null>(null);
   const [selectedActivity, setSelectedActivity] =
     useState<CompanyActivity | null>(null);
 
@@ -288,7 +288,7 @@ export default MediaSuggestionsList;
 type SuggestionRendererProps = {
   mediaId: string;
   kind: 'image' | 'video';
-  categories: ProfileCategory[];
+  categories: WebCardCategory[];
   selectedCategories: string[];
   activities: CompanyActivity[];
   selectedActivities: string[];

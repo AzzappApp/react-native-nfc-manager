@@ -28,7 +28,7 @@ const PostContentPanel = ({
     setAllowLikes,
     setAllowComments,
     setContent,
-    profile,
+    webCard,
   } = useContext(PostCreationScreenContext);
 
   const [showContentModal, setShowContentModal] = useState(false);
@@ -53,7 +53,7 @@ const PostContentPanel = ({
         {...props}
       >
         <AuthorCartouche
-          author={profile!}
+          author={webCard!}
           variant="createPost"
           style={styles.authorCartouche}
         />

@@ -27,8 +27,10 @@ const HomeProfileLink = ({
     graphql`
       fragment HomeProfileLink_user on User {
         profiles {
-          id
-          userName
+          webCard {
+            id
+            userName
+          }
         }
       }
     `,
@@ -36,7 +38,7 @@ const HomeProfileLink = ({
   );
 
   const userNames = useMemo(
-    () => user?.profiles?.map(p => p.userName) ?? [],
+    () => user?.profiles?.map(p => p.webCard.userName) ?? [],
     [user?.profiles],
   );
 

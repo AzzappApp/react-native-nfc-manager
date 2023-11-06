@@ -5,32 +5,32 @@ import CommentFeedItems from '../CommentFeedItems';
 import styles from './CommentFeed.css';
 import type {
   Media,
-  PostCommentWithProfile,
+  PostCommentWithWebCard,
   PostWithMedias,
-  Profile,
+  WebCard,
 } from '@azzapp/data/domains';
 
 type CommentFeedProps = {
-  comments: PostCommentWithProfile[];
+  comments: PostCommentWithWebCard[];
   post: PostWithMedias;
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
 const CommentFeed = (props: CommentFeedProps) => {
-  const { post, profile, media, comments } = props;
+  const { post, webCard, media, comments } = props;
 
   return (
     <>
       <div className={styles.feed}>
         <CommentFeedActions
           defaultPost={post}
-          profile={profile}
+          webCard={webCard}
           media={media}
         />
-        <CommentFeedHeader profile={profile} media={media} />
+        <CommentFeedHeader webCard={webCard} media={media} />
         <CommentFeedItems
-          author={profile}
+          webCard={webCard}
           post={post}
           defaultComments={comments}
           media={media}

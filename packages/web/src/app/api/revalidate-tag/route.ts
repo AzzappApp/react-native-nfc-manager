@@ -9,13 +9,13 @@ async function revalidate(req: Request) {
   const session = await getSessionData();
 
   if (!session) {
-    return NextResponse.json({ error: ERRORS.UNAUTORIZED }, { status: 401 });
+    return NextResponse.json({ error: ERRORS.UNAUTHORIZED }, { status: 401 });
   }
 
   const user = await getUserById(session?.userId);
 
   if (!user) {
-    return NextResponse.json({ error: ERRORS.UNAUTORIZED }, { status: 401 });
+    return NextResponse.json({ error: ERRORS.UNAUTHORIZED }, { status: 401 });
   }
 
   if (!user.roles?.includes('admin')) {

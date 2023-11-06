@@ -29,7 +29,7 @@ const PhotoWithTextAndTitleEditionMobileScreen = ({
   let module: PhotoWithTextAndTitleEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module =>
           module?.id === moduleId &&
           module?.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
@@ -49,10 +49,12 @@ const PhotoWithTextAndTitleQuery = graphql`
     viewer {
       ...PhotoWithTextAndTitleEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...PhotoWithTextAndTitleEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...PhotoWithTextAndTitleEditionScreen_module
+          }
         }
       }
     }

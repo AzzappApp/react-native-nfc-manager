@@ -28,7 +28,7 @@ const CoverLink = ({
   );
 
   return (
-    <Link route="PROFILE" params={props} prefetch={prefetch}>
+    <Link route="WEBCARD" params={props} prefetch={prefetch}>
       <PressableScaleHighlight style={containerStyle} onPress={onPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
@@ -63,7 +63,9 @@ const BlockTextTextBackgroundEditionPanel = ({
           ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPicker_profile
+          webCard {
+            ...WebCardColorPicker_webCard
+          }
         }
       }
     `,
@@ -107,13 +109,13 @@ const BlockTextTextBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'TextBackground',
           description:
             'Label of TextBackground tab in Horizontal photo edition',
         })}
-        profile={profile!}
+        webCard={profile?.webCard ?? null}
         medias={moduleBackgrounds}
         selectedMedia={textBackground}
         tintColor={patternColor}
@@ -125,6 +127,7 @@ const BlockTextTextBackgroundEditionPanel = ({
         imageRatio={1}
         style={styles.mediaSelector}
       />
+
       <LabeledDashedSlider
         label={
           <FormattedMessage

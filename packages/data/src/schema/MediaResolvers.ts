@@ -1,4 +1,5 @@
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
+import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
   decodeMediaId,
@@ -28,7 +29,7 @@ export type DefferedMedia = MediaModel | string;
 
 export type MediaWithAssetKind = {
   media: DefferedMedia;
-  assetKind: 'cover' | 'coverSource' | 'module' | 'post';
+  assetKind: 'contactCard' | 'cover' | 'coverSource' | 'module' | 'post';
 };
 
 export type MediaResolverBaseType = DefferedMedia | MediaWithAssetKind;
@@ -143,6 +144,8 @@ const uriResolver =
         ? COVER_ASSET_SIZES
         : assetKind === 'module'
         ? MODULE_IMAGES_SIZES
+        : assetKind === 'contactCard'
+        ? CONTACTCARD_ASSET_SIZES
         : assetKind === 'post'
         ? kind === 'image'
           ? POST_IMAGES_SIZES

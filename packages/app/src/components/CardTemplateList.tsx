@@ -30,9 +30,10 @@ import { CancelHeaderButton } from './commonsButtons';
 import WebCardPreview from './WebCardPreview';
 import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
-import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
+import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
 import type { ModuleData_cardModules$key } from '@azzapp/relay/artifacts/ModuleData_cardModules.graphql';
-import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
+import type { WebCardBackground_webCard$key } from '@azzapp/relay/artifacts/WebCardBackground_webCard.graphql';
+import type { WebCardBackgroundPreview_webCard$key } from '@azzapp/relay/artifacts/WebCardBackgroundPreview_webCard.graphql';
 import type {
   CardStyle,
   ColorPalette,
@@ -83,19 +84,22 @@ const CardTemplateList = (
           cardTemplateTypes {
             id
             label
-            profileCategory {
+            webCardCategory {
               id
               label
             }
           }
           profile {
-            id
-            ...CoverRenderer_profile
-            ...WebCardBackground_profile
-            cardColors {
-              primary
-              dark
-              light
+            webCard {
+              id
+              ...CoverRenderer_webCard
+              ...WebCardBackground_webCard
+              ...WebCardBackgroundPreview_webCard
+              cardColors {
+                primary
+                dark
+                light
+              }
             }
           }
         }
@@ -329,7 +333,7 @@ const CardTemplateList = (
     { id: string; title: string } | undefined
   >(undefined);
 
-  const templateTypesByProfileCategory = useMemo(() => {
+  const templateTypesByWebCardCategory = useMemo(() => {
     return (
       cardTemplateTypes?.reduce(
         (
@@ -348,7 +352,7 @@ const CardTemplateList = (
           if (!curr) {
             return acc;
           }
-          const label = curr.profileCategory?.label ?? '-';
+          const label = curr.webCardCategory?.label ?? '-';
 
           const existingSection = acc.find(section => section.title === label);
 
@@ -397,7 +401,7 @@ const CardTemplateList = (
           <SelectSection
             nativeID="activities"
             accessibilityLabelledBy="activitiesLabel"
-            sections={templateTypesByProfileCategory}
+            sections={templateTypesByWebCardCategory}
             inputLabel={selectedCardTemplateType?.title}
             selectedItemKey={selectedCardTemplateType?.id}
             keyExtractor={sectionKeyExtractor as any}
@@ -459,16 +463,18 @@ const CardTemplateList = (
           )}
         </View>
       </View>
-      <CardTemplatePreviewModal
-        visible={showPreviewModal}
-        onRequestClose={onClosePreviewModal}
-        onApply={onApplyPreviewTemplate}
-        template={previewTemplate}
-        profile={profile}
-        cardColors={profile?.cardColors ?? DEFAULT_COLOR_PALETTE}
-        loading={loading}
-        style={previewModalStyle}
-      />
+      {profile?.webCard && (
+        <CardTemplatePreviewModal
+          visible={showPreviewModal}
+          onRequestClose={onClosePreviewModal}
+          onApply={onApplyPreviewTemplate}
+          template={previewTemplate}
+          webCard={profile?.webCard}
+          cardColors={profile?.webCard?.cardColors ?? DEFAULT_COLOR_PALETTE}
+          loading={loading}
+          style={previewModalStyle}
+        />
+      )}
     </>
   );
 };
@@ -486,7 +492,11 @@ type CardTemplateItem = {
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
-  profile: (CoverRenderer_profile$key & WebCardBackground_profile$key) | null;
+  webCard:
+    | (CoverRenderer_webCard$key &
+        WebCardBackground_webCard$key &
+        WebCardBackgroundPreview_webCard$key)
+    | null;
   template: CardTemplateItem | null;
   cardColors: ColorPalette;
   loading: boolean;
@@ -497,7 +507,7 @@ type CoverTemplatePreviewModalProps = {
 
 const CardTemplatePreviewModal = ({
   visible,
-  profile,
+  webCard,
   template,
   cardColors,
   loading,
@@ -546,9 +556,9 @@ const CardTemplatePreviewModal = ({
             />
           }
         />
-        {template && profile && (
+        {template && webCard && (
           <WebCardPreview
-            profile={profile}
+            webCard={webCard}
             height={previewHeight}
             cardStyle={template.cardStyle}
             cardColors={cardColors}

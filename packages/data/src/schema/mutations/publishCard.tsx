@@ -1,19 +1,22 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { updateProfile } from '#domains';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { updateWebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const publishCard: MutationResolvers['publishCard'] = async (
   _,
   _args,
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const profileId = auth.profileId;
+  const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+
   const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
+
+  if (!profile || !isAdmin(profile.profileRole)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -21,17 +24,25 @@ const publishCard: MutationResolvers['publishCard'] = async (
     cardIsPublished: true,
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
-    lastContactCardUpdate: new Date(),
   };
+
   try {
-    await updateProfile(profileId, updates);
+    await updateWebCard(profile.webCardId, updates);
   } catch (e) {
+    console.error(e);
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  cardUsernamesToRevalidate.add(profile.userName);
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
   return {
-    profile: {
-      ...profile,
+    webCard: {
+      ...webCard,
       ...updates,
     },
   };

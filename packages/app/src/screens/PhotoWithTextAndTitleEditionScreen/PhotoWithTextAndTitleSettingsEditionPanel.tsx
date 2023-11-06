@@ -9,20 +9,20 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_MIN_FONT_SIZE,
   PHOTO_WITH_TEXT_AND_TITLE_MIN_TITLE_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
+import { WebCardColorDropDownPicker } from '#components/WebCardColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
-import type { PhotoWithTextAndTitleSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleSettingsEditionPanel_viewer.graphql';
+import type { PhotoWithTextAndTitleSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
   /**
-   * A relay fragment reference to the viewer
+   * A relay fragment reference to the webCard
    */
-  viewer: PhotoWithTextAndTitleSettingsEditionPanel_viewer$key;
+  webCard: PhotoWithTextAndTitleSettingsEditionPanel_webCard$key | null;
   /**
    * The content fontFamily currently set on the module
    */
@@ -113,7 +113,7 @@ type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
  * A Panel to edit the Settings of the PhotoWithTextAndTitle edition screen
  */
 const PhotoWithTextAndTitleSettingsEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   titleFontFamily,
   onTitleFontFamilyChange,
   titleFontColor,
@@ -141,20 +141,18 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
   const intl = useIntl();
   const [currentTab, setCurrentTab] = useState<string>('title');
 
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment PhotoWithTextAndTitleSettingsEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            light
-            dark
-          }
+      fragment PhotoWithTextAndTitleSettingsEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          light
+          dark
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const tabs = useMemo(() => {
@@ -197,8 +195,8 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             }
             bottomSheetHeight={bottomSheetHeight}
           />
-          <ProfileColorDropDownPicker
-            profile={profile!}
+          <WebCardColorDropDownPicker
+            webCard={webCard}
             color={currentTab === 'title' ? titleFontColor : contentFontColor}
             onColorChange={
               currentTab === 'title'

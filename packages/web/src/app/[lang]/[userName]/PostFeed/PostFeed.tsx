@@ -11,13 +11,13 @@ import PostFeedItem from './PostFeedItem';
 import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
 import type { ModalActions } from '#ui/Modal';
 import type {
-  Profile,
   Media,
   PostWithCommentAndAuthor,
+  WebCard,
 } from '@azzapp/data/domains';
 
 type PostFeedProps = {
-  profile: Profile;
+  webCard: WebCard;
   defaultPosts: PostWithCommentAndAuthor[];
   postsCount: number;
   media: Media;
@@ -25,7 +25,7 @@ type PostFeedProps = {
 };
 
 const PostFeed = (props: PostFeedProps) => {
-  const { profile, defaultPosts, postsCount, media, onClose } = props;
+  const { webCard, defaultPosts, postsCount, media, onClose } = props;
 
   const share = useRef<ModalActions>(null);
   const download = useRef<ModalActions>(null);
@@ -51,25 +51,25 @@ const PostFeed = (props: PostFeedProps) => {
       if (isPending) return;
 
       const newPosts = await ProfileActions.loadProfilePostsWithTopComment(
-        profile.id,
+        webCard.id,
         COUNT_POSTS_TO_FETCH,
         posts.length,
       );
 
       setPosts(prevPosts => [...prevPosts, ...newPosts]);
     });
-  }, [isPending, posts.length, profile.id]);
+  }, [isPending, posts.length, webCard.id]);
 
   useEffect(() => {
     startTransition(async () => {
       const refreshed = await ProfileActions.loadProfilePostsWithTopComment(
-        profile.id,
+        webCard.id,
         COUNT_POSTS_TO_FETCH,
       );
 
       setPosts(refreshed);
     });
-  }, [profile.id]);
+  }, [webCard.id]);
 
   const onVideoPlay = useCallback((playedVideoIndex: number) => {
     videos.current.forEach((video, i) => {
@@ -88,7 +88,7 @@ const PostFeed = (props: PostFeedProps) => {
     <>
       <div className={styles.wrapper} ref={ref}>
         <PostFeedHeader
-          profile={profile}
+          webCard={webCard}
           postsCount={postsCount}
           media={media}
           onClose={onClose}
@@ -100,7 +100,7 @@ const PostFeed = (props: PostFeedProps) => {
             }}
             key={`${post.id}-${i}`}
             media={media}
-            profile={profile}
+            webCard={webCard}
             post={post}
             onDownload={() => download.current?.open()}
             onPlay={() => onVideoPlay(i)}
@@ -108,10 +108,10 @@ const PostFeed = (props: PostFeedProps) => {
           />
         ))}
       </div>
-      <DownloadAppModal ref={download} profile={profile} media={media} />
+      <DownloadAppModal ref={download} webCard={webCard} media={media} />
       <ShareModal
         ref={share}
-        link={generateShareProfileLink(profile.userName)}
+        link={generateShareProfileLink(webCard.userName)}
       />
     </>
   );

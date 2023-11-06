@@ -86,63 +86,65 @@ const CoverEditor = (
     graphql`
       fragment CoverEditor_viewer on Viewer {
         profile {
-          firstName
-          lastName
-          companyName
-          companyActivity {
-            label
+          webCard {
+            firstName
+            lastName
+            companyName
+            companyActivity {
+              label
+            }
+            webCardKind
+            cardCover {
+              title
+              subTitle
+              mediaParameters
+              mediaFilter
+              sourceMedia {
+                __typename
+                id
+                uri
+                width
+                height
+              }
+              maskMedia {
+                id
+                uri
+              }
+              background {
+                id
+                uri
+                resizeMode
+              }
+              foreground {
+                id
+                uri
+              }
+              backgroundColor
+              backgroundPatternColor
+              foregroundColor
+              segmented
+              merged
+              textOrientation
+              textPosition
+              titleStyle {
+                fontFamily
+                fontSize
+                color
+              }
+              subTitleStyle {
+                fontFamily
+                fontSize
+                color
+              }
+            }
+            cardColors {
+              primary
+              light
+              dark
+              otherColors
+            }
+            ...useSaveCover_webCard
           }
-          profileKind
-          cardCover {
-            title
-            subTitle
-            mediaParameters
-            mediaFilter
-            sourceMedia {
-              __typename
-              id
-              uri
-              width
-              height
-            }
-            maskMedia {
-              id
-              uri
-            }
-            background {
-              id
-              uri
-              resizeMode
-            }
-            foreground {
-              id
-              uri
-            }
-            backgroundColor
-            backgroundPatternColor
-            foregroundColor
-            segmented
-            merged
-            textOrientation
-            textPosition
-            titleStyle {
-              fontFamily
-              fontSize
-              color
-            }
-            subTitleStyle {
-              fontFamily
-              fontSize
-              color
-            }
-          }
-          cardColors {
-            primary
-            light
-            dark
-            otherColors
-          }
-          ...useSaveCover_profile
         }
         ...CoverEditorCustom_viewer
         ...CoverEditorTemplateList_viewer
@@ -152,8 +154,8 @@ const CoverEditor = (
     viewerKey as CoverEditor_viewer$key,
   );
 
-  const cardCover = viewer?.profile?.cardCover ?? null;
-  const cardColors = viewer?.profile?.cardColors ?? null;
+  const cardCover = viewer?.profile?.webCard.cardCover ?? null;
+  const cardColors = viewer?.profile?.webCard.cardColors ?? null;
 
   // #endregion
   const initialTemplateKind = useMemo<TemplateKind>(() => {
@@ -164,7 +166,9 @@ const CoverEditor = (
         ? 'people'
         : 'others';
     }
-    return viewer.profile?.profileKind === 'business' ? 'others' : 'people';
+    return viewer.profile?.webCard.webCardKind === 'business'
+      ? 'others'
+      : 'people';
     // We don't want to update the initial data when the cardCover change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -212,20 +216,20 @@ const CoverEditor = (
     if (cardCover) {
       return cardCover.title ?? null;
     }
-    if (viewer.profile?.profileKind === 'business') {
-      return viewer.profile.companyName ?? null;
+    if (viewer.profile?.webCard.webCardKind === 'business') {
+      return viewer.profile.webCard.companyName ?? null;
     }
-    return viewer.profile?.firstName ?? null;
+    return viewer.profile?.webCard.firstName ?? null;
   });
 
   const [subTitle, setSubTitle] = useState(() => {
     if (cardCover) {
       return cardCover.subTitle ?? null;
     }
-    if (viewer.profile?.profileKind === 'business') {
-      return viewer.profile.companyActivity?.label ?? null;
+    if (viewer.profile?.webCard.webCardKind === 'business') {
+      return viewer.profile.webCard.companyActivity?.label ?? null;
     }
-    return viewer.profile?.lastName ?? null;
+    return viewer.profile?.webCard.lastName ?? null;
   });
 
   const initialCoverStyle = useMemo<CoverStyleData | null>(() => {
@@ -346,7 +350,7 @@ const CoverEditor = (
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile,
+    viewer.profile?.webCard ?? null,
     onCoverSaved,
   );
 

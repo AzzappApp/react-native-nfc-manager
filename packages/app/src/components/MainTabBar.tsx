@@ -9,6 +9,8 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { createId } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -28,8 +30,8 @@ const mainTabBarVisibilityStates: Array<{
   state: SharedValue<number> | false | true;
 }> = [];
 
-const mainTabBarVisibleListners = new Set<() => void>();
-export const useMainTabBarVisiblilityController = (
+const mainTabBarVisibleListeners = new Set<() => void>();
+export const useMainTabBarVisibilityController = (
   visibilityState: SharedValue<number> | false | true,
   active = true,
 ) => {
@@ -48,7 +50,7 @@ export const useMainTabBarVisiblilityController = (
   useLayoutEffect(() => {
     if (controlVisibility && active) {
       mainTabBarVisibilityStates.push({ id, state: visibilityState });
-      mainTabBarVisibleListners.forEach(listener => listener());
+      mainTabBarVisibleListeners.forEach(listener => listener());
     }
     return () => {
       const index = mainTabBarVisibilityStates.findIndex(
@@ -56,7 +58,7 @@ export const useMainTabBarVisiblilityController = (
       );
       if (index !== -1) {
         mainTabBarVisibilityStates.splice(index, 1);
-        mainTabBarVisibleListners.forEach(listener => listener());
+        mainTabBarVisibleListeners.forEach(listener => listener());
       }
     };
   }, [controlVisibility, id, visibilityState, active]);
@@ -73,8 +75,21 @@ const MainTabBar = ({
   style?: StyleProp<ViewStyle>;
 }) => {
   const router = useRouter();
+
+  const { profileRole } = useAuthState();
+
   const onItemPress = (key: string) => {
-    router.push({ route: key as any });
+    if (key !== 'NEW_POST' || (profileRole && isEditor(profileRole))) {
+      router.push({ route: key as any });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins can create a post',
+          description: 'Error message when trying to create a post',
+        }),
+      });
+    }
   };
 
   const insets = useScreenInsets();
@@ -120,9 +135,9 @@ const MainTabBar = ({
     const listener = () => {
       forceUpdate(v => v + 1);
     };
-    mainTabBarVisibleListners.add(listener);
+    mainTabBarVisibleListeners.add(listener);
     return () => {
-      mainTabBarVisibleListners.delete(listener);
+      mainTabBarVisibleListeners.delete(listener);
     };
   }, []);
 

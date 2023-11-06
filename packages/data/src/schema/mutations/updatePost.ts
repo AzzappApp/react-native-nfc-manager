@@ -2,6 +2,7 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { updatePost } from '#domains';
 import type { NewPost } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -12,9 +13,16 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   { input },
   { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { profileId, userId } = auth;
+
+  if (!profileId || !userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const { postId, ...postInput } = input;
@@ -23,7 +31,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   const post = await loaders.Post.load(targetId);
 
   if (!post) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const partialPost: Partial<NewPost> = {
@@ -35,8 +43,10 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   try {
     await updatePost(post.id, partialPost);
 
-    const profile = await loaders.Profile.load(profileId);
-    cardUsernamesToRevalidate.add(profile!.userName);
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+    if (webCard) {
+      cardUsernamesToRevalidate.add(webCard.userName);
+    }
 
     return {
       post: { ...post, ...partialPost },

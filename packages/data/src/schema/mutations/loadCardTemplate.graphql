@@ -13,5 +13,5 @@ input LoadCardTemplateInput {
 }
 
 type LoadCardTemplatePayload {
-  profile: Profile!
+  webCard: WebCard!
 }

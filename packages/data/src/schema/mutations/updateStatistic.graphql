@@ -2,29 +2,33 @@ extend type Mutation {
   """
   Update webcard views
   """
-  updateWebcardViews(input: UpdateWebcardViewsInput!): Boolean
+  updateWebCardViews(input: UpdateWebCardViewsInput!): Boolean
   """
   Update contact card scan
   """
-  updateContactcardScans(input: UpdateContactcardScansInput!): Boolean
+  updateContactCardScans(input: UpdateContactCardScansInput!): Boolean
   """
   Update likes counter
   """
   updateLikes(input: UpdateLikesInput!): Boolean
 }
 
-input UpdateWebcardViewsInput {
+input UpdateWebCardViewsInput {
   """
-  The webcard view that was show
+  The webCard view that was show
   """
   id: ID!
 }
 
-input UpdateContactcardScansInput {
+input UpdateContactCardScansInput {
   """
-  The contact card that was scan
+  The userId of the contact card that was scan
   """
-  id: ID!
+  userId: ID!
+  """
+  The profileID of the contact card that was scan
+  """
+  profileId: ID!
 }
 
 input UpdateLikesInput {

@@ -30,9 +30,16 @@ jest.mock('react-native/Libraries/Share/Share', () => ({
   share: mockShare,
 }));
 
+jest.mock('#helpers/authStore', () => ({
+  getAuthState: () => ({
+    profileRole: 'owner',
+  }),
+  addAuthStateListener: jest.fn(),
+}));
+
 const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
-  const environement = createMockEnvironment();
-  environement.mock.queueOperationResolver(operation =>
+  const environment = createMockEnvironment();
+  environment.mock.queueOperationResolver(operation =>
     MockPayloadGenerator.generate(operation, {
       Post(_, generateId) {
         return {
@@ -61,7 +68,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
     return <PostRendererActionBar postKey={data.post!} {...props} />;
   };
   const component = render(
-    <RelayEnvironmentProvider environment={environement}>
+    <RelayEnvironmentProvider environment={environment}>
       <TestRenderer {...props} />
     </RelayEnvironmentProvider>,
   );
@@ -69,7 +76,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
   return {
     rerender(updates?: Partial<PostRendererMediaProps>) {
       component.rerender(
-        <RelayEnvironmentProvider environment={environement}>
+        <RelayEnvironmentProvider environment={environment}>
           <TestRenderer {...props} {...updates} />
         </RelayEnvironmentProvider>,
       );

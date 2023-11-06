@@ -9,16 +9,16 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
 import styles from './CommentFeedActions.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, PostWithMedias, Profile } from '@azzapp/data/domains';
+import type { Media, PostWithMedias, WebCard } from '@azzapp/data/domains';
 
 type CommentFeedActionsProps = {
   defaultPost: PostWithMedias;
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
 const CommentFeedActions = (props: CommentFeedActionsProps) => {
-  const { defaultPost, profile, media } = props;
+  const { defaultPost, webCard, media } = props;
 
   const [post, setPost] = useState(defaultPost);
   const share = useRef<ModalActions>(null);
@@ -34,7 +34,7 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
 
       if (newPost) setPost(newPost);
     });
-  }, [defaultPost.id, profile.id]);
+  }, [defaultPost.id]);
 
   return (
     <>
@@ -67,9 +67,9 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
       </div>
       <ShareModal
         ref={share}
-        link={generateSharePostLink(profile.userName, post.id)}
+        link={generateSharePostLink(webCard.userName, post.id)}
       />
-      <DownloadAppModal ref={download} profile={profile} media={media} />
+      <DownloadAppModal ref={download} webCard={webCard} media={media} />
     </>
   );
 };

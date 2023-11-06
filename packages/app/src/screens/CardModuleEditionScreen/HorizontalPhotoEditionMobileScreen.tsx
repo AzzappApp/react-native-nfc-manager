@@ -29,7 +29,7 @@ const HorizontalPhotoEditionMobileScreen = ({
   let module: HorizontalPhotoEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module =>
           module?.id === moduleId &&
           module?.kind === MODULE_KIND_HORIZONTAL_PHOTO,
@@ -47,10 +47,12 @@ const HorizontalPhotoQuery = graphql`
     viewer {
       ...HorizontalPhotoEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...HorizontalPhotoEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...HorizontalPhotoEditionScreen_module
+          }
         }
       }
     }

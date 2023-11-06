@@ -2,13 +2,13 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import {
-  incrementContactCardScans,
   updateStatistics,
   incrementWebCardViews,
+  incrementContactCardScans,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
-const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
+const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
   _,
   { input: { id } },
   { auth },
@@ -16,7 +16,7 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   const { profileId } = auth;
 
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(id);
@@ -34,23 +34,15 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   }
 };
 
-const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
-  async (_, { input: { id } }, { auth }) => {
-    const { profileId } = auth;
-
+const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
+  async (_, { input: { profileId } }, { auth }) => {
     if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTORIZED);
-    }
-
-    const { id: targetId, type } = fromGlobalId(id);
-
-    if (type !== 'Profile') {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     try {
-      if (targetId !== profileId) {
-        await incrementContactCardScans(targetId);
+      if (profileId !== auth.profileId) {
+        await incrementContactCardScans(profileId, true);
       }
 
       return true;
@@ -67,7 +59,7 @@ const updateLikes: MutationResolvers['updateLikes'] = async (
   const { profileId } = auth;
 
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(id);
@@ -86,4 +78,4 @@ const updateLikes: MutationResolvers['updateLikes'] = async (
   }
 };
 
-export { updateWebcardViews, updateContactcardScans, updateLikes };
+export { updateWebCardViews, updateContactCardScans, updateLikes };

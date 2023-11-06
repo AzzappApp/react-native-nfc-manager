@@ -1,6 +1,33 @@
 import { json2csv, csv2json } from 'csv42';
 
 import { buildUserUrl } from './urlHelpers';
+
+/**
+ * A contact card
+ */
+export type CommonInformation = {
+  company?: string | null;
+  phoneNumbers?: Array<{
+    label: string;
+    number: string;
+  }> | null;
+  emails?: Array<{
+    label: string;
+    address: string;
+  }> | null;
+  urls?: Array<{
+    address: string;
+  }> | null;
+  addresses?: Array<{
+    label: string;
+    address: string;
+  }> | null;
+  socials?: Array<{
+    url: string;
+    label: string;
+  }> | null;
+};
+
 /**
  * A contact card
  */
@@ -12,34 +39,35 @@ export type ContactCard = {
   phoneNumbers?: Array<{
     label: string;
     number: string;
-    selected: boolean;
+    selected?: boolean | null;
   }> | null;
   emails?: Array<{
     label: string;
     address: string;
-    selected: boolean;
+    selected?: boolean | null;
   }> | null;
   urls?: Array<{
     address: string;
-    selected: boolean;
+    selected?: boolean | null;
   }> | null;
   addresses?: Array<{
     label: string;
     address: string;
-    selected: boolean;
+    selected?: boolean | null;
   }> | null;
   birthday?: {
     birthday: string;
-    selected: boolean;
+    selected?: boolean | null;
   };
   socials?: Array<{
     url: string;
     label: string;
-    selected: boolean;
+    selected?: boolean | null;
   }> | null;
 };
 
 type ParsedContactCard = [
+  string,
   string,
   string,
   string,
@@ -59,36 +87,40 @@ type ParsedContactCard = [
 export const serializeContactCard = (
   username: string,
   profileId: string,
+  webCardId: string,
   card: ContactCard | null,
+  commonInformation?: CommonInformation | null,
 ) => {
   const urls: Array<[string, string]> = [['azzapp', buildUserUrl(username)]];
-  if (card?.urls)
+  if (card?.urls) {
     urls.push(
-      ...card.urls
-        .filter(url => url.selected)
+      ...(commonInformation?.urls ?? [])
+        .concat(card.urls.filter(url => url.selected) ?? [])
         .map(({ address }) => ['', address] as [string, string]),
     );
+  }
 
   const serializedContactCard: ParsedContactCard = [
     profileId,
+    webCardId,
     card?.firstName ?? '',
     card?.lastName ?? '',
-    card?.company ?? '',
+    commonInformation?.company ?? card?.company ?? '',
     card?.title ?? '',
-    card?.phoneNumbers
-      ?.filter(p => p.selected)
-      .map(({ label, number }) => [label, number]) ?? [],
-    card?.emails
-      ?.filter(e => e.selected)
-      .map(({ label, address }) => [label, address]) ?? [],
+    (commonInformation?.phoneNumbers ?? [])
+      .concat(card?.phoneNumbers?.filter(p => p.selected) ?? [])
+      .map(({ label, number }) => [label, number]),
+    (commonInformation?.emails ?? [])
+      .concat(card?.emails?.filter(e => e.selected) ?? [])
+      .map(({ label, address }) => [label, address]),
     urls,
-    card?.addresses
-      ?.filter(address => address.selected)
-      .map(({ label, address }) => [label, address]) ?? [],
+    (commonInformation?.addresses ?? [])
+      .concat(card?.addresses?.filter(address => address.selected) ?? [])
+      .map(({ label, address }) => [label, address]),
     card?.birthday?.selected ? card?.birthday.birthday : undefined,
-    card?.socials
-      ?.filter(social => social.selected)
-      .map(({ label, url }) => [label, url]) ?? [],
+    (commonInformation?.socials ?? [])
+      .concat(card?.socials?.filter(social => social.selected) ?? [])
+      .map(({ label, url }) => [label, url]),
   ];
 
   return json2csv([serializedContactCard], { header: false });
@@ -107,6 +139,7 @@ export const parseContactCard = (contactCardData: string) => {
   const [
     [
       profileId,
+      webCardId,
       firstName,
       lastName,
       company,
@@ -122,6 +155,7 @@ export const parseContactCard = (contactCardData: string) => {
 
   return {
     profileId,
+    webCardId,
     firstName,
     lastName,
     company,
@@ -134,3 +168,7 @@ export const parseContactCard = (contactCardData: string) => {
     socials,
   };
 };
+
+export const AVATAR_MAX_WIDTH = 2048;
+
+export const CONTACTCARD_ASSET_SIZES = [112];

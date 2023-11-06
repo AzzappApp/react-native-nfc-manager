@@ -7,5 +7,5 @@ input ReorderModulesInput {
 }
 
 type ReorderModulesPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

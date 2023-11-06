@@ -104,25 +104,28 @@ const CarouselEditionScreen = ({
     graphql`
       fragment CarouselEditionScreen_viewer on Viewer {
         ...CarouselEditionBackgroundPanel_viewer
-        ...CarouselEditionBorderPanel_viewer
+
         profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            light
-            dark
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
+          webCard {
+            ...WebCardColorPicker_webCard
+            cardColors {
+              primary
+              light
+              dark
+            }
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            ...CarouselEditionBorderPanel_webCard
           }
         }
         moduleBackgrounds {
@@ -161,7 +164,7 @@ const CarouselEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.cardStyle,
+      cardStyle: viewer.profile?.webCard.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
@@ -195,7 +198,7 @@ const CarouselEditionScreen = ({
         $input: SaveCarouselModuleInput!
       ) {
         saveCarouselModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -469,8 +472,8 @@ const CarouselEditionScreen = ({
         data={previewData}
         height={topPanelHeight - 40}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={viewer.profile?.webCard.cardColors}
+        cardStyle={viewer.profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -498,7 +501,7 @@ const CarouselEditionScreen = ({
             id: 'border',
             element: (
               <CarouselEditionBorderPanel
-                viewer={viewer}
+                webCard={viewer.profile?.webCard ?? null}
                 borderWidth={borderWidth}
                 borderColor={borderColor}
                 borderRadius={borderRadius}

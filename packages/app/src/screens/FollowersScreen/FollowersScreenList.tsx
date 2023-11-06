@@ -4,29 +4,31 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import ProfileList from '#components/ProfileList';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import WebCardList from '#components/WebCardList';
+import useAuthState from '#hooks/useAuthState';
 import type {
   FollowersScreenList_removeFollowerMutation,
   FollowersScreenList_removeFollowerMutation$data,
 } from '@azzapp/relay/artifacts/FollowersScreenList_removeFollowerMutation.graphql';
-import type { FollowersScreenList_viewer$key } from '@azzapp/relay/artifacts/FollowersScreenList_viewer.graphql';
+import type { FollowersScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowersScreenList_webCard.graphql';
 import type { RecordSourceSelectorProxy } from 'relay-runtime';
 
 type FollowersListProps = {
   isPublic: boolean;
-  currentProfileId: string;
-  viewer: FollowersScreenList_viewer$key;
+  currentWebCardId: string;
+  webCard: FollowersScreenList_webCard$key | null;
 };
 
 const FollowersScreenList = ({
   isPublic,
-  currentProfileId,
-  viewer: viewerKey,
+  currentWebCardId,
+  webCard: webCardKey,
 }: FollowersListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment FollowersScreenList_viewer on Viewer
+        fragment FollowersScreenList_webCard on WebCard
         @refetchable(queryName: "FollowersListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -38,13 +40,13 @@ const FollowersScreenList = ({
             __id
             edges {
               node {
-                ...ProfileList_users
+                ...WebCardList_webCard
               }
             }
           }
         }
       `,
-      viewerKey,
+      webCardKey,
     );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -70,44 +72,57 @@ const FollowersScreenList = ({
 
   const intl = useIntl();
 
-  const removeFollower = useCallback(
-    (profileId: string) => {
-      // currentProfileId is undefined when user is anonymous so we can't follow
-      if (currentProfileId && data.followers) {
-        //data.followers was null on sentry crash
-        const connectionID = data.followers.__id;
+  const { profileRole } = useAuthState();
 
-        commit({
-          variables: {
-            input: {
-              profileId,
+  const removeFollower = useCallback(
+    (webCardId: string) => {
+      if (profileRole && isEditor(profileRole)) {
+        // currentProfileId is undefined when user is anonymous so we can't follow
+        if (currentWebCardId && data?.followers) {
+          //data.followers was null on sentry crash
+          const connectionID = data.followers.__id;
+
+          commit({
+            variables: {
+              input: {
+                webCardId,
+              },
+              connections: [connectionID],
             },
-            connections: [connectionID],
-          },
-          optimisticResponse: {
-            removeFollower: {
-              removedFollowerId: profileId,
+            optimisticResponse: {
+              removeFollower: {
+                removedFollowerId: webCardId,
+              },
             },
-          },
-          optimisticUpdater: store =>
-            updater(store, currentProfileId, profileId),
-          updater: store => updater(store, currentProfileId, profileId),
-          onError(error) {
-            console.error(error);
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error, could not remove follower, please try again later',
-                description:
-                  'Error message displayed when the user could not remove a follower',
-              }),
-            });
-          },
+            optimisticUpdater: store =>
+              updater(store, currentWebCardId, webCardId),
+            updater: store => updater(store, currentWebCardId, webCardId),
+            onError(error) {
+              console.error(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, could not remove follower, please try again later',
+                  description:
+                    'Error message displayed  when the user is not allowed to remove a follower',
+                }),
+              });
+            },
+          });
+        }
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Only admins can remove a follower',
+            description:
+              'Error message displayed when the user is not allowed to remove a follower',
+          }),
         });
       }
     },
-    [commit, currentProfileId, data.followers, intl],
+    [commit, currentWebCardId, data?.followers, intl, profileRole],
   );
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
@@ -132,16 +147,16 @@ const FollowersScreenList = ({
 
   const onToggleFollow = useMemo(
     () =>
-      isPublic ? undefined : (profileId: string) => removeFollower(profileId),
+      isPublic ? undefined : (webCardId: string) => removeFollower(webCardId),
     [isPublic, removeFollower],
   );
 
   return (
-    <ProfileList
+    <WebCardList
       searchValue={searchValue}
       setSearchValue={setSearchValue}
       users={convertToNonNullArray(
-        data.followers.edges?.map(edge => edge?.node) ?? [],
+        data?.followers.edges?.map(edge => edge?.node) ?? [],
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}
@@ -156,23 +171,23 @@ const FollowersScreenList = ({
 
 const updater = (
   store: RecordSourceSelectorProxy<FollowersScreenList_removeFollowerMutation$data>,
-  currentProfileId: string,
-  profileId: string,
+  currentWebCardId: string,
+  webCardId: string,
 ) => {
-  const currentProfile = store.get(currentProfileId);
+  const currentWebCard = store.get(currentWebCardId);
 
-  const nbFollowers = currentProfile?.getValue('nbFollowers');
+  const nbFollowers = currentWebCard?.getValue('nbFollowers');
 
   if (typeof nbFollowers === 'number') {
-    currentProfile?.setValue(nbFollowers - 1, 'nbFollowers');
+    currentWebCard?.setValue(nbFollowers - 1, 'nbFollowers');
   }
 
-  const profile = store.get(profileId);
+  const webCard = store.get(webCardId);
 
-  const nbFollowings = profile?.getValue('nbFollowings');
+  const nbFollowings = webCard?.getValue('nbFollowings');
 
   if (typeof nbFollowings === 'number') {
-    profile?.setValue(nbFollowings - 1, 'nbFollowings');
+    webCard?.setValue(nbFollowings - 1, 'nbFollowings');
   }
 };
 

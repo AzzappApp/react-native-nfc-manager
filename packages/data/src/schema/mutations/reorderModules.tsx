@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   db,
   getCardModulesByIds,
@@ -11,19 +12,19 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const reorderModules: MutationResolvers['reorderModules'] = async (
   _,
   { input: { moduleIds } },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const profileId = auth.profileId;
+  const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
+  if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   const modules = await getCardModulesByIds(moduleIds);
-  if (modules.some(module => module?.profileId !== profileId)) {
+  if (modules.some(module => module?.webCardId !== profile.webCardId)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -40,9 +41,15 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  cardUsernamesToRevalidate.add(profile.userName);
+  const webCard = await loaders.WebCard.load(profile.webCardId);
 
-  return { profile };
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
+
+  return { webCard };
 };
 
 export default reorderModules;

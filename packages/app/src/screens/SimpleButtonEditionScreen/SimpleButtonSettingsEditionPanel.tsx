@@ -11,9 +11,9 @@ import {
   SIMPLE_BUTTON_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import ProfileColorPicker, {
-  ProfileColorDropDownPicker,
-} from '#components/ProfileColorPicker';
+import WebCardColorPicker, {
+  WebCardColorDropDownPicker,
+} from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
@@ -21,15 +21,15 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import TextInput from '#ui/TextInput';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
-import type { SimpleButtonSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleButtonSettingsEditionPanel_viewer.graphql';
+import type { SimpleButtonSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/SimpleButtonSettingsEditionPanel_webCard.graphql';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewProps } from 'react-native';
 
 type SimpleButtonSettingsEditionPanelProps = ViewProps & {
   /**
-   * A relay fragment reference to the viewer
+   * A relay fragment reference to the webCard
    */
-  viewer: SimpleButtonSettingsEditionPanel_viewer$key;
+  webCard: SimpleButtonSettingsEditionPanel_webCard$key | null;
   /**
    * The buttonLabel currently set on the module
    */
@@ -97,7 +97,7 @@ type SimpleButtonSettingsEditionPanelProps = ViewProps & {
  * A Panel to edit the Settings of the SimpleButton edition screen
  */
 const SimpleButtonSettingsEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   buttonLabel,
   onButtonLabelChange,
   actionType,
@@ -119,20 +119,18 @@ const SimpleButtonSettingsEditionPanel = ({
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment SimpleButtonSettingsEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            dark
-            light
-          }
+      fragment SimpleButtonSettingsEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -157,13 +155,13 @@ const SimpleButtonSettingsEditionPanel = ({
           }),
           rightElement: (
             <ColorPreview
-              color={swapColor(buttonColor, profile?.cardColors)}
+              color={swapColor(buttonColor, webCard?.cardColors)}
               style={{ marginLeft: 5 }}
             />
           ),
         },
       ]),
-    [buttonColor, intl, profile?.cardColors],
+    [buttonColor, intl, webCard?.cardColors],
   );
 
   const SELECTORS: Array<CountryCodeListOption<'email' | 'link'>> = [
@@ -268,8 +266,8 @@ const SimpleButtonSettingsEditionPanel = ({
             onFontFamilyChange={onFontFamilyChange}
             bottomSheetHeight={bottomSheetHeight}
           />
-          <ProfileColorDropDownPicker
-            profile={profile!}
+          <WebCardColorDropDownPicker
+            webCard={webCard}
             color={fontColor}
             onColorChange={onFontColorChange}
             bottomSheetHeight={bottomSheetHeight}
@@ -297,11 +295,11 @@ const SimpleButtonSettingsEditionPanel = ({
           })}
           style={styles.slider}
         />
-        {profile && (
-          <ProfileColorPicker
+        {webCard && (
+          <WebCardColorPicker
             visible={currentTab !== 'settings'}
             height={bottomSheetHeight}
-            profile={profile}
+            webCard={webCard}
             title={intl.formatMessage({
               defaultMessage: 'Button color',
               description: 'Button color title in SimpleButton edition',

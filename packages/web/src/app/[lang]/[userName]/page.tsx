@@ -3,9 +3,9 @@ import { notFound } from 'next/navigation';
 import {
   getCardModules,
   getMediasByIds,
-  getProfileByUserName,
   getProfilesPostsWithTopComment,
   getStaticMediasByIds,
+  getWebCardByUserName,
 } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -19,7 +19,7 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
-import ProfilePageLayout from './ProfilePageLayout';
+import WebCardPageLayout from './WebCardPageLayout';
 
 type ProfilePageProps = {
   params: {
@@ -28,19 +28,19 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { profile, modules, media, posts, backgrounds } = await unstable_cache(
+  const { webCard, modules, media, posts, backgrounds } = await unstable_cache(
     async () => {
       console.info(`Caching webcard for user ${userName}`);
 
-      const profile = await getProfileByUserName(userName);
+      const webCard = await getWebCardByUserName(userName);
 
       try {
-        if (profile?.cardIsPublished) {
+        if (webCard?.cardIsPublished) {
           const [posts, modules, media] = await Promise.all([
-            getProfilesPostsWithTopComment(profile.id, 5, 0),
-            getCardModules(profile.id),
-            profile.coverData?.mediaId
-              ? getMediasByIds([profile.coverData.mediaId]).then(
+            getProfilesPostsWithTopComment(webCard.id, 5, 0),
+            getCardModules(webCard.id),
+            webCard.coverData?.mediaId
+              ? getMediasByIds([webCard.coverData.mediaId]).then(
                   ([media]) => media,
                 )
               : null,
@@ -55,7 +55,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
             : [];
 
           return {
-            profile,
+            webCard,
             modules,
             media,
             posts,
@@ -67,7 +67,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
       }
 
       return {
-        profile,
+        webCard,
         card: undefined,
         cover: undefined,
         modules: [],
@@ -81,7 +81,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
     { tags: [userName] },
   )();
 
-  if (!profile?.cardIsPublished || !media) {
+  if (!webCard?.cardIsPublished || !media) {
     return notFound();
   }
 
@@ -89,10 +89,10 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
     convertToNonNullArray(backgrounds).map(b => [b.id, b.resizeMode!]),
   );
 
-  const cardColors = profile.cardColors ?? DEFAULT_COLOR_PALETTE;
+  const cardColors = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
 
   const cardBackgroundColor = swapColor(
-    profile.coverData?.backgroundColor ?? cardColors.light,
+    webCard.coverData?.backgroundColor ?? cardColors.light,
     cardColors,
   );
   let lastModuleBackgroundColor = cardBackgroundColor;
@@ -101,7 +101,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
   if (lastModule) {
     const lastModuleData = getModuleDataValues({
       data: lastModule.data as any,
-      cardStyle: profile.cardStyle ?? DEFAULT_CARD_STYLE,
+      cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
       defaultValues: MODULES_DEFAULT_VALUES[lastModule.kind],
       styleValuesMap: MODULES_STYLES_VALUES[lastModule.kind],
     });
@@ -114,8 +114,8 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
   }
 
   return (
-    <ProfilePageLayout
-      profile={profile}
+    <WebCardPageLayout
+      webCard={webCard}
       modules={
         <>
           {modules.map(module => (
@@ -123,15 +123,15 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
               resizeModes={resizeModes}
               module={module}
               key={module.id}
-              colorPalette={profile.cardColors ?? DEFAULT_COLOR_PALETTE}
-              cardStyle={profile.cardStyle ?? DEFAULT_CARD_STYLE}
+              colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
+              cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
             />
           ))}
         </>
       }
       posts={posts}
       media={media}
-      cover={<CoverRenderer profile={profile} media={media} />}
+      cover={<CoverRenderer webCard={webCard} media={media} />}
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
     />

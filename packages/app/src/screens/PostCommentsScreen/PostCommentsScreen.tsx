@@ -15,7 +15,9 @@ const postCommentsMobileScreenQuery = graphql`
   query PostCommentsScreenQuery($postId: ID!) {
     viewer {
       profile {
-        ...AuthorCartoucheFragment_profile
+        webCard {
+          ...AuthorCartoucheFragment_webCard
+        }
       }
     }
     node(id: $postId) {
@@ -35,7 +37,7 @@ const PostCommentsMobileScreen = ({
   }
   return (
     <PostCommentsList
-      viewer={data.viewer.profile}
+      webCard={data.viewer.profile.webCard}
       post={data.node}
       postId={params.postId}
     />

@@ -4,18 +4,18 @@ import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CoverRenderer.css';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverPreviewProps = Omit<
   React.HTMLProps<HTMLDivElement>,
   'children' | 'media'
 > & {
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
 };
 
-const CoverPreview = ({ profile, media, ...props }: CoverPreviewProps) => {
-  const { coverData, cardColors } = profile;
+const CoverPreview = ({ webCard, media, ...props }: CoverPreviewProps) => {
+  const { coverData, cardColors } = webCard;
 
   if (!coverData) return null;
 

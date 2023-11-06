@@ -38,7 +38,7 @@ export const CardModuleTable = mysqlTable(
   'CardModule',
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-    profileId: cols.cuid('profileId').notNull(),
+    webCardId: cols.cuid('webCardId').notNull(),
     kind: mysqlEnum('kind', [
       'blockText',
       'carousel',
@@ -58,7 +58,7 @@ export const CardModuleTable = mysqlTable(
   },
   table => {
     return {
-      profileIdIdx: index('CardModule_profileId_idx').on(table.profileId),
+      webCardIdIdx: index('CardModule_webCardId_idx').on(table.webCardId),
     };
   },
 );
@@ -157,11 +157,11 @@ export const getCardModulesSortedByPosition = (ids: string[]) =>
 /**
  * Retrieve all card modules for a given card
  *
- * @param profileId - The card id
+ * @param webCardId - The card id
  * @returns The card modules
  */
 export const getCardModules = async (
-  profileId: string,
+  webCardId: string,
   includeHidden = false,
   trx: DbTransaction = db,
 ): Promise<CardModule[]> =>
@@ -170,7 +170,7 @@ export const getCardModules = async (
     .from(CardModuleTable)
     .where(
       and(
-        eq(CardModuleTable.profileId, profileId),
+        eq(CardModuleTable.webCardId, webCardId),
         includeHidden ? undefined : eq(CardModuleTable.visible, true),
       ),
     )
@@ -183,12 +183,12 @@ export const getCardModules = async (
  * @param qc - The query creator to use (profile for transactions)
  * @returns The created card
  */
-export const getCardModuleCount = async (profileId: string) =>
+export const getCardModuleCount = async (webCardId: string) =>
   db
 
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(CardModuleTable)
-    .where(eq(CardModuleTable.profileId, profileId))
+    .where(eq(CardModuleTable.webCardId, webCardId))
 
     .then(res => res[0].count);
 
@@ -239,14 +239,16 @@ export const updateCardModule = async (
  * Reset all card modules positions to match their order in the array
  */
 export const resetCardModulesPositions = async (
-  profileId: string,
+  webCardId: string,
   trx: DbTransaction = db,
 ) => {
-  const modules = await getCardModules(profileId, true, trx);
-  await modules.map((module, index) =>
-    trx
-      .update(CardModuleTable)
-      .set({ position: index })
-      .where(eq(CardModuleTable.id, module.id)),
+  const modules = await getCardModules(webCardId, true, trx);
+  await Promise.all(
+    modules.map((module, index) =>
+      trx
+        .update(CardModuleTable)
+        .set({ position: index })
+        .where(eq(CardModuleTable.id, module.id)),
+    ),
   );
 };

@@ -8,7 +8,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 export const CardTemplateTypeTable = mysqlTable('CardTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labels: cols.labels('labels').notNull(),
-  profileCategoryId: cols.cuid('profileCategoryId').notNull(),
+  webCardCategoryId: cols.cuid('webCardCategoryId').notNull(),
 });
 
 export type CardTemplateType = InferSelectModel<typeof CardTemplateTypeTable>;

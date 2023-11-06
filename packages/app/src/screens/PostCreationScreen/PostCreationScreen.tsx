@@ -47,8 +47,10 @@ const postCreationcreenQuery = graphql`
   query PostCreationScreenQuery {
     viewer {
       profile {
-        id
-        ...AuthorCartoucheFragment_profile
+        webCard {
+          id
+          ...AuthorCartoucheFragment_webCard
+        }
       }
     }
   }
@@ -66,10 +68,10 @@ const PostCreationScreen = ({
   } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
 
   const connectionID =
-    profile?.id &&
+    profile?.webCard.id &&
     ConnectionHandler.getConnectionID(
-      profile.id,
-      'ProfilePostsList_profile_connection_posts',
+      profile.webCard.id,
+      'WebCardPostsList_webCard_connection_posts',
     );
 
   const router = useRouter();
@@ -94,7 +96,7 @@ const PostCreationScreen = ({
           allowComments
           counterComments
           counterReactions
-          author {
+          webCard {
             id
             userName
           }
@@ -225,14 +227,14 @@ const PostCreationScreen = ({
           setProgressIndicator(null);
         },
         updater: store => {
-          if (profile?.id) {
-            const currentProfile = store.get(profile.id);
+          if (profile?.webCard.id) {
+            const currentWebCard = store.get(profile.webCard.id);
 
-            if (currentProfile) {
-              const nbPosts = currentProfile?.getValue('nbPosts');
+            if (currentWebCard) {
+              const nbPosts = currentWebCard?.getValue('nbPosts');
 
               if (typeof nbPosts === 'number') {
-                currentProfile.setValue(nbPosts + 1, 'nbPosts');
+                currentWebCard.setValue(nbPosts + 1, 'nbPosts');
               }
             }
           }
@@ -258,9 +260,9 @@ const PostCreationScreen = ({
       setAllowLikes,
       setAllowComments,
       setContent,
-      profile,
+      webCard: profile?.webCard ?? null,
     }),
-    [allowComments, allowLikes, content, profile],
+    [allowComments, allowLikes, content, profile?.webCard],
   );
 
   if (!profile) {

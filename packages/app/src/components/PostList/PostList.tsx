@@ -60,7 +60,7 @@ const PostList = ({
           __typename
         }
         ...PostRendererFragment_post
-        author @include(if: $includeAuthor) {
+        webCard @include(if: $includeAuthor) {
           ...PostRendererFragment_author
         }
       }
@@ -149,7 +149,7 @@ const PostList = ({
           post={item}
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
-          author={item.author ?? extraData.author!}
+          author={item.webCard ?? extraData.author!}
         />
       );
     },

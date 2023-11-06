@@ -42,7 +42,7 @@ extend type Mutation {
 }
 
 type SaveModulePayload {
-  profile: Profile!
+  webCard: WebCard!
 }
 
 input SaveBlockTextModuleInput {

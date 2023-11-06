@@ -2,21 +2,21 @@ import Link from 'next/link';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CommentFeedSeeMore.css';
-import type { PostWithMedias, Profile } from '@azzapp/data/domains';
+import type { PostWithMedias, WebCard } from '@azzapp/data/domains';
 
 type CommentFeedMoreMediaProps = {
-  profile: Profile;
+  webCard: WebCard;
   post: PostWithMedias;
 };
 
 const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
-  const { post, profile } = props;
+  const { post, webCard } = props;
 
   const media = post.medias[0];
 
   return (
     <Link
-      href={`/${profile.userName}/${post.id}`}
+      href={`/${webCard.userName}/${post.id}`}
       className={styles.media}
       style={{
         aspectRatio: `${media.width / media.height}`,

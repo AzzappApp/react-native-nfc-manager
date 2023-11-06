@@ -7,11 +7,11 @@ import {
   CAROUSEL_MAX_BORDER_RADIUS,
   CAROUSEL_MAX_BORDER_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import ProfileColorPicker from '#components/ProfileColorPicker';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { CarouselEditionBorderPanel_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionBorderPanel_viewer.graphql';
+import type { CarouselEditionBorderPanel_webCard$key } from '@azzapp/relay/artifacts/CarouselEditionBorderPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
@@ -32,9 +32,9 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
    */
   bottomSheetHeight: number;
   /**
-   * The current profile. used for the color picker.
+   * The current webCard. used for the color picker.
    */
-  viewer: CarouselEditionBorderPanel_viewer$key;
+  webCard: CarouselEditionBorderPanel_webCard$key | null;
   /**
    * Called when the user wants to change the border size.
    */
@@ -53,7 +53,7 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
  * A panel to edit the border of the carousel.
  */
 const CarouselEditionBorderPanel = ({
-  viewer,
+  webCard: webCardKey,
   borderWidth,
   borderColor,
   borderRadius,
@@ -66,20 +66,18 @@ const CarouselEditionBorderPanel = ({
 }: CarouselEditionBorderPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('size');
 
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment CarouselEditionBorderPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            dark
-            light
-          }
+      fragment CarouselEditionBorderPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -105,13 +103,13 @@ const CarouselEditionBorderPanel = ({
         }),
         rightElement: (
           <ColorPreview
-            color={swapColor(borderColor, profile?.cardColors)}
+            color={swapColor(borderColor, webCard?.cardColors)}
             style={{ marginLeft: 5 }}
           />
         ),
       },
     ],
-    [borderColor, intl, profile?.cardColors],
+    [borderColor, intl, webCard?.cardColors],
   );
 
   return (
@@ -163,11 +161,11 @@ const CarouselEditionBorderPanel = ({
           style={styles.slider}
         />
       </View>
-      {profile && (
-        <ProfileColorPicker
+      {webCard && (
+        <WebCardColorPicker
           visible={currentTab !== 'size'}
           height={bottomSheetHeight}
-          profile={profile}
+          webCard={webCard}
           title={intl.formatMessage({
             defaultMessage: 'Border color',
             description: 'Title of the border color picker in carousel edition',

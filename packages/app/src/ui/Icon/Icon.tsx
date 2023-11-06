@@ -253,6 +253,9 @@ const icons = {
   get locked() {
     return require('./assets/locked.png');
   },
+  get lock_line() {
+    return require('./assets/lock_line.png');
+  },
   get logout() {
     return require('./assets/logout.png');
   },
@@ -414,6 +417,9 @@ const icons = {
   },
   get trash() {
     return require('./assets/trash.png');
+  },
+  get multi_user() {
+    return require('./assets/multi-user.png');
   },
 } as const;
 

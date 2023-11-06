@@ -18,12 +18,14 @@ describe('ContactCardEditModal', () => {
     props?: Partial<ContactCardEditModalProps>,
   ) => {
     environment = createMockEnvironment();
-    environment.mock.queueOperationResolver(operation =>
-      MockPayloadGenerator.generate(operation, {
-        Viewer: () => ({
-          id: 'viewerId',
-          profile: {
-            id: 'profileId',
+    environment.mock.queueOperationResolver(operation => {
+      return MockPayloadGenerator.generate(operation, {
+        Profile() {
+          return {
+            webCard: {
+              isMultiUser: false,
+              commonInformation: null,
+            },
             contactCard: {
               id: 'contactCardId',
               firstName: 'John',
@@ -45,10 +47,13 @@ describe('ContactCardEditModal', () => {
                 },
               ],
             },
-          },
-        }),
-      }),
-    );
+            commonInformation: {
+              company: '',
+            },
+          };
+        },
+      });
+    });
 
     const TestRenderer = (props?: Partial<ContactCardEditModalProps>) => {
       const data = useLazyLoadQuery<ContactCardEditModalTestQuery>(
@@ -56,9 +61,7 @@ describe('ContactCardEditModal', () => {
           query ContactCardEditModalTestQuery @relay_test_operation {
             viewer {
               profile {
-                contactCard {
-                  ...ContactCardEditModal_card
-                }
+                ...ContactCardEditModal_card
               }
             }
           }
@@ -67,14 +70,12 @@ describe('ContactCardEditModal', () => {
       );
 
       return (
-        data.viewer.profile && (
-          <ContactCardEditModal
-            contactCard={data.viewer.profile.contactCard!}
-            visible
-            toggleBottomSheet={() => void 0}
-            {...props}
-          />
-        )
+        <ContactCardEditModal
+          profile={data.viewer.profile!}
+          visible
+          toggleBottomSheet={() => void 0}
+          {...props}
+        />
       );
     };
 

@@ -30,17 +30,27 @@ type Query {
   ): [Node]!
 
   """
-  Fetches a profile given its user name
+  Check if webCard is used
   """
-  profile(
+  isUserNameUsed(
+    """
+    The user name of the webCard
+    """
+    userName: String!
+  ): Boolean!
+   """
+  Fetches a published webCard given its user name
+  """
+  webCard(
     """
     The user name of the profile
     """
     userName: String!
-  ): Profile
+  ): WebCard
+
 
   """
-  Return a list of profile categories
+  Return a list of webcard categories
   """
-  profileCategories: [ProfileCategory!]!
+  webCardCategories: [WebCardCategory!]!
 }

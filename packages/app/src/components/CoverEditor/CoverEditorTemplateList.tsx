@@ -108,8 +108,10 @@ const CoverEditorTemplateList = ({
           }
         }
         profile {
-          id
-          profileKind
+          webCard {
+            id
+            webCardKind
+          }
         }
         ...CoverEditorTemplateList_templates
       }

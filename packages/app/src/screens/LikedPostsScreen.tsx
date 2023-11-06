@@ -19,7 +19,9 @@ const likedPostsScreenQuery = graphql`
   query LikedPostsScreenQuery {
     viewer {
       profile {
-        ...LikedPostsScreen_profile
+        webCard {
+          ...LikedPostsScreen_profile
+        }
       }
     }
   }
@@ -41,7 +43,7 @@ const LikedPostsScreen = ({
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment LikedPostsScreen_profile on Profile
+        fragment LikedPostsScreen_profile on WebCard
         @refetchable(queryName: "LikedPostListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -58,7 +60,7 @@ const LikedPostsScreen = ({
           }
         }
       `,
-      profile as LikedPostsScreen_profile$key,
+      profile?.webCard as LikedPostsScreen_profile$key,
     );
 
   const [refreshing, setRefreshing] = useState(false);

@@ -12,6 +12,7 @@ import {
   getCardTemplateById,
   referencesMedias,
   updateProfile,
+  updateWebCard,
 } from '#domains';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -19,15 +20,16 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
   { input: { cardTemplateId } },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const { type, id } = fromGlobalId(cardTemplateId);
@@ -76,26 +78,36 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
         cardTemplate.modules.map(({ kind, data }, index) => ({
           kind,
           data,
-          profileId,
+          webCardId: profile.webCardId,
           position: index,
         })),
       );
 
-      const profileUpdates = {
+      const webCardUpdates = {
         cardStyle: omit(cardStyle, 'id', 'labels', 'enabled'),
         updatedAt: new Date(),
         lastCardUpdate: new Date(),
+      };
+
+      const userProfileUpdates = {
         lastContactCardUpdate: new Date(),
       };
-      await updateProfile(profileId, profileUpdates, trx);
+
+      await updateWebCard(profile.webCardId, webCardUpdates, trx);
+      await updateProfile(profileId, userProfileUpdates, trx);
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  cardUsernamesToRevalidate.add(profile.userName);
-  return { profile };
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
+  return { webCard };
 };
 
 export default loadCardTemplateMutation;

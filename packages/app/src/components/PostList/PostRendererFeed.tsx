@@ -75,8 +75,8 @@ const PostRendererFeed = (
     graphql`
       fragment PostRendererFeedFragment_post on Post {
         ...PostRendererMediaFragment_post
-        author {
-          ...AuthorCartoucheFragment_profile
+        webCard {
+          ...AuthorCartoucheFragment_webCard
         }
       }
     `,
@@ -119,7 +119,7 @@ const PostRendererFeed = (
         onReady={onReady}
       />
       <AuthorCartouche
-        author={post.author}
+        author={post.webCard}
         style={styles.smallAuthorCartouche}
         variant="small"
       />

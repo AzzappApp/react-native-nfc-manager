@@ -1,9 +1,14 @@
+import acceptInvitation from './acceptInvitation';
+import acceptOwnership from './acceptOwnership';
 import createPost from './createPost';
 import createPostComment from './createPostComment';
-import createProfile from './createProfile';
+import createWebCard from './createWebCard';
+import declineInvitation from './declineInvitation';
+import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
+import inviteUser from './InviteUser';
 import loadCardTemplate from './loadCardTemplate';
 import {
   saveBlockTextModule,
@@ -21,23 +26,25 @@ import removeFollower from './removeFollower';
 import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
+import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
 import toggleFollowing from './toggleFollowing';
 import updateModulesVisibility from './updateModulesVisibility';
+import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
-import updateProfile from './updateProfile';
 import {
-  updateContactcardScans,
+  updateContactCardScans,
   updateLikes,
-  updateWebcardViews,
+  updateWebCardViews,
 } from './updateStatistic';
 import updateUser from './updateUser';
+import updateWebCard from './updateWebCard';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 export const Mutation: MutationResolvers = {
   createPost,
-  createProfile,
+  createWebCard,
   createPostComment,
   deleteModules,
   deletePostComment,
@@ -59,12 +66,19 @@ export const Mutation: MutationResolvers = {
   saveContactCard,
   saveCover,
   toggleFollowing,
-  updateContactcardScans,
+  updateContactCardScans,
   togglePostReaction,
   updateLikes,
   updatePost,
-  updateProfile,
+  updateWebCard,
   updateUser,
-  updateWebcardViews,
+  updateWebCardViews,
   updateModulesVisibility,
+  acceptInvitation,
+  declineInvitation,
+  saveCommonInformation,
+  updateMultiUser,
+  acceptOwnership,
+  declineOwnership,
+  inviteUser,
 };

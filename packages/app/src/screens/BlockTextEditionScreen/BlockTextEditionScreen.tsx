@@ -94,7 +94,6 @@ const BlockTextEditionScreen = ({
   const viewer = useFragment(
     graphql`
       fragment BlockTextEditionScreen_viewer on Viewer {
-        ...BlockTextSettingsEditionPanel_viewer
         ...BlockTextSectionBackgroundEditionPanel_viewer
         ...BlockTextTextBackgroundEditionPanel_viewer
         moduleBackgrounds {
@@ -103,22 +102,25 @@ const BlockTextEditionScreen = ({
           resizeMode
         }
         profile {
-          cardColors {
-            primary
-            light
-            dark
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
+          webCard {
+            cardColors {
+              primary
+              light
+              dark
+            }
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            ...BlockTextSettingsEditionPanel_webCard
           }
         }
       }
@@ -150,7 +152,7 @@ const BlockTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: viewer.profile?.webCard.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
     defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
@@ -192,7 +194,7 @@ const BlockTextEditionScreen = ({
         $input: SaveBlockTextModuleInput!
       ) {
         saveBlockTextModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -348,8 +350,8 @@ const BlockTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={viewer.profile?.webCard.cardColors}
+        cardStyle={viewer.profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -359,7 +361,7 @@ const BlockTextEditionScreen = ({
             id: 'settings',
             element: (
               <BlockTextSettingsEditionPanel
-                viewer={viewer}
+                webCard={viewer.profile?.webCard ?? null}
                 fontFamily={fontFamily}
                 onFontFamilyChange={onFontFamilyChange}
                 fontColor={fontColor}

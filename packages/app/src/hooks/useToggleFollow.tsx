@@ -13,50 +13,50 @@ const propagateFollowUpdateInProfileList = (
   connection: RecordProxy,
   store: RecordSourceSelectorProxy<useToggleFollowMutation$data>,
   follow: boolean,
-  profileId: string,
+  webCardId: string,
 ) => {
   if (follow) {
-    const followed = store.get(profileId);
+    const followed = store.get(webCardId);
     if (followed) {
       const edge = ConnectionHandler.createEdge(
         store,
         connection,
         followed,
-        'ProfileEdge',
+        'WebCardEdge',
       );
       ConnectionHandler.insertEdgeBefore(connection, edge);
     }
   } else {
-    ConnectionHandler.deleteNode(connection, profileId);
+    ConnectionHandler.deleteNode(connection, webCardId);
   }
 };
 
 const updater = (
   store: RecordSourceSelectorProxy<useToggleFollowMutation$data>,
-  currentProfileId: string,
-  profileId: string,
+  currentWebCardId: string,
+  webCardId: string,
   follow: boolean,
   userNameFilter?: string,
 ) => {
-  const currentProfile = store.get(currentProfileId);
+  const currentWebCard = store.get(currentWebCardId);
 
-  const nbFollowings = currentProfile?.getValue('nbFollowings');
+  const nbFollowings = currentWebCard?.getValue('nbFollowings');
 
   if (typeof nbFollowings === 'number') {
-    currentProfile?.setValue(
+    currentWebCard?.setValue(
       follow ? nbFollowings + 1 : nbFollowings - 1,
       'nbFollowings',
     );
   }
 
-  const profile = store.get(profileId);
+  const webCard = store.get(webCardId);
 
-  profile?.setValue(follow, 'isFollowing');
+  webCard?.setValue(follow, 'isFollowing');
 
-  const nbFollowers = profile?.getValue('nbFollowers');
+  const nbFollowers = webCard?.getValue('nbFollowers');
 
   if (typeof nbFollowers === 'number') {
-    profile?.setValue(
+    webCard?.setValue(
       follow ? nbFollowers + 1 : nbFollowers - 1,
       'nbFollowers',
     );
@@ -76,13 +76,13 @@ const updater = (
         connectionRecord,
         store,
         follow,
-        profileId,
+        webCardId,
       );
     }
 
     const connectionRecordHome = ConnectionHandler.getConnection(
       viewer,
-      'Viewer_followings',
+      'WebCard_followings',
     );
 
     if (connectionRecordHome) {
@@ -90,24 +90,24 @@ const updater = (
         connectionRecordHome,
         store,
         follow,
-        profileId,
+        webCardId,
       );
     }
 
     ConnectionHandler.getConnection(
       viewer,
-      'Viewer_followingsPosts',
+      'WebCard_followingsPosts',
     )?.invalidateRecord();
   }
 };
 
 const useToggleFollow = (userNameFilter?: string) => {
-  const { profileId: currentProfileId } = useAuthState();
+  const { webCardId: currentWebCardId } = useAuthState();
   const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
     graphql`
       mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
         toggleFollowing(input: $input) {
-          profile {
+          webCard {
             id
             isFollowing
           }
@@ -119,7 +119,7 @@ const useToggleFollow = (userNameFilter?: string) => {
   const intl = useIntl();
 
   const toggleFollow = (
-    profileId: string,
+    webCardId: string,
     userName: string,
     follow: boolean,
   ) => {
@@ -151,26 +151,26 @@ const useToggleFollow = (userNameFilter?: string) => {
     });
 
     // currentProfileId is undefined when user is anonymous so we can't follow
-    if (currentProfileId) {
+    if (currentWebCardId) {
       commit({
         variables: {
           input: {
-            profileId,
+            webCardId,
             follow,
           },
         },
         optimisticResponse: {
           toggleFollowing: {
-            profile: {
-              id: profileId,
+            webCard: {
+              id: webCardId,
               isFollowing: follow,
             },
           },
         },
         optimisticUpdater: store =>
-          updater(store, currentProfileId, profileId, follow, userNameFilter),
+          updater(store, currentWebCardId, webCardId, follow, userNameFilter),
         updater: store =>
-          updater(store, currentProfileId, profileId, follow, userNameFilter),
+          updater(store, currentWebCardId, webCardId, follow, userNameFilter),
         onError(error) {
           console.error(error);
           Toast.show({

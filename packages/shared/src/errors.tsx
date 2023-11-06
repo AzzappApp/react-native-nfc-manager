@@ -46,14 +46,14 @@ const ERRORS = {
    * Unauthorized access.
    * This may happen when a user tries to access a protected resource without being authenticated.
    */
-  UNAUTORIZED: 'UNAUTORIZED',
+  UNAUTHORIZED: 'UNAUTHORIZED',
   /**
    * Forbidden access.
    * This may happen when a user tries to access a protected resource without the required permissions.
    */
   FORBIDDEN: 'FORBIDDEN',
   // TODO why do we have two different errors for the same thing?
-  UNAUTORIZED_INVALID_ACCESS_TOKEN: 'UNAUTORIZED_INVALID_ACCESS_TOKEN',
+  UNAUTHORIZED_INVALID_ACCESS_TOKEN: 'UNAUTHORIZED_INVALID_ACCESS_TOKEN',
   /**
    * Internal server error.
    * This may happen when the server encounters an unexpected error.

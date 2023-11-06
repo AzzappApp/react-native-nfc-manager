@@ -1,7 +1,7 @@
 input ContactCardEmailInput {
   address: String!
   label: String!
-  selected: Boolean!
+  selected: Boolean
 }
 extend type Mutation {
   """
@@ -13,29 +13,29 @@ extend type Mutation {
 input ContactCardPhoneNumberInput {
   number: String!
   label: String!
-  selected: Boolean!
+  selected: Boolean
 }
 
 input ContactCardUrlInput {
   address: String!
-  selected: Boolean!
+  selected: Boolean
 }
 
 input ContactCardAddressInput {
   address: String!
   label: String!
-  selected: Boolean!
+  selected: Boolean
 }
 
 input ContactCardBirthdayInput {
   birthday: String!
-  selected: Boolean!
+  selected: Boolean
 }
 
 input ContactCardSocialInput {
   url: String!
   label: String!
-  selected: Boolean!
+  selected: Boolean
 }
 
 input ContactCardStyleInput {
@@ -55,6 +55,7 @@ input SaveContactCardInput {
   socials: [ContactCardSocialInput!]
   isPrivate: Boolean
   displayedOnWebCard: Boolean
+  avatarId: String
 }
 
 type SaveContactCardPayload {

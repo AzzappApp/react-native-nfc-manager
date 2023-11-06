@@ -6,27 +6,27 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import { useRouter } from './NativeRouter';
-import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
+import type { AccountHeader_webCard$key } from '@azzapp/relay/artifacts/AccountHeader_webCard.graphql';
 
 const COVER_WIDTH = 29;
 
 const AccountHeader = ({
-  profile: profileKey,
+  webCard: webCardKey,
   title,
 }: {
-  profile: AccountHeader_profile$key | null;
+  webCard: AccountHeader_webCard$key | null;
   title: string;
 }) => {
-  const profile = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment AccountHeader_profile on Profile {
+      fragment AccountHeader_webCard on WebCard {
         cardColors {
           primary
         }
-        ...CoverRenderer_profile
+        ...CoverRenderer_webCard
       }
     `,
-    profileKey,
+    webCardKey,
   );
 
   const router = useRouter();
@@ -45,7 +45,7 @@ const AccountHeader = ({
       }
       middleElement={<Text variant="large">{title}</Text>}
       rightElement={
-        profile && (
+        webCard && (
           <PressableNative
             onPress={router.back}
             accessibilityRole="link"
@@ -54,7 +54,7 @@ const AccountHeader = ({
               description: 'Go back button in account header',
             })}
           >
-            <CoverRenderer width={COVER_WIDTH} profile={profile} />
+            <CoverRenderer width={COVER_WIDTH} webCard={webCard} />
           </PressableNative>
         )
       }

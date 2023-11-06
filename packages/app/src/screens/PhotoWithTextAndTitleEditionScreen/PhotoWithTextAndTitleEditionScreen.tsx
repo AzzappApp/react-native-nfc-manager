@@ -131,29 +131,31 @@ const PhotoWithTextAndTitleEditionScreen = ({
     graphql`
       fragment PhotoWithTextAndTitleEditionScreen_viewer on Viewer {
         ...PhotoWithTextAndTitleBackgroundEditionPanel_viewer
-        ...PhotoWithTextAndTitleSettingsEditionPanel_viewer
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
         profile {
-          cardColors {
-            primary
-            dark
-            light
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
+          webCard {
+            cardColors {
+              primary
+              dark
+              light
+            }
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
           }
         }
       }
@@ -197,7 +199,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.cardStyle,
+      cardStyle: viewer.profile?.webCard.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
       defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
@@ -244,7 +246,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         $input: SavePhotoWithTextAndTitleModuleInput!
       ) {
         savePhotoWithTextAndTitleModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -534,8 +536,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.cardColors}
-          cardStyle={viewer.profile?.cardStyle}
+          colorPalette={viewer.profile?.webCard.cardColors}
+          cardStyle={viewer.profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -546,7 +548,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id: 'text',
             element: (
               <PhotoWithTextAndTitleSettingsEditionPanel
-                viewer={viewer}
+                webCard={viewer.profile?.webCard ?? null}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

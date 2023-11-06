@@ -72,7 +72,7 @@ export const updateCardTemplate = async (
  * Return a list of card template
  */
 export const getCardTemplates = async (
-  profileKind: 'business' | 'personal',
+  webCardKind: 'business' | 'personal',
   cardTemplateTypeId: string | null | undefined,
   randomSeed: string,
   offset?: string | null,
@@ -82,7 +82,7 @@ export const getCardTemplates = async (
     SELECT *, RAND(${randomSeed}) as cursor
     FROM CardTemplate
     WHERE ${
-      profileKind === 'business'
+      webCardKind === 'business'
         ? CardTemplateTable.businessEnabled
         : CardTemplateTable.personalEnabled
     } = 1

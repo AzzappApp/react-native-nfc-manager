@@ -15,7 +15,7 @@ describe('deeplinkHelpers', () => {
     const res = await matchUrlWithRoute('https://fake-azzapp.com/123');
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '123',
       },
@@ -41,7 +41,7 @@ describe('deeplinkHelpers', () => {
     });
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '123',
         contactData: 'contact123',
@@ -68,7 +68,7 @@ describe('deeplinkHelpers', () => {
     });
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '124',
       },

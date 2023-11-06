@@ -19,11 +19,12 @@ const followersScreenQuery = graphql`
     viewer {
       profile {
         id
-        contactCard {
-          isPrivate
+        contactCardIsPrivate
+        webCard {
+          id
+          ...FollowersScreenList_webCard
         }
       }
-      ...FollowersScreenList_viewer
     }
   }
 `;
@@ -81,9 +82,9 @@ const FollowerScreenInner = ({
 
   return (
     <FollowersScreenList
-      isPublic={!viewer?.profile?.contactCard?.isPrivate ?? false}
-      currentProfileId={viewer.profile?.id ?? ''}
-      viewer={viewer}
+      isPublic={!viewer?.profile?.contactCardIsPrivate ?? false}
+      currentWebCardId={viewer.profile?.webCard?.id ?? ''}
+      webCard={viewer.profile?.webCard ?? null}
     />
   );
 };

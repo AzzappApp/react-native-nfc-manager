@@ -10,7 +10,8 @@ import { addGlobalEventListener } from './globalEvents';
  */
 
 const ENCRYPTED_STORAGE_TOKENS_KEY = 'AZZAPP_AUTH';
-const MMKVS_PROFILE_ID = '@azzap/auth.profileId';
+const MMKVS_WEBCARD_ID = '@azzap/auth.webCardId';
+const MMKVS_PROFILE_ROLE = '@azzap/auth.profileRole';
 const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
 
 /**
@@ -22,9 +23,13 @@ export type AuthState = {
    */
   authenticated: boolean;
   /**
-   * The current user profile id, null if authenticated but without profile created
+   * The current user web card id, null if authenticated but without profile created
    */
-  profileId: string | null;
+  webCardId: string | null;
+  /**
+   * The current user profile role, null if authenticated but without profile created
+   */
+  profileRole: string | null;
   /**
    * Has the user been signed in at least once
    */
@@ -60,9 +65,12 @@ export const init = async () => {
 
   addGlobalEventListener(
     'SIGN_IN',
-    async ({ payload: { authTokens: tokens, profileId } }) => {
-      if (profileId) {
-        storage.set(MMKVS_PROFILE_ID, toGlobalId('Profile', profileId));
+    async ({ payload: { authTokens: tokens, webCardId, profileRole } }) => {
+      if (webCardId) {
+        storage.set(MMKVS_WEBCARD_ID, toGlobalId('WebCard', webCardId));
+      }
+      if (profileRole) {
+        storage.set(MMKVS_PROFILE_ROLE, profileRole);
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
@@ -75,15 +83,25 @@ export const init = async () => {
   );
 
   addGlobalEventListener(
-    'PROFILE_CHANGE',
-    async ({ payload: { profileId } }) => {
-      storage.set(MMKVS_PROFILE_ID, profileId);
+    'WEBCARD_CHANGE',
+    async ({ payload: { webCardId, profileRole } }) => {
+      storage.set(MMKVS_WEBCARD_ID, webCardId);
+      storage.set(MMKVS_PROFILE_ROLE, profileRole);
+      emitAuthState();
+    },
+  );
+
+  addGlobalEventListener(
+    'PROFILE_ROLE_CHANGE',
+    async ({ payload: { profileRole } }) => {
+      storage.set(MMKVS_PROFILE_ROLE, profileRole);
       emitAuthState();
     },
   );
 
   addGlobalEventListener('SIGN_OUT', async () => {
-    storage.delete(MMKVS_PROFILE_ID);
+    storage.delete(MMKVS_WEBCARD_ID);
+    storage.delete(MMKVS_PROFILE_ROLE);
     clearRecentSearch();
     await EncryptedStorage.clear();
     authTokens = null;
@@ -103,7 +121,7 @@ export const init = async () => {
 
   addGlobalEventListener('NETWORK_ERROR', async ({ payload: { error } }) => {
     if (error instanceof Error && error.message === ERRORS.INVALID_TOKEN) {
-      storage.delete(MMKVS_PROFILE_ID);
+      storage.delete(MMKVS_WEBCARD_ID);
       await EncryptedStorage.removeItem(ENCRYPTED_STORAGE_TOKENS_KEY);
       authTokens = null;
       emitAuthState();
@@ -116,8 +134,9 @@ export const init = async () => {
  */
 export const getAuthState = (): AuthState => ({
   authenticated: authTokens !== null,
-  profileId: storage.getString(MMKVS_PROFILE_ID) ?? null,
+  webCardId: storage.getString(MMKVS_WEBCARD_ID) ?? null,
   hasBeenSignedIn: storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN) ?? false,
+  profileRole: storage.getString(MMKVS_PROFILE_ROLE) ?? null,
 });
 
 /**

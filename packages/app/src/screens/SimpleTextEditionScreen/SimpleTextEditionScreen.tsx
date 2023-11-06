@@ -115,25 +115,27 @@ const SimpleTextEditionScreen = ({
     graphql`
       fragment SimpleTextEditionScreen_viewer on Viewer {
         ...SimpleTextEditionBackgroundPanel_viewer
-        ...SimpleTextStyleEditionPanel_viewer
         profile {
-          ...ProfileColorPicker_profile
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
-          }
-          cardColors {
-            primary
-            light
-            dark
+          webCard {
+            ...WebCardColorPicker_webCard
+            ...SimpleTextStyleEditionPanel_webCard
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            cardColors {
+              primary
+              light
+              dark
+            }
           }
         }
         moduleBackgrounds {
@@ -167,7 +169,7 @@ const SimpleTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: viewer.profile?.webCard.cardStyle,
     styleValuesMap:
       moduleKind === 'simpleText'
         ? SIMPLE_TEXT_STYLE_VALUES
@@ -208,7 +210,7 @@ const SimpleTextEditionScreen = ({
         $input: SaveSimpleTextModuleInput!
       ) {
         saveSimpleTextModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               visible
@@ -356,8 +358,8 @@ const SimpleTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={viewer.profile?.webCard.cardColors}
+        cardStyle={viewer.profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -368,7 +370,7 @@ const SimpleTextEditionScreen = ({
             element: (
               <SimpleTextStyleEditionPanel
                 moduleKind={moduleKind}
-                viewer={viewer}
+                webCard={viewer.profile?.webCard ?? null}
                 fontColor={fontColor ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}
                 fontSize={fontSize ?? 12}

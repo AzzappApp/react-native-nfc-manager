@@ -1,125 +1,172 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useReducer } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { ScrollView, View, useWindowDimensions, Pressable } from 'react-native';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
+import * as mime from 'react-native-mime-types';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useScreenInsets from '#hooks/useScreenInsets';
-import BottomSheetModal from '#ui/BottomSheetModal';
+import { Observable } from 'relay-runtime';
+import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import ScreenModal from '#components/ScreenModal';
+import { getFileName } from '#helpers/fileHelpers';
+import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
-import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
-import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
-import ContactCardEditModalBirthdays from './ContactCardEditModalBirthday';
-import ContactCardEditModalEmails from './ContactCardEditModalEmails';
-import ContactCardEditModalPhones from './ContactCardEditModalPhones';
-import { contactCardEditSchema } from './ContactCardEditModalSchema';
-import ContactCardEditModalSocials from './ContactCardEditModalSocials';
-import {
-  buildContactCardModalStyleSheet,
-  DELETE_BUTTON_WIDTH,
-} from './ContactCardEditModalStyles';
-import ContactCardEditModalUrls from './ContactCardEditModalUrls';
-import type { ContactCardEditForm } from './ContactCardEditModalSchema';
-import type { ContactCardEditModal_card$key } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
-import type { LayoutRectangle } from 'react-native';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
+import UploadProgressModal from '#ui/UploadProgressModal';
 
-const reducer = (
-  state: { deleted: boolean; rect: LayoutRectangle | null },
-  action:
-    | {
-        type: 'DELETE_FIELD';
-      }
-    | {
-        type: 'OPEN_DELETION_OPTION';
-        payload: LayoutRectangle | null;
-      }
-    | { type: 'CLOSE_DELETION_OPTION' },
-) => {
-  switch (action.type) {
-    case 'DELETE_FIELD':
-      return {
-        ...state,
-        deleted: true,
-        rect: null,
-      };
-    case 'OPEN_DELETION_OPTION':
-      return {
-        deleted: false,
-        rect: action.payload,
-      };
-    case 'CLOSE_DELETION_OPTION':
-      return {
-        deleted: false,
-        rect: null,
-      };
-  }
-};
+import ContactCardEditForm from './ContactCardEditForm';
+import { contactCardEditSchema } from './ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardEditModal_card$key } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
 
 export type ContactCardEditModalProps = {
   visible: boolean;
   toggleBottomSheet: () => void;
-  contactCard: ContactCardEditModal_card$key;
+  profile: ContactCardEditModal_card$key;
 };
 
 const ContactCardEditModal = ({
-  visible,
   toggleBottomSheet,
-  contactCard: contactCardKey,
+  profile: profileKey,
 }: ContactCardEditModalProps) => {
-  const contactCard = useFragment(
+  const {
+    contactCard,
+    webCard: { commonInformation, isMultiUser },
+    avatar,
+  } = useFragment(
     graphql`
-      fragment ContactCardEditModal_card on ContactCard {
-        firstName
-        lastName
-        title
-        company
-        emails {
-          label
-          address
-          selected
+      fragment ContactCardEditModal_card on Profile
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "../providers/CappedPixelRatio.relayprovider"
         }
-        phoneNumbers {
-          label
-          number
-          selected
+      ) {
+        webCard {
+          isMultiUser
+          commonInformation {
+            company
+            addresses {
+              address
+              label
+            }
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            urls {
+              address
+            }
+            socials {
+              label
+              url
+            }
+          }
         }
-        urls {
-          address
-          selected
-        }
-        addresses {
-          address
-          label
-          selected
-        }
-        birthday {
-          birthday
-          selected
-        }
-        socials {
-          url
-          label
-          selected
+        contactCard {
+          firstName
+          lastName
+          title
+          company
+          emails {
+            label
+            address
+            selected
+          }
+          phoneNumbers {
+            label
+            number
+            selected
+          }
+          urls {
+            address
+            selected
+          }
+          addresses {
+            address
+            label
+            selected
+          }
+          birthday {
+            birthday
+            selected
+          }
+          socials {
+            url
+            label
+            selected
+          }
         }
         serializedContactCard {
           data
           signature
         }
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio)
+        }
       }
     `,
-    contactCardKey,
+    profileKey,
   );
 
   const [commit] = useMutation(graphql`
-    mutation ContactCardEditModalMutation($input: SaveContactCardInput!) {
+    mutation ContactCardEditModalMutation(
+      $input: SaveContactCardInput!
+      $pixelRatio: Float!
+    ) {
       saveContactCard(input: $input) {
         profile {
           contactCard {
-            ...ContactCardEditModal_card
+            firstName
+            lastName
+            title
+            company
+            emails {
+              label
+              address
+              selected
+            }
+            phoneNumbers {
+              label
+              number
+              selected
+            }
+            urls {
+              address
+              selected
+            }
+            addresses {
+              address
+              label
+              selected
+            }
+            birthday {
+              birthday
+              selected
+            }
+            socials {
+              url
+              label
+              selected
+            }
+          }
+          serializedContactCard {
+            data
+            signature
+          }
+          avatar {
+            id
+            uri: uri(width: 112, pixelRatio: $pixelRatio)
           }
         }
       }
@@ -132,34 +179,50 @@ const ContactCardEditModal = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<ContactCardEditForm>({
+    setValue,
+  } = useForm<ContactCardEditFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(contactCardEditSchema),
     defaultValues: {
       ...contactCard,
-      emails: contactCard.emails?.map(m => ({ ...m })) ?? [],
-      phoneNumbers: contactCard.phoneNumbers?.map(p => ({ ...p })) ?? [],
-      urls: contactCard.urls?.map(p => ({ ...p })) ?? [],
-      addresses: contactCard.addresses?.map(p => ({ ...p })) ?? [],
-      birthday: contactCard.birthday,
-      socials: contactCard.socials?.map(p => ({ ...p })) ?? [],
+      company: contactCard?.company ?? '',
+      emails: contactCard?.emails?.map(m => ({ ...m })) ?? [],
+      phoneNumbers: contactCard?.phoneNumbers?.map(p => ({ ...p })) ?? [],
+      urls: contactCard?.urls?.map(p => ({ ...p })) ?? [],
+      addresses: contactCard?.addresses?.map(p => ({ ...p })) ?? [],
+      birthday: contactCard?.birthday,
+      socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
+      avatar,
     },
   });
 
-  const [state, dispatch] = useReducer(reducer, { rect: null, deleted: false });
-
-  const openDeleteButton = useCallback((rect: LayoutRectangle | null) => {
-    dispatch({ type: 'OPEN_DELETION_OPTION', payload: rect });
-  }, []);
-
-  const closeDeleteButton = useCallback(() => {
-    dispatch({
-      type: 'CLOSE_DELETION_OPTION',
-    });
-  }, []);
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
 
   const submit = handleSubmit(
-    data => {
+    async ({ avatar, ...data }) => {
+      let avatarId: string | undefined = undefined;
+      if (avatar?.local && avatar.uri) {
+        setProgressIndicator(Observable.from(0));
+
+        const fileName = getFileName(avatar.uri);
+        const file: any = {
+          name: fileName,
+          uri: avatar.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
+
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'post',
+        });
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(uploadProgress);
+        const { public_id } = await uploadPromise;
+        avatarId = public_id;
+      }
+
       commit({
         variables: {
           input: {
@@ -172,9 +235,18 @@ const ContactCardEditModal = ({
             addresses: data.addresses.filter(address => address.address),
             birthday: data.birthday,
             socials: data.socials.filter(social => social.url),
+            avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
           },
+          pixelRatio: CappedPixelRatio(),
         },
         onCompleted: () => {
+          if (avatarId && avatar?.uri) {
+            addLocalCachedMediaFile(
+              `${'image'.slice(0, 1)}:${avatarId}`,
+              'image',
+              avatar.uri,
+            );
+          }
           toggleBottomSheet();
         },
         onError: e => {
@@ -196,265 +268,66 @@ const ContactCardEditModal = ({
     },
   );
 
-  const insets = useScreenInsets();
-  const { height } = useWindowDimensions();
-  const styles = useStyleSheet(styleSheet);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   return (
-    <BottomSheetModal
-      contentContainerStyle={styles.bottomSheetContainerStyle}
-      headerStyle={styles.headerStyle}
-      visible={visible}
-      height={height - 30 - insets.top}
-      onRequestClose={toggleBottomSheet}
-      nestedScroll
-      headerTitle={intl.formatMessage({
-        defaultMessage: 'Edit Contact Card',
-        description: 'Edit Contact Card Modal title',
-      })}
-      showGestureIndicator
-      disableKeyboardAvoidingView
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Edit contact card modal cancel button title',
+    <Container style={styles.container}>
+      <SafeAreaView>
+        <Header
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Edit Contact Card',
+            description: 'Edit Contact Card Modal title',
           })}
-          onPress={toggleBottomSheet}
-          variant="secondary"
-          style={styles.headerButton}
+          leftElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Edit contact card modal cancel button title',
+              })}
+              onPress={toggleBottomSheet}
+              variant="secondary"
+              style={styles.headerButton}
+            />
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'Edit contact card modal save button label',
+              })}
+              testID="save-contact-card"
+              loading={isSubmitting}
+              onPress={submit}
+              variant="primary"
+              style={styles.headerButton}
+            />
+          }
         />
-      }
-      headerRightButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Save',
-            description: 'Edit contact card modal save button label',
-          })}
-          testID="save-contact-card"
-          loading={isSubmitting}
-          onPress={submit}
-          variant="primary"
-          style={styles.headerButton}
+
+        <ContactCardEditForm
+          commonInformation={commonInformation}
+          isMultiUser={isMultiUser}
+          control={control}
+          showImagePicker={() => setShowImagePicker(true)}
+          hideImagePicker={() => setShowImagePicker(false)}
+          setAvatar={avatar => setValue('avatar', avatar)}
+          imagePickerVisible={showImagePicker}
         />
-      }
-    >
-      <ScrollView scrollEnabled={!state.rect} automaticallyAdjustKeyboardInsets>
-        <View style={styles.sectionsContainer}>
-          <Controller
-            control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="First name"
-                    description="First name registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a first name',
-                    description:
-                      'Placeholder for first name inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Last name"
-                    description="Last name field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a last name',
-                    description: 'Placeholder for last name contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Title"
-                    description="Job title field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a title',
-                    description: 'Placeholder for title inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-          <Controller
-            control={control}
-            name="company"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Company name"
-                    description="Company name field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a company name',
-                    description:
-                      'Placeholder for company name inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-
-          <View style={styles.separator} />
-          <ContactCardEditModalPhones
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-          <View style={styles.separator} />
-          <ContactCardEditModalEmails
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-          <View style={styles.separator} />
-          <ContactCardEditModalUrls
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-          <View style={styles.separator} />
-          <ContactCardEditModalAddresses
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-          <View style={styles.separator} />
-          <ContactCardEditModalBirthdays
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-          <View style={styles.separator} />
-          <ContactCardEditModalSocials
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-        </View>
-        {state.rect && (
-          <Pressable
-            style={styles.overlay}
-            onPress={event => {
-              if (
-                state.rect &&
-                event.nativeEvent.locationY >= state.rect.y &&
-                event.nativeEvent.locationY <=
-                  state.rect.y + state.rect.height &&
-                event.nativeEvent.locationX >=
-                  state.rect.x + state.rect.width - DELETE_BUTTON_WIDTH &&
-                event.nativeEvent.locationX <= state.rect.x + state.rect.width
-              ) {
-                dispatch({
-                  type: 'DELETE_FIELD',
-                });
-              } else {
-                dispatch({
-                  type: 'CLOSE_DELETION_OPTION',
-                });
-              }
-            }}
-          />
-        )}
-      </ScrollView>
-    </BottomSheetModal>
+        <ScreenModal visible={!!progressIndicator}>
+          {progressIndicator && (
+            <UploadProgressModal progressIndicator={progressIndicator} />
+          )}
+        </ScreenModal>
+      </SafeAreaView>
+    </Container>
   );
 };
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   bottomSheetContainerStyle: { paddingHorizontal: 0 },
   headerStyle: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
-  sectionTitleContainer: {
-    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
-    height: 28,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    textAlign: 'center',
-    textTransform: 'uppercase',
-  },
-  sectionsContainer: {
-    rowGap: 1,
-    paddingBottom: 20,
-    backgroundColor: colors.grey50,
-  },
-  separator: {
-    height: 30,
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  ...buildContactCardModalStyleSheet(appearance),
-}));
+  container: { flex: 1 },
+});
 
 export default ContactCardEditModal;

@@ -14,12 +14,13 @@ import {
   MediaSuggestionTable,
   PostCommentTable,
   PostTable,
-  ProfileCategoryTable,
+  WebCardCategoryTable,
   ProfileTable,
   StaticMediaTable,
   UserTable,
 } from '#domains';
 import { sortEntitiesByIds } from '#domains/generic';
+import { WebCardTable } from '#domains/webCards';
 import type {
   Post,
   Media,
@@ -35,7 +36,8 @@ import type {
   CardModule,
   CompanyActivity,
   MediaSuggestion,
-  ProfileCategory,
+  WebCardCategory,
+  WebCard,
 } from '#domains';
 
 export type GraphQLContext = {
@@ -84,10 +86,11 @@ const entities = [
   'MediaSuggestion',
   'PostComment',
   'Post',
-  'ProfileCategory',
+  'WebCardCategory',
   'Profile',
   'StaticMedia',
   'User',
+  'WebCard',
 ] as const;
 
 type Entity = (typeof entities)[number];
@@ -104,8 +107,9 @@ type EntityToType<T extends Entity> = {
   MediaSuggestion: MediaSuggestion;
   PostComment: PostComment;
   Post: Post;
-  ProfileCategory: ProfileCategory;
+  WebCardCategory: WebCardCategory;
   Profile: Profile;
+  WebCard: WebCard;
   StaticMedia: StaticMedia;
   User: User;
 }[T];
@@ -126,8 +130,9 @@ const entitiesTable = {
   MediaSuggestion: MediaSuggestionTable,
   PostComment: PostCommentTable,
   Post: PostTable,
-  ProfileCategory: ProfileCategoryTable,
+  WebCardCategory: WebCardCategoryTable,
   Profile: ProfileTable,
+  WebCard: WebCardTable,
   StaticMedia: StaticMediaTable,
   User: UserTable,
 } as const;
@@ -157,7 +162,7 @@ const getEntitiesByIds = async (
   );
 };
 
-const dataloadersOptions = {
+const dataLoadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
@@ -170,7 +175,7 @@ const createLoaders = (): Loaders =>
       if (!loaders[entity]) {
         loaders[entity] = new DataLoader<string, EntityToType<Entity> | null>(
           ids => getEntitiesByIds(entity, ids),
-          dataloadersOptions,
+          dataLoadersOptions,
         ) as any;
       }
       return loaders[entity];

@@ -8,7 +8,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   mediaId: cols.mediaId('mediaId').notNull(),
-  profileCategoryId: cols.cuid('profileCategoryId'),
+  webCardCategoryId: cols.cuid('webCardCategoryId'),
   companyActivityId: cols.cuid('companyActivityId'),
 });
 
@@ -17,7 +17,7 @@ export type NewMediaSuggestion = InferInsertModel<typeof MediaSuggestionTable>;
 
 /**
  * Return a list of media suggestions. filtered by profile kind and template kind
- * @param profileCategoryId the profile catetgory Id
+ * @param webCardCategoryId the webCard category Id
  * @param companyActivityId tue company activity
  * @param randomSeed the random seed to use for random ordering
  * @param offset the offset to use for pagination
@@ -27,7 +27,7 @@ export type NewMediaSuggestion = InferInsertModel<typeof MediaSuggestionTable>;
 export const getMediaSuggestions = async (
   randomSeed: string,
   kind: 'image' | 'video',
-  profileCategoryId: string,
+  webCardCategoryId: string,
   companyActivityId: string | null | undefined,
   offset?: string | null,
   limit?: number | null,
@@ -41,7 +41,7 @@ export const getMediaSuggestions = async (
 
   if (companyActivityId == null) {
     query.append(
-      sql` AND MediaSuggestion.profileCategoryId = ${profileCategoryId}`,
+      sql` AND MediaSuggestion.webCardCategoryId = ${webCardCategoryId}`,
     );
   } else {
     query.append(
@@ -49,9 +49,9 @@ export const getMediaSuggestions = async (
     );
     //keep it for futur usage
     // query.append(
-    //   sql` WHERE (profileCategoryId = ${profileCategoryId} AND companyActivityId IS NULL)
-    //   OR (profileCategoryId IS NULL AND companyActivityId = ${companyActivityId} )
-    //   OR (profileCategoryId = ${profileCategoryId} AND companyActivityId = ${companyActivityId})`,
+    //   sql` WHERE (webCardCategoryId = ${webCardCategoryId} AND companyActivityId IS NULL)
+    //   OR (webCardCategoryId IS NULL AND companyActivityId = ${companyActivityId} )
+    //   OR (webCardCategoryId = ${webCardCategoryId} AND companyActivityId = ${companyActivityId})`,
     // );
   }
   if (offset) {
@@ -65,6 +65,6 @@ export const getMediaSuggestions = async (
   return rows as Array<Media & { cursor: string }>;
 };
 //keep it. this request should group to make the search they want
-// SELECT mediaId, GROUP_CONCAT(DISTINCT profileCategoryId) as profileCategoryIds, GROUP_CONCAT(DISTINCT companyActivityId) as companyActivityIds
+// SELECT mediaId, GROUP_CONCAT(DISTINCT webCardCategoryId) as webCardCategoryIds, GROUP_CONCAT(DISTINCT companyActivityId) as companyActivityIds
 // FROM MediaSuggestion
 // GROUP BY mediaId;

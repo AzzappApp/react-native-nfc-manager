@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
-import ProfilePostsList from '#components/ProfilePostsList';
+import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -13,10 +13,10 @@ import PressableNative from '#ui/PressableNative';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
-import MediaFollowingsProfiles from './MediaFollowingsProfiles';
 import MediaFollowingsScreen from './MediaFollowingsScreen';
-import MediaSuggestionsProfiles from './MediaSuggestionsProfiles';
+import MediaFollowingsWebCards from './MediaFollowingsWebCards';
 import MediaSuggestionsScreen from './MediaSuggestionsScreen';
+import MediaSuggestionsWebCards from './MediaSuggestionsWebCards';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MediaRoute } from '#routes';
 import type { MediaScreenQuery } from '@azzapp/relay/artifacts/MediaScreenQuery.graphql';
@@ -28,15 +28,18 @@ const mediaScreenQuery = graphql`
   query MediaScreenQuery {
     viewer {
       profile {
-        id
-        userName
-        ...ProfilePostsList_profile
-        ...PostRendererFragment_author
+        webCard {
+          id
+          userName
+          ...WebCardPostsList_webCard
+          ...PostRendererFragment_author
+          ...MediaFollowingsWebCards_webCard
+          ...MediaFollowingsScreen_webCard
+        }
       }
+
       ...MediaSuggestionsScreen_viewer
-      ...MediaSuggestionsProfiles_viewer
-      ...MediaFollowingsScreen_viewer
-      ...MediaFollowingsProfiles_viewer
+      ...MediaSuggestionsWebCards_viewer
     }
   }
 `;
@@ -63,7 +66,7 @@ const MediaScreen = ({
           canPlay={hasFocus && tab === 'SUGGESTIONS'}
           ListHeaderComponent={
             <View>
-              <MediaSuggestionsProfiles
+              <MediaSuggestionsWebCards
                 header={
                   <Text variant="large" style={styles.coversTitleStyle}>
                     <FormattedMessage
@@ -90,16 +93,19 @@ const MediaScreen = ({
         />
       ),
     },
-    {
+  ];
+
+  if (viewer.profile?.webCard) {
+    tabs.push({
       id: 'FOLLOWINGS',
       element: (
         <Suspense>
           <MediaFollowingsScreen
-            viewer={viewer}
+            webCard={viewer.profile.webCard}
             canPlay={hasFocus && tab === 'FOLLOWINGS'}
             ListHeaderComponent={
               <View>
-                <MediaFollowingsProfiles
+                <MediaFollowingsWebCards
                   header={
                     <Text variant="large" style={styles.coversTitleStyle}>
                       <FormattedMessage
@@ -108,7 +114,7 @@ const MediaScreen = ({
                       />
                     </Text>
                   }
-                  viewer={viewer}
+                  webCard={viewer.profile?.webCard}
                   style={styles.coverList}
                 />
 
@@ -123,8 +129,8 @@ const MediaScreen = ({
           />
         </Suspense>
       ),
-    },
-  ];
+    });
+  }
 
   if (viewer.profile) {
     tabs.push({
@@ -133,7 +139,7 @@ const MediaScreen = ({
         <View style={{ flex: 1 }}>
           <Suspense>
             <ProfilePostsList
-              profile={viewer.profile}
+              webCard={viewer.profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
             />
           </Suspense>

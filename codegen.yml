@@ -18,7 +18,7 @@ generates:
       mappers:
         Profile: ../../domains#Profile as ProfileModel
         StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
-        ProfileCategory: ../../domains#ProfileCategory as ProfileCategoryModel
+        WebCardCategory: ../../domains#WebCardCategory as WebCardCategoryModel
         MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
         CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
@@ -28,7 +28,7 @@ generates:
         CardTemplateType: ../../domains#CardTemplateType as CardTemplateTypeModel
         CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
         CoverTemplateData: ../../domains#CoverTemplateData as CoverTemplateDataModel
-        CardCover: ../../domains#Profile as ProfileModel
+        CardCover: ../../domains#WebCard as WebCardModel
         CardModule: ../../domains#CardModule as CardModuleModel
         CardModuleCarousel: ../../domains#CardModuleCarousel as CardModuleCarouselModel
         CardModuleHorizontalPhoto: ../../domains#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
@@ -40,9 +40,11 @@ generates:
         CardModuleBlockText: ../../domains#CardModuleBlockText as CardModuleBlockTextModel
         CardModuleLineDivider: ../../domains#CardModuleLineDivider as CardModuleLineDividerModel
         CardStyle: ../../domains#CardStyle as CardStyleModel
-        ContactCard: ../../domains#Profile as ProfileModel
         ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
-        Statistic: ../../domains#Statistic as StatisticModel
+        WebCardStatistic: ../../domains#WebCardStatistic as WebCardStatisticModel
+        ProfileStatistic: ../../domains#ProfileStatistic as ProfileStatisticModel
+        WebCard: ../../domains#WebCard as WebCardModel
+        User: ../../domains#User as UserModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

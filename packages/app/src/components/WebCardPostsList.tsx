@@ -1,0 +1,94 @@
+import { useState, useCallback, useMemo, memo } from 'react';
+import { StyleSheet } from 'react-native';
+import { usePaginationFragment, graphql } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import PostList from './PostList';
+import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
+import type { WebCardPostsList_webCard$key } from '@azzapp/relay/artifacts/WebCardPostsList_webCard.graphql';
+
+const WebCardPostsList = ({
+  webCard,
+  canPlay,
+}: {
+  webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
+  canPlay: boolean;
+}) => {
+  const { data, loadNext, refetch, hasNext, isLoadingNext } =
+    usePaginationFragment(
+      graphql`
+        fragment WebCardPostsList_webCard on WebCard
+        @refetchable(queryName: "WebCardPostsList_webCard_posts_query")
+        @argumentDefinitions(
+          after: { type: String }
+          first: { type: Int, defaultValue: 10 }
+        ) {
+          posts(after: $after, first: $first)
+            @connection(key: "WebCardPostsList_webCard_connection_posts") {
+            edges {
+              node {
+                id
+                ...PostList_posts @arguments(includeAuthor: false)
+              }
+            }
+          }
+        }
+      `,
+      webCard as WebCardPostsList_webCard$key,
+    );
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onEndReached = useCallback(() => {
+    if (!isLoadingNext && hasNext && !refreshing) {
+      loadNext(10);
+    }
+  }, [isLoadingNext, hasNext, refreshing, loadNext]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    if (!refreshing && !isLoadingNext) {
+      refetch(
+        {},
+        {
+          fetchPolicy: 'store-and-network',
+          onComplete() {
+            setRefreshing(false);
+          },
+        },
+      );
+    }
+  }, [isLoadingNext, refetch, refreshing]);
+
+  const posts = useMemo(
+    () =>
+      data.posts?.edges
+        ? convertToNonNullArray(
+            data.posts.edges.map(edge => edge?.node ?? null),
+          )
+        : [],
+    [data.posts?.edges],
+  );
+
+  return (
+    <PostList
+      posts={posts}
+      author={webCard}
+      canPlay={canPlay}
+      refreshing={refreshing}
+      onEndReached={onEndReached}
+      onRefresh={onRefresh}
+      contentContainerStyle={styles.container}
+    />
+  );
+};
+
+//TODO: should be tested in real condition, on dev android, it feels better
+export default memo(WebCardPostsList);
+
+const FOOTER_ICONS_HEIGHT = 50;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingBottom: FOOTER_ICONS_HEIGHT,
+  },
+});

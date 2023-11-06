@@ -12,7 +12,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 export const PostReactionTable = mysqlTable(
   'PostReaction',
   {
-    profileId: cols.cuid('profileId').notNull(),
+    webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
     reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
     createdAt: cols.dateTime('createdAt').notNull(),
@@ -23,11 +23,11 @@ export const PostReactionTable = mysqlTable(
       // We could imagine to user the last one but do we need to keep an historic of reactions ?
       postReactionPostIdReactionKindProfileId: primaryKey(
         table.postId,
-        table.profileId,
+        table.webCardId,
         table.reactionKind,
       ),
       postIdIdx: index('PostReaction_postId_idx').on(table.postId),
-      profileIdIdx: index('PostReaction_profileId_idx').on(table.profileId),
+      webCardIdIdx: index('PostReaction_webCardId_idx').on(table.webCardId),
     };
   },
 );
@@ -38,19 +38,19 @@ export type NewPostReaction = InferInsertModel<typeof PostReactionTable>;
 /**
  * insert a post reaction
  *
- * @param {string} profileId
+ * @param {string} webCardId
  * @param {string} postId
  * @param {ReactionKind} reactionKind
  * @return {*}  {Promise<void>}
  */
 export const insertPostReaction = async (
-  profileId: string,
+  webCardId: string,
   postId: string,
   reactionKind: PostReaction['reactionKind'],
   trx: DbTransaction = db,
 ) =>
   trx.insert(PostReactionTable).values({
-    profileId,
+    webCardId,
     postId,
     reactionKind,
   });
@@ -58,12 +58,12 @@ export const insertPostReaction = async (
 /**
  * delete a post reaction
  *
- * @param {string} profileId
+ * @param {string} webCardId
  * @param {string} postId
  * @return {*}  {Promise<void>}
  */
 export const deletePostReaction = async (
-  profileId: string,
+  webCardId: string,
   postId: string,
   trx: DbTransaction = db,
 ) =>
@@ -71,7 +71,7 @@ export const deletePostReaction = async (
     .delete(PostReactionTable)
     .where(
       and(
-        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.webCardId, webCardId),
         eq(PostReactionTable.postId, postId),
       ),
     );
@@ -79,12 +79,12 @@ export const deletePostReaction = async (
 /**
  * get a post reaction
  *
- * @param {string} profileId
+ * @param {string} webCardId
  * @param {string} postId
  * @return {*}  {(Promise<PostReaction | null>)}
  */
 export const getPostReaction = async (
-  profileId: string,
+  webCardId: string,
   postId: string,
   trx: DbTransaction = db,
 ) =>
@@ -93,7 +93,7 @@ export const getPostReaction = async (
     .from(PostReactionTable)
     .where(
       and(
-        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.webCardId, webCardId),
         eq(PostReactionTable.postId, postId),
       ),
     )

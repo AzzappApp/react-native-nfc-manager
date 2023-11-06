@@ -2,6 +2,7 @@ import { sql, and, gt, eq, notInArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import omit from 'lodash/omit';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   db,
   getCardModulesSortedByPosition,
@@ -13,14 +14,21 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
   _,
   { input: { moduleIds } },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   const modules = await getCardModulesSortedByPosition(moduleIds);
-  if (modules.some(m => m.profileId !== profileId)) {
+  if (modules.some(m => m.webCardId !== profile.webCardId)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -49,7 +57,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
                 CardModuleTable.position,
                 modules[modules.length - 1].position,
               ),
-              eq(CardModuleTable.profileId, profileId),
+              eq(CardModuleTable.webCardId, profile.webCardId),
               notInArray(CardModuleTable.id, createdModuleIds),
             ),
           );
@@ -60,11 +68,15 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
     }
   }
 
-  const profile = (await loaders.Profile.load(profileId))!;
-  cardUsernamesToRevalidate.add(profile.userName);
+  if (!profile) throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (webCard) {
+    cardUsernamesToRevalidate.add(webCard.userName);
+  }
 
   return {
-    profile,
     createdModules: modules.map((module, index) => ({
       originalModuleId: module.id,
       newModuleId: createdModuleIds[index],

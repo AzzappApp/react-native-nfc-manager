@@ -38,7 +38,7 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      *
      * @default true
      */
-    canGoback?: boolean;
+    canGoBack?: boolean;
   };
 
 /**
@@ -77,8 +77,8 @@ function relayScreen<TRoute extends Route>(
   {
     fallback: Fallback,
     errorFallback: ErrorFallback,
-    canGoback = true,
-    profileBound = true,
+    canGoBack: canGoback = true,
+    webCardBound = true,
     ...options
   }: RelayScreenOptions<TRoute>,
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
@@ -89,11 +89,11 @@ function relayScreen<TRoute extends Route>(
       route: { params },
     } = props;
 
-    const { profileId } = useAuthState();
+    const { webCardId } = useAuthState();
     const actorId = (
-      typeof profileBound === 'function' ? profileBound(params) : profileBound
+      typeof webCardBound === 'function' ? webCardBound(params) : webCardBound
     )
-      ? profileId
+      ? webCardId
       : ROOT_ACTOR_ID;
     const environment = useRelayActorEnvironment(actorId);
 
@@ -198,7 +198,10 @@ function relayScreen<TRoute extends Route>(
 
   const displayName = Component.displayName ?? Component.name ?? 'Screen';
   RelayWrapper.displayName = `RelayWrapper(${displayName})`;
-  Object.assign(RelayWrapper, Component, { ...options, profileBound });
+  Object.assign(RelayWrapper, Component, {
+    ...options,
+    webCardBound,
+  });
 
   return RelayWrapper as any;
 }

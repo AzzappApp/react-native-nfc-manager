@@ -31,7 +31,7 @@ import type {
   MaskMedia,
   SourceMedia,
 } from './coverEditorTypes';
-import type { useSaveCover_profile$key } from '@azzapp/relay/artifacts/useSaveCover_profile.graphql';
+import type { useSaveCover_webCard$key } from '@azzapp/relay/artifacts/useSaveCover_webCard.graphql';
 import type {
   SaveCoverInput,
   useSaveCoverMutation,
@@ -39,13 +39,13 @@ import type {
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 const useSaveCover = (
-  profile: useSaveCover_profile$key | null,
+  webCard: useSaveCover_webCard$key | null,
   onCoverSaved: () => void,
 ) => {
   const onCoverSavedInner = useLatestCallback(onCoverSaved);
   const { cardCover } = useFragment(
     graphql`
-      fragment useSaveCover_profile on Profile {
+      fragment useSaveCover_webCard on WebCard {
         cardCover {
           mediaParameters
           mediaFilter
@@ -57,16 +57,16 @@ const useSaveCover = (
         }
       }
     `,
-    profile,
+    webCard,
   ) ?? { cardCover: null };
 
   const [commit] = useMutation<useSaveCoverMutation>(graphql`
     mutation useSaveCoverMutation($saveCoverInput: SaveCoverInput!) {
       saveCover(input: $saveCoverInput) {
-        profile {
+        webCard {
           id
-          ...CoverRenderer_profile
-          ...useSaveCover_profile
+          ...CoverRenderer_webCard
+          ...useSaveCover_webCard
           cardCover {
             media {
               id
@@ -289,7 +289,7 @@ const useSaveCover = (
         },
         onCompleted: response => {
           if (mediaPath) {
-            const mediaId = response.saveCover.profile.cardCover?.media?.id;
+            const mediaId = response.saveCover.webCard.cardCover?.media?.id;
             if (mediaId) {
               addLocalCachedMediaFile(
                 mediaId,

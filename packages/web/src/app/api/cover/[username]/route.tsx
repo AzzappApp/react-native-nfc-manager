@@ -1,7 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 import cx from 'classnames';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getMediasByIds, getProfileByUserName } from '@azzapp/data/domains';
+import { getMediasByIds, getWebCardByUserName } from '@azzapp/data/domains';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -79,10 +79,10 @@ export const GET = async (
     return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
   }
 
-  const profile = await getProfileByUserName(username);
+  const webCard = await getWebCardByUserName(username);
 
-  if (profile?.cardIsPublished) {
-    const { coverData, cardColors, coverTitle, coverSubTitle } = profile;
+  if (webCard?.cardIsPublished) {
+    const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;
     const mediaId = coverData?.mediaId;
     if (mediaId) {
       const [media] = await getMediasByIds([mediaId]);
@@ -293,7 +293,7 @@ export const GET = async (
       return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
     }
   } else {
-    if (profile) {
+    if (webCard) {
       return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
     }
     return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });

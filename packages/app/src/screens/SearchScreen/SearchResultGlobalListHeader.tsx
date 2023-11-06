@@ -33,12 +33,12 @@ const SearchResultGlobalListHeader = ({
         search: { type: "String!" }
         useLocation: { type: "Boolean!" }
       ) {
-        searchProfiles(
+        searchWebCards(
           after: $after
           first: $first
           search: $search
           useLocation: $useLocation
-        ) @connection(key: "ViewerGlobal_searchProfiles") {
+        ) @connection(key: "ViewerGlobal_searchWebCards") {
           edges {
             node {
               id
@@ -59,7 +59,7 @@ const SearchResultGlobalListHeader = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchProfiles?.edges?.map(edge => edge?.node) ?? [],
+      data.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
     );
   }, [data]);
 

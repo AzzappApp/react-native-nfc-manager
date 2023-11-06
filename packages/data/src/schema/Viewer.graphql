@@ -4,10 +4,11 @@ Represent an Application Viewer
 type Viewer {
   profile: Profile
 
+  contacts(emails: [String!]!, phoneNumbers: [String!]!): [KnownContact!]
   """
   Return a list of suggested profiles for current user
   """
-  suggestedProfiles(
+  suggestedWebCards(
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -17,12 +18,11 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
-  ): ProfileConnection!
-
+  ): WebCardConnection!
   """
-  Return a list of Profiles that the current user is following
+  Return a list of WebCards that this user might possibility be interested in (following WebCard or promoted one)
   """
-  followings(
+  trendingWebCards(
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -32,62 +32,7 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
-
-    """
-    Filter by userName
-    """
-    userName: String
-  ): ProfileConnection!
-
-  """
-  Return a list of Profiles that follow the current user
-  """
-  followers(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the first n items from the list.
-    """
-    first: Int
-
-    """
-    Filter by userName
-    """
-    userName: String
-  ): ProfileConnection!
-
-  """
-  Return a list of Post that the current user is following author
-  """
-  followingsPosts(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the first n items from the list.
-    """
-    first: Int
-  ): PostConnection!
-
-  """
-  Return a list of Profile that this user might possibility be interested in (following Profile or promoted one)
-  """
-  trendingProfiles(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the first n items from the list.
-    """
-    first: Int
-  ): ProfileConnection!
+  ): WebCardConnection!
 
   """
   Return a list of tranding posts (public ?) at the time of the request
@@ -107,7 +52,7 @@ type Viewer {
   """
   Return a list of profiles the current user can be interested in
   """
-  recommendedProfiles(
+  recommendedWebCards(
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -117,7 +62,7 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
-  ): ProfileConnection!
+  ): WebCardConnection!
 
   """
   Return a list of posts that match the search query
@@ -140,7 +85,7 @@ type Viewer {
   """
   Return a list of profiles that match the search query
   """
-  searchProfiles(
+  searchWebCards(
     search: String!
     useLocation: Boolean!
 
@@ -153,7 +98,7 @@ type Viewer {
     Returns the first n items from the list.
     """
     first: Int
-  ): ProfileConnection!
+  ): WebCardConnection!
 
   """
   Return a list of cover backgrounds
@@ -187,8 +132,12 @@ type Viewer {
   """
   Fetches card templates
   """
-  cardTemplates(cardTemplateTypeId: String,first: Int, after: String): CardTemplateConnection!
-  
+  cardTemplates(
+    cardTemplateTypeId: String
+    first: Int
+    after: String
+  ): CardTemplateConnection!
+
   """
   Fetches card templates Type
   """
@@ -218,4 +167,10 @@ type CoverTemplateCategory {
   The category templates
   """
   templates: [CoverTemplate!]!
+}
+
+type KnownContact {
+  email: String
+  phoneNumber: String
+  publishedWebCards: [WebCard!]!
 }

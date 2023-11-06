@@ -12,7 +12,7 @@ import {
 import { colors } from '#theme';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
 import CoverTextRenderer from './CoverTextRenderer';
-import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
+import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -20,7 +20,7 @@ export type CoverRendererProps = {
   /**
    * The relay reference to the cover
    */
-  profile: CoverRenderer_profile$key | null | undefined;
+  webCard: CoverRenderer_webCard$key | null | undefined;
   /**
    * The width of the displayed cover
    */
@@ -53,7 +53,7 @@ export type CoverRendererProps = {
  */
 const CoverRenderer = (
   {
-    profile: coverKey,
+    webCard: coverKey,
     width = 125,
     hideBorderRadius,
     style,
@@ -66,7 +66,7 @@ const CoverRenderer = (
   const { cardColors, cardCover } =
     useFragment(
       graphql`
-        fragment CoverRenderer_profile on Profile
+        fragment CoverRenderer_webCard on WebCard
         @argumentDefinitions(
           screenWidth: {
             type: "Float!"

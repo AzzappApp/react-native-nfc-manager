@@ -52,10 +52,9 @@ export const verifySign = withFetchFunction(
   unauthenticatedFetchJSON,
 );
 
-export const getAppleWalletPass = (params: {
-  locale: string;
-  profileId: string;
-}) =>
+type appleWalletPassParams = { locale: string; webCardId: string };
+
+export const getAppleWalletPass = (params: appleWalletPassParams) =>
   WebAPI.getAppleWalletPass(params, {
     fetchFunction: authenticatedFetchBlob,
   });

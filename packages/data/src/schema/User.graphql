@@ -16,4 +16,9 @@ type User {
   Returns a list of Profiles of the user
   """
   profiles: [Profile!]
+
+  """
+  Returns a list of published WebCards of the user
+  """
+  publishedWebCards: [WebCard!]
 }

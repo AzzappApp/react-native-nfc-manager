@@ -1,31 +1,31 @@
 import { graphql, useFragment } from 'react-relay';
 import CoverLinkRenderer from './CoverLinkRenderer';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
-import type { CoverLink_profile$key } from '@azzapp/relay/artifacts/CoverLink_profile.graphql';
+import type { CoverLink_webCard$key } from '@azzapp/relay/artifacts/CoverLink_webCard.graphql';
 
 export type CoverLinkProps = Omit<
   CoverLinkRendererProps,
-  'profile' | 'userName'
+  'userName' | 'webCard' | 'webCardKey'
 > & {
-  profile: CoverLink_profile$key;
+  webCard: CoverLink_webCard$key;
 };
 
-const CoverLink = ({ profile: profileKey, ...props }: CoverLinkProps) => {
-  const profile = useFragment(
+const CoverLink = ({ webCard: webCardKey, ...props }: CoverLinkProps) => {
+  const webCard = useFragment(
     graphql`
-      fragment CoverLink_profile on Profile {
+      fragment CoverLink_webCard on WebCard {
         userName
-        ...CoverRenderer_profile
+        ...CoverRenderer_webCard
       }
     `,
-    profileKey,
+    webCardKey,
   );
 
   return (
     <CoverLinkRenderer
       {...props}
-      userName={profile.userName}
-      profile={profile}
+      userName={webCard.userName}
+      webCard={webCard}
     />
   );
 };

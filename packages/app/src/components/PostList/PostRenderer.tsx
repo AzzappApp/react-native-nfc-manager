@@ -102,8 +102,8 @@ const PostRenderer = (
 
   const author = useFragment(
     graphql`
-      fragment PostRendererFragment_author on Profile {
-        ...AuthorCartoucheFragment_profile
+      fragment PostRendererFragment_author on WebCard {
+        ...AuthorCartoucheFragment_webCard
       }
     `,
     authorKey,

@@ -106,9 +106,11 @@ const CoverEditorCustom = ({
         ...CECBackgroundPanel_viewer
         ...CECForegroundPanel_viewer
         profile {
-          ...useSaveCover_profile
-          cardColors {
-            otherColors
+          webCard {
+            ...useSaveCover_webCard
+            cardColors {
+              otherColors
+            }
           }
         }
         coverBackgrounds {
@@ -124,7 +126,7 @@ const CoverEditorCustom = ({
     viewerKey,
   );
   const { coverBackgrounds, coverForegrounds } = viewer ?? {};
-  const cardColors = viewer?.profile?.cardColors;
+  const cardColors = viewer?.profile?.webCard.cardColors;
   //#endregion
 
   //#region Updates management
@@ -277,7 +279,7 @@ const CoverEditorCustom = ({
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile,
+    viewer.profile?.webCard ?? null,
     onCoverSaved,
   );
 

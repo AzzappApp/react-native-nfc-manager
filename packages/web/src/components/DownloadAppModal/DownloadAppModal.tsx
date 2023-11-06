@@ -2,16 +2,16 @@
 
 import { useEffect, useState, forwardRef } from 'react';
 import { Button, Modal, type ModalProps } from '#ui';
-import { loadProfileStats } from '#app/actions/profileActions';
+import { loadWebCardStats } from '#app/actions/profileActions';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 import type { ForwardedRef } from 'react';
 
 type DownloadAppModalProps = Omit<ModalProps, 'children'> & {
   media: Media;
-  profile: Profile;
+  webCard: WebCard;
 };
 
 type Stats = {
@@ -23,14 +23,14 @@ type Stats = {
 // eslint-disable-next-line react/display-name
 const DownloadAppModal = forwardRef(
   (props: DownloadAppModalProps, ref: ForwardedRef<ModalActions>) => {
-    const { media, profile, ...others } = props;
+    const { media, webCard, ...others } = props;
 
     const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
       async function loadStats() {
-        const { nbFollowers, nbPosts, nbFollowings } = await loadProfileStats(
-          profile.id,
+        const { nbFollowers, nbPosts, nbFollowings } = await loadWebCardStats(
+          webCard.id,
         );
         setStats({
           posts: nbPosts,
@@ -40,7 +40,7 @@ const DownloadAppModal = forwardRef(
       }
 
       void loadStats();
-    }, [profile.id]);
+    }, [webCard.id]);
 
     return (
       <Modal ref={ref} {...others}>
@@ -70,7 +70,7 @@ const DownloadAppModal = forwardRef(
         </div>
         <div className={styles.footer}>
           <span className={styles.footerTitle}>
-            Stay connected to {profile.userName}
+            Stay connected to {webCard.userName}
           </span>
           <span className={styles.footerText}>
             Access digital profile, albums, posts...

@@ -1,28 +1,20 @@
 import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, type LayoutRectangle } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
+import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import { contactCardEditModalStyleSheet } from '#helpers/contactCardHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactCardEditModalField from './ContactCardEditModalField';
-import { contactCardEditModalStyleSheet } from './ContactCardEditModalStyles';
-import type { ContactCardEditForm } from './ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalBirthdays = ({
   control,
-  deleted,
-  openDeleteButton,
-  deleteButtonRect,
-  closeDeleteButton,
 }: {
-  control: Control<ContactCardEditForm>;
-  deleted: boolean;
-  openDeleteButton: (changeEvent: LayoutRectangle) => void;
-  deleteButtonRect: LayoutRectangle | null;
-  closeDeleteButton: () => void;
+  control: Control<ContactCardEditFormValues>;
 }) => {
   const { field } = useController({
     control,
@@ -37,10 +29,6 @@ const ContactCardEditModalBirthdays = ({
     <>
       {field.value && (
         <ContactCardEditModalField
-          deleteButtonRect={deleteButtonRect}
-          deleted={deleted}
-          openDeleteButton={openDeleteButton}
-          closeDeleteButton={closeDeleteButton}
           control={control}
           valueKey={`birthday.birthday`}
           selectedKey={`birthday.selected`}

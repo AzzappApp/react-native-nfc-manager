@@ -14,6 +14,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
 
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   getCardModulesByIds,
   type CardModule,
@@ -39,15 +40,16 @@ const createModuleSavingMutation =
         moduleId?: string | null;
       };
     },
-    { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
+    { auth, cardUsernamesToRevalidate, loaders }: GraphQLContext,
   ) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTORIZED);
+    const { profileId, userId } = auth;
+    if (!profileId || !userId) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     const profile = await loaders.Profile.load(profileId);
-    if (!profile) {
+
+    if (!profile || !isEditor(profile.profileRole)) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
@@ -71,7 +73,7 @@ const createModuleSavingMutation =
       }
       if (
         !module ||
-        module.profileId !== profileId ||
+        module.webCardId !== profile.webCardId ||
         module.kind !== moduleKind
       ) {
         throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -93,9 +95,9 @@ const createModuleSavingMutation =
         } else {
           await createCardModule(
             {
-              profileId,
+              webCardId: profile.webCardId,
               kind: moduleKind,
-              position: await getCardModuleCount(profileId),
+              position: await getCardModuleCount(profile.webCardId),
               data,
               visible: true,
             },
@@ -108,9 +110,14 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    cardUsernamesToRevalidate.add(profile.userName);
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
 
-    return { profile };
+    cardUsernamesToRevalidate.add(webCard.userName);
+
+    return { webCard };
   };
 
 export const MODULES_SAVE_RULES: {

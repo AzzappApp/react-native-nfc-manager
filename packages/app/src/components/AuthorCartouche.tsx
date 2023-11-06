@@ -13,16 +13,16 @@ import Text from '#ui/Text';
 import Link from './Link';
 import MediaImageRenderer from './medias/MediaImageRenderer';
 import type { MediaImageRendererProps } from './medias';
-import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
+import type { AuthorCartoucheFragment_webCard$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type AuthorCartoucheProps = ViewProps & {
   /**
    *
    *
-   * @type {AuthorCartoucheFragment_profile$key}
+   * @type {AuthorCartoucheFragment_webCard$key}
    */
-  author: AuthorCartoucheFragment_profile$key;
+  author: AuthorCartoucheFragment_webCard$key;
   /**
    * variant of the author cartouche
    *
@@ -56,7 +56,7 @@ const AuthorCartouche = ({
 }: AuthorCartoucheProps) => {
   const author = useFragment(
     graphql`
-      fragment AuthorCartoucheFragment_profile on Profile
+      fragment AuthorCartoucheFragment_webCard on WebCard
       @argumentDefinitions(
         pixelRatio: {
           type: "Float!"
@@ -121,7 +121,7 @@ const AuthorCartouche = ({
 
   if (activeLink) {
     return (
-      <Link route="PROFILE" params={{ userName: author.userName }}>
+      <Link route="WEBCARD" params={{ userName: author.userName }}>
         <PressableOpacity style={[styles.container, style]} {...props}>
           <AuthorCartoucheContent
             mediaSource={mediaSource}

@@ -178,11 +178,11 @@ describe('fetchWithAuthTokens', () => {
 
   test('should throw an error if the error is not invalid token', () => {
     expect.assertions(2);
-    fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.UNAUTORIZED));
+    fetchJSONMock.mockRejectedValueOnce(new Error(ERRORS.UNAUTHORIZED));
     fetchWithAuthTokens(fetchJSONMock)('https://example.com', {
       method: 'POST',
     }).catch(e => {
-      expect(e.message).toBe(ERRORS.UNAUTORIZED);
+      expect(e.message).toBe(ERRORS.UNAUTHORIZED);
     });
     expect(fetchJSONMock).toHaveBeenCalledTimes(1);
   });

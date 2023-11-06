@@ -73,10 +73,10 @@ export const init = () => {
         break;
     }
   });
-  let currentProfileId = getAuthState().profileId;
-  addAuthStateListener(({ profileId }) => {
-    if (profileId !== currentProfileId) {
-      currentProfileId = profileId;
+  let currentWebCardId = getAuthState().webCardId;
+  addAuthStateListener(({ webCardId }) => {
+    if (webCardId !== currentWebCardId) {
+      currentWebCardId = webCardId;
       refreshQueries();
     }
   });
@@ -86,12 +86,12 @@ let refreshTimeout: any = null;
 const refreshQueries = () => {
   clearTimeout(refreshTimeout);
   refreshTimeout = setTimeout(() => {
-    const profileId = getAuthState().profileId;
+    const webCardId = getAuthState().webCardId;
     for (const [screenId, entry] of activeQueries.entries()) {
-      if (entry.actorId !== profileId && entry.actorId !== ROOT_ACTOR_ID) {
+      if (entry.actorId !== webCardId && entry.actorId !== ROOT_ACTOR_ID) {
         const oldPreloadedQuery = entry.preloadedQuery;
         const multiActorEnvironment = getRelayEnvironment();
-        const actorId = profileId ?? ROOT_ACTOR_ID;
+        const actorId = webCardId ?? ROOT_ACTOR_ID;
         const newPreloadedQuery = loadQuery(
           multiActorEnvironment.forActor(actorId),
           entry.query,
@@ -162,9 +162,9 @@ export type LoadQueryOptions<TParams> = {
    */
   getVariables?: (params: TParams) => Variables;
   /**
-   * If true, the query will be bound to the current profile
+   * If true, the query will be bound to the current webCard
    */
-  profileBound?: boolean | ((params: TParams) => boolean);
+  webCardBound?: boolean | ((params: TParams) => boolean);
   /**
    * The request fetch policy
    */
@@ -193,7 +193,7 @@ export const loadQueryFor = <T>(
 
     const multiActorEnvironment = getRelayEnvironment();
     const actorId =
-      (options.profileBound && getAuthState().profileId) || ROOT_ACTOR_ID;
+      (options.webCardBound && getAuthState().webCardId) || ROOT_ACTOR_ID;
 
     const preloadedQuery = loadQuery(
       multiActorEnvironment.forActor(actorId),

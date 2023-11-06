@@ -41,9 +41,13 @@ const HomeStatisticsChart = ({
         profiles {
           statsSummary {
             day
-            contactcardScans
-            webcardViews
-            likes
+            contactCardScans
+          }
+          webCard {
+            statsSummary {
+              webCardViews
+              likes
+            }
           }
         }
       }

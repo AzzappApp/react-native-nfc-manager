@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
@@ -50,7 +50,7 @@ const HomeScreen = ({
 };
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisiblilityController(false);
+  useMainTabBarVisibilityController(false);
 
   return (
     <Container
@@ -67,7 +67,7 @@ const HomeScreenFallback = () => {
 
 export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
-  profileBound: false,
+  webCardBound: false,
   fallback: HomeScreenFallback,
-  canGoback: false,
+  canGoBack: false,
 });

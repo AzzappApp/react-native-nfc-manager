@@ -1,28 +1,28 @@
 import { useEffect } from 'react';
 import { graphql, useMutation } from 'react-relay';
 
-const UPDATE_WEBCARD_VIEWS = graphql`
-  mutation useStatisticsWebcardViewsMutation($input: UpdateWebcardViewsInput!) {
-    updateWebcardViews(input: $input)
+const UPDATE_WEB_CARD_VIEWS = graphql`
+  mutation useStatisticsWebcardViewsMutation($input: UpdateWebCardViewsInput!) {
+    updateWebCardViews(input: $input)
   }
 `;
 
-export const UPDATE_CONTACTCARD_SCANS = graphql`
+export const UPDATE_CONTACT_CARD_SCANS = graphql`
   mutation useStatisticsUpdateContactcardScansMutation(
-    $input: UpdateContactcardScansInput!
+    $input: UpdateContactCardScansInput!
   ) {
-    updateContactcardScans(input: $input)
+    updateContactCardScans(input: $input)
   }
 `;
 
-export function useWebcardViewStatistic(profileId: string | undefined) {
-  const [commit] = useMutation(UPDATE_WEBCARD_VIEWS);
+export function useWebCardViewStatistic(webCardId: string | undefined) {
+  const [commit] = useMutation(UPDATE_WEB_CARD_VIEWS);
   useEffect(() => {
-    if (profileId) {
+    if (webCardId) {
       commit({
-        variables: { input: { id: profileId } },
+        variables: { input: { id: webCardId } },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId]);
+  }, [webCardId]);
 }

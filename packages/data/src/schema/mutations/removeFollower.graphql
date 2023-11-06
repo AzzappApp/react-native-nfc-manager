@@ -10,10 +10,9 @@ input RemoveFollowerInput {
   """
   The id of the user we want remove as follower
   """
-  profileId: ID!
+  webCardId: ID!
 }
 
 type RemoveFollowerPayload {
-  viewer: Viewer!
   removedFollowerId: ID!
 }

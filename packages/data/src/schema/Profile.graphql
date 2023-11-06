@@ -1,210 +1,62 @@
 """
-Represent an Azzapp Profile
+Represent a Profile
 """
 type Profile implements Node {
-  """
-  The ID of an object
-  """
   id: ID!
+  profileRole: ProfileRole!
   """
-  The user name of the profile
-  """
-  userName: String!
-  """
-  The kind of the profile (business, personal)
-  """
-  profileKind: ProfileKind
-  """
-  The profile category
-  """
-  profileCategory: ProfileCategory
-  """
-  The first name of the profile, will only be set for personal profile
-  """
-  firstName: String
-  """
-  The last name of the profile, will only be set for personal profile
-  """
-  lastName: String
-  """
-  The company name of the profile, will only be set for business profile
-  """
-  companyName: String
-  """
-  The company activity of the profile, will only be set for business profile
-  """
-  companyActivity: CompanyActivity
-  """
-  The colors used by the webcard and the contact card of the profile
-  """
-  cardColors: CardColors
-  """
-  The profile WebCard cover
-  """
-  cardCover: CardCover
-  """
-  the profile WebCar style
-  """
-  cardStyle: ProfileCardStyle
-  """
-  the profle WebCard modules
-  """
-  cardModules: [CardModule!]!
-  """
-  Is the profile webcard published
-  """
-  cardIsPublished: Boolean!
-  """
-  The profile contact card
+  The contact card of the Profile
   """
   contactCard: ContactCard
+  contactCardIsPrivate: Boolean!
+  contactCardDisplayedOnWebCard: Boolean!
+  lastContactCardUpdate: DateTime!
+
   """
-  True if the current viewer is following this profile
+  the number of total time the card was scan
   """
-  isFollowing: Boolean!
+  nbContactCardScans: Int
   """
-  the number of post the profile like
+  The related user
   """
-  nbPostsLiked: Int!
+  user: User!
   """
-  the number of likes received by the profile posts
+  The profile role
   """
-  nbLikes: Int!
+  profileRole: ProfileRole!
   """
-  the number of profile followed by this profile
+  The user avatar
   """
-  nbFollowings: Int!
+  avatar: Media
   """
-  the number of followers of the profile
+  True if user has been invited
   """
-  nbFollowers: Int!
+  invited: Boolean!
   """
-  the number of posts of the profile
+  True if user has been promoted to become owner
   """
-  nbPosts: Int!
-  """
-  the number of total time the webcards was viewed
-  """
-  nbWebcardViews: Int!
-  """
-  the number of totam time the card was scan
-  """
-  nbContactCardScans: Int!
-  """
-  return the list of the profile posts
-  """
-  posts(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
-    """
-    Returns the first n items from the list.
-    """
-    first: Int
-  ): PostConnection
+  promotedAsOwner: Boolean!
   """
   Returns summary of statistics
   """
-  statsSummary: [Statistic]
-   """
-  Returns a list of posts that user like
-  """
-  likedPosts(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
+  statsSummary: [ProfileStatistic!]
 
-    """
-    Returns the first n items from the list.
-    """
-    first: Int
-  ): PostConnection!
+  serializedContactCard: SerializedContactCard!
+
+  webCard: WebCard!
 }
 
-type ProfileCardStyle {
-  fontFamily: String!
-  fontSize: Int!
-  titleFontFamily: String!
-  titleFontSize: Int!
-  buttonRadius: Int!
-  borderRadius: Int!
-  borderWidth: Int!
-  borderColor: String!
-  buttonColor: String!
-  gap: Int!
+type SerializedContactCard {
+  data: String!
+  signature: String!
 }
 
 """
-A connection to a list of items.
+Represent a role for a Profile
 """
-type ProfileConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-
-  """
-  A list of edges.
-  """
-  edges: [ProfileEdge]
-}
-
-"""
-An edge in a connection.
-"""
-type ProfileEdge {
-  """
-  The item at the end of the edge
-  """
-  node: Profile
-
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
-}
-
-"""
-Represent a Profile Kind
-"""
-enum ProfileKind {
-  business
-  personal
-}
-
-"""
-Represent a Profile Category
-"""
-type ProfileCategory implements Node {
-  """
-  The ID of an object
-  """
-  id: ID!
-  profileKind: ProfileKind!
-  label: String
-  medias: [MediaImage!]
-  companyActivities: [CompanyActivity!]!
-}
-
-"""
-Represent a Company Activity
-"""
-type CompanyActivity implements Node {
-  """
-  The ID of an object
-  """
-  id: ID!
-  label: String
-}
-
-"""
-A set of colors used by the webcard and the contact card of attached profiles
-"""
-type CardColors {
-  primary: String!
-  light: String!
-  dark: String!
-  otherColors: [String!]!
+enum ProfileRole {
+  owner
+  admin
+  editor
+  user
 }

@@ -45,7 +45,7 @@ export const addSuggestions = async ({
           medias.map(media => ({
             id: createId(),
             mediaId: media,
-            profileCategoryId: categoryId,
+            webCardCategoryId: categoryId,
             companyActivityId: null,
           })),
         ),
@@ -53,7 +53,7 @@ export const addSuggestions = async ({
           medias.map(media => ({
             id: createId(),
             mediaId: media,
-            profileCategoryId: null,
+            webCardCategoryId: null,
             companyActivityId: activityId,
           })),
         ),
@@ -92,12 +92,12 @@ export const setSuggestionsForMedia = async ({
       const suggestions: NewMediaSuggestion[] = [
         ...categories.map(categoryId => ({
           mediaId,
-          profileCategoryId: categoryId,
+          webCardCategoryId: categoryId,
           companyActivityId: null,
         })),
         ...activities.map(activityId => ({
           mediaId,
-          profileCategoryId: null,
+          webCardCategoryId: null,
           companyActivityId: activityId,
         })),
       ];

@@ -22,10 +22,10 @@ const CommentItem = ({ item }: CommentItemProps) => {
         id
         comment
         createdAt
-        author {
+        webCard {
           id
           userName
-          ...AuthorCartoucheFragment_profile
+          ...AuthorCartoucheFragment_webCard
         }
       }
     `,
@@ -39,7 +39,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
   return (
     <View style={styles.commentContainer}>
       <AuthorCartouche
-        author={postComment.author}
+        author={postComment.webCard}
         variant="post"
         hideUserName
         style={styles.commentCartouche}
@@ -48,10 +48,10 @@ const CommentItem = ({ item }: CommentItemProps) => {
       <View style={{ flex: 1 }}>
         <Text variant="small">
           <Link
-            route="PROFILE"
-            params={{ userName: postComment.author.userName }}
+            route="WEBCARD"
+            params={{ userName: postComment.webCard.userName }}
           >
-            <Text variant="smallbold">{postComment.author.userName} </Text>
+            <Text variant="smallbold">{postComment.webCard.userName} </Text>
           </Link>
           {postComment.comment}
         </Text>

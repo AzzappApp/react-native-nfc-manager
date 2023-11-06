@@ -8,9 +8,9 @@ type Post implements Node {
   id: ID!
 
   """
-  The author of the publication
+  The webCard associated to the publication
   """
-  author: Profile!
+  webCard: WebCard!
 
   """
   The media of the publication
@@ -96,9 +96,9 @@ type PostComment implements Node {
   id: ID!
 
   """
-  The author of the publication
+  The webCard associate to the comment
   """
-  author: Profile!
+  webCard: WebCard!
   comment: String!
 
   """

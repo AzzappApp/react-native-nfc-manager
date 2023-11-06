@@ -91,5 +91,5 @@ input CardCoverTextStyleInput {
 }
 
 type SaveCoverPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

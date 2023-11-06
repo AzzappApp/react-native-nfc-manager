@@ -67,16 +67,18 @@ import InviteFriendsScreen from '#screens/InviteFriendsScreen';
 import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
-import NewProfileScreen from '#screens/NewProfileScreen';
+import MultiUserAddScreen from '#screens/MultiUserAddScreen';
+import MultiUserScreen from '#screens/MultiUserScreen';
+import NewWebCardScreen from '#screens/NewWebCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
-import ProfileScreen from '#screens/ProfileScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
+import WebCardScreen from '#screens/WebCardScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -177,10 +179,10 @@ const screens = {
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
   NEW_POST: PostCreationScreen,
-  NEW_PROFILE: NewProfileScreen,
+  NEW_WEBCARD: NewWebCardScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   COVER_EDITION: CoverEditionScreen,
-  PROFILE: ProfileScreen,
+  WEBCARD: WebCardScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
@@ -189,6 +191,8 @@ const screens = {
   CONTACT_CARD: ContactCardScreen,
   ONBOARDING: WelcomeScreen,
   LIKED_POSTS: LikedPostsScreen,
+  MULTI_USER: MultiUserScreen,
+  MULTI_USER_ADD: MultiUserAddScreen,
 };
 
 const tabs = {
@@ -205,16 +209,16 @@ const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn, profileId } = getAuthState();
+    const { authenticated, hasBeenSignedIn, webCardId } = getAuthState();
     return authenticated
-      ? mainRoutes(!profileId)
+      ? mainRoutes(!webCardId)
       : hasBeenSignedIn
       ? signInRoutes
       : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated, profileId } = useAuthState();
+  const { authenticated, webCardId } = useAuthState();
 
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
@@ -225,10 +229,10 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes(!profileId));
+        router.replaceAll(mainRoutes(!webCardId));
       }
     }
-  }, [authenticated, profileId, router]);
+  }, [authenticated, webCardId, router]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -249,8 +253,8 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser(profileId ? { id: fromGlobalId(profileId).id } : null);
-  }, [profileId]);
+    Sentry.setUser(webCardId ? { id: fromGlobalId(webCardId).id } : null);
+  }, [webCardId]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps

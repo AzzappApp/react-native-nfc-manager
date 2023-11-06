@@ -10,12 +10,12 @@ import {
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { CONTACT_CARD_RATIO } from '#components/ContactCard';
+import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useOnFocus } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -48,13 +48,17 @@ const HomeScreenContent = ({
       fragment HomeScreenContent_user on User {
         profiles {
           id
-          userName
+          profileRole
+          webCard {
+            id
+            userName
+          }
           ...HomeContactCardLandscape_profile
         }
+        ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
-        ...HomeBackground_user
         ...HomeHeader_user
       }
     `,
@@ -67,7 +71,7 @@ const HomeScreenContent = ({
   const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
-      profile => profile.id === auth.profileId,
+      profile => profile.webCard.id === auth.webCardId,
     );
     return index !== undefined && index !== -1 ? index : 0;
     // we only want to run this once
@@ -80,27 +84,31 @@ const HomeScreenContent = ({
   const currentProfileIndexSharedValue = useSharedValue(currentProfileIndex);
   const currentProfile = user.profiles?.[currentProfileIndex];
 
-  const switchProfile = useDebouncedCallback((profileId: string) => {
-    if (profileId && auth.profileId !== profileId) {
-      void dispatchGlobalEvent({
-        type: 'PROFILE_CHANGE',
-        payload: {
-          profileId,
-        },
-      });
-    }
-  }, 50);
+  const switchWebCard = useDebouncedCallback(
+    (webCardId: string, profileRole: string) => {
+      if (webCardId && auth.webCardId !== webCardId) {
+        void dispatchGlobalEvent({
+          type: 'WEBCARD_CHANGE',
+          payload: {
+            webCardId,
+            profileRole,
+          },
+        });
+      }
+    },
+    50,
+  );
 
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       currentProfileIndexRef.current = index;
       setCurrentProfileIndex(index);
-      const newProfileId = user.profiles?.[index]?.id;
-      if (newProfileId) {
-        switchProfile(newProfileId);
+      const newProfile = user.profiles?.[index];
+      if (newProfile) {
+        switchWebCard(newProfile.webCard.id, newProfile.profileRole!);
       }
     },
-    [setCurrentProfileIndex, switchProfile, user.profiles],
+    [setCurrentProfileIndex, switchWebCard, user.profiles],
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
@@ -114,7 +122,7 @@ const HomeScreenContent = ({
 
   useOnFocus(() => {
     const authProfileIndex = user.profiles?.findIndex(
-      profile => profile.id === auth.profileId,
+      profile => profile.id === auth.webCardId,
     );
     if (
       authProfileIndex !== undefined &&
@@ -134,7 +142,7 @@ const HomeScreenContent = ({
     if (currentProfileIndex === -1) {
       disposable = prefetchRoute(
         getRelayEnvironment().forActor(ROOT_ACTOR_ID),
-        { route: 'NEW_PROFILE' },
+        { route: 'NEW_WEBCARD' },
       );
     }
     return () => {
@@ -150,19 +158,21 @@ const HomeScreenContent = ({
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
-    if (auth.profileId) {
+    if (auth.webCardId) {
       const profile = profilesRef.current?.find(
-        profile => profile.id === auth.profileId,
+        profile => profile.webCard.id === auth.webCardId,
       );
       if (profile) {
         const multiActorEnvironment = getRelayEnvironment();
-        const profileEnvironment = multiActorEnvironment.forActor(profile.id);
+        const profileEnvironment = multiActorEnvironment.forActor(
+          profile.webCard.id,
+        );
         profilesDisposables.push(
           prefetchRoute(profileEnvironment, {
-            route: 'PROFILE',
+            route: 'WEBCARD',
             params: {
-              profileId: auth.profileId,
-              userName: profile.userName,
+              webCardId: auth.webCardId,
+              userName: profile.webCard.userName,
             },
           }),
           prefetchRoute(profileEnvironment, {
@@ -171,7 +181,7 @@ const HomeScreenContent = ({
         );
       }
     }
-  }, [auth.profileId, profilesDisposables, prefetchRoute]);
+  }, [profilesDisposables, prefetchRoute, auth.webCardId]);
 
   useEffect(
     () => () => {
@@ -250,11 +260,11 @@ const HomeScreenContent = ({
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <ProfileBoundRelayEnvironmentProvider
-        profileId={currentProfile?.id ?? null}
+      <WebCardBoundRelayEnvironmentProvider
+        webCardId={currentProfile?.webCard?.id ?? null}
       >
         <HomeContactCardLandscape profile={currentProfile ?? null} />
-      </ProfileBoundRelayEnvironmentProvider>
+      </WebCardBoundRelayEnvironmentProvider>
     </View>
   );
 };

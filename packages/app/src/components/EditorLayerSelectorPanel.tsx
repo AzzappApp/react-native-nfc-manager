@@ -8,8 +8,8 @@ import StaticMediaList from '#components/StaticMediaList';
 import ColorPicker from '#ui/ColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import TabsBar from '#ui/TabsBar';
-import { useProfileCardColors } from './ProfileColorPicker';
-import type { ProfileColorsBoundsComponentProps } from './ProfileColorPicker';
+import { useWebCardColors } from './WebCardColorPicker';
+import type { WebCardColorsBoundsComponentProps } from './WebCardColorPicker';
 import type { StaticMediaList_staticMedias$key } from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
@@ -235,16 +235,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export type ProfileColorsBoundEditorLayerSelectorPanel =
-  ProfileColorsBoundsComponentProps<EditorLayerSelectorPanelProps>;
+export type WebCardColorsBoundEditorLayerSelectorPanel =
+  WebCardColorsBoundsComponentProps<EditorLayerSelectorPanelProps>;
 
 /**
  * EditorLayerSelectorPanel component with the profile colors bound to the one of the current profile.
  */
-export const ProfileBoundEditorLayerSelectorPanel = ({
-  profile,
+export const WebCardBoundEditorLayerSelectorPanel = ({
+  webCard,
   ...props
-}: ProfileColorsBoundEditorLayerSelectorPanel) => {
-  const profileColorsProps = useProfileCardColors(profile);
-  return <EditorLayerSelectorPanel {...profileColorsProps} {...props} />;
+}: WebCardColorsBoundEditorLayerSelectorPanel) => {
+  const webCardColorsProps = useWebCardColors(webCard);
+  return <EditorLayerSelectorPanel {...webCardColorsProps} {...props} />;
 };

@@ -2,8 +2,9 @@ import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { ProfileTable, db, follows, unfollows } from '#domains';
-import type { Profile } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import { WebCardTable, db, follows, unfollows } from '#domains';
+import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
@@ -11,19 +12,27 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   { input },
   { auth, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { profileId, userId } = auth;
+  if (!profileId || !userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(input.profileId);
-  if (type !== 'Profile') {
+  const profile = await loaders.Profile.load(profileId);
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  let target: Profile | null;
+  const { id: targetId, type } = fromGlobalId(input.webCardId);
+  if (type !== 'WebCard') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  let target: WebCard | null;
   try {
-    target = await loaders.Profile.load(targetId);
+    target = await loaders.WebCard.load(targetId);
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
@@ -35,27 +44,27 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   try {
     await db.transaction(async trx => {
       await trx
-        .update(ProfileTable)
+        .update(WebCardTable)
         .set({
           nbFollowers: follow ? sql`nbFollowers + 1` : sql`nbFollowers - 1`,
         })
-        .where(eq(ProfileTable.id, targetId));
+        .where(eq(WebCardTable.id, targetId));
 
       await trx
-        .update(ProfileTable)
+        .update(WebCardTable)
         .set({
           nbFollowings: follow ? sql`nbFollowings + 1` : sql`nbFollowings - 1`,
         })
-        .where(eq(ProfileTable.id, profileId));
+        .where(eq(WebCardTable.id, profile.webCardId));
 
-      if (follow) await follows(profileId, targetId, trx);
-      else await unfollows(profileId, targetId, trx);
+      if (follow) await follows(profile.webCardId, targetId, trx);
+      else await unfollows(profile.webCardId, targetId, trx);
     });
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  return { profile: target };
+  return { webCard: target };
 };
 
 export default toggleFollowing;

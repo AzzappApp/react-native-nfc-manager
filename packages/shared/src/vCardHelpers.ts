@@ -52,5 +52,14 @@ export const buildVCard = (contactCardData: string) => {
     vcard.addSocial(social[1], social[0]);
   });
 
-  return { vCard: vcard, contactId: contactCard.profileId };
+  return {
+    vCard: vcard,
+    contact: {
+      profileId: contactCard.profileId,
+      webCardId: contactCard.webCardId,
+      lastName: contactCard.lastName,
+      firstName: contactCard.firstName,
+      company: contactCard.company,
+    },
+  };
 };

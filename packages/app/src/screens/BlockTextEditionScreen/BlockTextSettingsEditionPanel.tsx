@@ -7,19 +7,19 @@ import {
   BLOCK_TEXT_MAX_VERTICAL_SPACING,
   BLOCK_TEXT_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import ProfileColorPicker, {
-  ProfileColorDropDownPicker,
-} from '#components/ProfileColorPicker';
+import WebCardColorPicker, {
+  WebCardColorDropDownPicker,
+} from '#components/WebCardColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { BlockTextSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextSettingsEditionPanel_viewer.graphql';
+import type { BlockTextSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/BlockTextSettingsEditionPanel_webCard.graphql';
 import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
 
 type BlockTextSettingsEditionPanelProps = ViewProps & {
-  viewer: BlockTextSettingsEditionPanel_viewer$key;
+  webCard: BlockTextSettingsEditionPanel_webCard$key | null;
   /**
    * The fontFamily currently set on the module
    */
@@ -70,7 +70,7 @@ type BlockTextSettingsEditionPanelProps = ViewProps & {
  * A Panel to edit the Settings of the BlockText edition screen
  */
 const BlockTextSettingsEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   fontFamily,
   onFontFamilyChange,
   fontColor,
@@ -89,15 +89,13 @@ const BlockTextSettingsEditionPanel = ({
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
 
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment BlockTextSettingsEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-        }
+      fragment BlockTextSettingsEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -119,8 +117,8 @@ const BlockTextSettingsEditionPanel = ({
             onFontFamilyChange={onFontFamilyChange}
             bottomSheetHeight={bottomSheetHeight}
           />
-          <ProfileColorDropDownPicker
-            profile={profile!}
+          <WebCardColorDropDownPicker
+            webCard={webCard}
             color={fontColor}
             onColorChange={onFontColorChange}
             bottomSheetHeight={bottomSheetHeight}
@@ -177,11 +175,11 @@ const BlockTextSettingsEditionPanel = ({
           style={styles.slider}
         />
       </View>
-      {profile && (
-        <ProfileColorPicker
+      {webCard && (
+        <WebCardColorPicker
           visible={currentTab !== 'settings'}
           height={bottomSheetHeight}
-          profile={profile}
+          webCard={webCard}
           title={intl.formatMessage({
             defaultMessage: ' color',
             description: ' color title in BlockText edition',

@@ -48,8 +48,10 @@ const HomeStatistics = ({
       fragment HomeStatistics_user on User {
         profiles {
           id
-          nbLikes
-          nbWebcardViews
+          webCard {
+            nbLikes
+            nbWebCardViews
+          }
           nbContactCardScans
         }
         ...HomeStatisticsChart_user
@@ -73,15 +75,15 @@ const HomeStatistics = ({
   const inputRange = _.range(0, data.profiles?.length);
   const { profiles } = data;
   const likes = useMemo(
-    () => profiles?.map(profile => profile.nbLikes) ?? [],
+    () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
     [profiles],
   );
-  const contactcardScans = useMemo(
-    () => profiles?.map(profile => profile.nbContactCardScans) ?? [],
+  const contactCardScans = useMemo(
+    () => profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? [],
     [profiles],
   );
-  const webcardViews = useMemo(
-    () => profiles?.map(profile => profile.nbWebcardViews) ?? [],
+  const webCardViews = useMemo(
+    () => profiles?.map(profile => profile.webCard.nbWebCardViews) ?? [],
     [profiles],
   );
 
@@ -96,22 +98,22 @@ const HomeStatistics = ({
           interpolate(
             currentProfileIndexSharedValue.value,
             inputRange,
-            contactcardScans,
+            contactCardScans,
           ),
         );
         totalViews.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
             inputRange,
-            webcardViews,
+            webCardViews,
           ),
         );
       } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
         //use to hide animation if not show. few perf gain
         const prevIndex = Math.floor(actual);
         totalLikes.value = format(likes[prevIndex] ?? 0);
-        totalScans.value = format(contactcardScans[prevIndex] ?? 0);
-        totalViews.value = format(webcardViews[prevIndex] ?? 0);
+        totalScans.value = format(contactCardScans[prevIndex] ?? 0);
+        totalViews.value = format(webCardViews[prevIndex] ?? 0);
       }
     },
 

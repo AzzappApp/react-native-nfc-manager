@@ -9,6 +9,7 @@ import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
+import { getProfileWithWebCardId } from '@azzapp/data/domains';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
@@ -18,7 +19,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
-import type { Profile } from '@azzapp/data/domains';
 import type { Plugin } from '@envelop/types';
 import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
@@ -149,19 +149,31 @@ const { handleRequest } = createYoga({
         try {
           const res = await getSessionData();
 
-          const profileId = headers().get('azzapp-profileId');
-          let profile: Profile | null = null;
-          if (profileId) {
-            profile = await context.loaders.Profile.load(profileId);
-            if (profile?.userId !== res?.userId) {
-              return null;
+          const webCardId = headers().get('azzapp-webCardId');
+
+          if (webCardId && res?.userId) {
+            const profile = await getProfileWithWebCardId(
+              res.userId,
+              webCardId,
+            );
+
+            if (profile) {
+              context.loaders.Profile.prime(profile.id, profile);
+            }
+
+            if (profile && profile.userId !== res.userId) {
+              throw new Error('Invalid profile');
+            }
+
+            if (profile) {
+              return {
+                ...res,
+                profileId: profile.id,
+              };
             }
           }
 
-          return {
-            ...res,
-            profileId,
-          };
+          return res;
         } catch (e) {
           console.log('error', e);
           return null;

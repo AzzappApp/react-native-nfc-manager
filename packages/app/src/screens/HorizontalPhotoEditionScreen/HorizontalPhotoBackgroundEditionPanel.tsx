@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 
 import type { HorizontalPhotoBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
@@ -59,7 +59,9 @@ const HorizontalPhotoBackgroundEditionPanel = ({
           ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPicker_profile
+          webCard {
+            ...WebCardColorPicker_webCard
+          }
         }
       }
     `,
@@ -90,12 +92,12 @@ const HorizontalPhotoBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        profile={profile!}
+        webCard={profile?.webCard ?? null}
         medias={moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}

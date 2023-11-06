@@ -13,22 +13,22 @@ import { useState } from 'react';
 import { labelsOptions, useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type { CardTemplateType, ProfileCategory } from '@azzapp/data/domains';
+import type { CardTemplateType, WebCardCategory } from '@azzapp/data/domains';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;
-  profileCategories: ProfileCategory[];
+  webCardCategories: WebCardCategory[];
   saved?: boolean;
 };
 
 type FormValue = CardTemplateType & {
-  profileCategory: ProfileCategory;
+  webCardCategory: WebCardCategory;
 };
 
 const CardTemplateTypeForm = ({
   cardTemplateType,
   saved = false,
-  profileCategories,
+  webCardCategories,
 }: CardTemplateTypeFormProps) => {
   const isCreation = !cardTemplateType;
   const [saving, setIsSaving] = useState(false);
@@ -42,9 +42,9 @@ const CardTemplateTypeForm = ({
     () =>
       ({
         ...cardTemplateType,
-        profileCategory: cardTemplateType?.profileCategoryId
-          ? profileCategories?.find(item => {
-              return item.id === cardTemplateType?.profileCategoryId;
+        webCardCategory: cardTemplateType?.webCardCategoryId
+          ? webCardCategories?.find(item => {
+              return item.id === cardTemplateType?.webCardCategoryId;
             })
           : null,
       }) as Partial<CardTemplateType>,
@@ -107,13 +107,13 @@ const CardTemplateTypeForm = ({
           fullWidth
           multiple={false}
           id="profile-categories"
-          options={profileCategories}
+          options={webCardCategories}
           getOptionLabel={option => {
             return option.labels.en;
           }}
-          value={fieldProps('profileCategory').value as ProfileCategory}
+          value={fieldProps('webCardCategory').value as WebCardCategory}
           onChange={(_, value) => {
-            fieldProps('profileCategory').onChange(value as ProfileCategory);
+            fieldProps('webCardCategory').onChange(value as WebCardCategory);
           }}
           renderInput={params => (
             <TextField

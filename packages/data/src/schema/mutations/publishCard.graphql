@@ -6,5 +6,5 @@ extend type Mutation {
 }
 
 type PublishCardPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

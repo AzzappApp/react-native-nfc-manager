@@ -60,30 +60,33 @@ const WebCardModulePreview = ({
       query WebCardModulePreviewQuery {
         viewer {
           profile {
-            id
-            ...CoverRenderer_profile
-            ...WebCardBackground_profile
-            cardStyle {
-              borderColor
-              borderRadius
-              buttonRadius
-              borderWidth
-              buttonColor
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            cardModules {
+            webCard {
               id
-              visible
-              ...ModuleData_cardModules
-            }
-            cardColors {
-              primary
-              dark
-              light
+              cardStyle {
+                borderColor
+                borderRadius
+                buttonRadius
+                borderWidth
+                buttonColor
+                fontFamily
+                fontSize
+                gap
+                titleFontFamily
+                titleFontSize
+              }
+              cardModules {
+                id
+                visible
+                ...ModuleData_cardModules
+              }
+              cardColors {
+                primary
+                dark
+                light
+              }
+              ...CoverRenderer_webCard
+              ...WebCardBackgroundPreview_webCard
+              ...WebCardBackground_webCard
             }
           }
         }
@@ -92,7 +95,7 @@ const WebCardModulePreview = ({
     {},
   );
 
-  const cardModules = useModulesData(profile?.cardModules ?? [], true);
+  const cardModules = useModulesData(profile?.webCard?.cardModules ?? [], true);
 
   const { editedIndex, modules } = useMemo(() => {
     if (!profile) {
@@ -183,9 +186,9 @@ const WebCardModulePreview = ({
       </Container>
       <Container>
         <WebCardPreview
-          profile={profile}
-          cardStyle={profile.cardStyle}
-          cardColors={profile.cardColors}
+          webCard={profile.webCard}
+          cardStyle={profile.webCard.cardStyle}
+          cardColors={profile.webCard.cardColors}
           height={previewHeight}
           cardModules={modules}
           onLayout={onScrollViewLayout}

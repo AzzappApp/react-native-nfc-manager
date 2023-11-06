@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import type { SocialLinksBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SocialLinksBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -58,7 +58,9 @@ const SocialLinksBackgroundEditionPanel = ({
           ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPicker_profile
+          webCard {
+            ...WebCardColorPicker_webCard
+          }
         }
       }
     `,
@@ -89,12 +91,12 @@ const SocialLinksBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        profile={profile!}
+        webCard={profile?.webCard ?? null}
         medias={moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}

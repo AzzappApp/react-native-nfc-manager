@@ -110,7 +110,6 @@ const HorizontalPhotoEditionScreen = ({
   const viewer = useFragment(
     graphql`
       fragment HorizontalPhotoEditionScreen_viewer on Viewer {
-        ...HorizontalPhotoBorderEditionPanel_viewer
         ...HorizontalPhotoBackgroundEditionPanel_viewer
         moduleBackgrounds {
           id
@@ -118,22 +117,25 @@ const HorizontalPhotoEditionScreen = ({
           resizeMode
         }
         profile {
-          cardColors {
-            primary
-            light
-            dark
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
+          webCard {
+            cardColors {
+              primary
+              light
+              dark
+            }
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            ...HorizontalPhotoBorderEditionPanel_webCard
           }
         }
       }
@@ -160,7 +162,7 @@ const HorizontalPhotoEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: viewer.profile?.webCard.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
@@ -191,7 +193,7 @@ const HorizontalPhotoEditionScreen = ({
         $input: SaveHorizontalPhotoModuleInput!
       ) {
         saveHorizontalPhotoModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -416,8 +418,8 @@ const HorizontalPhotoEditionScreen = ({
         <HorizontalPhotoPreview
           style={{ height: topPanelHeight - 110, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.cardColors}
-          cardStyle={viewer.profile?.cardStyle}
+          colorPalette={viewer.profile?.webCard.cardColors}
+          cardStyle={viewer.profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <View
@@ -459,7 +461,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBorderRadiusChange={onBorderradiusChange}
                 borderColor={borderColor}
                 onBorderColorChange={onBordercolorChange}
-                viewer={viewer}
+                webCard={viewer.profile?.webCard ?? null}
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,

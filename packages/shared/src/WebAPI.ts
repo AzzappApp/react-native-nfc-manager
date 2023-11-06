@@ -82,7 +82,7 @@ export type SignInParams = {
  */
 export const signin: APIMethod<
   SignInParams,
-  TokensResponse & { profileId?: string }
+  TokensResponse & { webCardId?: string; profileRole?: string }
 > = (data, init): Promise<TokensResponse> =>
   apiFetch(`${API_ENDPOINT}/signin`, {
     ...init,
@@ -222,10 +222,10 @@ export const verifySign: APIMethod<
  * Api call to generate an apple wallet pass.
  */
 export const getAppleWalletPass = (
-  { locale, profileId }: { locale: string; profileId: string },
+  { locale, webCardId }: { locale: string; webCardId: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?profileId=${profileId}`, {
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?webCardId=${webCardId}`, {
     ...init,
     method: 'GET',
   });
@@ -234,10 +234,10 @@ export const getAppleWalletPass = (
  * Api call to generate a google wallet pass.
  */
 export const getGoogleWalletPass: APIMethod<
-  { locale: string; profileId: string },
+  { locale: string; webCardId: string },
   { token: string }
-> = ({ locale, profileId }, init) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?profileId=${profileId}`, {
+> = ({ locale, webCardId }, init) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?webCardId=${webCardId}`, {
     ...init,
     method: 'GET',
   });

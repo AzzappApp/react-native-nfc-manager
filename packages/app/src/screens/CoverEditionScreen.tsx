@@ -145,11 +145,11 @@ export default relayScreen(CoverEditionScreen, {
       `,
       {},
     ).mergeMap(({ viewer }) => {
-      if (!viewer.profile?.cardCover) {
+      if (!viewer.profile?.webCard.cardCover) {
         return [];
       }
       const { background, foreground, sourceMedia, maskMedia } =
-        viewer.profile.cardCover;
+        viewer.profile.webCard.cardCover;
       const medias = convertToNonNullArray([
         background && { kind: 'image', uri: background.uri },
         foreground && { kind: 'image', uri: foreground.uri },

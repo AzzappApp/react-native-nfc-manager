@@ -7,5 +7,5 @@ input DeleteModulesInput {
 }
 
 type DeleteModulesPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

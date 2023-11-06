@@ -2,7 +2,7 @@ import { asc, eq } from 'drizzle-orm';
 import {
   CompanyActivityTable,
   MediaSuggestionTable,
-  ProfileCategoryTable,
+  WebCardCategoryTable,
   db,
   getMediasByIds,
 } from '@azzapp/data/domains';
@@ -10,17 +10,17 @@ import MediaSuggestionsList from './MediaSuggestionsList';
 
 const StaticMediasPage = async () => {
   const suggestions = await db.select().from(MediaSuggestionTable);
-  const profileCategories = await db
+  const webCardCategories = await db
     .select()
-    .from(ProfileCategoryTable)
-    .where(eq(ProfileCategoryTable.enabled, true))
-    .orderBy(asc(ProfileCategoryTable.order));
+    .from(WebCardCategoryTable)
+    .where(eq(WebCardCategoryTable.enabled, true))
+    .orderBy(asc(WebCardCategoryTable.order));
 
   const companyActivities = await db.select().from(CompanyActivityTable);
 
   const mediasSuggestions = suggestions.reduce(
     (acc, suggestion) => {
-      const { mediaId, companyActivityId, profileCategoryId } = suggestion;
+      const { mediaId, companyActivityId, webCardCategoryId } = suggestion;
       if (!acc[mediaId]) {
         acc[mediaId] = {
           kind: 'image',
@@ -32,8 +32,8 @@ const StaticMediasPage = async () => {
         acc[mediaId].activities[companyActivityId] = true;
       }
 
-      if (profileCategoryId) {
-        acc[mediaId].categories[profileCategoryId] = true;
+      if (webCardCategoryId) {
+        acc[mediaId].categories[webCardCategoryId] = true;
       }
       return acc;
     },
@@ -68,14 +68,14 @@ const StaticMediasPage = async () => {
   companyActivities.sort((a, b) =>
     (a.labels?.en ?? '').localeCompare(b.labels?.en ?? ''),
   );
-  profileCategories.sort((a, b) =>
+  webCardCategories.sort((a, b) =>
     (a.labels?.en ?? '').localeCompare(b.labels?.en ?? ''),
   );
 
   return (
     <MediaSuggestionsList
       activities={companyActivities}
-      categories={profileCategories}
+      categories={webCardCategories}
       mediasSuggestions={sortedMediasSuggestions}
     />
   );

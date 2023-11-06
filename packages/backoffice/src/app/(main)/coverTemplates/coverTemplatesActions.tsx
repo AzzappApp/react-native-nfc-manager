@@ -10,7 +10,7 @@ import {
   getColorPaletteByColors,
   getCoverTemplateById,
   getMediasByIds,
-  getProfileByUserName,
+  getWebCardByUserName,
   referencesMedias,
 } from '@azzapp/data/domains';
 import { ADMIN } from '#roles';
@@ -101,28 +101,28 @@ export const saveCoverTemplate = async (
 };
 
 export const getCoverData = async (username: string) => {
-  const profile = await getProfileByUserName(username);
-  if (!profile) {
-    throw new Error('Profile not found');
+  const webCard = await getWebCardByUserName(username);
+  if (!webCard) {
+    throw new Error('WebCard not found');
   }
-  if (!profile.coverData?.sourceMediaId) {
+  if (!webCard.coverData?.sourceMediaId) {
     throw new Error('Cover data not found');
   }
-  const [media] = await getMediasByIds([profile.coverData.sourceMediaId]);
+  const [media] = await getMediasByIds([webCard.coverData.sourceMediaId]);
   if (!media) {
     throw new Error('Media not found');
   }
 
   const colorPalette =
-    profile.cardColors &&
+    webCard.cardColors &&
     (await getColorPaletteByColors(
-      profile.cardColors.primary,
-      profile.cardColors.dark,
-      profile.cardColors.light,
+      webCard.cardColors.primary,
+      webCard.cardColors.dark,
+      webCard.cardColors.light,
     ));
 
   return {
-    kind: profile.coverData.segmented
+    kind: webCard.coverData.segmented
       ? 'people'
       : media.kind === 'image'
       ? 'others'
@@ -133,21 +133,21 @@ export const getCoverData = async (username: string) => {
       kind: media.kind,
     },
     colorPaletteId: colorPalette?.id,
-    titleFontSize: profile.coverData.titleStyle?.fontSize,
-    titleFontFamily: profile.coverData.titleStyle?.fontFamily,
-    titleColor: profile.coverData.titleStyle?.color,
-    subTitleFontSize: profile.coverData.subTitleStyle?.fontSize,
-    subTitleFontFamily: profile.coverData.subTitleStyle?.fontFamily,
-    subTitleColor: profile.coverData.subTitleStyle?.color,
-    textOrientation: profile.coverData.textOrientation,
-    textPosition: profile.coverData.textPosition,
-    backgroundId: profile.coverData.backgroundId,
-    backgroundColor: profile.coverData.backgroundColor,
-    backgroundPatternColor: profile.coverData.backgroundPatternColor,
-    foregroundId: profile.coverData.foregroundId,
-    foregroundColor: profile.coverData.foregroundColor,
-    mediaFilter: profile.coverData.mediaFilter,
-    mediaParameters: profile.coverData.mediaParameters,
-    merged: profile.coverData.merged,
+    titleFontSize: webCard.coverData.titleStyle?.fontSize,
+    titleFontFamily: webCard.coverData.titleStyle?.fontFamily,
+    titleColor: webCard.coverData.titleStyle?.color,
+    subTitleFontSize: webCard.coverData.subTitleStyle?.fontSize,
+    subTitleFontFamily: webCard.coverData.subTitleStyle?.fontFamily,
+    subTitleColor: webCard.coverData.subTitleStyle?.color,
+    textOrientation: webCard.coverData.textOrientation,
+    textPosition: webCard.coverData.textPosition,
+    backgroundId: webCard.coverData.backgroundId,
+    backgroundColor: webCard.coverData.backgroundColor,
+    backgroundPatternColor: webCard.coverData.backgroundPatternColor,
+    foregroundId: webCard.coverData.foregroundId,
+    foregroundColor: webCard.coverData.foregroundColor,
+    mediaFilter: webCard.coverData.mediaFilter,
+    mediaParameters: webCard.coverData.mediaParameters,
+    merged: webCard.coverData.merged,
   } as const;
 };

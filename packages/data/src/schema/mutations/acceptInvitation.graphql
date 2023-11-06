@@ -1,0 +1,7 @@
+extend type Mutation {
+  acceptInvitation: AcceptInvitationPayload
+}
+
+type AcceptInvitationPayload {
+  profile: Profile
+}

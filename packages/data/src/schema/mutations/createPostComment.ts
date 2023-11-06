@@ -1,17 +1,24 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { getPostByIdWithMedia, insertPostComment } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostComment: MutationResolvers['createPostComment'] = async (
   _,
   { input: { postId, comment } },
-  { auth },
+  { auth, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const { id: targetId, type } = fromGlobalId(postId);
@@ -23,7 +30,7 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
     if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
     const postComment = {
-      profileId,
+      webCardId: profile.webCardId,
       postId: targetId,
       comment,
     };

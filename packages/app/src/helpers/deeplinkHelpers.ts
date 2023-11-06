@@ -61,7 +61,7 @@ export const matchUrlWithRoute = async (
         );
       } catch {
         return {
-          route: 'PROFILE',
+          route: 'WEBCARD',
           params: {
             userName: username,
           },
@@ -77,7 +77,7 @@ export const matchUrlWithRoute = async (
           });
 
           return {
-            route: 'PROFILE',
+            route: 'WEBCARD',
             params: {
               userName: username,
               contactData,
@@ -85,7 +85,7 @@ export const matchUrlWithRoute = async (
           };
         } catch {
           return {
-            route: 'PROFILE',
+            route: 'WEBCARD',
             params: {
               userName: username,
             },
@@ -94,7 +94,7 @@ export const matchUrlWithRoute = async (
       }
     } else {
       return {
-        route: 'PROFILE',
+        route: 'WEBCARD',
         params: {
           userName: username,
         },

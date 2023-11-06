@@ -33,7 +33,7 @@ const SimpleTextEditionMobileScreen = ({
   let module: SimpleTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      data.viewer.profile?.webCard.cardModules.find(
         module => module?.id === moduleId && module?.kind === moduleKind,
       ) ?? null;
     if (!module) {
@@ -55,10 +55,12 @@ const SimpleTextQuery = graphql`
     viewer {
       ...SimpleTextEditionScreen_viewer
       profile {
-        cardModules {
-          id
-          kind
-          ...SimpleTextEditionScreen_module
+        webCard {
+          cardModules {
+            id
+            kind
+            ...SimpleTextEditionScreen_module
+          }
         }
       }
     }

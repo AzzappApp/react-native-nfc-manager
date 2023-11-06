@@ -5,20 +5,23 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ToggleButton from '#ui/ToggleButton';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer, { CoverRendererPreviewDesktop } from './CoverRenderer';
-import WebCardBackground from './WebCardBackground';
+import WebCardBackground from './WebCardBackgroundPreview';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
-import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
-import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
+import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
+import type { WebCardBackground_webCard$key } from '@azzapp/relay/artifacts/WebCardBackground_webCard.graphql';
+import type { WebCardBackgroundPreview_webCard$key } from '@azzapp/relay/artifacts/WebCardBackgroundPreview_webCard.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { LayoutRectangle, PointProp, ViewProps } from 'react-native';
 
 export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
   /**
-   * The profile to render.
+   * The webCard to render.
    * Contains the cover informations.
    */
-  profile: CoverRenderer_profile$key & WebCardBackground_profile$key;
+  webCard: CoverRenderer_webCard$key &
+    WebCardBackground_webCard$key &
+    WebCardBackgroundPreview_webCard$key;
   /**
    * The card style to use.
    */
@@ -58,7 +61,7 @@ export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
  */
 const WebCardPreview = (
   {
-    profile,
+    webCard,
     cardModules,
     cardColors,
     cardStyle,
@@ -154,7 +157,7 @@ const WebCardPreview = (
         >
           <View ref={contentRef}>
             <WebCardBackground
-              profile={profile}
+              webCard={webCard}
               overrideCardStyle={cardStyle}
               overrideLastModule={cardModules.at(-1)}
               style={{
@@ -167,10 +170,10 @@ const WebCardPreview = (
               }}
             />
             {viewMode === 'desktop' ? (
-              <CoverRendererPreviewDesktop profile={profile} videoEnabled />
+              <CoverRendererPreviewDesktop webCard={webCard} videoEnabled />
             ) : (
               <CoverRenderer
-                profile={profile}
+                webCard={webCard}
                 width={windowWidth}
                 hideBorderRadius
                 videoEnabled

@@ -14,17 +14,22 @@ const updatePass = async (
     .get('Authorization')
     ?.replace(APPLE_HEADER_PREFIX, '');
 
-  if (
-    !authorization ||
-    (await unseal(authorization, process.env.APPLE_TOKEN_PASSWORD ?? '')) !==
-      params.serial
-  ) {
+  if (!authorization) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  const profileId = await unseal(
+    authorization,
+    process.env.APPLE_TOKEN_PASSWORD ?? '',
+  );
+
+  if (profileId !== params.serial) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   const ifModifiedSince = req.headers.get('If-Modified-Since');
 
-  const profile = await getProfileById(params.serial);
+  const profile = await getProfileById(profileId);
 
   if (!profile) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });
@@ -32,6 +37,7 @@ const updatePass = async (
 
   if (
     ifModifiedSince &&
+    'lastContactCardUpdate' in profile &&
     new Date(ifModifiedSince) >= profile.lastContactCardUpdate
   ) {
     return new NextResponse(null, {
@@ -39,7 +45,7 @@ const updatePass = async (
     });
   }
 
-  const pass = await buildApplePass(params.serial, params.lang);
+  const pass = await buildApplePass(profileId, params.lang);
 
   if (pass) {
     return new Response(pass.getAsBuffer(), {

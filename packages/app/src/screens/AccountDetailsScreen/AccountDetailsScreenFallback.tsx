@@ -10,7 +10,7 @@ const AccountDetailsScreenFallback = () => (
         rowGap: 15,
       }}
     >
-      <AccountDetailsHeader profile={null} />
+      <AccountDetailsHeader webCard={null} />
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
       </View>

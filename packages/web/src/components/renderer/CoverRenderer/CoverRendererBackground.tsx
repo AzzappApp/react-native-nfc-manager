@@ -4,16 +4,16 @@ import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CoverRenderer.css';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverRendererBackgroundProps = {
   media: Media | null;
-  profile: Profile;
+  webCard: WebCard;
 };
 
 const CoverRendererBackground = ({
   media,
-  profile: { coverData, cardColors },
+  webCard: { coverData, cardColors },
 }: CoverRendererBackgroundProps) => {
   if (!media) return null;
 

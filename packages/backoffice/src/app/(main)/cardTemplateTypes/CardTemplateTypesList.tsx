@@ -59,7 +59,7 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
-    field: 'profileCategoryId',
+    field: 'webCardCategoryId',
     headerName: 'Profile Category',
     renderCell: params => params.row.cardTemplateTypeId,
     width: 250,

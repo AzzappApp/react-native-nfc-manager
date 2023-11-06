@@ -9,52 +9,24 @@ import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/Cont
 
 const ContactCardExportVcf = ({
   userName,
-  contactCard: contactCardKey,
+  profile: profileKey,
 }: {
   userName: string;
-  contactCard: ContactCardExportVcf_card$key;
+  profile: ContactCardExportVcf_card$key;
 }) => {
-  const contactCard = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment ContactCardExportVcf_card on ContactCard {
-        firstName
-        lastName
-        title
-        company
-        emails {
-          label
-          address
-          selected
-        }
-        phoneNumbers {
-          label
-          number
-          selected
-        }
-        urls {
-          address
-          selected
-        }
-        addresses {
-          address
-          label
-          selected
-        }
-        birthday {
-          birthday
-          selected
-        }
-        socials {
-          url
-          label
-          selected
+      fragment ContactCardExportVcf_card on Profile {
+        contactCard {
+          firstName
+          lastName
         }
         serializedContactCard {
           data
         }
       }
     `,
-    contactCardKey,
+    profileKey,
   );
 
   const intl = useIntl();
@@ -66,7 +38,7 @@ const ContactCardExportVcf = ({
         description: 'Share button label',
       })}
       onPress={async () => {
-        const { vCard } = buildVCard(contactCard.serializedContactCard.data);
+        const { vCard } = buildVCard(profile.serializedContactCard.data);
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;
         try {
@@ -78,8 +50,10 @@ const ContactCardExportVcf = ({
 
           await ShareCommand.open({
             title:
-              formatDisplayName(contactCard.firstName, contactCard.lastName) ??
-              '',
+              formatDisplayName(
+                profile.contactCard?.firstName,
+                profile.contactCard?.lastName,
+              ) ?? '',
             url: `file://${filePath}`,
             type: 'text/vcard',
             failOnCancel: false,

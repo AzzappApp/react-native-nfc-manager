@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import type { CarouselEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionBackgroundPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -58,7 +58,9 @@ const CarouselEditionBackgroundPanel = ({
           ...StaticMediaList_staticMedias
         }
         profile {
-          ...ProfileColorPicker_profile
+          webCard {
+            ...WebCardColorPicker_webCard
+          }
         }
       }
     `,
@@ -89,12 +91,12 @@ const CarouselEditionBackgroundPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in carousel edition',
         })}
-        profile={profile!}
+        webCard={profile?.webCard ?? null}
         medias={moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}

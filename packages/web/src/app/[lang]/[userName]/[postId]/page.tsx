@@ -3,9 +3,9 @@ import { notFound, redirect } from 'next/navigation';
 import {
   getMediasByIds,
   getPostByIdWithMedia,
-  getPostCommentsWithProfile,
-  getProfileById,
-  getProfilesPostsWithMedias,
+  getPostCommentsWithWebCard,
+  getWebCardById,
+  getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -30,13 +30,13 @@ const PostPage = async (props: PostPageProps) => {
   const { post, seeMorePosts, media, comments, author } = await unstable_cache(
     async () => {
       const post = await getPostByIdWithMedia(postId);
-      const author = post ? await getProfileById(post.authorId) : null;
+      const author = post ? await getWebCardById(post.webCardId) : null;
       const seeMorePosts =
         author && post
-          ? await getProfilesPostsWithMedias(author.id, 3, 0, post.id)
+          ? await getWebCardsPostsWithMedias(author.id, 3, 0, post.id)
           : [];
       const comments = post?.allowComments
-        ? await getPostCommentsWithProfile(post.id, 5)
+        ? await getPostCommentsWithWebCard(post.id, 5)
         : [];
 
       const [media] = author?.coverData?.mediaId
@@ -66,7 +66,7 @@ const PostPage = async (props: PostPageProps) => {
   return (
     <div className={styles.background}>
       <div className={styles.postFeedHeader}>
-        <PostFeedHeader profile={author} postsCount={0} media={media} />
+        <PostFeedHeader webCard={author} postsCount={0} media={media} />
       </div>
       <div className={styles.center}>
         <main className={styles.wrapper}>
@@ -102,7 +102,7 @@ const PostPage = async (props: PostPageProps) => {
             </div>
           </div>
           <CommentFeed
-            profile={author}
+            webCard={author}
             post={post}
             media={media}
             comments={comments}
@@ -113,7 +113,7 @@ const PostPage = async (props: PostPageProps) => {
         <CommentFeedSeeMore
           posts={seeMorePosts}
           media={media}
-          profile={author}
+          webCard={author}
         />
       </aside>
     </div>

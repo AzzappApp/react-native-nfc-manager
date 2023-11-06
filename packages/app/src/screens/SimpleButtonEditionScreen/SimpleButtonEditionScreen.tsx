@@ -113,33 +113,35 @@ const SimpleButtonEditionScreen = ({
   const viewer = useFragment(
     graphql`
       fragment SimpleButtonEditionScreen_viewer on Viewer {
-        ...SimpleButtonSettingsEditionPanel_viewer
-        ...SimpleButtonBordersEditionPanel_viewer
-        ...SimpleButtonBackgroundEditionPanel_viewer
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
         profile {
-          cardColors {
-            primary
-            dark
-            light
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
+          webCard {
+            cardColors {
+              primary
+              dark
+              light
+            }
+            cardStyle {
+              borderColor
+              borderRadius
+              borderWidth
+              buttonColor
+              buttonRadius
+              fontFamily
+              fontSize
+              gap
+              titleFontFamily
+              titleFontSize
+            }
+            ...SimpleButtonBordersEditionPanel_webCard
+            ...SimpleButtonSettingsEditionPanel_webCard
           }
         }
+        ...SimpleButtonBackgroundEditionPanel_viewer
       }
     `,
     viewerKey,
@@ -171,7 +173,7 @@ const SimpleButtonEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: viewer.profile?.webCard.cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
     defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
@@ -211,7 +213,7 @@ const SimpleButtonEditionScreen = ({
         $input: SaveSimpleButtonModuleInput!
       ) {
         saveSimpleButtonModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -352,8 +354,8 @@ const SimpleButtonEditionScreen = ({
         <SimpleButtonPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.cardColors}
-          cardStyle={viewer.profile?.cardStyle}
+          colorPalette={viewer.profile?.webCard.cardColors}
+          cardStyle={viewer.profile?.webCard.cardStyle}
         />
         <TabView
           style={{ height: bottomPanelHeight }}
@@ -363,7 +365,7 @@ const SimpleButtonEditionScreen = ({
               id: 'settings',
               element: (
                 <SimpleButtonSettingsEditionPanel
-                  viewer={viewer}
+                  webCard={viewer.profile?.webCard ?? null}
                   buttonLabel={buttonLabel ?? ''}
                   onButtonLabelChange={onButtonLabelChange}
                   actionType={actionType ?? ''}
@@ -390,13 +392,13 @@ const SimpleButtonEditionScreen = ({
               id: 'borders',
               element: (
                 <SimpleButtonBordersEditionPanel
-                  viewer={viewer}
+                  webCard={viewer.profile?.webCard ?? null}
                   borderColor={borderColor}
-                  onBordercolorChange={onBordercolorChange}
+                  onBorderColorChange={onBordercolorChange}
                   borderWidth={borderWidth}
-                  onBorderwidthChange={onBorderwidthChange}
+                  onBorderWidthChange={onBorderwidthChange}
                   borderRadius={borderRadius}
-                  onBorderradiusChange={onBorderradiusChange}
+                  onBorderRadiusChange={onBorderradiusChange}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

@@ -9,7 +9,7 @@ input ToggleFollowingInput {
   """
   The id of the user we want toggle following on
   """
-  profileId: ID!
+  webCardId: ID!
 
   """
   Should we follow or unfollow the user
@@ -18,6 +18,5 @@ input ToggleFollowingInput {
 }
 
 type ToggleFollowingPayload {
-  viewer: Viewer!
-  profile: Profile!
+  webCard: WebCard!
 }

@@ -42,12 +42,12 @@ const SearchResultProfiles = ({
         first: { type: Int, defaultValue: 8 }
         search: { type: "String!" }
       ) {
-        searchProfiles(
+        searchWebCards(
           after: $after
           first: $first
           search: $search
           useLocation: false
-        ) @connection(key: "Viewer_searchProfiles") {
+        ) @connection(key: "Viewer_searchWebCards") {
           edges {
             node {
               ...CoverList_users
@@ -61,9 +61,9 @@ const SearchResultProfiles = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchProfiles?.edges?.map(edge => edge?.node) ?? [],
+      data.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchProfiles?.edges]);
+  }, [data.searchWebCards?.edges]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

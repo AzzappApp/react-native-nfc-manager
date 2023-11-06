@@ -1,0 +1,7 @@
+extend type Mutation {
+  acceptOwnership: AcceptOwnershipPayload
+}
+
+type AcceptOwnershipPayload {
+  profile: Profile
+}

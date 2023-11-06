@@ -18,9 +18,11 @@ const followingsScreenQuery = graphql`
   query FollowingsScreenQuery {
     viewer {
       profile {
-        id
+        webCard {
+          id
+          ...FollowingsScreenList_webCard
+        }
       }
-      ...FollowingsScreenList_viewer
     }
   }
 `;
@@ -75,7 +77,7 @@ const FollowingScreenInner = ({
 }) => {
   const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
 
-  return <FollowingsScreenList viewer={viewer} />;
+  return <FollowingsScreenList webCard={viewer.profile?.webCard ?? null} />;
 };
 export default relayScreen(FollowingsScreen, {
   query: followingsScreenQuery,

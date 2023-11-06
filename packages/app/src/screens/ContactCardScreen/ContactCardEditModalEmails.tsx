@@ -1,29 +1,23 @@
-import { useMemo } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, type LayoutRectangle } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
+import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import {
+  contactCardEditModalStyleSheet,
+  useContactCardEmailLabels,
+} from '#helpers/contactCardHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactCardEditModalField from './ContactCardEditModalField';
-import { contactCardEditModalStyleSheet } from './ContactCardEditModalStyles';
-import type { ContactCardEditForm } from './ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
 
-const ContactCardEditModalPhones = ({
+const ContactCardEditModalEmails = ({
   control,
-  deleted,
-  openDeleteButton,
-  deleteButtonRect,
-  closeDeleteButton,
 }: {
-  control: Control<ContactCardEditForm>;
-  deleted: boolean;
-  openDeleteButton: (changeEvent: LayoutRectangle) => void;
-  deleteButtonRect: LayoutRectangle | null;
-  closeDeleteButton: () => void;
+  control: Control<ContactCardEditFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -32,44 +26,7 @@ const ContactCardEditModalPhones = ({
 
   const intl = useIntl();
 
-  const labelValues = useMemo(
-    () => [
-      {
-        key: 'Home',
-        value: intl.formatMessage({
-          defaultMessage: 'Home',
-          description:
-            '"Home" value as type for an email in Contact Card edition',
-        }),
-      },
-      {
-        key: 'Work',
-        value: intl.formatMessage({
-          defaultMessage: 'Work',
-          description:
-            '"Work" value as type for an email in Contact Card edition',
-        }),
-      },
-      {
-        key: 'Main',
-        value: intl.formatMessage({
-          defaultMessage: 'Main',
-          description:
-            '"Main" value as type for an email in Contact Card edition',
-        }),
-      },
-
-      {
-        key: 'Other',
-        value: intl.formatMessage({
-          defaultMessage: 'Other',
-          description:
-            '"Other" value as type for an email in Contact Card edition',
-        }),
-      },
-    ],
-    [intl],
-  );
+  const labelValues = useContactCardEmailLabels();
 
   const styles = useStyleSheet(contactCardEditModalStyleSheet);
 
@@ -77,10 +34,6 @@ const ContactCardEditModalPhones = ({
     <>
       {fields.map((email, index) => (
         <ContactCardEditModalField
-          deleteButtonRect={deleteButtonRect}
-          deleted={deleted}
-          openDeleteButton={openDeleteButton}
-          closeDeleteButton={closeDeleteButton}
           key={email.id}
           control={control}
           labelKey={`emails.${index}.label`}
@@ -88,6 +41,7 @@ const ContactCardEditModalPhones = ({
           selectedKey={`emails.${index}.selected`}
           deleteField={() => remove(index)}
           keyboardType="email-address"
+          autoCapitalize="none"
           labelValues={labelValues}
           placeholder={intl.formatMessage({
             defaultMessage: 'Enter an email',
@@ -99,7 +53,11 @@ const ContactCardEditModalPhones = ({
         <PressableNative
           style={styles.addButton}
           onPress={() => {
-            append({ label: 'Home', address: '', selected: true });
+            append({
+              label: 'Home',
+              address: '',
+              selected: true,
+            });
           }}
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
@@ -115,4 +73,4 @@ const ContactCardEditModalPhones = ({
   );
 };
 
-export default ContactCardEditModalPhones;
+export default ContactCardEditModalEmails;

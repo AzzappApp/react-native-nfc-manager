@@ -74,7 +74,7 @@ const StaticMediaAddForm = ({
           />
 
           <FormControl sx={{ maxWidth: 300 }}>
-            <InputLabel id="profileKind-label">Resize Mode</InputLabel>
+            <InputLabel id="webCardKind-label">Resize Mode</InputLabel>
             <Select
               labelId={'resizeMode-label'}
               id="resizeMode"

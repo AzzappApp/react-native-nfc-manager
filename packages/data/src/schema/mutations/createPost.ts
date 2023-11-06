@@ -1,8 +1,9 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
-  ProfileTable,
+  WebCardTable,
   checkMedias,
   createPost,
   db,
@@ -17,11 +18,15 @@ const createPostMutation: MutationResolvers['createPost'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
+
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -34,14 +39,14 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     const post = await db.transaction(async trx => {
       await referencesMedias([mediaId], null, trx);
       await trx
-        .update(ProfileTable)
+        .update(WebCardTable)
         .set({
           nbPosts: sql`nbPosts + 1`,
         })
-        .where(eq(ProfileTable.id, profileId));
+        .where(eq(WebCardTable.id, profile.webCardId));
 
       const newPost = {
-        authorId: profileId,
+        webCardId: profile.webCardId,
         content,
         allowComments,
         allowLikes,
@@ -60,7 +65,11 @@ const createPostMutation: MutationResolvers['createPost'] = async (
       };
     });
 
-    cardUsernamesToRevalidate.add(profile.userName);
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+
+    if (webCard) {
+      cardUsernamesToRevalidate.add(webCard.userName);
+    }
     return { post };
   } catch (error) {
     console.error(error);

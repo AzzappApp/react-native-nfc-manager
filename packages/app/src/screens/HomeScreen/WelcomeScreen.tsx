@@ -6,7 +6,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
@@ -22,7 +22,7 @@ import type { ScreenOptions } from '#components/NativeRouter';
 
 const WelcomeScreen = () => {
   const intl = useIntl();
-  useMainTabBarVisiblilityController(false, true);
+  useMainTabBarVisibilityController(false, true);
 
   const [showMenu, toggleShowMenu] = useToggle(false);
 
@@ -30,19 +30,19 @@ const WelcomeScreen = () => {
     dispatchGlobalEvent({ type: 'READY' });
   }, []);
 
-  const { profileId } = useAuthState();
+  const { webCardId } = useAuthState();
 
   const router = useRouter();
 
   const goBackToHome = useCallback(() => {
-    if (profileId) {
+    if (webCardId) {
       router.replaceAll(mainRoutes(false));
     }
-  }, [profileId, router]);
+  }, [webCardId, router]);
 
   useFocusEffect(goBackToHome);
 
-  return profileId ? (
+  return webCardId ? (
     <Container
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >
@@ -81,7 +81,7 @@ const WelcomeScreen = () => {
             }}
           />
         </Text>
-        <Link route="NEW_PROFILE" prefetch>
+        <Link route="NEW_WEBCARD" prefetch>
           <Button
             label={intl.formatMessage(
               {

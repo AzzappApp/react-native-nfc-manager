@@ -19,5 +19,5 @@ input SaveCardStyleInput {
 }
 
 type SaveCardStylePayload {
-  profile: Profile!
+  webCard: WebCard!
 }

@@ -7,7 +7,7 @@ const useLoadCardTemplateMutation = () => {
       $loadCardTemplateInput: LoadCardTemplateInput!
     ) {
       loadCardTemplate(input: $loadCardTemplateInput) {
-        profile {
+        webCard {
           id
           cardStyle {
             borderColor

@@ -17,7 +17,11 @@ import type { PreloadedQuery } from 'react-relay';
 const followingsMosaicScreenQuery = graphql`
   query FollowingsMosaicScreenQuery {
     viewer {
-      ...FollowingsMosaicScreenList_viewer
+      profile {
+        webCard {
+          ...FollowingsMosaicScreenList_webCard
+        }
+      }
     }
   }
 `;
@@ -70,12 +74,11 @@ const FollowingsMosaicScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsMosaicScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(
-    followingsMosaicScreenQuery,
-    preloadedQuery,
-  );
+  const {
+    viewer: { profile },
+  } = usePreloadedQuery(followingsMosaicScreenQuery, preloadedQuery);
 
-  return <FollowingsMosaicScreenList viewer={viewer} />;
+  return <FollowingsMosaicScreenList webCard={profile?.webCard ?? null} />;
 };
 
 export default relayScreen(FollowingsMosaicScreen, {

@@ -68,10 +68,10 @@ const CoverList = ({
 
   const users = useFragment(
     graphql`
-      fragment CoverList_users on Profile @relay(plural: true) {
+      fragment CoverList_users on WebCard @relay(plural: true) {
         id
         userName
-        ...CoverLink_profile
+        ...CoverLink_webCard
       }
     `,
     usersKey,
@@ -108,9 +108,9 @@ const CoverList = ({
         }
       >
         <CoverLink
-          profile={item}
+          webCard={item}
           width={coverWidth}
-          profileId={item.id}
+          webCardId={item.id}
           style={coverStyle}
           onReadyForDisplay={onCoverReady}
         />

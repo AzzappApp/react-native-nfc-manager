@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { generateTokens } from './tokens';
-import type { User, Profile } from '@azzapp/data/domains';
+import type { Profile, User } from '@azzapp/data/domains';
 
-export const handleSigninAuthMethod = async (
+export const handleSignInAuthMethod = async (
   user: User,
   profile: Profile | null | undefined,
 ) => {
@@ -11,7 +11,8 @@ export const handleSigninAuthMethod = async (
   });
   return NextResponse.json({
     ok: true,
-    profileId: profile?.id,
+    webCardId: profile?.webCardId,
+    profileRole: profile?.profileRole,
     userId: user.id,
     token,
     refreshToken,

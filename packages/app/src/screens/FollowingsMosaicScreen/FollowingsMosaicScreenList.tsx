@@ -4,17 +4,17 @@ import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import CoverList from '#components/CoverList';
 import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { FollowingsMosaicScreenList_viewer$key } from '@azzapp/relay/artifacts/FollowingsMosaicScreenList_viewer.graphql';
+import type { FollowingsMosaicScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowingsMosaicScreenList_webCard.graphql';
 
 const FollowingsMosaicScreen = ({
-  viewer,
+  webCard,
 }: {
-  viewer: FollowingsMosaicScreenList_viewer$key;
+  webCard: FollowingsMosaicScreenList_webCard$key | null;
 }) => {
   const { data, loadNext, hasNext, isLoadingNext, isLoadingPrevious, refetch } =
     usePaginationFragment(
       graphql`
-        fragment FollowingsMosaicScreenList_viewer on Viewer
+        fragment FollowingsMosaicScreenList_webCard on WebCard
         @refetchable(queryName: "FollowingsMosaicListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -31,7 +31,7 @@ const FollowingsMosaicScreen = ({
           }
         }
       `,
-      viewer,
+      webCard,
     );
 
   const onEndReached = useCallback(() => {
@@ -42,9 +42,9 @@ const FollowingsMosaicScreen = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.followings?.edges?.map(edge => edge?.node) ?? [],
+      data?.followings?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.followings?.edges]);
+  }, [data?.followings?.edges]);
 
   return (
     <CoverList

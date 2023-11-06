@@ -7,17 +7,17 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
 import styles from './PostFeed.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type PostFeedHeaderProps = {
-  profile: Profile;
+  webCard: WebCard;
   postsCount: number;
   media: Media;
   onClose?: () => void;
 };
 
 const PostFeedHeader = (props: PostFeedHeaderProps) => {
-  const { profile, postsCount, media, onClose } = props;
+  const { webCard, postsCount, media, onClose } = props;
   const share = useRef<ModalActions>(null);
   const download = useRef<ModalActions>(null);
 
@@ -30,7 +30,7 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
           className={styles.close}
         />
         <div className={styles.headerData}>
-          <span className={styles.headerName}>{profile.userName}</span>
+          <span className={styles.headerName}>{webCard.userName}</span>
           <span className={styles.headerPostsCount}>{postsCount} posts</span>
           <Button
             onClick={() => download.current?.open()}
@@ -42,10 +42,10 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
         </div>
         <ButtonIcon Icon={ShareIcon} onClick={() => share.current?.open()} />
       </div>
-      <DownloadAppModal ref={download} profile={profile} media={media} />
+      <DownloadAppModal ref={download} webCard={webCard} media={media} />
       <ShareModal
         ref={share}
-        link={generateShareProfileLink(profile.userName)}
+        link={generateShareProfileLink(webCard.userName)}
       />
     </div>
   );

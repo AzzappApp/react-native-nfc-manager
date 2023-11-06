@@ -14,8 +14,8 @@ import Link from '#components/Link';
 import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { HomeInformations_profile$key } from '@azzapp/relay/artifacts/HomeInformations_profile.graphql';
 import type { HomeInformations_user$key } from '@azzapp/relay/artifacts/HomeInformations_user.graphql';
+import type { HomeInformations_webCard$key } from '@azzapp/relay/artifacts/HomeInformations_webCard.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
@@ -39,21 +39,23 @@ const HomeInformations = ({
   user,
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
-  const { profiles: profilesKey } = useFragment(
+  const { profiles } = useFragment(
     graphql`
       fragment HomeInformations_user on User {
         profiles {
-          id
-          ...HomeInformations_profile
+          webCard {
+            id
+            ...HomeInformations_webCard
+          }
         }
       }
     `,
     user,
   );
 
-  const profiles = useMultiActorEnvironmentPluralFragment(
+  const webCards = useMultiActorEnvironmentPluralFragment(
     graphql`
-      fragment HomeInformations_profile on Profile {
+      fragment HomeInformations_webCard on WebCard {
         id
         userName
         firstName
@@ -63,13 +65,13 @@ const HomeInformations = ({
         nbPostsLiked
       }
     `,
-    (profile: any) => profile.id,
-    profilesKey as unknown as HomeInformations_profile$key[],
+    (webCard: any) => webCard.id,
+    profiles?.map(p => p.webCard) as unknown as HomeInformations_webCard$key[],
   );
 
   // using relay result direclty inside animated hook cause crash
   const infosShared = useSharedValue(
-    profiles?.map(profile => {
+    webCards?.map(profile => {
       return {
         nbPosts: profile.nbPosts,
         nbFollowings: profile.nbFollowings,
@@ -81,8 +83,8 @@ const HomeInformations = ({
 
   useEffect(() => {
     //updating the infosShared when profiles changed (after creating a new profile)
-    if (profiles) {
-      infosShared.value = profiles?.map(profile => {
+    if (webCards) {
+      infosShared.value = webCards?.map(profile => {
         return {
           nbPosts: profile.nbPosts,
           nbFollowings: profile.nbFollowings,
@@ -92,7 +94,7 @@ const HomeInformations = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profiles]);
+  }, [webCards]);
 
   //TODO: reanmiated 3 and computedValue for better performance
   const nbPosts = useSharedValue(format(infosShared.value[0].nbPosts ?? 0));
@@ -105,10 +107,10 @@ const HomeInformations = ({
   );
 
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
-  const [currentProfile, setCurrentProfile] = useState(profiles?.[0]);
+  const [currentProfile, setCurrentProfile] = useState(webCards?.[0]);
   const defineCurrentProfile = (index: number) => {
-    if (profiles && index >= 0 && index < profiles.length) {
-      setCurrentProfile(profiles[index]);
+    if (webCards && index >= 0 && index < webCards.length) {
+      setCurrentProfile(webCards[index]);
     }
   };
 
@@ -165,7 +167,7 @@ const HomeInformations = ({
         );
       }
     },
-    [animated, profiles],
+    [animated, webCards],
   );
 
   if (!currentProfile) {
@@ -176,10 +178,10 @@ const HomeInformations = ({
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
         <Link
-          route="PROFILE"
+          route="WEBCARD"
           params={{
             userName: currentProfile.userName,
-            profileId: currentProfile.id,
+            webCardId: currentProfile.id,
             showPosts: true,
           }}
         >

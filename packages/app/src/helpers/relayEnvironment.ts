@@ -105,11 +105,11 @@ export const createNetwork = (actorId: string) => {
         'azzapp-appVersion': APP_VERSION,
       };
 
-      const profileId = actorId === ROOT_ACTOR_ID ? null : actorId;
+      const webCardId = actorId === ROOT_ACTOR_ID ? null : actorId;
 
-      if (profileId) {
-        const { id } = fromGlobalId(profileId);
-        headers['azzapp-profileId'] = id;
+      if (webCardId) {
+        const { id } = fromGlobalId(webCardId);
+        headers['azzapp-webCardId'] = id;
       }
 
       const locale = getCurrentLocale();

@@ -143,13 +143,13 @@ describe('CoverEditionScreen', () => {
 
 //   const renderCoverEditionScreen = ({
 //     coverData = null,
-//     profileKind = 'personal',
+//     webCardKind = 'personal',
 //     templateData = [],
 //     ...props
 //   }: Partial<
 //     CoverEditionScreenProps & {
 //       coverData: CoverData | null;
-//       profileKind: 'business' | 'personal';
+//       webCardKind: 'business' | 'personal';
 //       templateData: Array<TemplateData | null>;
 //     }
 //   > = {}) => {
@@ -167,7 +167,7 @@ describe('CoverEditionScreen', () => {
 //             firstName: '',
 //             lastName: '',
 //             companyName: '',
-//             profileKind,
+//             webCardKind,
 //             colorPalette: ['#233423'],
 //           },
 //           coverBackgrounds: range(10).map(i => ({
@@ -848,7 +848,7 @@ describe('CoverEditionScreen', () => {
 //     expect(screen.queryByText('Cancel')).toBeTruthy();
 //   });
 
-//   test('Button `save` should enable if the sourceMedia is empty with a personal profileKind', async () => {
+//   test('Button `save` should enable if the sourceMedia is empty with a personal webCardKind', async () => {
 //     renderCoverEditionScreen({
 //       templateData: [{ suggested: true, data: fakeCover }],
 //     });
@@ -864,9 +864,9 @@ describe('CoverEditionScreen', () => {
 //   });
 
 //   // in any case the save button will be enable, if suggested template, the source media is used, otherwise a alert is shown
-//   test('Button `save` should be enable if the sourceMedia is empty with a business profileKind and a suggested template exist', async () => {
+//   test('Button `save` should be enable if the sourceMedia is empty with a business webCardKind and a suggested template exist', async () => {
 //     renderCoverEditionScreen({
-//       profileKind: 'business',
+//       webCardKind: 'business',
 //       templateData: [{ suggested: true, data: fakeCover }],
 //     });
 //     let saveButton = screen.getByText('Save');
@@ -928,7 +928,7 @@ describe('CoverEditionScreen', () => {
 
 //   test('should load the template definition with source media  in case of business and suggested cover exist', async () => {
 //     renderCoverEditionScreen({
-//       profileKind: 'business',
+//       webCardKind: 'business',
 //       coverData: null,
 //       templateData: [{ ...fakeTemplate, suggested: true }],
 //     });
