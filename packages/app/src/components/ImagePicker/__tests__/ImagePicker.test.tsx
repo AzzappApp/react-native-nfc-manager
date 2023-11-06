@@ -275,7 +275,7 @@ describe('ImagePicker', () => {
         fireEvent.press(screen.getByLabelText('Take a video'));
       });
       const cameraControlPanel = screen.getByTestId('camera-control-panel');
-      console.log(mockCameraViewRef);
+
       mockCameraViewRef.startRecording.mockReturnValueOnce({
         end: () =>
           Promise.resolve({

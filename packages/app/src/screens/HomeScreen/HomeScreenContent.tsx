@@ -1,5 +1,12 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  StatusBar,
+  Platform,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  PixelRatio,
+} from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -179,19 +186,33 @@ const HomeScreenContent = ({
   const insets = useScreenInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
-  const contentHeight =
-    windowHeight -
-    insets.top -
-    HOME_HEADER_HEIGHT -
-    PROFILE_LINK_HEIGHT -
-    PROFILE_LINK_MARGIN_TOP -
-    BOTTOM_MENU_GAP -
-    BOTTOM_MENU_HEIGHT -
-    insets.bottom;
+  // windowsHeight return by android can have some issue (navbar/statusbar).
+  ///navbar is not included in useWindowsDimensions.onLayout is the way to go in case of further ratio issue on multiple android
+  const contentHeight = useMemo(
+    () =>
+      Math.floor(windowHeight) -
+      insets.top -
+      HOME_HEADER_HEIGHT -
+      PROFILE_LINK_HEIGHT -
+      PROFILE_LINK_MARGIN_TOP -
+      BOTTOM_MENU_GAP -
+      BOTTOM_MENU_HEIGHT -
+      insets.bottom -
+      (Platform.OS === 'android' ? StatusBar?.currentHeight ?? 0 : 0),
+    [insets.bottom, insets.top, windowHeight],
+  );
 
-  const bottomPanelHeight =
-    (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT;
-  const carouselHeight = contentHeight - bottomPanelHeight;
+  const bottomPanelHeight = useMemo(() => {
+    return PixelRatio.roundToNearestPixel(
+      (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT,
+    );
+  }, [windowWidth]);
+
+  //used PixelRatio because different amount of pixels per square inch on android.
+  const carouselHeight = useMemo(
+    () => PixelRatio.roundToNearestPixel(contentHeight - bottomPanelHeight),
+    [bottomPanelHeight, contentHeight],
+  );
   // #endregion
 
   return (
@@ -222,7 +243,6 @@ const HomeScreenContent = ({
           }
           initialProfileIndex={initialProfileIndex}
         />
-
         <HomeBottomPanel
           height={bottomPanelHeight}
           user={user}

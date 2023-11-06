@@ -161,20 +161,6 @@ function CarouselSelectList<TItem = any>(
     [itemWidth],
   );
 
-  // const CellRenderer = useMemo(() => {
-  //   const CellRenderer = ({
-  //     index,
-  //     children,
-  //     style: _,
-  //     ...props
-  //   }: PropsWithChildren<{
-  //     index: number;
-  //     style: StyleProp<ViewStyle>;
-  //   }>) => {};
-  //   return CellRenderer;
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [itemWidth, scrollX, scaleRatio, width]);
-
   const offset = useMemo(
     () => (itemWidth - itemWidth * scaleRatio) / 2,
     [itemWidth, scaleRatio],
@@ -188,10 +174,11 @@ function CarouselSelectList<TItem = any>(
       {
         paddingLeft: (width - itemWidth) / 2,
         paddingRight: (width - itemWidth) / 2,
+        height,
       },
       contentContainerStyle,
     ];
-  }, [contentContainerStyle, itemWidth, width]);
+  }, [contentContainerStyle, height, itemWidth, width]);
 
   const renderAnimatedItem = useCallback(
     (info: ListRenderItemInfo<TItem>) => {

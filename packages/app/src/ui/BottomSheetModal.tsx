@@ -193,33 +193,33 @@ const BottomSheetModal = ({
       onRequestClose={onRequestClose}
       {...props}
     >
-      <TouchableWithoutFeedback
-        style={styles.absoluteFill}
-        onPress={onRequestClose}
-      >
-        <View style={styles.absoluteFill}>
-          {variant === 'modal' && (
-            <Animated.View
-              style={[
-                styles.absoluteFill,
-                {
-                  backgroundColor: colors.black,
-                  opacity: animation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, 0.8],
-                  }),
-                },
-              ]}
-            />
-          )}
-        </View>
-      </TouchableWithoutFeedback>
       <KeyboardAvoidingView
         style={styles.modalContainer}
         behavior="position"
         contentContainerStyle={styles.absoluteFill}
         enabled={!disableKeyboardAvoidingView}
       >
+        <TouchableWithoutFeedback
+          style={styles.absoluteFill}
+          onPress={onRequestClose}
+        >
+          <View style={styles.absoluteFill}>
+            {variant === 'modal' && (
+              <Animated.View
+                style={[
+                  styles.absoluteFill,
+                  {
+                    backgroundColor: colors.black,
+                    opacity: animation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 0.8],
+                    }),
+                  },
+                ]}
+              />
+            )}
+          </View>
+        </TouchableWithoutFeedback>
         <Animated.View
           {...pan?.current.panHandlers}
           style={[

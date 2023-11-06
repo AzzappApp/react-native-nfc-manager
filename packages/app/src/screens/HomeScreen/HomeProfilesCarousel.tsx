@@ -8,7 +8,12 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet } from 'react-native';
+import {
+  View,
+  useWindowDimensions,
+  StyleSheet,
+  PixelRatio,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -83,10 +88,10 @@ const HomeProfilesCarousel = (
 
   const { width: windowWidth } = useWindowDimensions();
   const coverHeight = height - 2 * VERTICAL_MARGIN;
-  const coverWidth = Math.trunc(coverHeight * COVER_RATIO);
-
+  const coverWidth = PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex + 1);
+
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       setSelectedIndex(index);
@@ -163,7 +168,7 @@ const HomeProfilesCarousel = (
     [profiles],
   );
 
-  if (height <= 0 || profiles == null) {
+  if (profiles == null) {
     return null;
   }
 

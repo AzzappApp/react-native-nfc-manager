@@ -26,9 +26,10 @@ const CoverLink = ({
     ],
     [style, props.width],
   );
+
   return (
-    <Link route="PROFILE" params={props} prefetch={prefetch} onPress={onPress}>
-      <PressableScaleHighlight style={containerStyle}>
+    <Link route="PROFILE" params={props} prefetch={prefetch}>
+      <PressableScaleHighlight style={containerStyle} onPress={onPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
     </Link>

@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -28,6 +28,7 @@ const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
+  //this code work on ios only
   const onDismiss = () => {
     if (requestedLogout) {
       void dispatchGlobalEvent({ type: 'SIGN_OUT' });
@@ -35,8 +36,14 @@ const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
   };
   //TODO: review Using onDismiss to logout (strange) but without it, the app is crashing in dev
   const onLogout = useCallback(async () => {
-    toggleRequestLogout();
+    if (Platform.OS === 'ios') {
+      toggleRequestLogout();
+    }
     close();
+    if (Platform.OS === 'android') {
+      //android is not crashing, but onDismiss is an ios feature only
+      void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+    }
   }, [close, toggleRequestLogout]);
 
   return (

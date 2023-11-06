@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Platform, Pressable, View, useColorScheme } from 'react-native';
+import { Platform, Pressable, useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,
@@ -67,7 +67,13 @@ const Button = (
 
   if (Platform.OS === 'android') {
     return (
-      <View style={[variantStyles.androidContainer, style]}>
+      <View
+        style={[
+          variantStyles.androidContainer,
+          style,
+          variantStyles.androidNoPadding,
+        ]}
+      >
         <Pressable
           {...buttonProps}
           style={[
@@ -120,6 +126,15 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     androidContainer: {
       borderRadius: 12,
       overflow: 'hidden',
+    },
+    androidNoPadding: {
+      padding: 0,
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
     },
   },
   primary: {
