@@ -1,5 +1,6 @@
-## 0.5.1-canary.52
+## 0.5.1-canary.53
 
+* **fix:**  - **android:** [#1561](https://github.com/AzzappApp/azzapp/pull/1561) pause video during export to avoid crash on android ([#1577](https://github.com/AzzappApp/azzapp/pull/1577))
 * **feat:**  - 🎸 add option to fetch with network for profile ([#1567](https://github.com/AzzappApp/azzapp/pull/1567))
 * **fix:**  - **cover:** [#1222](https://github.com/AzzappApp/azzapp/pull/1222) remove autoCapitalize on url typing ([#1578](https://github.com/AzzappApp/azzapp/pull/1578))
 * **Android:**  - Home && fix ([#1565](https://github.com/AzzappApp/azzapp/pull/1565))
