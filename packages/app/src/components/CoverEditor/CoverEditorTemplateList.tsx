@@ -79,6 +79,7 @@ export type CoverEditorProps = {
     height: number;
   }) => void;
   showSuggestedMedia: boolean;
+  videoPaused: boolean;
 };
 
 const CoverEditorTemplateList = ({
@@ -102,6 +103,7 @@ const CoverEditorTemplateList = ({
   onColorPaletteChange,
   onPreviewMediaChange,
   onSelectedIndexChange,
+  videoPaused,
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
@@ -533,7 +535,7 @@ const CoverEditorTemplateList = ({
             }
             computing={mediaComputing}
             height={carouselHeight}
-            paused={!isSelectedItem}
+            paused={!isSelectedItem || videoPaused}
             style={styles.templateItemContainer}
           />
         </PressableScaleHighlight>
@@ -548,6 +550,7 @@ const CoverEditorTemplateList = ({
       cardColors,
       mediaComputing,
       carouselHeight,
+      videoPaused,
       styles.templateItemContainer,
       onNextColorPalette,
       scrollToIndex,

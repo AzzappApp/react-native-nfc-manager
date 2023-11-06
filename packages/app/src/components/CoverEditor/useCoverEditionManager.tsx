@@ -970,6 +970,7 @@ const useCoverEditionManager = ({
     setTemplateKind,
     onSave,
     selectSuggestedMedia: setSuggestedMedia,
+    progressIndicator,
   };
 };
 

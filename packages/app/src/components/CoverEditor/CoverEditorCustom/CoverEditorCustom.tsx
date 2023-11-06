@@ -141,6 +141,7 @@ const CoverEditorCustom = ({
     setOtherColors,
     openImagePicker,
     onSave,
+    progressIndicator,
   } = useCoverEditionManager({
     initialData,
     initialColorPalette,
@@ -410,6 +411,7 @@ const CoverEditorCustom = ({
               onError={onMediaError}
               height={coverHeight}
               colorPalette={colorPalette}
+              paused={!!progressIndicator}
             />
           </PressableNative>
           {activeSourceMedia && !editedParameter && (

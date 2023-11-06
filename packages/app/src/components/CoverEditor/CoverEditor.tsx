@@ -113,6 +113,7 @@ const CoverEditor = (
     selectSuggestedMedia,
     updateEditedMediaKind,
     setTemplateKind,
+    progressIndicator,
   } = useCoverEditionManager({
     initialData: null,
     initialColorPalette: null,
@@ -320,6 +321,7 @@ const CoverEditor = (
               showTemplatesMedias={!mediaVisible}
               title={title}
               subTitle={subTitle}
+              videoPaused={!!progressIndicator}
               width={templateListWidth}
               height={templateListHeight}
               mediaCropParameters={mediaCropParameter}
