@@ -9,9 +9,6 @@ const config = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
-  experimental: {
-    serverActions: true,
-  },
   modularizeImports: {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}',

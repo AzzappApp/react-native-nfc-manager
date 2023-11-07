@@ -4,9 +4,6 @@ import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 // import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
 
-const fetchFunction =
-  process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
-
 export const ConnectionMonitorer = {
   concurrentRequestsCount: 0,
   queries: [] as any[],
@@ -32,10 +29,8 @@ const connection = connect({
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    return fetchFunction(input, init);
-    /* monitorRequest(init);
-
+  /*  async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
+    monitorRequest(init);
     let response: Response;
     try {
       if (process.env.NODE_ENV !== 'production') {
@@ -48,8 +43,8 @@ const connection = connect({
     } finally {
       monitorRequestEnd();
     }
-    return response;*/
-  },
+    return response;
+  },*/
 });
 
 const db = drizzle(connection);

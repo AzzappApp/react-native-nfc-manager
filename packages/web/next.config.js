@@ -54,7 +54,6 @@ const config = {
     //     },
     //   ],
     // ],
-    serverActions: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
   sentry: {
