@@ -1,5 +1,6 @@
-## 0.5.1-canary.60
+## 0.5.1-canary.61
 
+* **fix:**  - **cover:** [#1574](https://github.com/AzzappApp/azzapp/pull/1574) adapt slider behavior per platform ([#1583](https://github.com/AzzappApp/azzapp/pull/1583))
 * **build:**  - make an independant install of vercel-cli
 * **build:**  - try to transpile `string-width`
 * **feat:**  - nextJSv14.0.1 ([#1586](https://github.com/AzzappApp/azzapp/pull/1586))
