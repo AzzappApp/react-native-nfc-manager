@@ -1,7 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import range from 'lodash/range';
 import { memo, useMemo } from 'react';
-import { View, useColorScheme, useWindowDimensions } from 'react-native';
+import {
+  Platform,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
@@ -13,6 +18,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { useThrottledCallback } from 'use-debounce';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ViewProps } from 'react-native';
@@ -90,6 +96,13 @@ const DashedSlider = ({
 
   const animationOffsetValue = useSharedValue(0);
 
+  const debouncedUpdate = useThrottledCallback(
+    onChange,
+    // delay in ms
+    Platform.OS === 'android' ? 200 : 20,
+    { trailing: false, leading: false },
+  );
+
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       animationOffsetValue.value = pan.value;
@@ -100,6 +113,8 @@ const DashedSlider = ({
         Math.max(animationOffsetValue.value - dval, min),
         max,
       );
+
+      runOnJS(debouncedUpdate)(pan.value);
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
