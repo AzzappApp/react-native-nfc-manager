@@ -55,12 +55,7 @@ const config = {
     //   ],
     // ],
   },
-  transpilePackages: [
-    '@azzapp/shared/',
-    '@azzapp/data',
-    '@azzapp/relay',
-    'string-width',
-  ],
+  transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
   sentry: {
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,

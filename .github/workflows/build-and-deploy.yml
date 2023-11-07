@@ -269,7 +269,7 @@ jobs:
       #
       ############################################
       - name: Install Vercel CLI
-        run: yarn global add vercel@latest
+        run: npm i -g vercel@latest
 
       - name: Azzapp Web - Pull Vercel configuration 
         env:
