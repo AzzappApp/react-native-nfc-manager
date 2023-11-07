@@ -1,5 +1,6 @@
-## 0.5.1-canary.58
+## 0.5.1-canary.59
 
+* **build:**  - try to transpile `string-width`
 * **feat:**  - nextJSv14.0.1 ([#1586](https://github.com/AzzappApp/azzapp/pull/1586))
 * **build:**  - force esm version of the module
 * **build:**  - remove unused dependency
