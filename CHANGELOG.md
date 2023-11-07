@@ -1,5 +1,6 @@
-## 0.5.1-canary.59
+## 0.5.1-canary.60
 
+* **build:**  - make an independant install of vercel-cli
 * **build:**  - try to transpile `string-width`
 * **feat:**  - nextJSv14.0.1 ([#1586](https://github.com/AzzappApp/azzapp/pull/1586))
 * **build:**  - force esm version of the module
