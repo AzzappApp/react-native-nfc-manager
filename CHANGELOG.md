@@ -1,5 +1,6 @@
-## 0.5.1-canary.56
+## 0.5.1-canary.57
 
+* **build:**  - remove unused dependency
 * **docs:**  - fix typos
 * **fix:**  - **CoverEdition:** complete refactoring ([#1575](https://github.com/AzzappApp/azzapp/pull/1575))
 * **feat:**  - 🎸 refresh medias ([#1581](https://github.com/AzzappApp/azzapp/pull/1581))
