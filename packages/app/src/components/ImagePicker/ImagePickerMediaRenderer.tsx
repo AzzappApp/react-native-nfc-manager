@@ -127,6 +127,7 @@ const ImagePickerMediaRenderer = ({
                 lutFilterUri={
                   isFilter(mediaFilter) ? FILTERS[mediaFilter] : null
                 }
+                backgroundColor="#FFFFFF"
               />
             </GPUImageView>
           ) : (

@@ -44,6 +44,7 @@ const exportMedia = async ({
           uri,
           lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
           parameters: editionParameters ?? {},
+          backgroundColor: '#FFFFFF',
         },
       ],
       size,
