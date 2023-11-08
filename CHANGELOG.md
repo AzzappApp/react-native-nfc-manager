@@ -1,5 +1,6 @@
-## 0.5.1-canary.66
+## 0.5.1-canary.67
 
+* **fix:**  - restore backgroundColor on ProfileScreen ([#1607](https://github.com/AzzappApp/azzapp/pull/1607))
 * **fix:**  - **WebCard:** layout at appear ([#1588](https://github.com/AzzappApp/azzapp/pull/1588))
 * **fix:**  - [#1595](https://github.com/AzzappApp/azzapp/pull/1595) ([#1596](https://github.com/AzzappApp/azzapp/pull/1596))
 * **Android:**  - more fix ([#1580](https://github.com/AzzappApp/azzapp/pull/1580))
