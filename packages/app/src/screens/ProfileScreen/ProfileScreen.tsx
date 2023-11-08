@@ -422,7 +422,7 @@ export default relayScreen(ProfileScreen, {
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: 'transparent' },
   front: {
     flex: 1,
     height: '100%',

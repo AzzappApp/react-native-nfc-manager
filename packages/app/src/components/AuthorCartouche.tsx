@@ -200,7 +200,7 @@ const AuthorCartoucheContent = ({
           )}
         </View>
       ) : (
-        mediaSource && <View style={styles.image} />
+        <View style={styles.image} />
       )}
       {!hideUserName && (
         <Text

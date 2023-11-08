@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useRef } from 'react';
-import { type HostComponent } from 'react-native';
+import { type HostComponent, StyleSheet } from 'react-native';
 import NativeMediaImageRenderer from './NativeMediaImageRenderer';
 import type { MediaImageRendererProps } from './mediasTypes';
 import type { ForwardedRef } from 'react';
@@ -56,7 +56,7 @@ const MediaImageRenderer = (
       accessibilityLabel={alt}
       onLoad={onImageLoad}
       onPlaceHolderImageLoad={onPlaceHolderImageLoad}
-      style={style}
+      style={[style, styles.mediaImage]}
       tintColor={tintColor}
       {...props}
     />
@@ -64,3 +64,7 @@ const MediaImageRenderer = (
 };
 
 export default forwardRef(MediaImageRenderer);
+
+const styles = StyleSheet.create({
+  mediaImage: { overflow: 'hidden' },
+});
