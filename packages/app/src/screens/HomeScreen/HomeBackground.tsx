@@ -15,6 +15,8 @@ import {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
+import type { HomeBackground_profileColors$key } from '@azzapp/relay/artifacts/HomeBackground_profileColors.graphql';
 import type { HomeBackground_user$key } from '@azzapp/relay/artifacts/HomeBackground_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -29,19 +31,30 @@ const HomeBackground = ({
 }: HomeBackgroundProps) => {
   const { width, height } = useWindowDimensions();
 
-  const { profiles } = useFragment(
+  const user = useFragment(
     graphql`
       fragment HomeBackground_user on User {
         profiles {
           id
-          cardColors {
-            primary
-            dark
-          }
+          ...HomeBackground_profileColors
         }
       }
     `,
     userKey,
+  );
+
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeBackground_profileColors on Profile {
+        id
+        cardColors {
+          dark
+          primary
+        }
+      }
+    `,
+    (profile: any) => profile.id,
+    user.profiles as readonly HomeBackground_profileColors$key[],
   );
 
   const inputRange = _.range(0, profiles?.length);
