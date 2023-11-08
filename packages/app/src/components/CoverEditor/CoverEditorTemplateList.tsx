@@ -2,7 +2,7 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -26,6 +26,7 @@ import {
   type EditionParameters,
 } from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
@@ -459,6 +460,7 @@ const CoverEditorTemplateList = ({
 
   const carouselHeight = height - PALETTE_LIST_HEIGHT - GAP;
   const templateWidth = COVER_RATIO * carouselHeight;
+  const { width: windowWidth } = useWindowDimensions();
 
   const styles = useStyleSheet(styleSheet);
 
@@ -592,6 +594,21 @@ const CoverEditorTemplateList = ({
         onEndReached={onEndTemplateReached}
         extraData={selectedItemId}
       />
+      {isLoadingNext && (
+        <View
+          style={{
+            position: 'absolute',
+            height: carouselHeight,
+            width: windowWidth / 4,
+            right: (width - windowWidth) / 2,
+            top: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ActivityIndicator />
+        </View>
+      )}
       <View
         style={{
           height: PALETTE_LIST_HEIGHT,
