@@ -1,5 +1,8 @@
-## 0.5.1-canary.61
+## 0.5.1-canary.62
 
+* **feat:**  - **CardEdition:** adapt icon color to background in color picker ([#1593](https://github.com/AzzappApp/azzapp/pull/1593))
+* **feat:**  - **Post:** make post background white ([#1592](https://github.com/AzzappApp/azzapp/pull/1592))
+* **feat:**  - **CoverEdition:** add load more indicator ([#1591](https://github.com/AzzappApp/azzapp/pull/1591))
 * **fix:**  - **cover:** [#1574](https://github.com/AzzappApp/azzapp/pull/1574) adapt slider behavior per platform ([#1583](https://github.com/AzzappApp/azzapp/pull/1583))
 * **build:**  - make an independant install of vercel-cli
 * **build:**  - try to transpile `string-width`
