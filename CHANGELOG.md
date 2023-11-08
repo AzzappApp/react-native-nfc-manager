@@ -1,5 +1,6 @@
-## 0.5.1-canary.62
+## 0.5.1-canary.63
 
+* **fix:**  - always display azzapp.com in  home header
 * **feat:**  - **CardEdition:** adapt icon color to background in color picker ([#1593](https://github.com/AzzappApp/azzapp/pull/1593))
 * **feat:**  - **Post:** make post background white ([#1592](https://github.com/AzzappApp/azzapp/pull/1592))
 * **feat:**  - **CoverEdition:** add load more indicator ([#1591](https://github.com/AzzappApp/azzapp/pull/1591))
