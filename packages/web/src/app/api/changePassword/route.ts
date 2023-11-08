@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import { bcrypt } from 'hash-wasm';
+import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import { Twilio } from 'twilio';
 import {
@@ -7,7 +7,6 @@ import {
   getUserByPhoneNumber,
   getUserByEmail,
 } from '@azzapp/data/domains';
-import { getCrypto } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 
@@ -48,14 +47,8 @@ export const POST = async (req: Request) => {
       : await getUserByPhoneNumber(issuer);
 
     if (user) {
-      const salt = new Uint8Array(16);
-      getCrypto().getRandomValues(salt);
       await updateUser(user.id, {
-        password: await bcrypt({
-          password,
-          salt,
-          costFactor: 12,
-        }),
+        password: bcrypt.hashSync(password, 12),
       });
       return NextResponse.json({ ok: true });
     }

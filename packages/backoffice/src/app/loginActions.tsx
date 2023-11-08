@@ -1,5 +1,5 @@
 'use server';
-import { bcryptVerify } from 'hash-wasm';
+import * as bcrypt from 'bcrypt-ts';
 import { redirect } from 'next/navigation';
 import isEmail from 'validator/lib/isEmail';
 import { getUserByEmail } from '@azzapp/data/domains';
@@ -33,12 +33,7 @@ export const login = async (data: FormData): Promise<LoginErrors | null> => {
     return { failed: 'Invalid email or password' };
   }
 
-  if (
-    !(await bcryptVerify({
-      password,
-      hash: user.password!,
-    }))
-  ) {
+  if (!bcrypt.compareSync(password, user.password!)) {
     return { failed: 'Invalid email or password' };
   }
 

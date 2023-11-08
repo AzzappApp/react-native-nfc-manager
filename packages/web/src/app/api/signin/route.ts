@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import { bcryptVerify } from 'hash-wasm';
+import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import {
   getProfileByUserName,
@@ -63,7 +63,7 @@ const signin = async (req: Request) => {
 
     //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
     // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
-    if (!(await bcryptVerify({ password, hash: user.password }))) {
+    if (!bcrypt.compareSync(password, user.password)) {
       return NextResponse.json(
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
