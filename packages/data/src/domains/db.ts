@@ -1,8 +1,23 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { connect } from '@planetscale/database';
 import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-// import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
+import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
+
+let fetchFunction: typeof fetch;
+
+if (process.env.NEXT_RUNTIME !== 'edge') {
+  let nodeFetch: typeof import('node-fetch');
+  fetchFunction = async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (!nodeFetch) {
+      nodeFetch = await import('node-fetch');
+    }
+    return nodeFetch.default(input as any, init as any) as any;
+  };
+} else {
+  fetchFunction = fetch;
+}
 
 export const ConnectionMonitorer = {
   concurrentRequestsCount: 0,
@@ -29,22 +44,22 @@ const connection = connect({
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  /*  async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    monitorRequest(init);
+  async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
+    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+      monitorRequest(init);
+    }
     let response: Response;
     try {
-      if (process.env.NODE_ENV !== 'production') {
-        response = await fetchFunction(input, init);
-      } else {
-        response = await limit(() => fetchFunction(input, init));
-      }
+      response = await fetchFunction(input, init);
     } catch (e) {
       throw e as any;
     } finally {
-      monitorRequestEnd();
+      if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+        monitorRequestEnd();
+      }
     }
     return response;
-  },*/
+  },
 });
 
 const db = drizzle(connection);
