@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import * as bcrypt from 'bcrypt-ts';
+import { bcrypt, bcryptVerify } from 'hash-wasm';
 import { NextResponse } from 'next/server';
 import {
   createUser,
@@ -7,6 +7,7 @@ import {
   getUserByPhoneNumber,
   getUserProfiles,
 } from '@azzapp/data/domains';
+import { getCrypto } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
@@ -48,7 +49,10 @@ export const POST = async (req: Request) => {
         try {
           //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
           // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
-          if (user?.password && bcrypt.compareSync(password, user.password)) {
+          if (
+            user?.password &&
+            (await bcryptVerify({ password, hash: user.password }))
+          ) {
             // we can log the user
             const [profile] = await getUserProfiles(user.id);
             return await handleSigninAuthMethod(user, profile);
@@ -73,7 +77,13 @@ export const POST = async (req: Request) => {
         try {
           //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
           // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
-          if (user?.password && bcrypt.compareSync(password, user.password)) {
+          if (
+            user?.password &&
+            (await bcryptVerify({
+              password,
+              hash: user.password,
+            }))
+          ) {
             // we can log the user
             const [profile] = await getUserProfiles(user.id);
             await handleSigninAuthMethod(user, profile);
@@ -91,10 +101,17 @@ export const POST = async (req: Request) => {
       }
     }
 
+    const salt = new Uint8Array(16);
+    getCrypto().getRandomValues(salt);
+
     const userId = await createUser({
       email: email ?? null,
       phoneNumber: phoneNumber?.replace(/\s/g, '') ?? null,
-      password: bcrypt.hashSync(password, 12),
+      password: await bcrypt({
+        password,
+        salt,
+        costFactor: 12,
+      }),
       roles: null,
     });
 

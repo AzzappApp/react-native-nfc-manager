@@ -1,4 +1,5 @@
-import * as bcrypt from 'bcrypt-ts';
+import { bcrypt, bcryptVerify } from 'hash-wasm';
+import { getCrypto } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
@@ -50,12 +51,21 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     if (
       !currentPassword ||
       !dbUser.password ||
-      !bcrypt.compareSync(currentPassword, dbUser.password)
+      !(await bcryptVerify({
+        password: currentPassword,
+        hash: dbUser.password,
+      }))
     ) {
       throw new Error(ERRORS.INVALID_CREDENTIALS);
     }
 
-    partialUser.password = bcrypt.hashSync(newPassword, 12);
+    const salt = new Uint8Array(16);
+    getCrypto().getRandomValues(salt);
+    partialUser.password = await bcrypt({
+      password: newPassword,
+      salt,
+      costFactor: 12,
+    });
   }
 
   try {
