@@ -1,5 +1,7 @@
-## 0.5.1-canary.64
+## 0.5.1-canary.65
 
+* **fix:**  - **WebCard:** layout at appear ([#1588](https://github.com/AzzappApp/azzapp/pull/1588))
+* **fix:**  - [#1595](https://github.com/AzzappApp/azzapp/pull/1595) ([#1596](https://github.com/AzzappApp/azzapp/pull/1596))
 * **Android:**  - more fix ([#1580](https://github.com/AzzappApp/azzapp/pull/1580))
 * **fix:**  - use node-fetch ([#1587](https://github.com/AzzappApp/azzapp/pull/1587))
 * **fix:**  - always display azzapp.com in  home header
