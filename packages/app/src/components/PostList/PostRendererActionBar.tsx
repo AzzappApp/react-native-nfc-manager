@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -69,6 +69,10 @@ const PostRendererActionBar = ({
   const [reaction, setReaction] = useState<ReactionKind | null>(
     viewerPostReaction,
   );
+
+  useEffect(() => {
+    setReaction(viewerPostReaction);
+  }, [viewerPostReaction]);
 
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
@@ -156,70 +160,72 @@ const PostRendererActionBar = ({
   };
 
   return (
-    <View {...props} style={[styles.container, style]}>
-      <View style={{ flexDirection: 'row' }}>
-        {allowLikes && (
+    <>
+      <View {...props} style={[styles.container, style]}>
+        <View style={{ flexDirection: 'row' }}>
+          {allowLikes && (
+            <IconButton
+              //TODO create an animation for the like button later ? design team
+              icon={reaction ? 'like_filled' : 'like'}
+              style={styles.icon}
+              onPress={toggleReaction}
+              variant="icon"
+              accessibilityState={{ checked: !!reaction }}
+              accessibilityLabel={
+                reaction
+                  ? intl.formatMessage({
+                      defaultMessage: 'Like the post',
+                      description:
+                        'PostRendererActionBar like button accessibility',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'Unlike the post',
+                      description:
+                        'PostRendererActionBar unlike button accessibility',
+                    })
+              }
+            />
+          )}
+          {allowComments && (
+            <IconButton
+              icon="comment"
+              style={styles.icon}
+              onPress={goToComments}
+              variant="icon"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Comment the post',
+                description:
+                  'PostRendererActionBar Comment post button accessibility',
+              })}
+            />
+          )}
           <IconButton
-            //TODO create an animation for the like button later ? design team
-            icon={reaction ? 'like_filled' : 'like'}
+            icon="share"
             style={styles.icon}
-            onPress={toggleReaction}
             variant="icon"
-            accessibilityState={{ checked: !!reaction }}
-            accessibilityLabel={
-              reaction
-                ? intl.formatMessage({
-                    defaultMessage: 'Like the post',
-                    description:
-                      'PostRendererActionBar like button accessibility',
-                  })
-                : intl.formatMessage({
-                    defaultMessage: 'Unlike the post',
-                    description:
-                      'PostRendererActionBar unlike button accessibility',
-                  })
-            }
-          />
-        )}
-        {allowComments && (
-          <IconButton
-            icon="comment"
-            style={styles.icon}
-            onPress={goToComments}
-            variant="icon"
+            onPress={onShare}
             accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Comment the post',
+              defaultMessage: 'Share the post',
               description:
-                'PostRendererActionBar Comment post button accessibility',
+                'PostRendererActionBar Share post button accessibility',
             })}
           />
+        </View>
+        {allowLikes && (
+          <Text variant="smallbold">
+            <FormattedMessage
+              defaultMessage="{countReactions} likes"
+              description="PastRendererActionBar - Like Counter"
+              values={{ countReactions }}
+            />
+          </Text>
         )}
-        <IconButton
-          icon="share"
-          style={styles.icon}
-          variant="icon"
-          onPress={onShare}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Share the post',
-            description:
-              'PostRendererActionBar Share post button accessibility',
-          })}
-        />
       </View>
-      {allowLikes && (
-        <Text variant="smallbold">
-          <FormattedMessage
-            defaultMessage="{countReactions} likes"
-            description="PastRendererActionBar - Like Counter"
-            values={{ countReactions }}
-          />
-        </Text>
-      )}
-    </View>
+    </>
   );
 };
 
-export default PostRendererActionBar;
+export default memo(PostRendererActionBar);
 
 export const PostRendererActionBarSkeleton = () => {
   return (
