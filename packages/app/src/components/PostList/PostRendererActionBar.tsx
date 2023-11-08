@@ -8,6 +8,7 @@ import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
+import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
@@ -77,6 +78,7 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
+  const { profileId } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
     (add: boolean) => {
       commit({
@@ -104,6 +106,13 @@ const PostRendererActionBar = ({
               post?.setValue(counter + (add ? 1 : -1), 'counterReactions');
             }
             post.setValue(add ? reaction : null, 'viewerPostReaction');
+          }
+          if (profileId) {
+            const profile = store.get(profileId);
+            const counter = profile?.getValue('nbPostsLiked');
+            if (typeof counter === 'number') {
+              profile?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+            }
           }
         },
         onError: error => {
