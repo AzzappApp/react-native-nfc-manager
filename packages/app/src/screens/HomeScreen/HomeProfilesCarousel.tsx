@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
   StyleSheet,
   PixelRatio,
+  Platform,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -88,7 +89,10 @@ const HomeProfilesCarousel = (
 
   const { width: windowWidth } = useWindowDimensions();
   const coverHeight = height - 2 * VERTICAL_MARGIN;
-  const coverWidth = PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
+  const coverWidth =
+    Platform.OS === 'ios'
+      ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
+      : PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex + 1);
 

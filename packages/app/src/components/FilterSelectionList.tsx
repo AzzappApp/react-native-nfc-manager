@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View, Platform } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
@@ -30,33 +30,48 @@ const FilterSelectionList = ({
   const intl = useIntl();
   const filters = typedEntries(useFilterLabels());
 
+  const [height, setHeight] = useState(0);
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    setHeight(nativeEvent.layout.height / 1.9);
+  }, []);
+
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
-      <FilterButton
-        layer={layer}
-        aspectRatio={aspectRatio}
-        selected={selectedFilter === null}
-        label={intl.formatMessage({
-          defaultMessage: 'Normal',
-          description:
-            'Name of the default filter (no filter applied) in image edition',
-        })}
-        filter={null}
-        cardRadius={cardRadius}
-        onPress={() => onChange(null)}
-      />
-      {filters.map(([id, label]) => (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      {...props}
+      onLayout={onLayout}
+    >
+      <>
         <FilterButton
-          key={id}
           layer={layer}
           aspectRatio={aspectRatio}
-          selected={id === selectedFilter}
-          label={label}
-          filter={id}
+          selected={selectedFilter === null}
+          label={intl.formatMessage({
+            defaultMessage: 'Normal',
+            description:
+              'Name of the default filter (no filter applied) in image edition',
+          })}
+          filter={null}
+          height={height}
           cardRadius={cardRadius}
-          onPress={() => onChange(id)}
+          onPress={() => onChange(null)}
         />
-      ))}
+        {filters.map(([id, label]) => (
+          <FilterButton
+            key={id}
+            layer={layer}
+            aspectRatio={aspectRatio}
+            selected={id === selectedFilter}
+            label={label}
+            filter={id}
+            height={height}
+            cardRadius={cardRadius}
+            onPress={() => onChange(id)}
+          />
+        ))}
+      </>
     </ScrollView>
   );
 };
@@ -70,6 +85,7 @@ type FilterButtonProps = {
   label: string;
   cardRadius: number;
   onPress(): void;
+  height: number;
 };
 
 const FilterButton = ({
@@ -79,26 +95,22 @@ const FilterButton = ({
   label,
   filter,
   cardRadius,
-
+  height,
   onPress,
 }: FilterButtonProps) => {
-  const [width, setWidth] = useState<number | null>(null);
-  const onLayout = (event: LayoutChangeEvent) => {
-    setWidth(event.nativeEvent.layout.width);
-  };
-
-  const borderRadius = Platform.select({
-    web: cardRadius ? (`${cardRadius}%` as any) : null,
-    default: width != null && cardRadius != null ? cardRadius * width : null,
-  });
+  const borderRadius = useMemo(() => {
+    return Platform.select({
+      web: cardRadius ? (`${cardRadius}%` as any) : null,
+      default:
+        height * aspectRatio != null && cardRadius != null
+          ? cardRadius * height * aspectRatio
+          : null,
+    });
+  }, [aspectRatio, cardRadius, height]);
 
   const styles = useStyleSheet(styleSheet);
   return (
-    <PressableNative
-      onPress={onPress}
-      style={[styles.filterButton]}
-      onLayout={onLayout}
-    >
+    <PressableNative onPress={onPress} style={styles.filterButton}>
       <View
         style={[
           styles.filterImageContainer,
@@ -109,9 +121,9 @@ const FilterButton = ({
           selected && styles.selected,
         ]}
       >
-        <View style={[styles.imageWrapper, { borderRadius }]}>
+        <View style={[styles.imageWrapper, { borderRadius, aspectRatio }]}>
           <GPUImageView
-            style={[styles.filterImage, { aspectRatio, borderRadius }]}
+            style={[styles.filterImage, { height, aspectRatio, borderRadius }]}
             layers={[
               {
                 ...layer,
@@ -122,7 +134,7 @@ const FilterButton = ({
         </View>
       </View>
       <Text
-        variant="small"
+        variant="xsmall"
         style={[styles.filterTitle, selected && styles.filterTitleSelected]}
       >
         {label}
@@ -139,8 +151,9 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: colors.grey200,
   },
   filterButton: {
+    height: '100%',
+    alignItems: 'center',
     marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
-    height: '90%',
   },
   filterImageContainer: [
     {
