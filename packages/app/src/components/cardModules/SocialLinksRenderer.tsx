@@ -272,3 +272,41 @@ export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'mail', mask: '' },
   { id: 'sms', mask: '' },
 ];
+
+export const measureSocialLinksHeight = async (
+  data: SocialLinksRendererData,
+  cardStyle: CardStyle,
+  maxWidth: number,
+) => {
+  const {
+    links,
+    iconSize,
+    arrangement,
+    columnGap,
+    marginTop,
+    marginBottom,
+    marginHorizontal,
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+    styleValuesMap: null,
+  });
+
+  if (arrangement === 'inline') {
+    return iconSize + marginTop + marginBottom;
+  } else {
+    const [contentHeight] = (links ?? []).reduce(
+      ([height, width], _) => {
+        const nextWidth = width + iconSize;
+        if (nextWidth > maxWidth) {
+          return [height + iconSize + columnGap, width];
+        } else {
+          return [height, nextWidth + columnGap];
+        }
+      },
+      [iconSize, marginHorizontal],
+    );
+    return contentHeight + marginTop + marginBottom;
+  }
+};

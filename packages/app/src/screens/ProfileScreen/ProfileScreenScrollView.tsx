@@ -152,6 +152,7 @@ const ProfileScreenScrollView = ({
     setTimeout(() => {
       // we need to wait for the height to be applied on container before displaying the other elements
       setLayoutReady(true);
+      layoutChangedListeners.current.forEach(listener => listener());
     }, 10);
   }, [blockContainerDimensions]);
 
@@ -160,7 +161,6 @@ const ProfileScreenScrollView = ({
     computeLayoutTimeout.current = setTimeout(() => {
       computeLayoutTimeout.current = undefined;
       computeLayout();
-      layoutChangedListeners.current.forEach(listener => listener());
     }, 10);
   }, [computeLayout]);
 
@@ -231,6 +231,7 @@ const ProfileScreenScrollView = ({
       getBlockPositions,
       setBlockInfos,
       addLayoutChangedListener,
+      isLayoutReady: () => layoutInitialized.current,
     }),
     [addLayoutChangedListener, getBlockPositions, registerBlock, setBlockInfos],
   );
@@ -401,6 +402,7 @@ export const ProfileScreenScrollViewContext = createContext<{
     }>,
   ) => void;
   addLayoutChangedListener: (listener: () => void) => () => void;
+  isLayoutReady(): boolean;
 } | null>(null);
 
 export const EDIT_BLOCK_GAP = 20;

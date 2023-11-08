@@ -672,6 +672,8 @@ const ProfileScreenBody = (
         selectionMode={selectionMode}
         selected={!!selectedModules[module.id]}
         backgroundColor={cardColors?.light ?? '#fff'}
+        moduleRenderInfo={module}
+        cardStyle={cardStyle}
         // @ts-expect-error this extraData is used to trigger a re-render when the module data change
         extraData={{
           cardStyle,

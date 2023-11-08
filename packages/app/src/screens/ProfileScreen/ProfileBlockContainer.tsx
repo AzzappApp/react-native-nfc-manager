@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  PixelRatio,
   StyleSheet,
   View,
   useColorScheme,
@@ -19,6 +20,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
+import {
+  type ModuleRenderInfo,
+  measureModuleHeight,
+} from '#components/cardModules/CardModuleRenderer';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import {
@@ -31,7 +36,7 @@ import {
   useEditTransition,
   useSelectionModeTransition,
 } from './ProfileScreenTransitions';
-import type { LayoutChangeEvent } from 'react-native';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -102,6 +107,9 @@ export type ProfileBlockContainerProps = {
    * The background color of the card
    */
   backgroundColor: string;
+
+  moduleRenderInfo?: ModuleRenderInfo;
+  cardStyle?: CardStyle | null;
   /**
    * Called when the user press a module, only enabled in edit mode
    */
@@ -110,7 +118,6 @@ export type ProfileBlockContainerProps = {
    * Called when the user press the move up button
    */
   onMoveUp?: () => void;
-
   /**
    * Called when the user press the move down button
    */
@@ -153,6 +160,8 @@ const ProfileBlockContainer = ({
   selected,
   backgroundColor,
   children,
+  moduleRenderInfo,
+  cardStyle,
   onModulePress,
   onMoveUp,
   onMoveDown,
@@ -164,13 +173,7 @@ const ProfileBlockContainer = ({
   const intl = useIntl();
 
   const { width: windowWidth } = useWindowDimensions();
-
   const [measuredHeight, setMeasuredHeight] = useState(0);
-
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    const height = event.nativeEvent.layout.height;
-    setMeasuredHeight(height);
-  }, []);
 
   const editScale = useProfileEditScale();
 
@@ -187,6 +190,7 @@ const ProfileBlockContainer = ({
     addLayoutChangedListener,
     getBlockPositions,
     setBlockInfos,
+    isLayoutReady,
   } = useContext(ProfileScreenScrollViewContext)!;
 
   useEffect(
@@ -198,6 +202,22 @@ const ProfileBlockContainer = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [id, registerBlock],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    if (moduleRenderInfo) {
+      measureModuleHeight(moduleRenderInfo, cardStyle, windowWidth).then(
+        height => {
+          if (!cancelled) {
+            setMeasuredHeight(PixelRatio.roundToNearestPixel(height));
+          }
+        },
+      );
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [moduleRenderInfo, cardStyle, windowWidth]);
 
   useEffect(() => {
     if (measuredHeight === 0) {
@@ -213,6 +233,10 @@ const ProfileBlockContainer = ({
   const { position, editPosition } = getBlockPositions(id) ?? {};
   const positionSharedValue = useSharedValue(position);
   const editPositionSharedValue = useSharedValue(editPosition);
+  const layoutReadySharedValue = useSharedValue(
+    id === 'cover' || isLayoutReady() ? 1 : 0,
+  );
+  const [hasBeenDisplayed, setHasBeenDisplayed] = useState(id === 'cover');
   useEffect(
     () =>
       addLayoutChangedListener(() => {
@@ -220,18 +244,30 @@ const ProfileBlockContainer = ({
         if (
           !positions ||
           positionSharedValue.value === undefined ||
-          editPositionSharedValue.value === undefined
+          editPositionSharedValue.value === undefined ||
+          !editingTransition?.value ||
+          !isLayoutReady() ||
+          id === 'cover'
         ) {
           positionSharedValue.value = positions?.position;
           editPositionSharedValue.value = positions?.editPosition;
-          return;
+        } else {
+          positionSharedValue.value = withTiming(positions.position, {
+            duration: EDIT_TRANSITION_DURATION,
+          });
+          editPositionSharedValue.value = withTiming(positions.editPosition, {
+            duration: EDIT_TRANSITION_DURATION,
+          });
         }
-        positionSharedValue.value = withTiming(positions.position, {
-          duration: EDIT_TRANSITION_DURATION,
-        });
-        editPositionSharedValue.value = withTiming(positions.editPosition, {
-          duration: EDIT_TRANSITION_DURATION,
-        });
+        if (isLayoutReady() && id !== 'cover') {
+          layoutReadySharedValue.value = withTiming(
+            1,
+            { duration: EDIT_TRANSITION_DURATION },
+            () => {
+              runOnJS(setHasBeenDisplayed)(true);
+            },
+          );
+        }
       }),
     [
       addLayoutChangedListener,
@@ -239,6 +275,9 @@ const ProfileBlockContainer = ({
       getBlockPositions,
       id,
       positionSharedValue,
+      isLayoutReady,
+      layoutReadySharedValue,
+      editingTransition,
     ],
   );
 
@@ -347,15 +386,12 @@ const ProfileBlockContainer = ({
     const editPosition = editPositionSharedValue.value;
     if (position === undefined || editPosition === undefined) {
       return {
-        position: 'absolute',
-        width: windowWidth,
-        opacity: 0,
-        zIndex: -1,
-        top: -1000,
+        display: 'none',
       };
     }
     const editTransitionValue = editingTransition?.value ?? 0;
     return {
+      display: 'flex',
       position: 'absolute',
       width: windowWidth,
       height: interpolate(
@@ -363,13 +399,15 @@ const ProfileBlockContainer = ({
         [0, 1],
         [measuredHeight, editingHeight],
       ),
-      opacity: visible ? 1 : editTransitionValue,
       zIndex: visible ? 0 : editTransitionValue > 0 ? 0 : -1,
+      left: 0,
       top: interpolate(
         editingTransition?.value ?? 0,
         [0, 1],
         [position, editPosition],
       ),
+      opacity:
+        layoutReadySharedValue.value * (visible ? 1 : editTransitionValue),
     };
   });
 
@@ -424,13 +462,12 @@ const ProfileBlockContainer = ({
   return (
     <Animated.View
       style={blockStyle}
-      exiting={id !== 'cover' ? FadeOut : undefined}
-      entering={id !== 'cover' ? FadeIn : undefined}
+      exiting={id !== 'cover' && hasBeenDisplayed ? FadeOut : undefined}
+      entering={id !== 'cover' && hasBeenDisplayed ? FadeIn : undefined}
     >
       <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
           style={[moduleContainerStyle, editing && shadow(appearance)]}
-          onLayout={onLayout}
         >
           {/** this View is only here because ios bug with shadow and overlow hidden */}
           <Animated.View

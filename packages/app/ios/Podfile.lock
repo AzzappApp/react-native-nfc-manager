@@ -633,6 +633,8 @@ PODS:
     - React-Core
   - RNSVG (13.14.0):
     - React-Core
+  - RNTextSize (4.0.0-rc.3):
+    - React
   - SDWebImage (5.15.8):
     - SDWebImage/Core (= 5.15.8)
   - SDWebImage/Core (5.15.8)
@@ -758,6 +760,7 @@ DEPENDENCIES:
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
+  - RNTextSize (from `../../../node_modules/rn-text-size`)
   - VisionCamera (from `../../../node_modules/react-native-vision-camera`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
@@ -947,6 +950,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-share"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
+  RNTextSize:
+    :path: "../../../node_modules/rn-text-size"
   VisionCamera:
     :path: "../../../node_modules/react-native-vision-camera"
   Yoga:
@@ -1049,6 +1054,7 @@ SPEC CHECKSUMS:
   RNSentry: 11917f7bf3e28806aca4c2791c6ba7522d8f09fe
   RNShare: 32e97adc8d8c97d4a26bcdd3c45516882184f8b6
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
+  RNTextSize: 57bd333a4903ebbaf93f1ca8278641330b07e900
   SDWebImage: cb032eba469c54e0000e78bcb0a13cdde0a52798
   SDWebImageAVIFCoder: 8348fef6d0ec69e129c66c9fe4d74fbfbf366112
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c

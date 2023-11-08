@@ -13,6 +13,7 @@ import {
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
+import measureText from '#helpers/measureText';
 import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
 import type {
@@ -170,3 +171,41 @@ const BlockTextRenderer = ({
 };
 
 export default BlockTextRenderer;
+
+export const measureBlockTextHeight = async (
+  data: BlockTextRendererData,
+  cardStyle: CardStyle,
+  maxWidth: number,
+) => {
+  const {
+    text,
+    fontFamily,
+    fontSize,
+    verticalSpacing,
+    textMarginVertical,
+    textMarginHorizontal,
+    marginHorizontal,
+    marginVertical,
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+    styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
+  });
+
+  const textMaxWidth =
+    maxWidth - (marginHorizontal ?? 0) * 2 - (textMarginHorizontal ?? 0) * 2;
+
+  const textSize = await measureText({
+    text: text ?? '',
+    fontFamily: fontFamily ?? undefined,
+    fontSize,
+    width: textMaxWidth,
+    lineHeight:
+      fontSize && verticalSpacing
+        ? fontSize * 1.2 + verticalSpacing
+        : undefined,
+  });
+
+  return marginVertical * 2 + textMarginVertical * 2 + textSize;
+};
