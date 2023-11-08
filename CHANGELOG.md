@@ -1,5 +1,7 @@
-## 0.5.1-canary.63
+## 0.5.1-canary.64
 
+* **Android:**  - more fix ([#1580](https://github.com/AzzappApp/azzapp/pull/1580))
+* **fix:**  - use node-fetch ([#1587](https://github.com/AzzappApp/azzapp/pull/1587))
 * **fix:**  - always display azzapp.com in  home header
 * **feat:**  - **CardEdition:** adapt icon color to background in color picker ([#1593](https://github.com/AzzappApp/azzapp/pull/1593))
 * **feat:**  - **Post:** make post background white ([#1592](https://github.com/AzzappApp/azzapp/pull/1592))
