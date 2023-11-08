@@ -1,8 +1,11 @@
 /**
  * Builds a user URL from a user name.
  */
-export function buildUserUrl(userName: string) {
-  return `${process.env.NEXT_PUBLIC_URL}${userName}`;
+export function buildUserUrl(
+  userName: string,
+  base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
+) {
+  return `${base}${userName}`;
 }
 
 /**

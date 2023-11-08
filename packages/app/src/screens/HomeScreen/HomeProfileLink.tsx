@@ -35,8 +35,8 @@ const HomeProfileLink = ({
     userKey,
   );
 
-  const urls = useMemo(
-    () => user?.profiles?.map(p => buildUserUrl(p.userName)) ?? [],
+  const userNames = useMemo(
+    () => user?.profiles?.map(p => p.userName) ?? [],
     [user?.profiles],
   );
 
@@ -48,7 +48,7 @@ const HomeProfileLink = ({
 
   const intl = useIntl();
   const onPress = () => {
-    Clipboard.setStringAsync(urls[currentProfileIndex])
+    Clipboard.setStringAsync(buildUserUrl(userNames[currentProfileIndex]))
       .then(() => {
         Toast.show({
           type: 'info',
@@ -69,7 +69,7 @@ const HomeProfileLink = ({
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
-            {urls[currentProfileIndex]?.replace('https://', '')}
+            {buildUserUrl(userNames[currentProfileIndex], 'azzapp.com/')}
           </Text>
           <View style={styles.emptyViewCenter} />
         </View>
