@@ -40,7 +40,11 @@ const HomeScreen = ({
   return (
     <>
       <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
-      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
+      <HomeBottomSheetPanel
+        visible={showMenu}
+        close={toggleShowMenu}
+        withProfile
+      />
     </>
   );
 };

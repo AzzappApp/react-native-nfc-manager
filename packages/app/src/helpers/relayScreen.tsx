@@ -39,11 +39,6 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * @default true
      */
     canGoback?: boolean;
-    /**
-     * If true, the screen will be refetched when the profileId changes.
-     * @default true
-     */
-    profileBound?: boolean;
   };
 
 /**
@@ -95,7 +90,11 @@ function relayScreen<TRoute extends Route>(
     } = props;
 
     const { profileId } = useAuthState();
-    const actorId = profileBound ? profileId : ROOT_ACTOR_ID;
+    const actorId = (
+      typeof profileBound === 'function' ? profileBound(params) : profileBound
+    )
+      ? profileId
+      : ROOT_ACTOR_ID;
     const environment = useRelayActorEnvironment(actorId);
 
     const { preloadedQuery, actorId: queryActorId } =

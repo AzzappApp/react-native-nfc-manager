@@ -113,7 +113,9 @@ export type LikedPostsRoute = {
 
 export type AccountDetailsRoute = {
   route: 'ACCOUNT_DETAILS';
-  params?: never;
+  params: {
+    withProfile: boolean;
+  };
 };
 
 export type InviteFriendsRoute = {

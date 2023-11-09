@@ -164,7 +164,7 @@ export type LoadQueryOptions<TParams> = {
   /**
    * If true, the query will be bound to the current profile
    */
-  profileBound?: boolean;
+  profileBound?: boolean | ((params: TParams) => boolean);
   /**
    * The request fetch policy
    */

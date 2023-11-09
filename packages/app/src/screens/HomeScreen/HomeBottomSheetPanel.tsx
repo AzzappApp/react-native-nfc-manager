@@ -22,9 +22,17 @@ type HomeBottomSheetPanel = {
    *
    */
   close: () => void;
+  /**
+   * User has a profile
+   */
+  withProfile: boolean;
 };
 
-const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
+const HomeBottomSheetPanel = ({
+  visible,
+  close,
+  withProfile,
+}: HomeBottomSheetPanel) => {
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
@@ -56,7 +64,7 @@ const HomeBottomSheetPanel = ({ visible, close }: HomeBottomSheetPanel) => {
     >
       <View style={styles.bottomSheetOptionsContainer}>
         <>
-          <Link route="ACCOUNT_DETAILS">
+          <Link route="ACCOUNT_DETAILS" params={{ withProfile }}>
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={close}

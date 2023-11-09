@@ -1,28 +1,28 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
-import AccountHeader from '#components/AccountHeader';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import AccountDetailsEmailForm from './AccountDetailsEmailForm';
+import AccountDetailsHeader from './AccountDetailsHeader';
 import AccountDetailsPasswordForm from './AccountDetailsPasswordForm';
 import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
+import AccountDetailsScreenFallback from './AccountDetailsScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountDetailsRoute } from '#routes';
-import type { AccountDetailsScreenQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenQuery.graphql';
-import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
+import type { AccountDetailsScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithoutProfileQuery.graphql';
+import type { AccountDetailsScreenWithProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithProfileQuery.graphql';
 
-const accountDetailsScreenQuery = graphql`
-  query AccountDetailsScreenQuery {
+const accountDetailsScreenWithProfileQuery = graphql`
+  query AccountDetailsScreenWithProfileQuery {
     currentUser {
       email
       phoneNumber
@@ -36,14 +36,31 @@ const accountDetailsScreenQuery = graphql`
   }
 `;
 
+const accountDetailsScreenWithoutProfileQuery = graphql`
+  query AccountDetailsScreenWithoutProfileQuery {
+    currentUser {
+      email
+      phoneNumber
+    }
+  }
+`;
+
 const AccountDetailsScreen = ({
   preloadedQuery,
-}: RelayScreenProps<AccountDetailsRoute, AccountDetailsScreenQuery>) => {
-  const { currentUser, viewer } = usePreloadedQuery(
-    accountDetailsScreenQuery,
+  route: { params },
+}: RelayScreenProps<
+  AccountDetailsRoute,
+  AccountDetailsScreenWithoutProfileQuery | AccountDetailsScreenWithProfileQuery
+>) => {
+  const preloaded = usePreloadedQuery(
+    params.withProfile
+      ? accountDetailsScreenWithProfileQuery
+      : accountDetailsScreenWithoutProfileQuery,
     preloadedQuery,
   );
 
+  const viewer = 'viewer' in preloaded ? preloaded.viewer : null;
+  const currentUser = preloaded.currentUser;
   const profile = viewer?.profile;
 
   const [emailsFormVisible, toggleEmailsFormVisible] = useToggle(false);
@@ -73,33 +90,37 @@ const AccountDetailsScreen = ({
               }}
             />
           </Text>
-          <View style={styles.section}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Webcard{azzappAp} details"
-                description="Title of the section where user can view their webcard details"
-                values={{
-                  azzappAp: (
-                    <Text style={styles.icon} variant="azzapp">
-                      a
-                    </Text>
-                  ),
-                }}
-              />
-            </Text>
-          </View>
-          <View style={styles.sectionField}>
-            <Text variant="smallbold">
-              <FormattedMessage
-                defaultMessage="Webcard{azzappAp} name"
-                description="Webcard name field in the account details screen"
-                values={{
-                  azzappAp: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            </Text>
-            <Text variant="medium">{profile?.userName}</Text>
-          </View>
+          {profile?.userName ? (
+            <>
+              <View style={styles.section}>
+                <Text variant="xsmall" style={styles.sectionTitle}>
+                  <FormattedMessage
+                    defaultMessage="Webcard{azzappAp} details"
+                    description="Title of the section where user can view their webcard details"
+                    values={{
+                      azzappAp: (
+                        <Text style={styles.icon} variant="azzapp">
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                </Text>
+              </View>
+              <View style={styles.sectionField}>
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Webcard{azzappAp} name"
+                    description="Webcard name field in the account details screen"
+                    values={{
+                      azzappAp: <Text variant="azzapp">a</Text>,
+                    }}
+                  />
+                </Text>
+                <Text variant="medium">{profile.userName}</Text>
+              </View>
+            </>
+          ) : null}
           <View style={styles.section}>
             <Text variant="xsmall" style={styles.sectionTitle}>
               <FormattedMessage
@@ -192,40 +213,6 @@ const AccountDetailsScreen = ({
   );
 };
 
-const AccountDetailsHeader = ({
-  profile,
-}: {
-  profile: AccountHeader_profile$key | null;
-}) => {
-  const intl = useIntl();
-  return (
-    <AccountHeader
-      profile={profile}
-      title={intl.formatMessage({
-        defaultMessage: 'Account details',
-        description:
-          'Title of the account details screen where user can change their email, phone number ...',
-      })}
-    />
-  );
-};
-
-const AccountDetailsScreenFallback = () => (
-  <Container style={{ flex: 1 }}>
-    <SafeAreaView
-      style={{
-        flex: 1,
-        rowGap: 15,
-      }}
-    >
-      <AccountDetailsHeader profile={null} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
-    </SafeAreaView>
-  </Container>
-);
-
 const styleSheet = createStyleSheet(appearance => ({
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   warningMessage: { width: 255, textAlign: 'center', alignSelf: 'center' },
@@ -254,6 +241,10 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 export default relayScreen(AccountDetailsScreen, {
-  query: accountDetailsScreenQuery,
+  query: params =>
+    params.withProfile
+      ? accountDetailsScreenWithProfileQuery
+      : accountDetailsScreenWithoutProfileQuery,
+  profileBound: params => params.withProfile,
   fallback: AccountDetailsScreenFallback,
 });

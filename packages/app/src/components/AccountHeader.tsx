@@ -14,7 +14,7 @@ const AccountHeader = ({
   profile: profileKey,
   title,
 }: {
-  profile: AccountHeader_profile$key | null;
+  profile?: AccountHeader_profile$key | null;
   title: string;
 }) => {
   const profile = useFragment(
