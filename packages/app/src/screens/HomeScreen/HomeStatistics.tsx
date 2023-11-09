@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
   largetText: {
     ...fontFamilies.extrabold,
     color: colors.white,
+    textAlign: 'center',
     fontSize: 44,
   },
   smallText: {
