@@ -5,7 +5,7 @@ import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountH
 const AccountDetailsHeader = ({
   profile,
 }: {
-  profile?: AccountHeader_profile$key | null;
+  profile: AccountHeader_profile$key | null;
 }) => {
   const intl = useIntl();
   return (

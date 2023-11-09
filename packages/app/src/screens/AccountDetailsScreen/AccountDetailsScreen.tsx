@@ -78,7 +78,7 @@ const AccountDetailsScreen = ({
           rowGap: 15,
         }}
       >
-        <AccountDetailsHeader profile={profile} />
+        <AccountDetailsHeader profile={profile ?? null} />
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>

@@ -133,7 +133,7 @@ const PostRenderer = (
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
-  const shouldPauseVideo = context.paused.includes(post.id);
+  const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
 
   return (
     <View {...props}>
