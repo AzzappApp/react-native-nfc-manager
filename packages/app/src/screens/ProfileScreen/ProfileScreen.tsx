@@ -282,20 +282,22 @@ const ProfileScreen = ({
         selectionMode={selectionMode}
       >
         <GestureDetector gesture={pan}>
-          <Container style={styles.container}>
+          <View style={styles.container}>
             <Animated.View
               style={[styles.front, borderRadiusStyle, frontStyle]}
             >
-              <ProfileScreenContent
-                ready={ready}
-                profile={data.profile}
-                editing={editing}
-                isViewer={isViewer}
-                selectionMode={selectionMode}
-                onToggleEditing={toggleEditing}
-                onToggleSelectionMode={toggleSelectionMode}
-                onContentPositionChange={onContentPositionChange}
-              />
+              <Container style={styles.container}>
+                <ProfileScreenContent
+                  ready={ready}
+                  profile={data.profile}
+                  editing={editing}
+                  isViewer={isViewer}
+                  selectionMode={selectionMode}
+                  onToggleEditing={toggleEditing}
+                  onToggleSelectionMode={toggleSelectionMode}
+                  onContentPositionChange={onContentPositionChange}
+                />
+              </Container>
             </Animated.View>
             <Animated.View
               style={[styles.back, borderRadiusStyle, backStyle]}
@@ -310,7 +312,7 @@ const ProfileScreen = ({
                 />
               </Suspense>
             </Animated.View>
-          </Container>
+          </View>
         </GestureDetector>
         <ProfileScreenButtonBar
           profile={data.profile}
@@ -422,7 +424,7 @@ export default relayScreen(ProfileScreen, {
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent' },
+  container: { flex: 1 },
   front: {
     flex: 1,
     height: '100%',
