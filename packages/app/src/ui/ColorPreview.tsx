@@ -1,5 +1,6 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ColorValue, ViewProps } from 'react-native';
 
 type ColorPreviewProps = ViewProps & {
@@ -30,24 +31,27 @@ const ColorPreview = ({
   style,
   colorSize = 10,
   ...props
-}: ColorPreviewProps) => (
-  <View style={[styles.colorPreviewContainer, style]} {...props}>
-    <View
-      style={{
-        backgroundColor: color,
-        width: colorSize,
-        height: colorSize,
-        borderRadius: colorSize / 2,
-      }}
-    />
-  </View>
-);
+}: ColorPreviewProps) => {
+  const styles = useStyleSheet(styleSheet);
+  return (
+    <View style={[styles.colorPreviewContainer, style]} {...props}>
+      <View
+        style={{
+          backgroundColor: color,
+          width: colorSize,
+          height: colorSize,
+          borderRadius: colorSize / 2,
+        }}
+      />
+    </View>
+  );
+};
 
 export default ColorPreview;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   colorPreviewContainer: {
-    borderColor: colors.black,
+    borderColor: appearance === 'light' ? colors.black : colors.white,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -55,4 +59,4 @@ const styles = StyleSheet.create({
     width: 14,
     borderRadius: 7,
   },
-});
+}));
