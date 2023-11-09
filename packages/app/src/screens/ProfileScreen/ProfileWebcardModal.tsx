@@ -1,12 +1,13 @@
 import * as Sentry from '@sentry/react-native';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet, Share } from 'react-native';
+import { View, useWindowDimensions, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -103,6 +104,8 @@ const ProfileWebCardModal = ({
     onToggleFollow(profile.id, profile.userName, !profile.isFollowing);
   }, 600);
 
+  const styles = useStyleSheet(stylesheet);
+
   return (
     <BottomSheetModal
       height={windowsHeight - top - 30}
@@ -129,11 +132,13 @@ const ProfileWebCardModal = ({
             paddingVertical: 20,
           }}
         >
-          <CoverRenderer
-            profile={profile}
-            width={windowsWith / 3}
-            videoEnabled={false}
-          />
+          <View style={styles.coverStyle}>
+            <CoverRenderer
+              profile={profile}
+              width={windowsWith / 3}
+              videoEnabled={false}
+            />
+          </View>
         </View>
         <View style={styles.countersContainer}>
           <View style={styles.counterContainer}>
@@ -218,7 +223,7 @@ const ProfileWebCardModal = ({
 
 export default ProfileWebCardModal;
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
   countersContainer: {
     flexDirection: 'row',
     columnGap: 12,
@@ -257,4 +262,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     columnGap: 10,
   },
-});
+  coverStyle: {
+    ...shadow(appearance, 'bottom'),
+  },
+}));
