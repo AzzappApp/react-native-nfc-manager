@@ -175,6 +175,10 @@ function SelectSectionListItem<ItemT>({
           (selectedItemContainerStyle ?? styles.selectedItemContainer),
       ]}
       onPress={onPress}
+      hitSlop={{
+        top: 10,
+        bottom: 10,
+      }}
     >
       {renderItem?.({ item, isSelected, index }) ?? (
         <Text variant="medium" style={styles.defaultItemRenderer}>
