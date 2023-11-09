@@ -1,5 +1,10 @@
-## 0.5.1-canary.73
+## 0.5.1-canary.74
 
+* **fix:**  - increase hitSlop of section list item ([#1633](https://github.com/AzzappApp/azzapp/pull/1633))
+* **fix:**  - prevent crop prevent zoom smaller than image size
+* **fix:**  - prevent crop outside of bounds
+* **fix:**  - textAlign in HomeStats ([#1632](https://github.com/AzzappApp/azzapp/pull/1632))
+* **fix:**  - **account:** [#1392](https://github.com/AzzappApp/azzapp/pull/1392) don’t get profile before it’s created ([#1609](https://github.com/AzzappApp/azzapp/pull/1609))
 * **fix:**  - **webcard:** [#1621](https://github.com/AzzappApp/azzapp/pull/1621) incorrect font size/weight in header ([#1631](https://github.com/AzzappApp/azzapp/pull/1631))
 * **fix:**  - **suggestions:** [#1624](https://github.com/AzzappApp/azzapp/pull/1624) update only on tab change ([#1627](https://github.com/AzzappApp/azzapp/pull/1627))
 * **style:**  - **contatCard:** [#1237](https://github.com/AzzappApp/azzapp/pull/1237) update contact card form ([#1626](https://github.com/AzzappApp/azzapp/pull/1626))
