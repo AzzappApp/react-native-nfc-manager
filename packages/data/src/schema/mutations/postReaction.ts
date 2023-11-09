@@ -30,7 +30,9 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
 
   try {
     db.transaction(async trx => {
-      const reaction = await getPostReaction(profileId, targetId);
+      console.warn('PostReaction', profileId, targetId);
+      const reaction = await getPostReaction(profileId, targetId, trx);
+      console.warn('PostReaction reaction', reaction);
       const removeReaction = reaction?.reactionKind === reactionKind;
 
       if (removeReaction) {
@@ -54,6 +56,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           nbLikes: removeReaction? sql`${ProfileTable.nbLikes} - 1`: sql`${ProfileTable.nbLikes} + 1`,
         })
         .where(eq(ProfileTable.id, post.authorId));
+
       await trx
         .update(ProfileTable)
         .set({
@@ -61,7 +64,9 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           nbPostsLiked: removeReaction? sql`${ProfileTable.nbPostsLiked} - 1`: sql`${ProfileTable.nbPostsLiked} + 1`,
         })
         .where(eq(ProfileTable.id, profileId));
+      console.warn('PostReaction before statistics');
       await updateStatistics(post.authorId, 'likes', !removeReaction, trx);
+      console.warn('PostReaction adter statistics');
     });
   } catch (e) {
     console.error(e);

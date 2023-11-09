@@ -83,8 +83,12 @@ export const deletePostReaction = async (
  * @param {string} postId
  * @return {*}  {(Promise<PostReaction | null>)}
  */
-export const getPostReaction = async (profileId: string, postId: string) =>
-  db
+export const getPostReaction = async (
+  profileId: string,
+  postId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .select()
     .from(PostReactionTable)
     .where(
