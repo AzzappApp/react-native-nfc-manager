@@ -330,11 +330,9 @@ const Cropper = ({
 
           let width = offsetWidth / e.scale;
           let height = offsetHeight / e.scale;
-          if (isAndroid) {
-            // android effect doesn't support this kind of downscaling
-            width = Math.min(width, mediaWidth);
-            height = Math.min(height, mediaHeight);
-          }
+          // TODO remove this when we make sure that cropping outside of the image is not an issue on the native side
+          width = Math.min(width, mediaWidth);
+          height = Math.min(height, mediaHeight);
 
           setCropDataCurrentValue({
             originX: offsetX - (width - offsetWidth) / 2,
@@ -344,7 +342,7 @@ const Cropper = ({
           });
         })
         .onFinalize(onGestureEnd),
-    [isAndroid, mediaHeight, mediaWidth, onGestureEnd, onGestureStart],
+    [mediaHeight, mediaWidth, onGestureEnd, onGestureStart],
   );
 
   return (
