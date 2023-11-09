@@ -171,6 +171,12 @@ export const FILTERS = {
   eterna: getUri(require('./assets/luts/eterna.png')),
   'deep-south': getUri(require('./assets/luts/deep-south.png')),
   'gold-dust': getUri(require('./assets/luts/gold-dust.png')),
+  'bw1-cinematic': getUri(require('./assets/luts/BW1-Cinematic.png')),
+  'color1-portrait': getUri(require('./assets/luts/Color1_Portrait.png')),
+  Color3_Vintage: getUri(require('./assets/luts/Color3_Vintage.png')),
+  Color6_Azure: getUri(require('./assets/luts/Color6_Azure.png')),
+  Color9_Mosaic: getUri(require('./assets/luts/Color9_Mosaic.png')),
+  Sepia2_Harmony: getUri(require('./assets/luts/Sepia2_Harmony.png')),
 } as const;
 
 export type Filter = keyof typeof FILTERS;
@@ -182,10 +188,6 @@ export const useFilterLabels = (): Record<Filter, string> => {
   const intl = useIntl();
   return useMemo(
     () => ({
-      'black-and-white': intl.formatMessage({
-        defaultMessage: 'Black & White',
-        description: 'Black & White photo filter name',
-      }),
       eterna: intl.formatMessage({
         defaultMessage: 'Eterna',
         description: 'Eterna photo filter name',
@@ -197,6 +199,34 @@ export const useFilterLabels = (): Record<Filter, string> => {
       'gold-dust': intl.formatMessage({
         defaultMessage: 'Gold Dust',
         description: 'Gold Dust photo filter name',
+      }),
+      'color1-portrait': intl.formatMessage({
+        defaultMessage: 'Color1 Portrait',
+        description: 'Color1 Portrait photo filter name',
+      }),
+      Color3_Vintage: intl.formatMessage({
+        defaultMessage: 'Color3_Vintage',
+        description: 'Color3_Vintage photo filter name',
+      }),
+      Color6_Azure: intl.formatMessage({
+        defaultMessage: 'Color6_Azure',
+        description: 'Color6_Azure photo filter name',
+      }),
+      Color9_Mosaic: intl.formatMessage({
+        defaultMessage: 'Color9_Mosaic',
+        description: 'Color9_Mosaic photo filter name',
+      }),
+      Sepia2_Harmony: intl.formatMessage({
+        defaultMessage: 'Sepia2_Harmony',
+        description: 'Sepia2_Harmonyphoto filter name',
+      }),
+      'black-and-white': intl.formatMessage({
+        defaultMessage: 'Black & White',
+        description: 'Black & White photo filter name',
+      }),
+      'bw1-cinematic': intl.formatMessage({
+        defaultMessage: 'BW1 Cinematic',
+        description: 'BW1 Cinematic photo filter name',
       }),
     }),
     [intl],
