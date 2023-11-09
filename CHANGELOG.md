@@ -1,5 +1,8 @@
-## 0.5.1-canary.72
+## 0.5.1-canary.73
 
+* **fix:**  - **webcard:** [#1621](https://github.com/AzzappApp/azzapp/pull/1621) incorrect font size/weight in header ([#1631](https://github.com/AzzappApp/azzapp/pull/1631))
+* **fix:**  - **suggestions:** [#1624](https://github.com/AzzappApp/azzapp/pull/1624) update only on tab change ([#1627](https://github.com/AzzappApp/azzapp/pull/1627))
+* **style:**  - **contatCard:** [#1237](https://github.com/AzzappApp/azzapp/pull/1237) update contact card form ([#1626](https://github.com/AzzappApp/azzapp/pull/1626))
 * **fix:**  - Slider synch with JS thread ([#1629](https://github.com/AzzappApp/azzapp/pull/1629))
 * **fix:**  - **WebCardEdition:** fix background in edition mode
 * **fix:**  - **account:** [#1611](https://github.com/AzzappApp/azzapp/pull/1611) wrong background on account header ([#1618](https://github.com/AzzappApp/azzapp/pull/1618))
