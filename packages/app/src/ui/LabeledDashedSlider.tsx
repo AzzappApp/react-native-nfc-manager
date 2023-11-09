@@ -6,7 +6,10 @@ import DashedSlider, { getClampedValue } from './DashedSlider';
 import Text from './Text';
 import type { DashedSliderProps } from './DashedSlider';
 
-export type LabeledDashedSliderProps = Omit<DashedSliderProps, 'value'> & {
+export type LabeledDashedSliderProps = Omit<
+  DashedSliderProps,
+  'sharedValue'
+> & {
   label?: ReactNode;
   value: number;
   formatValue?: (value: number) => number;
@@ -40,7 +43,7 @@ const LabeledDashedSlider = ({
       </View>
       <DashedSlider
         variant={variant}
-        value={sharedValue}
+        sharedValue={sharedValue}
         min={min}
         max={max}
         step={step}

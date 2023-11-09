@@ -1,32 +1,26 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import range from 'lodash/range';
 import { memo, useMemo } from 'react';
-import {
-  Platform,
-  View,
-  useColorScheme,
-  useWindowDimensions,
-} from 'react-native';
+import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   Extrapolation,
   clamp,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useThrottledCallback } from 'use-debounce';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useInterval from '#hooks/useInterval';
 import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 export type DashedSliderProps = ViewProps & {
   variant?: 'default' | 'small';
-  value: SharedValue<number>;
+  sharedValue: SharedValue<number>;
   min: number;
   max: number;
   step: number;
@@ -34,52 +28,9 @@ export type DashedSliderProps = ViewProps & {
   onChange: (value: number) => void;
 };
 
-const gradientLocation = [0.0, 0.5, 1];
-const gradientStart = { x: 0, y: 1 };
-const gradientEnd = { x: 1, y: 1 };
-
-const MemoizedLinearGradient = memo(
-  LinearGradient,
-  (prevProps, nextProps) =>
-    prevProps.colors === nextProps.colors &&
-    prevProps.locations === nextProps.locations &&
-    prevProps.start === nextProps.start &&
-    prevProps.end === nextProps.end,
-);
-
-const getPrecision = (a: number) => {
-  'worklet';
-  if (!isFinite(a)) return 0;
-  let e = 1;
-  let p = 0;
-  while (Math.round(a * e) / e !== a) {
-    e *= 10;
-    p++;
-  }
-  return p;
-};
-
-export const getClampedValue = (
-  currentValue: number,
-  step: number,
-  min: number,
-  max: number,
-) => {
-  'worklet';
-  const multiplier = 10 ** getPrecision(step);
-  const value = (currentValue - min) * multiplier;
-  const modulo = step * multiplier;
-  const clampedValue = clamp(
-    Math.floor(value - (value % modulo)) / multiplier,
-    0,
-    max - min,
-  );
-  return min + clampedValue;
-};
-
 const DashedSlider = ({
   variant = 'default',
-  value: pan,
+  sharedValue: pan,
   min,
   max,
   step,
@@ -96,16 +47,19 @@ const DashedSlider = ({
 
   const animationOffsetValue = useSharedValue(0);
 
-  const debouncedUpdate = useThrottledCallback(
-    onChange,
-    // delay in ms
-    200,
-    { trailing: false, leading: false },
-  );
+  const animationActive = useSharedValue(false);
+
+  useInterval(() => {
+    if (!animationActive.value) {
+      return;
+    }
+    onChange(pan.value);
+  }, 16);
 
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       animationOffsetValue.value = pan.value;
+      animationActive.value = true;
     })
     .onUpdate(e => {
       const dval = step * (e.translationX / computedInterval);
@@ -115,7 +69,6 @@ const DashedSlider = ({
       );
 
       pan.value = newValue;
-      runOnJS(Platform.OS === 'android' ? debouncedUpdate : onChange)(newValue);
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
@@ -126,7 +79,7 @@ const DashedSlider = ({
           easing: Easing.out(Easing.exp),
         },
         () => {
-          runOnJS(onChange)(clamped);
+          animationActive.value = false;
         },
       );
     });
@@ -190,6 +143,49 @@ const DashedSlider = ({
 };
 
 export default DashedSlider;
+
+const gradientLocation = [0.0, 0.5, 1];
+const gradientStart = { x: 0, y: 1 };
+const gradientEnd = { x: 1, y: 1 };
+
+const MemoizedLinearGradient = memo(
+  LinearGradient,
+  (prevProps, nextProps) =>
+    prevProps.colors === nextProps.colors &&
+    prevProps.locations === nextProps.locations &&
+    prevProps.start === nextProps.start &&
+    prevProps.end === nextProps.end,
+);
+
+const getPrecision = (a: number) => {
+  'worklet';
+  if (!isFinite(a)) return 0;
+  let e = 1;
+  let p = 0;
+  while (Math.round(a * e) / e !== a) {
+    e *= 10;
+    p++;
+  }
+  return p;
+};
+
+export const getClampedValue = (
+  currentValue: number,
+  step: number,
+  min: number,
+  max: number,
+) => {
+  'worklet';
+  const multiplier = 10 ** getPrecision(step);
+  const value = (currentValue - min) * multiplier;
+  const modulo = step * multiplier;
+  const clampedValue = clamp(
+    Math.floor(value - (value % modulo)) / multiplier,
+    0,
+    max - min,
+  );
+  return min + clampedValue;
+};
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
