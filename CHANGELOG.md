@@ -1,5 +1,6 @@
-## 0.5.1-canary.78
+## 0.5.1-canary.79
 
+* **test:**  - await end of transaction
 * **fix:**  - remove panresponder and replace by reanimated ([#1617](https://github.com/AzzappApp/azzapp/pull/1617))
 * **ui:**  - [#1426](https://github.com/AzzappApp/azzapp/pull/1426) fix color preview border in 🌒 mode ([#1634](https://github.com/AzzappApp/azzapp/pull/1634))
 * **fix:**  - increase hitSlop of section list item ([#1633](https://github.com/AzzappApp/azzapp/pull/1633))
