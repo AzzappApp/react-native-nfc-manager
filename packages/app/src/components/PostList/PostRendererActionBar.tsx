@@ -116,7 +116,9 @@ const PostRendererActionBar = ({
           }
         },
         onError: error => {
-          console.error(error);
+          console.log(error);
+          //add manual capture exception for testing issue
+          Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
 
           setCountReactions(prevReactions =>
             add ? prevReactions + 1 : prevReactions - 1,
