@@ -273,17 +273,32 @@ const Cropper = ({
               ? displayedHeight / offsetHeight
               : displayedWidth / offsetWidth;
 
+          // TODO reenable this when we make sure that cropping outside of the image is not an issue on the native side
+          // setCropDataCurrentValue(cropDataCurrentValue => ({
+          //   ...cropDataCurrentValue,
+          //   originX: clamp(
+          //     offsetX - e.translationX / scale,
+          //     -offsetWidth / 4,
+          //     mediaWidth - (3 * offsetWidth) / 4,
+          //   ),
+          //   originY: clamp(
+          //     offsetY + e.translationY / scale,
+          //     -offsetHeight / 2,
+          //     mediaHeight - (3 * offsetHeight) / 4,
+          //   ),
+          // }));
+
           setCropDataCurrentValue(cropDataCurrentValue => ({
             ...cropDataCurrentValue,
             originX: clamp(
               offsetX - e.translationX / scale,
-              -offsetWidth / 4,
-              mediaWidth - (3 * offsetWidth) / 4,
+              0,
+              mediaWidth - offsetWidth,
             ),
             originY: clamp(
               offsetY + e.translationY / scale,
-              -offsetHeight / 2,
-              mediaHeight - (3 * offsetHeight) / 4,
+              0,
+              mediaHeight - offsetHeight,
             ),
           }));
         })
