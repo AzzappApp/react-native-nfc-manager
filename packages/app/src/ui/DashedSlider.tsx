@@ -53,7 +53,7 @@ const DashedSlider = ({
     if (!animationActive.value) {
       return;
     }
-    onChange(pan.value);
+    onChange(Math.round(pan.value / step) * step);
   }, 16);
 
   const panGesture = Gesture.Pan()
