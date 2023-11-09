@@ -88,7 +88,7 @@ const ProfileScreenHeader = ({
       <Animated.View style={editHeaderStyle}>
         <Header
           middleElement={
-            <Text>
+            <Text variant="large">
               {selectionMode ? (
                 <FormattedMessage
                   defaultMessage="{nbSelectedModules} selected"
