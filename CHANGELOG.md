@@ -1,5 +1,6 @@
-## 0.5.1-canary.67
+## 0.5.1-canary.68
 
+* **fix:**  - onUpdate doesn’t work in ios built app ([#1625](https://github.com/AzzappApp/azzapp/pull/1625))
 * **fix:**  - restore backgroundColor on ProfileScreen ([#1607](https://github.com/AzzappApp/azzapp/pull/1607))
 * **fix:**  - **WebCard:** layout at appear ([#1588](https://github.com/AzzappApp/azzapp/pull/1588))
 * **fix:**  - [#1595](https://github.com/AzzappApp/azzapp/pull/1595) ([#1596](https://github.com/AzzappApp/azzapp/pull/1596))
