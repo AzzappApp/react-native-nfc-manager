@@ -29,7 +29,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   }
 
   try {
-    db.transaction(async trx => {
+    await db.transaction(async trx => {
       try {
         console.warn('PostReaction', profileId, targetId);
         const reaction = await getPostReaction(profileId, targetId, trx);
