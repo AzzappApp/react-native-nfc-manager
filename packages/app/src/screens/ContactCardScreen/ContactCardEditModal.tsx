@@ -18,7 +18,8 @@ import ContactCardEditModalEmails from './ContactCardEditModalEmails';
 import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
 import ContactCardEditModalSocials from './ContactCardEditModalSocials';
-import ContactCardEditModalStyles, {
+import {
+  buildContactCardModalStyleSheet,
   DELETE_BUTTON_WIDTH,
 } from './ContactCardEditModalStyles';
 import ContactCardEditModalUrls from './ContactCardEditModalUrls';
@@ -199,6 +200,8 @@ const ContactCardEditModal = ({
 
   return (
     <BottomSheetModal
+      contentContainerStyle={styles.bottomSheetContainerStyle}
+      headerStyle={styles.headerStyle}
       visible={visible}
       height={height - 30 - insets.top}
       onRequestClose={toggleBottomSheet}
@@ -235,220 +238,166 @@ const ContactCardEditModal = ({
     >
       <ScrollView scrollEnabled={!state.rect} automaticallyAdjustKeyboardInsets>
         <View style={styles.sectionsContainer}>
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Details"
-                description="Section title fro basic infos of the contact card (firstname, lastname ...)"
-              />
-            </Text>
-          </View>
-
-          <Controller
-            control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="First name"
-                    description="First name registered for the contact card"
+          <View style={styles.section}>
+            <Controller
+              control={control}
+              name="firstName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold">
+                    <FormattedMessage
+                      defaultMessage="First name"
+                      description="First name registered for the contact card"
+                    />
+                  </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a first name',
+                      description:
+                        'Placeholder for first name inside contact card',
+                    })}
                   />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a first name',
-                    description:
-                      'Placeholder for first name inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
+                </View>
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Last name"
-                    description="Last name field registered for the contact card"
+            <Controller
+              control={control}
+              name="lastName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold">
+                    <FormattedMessage
+                      defaultMessage="Last name"
+                      description="Last name field registered for the contact card"
+                    />
+                  </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    clearButtonMode="while-editing"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a last name',
+                      description: 'Placeholder for last name contact card',
+                    })}
                   />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a last name',
-                    description: 'Placeholder for last name contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
+                </View>
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Title"
-                    description="Job title field registered for the contact card"
+            <Controller
+              control={control}
+              name="title"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold">
+                    <FormattedMessage
+                      defaultMessage="Title"
+                      description="Job title field registered for the contact card"
+                    />
+                  </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    clearButtonMode="while-editing"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a title',
+                      description: 'Placeholder for title inside contact card',
+                    })}
                   />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a title',
-                    description: 'Placeholder for title inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-          <Controller
-            control={control}
-            name="company"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Company name"
-                    description="Company name field registered for the contact card"
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name="company"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold">
+                    <FormattedMessage
+                      defaultMessage="Company name"
+                      description="Company name field registered for the contact card"
+                    />
+                  </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    clearButtonMode="while-editing"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a company name',
+                      description:
+                        'Placeholder for company name inside contact card',
+                    })}
                   />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a company name',
-                    description:
-                      'Placeholder for company name inside contact card',
-                  })}
-                />
-              </View>
-            )}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Phone number"
-                description="Section title for phone numbers"
-              />
-            </Text>
+                </View>
+              )}
+            />
+          </View>
+          <View style={styles.section}>
+            <ContactCardEditModalPhones
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
+          </View>
+          <View style={styles.section}>
+            <ContactCardEditModalEmails
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
+          </View>
+          <View style={styles.section}>
+            <ContactCardEditModalUrls
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
           </View>
 
-          <ContactCardEditModalPhones
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Email"
-                description="Section title for emails"
-              />
-            </Text>
+          <View style={styles.section}>
+            <ContactCardEditModalAddresses
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
           </View>
-
-          <ContactCardEditModalEmails
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="URL"
-                description="Section title for URL"
-              />
-            </Text>
+          <View style={styles.section}>
+            <ContactCardEditModalBirthdays
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
           </View>
-
-          <ContactCardEditModalUrls
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="address"
-                description="Section title for address"
-              />
-            </Text>
+          <View style={styles.section}>
+            <ContactCardEditModalSocials
+              deleted={state.deleted}
+              deleteButtonRect={state.rect}
+              control={control}
+              openDeleteButton={openDeleteButton}
+              closeDeleteButton={closeDeleteButton}
+            />
           </View>
-
-          <ContactCardEditModalAddresses
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="birthday"
-                description="Section title for birthday"
-              />
-            </Text>
-          </View>
-
-          <ContactCardEditModalBirthdays
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="social profile"
-                description="Section title for social profile"
-              />
-            </Text>
-          </View>
-
-          <ContactCardEditModalSocials
-            deleted={state.deleted}
-            deleteButtonRect={state.rect}
-            control={control}
-            openDeleteButton={openDeleteButton}
-            closeDeleteButton={closeDeleteButton}
-          />
         </View>
         {state.rect && (
           <Pressable
@@ -480,6 +429,8 @@ const ContactCardEditModal = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  bottomSheetContainerStyle: { paddingHorizontal: 0 },
+  headerStyle: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   sectionTitleContainer: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
@@ -493,9 +444,12 @@ const styleSheet = createStyleSheet(appearance => ({
     textTransform: 'uppercase',
   },
   sectionsContainer: {
-    paddingHorizontal: 10,
-    rowGap: 20,
-    paddingVertical: 20,
+    rowGap: 30,
+    paddingBottom: 20,
+    backgroundColor: colors.grey50,
+  },
+  section: {
+    rowGap: 1,
   },
   overlay: {
     position: 'absolute',
@@ -504,7 +458,7 @@ const styleSheet = createStyleSheet(appearance => ({
     right: 0,
     bottom: 0,
   },
-  ...ContactCardEditModalStyles,
+  ...buildContactCardModalStyleSheet(appearance),
 }));
 
 export default ContactCardEditModal;

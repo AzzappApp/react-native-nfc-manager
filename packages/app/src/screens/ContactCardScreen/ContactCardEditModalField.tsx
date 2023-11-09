@@ -6,7 +6,7 @@ import {
   useWatch,
 } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -14,6 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -22,7 +23,8 @@ import SelectList from '#ui/SelectList';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import contactModalStyles, {
+import {
+  buildContactCardModalStyleSheet,
   DELETE_BUTTON_WIDTH,
 } from './ContactCardEditModalStyles';
 import type { ContactCardEditForm } from './ContactCardEditModalSchema';
@@ -96,6 +98,8 @@ const ContactCardEditModalField = ({
 
   const [visible, setVisible] = useState(false);
 
+  const styles = useStyleSheet(stylesheet);
+
   return (
     <>
       <Animated.View
@@ -108,13 +112,7 @@ const ContactCardEditModalField = ({
         //   originX: -50,
         // }).withCallback(callback)}
       >
-        <View
-          style={{
-            columnGap: 7,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
+        <View style={styles.fieldContainer}>
           <IconButton
             variant="icon"
             icon="delete_filled"
@@ -159,7 +157,11 @@ const ContactCardEditModalField = ({
           control={control}
           name={selectedKey}
           render={({ field: { onChange, value } }) => (
-            <Switch value={value as boolean} onValueChange={onChange} />
+            <Switch
+              value={value as boolean}
+              onValueChange={onChange}
+              style={styles.switch}
+            />
           )}
         />
         <PressableNative
@@ -205,7 +207,12 @@ const ContactCardEditModalField = ({
   );
 };
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
+  fieldContainer: {
+    columnGap: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   deleteButton: {
     right: -70,
     height: 32,
@@ -218,9 +225,10 @@ const styles = StyleSheet.create({
   labelSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: 10,
+    columnGap: 5,
   },
-  ...contactModalStyles,
-});
+  switch: { marginRight: -8 },
+  ...buildContactCardModalStyleSheet(appearance),
+}));
 
 export default ContactCardEditModalField;

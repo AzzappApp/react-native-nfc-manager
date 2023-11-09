@@ -47,6 +47,10 @@ export type BottomSheetModalProps = Omit<
    */
   contentContainerStyle?: StyleProp<ViewStyle>;
   /**
+   * The style of the header
+   */
+  headerStyle?: StyleProp<ViewStyle>;
+  /**
    *
    * disableGestureInteraction
    */
@@ -86,6 +90,7 @@ const BottomSheetModal = ({
   variant,
   disableGestureInteraction,
   contentContainerStyle,
+  headerStyle,
   showGestureIndicator = true,
   onRequestClose,
   disableKeyboardAvoidingView,
@@ -246,7 +251,7 @@ const BottomSheetModal = ({
           )}
           {hasHeader && (
             <Header
-              style={styles.accessoryView}
+              style={[styles.accessoryView, headerStyle]}
               middleElement={headerTitle}
               leftElement={headerLeftButton}
               rightElement={headerRightButton}
