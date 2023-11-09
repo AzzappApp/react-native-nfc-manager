@@ -99,7 +99,7 @@ const DashedSlider = ({
   const debouncedUpdate = useThrottledCallback(
     onChange,
     // delay in ms
-    Platform.OS === 'android' ? 200 : 20,
+    200,
     { trailing: false, leading: false },
   );
 
@@ -109,12 +109,13 @@ const DashedSlider = ({
     })
     .onUpdate(e => {
       const dval = step * (e.translationX / computedInterval);
-      pan.value = Math.min(
+      const newValue = Math.min(
         Math.max(animationOffsetValue.value - dval, min),
         max,
       );
 
-      runOnJS(debouncedUpdate)(pan.value);
+      pan.value = newValue;
+      runOnJS(Platform.OS === 'android' ? debouncedUpdate : onChange)(newValue);
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
