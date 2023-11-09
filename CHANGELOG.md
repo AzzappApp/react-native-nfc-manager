@@ -1,5 +1,6 @@
-## 0.5.1-canary.70
+## 0.5.1-canary.71
 
+* **fix:**  - **WebCardEdition:** fix background in edition mode
 * **fix:**  - **account:** [#1611](https://github.com/AzzappApp/azzapp/pull/1611) wrong background on account header ([#1618](https://github.com/AzzappApp/azzapp/pull/1618))
 * **style:**  - [#1615](https://github.com/AzzappApp/azzapp/pull/1615) missing shadow on cover ([#1619](https://github.com/AzzappApp/azzapp/pull/1619))
 * **fix:**  - onUpdate doesn’t work in ios built app ([#1625](https://github.com/AzzappApp/azzapp/pull/1625))
