@@ -77,6 +77,7 @@ const MediaScreen = ({
                 }
                 coverListStyle={styles.coverList}
                 viewer={viewer}
+                isCurrentTab={tab === 'SUGGESTIONS'}
               />
               <Text style={styles.postsTitleStyle} variant="large">
                 <FormattedMessage

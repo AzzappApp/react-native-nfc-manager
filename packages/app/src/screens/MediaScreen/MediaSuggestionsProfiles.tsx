@@ -16,7 +16,6 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
-import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggleFollow from '#hooks/useToggleFollow';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -29,6 +28,7 @@ type MediaSuggestionsProfilesProps = {
   viewer: MediaSuggestionsProfiles_viewer$key;
   coverListStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
+  isCurrentTab: boolean;
 };
 
 const NB_PROFILES = 6;
@@ -37,6 +37,7 @@ const MediaSuggestionsProfiles = ({
   viewer,
   coverListStyle,
   header,
+  isCurrentTab,
 }: MediaSuggestionsProfilesProps) => (
   <View>
     {header}
@@ -52,7 +53,11 @@ const MediaSuggestionsProfiles = ({
         </View>
       }
     >
-      <MediaSuggestionsProfilesInner viewer={viewer} style={coverListStyle} />
+      <MediaSuggestionsProfilesInner
+        viewer={viewer}
+        style={coverListStyle}
+        isCurrentTab={isCurrentTab}
+      />
     </Suspense>
   </View>
 );
@@ -60,9 +65,11 @@ const MediaSuggestionsProfiles = ({
 const MediaSuggestionsProfilesInner = ({
   viewer,
   style,
+  isCurrentTab,
 }: {
   viewer: MediaSuggestionsProfiles_viewer$key;
   style?: StyleProp<ViewStyle>;
+  isCurrentTab: boolean;
 }) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -91,10 +98,10 @@ const MediaSuggestionsProfilesInner = ({
       viewer,
     );
 
-  const hasFocus = useScreenHasFocus();
-  const hasFocusRef = useRef(hasFocus);
+  const isCurrentTabRef = useRef(isCurrentTab);
   useEffect(() => {
-    if (hasFocus && !hasFocusRef.current) {
+    console.log('isCurrentTabRef', isCurrentTabRef.current, isCurrentTab);
+    if (isCurrentTab && !isCurrentTabRef.current) {
       startTransition(() => {
         refetch(
           {
@@ -105,8 +112,8 @@ const MediaSuggestionsProfilesInner = ({
         );
       });
     }
-    hasFocusRef.current = hasFocus;
-  }, [hasFocus, refetch]);
+    isCurrentTabRef.current = isCurrentTab;
+  }, [isCurrentTab, refetch]);
 
   const users = useMemo(() => {
     return convertToNonNullArray(
