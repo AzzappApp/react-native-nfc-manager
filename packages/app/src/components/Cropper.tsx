@@ -2,7 +2,7 @@ import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
 import range from 'lodash/range';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { colors, mixins } from '#theme';
 import type { CropData, ImageOrientation } from '#components/gpu';
@@ -314,7 +314,6 @@ const Cropper = ({
     ],
   );
 
-  const isAndroid = Platform.OS === 'android';
   const pinchGesture = useMemo(
     () =>
       Gesture.Pinch()
