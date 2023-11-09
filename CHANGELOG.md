@@ -1,5 +1,6 @@
-## 0.5.1-canary.74
+## 0.5.1-canary.75
 
+* **ui:**  - [#1426](https://github.com/AzzappApp/azzapp/pull/1426) fix color preview border in 🌒 mode ([#1634](https://github.com/AzzappApp/azzapp/pull/1634))
 * **fix:**  - increase hitSlop of section list item ([#1633](https://github.com/AzzappApp/azzapp/pull/1633))
 * **fix:**  - prevent crop prevent zoom smaller than image size
 * **fix:**  - prevent crop outside of bounds
