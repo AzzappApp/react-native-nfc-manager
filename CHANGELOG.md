@@ -1,5 +1,7 @@
-## 0.5.1-canary.68
+## 0.5.1-canary.69
 
+* **fix:**  - **account:** [#1611](https://github.com/AzzappApp/azzapp/pull/1611) wrong background on account header ([#1618](https://github.com/AzzappApp/azzapp/pull/1618))
+* **style:**  - [#1615](https://github.com/AzzappApp/azzapp/pull/1615) missing shadow on cover ([#1619](https://github.com/AzzappApp/azzapp/pull/1619))
 * **fix:**  - onUpdate doesn’t work in ios built app ([#1625](https://github.com/AzzappApp/azzapp/pull/1625))
 * **fix:**  - restore backgroundColor on ProfileScreen ([#1607](https://github.com/AzzappApp/azzapp/pull/1607))
 * **fix:**  - **WebCard:** layout at appear ([#1588](https://github.com/AzzappApp/azzapp/pull/1588))
