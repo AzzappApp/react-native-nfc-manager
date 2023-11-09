@@ -58,7 +58,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
               description="Top/bottom margin message in HorizontalPhoto edition"
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN}
           step={1}
@@ -89,7 +89,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
               />
             )
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN}
           step={1}

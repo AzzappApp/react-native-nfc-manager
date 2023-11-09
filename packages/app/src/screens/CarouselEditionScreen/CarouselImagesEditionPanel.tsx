@@ -137,7 +137,7 @@ const CarouselImagesEditionPanel = ({
               description="Images height label in carousel edition"
             />
           }
-          value={imageHeight}
+          initialValue={imageHeight}
           min={CAROUSEL_MIN_IMAGE_HEIGHT}
           max={CAROUSEL_MAX_IMAGE_HEIGHT}
           step={5}

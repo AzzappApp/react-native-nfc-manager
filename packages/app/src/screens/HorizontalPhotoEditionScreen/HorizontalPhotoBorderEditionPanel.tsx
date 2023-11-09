@@ -119,7 +119,7 @@ const HorizontalPhotoBorderEditionPanel = ({
               description="Border size message in Horizontal Photo edition"
             />
           }
-          value={borderWidth}
+          initialValue={borderWidth}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_BORDER_WIDTH}
           step={1}
@@ -143,7 +143,7 @@ const HorizontalPhotoBorderEditionPanel = ({
               description="Border radius message in Horizontal Photo edition"
             />
           }
-          value={borderRadius}
+          initialValue={borderRadius}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_BORDER_RADIUS}
           step={1}

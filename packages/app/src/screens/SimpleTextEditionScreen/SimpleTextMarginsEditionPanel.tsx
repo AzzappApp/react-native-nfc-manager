@@ -63,7 +63,7 @@ const SimpleTextMarginEditionPanel = ({
               description="Font size message in cover edition"
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={
             moduleKind === 'simpleText'
@@ -89,7 +89,7 @@ const SimpleTextMarginEditionPanel = ({
               description="margin size message in cover edition"
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={
             moduleKind === 'simpleText'

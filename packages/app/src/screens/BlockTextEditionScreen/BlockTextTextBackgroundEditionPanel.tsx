@@ -132,7 +132,7 @@ const BlockTextTextBackgroundEditionPanel = ({
             description="Photo Opacity message in BlockText edition"
           />
         }
-        value={opacity}
+        initialValue={opacity}
         min={0}
         max={100}
         step={1}

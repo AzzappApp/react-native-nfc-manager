@@ -68,7 +68,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Left/Right message in PhotoWithTextAndTitle edition"
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_HORIZONTAL_MARGIN}
           step={1}
@@ -92,7 +92,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Top/Bottom margin message in PhotoWithTextAndTitle edition"
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_MARGIN}
           step={1}
@@ -116,7 +116,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Image/Text Gap message in PhotoWithTextAndTitle edition"
             />
           }
-          value={gap}
+          initialValue={gap}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_GAP}
           step={1}

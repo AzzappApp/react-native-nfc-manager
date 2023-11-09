@@ -170,7 +170,7 @@ const SocialLinksSettingsEditionPanel = ({
               description="Icon Size message in SocialLinks edition"
             />
           }
-          value={iconSize}
+          initialValue={iconSize}
           min={SOCIAL_LINKS_MIN_ICON_SIZE}
           max={SOCIAL_LINKS_MAX_ICON_SIZE}
           step={1}
@@ -192,7 +192,7 @@ const SocialLinksSettingsEditionPanel = ({
               description="Border size message in SocialLinks edition"
             />
           }
-          value={borderWidth}
+          initialValue={borderWidth}
           min={0}
           max={SOCIAL_LINKS_MAX_BORDER_WIDTH}
           step={1}
@@ -216,7 +216,7 @@ const SocialLinksSettingsEditionPanel = ({
               description="Spacing message in SocialLinks edition"
             />
           }
-          value={columnGap}
+          initialValue={columnGap}
           min={0}
           max={SOCIAL_LINKS_MAX_COLUMN_GAP}
           step={1}

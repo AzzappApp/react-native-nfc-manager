@@ -80,7 +80,7 @@ const SimpleButtonMarginsEditionPanel = ({
             description="marginTop message in SimpleButton edition"
           />
         }
-        value={marginTop}
+        initialValue={marginTop}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_TOP}
         step={1}
@@ -102,7 +102,7 @@ const SimpleButtonMarginsEditionPanel = ({
             description="Bottom margin message in SimpleButton edition"
           />
         }
-        value={marginBottom}
+        initialValue={marginBottom}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_BOTTOM}
         step={1}
@@ -133,7 +133,7 @@ const SimpleButtonMarginsEditionPanel = ({
               description="width message in SimpleButton edition"
             />
           }
-          value={width}
+          initialValue={width}
           min={SIMPLE_BUTTON_MIN_WIDTH}
           max={SIMPLE_BUTTON_MAX_WIDTH}
           step={1}
@@ -158,7 +158,7 @@ const SimpleButtonMarginsEditionPanel = ({
               }}
             />
           }
-          value={height}
+          initialValue={height}
           min={SIMPLE_BUTTON_MIN_HEIGHT}
           max={SIMPLE_BUTTON_MAX_HEIGHT}
           step={1}

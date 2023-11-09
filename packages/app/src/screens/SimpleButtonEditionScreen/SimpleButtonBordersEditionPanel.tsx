@@ -126,7 +126,7 @@ const SimpleButtonBordersEditionPanel = ({
               description="borderWidth message in SimpleButton edition"
             />
           }
-          value={borderWidth}
+          initialValue={borderWidth}
           min={0}
           max={SIMPLE_BUTTON_MAX_BORDER_WIDTH}
           step={1}
@@ -151,7 +151,7 @@ const SimpleButtonBordersEditionPanel = ({
               description="border radius message in SimpleButton edition"
             />
           }
-          value={borderRadius}
+          initialValue={borderRadius}
           min={0}
           max={SIMPLE_BUTTON_MAX_BORDER_RADIUS}
           step={1}

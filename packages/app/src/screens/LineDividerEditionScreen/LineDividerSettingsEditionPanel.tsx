@@ -69,7 +69,7 @@ const LineDividerSettingsEditionPanel = ({
             description="Height message in Line Divider edition"
           />
         }
-        value={height}
+        initialValue={height}
         min={LINE_DIVIDER_MIN_HEIGHT}
         max={LINE_DIVIDER_MAX_HEIGHT}
         step={1}

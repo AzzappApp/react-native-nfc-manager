@@ -282,7 +282,7 @@ const SimpleButtonSettingsEditionPanel = ({
               description="fontSize message in SimpleButton edition"
             />
           }
-          value={fontSize}
+          initialValue={fontSize}
           min={SIMPLE_BUTTON_MIN_FONT_SIZE}
           max={SIMPLE_BUTTON_MAX_FONT_SIZE}
           step={1}

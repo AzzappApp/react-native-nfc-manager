@@ -226,7 +226,9 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
                 description="Font size message in PhotoWithTextAndTitle edition"
               />
             }
-            value={currentTab === 'title' ? titleFontSize : contentFontSize}
+            initialValue={
+              currentTab === 'title' ? titleFontSize : contentFontSize
+            }
             min={
               currentTab === 'title'
                 ? PHOTO_WITH_TEXT_AND_TITLE_MIN_TITLE_FONT_SIZE
@@ -279,7 +281,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               description="Vertical Spacing message in PhotoWithTextAndTitle edition"
             />
           }
-          value={
+          initialValue={
             currentTab === 'title'
               ? titleVerticalSpacing
               : contentVerticalSpacing

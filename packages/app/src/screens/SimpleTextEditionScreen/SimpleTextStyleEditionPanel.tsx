@@ -144,7 +144,7 @@ const SimpleTextStyleEditionPanel = ({
             description="Font size message in cover edition"
           />
         }
-        value={fontSize}
+        initialValue={fontSize}
         min={
           moduleKind === 'simpleText'
             ? SIMPLE_TEXT_MIN_FONT_SIZE
@@ -174,7 +174,7 @@ const SimpleTextStyleEditionPanel = ({
             description="Vertical Spacing message in simple text edition"
           />
         }
-        value={verticalSpacing}
+        initialValue={verticalSpacing}
         min={0}
         max={
           moduleKind === 'simpleText'

@@ -137,7 +137,7 @@ const BlockTextSettingsEditionPanel = ({
               description="fontSize message in BlockText edition"
             />
           }
-          value={fontSize}
+          initialValue={fontSize}
           min={BLOCK_TEXT_MIN_FONT_SIZE}
           max={BLOCK_TEXT_MAX_FONT_SIZE}
           step={1}
@@ -159,7 +159,7 @@ const BlockTextSettingsEditionPanel = ({
               description="vertical Spacing message in BlockText edition"
             />
           }
-          value={verticalSpacing}
+          initialValue={verticalSpacing}
           min={0}
           max={BLOCK_TEXT_MAX_VERTICAL_SPACING}
           step={1}

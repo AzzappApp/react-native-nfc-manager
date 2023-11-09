@@ -77,7 +77,7 @@ const BlockTextMarginsEditionPanel = ({
             defaultMessage: 'Text margin :',
             description: 'Text margin message in BlockText edition',
           })}
-          value={textMarginVertical}
+          initialValue={textMarginVertical}
           min={0}
           max={BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN}
           step={1}
@@ -101,7 +101,7 @@ const BlockTextMarginsEditionPanel = ({
               description="textMarginHorizontal message in BlockText edition"
             />
           }
-          value={textMarginHorizontal}
+          initialValue={textMarginHorizontal}
           min={0}
           max={BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN}
           step={1}
@@ -132,7 +132,7 @@ const BlockTextMarginsEditionPanel = ({
                 description="Space top/bottom message in BlockText edition"
               />
             }
-            value={marginVertical}
+            initialValue={marginVertical}
             min={0}
             max={BLOCK_TEXT_MAX_VERTICAL_MARGIN}
             step={1}
@@ -156,7 +156,7 @@ const BlockTextMarginsEditionPanel = ({
                 description="Space left/right message in BlockText edition"
               />
             }
-            value={marginHorizontal}
+            initialValue={marginHorizontal}
             min={0}
             max={BLOCK_TEXT_MAX_HORIZONTAL_MARGIN}
             step={1}

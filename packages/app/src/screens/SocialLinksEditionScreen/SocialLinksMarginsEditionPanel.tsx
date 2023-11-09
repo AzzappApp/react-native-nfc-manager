@@ -72,7 +72,7 @@ const SocialLinksMarginsEditionPanel = ({
               description="Top margin message in SocialLinks edition"
             />
           }
-          value={marginTop}
+          initialValue={marginTop}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_TOP}
           step={1}
@@ -95,7 +95,7 @@ const SocialLinksMarginsEditionPanel = ({
               description="Bottom margin message in SocialLinks edition"
             />
           }
-          value={marginBottom}
+          initialValue={marginBottom}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_BOTTOM}
           step={1}
@@ -119,7 +119,7 @@ const SocialLinksMarginsEditionPanel = ({
               description="Horizontal margin message in SocialLinks edition"
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL}
           step={1}

@@ -67,7 +67,7 @@ const CarouselEditionMarginPanel = ({
               description="Margin vertical label in carousel edition"
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={CAROUSEL_MAX_VERTICAL_MARGIN}
           step={1}
@@ -81,7 +81,7 @@ const CarouselEditionMarginPanel = ({
               description="Margin horizontal label in carousel edition"
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={CAROUSEL_MAX_HORIZONTAL_MARGIN}
           step={1}
@@ -95,7 +95,7 @@ const CarouselEditionMarginPanel = ({
               description="Image gap label in carousel edition"
             />
           }
-          value={gap}
+          initialValue={gap}
           min={0}
           max={CAROUSEL_MAX_GAP}
           step={1}

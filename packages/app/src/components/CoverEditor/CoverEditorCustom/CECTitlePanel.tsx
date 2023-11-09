@@ -248,13 +248,14 @@ const CECTitlePanel = ({
         </View>
 
         <LabeledDashedSlider
+          key={`${currentTab}-fontSize`}
           label={
             <FormattedMessage
               defaultMessage="Font size :"
               description="Font size message in cover edition"
             />
           }
-          value={fontSize}
+          initialValue={fontSize}
           min={COVER_MIN_FONT_SIZE}
           max={COVER_MAX_FONT_SIZE}
           step={1}

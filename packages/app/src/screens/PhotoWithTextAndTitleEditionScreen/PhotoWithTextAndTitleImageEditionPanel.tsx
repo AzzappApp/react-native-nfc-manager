@@ -137,7 +137,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               description="borderRadius message in PhotoWithTextAndTitle edition"
             />
           }
-          value={borderRadius}
+          initialValue={borderRadius}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_BORDER_RADIUS}
           step={1}
@@ -161,7 +161,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               description="Aspect ratio message in PhotoWithTextAndTitle edition"
             />
           }
-          value={aspectRatio}
+          initialValue={aspectRatio}
           min={PHOTO_WITH_TEXT_AND_TITLE_MIN_ASPECT_RATIO}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_ASPECT_RATIO}
           step={0.01}

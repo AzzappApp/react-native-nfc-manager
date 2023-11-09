@@ -56,7 +56,7 @@ const LineDividerMarginEditionPanel = ({
               description="Top margin message in Line Divider edition"
             />
           }
-          value={marginTop}
+          initialValue={marginTop}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_TOP}
           step={1}
@@ -80,7 +80,7 @@ const LineDividerMarginEditionPanel = ({
               description="Bottom margin message in Line Divider edition"
             />
           }
-          value={marginBottom}
+          initialValue={marginBottom}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_BOTTOM}
           step={1}

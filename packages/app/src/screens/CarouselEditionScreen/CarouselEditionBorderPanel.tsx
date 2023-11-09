@@ -125,7 +125,7 @@ const CarouselEditionBorderPanel = ({
               description="Border size message in carousel edition"
             />
           }
-          value={borderWidth}
+          initialValue={borderWidth}
           min={0}
           max={CAROUSEL_MAX_BORDER_WIDTH}
           step={1}
@@ -147,7 +147,7 @@ const CarouselEditionBorderPanel = ({
               description="Border radius in carousel edition"
             />
           }
-          value={borderRadius}
+          initialValue={borderRadius}
           min={0}
           max={CAROUSEL_MAX_BORDER_RADIUS}
           step={1}

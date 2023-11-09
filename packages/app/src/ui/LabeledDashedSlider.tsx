@@ -11,14 +11,14 @@ export type LabeledDashedSliderProps = Omit<
   'sharedValue'
 > & {
   label?: ReactNode;
-  value: number;
+  initialValue: number;
   formatValue?: (value: number) => number;
 };
 
 const LabeledDashedSlider = ({
   label,
   variant,
-  value,
+  initialValue,
   min,
   max,
   step,
@@ -27,7 +27,7 @@ const LabeledDashedSlider = ({
   formatValue,
   ...props
 }: LabeledDashedSliderProps) => {
-  const sharedValue = useSharedValue(value);
+  const sharedValue = useSharedValue(initialValue);
 
   const textValue = useDerivedValue(() => {
     return formatValue

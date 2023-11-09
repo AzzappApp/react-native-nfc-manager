@@ -92,7 +92,7 @@ const ImageEditionParameterControl = ({
     <View style={[styles.root, style]} {...props}>
       <LabeledDashedSlider
         formatValue={formatValue}
-        value={value}
+        initialValue={value}
         min={min}
         max={max}
         step={step}

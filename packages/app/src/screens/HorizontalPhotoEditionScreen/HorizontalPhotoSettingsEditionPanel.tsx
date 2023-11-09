@@ -47,7 +47,7 @@ const HorizontalPhotoSettingsEditionPanel = ({
               description="Height message in HorizontalPhoto edition"
             />
           }
-          value={height}
+          initialValue={height}
           min={HORIZONTAL_PHOTO_MIN_IMAGE_HEIGHT}
           max={HORIZONTAL_PHOTO_MAX_IMAGE_HEIGHT}
           step={1}
