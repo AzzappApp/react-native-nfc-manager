@@ -75,6 +75,7 @@ const CountryCodeListWithOptions = <T extends string>({
         visible={showDropdown}
         height={windowHeight - 120}
         contentContainerStyle={styles.bottomSheetContainer}
+        nestedScroll
         onRequestClose={() => setShowDropdown(false)}
       >
         <CountrySelector

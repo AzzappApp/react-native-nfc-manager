@@ -182,6 +182,7 @@ const ContactCardEditModalField = ({
         <BottomSheetModal
           visible={visible}
           onRequestClose={() => setVisible(false)}
+          nestedScroll
         >
           <View>
             <Controller

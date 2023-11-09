@@ -205,6 +205,7 @@ const ContactCardEditModal = ({
       visible={visible}
       height={height - 30 - insets.top}
       onRequestClose={toggleBottomSheet}
+      nestedScroll
       headerTitle={intl.formatMessage({
         defaultMessage: 'Edit Contact Card',
         description: 'Edit Contact Card Modal title',

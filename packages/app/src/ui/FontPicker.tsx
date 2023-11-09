@@ -30,6 +30,7 @@ const FontPicker = ({
     <BottomSheetModal
       visible={visible}
       onRequestClose={onRequestClose}
+      nestedScroll
       height={height}
       headerTitle={title}
       headerRightButton={

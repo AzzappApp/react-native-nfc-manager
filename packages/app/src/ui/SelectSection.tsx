@@ -152,6 +152,7 @@ const SelectSection = <ItemT, SectionT>({
         variant="modal"
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
+        nestedScroll
       >
         <SelectSectionList
           sections={sections as any}

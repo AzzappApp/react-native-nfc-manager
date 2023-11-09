@@ -98,6 +98,7 @@ function SelectSectionList<ItemT, SectionT>({
       keyExtractor={keyExtractor}
       renderItem={renderListItem}
       renderSectionHeader={renderHeaderSection}
+      showsVerticalScrollIndicator={false}
       {...props}
     />
   );
