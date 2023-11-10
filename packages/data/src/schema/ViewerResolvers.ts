@@ -114,6 +114,7 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(ProfileTable)
+        .where(eq(ProfileTable.cardIsPublished, true))
         .orderBy(desc(ProfileTable.createdAt)),
       args,
     );
@@ -148,12 +149,18 @@ export const Viewer: ViewerResolvers = {
     );
   },
   searchPosts: async (_, args) => {
-    // TODO dummy implementation just to test frontend
+    const posts = await db
+      .select()
+      .from(PostTable)
+      .innerJoin(ProfileTable, eq(PostTable.authorId, ProfileTable.id))
+      .where(
+        and(
+          like(PostTable.content, `%${args.search}%`),
+          eq(ProfileTable.cardIsPublished, true),
+        ),
+      );
     return connectionFromArray(
-      await db
-        .select()
-        .from(PostTable)
-        .where(like(PostTable.content, `%${args.search}%`)),
+      posts.map(({ Post }) => Post),
       args,
     );
   },
@@ -163,7 +170,12 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(ProfileTable)
-        .where(like(ProfileTable.userName, `%${args.search}%`)),
+        .where(
+          and(
+            eq(ProfileTable.cardIsPublished, true),
+            like(ProfileTable.userName, `%${args.search}%`),
+          ),
+        ),
       args,
     );
   },
