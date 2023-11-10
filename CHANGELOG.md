@@ -1,5 +1,7 @@
-## 0.5.1-canary.84
+## 0.5.1-canary.85
 
+* **fix:**  - [#1620](https://github.com/AzzappApp/azzapp/pull/1620) rotation counter 🕰️ ([#1654](https://github.com/AzzappApp/azzapp/pull/1654))
+* **fix:**  - **modules:** [#1646](https://github.com/AzzappApp/azzapp/pull/1646) issue in social module size calculation ([#1655](https://github.com/AzzappApp/azzapp/pull/1655))
 * **fix:**  - error message can be hide by sentry inner object ([#1499](https://github.com/AzzappApp/azzapp/pull/1499))
 * **fix:**  - **modules:** height is displayed twice on simple button edition ([#1644](https://github.com/AzzappApp/azzapp/pull/1644))
 * **ui:**  - [#1624](https://github.com/AzzappApp/azzapp/pull/1624) replace chevron with 𝕏 ([#1642](https://github.com/AzzappApp/azzapp/pull/1642))
