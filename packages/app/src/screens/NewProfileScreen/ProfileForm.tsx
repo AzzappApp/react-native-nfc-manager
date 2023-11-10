@@ -196,6 +196,9 @@ const ProfileForm = (
           nbFollowings
           nbFollowers
           nbLikes
+          nbPostsLiked
+          nbWebcardViews
+          nbContactCardScans
         }
       }
     }
