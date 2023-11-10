@@ -151,11 +151,8 @@ const SimpleButtonMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Height : {size}"
+              defaultMessage="Height :"
               description="height message in SimpleButton edition"
-              values={{
-                size: height,
-              }}
             />
           }
           initialValue={height}
