@@ -300,7 +300,7 @@ export const measureSocialLinksHeight = async (
       ([height, width], _) => {
         const nextWidth = width + iconSize;
         if (nextWidth > maxWidth) {
-          return [height + iconSize + columnGap, width];
+          return [height + iconSize + columnGap, iconSize];
         } else {
           return [height, nextWidth + columnGap];
         }
