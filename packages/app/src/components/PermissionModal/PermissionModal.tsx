@@ -114,9 +114,9 @@ const PermissionModal = ({
       <Container style={styles.container}>
         <SafeAreaView style={styles.root}>
           <Header
-            leftElement={
+            rightElement={
               <IconButton
-                icon="arrow_down"
+                icon="close"
                 onPress={onRequestClose}
                 variant="icon"
               />
