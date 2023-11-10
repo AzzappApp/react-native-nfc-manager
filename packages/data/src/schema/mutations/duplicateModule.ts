@@ -1,4 +1,5 @@
 import { sql, and, gt, eq, notInArray } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import omit from 'lodash/omit';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -16,11 +17,11 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
   const modules = await getCardModulesSortedByPosition(moduleIds);
   if (modules.some(m => m.profileId !== profileId)) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   let createdModuleIds: string[] = [];
@@ -55,7 +56,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
       });
     } catch (e) {
       console.error(e);
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
   }
 

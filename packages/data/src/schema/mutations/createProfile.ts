@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -21,7 +22,7 @@ const createProfileMutation: MutationResolvers['createProfile'] = async (
 ) => {
   const { userId } = auth;
   if (!userId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const {
@@ -37,18 +38,18 @@ const createProfileMutation: MutationResolvers['createProfile'] = async (
     graphqlProfileCategoryId,
   );
   if (type !== 'ProfileCategory') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   const profileCategory = await getProfileCategoryById(profileCategoryId);
   if (!profileCategory) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   let companyActivityId: string | null = null;
   if (graphqlCompanyActivityId) {
     const { id, type } = fromGlobalId(graphqlCompanyActivityId);
     if (type !== 'CompanyActivity') {
-      throw new Error(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
     companyActivityId = id;
     const profileCategoryActivities =
@@ -58,16 +59,16 @@ const createProfileMutation: MutationResolvers['createProfile'] = async (
         ({ id: activityId }) => activityId === companyActivityId,
       )
     ) {
-      throw new Error(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
 
   if (!isValidUserName(userName)) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (await getProfileByUserName(userName)) {
-    throw new Error(ERRORS.USERNAME_ALREADY_EXISTS);
+    throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
   }
 
   const inputProfile = {
@@ -87,11 +88,11 @@ const createProfileMutation: MutationResolvers['createProfile'] = async (
     const profileId = await createProfile({ ...inputProfile, contactCard });
     const profile = await loaders.Profile.load(profileId);
     if (!profile) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

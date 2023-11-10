@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt-ts';
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
@@ -25,7 +26,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   if (email) {
     const existingUser = await getUserByEmail(email);
     if (existingUser && existingUser.id !== userId) {
-      throw new Error(ERRORS.EMAIL_ALREADY_EXISTS);
+      throw new GraphQLError(ERRORS.EMAIL_ALREADY_EXISTS);
     }
     partialUser.email = email;
   }
@@ -35,7 +36,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
       formatPhoneNumber(phoneNumber),
     );
     if (existingUser && existingUser.id !== userId) {
-      throw new Error(ERRORS.PHONENUMBER_ALREADY_EXISTS);
+      throw new GraphQLError(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
     partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
   }
@@ -43,7 +44,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   const dbUser = await loaders.User.load(userId);
 
   if (!dbUser) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (newPassword) {
@@ -52,7 +53,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
       !dbUser.password ||
       !bcrypt.compareSync(currentPassword, dbUser.password)
     ) {
-      throw new Error(ERRORS.INVALID_CREDENTIALS);
+      throw new GraphQLError(ERRORS.INVALID_CREDENTIALS);
     }
 
     partialUser.password = bcrypt.hashSync(newPassword, 12);
@@ -63,7 +64,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
 
     return { user: { ...dbUser, ...partialUser } };
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

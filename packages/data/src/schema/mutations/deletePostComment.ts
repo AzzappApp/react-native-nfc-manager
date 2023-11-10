@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { PostTable, db, getPostCommentById, removeComment } from '#domains';
@@ -12,18 +13,18 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
   const { profileId } = auth;
 
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(commentId);
   if (type !== 'PostComment') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   try {
     const originalComment = await getPostCommentById(targetId);
-    if (!originalComment) throw new Error(ERRORS.INVALID_REQUEST);
+    if (!originalComment) throw new GraphQLError(ERRORS.INVALID_REQUEST);
     if (originalComment.profileId !== profileId)
-      throw new Error(ERRORS.FORBIDDEN);
+      throw new GraphQLError(ERRORS.FORBIDDEN);
 
     await db.transaction(async trx => {
       await trx
@@ -41,7 +42,7 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
     };
   } catch (error) {
     console.error(error);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

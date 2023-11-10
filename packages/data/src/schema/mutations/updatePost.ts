@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { updatePost } from '#domains';
@@ -13,7 +14,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { postId, ...postInput } = input;
@@ -22,7 +23,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   const post = await loaders.Post.load(targetId);
 
   if (!post) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const partialPost: Partial<NewPost> = {
@@ -41,7 +42,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
       post: { ...post, ...partialPost },
     };
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

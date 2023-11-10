@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -9,11 +10,11 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const updates = {
@@ -25,7 +26,7 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
   try {
     await updateProfile(profileId, updates);
   } catch (e) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   cardUsernamesToRevalidate.add(profile.userName);
   return {

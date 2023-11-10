@@ -1,4 +1,5 @@
 import { inArray } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
@@ -22,20 +23,20 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { type, id } = fromGlobalId(cardTemplateId);
   if (type !== 'CardTemplate') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   const cardTemplate = await getCardTemplateById(id);
   if (!cardTemplate) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const cardStyle =
@@ -90,7 +91,7 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     });
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   cardUsernamesToRevalidate.add(profile.userName);

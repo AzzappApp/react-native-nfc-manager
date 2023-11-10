@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import {
   ProfileTable,
@@ -16,16 +17,16 @@ const createPostMutation: MutationResolvers['createPost'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (!mediaId) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
@@ -63,7 +64,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     return { post };
   } catch (error) {
     console.error(error);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

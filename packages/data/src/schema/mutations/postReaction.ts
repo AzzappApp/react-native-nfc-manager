@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { PostTable, ProfileTable, db, updateStatistics } from '#domains';
@@ -15,17 +16,17 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   { auth, loaders },
 ) => {
   if (!auth.userId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(postId);
   const post = await loaders.Post.load(targetId);
   if (type !== 'Post' || !post) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
@@ -63,7 +64,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
     });
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   return { post };

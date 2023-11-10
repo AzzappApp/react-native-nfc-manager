@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { updateProfile } from '#domains/profiles';
 import type { Profile } from '#domains';
@@ -12,17 +13,17 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   let profile: Profile | null;
   try {
     profile = await loaders.Profile.load(profileId);
   } catch (e) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
   if (!profile) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { ...profileUpdates } = args.input;
@@ -39,7 +40,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
       profile: { ...profile, ...partialProfile },
     };
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

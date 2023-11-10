@@ -1,4 +1,5 @@
 import { sql, eq } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { ProfileTable, db, updateStatistics } from '#domains';
@@ -12,12 +13,12 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   const { profileId } = auth;
 
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(id);
   if (type !== 'Profile') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   try {
     if (targetId !== profileId) {
@@ -34,7 +35,7 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
 
     return true;
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -43,13 +44,13 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
     const { profileId } = auth;
 
     if (!profileId) {
-      throw new Error(ERRORS.UNAUTORIZED);
+      throw new GraphQLError(ERRORS.UNAUTORIZED);
     }
 
     const { id: targetId, type } = fromGlobalId(id);
 
     if (type !== 'Profile') {
-      throw new Error(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
     try {
       if (targetId !== profileId) {
@@ -58,7 +59,7 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
 
       return true;
     } catch (error) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
   };
 
@@ -70,13 +71,13 @@ const updateLikes: MutationResolvers['updateLikes'] = async (
   const { profileId } = auth;
 
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(id);
 
   if (type !== 'Profile') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   try {
     if (targetId !== profileId) {
@@ -85,7 +86,7 @@ const updateLikes: MutationResolvers['updateLikes'] = async (
 
     return true;
   } catch (error) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 
