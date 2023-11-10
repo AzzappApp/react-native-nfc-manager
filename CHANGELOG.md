@@ -1,5 +1,6 @@
-## 0.5.1-canary.79
+## 0.5.1-canary.80
 
+* **fix:**  - remove log and insure all transaction are await ([#1643](https://github.com/AzzappApp/azzapp/pull/1643))
 * **test:**  - await end of transaction
 * **fix:**  - remove panresponder and replace by reanimated ([#1617](https://github.com/AzzappApp/azzapp/pull/1617))
 * **ui:**  - [#1426](https://github.com/AzzappApp/azzapp/pull/1426) fix color preview border in 🌒 mode ([#1634](https://github.com/AzzappApp/azzapp/pull/1634))
