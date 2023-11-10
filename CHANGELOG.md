@@ -1,5 +1,6 @@
-## 0.5.1-canary.81
+## 0.5.1-canary.82
 
+* **fix:**  - error message can be hide by sentry inner object ([#1499](https://github.com/AzzappApp/azzapp/pull/1499))
 * **fix:**  - **modules:** height is displayed twice on simple button edition ([#1644](https://github.com/AzzappApp/azzapp/pull/1644))
 * **ui:**  - [#1624](https://github.com/AzzappApp/azzapp/pull/1624) replace chevron with 𝕏 ([#1642](https://github.com/AzzappApp/azzapp/pull/1642))
 * **fix:**  - remove log and insure all transaction are await ([#1643](https://github.com/AzzappApp/azzapp/pull/1643))
