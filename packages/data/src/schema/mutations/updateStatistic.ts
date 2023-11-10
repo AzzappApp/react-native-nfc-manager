@@ -21,7 +21,7 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   }
   try {
     if (targetId !== profileId) {
-      db.transaction(async trx => {
+      await db.transaction(async trx => {
         await updateStatistics(targetId, 'webcardViews', true, trx);
         await trx
           .update(ProfileTable)
