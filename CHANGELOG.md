@@ -1,4 +1,4 @@
-## 0.5.1-canary.82
+## 0.5.1-canary.83
 
 * **fix:**  - error message can be hide by sentry inner object ([#1499](https://github.com/AzzappApp/azzapp/pull/1499))
 * **fix:**  - **modules:** height is displayed twice on simple button edition ([#1644](https://github.com/AzzappApp/azzapp/pull/1644))
