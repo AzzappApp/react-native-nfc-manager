@@ -524,10 +524,15 @@ const CoverEditor = (
 
   // #region Media required modal
   const [showMediaRequiredModal, setShowMediaRequiredModal] = useState(false);
-  const onMediaRequiredModalClose = useCallback(() => {
-    setShowMediaRequiredModal(false);
-    openImagePicker();
-  }, [openImagePicker]);
+  const onMediaRequiredModalClose = useCallback(
+    (openPicker: boolean) => {
+      setShowMediaRequiredModal(false);
+      if (openPicker) {
+        openImagePicker();
+      }
+    },
+    [openImagePicker],
+  );
   // #endregion
 
   // #region Templates state
