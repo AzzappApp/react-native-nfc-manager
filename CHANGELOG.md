@@ -1,5 +1,6 @@
-## 0.5.1-canary.87
+## 0.5.1-canary.88
 
+* **feat:**  - add apple app site association ([#1661](https://github.com/AzzappApp/azzapp/pull/1661))
 * **fix:**  - [#1614](https://github.com/AzzappApp/azzapp/pull/1614) missing close button on MediaRequiredModal ([#1660](https://github.com/AzzappApp/azzapp/pull/1660))
 * **ui:**  - [#5](https://github.com/AzzappApp/azzapp/pull/5) add label for roll parameter ([#1658](https://github.com/AzzappApp/azzapp/pull/1658))
 * **fix:**  - **contactCard:** [#1638](https://github.com/AzzappApp/azzapp/pull/1638) social network are not viewed on ios + semico… ([#1653](https://github.com/AzzappApp/azzapp/pull/1653))
