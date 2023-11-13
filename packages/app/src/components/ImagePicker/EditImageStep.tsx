@@ -298,6 +298,11 @@ const EditImageStep = () => {
               <ImageEditionParameterControl
                 value={editionParameters.roll}
                 parameter="roll"
+                label={intl.formatMessage({
+                  defaultMessage: 'rotate:',
+                  description: 'Image roll parameter label',
+                })}
+                labelSuffix="°"
                 onChange={value => onParameterValueChange('roll', value)}
                 style={styles.filterSelectionStyle}
               />

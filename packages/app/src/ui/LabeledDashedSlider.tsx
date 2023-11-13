@@ -12,7 +12,7 @@ export type LabeledDashedSliderProps = Omit<
 > & {
   label?: ReactNode;
   initialValue: number;
-  formatValue?: (value: number) => number;
+  formatValue?: (value: number) => number | string;
 };
 
 const LabeledDashedSlider = ({

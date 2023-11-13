@@ -17,6 +17,14 @@ type ImageEditionParameterControlProps = ViewProps & {
    * Callback called when the value of the parameter changes.x
    */
   onChange(value: number): void;
+  /**
+   * The label suffix to display after the value.
+   */
+  labelSuffix?: string;
+  /**
+   * The label to display before the value.
+   */
+  label?: string;
 };
 
 function lerp(min: number, max: number, value: number) {
@@ -54,6 +62,8 @@ const ImageEditionParameterControl = ({
   value: propsValue,
   onChange,
   style,
+  labelSuffix,
+  label,
   ...props
 }: ImageEditionParameterControlProps) => {
   const parameterSettings = parameter && editionParametersSettings[parameter];
@@ -77,9 +87,9 @@ const ImageEditionParameterControl = ({
           displayedValue = Math.round(((value - min) * 100) / (max - min));
         }
       }
-      return displayedValue;
+      return labelSuffix ? `${displayedValue}${labelSuffix}` : displayedValue;
     },
-    [parameterSettings],
+    [labelSuffix, parameterSettings],
   );
 
   if (!parameterSettings) {
@@ -98,6 +108,7 @@ const ImageEditionParameterControl = ({
         step={step}
         interval={interval}
         onChange={onChange}
+        label={label}
       />
     </View>
   );

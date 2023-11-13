@@ -171,6 +171,11 @@ const CoverEditorCropModal = ({
         </Cropper>
         <View style={{ flex: 1 }}>
           <ImageEditionParameterControl
+            label={intl.formatMessage({
+              defaultMessage: 'rotate:',
+              description: 'Cover editor roll parameter label',
+            })}
+            labelSuffix="°"
             value={editionParameters.roll}
             parameter="roll"
             onChange={onRollChange}
