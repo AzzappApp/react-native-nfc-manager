@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View, type LayoutRectangle } from 'react-native';
 import { colors } from '#theme';
 import { useStyleSheet } from '#helpers/createStyles';
+import { SOCIAL_NETWORK_LINKS } from '#helpers/socialLinkHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -24,7 +25,7 @@ const ContactCardEditModalSocials = ({
   deleteButtonRect: LayoutRectangle | null;
   closeDeleteButton: () => void;
 }) => {
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'socials',
   });
@@ -43,7 +44,12 @@ const ContactCardEditModalSocials = ({
           closeDeleteButton={closeDeleteButton}
           key={social.id}
           control={control}
-          valueKey={`socials.${index}.social`}
+          labelKey={`socials.${index}.label`}
+          valueKey={`socials.${index}.url`}
+          labelValues={SOCIAL_NETWORK_LINKS.map(socialLink => ({
+            key: socialLink.id as string,
+            value: socialLink.id as string,
+          }))}
           selectedKey={`socials.${index}.selected`}
           deleteField={() => remove(index)}
           keyboardType="default"
@@ -51,13 +57,26 @@ const ContactCardEditModalSocials = ({
             defaultMessage: 'Enter a social profile',
             description: 'Placeholder for social profile inside contact card',
           })}
+          onChangeLabel={label => {
+            update(index, {
+              ...social,
+              label,
+              url:
+                SOCIAL_NETWORK_LINKS.find(socialLink => socialLink.id === label)
+                  ?.mask ?? '',
+            });
+          }}
         />
       ))}
       <View>
         <PressableNative
           style={styles.addButton}
           onPress={() => {
-            append({ social: '', selected: true });
+            append({
+              url: SOCIAL_NETWORK_LINKS[0].mask,
+              label: SOCIAL_NETWORK_LINKS[0].id,
+              selected: true,
+            });
           }}
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />

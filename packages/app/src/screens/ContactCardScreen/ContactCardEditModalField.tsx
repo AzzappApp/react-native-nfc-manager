@@ -43,6 +43,7 @@ const ContactCardEditModalField = ({
   control,
   labelValues,
   placeholder,
+  onChangeLabel,
 }: {
   deleted: boolean;
   deleteButtonRect: LayoutRectangle | null;
@@ -56,6 +57,7 @@ const ContactCardEditModalField = ({
   control: Control<ContactCardEditForm>;
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
+  onChangeLabel?: (label: string) => void;
 }) => {
   const deleteMode = useSharedValue(false);
 
@@ -194,6 +196,7 @@ const ContactCardEditModalField = ({
                   data={labelValues}
                   onItemSelected={item => {
                     onChange(item.key);
+                    onChangeLabel?.(item.key);
                     setVisible(false);
                   }}
                   selectedItemKey={value as string}

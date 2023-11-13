@@ -33,7 +33,8 @@ export type ContactCard = {
     selected: boolean;
   };
   socials?: Array<{
-    social: string;
+    url: string;
+    label: string;
     selected: boolean;
   }> | null;
 };
@@ -49,7 +50,7 @@ type ParsedContactCard = [
   Array<[string, string]>,
   Array<[string, string]>,
   string | undefined,
-  string[],
+  Array<[string, string]>,
 ];
 
 /**
@@ -87,7 +88,7 @@ export const serializeContactCard = (
     card?.birthday?.selected ? card?.birthday.birthday : undefined,
     card?.socials
       ?.filter(social => social.selected)
-      .map(social => social.social) ?? [],
+      .map(({ label, url }) => [label, url]) ?? [],
   ];
 
   return json2csv([serializedContactCard], { header: false });

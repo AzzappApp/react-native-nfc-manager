@@ -100,7 +100,8 @@ const ContactCardEditModal = ({
           selected
         }
         socials {
-          social
+          url
+          label
           selected
         }
         serializedContactCard {
@@ -169,7 +170,7 @@ const ContactCardEditModal = ({
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
             birthday: data.birthday,
-            socials: data.socials.filter(social => social.social),
+            socials: data.socials.filter(social => social.url),
           },
         },
         onCompleted: () => {

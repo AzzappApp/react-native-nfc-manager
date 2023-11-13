@@ -208,7 +208,7 @@ const BottomSheetModal = ({
         )}
         {hasHeader && (
           <Header
-            style={styles.accessoryView}
+            style={[styles.accessoryView, headerStyle]}
             middleElement={headerTitle}
             leftElement={headerLeftButton}
             rightElement={headerRightButton}
@@ -223,6 +223,7 @@ const BottomSheetModal = ({
     hasHeader,
     headerLeftButton,
     headerRightButton,
+    headerStyle,
     headerTitle,
     showGestureIndicator,
     styles.accessoryView,

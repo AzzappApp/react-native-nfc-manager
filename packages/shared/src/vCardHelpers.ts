@@ -43,13 +43,13 @@ export const buildVCard = (contactCardData: string) => {
   });
 
   contactCard.addresses.forEach(address => {
-    vcard.addAddress(address[0], address[1]);
+    vcard.addAddress(address[0], address[1].replace(/;/g, '\\;'));
   });
 
   if (contactCard.birthday) vcard.addBirthday(contactCard.birthday);
 
   contactCard.socials.forEach(social => {
-    vcard.addSocial(social, '');
+    vcard.addSocial(social[1], social[0]);
   });
 
   return vcard;
