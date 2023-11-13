@@ -1,5 +1,6 @@
-## 0.5.1-canary.92
+## 0.5.1-canary.93
 
+* **feat:**  - **aasa:** separate components root and profile
 * **fix:**  - aasa component pass for profile
 * **fix:**  - applcation site association and entitlement for ios
 * **fix:**  - [#1453](https://github.com/AzzappApp/azzapp/pull/1453) hide onboarding after profile creation ([#1659](https://github.com/AzzappApp/azzapp/pull/1659))
