@@ -34,6 +34,10 @@ const RootLayout = ({
         {/* todo better colors */}
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
+        <meta
+          name="apple-app-site-association"
+          content="/.well-known/apple-app-site-association"
+        />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
