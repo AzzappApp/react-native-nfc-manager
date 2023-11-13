@@ -4,8 +4,8 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:azzap-dev.azzap.com</string>
-		<string>applinks:azzapp-dev.azzap.com</string>
+		<string>webcredentials:azzapp-dev.vercel.app</string>
+		<string>applinks:azzapp-dev.vercel.app</string>
 	</array>
 </dict>
 </plist>
