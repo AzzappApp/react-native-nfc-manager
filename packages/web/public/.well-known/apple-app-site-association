@@ -10,8 +10,12 @@
         ],
         "components": [
           {
-            "/:profile": "/:profile",
-            "comment": "Matches any URL with a path that starts with */*."
+            "/": "/",
+            "comment": "Matches any root URL."
+          },
+          {
+            "/": "/*",
+            "comment": "Matches any URL with a path that starts with /*. (profile)"
           }
         ]
       }
