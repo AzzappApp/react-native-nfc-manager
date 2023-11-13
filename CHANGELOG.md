@@ -1,5 +1,6 @@
-## 0.5.1-canary.89
+## 0.5.1-canary.90
 
+* **fix:**  - [#1453](https://github.com/AzzappApp/azzapp/pull/1453) hide onboarding after profile creation ([#1659](https://github.com/AzzappApp/azzapp/pull/1659))
 * **fix:**  - format AASA file
 * **feat:**  - add apple app site association ([#1661](https://github.com/AzzappApp/azzapp/pull/1661))
 * **fix:**  - [#1614](https://github.com/AzzappApp/azzapp/pull/1614) missing close button on MediaRequiredModal ([#1660](https://github.com/AzzappApp/azzapp/pull/1660))
