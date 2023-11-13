@@ -12,11 +12,13 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import type { ScreenOptions } from '#components/NativeRouter';
 
 const WelcomeScreen = () => {
   const intl = useIntl();
@@ -40,7 +42,13 @@ const WelcomeScreen = () => {
 
   useFocusEffect(goBackToHome);
 
-  return (
+  return profileId ? (
+    <Container
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+    >
+      <ActivityIndicator />
+    </Container>
+  ) : (
     <Container style={{ flex: 1 }}>
       <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
       <Image
@@ -99,6 +107,10 @@ const WelcomeScreen = () => {
     </Container>
   );
 };
+
+WelcomeScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'none',
+});
 
 const styles = StyleSheet.create({
   linear: {
