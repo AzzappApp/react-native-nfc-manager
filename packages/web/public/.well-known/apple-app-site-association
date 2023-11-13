@@ -1,5 +1,4 @@
 {
-   // This section enables Universal Links
   "applinks": {
     "apps": [],
     "details": [
@@ -10,24 +9,19 @@
           "N349L99RA9.com.azzapp.azzapp-staging"
         ],
         "components": [
-          // {
-          //    "#": "no_universal_links",
-          //    "exclude": false,
-          //    "comment": "Matches any URL with a fragment that equals no_universal_links and instructs the system not to open it as a universal link."
-          // },
           {
-             "*": "/*",
-            // "?": { "s": "*" },
-             "comment": "Matches any URL with a path that starts with */*."
+            "*": "/*",
+            "comment": "Matches any URL with a path that starts with */*."
           }
         ]
       }
     ]
   },
-  // This section enable Shared Web Credentials
   "webcredentials": {
-    "apps": ["N349L99RA9.com.azzapp.azzapp",
-    "N349L99RA9.com.azzapp.azzapp-dev",
-    "N349L99RA9.com.azzapp.azzapp-staging"]
+    "apps": [
+      "N349L99RA9.com.azzapp.azzapp",
+      "N349L99RA9.com.azzapp.azzapp-dev",
+      "N349L99RA9.com.azzapp.azzapp-staging"
+    ]
   }
 }
