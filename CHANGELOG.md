@@ -1,4 +1,4 @@
-## 0.5.1-canary.93
+## 0.5.1-canary.94
 
 * **feat:**  - **aasa:** separate components root and profile
 * **fix:**  - aasa component pass for profile
