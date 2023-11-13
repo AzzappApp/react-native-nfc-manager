@@ -1,5 +1,6 @@
-## 0.5.1-canary.90
+## 0.5.1-canary.91
 
+* **fix:**  - applcation site association and entitlement for ios
 * **fix:**  - [#1453](https://github.com/AzzappApp/azzapp/pull/1453) hide onboarding after profile creation ([#1659](https://github.com/AzzappApp/azzapp/pull/1659))
 * **fix:**  - format AASA file
 * **feat:**  - add apple app site association ([#1661](https://github.com/AzzappApp/azzapp/pull/1661))
