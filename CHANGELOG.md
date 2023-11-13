@@ -1,5 +1,6 @@
-## 0.5.1-canary.85
+## 0.5.1-canary.86
 
+* **fix:**  - **contactCard:** [#1638](https://github.com/AzzappApp/azzapp/pull/1638) social network are not viewed on ios + semico… ([#1653](https://github.com/AzzappApp/azzapp/pull/1653))
 * **fix:**  - [#1620](https://github.com/AzzappApp/azzapp/pull/1620) rotation counter 🕰️ ([#1654](https://github.com/AzzappApp/azzapp/pull/1654))
 * **fix:**  - **modules:** [#1646](https://github.com/AzzappApp/azzapp/pull/1646) issue in social module size calculation ([#1655](https://github.com/AzzappApp/azzapp/pull/1655))
 * **fix:**  - error message can be hide by sentry inner object ([#1499](https://github.com/AzzappApp/azzapp/pull/1499))
