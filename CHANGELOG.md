@@ -1,5 +1,7 @@
-## 0.5.1-canary.86
+## 0.5.1-canary.87
 
+* **fix:**  - [#1614](https://github.com/AzzappApp/azzapp/pull/1614) missing close button on MediaRequiredModal ([#1660](https://github.com/AzzappApp/azzapp/pull/1660))
+* **ui:**  - [#5](https://github.com/AzzappApp/azzapp/pull/5) add label for roll parameter ([#1658](https://github.com/AzzappApp/azzapp/pull/1658))
 * **fix:**  - **contactCard:** [#1638](https://github.com/AzzappApp/azzapp/pull/1638) social network are not viewed on ios + semico… ([#1653](https://github.com/AzzappApp/azzapp/pull/1653))
 * **fix:**  - [#1620](https://github.com/AzzappApp/azzapp/pull/1620) rotation counter 🕰️ ([#1654](https://github.com/AzzappApp/azzapp/pull/1654))
 * **fix:**  - **modules:** [#1646](https://github.com/AzzappApp/azzapp/pull/1646) issue in social module size calculation ([#1655](https://github.com/AzzappApp/azzapp/pull/1655))
