@@ -36,9 +36,8 @@ const DownloadVCard = ({
       })
         .then(res => {
           if (res.status === 200) {
-            const vCard = buildVCard(decodeURI(contactCard));
-
-            if (contactCard.startsWith(profileId)) {
+            const { vCard, contactId } = buildVCard(decodeURI(contactCard));
+            if (contactId === profileId) {
               const file = new Blob([vCard.toString()], { type: 'text/vcard' });
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);

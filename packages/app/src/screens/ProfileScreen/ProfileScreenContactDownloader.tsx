@@ -35,8 +35,8 @@ const ProfileScreenContactDownloader = ({
   const intl = useIntl();
   useEffect(() => {
     if (contactData && profile) {
-      if (contactData.startsWith(fromGlobalId(profile.id).id)) {
-        const contact = buildContact(contactData);
+      const contact = buildContact(contactData);
+      if (contact.id === fromGlobalId(profile.id).id) {
         Alert.alert(
           intl.formatMessage(
             {
