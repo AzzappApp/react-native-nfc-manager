@@ -1,5 +1,6 @@
-## 0.5.1-canary.94
+## 0.5.1-canary.95
 
+* **feat:**  - **PostList:** add empty list placeholder on postlist ([#1674](https://github.com/AzzappApp/azzapp/pull/1674))
 * **feat:**  - **aasa:** separate components root and profile
 * **fix:**  - aasa component pass for profile
 * **fix:**  - applcation site association and entitlement for ios
