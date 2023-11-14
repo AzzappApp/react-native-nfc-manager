@@ -1,5 +1,7 @@
-## 0.5.1-canary.96
+## 0.5.1-canary.97
 
+* **feat:**  -  open app from website  trom Associated domain ([#1678](https://github.com/AzzappApp/azzapp/pull/1678))
+* **fix:**  - **contactCard:** [#1667](https://github.com/AzzappApp/azzapp/pull/1667) modifications in layout break delete button ([#1680](https://github.com/AzzappApp/azzapp/pull/1680))
 * **fix:**  - **CoverEdition:** Prevent user from saving demo people asset ([#1670](https://github.com/AzzappApp/azzapp/pull/1670))
 * **feat:**  - **PostList:** add empty list placeholder on postlist ([#1674](https://github.com/AzzappApp/azzapp/pull/1674))
 * **feat:**  - **aasa:** separate components root and profile
