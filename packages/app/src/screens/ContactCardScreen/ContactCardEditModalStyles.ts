@@ -2,7 +2,7 @@ import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import type { ColorSchemeName } from 'react-native';
 
-export const DELETE_BUTTON_WIDTH = 60;
+export const DELETE_BUTTON_WIDTH = 70;
 
 const FIELD_HEIGHT = 72;
 

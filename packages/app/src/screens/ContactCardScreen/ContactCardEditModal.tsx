@@ -240,166 +240,158 @@ const ContactCardEditModal = ({
     >
       <ScrollView scrollEnabled={!state.rect} automaticallyAdjustKeyboardInsets>
         <View style={styles.sectionsContainer}>
-          <View style={styles.section}>
-            <Controller
-              control={control}
-              name="firstName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="smallbold">
-                    <FormattedMessage
-                      defaultMessage="First name"
-                      description="First name registered for the contact card"
-                    />
-                  </Text>
-                  <TextInput
-                    value={value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    style={styles.input}
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Enter a first name',
-                      description:
-                        'Placeholder for first name inside contact card',
-                    })}
+          <Controller
+            control={control}
+            name="firstName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.field}>
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="First name"
+                    description="First name registered for the contact card"
                   />
-                </View>
-              )}
-            />
+                </Text>
+                <TextInput
+                  value={value ?? ''}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={styles.input}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a first name',
+                    description:
+                      'Placeholder for first name inside contact card',
+                  })}
+                />
+              </View>
+            )}
+          />
 
-            <Controller
-              control={control}
-              name="lastName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="smallbold">
-                    <FormattedMessage
-                      defaultMessage="Last name"
-                      description="Last name field registered for the contact card"
-                    />
-                  </Text>
-                  <TextInput
-                    value={value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    style={styles.input}
-                    clearButtonMode="while-editing"
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Enter a last name',
-                      description: 'Placeholder for last name contact card',
-                    })}
+          <Controller
+            control={control}
+            name="lastName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.field}>
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Last name"
+                    description="Last name field registered for the contact card"
                   />
-                </View>
-              )}
-            />
+                </Text>
+                <TextInput
+                  value={value ?? ''}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={styles.input}
+                  clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a last name',
+                    description: 'Placeholder for last name contact card',
+                  })}
+                />
+              </View>
+            )}
+          />
 
-            <Controller
-              control={control}
-              name="title"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="smallbold">
-                    <FormattedMessage
-                      defaultMessage="Title"
-                      description="Job title field registered for the contact card"
-                    />
-                  </Text>
-                  <TextInput
-                    value={value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    style={styles.input}
-                    clearButtonMode="while-editing"
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Enter a title',
-                      description: 'Placeholder for title inside contact card',
-                    })}
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.field}>
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Title"
+                    description="Job title field registered for the contact card"
                   />
-                </View>
-              )}
-            />
-            <Controller
-              control={control}
-              name="company"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.field}>
-                  <Text variant="smallbold">
-                    <FormattedMessage
-                      defaultMessage="Company name"
-                      description="Company name field registered for the contact card"
-                    />
-                  </Text>
-                  <TextInput
-                    value={value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    style={styles.input}
-                    clearButtonMode="while-editing"
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Enter a company name',
-                      description:
-                        'Placeholder for company name inside contact card',
-                    })}
+                </Text>
+                <TextInput
+                  value={value ?? ''}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={styles.input}
+                  clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a title',
+                    description: 'Placeholder for title inside contact card',
+                  })}
+                />
+              </View>
+            )}
+          />
+          <Controller
+            control={control}
+            name="company"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.field}>
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Company name"
+                    description="Company name field registered for the contact card"
                   />
-                </View>
-              )}
-            />
-          </View>
-          <View style={styles.section}>
-            <ContactCardEditModalPhones
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
-          <View style={styles.section}>
-            <ContactCardEditModalEmails
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
-          <View style={styles.section}>
-            <ContactCardEditModalUrls
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
+                </Text>
+                <TextInput
+                  value={value ?? ''}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={styles.input}
+                  clearButtonMode="while-editing"
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter a company name',
+                    description:
+                      'Placeholder for company name inside contact card',
+                  })}
+                />
+              </View>
+            )}
+          />
 
-          <View style={styles.section}>
-            <ContactCardEditModalAddresses
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
-          <View style={styles.section}>
-            <ContactCardEditModalBirthdays
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
-          <View style={styles.section}>
-            <ContactCardEditModalSocials
-              deleted={state.deleted}
-              deleteButtonRect={state.rect}
-              control={control}
-              openDeleteButton={openDeleteButton}
-              closeDeleteButton={closeDeleteButton}
-            />
-          </View>
+          <View style={styles.separator} />
+          <ContactCardEditModalPhones
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+          <View style={styles.separator} />
+          <ContactCardEditModalEmails
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+          <View style={styles.separator} />
+          <ContactCardEditModalUrls
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+          <View style={styles.separator} />
+          <ContactCardEditModalAddresses
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+          <View style={styles.separator} />
+          <ContactCardEditModalBirthdays
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
+          <View style={styles.separator} />
+          <ContactCardEditModalSocials
+            deleted={state.deleted}
+            deleteButtonRect={state.rect}
+            control={control}
+            openDeleteButton={openDeleteButton}
+            closeDeleteButton={closeDeleteButton}
+          />
         </View>
         {state.rect && (
           <Pressable
@@ -446,12 +438,12 @@ const styleSheet = createStyleSheet(appearance => ({
     textTransform: 'uppercase',
   },
   sectionsContainer: {
-    rowGap: 30,
+    rowGap: 1,
     paddingBottom: 20,
     backgroundColor: colors.grey50,
   },
-  section: {
-    rowGap: 1,
+  separator: {
+    height: 30,
   },
   overlay: {
     position: 'absolute',

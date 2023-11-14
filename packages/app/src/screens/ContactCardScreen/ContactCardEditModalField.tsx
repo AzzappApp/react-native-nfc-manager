@@ -218,8 +218,8 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
   },
   deleteButton: {
-    right: -70,
-    height: 32,
+    right: -DELETE_BUTTON_WIDTH,
+    height: '100%',
     width: DELETE_BUTTON_WIDTH,
     position: 'absolute',
     justifyContent: 'center',
