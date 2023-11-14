@@ -663,6 +663,7 @@ const CoverEditor = (
               mediaVisible={mediaVisible}
               toggleMediaVisibility={toggleMediaVisibility}
               onSelectSuggestedMedia={onNextSuggestedMedia}
+              hasSuggestedMedia={!!suggestedMedia}
             />
           )}
           {sourceMedia && (

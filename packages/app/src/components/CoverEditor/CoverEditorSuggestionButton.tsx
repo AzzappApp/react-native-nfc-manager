@@ -19,6 +19,7 @@ type CoverEditorSuggestionButtonProps = {
   mediaVisible: boolean;
   iconHeight?: number;
   templateKind: TemplateKind;
+  hasSuggestedMedia: boolean;
   toggleMediaVisibility: () => void;
   onSelectSuggestedMedia: () => void;
 };
@@ -27,6 +28,7 @@ const CoverEditorSuggestionButton = ({
   sourceMedia,
   templateKind,
   mediaVisible,
+  hasSuggestedMedia,
   toggleMediaVisibility,
   onSelectSuggestedMedia,
 }: CoverEditorSuggestionButtonProps) => {
@@ -75,6 +77,10 @@ const CoverEditorSuggestionButton = ({
     !sourceMedia &&
     templateKind === 'people'
   ) {
+    return null;
+  }
+
+  if (!hasSuggestedMedia) {
     return null;
   }
 
