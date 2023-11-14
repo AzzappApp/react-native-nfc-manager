@@ -21,6 +21,7 @@ import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Text from '#ui/Text';
+import { format } from './HomeInformations';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_user$key } from '@azzapp/relay/artifacts/HomeStatistics_user.graphql';
 
@@ -303,8 +304,3 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
-
-const format = (value: number) => {
-  'worklet';
-  return Math.trunc(value).toString();
-};

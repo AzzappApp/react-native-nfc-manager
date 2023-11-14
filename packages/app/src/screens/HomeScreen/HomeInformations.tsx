@@ -243,9 +243,12 @@ const HomeInformations = ({
 
 export default memo(HomeInformations);
 
-const format = (value: number) => {
+export const format = (value: number) => {
   'worklet';
-  return Math.trunc(value).toString();
+  if (typeof value === 'number') {
+    return Math.trunc(value).toString();
+  }
+  return '0';
 };
 
 const styles = StyleSheet.create({
