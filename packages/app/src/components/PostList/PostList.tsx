@@ -1,9 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
+import { FormattedMessage } from 'react-intl';
+import { useColorScheme, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
+import useScreenInsets from '#hooks/useScreenInsets';
+import { HEADER_HEIGHT } from '#ui/Header';
+import Icon from '#ui/Icon';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
+import Text from '#ui/Text';
 import { PostListContext } from './PostListsContext';
 import type {
   PostList_posts$data,
@@ -135,7 +141,7 @@ const PostList = ({
     [posts.length],
   );
 
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Post>) => {
       return (
@@ -157,6 +163,49 @@ const PostList = ({
     [loading],
   );
 
+  const colorScheme = useColorScheme();
+  const insets = useScreenInsets();
+  const ListEmptyComponent = useMemo(
+    () => (
+      <View
+        style={{
+          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <View style={{ alignItems: 'center', width: 200 }}>
+          <Icon
+            style={{
+              width: 60,
+              height: 60,
+              marginBottom: 20,
+              tintColor:
+                colorScheme === 'dark' ? colors.grey800 : colors.grey200,
+            }}
+            icon="empty"
+          />
+          <Text
+            variant="xlarge"
+            style={{ marginBottom: 10, textAlign: 'center' }}
+          >
+            <FormattedMessage
+              defaultMessage="No posts yet"
+              description="Empty post list message title"
+            />
+          </Text>
+          <Text variant="medium" style={{ textAlign: 'center' }}>
+            <FormattedMessage
+              defaultMessage="Seems like there is no post on this feed..."
+              description="Empty post list message content"
+            />
+          </Text>
+        </View>
+      </View>
+    ),
+    [colorScheme],
+  );
+
   return (
     <PostListContext.Provider value={visiblePostIds}>
       <FlashList<Post>
@@ -171,6 +220,7 @@ const PostList = ({
         onEndReachedThreshold={1}
         extraData={extraData}
         viewabilityConfig={viewabilityConfig}
+        ListEmptyComponent={ListEmptyComponent}
         {...props}
       />
     </PostListContext.Provider>
