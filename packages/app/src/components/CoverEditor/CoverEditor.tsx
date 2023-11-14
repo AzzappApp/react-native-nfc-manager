@@ -352,9 +352,22 @@ const CoverEditor = (
   );
 
   const onSave = useCallback(() => {
-    if (templateKind === 'people' && !sourceMedia) {
-      setShowMediaRequiredModal(true);
-      return;
+    if (templateKind === 'people') {
+      if (!sourceMedia) {
+        setShowMediaRequiredModal(true);
+        return;
+      }
+      if (!mediaVisible) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Please show your media before saving.',
+            description:
+              'Error toast message displayed when the user try to save a people cover with hidden media.',
+          }),
+        });
+        return;
+      }
     }
     if (mediaComputing) {
       return;
@@ -387,6 +400,7 @@ const CoverEditor = (
     cardColors?.otherColors,
     colorPalette,
     coverStyle,
+    intl,
     maskMedia,
     mediaComputing,
     mediaCropParameters,
