@@ -10,7 +10,11 @@
         ],
         "components": [
           {
-            "/": "/*",
+            "/": "/",
+            "comment": "Matches any root URL."
+          },
+          {
+            "/:profileID": "/:profileID",
             "comment": "Matches any URL with a path that starts with /*. (profile)"
           }
         ]

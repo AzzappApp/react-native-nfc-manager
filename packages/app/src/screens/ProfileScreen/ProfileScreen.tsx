@@ -24,7 +24,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
+import {
+  graphql,
+  useMutation,
+  usePreloadedQuery,
+  useRelayEnvironment,
+} from 'react-relay';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -37,7 +42,10 @@ import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useAuthState from '#hooks/useAuthState';
-import { useWebcardViewStatistic } from '#hooks/useStatistics';
+import {
+  UPDATE_CONTACTCARD_SCANS,
+  useWebcardViewStatistic,
+} from '#hooks/useStatistics';
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
@@ -90,6 +98,19 @@ const ProfileScreen = ({
   const canEdit = auth && auth.profileId === data.profile?.id;
 
   const environment = useRelayEnvironment();
+
+  // contact card scan
+  const [commit] = useMutation(UPDATE_CONTACTCARD_SCANS);
+  useEffect(() => {
+    if (params.contactData && data.profile?.id) {
+      // the profile is open from a scan contact card with the phone
+      commit({
+        variables: { input: { id: data.profile?.id } },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     let disposables: Disposable[];
     if (canEdit) {

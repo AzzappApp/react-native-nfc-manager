@@ -11,7 +11,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile', async () => {
-    const res = await matchUrlWithRoute('https://fake-azzapp.com/profile/123');
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123');
 
     expect(res).toEqual({
       route: 'PROFILE',
@@ -21,17 +21,11 @@ describe('deeplinkHelpers', () => {
     });
   });
 
-  test('no route found', async () => {
-    const res = await matchUrlWithRoute('https://fake-azzapp.com/wrong/123');
-
-    expect(res).toBeUndefined();
-  });
-
   test('should redirect to profile with contactData', async () => {
     verifySignMock.mockReturnValueOnce(Promise.resolve({ message: 'ok' }));
 
     const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/profile/123?c=contact123&s=sign123',
+      'https://fake-azzapp.com/123?c=contact123&s=sign123',
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -54,7 +48,7 @@ describe('deeplinkHelpers', () => {
     verifySignMock.mockRejectedValueOnce(new Error('something bad happened'));
 
     const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/profile/124?c=contact124&s=sign124',
+      'https://fake-azzapp.com/124?c=contact124&s=sign124',
     );
 
     expect(verifySignMock).toBeCalledTimes(1);

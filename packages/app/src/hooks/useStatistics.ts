@@ -7,7 +7,7 @@ const UPDATE_WEBCARD_VIEWS = graphql`
   }
 `;
 
-const UPDATE_CONTACTCARD_SCANS = graphql`
+export const UPDATE_CONTACTCARD_SCANS = graphql`
   mutation useStatisticsUpdateContactcardScansMutation(
     $input: UpdateContactcardScansInput!
   ) {
@@ -25,16 +25,4 @@ export function useWebcardViewStatistic(profileId: string | undefined) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileId]);
-}
-
-export function useUpdateContactcardScans(profileId: string) {
-  const [commit] = useMutation(UPDATE_CONTACTCARD_SCANS);
-  useEffect(() => {
-    if (profileId) {
-      commit({
-        variables: { input: { id: profileId } },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 }

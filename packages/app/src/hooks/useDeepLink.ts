@@ -19,6 +19,9 @@ export const useDeepLink = (router: NativeRouter) => {
       deeplinkHandler(url).catch(err => {
         console.error(err);
       });
+      return () => {
+        listener.remove();
+      };
     });
 
     return listener.remove;

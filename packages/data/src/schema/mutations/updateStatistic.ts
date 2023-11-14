@@ -52,6 +52,7 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
     if (type !== 'Profile') {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
+
     try {
       if (targetId !== profileId) {
         await updateStatistics(targetId, 'contactcardScans', true);
