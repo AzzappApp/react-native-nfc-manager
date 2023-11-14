@@ -1,5 +1,6 @@
-## 0.5.1-canary.95
+## 0.5.1-canary.96
 
+* **fix:**  - **CoverEdition:** Prevent user from saving demo people asset ([#1670](https://github.com/AzzappApp/azzapp/pull/1670))
 * **feat:**  - **PostList:** add empty list placeholder on postlist ([#1674](https://github.com/AzzappApp/azzapp/pull/1674))
 * **feat:**  - **aasa:** separate components root and profile
 * **fix:**  - aasa component pass for profile
