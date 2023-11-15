@@ -264,8 +264,8 @@ export const measureSocialLinksHeight = async (
   } else {
     const [contentHeight] = (links ?? []).reduce(
       ([height, width], _) => {
-        const nextWidth = width + iconSize;
-        if (nextWidth > maxWidth) {
+        const nextWidth = width + iconSize + columnGap;
+        if (nextWidth > maxWidth - 2 * marginHorizontal) {
           return [height + iconSize + columnGap, iconSize];
         } else {
           return [height, nextWidth + columnGap];
