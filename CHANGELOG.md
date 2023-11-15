@@ -1,5 +1,7 @@
-## 0.5.1-canary.104
+## 0.5.1-canary.105
 
+* **fix:**  - **CoverEdition:**  Update crop editon modal parameters ([#1712](https://github.com/AzzappApp/azzapp/pull/1712))
+* **fix:**  - prevent tab from leaking during animation ([#1710](https://github.com/AzzappApp/azzapp/pull/1710))
 * **fix:**  - Replace react-native-pager-view by simple react-native tab ([#1706](https://github.com/AzzappApp/azzapp/pull/1706))
 * **fix:**  - **CoverEdition:** suggestion button
 * **fix:**  - Statistic bar display  and contactCard total count ([#1696](https://github.com/AzzappApp/azzapp/pull/1696))
