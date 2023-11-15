@@ -268,10 +268,10 @@ export const measureSocialLinksHeight = async (
         if (nextWidth > maxWidth - 2 * marginHorizontal) {
           return [height + iconSize + columnGap, iconSize];
         } else {
-          return [height, nextWidth + columnGap];
+          return [height, nextWidth];
         }
       },
-      [iconSize, marginHorizontal],
+      [iconSize, 0],
     );
     return contentHeight + marginTop + marginBottom;
   }
