@@ -44,6 +44,7 @@ const reducer = (
       return {
         ...state,
         deleted: true,
+        rect: null,
       };
     case 'OPEN_DELETION_OPTION':
       return {
