@@ -7,8 +7,8 @@ export type TabViewProps = Omit<ViewProps, 'children'> & {
   tabs: Array<{ id: string; element: ReactElement }>;
 };
 
-const TabView = ({ tabs, currentTab, ...props }: TabViewProps) => (
-  <View {...props}>
+const TabView = ({ tabs, currentTab, style, ...props }: TabViewProps) => (
+  <View {...props} style={[{ overflow: 'hidden' }, style]}>
     {tabs.map(({ id, element }) => (
       <View
         key={id}
