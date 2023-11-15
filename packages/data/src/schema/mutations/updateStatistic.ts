@@ -55,7 +55,15 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
 
     try {
       if (targetId !== profileId) {
-        await updateStatistics(targetId, 'contactcardScans', true);
+        await db.transaction(async trx => {
+          await updateStatistics(targetId, 'contactcardScans', true, trx);
+          await trx
+            .update(ProfileTable)
+            .set({
+              nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
+            })
+            .where(eq(ProfileTable.id, targetId));
+        });
       }
 
       return true;

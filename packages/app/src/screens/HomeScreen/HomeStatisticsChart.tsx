@@ -65,16 +65,13 @@ const HomeStatisticsChart = ({
           }),
         };
       });
-      profiles.forEach(profile => {
+      profiles.forEach((profile, indexProfile) => {
         if (profile.statsSummary) {
-          profile.statsSummary.forEach((stats, indexProfile) => {
+          profile.statsSummary.forEach(stats => {
             if (stats) {
               const index = result.findIndex(item => item.day === stats.day);
-              if (index === -1) {
-                result.push({ day: stats.day, data: [stats] });
-              } else {
-                result[index].data[indexProfile] = stats;
-              }
+
+              result[index].data[indexProfile] = stats;
             }
           });
         }
