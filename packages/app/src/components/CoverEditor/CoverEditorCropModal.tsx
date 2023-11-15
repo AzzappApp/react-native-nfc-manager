@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { isEqual } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -60,6 +61,13 @@ const CoverEditorCropModal = ({
   const [editionParameters, setEditionParameters] = useState(
     mediaParameters ?? {},
   );
+
+  useEffect(() => {
+    if (!visible && !isEqual(mediaParameters, editionParameters)) {
+      setEditionParameters(mediaParameters ?? {});
+    }
+  }, [editionParameters, mediaParameters, visible]);
+
   const onCropDataChange = (cropData: CropData) => {
     setEditionParameters(prev => ({
       ...prev,
