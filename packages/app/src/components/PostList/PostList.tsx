@@ -203,7 +203,7 @@ const PostList = ({
         </View>
       </View>
     ),
-    [colorScheme],
+    [colorScheme, insets.bottom, insets.top, windowHeight],
   );
 
   return (
