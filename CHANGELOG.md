@@ -1,5 +1,6 @@
-## 0.5.1-canary.102
+## 0.5.1-canary.103
 
+* **fix:**  - Replace react-native-pager-view by simple react-native tab ([#1706](https://github.com/AzzappApp/azzapp/pull/1706))
 * **fix:**  - **CoverEdition:** suggestion button
 * **fix:**  - Statistic bar display  and contactCard total count ([#1696](https://github.com/AzzappApp/azzapp/pull/1696))
 * **fix:**  - **Backoffice:** errors due to next 14 migration ([#1691](https://github.com/AzzappApp/azzapp/pull/1691))
