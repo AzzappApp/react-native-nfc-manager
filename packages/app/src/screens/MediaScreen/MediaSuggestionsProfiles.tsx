@@ -100,7 +100,6 @@ const MediaSuggestionsProfilesInner = ({
 
   const isCurrentTabRef = useRef(isCurrentTab);
   useEffect(() => {
-    console.log('isCurrentTabRef', isCurrentTabRef.current, isCurrentTab);
     if (isCurrentTab && !isCurrentTabRef.current) {
       startTransition(() => {
         refetch(
