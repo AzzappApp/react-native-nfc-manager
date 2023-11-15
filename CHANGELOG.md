@@ -1,4 +1,4 @@
-## 0.5.1-canary.103
+## 0.5.1-canary.104
 
 * **fix:**  - Replace react-native-pager-view by simple react-native tab ([#1706](https://github.com/AzzappApp/azzapp/pull/1706))
 * **fix:**  - **CoverEdition:** suggestion button
