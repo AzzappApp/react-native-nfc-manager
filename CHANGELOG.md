@@ -1,5 +1,7 @@
-## 0.5.1-canary.99
+## 0.5.1-canary.100
 
+* **fix:**  - **Backoffice:** errors due to next 14 migration ([#1691](https://github.com/AzzappApp/azzapp/pull/1691))
+* **fix:**  - **contactCard:** [#1667](https://github.com/AzzappApp/azzapp/pull/1667) remove overlay on deletion ([#1690](https://github.com/AzzappApp/azzapp/pull/1690))
 * **Fix:**  -  Download contact card ([#1685](https://github.com/AzzappApp/azzapp/pull/1685))
 * **fix:**  - be sure the format is a number ([#1688](https://github.com/AzzappApp/azzapp/pull/1688))
 * **fix:**  - check to be authenticated before handling deep link ([#1687](https://github.com/AzzappApp/azzapp/pull/1687))
