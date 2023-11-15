@@ -142,7 +142,6 @@ const CoverEditor = (
             dark
             otherColors
           }
-          ...CoverEditorSuggestionButton_profile
           ...useSaveCover_profile
         }
         ...CoverEditorCustom_viewer
@@ -655,17 +654,15 @@ const CoverEditor = (
         >
           <FloatingIconButton icon="camera" onPress={openImagePicker} />
           <FloatingIconButton icon="text" onPress={openTitleModal} />
-          {viewer?.profile && (
-            <CoverEditorSuggestionButton
-              profile={viewer.profile}
-              sourceMedia={sourceMedia}
-              templateKind={templateKind}
-              mediaVisible={mediaVisible}
-              toggleMediaVisibility={toggleMediaVisibility}
-              onSelectSuggestedMedia={onNextSuggestedMedia}
-              hasSuggestedMedia={!!suggestedMedia}
-            />
-          )}
+          <CoverEditorSuggestionButton
+            key={templateKind}
+            sourceMedia={sourceMedia}
+            templateKind={templateKind}
+            mediaVisible={mediaVisible}
+            toggleMediaVisibility={toggleMediaVisibility}
+            onSelectSuggestedMedia={onNextSuggestedMedia}
+            hasSuggestedMedia={!!suggestedMedia}
+          />
           {sourceMedia && (
             <FloatingIconButton
               icon="crop"
