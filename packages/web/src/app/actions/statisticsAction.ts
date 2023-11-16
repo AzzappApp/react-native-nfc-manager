@@ -1,10 +1,19 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { updateStatistics } from '@azzapp/data/domains';
+import {
+  incrementContactCardScans,
+  incrementWebCardViews,
+} from '@azzapp/data/domains';
 
-export const updateWebcardViews = async (profileId: string) => {
+export const updateWebcardViewsCounter = async (profileId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  return updateStatistics(profileId, 'webcardViews', true);
+  return incrementWebCardViews(profileId);
+};
+
+export const updateContactCardScanCounter = async (profileId: string) => {
+  // @TODO: make this function dynamic with a better mechanism than headers
+  headers();
+  return incrementContactCardScans(profileId);
 };

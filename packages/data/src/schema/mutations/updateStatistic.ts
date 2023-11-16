@@ -1,8 +1,11 @@
-import { sql, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { ProfileTable, db, updateStatistics } from '#domains';
+import {
+  incrementContactCardScans,
+  updateStatistics,
+  incrementWebCardViews,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
@@ -22,15 +25,7 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   }
   try {
     if (targetId !== profileId) {
-      await db.transaction(async trx => {
-        await updateStatistics(targetId, 'webcardViews', true, trx);
-        await trx
-          .update(ProfileTable)
-          .set({
-            nbWebcardViews: sql`${ProfileTable.nbWebcardViews} + 1`,
-          })
-          .where(eq(ProfileTable.id, targetId));
-      });
+      await incrementWebCardViews(profileId);
     }
 
     return true;
@@ -55,15 +50,7 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
 
     try {
       if (targetId !== profileId) {
-        await db.transaction(async trx => {
-          await updateStatistics(targetId, 'contactcardScans', true, trx);
-          await trx
-            .update(ProfileTable)
-            .set({
-              nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
-            })
-            .where(eq(ProfileTable.id, targetId));
-        });
+        await incrementContactCardScans(targetId);
       }
 
       return true;

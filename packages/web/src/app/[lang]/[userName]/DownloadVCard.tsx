@@ -2,6 +2,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
+import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { Profile } from '@azzapp/data/domains';
@@ -42,6 +43,7 @@ const DownloadVCard = ({
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
               setOpened(true);
+              updateContactCardScanCounter(contactId);
             }
           }
         })

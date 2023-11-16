@@ -1,5 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
+import { ProfileTable } from '#domains';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferSelectModel } from 'drizzle-orm';
@@ -91,6 +92,28 @@ export const updateStatistics = async (
     })
     .onDuplicateKeyUpdate(onDuplicateSet);
 };
+
+export const incrementWebCardViews = async (profileId: string) =>
+  db.transaction(async trx => {
+    await updateStatistics(profileId, 'webcardViews', true, trx);
+    await trx
+      .update(ProfileTable)
+      .set({
+        nbWebcardViews: sql`${ProfileTable.nbWebcardViews} + 1`,
+      })
+      .where(eq(ProfileTable.id, profileId));
+  });
+
+export const incrementContactCardScans = async (profileId: string) =>
+  db.transaction(async trx => {
+    await updateStatistics(profileId, 'contactcardScans', true, trx);
+    await trx
+      .update(ProfileTable)
+      .set({
+        nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
+      })
+      .where(eq(ProfileTable.id, profileId));
+  });
 
 export const getLastStatisticsFor = (profileId: string, days: number) => {
   return db

@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { useEffect, useState } from 'react';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
-import { updateWebcardViews } from '#app/actions/statisticsAction';
+import { updateWebcardViewsCounter } from '#app/actions/statisticsAction';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './ProfilePage.css';
@@ -41,7 +41,7 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
 
   useEffect(() => {
     if (profile?.id) {
-      updateWebcardViews(profile?.id);
+      updateWebcardViewsCounter(profile?.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
