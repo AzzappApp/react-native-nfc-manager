@@ -46,7 +46,13 @@ function useAppVersion(): YogaPlugin {
   return {
     onRequest({ request, fetchAPI, endResponse }) {
       const appVersion = request.headers.get('azzapp-appVersion');
-      if (appVersion && compare(appVersion, LAST_SUPPORTED_APP_VERSION) < 0) {
+      if (
+        appVersion &&
+        compare(
+          removePreRelease(appVersion),
+          removePreRelease(LAST_SUPPORTED_APP_VERSION),
+        ) < 0
+      ) {
         endResponse(
           new fetchAPI.Response(
             JSON.stringify({ message: ERRORS.UPDATE_APP_VERSION }),
@@ -190,3 +196,8 @@ const { handleRequest } = createYoga({
 });
 
 export { handleRequest as GET, handleRequest as POST };
+
+const removePreRelease = (version: string) => {
+  const versionParts = version.split('-');
+  return versionParts[0];
+};
