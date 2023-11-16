@@ -1,5 +1,6 @@
-## 0.5.1-canary.105
+## 0.5.1-canary.106
 
+* **fix:**  - **CoverEdition:** infinit loop in CoverEditorCropModal
 * **fix:**  - **CoverEdition:**  Update crop editon modal parameters ([#1712](https://github.com/AzzappApp/azzapp/pull/1712))
 * **fix:**  - prevent tab from leaking during animation ([#1710](https://github.com/AzzappApp/azzapp/pull/1710))
 * **fix:**  - Replace react-native-pager-view by simple react-native tab ([#1706](https://github.com/AzzappApp/azzapp/pull/1706))
