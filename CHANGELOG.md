@@ -1,5 +1,6 @@
-## 0.5.1-canary.107
+## 0.5.1-canary.108
 
+* **fix:**  - WebcardView  global counter not incremented on browser and contactCardScan added to browser ([#1725](https://github.com/AzzappApp/azzapp/pull/1725))
 * **fix:**  - **BrowserView:** errors in fetching
 * **fix:**  - **CoverEdition:** infinit loop in CoverEditorCropModal
 * **fix:**  - **CoverEdition:**  Update crop editon modal parameters ([#1712](https://github.com/AzzappApp/azzapp/pull/1712))
