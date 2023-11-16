@@ -1,5 +1,6 @@
-## 0.5.1-canary.106
+## 0.5.1-canary.107
 
+* **fix:**  - **BrowserView:** errors in fetching
 * **fix:**  - **CoverEdition:** infinit loop in CoverEditorCropModal
 * **fix:**  - **CoverEdition:**  Update crop editon modal parameters ([#1712](https://github.com/AzzappApp/azzapp/pull/1712))
 * **fix:**  - prevent tab from leaking during animation ([#1710](https://github.com/AzzappApp/azzapp/pull/1710))
