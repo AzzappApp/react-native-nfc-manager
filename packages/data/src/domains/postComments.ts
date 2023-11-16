@@ -142,15 +142,18 @@ export const getPostCommentsByDate = async (
  * @returns A list of PostComment
  */
 export const getTopPostsComment = async (
-  postId: string[],
+  postIds: string[],
 ): Promise<Array<PostComment & { author: Profile }>> => {
+  if (!postIds.length) {
+    return [];
+  }
   const comments = await db
     .select({
       postsId: PostCommentTable.postId,
       createdAt: sql<string>`max(createdAt)`,
     })
     .from(PostCommentTable)
-    .where(inArray(PostCommentTable.postId, postId))
+    .where(inArray(PostCommentTable.postId, postIds))
     .groupBy(PostCommentTable.postId);
 
   if (comments.length === 0) return [];
