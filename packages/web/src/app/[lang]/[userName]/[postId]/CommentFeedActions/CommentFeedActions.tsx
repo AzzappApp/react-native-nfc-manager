@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { getElapsedTime } from '@azzapp/shared/timeHelpers';
+import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import { HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
 import { Button, ButtonIcon } from '#ui';
@@ -23,7 +23,9 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
   const [post, setPost] = useState(defaultPost);
   const share = useRef<ModalActions>(null);
   const download = useRef<ModalActions>(null);
-  const elapsedTime = getElapsedTime(new Date(post.createdAt).getTime());
+  const elapsedTime = getFormatedElapsedTime(
+    new Date(post.createdAt).getTime(),
+  );
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -54,9 +56,7 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
             <span className={styles.likes}>{post.counterReactions} Likes</span>
           )}
         </div>
-        <span className={styles.elapsed}>
-          {elapsedTime.value} {elapsedTime.kind} ago
-        </span>
+        <span className={styles.elapsed}>{elapsedTime}</span>
         {post.allowComments && (
           <div className={styles.comment}>
             <Button size="small" onClick={() => download.current?.open()}>

@@ -44,7 +44,8 @@ type ContactCardBirthday {
 }
 
 type ContactCardSocial {
-  social: String!
+  url: String!
+  label: String!
   selected: Boolean!
 }
 

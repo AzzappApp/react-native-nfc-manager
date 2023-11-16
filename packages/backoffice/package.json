@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.4.1-rc.0",
+  "version": "0.5.1-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,8 +13,8 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.4.1-rc.0",
-    "@azzapp/shared": "0.4.1-rc.0",
+    "@azzapp/data": "0.5.1-rc.0",
+    "@azzapp/shared": "0.5.1-rc.0",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
@@ -27,14 +27,14 @@
     "classnames": "^2.3.2",
     "drizzle-orm": "^0.28.6",
     "lodash": "^4.17.21",
-    "next": "^13.5.1",
+    "next": "^14.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7"
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15"
   }
 }

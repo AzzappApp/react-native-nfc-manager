@@ -9,7 +9,7 @@ require('@testing-library/jest-native/extend-expect');
 
 //#region Native Dependencies mock
 // Reanimated Mock
-require('react-native-reanimated/lib/reanimated2/jestUtils').setUpTests();
+require('react-native-reanimated/lib/module/reanimated2/jestUtils').setUpTests();
 global.ReanimatedDataMock = {
   now: () => Date.now(),
 };
@@ -19,6 +19,11 @@ require('react-native-gesture-handler/jestSetup');
 
 // React Native Localize Mock
 jest.mock('react-native-localize', () => require('react-native-localize/mock'));
+
+// React-native-permission
+jest.mock('react-native-permissions', () =>
+  require('react-native-permissions/mock'),
+);
 
 // React Native Safe Area Context Mock
 jest.mock(

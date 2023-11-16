@@ -1,11 +1,14 @@
+import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { int, mysqlTable, primaryKey } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
+import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = mysqlTable('CompanyActivity', {
-  id: cols.cuid('id').notNull().primaryKey(),
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labels: cols.labels('labels').notNull(),
+  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
 });
 
 export const ProfileCategoryCompanyActivityTable = mysqlTable(
@@ -64,4 +67,38 @@ export const getCompanyActivityById = async (id: string) => {
     .from(CompanyActivityTable)
     .where(eq(CompanyActivityTable.id, id))
     .then(res => res.pop() ?? null);
+};
+
+/**
+ * Update a company Activity
+ *
+ * @param id - The id of the card template to update
+ * @param values - the company activity fields, excluding the id and the cardDate
+ * @param tx - The query creator to use (profile for transactions)
+ */
+export const updateCompanyActivity = async (
+  id: string,
+  values: Partial<CompanyActivity>,
+  tx: DbTransaction = db,
+) => {
+  await tx
+    .update(CompanyActivityTable)
+    .set({ ...values })
+    .where(eq(CompanyActivityTable.id, id));
+};
+
+/**
+ * Create a cardTemplate.
+ *
+ * @param newCardTemplate - the cardTemplate fields, excluding the id
+ * @param tx - The query creator to use (user for transactions)
+ * @returns The created cardTemplate
+ */
+export const createCompanyActivity = async (
+  newCardTemplate: NewCompanyActivity,
+  tx: DbTransaction = db,
+) => {
+  const id = createId();
+  await tx.insert(CompanyActivityTable).values({ ...newCardTemplate, id });
+  return id;
 };

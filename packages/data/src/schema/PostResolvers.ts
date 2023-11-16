@@ -44,9 +44,11 @@ export const Post: PostResolvers = {
     return null;
   },
   previewComment: async (post, _) => {
-    const comments = await getPostCommentsByDate(post.id, 1);
-    if (comments.length > 0) {
-      return comments[0];
+    if (post.allowComments) {
+      const comments = await getPostCommentsByDate(post.id, 1);
+      if (comments.length > 0) {
+        return comments[0];
+      }
     }
     return null;
   },

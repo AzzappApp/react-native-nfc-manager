@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { ProfileTable, db, follows, unfollows } from '#domains';
@@ -12,22 +13,22 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(input.profileId);
   if (type !== 'Profile') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   let target: Profile | null;
   try {
     target = await loaders.Profile.load(targetId);
   } catch (e) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
   if (!target) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   const { follow } = input;
 
@@ -51,7 +52,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
       else await unfollows(profileId, targetId, trx);
     });
   } catch (e) {
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   return { profile: target };

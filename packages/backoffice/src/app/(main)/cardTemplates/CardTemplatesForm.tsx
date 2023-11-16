@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -20,12 +19,12 @@ import {
 import { omit } from 'lodash';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
 import { labelsOptions, useForm } from '#helpers/formHelpers';
+import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
   CardTemplateErrors,
@@ -34,26 +33,19 @@ import type {
 import type {
   CardStyle,
   CardTemplate,
-  CompanyActivity,
-  ProfileCategory,
+  CardTemplateType,
 } from '@azzapp/data/domains';
 
 type CoverTemplateFormProps = {
   cardTemplate?: CardTemplate;
-  profileCategories: ProfileCategory[];
-  companyActivities: CompanyActivity[];
-  templateActivities?: string[] | null;
-  templateCategories?: string[] | null;
+  cardTemplateTypes: CardTemplateType[];
   cardStyles: CardStyle[];
 };
 
 const CardTemplateForm = ({
-  profileCategories,
-  companyActivities,
   cardStyles,
   cardTemplate,
-  templateActivities,
-  templateCategories,
+  cardTemplateTypes,
 }: CoverTemplateFormProps) => {
   const [profileUserName, setProfileUserName] = useState<string | null>(null);
   const [modulesLoading, loadModules] = useTransition();
@@ -67,6 +59,7 @@ const CardTemplateForm = ({
 
   type Data = Omit<CardTemplateFormValue, 'previewMediaId'> & {
     previewMediaId: File | string | null;
+    cardTemplateType: CardTemplateType | undefined;
   };
   const { data, setData, fieldProps } = useForm<Data>(
     () => {
@@ -77,9 +70,12 @@ const CardTemplateForm = ({
           modules: cardTemplate.modules,
           businessEnabled: cardTemplate.businessEnabled,
           personalEnabled: cardTemplate.personalEnabled,
-          profileCategories: templateCategories,
-          companyActivities: templateActivities,
           previewMediaId: cardTemplate.previewMediaId,
+          cardTemplateType: cardTemplate?.cardTemplateTypeId
+            ? cardTemplateTypes?.find(item => {
+                return item.id === cardTemplate?.cardTemplateTypeId;
+              })
+            : undefined,
         };
       }
       return {
@@ -167,34 +163,6 @@ const CardTemplateForm = ({
 
   const fields = {
     label: fieldProps('labels', labelsOptions),
-    profileCategories: fieldProps('profileCategories', {
-      parse: (value: ProfileCategory[]) =>
-        value.map((category: any) => category.id),
-      format: (value: string[] | null | undefined) => {
-        return convertToNonNullArray(
-          value?.map(
-            profileCategoryId =>
-              profileCategories.find(
-                category => category.id === profileCategoryId ?? null,
-              ) ?? null,
-          ) ?? [],
-        );
-      },
-    }),
-    companyActivities: fieldProps('companyActivities', {
-      parse: (value: CompanyActivity[] | null | undefined) =>
-        value?.map(activity => activity.id) ?? [],
-      format: (value: string[] | null | undefined) => {
-        return convertToNonNullArray(
-          value?.map(
-            activityId =>
-              companyActivities.find(
-                activity => activity.id === activityId ?? null,
-              ) ?? null,
-          ) ?? [],
-        );
-      },
-    }),
     cardStyle: fieldProps('cardStyle'),
     businessEnabled: fieldProps('businessEnabled'),
     personalEnabled: fieldProps('personalEnabled'),
@@ -266,58 +234,12 @@ const CardTemplateForm = ({
           General
         </Typography>
         <TextField name="label" label="Label" required {...fields.label} />
-        <FormControl fullWidth error={fields.profileCategories.error}>
-          <Autocomplete
-            multiple
-            id="profile-categories"
-            options={profileCategories}
-            getOptionLabel={option => option.labels.en}
-            value={fields.profileCategories.value}
-            onChange={(_, value) => fields.profileCategories.onChange(value)}
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Profile categories"
-              />
-            )}
-            renderOption={(props, option) => {
-              const label = option.labels.en;
-              return (
-                <li {...props} key={option.id}>
-                  {label}
-                </li>
-              );
-            }}
-          />
-          <FormHelperText>{fields.profileCategories.helperText}</FormHelperText>
-        </FormControl>
-        <FormControl fullWidth error={fields.companyActivities.error}>
-          <Autocomplete
-            multiple
-            id="profile-categories"
-            options={companyActivities}
-            getOptionLabel={option => option.labels.en}
-            value={fields.companyActivities.value}
-            onChange={(_, value) => fields.companyActivities.onChange(value)}
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Company activities"
-              />
-            )}
-            renderOption={(props, option) => {
-              const label = option.labels.en;
-              return (
-                <li {...props} key={option.id}>
-                  {label}
-                </li>
-              );
-            }}
-          />
-          <FormHelperText>{fields.companyActivities.helperText}</FormHelperText>
-        </FormControl>
+        <WebCardTemplateTypeListInput
+          label="Webcard template type"
+          name="cardTemplateType"
+          options={cardTemplateTypes}
+          {...fieldProps('cardTemplateType')}
+        />
         <FormControl fullWidth error={fields.cardStyle.error}>
           <InputLabel id="cardStyle-label">Card Style</InputLabel>
           <Select

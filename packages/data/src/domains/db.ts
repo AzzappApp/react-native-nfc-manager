@@ -1,16 +1,23 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import { connect } from '@planetscale/database';
 import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import pLimit from 'p-limit';
 import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
 
-const fetchFunction =
-  process.env.NEXT_RUNTIME !== 'edge' ? require('node-fetch') : fetch;
+let fetchFunction: typeof fetch;
 
-const MAX_CONCURRENT_QUERIES = 5;
-
-const limit = pLimit(MAX_CONCURRENT_QUERIES);
+if (process.env.NEXT_RUNTIME !== 'edge') {
+  let nodeFetch: typeof import('node-fetch');
+  fetchFunction = async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (!nodeFetch) {
+      nodeFetch = await import('node-fetch');
+    }
+    return nodeFetch.default(input as any, init as any) as any;
+  };
+} else {
+  fetchFunction = fetch;
+}
 
 export const ConnectionMonitorer = {
   concurrentRequestsCount: 0,
@@ -26,7 +33,6 @@ export const ConnectionMonitorer = {
   },
   increaseConcurrentRequestsCount() {
     this.concurrentRequestsCount++;
-    console.log('concurrentRequestsCount', this.concurrentRequestsCount);
   },
   decreaseConcurrentRequestsCount() {
     this.concurrentRequestsCount--;
@@ -39,19 +45,18 @@ const connection = connect({
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-    monitorRequest(init);
-
+    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+      monitorRequest(init);
+    }
     let response: Response;
     try {
-      if (process.env.NODE_ENV !== 'production') {
-        response = await fetchFunction(input, init);
-      } else {
-        response = await limit(() => fetchFunction(input, init));
-      }
+      response = await fetchFunction(input, init);
     } catch (e) {
       throw e as any;
     } finally {
-      monitorRequestEnd();
+      if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+        monitorRequestEnd();
+      }
     }
     return response;
   },

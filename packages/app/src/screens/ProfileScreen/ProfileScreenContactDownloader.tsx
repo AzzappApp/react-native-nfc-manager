@@ -35,8 +35,8 @@ const ProfileScreenContactDownloader = ({
   const intl = useIntl();
   useEffect(() => {
     if (contactData && profile) {
-      if (contactData.startsWith(fromGlobalId(profile.id).id)) {
-        const contact = buildContact(contactData);
+      const contact = buildContact(contactData);
+      if (contact.id === fromGlobalId(profile.id).id) {
         Alert.alert(
           intl.formatMessage(
             {
@@ -111,7 +111,7 @@ const buildContact = (contactCardData: string) => {
     lastName,
     company,
     title,
-    phones,
+    phoneNumbers,
     emails,
     urls,
   } = parseContactCard(contactCardData);
@@ -124,22 +124,22 @@ const buildContact = (contactCardData: string) => {
     name: `${firstName ?? ''} ${lastName ?? ''}`,
     company: company ?? '',
     jobTitle: title ?? '',
-    phoneNumbers: phones.map(phone => ({
-      label: phone.label,
-      number: phone.number,
-      isPrimary: phone.label === 'Main',
-      id: `${profileId}-${phone.number}`,
+    phoneNumbers: phoneNumbers.map(phone => ({
+      label: phone[0],
+      number: phone[1],
+      isPrimary: phone[0] === 'Main',
+      id: `${profileId}-${phone[1]}`,
     })),
     emails: emails.map(email => ({
-      label: email.label,
-      email: email.email,
-      isPrimary: email.label === 'Main',
-      id: `${profileId}-${email.email}`,
+      label: email[0],
+      email: email[1],
+      isPrimary: email[0] === 'Main',
+      id: `${profileId}-${email[1]}`,
     })),
     urlAddresses: urls.map(url => ({
-      label: url.label,
-      url: url.url,
-      id: `${profileId}-${url.url}`,
+      label: url[0],
+      url: url[1],
+      id: `${profileId}-${url[1]}`,
     })),
   };
 

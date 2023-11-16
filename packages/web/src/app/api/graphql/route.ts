@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useLogger } from '@envelop/core';
+import { useLogger, useErrorHandler } from '@envelop/core';
 import { useDisableIntrospection } from '@envelop/disable-introspection';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
@@ -20,6 +20,7 @@ import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
 import type { Profile } from '@azzapp/data/domains';
 import type { Plugin } from '@envelop/types';
+import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -32,7 +33,6 @@ function useRevalidateTag(): Plugin<GraphQLContext> {
         onExecuteDone(payload) {
           payload.args.contextValue.cardUsernamesToRevalidate.forEach(
             username => {
-              console.info(`Revalidating webcard for user ${username}`);
               revalidateTag(username);
             },
           );
@@ -46,7 +46,13 @@ function useAppVersion(): YogaPlugin {
   return {
     onRequest({ request, fetchAPI, endResponse }) {
       const appVersion = request.headers.get('azzapp-appVersion');
-      if (appVersion && compare(appVersion, LAST_SUPPORTED_APP_VERSION) < 0) {
+      if (
+        appVersion &&
+        compare(
+          removePreRelease(appVersion),
+          removePreRelease(LAST_SUPPORTED_APP_VERSION),
+        ) < 0
+      ) {
         endResponse(
           new fetchAPI.Response(
             JSON.stringify({ message: ERRORS.UPDATE_APP_VERSION }),
@@ -121,6 +127,14 @@ const { handleRequest } = createYoga({
         }
       },
     }),
+    useErrorHandler(({ errors }) => {
+      errors
+        .filter(
+          err =>
+            (err as GraphQLError).extensions?.code !== ERRORS.INVALID_TOKEN,
+        )
+        .map(err => console.error(err));
+    }),
     usePersistedOperations({
       extractPersistedOperationId: params => {
         return 'id' in params && params.id ? (params.id as string) : null;
@@ -182,3 +196,8 @@ const { handleRequest } = createYoga({
 });
 
 export { handleRequest as GET, handleRequest as POST };
+
+const removePreRelease = (version: string) => {
+  const versionParts = version.split('-');
+  return versionParts[0];
+};

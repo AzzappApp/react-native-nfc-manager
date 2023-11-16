@@ -5,13 +5,14 @@
  * @format
  */
 const path = require('path');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const {
   getMetroAndroidAssetsResolutionFix,
 } = require('react-native-monorepo-tools');
 
 const androidAssetsResolutionFix = getMetroAndroidAssetsResolutionFix();
 
-module.exports = {
+module.exports = mergeConfig(getDefaultConfig(__dirname), {
   transformer: {
     publicPath: androidAssetsResolutionFix.publicPath,
     getTransformOptions: async () => ({
@@ -28,4 +29,4 @@ module.exports = {
     },
   },
   watchFolders: [path.resolve(__dirname, '../../')],
-};
+});

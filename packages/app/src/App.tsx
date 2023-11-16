@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { useColorScheme } from 'react-native';
+import { BackHandler, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import {
   initialWindowMetrics,
@@ -36,6 +36,7 @@ import {
   messages,
   useCurrentLocale,
 } from '#helpers/localeHelpers';
+import { PermissionProvider } from '#helpers/PermissionContext';
 import {
   ROOT_ACTOR_ID,
   addEnvironmentListener,
@@ -62,6 +63,7 @@ import ForgotPasswordScreen from '#screens/ForgotPasswordScreen';
 import HomeScreen from '#screens/HomeScreen';
 import WelcomeScreen from '#screens/HomeScreen/WelcomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
+import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import NewProfileScreen from '#screens/NewProfileScreen';
@@ -149,7 +151,9 @@ const App = () => {
   return (
     <AppIntlProvider>
       <ErrorBoundary>
-        <AppRouter />
+        <PermissionProvider>
+          <AppRouter />
+        </PermissionProvider>
       </ErrorBoundary>
     </AppIntlProvider>
   );
@@ -181,6 +185,7 @@ const screens = {
   INVITE_FRIENDS: InviteFriendsScreen,
   CONTACT_CARD: ContactCardScreen,
   ONBOARDING: WelcomeScreen,
+  LIKED_POSTS: LikedPostsScreen,
 };
 
 const tabs = {
@@ -221,6 +226,22 @@ const AppRouter = () => {
       }
     }
   }, [authenticated, profileId, router]);
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (router.canGoBack()) {
+          router.back();
+          return true;
+        }
+
+        return false;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
@@ -308,9 +329,9 @@ const AppRouter = () => {
       router.screenDismissed(id);
 
       // TODO should we not handle this in the router?
-      screenIdToDispose.push(id);
+      RelayQueryManager.disposeQueryFor(id);
     },
-    [router, screenIdToDispose],
+    [router],
   );
 
   const slapshScreenHidden = useRef(false);

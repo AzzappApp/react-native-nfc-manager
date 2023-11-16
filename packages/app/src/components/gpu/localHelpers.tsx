@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // TODO refactor this file quite messy
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { Image } from 'react-native';
 import type { Icons } from '#ui/Icon';
 import type { EditionParameters } from './GPULayers';
+import type { ImageSourcePropType } from 'react-native';
 
 type ParametersInfo<T> = Partial<Record<keyof EditionParameters, T>>;
 
@@ -109,7 +112,7 @@ export const editionParametersSettings: ParametersInfo<{
   max: number;
   step: number;
   interval?: number;
-  displayOriginalValue?: boolean;
+  displayedValues?: [number, number];
 }> = {
   brightness: {
     defaultValue: 0,
@@ -117,18 +120,36 @@ export const editionParametersSettings: ParametersInfo<{
     max: 0.5,
     step: 0.025,
   },
-  contrast: { defaultValue: 1, min: 0.5, max: 1.5, step: 0.025 },
-  highlights: { defaultValue: 1, min: 0, max: 1, step: 0.05 },
-  saturation: { defaultValue: 1, min: 0, max: 2, step: 0.05 },
-  shadow: { defaultValue: 0, min: 0, max: 1, step: 0.05 },
+  contrast: {
+    defaultValue: 1,
+    min: 0.5,
+    max: 1.5,
+    step: 0.025,
+    displayedValues: [-100, 100],
+  },
+  highlights: {
+    defaultValue: 1,
+    min: 0,
+    max: 1,
+    step: 0.025,
+    displayedValues: [-100, 100],
+  },
+  saturation: {
+    defaultValue: 1,
+    min: 0,
+    max: 2,
+    step: 0.05,
+    displayedValues: [-100, 100],
+  },
+  shadow: { defaultValue: 0, min: -1, max: 1, step: 0.05 },
   sharpness: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   structure: { defaultValue: 0, min: -2, max: 2, step: 0.05 },
   temperature: {
     defaultValue: 6500,
-    min: 3500,
-    max: 12500,
-    step: 50,
-    displayOriginalValue: true,
+    min: 2000,
+    max: 11000,
+    step: 225,
+    displayedValues: [-100, 100],
   },
   tint: { defaultValue: 0, min: -150, max: 150, step: 5 },
   vibrance: { defaultValue: 0, min: -1, max: 1, step: 0.05 },
@@ -138,127 +159,76 @@ export const editionParametersSettings: ParametersInfo<{
     min: -20,
     max: 20,
     step: 1,
-    displayOriginalValue: true,
   },
 };
 
-export const useFilterList = (): Array<{
-  filter: string;
-  label: string;
-  ios?: boolean;
-  android?: boolean;
-}> => {
+const getUri = (source: ImageSourcePropType) =>
+  // question mark for jest
+  Image.resolveAssetSource(source)?.uri;
+
+export const FILTERS = {
+  'black-and-white': getUri(require('./assets/luts/black-and-white.png')),
+  eterna: getUri(require('./assets/luts/eterna.png')),
+  'deep-south': getUri(require('./assets/luts/deep-south.png')),
+  'gold-dust': getUri(require('./assets/luts/gold-dust.png')),
+  'bw1-cinematic': getUri(require('./assets/luts/BW1-Cinematic.png')),
+  'color1-portrait': getUri(require('./assets/luts/Color1_Portrait.png')),
+  Color3_Vintage: getUri(require('./assets/luts/Color3_Vintage.png')),
+  Color6_Azure: getUri(require('./assets/luts/Color6_Azure.png')),
+  Color9_Mosaic: getUri(require('./assets/luts/Color9_Mosaic.png')),
+  Sepia2_Harmony: getUri(require('./assets/luts/Sepia2_Harmony.png')),
+} as const;
+
+export type Filter = keyof typeof FILTERS;
+
+export const isFilter = (filter?: string | null): filter is Filter =>
+  !!(FILTERS as any)[filter as Filter];
+
+export const useFilterLabels = (): Record<Filter, string> => {
   const intl = useIntl();
   return useMemo(
-    () => [
-      {
-        filter: 'chrome',
-        label: intl.formatMessage({
-          defaultMessage: 'Chrome',
-          description: 'Chrome photo filter name',
-        }),
-        ios: true,
-      },
-      {
-        filter: 'fade',
-        label: intl.formatMessage({
-          defaultMessage: 'Fade',
-          description: 'Fade photo filter name',
-        }),
-        ios: true,
-      },
-      {
-        filter: 'instant',
-        label: intl.formatMessage({
-          defaultMessage: 'Instant',
-          description: 'Instant photo filter name',
-        }),
-        ios: true,
-      },
-      // {
-      //   filter: 'noir',
-      //   label: intl.formatMessage({
-      //     defaultMessage: 'Noir',
-      //     description: 'Noir photo filter name',
-      //   }),
-      //   ios: true,
-      //   android: true,
-      // },
-      {
-        filter: 'process',
-        label: intl.formatMessage({
-          defaultMessage: 'Process',
-          description: 'Process photo filter name',
-        }),
-        ios: true,
-        android: true,
-      },
-      {
-        filter: 'tonal',
-        label: intl.formatMessage({
-          defaultMessage: 'Tonal',
-          description: 'Tonal photo filter name',
-        }),
-        ios: true,
-      },
-      {
-        filter: 'transfer',
-        label: intl.formatMessage({
-          defaultMessage: 'Transfer',
-          description: 'Transfer photo filter name',
-        }),
-        ios: true,
-      },
-      // {
-      //   filter: 'sepia',
-      //   label: intl.formatMessage({
-      //     defaultMessage: 'Sepia',
-      //     description: 'Sepia photo filter name',
-      //   }),
-      //   ios: true,
-      //   android: true,
-      // },
-      // {
-      //   filter: 'thermal',
-      //   label: intl.formatMessage({
-      //     defaultMessage: 'Thermal',
-      //     description: 'Thermal photo filter name',
-      //   }),
-      //   ios: true,
-      // },
-      // {
-      //   filter: 'xray',
-      //   label: intl.formatMessage({
-      //     defaultMessage: 'X-ray',
-      //     description: 'X-ray photo filter name',
-      //   }),
-      //   ios: true,
-      // },
-      {
-        filter: 'documentary',
-        label: intl.formatMessage({
-          defaultMessage: 'Documentary',
-          description: 'Documentary photo filter name',
-        }),
-        android: true,
-      },
-      {
-        filter: 'negative',
-        label: intl.formatMessage({
-          defaultMessage: 'Negative',
-          description: 'Negative photo filter name',
-        }),
-        android: true,
-      },
-      {
-        filter: 'posterize',
-        label: intl.formatMessage({
-          defaultMessage: 'Posterize',
-          description: 'Posterize photo filter name',
-        }),
-        android: true,
-      },
-    ],
+    () => ({
+      eterna: intl.formatMessage({
+        defaultMessage: 'Eterna',
+        description: 'Eterna photo filter name',
+      }),
+      'deep-south': intl.formatMessage({
+        defaultMessage: 'Deep South',
+        description: 'Deep South photo filter name',
+      }),
+      'gold-dust': intl.formatMessage({
+        defaultMessage: 'Gold Dust',
+        description: 'Gold Dust photo filter name',
+      }),
+      'color1-portrait': intl.formatMessage({
+        defaultMessage: 'Color1 Portrait',
+        description: 'Color1 Portrait photo filter name',
+      }),
+      Color3_Vintage: intl.formatMessage({
+        defaultMessage: 'Color3_Vintage',
+        description: 'Color3_Vintage photo filter name',
+      }),
+      Color6_Azure: intl.formatMessage({
+        defaultMessage: 'Color6_Azure',
+        description: 'Color6_Azure photo filter name',
+      }),
+      Color9_Mosaic: intl.formatMessage({
+        defaultMessage: 'Color9_Mosaic',
+        description: 'Color9_Mosaic photo filter name',
+      }),
+      Sepia2_Harmony: intl.formatMessage({
+        defaultMessage: 'Sepia2_Harmony',
+        description: 'Sepia2_Harmonyphoto filter name',
+      }),
+      'black-and-white': intl.formatMessage({
+        defaultMessage: 'Black & White',
+        description: 'Black & White photo filter name',
+      }),
+      'bw1-cinematic': intl.formatMessage({
+        defaultMessage: 'BW1 Cinematic',
+        description: 'BW1 Cinematic photo filter name',
+      }),
+    }),
     [intl],
   );
 };

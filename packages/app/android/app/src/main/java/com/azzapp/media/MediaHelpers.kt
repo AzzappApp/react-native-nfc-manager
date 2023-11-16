@@ -1,12 +1,20 @@
 package com.azzapp.media
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import androidx.media3.common.util.UnstableApi
 import com.facebook.react.bridge.*
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.segmentation.Segmentation
+import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 
-class MediaHelpers(private val reactContext: ReactApplicationContext) :
+@UnstableApi class MediaHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "AZPMediaHelpers"
 
@@ -33,13 +41,62 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
       promise.reject("failure", "Error while retrieving metadata", e)
       return;
     }
-    promise.resolve(mapOf("width" to width, "height" to height))
+    val map = WritableNativeMap();
+    map.putInt("width", width);
+    map.putInt("height", height);
+    promise.resolve(map)
   }
+
+
 
   @ReactMethod
   fun segmentImage(uri: String, promise: Promise) {
-    // TODO
-    promise.resolve(null)
+
+    val options =
+        SelfieSegmenterOptions.Builder()
+          .setDetectorMode(SelfieSegmenterOptions.SINGLE_IMAGE_MODE)
+          .enableRawSizeMask()
+          .build()
+    val segmenter = Segmentation.getClient(options)
+    val imagePath = try { Uri.parse(uri) } catch(e: NullPointerException) {
+      promise.reject("INVALID_URI", "provided uri is invalid")
+      return;
+    }
+
+    val inputImage =  InputImage.fromFilePath(reactContext, imagePath)
+    val maskedImageFile = File(reactContext.cacheDir, UUID.randomUUID().toString() + ".png")
+    segmenter.process(inputImage)
+    .addOnSuccessListener { segmentationResult ->
+      val mask = segmentationResult.buffer.asFloatBuffer()
+      val maskWidth = segmentationResult.width
+      val maskHeight = segmentationResult.height
+
+      val maskBitmap = Bitmap.createBitmap(maskWidth, maskHeight, Bitmap.Config.ARGB_8888)
+      for (y in 0 until maskHeight) {
+          for (x in 0 until maskWidth) {
+              val foregroundConfidence = mask.get().coerceIn(0.0f, 1.0f)
+              //interpolate [0.2, 1]  to [ 0 ,255]
+              val alpha = (((foregroundConfidence - 0.2f) / (1.0f - 0.2f)) * 255).toInt()
+              if (foregroundConfidence <= 0.2){
+                maskBitmap.setPixel(x, y, Color.BLACK)
+              }
+              else {
+                maskBitmap.setPixel(x, y, Color.argb(alpha, 255, 255, 255))
+              }
+          }
+      }
+
+
+
+      val outputStream = FileOutputStream(maskedImageFile)
+      maskBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+      outputStream.flush()
+      outputStream.close()
+      promise.resolve(maskedImageFile.absolutePath)
+    }
+    .addOnFailureListener { e ->
+        promise.reject("ERROR_SEGMENTATION", e.localizedMessage)
+    }
   }
 
   @ReactMethod
@@ -88,18 +145,5 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
   fun cancelVideoPrefetch(uriStr: String) {
     val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) { return }
     VideoCache.cancelPrefetch(uri)
-  }
-
-  @ReactMethod
-  fun addLocalCachedImage(mediaId: String, uri: String) {
-    ImageURICache.addLocalCacheEntry(
-      mediaId,
-      uri
-    )
-  }
-
-  @ReactMethod
-  fun addLocalCachedVideo(mediaId: String, uri: String) {
-    MediaVideoRenderer.addLocalCachedFile(mediaId, uri)
   }
 }

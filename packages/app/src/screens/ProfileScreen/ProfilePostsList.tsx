@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from '#components/NativeRouter';
@@ -65,4 +66,4 @@ const ProfilePostsList = ({
   );
 };
 
-export default ProfilePostsList;
+export default memo(ProfilePostsList);

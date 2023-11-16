@@ -8,14 +8,20 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet } from 'react-native';
-import { useWorkletCallback } from 'react-native-reanimated';
+import {
+  View,
+  useWindowDimensions,
+  StyleSheet,
+  PixelRatio,
+  Platform,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import Skeleton from '#components/Skeleton';
 import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
@@ -83,11 +89,13 @@ const HomeProfilesCarousel = (
 
   const { width: windowWidth } = useWindowDimensions();
   const coverHeight = height - 2 * VERTICAL_MARGIN;
-  const coverWidth = Math.trunc(coverHeight * COVER_RATIO);
-
+  const coverWidth =
+    Platform.OS === 'ios'
+      ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
+      : PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex + 1);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       setSelectedIndex(index);
@@ -96,9 +104,9 @@ const HomeProfilesCarousel = (
     [onCurrentProfileIndexChange],
   );
 
-  const onSelectedIndexChangeAnimated = useWorkletCallback(
+  const onSelectedIndexChangeAnimated = useCallback(
     (index: number) => {
-      'worlket';
+      'worklet';
       onCurrentProfileIndexChangeAnimated(index - 1);
     },
     [onCurrentProfileIndexChangeAnimated],
@@ -116,20 +124,47 @@ const HomeProfilesCarousel = (
     [scrollToIndex],
   );
 
+  const intl = useIntl();
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ProfileType | null>) => (
-      <ProfileBoundRelayEnvironmentProvider profileId={item?.id ?? null}>
-        <ItemRender
-          item={item}
-          coverHeight={coverHeight}
-          coverWidth={coverWidth}
-          index={index}
-          scrollToIndex={scrollToIndex}
-          currentUserIndex={selectedIndex}
-        />
-      </ProfileBoundRelayEnvironmentProvider>
-    ),
-    [coverHeight, coverWidth, selectedIndex, scrollToIndex],
+    ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
+      if (item) {
+        return (
+          <ProfileBoundRelayEnvironmentProvider profileId={item?.id}>
+            <ItemRender
+              item={item}
+              coverHeight={coverHeight}
+              coverWidth={coverWidth}
+              index={index}
+              scrollToIndex={scrollToIndex}
+              currentUserIndex={selectedIndex}
+            />
+          </ProfileBoundRelayEnvironmentProvider>
+        );
+      }
+
+      return (
+        <Link route="NEW_PROFILE">
+          <PressableOpacity
+            style={[
+              styles.newCover,
+              styles.coverShadow,
+              {
+                width: coverWidth,
+                height: coverHeight,
+                borderRadius: coverWidth * COVER_CARD_RADIUS,
+              },
+            ]}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Create a new profile',
+              description: 'Start new profile creation from account screen',
+            })}
+          >
+            <Icon icon="add" style={styles.icon} />
+          </PressableOpacity>
+        </Link>
+      );
+    },
+    [coverWidth, coverHeight, intl, scrollToIndex, selectedIndex],
   );
 
   const data = useMemo(
@@ -137,7 +172,7 @@ const HomeProfilesCarousel = (
     [profiles],
   );
 
-  if (height <= 0 || profiles == null) {
+  if (profiles == null) {
     return null;
   }
 
@@ -178,7 +213,7 @@ type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 
 type ItemRenderProps = {
   index: number;
-  item: ProfileType | null;
+  item: ProfileType;
   coverWidth: number;
   coverHeight: number;
   scrollToIndex: (index: number) => void;
@@ -201,13 +236,15 @@ const ItemRenderComponent = ({
         id
         userName
         cardCover {
-          title
+          media {
+            id
+          }
         }
         ...CoverLink_profile
         ...CoverRenderer_profile
       }
     `,
-    item as HomeProfilesCarouselItem_profile$key | null,
+    item as HomeProfilesCarouselItem_profile$key,
   );
 
   const [ready, setReady] = useState(!profile?.cardCover);
@@ -225,29 +262,7 @@ const ItemRenderComponent = ({
 
   const isCurrent = index === currentUserIndex;
 
-  if (!profile) {
-    return (
-      <Link route="NEW_PROFILE">
-        <PressableOpacity
-          style={[
-            styles.newCover,
-            styles.coverShadow,
-            {
-              width: coverWidth,
-              height: coverHeight,
-              borderRadius: coverWidth * COVER_CARD_RADIUS,
-            },
-          ]}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Create a new profile',
-            description: 'Start new profile creation from account screen',
-          })}
-        >
-          <Icon icon="add" style={styles.icon} />
-        </PressableOpacity>
-      </Link>
-    );
-  }
+  const hasFocus = useScreenHasFocus();
 
   return (
     <View
@@ -261,13 +276,13 @@ const ItemRenderComponent = ({
         },
       ]}
     >
-      {profile.cardCover ? (
+      {profile.cardCover?.media?.id != null ? (
         <CoverLink
           profile={profile}
           width={coverWidth}
           profileId={profile.id}
           onPress={onPress}
-          videoEnabled={isCurrent}
+          videoEnabled={isCurrent && hasFocus}
           onReadyForDisplay={onReady}
         />
       ) : (

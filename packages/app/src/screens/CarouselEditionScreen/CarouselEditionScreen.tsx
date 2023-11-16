@@ -12,9 +12,10 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { exportLayersToImage } from '#components/gpu';
+import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -24,7 +25,6 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import InnerModal from '#ui/InnerModal';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CarouselEditionBackgroundPanel from './CarouselEditionBackgroundPanel';
@@ -189,9 +189,8 @@ const CarouselEditionScreen = ({
   };
 
   // #region Mutations and saving logic
-  const [saving, setSaving] = useState(false);
-  const [commit] = useMutation<CarouselEditionScreenUpdateModuleMutation>(
-    graphql`
+  const [commit, saving] =
+    useMutation<CarouselEditionScreenUpdateModuleMutation>(graphql`
       mutation CarouselEditionScreenUpdateModuleMutation(
         $input: SaveCarouselModuleInput!
       ) {
@@ -206,22 +205,20 @@ const CarouselEditionScreen = ({
           }
         }
       }
-    `,
-  );
+    `);
 
   const isValid = images.length > 0;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
-  const [uploadProgress, setUploadProgress] =
+  const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
   const onSave = useCallback(async () => {
     if (!canSave) {
       return;
     }
-    setSaving(true);
     const { images, ...rest } = value;
 
     let mediasMap: Record<
@@ -264,7 +261,7 @@ const CarouselEditionScreen = ({
           }),
         );
 
-        setUploadProgress(
+        setProgressIndicator(
           combineLatest(uploads.map(({ progress }) => progress)).map(
             progresses =>
               progresses.reduce((a, b) => a + b, 0) / progresses.length,
@@ -284,8 +281,6 @@ const CarouselEditionScreen = ({
           (acc, media) => ({ ...acc, [media.uri]: media }),
           {},
         );
-
-        setUploadProgress(null);
       } catch (e) {
         console.error(e);
         Toast.show({
@@ -297,8 +292,7 @@ const CarouselEditionScreen = ({
               'Error toast message when saving a carousel module failed because medias upload failed.',
           }),
         });
-        setUploadProgress(null);
-        setSaving(false);
+        setProgressIndicator(null);
         return;
       }
     }
@@ -317,10 +311,12 @@ const CarouselEditionScreen = ({
         },
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
         console.error(e);
+        setShowImagePicker(false);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -332,7 +328,15 @@ const CarouselEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, commit, carousel?.id, router, intl]);
+  }, [
+    canSave,
+    setProgressIndicator,
+    value,
+    commit,
+    carousel?.id,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -374,7 +378,7 @@ const CarouselEditionScreen = ({
             kind: 'image',
             uri,
             parameters: editionParameters,
-            filters: filter ? [filter] : [],
+            lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
           },
         ],
       });
@@ -385,7 +389,7 @@ const CarouselEditionScreen = ({
           {
             local: true,
             id: localPath,
-            uri: `file://${localPath}`,
+            uri: `file://${localPath.replace('file://', '')}`,
             aspectRatio,
           },
         ],
@@ -576,17 +580,19 @@ const CarouselEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <InnerModal visible={showImagePicker}>
+      <ScreenModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onImagePickerFinished}
           onCancel={onCloseImagePicker}
         />
-      </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
+      </ScreenModal>
+
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

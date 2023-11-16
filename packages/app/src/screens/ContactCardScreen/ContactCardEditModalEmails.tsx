@@ -3,11 +3,12 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, type LayoutRectangle } from 'react-native';
 import { colors } from '#theme';
+import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactCardEditModalField from './ContactCardEditModalField';
-import styles from './ContactCardEditModalStyles';
+import { contactCardEditModalStyleSheet } from './ContactCardEditModalStyles';
 import type { ContactCardEditForm } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
 
@@ -69,6 +70,8 @@ const ContactCardEditModalPhones = ({
     ],
     [intl],
   );
+
+  const styles = useStyleSheet(contactCardEditModalStyleSheet);
 
   return (
     <>

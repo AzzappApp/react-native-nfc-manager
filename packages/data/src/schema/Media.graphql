@@ -1,3 +1,12 @@
+interface Media {
+  id: String!
+  aspectRatio: Float!
+  width: Float!
+  height: Float!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
+}
+
+
 """
 A video media
 """
@@ -6,21 +15,13 @@ type MediaVideo implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
   thumbnail(
     pixelRatio: Float
     height: Float
     width: Float
     time: Float
   ): String!
-}
-
-interface Media {
-  id: String!
-  aspectRatio: Float!
-  width: Float!
-  height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float): String!
 }
 
 """
@@ -31,7 +32,7 @@ type MediaImage implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
 }
 
 """

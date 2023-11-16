@@ -1,7 +1,8 @@
 import { eq, sql } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { PostTable, ProfileTable, db } from '#domains';
+import { PostTable, ProfileTable, db, updateStatistics } from '#domains';
 import {
   deletePostReaction,
   getPostReaction,
@@ -15,22 +16,22 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   { auth, loaders },
 ) => {
   if (!auth.userId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(postId);
   const post = await loaders.Post.load(targetId);
   if (type !== 'Post' || !post) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
-    db.transaction(async trx => {
-      const reaction = await getPostReaction(profileId, targetId);
+    await db.transaction(async trx => {
+      const reaction = await getPostReaction(profileId, targetId, trx);
       const removeReaction = reaction?.reactionKind === reactionKind;
 
       if (removeReaction) {
@@ -38,7 +39,6 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
       } else {
         await insertPostReaction(profileId, targetId, reactionKind, trx);
       }
-
       await trx
         .update(PostTable)
         .set({
@@ -46,7 +46,6 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           counterReactions:removeReaction? sql`${PostTable.counterReactions} -  1`: sql`${PostTable.counterReactions} +  1`,
         })
         .where(eq(PostTable.id, targetId));
-
       await trx
         .update(ProfileTable)
         .set({
@@ -54,10 +53,18 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           nbLikes: removeReaction? sql`${ProfileTable.nbLikes} - 1`: sql`${ProfileTable.nbLikes} + 1`,
         })
         .where(eq(ProfileTable.id, post.authorId));
+      await trx
+        .update(ProfileTable)
+        .set({
+          //prettier-ignore
+          nbPostsLiked: removeReaction? sql`${ProfileTable.nbPostsLiked} - 1`: sql`${ProfileTable.nbPostsLiked} + 1`,
+        })
+        .where(eq(ProfileTable.id, profileId));
+      await updateStatistics(post.authorId, 'likes', !removeReaction, trx);
     });
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   return { post };

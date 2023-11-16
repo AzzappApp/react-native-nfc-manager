@@ -65,14 +65,11 @@ const LineDividerSettingsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Height : {size}"
+            defaultMessage="Height :"
             description="Height message in Line Divider edition"
-            values={{
-              size: height,
-            }}
           />
         }
-        value={height}
+        initialValue={height}
         min={LINE_DIVIDER_MIN_HEIGHT}
         max={LINE_DIVIDER_MAX_HEIGHT}
         step={1}

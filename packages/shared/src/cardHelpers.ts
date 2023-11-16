@@ -70,6 +70,18 @@ export const swapColor = <T extends string | null | undefined>(
 /**
  * A list of style used by a card modules
  */
+export type CardTemplateType = {
+  id: string | null;
+  label: string | null;
+} | null;
+
+// #endregion
+
+// #region Card Style
+
+/**
+ * A list of style used by a card modules
+ */
 export type CardStyle = {
   borderColor: string;
   borderRadius: number;

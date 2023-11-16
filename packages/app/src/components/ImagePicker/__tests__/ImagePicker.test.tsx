@@ -1,6 +1,6 @@
 import { flushPromises, mockReactComponent } from '@azzapp/shared/jestHelpers';
 import { render, screen, act, fireEvent } from '#helpers/testHelpers';
-import useCameraPermissions from '#hooks/useCameraPermissions';
+import { useCameraPermission } from '#hooks/usePermissions';
 import ImagePicker from '..';
 import type { ImagePickerProps } from '../ImagePicker';
 
@@ -81,28 +81,24 @@ jest.mock('#helpers/mediaHelpers', () => ({
   getVideoSize: () => ({ width: 1080, height: 1920 }),
 }));
 
-jest.mock('#hooks/useMediaLibraryPermission', () =>
-  jest.fn().mockReturnValue({
-    granted: true,
+jest.mock('#helpers/PermissionContext', () => ({
+  usePermissionContext: jest.fn().mockReturnValue({
+    mediaPermission: 'granted',
+    cameraPermission: 'granted',
+    audioPermission: 'granted',
   }),
-);
-
-jest.mock('#hooks/useCameraPermissions', () =>
-  jest.fn().mockReturnValue({
-    cameraPermission: 'authorized',
-    microphonePermission: 'authorized',
-  }),
-);
+}));
 
 const withPermissionStatus = async (
-  status: ReturnType<typeof useCameraPermissions>,
+  status: string,
   callback: () => Promise<any>,
 ) => {
-  (useCameraPermissions as jest.Mock).mockReturnValue(status);
+  (useCameraPermission as jest.Mock).mockReturnValue({
+    cameraPermission: status,
+  });
   await callback();
-  (useCameraPermissions as jest.Mock).mockReturnValue({
-    cameraPermission: 'authorized',
-    microphonePermission: 'authorized',
+  (useCameraPermission as jest.Mock).mockReturnValue({
+    cameraPermission: 'granted',
   });
 };
 
@@ -224,40 +220,28 @@ describe('ImagePicker', () => {
 
     test('Should display permission modal when the user try to access the camera and the permission is denied', async () => {
       await renderImagePicker({ kind: 'image' });
-      await withPermissionStatus(
-        {
-          cameraPermission: 'not-determined',
-          microphonePermission: 'not-determined',
-        },
-        async () => {
-          await renderImagePicker();
-          act(() => {
-            fireEvent.press(screen.getByLabelText('Take a picture'));
-          });
-          const permissionModal = screen.getByTestId('permission-modal');
-          expect(permissionModal).toHaveProp('visible', true);
-          expect(permissionModal).toHaveProp('permissionsFor', 'photo');
-        },
-      );
+      await withPermissionStatus('denied', async () => {
+        await renderImagePicker();
+        act(() => {
+          fireEvent.press(screen.getByLabelText('Take a picture'));
+        });
+        const permissionModal = screen.getByTestId('permission-modal');
+        expect(permissionModal).toHaveProp('visible', true);
+        expect(permissionModal).toHaveProp('permissionsFor', 'photo');
+      });
     });
 
     test('Should display permission modal when the user try to access the microphone and the permission is denied', async () => {
       await renderImagePicker({ kind: 'image' });
-      await withPermissionStatus(
-        {
-          cameraPermission: 'authorized',
-          microphonePermission: 'not-determined',
-        },
-        async () => {
-          await renderImagePicker();
-          act(() => {
-            fireEvent.press(screen.getByLabelText('Take a video'));
-          });
-          const permissionModal = screen.getByTestId('permission-modal');
-          expect(permissionModal).toHaveProp('visible', true);
-          expect(permissionModal).toHaveProp('permissionsFor', 'video');
-        },
-      );
+      await withPermissionStatus('denied', async () => {
+        await renderImagePicker();
+        act(() => {
+          fireEvent.press(screen.getByLabelText('Take a video'));
+        });
+        const permissionModal = screen.getByTestId('permission-modal');
+        expect(permissionModal).toHaveProp('visible', true);
+        expect(permissionModal).toHaveProp('permissionsFor', 'video');
+      });
     });
 
     test('Should select the picture taken by the user and goes to the next step', async () => {
@@ -291,6 +275,7 @@ describe('ImagePicker', () => {
         fireEvent.press(screen.getByLabelText('Take a video'));
       });
       const cameraControlPanel = screen.getByTestId('camera-control-panel');
+
       mockCameraViewRef.startRecording.mockReturnValueOnce({
         end: () =>
           Promise.resolve({

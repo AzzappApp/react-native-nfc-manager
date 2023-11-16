@@ -2,7 +2,7 @@ import clamp from 'lodash/clamp';
 import isEqual from 'lodash/isEqual';
 import range from 'lodash/range';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { colors, mixins } from '#theme';
 import type { CropData, ImageOrientation } from '#components/gpu';
@@ -273,17 +273,32 @@ const Cropper = ({
               ? displayedHeight / offsetHeight
               : displayedWidth / offsetWidth;
 
+          // TODO reenable this when we make sure that cropping outside of the image is not an issue on the native side
+          // setCropDataCurrentValue(cropDataCurrentValue => ({
+          //   ...cropDataCurrentValue,
+          //   originX: clamp(
+          //     offsetX - e.translationX / scale,
+          //     -offsetWidth / 4,
+          //     mediaWidth - (3 * offsetWidth) / 4,
+          //   ),
+          //   originY: clamp(
+          //     offsetY + e.translationY / scale,
+          //     -offsetHeight / 2,
+          //     mediaHeight - (3 * offsetHeight) / 4,
+          //   ),
+          // }));
+
           setCropDataCurrentValue(cropDataCurrentValue => ({
             ...cropDataCurrentValue,
             originX: clamp(
               offsetX - e.translationX / scale,
-              -offsetWidth / 4,
-              mediaWidth - (3 * offsetWidth) / 4,
+              0,
+              mediaWidth - offsetWidth,
             ),
             originY: clamp(
               offsetY + e.translationY / scale,
-              -offsetHeight / 2,
-              mediaHeight - (3 * offsetHeight) / 4,
+              0,
+              mediaHeight - offsetHeight,
             ),
           }));
         })
@@ -299,7 +314,6 @@ const Cropper = ({
     ],
   );
 
-  const isAndroid = Platform.OS === 'android';
   const pinchGesture = useMemo(
     () =>
       Gesture.Pinch()
@@ -315,11 +329,9 @@ const Cropper = ({
 
           let width = offsetWidth / e.scale;
           let height = offsetHeight / e.scale;
-          if (isAndroid) {
-            // android effect doesn't support this kind of downscaling
-            width = Math.min(width, mediaWidth);
-            height = Math.min(height, mediaHeight);
-          }
+          // TODO remove this when we make sure that cropping outside of the image is not an issue on the native side
+          width = Math.min(width, mediaWidth);
+          height = Math.min(height, mediaHeight);
 
           setCropDataCurrentValue({
             originX: offsetX - (width - offsetWidth) / 2,
@@ -329,7 +341,7 @@ const Cropper = ({
           });
         })
         .onFinalize(onGestureEnd),
-    [isAndroid, mediaHeight, mediaWidth, onGestureEnd, onGestureStart],
+    [mediaHeight, mediaWidth, onGestureEnd, onGestureStart],
   );
 
   return (

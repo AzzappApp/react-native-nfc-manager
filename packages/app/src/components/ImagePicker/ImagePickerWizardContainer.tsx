@@ -239,7 +239,10 @@ const ImagePickerWizardRenderer = ({
           : bottomPanel}
       </View>
       {menuBarProps && (
-        <View style={[styles.bottomMenuContainer, { bottom: insetBottom }]}>
+        <View
+          style={[styles.bottomMenuContainer, { bottom: insetBottom }]}
+          pointerEvents="box-none"
+        >
           <BottomMenu {...menuBarProps} />
         </View>
       )}

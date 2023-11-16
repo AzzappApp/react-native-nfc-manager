@@ -63,6 +63,10 @@ type Profile implements Node {
   """
   isFollowing: Boolean!
   """
+  the number of post the profile like
+  """
+  nbPostsLiked: Int!
+  """
   the number of likes received by the profile posts
   """
   nbLikes: Int!
@@ -79,9 +83,34 @@ type Profile implements Node {
   """
   nbPosts: Int!
   """
+  the number of total time the webcards was viewed
+  """
+  nbWebcardViews: Int!
+  """
+  the number of totam time the card was scan
+  """
+  nbContactCardScans: Int!
+  """
   return the list of the profile posts
   """
   posts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection
+  """
+  Returns summary of statistics
+  """
+  statsSummary: [Statistic]
+   """
+  Returns a list of posts that user like
+  """
+  likedPosts(
     """
     Returns the items in the list that come after the specified cursor.
     """
@@ -91,10 +120,7 @@ type Profile implements Node {
     Returns the first n items from the list.
     """
     first: Int
-  ): PostConnection
-
-  #TODO
-  statsSummary: [DailyStatsSumary]!
+  ): PostConnection!
 }
 
 type ProfileCardStyle {
@@ -108,16 +134,6 @@ type ProfileCardStyle {
   borderColor: String!
   buttonColor: String!
   gap: Int!
-}
-
-"""
-Represent the daily stats summary of a profile
-"""
-type DailyStatsSumary {
-  date: String!
-  scans: Int!
-  webcardViews: Int!
-  totalLikes: Int!
 }
 
 """

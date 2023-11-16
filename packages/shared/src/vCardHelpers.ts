@@ -21,36 +21,36 @@ export const buildVCard = (contactCardData: string) => {
 
   contactCard.emails.forEach(email => {
     vcard.addEmail(
-      email.email,
-      email.label === 'Main'
+      email[1],
+      email[0] === 'Main'
         ? 'type=PREF'
-        : `type=${email.label.toLocaleUpperCase()}`,
+        : `type=${email[0].toLocaleUpperCase()}`,
     );
   });
 
-  contactCard.phones.forEach(phone => {
+  contactCard.phoneNumbers.forEach(phone => {
     vcard.addPhoneNumber(
-      phone.number,
-      phone.label === 'Main'
+      phone[1],
+      phone[0] === 'Main'
         ? 'type=PREF'
-        : phone.label === 'Mobile'
+        : phone[0] === 'Mobile'
         ? 'type=CELL'
-        : `type=${phone.label.toLocaleUpperCase()}`,
+        : `type=${phone[0].toLocaleUpperCase()}`,
     );
   });
   contactCard.urls.forEach(url => {
-    vcard.addURL(url.url, url.label);
+    vcard.addURL(url[1], url[0]);
   });
 
-  contactCard.adresses.forEach(address => {
-    vcard.addAddress(address.label, address.address);
+  contactCard.addresses.forEach(address => {
+    vcard.addAddress(address[0], address[1].replace(/;/g, '\\;'));
   });
 
-  vcard.addBirthday(contactCard.birthday);
+  if (contactCard.birthday) vcard.addBirthday(contactCard.birthday);
 
   contactCard.socials.forEach(social => {
-    vcard.addSocial(social, '');
+    vcard.addSocial(social[1], social[0]);
   });
 
-  return vcard;
+  return { vCard: vcard, contactId: contactCard.profileId };
 };

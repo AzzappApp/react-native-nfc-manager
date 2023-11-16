@@ -54,14 +54,11 @@ const HorizontalPhotoMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Top/bottom margin: {size}"
+              defaultMessage="Top/bottom margin:"
               description="Top/bottom margin message in HorizontalPhoto edition"
-              values={{
-                size: marginVertical,
-              }}
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN}
           step={1}
@@ -80,15 +77,19 @@ const HorizontalPhotoMarginsEditionPanel = ({
         />
         <LabeledDashedSlider
           label={
-            <FormattedMessage
-              defaultMessage="Left/right margin: {size}"
-              description="Left/right margin message in Horizontal Photo edition"
-              values={{
-                size: marginHorizontal,
-              }}
-            />
+            marginHorizontal === 0 ? (
+              <FormattedMessage
+                defaultMessage="Left/right margin: 0 - Full Width"
+                description="Left/right margin message in Horizontal Photo edition"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Left/right margin:"
+                description="Left/right margin message in Horizontal Photo edition"
+              />
+            )
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN}
           step={1}

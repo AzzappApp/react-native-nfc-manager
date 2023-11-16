@@ -2,6 +2,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
+import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { Profile } from '@azzapp/data/domains';
@@ -36,13 +37,13 @@ const DownloadVCard = ({
       })
         .then(res => {
           if (res.status === 200) {
-            const vCard = buildVCard(decodeURI(contactCard));
-
-            if (contactCard.startsWith(profileId)) {
+            const { vCard, contactId } = buildVCard(decodeURI(contactCard));
+            if (contactId === profileId) {
               const file = new Blob([vCard.toString()], { type: 'text/vcard' });
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
               setOpened(true);
+              updateContactCardScanCounter(contactId);
             }
           }
         })

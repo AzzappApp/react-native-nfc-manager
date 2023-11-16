@@ -76,7 +76,6 @@ type CardCover {
   merged: Boolean!
 }
 
-
 """
 Style of the text in a card cover
 """

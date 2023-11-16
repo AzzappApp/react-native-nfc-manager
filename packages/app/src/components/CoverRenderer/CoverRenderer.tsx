@@ -1,5 +1,5 @@
-import { forwardRef, memo, useRef } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { forwardRef, memo, useCallback, useMemo, useRef } from 'react';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -91,13 +91,9 @@ const CoverRenderer = (
               id
               __typename
               uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
               ... on MediaVideo {
                 thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
-              }
-              ... on MediaImage {
-                smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
-              }
-              ... on MediaVideo {
                 smallThumbnail: thumbnail(
                   width: 125
                   pixelRatio: $cappedPixelRatio
@@ -172,25 +168,26 @@ const CoverRenderer = (
     sources.current.foreground = cardCover?.foreground?.id;
   }
 
-  const onMediaReadyForDisplay = () => {
+  const onMediaReadyForDisplay = useCallback(() => {
     readyStates.current.media = true;
     if (readyStates.current.foreground && readyStates.current.background) {
       onReadyForDisplay?.();
     }
-  };
+  }, [onReadyForDisplay]);
 
-  const onForegroundReadyForDisplay = () => {
+  const onForegroundReadyForDisplay = useCallback(() => {
     readyStates.current.foreground = true;
     if (readyStates.current.media && readyStates.current.background) {
       onReadyForDisplay?.();
     }
-  };
-  const onBackgroundReadyForDisplay = () => {
+  }, [onReadyForDisplay]);
+
+  const onBackgroundReadyForDisplay = useCallback(() => {
     readyStates.current.background = true;
     if (readyStates.current.media && readyStates.current.foreground) {
       onReadyForDisplay?.();
     }
-  };
+  }, [onReadyForDisplay]);
   //#endregion
 
   //#region Styles
@@ -214,74 +211,110 @@ const CoverRenderer = (
   //#endregion
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
-  const isSmallCover = width === COVER_BASE_WIDTH;
+  const isSmallCover = width <= COVER_BASE_WIDTH;
   const isVideoMedia = __typename === 'MediaVideo';
 
-  const mediaUri = isSmallCover
-    ? !isVideoMedia || videoEnabled
-      ? smallURI
-      : smallThumbnail
-    : !isVideoMedia || videoEnabled
-    ? uri
-    : thumbnail;
+  const mediaUri = isSmallCover ? smallURI : uri;
 
-  const MediaRenderer =
-    isVideoMedia && videoEnabled ? MediaVideoRenderer : MediaImageRenderer;
+  const requestedSize = useMemo(
+    () => (isSmallCover ? COVER_BASE_WIDTH : Dimensions.get('window').width),
+    [isSmallCover],
+  );
+
+  const backgroundSource = useMemo(
+    () =>
+      background?.id && {
+        uri: isSmallCover ? background.smallURI : background.largeURI,
+        mediaId: background.id,
+        requestedSize,
+      },
+    [
+      isSmallCover,
+      background?.smallURI,
+      background?.largeURI,
+      background?.id,
+      requestedSize,
+    ],
+  );
+
+  const coverSource = useMemo(
+    () =>
+      mediaUri && media?.id
+        ? {
+            uri: mediaUri,
+            requestedSize,
+            mediaId: media?.id,
+          }
+        : null,
+    [mediaUri, requestedSize, media?.id],
+  );
+
+  const foregroundSource = useMemo(
+    () =>
+      foreground?.id
+        ? {
+            uri: isSmallCover ? foreground.smallURI : foreground.largeURI,
+            mediaId: foreground.id,
+            requestedSize,
+          }
+        : null,
+    [
+      isSmallCover,
+      foreground?.smallURI,
+      foreground?.largeURI,
+      foreground?.id,
+      requestedSize,
+    ],
+  );
+
+  const containerStyle = useMemo(
+    () => [
+      styles.root,
+      {
+        borderRadius,
+        width,
+        backgroundColor: swapColor(backgroundColor, cardColors) as any,
+      },
+      style,
+    ],
+    [borderRadius, width, backgroundColor, cardColors, style],
+  );
 
   return (
-    <View
-      ref={forwardRef}
-      style={[
-        styles.root,
-        {
-          borderRadius,
-          width,
-          backgroundColor: swapColor(backgroundColor, cardColors) as any,
-        },
-        style,
-      ]}
-      testID="cover-renderer"
-    >
-      {media ? (
+    <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
+      {coverSource ? (
         <>
-          {background && (
+          {backgroundSource && (
             <MediaImageRenderer
               testID="CoverRenderer_background"
-              source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? background.smallURI
-                    : background.largeURI,
-                mediaId: background.id,
-                requestedSize: width,
-              }}
+              source={backgroundSource}
               tintColor={swapColor(backgroundPatternColor, cardColors)}
-              aspectRatio={COVER_RATIO}
               onReadyForDisplay={onBackgroundReadyForDisplay}
               style={styles.layer}
             />
           )}
-          <MediaRenderer
-            testID="CoverRenderer_media"
-            source={{ uri: mediaUri!, requestedSize: width, mediaId: media.id }}
-            thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-            aspectRatio={COVER_RATIO}
-            onReadyForDisplay={onMediaReadyForDisplay}
-            style={styles.layer}
-          />
-          {foreground && (
+          {isVideoMedia ? (
+            <MediaVideoRenderer
+              testID="CoverRenderer_media"
+              source={coverSource}
+              thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+              onReadyForDisplay={onMediaReadyForDisplay}
+              style={styles.layer}
+              videoEnabled={videoEnabled}
+            />
+          ) : (
+            <MediaImageRenderer
+              testID="CoverRenderer_media"
+              source={coverSource}
+              onReadyForDisplay={onMediaReadyForDisplay}
+              style={styles.layer}
+            />
+          )}
+          {foregroundSource && (
             <MediaImageRenderer
               testID="CoverRenderer_foreground"
-              source={{
-                uri:
-                  width === COVER_BASE_WIDTH
-                    ? foreground.smallURI
-                    : foreground.largeURI,
-                mediaId: foreground.id,
-                requestedSize: width,
-              }}
+              source={foregroundSource}
               tintColor={swapColor(foregroundColor, cardColors)}
-              aspectRatio={COVER_RATIO}
               onReadyForDisplay={onForegroundReadyForDisplay}
               style={styles.layer}
             />
@@ -326,6 +359,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
+    aspectRatio: COVER_RATIO,
   },
   coverPlaceHolder: {
     backgroundColor: colors.black,

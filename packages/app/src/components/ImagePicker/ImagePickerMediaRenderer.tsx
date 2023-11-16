@@ -2,11 +2,13 @@ import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import {
+  FILTERS,
   GPUImageView,
   GPUVideoView,
   Image,
   Video,
   VideoFrame,
+  isFilter,
 } from '#components/gpu';
 import { useImagePickerState } from './ImagePickerContext';
 
@@ -50,8 +52,8 @@ const ImagePickerMediaRenderer = ({
     // Displaying edited video and exporting is too much for android
     const sizeStyles =
       aspectRatio > 1
-        ? { aspectRatio, width: '100%' }
-        : { aspectRatio, height: '100%' };
+        ? ({ aspectRatio, width: '100%' } as const)
+        : ({ aspectRatio, height: '100%' } as const);
 
     return (
       <View
@@ -89,7 +91,7 @@ const ImagePickerMediaRenderer = ({
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.grey100,
+        backgroundColor: colors.grey500,
       }}
     >
       <Cropper
@@ -122,7 +124,10 @@ const ImagePickerMediaRenderer = ({
               <Image
                 uri={media.uri}
                 parameters={{ ...editionParameters, cropData }}
-                filters={mediaFilter ? [mediaFilter] : null}
+                lutFilterUri={
+                  isFilter(mediaFilter) ? FILTERS[mediaFilter] : null
+                }
+                backgroundColor="#FFFFFF"
               />
             </GPUImageView>
           ) : (
@@ -133,7 +138,9 @@ const ImagePickerMediaRenderer = ({
               <Video
                 uri={media.uri}
                 parameters={{ ...editionParameters, cropData }}
-                filters={mediaFilter ? [mediaFilter] : null}
+                lutFilterUri={
+                  isFilter(mediaFilter) ? FILTERS[mediaFilter] : null
+                }
                 startTime={timeRange?.startTime}
                 duration={timeRange?.duration}
               />

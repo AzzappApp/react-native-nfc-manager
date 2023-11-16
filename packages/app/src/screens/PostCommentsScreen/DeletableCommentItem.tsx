@@ -1,0 +1,104 @@
+import { View, StyleSheet } from 'react-native';
+import { graphql, useFragment, useMutation } from 'react-relay';
+import { colors } from '#theme';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
+import SwipeableRow, { SwipeableRowRightAction } from '#ui/SwipeableRow';
+import CommentItem from './CommentItem';
+import type { SwipeableRowActionsProps } from '#ui/SwipeableRow';
+import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
+import type { DeletableCommentItemDeleteCommentMutation } from '@azzapp/relay/artifacts/DeletableCommentItemDeleteCommentMutation.graphql';
+type DeletableCommentItemProps = {
+  item: CommentItemFragment_comment$key;
+  postId: string;
+};
+
+const DeletableCommentItem = (props: DeletableCommentItemProps) => {
+  const { item, postId } = props;
+
+  const comment = useFragment(
+    graphql`
+      fragment DeletableCommentItemFragment_comment on PostComment {
+        id
+      }
+    `,
+    item,
+  );
+
+  const [commit] = useMutation<DeletableCommentItemDeleteCommentMutation>(
+    graphql`
+      mutation DeletableCommentItemDeleteCommentMutation(
+        $input: DeletePostCommentInput!
+      ) {
+        deletePostComment(input: $input) {
+          commentId @deleteRecord
+        }
+      }
+    `,
+  );
+
+  if (!comment) return null;
+
+  const DeletableCommenItemActions = ({
+    progress,
+    onClose,
+  }: SwipeableRowActionsProps) => {
+    const onDelete = () => {
+      commit({
+        variables: {
+          input: {
+            commentId: comment.id,
+          },
+        },
+        onCompleted() {
+          onClose();
+        },
+        updater: store => {
+          const post = store.get<{ counterComments: number }>(postId);
+          if (post) {
+            const counterComments = post?.getValue('counterComments');
+
+            if (typeof counterComments === 'number') {
+              post?.setValue(counterComments - 1, 'counterComments');
+            }
+          }
+        },
+      });
+    };
+
+    return (
+      <View
+        style={{
+          width: 72,
+          flexDirection: 'row',
+        }}
+      >
+        <SwipeableRowRightAction x={72} progress={progress}>
+          <PressableNative style={styles.rightAction} onPress={onDelete}>
+            <Icon
+              icon="trash"
+              style={{ tintColor: colors.white, width: 24, height: 24 }}
+            />
+          </PressableNative>
+        </SwipeableRowRightAction>
+      </View>
+    );
+  };
+
+  return (
+    <SwipeableRow RightActions={DeletableCommenItemActions}>
+      <CommentItem item={item} />
+    </SwipeableRow>
+  );
+};
+
+const styles = StyleSheet.create({
+  rightAction: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: colors.red400,
+  },
+});
+
+export default DeletableCommentItem;

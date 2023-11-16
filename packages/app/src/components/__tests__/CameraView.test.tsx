@@ -34,11 +34,6 @@ jest.mock('react-native-vision-camera', () => {
 });
 const useCameraDevicesMock = useCameraDevices as jest.Mock;
 
-jest.mock('#hooks/useCameraPermissions', () => () => ({
-  cameraPermission: 'authorized',
-  microphonePermission: 'authorized',
-}));
-
 describe('CameraView', () => {
   beforeEach(() => {
     AppState.currentState = 'active' as AppStateStatus;

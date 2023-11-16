@@ -171,6 +171,7 @@ const Select = <ItemT,>({
         variant="modal"
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
+        nestedScroll
       >
         <SelectList
           data={data}

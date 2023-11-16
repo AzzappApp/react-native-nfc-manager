@@ -1,10 +1,7 @@
 'use server';
-
 import { asc, eq } from 'drizzle-orm';
 import {
   CardModuleTable,
-  CardTemplateCompanyActivityTable,
-  CardTemplateProfileCategoryTable,
   ProfileTable,
   checkMedias,
   createCardTemplate,
@@ -17,6 +14,7 @@ import {
   cardTemplateSchema,
   type CardTemplateFormValue,
 } from './cardTemplateSchema';
+import type { CardTemplateType } from '@azzapp/data/domains';
 
 export const getModulesData = async (profileUserName: string) => {
   const res = await db
@@ -35,11 +33,13 @@ export const getModulesData = async (profileUserName: string) => {
 };
 
 export const saveCardTemplate = async (
-  data: Partial<CardTemplateFormValue>,
+  data: Partial<
+    CardTemplateFormValue & { cardTemplateType?: CardTemplateType }
+  >,
   id?: string,
 ) => {
-  const validation = cardTemplateSchema.safeParse(data);
-
+  const { cardTemplateType, ...cardTemplateData } = data;
+  const validation = cardTemplateSchema.safeParse(cardTemplateData);
   if (!validation.success) {
     return {
       success: false,
@@ -54,47 +54,20 @@ export const saveCardTemplate = async (
     previewMediaId: validation.data.previewMediaId,
     businessEnabled: validation.data.businessEnabled,
     personalEnabled: validation.data.personalEnabled,
+    cardTemplateTypeId: cardTemplateType ? cardTemplateType.id : null,
   };
 
   await checkMedias([validation.data.previewMediaId]);
 
   await db.transaction(async trx => {
-    let cardTemplateId: string;
     let previousMediaId: string | null = null;
 
     if (id) {
       const cardTemplate = await getCardTemplateById(id);
-
-      await trx
-        .delete(CardTemplateCompanyActivityTable)
-        .where(eq(CardTemplateCompanyActivityTable.cardTemplateId, id));
-
-      await trx
-        .delete(CardTemplateProfileCategoryTable)
-        .where(eq(CardTemplateProfileCategoryTable.cardTemplateId, id));
-      cardTemplateId = id;
       previousMediaId = cardTemplate.previewMediaId;
-
       await updateCardTemplate(id, template);
     } else {
-      const id = await createCardTemplate(template);
-      cardTemplateId = id;
-    }
-    if (validation.data.companyActivities?.length) {
-      await trx.insert(CardTemplateCompanyActivityTable).values(
-        validation.data.companyActivities.map(companyActivityId => ({
-          cardTemplateId,
-          companyActivityId,
-        })),
-      );
-    }
-    if (validation.data.profileCategories?.length) {
-      await trx.insert(CardTemplateProfileCategoryTable).values(
-        validation.data.profileCategories.map(profileCategoryId => ({
-          cardTemplateId,
-          profileCategoryId,
-        })),
-      );
+      await createCardTemplate(template);
     }
     await referencesMedias([template.previewMediaId], [previousMediaId], trx);
   });

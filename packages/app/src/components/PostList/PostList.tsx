@@ -1,9 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { useColorScheme, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
+import useScreenInsets from '#hooks/useScreenInsets';
+import { HEADER_HEIGHT } from '#ui/Header';
+import Icon from '#ui/Icon';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
+import Text from '#ui/Text';
 import { PostListContext } from './PostListsContext';
 import type {
   PostList_posts$data,
@@ -23,6 +29,11 @@ type PostListProps = ViewProps & {
   refreshing?: boolean;
   loading?: boolean;
   contentContainerStyle?: ContentStyle;
+};
+
+const viewabilityConfig = {
+  //TODO: improve this with review of tester
+  itemVisiblePercentThreshold: 60,
 };
 
 // TODO docs and tests once this component is production ready
@@ -57,7 +68,10 @@ const PostList = ({
     postKey,
   );
 
-  const [visiblePostIds, setVisiblePostIds] = useState<string[]>([]);
+  const [visiblePostIds, setVisiblePostIds] = useState<{
+    played: string | null;
+    paused: string[];
+  }>({ played: null, paused: [] });
 
   const onViewableItemsChanged = useCallback(
     (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
@@ -75,21 +89,59 @@ const PostList = ({
       if (videoIds.length > 0) {
         //we need to make a specia case for the first and last video which could not be view depeding on configuration
         //look for index 0 and last index
-        if (videoIds[0].index === 0) {
-          setVisiblePostIds([videoIds[0].id]);
-        } else if (videoIds[videoIds.length - 1].index === posts.length - 1) {
-          setVisiblePostIds([videoIds[videoIds.length - 1].id]);
+        if (videoIds[videoIds.length - 1].index === posts.length - 1) {
+          setVisiblePostIds(before =>
+            before.played === videoIds[videoIds.length - 1].id
+              ? before
+              : {
+                  played: videoIds[videoIds.length - 1].id,
+                  paused: before.played
+                    ? [before.played]
+                    : before.paused.length > 1
+                    ? before.paused.includes(videoIds[videoIds.length - 1].id)
+                      ? before.paused.filter(
+                          paused => paused !== videoIds[videoIds.length - 1].id,
+                        )
+                      : before.paused.slice(1)
+                    : before.paused,
+                },
+          );
         } else {
-          setVisiblePostIds([videoIds[0].id]);
+          setVisiblePostIds(before =>
+            before.played === videoIds[0].id
+              ? before
+              : {
+                  played: videoIds[0].id,
+                  paused: before.played
+                    ? [before.played]
+                    : before.paused.length > 1
+                    ? before.paused.includes(videoIds[0].id)
+                      ? before.paused.filter(
+                          paused => paused !== videoIds[0].id,
+                        )
+                      : before.paused.slice(1)
+                    : before.paused,
+                },
+          );
         }
       } else {
-        setVisiblePostIds([]);
+        setVisiblePostIds(before =>
+          before.played === null
+            ? before
+            : {
+                played: null,
+                paused:
+                  before.paused.length > 1
+                    ? before.paused.slice(1).concat(before.played)
+                    : before.paused.concat(before.played),
+              },
+        );
       }
     },
     [posts.length],
   );
 
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Post>) => {
       return (
@@ -97,30 +149,78 @@ const PostList = ({
           post={item}
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
-          author={item.author ?? author!}
+          author={item.author ?? extraData.author!}
         />
       );
     },
-    [author, windowWidth],
+    [windowWidth],
+  );
+
+  const extraData = useMemo(() => ({ canPlay, author }), [canPlay, author]);
+
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={loading} />,
+    [loading],
+  );
+
+  const colorScheme = useColorScheme();
+  const insets = useScreenInsets();
+  const ListEmptyComponent = useMemo(
+    () => (
+      <View
+        style={{
+          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <View style={{ alignItems: 'center', width: 200 }}>
+          <Icon
+            style={{
+              width: 60,
+              height: 60,
+              marginBottom: 20,
+              tintColor:
+                colorScheme === 'dark' ? colors.grey800 : colors.grey200,
+            }}
+            icon="empty"
+          />
+          <Text
+            variant="xlarge"
+            style={{ marginBottom: 10, textAlign: 'center' }}
+          >
+            <FormattedMessage
+              defaultMessage="No posts yet"
+              description="Empty post list message title"
+            />
+          </Text>
+          <Text variant="medium" style={{ textAlign: 'center' }}>
+            <FormattedMessage
+              defaultMessage="Seems like there is no post on this feed..."
+              description="Empty post list message content"
+            />
+          </Text>
+        </View>
+      </View>
+    ),
+    [colorScheme, insets.bottom, insets.top, windowHeight],
   );
 
   return (
-    <PostListContext.Provider value={{ visibleVideoPostIds: visiblePostIds }}>
+    <PostListContext.Provider value={visiblePostIds}>
       <FlashList<Post>
         data={posts}
         renderItem={renderItem}
         onEndReached={onEndReached}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        ListFooterComponent={<ListLoadingFooter loading={loading} />}
+        ListFooterComponent={ListFooterComponent}
         estimatedItemSize={300}
         onViewableItemsChanged={onViewableItemsChanged}
         onEndReachedThreshold={1}
-        extraData={{ canPlay }}
-        viewabilityConfig={{
-          //TODO: improve this with review of tester
-          itemVisiblePercentThreshold: 60,
-        }}
+        extraData={extraData}
+        viewabilityConfig={viewabilityConfig}
+        ListEmptyComponent={ListEmptyComponent}
         {...props}
       />
     </PostListContext.Provider>

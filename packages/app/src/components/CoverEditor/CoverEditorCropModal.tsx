@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { isEqual } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, View, useColorScheme, useWindowDimensions } from 'react-native';
+import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { RotateButton } from '#components/commonsButtons';
@@ -13,11 +14,13 @@ import {
 } from '#components/gpu';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
+import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
-import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
+import type { CoverStyleData } from './coverEditorTypes';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 type CoverEditorCropModalProps = {
   visible: boolean;
@@ -55,9 +58,14 @@ const CoverEditorCropModal = ({
 }: CoverEditorCropModalProps) => {
   const intl = useIntl();
 
-  const [editionParameters, setEditionParameters] = useState(
-    mediaParameters ?? {},
-  );
+  const [editionParameters, setEditionParameters] = useState(mediaParameters);
+
+  useEffect(() => {
+    if (!visible && !isEqual(mediaParameters, editionParameters)) {
+      setEditionParameters(mediaParameters);
+    }
+  }, [editionParameters, mediaParameters, visible]);
+
   const onCropDataChange = (cropData: CropData) => {
     setEditionParameters(prev => ({
       ...prev,
@@ -66,7 +74,7 @@ const CoverEditorCropModal = ({
   };
 
   const onSaveInner = () => {
-    onSave(editionParameters);
+    onSave(editionParameters ?? {});
   };
 
   const onRollChange = (roll: number) => {
@@ -79,7 +87,7 @@ const CoverEditorCropModal = ({
   const onNextOrientation = () => {
     setEditionParameters(prev => ({
       ...prev,
-      orientation: getNextOrientation(prev.orientation),
+      orientation: getNextOrientation(prev?.orientation),
     }));
   };
 
@@ -96,7 +104,7 @@ const CoverEditorCropModal = ({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <ScreenModal visible={visible} animationType="slide">
       <Container
         style={{
           flex: 1,
@@ -169,7 +177,12 @@ const CoverEditorCropModal = ({
         </Cropper>
         <View style={{ flex: 1 }}>
           <ImageEditionParameterControl
-            value={editionParameters.roll}
+            label={intl.formatMessage({
+              defaultMessage: 'rotate:',
+              description: 'Cover editor roll parameter label',
+            })}
+            labelSuffix="°"
+            value={editionParameters?.roll ?? 0}
             parameter="roll"
             onChange={onRollChange}
             style={{ flex: 1 }}
@@ -177,7 +190,7 @@ const CoverEditorCropModal = ({
           <ImageEditionFooter onSave={onSaveInner} onCancel={onClose} />
         </View>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 

@@ -51,7 +51,7 @@ describe('Button component', () => {
         testID="button_testId"
       />,
     );
-    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+
     expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle(style);
   });
 
@@ -81,7 +81,7 @@ describe('Button component', () => {
       fireEvent(screen.getByTestId('button_testId'), 'pressIn');
     });
     jest.advanceTimersByTime(2000);
-    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+
     expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
       backgroundColor: 'rgba(69, 68, 76, 1)', //colors.grey900,
     });
@@ -117,14 +117,14 @@ describe('Button component', () => {
     const { rerender } = render(
       <Button label={label} testID="button_testId" />,
     );
-    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+
     expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
       backgroundColor: 'rgba(255, 255, 255, 1)',
     });
     rerender(
       <Button label={label} testID="button_testId" variant="secondary" />,
     );
-    //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
+
     expect(screen.getByTestId('button_testId')).toHaveAnimatedStyle({
       backgroundColor: 'transparent',
     });

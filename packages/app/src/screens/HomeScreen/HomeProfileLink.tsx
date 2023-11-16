@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -35,17 +35,20 @@ const HomeProfileLink = ({
     userKey,
   );
 
-  const profiles = user.profiles ?? [];
-  const userName = profiles[Math.max(currentProfileIndex, 0)]?.userName;
-  const url = buildUserUrl(userName) ?? null;
+  const userNames = useMemo(
+    () => user?.profiles?.map(p => p.userName) ?? [],
+    [user?.profiles],
+  );
 
-  const opacityStyle = useAnimatedStyle(() => ({
-    opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
-  }));
+  const opacityStyle = useAnimatedStyle(() => {
+    return {
+      opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
+    };
+  }, [currentProfileIndexSharedValue]);
 
   const intl = useIntl();
   const onPress = () => {
-    Clipboard.setStringAsync(url)
+    Clipboard.setStringAsync(buildUserUrl(userNames[currentProfileIndex]))
       .then(() => {
         Toast.show({
           type: 'info',
@@ -66,7 +69,7 @@ const HomeProfileLink = ({
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
-            {url.replace('https://', '')}
+            {buildUserUrl(userNames[currentProfileIndex], 'azzapp.com/')}
           </Text>
           <View style={styles.emptyViewCenter} />
         </View>

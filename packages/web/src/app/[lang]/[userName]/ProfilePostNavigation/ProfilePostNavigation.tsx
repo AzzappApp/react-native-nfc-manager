@@ -4,33 +4,25 @@ import { type HTMLAttributes, useEffect, useRef } from 'react';
 import { ArrowRightIcon, ShareIcon } from '#assets';
 import { generateShareProfileLink } from '#helpers';
 import { ButtonIcon } from '#ui';
+import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
 import ShareModal from '#components/ShareModal';
-import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './ProfilePostNavigation.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media } from '@azzapp/data/domains';
+import type { Media, Profile } from '@azzapp/data/domains';
 
 export type ProfilePostNavigationProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   'children'
 > & {
-  postsCount: number;
-  username: string;
+  profile: Profile;
   cover: Media;
   onClickPosts: () => void;
   onClickCover: () => void;
 };
 
 const ProfilePostNavigation = (props: ProfilePostNavigationProps) => {
-  const {
-    className,
-    onClickPosts,
-    onClickCover,
-    cover,
-    username,
-    postsCount,
-    ...others
-  } = props;
+  const { profile, className, onClickPosts, onClickCover, cover, ...others } =
+    props;
 
   const modal = useRef<ModalActions>(null);
   const count = useRef<HTMLDivElement>(null);
@@ -75,7 +67,7 @@ const ProfilePostNavigation = (props: ProfilePostNavigationProps) => {
         >
           <div className={styles.postsCountWrapper} ref={count}>
             <div className={styles.postsCountContent}>
-              <span className={styles.postsCount}>{postsCount}</span>
+              <span className={styles.postsCount}>{profile.nbPosts}</span>
               <div className={styles.open}>
                 <ArrowRightIcon
                   color="black"
@@ -89,13 +81,10 @@ const ProfilePostNavigation = (props: ProfilePostNavigationProps) => {
           <span className={styles.text}>Posts</span>
         </button>
         <button className={styles.coverContainer} onClick={onClickCover}>
-          <CloudinaryImage
-            mediaId={cover.id}
-            assetKind="cover"
-            videoThumbnail={cover.kind === 'video'}
-            alt="cover"
-            fill
-            className={styles.cover}
+          <CoverPreview
+            media={cover}
+            profile={profile}
+            style={{ borderRadius: '6px', overflow: 'hidden' }}
           />
         </button>
         <ButtonIcon
@@ -106,7 +95,10 @@ const ProfilePostNavigation = (props: ProfilePostNavigationProps) => {
           <span className={styles.text}>Share</span>
         </ButtonIcon>
       </div>
-      <ShareModal ref={modal} link={generateShareProfileLink(username)} />
+      <ShareModal
+        ref={modal}
+        link={generateShareProfileLink(profile.userName)}
+      />
     </>
   );
 };

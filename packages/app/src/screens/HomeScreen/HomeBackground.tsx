@@ -3,16 +3,20 @@ import {
   RadialGradient,
   Rect,
   vec,
-  useValue,
   LinearGradient,
-  useComputedValue,
-  interpolateColors,
-  useSharedValueEffect,
 } from '@shopify/react-native-skia';
+import _ from 'lodash';
 import { useMemo } from 'react';
 import { useWindowDimensions, View, StyleSheet } from 'react-native';
+import {
+  interpolateColor,
+  useDerivedValue,
+  convertToRGBA,
+} from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
+import type { HomeBackground_profileColors$key } from '@azzapp/relay/artifacts/HomeBackground_profileColors.graphql';
 import type { HomeBackground_user$key } from '@azzapp/relay/artifacts/HomeBackground_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -26,62 +30,73 @@ const HomeBackground = ({
   currentProfileIndexSharedValue,
 }: HomeBackgroundProps) => {
   const { width, height } = useWindowDimensions();
-  const { profiles } = useFragment(
+
+  const user = useFragment(
     graphql`
       fragment HomeBackground_user on User {
         profiles {
           id
-          cardColors {
-            primary
-            dark
-          }
+          ...HomeBackground_profileColors
         }
       }
     `,
     userKey,
   );
 
-  const skiaFirstColor = useValue(0);
-  const skiaSecondColor = useValue(0);
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeBackground_profileColors on Profile {
+        id
+        cardColors {
+          dark
+          primary
+        }
+      }
+    `,
+    (profile: any) => profile.id,
+    user.profiles as readonly HomeBackground_profileColors$key[],
+  );
 
-  const profilesColors = useMemo(
+  const inputRange = _.range(0, profiles?.length);
+
+  const primaryColors = useMemo(
     () =>
-      profiles?.map(profile => ({
-        primary: profile.cardColors?.primary ?? '#45444b',
-        dark: profile.cardColors?.dark ?? colors.black,
-      })) ?? [],
+      (profiles ?? []).map(profile => {
+        if (profile.cardColors?.primary) {
+          return profile.cardColors?.primary;
+        }
+        return '#45444b';
+      }),
     [profiles],
   );
 
-  useSharedValueEffect(() => {
-    const currentProfileIndex = currentProfileIndexSharedValue.value;
-    const prev = Math.floor(currentProfileIndexSharedValue.value);
-    const next = Math.ceil(currentProfileIndexSharedValue.value);
+  const darkColors = useMemo(
+    () =>
+      (profiles ?? []).map(profile => profile.cardColors?.dark ?? colors.black),
+    [profiles],
+  );
 
-    //@ts-expect-error interpolateColors is typed as returning a `number[]`, but the value is correct
-    skiaFirstColor.current = interpolateColors(
-      currentProfileIndex,
-      [prev, next],
-      [
-        profilesColors[prev]?.primary ?? '#45444b',
-        profilesColors[next]?.primary ?? '#45444b',
-      ],
-    );
-
-    //@ts-expect-error interpolateColors is typed as returning a `number[]`, but the value is correct
-    skiaSecondColor.current = interpolateColors(
-      currentProfileIndex,
-      [prev, next],
-      [
-        profilesColors[prev]?.dark ?? '#45444b',
-        profilesColors[next]?.dark ?? '#45444b',
-      ],
-    );
-  }, currentProfileIndexSharedValue);
-
-  const radiantColor = useComputedValue(() => {
-    return [skiaFirstColor.current, skiaSecondColor.current];
-  }, [skiaFirstColor, skiaSecondColor]);
+  const skiaGradient = useDerivedValue(() => {
+    if (primaryColors.length > 1) {
+      return [
+        convertToRGBA(
+          interpolateColor(
+            currentProfileIndexSharedValue.value,
+            inputRange,
+            primaryColors,
+          ),
+        ),
+        convertToRGBA(
+          interpolateColor(
+            currentProfileIndexSharedValue.value,
+            inputRange,
+            darkColors,
+          ),
+        ),
+      ];
+    }
+    return [primaryColors[0], darkColors[0]];
+  }, [inputRange, primaryColors, darkColors]);
 
   return (
     <View style={StyleSheet.absoluteFill}>
@@ -90,7 +105,7 @@ const HomeBackground = ({
           <RadialGradient
             c={vec(width / 2, 0)}
             r={width * 1.3}
-            colors={radiantColor}
+            colors={skiaGradient}
           />
         </Rect>
         <Rect x={0} y={0} width={width} height={height}>
@@ -107,35 +122,3 @@ const HomeBackground = ({
 };
 
 export default HomeBackground;
-
-// NOT ANIMATED RADIAL VERSION USING SVG AND NOT SKIA (not possible to anim due to Stop component)
-//     https://github.com/software-mansion/react-native-reanimated/issues/1938
-//     The SVG.Stop is something like a dummy component and they don't have native tag and there is no possibility to animate them at this moment.
-//      <Svg height={height} width={width}>
-//       <Defs>
-//         <RadialGradientSVG
-//           id="grad"
-//           cx={0.5}
-//           cy={0.0}
-//           rx={1.3}
-//           ry={0.66}
-//           gradientUnits="objectBoundingBox"
-//         >
-//           <Stop offset="0%" stopColor="blue" stopOpacity="1" />
-//           <Stop offset="100%" stopColor="#yellow" stopOpacity="1" />
-//         </RadialGradientSVG>
-//         {/* <LinearGradient
-//           id="linear"
-//           x1={0.5}
-//           y1={0}
-//           x2={0.5}
-//           y2={0.66}
-//           gradientUnits="objectBoundingBox"
-//         >
-//           <Stop offset={0.22} stopColor="rgb(0, 0, 0)" stopOpacity={0} />
-//           <Stop offset={0.66} stopColor="rgb(0, 0, 0)" stopOpacity={0.2} />
-//         </LinearGradient> */}
-//       </Defs>
-//       <RectSVG x="0" y="0" height={height} width={width} fill="url(#grad)" />
-//       <Rect x="0" y="0" height={height} width={width} fill="url(#linear)" />
-//        </Svg>

@@ -453,6 +453,11 @@ const SimpleTextEditionScreen = ({
           description:
             'Placeholder for text area in simple text edition screen',
         })}
+        headerTitle={intl.formatMessage({
+          defaultMessage: 'Edit text',
+          description:
+            'Title for text area header modal in simple text edition screen',
+        })}
         maxLength={
           moduleKind === 'simpleText'
             ? SIMPLE_TEXT_MAX_LENGTH

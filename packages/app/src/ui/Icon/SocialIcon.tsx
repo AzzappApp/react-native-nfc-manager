@@ -43,6 +43,9 @@ const socialIcons = {
   get linkedin() {
     return require('./assets/social/linkedin.png');
   },
+  get mail() {
+    return require('./assets/social/mail.png');
+  },
   get mastodon() {
     return require('./assets/social/mastodon.png');
   },
@@ -55,8 +58,14 @@ const socialIcons = {
   get patreon() {
     return require('./assets/social/patreon.png');
   },
+  get phone() {
+    return require('./assets/social/phone.png');
+  },
   get pinterest() {
     return require('./assets/social/pinterest.png');
+  },
+  get sms() {
+    return require('./assets/social/sms.png');
   },
   get snapchat() {
     return require('./assets/social/snapchat.png');
@@ -87,6 +96,9 @@ const socialIcons = {
   },
   get youtube() {
     return require('./assets/social/youtube.png');
+  },
+  get website() {
+    return require('./assets/social/website.png');
   },
 } as const;
 

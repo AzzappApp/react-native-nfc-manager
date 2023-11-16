@@ -1,3 +1,4 @@
+import { pick } from 'lodash';
 import {
   Suspense,
   useCallback,
@@ -9,42 +10,57 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useIntl } from 'react-intl';
+import { Keyboard, StyleSheet, View, useWindowDimensions } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { graphql, useFragment } from 'react-relay';
 import {
-  Keyboard,
-  Modal,
-  StyleSheet,
-  View,
-  unstable_batchedUpdates,
-  useWindowDimensions,
-} from 'react-native';
-import { graphql, useFragment, usePaginationFragment } from 'react-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
+  DEFAULT_COLOR_LIST,
+  DEFAULT_COLOR_PALETTE,
+} from '@azzapp/shared/cardHelpers';
+import {
+  COVER_RATIO,
+  DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
+  DEFAULT_COVER_TEXT_STYLE,
+  textOrientationOrDefaut,
+  textPositionOrDefaut,
+} from '@azzapp/shared/coverHelpers';
+import { extractLayoutParameters } from '#components/gpu';
+import ScreenModal from '#components/ScreenModal';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import { FLOATING_BUTTON_SIZE } from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
-import TabBarMenuItem, { TAB_BAR_MENU_ITEM_HEIGHT } from '#ui/TabBarMenuItem';
 import TextInput from '#ui/TextInput';
+import UploadProgressModal from '#ui/UploadProgressModal';
+import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
+import CoverEditiorImagePicker from './CoverEditorImagePicker';
+import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
-import useCoverEditionManager from './useCoverEditionManager';
-import type { ColorPalette, TemplateKind } from './coverEditorTypes';
-import type { CoverData } from './useCoverEditionManager';
-import type { CoverEditor_suggested$key } from '@azzapp/relay/artifacts/CoverEditor_suggested.graphql';
+import MediaRequiredModal from './MediaRequiredModal';
+import { useTemplateSwitcherCoverMediaEditor } from './useCoverMediaEditor';
+import useSaveCover from './useSaveCover';
+import useSuggestedMedias from './useSuggestedMedias';
+import type { EditionParameters } from '#components/gpu';
+import type { ImagePickerResult } from '#components/ImagePicker';
+import type { CoverEditorCustomProps } from './CoverEditorCustom/CoverEditorCustom';
+import type {
+  TemplateKind,
+  CoverStyleData,
+  SourceMedia,
+} from './coverEditorTypes';
 import type { CoverEditor_viewer$key } from '@azzapp/relay/artifacts/CoverEditor_viewer.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 export type CoverEditorProps = {
-  viewer: CoverEditor_suggested$key & CoverEditor_viewer$key;
+  viewer: CoverEditor_viewer$key;
   height: number;
-  initialTemplateKind?: TemplateKind;
   onCoverSaved: () => void;
   onCanSaveChange: (canSave: boolean) => void;
 };
@@ -57,83 +73,353 @@ const CoverEditor = (
   {
     viewer: viewerKey,
     height,
-    initialTemplateKind = 'people',
     onCoverSaved,
     onCanSaveChange,
   }: CoverEditorProps,
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
+  const intl = useIntl();
+  const { bottom: insetBottom } = useScreenInsets();
+
   // #region Data
   const viewer = useFragment(
     graphql`
       fragment CoverEditor_viewer on Viewer {
         profile {
+          firstName
+          lastName
+          companyName
+          companyActivity {
+            label
+          }
           profileKind
-          ...useCoverEditionManager_profile
+          cardCover {
+            title
+            subTitle
+            mediaParameters
+            mediaFilter
+            sourceMedia {
+              __typename
+              id
+              uri
+              width
+              height
+            }
+            maskMedia {
+              id
+              uri
+            }
+            background {
+              id
+              uri
+              resizeMode
+            }
+            foreground {
+              id
+              uri
+            }
+            backgroundColor
+            backgroundPatternColor
+            foregroundColor
+            segmented
+            merged
+            textOrientation
+            textPosition
+            titleStyle {
+              fontFamily
+              fontSize
+              color
+            }
+            subTitleStyle {
+              fontFamily
+              fontSize
+              color
+            }
+          }
+          cardColors {
+            primary
+            light
+            dark
+            otherColors
+          }
+          ...useSaveCover_profile
         }
         ...CoverEditorCustom_viewer
         ...CoverEditorTemplateList_viewer
+        ...useSuggestedMedias_viewer
       }
     `,
     viewerKey as CoverEditor_viewer$key,
   );
 
-  // #endregion
+  const cardCover = viewer?.profile?.cardCover ?? null;
+  const cardColors = viewer?.profile?.cardColors ?? null;
 
-  // #region Data edition
+  // #endregion
+  const initialTemplateKind = useMemo<TemplateKind>(() => {
+    if (cardCover) {
+      return cardCover.sourceMedia?.__typename === 'MediaVideo'
+        ? 'video'
+        : cardCover.segmented
+        ? 'people'
+        : 'others';
+    }
+    return viewer.profile?.profileKind === 'business' ? 'others' : 'people';
+    // We don't want to update the initial data when the cardCover change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [templateKind, setTemplateKind] =
     useState<TemplateKind>(initialTemplateKind);
 
-  const {
-    title,
-    subTitle,
-    sourceMedia,
-    maskMedia,
-    mediaCropParameter,
-    coverStyle,
-    timeRange,
-    colorPalette,
-    currentCoverStyle,
-    cardColors,
-    modals,
-    mediaComputing,
-    mediaVisible,
-    hasSuggestedMedia,
-    isCoverCreation,
-    hasSourceMediaBeforeSuggested,
-    // TODO handle
-    // mediaComputationError
-    setTitle,
-    setSubTitle,
-    setCoverStyle,
-    setColorPalette,
-    setSuggestedMedia,
-    toggleCropMode,
-    openImagePicker,
-    onSave,
-    toggleMediaVisibility,
-    updateEditedMediaKind,
-  } = useCoverEditionManager({
-    initialData: null,
-    initialColorPalette: null,
-    onCoverSaved,
-    initialTemplateKind: templateKind === 'video' ? 'video' : 'image',
-    profile: viewer.profile ?? null,
-  });
+  // #region Template Kind
+  const onSwitchTemplateKind = useCallback(
+    async (kind: string) => {
+      startTransition(() => {
+        setTemplateKind(kind as TemplateKind);
+      });
+      const tostMessage =
+        kind === 'people'
+          ? intl.formatMessage({
+              defaultMessage: "Remove background behind people's photo",
+              description:
+                'Toast message while switching to people in cover creation',
+            })
+          : kind === 'others'
+          ? intl.formatMessage({
+              defaultMessage: 'Add a photo yo your cover',
+              description:
+                'Toast message while switching to others in cover creation',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Add a video to your cover',
+              description:
+                'Toast message while switching to viode in cover creation',
+            });
 
+      Toast.show({
+        type: 'success',
+        text1: tostMessage,
+        bottomOffset: BOTTOM_MENU_HEIGHT + insetBottom,
+      });
+    },
+    [insetBottom, intl, setTemplateKind],
+  );
   // #endregion
 
-  // #region Preview media
-  const [previewMedia, setPreviewMedia] = useState<
-    CoverData['sourceMedia'] | null
-  >(null);
+  // #region Data edition
+  const [title, setTitle] = useState(() => {
+    if (cardCover) {
+      return cardCover.title ?? null;
+    }
+    if (viewer.profile?.profileKind === 'business') {
+      return viewer.profile.companyName ?? null;
+    }
+    return viewer.profile?.firstName ?? null;
+  });
 
-  const onPreviewMediaChange = useCallback(
-    (media: CoverData['sourceMedia']) => {
-      setPreviewMedia(media);
-    },
+  const [subTitle, setSubTitle] = useState(() => {
+    if (cardCover) {
+      return cardCover.subTitle ?? null;
+    }
+    if (viewer.profile?.profileKind === 'business') {
+      return viewer.profile.companyActivity?.label ?? null;
+    }
+    return viewer.profile?.lastName ?? null;
+  });
+
+  const initialCoverStyle = useMemo<CoverStyleData | null>(() => {
+    if (!cardCover) {
+      return null;
+    }
+    return {
+      titleStyle: cardCover.titleStyle ?? DEFAULT_COVER_TEXT_STYLE,
+      subTitleStyle:
+        cardCover.subTitleStyle ?? DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
+      textOrientation: textOrientationOrDefaut(cardCover.textOrientation),
+      textPosition: textPositionOrDefaut(cardCover.textPosition),
+      mediaFilter: cardCover.mediaFilter ?? null,
+      mediaParameters: cardCover.mediaParameters
+        ? extractLayoutParameters(
+            cardCover.mediaParameters as EditionParameters,
+          )[1]
+        : {},
+      background: cardCover.background ?? null,
+      backgroundColor: cardCover.backgroundColor ?? '#FFF',
+      backgroundPatternColor: cardCover.backgroundPatternColor ?? '#000',
+      foreground: cardCover.foreground ?? null,
+      foregroundColor: cardCover.foregroundColor ?? '#FFF',
+      merged: cardCover.merged ?? false,
+      segmented: cardCover.segmented ?? false,
+    };
+
+    // We don't want to update the initial data when the cardCover change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(
+    () => initialCoverStyle ?? DEFAULT_COVER_STYLE,
+  );
+
+  const initialMediaInfos = useMemo(
+    () =>
+      cardCover
+        ? {
+            sourceMedia: cardCover.sourceMedia
+              ? ({
+                  id: cardCover.sourceMedia.id,
+                  uri: cardCover.sourceMedia.uri,
+                  height: cardCover.sourceMedia.height,
+                  width: cardCover.sourceMedia.width,
+                  kind:
+                    cardCover.sourceMedia.__typename === 'MediaVideo'
+                      ? 'video'
+                      : 'image',
+                } as const)
+              : null,
+            maskMedia: cardCover.maskMedia,
+            mediaCropParameters: extractLayoutParameters(
+              cardCover.mediaParameters,
+            )[0],
+          }
+        : null,
+
+    // We don't want to update the initial data when the cardCover change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  const {
+    sourceMedia,
+    maskMedia,
+    timeRange,
+    mediaCropParameters,
+
+    setMediaCropParameters,
+    setSourceMediaFromImagePicker,
+
+    mediaComputing,
+    // TODO handle those case
+    // mediaComputationError,
+    // retryMediaComputation,
+  } = useTemplateSwitcherCoverMediaEditor(
+    templateKind,
+    initialTemplateKind,
+    initialMediaInfos,
+  );
+
+  const [mediaVisibleByTemplateKind, setMediaVisibleByTemplateKind] = useState({
+    people: true,
+    video: true,
+    others: true,
+  });
+
+  const mediaVisible = mediaVisibleByTemplateKind[templateKind];
+  const toggleMediaVisibility = useCallback(() => {
+    setMediaVisibleByTemplateKind(previous => ({
+      ...previous,
+      [templateKind]: !previous[templateKind],
+    }));
+  }, [templateKind]);
+
+  const [colorPalette, setColorPalette] = useState<ColorPalette>(
+    cardColors
+      ? pick(cardColors, 'dark', 'light', 'primary')
+      : DEFAULT_COLOR_PALETTE,
+  );
+
+  const currentDemoMediaRef = useRef<SourceMedia | null>(null);
+  const onSelectedTemplateChange = useCallback(
+    (template: { style: CoverStyleData; media: SourceMedia }) => {
+      setCoverStyle(template.style);
+      currentDemoMediaRef.current = template.media;
+    },
+    [setCoverStyle],
+  );
+  // #endregion
+
+  // #region Suggested Media
+  const { suggestedMedia, onNextSuggestedMedia } = useSuggestedMedias(
+    viewer,
+    templateKind,
+  );
+
+  // #region Save cover
+  const { progressIndicator, saveCover } = useSaveCover(
+    viewer.profile,
+    onCoverSaved,
+  );
+
+  const onSave = useCallback(() => {
+    if (templateKind === 'people') {
+      if (!sourceMedia) {
+        setShowMediaRequiredModal(true);
+        return;
+      }
+      if (!mediaVisible) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Please show your media before saving.',
+            description:
+              'Error toast message displayed when the user try to save a people cover with hidden media.',
+          }),
+        });
+        return;
+      }
+    }
+    if (mediaComputing) {
+      return;
+    }
+    let media: SourceMedia | null = null;
+    let cropParameters: EditionParameters = {};
+    if (mediaVisible) {
+      media = sourceMedia;
+      cropParameters = mediaCropParameters ?? {};
+    }
+    if (!media) {
+      media = suggestedMedia ?? currentDemoMediaRef.current;
+    }
+    if (!media) {
+      // should not happend
+      return;
+    }
+
+    saveCover(
+      title,
+      subTitle,
+      coverStyle,
+      maskMedia,
+      cropParameters,
+      media,
+      colorPalette,
+      cardColors?.otherColors ?? DEFAULT_COLOR_LIST,
+    );
+  }, [
+    cardColors?.otherColors,
+    colorPalette,
+    coverStyle,
+    intl,
+    maskMedia,
+    mediaComputing,
+    mediaCropParameters,
+    mediaVisible,
+    saveCover,
+    sourceMedia,
+    subTitle,
+    suggestedMedia,
+    templateKind,
+    title,
+  ]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      save: onSave,
+    }),
+    [onSave],
+  );
+  // #endregion
 
   // #region Title modal
   const [titleModalOpen, setTitleModalOpen] = useState(false);
@@ -152,107 +438,117 @@ const CoverEditor = (
   }, []);
   // #endregion
 
-  // #region Template Kind
-  const onSwitchTemplateKind = useCallback(
-    async (kind: TemplateKind) => {
-      startTransition(() => {
-        // We try to take advantage of the transition to reduce the flickering
-        // but it's not perfect, and we would need to use react 18 concurrent mode
-        unstable_batchedUpdates(() => {
-          setTemplateKind(kind);
-          updateEditedMediaKind(kind === 'video' ? 'video' : 'image');
-          if (hasSuggestedMedia) {
-            setSuggestedMedia(null);
-          }
-        });
-      });
+  // #region Image picker
+  const [showImagePicker, setShowImagePicker] = useState(false);
+
+  const openImagePicker = useCallback(() => {
+    setShowImagePicker(true);
+  }, []);
+
+  const closeImagePicker = useCallback(() => {
+    setShowImagePicker(false);
+  }, []);
+
+  const onMediaSelected = useCallback(
+    (result: ImagePickerResult) => {
+      setSourceMediaFromImagePicker(result);
+      setShowImagePicker(false);
     },
-    [hasSuggestedMedia, setSuggestedMedia, updateEditedMediaKind],
+    [setSourceMediaFromImagePicker],
   );
+  // #endregion
 
-  // #region canSave
-  const canSave =
-    !mediaComputing &&
-    (((mediaVisible || sourceMedia == null) &&
-      (viewer?.profile?.profileKind === 'personal' ||
-        templateKind === 'people')) ||
-      (viewer?.profile?.profileKind === 'business' &&
-        templateKind !== 'people' &&
-        (mediaVisible || hasSuggestedMedia)));
+  // #region Crop mode
+  const [showCropModal, setShowCropModal] = useState(false);
+  const openCropModal = useCallback(() => {
+    setShowCropModal(true);
+  }, []);
 
-  useEffect(() => {
-    onCanSaveChange(canSave);
-  }, [canSave, onCanSaveChange]);
+  const closeCropModal = useCallback(() => {
+    setShowCropModal(false);
+  }, []);
+
+  const onSaveCropData = useCallback(
+    (editionParameters: EditionParameters) => {
+      setMediaCropParameters(editionParameters);
+      setShowCropModal(false);
+    },
+    [setMediaCropParameters],
+  );
   // #endregion
 
   // #region Custom edition
   const [customEditionProps, setCustomEditionProps] = useState<{
-    initialData: CoverData;
-    colorPalette: ColorPalette;
-    previewMedia: CoverData['sourceMedia'] | null;
+    initialData: CoverEditorCustomProps['initialData'];
+    initialColorPalette: ColorPalette;
   } | null>(null);
 
   const onCustomEdition = useCallback(() => {
     if (mediaComputing) {
       return;
     }
+    let media: SourceMedia | null = null;
+    let cropParameters: EditionParameters = {};
+    if (mediaVisible) {
+      media = sourceMedia;
+      cropParameters = mediaCropParameters ?? {};
+    }
+    if (!media) {
+      media = suggestedMedia ?? currentDemoMediaRef.current;
+    }
+    if (!media) {
+      // should not happend
+      return;
+    }
     setCustomEditionProps({
       initialData: {
         title,
         subTitle,
-        sourceMedia,
+        sourceMedia: {
+          id: media.id,
+          width: media.width,
+          height: media.height,
+          uri: media.rawUri ?? media.uri,
+          kind: media.kind,
+        },
         maskMedia,
-        mediaCropParameter,
+        mediaCropParameters: cropParameters,
         coverStyle,
       },
-      colorPalette,
-      previewMedia,
+      initialColorPalette: colorPalette,
     });
   }, [
-    mediaComputing,
     colorPalette,
     coverStyle,
     maskMedia,
-    mediaCropParameter,
-    previewMedia,
+    mediaComputing,
+    mediaCropParameters,
+    mediaVisible,
     sourceMedia,
     subTitle,
+    suggestedMedia,
     title,
   ]);
 
   const onCustomEditionCancel = useCallback(() => {
     setCustomEditionProps(null);
   }, []);
+  // #endregion
 
-  const onCustomCoverSaved = useCallback(() => {
-    setCustomEditionProps(null);
-    onCoverSaved();
-  }, [onCoverSaved]);
-
-  // #region Layout
-  const { width: windowWidth } = useWindowDimensions();
-
-  const templateListHeight = Math.min(
-    height -
-      (SMALL_GAP +
-        TAB_BAR_MENU_ITEM_HEIGHT +
-        SMALL_GAP +
-        GAP +
-        FLOATING_BUTTON_SIZE),
-    windowWidth / (COVER_RATIO * 1.5),
+  // #region Media required modal
+  const [showMediaRequiredModal, setShowMediaRequiredModal] = useState(false);
+  const onMediaRequiredModalClose = useCallback(
+    (openPicker: boolean) => {
+      setShowMediaRequiredModal(false);
+      if (openPicker) {
+        openImagePicker();
+      }
+    },
+    [openImagePicker],
   );
   // #endregion
 
-  const templateListWidth = templateListHeight * COVER_RATIO * 2;
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      save: onSave,
-    }),
-    [onSave],
-  );
-
+  // #region Templates state
   const indexes = useRef({
     people: 0,
     video: 0,
@@ -265,193 +561,45 @@ const CoverEditor = (
     },
     [templateKind],
   );
-
-  // #region Suggested Media
-  const {
-    data: suggestedMediaData,
-    loadNext: loadNextSuggestion,
-    isLoadingNext: isLoadingNextSuggestion,
-    hasNext: hasNextSuggestion,
-  } = usePaginationFragment(
-    graphql`
-      fragment CoverEditor_suggested on Viewer
-      @refetchable(queryName: "CoverEditor_suggested_query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 50 }
-      ) {
-        suggestedMedias(after: $after, first: $first)
-          @connection(key: "CoverEditor_connection_suggestedMedias") {
-          edges {
-            node {
-              __typename
-              id
-              # we use arbitrary values here, but it should be good enough (arguments in refetchable fragment)
-              uri(width: 300, pixelRatio: 2)
-              width
-              height
-            }
-          }
-        }
-      }
-    `,
-    viewerKey as CoverEditor_suggested$key,
-  );
-
-  const [selectedSuggestedMediaIndex, setSelectedSuggestedMediaIndex] =
-    useState(0);
-
-  //media: CoverData['sourceMedia'] | null
-  const suggestedMedias = useMemo(() => {
-    if (
-      suggestedMediaData.suggestedMedias &&
-      viewer?.profile?.profileKind === 'business' &&
-      templateKind !== 'people'
-    ) {
-      return suggestedMediaData.suggestedMedias.edges
-        ? convertToNonNullArray(
-            suggestedMediaData.suggestedMedias.edges
-              .map(edge => {
-                return edge?.node;
-              })
-              .filter(mediaFilter =>
-                mediaFilter
-                  ? templateKind === 'video'
-                    ? mediaFilter.__typename === 'MediaVideo'
-                    : mediaFilter.__typename === 'MediaImage'
-                  : false,
-              ),
-          )
-        : [];
-    } else {
-      return undefined;
-    }
-  }, [
-    suggestedMediaData.suggestedMedias,
-    templateKind,
-    viewer?.profile?.profileKind,
-  ]);
-
-  const showSuggestedMedia = useMemo(
-    () =>
-      templateKind !== 'people' &&
-      (!mediaVisible || sourceMedia == null) &&
-      viewer.profile?.profileKind === 'business',
-    [sourceMedia, mediaVisible, templateKind, viewer.profile?.profileKind],
-  );
-
-  const selectSuggestedMedia = useCallback(() => {
-    let newIndex = 0;
-    if (selectedSuggestedMediaIndex + 1 < (suggestedMedias?.length ?? 0)) {
-      newIndex = selectedSuggestedMediaIndex + 1;
-    }
-
-    setSelectedSuggestedMediaIndex(newIndex);
-    if (suggestedMedias?.[newIndex]) {
-      setSuggestedMedia({
-        id: suggestedMedias[newIndex].id,
-        uri: suggestedMedias[newIndex].uri,
-        kind:
-          suggestedMedias[newIndex].__typename === 'MediaImage'
-            ? 'image'
-            : 'video',
-        width: suggestedMedias[newIndex].width,
-        height: suggestedMedias[newIndex].height,
-      });
-
-      if (
-        !isLoadingNextSuggestion &&
-        selectedSuggestedMediaIndex > (suggestedMedias?.length ?? 0) - 3 &&
-        hasNextSuggestion
-      ) {
-        loadNextSuggestion(50);
-      }
-    }
-  }, [
-    hasNextSuggestion,
-    isLoadingNextSuggestion,
-    loadNextSuggestion,
-    selectedSuggestedMediaIndex,
-    setSuggestedMedia,
-    suggestedMedias,
-  ]);
-
-  const onPressSuggestedMedia = useCallback(() => {
-    if (showSuggestedMedia) {
-      selectSuggestedMedia();
-    }
-  }, [selectSuggestedMedia, showSuggestedMedia]);
-
-  useEffect(() => {
-    if (mediaVisible && hasSuggestedMedia) {
-      setSuggestedMedia(null);
-    } else if (!mediaVisible && showSuggestedMedia && !hasSuggestedMedia) {
-      selectSuggestedMedia();
-    }
-  }, [
-    isCoverCreation,
-    hasSuggestedMedia,
-    mediaVisible,
-    setSuggestedMedia,
-    selectSuggestedMedia,
-    showSuggestedMedia,
-  ]);
-
-  useEffect(() => {
-    // creating a new cover
-    if (
-      isCoverCreation &&
-      templateKind !== 'people' &&
-      !sourceMedia &&
-      !hasSuggestedMedia
-    ) {
-      selectSuggestedMedia();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCoverCreation, templateKind]);
   // #endregion
+
+  // #region Layout
+  const { width: windowWidth } = useWindowDimensions();
+
+  const templateListHeight = Math.min(
+    height -
+      (SMALL_GAP +
+        BOTTOM_MENU_HEIGHT +
+        SMALL_GAP +
+        GAP +
+        (FLOATING_BUTTON_SIZE * 2 + 10)),
+    windowWidth / (COVER_RATIO * 1.5),
+  );
+
+  const templateListWidth = templateListHeight * COVER_RATIO * 2;
+  // #endregion
+
+  // #region canSave
+  const canSave = !mediaComputing;
+
+  useEffect(() => {
+    onCanSaveChange(canSave);
+  }, [canSave, onCanSaveChange]);
+  // #endregion
+
+  const displayedMedia = mediaVisible
+    ? sourceMedia ?? suggestedMedia
+    : suggestedMedia;
 
   return (
     <>
-      <Container style={styles.root}>
-        <View style={styles.tabBarContainer} accessibilityRole="tablist">
-          <TabBarMenuItem
-            selected={templateKind === 'people'}
-            setSelected={() => onSwitchTemplateKind('people')}
-            icon="silhouette"
-          >
-            <FormattedMessage
-              defaultMessage="People"
-              description="Cover editor people tab bar item label"
-            />
-          </TabBarMenuItem>
-          <TabBarMenuItem
-            selected={templateKind === 'video'}
-            setSelected={() => onSwitchTemplateKind('video')}
-            icon="video"
-          >
-            <FormattedMessage
-              defaultMessage="Video"
-              description="Cover editor video tab bar item label"
-            />
-          </TabBarMenuItem>
-
-          <TabBarMenuItem
-            selected={templateKind === 'others'}
-            setSelected={() => onSwitchTemplateKind('others')}
-            icon="landscape"
-          >
-            <FormattedMessage
-              defaultMessage="Others"
-              description="Cover editor others tab bar item label"
-            />
-          </TabBarMenuItem>
-        </View>
+      <Container style={[styles.root]}>
         <View
           style={{
             height: templateListHeight,
             width: templateListWidth,
             alignSelf: 'center',
+            marginTop: 30,
           }}
         >
           <Suspense
@@ -471,73 +619,106 @@ const CoverEditor = (
               key={templateKind}
               viewer={viewer}
               templateKind={templateKind}
-              media={sourceMedia}
+              media={displayedMedia ?? null}
               maskUri={
-                templateKind === 'people' ? maskMedia?.uri ?? null : null
+                mediaVisible && templateKind === 'people'
+                  ? maskMedia?.uri ?? null
+                  : null
               }
-              showTemplatesMedias={!mediaVisible}
               title={title}
               subTitle={subTitle}
+              videoPaused={!!progressIndicator}
               width={templateListWidth}
               height={templateListHeight}
-              mediaCropParameters={mediaCropParameter}
+              mediaCropParameters={mediaVisible ? mediaCropParameters : null}
               timeRange={timeRange}
               currentCoverStyle={
-                initialTemplateKind === templateKind ? currentCoverStyle : null
+                initialTemplateKind === templateKind ? initialCoverStyle : null
               }
               cardColors={cardColors ?? null}
               initialSelectedIndex={indexes.current[templateKind]}
-              onPreviewMediaChange={onPreviewMediaChange}
-              onCoverStyleChange={setCoverStyle}
+              onSelectedItemChange={onSelectedTemplateChange}
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
-              onSelectSuggestedMedia={onPressSuggestedMedia}
               mediaComputing={mediaComputing}
-              showSuggestedMedia={showSuggestedMedia}
             />
           </Suspense>
         </View>
-        <View style={styles.controlPanel}>
+        <View
+          style={[
+            styles.controlPanel,
+            {
+              marginBottom: BOTTOM_MENU_HEIGHT + insetBottom,
+            },
+          ]}
+        >
           <FloatingIconButton icon="camera" onPress={openImagePicker} />
           <FloatingIconButton icon="text" onPress={openTitleModal} />
-          {((sourceMedia && !hasSuggestedMedia) ||
-            (sourceMedia &&
-              hasSuggestedMedia &&
-              hasSourceMediaBeforeSuggested)) && (
-            <PressableOpacity
-              style={[styles.mediaHideButton]}
-              onPress={toggleMediaVisibility}
-            >
-              <GPUImageView
-                style={[
-                  styles.mediaHideButtonImage,
-                  !mediaVisible && { opacity: 0.5 },
-                  { overflow: 'hidden' },
-                ]}
-                testID="image-picker-media-video"
-              >
-                {sourceMedia.kind === 'image' ? (
-                  <ImageLayer uri={sourceMedia.uri} />
-                ) : (
-                  <VideoFrame uri={sourceMedia.uri} time={0} />
-                )}
-              </GPUImageView>
-
-              <Icon
-                style={styles.mediaHideButtonIcon}
-                icon={mediaVisible ? 'display' : 'hide'}
-              />
-            </PressableOpacity>
-          )}
+          <CoverEditorSuggestionButton
+            key={templateKind}
+            sourceMedia={sourceMedia}
+            templateKind={templateKind}
+            mediaVisible={mediaVisible}
+            toggleMediaVisibility={toggleMediaVisibility}
+            onSelectSuggestedMedia={onNextSuggestedMedia}
+            hasSuggestedMedia={!!suggestedMedia}
+          />
           {sourceMedia && (
             <FloatingIconButton
               icon="crop"
-              onPress={toggleCropMode}
-              disabled={!mediaVisible && !hasSuggestedMedia}
+              onPress={openCropModal}
+              disabled={!mediaVisible}
             />
           )}
-          <FloatingIconButton icon="settings" onPress={onCustomEdition} />
+          <FloatingIconButton
+            icon="settings"
+            onPress={onCustomEdition}
+            disabled={
+              templateKind === 'people' && (!sourceMedia || !mediaVisible)
+            }
+          />
         </View>
+        <BottomMenu
+          currentTab={templateKind}
+          onItemPress={onSwitchTemplateKind}
+          tabs={useMemo(
+            () => [
+              {
+                key: 'people',
+                icon: 'silhouette',
+                label: intl.formatMessage({
+                  defaultMessage: 'People',
+                  description: 'Cover editor people tab bar item label',
+                }),
+              },
+              {
+                key: 'video',
+                icon: 'video',
+                label: intl.formatMessage({
+                  defaultMessage: 'Video',
+                  description: 'Cover editor video tab bar item label',
+                }),
+              },
+              {
+                key: 'others',
+                icon: 'landscape',
+                label: intl.formatMessage({
+                  defaultMessage: 'Others',
+                  description: 'Cover editor others tab bar item label',
+                }),
+              },
+            ],
+            [intl],
+          )}
+          showLabel={true}
+          style={[
+            {
+              position: 'absolute',
+              alignSelf: 'center',
+            },
+            { bottom: insetBottom, width: 210 },
+          ]}
+        />
       </Container>
 
       <BottomSheetModal
@@ -563,24 +744,45 @@ const CoverEditor = (
           />
         </View>
       </BottomSheetModal>
-      {modals}
-      <Modal
-        visible={customEditionProps != null}
-        transparent
-        animationType="fade"
-        onRequestClose={onCustomEditionCancel}
-      >
+      <ScreenModal visible={showImagePicker} animationType="slide">
+        <CoverEditiorImagePicker
+          kind={templateKind === 'video' ? 'video' : 'image'}
+          onFinished={onMediaSelected}
+          onCancel={closeImagePicker}
+        />
+      </ScreenModal>
+      <MediaRequiredModal
+        visible={showMediaRequiredModal}
+        onClose={onMediaRequiredModalClose}
+      />
+      <CoverEditorCropModal
+        visible={showCropModal}
+        media={sourceMedia}
+        maskMedia={coverStyle?.segmented ? maskMedia : null}
+        title={title}
+        subTitle={subTitle}
+        timeRange={timeRange}
+        coverStyle={coverStyle}
+        mediaParameters={mediaCropParameters}
+        colorPalette={colorPalette}
+        onClose={closeCropModal}
+        onSave={onSaveCropData}
+      />
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
+      <ScreenModal visible={customEditionProps != null} animationType="fade">
         {customEditionProps && (
           <CoverEditorCustom
-            initialData={customEditionProps.initialData}
-            initialColorPalette={customEditionProps.colorPalette}
-            previewMedia={customEditionProps.previewMedia}
+            {...customEditionProps}
             onCancel={onCustomEditionCancel}
-            onCoverSaved={onCustomCoverSaved}
+            onCoverSaved={onCoverSaved}
             viewer={viewer}
           />
         )}
-      </Modal>
+      </ScreenModal>
     </>
   );
 };
@@ -614,33 +816,31 @@ const styles = StyleSheet.create({
     height: 22,
   },
   controlPanel: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
-    marginTop: GAP,
   },
   modalContent: {
     height: MODAL_HEIGHT,
     justifyContent: 'space-around',
     padding: 20,
   },
-  mediaHideButton: {
-    width: FLOATING_BUTTON_SIZE,
-    height: FLOATING_BUTTON_SIZE,
-    borderRadius: FLOATING_BUTTON_SIZE / 2,
-  },
-  mediaHideButtonImage: {
-    width: FLOATING_BUTTON_SIZE,
-    height: FLOATING_BUTTON_SIZE,
-    borderRadius: FLOATING_BUTTON_SIZE / 2,
-  },
-  mediaHideButtonIcon: {
-    position: 'absolute',
-    top: (FLOATING_BUTTON_SIZE - 24) / 2,
-    left: (FLOATING_BUTTON_SIZE - 24) / 2,
-    width: 24,
-    height: 24,
-  },
 });
+
+const DEFAULT_COVER_STYLE: CoverStyleData = {
+  background: null,
+  backgroundColor: 'light',
+  backgroundPatternColor: 'dark',
+  foreground: null,
+  foregroundColor: 'primary',
+  mediaFilter: null,
+  mediaParameters: {},
+  merged: false,
+  segmented: false,
+  subTitleStyle: DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
+  textOrientation: 'horizontal',
+  textPosition: 'bottomLeft',
+  titleStyle: DEFAULT_COVER_TEXT_STYLE,
+};

@@ -7,6 +7,7 @@ import {
   getPostCommentsWithProfile,
   getPostByIdWithMedia,
   getProfileById,
+  getPostById,
 } from '@azzapp/data/domains';
 
 export const loadProfilePosts = async (
@@ -36,6 +37,9 @@ export const loadPostCommentsWithProfile = async (
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
+  const post = await getPostById(postId);
+  if (!post?.allowComments) return [];
+
   return getPostCommentsWithProfile(postId, limit, before);
 };
 

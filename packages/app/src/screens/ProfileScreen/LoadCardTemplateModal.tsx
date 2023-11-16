@@ -1,27 +1,46 @@
-import { Suspense, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Suspense, useCallback, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { graphql, useFragment } from 'react-relay';
 import CardTemplateList from '#components/CardTemplateList';
+import ScreenModal from '#components/ScreenModal';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { LoadCardTemplateModal_profile$key } from '@azzapp/relay/artifacts/LoadCardTemplateModal_profile.graphql';
 
 type LoadCardTemplateModalProps = {
   onClose: () => void;
   visible: boolean;
+  profile: LoadCardTemplateModal_profile$key;
 };
 
-const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
-  const { visible, onClose } = props;
-
+const LoadCardTemplateModal = ({
+  onClose,
+  visible,
+  profile: profileKey,
+}: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
+
+  const profile = useFragment(
+    graphql`
+      fragment LoadCardTemplateModal_profile on Profile {
+        cardModules {
+          id
+        }
+      }
+    `,
+    profileKey,
+  );
 
   const intl = useIntl();
   const insets = useScreenInsets();
@@ -30,84 +49,116 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
-  const onSubmit = () => {
-    if (!cardTemplateId) return;
-
-    commit({
-      variables: {
-        loadCardTemplateInput: {
-          cardTemplateId,
+  const commitCardTemplate = useCallback(
+    (id: string) => {
+      commit({
+        variables: {
+          loadCardTemplateInput: {
+            cardTemplateId: id,
+          },
         },
-      },
-      onCompleted: () => {
-        setCardTemplateId(null);
-        onClose();
-      },
-      onError: error => {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could not load the template',
-            description: 'Load card template modal error toast',
-          }),
-        });
-      },
-    });
-  };
+        onCompleted: () => {
+          setCardTemplateId(null);
+          onClose();
+        },
+        onError: error => {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not load the template',
+              description: 'Load card template modal error toast',
+            }),
+          });
+        },
+      });
+    },
+    [commit, intl, onClose],
+  );
+
+  const cardTemplatehandle = useRef<CardTemplatelistHandle>(null);
+  const onSubmit = useCallback(() => {
+    if (!cardTemplateId) return;
+    commitCardTemplate(cardTemplateId);
+  }, [cardTemplateId, commitCardTemplate]);
+
+  const showWarning = Boolean(profile.cardModules?.length);
+
+  const applyTemplate = useCallback(
+    (templateId: string) => {
+      setCardTemplateId(templateId);
+      if (!showWarning) {
+        commitCardTemplate(templateId);
+      }
+    },
+    [commitCardTemplate, showWarning],
+  );
 
   return (
-    <Modal animationType="none" visible={visible}>
-      <Container
-        style={{
-          flex: 1,
-          paddingBottom: insets.bottom,
-          paddingTop: insets.top,
-        }}
-      >
-        <Header
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={28}
-              variant="icon"
-            />
-          }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Load a WebCard® template',
-            description: 'WebCard creation screen title',
-          })}
-        />
-        <Suspense
-          fallback={
-            <View style={styles.activityIndicatorContainer}>
-              <ActivityIndicator />
-            </View>
-          }
+    <>
+      <ScreenModal animationType="none" visible={visible}>
+        <Container
+          style={{
+            flex: 1,
+            paddingBottom: insets.bottom,
+            paddingTop: insets.top,
+          }}
         >
-          <CardTemplateList
-            height={height}
-            onApplyTemplate={(cardTemplateId: string) =>
-              setCardTemplateId(cardTemplateId)
+          <Header
+            leftElement={
+              <IconButton
+                icon="arrow_down"
+                onPress={onClose}
+                iconSize={28}
+                variant="icon"
+              />
             }
-            loading={inFlight}
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Load a template',
+              description: 'WebCard creation screen title',
+            })}
+            rightElement={
+              <HeaderButton
+                onPress={() => cardTemplatehandle.current?.onSubmit()}
+                label={intl.formatMessage({
+                  defaultMessage: 'Apply',
+                  description: 'Apply button label in card template preview',
+                })}
+                loading={inFlight}
+              />
+            }
+            style={{ marginBottom: 10 }}
           />
-        </Suspense>
-      </Container>
-
-      <Modal
+          <Suspense
+            fallback={
+              <View style={styles.activityIndicatorContainer}>
+                <ActivityIndicator />
+              </View>
+            }
+          >
+            <CardTemplateList
+              height={height}
+              onApplyTemplate={applyTemplate}
+              loading={inFlight}
+              ref={cardTemplatehandle}
+            />
+          </Suspense>
+        </Container>
+      </ScreenModal>
+      <ScreenModal
         animationType="none"
-        visible={visible && !!cardTemplateId && !inFlight}
-        style={{ zIndex: 1000 }}
+        visible={visible && !!cardTemplateId && !inFlight && showWarning}
       >
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
           <Text variant="large" style={{ marginTop: 10 }}>
-            {intl.formatMessage({
-              defaultMessage: 'Delete your current WebCard contents?',
-              description: 'Confirmation title for load card template modal',
-            })}
+            <FormattedMessage
+              defaultMessage="Delete your current WebCard{azzappAp} contents?"
+              description="Confirmation title for load card template modal"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
           </Text>
           <Text
             style={{
@@ -116,12 +167,13 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
               paddingHorizontal: 20,
             }}
           >
-            {intl.formatMessage({
-              defaultMessage:
-                'Loading a new template will remove current contents of your WebCarda and replace them with the new template. Are you ready to start from the scratch?',
-              description:
-                'Confirmation description for load card template modal',
-            })}
+            <FormattedMessage
+              defaultMessage="Loading a new template will remove current contents of your WebCard{azzappAp} and replace them with the new template. Are you ready to start from the scratch?"
+              description="Confirmation description for load card template modal"
+              values={{
+                azzappAp: <Text variant="azzapp">a</Text>,
+              }}
+            />
           </Text>
           <View style={styles.buttons}>
             <Button
@@ -143,8 +195,8 @@ const LoadCardTemplateModal = (props: LoadCardTemplateModalProps) => {
             />
           </View>
         </Container>
-      </Modal>
-    </Modal>
+      </ScreenModal>
+    </>
   );
 };
 

@@ -1,22 +1,26 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import clamp from 'lodash/clamp';
 import range from 'lodash/range';
-import { useEffect, useRef } from 'react';
-import {
-  Animated,
-  PanResponder,
-  View,
-  useColorScheme,
-  useWindowDimensions,
-} from 'react-native';
-import { getPrecision } from '@azzapp/shared/numberHelpers';
+import { memo, useMemo } from 'react';
+import { View, useColorScheme, useWindowDimensions } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  Easing,
+  Extrapolation,
+  clamp,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useInterval from '#hooks/useInterval';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 export type DashedSliderProps = ViewProps & {
   variant?: 'default' | 'small';
-  value: number;
+  sharedValue: SharedValue<number>;
   min: number;
   max: number;
   step: number;
@@ -26,7 +30,7 @@ export type DashedSliderProps = ViewProps & {
 
 const DashedSlider = ({
   variant = 'default',
-  value,
+  sharedValue: pan,
   min,
   max,
   step,
@@ -35,128 +39,153 @@ const DashedSlider = ({
   style,
   ...props
 }: DashedSliderProps) => {
-  const pan = useRef(new Animated.Value(value)).current;
-  // fix #287 : Changing from name to subtitle in coveredition did not update the value of the slider
-  useEffect(() => {
-    pan.setValue(value);
-  }, [pan, value]);
-
   const windowWidth = useWindowDimensions().width;
 
   const interval = chosenInterval ?? Math.floor((windowWidth - 80) / 60);
 
   const computedInterval = interval * (variant === 'small' ? 0.5 : 1);
 
-  const isPaning = useRef(false);
-  const propsRef = useRef({ value, min, max, step, computedInterval });
-  propsRef.current = { value, min, max, step, computedInterval };
-  if (!isPaning) {
-    pan.setValue(value);
-  }
+  const animationOffsetValue = useSharedValue(0);
 
-  const animationOffsetValue = useRef(0);
-  const animatedEvent = useRef(
-    Animated.event([pan], {
-      useNativeDriver: false,
-    }),
-  ).current;
+  const animationActive = useSharedValue(false);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant() {
-        const { value } = propsRef.current;
-        animationOffsetValue.current = value;
-        isPaning.current = true;
-      },
-      onPanResponderMove: (e, gestureState) => {
-        const { min, max, step, computedInterval } = propsRef.current;
-        const dval = step * (gestureState.dx / computedInterval);
-        animatedEvent(clamp(animationOffsetValue.current - dval, min, max));
-      },
-      onPanResponderRelease() {
-        isPaning.current = false;
-        pan.setValue(propsRef.current.value);
-      },
-    }),
-  ).current;
+  useInterval(() => {
+    if (!animationActive.value) {
+      return;
+    }
+    onChange(Math.round(pan.value / step) * step);
+  }, 16);
 
-  useEffect(() => {
-    const multiplier = 10 ** getPrecision(step);
-    const id = pan.addListener(({ value }) => {
-      value = (value - min) * multiplier;
-      const modulo = step * multiplier;
-      const clampedValue = clamp(
-        Math.floor(value - (value % modulo)) / multiplier,
-        0,
-        max - min,
+  const panGesture = Gesture.Pan()
+    .onBegin(() => {
+      animationOffsetValue.value = pan.value;
+      animationActive.value = true;
+    })
+    .onUpdate(e => {
+      const dval = step * (e.translationX / computedInterval);
+      const newValue = Math.min(
+        Math.max(animationOffsetValue.value - dval, min),
+        max,
       );
-      onChange(clampedValue + min);
+
+      pan.value = newValue;
+    })
+    .onEnd(() => {
+      const clamped = getClampedValue(pan.value, step, min, max);
+      pan.value = withTiming(
+        clamped,
+        {
+          duration: 50,
+          easing: Easing.out(Easing.exp),
+        },
+        () => {
+          animationActive.value = false;
+        },
+      );
     });
-    return () => {
-      pan.removeListener(id);
-    };
-  }, [max, min, onChange, pan, step]);
 
   const steps = range(min, max, step);
   const size = steps.length * computedInterval;
   const colorScheme = useColorScheme();
-  const colorsGradient =
-    colorScheme === 'light'
-      ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
-      : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'];
+  const colorsGradient = useMemo(
+    () =>
+      colorScheme === 'light'
+        ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
+        : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'],
+    [colorScheme],
+  );
 
   const styles = useStyleSheet(styleSheet);
+
+  const dashContainerStyle = useAnimatedStyle(() => ({
+    gap: computedInterval - 1,
+    transform: [
+      {
+        translateX: interpolate(
+          pan.value,
+          [min, max],
+          [0, -size],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
+  }));
+
   return (
-    <LinearGradient
+    <MemoizedLinearGradient
       colors={colorsGradient}
-      locations={[0.0, 0.5, 1]}
-      start={{ x: 0, y: 1 }}
-      end={{ x: 1, y: 1 }}
+      locations={gradientLocation}
+      start={gradientStart}
+      end={gradientEnd}
     >
-      <View
-        {...props}
-        {...panResponder.panHandlers}
-        style={[
-          style,
-          styles.container,
-          variant === 'small' && { width: '50%' },
-        ]}
-        accessibilityRole="adjustable"
-        accessibilityValue={{ min, max, now: value }}
-      >
+      <GestureDetector gesture={panGesture}>
         <Animated.View
+          {...props}
           style={[
-            styles.dashContainer,
-            {
-              transform: [
-                {
-                  translateX: pan.interpolate({
-                    inputRange: [min, max],
-                    outputRange: [0, -size],
-                    extrapolate: 'clamp',
-                  }),
-                },
-              ],
-            },
+            style,
+            styles.container,
+            variant === 'small' && { width: '50%' },
           ]}
+          accessibilityRole="adjustable"
+          accessibilityValue={{ min, max, now: pan.value }}
         >
-          {steps.map(step => (
-            <View
-              key={step}
-              style={[styles.dash, { marginRight: computedInterval - 1 }]}
-            />
-          ))}
-          <View style={styles.dash} />
+          <Animated.View style={[styles.dashContainer, dashContainerStyle]}>
+            {steps.map(step => (
+              <View key={step} style={styles.dash} />
+            ))}
+            <View style={styles.dash} />
+          </Animated.View>
+          <View style={styles.thumb} />
         </Animated.View>
-        <View style={styles.thumb} />
-      </View>
-    </LinearGradient>
+      </GestureDetector>
+    </MemoizedLinearGradient>
   );
 };
 
 export default DashedSlider;
+
+const gradientLocation = [0.0, 0.5, 1];
+const gradientStart = { x: 0, y: 1 };
+const gradientEnd = { x: 1, y: 1 };
+
+const MemoizedLinearGradient = memo(
+  LinearGradient,
+  (prevProps, nextProps) =>
+    prevProps.colors === nextProps.colors &&
+    prevProps.locations === nextProps.locations &&
+    prevProps.start === nextProps.start &&
+    prevProps.end === nextProps.end,
+);
+
+const getPrecision = (a: number) => {
+  'worklet';
+  if (!isFinite(a)) return 0;
+  let e = 1;
+  let p = 0;
+  while (Math.round(a * e) / e !== a) {
+    e *= 10;
+    p++;
+  }
+  return p;
+};
+
+export const getClampedValue = (
+  currentValue: number,
+  step: number,
+  min: number,
+  max: number,
+) => {
+  'worklet';
+  const multiplier = 10 ** getPrecision(step);
+  const value = (currentValue - min) * multiplier;
+  const modulo = step * multiplier;
+  const clampedValue = clamp(
+    Math.floor(value - (value % modulo)) / multiplier,
+    0,
+    max - min,
+  );
+  return min + clampedValue;
+};
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {

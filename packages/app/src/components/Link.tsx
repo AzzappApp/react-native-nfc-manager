@@ -13,10 +13,6 @@ type LinkProps<T extends Route> = T & {
    */
   replace?: boolean;
   /**
-   * If true, the new screen will be opened as a modal.
-   */
-  modal?: boolean;
-  /**
    * If true, the Screen prefetcher will be used to prefetch the route.
    */
   prefetch?: boolean;
@@ -25,6 +21,11 @@ type LinkProps<T extends Route> = T & {
    * it should be a react-native pressable component.
    */
   children: ReactElement;
+
+  /**
+   * The route key that will be used to prefetch the route.
+   */
+  routeKey?: string;
 };
 
 /**
@@ -43,9 +44,9 @@ const Link = <T extends Route>({
   route,
   params,
   replace,
-  modal,
   prefetch,
   children,
+  routeKey,
 }: LinkProps<T>) => {
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
@@ -71,10 +72,8 @@ const Link = <T extends Route>({
     }
     if (replace) {
       router.replace({ route, params } as Route);
-    } else if (modal) {
-      router.showModal({ route, params } as Route);
     } else {
-      router.push({ route, params } as Route);
+      router.push({ id: routeKey ?? null, route, params } as Route);
     }
   };
 

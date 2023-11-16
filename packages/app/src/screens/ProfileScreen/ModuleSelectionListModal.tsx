@@ -1,16 +1,20 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, Modal, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import ModuleSelectionListModalItem from './ModuleSelectionListModalItem';
+import type { ScreenModalProps } from '#components/ScreenModal';
 import type { ModuleSelectionListItem } from './ModuleSelectionListModalItem';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
-import type { ModalProps } from 'react-native';
 
-type ModuleSelectionListModalProps = Exclude<ModalProps, 'onRequestClose'> & {
+type ModuleSelectionListModalProps = Exclude<
+  ScreenModalProps,
+  'onRequestClose'
+> & {
   onSelectModuleKind: (module: ModuleKind) => void;
   onRequestClose: () => void;
 };
@@ -124,7 +128,7 @@ const ModuleSelectionListModal = ({
         {
           moduleKind: 'socialLinks',
           label: intl.formatMessage({
-            defaultMessage: 'Social',
+            defaultMessage: 'Links',
             description:
               'Module selection list modal Social Links module label',
           }),
@@ -175,7 +179,7 @@ const ModuleSelectionListModal = ({
   );
 
   return (
-    <Modal onRequestClose={onRequestClose} {...props}>
+    <ScreenModal {...props}>
       <Container style={[styles.root, { paddingTop: top }]}>
         <Header
           leftElement={
@@ -199,7 +203,7 @@ const ModuleSelectionListModal = ({
           showsVerticalScrollIndicator={false}
         />
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 

@@ -13,6 +13,7 @@ import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
+import { PostReactionTable } from './postReactions';
 import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
 import type { Profile } from './profiles';
@@ -44,6 +45,18 @@ export type NewPost = InferInsertModel<typeof PostTable>;
 export type PostWithMedias = Omit<Post, 'medias'> & { medias: Media[] };
 export type PostWithCommentAndAuthor = PostWithMedias & {
   comment: (PostComment & { author: Profile }) | null;
+};
+
+/**
+ * Retrieve a post by its id.
+ * @param id - The id of the post to retrieve
+ * @returns A post
+ */
+export const getPostById = async (id: string) => {
+  const res = await db.select().from(PostTable).where(eq(PostTable.id, id));
+
+  if (res.length === 0) return null;
+  return res[0];
 };
 
 /**
@@ -154,7 +167,9 @@ export const getProfilesPostsWithTopComment = async (
 
   if (posts.length === 0) return [];
 
-  const comments = await getTopPostsComment(posts.map(post => post.id));
+  const comments = await getTopPostsComment(
+    posts.filter(post => post.allowComments).map(post => post.id),
+  );
 
   const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
     return [...mediasIds, ...post.medias];
@@ -259,4 +274,40 @@ export const updatePost = async (postId: string, data: Partial<NewPost>) => {
     .update(PostTable)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(PostTable.id, postId));
+};
+
+/**
+ * Retrieve a list of post liked by a profile
+ * with pagination based on postDate.
+ *
+ * @param profileId - The id of the profile
+ * @param limit - The maximum number of post to retrieve
+ * @param offset - the offset of the first post to retrieve (based on postDate)
+ * @returns A list of post
+ */
+export const getLikedPosts = async (
+  profileId: string,
+  limit: number,
+  after: Date | null = null,
+) => {
+  // The limit clause is applied AFTER the join operation
+  // So there is 2 requests to apply the limit on post reaction table
+  const subquery = db
+    .select()
+    .from(PostReactionTable)
+    .where(
+      and(
+        eq(PostReactionTable.profileId, profileId),
+        after ? lt(PostReactionTable.createdAt, after) : undefined,
+      ),
+    )
+    .orderBy(desc(PostReactionTable.createdAt))
+    .limit(limit)
+    .as('LimitedPostReactionTable');
+
+  return db
+    .select()
+    .from(PostTable)
+    .innerJoin(subquery, eq(PostTable.id, subquery.postId))
+    .then(res => res.map(({ Post }) => Post));
 };

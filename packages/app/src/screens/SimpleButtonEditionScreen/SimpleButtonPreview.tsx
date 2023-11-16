@@ -2,8 +2,7 @@ import { useIntl } from 'react-intl';
 import SimpleButtonRenderer from '#components/cardModules/SimpleButtonRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
 import type { SimpleButtonRendererData } from '#components/cardModules/SimpleButtonRenderer';
-import type { ColorPalette } from '#components/CoverEditor/coverEditorTypes';
-import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleButtonPreviewProps = ViewProps & {

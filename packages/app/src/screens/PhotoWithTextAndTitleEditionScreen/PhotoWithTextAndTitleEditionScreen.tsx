@@ -14,12 +14,13 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import { exportLayersToImage } from '#components/gpu';
+import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
@@ -31,7 +32,6 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
@@ -261,8 +261,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-
-  const [uploadProgress, setUploadProgress] =
+  const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
   const onSave = useCallback(async () => {
@@ -290,7 +289,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         uploadURL,
         uploadParameters,
       );
-      setUploadProgress(uploadProgress);
+      setProgressIndicator(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
@@ -304,8 +303,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
               'Error toast message when saving a photo with text and title failed because of a media upload error.',
           }),
         });
-      } finally {
-        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 
@@ -326,9 +323,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
         input,
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
+        setShowImagePicker(false);
         console.log(e);
         if (e instanceof GraphQLError) {
           console.log(e.cause);
@@ -344,7 +343,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, photoWithTextAndTitle?.id, commit, router, intl]);
+  }, [
+    canSave,
+    value,
+    photoWithTextAndTitle?.id,
+    commit,
+    setProgressIndicator,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -377,7 +384,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           kind: 'image',
           uri,
           parameters: editionParameters,
-          filters: filter ? [filter] : [],
+          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
         },
       ],
     });
@@ -632,7 +639,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
           description:
-            'Placeholder for text area in simple text edition screen',
+            'Placeholder for text area in photo with text edition screen',
+        })}
+        headerTitle={intl.formatMessage({
+          defaultMessage: 'Edit text',
+          description:
+            'Text area modal title in photo with text edition screen',
         })}
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
@@ -697,18 +709,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <InnerModal visible={showImagePicker}>
+      <ScreenModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[SelectImageStep, EditImageStep]}
         />
-      </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
+      </ScreenModal>
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

@@ -2,6 +2,7 @@ import createPost from './createPost';
 import createPostComment from './createPostComment';
 import createProfile from './createProfile';
 import deleteModules from './deleteModules';
+import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
 import loadCardTemplate from './loadCardTemplate';
 import {
@@ -26,18 +27,25 @@ import toggleFollowing from './toggleFollowing';
 import updateModulesVisibility from './updateModulesVisibility';
 import updatePost from './updatePost';
 import updateProfile from './updateProfile';
+import {
+  updateContactcardScans,
+  updateLikes,
+  updateWebcardViews,
+} from './updateStatistic';
 import updateUser from './updateUser';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 export const Mutation: MutationResolvers = {
-  updateProfile,
-  updateUser,
   createPost,
   createProfile,
-  updatePost,
-  toggleFollowing,
+  createPostComment,
+  deleteModules,
+  deletePostComment,
+  duplicateModule,
+  loadCardTemplate,
+  publishCard,
   removeFollower,
-  togglePostReaction,
+  reorderModules,
   saveSimpleTextModule,
   saveLineDividerModule,
   saveHorizontalPhotoModule,
@@ -46,15 +54,17 @@ export const Mutation: MutationResolvers = {
   saveSimpleButtonModule,
   saveSocialLinksModule,
   saveBlockTextModule,
-  reorderModules,
-  deleteModules,
-  duplicateModule,
-  loadCardTemplate,
-  updateModulesVisibility,
-  createPostComment,
   saveCardColors,
   saveCardStyle,
   saveContactCard,
   saveCover,
-  publishCard,
+  toggleFollowing,
+  updateContactcardScans,
+  togglePostReaction,
+  updateLikes,
+  updatePost,
+  updateProfile,
+  updateUser,
+  updateWebcardViews,
+  updateModulesVisibility,
 };

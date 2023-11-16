@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import {
@@ -16,6 +16,7 @@ import { DEFAULT_CARD_STYLE, type CardStyle } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
+import ScreenModal from '#components/ScreenModal';
 import WebCardPreview from '#components/WebCardPreview';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -163,11 +164,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     insets.bottom;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      onRequestClose={onCloseInner}
-    >
+    <ScreenModal visible={visible} animationType="slide">
       <Container
         style={[
           styles.root,
@@ -224,7 +221,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
           />
         </Suspense>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 

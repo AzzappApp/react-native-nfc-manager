@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
@@ -105,9 +106,16 @@ export type FollowersRoute = {
   params?: never;
 };
 
+export type LikedPostsRoute = {
+  route: 'LIKED_POSTS';
+  params?: never;
+};
+
 export type AccountDetailsRoute = {
   route: 'ACCOUNT_DETAILS';
-  params?: never;
+  params: {
+    withProfile: boolean;
+  };
 };
 
 export type InviteFriendsRoute = {
@@ -145,6 +153,7 @@ export type Route =
   | ForgotPasswordRoute
   | HomeRoute
   | InviteFriendsRoute
+  | LikedPostsRoute
   | MediaRoute
   | NewPostRoute
   | NewProfileRoute
@@ -158,3 +167,19 @@ export type Route =
   | SignUpRoute;
 
 export type ROUTES = Route['route'];
+
+export const isRouteEqual = (route: Route, compareRoute: Route) => {
+  if (route.route !== compareRoute.route) {
+    return false;
+  }
+  if (route.route === 'POST' && compareRoute.route === 'POST') {
+    return route.params.postId === compareRoute.params.postId;
+  }
+  if (route.route === 'PROFILE' && compareRoute.route === 'PROFILE') {
+    return (
+      route.params.userName === compareRoute.params.userName &&
+      route.params.profileId === compareRoute.params.profileId
+    );
+  }
+  return isEqual(route.params, compareRoute.params);
+};

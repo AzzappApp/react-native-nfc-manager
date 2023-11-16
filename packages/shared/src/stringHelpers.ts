@@ -160,3 +160,6 @@ export const simpleHash = (str: string) => {
   return new Uint32Array([hash])[0];
 };
 /* eslint-enable no-bitwise*/
+
+export const URL_REGEX =
+  /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;

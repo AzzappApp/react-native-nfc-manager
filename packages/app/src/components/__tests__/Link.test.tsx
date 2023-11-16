@@ -43,6 +43,7 @@ describe('Link', () => {
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: null,
       route: 'PROFILE',
       params: { userName: 'hello' },
     });
@@ -58,20 +59,6 @@ describe('Link', () => {
       isDefaultPrevented() {
         return true;
       },
-    });
-    expect(mockRouter.push).not.toHaveBeenCalled();
-  });
-
-  test('should show modal  when pressed and modal is true', () => {
-    render(
-      <Link route="PROFILE" modal params={{ userName: 'hello' }}>
-        <Pressable testID="pressable" />
-      </Link>,
-    );
-    fireEvent.press(screen.getByTestId('pressable'));
-    expect(mockRouter.showModal).toHaveBeenCalledWith({
-      route: 'PROFILE',
-      params: { userName: 'hello' },
     });
     expect(mockRouter.push).not.toHaveBeenCalled();
   });
@@ -98,6 +85,7 @@ describe('Link', () => {
     );
     fireEvent.press(screen.getByTestId('pressable'));
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: null,
       route: 'PROFILE',
       params: { userName: 'hello' },
     });

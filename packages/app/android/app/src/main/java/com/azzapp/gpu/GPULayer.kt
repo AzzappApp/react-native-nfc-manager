@@ -9,7 +9,7 @@ class GPULayer(
   val source: GPULayerSource,
   val parameters: EditionParameters?,
   val maskUri: Uri?,
-  val filters: ArrayList<String>?,
+  val lutFilterUri: Uri?,
   val backgroundColor: String?,
   val tintColor: String?
 ) {
@@ -126,7 +126,8 @@ class GPULayer(
       val uriStr = readableMap.getString("uri")
       val maskUriStr = readableMap.getString("maskUri")
       val editionParameters = readableMap.getMap("parameters")
-      val filters = readableMap.getArray("filters")
+      val lutFilterUriStr = readableMap.getString("lutFilterUri")
+
       val startTime = RNHelpers.readDoubleIfHasKey( readableMap, "startTime")
       val duration = RNHelpers.readDoubleIfHasKey( readableMap, "duration")
       val time = RNHelpers.readDoubleIfHasKey( readableMap, "time")
@@ -167,11 +168,16 @@ class GPULayer(
           try { Uri.parse(maskUriStr) } catch (e: NullPointerException) { null }
         else null
 
+      val lutFilterUri =
+        if (lutFilterUriStr !== null)
+          try { Uri.parse(lutFilterUriStr) } catch (e: NullPointerException) { null }
+        else null
+
       return GPULayer(
         source,
         if (editionParameters != null) EditionParameters.fromReadableMap(editionParameters) else null,
         maskUri,
-        RNHelpers.readableArrayToStringArrayList(filters),
+        lutFilterUri,
         backgroundColor,
         tintColor
       )

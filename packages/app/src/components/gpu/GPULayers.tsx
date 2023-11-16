@@ -40,9 +40,9 @@ export type Blending = 'multiply' | 'none';
 
 export type GPULayerBase = {
   parameters?: EditionParameters | null;
-  filters?: string[] | null;
   blending?: Blending | null;
   maskUri?: string | null;
+  lutFilterUri?: string | null;
   backgroundColor?: string | null;
   tintColor?: string | null;
 };
@@ -144,14 +144,14 @@ export const getNextOrientation = (
 ): ImageOrientation => {
   switch (orientation) {
     case 'LEFT':
-      return 'UP';
-    case 'DOWN':
-      return 'LEFT';
-    case 'RIGHT':
       return 'DOWN';
+    case 'DOWN':
+      return 'RIGHT';
+    case 'RIGHT':
+      return 'UP';
     case 'UP':
     default:
-      return 'RIGHT';
+      return 'LEFT';
   }
 };
 

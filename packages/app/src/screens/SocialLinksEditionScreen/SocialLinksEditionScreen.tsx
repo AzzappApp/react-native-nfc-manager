@@ -4,10 +4,12 @@ import { useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import * as z from 'zod';
 import {
   MODULE_KIND_SOCIAL_LINKS,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import { URL_REGEX } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -41,6 +43,21 @@ export type SocialLinksEditionScreenProps = ViewProps & {
    */
   module: SocialLinksEditionScreen_module$key | null;
 };
+
+const socialLinkSchema = z
+  .array(
+    z.union([
+      z.object({
+        socialId: z.literal('website'),
+        link: z.string().regex(URL_REGEX).nonempty(),
+      }),
+      z.object({
+        socialId: z.custom<string>(value => value !== 'website'),
+        link: z.string().nonempty(),
+      }),
+    ]),
+  )
+  .nonempty();
 
 /**
  * A component that allows to create or update the SocialLinks Webcard module.
@@ -171,7 +188,8 @@ const SocialLinksEditionScreen = ({
         }
       }
     `);
-  const isValid = links.length > 0;
+
+  const isValid = socialLinkSchema.safeParse(links).success;
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
@@ -260,7 +278,7 @@ const SocialLinksEditionScreen = ({
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
         middleElement={intl.formatMessage({
-          defaultMessage: 'Social platforms',
+          defaultMessage: 'Links',
           description: 'SocialLinks text screen title',
         })}
         leftElement={

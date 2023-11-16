@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -10,6 +10,7 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
 import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
@@ -22,6 +23,7 @@ import ImagePicker, {
   EditImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -38,7 +40,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewPostRoute } from '#routes';
 import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
 import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
-import type { Observable } from 'relay-runtime';
 
 const POST_MAX_DURATION = 15;
 
@@ -91,6 +92,8 @@ const PostCreationScreen = ({
           content
           allowLikes
           allowComments
+          counterComments
+          counterReactions
           author {
             id
             userName
@@ -119,9 +122,9 @@ const PostCreationScreen = ({
     }
   `);
 
-  const [uploadProgress, setUploadProgress] =
+  const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const [saving, setSaving] = useState(false);
+
   const onFinished = async ({
     kind,
     uri,
@@ -130,57 +133,88 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
-    setSaving(true);
+    try {
+      setProgressIndicator(Observable.from(0));
+      const exportedMedia = await exportMedia({
+        uri,
+        kind,
+        editionParameters,
+        aspectRatio,
+        filter,
+        ...timeRange,
+      });
 
-    const exportedMedia = await exportMedia({
-      uri,
-      kind,
-      editionParameters,
-      aspectRatio,
-      filter,
-      ...timeRange,
-    });
+      const fileName = getFileName(exportedMedia.path);
+      const file: any = {
+        name: fileName,
+        uri: `file://${exportedMedia.path}`,
+        type:
+          mime.lookup(fileName) ||
+          (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
+      };
 
-    const fileName = getFileName(exportedMedia.path);
-    const file: any = {
-      name: fileName,
-      uri: `file://${exportedMedia.path}`,
-      type:
-        mime.lookup(fileName) ||
-        (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
-    };
-
-    const { uploadURL, uploadParameters } = await uploadSign({
-      kind: kind === 'video' ? 'video' : 'image',
-      target: 'post',
-    });
-    const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-      file,
-      uploadURL,
-      uploadParameters,
-    );
-    // TODO uploadProgressModal crash on android
-    if (Platform.OS === 'ios') {
-      setUploadProgress(uploadProgress);
-    }
-    const { public_id } = await uploadPromise;
-    setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
-    commit({
-      variables: {
-        input: {
-          mediaId: encodeMediaId(public_id, kind),
-          allowComments,
-          allowLikes,
-          content,
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: kind === 'video' ? 'video' : 'image',
+        target: 'post',
+      });
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
+      setProgressIndicator(uploadProgress);
+      const { public_id } = await uploadPromise;
+      commit({
+        variables: {
+          input: {
+            mediaId: encodeMediaId(public_id, kind),
+            allowComments,
+            allowLikes,
+            content,
+          },
+          screenWidth: ScreenWidth(),
+          postWith: PostWidth(),
+          cappedPixelRatio: CappedPixelRatio(),
+          pixelRatio: PixelRatio(),
+          connections: [connectionID!],
         },
-        screenWidth: ScreenWidth(),
-        postWith: PostWidth(),
-        cappedPixelRatio: CappedPixelRatio(),
-        pixelRatio: PixelRatio(),
-        connections: [connectionID!],
-      },
-      onCompleted(response, error) {
-        if (error) {
+        onCompleted(response, error) {
+          if (error) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error while creating post',
+                description: 'Toast Error message while creating post',
+              }),
+            });
+          } else {
+            Toast.show({
+              type: 'success',
+              text1: intl.formatMessage({
+                defaultMessage: 'Post created',
+                description: 'Toast Success message while creating post',
+              }),
+            });
+            addLocalCachedMediaFile(
+              `${kind.slice(0, 1)}:${public_id}`,
+              kind === 'video' ? 'video' : 'image',
+              `file://${exportedMedia.path}`,
+            );
+            // TODO use fragment instead of response
+            // if (params?.fromProfile) {
+            router.back();
+            // } else {
+            //   router.replace({
+            //     route: 'PROFILE',
+            //     params: {
+            //       userName: response.createPost?.post?.author.userName as string,
+            //       showPosts: true,
+            //     },
+            //   });
+            // }
+          }
+        },
+        onError() {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -188,56 +222,32 @@ const PostCreationScreen = ({
               description: 'Toast Error message while creating post',
             }),
           });
-        } else {
-          Toast.show({
-            type: 'success',
-            text1: intl.formatMessage({
-              defaultMessage: 'Post created',
-              description: 'Toast Success message while creating post',
-            }),
-          });
-          addLocalCachedMediaFile(
-            public_id,
-            kind === 'video' ? 'video' : 'image',
-            `file://${exportedMedia.path}`,
-          );
-          // TODO use fragment instead of response
-          // if (params?.fromProfile) {
-          router.back();
-          // } else {
-          //   router.replace({
-          //     route: 'PROFILE',
-          //     params: {
-          //       userName: response.createPost?.post?.author.userName as string,
-          //       showPosts: true,
-          //     },
-          //   });
-          // }
-        }
-      },
-      onError() {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error while creating post',
-            description: 'Toast Error message while creating post',
-          }),
-        });
-      },
-      updater: store => {
-        if (profile?.id) {
-          const currentProfile = store.get(profile.id);
+          setProgressIndicator(null);
+        },
+        updater: store => {
+          if (profile?.id) {
+            const currentProfile = store.get(profile.id);
 
-          if (currentProfile) {
-            const nbPosts = currentProfile?.getValue('nbPosts');
+            if (currentProfile) {
+              const nbPosts = currentProfile?.getValue('nbPosts');
 
-            if (typeof nbPosts === 'number') {
-              currentProfile.setValue(nbPosts + 1, 'nbPosts');
+              if (typeof nbPosts === 'number') {
+                currentProfile.setValue(nbPosts + 1, 'nbPosts');
+              }
             }
           }
-        }
-      },
-    });
+        },
+      });
+    } catch (e) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while creating post',
+          description: 'Toast Error message while creating post',
+        }),
+      });
+      setProgressIndicator(null);
+    }
   };
 
   const contextValue = useMemo(
@@ -259,21 +269,25 @@ const PostCreationScreen = ({
   }
 
   return (
-    <PostCreationScreenContext.Provider value={contextValue}>
-      <ImagePicker
-        maxVideoDuration={POST_MAX_DURATION}
-        forceCameraRatio={1}
-        onCancel={onCancel}
-        onFinished={onFinished}
-        busy={saving}
-        steps={[SelectImageStep, EditImageStep, PostContentStep]}
-        exporting={saving}
-      />
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
-    </PostCreationScreenContext.Provider>
+    <>
+      <PostCreationScreenContext.Provider value={contextValue}>
+        <ImagePicker
+          maxVideoDuration={POST_MAX_DURATION}
+          forceCameraRatio={1}
+          onCancel={onCancel}
+          onFinished={onFinished}
+          busy={!!progressIndicator}
+          steps={[SelectImageStep, EditImageStep, PostContentStep]}
+          exporting={!!progressIndicator}
+        />
+      </PostCreationScreenContext.Provider>
+
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
+    </>
   );
 };
 

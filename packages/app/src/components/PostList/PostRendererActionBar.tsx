@@ -1,11 +1,14 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useEffect, useState } from 'react';
+import { fromGlobalId } from 'graphql-relay';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
+import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
@@ -32,6 +35,7 @@ const PostRendererActionBar = ({
     allowLikes,
     allowComments,
     counterReactions,
+    author,
   } = useFragment(
     graphql`
       fragment PostRendererActionBar_post on Post {
@@ -41,6 +45,9 @@ const PostRendererActionBar = ({
         allowLikes
         counterReactions
         content
+        author {
+          userName
+        }
       }
     `,
     postKey,
@@ -64,9 +71,14 @@ const PostRendererActionBar = ({
     viewerPostReaction,
   );
 
+  useEffect(() => {
+    setReaction(viewerPostReaction);
+  }, [viewerPostReaction]);
+
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
+  const { profileId } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
     (add: boolean) => {
       commit({
@@ -95,9 +107,22 @@ const PostRendererActionBar = ({
             }
             post.setValue(add ? reaction : null, 'viewerPostReaction');
           }
+          if (profileId) {
+            const profile = store.get(profileId);
+            const counter = profile?.getValue('nbPostsLiked');
+            if (typeof counter === 'number') {
+              profile?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+            }
+          }
         },
         onError: error => {
-          console.error(error);
+          console.log(error);
+          //add manual capture exception for testing issue
+          Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
+
+          setCountReactions(prevReactions =>
+            add ? prevReactions + 1 : prevReactions - 1,
+          );
 
           Toast.show({
             type: 'error',
@@ -111,6 +136,7 @@ const PostRendererActionBar = ({
     },
     // delay in ms
     600,
+    { trailing: true, leading: false },
   );
   // toggle the value locally
   const toggleReaction = useCallback(() => {
@@ -125,27 +151,18 @@ const PostRendererActionBar = ({
     }
   }, [countReactions, debouncedCommit, reaction]);
 
-  //refresh the value based on the GraphQL response
-  useEffect(() => {
-    setReaction(viewerPostReaction);
-  }, [viewerPostReaction]);
-
-  useEffect(() => {
-    setCountReactions(counterReactions);
-  }, [counterReactions]);
-
   const goToComments = () => {
-    router.push({ route: 'POST_COMMENTS', params: { postId } });
+    router.push({
+      route: 'POST_COMMENTS',
+      params: { postId },
+    });
   };
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description: 'Post Item : Predefined Message used in sharing a Post ',
-        }),
+        url: buildPostUrl(author.userName, fromGlobalId(postId).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -154,70 +171,72 @@ const PostRendererActionBar = ({
   };
 
   return (
-    <View {...props} style={[styles.container, style]}>
-      <View style={{ flexDirection: 'row' }}>
-        {allowLikes && (
+    <>
+      <View {...props} style={[styles.container, style]}>
+        <View style={{ flexDirection: 'row' }}>
+          {allowLikes && (
+            <IconButton
+              //TODO create an animation for the like button later ? design team
+              icon={reaction ? 'like_filled' : 'like'}
+              style={styles.icon}
+              onPress={toggleReaction}
+              variant="icon"
+              accessibilityState={{ checked: !!reaction }}
+              accessibilityLabel={
+                reaction
+                  ? intl.formatMessage({
+                      defaultMessage: 'Like the post',
+                      description:
+                        'PostRendererActionBar like button accessibility',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'Unlike the post',
+                      description:
+                        'PostRendererActionBar unlike button accessibility',
+                    })
+              }
+            />
+          )}
+          {allowComments && (
+            <IconButton
+              icon="comment"
+              style={styles.icon}
+              onPress={goToComments}
+              variant="icon"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Comment the post',
+                description:
+                  'PostRendererActionBar Comment post button accessibility',
+              })}
+            />
+          )}
           <IconButton
-            //TODO create an animation for the like button later ? design team
-            icon={reaction ? 'like_filled' : 'like'}
+            icon="share"
             style={styles.icon}
-            onPress={toggleReaction}
             variant="icon"
-            accessibilityState={{ checked: !!reaction }}
-            accessibilityLabel={
-              reaction
-                ? intl.formatMessage({
-                    defaultMessage: 'Like the post',
-                    description:
-                      'PostRendererActionBar like button accessibility',
-                  })
-                : intl.formatMessage({
-                    defaultMessage: 'Unlike the post',
-                    description:
-                      'PostRendererActionBar unlike button accessibility',
-                  })
-            }
-          />
-        )}
-        {allowComments && (
-          <IconButton
-            icon="comment"
-            style={styles.icon}
-            onPress={goToComments}
-            variant="icon"
+            onPress={onShare}
             accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Comment the post',
+              defaultMessage: 'Share the post',
               description:
-                'PostRendererActionBar Comment post button accessibility',
+                'PostRendererActionBar Share post button accessibility',
             })}
           />
+        </View>
+        {allowLikes && (
+          <Text variant="smallbold">
+            <FormattedMessage
+              defaultMessage="{countReactions} likes"
+              description="PastRendererActionBar - Like Counter"
+              values={{ countReactions }}
+            />
+          </Text>
         )}
-        <IconButton
-          icon="share"
-          style={styles.icon}
-          variant="icon"
-          onPress={onShare}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Share the post',
-            description:
-              'PostRendererActionBar Share post button accessibility',
-          })}
-        />
       </View>
-      {allowLikes && (
-        <Text variant="smallbold">
-          <FormattedMessage
-            defaultMessage="{countReactions} likes"
-            description="PastRendererActionBar - Like Counter"
-            values={{ countReactions }}
-          />
-        </Text>
-      )}
-    </View>
+    </>
   );
 };
 
-export default PostRendererActionBar;
+export default memo(PostRendererActionBar);
 
 export const PostRendererActionBarSkeleton = () => {
   return (

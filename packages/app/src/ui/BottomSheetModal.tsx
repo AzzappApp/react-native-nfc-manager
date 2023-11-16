@@ -1,15 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { KeyboardAvoidingView, Modal, Platform, View } from 'react-native';
 import {
-  Animated,
-  KeyboardAvoidingView,
-  Modal,
-  PanResponder,
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
   TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+} from 'react-native-gesture-handler';
+import Animated, {
+  interpolate,
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
+import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from './Button';
 import Header from './Header';
@@ -46,6 +55,10 @@ export type BottomSheetModalProps = Omit<
    */
   contentContainerStyle?: StyleProp<ViewStyle>;
   /**
+   * The style of the header
+   */
+  headerStyle?: StyleProp<ViewStyle>;
+  /**
    *
    * disableGestureInteraction
    */
@@ -67,6 +80,8 @@ export type BottomSheetModalProps = Omit<
    * @see KeyboardAvoidingView
    */
   disableKeyboardAvoidingView?: boolean;
+
+  nestedScroll?: boolean;
 };
 
 // TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
@@ -85,40 +100,14 @@ const BottomSheetModal = ({
   variant,
   disableGestureInteraction,
   contentContainerStyle,
+  headerStyle,
   showGestureIndicator = true,
   onRequestClose,
   disableKeyboardAvoidingView,
+  nestedScroll = false,
   ...props
 }: BottomSheetModalProps) => {
-  const animation = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const [isVisible, setIsVisible] = useState(false);
-  const currentAnimationRef = useRef<Animated.CompositeAnimation | null>();
-
-  useEffect(() => {
-    let canceled = false;
-    if (visible) {
-      setIsVisible(true);
-    }
-    currentAnimationRef.current?.stop();
-    currentAnimationRef.current = Animated.spring(animation, {
-      toValue: visible ? 1 : 0,
-      useNativeDriver: true,
-      bounciness: 0,
-    });
-    currentAnimationRef.current.start(
-      !visible
-        ? () => {
-            if (!canceled) {
-              setIsVisible(false);
-            }
-          }
-        : undefined,
-    );
-    return () => {
-      canceled = false;
-    };
-  }, [animation, visible]);
-
   const insets = useScreenInsets();
   const intl = useIntl();
 
@@ -144,116 +133,165 @@ const BottomSheetModal = ({
     disableGestureInteractionRef.current = disableGestureInteraction;
   }, [disableGestureInteraction]);
 
-  // there is issue when the height is not known at the first render(if initial height is 0), it will crash on pandown
-  const createPanResponder = useCallback(
-    (height: number) => {
-      return PanResponder.create({
-        onStartShouldSetPanResponder: () =>
-          disableGestureInteractionRef.current !== true,
-        onPanResponderMove: (_, gestureState) => {
-          if (gestureState.dy > 0) {
-            if (height > 0) {
-              // division by zero (even if should not happened, it happened during dev and will crash the app)
-              animation.setValue(1 - gestureState.dy / height);
-            }
-          }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureState.dy > 0) {
-            if (gestureState.dy > height / 2) {
-              onRequestClose();
-            } else {
-              Animated.spring(animation, {
-                toValue: 1,
-                useNativeDriver: true,
-                bounciness: 0,
-              }).start();
-            }
-          }
-        },
-      });
-    },
-    [animation, onRequestClose],
-  );
-
-  const pan = useRef(createPanResponder(height));
+  const styles = useStyleSheet(styleSheet);
+  const translateY = useAnimatedState(isVisible);
+  const panTranslationY = useSharedValue(0);
 
   useEffect(() => {
-    pan.current = createPanResponder(height);
-  }, [createPanResponder, height, pan]);
+    if (visible != null) {
+      setIsVisible(visible);
+      if (!visible) {
+        panTranslationY.value = 0;
+      }
+    }
+  }, [panTranslationY, visible]);
 
-  const styles = useStyleSheet(styleSheet);
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(!disableGestureInteractionRef.current)
+        .onChange(e => {
+          panTranslationY.value = Math.max(0, e.translationY) / height;
+        })
+        .onEnd(() => {
+          if (panTranslationY.value > 0.5) {
+            panTranslationY.value = withSpring(1);
+          } else {
+            panTranslationY.value = withSpring(0);
+          }
+        }),
+
+    [height, panTranslationY],
+  );
+
+  useAnimatedReaction(
+    () => panTranslationY.value,
+    positionYValue => {
+      if (positionYValue !== null && positionYValue >= 1) {
+        runOnJS(onRequestClose)();
+      }
+    },
+  );
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            translateY.value - panTranslationY.value,
+            [0, 1],
+            [0, -(height + insets.bottom)],
+          ),
+        },
+      ],
+    };
+  });
+
+  const backgroundOpacity = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        translateY.value - panTranslationY.value,
+        [0, 1],
+        [0, 0.8],
+      ),
+    };
+  });
+
+  const content = useMemo(() => {
+    return (
+      <>
+        {!disableGestureInteraction && showGestureIndicator && (
+          <View
+            style={styles.gestureInteractionIndicator}
+            pointerEvents="box-none"
+          />
+        )}
+        {hasHeader && (
+          <Header
+            style={[styles.accessoryView, headerStyle]}
+            middleElement={headerTitle}
+            leftElement={headerLeftButton}
+            rightElement={headerRightButton}
+          />
+        )}
+        {children}
+      </>
+    );
+  }, [
+    children,
+    disableGestureInteraction,
+    hasHeader,
+    headerLeftButton,
+    headerRightButton,
+    headerStyle,
+    headerTitle,
+    showGestureIndicator,
+    styles.accessoryView,
+    styles.gestureInteractionIndicator,
+  ]);
 
   return (
     <Modal
       animationType="none"
       visible={isVisible}
-      onRequestClose={onRequestClose}
-      {...props}
       transparent
+      onRequestClose={onRequestClose}
+      pointerEvents="box-none"
+      {...props}
     >
-      <TouchableWithoutFeedback
-        style={styles.absoluteFill}
-        onPress={onRequestClose}
-      >
-        <View style={styles.absoluteFill}>
-          {variant === 'modal' && (
-            <Animated.View
-              style={[
-                styles.absoluteFill,
-                {
-                  backgroundColor: colors.black,
-                  opacity: animation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, 0.8],
-                  }),
-                },
-              ]}
-            />
-          )}
-        </View>
-      </TouchableWithoutFeedback>
-      <KeyboardAvoidingView
-        style={styles.modalContainer}
-        behavior="position"
-        contentContainerStyle={styles.absoluteFill}
-        enabled={!disableKeyboardAvoidingView}
-      >
-        <Animated.View
-          {...pan?.current.panHandlers}
-          style={[
-            styles.bottomSheetContainer,
-            {
-              height: height + insets.bottom,
-              paddingBottom: insets.bottom,
-            },
-            contentContainerStyle,
-            {
-              transform: [
-                {
-                  translateY: animation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -(height + insets.bottom)],
-                  }),
-                },
-              ],
-            },
-          ]}
+      {/* required for android */}
+      <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
+        <KeyboardAvoidingView
+          style={styles.modalContainer}
+          behavior="position"
+          contentContainerStyle={styles.absoluteFill}
+          enabled={!disableKeyboardAvoidingView}
         >
-          {!disableGestureInteraction && showGestureIndicator && (
-            <View style={styles.gestureInteractionIndicator} />
-          )}
-          {hasHeader && (
-            <Header
-              style={styles.accessoryView}
-              middleElement={headerTitle}
-              leftElement={headerLeftButton}
-              rightElement={headerRightButton}
-            />
-          )}
-          {children}
-        </Animated.View>
-      </KeyboardAvoidingView>
+          <TouchableWithoutFeedback
+            style={styles.absoluteFill}
+            onPress={onRequestClose}
+          >
+            <View style={styles.absoluteFill}>
+              {variant === 'modal' && (
+                <Animated.View
+                  style={[
+                    styles.absoluteFill,
+                    {
+                      backgroundColor: colors.black,
+                    },
+                    backgroundOpacity,
+                  ]}
+                />
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+          <Animated.View
+            style={[
+              styles.bottomSheetContainer,
+              {
+                height: height + insets.bottom,
+                paddingBottom: insets.bottom,
+              },
+              contentContainerStyle,
+              animatedStyle,
+            ]}
+          >
+            {nestedScroll && Platform.OS === 'android' ? (
+              <>
+                <GestureDetector gesture={panGesture}>
+                  <View style={styles.gestureViewAndroid} collapsable={false} />
+                </GestureDetector>
+                {content}
+              </>
+            ) : (
+              <GestureDetector gesture={panGesture}>
+                <View style={styles.gestureView}>{content}</View>
+              </GestureDetector>
+            )}
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </GestureHandlerRootView>
+      <Toast />
     </Modal>
   );
 };
@@ -268,6 +306,12 @@ const styleSheet = createStyleSheet(appearance => ({
     alignSelf: 'center',
     borderRadius: 2,
     marginBottom: 4,
+  },
+  gestureView: { flex: 1, backgroundColor: 'transparent' },
+  gestureViewAndroid: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
   },
   modalContainer: {
     flex: 1,

@@ -1,7 +1,12 @@
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { getAssetInfoAsync, getAssetsAsync } from 'expo-media-library';
-import { useCallback, useRef, useState, useEffect, memo } from 'react';
+import {
+  addListener,
+  getAssetInfoAsync,
+  getAssetsAsync,
+  removeAllListeners,
+} from 'expo-media-library';
+import { useCallback, useRef, useState, useEffect, memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions, View } from 'react-native';
 import { ScrollView, PanGestureHandler } from 'react-native-gesture-handler';
@@ -30,7 +35,6 @@ import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
 import type { Album, Asset } from 'expo-media-library';
 import type { LayoutChangeEvent } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-
 type PhotoGalleryMediaListProps = Omit<
   FlashListProps<Asset>,
   'children' | 'data' | 'onEndReached' | 'renderItem'
@@ -300,6 +304,23 @@ const PhotoGalleryMediaList = ({
     }
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaID]);
 
+  useEffect(() => {
+    addListener(() => {
+      load(true);
+    });
+
+    return () => {
+      removeAllListeners();
+    };
+  }, [load]);
+
+  const simultaneousHandlers = useMemo(
+    () => ({
+      simultaneousHandlers: panRef,
+    }),
+    [panRef],
+  );
+
   return (
     <PanGestureHandler onGestureEvent={eventHandler} ref={panRef}>
       <Animated.View
@@ -314,9 +335,7 @@ const PhotoGalleryMediaList = ({
       >
         <AnimatedFlashList
           ref={scrollViewRef}
-          overrideProps={{
-            simultaneousHandlers: panRef,
-          }}
+          overrideProps={simultaneousHandlers}
           numColumns={numColumns}
           data={medias}
           showsVerticalScrollIndicator={false}
@@ -327,9 +346,7 @@ const PhotoGalleryMediaList = ({
           onEndReached={onEndReached}
           accessibilityRole="list"
           contentContainerStyle={contentContainerStyle}
-          ItemSeparatorComponent={() => (
-            <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
-          )}
+          ItemSeparatorComponent={ItemSeparatorComponent}
           {...props}
           estimatedItemSize={itemHeight}
           renderScrollComponent={ScrollView}
@@ -401,6 +418,10 @@ const PhotoGalleyMediaItem = ({
     </PressableNative>
   );
 };
+
+const ItemSeparatorComponent = () => (
+  <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
+);
 
 const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
 

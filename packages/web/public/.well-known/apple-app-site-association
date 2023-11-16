@@ -1,0 +1,31 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "N349L99RA9.com.azzapp.azzapp",
+          "N349L99RA9.com.azzapp.azzapp-dev",
+          "N349L99RA9.com.azzapp.azzapp-staging"
+        ],
+        "components": [
+          {
+            "/": "/",
+            "comment": "Matches any root URL."
+          },
+          {
+            "/:profileID": "/:profileID",
+            "comment": "Matches any URL with a path that starts with /*. (profile)"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "N349L99RA9.com.azzapp.azzapp",
+      "N349L99RA9.com.azzapp.azzapp-dev",
+      "N349L99RA9.com.azzapp.azzapp-staging"
+    ]
+  }
+}

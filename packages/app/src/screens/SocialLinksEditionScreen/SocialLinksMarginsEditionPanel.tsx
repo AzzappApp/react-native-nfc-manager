@@ -68,14 +68,11 @@ const SocialLinksMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Top margin : {size}"
+              defaultMessage="Top margin :"
               description="Top margin message in SocialLinks edition"
-              values={{
-                size: marginTop,
-              }}
             />
           }
-          value={marginTop}
+          initialValue={marginTop}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_TOP}
           step={1}
@@ -94,14 +91,11 @@ const SocialLinksMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Bottom margin : {size}"
+              defaultMessage="Bottom margin :"
               description="Bottom margin message in SocialLinks edition"
-              values={{
-                size: marginBottom,
-              }}
             />
           }
-          value={marginBottom}
+          initialValue={marginBottom}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_BOTTOM}
           step={1}
@@ -121,14 +115,11 @@ const SocialLinksMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Horizontal margin : {size}"
+              defaultMessage="Horizontal margin :"
               description="Horizontal margin message in SocialLinks edition"
-              values={{
-                size: marginHorizontal,
-              }}
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL}
           step={1}

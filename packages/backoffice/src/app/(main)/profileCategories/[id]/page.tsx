@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import {
+  CardTemplateTypeTable,
   CompanyActivityTable,
   db,
   getCompanyActivitiesByProfileCategory,
@@ -25,6 +26,7 @@ const ProfileCategoryPage = async ({
     return notFound();
   }
   const companyActivities = await db.select().from(CompanyActivityTable);
+  const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
   const categoryCompanyActivities = await getCompanyActivitiesByProfileCategory(
     id,
   ).then(activities => activities.map(activity => activity.id));
@@ -34,6 +36,7 @@ const ProfileCategoryPage = async ({
       profileCategory={profileCategory}
       companyActivities={companyActivities}
       categoryCompanyActivities={categoryCompanyActivities}
+      cardTemplateTypes={cardTemplateTypes}
       saved={!!searchParams?.saved}
     />
   );

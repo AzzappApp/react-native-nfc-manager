@@ -21,10 +21,12 @@ import type {
 } from '@azzapp/data/domains';
 
 export const saveProfileCategory = async (
-  data: { activities?: Array<string | { id: string }> } & (
-    | NewProfileCategory
-    | ProfileCategory
-  ),
+  data: {
+    cardTemplateType?: { id: string };
+  } & { activities?: Array<string | { id: string }> } & (
+      | NewProfileCategory
+      | ProfileCategory
+    ),
 ) => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
@@ -44,7 +46,8 @@ export const saveProfileCategory = async (
 
   try {
     profileCategoryId = await db.transaction(async trx => {
-      const { id, activities, ...profileCategoryData } = data;
+      const { id, activities, cardTemplateType, ...profileCategoryData } = data;
+
       let profileCategoryId: string;
       if (id) {
         const oldCategory = await getProfileCategoryById(id);
@@ -56,13 +59,18 @@ export const saveProfileCategory = async (
         profileCategoryId = id;
         await trx
           .update(ProfileCategoryTable)
-          .set(profileCategoryData)
+          .set({
+            ...profileCategoryData,
+            cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+          })
           .where(eq(ProfileCategoryTable.id, id));
       } else {
         profileCategoryId = createId();
-        await trx
-          .insert(ProfileCategoryTable)
-          .values({ ...profileCategoryData, id: profileCategoryId });
+        await trx.insert(ProfileCategoryTable).values({
+          ...profileCategoryData,
+          cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+          id: profileCategoryId,
+        });
       }
 
       await referencesMedias(profileCategoryData.medias, previousMedias, trx);
@@ -76,6 +84,7 @@ export const saveProfileCategory = async (
             activitiesToCreate.push({
               id,
               labels: { en: activity },
+              cardTemplateTypeId: data.cardTemplateType?.id ?? null,
             });
             categoriesToAssociate.push(id);
           } else {

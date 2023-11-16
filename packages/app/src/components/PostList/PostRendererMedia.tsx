@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
@@ -46,7 +46,7 @@ export type PostRendererMediaProps = ViewProps & {
    */
   paused?: boolean;
   /**
-   * iniital time of the video
+   * initial time of the video
    *
    * @type {(number | null)}
    */
@@ -92,13 +92,19 @@ const PostRendererMedia = (
           type: "Float!"
           provider: "../providers/PixelRatio.relayprovider"
         }
+        videoPixelRatio: {
+          type: "Float!"
+          provider: "../providers/VideoPixelRatio.relayprovider"
+        }
       ) {
         media {
           __typename
           id
           aspectRatio
-          largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallURI: uri(width: $postWith, pixelRatio: $cappedPixelRatio)
+          ... on MediaImage {
+            largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          }
           ... on MediaVideo {
             largeThumbnail: thumbnail(
               width: $screenWidth
@@ -108,6 +114,7 @@ const PostRendererMedia = (
               width: $postWith
               pixelRatio: $cappedPixelRatio
             )
+            largeURI: uri(width: $screenWidth, pixelRatio: $videoPixelRatio)
           }
         }
       }
@@ -127,58 +134,49 @@ const PostRendererMedia = (
     },
   } = post;
 
+  const source = useMemo(
+    () => ({
+      uri: small ? smallURI : largeURI!,
+      mediaId: id,
+      requestedSize: width,
+    }),
+    [small, smallURI, largeURI, id, width],
+  );
+
+  const style = useMemo(
+    () => ({
+      aspectRatio,
+    }),
+    [aspectRatio],
+  );
+
   return (
     <View {...props} style={styles.mediaContainer}>
       {__typename === 'MediaVideo' ? (
-        videoDisabled ? (
-          <>
-            <MediaImageRenderer
-              ref={forwardedRef as any}
-              source={{
-                uri: small ? smallThumbnail! : largeThumbnail!,
-                mediaId: id,
-                requestedSize: width,
-              }}
-              isVideo
-              // TODO alt generation by cloudinary AI ? include text in small format ?
-              alt={`This is an image posted`}
-              aspectRatio={aspectRatio}
-              onReadyForDisplay={onReady}
-              testID="PostRendererMedia_media"
-            />
-            {/* Play iconicon */}
-            <Icon icon="play" style={styles.playIcon} />
-          </>
-        ) : (
+        <>
           <MediaVideoRenderer
             ref={forwardedRef as any}
-            source={{
-              uri: small ? smallURI : largeURI,
-              mediaId: id,
-              requestedSize: width,
-            }}
+            source={source}
             // TODO alt generation by cloudinary AI ? include text in small format ?
             alt={`This is a video posted`}
             thumbnailURI={small ? smallThumbnail : largeThumbnail}
-            aspectRatio={aspectRatio}
+            style={style}
             muted={muted}
             paused={paused}
             currentTime={initialTime}
             onReadyForDisplay={onReady}
             testID="PostRendererMedia_media"
+            videoEnabled={!videoDisabled}
           />
-        )
+          {videoDisabled ? <Icon icon="play" style={styles.playIcon} /> : null}
+        </>
       ) : (
         <MediaImageRenderer
           ref={forwardedRef as any}
-          source={{
-            uri: small ? smallURI : largeURI,
-            mediaId: id,
-            requestedSize: width,
-          }}
+          source={source}
           // TODO alt generation by cloudinary AI ? include text in small format ?
           alt={`This is an image posted`}
-          aspectRatio={aspectRatio}
+          style={style}
           onReadyForDisplay={onReady}
           testID="PostRendererMedia_media"
         />

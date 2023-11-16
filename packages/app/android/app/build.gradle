@@ -1,8 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
-import com.android.build.OutputFile
-
 def reactNativePath = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath()
 
 /**
@@ -15,8 +13,8 @@ react {
     // root = file("../")
     //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
     reactNativeDir =   file("${reactNativePath}")
-    //   The folder where the react-native Codegen package is. Default is ../node_modules/react-native-codegen
-    codegenDir =  file("${reactNativePath}/../react-native-codegen")
+    //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
+	codegenDir = file("${reactNativePath}/../@react-native/codegen")
     //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
     cliFile = file("${reactNativePath}/cli.js")
 
@@ -55,14 +53,6 @@ react {
 }
 
 /**
- * Set this to true to create four separate APKs instead of one,
- * one for each native architecture. This is useful if you don't
- * use App Bundles (https://developer.android.com/guide/app-bundle/)
- * and want to have separate APKs to upload to the Play Store.
- */
-def enableSeparateBuildPerCPUArchitecture = false
-
-/**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
 def enableProguardInReleaseBuilds = false
@@ -80,16 +70,6 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
-/**
- * Private function to get the list of Native Architectures you want to build.
- * This reads the value from reactNativeArchitectures in your gradle.properties
- * file and works together with the --active-arch-only flag of react-native run-android.
- */
-def reactNativeArchitectures() {
-    def value = project.getProperties().get("reactNativeArchitectures")
-    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
-}
-
 apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -101,18 +81,10 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4001
-        versionName "0.4.1-rc.0"
+        versionCode 5001
+        versionName "0.5.1-rc.0"
     }
 
-    splits {
-        abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include (*reactNativeArchitectures())
-        }
-    }
     flavorDimensions "env"
     productFlavors {
         production {
@@ -154,26 +126,11 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
-    // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // https://developer.android.com/studio/build/configure-apk-splits.html
-            // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        defaultConfig.versionCode * 1000 + versionCodes.get(abi)
-            }
-
-        }
-    }
 }
 
 ext {
     REACT_NATIVE_NODE_MODULES_DIR = reactNativePath
+    MEDIA3_VERSION = "1.1.1"
 }
 
 apply plugin: "kotlin-android"
@@ -181,8 +138,6 @@ apply plugin: "kotlin-android"
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
@@ -201,15 +156,19 @@ dependencies {
     // TODO https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
+    // Selfie segmentation mlkit
+    implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta4'
+    
     // glide dependencies
     implementation "com.github.bumptech.glide:glide:4.14.2"
     implementation "com.github.bumptech.glide:okhttp3-integration:4.14.2"
     annotationProcessor "com.github.bumptech.glide:compiler:4.14.2"
 
     // exoplayer dependencies
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
-    implementation 'com.google.android.exoplayer:exoplayer-transformer:2.18.2'
-    implementation 'com.google.android.exoplayer:exoplayer-effect:2.18.2'
+    implementation "androidx.media3:media3-exoplayer:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-transformer:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-datasource:${MEDIA3_VERSION}"
+    implementation "androidx.media3:media3-effect:${MEDIA3_VERSION}"
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {

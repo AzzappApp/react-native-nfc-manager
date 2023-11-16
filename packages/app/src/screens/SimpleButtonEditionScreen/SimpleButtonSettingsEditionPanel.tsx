@@ -200,13 +200,13 @@ const SimpleButtonSettingsEditionPanel = ({
 
   const onFocus = () => {
     if (actionType === 'link' && !isNotFalsyString(actionLink)) {
-      onActionLinkChange('http://');
+      onActionLinkChange('https://');
     }
   };
 
   const onBlur = () => {
     if (actionType === 'link' && !actionLink.startsWith('http')) {
-      onActionLinkChange(`http://${actionLink}`);
+      onActionLinkChange(`https://${actionLink}`);
     }
   };
 
@@ -259,6 +259,7 @@ const SimpleButtonSettingsEditionPanel = ({
             style={{ flex: 1 }}
             onFocus={onFocus}
             onBlur={onBlur}
+            autoCapitalize="none"
           />
         </View>
         <View style={styles.buttonContainer}>
@@ -277,14 +278,11 @@ const SimpleButtonSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Font size : {size}"
+              defaultMessage="Font size :"
               description="fontSize message in SimpleButton edition"
-              values={{
-                size: fontSize,
-              }}
             />
           }
-          value={fontSize}
+          initialValue={fontSize}
           min={SIMPLE_BUTTON_MIN_FONT_SIZE}
           max={SIMPLE_BUTTON_MAX_FONT_SIZE}
           step={1}

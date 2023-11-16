@@ -4,8 +4,8 @@ import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import { SOCIAL_LINKS } from '#components/cardModules/SocialLinksRenderer';
 import SortableList from '#components/SortableScrollView/SortableScrollView';
+import { SOCIAL_LINKS } from '#helpers/socialLinkHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
@@ -101,7 +101,7 @@ const SocialLinksLinksEditionPanel = ({
 
   const renderItem = (
     item: {
-      id: string;
+      id: SocialIcons;
       link?: string | undefined;
       position: number;
       mask: string;
@@ -109,6 +109,13 @@ const SocialLinksLinksEditionPanel = ({
     panGesture: PanGesture,
   ) => {
     const value = links.find(link => link?.socialId === item.id)?.link ?? '';
+
+    const onFocus = () => {
+      if (item.id === 'website' && !isNotFalsyString(item.link)) {
+        onChangeLink(item.id, 'https://');
+      }
+    };
+
     return (
       <View
         key={item.id}
@@ -143,6 +150,7 @@ const SocialLinksLinksEditionPanel = ({
           onChangeText={link => onChangeLink(item.id as SocialIcons, link)}
           autoCapitalize="none"
           inputStyle={{ paddingLeft: 0 }}
+          onPressIn={onFocus}
         />
         <GestureDetector gesture={panGesture}>
           <Icon icon="menu" style={{ tintColor: colors.grey400 }} />
@@ -187,7 +195,7 @@ const SocialLinksLinksEditionPanel = ({
         })}
       />
       <SortableList<{
-        id: string;
+        id: SocialIcons;
         link?: string | undefined;
         position: number;
         mask: string;

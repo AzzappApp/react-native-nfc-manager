@@ -1,42 +1,30 @@
-import { useMemo, type ReactElement, useEffect, useRef } from 'react';
-import { View, type ViewProps } from 'react-native';
-import PagerView from 'react-native-pager-view';
+import { StyleSheet, View } from 'react-native';
+import type { ReactElement } from 'react';
+import type { ViewProps } from 'react-native';
 
 export type TabViewProps = Omit<ViewProps, 'children'> & {
   currentTab: string;
   tabs: Array<{ id: string; element: ReactElement }>;
 };
 
-const TabView = ({ tabs, currentTab, ...props }: TabViewProps) => {
-  const initialPage = useMemo(
-    () => tabs.findIndex(({ id }) => id === currentTab),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+const TabView = ({ tabs, currentTab, style, ...props }: TabViewProps) => (
+  <View {...props} style={[{ overflow: 'hidden' }, style]}>
+    {tabs.map(({ id, element }) => (
+      <View
+        key={id}
+        style={[
+          StyleSheet.absoluteFill,
+          id !== currentTab && { opacity: 0, zIndex: -1 },
+        ]}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: id === currentTab }}
+        aria-hidden={id !== currentTab}
+        pointerEvents={id === currentTab ? 'auto' : 'none'}
+      >
+        {element}
+      </View>
+    ))}
+  </View>
+);
 
-  const tabRef = useRef<PagerView>(null);
-  const lastPage = useRef<number>(initialPage);
-  useEffect(() => {
-    const nextPage = tabs.findIndex(({ id }) => id === currentTab);
-    if (nextPage !== lastPage.current) {
-      tabRef.current?.setPageWithoutAnimation(nextPage);
-      lastPage.current = nextPage;
-    }
-  }, [currentTab, initialPage, tabs]);
-
-  return (
-    <PagerView
-      ref={tabRef}
-      scrollEnabled={false}
-      {...props}
-      initialPage={initialPage}
-    >
-      {tabs.map(({ id, element }) => (
-        <View key={id} style={{ flex: 1 }} collapsable={false}>
-          {element}
-        </View>
-      ))}
-    </PagerView>
-  );
-};
 export default TabView;

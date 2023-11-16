@@ -1,18 +1,20 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+
 import { graphql, useFragment } from 'react-relay';
-import { useDebounce } from 'use-debounce';
+import { useDebouncedCallback } from 'use-debounce';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
-import useToggle from '#hooks/useToggle';
+import BlurredFloatingButton, {
+  BlurredFloatingIconButton,
+} from '#ui/BlurredFloatingButton';
 import FloatingButton from '#ui/FloatingButton';
-import FloatingIconButton from '#ui/FloatingIconButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './ProfileScreenTransitions';
 import type { ProfileScreenButtonBar_profile$key } from '@azzapp/relay/artifacts/ProfileScreenButtonBar_profile.graphql';
@@ -46,11 +48,15 @@ type ProfileScreenButtonBarProps = ViewProps & {
   /**
    * A callback called when the user press the follow button
    */
-  onToggleFollow: (follow: boolean) => void;
+  onToggleFollow: (
+    profileId: string,
+    userName: string,
+    follow: boolean,
+  ) => void;
   /**
    * A callback called when the user press flip button
    */
-  onFlip: () => void;
+  onFlip?: () => void;
   /**
    * A callback called when the user press the more ... button
    */
@@ -80,12 +86,12 @@ const ProfileScreenButtonBar = ({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: interpolate(
-        editTransition.value,
+        editTransition?.value ?? 0,
         [0, 0.2, 0.8, 1],
         [1, 0.1, 0.0, 0],
       ),
     };
-  }, [editTransition.value]);
+  }, [editTransition?.value]);
 
   return (
     <Animated.View
@@ -93,7 +99,7 @@ const ProfileScreenButtonBar = ({
       {...props}
       pointerEvents={editing ? 'none' : 'box-none'}
     >
-      <FloatingIconButton
+      <BlurredFloatingIconButton
         icon="azzapp"
         onPress={onHome}
         iconSize={26}
@@ -118,7 +124,7 @@ const ProfileScreenButtonBar = ({
           onShowWebcardModal={onShowWebcardModal}
         />
       </Suspense>
-      <FloatingIconButton
+      <BlurredFloatingIconButton
         icon="flip"
         iconSize={26}
         iconStyle={{ tintColor: colors.white }}
@@ -137,7 +143,11 @@ type ProfileScreenButtonActionButtonProps = {
   isViewer: boolean;
   isWebCardDisplayed: boolean;
   onEdit: () => void;
-  onToggleFollow: (follow: boolean) => void;
+  onToggleFollow: (
+    profileId: string,
+    userName: string,
+    follow: boolean,
+  ) => void;
   /**
    * A callback called when the user press the more ... button
    */
@@ -155,37 +165,17 @@ const ProfileScreenButtonActionButton = ({
   const profile = useFragment(
     graphql`
       fragment ProfileScreenButtonBar_profile on Profile {
+        id
+        userName
         isFollowing
       }
     `,
     profileKey,
   );
 
-  //we want to prevent debounced effect when following profiles is updated elsewhere
-  const isFollowingValue = useRef(Boolean(profile?.isFollowing));
-
-  const [isFollowing, toggleFollowing, setFollowing] = useToggle(
-    Boolean(profile?.isFollowing),
-  );
-
-  const [debouncedIsFollowing] = useDebounce(isFollowing, 600);
-
-  useEffect(() => {
-    if (isFollowingValue.current === Boolean(profile?.isFollowing)) {
-      if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
-        onToggleFollow(debouncedIsFollowing);
-      }
-    } else {
-      isFollowingValue.current = Boolean(profile?.isFollowing);
-      setFollowing(Boolean(profile?.isFollowing));
-    }
-  }, [
-    debouncedIsFollowing,
-    onToggleFollow,
-    profile?.isFollowing,
-    setFollowing,
-    toggleFollowing,
-  ]);
+  const debouncedToggleFollowing = useDebouncedCallback(() => {
+    onToggleFollow(profile.id, profile.userName, !profile.isFollowing);
+  }, 600);
 
   const intl = useIntl();
 
@@ -196,7 +186,7 @@ const ProfileScreenButtonActionButton = ({
 
   return isViewer ? (
     isWebCardDisplayed ? (
-      <FloatingButton
+      <BlurredFloatingButton
         onPress={onEdit}
         style={styles.mainButton}
         variant="grey"
@@ -211,9 +201,9 @@ const ProfileScreenButtonActionButton = ({
             description="Build my webcard button label in Profile Screen Button Bar"
           />
         </Text>
-      </FloatingButton>
+      </BlurredFloatingButton>
     ) : (
-      <FloatingButton
+      <BlurredFloatingButton
         variant="grey"
         onPress={onCreateNewPost}
         style={styles.mainButton}
@@ -228,12 +218,12 @@ const ProfileScreenButtonActionButton = ({
             description="Profile post create a new post"
           />
         </Text>
-      </FloatingButton>
+      </BlurredFloatingButton>
     )
   ) : (
     <View style={{ flexDirection: 'row', flex: 1 }}>
-      <FloatingButton
-        onPress={toggleFollowing}
+      <BlurredFloatingButton
+        onPress={debouncedToggleFollowing}
         style={styles.mainButton}
         variant="grey"
         accessibilityLabel={intl.formatMessage({
@@ -242,7 +232,7 @@ const ProfileScreenButtonActionButton = ({
         })}
       >
         <Text variant="button" style={styles.textButton}>
-          {isFollowing ? (
+          {profile.isFollowing ? (
             <FormattedMessage
               defaultMessage="Unfollow"
               description="Unfollow button label in Profile Screen Button Bar"
@@ -254,8 +244,8 @@ const ProfileScreenButtonActionButton = ({
             />
           )}
         </Text>
-      </FloatingButton>
-      <FloatingIconButton
+      </BlurredFloatingButton>
+      <BlurredFloatingIconButton
         icon="more"
         variant="grey"
         onPress={onShowWebcardModal}

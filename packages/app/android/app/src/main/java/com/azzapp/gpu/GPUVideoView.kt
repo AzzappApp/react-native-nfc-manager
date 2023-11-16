@@ -1,5 +1,6 @@
 package com.azzapp.gpu
 
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.media.effect.EffectContext
 import android.opengl.GLES20
@@ -9,25 +10,28 @@ import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import android.widget.FrameLayout
-import com.azzapp.media.MediaVideoRendererManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.video.VideoSize
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.common.util.UnstableApi
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.round
 
 
-class GPUVideoView(private val reactContext: ThemedReactContext) :
+@UnstableApi class GPUVideoView(private val reactContext: ThemedReactContext) :
   FrameLayout(reactContext),
   LifecycleEventListener,
   GLSurfaceView.Renderer,
@@ -48,6 +52,9 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
   private val externalTextureTransformMatrix: FloatArray = FloatArray(16)
   private var frameBuffer: Int? = null
   private var externalTextureRenderer: TextureRenderer? = null
+  private var lutBitmap: Bitmap? = null
+  private var lutImage: GLFrame? = null
+  private var colorLutEffect: ColorLUTEffect? = null;
   private var image: GLFrame? = null
   private var transformedImage: GLFrame? = null
   private var textureRenderer: TextureRenderer? = null
@@ -59,8 +66,8 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
     surfaceView.setEGLContextClientVersion(2)
     surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
     surfaceView.setRenderer(this)
-    surfaceView. preserveEGLContextOnPause = true
-    surfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+    surfaceView.setPreserveEGLContextOnPause(true)
+    surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY)
   }
 
   private var _paused = false
@@ -94,10 +101,20 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
     }
     val newLayer = layers?.last { it.source.kind === GPULayer.GPULayerKind.VIDEO }
     var oldUri = layer?.source?.uri
+    var oldStartTime = layer?.source?.startTime
+    var oldDuration = layer?.source?.duration
+
+    val oldLutFilterUri = layer?.lutFilterUri
     layer = newLayer;
-    if (oldUri == layer?.source?.uri) {
+
+    if (oldLutFilterUri != layer?.lutFilterUri) {
+      loadLutBitmapIfNecessary()
+    }
+
+    if (oldUri == layer?.source?.uri &&  oldDuration == layer?.source?.duration && oldStartTime == layer?.source?.startTime) {
       return
     }
+
     this.initPlayer()
   }
 
@@ -223,19 +240,24 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
         image = this.transformedImage ?: image
       }
 
-      val filters = layer?.filters
-      if (filters != null) {
-        for (filter in filters!!) {
-          val transform = GLFrameTransformations.transformationForName(filter)
-          if (transform != null) {
-            this.transformedImage = transform(
-              image,
-              this.transformedImage,
-              null,
-              effectContext!!.factory
-            )
-            image = this.transformedImage ?: image
-          }
+      val lutBitmap = lutBitmap
+      if (lutBitmap != null && lutImage == null) {
+        lutImage = GLFrame.create(lutBitmap.width, lutBitmap.height)
+        ShaderUtils.bindImageTexture(lutImage!!.texture, lutBitmap)
+      }
+      val lutImage = lutImage
+      if (lutImage != null) {
+        if (colorLutEffect == null) {
+          colorLutEffect = ColorLUTEffect()
+        }
+        val imageWithLut = colorLutEffect?.apply(
+          image,
+          lutImage,
+        )
+        if (imageWithLut != null) {
+          this.transformedImage?.release()
+          this.transformedImage = imageWithLut
+          image = this.transformedImage ?: image
         }
       }
     }
@@ -276,7 +298,7 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
       event.putDouble("currentTime", currentPosition / 1000.0)
       eventListener.receiveEvent(
         this.id,
-        MediaVideoRendererManager.ON_PROGRESS,
+        GPUVideoViewManager.ON_PROGRESS,
         event
       )
     }
@@ -334,8 +356,16 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
       player.stop()
       player.removeMediaItem(0)
     }
-    val mediaItem = MediaItem.fromUri(uri)
-    player.addMediaItem(mediaItem)
+    val mediaItemBuilder = MediaItem.Builder().setUri(uri)
+    if(layer?.source?.startTime != null){
+      val start = layer!!.source.startTime!!.toLong() * 1000L;
+      mediaItemBuilder.setClippingConfiguration(
+              MediaItem.ClippingConfiguration.Builder().setStartPositionMs(start).setEndPositionMs(start + layer!!.source.duration!!.toLong() * 1000L).build()
+      )
+    }
+
+    player.addMediaItem(mediaItemBuilder.build())
+
     player.prepare()
 
     if (surface != null) {
@@ -352,6 +382,21 @@ class GPUVideoView(private val reactContext: ThemedReactContext) :
   private fun releaseSurface(oldSurfaceTexture: SurfaceTexture?, oldSurface: Surface?) {
     oldSurfaceTexture?.release()
     oldSurface?.release()
+  }
+
+
+  private var loadLutJob: Deferred<Any>? = null
+  private fun loadLutBitmapIfNecessary() {
+    loadLutJob?.cancel()
+    lutBitmap = null
+    lutImage?.release()
+    lutImage = null
+    val lutFilterUri = layer?.lutFilterUri;
+    if (lutFilterUri != null) {
+      loadLutJob = GlobalScope.async {
+        lutBitmap = GPULayerImageLoader.loadImage(lutFilterUri)
+      }
+    }
   }
 
   companion object {

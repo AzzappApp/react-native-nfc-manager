@@ -18,7 +18,7 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
-import type { ColorPalette } from '../coverEditorTypes';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   TextOrientation,
   TextPosition,
@@ -248,14 +248,14 @@ const CECTitlePanel = ({
         </View>
 
         <LabeledDashedSlider
+          key={`${currentTab}-fontSize`}
           label={
             <FormattedMessage
-              defaultMessage="Font size : {fontSize}"
+              defaultMessage="Font size :"
               description="Font size message in cover edition"
-              values={{ fontSize }}
             />
           }
-          value={fontSize}
+          initialValue={fontSize}
           min={COVER_MIN_FONT_SIZE}
           max={COVER_MAX_FONT_SIZE}
           step={1}

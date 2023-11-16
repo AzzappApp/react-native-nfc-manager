@@ -8,14 +8,10 @@ import useToggleFollow from '#hooks/useToggleFollow';
 import type { FollowingsScreenList_viewer$key } from '@azzapp/relay/artifacts/FollowingsScreenList_viewer.graphql';
 
 type FollowingsListProps = {
-  currentProfileId: string;
   viewer: FollowingsScreenList_viewer$key;
 };
 
-const FollowingsScreenList = ({
-  currentProfileId,
-  viewer: viewerKey,
-}: FollowingsListProps) => {
+const FollowingsScreenList = ({ viewer: viewerKey }: FollowingsListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
@@ -53,7 +49,7 @@ const FollowingsScreenList = ({
 
   const [debouncedSearch] = useDebounce(searchValue, 300);
 
-  const toggleFollow = useToggleFollow(currentProfileId, debouncedSearch);
+  const toggleFollow = useToggleFollow(debouncedSearch);
 
   useEffect(() => {
     if (debouncedSearch) {

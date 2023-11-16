@@ -4,16 +4,18 @@ import {
   getMediasByIds,
   buildDefaultContactCard,
 } from '@azzapp/data/domains';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal } from '@azzapp/shared/crypto';
-import {
-  getImageURLForSize,
-  getVideoThumbnailURL,
-} from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
-import logo from '@azzapp/web/public/pass/logo.png';
-import logo2x from '@azzapp/web/public/pass/logo@2x.png';
+import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
+import icon2x from '@azzapp/web/public/pass/ICON_PADDING_15@2x.png';
+import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
+import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
 import { convertHexToRGBA } from '../color';
+
+const getCoverUrl = (userName: string, size: number) =>
+  `${process.env.NEXT_PUBLIC_URL}api/cover/${userName}?width=${size}&height=${size}&keepAspectRatio=left_pad`;
 
 export const buildApplePass = async (profileId: string, locale: string) => {
   const profile = await getProfileById(profileId);
@@ -26,29 +28,17 @@ export const buildApplePass = async (profileId: string, locale: string) => {
 
     if (media) {
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] =
-        media?.kind === 'video'
-          ? await Promise.allSettled([
-              fetch(getVideoThumbnailURL(media.id, 90)).then(res =>
-                res.arrayBuffer(),
-              ),
-              fetch(getVideoThumbnailURL(media.id, 90 * 2)).then(res =>
-                res.arrayBuffer(),
-              ),
-              fetch(getVideoThumbnailURL(media.id, 90 * 3)).then(res =>
-                res.arrayBuffer(),
-              ),
-            ])
-          : await Promise.allSettled([
-              fetch(getImageURLForSize(media.id, 90)).then(res =>
-                res.arrayBuffer(),
-              ),
-              fetch(getImageURLForSize(media.id, 90 * 2)).then(res =>
-                res.arrayBuffer(),
-              ),
-              fetch(getImageURLForSize(media.id, 90 * 3)).then(res =>
-                res.arrayBuffer(),
-              ),
-            ]);
+        await Promise.allSettled([
+          fetch(getCoverUrl(profile.userName, 90)).then(res =>
+            res.arrayBuffer(),
+          ),
+          fetch(getCoverUrl(profile.userName, 90 * 2)).then(res =>
+            res.arrayBuffer(),
+          ),
+          fetch(getCoverUrl(profile.userName, 90 * 3)).then(res =>
+            res.arrayBuffer(),
+          ),
+        ]);
 
       if (thumbnailUrl.status === 'fulfilled') {
         thumbnails['thumbnail.png'] = Buffer.from(thumbnailUrl.value);
@@ -67,20 +57,32 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       contactCard = await buildDefaultContactCard(profile);
     }
 
-    const [logoContent, logo2xContent] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_URL}${logo.src}`).then(res =>
-        res.arrayBuffer(),
-      ),
-      fetch(`${process.env.NEXT_PUBLIC_URL}${logo2x.src}`).then(res =>
-        res.arrayBuffer(),
-      ),
-    ]);
+    const [iconContent, icon2xContent, logoContent, logo2xContent] =
+      await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_URL}${icon.src}`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${process.env.NEXT_PUBLIC_URL}${icon2x.src}`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${process.env.NEXT_PUBLIC_URL}${logo.src}`).then(res =>
+          res.arrayBuffer(),
+        ),
+        fetch(`${process.env.NEXT_PUBLIC_URL}${logo2x.src}`).then(res =>
+          res.arrayBuffer(),
+        ),
+      ]);
 
     const primary = profile.cardColors?.primary;
+
+    const backgroundColor = primary
+      ? convertHexToRGBA(primary)
+      : 'rgb(0, 0, 0)';
+
     const pass = new PKPass(
       {
-        'icon.png': Buffer.from(logoContent),
-        'icon@2x.png': Buffer.from(logo2xContent),
+        'icon.png': Buffer.from(iconContent),
+        'icon@2x.png': Buffer.from(icon2xContent),
         'logo.png': Buffer.from(logoContent),
         'logo@2x.png': Buffer.from(logo2xContent),
         ...thumbnails,
@@ -102,10 +104,9 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         teamIdentifier: process.env.APPLE_TEAM_IDENTIFIER ?? '',
         organizationName: process.env.APPLE_ORGANIZATION_NAME ?? '',
         description: 'Contact Card',
-        foregroundColor: 'rgb(255, 255, 255)',
-        backgroundColor: primary ? convertHexToRGBA(primary) : 'rgb(0, 0, 0)',
-        labelColor: 'rgb(255, 255, 255)',
-        logoText: 'azzapp',
+        foregroundColor: convertHexToRGBA(getTextColor(backgroundColor)),
+        backgroundColor,
+        labelColor: convertHexToRGBA(getTextColor(backgroundColor)),
         suppressStripShine: false,
         serialNumber: profile?.id,
         webServiceURL: `${process.env.NEXT_PUBLIC_URL}api/${locale}/wallet/apple/`,

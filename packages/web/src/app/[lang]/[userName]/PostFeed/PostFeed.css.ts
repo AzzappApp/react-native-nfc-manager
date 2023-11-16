@@ -3,7 +3,7 @@ import { MediaQuery, textSmall, vars } from '#app/theme.css';
 
 const wrapper = style({
   width: '100%',
-  height: '100%',
+  height: '100vh',
   backgroundColor: vars.color.white,
   overflowY: 'scroll',
   '::-webkit-scrollbar': {

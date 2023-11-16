@@ -1,0 +1,11 @@
+extend type Mutation {
+  deletePostComment(input: DeletePostCommentInput!): DeletePostCommentPayload!
+}
+
+input DeletePostCommentInput {
+  commentId: ID!
+}
+
+type DeletePostCommentPayload {
+  commentId: ID!
+}

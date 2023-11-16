@@ -1,23 +1,24 @@
-import { Suspense, useCallback, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Suspense, memo, useCallback, useRef, useState } from 'react';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackground';
 import WebCardColorPicker from '#components/WebCardColorPicker';
-import Button from '#ui/Button';
-import Text from '#ui/Text';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import ProfileScreenBody from './ProfileScreenBody';
+import ProfileScreenEditModeFooter, {
+  PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
+} from './ProfileScreenEditModeFooter';
 import ProfileScreenFooter from './ProfileScreenFooter';
 import ProfileScreenHeader from './ProfileScreenHeader';
 import ProfileScreenScrollView from './ProfileScreenScrollView';
@@ -92,6 +93,7 @@ const ProfileScreenContent = ({
         ...WebCardColorPicker_profile
         ...WebCardBackground_profile
         ...PreviewModal_viewer
+        ...LoadCardTemplateModal_profile
         cardCover {
           backgroundColor
         }
@@ -156,12 +158,19 @@ const ProfileScreenContent = ({
   // #endregion
 
   // #region Module edition
+  const [allBlockLoaded, setAllBlockLoaded] = useState(false);
+  const onProfileBodyLoad = useCallback(() => {
+    setAllBlockLoaded(true);
+  }, []);
+
   const onEditModule = useCallback(
     (module: ModuleKind, moduleId: string) => {
       if (!MODULE_KINDS.includes(module)) {
         // unhanded module kind could be a future addition
         return;
       }
+      //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
+      Toast.hide();
       router.push({
         route: 'CARD_MODULE_EDITION',
         params: {
@@ -174,6 +183,8 @@ const ProfileScreenContent = ({
   );
 
   const onEditCover = useCallback(() => {
+    //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
+    Toast.hide();
     router.push({
       route: 'COVER_EDITION',
     });
@@ -211,6 +222,11 @@ const ProfileScreenContent = ({
     onToggleSelectionMode();
   }, [onToggleSelectionMode]);
 
+  const onDuplicateSelectedModules = useCallback(() => {
+    profileBodyRef.current?.duplicateSelectedModules();
+    onToggleSelectionMode();
+  }, [onToggleSelectionMode]);
+
   const onToggleSelectedModulesVisibility = useCallback(
     (visible: boolean) => {
       profileBodyRef.current?.toggleSelectedModulesVisibility(visible);
@@ -242,8 +258,6 @@ const ProfileScreenContent = ({
   }, []);
   // #endregion
 
-  const [modulesCount, setModulesCount] = useState(1);
-
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const atTop = event.nativeEvent.contentOffset.y < 5;
@@ -262,11 +276,11 @@ const ProfileScreenContent = ({
 
   const backgroundStyle = useAnimatedStyle(() => {
     return {
-      opacity: 1 - editTransiton.value,
+      opacity: 1 - (editTransiton?.value ?? 0),
     };
   }, []);
 
-  const intl = useIntl();
+  const hasFocus = useScreenHasFocus();
 
   return (
     <>
@@ -285,11 +299,16 @@ const ProfileScreenContent = ({
         />
         <ProfileScreenScrollView
           editing={editing}
-          ready={ready}
-          blocksCount={modulesCount + 1}
+          allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
+          editFooter={
+            <ProfileScreenEditModeFooter setLoadTemplate={setLoadTemplate} />
+          }
+          editFooterHeight={PROFILE_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
         >
           <ProfileBlockContainer
+            id="cover"
+            index={0}
             backgroundColor={coverBackgroundColor}
             editing={editing}
             displayEditionButtons={false}
@@ -298,7 +317,7 @@ const ProfileScreenContent = ({
             <CoverRenderer
               profile={profile}
               width={windowSize}
-              videoEnabled={ready}
+              videoEnabled={ready && hasFocus}
               hideBorderRadius
             />
           </ProfileBlockContainer>
@@ -310,31 +329,8 @@ const ProfileScreenContent = ({
               selectionMode={selectionMode}
               onEditModule={onEditModule}
               onSelectionStateChange={onSelectionStateChange}
-              onModulesCountChange={setModulesCount}
+              onLoad={onProfileBodyLoad}
             />
-            {editing && (
-              <>
-                <View style={styles.loadTemplate}>
-                  <Text style={styles.loadDescription}>
-                    {intl.formatMessage({
-                      defaultMessage:
-                        'You can completly change your WebCard by loading a new template',
-                      description:
-                        'ProfileScreenBody description to load a new template',
-                    })}
-                  </Text>
-                  <Button
-                    variant="secondary"
-                    label={intl.formatMessage({
-                      defaultMessage: 'Load a new WebCard template',
-                      description:
-                        'ProfileScreenBody button to load a new template',
-                    })}
-                    onPress={() => setLoadTemplate(true)}
-                  />
-                </View>
-              </>
-            )}
           </Suspense>
         </ProfileScreenScrollView>
         <Suspense fallback={null}>
@@ -349,6 +345,7 @@ const ProfileScreenContent = ({
             onRequestWebcardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
+            onDuplicate={onDuplicateSelectedModules}
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>
@@ -401,6 +398,7 @@ const ProfileScreenContent = ({
             <LoadCardTemplateModal
               onClose={() => setLoadTemplate(false)}
               visible={loadTemplate}
+              profile={profile}
             />
             <WebCardColorPicker
               profile={profile}
@@ -414,18 +412,4 @@ const ProfileScreenContent = ({
   );
 };
 
-const styles = StyleSheet.create({
-  loadTemplate: {
-    marginTop: 30,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 20,
-    alignItems: 'center',
-  },
-  loadDescription: {
-    textAlign: 'center',
-    color: colors.grey700,
-  },
-});
-
-export default ProfileScreenContent;
+export default memo(ProfileScreenContent);

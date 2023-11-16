@@ -25,6 +25,7 @@ generates:
         Post: ../../domains#Post as PostModel
         PostComment: ../../domains#PostComment as PostCommentModel
         CardTemplate: ../../domains#CardTemplate as CardTemplateModel
+        CardTemplateType: ../../domains#CardTemplateType as CardTemplateTypeModel
         CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
         CoverTemplateData: ../../domains#CoverTemplateData as CoverTemplateDataModel
         CardCover: ../../domains#Profile as ProfileModel
@@ -41,6 +42,7 @@ generates:
         CardStyle: ../../domains#CardStyle as CardStyleModel
         ContactCard: ../../domains#Profile as ProfileModel
         ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
+        Statistic: ../../domains#Statistic as StatisticModel
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

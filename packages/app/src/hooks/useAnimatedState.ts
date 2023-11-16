@@ -16,9 +16,17 @@ type AnimatedStateConfig =
 
 const useAnimatedState = (
   state: boolean | number,
-  config?: AnimatedStateConfig,
+  config?: AnimatedStateConfig & { preventInitialAnimation?: boolean },
 ) => {
-  const value = useSharedValue(0);
+  const value = useSharedValue(
+    config?.preventInitialAnimation
+      ? typeof state === 'boolean'
+        ? state
+          ? 1
+          : 0
+        : state
+      : 0,
+  );
 
   useEffect(() => {
     value.value = typeof state === 'boolean' ? (state ? 1 : 0) : state;

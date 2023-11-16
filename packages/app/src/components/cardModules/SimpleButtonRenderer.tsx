@@ -148,7 +148,7 @@ const SimpleButtonRenderer = ({
     >
       <PressableOpacity
         onPress={onPress}
-        style={[contentStyle]}
+        style={contentStyle}
         disabled={disabled}
         disabledOpacity={1}
       >
@@ -185,3 +185,18 @@ const SimpleButtonRenderer = ({
 };
 
 export default SimpleButtonRenderer;
+
+export const measureSimpleButtonHeight = async (
+  data: SimpleButtonRendererData,
+  cardStyle: CardStyle,
+  _maxWidth: number,
+) => {
+  const { marginTop, marginBottom, height } = getModuleDataValues({
+    data,
+    cardStyle,
+    styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
+    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+  });
+
+  return height + marginBottom + marginTop;
+};

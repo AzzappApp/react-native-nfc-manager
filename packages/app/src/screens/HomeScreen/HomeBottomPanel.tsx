@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
-  useAnimatedProps,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -67,6 +66,7 @@ const HomeBottomPanel = ({
     `,
     userKey,
   );
+  const intl = useIntl();
 
   const profiles = useMultiActorEnvironmentPluralFragment(
     graphql`
@@ -92,7 +92,6 @@ const HomeBottomPanel = ({
   //#endregion
 
   //#region card publication
-
   const onPublish = () => {
     const profileId = getAuthState().profileId;
     if (!profileId || profileId !== currentProfile?.id) {
@@ -128,22 +127,32 @@ const HomeBottomPanel = ({
         }
         Toast.show({
           type: 'success',
-          text1: intl.formatMessage({
-            defaultMessage: 'Your WebCard has been published',
-            description: 'Home Screen - webcard published toast',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'Your WebCard{azzappAp} has been published.',
+              description: 'Home Screen - webcard published toast',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
       onError: error => {
         console.error(error);
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not publish your WebCard, please try again later',
-            description:
-              'Error message displayed when the publication of the webcard failed in Home Screen',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not publish your WebCard{azzappAp}, please try again later',
+              description:
+                'Error message displayed when the publication of the webcard failed in Home Screen',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
     });
@@ -172,22 +181,19 @@ const HomeBottomPanel = ({
     const nextWebCardPublished = !!profilesWebcCardPublished[next];
     const prevIsNewProfile = prev === -1;
 
-    const newProfilePanelVisible = interpolate(
-      currentProfileIndexSharedValue.value,
-      [-1, 0],
-      [1, 0],
-    );
-
-    const missingCoverPanelVisible = interpolate(
-      currentProfileIndexSharedValue.value,
-      [prev, prev + 0.2, next - 0.2, next],
-      [
-        prevIsNewProfile || prevHasWebCover ? 0 : 1,
-        0,
-        0,
-        nextHasWebCover ? 0 : 1,
-      ],
-    );
+    let missingCoverPanelVisible = 0;
+    if (prev > -1) {
+      missingCoverPanelVisible = interpolate(
+        currentProfileIndexSharedValue.value,
+        [prev, prev + 0.2, next - 0.2, next],
+        [
+          prevIsNewProfile || prevHasWebCover ? 0 : 1,
+          0,
+          0,
+          nextHasWebCover ? 0 : 1,
+        ],
+      );
+    }
 
     const webCardPublishPanelVisible = interpolate(
       currentProfileIndexSharedValue.value,
@@ -213,65 +219,43 @@ const HomeBottomPanel = ({
     }
 
     return {
-      newProfilePanelVisible,
       missingCoverPanelVisible,
       webCardPublishPanelVisible,
       bottomPanelVisible,
     };
   });
 
-  const newCardPanelStyle = useAnimatedStyle(() => ({
-    opacity: panelVisibilities.value.newProfilePanelVisible,
-    zIndex: panelVisibilities.value.newProfilePanelVisible,
-  }));
-  const newCardPanelProps = useAnimatedProps(
-    () =>
-      ({
-        pointerEvents:
-          panelVisibilities.value.newProfilePanelVisible === 1
-            ? 'auto'
-            : 'none',
-      }) as const,
-  );
+  const newCardPanelStyle = useAnimatedStyle(() => {
+    if (currentProfileIndexSharedValue.value > 1) {
+      return {
+        opacity: 0,
+        zIndex: 0,
+      };
+    }
+    const newProfilePanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [-1, 0],
+      [1, 0],
+    );
+    return {
+      opacity: newProfilePanelVisible,
+      zIndex: newProfilePanelVisible,
+    };
+  }, [currentProfileIndexSharedValue]);
 
   const missingCoverPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.missingCoverPanelVisible,
     zIndex: panelVisibilities.value.missingCoverPanelVisible,
   }));
-  const missingCoverPanelProps = useAnimatedProps(
-    () =>
-      ({
-        pointerEvents:
-          panelVisibilities.value.missingCoverPanelVisible === 1
-            ? 'auto'
-            : 'none',
-      }) as const,
-  );
 
   const webCardPublishPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.webCardPublishPanelVisible,
     zIndex: panelVisibilities.value.webCardPublishPanelVisible,
   }));
-  const webCardPublishPanelProps = useAnimatedProps(
-    () =>
-      ({
-        pointerEvents:
-          panelVisibilities.value.webCardPublishPanelVisible === 1
-            ? 'auto'
-            : 'none',
-      }) as const,
-  );
 
   const bottomPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.bottomPanelVisible,
   }));
-  const bottomPanelProps = useAnimatedProps(
-    () =>
-      ({
-        pointerEvents:
-          panelVisibilities.value.bottomPanelVisible === 1 ? 'auto' : 'none',
-      }) as const,
-  );
 
   const mainTabBarVisible = useDerivedValue(
     () => panelVisibilities.value.bottomPanelVisible,
@@ -279,19 +263,14 @@ const HomeBottomPanel = ({
   useMainTabBarVisiblilityController(mainTabBarVisible);
   //#endregion
 
-  const intl = useIntl();
-
   const panelHeight = height - HOME_MENU_HEIGHT;
 
   return (
     <View style={{ flex: 1 }}>
-      <Animated.View
-        style={[styles.informationPanel, newCardPanelStyle]}
-        animatedProps={newCardPanelProps}
-      >
+      <Animated.View style={[styles.informationPanel, newCardPanelStyle]}>
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="Create a new Webcard{azzappAp}"
+            defaultMessage="Create a new WebCard{azzappAp}"
             description="Home Screen - Create a new WebCard"
             values={{
               azzappAp: (
@@ -317,17 +296,18 @@ const HomeBottomPanel = ({
         </Text>
       </Animated.View>
 
-      <Animated.View
-        style={[styles.informationPanel, missingCoverPanelStyle]}
-        animatedProps={missingCoverPanelProps}
-      >
+      <Animated.View style={[styles.informationPanel, missingCoverPanelStyle]}>
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
             defaultMessage="This WebCard{azzappAp} needs a cover"
             description="Home Screen - Missing cover title"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -336,7 +316,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} has no cover and can’t be published."
             description="Home Screen - Missing cover text"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -349,10 +333,19 @@ const HomeBottomPanel = ({
           <Button
             variant="secondary"
             appearance="dark"
-            label={intl.formatMessage({
-              defaultMessage: 'Create your WebCard cover',
-              description: 'Home Screen - Missing cover button',
-            })}
+            label={
+              <FormattedMessage
+                defaultMessage="Create your WebCard{azzappAp} cover"
+                description="Home Screen - Missing cover button"
+                values={{
+                  azzappAp: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            }
             style={styles.informationPanelButton}
           />
         </Link>
@@ -360,7 +353,6 @@ const HomeBottomPanel = ({
 
       <Animated.View
         style={[styles.informationPanel, webCardPublishPanelStyle]}
-        animatedProps={webCardPublishPanelProps}
       >
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
@@ -368,7 +360,11 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} is not published"
             description="Home Screen - webcard not published title"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
@@ -377,17 +373,30 @@ const HomeBottomPanel = ({
             defaultMessage="This WebCard{azzappAp} has not been published, nobody can see it for the moment."
             description="Home Screen - webcard not published text"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappAp: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
             }}
           />
         </Text>
         <Button
           variant="secondary"
           appearance="dark"
-          label={intl.formatMessage({
-            defaultMessage: 'Publish this WebCard',
-            description: 'Home Screen - webcard not published button',
-          })}
+          label={
+            <FormattedMessage
+              defaultMessage="Publish this WebCard{azzappAp}"
+              description="Home Screen - webcard not published button"
+              values={{
+                azzappAp: (
+                  <Text style={styles.icon} variant="azzapp">
+                    a
+                  </Text>
+                ),
+              }}
+            />
+          }
           style={styles.informationPanelButton}
           onPress={onPublish}
         />
@@ -395,7 +404,9 @@ const HomeBottomPanel = ({
 
       <Animated.View
         style={[styles.bottomPanel, bottomPanelStyle]}
-        animatedProps={bottomPanelProps}
+        pointerEvents={
+          profilesWebcCardPublished[currentProfileIndex] === 1 ? 'auto' : 'none'
+        }
       >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
 

@@ -26,7 +26,10 @@ import { createId } from '#helpers/idHelpers';
 import ProfileBlockContainer from './ProfileBlockContainer';
 import type { ProfileScreenBody_profile$key } from '@azzapp/relay/artifacts/ProfileScreenBody_profile.graphql';
 import type { ProfileScreenBodyDeleteModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDeleteModuleMutation.graphql';
-import type { ProfileScreenBodyDuplicateModuleMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyDuplicateModuleMutation.graphql';
+import type {
+  ProfileScreenBodyDuplicateModuleMutation,
+  ProfileScreenBodyDuplicateModuleMutation$data,
+} from '@azzapp/relay/artifacts/ProfileScreenBodyDuplicateModuleMutation.graphql';
 import type { ProfileScreenBodySwapModulesMutation } from '@azzapp/relay/artifacts/ProfileScreenBodySwapModulesMutation.graphql';
 import type { ProfileScreenBodyUpdateModulesVisibilityMutation } from '@azzapp/relay/artifacts/ProfileScreenBodyUpdateModulesVisibilityMutation.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -63,10 +66,6 @@ export type ProfileScreenBodyProps = {
    */
   selectionMode: boolean;
   /**
-   * A callback called when the number of rendered modules change
-   */
-  onModulesCountChange: (count: number) => void;
-  /**
    * A callback called when the user press a module block in edit mode
    */
   onEditModule: (module: ModuleKind, moduleId: string) => void;
@@ -74,10 +73,15 @@ export type ProfileScreenBodyProps = {
    * A callback called when the selection state change
    */
   onSelectionStateChange: (info: ModuleSelectionInfos) => void;
+  /**
+   * A callback called when the body is loaded
+   */
+  onLoad: () => void;
 };
 
 export type ProfileBodyHandle = {
   deleteSelectedModules: () => void;
+  duplicateSelectedModules: () => void;
   toggleSelectedModulesVisibility: (visible: boolean) => void;
   selectAllModules: () => void;
   unselectAllModules: () => void;
@@ -92,9 +96,9 @@ const ProfileScreenBody = (
     profile,
     editing,
     selectionMode,
-    onModulesCountChange,
     onEditModule,
     onSelectionStateChange,
+    onLoad,
   }: ProfileScreenBodyProps,
   forwardedRef: ForwardedRef<ProfileBodyHandle>,
 ): any => {
@@ -134,6 +138,9 @@ const ProfileScreenBody = (
     `,
     profile,
   );
+  useEffect(() => {
+    onLoad();
+  }, [onLoad]);
   // #endregion
 
   // #region Selection
@@ -172,10 +179,6 @@ const ProfileScreenBody = (
       ),
     });
   }, [selectedModules, onSelectionStateChange, cardModules]);
-
-  useEffect(() => {
-    onModulesCountChange(cardModules?.length ?? 0);
-  }, [cardModules?.length, onModulesCountChange]);
   // #endregion
 
   // #region Modules mutations
@@ -198,7 +201,10 @@ const ProfileScreenBody = (
         $input: DuplicateModuleInput!
       ) {
         duplicateModule(input: $input) {
-          createdModuleId
+          createdModules {
+            originalModuleId
+            newModuleId
+          }
         }
       }
     `);
@@ -410,55 +416,91 @@ const ProfileScreenBody = (
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
 
-  const onDuplicateModule = useCallback(
-    (moduleId: string) => {
+  const duplicatedBlocks = useRef<Record<string, string>>({});
+
+  const duplicateModules = useCallback(
+    (moduleIds: string[]) => {
       if (!canDuplicate) {
         return;
       }
 
       const updater = (
         store: RecordSourceSelectorProxy,
-        newModuleId: string,
+        createdModules: ProfileScreenBodyDuplicateModuleMutation$data['duplicateModule']['createdModules'],
       ) => {
         const profileRecord = store.get(profileId);
         if (!profileRecord) {
           return;
         }
-        let modules = profileRecord.getLinkedRecords('cardModules') ?? [];
-        const moduleRecordIndex = modules.findIndex(
-          moduleRecord => moduleRecord?.getDataID() === moduleId,
+        const modules = profileRecord.getLinkedRecords('cardModules') ?? [];
+
+        const maxPosition = Math.max(
+          ...[...createdModules].map(c =>
+            modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === c.originalModuleId,
+            ),
+          ),
         );
-        if (moduleRecordIndex === -1) {
-          return;
-        }
-        const moduleRecord = modules[moduleRecordIndex];
-        const newModuleRecord = store.create(
-          newModuleId,
-          moduleRecord.getType(),
-        );
-        newModuleRecord.copyFieldsFrom(moduleRecord);
-        newModuleRecord.setValue(newModuleId, 'id');
-        modules = [...modules];
-        modules.splice(moduleRecordIndex + 1, 0, newModuleRecord);
+
+        [...createdModules]
+          .sort((a, b) => {
+            const aModuleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === a.originalModuleId,
+            );
+
+            const bModuleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === b.originalModuleId,
+            );
+
+            return aModuleRecordIndex - bModuleRecordIndex;
+          })
+          .forEach(({ originalModuleId, newModuleId }, index) => {
+            const moduleRecordIndex = modules.findIndex(
+              moduleRecord => moduleRecord?.getDataID() === originalModuleId,
+            );
+            if (moduleRecordIndex === -1) {
+              return;
+            }
+            const moduleRecord = modules[moduleRecordIndex];
+            const newModuleRecord = store.create(
+              newModuleId,
+              moduleRecord.getType(),
+            );
+            newModuleRecord.copyFieldsFrom(moduleRecord);
+            newModuleRecord.setValue(newModuleId, 'id');
+            modules.splice(maxPosition + index + 1, 0, newModuleRecord);
+          });
         profileRecord.setLinkedRecords(modules, 'cardModules');
       };
+
+      const optimisticModuleIds = moduleIds.map(mId => ({
+        originalModuleId: mId,
+        newModuleId: `temp-${createId()}`,
+      }));
+      const duplicatedBlockTempIds = optimisticModuleIds.reduce(
+        (acc, { originalModuleId, newModuleId }) => {
+          acc[originalModuleId] = newModuleId;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
 
       commitDuplicateModule({
         variables: {
           input: {
-            moduleId,
+            moduleIds,
           },
         },
         updater(store, response) {
-          const createdModuleId = response.duplicateModule?.createdModuleId;
-          if (!createdModuleId) {
-            //TODO
-            return;
-          }
-          updater(store, createdModuleId);
+          const createdModules = response.duplicateModule?.createdModules;
+          createdModules.forEach(({ originalModuleId, newModuleId }) => {
+            duplicatedBlocks.current[newModuleId] =
+              duplicatedBlockTempIds[originalModuleId];
+          });
+          updater(store, createdModules);
         },
         optimisticUpdater(store) {
-          updater(store, `temp-${createId()}`);
+          updater(store, optimisticModuleIds);
         },
         onError(error) {
           console.error(error);
@@ -473,6 +515,13 @@ const ProfileScreenBody = (
       });
     },
     [canDuplicate, commitDuplicateModule, intl, profileId],
+  );
+
+  const onDuplicateModule = useCallback(
+    (moduleId: string) => {
+      duplicateModules([moduleId]);
+    },
+    [duplicateModules],
   );
   // #endregion
 
@@ -532,6 +581,10 @@ const ProfileScreenBody = (
         deleteModules(Object.keys(selectedModules));
         setSelectedModules({});
       },
+      duplicateSelectedModules() {
+        duplicateModules(Object.keys(selectedModules));
+        setSelectedModules({});
+      },
       toggleSelectedModulesVisibility(visible) {
         updateModulesVisibility(Object.keys(selectedModules), visible);
         setSelectedModules({});
@@ -551,7 +604,13 @@ const ProfileScreenBody = (
         setSelectedModules({});
       },
     }),
-    [deleteModules, cardModules, selectedModules, updateModulesVisibility],
+    [
+      deleteModules,
+      duplicateModules,
+      cardModules,
+      selectedModules,
+      updateModulesVisibility,
+    ],
   );
   //#endregion
 
@@ -560,6 +619,7 @@ const ProfileScreenBody = (
     () =>
       memoize((id: string, kind: ModuleKind) => ({
         onModulePress() {
+          Toast.hide();
           onEditModule(kind, id);
         },
         onDuplicate() {
@@ -593,35 +653,43 @@ const ProfileScreenBody = (
 
   const modulesData = useModulesData(cardModules);
 
-  return modulesData.map((module, index) => (
-    <ProfileBlockContainerMemo
-      key={module.id}
-      editing={editing}
-      canMove={canReorder}
-      canDelete={canDelete}
-      canDuplicate={canDuplicate}
-      canToggleVisibility={canUpdateVisibility}
-      isFirst={index === 0}
-      isLast={index === cardModules.length - 1}
-      visible={module.visible}
-      selectionMode={selectionMode}
-      selected={!!selectedModules[module.id]}
-      backgroundColor={cardColors?.light ?? '#fff'}
-      // @ts-expect-error this extraData is used to trigger a re-render when the module data change
-      extraData={{
-        cardStyle,
-        cardColors,
-        module,
-      }}
-      {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
-    >
-      <CardModuleRenderer
-        module={module}
-        colorPalette={cardColors}
+  return modulesData.map((module, index) => {
+    // prevent duplicated blocks from being re-rendered
+    const blockId = duplicatedBlocks.current[module.id] ?? module.id;
+    return (
+      <ProfileBlockContainerMemo
+        key={blockId}
+        id={blockId}
+        index={index}
+        editing={editing}
+        canMove={canReorder}
+        canDelete={canDelete}
+        canDuplicate={canDuplicate}
+        canToggleVisibility={canUpdateVisibility}
+        isFirst={index === 0}
+        isLast={index === cardModules.length - 1}
+        visible={module.visible}
+        selectionMode={selectionMode}
+        selected={!!selectedModules[module.id]}
+        backgroundColor={cardColors?.light ?? '#fff'}
+        moduleRenderInfo={module}
         cardStyle={cardStyle}
-      />
-    </ProfileBlockContainerMemo>
-  ));
+        // @ts-expect-error this extraData is used to trigger a re-render when the module data change
+        extraData={{
+          cardStyle,
+          cardColors,
+          module,
+        }}
+        {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
+      >
+        <CardModuleRenderer
+          module={module}
+          colorPalette={cardColors}
+          cardStyle={cardStyle}
+        />
+      </ProfileBlockContainerMemo>
+    );
+  });
 };
 
 export default memo(forwardRef(ProfileScreenBody));

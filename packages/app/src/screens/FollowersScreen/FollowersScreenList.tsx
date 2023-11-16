@@ -73,7 +73,8 @@ const FollowersScreenList = ({
   const removeFollower = useCallback(
     (profileId: string) => {
       // currentProfileId is undefined when user is anonymous so we can't follow
-      if (currentProfileId) {
+      if (currentProfileId && data.followers) {
+        //data.followers was null on sentry crash
         const connectionID = data.followers.__id;
 
         commit({
@@ -106,7 +107,7 @@ const FollowersScreenList = ({
         });
       }
     },
-    [commit, currentProfileId, data.followers.__id, intl],
+    [commit, currentProfileId, data.followers, intl],
   );
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');

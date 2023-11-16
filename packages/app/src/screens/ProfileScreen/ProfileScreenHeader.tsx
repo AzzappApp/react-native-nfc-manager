@@ -1,4 +1,4 @@
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { colors } from '#theme';
@@ -6,6 +6,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import Text from '#ui/Text';
 import { useEditTransition } from './ProfileScreenTransitions';
 
 export type ProfileScreenHeaderProps = {
@@ -73,13 +74,13 @@ const ProfileScreenHeader = ({
   const intl = useIntl();
 
   const editHeaderStyle = useAnimatedStyle(() => ({
-    height: editTransition.value * (HEADER_HEIGHT + 4),
-    marginTop: editTransition.value * inset.top,
-    opacity: editTransition.value,
+    height: (editTransition?.value ?? 0) * (HEADER_HEIGHT + 4),
+    marginTop: (editTransition?.value ?? 0) * inset.top,
+    opacity: editTransition?.value ?? 0,
   }));
 
   const closeStyle = useAnimatedStyle(() => ({
-    opacity: 1 - editTransition.value,
+    opacity: 1 - (editTransition?.value ?? 0),
   }));
 
   return (
@@ -87,19 +88,25 @@ const ProfileScreenHeader = ({
       <Animated.View style={editHeaderStyle}>
         <Header
           middleElement={
-            selectionMode
-              ? intl.formatMessage(
-                  {
-                    defaultMessage: '{nbSelectedModules} selected',
-                    description:
-                      'Webcard builder header title in module edition mode',
-                  },
-                  { nbSelectedModules },
-                )
-              : intl.formatMessage({
-                  defaultMessage: 'Webcard builder',
-                  description: 'Webcard builder header title',
-                })
+            <Text variant="large">
+              {selectionMode ? (
+                <FormattedMessage
+                  defaultMessage="{nbSelectedModules} selected"
+                  description="Webcard builder header title in module edition mode"
+                  values={{
+                    nbSelectedModules,
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Webcard{azzappAp} builder"
+                  description="Webcard builder header title"
+                  values={{
+                    azzappAp: <Text variant="azzapp">a</Text>,
+                  }}
+                />
+              )}
+            </Text>
           }
           leftElement={
             selectionMode ? (

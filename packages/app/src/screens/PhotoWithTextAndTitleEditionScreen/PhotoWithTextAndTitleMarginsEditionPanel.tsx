@@ -64,14 +64,11 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Left/Right margin : {size}"
+              defaultMessage="Left/Right margin :"
               description="Left/Right message in PhotoWithTextAndTitle edition"
-              values={{
-                size: marginHorizontal,
-              }}
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_HORIZONTAL_MARGIN}
           step={1}
@@ -91,14 +88,11 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Top/Bottom margin : {size}"
+              defaultMessage="Top/Bottom margin :"
               description="Top/Bottom margin message in PhotoWithTextAndTitle edition"
-              values={{
-                size: marginVertical,
-              }}
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_MARGIN}
           step={1}
@@ -118,14 +112,11 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Image/Text Gap : {size}"
+              defaultMessage="Image/Text Gap :"
               description="Image/Text Gap message in PhotoWithTextAndTitle edition"
-              values={{
-                size: gap,
-              }}
             />
           }
-          value={gap}
+          initialValue={gap}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_GAP}
           step={1}

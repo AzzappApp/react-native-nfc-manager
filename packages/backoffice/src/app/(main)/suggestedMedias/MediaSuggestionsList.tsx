@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { experimental_useOptimistic, useState } from 'react';
+import { useOptimistic, useState } from 'react';
 import {
   encodeMediaId,
   getImageURLForSize,
@@ -55,28 +55,27 @@ const MediaSuggestionsList = ({
   const [uploading, setUploading] = useState(false);
   const [saveError, setSaveError] = useState<any>(null);
 
-  const [optimisticSuggestions, setLocalSuggestions] =
-    experimental_useOptimistic<
-      typeof mediasSuggestions,
-      {
-        mediaId: string;
-        categories: string[];
-        activities: string[];
-      }
-    >(mediasSuggestions, (state, { mediaId, categories, activities }) => ({
-      ...state,
-      [mediaId]: {
-        ...state[mediaId],
-        categories: categories.reduce(
-          (acc, category) => ({ ...acc, [category]: true }),
-          {},
-        ),
-        activities: activities.reduce(
-          (acc, activity) => ({ ...acc, [activity]: true }),
-          {},
-        ),
-      },
-    }));
+  const [optimisticSuggestions, setLocalSuggestions] = useOptimistic<
+    typeof mediasSuggestions,
+    {
+      mediaId: string;
+      categories: string[];
+      activities: string[];
+    }
+  >(mediasSuggestions, (state, { mediaId, categories, activities }) => ({
+    ...state,
+    [mediaId]: {
+      ...state[mediaId],
+      categories: categories.reduce(
+        (acc, category) => ({ ...acc, [category]: true }),
+        {},
+      ),
+      activities: activities.reduce(
+        (acc, activity) => ({ ...acc, [activity]: true }),
+        {},
+      ),
+    },
+  }));
 
   const saveMedias = async (
     medias: File[],

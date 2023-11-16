@@ -33,7 +33,8 @@ input ContactCardBirthdayInput {
 }
 
 input ContactCardSocialInput {
-  social: String!
+  url: String!
+  label: String!
   selected: Boolean!
 }
 

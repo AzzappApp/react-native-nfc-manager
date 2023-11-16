@@ -78,6 +78,7 @@ const ContactCardItem = ({
   currentProfileIndexSharedValue,
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
+
   const positionStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: (index - currentProfileIndexSharedValue.value) * width },

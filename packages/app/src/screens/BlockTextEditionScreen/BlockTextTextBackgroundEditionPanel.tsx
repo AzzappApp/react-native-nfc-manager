@@ -128,12 +128,11 @@ const BlockTextTextBackgroundEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Photo opacity : {opacity}"
+            defaultMessage="Photo opacity :"
             description="Photo Opacity message in BlockText edition"
-            values={{ opacity }}
           />
         }
-        value={opacity}
+        initialValue={opacity}
         min={0}
         max={100}
         step={1}

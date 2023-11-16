@@ -148,6 +148,9 @@ const icons = {
   get edit() {
     return require('./assets/edit.png');
   },
+  get empty() {
+    return require('./assets/empty.png');
+  },
   get expand() {
     return require('./assets/expand.png');
   },
@@ -408,6 +411,9 @@ const icons = {
   },
   get width_limited() {
     return require('./assets/width-limited.png');
+  },
+  get trash() {
+    return require('./assets/trash.png');
   },
 } as const;
 

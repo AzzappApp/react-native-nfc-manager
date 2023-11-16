@@ -5,8 +5,8 @@ import type { ForwardedRef } from 'react';
 import type {
   PressableProps,
   PressableAndroidRippleConfig,
-  View,
   LayoutChangeEvent,
+  View,
 } from 'react-native';
 
 type PressableNativeProps = PressableProps & {
@@ -24,7 +24,7 @@ const PressableNative = (
   const onLayout = (e: LayoutChangeEvent) => {
     setWidth(e.nativeEvent.layout.width);
   };
-  const androidRiple = ripple ?? { borderless: true, color: colors.grey400 };
+  const androidRiple = ripple ?? { borderless: false, color: colors.grey400 };
   if (!androidRiple.radius && androidRiple.borderless) {
     androidRiple.radius = width / 2 + 2;
   }

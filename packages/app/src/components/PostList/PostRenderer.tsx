@@ -70,7 +70,6 @@ export type PostRendererProps = ViewProps & {
 };
 
 export type PostRendererHandle = {
-  getCurrentMediaRenderer(): HostComponent<any> | null;
   getCurrentVideoTime(): Promise<number | null>;
   snapshot(): Promise<void>;
 };
@@ -105,7 +104,6 @@ const PostRenderer = (
     graphql`
       fragment PostRendererFragment_author on Profile {
         ...AuthorCartoucheFragment_profile
-        ...PostRendererBottomPanelFragment_author
       }
     `,
     authorKey,
@@ -118,16 +116,6 @@ const PostRenderer = (
   useImperativeHandle(
     forwardedRef,
     () => ({
-      getCurrentMediaRenderer() {
-        if (!mediaRef.current) {
-          return null;
-        }
-        if ('getContainer' in mediaRef.current) {
-          return mediaRef.current.getContainer();
-        } else {
-          return mediaRef.current;
-        }
-      },
       async getCurrentVideoTime() {
         if (mediaRef.current && 'getPlayerCurrentTime' in mediaRef.current) {
           return mediaRef.current.getPlayerCurrentTime();
@@ -144,7 +132,8 @@ const PostRenderer = (
   );
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
-  const shouldPlayVideo = context.visibleVideoPostIds.includes(post.id);
+  const shouldPlayVideo = context.played === post.id;
+  const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
 
   return (
     <View {...props}>
@@ -162,21 +151,22 @@ const PostRenderer = (
           style={{ marginRight: 20 }}
         />
       </View>
-      <View style={[styles.mediaContainer]}>
+      <View style={styles.mediaContainer}>
         <PostRendererMedia
           post={post}
           width={width}
           muted={muted}
           paused={paused || !shouldPlayVideo}
           initialTime={initialTime}
-          videoDisabled={videoDisabled}
+          videoDisabled={
+            videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
+          }
         />
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
           toggleModal={toggleModal}
           showModal={showModal}
-          author={author}
           post={post}
         />
       </Suspense>
@@ -190,7 +180,6 @@ const styles = StyleSheet.create({
   headerView: { flexDirection: 'row', alignItems: 'center', height: 56 },
   pressableLink: { flex: 1 },
   authorCartoucheStyle: { marginLeft: 10, flex: 1 },
-
   mediaContainer: {
     backgroundColor: colors.grey100,
     overflow: 'hidden',

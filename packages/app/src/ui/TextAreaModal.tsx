@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, Modal, StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
 import TextInput from './TextInput';
-import type { ModalProps } from 'react-native';
+import type { ModalProps, TextInput as TextInputBase } from 'react-native';
 
 export type TextAreaModalProps = Omit<
   ModalProps,
@@ -21,6 +27,10 @@ export type TextAreaModalProps = Omit<
    * The placeholder to show when the textarea is empty
    */
   placeholder?: string;
+  /**
+   * The title of the header modal
+   */
+  headerTitle?: string;
   /**
    * The maximum length of the textarea
    */
@@ -50,6 +60,7 @@ const TextAreaModal = ({
   placeholder,
   value,
   maxLength,
+  headerTitle,
   onChangeText,
   onClose,
   ItemTopComponent,
@@ -65,14 +76,28 @@ const TextAreaModal = ({
     setText(value);
     onClose();
   };
+
   const onBlur = () => {
     if (closeOnBlur) {
       onClose();
     }
   };
 
+  const textInputRef = useRef<TextInputBase>(null);
+
   return (
-    <Modal transparent animationType="fade" onRequestClose={onClose} {...props}>
+    <Modal
+      onRequestClose={onClose}
+      transparent
+      animationType="fade"
+      {...props}
+      onShow={() => {
+        // hack - on android autofocus doesn't open the keyboard
+        if (Platform.OS === 'android') {
+          textInputRef.current?.focus();
+        }
+      }}
+    >
       <View style={styles.modal}>
         <Header
           style={{
@@ -89,10 +114,13 @@ const TextAreaModal = ({
               onPress={onCancel}
             />
           }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Description',
-            description: 'Post creation screen textarea modal title',
-          })}
+          middleElement={
+            headerTitle ??
+            intl.formatMessage({
+              defaultMessage: 'Description',
+              description: 'Post creation screen textarea modal title',
+            })
+          }
           rightElement={
             <HeaderButton
               label={intl.formatMessage({
@@ -113,10 +141,11 @@ const TextAreaModal = ({
             placeholder={placeholder}
             value={text}
             onChangeText={setText}
-            autoFocus
+            autoFocus={Platform.OS === 'ios'}
             maxLength={maxLength}
             onBlur={onBlur}
-            style={{ borderWidth: 0, flex: 1 }}
+            style={styles.textInput}
+            ref={textInputRef}
           />
           {maxLength != null && (
             <Text
@@ -154,4 +183,5 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
+  textInput: { borderWidth: 0, flex: 1 },
 });

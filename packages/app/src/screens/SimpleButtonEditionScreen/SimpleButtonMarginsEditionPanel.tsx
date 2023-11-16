@@ -76,14 +76,11 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Top margin : {size}"
+            defaultMessage="Top margin :"
             description="marginTop message in SimpleButton edition"
-            values={{
-              size: marginTop,
-            }}
           />
         }
-        value={marginTop}
+        initialValue={marginTop}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_TOP}
         step={1}
@@ -101,14 +98,11 @@ const SimpleButtonMarginsEditionPanel = ({
       <LabeledDashedSlider
         label={
           <FormattedMessage
-            defaultMessage="Bottom margin : {size}"
+            defaultMessage="Bottom margin :"
             description="Bottom margin message in SimpleButton edition"
-            values={{
-              size: marginBottom,
-            }}
           />
         }
-        value={marginBottom}
+        initialValue={marginBottom}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_BOTTOM}
         step={1}
@@ -135,14 +129,11 @@ const SimpleButtonMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Width : {size}"
+              defaultMessage="Width :"
               description="width message in SimpleButton edition"
-              values={{
-                size: width,
-              }}
             />
           }
-          value={width}
+          initialValue={width}
           min={SIMPLE_BUTTON_MIN_WIDTH}
           max={SIMPLE_BUTTON_MAX_WIDTH}
           step={1}
@@ -160,14 +151,11 @@ const SimpleButtonMarginsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Height : {size}"
+              defaultMessage="Height :"
               description="height message in SimpleButton edition"
-              values={{
-                size: height,
-              }}
             />
           }
-          value={height}
+          initialValue={height}
           min={SIMPLE_BUTTON_MIN_HEIGHT}
           max={SIMPLE_BUTTON_MAX_HEIGHT}
           step={1}

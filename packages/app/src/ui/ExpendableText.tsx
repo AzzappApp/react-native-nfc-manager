@@ -51,6 +51,14 @@ const ExpendableText = ({
   };
 
   const intl = useIntl();
+
+  useEffect(() => {
+    if (label) {
+      setExpanded(false);
+      setClippedText(undefined);
+    }
+  }, [label]);
+
   const text = useMemo(() => {
     if (expanded) {
       return intl.formatMessage(

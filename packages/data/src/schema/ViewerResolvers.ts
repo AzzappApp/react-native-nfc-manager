@@ -1,4 +1,4 @@
-import { desc, like } from 'drizzle-orm';
+import { and, desc, eq, like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -14,6 +14,7 @@ import {
   getCoverTemplates,
   getCardTemplates,
   getColorPalettes,
+  getCardTemplateTypes,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
@@ -113,6 +114,7 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(ProfileTable)
+        .where(eq(ProfileTable.cardIsPublished, true))
         .orderBy(desc(ProfileTable.createdAt)),
       args,
     );
@@ -120,7 +122,18 @@ export const Viewer: ViewerResolvers = {
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
-      await db.select().from(PostTable).orderBy(desc(PostTable.createdAt)),
+      await db
+        .select()
+        .from(PostTable)
+        .innerJoin(
+          ProfileTable,
+          and(
+            eq(PostTable.authorId, ProfileTable.id),
+            eq(ProfileTable.cardIsPublished, true),
+          ),
+        )
+        .orderBy(desc(PostTable.createdAt))
+        .then(res => res.map(({ Post }) => Post)),
       args,
     );
   },
@@ -136,12 +149,18 @@ export const Viewer: ViewerResolvers = {
     );
   },
   searchPosts: async (_, args) => {
-    // TODO dummy implementation just to test frontend
+    const posts = await db
+      .select()
+      .from(PostTable)
+      .innerJoin(ProfileTable, eq(PostTable.authorId, ProfileTable.id))
+      .where(
+        and(
+          like(PostTable.content, `%${args.search}%`),
+          eq(ProfileTable.cardIsPublished, true),
+        ),
+      );
     return connectionFromArray(
-      await db
-        .select()
-        .from(PostTable)
-        .where(like(PostTable.content, `%${args.search}%`)),
+      posts.map(({ Post }) => Post),
       args,
     );
   },
@@ -151,7 +170,12 @@ export const Viewer: ViewerResolvers = {
       await db
         .select()
         .from(ProfileTable)
-        .where(like(ProfileTable.userName, `%${args.search}%`)),
+        .where(
+          and(
+            eq(ProfileTable.cardIsPublished, true),
+            like(ProfileTable.userName, `%${args.search}%`),
+          ),
+        ),
       args,
     );
   },
@@ -203,34 +227,60 @@ export const Viewer: ViewerResolvers = {
   },
   cardTemplates: async (
     _,
-    { after, first },
+    { cardTemplateTypeId, after, first },
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
     if (!profile) {
       return emptyConnection;
     }
-    const limit = first ?? 100;
+    let typeId = cardTemplateTypeId;
+    if (cardTemplateTypeId == null) {
+      if (profile.companyActivityId) {
+        const compActivity = await loaders.CompanyActivity.load(
+          profile.companyActivityId,
+        );
+        if (compActivity) {
+          typeId = compActivity.cardTemplateTypeId;
+        }
+      }
+    }
+    if (typeId == null) {
+      if (profile.profileCategoryId) {
+        const profileCategory = await loaders.ProfileCategory.load(
+          profile.profileCategoryId,
+        );
+        if (profileCategory) {
+          typeId = profileCategory.cardTemplateTypeId;
+        }
+      }
+    }
+    const limit = first ?? 20;
     const cardTemplates = await getCardTemplates(
       profile.profileKind,
+      typeId,
       profile.id,
       after,
       limit + 1,
     );
-    const sizedCardtemplate = cardTemplates.slice(0, limit);
-    return {
-      edges: sizedCardtemplate.map(cardTemplate => ({
-        node: cardTemplate,
-        cursor: cardTemplate.cursor,
-      })),
-      pageInfo: {
-        hasNextPage: cardTemplates.length > limit,
-        hasPreviousPage: false,
-        startCursor: cardTemplates[0]?.cursor,
-        endCursor: sizedCardtemplate[sizedCardtemplate.length - 1].cursor,
-      },
-    };
+    if (cardTemplates.length > 0) {
+      const sizedCardtemplate = cardTemplates.slice(0, limit);
+      return {
+        edges: sizedCardtemplate.map(cardTemplate => ({
+          node: cardTemplate,
+          cursor: cardTemplate.cursor,
+        })),
+        pageInfo: {
+          hasNextPage: cardTemplates.length > limit,
+          hasPreviousPage: false,
+          startCursor: cardTemplates[0]?.cursor,
+          endCursor: sizedCardtemplate[sizedCardtemplate.length - 1].cursor,
+        },
+      };
+    }
+    return emptyConnection;
   },
+  cardTemplateTypes: async () => getCardTemplateTypes(),
   cardStyles: async (_, { after, first }, { auth: { profileId } }) => {
     if (!profileId) {
       return emptyConnection;
@@ -272,7 +322,7 @@ export const Viewer: ViewerResolvers = {
   },
   suggestedMedias: async (
     _,
-    { after, first },
+    { kind, after, first },
     { auth: { profileId }, loaders },
   ) => {
     const profile = profileId ? await loaders.Profile.load(profileId) : null;
@@ -287,14 +337,15 @@ export const Viewer: ViewerResolvers = {
     const limit = first ?? 100;
     const suggestions = await getMediaSuggestions(
       profile.id,
+      kind,
       profile.profileCategoryId,
       profile.companyActivityId,
       after,
       (first ?? 100) + 1,
     );
     const sizedSuggestion = suggestions.slice(0, limit);
-    const edges = sizedSuggestion.map(({ mediaId, cursor }) => ({
-      node: mediaId,
+    const edges = sizedSuggestion.map(({ cursor, ...media }) => ({
+      node: media,
       cursor,
     })) as any[];
 

@@ -166,14 +166,42 @@ const EditImageStep = () => {
           {media?.kind === 'video' && (
             <View style={styles.viewVideoDurationError}>
               {media.duration > maxVideoDuration && (
-                <View style={styles.viewIconDuration}>
-                  <Icon
-                    icon="warning"
-                    style={{ width: 20, height: 20, tintColor: colors.white }}
-                  />
+                <View style={[styles.durationView, styles.viewIconDuration]}>
+                  <Text
+                    variant="xsmall"
+                    style={{ width: 25, fontSize: 10, color: 'white' }}
+                  >
+                    {formatDuration(media.duration)}
+                  </Text>
                 </View>
               )}
-              <Text variant="medium">{formatDuration(media.duration)}</Text>
+              {timeRange &&
+                timeRange?.duration < media.duration &&
+                !(media.duration > maxVideoDuration) && (
+                  <View style={[styles.durationView]}>
+                    <Text
+                      variant="xsmall"
+                      style={{ width: 25, fontSize: 10, color: 'white' }}
+                    >
+                      {formatDuration(media.duration)}
+                    </Text>
+                  </View>
+                )}
+              {(media.duration > maxVideoDuration ||
+                (timeRange && timeRange?.duration < media.duration)) && (
+                <Icon
+                  icon="arrow_right"
+                  style={{ tintColor: colors.white, width: 18, height: 18 }}
+                />
+              )}
+              <View style={styles.durationView}>
+                <Text
+                  variant="xsmall"
+                  style={{ width: 25, fontSize: 10, color: 'white' }}
+                >
+                  {formatDuration(timeRange?.duration ?? media.duration)}
+                </Text>
+              </View>
             </View>
           )}
         </ImagePickerMediaRenderer>
@@ -270,6 +298,11 @@ const EditImageStep = () => {
               <ImageEditionParameterControl
                 value={editionParameters.roll}
                 parameter="roll"
+                label={intl.formatMessage({
+                  defaultMessage: 'rotate:',
+                  description: 'Image roll parameter label',
+                })}
+                labelSuffix="°"
                 onChange={value => onParameterValueChange('roll', value)}
                 style={styles.filterSelectionStyle}
               />
@@ -306,6 +339,14 @@ EditImageStep.STEP_ID = 'EDIT_IMAGE';
 export default EditImageStep;
 
 const styles = StyleSheet.create({
+  durationView: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
   videoTimelineEditor: {
     flex: 1,
     flexShrink: 0,
@@ -314,16 +355,12 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   viewIconDuration: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
     backgroundColor: colors.red400,
-    marginRight: 7,
   },
   viewVideoDurationError: {
     position: 'absolute',
-    bottom: 25,
-    right: 15,
+    bottom: 10,
+    right: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

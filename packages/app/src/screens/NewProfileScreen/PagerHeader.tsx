@@ -1,9 +1,10 @@
 import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import { TRANSITION_DURATION } from './WizzardTransitioner';
 import type { Icons } from '#ui/Icon';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -13,6 +14,8 @@ type PagerHeaderProps = Omit<ViewProps, 'children'> & {
   nbPages: number;
   backIcon?: Icons;
   onBack: () => void;
+  rightElement?: React.ReactNode;
+  rightElementWidth?: number;
 };
 
 const PagerHeader = ({
@@ -22,6 +25,8 @@ const PagerHeader = ({
   currentPage,
   style,
   backIcon = 'arrow_left',
+  rightElement,
+  rightElementWidth = 40,
   ...props
 }: PagerHeaderProps) => {
   const styles = useStyleSheet(styleSheet);
@@ -34,21 +39,25 @@ const PagerHeader = ({
             onPress={onBack}
             iconSize={28}
             variant="icon"
-            style={styles.backIcon}
+            style={[styles.backIcon, { minWidth: rightElementWidth }]}
           />
         </View>
         <Animated.View
           key={currentPage}
-          style={styles.titleTextContainer}
-          // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
-          // exiting={FadeOutDown.duration(TRANSITION_DURATION)}
-          // entering={FadeInDown.duration(TRANSITION_DURATION)}
+          style={[styles.titleTextContainer]}
+          exiting={FadeOutDown.duration(TRANSITION_DURATION)}
+          entering={FadeInDown.duration(TRANSITION_DURATION)}
         >
-          <Text variant="xlarge" style={styles.titleText}>
+          <Text variant="large" style={styles.titleText}>
             {title}
           </Text>
         </Animated.View>
-        <View style={styles.headerSegment} />
+        <View
+          style={[styles.headerSegment, { minWidth: rightElementWidth }]}
+          collapsable={false}
+        >
+          {rightElement}
+        </View>
       </View>
       <View style={styles.pagerContainer}>
         {Array.from({ length: nbPages }).map((_, index) => {
@@ -88,7 +97,7 @@ export default PagerHeader;
 
 const CIRCLE_SIZE = 5;
 
-export const PAGER_HEADER_HEIGHT = 102;
+export const PAGER_HEADER_HEIGHT = 85;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {
@@ -96,25 +105,23 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-    paddingHorizontal: 20,
-    flex: 1,
   },
   headerSegment: {
-    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backIcon: {
     height: 17,
     width: 10,
   },
   titleTextContainer: {
-    flex: 1,
-    alingSelft: 'stretch',
+    alignSelf: 'center',
   },
   titleText: {
     textAlign: 'center',
-    paddingTop: 0,
     textAlignVertical: 'center',
   },
   pagerContainer: {

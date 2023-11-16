@@ -59,8 +59,8 @@ const AlbumPicker = ({
       </PressableNative>
       <Modal
         animationType="slide"
-        visible={showModal}
         onRequestClose={onModalClose}
+        visible={showModal}
       >
         <AlbumPickerScreen
           onSelectAlbum={onSelectAlbum}

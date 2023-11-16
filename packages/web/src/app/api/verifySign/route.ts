@@ -18,7 +18,7 @@ const verifySignApi = async (req: Request) => {
   const isValid = await verifyHmacWithPassword(
     process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
     signature,
-    data,
+    decodeURIComponent(data),
     { salt },
   );
 

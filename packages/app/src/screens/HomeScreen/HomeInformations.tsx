@@ -60,7 +60,7 @@ const HomeInformations = ({
         nbPosts
         nbFollowings
         nbFollowers
-        nbLikes
+        nbPostsLiked
       }
     `,
     (profile: any) => profile.id,
@@ -74,7 +74,7 @@ const HomeInformations = ({
         nbPosts: profile.nbPosts,
         nbFollowings: profile.nbFollowings,
         nbFollowers: profile.nbFollowers,
-        nbLikes: profile.nbLikes,
+        nbLikes: profile.nbPostsLiked,
       };
     }) ?? [],
   );
@@ -87,7 +87,7 @@ const HomeInformations = ({
           nbPosts: profile.nbPosts,
           nbFollowings: profile.nbFollowings,
           nbFollowers: profile.nbFollowers,
-          nbLikes: profile.nbLikes,
+          nbLikes: profile.nbPostsLiked,
         };
       });
     }
@@ -193,20 +193,17 @@ const HomeInformations = ({
             </Text>
           </PressableOpacity>
         </Link>
-        <PressableOpacity
-          style={styles.square}
-          onPress={() => {
-            console.log('todo');
-          }}
-        >
-          <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
-          <Text variant="small" style={styles.text}>
-            <FormattedMessage
-              defaultMessage="Likes"
-              description="HomeScreen - information panel - Likes label"
-            />
-          </Text>
-        </PressableOpacity>
+        <Link route="LIKED_POSTS">
+          <PressableOpacity style={styles.square}>
+            <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
+            <Text variant="small" style={styles.text}>
+              <FormattedMessage
+                defaultMessage="Likes"
+                description="HomeScreen - information panel - Likes label"
+              />
+            </Text>
+          </PressableOpacity>
+        </Link>
       </View>
       <View style={styles.row}>
         <Link route="FOLLOWERS">
@@ -246,9 +243,12 @@ const HomeInformations = ({
 
 export default memo(HomeInformations);
 
-const format = (value: number) => {
+export const format = (value: number) => {
   'worklet';
-  return Math.trunc(value).toString();
+  if (typeof value === 'number') {
+    return Math.trunc(value).toString();
+  }
+  return '0';
 };
 
 const styles = StyleSheet.create({

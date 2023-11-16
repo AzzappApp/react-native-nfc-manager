@@ -60,8 +60,6 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
     });
   }, [post.id]);
 
-  console.log({ content: post.content });
-
   return (
     <>
       <div className={styles.feed} ref={ref}>

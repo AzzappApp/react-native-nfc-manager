@@ -54,15 +54,7 @@ const AccountHeader = ({
               description: 'Go back button in account header',
             })}
           >
-            <CoverRenderer
-              width={COVER_WIDTH}
-              profile={profile}
-              style={
-                profile.cardColors?.primary != null && {
-                  backgroundColor: profile.cardColors?.primary,
-                }
-              }
-            />
+            <CoverRenderer width={COVER_WIDTH} profile={profile} />
           </PressableNative>
         )
       }

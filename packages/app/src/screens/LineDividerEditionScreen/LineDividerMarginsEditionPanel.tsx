@@ -52,14 +52,11 @@ const LineDividerMarginEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Top margin : {size}"
+              defaultMessage="Top margin :"
               description="Top margin message in Line Divider edition"
-              values={{
-                size: marginTop,
-              }}
             />
           }
-          value={marginTop}
+          initialValue={marginTop}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_TOP}
           step={1}
@@ -79,14 +76,11 @@ const LineDividerMarginEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Bottom margin : {size}"
+              defaultMessage="Bottom margin :"
               description="Bottom margin message in Line Divider edition"
-              values={{
-                size: marginBottom,
-              }}
             />
           }
-          value={marginBottom}
+          initialValue={marginBottom}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_BOTTOM}
           step={1}

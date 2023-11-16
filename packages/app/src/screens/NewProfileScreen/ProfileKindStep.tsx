@@ -1,6 +1,6 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -102,28 +102,37 @@ const ProfileKindStep = ({
 
   const mediasKeyExtractor = useCallback((item: Media) => item.id, []);
   const borderRadius = COVER_CARD_RADIUS * cardWidth;
-  const renderMediasItem = useCallback(
-    (media: Media) => (
-      <View style={[styles.mediaImageContainer, { borderRadius }]}>
-        <MediaImageRenderer
-          testID="category-image"
-          alt={intl.formatMessage({
-            defaultMessage: 'Category image',
-            description: 'ProfileKindStep - Category image alt',
-          })}
-          aspectRatio={COVER_RATIO}
-          source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
-          style={[styles.mediaImage, { width: cardWidth, borderRadius }]}
-        />
-      </View>
-    ),
-    [
-      borderRadius,
-      cardWidth,
-      intl,
+
+  const mediaStyle = useMemo(
+    () => [
       styles.mediaImage,
-      styles.mediaImageContainer,
+      { width: cardWidth, borderRadius, aspectRatio: COVER_RATIO },
     ],
+    [styles.mediaImage, cardWidth, borderRadius],
+  );
+
+  const mediaImageContainerStyle = useMemo(
+    () => [styles.mediaImageContainer, { borderRadius }],
+    [styles.mediaImageContainer, borderRadius],
+  );
+
+  const renderMediasItem = useCallback(
+    (media: Media) => {
+      return cardWidth > 0 ? (
+        <View style={mediaImageContainerStyle}>
+          <MediaImageRenderer
+            testID="category-image"
+            alt={intl.formatMessage({
+              defaultMessage: 'Category image',
+              description: 'ProfileKindStep - Category image alt',
+            })}
+            source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
+            style={mediaStyle}
+          />
+        </View>
+      ) : null;
+    },
+    [cardWidth, intl, mediaImageContainerStyle, mediaStyle],
   );
 
   const selectedCategory = profileCategories.find(
@@ -221,7 +230,14 @@ const ProfileKindStep = ({
           showsVerticalScrollIndicator={false}
         />
       </MaskedView>
-      <ContinueButton onPress={onNext} />
+      <ContinueButton
+        onPress={onNext}
+        label={intl.formatMessage({
+          defaultMessage: "Let's go!",
+          description:
+            'Create New Cover - Button Let"s go for choosing a webcard type',
+        })}
+      />
     </View>
   );
 };

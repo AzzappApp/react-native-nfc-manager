@@ -1,10 +1,12 @@
 /* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
-import { toGlobalId } from 'graphql-relay';
+import * as Clipboard from 'expo-clipboard';
+import { fromGlobalId } from 'graphql-relay';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
@@ -19,7 +21,6 @@ import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
 import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererBottomPanelFragment_author$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_author.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
 import type {
   PostRendererBottomPanelUpdatePostMutation,
@@ -40,12 +41,6 @@ type PostRendererBottomPanelProps = {
    */
   toggleModal: () => void;
   /**
-   *
-   *
-   * @type {PostRendererBottomPanelFragment_author$key}
-   */
-  author: PostRendererBottomPanelFragment_author$key;
-  /**
    * The post to display
    *
    * @type { PostRendererActionBar_post$key & PostRendererBottomPanelFragment_post$key}
@@ -57,7 +52,6 @@ type PostRendererBottomPanelProps = {
 const PostRendererBottomPanel = ({
   showModal,
   toggleModal,
-  author: authorKey,
   post: postKey,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
@@ -79,6 +73,7 @@ const PostRendererBottomPanel = ({
         author {
           id
           userName
+          isFollowing
         }
         createdAt
       }
@@ -86,31 +81,39 @@ const PostRendererBottomPanel = ({
     postKey as PostRendererBottomPanelFragment_post$key,
   );
 
-  const author = useFragment(
-    graphql`
-      fragment PostRendererBottomPanelFragment_author on Profile {
-        id
-        isFollowing
-      }
-    `,
-    authorKey,
-  );
-
   const copyLink = () => {
-    //TODO
-    alert('TODO');
     toggleModal();
+
+    Clipboard.setStringAsync(
+      buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+    ).then(() => {
+      /* 
+        Modals and Toasts are known to interfere with each other
+        We need to wait for the modal to be hidden before displaying the toast, or he will get hidden too
+      */
+      setTimeout(() => {
+        Toast.show({
+          type: 'info',
+          bottomOffset: TOAST_BOTTOM_OFFSET,
+          position: 'bottom',
+          props: {
+            showClose: true,
+          },
+          text1: intl.formatMessage({
+            defaultMessage: 'Link copied to the clipboard',
+            description:
+              'Toast info message that appears when the user copy the link of a post',
+          }),
+        });
+      }, MODAL_ANIMATION_TIME);
+    });
   };
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description:
-            'Post Botom Panel : Predefined Message used in sharing a Post ',
-        }),
+        url: buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -119,7 +122,10 @@ const PostRendererBottomPanel = ({
   };
 
   const goToComments = () => {
-    router.push({ route: 'POST_COMMENTS', params: { postId: post.id } });
+    router.push({
+      route: 'POST_COMMENTS',
+      params: { postId: post.id },
+    });
   };
   const addComment = () => {
     goToComments();
@@ -182,15 +188,18 @@ const PostRendererBottomPanel = ({
     updatePost({ postId: post.id, allowLikes: !post.allowLikes });
   };
 
-  const auth = useAuthState();
+  const { profileId } = useAuthState();
 
-  const currentProfileId = toGlobalId('Profile', auth.profileId ?? '');
-  const isViewer = author.id === currentProfileId;
+  const isViewer = profileId === post.author.id;
 
-  const toggleFollow = useToggleFollow(currentProfileId);
+  const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    toggleFollow(author.id, post.author.userName, !author.isFollowing);
+    toggleFollow(
+      post.author.id,
+      post.author.userName,
+      !post.author.isFollowing,
+    );
   };
 
   return (
@@ -214,20 +223,26 @@ const PostRendererBottomPanel = ({
               {post.previewComment.comment}
             </Text>
           )}
-          <Text
-            variant="medium"
-            style={styles.textCommentCounter}
-            numberOfLines={3}
-            ellipsizeMode="tail"
-          >
-            <FormattedMessage
-              defaultMessage="See {counterComments} comments"
-              description="PostRendererBottomPanel - Comment Counter"
-              values={{
-                counterComments: post.counterComments,
-              }}
-            />
-          </Text>
+          {post.allowComments && post.counterComments > 0 && (
+            <Text
+              variant="medium"
+              style={styles.textCommentCounter}
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
+              <FormattedMessage
+                defaultMessage="See {counterComments, plural,
+                                    =0 {0 comment}
+                                    one {1 comment}
+                                    other {# comments}
+                                }"
+                description="PostRendererBottomPanel - Comments Counter"
+                values={{
+                  counterComments: post.counterComments ?? 0,
+                }}
+              />
+            </Text>
+          )}
         </PressableOpacity>
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
@@ -239,7 +254,7 @@ const PostRendererBottomPanel = ({
       </View>
       <BottomSheetModal
         visible={showModal}
-        height={284}
+        height={post.allowComments ? MODAL_HEIGHT : SMALL_MODAL_HEIGHT}
         variant="modal"
         onRequestClose={toggleModal}
       >
@@ -291,17 +306,19 @@ const PostRendererBottomPanel = ({
               />
             </Text>
           </PressableOpacity>
-          <PressableOpacity onPress={addComment} style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Add a comment"
-                description="PostItem Modal - Add a comment Label"
-              />
-            </Text>
-          </PressableOpacity>
+          {post.allowComments && (
+            <PressableOpacity onPress={addComment} style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Add a comment"
+                  description="PostItem Modal - Add a comment Label"
+                />
+              </Text>
+            </PressableOpacity>
+          )}
           {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
-              {author?.isFollowing ? (
+              {post.author?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
                     defaultMessage="Unfollow"
@@ -380,3 +397,8 @@ export const PostRendererBottomPanelSkeleton = () => {
     </View>
   );
 };
+
+const TOAST_BOTTOM_OFFSET = 50;
+const MODAL_ANIMATION_TIME = 800;
+const MODAL_HEIGHT = 284;
+const SMALL_MODAL_HEIGHT = 200;

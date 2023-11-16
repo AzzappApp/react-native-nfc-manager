@@ -12,12 +12,13 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
-import { exportLayersToImage } from '#components/gpu';
+import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
@@ -28,7 +29,6 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import InnerModal from '#ui/InnerModal';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -209,6 +209,9 @@ const HorizontalPhotoEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
   const onSave = useCallback(async () => {
     if (!canSave) {
       return;
@@ -234,7 +237,7 @@ const HorizontalPhotoEditionScreen = ({
         uploadURL,
         uploadParameters,
       );
-      setUploadProgress(uploadProgress);
+      setProgressIndicator(uploadProgress);
       try {
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
@@ -249,8 +252,6 @@ const HorizontalPhotoEditionScreen = ({
               'Error toast message when saving a horizontal photo module failed because medias upload failed.',
           }),
         });
-      } finally {
-        setUploadProgress(null); //force to null to avoid a blink effect on uploadProgressModal
       }
     }
 
@@ -265,10 +266,12 @@ const HorizontalPhotoEditionScreen = ({
         input,
       },
       onCompleted() {
+        setShowImagePicker(false);
         router.back();
       },
       onError(e) {
         console.error(e);
+        setShowImagePicker(false);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -279,7 +282,15 @@ const HorizontalPhotoEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, horizontalPhoto?.id, commit, intl, router]);
+  }, [
+    canSave,
+    value,
+    horizontalPhoto?.id,
+    commit,
+    setProgressIndicator,
+    intl,
+    router,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -294,9 +305,6 @@ const HorizontalPhotoEditionScreen = ({
   const onPickImage = () => {
     setShowImagePicker(true);
   };
-
-  const [uploadProgress, setUploadProgress] =
-    useState<Observable<number> | null>(null);
 
   const onMediaSelected = async ({
     uri,
@@ -315,7 +323,7 @@ const HorizontalPhotoEditionScreen = ({
           kind: 'image',
           uri,
           parameters: editionParameters,
-          filters: filter ? [filter] : [],
+          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
         },
       ],
     });
@@ -525,18 +533,19 @@ const HorizontalPhotoEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <InnerModal visible={showImagePicker}>
+      <ScreenModal visible={showImagePicker}>
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
           steps={[SelectImageStep, EditImageStep]}
         />
-      </InnerModal>
-      <UploadProgressModal
-        visible={!!uploadProgress}
-        progressIndicator={uploadProgress}
-      />
+      </ScreenModal>
+      <ScreenModal visible={!!progressIndicator}>
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
+      </ScreenModal>
     </Container>
   );
 };

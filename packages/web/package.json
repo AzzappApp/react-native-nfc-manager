@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.4.1-rc.0",
+  "version": "0.5.1-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,10 +13,10 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.4.1-rc.0",
-    "@azzapp/i18n": "0.4.1-rc.0",
-    "@azzapp/relay": "0.4.1-rc.0",
-    "@azzapp/shared": "0.4.1-rc.0",
+    "@azzapp/data": "0.5.1-rc.0",
+    "@azzapp/i18n": "0.5.1-rc.0",
+    "@azzapp/relay": "0.5.1-rc.0",
+    "@azzapp/shared": "0.5.1-rc.0",
     "@envelop/dataloader": "^5.0.1",
     "@envelop/disable-introspection": "^5.0.1",
     "@envelop/generic-auth": "^6.0.1",
@@ -25,6 +25,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.70.0",
     "@sentry/tracing": "^7.70.0",
+    "@vercel/og": "^0.5.17",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
     "encoding": "^0.1.13",
@@ -32,9 +33,8 @@
     "graphql-yoga": "^4.0.4",
     "jsonwebtoken": "^9.0.1",
     "lodash": "^4.17.21",
-    "next": "^13.5.1",
+    "next": "^14.0.1",
     "os-browserify": "^0.3.0",
-    "p-limit": "^4.0.0",
     "passkit-generator": "^3.1.11",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
@@ -49,8 +49,8 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.15.11",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
     "@vanilla-extract/dynamic": "^2.0.3",
     "@vanilla-extract/next-plugin": "^2.3.0"
   }

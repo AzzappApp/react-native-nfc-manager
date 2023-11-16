@@ -1,6 +1,6 @@
 'use client';
 import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
-import { experimental_useOptimistic as useOptimistic, useState } from 'react';
+import { useOptimistic, useState } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import {
@@ -17,6 +17,7 @@ type StaticMediasListProps = {
 };
 
 const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
+  console.log(useOptimistic);
   const [optimisticStaticMedias, dispatchOptimistic] = useOptimistic<
     StaticMedia[],
     | {

@@ -1,13 +1,13 @@
 import * as Sentry from '@sentry/react-native';
-import { useRef, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet, Share } from 'react-native';
+import { View, useWindowDimensions, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment } from 'react-relay';
-import { useDebounce } from 'use-debounce';
-import { colors } from '#theme';
+import { useDebouncedCallback } from 'use-debounce';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import useToggle from '#hooks/useToggle';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -30,6 +30,12 @@ type ProfileWebCardModalProps = {
    *
    * @type {boolean}
    */
+  isViewer: boolean;
+  /**
+   *
+   *
+   * @type {boolean}
+   */
   visible: boolean;
   /**
    * callback to follow/unfollow
@@ -47,6 +53,7 @@ const ProfileWebCardModal = ({
   onToggleFollow,
   visible,
   close,
+  isViewer,
 }: ProfileWebCardModalProps) => {
   const profile = useFragment(
     graphql`
@@ -70,46 +77,34 @@ const ProfileWebCardModal = ({
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
-      await Share.share({
-        message: intl.formatMessage({
-          defaultMessage: 'Azzapp | An app made for your business',
-          description:
-            'Profile WebcardModal, message use when sharing the contact card',
-        }),
-      });
+      await Share.share(
+        {
+          url: buildUserUrl(profile.userName),
+        },
+        {
+          dialogTitle: intl.formatMessage({
+            defaultMessage: 'Azzapp | An app made for your business',
+            description:
+              'Profile WebcardModal, message use when sharing the contact card',
+          }),
+          subject: intl.formatMessage({
+            defaultMessage: 'Azzapp | An app made for your business',
+            description:
+              'Profile WebcardModal, message use when sharing the contact card',
+          }),
+        },
+      );
       //TODO: handle result of the share when specified
     } catch (error: any) {
       Sentry.captureException(error);
     }
   };
 
-  //we want to prevent debounced effect when following profiles is updated elsewhere
-  const isFollowingValue = useRef(Boolean(profile?.isFollowing));
+  const debouncedToggleFollowing = useDebouncedCallback(() => {
+    onToggleFollow(profile.id, profile.userName, !profile.isFollowing);
+  }, 600);
 
-  const [isFollowing, toggleFollowing, setFollowing] = useToggle(
-    Boolean(profile?.isFollowing),
-  );
-
-  const [debouncedIsFollowing] = useDebounce(isFollowing, 600);
-
-  useEffect(() => {
-    if (isFollowingValue.current === Boolean(profile?.isFollowing)) {
-      if (debouncedIsFollowing !== Boolean(profile?.isFollowing)) {
-        onToggleFollow(profile.id, profile.userName, debouncedIsFollowing);
-      }
-    } else {
-      isFollowingValue.current = Boolean(profile?.isFollowing);
-      setFollowing(Boolean(profile?.isFollowing));
-    }
-  }, [
-    debouncedIsFollowing,
-    onToggleFollow,
-    profile.id,
-    profile?.isFollowing,
-    profile.userName,
-    setFollowing,
-    toggleFollowing,
-  ]);
+  const styles = useStyleSheet(stylesheet);
 
   return (
     <BottomSheetModal
@@ -137,11 +132,13 @@ const ProfileWebCardModal = ({
             paddingVertical: 20,
           }}
         >
-          <CoverRenderer
-            profile={profile}
-            width={windowsWith / 3}
-            videoEnabled={false}
-          />
+          <View style={styles.coverStyle}>
+            <CoverRenderer
+              profile={profile}
+              width={windowsWith / 3}
+              videoEnabled={false}
+            />
+          </View>
         </View>
         <View style={styles.countersContainer}>
           <View style={styles.counterContainer}>
@@ -193,27 +190,31 @@ const ProfileWebCardModal = ({
               </View>
             </View>
           </PressableNative>
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={toggleFollowing}
-          >
-            <View style={styles.bottomSheetOptionIconLabel}>
-              <Icon icon={isFollowing ? 'delete_filled' : 'add_circle'} />
-              <Text>
-                {isFollowing ? (
-                  <FormattedMessage
-                    defaultMessage="Unfollow"
-                    description="Unfollow button label in Profile webcard modal Button"
-                  />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Follow"
-                    description="Follow button label in Profile webcard modal Button"
-                  />
-                )}
-              </Text>
-            </View>
-          </PressableNative>
+          {!isViewer && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={debouncedToggleFollowing}
+            >
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon
+                  icon={profile.isFollowing ? 'delete_filled' : 'add_circle'}
+                />
+                <Text>
+                  {profile.isFollowing ? (
+                    <FormattedMessage
+                      defaultMessage="Unfollow"
+                      description="Unfollow button label in Profile webcard modal Button"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="Follow"
+                      description="Follow button label in Profile webcard modal Button"
+                    />
+                  )}
+                </Text>
+              </View>
+            </PressableNative>
+          )}
         </View>
       </Container>
     </BottomSheetModal>
@@ -222,7 +223,7 @@ const ProfileWebCardModal = ({
 
 export default ProfileWebCardModal;
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
   countersContainer: {
     flexDirection: 'row',
     columnGap: 12,
@@ -261,4 +262,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     columnGap: 10,
   },
-});
+  coverStyle: {
+    ...shadow(appearance, 'bottom'),
+  },
+}));

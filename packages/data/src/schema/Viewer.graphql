@@ -185,9 +185,14 @@ type Viewer {
   cardStyles(first: Int, after: String): CardStyleConnection!
 
   """
-  Fetches card styles
+  Fetches card templates
   """
-  cardTemplates(first: Int, after: String): CardTemplateConnection!
+  cardTemplates(cardTemplateTypeId: String,first: Int, after: String): CardTemplateConnection!
+  
+  """
+  Fetches card templates Type
+  """
+  cardTemplateTypes: [CardTemplateType]
 
   """
   Fetches color palettes
@@ -197,7 +202,7 @@ type Viewer {
   """
   Fetches suggested medias
   """
-  suggestedMedias(first: Int, after: String): MediaConnection!
+  suggestedMedias(kind: MediaKind!, first: Int, after: String): MediaConnection!
 }
 
 """

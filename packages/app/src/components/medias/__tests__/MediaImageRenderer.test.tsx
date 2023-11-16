@@ -12,13 +12,15 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
+        style={{
+          aspectRatio: 2,
+        }}
         alt="An image"
       />,
     );
     expect(root).toHaveProp('accessibilityRole', 'image');
     expect(root).toHaveProp('accessibilityLabel', 'An image');
-    expect(root).toHaveStyle({ width: 200, aspectRatio: 2 });
+    expect(root).toHaveStyle({ aspectRatio: 2 });
   });
 
   it('should dispatch onReadyForDisplay only once for each requested media', () => {
@@ -30,7 +32,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -52,7 +53,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,
@@ -70,7 +70,6 @@ describe('MediaImageRenderer', () => {
           mediaId: 'id-2',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         alt="An image"
         onReadyForDisplay={onReadyForDisplay}
       />,

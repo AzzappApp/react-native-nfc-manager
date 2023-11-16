@@ -1,0 +1,15 @@
+"""
+Template  Type 
+"""
+type CardTemplateType implements Node {
+   """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+
+  """
+  Associated Profile Category
+  """
+  profileCategory: ProfileCategory
+}

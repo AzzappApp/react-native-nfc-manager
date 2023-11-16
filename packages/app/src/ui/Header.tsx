@@ -42,7 +42,7 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
-        <View style={styles.headerMiddle}>
+        <View style={styles.headerMiddle} pointerEvents="box-none">
           {typeof middleElement === 'string' ? (
             <Text variant="large" style={styles.title} numberOfLines={1}>
               {middleElement}

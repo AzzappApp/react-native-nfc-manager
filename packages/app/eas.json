@@ -4,7 +4,7 @@
   },
   "build": {
     "base": {
-      "node": "18.12.0",
+      "node": "18.17.0",
       "env": {
         "SENTRY_DSN": "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
       }

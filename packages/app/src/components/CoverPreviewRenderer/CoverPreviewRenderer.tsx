@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -133,6 +133,30 @@ const CoverPreviewRenderer = ({
 
   const { width: windowWidth } = useWindowDimensions();
 
+  const foregroundSource = useMemo(
+    () =>
+      foregroundImageUri && foregroundId
+        ? {
+            uri: foregroundImageUri,
+            mediaId: foregroundId,
+            requestedSize: windowWidth,
+          }
+        : null,
+    [foregroundImageUri, foregroundId, windowWidth],
+  );
+
+  const foregroundStyle = useMemo(
+    () => ({
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      height,
+      width: height * COVER_RATIO,
+      aspectRatio: COVER_RATIO,
+    }),
+    [height],
+  );
+
   return (
     <View
       style={[styles.root, { borderRadius, height }, styles.coverShadow, style]}
@@ -171,27 +195,6 @@ const CoverPreviewRenderer = ({
                 ) as any,
               }}
             />
-            {backgroundImageUri && (
-              <MediaImageRenderer
-                testID="cover-background-preview"
-                pointerEvents="none"
-                source={{
-                  uri: backgroundImageUri,
-                  mediaId: backgroundImageUri,
-                  requestedSize: windowWidth,
-                }}
-                tintColor={swapColor(backgroundImageTintColor, colorPalette)}
-                aspectRatio={COVER_RATIO}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height,
-                  width: height * COVER_RATIO,
-                }}
-                alt={'Cover edition foreground'}
-              />
-            )}
             {uri && (
               <CoverMediaPreview
                 key={uri}
@@ -201,7 +204,13 @@ const CoverPreviewRenderer = ({
                 startTime={startTime}
                 duration={duration}
                 maskUri={maskUri}
+                backgroundColor={swapColor(backgroundColor, colorPalette)}
                 backgroundMultiply={backgroundMultiply}
+                backgroundImageUri={backgroundImageUri}
+                backgroundImageTintColor={swapColor(
+                  backgroundImageTintColor,
+                  colorPalette,
+                )}
                 filter={filter}
                 editionParameters={editionParameters}
                 paused={paused}
@@ -212,24 +221,13 @@ const CoverPreviewRenderer = ({
                 testID="cover-edition-screen-cover-preview"
               />
             )}
-            {foregroundImageUri && foregroundId && (
+            {foregroundSource && (
               <MediaImageRenderer
                 testID="cover-foreground-preview"
                 pointerEvents="none"
-                source={{
-                  uri: foregroundImageUri,
-                  mediaId: foregroundId,
-                  requestedSize: windowWidth,
-                }}
+                source={foregroundSource}
                 tintColor={swapColor(foregroundImageTintColor, colorPalette)}
-                aspectRatio={COVER_RATIO}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height,
-                  width: height * COVER_RATIO,
-                }}
+                style={foregroundStyle}
                 alt={'Cover edition foreground'}
               />
             )}

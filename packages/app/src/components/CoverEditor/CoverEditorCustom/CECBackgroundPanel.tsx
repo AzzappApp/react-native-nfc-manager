@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
-import type { ColorPalette } from '../coverEditorTypes';
 import type { CECBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/CECBackgroundPanel_viewer.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CECBackgroundPanelProps = {

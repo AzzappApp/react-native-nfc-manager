@@ -1,13 +1,14 @@
-import { noop } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Modal, View } from 'react-native';
+import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -50,22 +51,34 @@ const ProfileScreenPublishHelper = ({
     `,
   );
 
+  const { bottom } = useScreenInsets();
+
   useEffect(() => {
     if (!cardIsPublished && editMode) {
       Toast.show({
         type: 'info',
-        text1: intl.formatMessage({
-          defaultMessage: 'Tap on a section of your WebCard to modify it',
-          description:
-            'Toast info message that appears when the user is in webcard edit mode for the first time',
-        }),
-        bottomOffset: 0,
+        bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
         autoHide: false,
+        text1: intl.formatMessage(
+          {
+            defaultMessage:
+              'Tap on a section of your WebCard{azzappAp} to modify it',
+            description:
+              'Toast info message that appears when the user is in webcard edit mode for the first time',
+          },
+          {
+            azzappAp: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
         props: {
           showClose: true,
         },
       });
     }
+
+    return () => {
+      Toast.hide();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode]);
 
@@ -90,11 +103,16 @@ const ProfileScreenPublishHelper = ({
         console.error(error);
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not publish your WebCard, try again later',
-            description: 'Publish modal error toast',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not publish your WebCard{azzappAp}, try again later',
+              description: 'Publish modal error toast',
+            },
+            {
+              azzappAp: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
     });
@@ -109,11 +127,7 @@ const ProfileScreenPublishHelper = ({
 
   const insets = useScreenInsets();
   return (
-    <Modal
-      animationType="fade"
-      visible={showPublishModal}
-      onRequestClose={noop}
-    >
+    <ScreenModal animationType="fade" visible={showPublishModal}>
       <Container
         style={[
           styles.container,
@@ -156,10 +170,19 @@ const ProfileScreenPublishHelper = ({
         <View style={styles.buttonGroup}>
           <Button
             onPress={onPublish}
-            label={intl.formatMessage({
-              defaultMessage: 'Ok, publish my WebCard!',
-              description: 'Publish modal publish button label',
-            })}
+            label={
+              <FormattedMessage
+                defaultMessage="Ok, publish my WebCard{azzappApp}!"
+                description="Publish modal publish button label"
+                values={{
+                  azzappApp: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            }
             loading={publishing}
           />
           <Button
@@ -172,7 +195,7 @@ const ProfileScreenPublishHelper = ({
           />
         </View>
       </Container>
-    </Modal>
+    </ScreenModal>
   );
 };
 
@@ -212,5 +235,8 @@ const stylesheet = createStyleSheet(appearance => ({
     tintColor: appearance === 'dark' ? colors.white : colors.black,
     height: 17,
     width: 17,
+  },
+  icon: {
+    color: appearance === 'dark' ? colors.black : colors.white,
   },
 }));

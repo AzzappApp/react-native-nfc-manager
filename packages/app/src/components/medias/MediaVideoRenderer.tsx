@@ -1,9 +1,9 @@
 import {
   forwardRef,
-  useEffect,
+  useCallback,
   useImperativeHandle,
+  useMemo,
   useRef,
-  useState,
 } from 'react';
 import { findNodeHandle, NativeModules, StyleSheet, View } from 'react-native';
 import SnapshotView, { snapshotView } from '../SnapshotView';
@@ -14,6 +14,7 @@ import type {
   MediaVideoRendererProps,
 } from './mediasTypes';
 import type { ForwardedRef } from 'react';
+import type { NativeSyntheticEvent } from 'react-native';
 
 /**
  * A native component that allows to display a video.
@@ -24,68 +25,63 @@ const MediaVideoRenderer = (
     alt,
     thumbnailURI,
     source,
-    aspectRatio,
     muted = false,
     paused = false,
     currentTime,
     onProgress,
     onEnd,
     onReadyForDisplay,
+    videoEnabled,
     style,
     ...props
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
 ) => {
   const isReadyForDisplay = useRef(false);
-  const [videoReady, setVideoReady] = useState(false);
-  const [seeking, setSeeking] = useState(false);
 
-  useEffect(() => {
-    if (videoReady && currentTime != null) {
-      setSeeking(true);
-    }
-  }, [currentTime, videoReady]);
-
-  const dispatchReady = () => {
+  const dispatchReady = useCallback(() => {
     if (!isReadyForDisplay.current) {
       isReadyForDisplay.current = true;
       onReadyForDisplay?.();
     }
-  };
+  }, [onReadyForDisplay]);
 
-  const cleanSnapshots = () => {
+  const cleanSnapshots = useCallback(() => {
     _videoSnapshots.delete(source.mediaId);
-  };
+  }, [source.mediaId]);
 
-  const onVideoReadyForDisplay = () => {
+  const onVideoReadyForDisplay = useCallback(() => {
     cleanSnapshots();
-    setVideoReady(true);
     dispatchReady();
-  };
+  }, [cleanSnapshots, dispatchReady]);
 
-  const onSeekComplete = () => {
+  const onSeekComplete = useCallback(() => {
     cleanSnapshots();
-    setSeeking(false);
-  };
+  }, [cleanSnapshots]);
+
+  const onProgressInner = useMemo(
+    () =>
+      onProgress
+        ? (event: NativeSyntheticEvent<{ currentTime: number }>) =>
+            onProgress?.(event.nativeEvent)
+        : null,
+    [onProgress],
+  );
 
   const sourceRef = useRef(source.mediaId);
   // we need to clean the state to start loading
   // the placeholder
   if (sourceRef.current !== source.mediaId) {
-    setVideoReady(false);
     sourceRef.current = source.mediaId;
     isReadyForDisplay.current = false;
   }
 
-  const videoRef = useRef<any>();
+  const videoRef = useRef<any>(null);
   const containerRef = useRef<any>(null);
 
   useImperativeHandle(
     ref,
     () => ({
-      getContainer() {
-        return containerRef.current;
-      },
       async getPlayerCurrentTime() {
         if (videoRef.current) {
           if (NativeModules.AZPMediaVideoRendererManager == null) {
@@ -111,52 +107,61 @@ const MediaVideoRenderer = (
     [],
   );
 
-  const snapshotID = _videoSnapshots.get(source.mediaId);
-
-  return (
-    <View
-      style={[
-        style,
-        { width: source.requestedSize, aspectRatio, overflow: 'hidden' },
-      ]}
-      ref={containerRef}
-      {...props}
-    >
-      <NativeMediaVideoRenderer
-        ref={videoRef}
-        source={source}
-        muted={muted}
-        paused={paused}
-        currentTime={currentTime}
-        accessibilityLabel={alt}
-        // todo accessibilityRole="video"
-        style={StyleSheet.absoluteFill}
-        onReadyForDisplay={onVideoReadyForDisplay}
-        onSeekComplete={onSeekComplete}
-        onProgress={onProgress}
-        onEnd={onEnd}
-      />
-      {!videoReady && thumbnailURI && !currentTime && (
-        <MediaImageRenderer
-          testID="thumbnail"
-          source={{
+  const thumbnailSource = useMemo(
+    () =>
+      thumbnailURI
+        ? {
             uri: thumbnailURI,
             mediaId: source.mediaId,
             requestedSize: source.requestedSize,
-          }}
+          }
+        : null,
+    [source.mediaId, source.requestedSize, thumbnailURI],
+  );
+
+  const snapshotID = _videoSnapshots.get(source.mediaId);
+
+  const containerStyle = useMemo(
+    () => [style, { overflow: 'hidden' as const }],
+    [style],
+  );
+
+  return (
+    <View style={containerStyle} ref={containerRef} {...props}>
+      {thumbnailSource && !currentTime && (
+        <MediaImageRenderer
+          testID="thumbnail"
+          source={thumbnailSource}
           alt={alt}
-          aspectRatio={aspectRatio}
           onReadyForDisplay={dispatchReady}
-          style={[StyleSheet.absoluteFill, { backgroundColor: 'transparent' }]}
+          style={StyleSheet.absoluteFill}
         />
       )}
-      {(!videoReady || seeking) && snapshotID && (
+      {snapshotID && (
         <SnapshotView
           clearOnUnmount
           snapshotID={snapshotID}
           style={StyleSheet.absoluteFill}
         />
       )}
+      {videoEnabled ? (
+        <View style={StyleSheet.absoluteFill}>
+          <NativeMediaVideoRenderer
+            ref={videoRef}
+            source={source}
+            muted={muted}
+            paused={paused}
+            currentTime={currentTime}
+            accessibilityLabel={alt}
+            // todo accessibilityRole="video"
+            style={StyleSheet.absoluteFill}
+            onReadyForDisplay={onVideoReadyForDisplay}
+            onSeekComplete={onSeekComplete}
+            onProgress={onProgressInner}
+            onEnd={onEnd}
+          />
+        </View>
+      ) : null}
     </View>
   );
 };

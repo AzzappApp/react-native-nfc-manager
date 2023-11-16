@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { isEqual } from 'lodash';
 import { z } from 'zod';
 import {
@@ -42,12 +43,12 @@ const createModuleSavingMutation =
   ) => {
     const profileId = auth.profileId;
     if (!profileId) {
-      throw new Error(ERRORS.UNAUTORIZED);
+      throw new GraphQLError(ERRORS.UNAUTORIZED);
     }
 
     const profile = await loaders.Profile.load(profileId);
     if (!profile) {
-      throw new Error(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
@@ -57,7 +58,7 @@ const createModuleSavingMutation =
     if (validator) {
       const { success } = validator.safeParse(data);
       if (!success) {
-        throw new Error(ERRORS.INVALID_REQUEST);
+        throw new GraphQLError(ERRORS.INVALID_REQUEST);
       }
     }
 
@@ -66,14 +67,14 @@ const createModuleSavingMutation =
         [module] = await getCardModulesByIds([moduleId]);
       } catch (e) {
         console.error(e);
-        throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+        throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
       }
       if (
         !module ||
         module.profileId !== profileId ||
         module.kind !== moduleKind
       ) {
-        throw new Error(ERRORS.INVALID_REQUEST);
+        throw new GraphQLError(ERRORS.INVALID_REQUEST);
       }
       previousMedias = getMedias?.(module.data as any) ?? null;
     }
@@ -104,7 +105,7 @@ const createModuleSavingMutation =
       });
     } catch (e) {
       console.error(e);
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
     cardUsernamesToRevalidate.add(profile.userName);
@@ -196,7 +197,7 @@ export const saveSimpleTextModule: MutationResolvers['saveSimpleTextModule'] = (
   context,
 ) => {
   if (kind !== MODULE_KIND_SIMPLE_TEXT && kind !== MODULE_KIND_SIMPLE_TITLE) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   return createModuleSavingMutation(kind)(parent, { input: rest }, context);
 };

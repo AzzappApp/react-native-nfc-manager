@@ -20,6 +20,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Input from '#ui/Input';
@@ -27,6 +28,7 @@ import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import CommentItem from './CommentItem';
+import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
 import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
@@ -69,6 +71,7 @@ const PostCommentsList = ({
 
   const router = useRouter();
   const intl = useIntl();
+  const auth = useAuthState();
   const onClose = () => {
     router.back();
   };
@@ -87,7 +90,11 @@ const PostCommentsList = ({
             edges {
               node {
                 id
+                author {
+                  id
+                }
                 ...CommentItemFragment_comment
+                ...DeletableCommentItemFragment_comment
               }
             }
           }
@@ -196,7 +203,33 @@ const PostCommentsList = ({
     [data.comments?.edges],
   );
 
+  const renderItem = useCallback(
+    ({
+      item,
+    }: {
+      item: CommentItemFragment_comment$key & { author: { id: string } };
+    }) => {
+      if (auth.profileId !== item.author.id) {
+        return <CommentItem item={item} />;
+      }
+      return <DeletableCommentItem item={item} postId={postId} />;
+    },
+    [auth.profileId, postId],
+  );
+
   const insets = useScreenInsets();
+
+  const refreshControl = useMemo(() => {
+    return (
+      <RefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
+    );
+  }, [refreshing, onRefresh]);
+
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={isLoadingNext} />,
+    [isLoadingNext],
+  );
+
   return (
     <Container
       style={[
@@ -215,15 +248,10 @@ const PostCommentsList = ({
           onEndReached={onEndReached}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          ListFooterComponent={<ListLoadingFooter loading={isLoadingNext} />}
+          ListFooterComponent={ListFooterComponent}
           onEndReachedThreshold={0.5}
-          style={{ flex: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing ?? false}
-              onRefresh={onRefresh}
-            />
-          }
+          style={styles.list}
+          refreshControl={refreshControl}
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
@@ -266,10 +294,6 @@ const PostCommentsList = ({
 export default PostCommentsList;
 const MAX_COMMENT_LENGHT = 2200;
 
-const renderItem = ({ item }: { item: CommentItemFragment_comment$key }) => {
-  return <CommentItem item={item} />;
-};
-
 const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
@@ -294,4 +318,5 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
+  list: { flex: 1 },
 });

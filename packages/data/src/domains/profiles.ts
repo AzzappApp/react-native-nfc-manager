@@ -56,6 +56,7 @@ export const ProfileTable = mysqlTable(
     coverTitle: cols.defaultVarchar('coverTitle'),
     coverSubTitle: cols.defaultVarchar('coverSubTitle'),
     coverData: json('coverData').$type<{
+      kind: 'others' | 'people' | 'video' | null;
       titleStyle: TextStyle;
       subTitleStyle: TextStyle;
       textOrientation: TextOrientation;
@@ -86,7 +87,10 @@ export const ProfileTable = mysqlTable(
     nbFollowers: int('nbFollowers').default(0).notNull(),
     nbFollowings: int('nbFollowings').default(0).notNull(),
     nbPosts: int('nbPosts').default(0).notNull(),
-    nbLikes: int('nbLikes').default(0).notNull(),
+    nbPostsLiked: int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
+    nbLikes: int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
+    nbWebcardViews: int('nbWebcardViews').default(0).notNull(),
+    nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
   },
   table => {
     return {
@@ -186,7 +190,8 @@ export const getRecommendedProfiles = async (
         isNull(FollowTable.followerId),
         eq(ProfileTable.cardIsPublished, true),
       ),
-    );
+    )
+    .orderBy(desc(ProfileTable.createdAt));
 
   return result.map(({ Profile }) => Profile);
 };

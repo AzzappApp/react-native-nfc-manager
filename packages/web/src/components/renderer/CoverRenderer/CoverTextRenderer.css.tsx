@@ -15,9 +15,7 @@ const converTextContainer = style({
   height: '100%',
   top: 0,
   left: 0,
-  padding: '5%',
-  paddingTop: '30%',
-
+  padding: `${COVER_RATIO * 0.15 * 100}%`,
   display: 'flex',
   flexDirection: 'column',
   '@media': {

@@ -6,6 +6,19 @@ import android.media.effect.EffectContext
 import android.opengl.EGL14
 import android.opengl.GLES20
 import android.opengl.GLUtils
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.transformer.Composition
+import androidx.media3.transformer.DefaultEncoderFactory
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EncoderSelector
+import androidx.media3.transformer.ExportException
+import androidx.media3.transformer.ExportResult
+import androidx.media3.transformer.TransformationRequest
+import androidx.media3.transformer.TransformationRequest.HDR_MODE_KEEP_HDR
+import androidx.media3.transformer.Transformer
+import androidx.media3.transformer.VideoEncoderSettings
 import com.azzapp.MainApplication
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -14,13 +27,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.UIManagerHelper
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.transformer.DefaultEncoderFactory
-import com.google.android.exoplayer2.transformer.EncoderSelector
-import com.google.android.exoplayer2.transformer.TransformationException
-import com.google.android.exoplayer2.transformer.TransformationResult
-import com.google.android.exoplayer2.transformer.Transformer
-import com.google.android.exoplayer2.transformer.VideoEncoderSettings
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -37,37 +43,11 @@ import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.egl.EGLSurface
 import kotlin.math.round
 
-class GPUHelpers(private val reactContext: ReactApplicationContext) :
+
+@UnstableApi class GPUHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "AZPGPUHelpers"
 
-
-  @ReactMethod
-  fun exportVideoFromView(
-    viewId: Int,
-    size: ReadableMap,
-    bitRate: Int,
-    removeAudio: Boolean,
-    promise: Promise
-  ) {
-    val view = UIManagerHelper.getUIManager(reactContext, viewId)?.resolveView(viewId) as GPUVideoView?
-    if (view == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView is not ready for export")
-      return
-    }
-    val layer = view.getLayers()?.get(0)
-    if (layer == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView does not render layer")
-      return
-    }
-    exportVideoLayer(
-      layer,
-      size,
-      bitRate,
-      removeAudio,
-      promise
-    )
-  }
 
   @ReactMethod
   fun exportLayersToVideo(
@@ -101,14 +81,23 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
     removeAudio: Boolean,
     promise: Promise
   ) {
-    val transformer = Transformer.Builder(reactContext)
-      .setRemoveAudio(removeAudio)
-      .setFrameProcessorFactory(
+    val transformerRequestBuilder = TransformationRequest.Builder().setHdrMode(HDR_MODE_KEEP_HDR).build()
+    var loadedLutFilterBitmap: Bitmap? = null
+    runBlocking {
+      try {
+        loadedLutFilterBitmap = if (layer.lutFilterUri != null) GPULayerImageLoader.loadImage(layer.lutFilterUri!!) else null
+      } catch (e: Exception) {
+        promise.reject(e)
+      }
+    }
+    val transformer =
+    Transformer.Builder(reactContext).setTransformationRequest(transformerRequestBuilder)
+      .setVideoFrameProcessorFactory(
         GLExoPlayerFrameProcessor.Factory(
           size.getInt("width"),
           size.getInt("height"),
           layer.parameters,
-          layer.filters
+          loadedLutFilterBitmap
         )
       )
       .setEncoderFactory(
@@ -122,71 +111,45 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
       )
       .build()
 
-    val inputMediaItem = MediaItem.fromUri(layer.source.uri)
+    val startMs = layer.source.startTime?.toLong()?.times(1000L) ?: C.TIME_UNSET
+    val endMs =  layer.source.startTime?.toLong()?.times(1000L)?.plus(layer.source.duration?.toLong()?.times(1000L) ?: 0) ?: C.TIME_UNSET
+    val sourceMediaItem = MediaItem.Builder().setUri(layer.source.uri);
 
-    /*val startMs = startTime * 1000L
-    val endMS = startTime + duration * 1000L
-    MediaItem.Builder()
-      .setUri(uri)
-      .setClippingConfiguration(
-        MediaItem.ClippingConfiguration.Builder()
-          .setStartPositionMs(startMs)
-          .setEndPositionMs(endMS)
-          .build()
-      ).build()*/
+    if(startMs != C.TIME_UNSET && endMs !=C.TIME_UNSET) {
+      sourceMediaItem.setClippingConfiguration(
+              MediaItem.ClippingConfiguration.Builder()
+                      .setStartPositionMs(startMs)
+                      .setEndPositionMs(endMs)
+                      .build()
+      );
+    }
 
 
-    val file = File.createTempFile(UUID.randomUUID().toString(), ".mp4", reactContext.cacheDir)
-    if (file.exists()) file.delete()
+    val editedMediaItem = EditedMediaItem.Builder(sourceMediaItem.build()).setRemoveAudio(removeAudio);
+
+    val file = File( reactContext.cacheDir, UUID.randomUUID().toString() + ".mp4")
+    check(!(file.exists() && !file.delete())) { "Could not delete the previous export output file" }
+    check(file.createNewFile()) { "Could not create the export output file" }
 
     transformer.addListener(object : Transformer.Listener {
-      override fun onTransformationCompleted(
-        inputMediaItem: MediaItem,
-        transformationResult: TransformationResult
+      override fun onCompleted(
+        composition: Composition,
+        exportResult: ExportResult
       ) {
-        super.onTransformationCompleted(inputMediaItem, transformationResult)
+        super.onCompleted(composition, exportResult)
         promise.resolve(file.absolutePath)
       }
 
-      override fun onTransformationError(
-        inputMediaItem: MediaItem,
-        exception: TransformationException
-      ) {
-        super.onTransformationError(inputMediaItem, exception)
-        promise.reject(exception)
+      override fun onError(
+               composition: Composition,
+               exportResult: ExportResult,
+               exportException: ExportException) {
+        super.onError(composition, exportResult, exportException)
+        promise.reject(exportException)
       }
     })
 
-    transformer.startTransformation(inputMediaItem, file.absolutePath)
-  }
-
-  @ReactMethod
-  fun exportImageFromView(
-    viewId: Int,
-    format: String,
-    quality: Double,
-    size: ReadableMap,
-    promise: Promise
-  ) {
-    val view = UIManagerHelper.getUIManager(reactContext, viewId)?.resolveView(viewId) as GPUImageView?
-    if (view == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView is not ready for export")
-      return
-    }
-    val layer = view.getLayers()?.get(0)
-    if (layer == null) {
-      promise.reject("FAILED_TO_EXPORT", "GPUImageView does not render layer")
-      return
-    }
-    GlobalScope.launch(Dispatchers.Main) {
-      exportImageLayer(
-        layer,
-        format,
-        quality,
-        size,
-        promise
-      )
-    }
+    transformer.start(editedMediaItem.build(), file.absolutePath)
   }
 
   @ReactMethod
@@ -218,7 +181,7 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
 
   private fun exportImageLayer(
     layer: GPULayer,
-    format: String,
+    format: String, //'auto' | 'jpg' | 'png'
     quality: Double,
     size: ReadableMap,
     promise: Promise
@@ -253,7 +216,7 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
         EGL10.EGL_GREEN_SIZE, 8,
         EGL10.EGL_BLUE_SIZE, 8,
         EGL10.EGL_ALPHA_SIZE, 8,
-        EGL10.EGL_DEPTH_SIZE, 16,
+        EGL10.EGL_DEPTH_SIZE, 0,
         EGL10.EGL_STENCIL_SIZE, 0,
         EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
         EGL10.EGL_SURFACE_TYPE, EGL10.EGL_PBUFFER_BIT,
@@ -304,9 +267,13 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
       }
 
       var loadedBitmap: Bitmap? = null
+      var loadedMaskBitmap: Bitmap? = null
+      var loadedLutFilterBitmap: Bitmap? = null
       runBlocking {
         try {
           loadedBitmap = GPULayerImageLoader.loadGPULayerSource(layer.source)
+          loadedMaskBitmap = if (layer.maskUri != null) GPULayerImageLoader.loadImage(layer.maskUri!!) else null
+          loadedLutFilterBitmap = if (layer.lutFilterUri != null) GPULayerImageLoader.loadImage(layer.lutFilterUri!!) else null
         } catch (e: Exception) {
           promise.reject(e)
         }
@@ -314,6 +281,20 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
       val inputBitmap = loadedBitmap ?:return
       sourceImage = GLFrame.create(inputBitmap.width, inputBitmap.height)
       ShaderUtils.bindImageTexture(sourceImage.texture, inputBitmap)
+
+      val maskBitmap = loadedMaskBitmap
+      if (maskBitmap != null) {
+        val maskImage = GLFrame.create(maskBitmap.width, maskBitmap.height)
+        ShaderUtils.bindImageTexture(maskImage.texture, maskBitmap)
+
+        var blendEffect = BlendEffect()
+        val imageWithMask = blendEffect.applyBlend(sourceImage, maskImage!!)
+        if (imageWithMask != null) {
+          sourceImage.release()
+          sourceImage = imageWithMask
+        }
+        maskImage.release()
+      }
 
       val parameters = layer.parameters
       if (parameters != null) {
@@ -327,29 +308,38 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
           sourceImage.release()
           sourceImage = croppedImage
         }
+      }
 
-        val filters = layer.filters
-        if (filters != null) {
-          for (filter in filters!!) {
-            val transform = GLFrameTransformations.transformationForName(filter)
-            if (transform != null) {
-              transform(
-                sourceImage,
-                sourceImage,
-                null,
-                effectContext.factory
-              )
-            }
-          }
+      val lutFilterBitmap = loadedLutFilterBitmap
+      if (lutFilterBitmap != null) {
+        val lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
+        ShaderUtils.bindImageTexture(lutImage.texture, lutFilterBitmap)
+
+        var colorLUTEffect = ColorLUTEffect()
+        val imageWithLut = colorLUTEffect.apply(sourceImage, lutImage!!)
+        if (imageWithLut != null) {
+          sourceImage.release()
+          sourceImage = imageWithLut
         }
+        lutImage.release()
       }
 
       var bitmap = saveTexture(sourceImage.texture, sourceImage.width, sourceImage.height)
-      val file = File.createTempFile(UUID.randomUUID().toString(), ".jpg", MainApplication.getMainApplicationContext().cacheDir)
+      val fileExtension = when (format) {
+        "png" -> ".png"
+        "auto" -> if (bitmap.hasAlpha())  ".png" else ".jpg"
+        else -> ".jpg"  // Default to JPEG if the format is not recognized
+      }
+      val file = File.createTempFile(UUID.randomUUID().toString(), fileExtension, MainApplication.getMainApplicationContext().cacheDir)
       if (file.exists()) file.delete()
       val out = FileOutputStream(file)
       bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
-      bitmap.compress(Bitmap.CompressFormat.JPEG, round(quality).toInt(), out)
+      val compressFormat = when (format) {
+        "png" -> Bitmap.CompressFormat.PNG
+        "auto" -> if (bitmap.hasAlpha())  Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
+        else -> Bitmap.CompressFormat.JPEG  // Default to JPEG if the format is not recognized
+      }
+      bitmap.compress(compressFormat, round(quality).toInt(), out)
       out.flush()
       out.close()
       promise.resolve(file.absolutePath)
@@ -367,33 +357,36 @@ class GPUHelpers(private val reactContext: ReactApplicationContext) :
     }
   }
 
-  private fun saveTexture(texture: Int, width: Int, height: Int): Bitmap {
-    val frame = IntArray(1)
-    GLES20.glGenFramebuffers(1, frame, 0)
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frame[0])
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture,
-      0
-    )
-    val buffer: ByteBuffer = ByteBuffer.allocate(width * height * 4)
-    GLES20.glReadPixels(
-      0, 0, width, height, GLES20.GL_RGBA,
-      GLES20.GL_UNSIGNED_BYTE, buffer
-    )
-    val bitmap = Bitmap.createBitmap(
-      width, height,
-      Bitmap.Config.ARGB_8888
-    )
-    bitmap.copyPixelsFromBuffer(buffer)
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
-    GLES20.glDeleteFramebuffers(1, frame, 0)
-    return bitmap
+  companion object{
+    fun saveTexture(texture: Int, width: Int, height: Int): Bitmap {
+      val frame = IntArray(1)
+      GLES20.glGenFramebuffers(1, frame, 0)
+      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frame[0])
+      GLES20.glFramebufferTexture2D(
+        GLES20.GL_FRAMEBUFFER,
+        GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture,
+        0
+      )
+      val buffer: ByteBuffer = ByteBuffer.allocate(width * height * 4)
+      GLES20.glReadPixels(
+        0, 0, width, height, GLES20.GL_RGBA,
+        GLES20.GL_UNSIGNED_BYTE, buffer
+      )
+      val bitmap = Bitmap.createBitmap(
+        width, height,
+        Bitmap.Config.ARGB_8888
+      )
+      bitmap.copyPixelsFromBuffer(buffer)
+      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+      GLES20.glDeleteFramebuffers(1, frame, 0)
+      return bitmap
+    }
   }
+
 
   private object ExcludingEncoderSelector : EncoderSelector {
 
-    private val EXCLUDED_ENCODERS = arrayListOf("OMX.qcom.video.encoder.avc")
+    private val EXCLUDED_ENCODERS = ArrayList<String>(0)
 
     override fun selectEncoderInfos(mimeType: String): ImmutableList<MediaCodecInfo> {
       return  ImmutableList.copyOf(

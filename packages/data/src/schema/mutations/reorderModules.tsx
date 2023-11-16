@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import {
   db,
@@ -14,16 +15,16 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   const modules = await getCardModulesByIds(moduleIds);
   if (modules.some(module => module?.profileId !== profileId)) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
@@ -36,7 +37,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     });
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   cardUsernamesToRevalidate.add(profile.userName);

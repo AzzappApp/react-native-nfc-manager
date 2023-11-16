@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -10,7 +11,6 @@ import { Screen, ScreenContainer } from 'react-native-screens';
 import Container from '#ui/Container';
 import PagerHeader from './PagerHeader';
 import type { Icons } from '#ui/Icon';
-import type { StyleProp, ViewStyle } from 'react-native';
 
 type WizzardTransitionerProps = {
   currentStepIndex: number;
@@ -18,6 +18,8 @@ type WizzardTransitionerProps = {
     title: string;
     element: React.ReactNode;
     backIcon?: Icons;
+    rightElement?: React.ReactNode;
+    rightElementWidth?: number;
   }>;
   headerHidden?: boolean;
   contentHeight: number;
@@ -36,7 +38,6 @@ const WizzardTransitioner = ({
   onBack,
 }: WizzardTransitionerProps) => {
   const currentStep = steps[currentStepIndex];
-
   const previousStepIndex = useRef(currentStepIndex);
   const transitionProgress = useSharedValue(0);
   const [transitionInformation, setTransitionInformation] = useState<{
@@ -88,6 +89,8 @@ const WizzardTransitioner = ({
           onBack={onBack}
           title={currentStep.title}
           backIcon={currentStep.backIcon}
+          rightElement={currentStep.rightElement}
+          rightElementWidth={currentStep.rightElementWidth}
         />
       )}
 

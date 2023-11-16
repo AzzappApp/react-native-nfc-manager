@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { buildDefaultContactCard, updateProfile } from '#domains';
 import type { Profile } from '#domains';
@@ -10,12 +11,12 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const updates: Partial<Profile> = {
@@ -32,7 +33,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     await updateProfile(profileId, updates);
   } catch (e) {
     console.error(e);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   cardUsernamesToRevalidate.add(profile.userName);

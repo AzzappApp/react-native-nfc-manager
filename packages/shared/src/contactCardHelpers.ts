@@ -1,5 +1,6 @@
-import { buildUserUrl } from './urlHelpers';
+import { json2csv, csv2json } from 'csv42';
 
+import { buildUserUrl } from './urlHelpers';
 /**
  * A contact card
  */
@@ -32,10 +33,25 @@ export type ContactCard = {
     selected: boolean;
   };
   socials?: Array<{
-    social: string;
+    url: string;
+    label: string;
     selected: boolean;
   }> | null;
 };
+
+type ParsedContactCard = [
+  string,
+  string,
+  string,
+  string,
+  string,
+  Array<[string, string]>,
+  Array<[string, string]>,
+  Array<[string, string]>,
+  Array<[string, string]>,
+  string | undefined,
+  Array<[string, string]>,
+];
 
 /**
  * Serializes a contact card to a string
@@ -45,13 +61,15 @@ export const serializeContactCard = (
   profileId: string,
   card: ContactCard | null,
 ) => {
-  const urls = [`azzapp,${buildUserUrl(username)}`];
+  const urls: Array<[string, string]> = [['azzapp', buildUserUrl(username)]];
   if (card?.urls)
     urls.push(
-      ...card.urls.filter(url => url.selected).map(url => `,${url.address}`),
+      ...card.urls
+        .filter(url => url.selected)
+        .map(({ address }) => ['', address] as [string, string]),
     );
 
-  const serializedContactCard = [
+  const serializedContactCard: ParsedContactCard = [
     profileId,
     card?.firstName ?? '',
     card?.lastName ?? '',
@@ -59,25 +77,21 @@ export const serializeContactCard = (
     card?.title ?? '',
     card?.phoneNumbers
       ?.filter(p => p.selected)
-      .map(p => `${p.label},${p.number}`)
-      .join(';') ?? '',
+      .map(({ label, number }) => [label, number]) ?? [],
     card?.emails
       ?.filter(e => e.selected)
-      .map(e => `${e.label},${e.address}`)
-      .join(';') ?? '',
-    urls.join(';'),
+      .map(({ label, address }) => [label, address]) ?? [],
+    urls,
     card?.addresses
       ?.filter(address => address.selected)
-      .map(address => `${address.label},${address.address}`)
-      .join(';'),
+      .map(({ label, address }) => [label, address]) ?? [],
     card?.birthday?.selected ? card?.birthday.birthday : undefined,
     card?.socials
       ?.filter(social => social.selected)
-      .map(social => social.social)
-      .join(';'),
-  ].join('|');
+      .map(({ label, url }) => [label, url]) ?? [],
+  ];
 
-  return serializedContactCard;
+  return json2csv([serializedContactCard], { header: false });
 };
 
 /**
@@ -86,7 +100,27 @@ export const serializeContactCard = (
  * @returns the parsed contact card
  */
 export const parseContactCard = (contactCardData: string) => {
+  const data = csv2json<{
+    [key: string]: ParsedContactCard;
+  }>(contactCardData, { header: false });
+
   const [
+    [
+      profileId,
+      firstName,
+      lastName,
+      company,
+      title,
+      phoneNumbers,
+      emails,
+      urls,
+      addresses,
+      birthday,
+      socials,
+    ],
+  ] = Object.values(data[0]);
+
+  return {
     profileId,
     firstName,
     lastName,
@@ -98,47 +132,5 @@ export const parseContactCard = (contactCardData: string) => {
     addresses,
     birthday,
     socials,
-  ] = contactCardData.split('|');
-
-  return {
-    profileId: profileId || '',
-    firstName: firstName || '',
-    lastName: lastName || '',
-    company: company || '',
-    title: title || '',
-    phones:
-      phoneNumbers?.split(';').map(phone => {
-        const [label, number] = phone.split(',');
-        return {
-          label,
-          number,
-        };
-      }) ?? [],
-    emails:
-      emails?.split(';').map(email => {
-        const [label, address] = email.split(',');
-        return {
-          label,
-          email: address,
-        };
-      }) ?? [],
-    urls:
-      urls?.split(';').map(url => {
-        const [label, address] = url.split(',');
-        return {
-          label,
-          url: address,
-        };
-      }) ?? [],
-    adresses:
-      addresses?.split(';').map(addr => {
-        const [label, address] = addr.split(',');
-        return {
-          label,
-          address,
-        };
-      }) ?? [],
-    birthday,
-    socials: socials?.split(';'),
   };
 };

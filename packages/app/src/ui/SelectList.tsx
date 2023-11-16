@@ -28,6 +28,12 @@ export type SelectListProps<ItemT> = Omit<
      * The selected item key
      */
     selectedItemKey?: string | null | undefined;
+    /**
+     * should use a SectionList instead of FlatList
+     *
+     * @type {boolean} default = false
+     */
+    section?: boolean;
   };
 
 /**

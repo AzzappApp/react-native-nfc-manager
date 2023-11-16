@@ -14,6 +14,7 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { Icons } from './Icon';
+import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 export type FooterBarItem = {
@@ -28,7 +29,7 @@ export type FooterBarItem = {
    */
   IconComponent?: React.ReactElement;
   /** the label of the tab(use for accesibility also) */
-  label: string;
+  label: ReactNode;
   /**
    * by default tabs icons are tinted if this property is set to `'unactive'`
    * the icon will only be tinted when the tab is not selected
@@ -175,7 +176,7 @@ const FooterBarItem = ({
     <PressableNative
       testID={tabKey}
       accessibilityRole="tab"
-      accessibilityLabel={label}
+      accessibilityLabel={typeof label === 'string' ? label : undefined}
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
       style={[style ?? styles.tab]}

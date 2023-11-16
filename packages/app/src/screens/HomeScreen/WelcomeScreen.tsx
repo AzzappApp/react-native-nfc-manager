@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
+import { mainRoutes } from '#mobileRoutes';
+import { colors } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -10,11 +12,13 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import type { ScreenOptions } from '#components/NativeRouter';
 
 const WelcomeScreen = () => {
   const intl = useIntl();
@@ -32,15 +36,19 @@ const WelcomeScreen = () => {
 
   const goBackToHome = useCallback(() => {
     if (profileId) {
-      router.replace({
-        route: 'HOME',
-      });
+      router.replaceAll(mainRoutes(false));
     }
   }, [profileId, router]);
 
   useFocusEffect(goBackToHome);
 
-  return (
+  return profileId ? (
+    <Container
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+    >
+      <ActivityIndicator />
+    </Container>
+  ) : (
     <Container style={{ flex: 1 }}>
       <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
       <Image
@@ -65,25 +73,44 @@ const WelcomeScreen = () => {
           })}
         </Text>
         <Text style={styles.subtitle}>
-          {intl.formatMessage({
-            defaultMessage:
-              'Introduce yourself in a new way by creating your own WebCard.',
-            description: 'Subtitle for welcome screen',
-          })}
+          <FormattedMessage
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            description="Subtitle for welcome screen"
+            values={{
+              azzappAp: <Text variant="azzapp">a</Text>,
+            }}
+          />
         </Text>
         <Link route="NEW_PROFILE" prefetch>
           <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Create my first webcard',
-              description: 'Button label for welcome screen',
-            })}
+            label={intl.formatMessage(
+              {
+                defaultMessage: 'Create my first webcard{azzappAp}',
+                description: 'Button label for welcome screen',
+              },
+              {
+                azzappAp: (
+                  <Text style={styles.icon} variant="azzapp">
+                    a
+                  </Text>
+                ),
+              },
+            )}
           />
         </Link>
       </View>
-      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
+      <HomeBottomSheetPanel
+        visible={showMenu}
+        close={toggleShowMenu}
+        withProfile={false}
+      />
     </Container>
   );
 };
+
+WelcomeScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'none',
+});
 
 const styles = StyleSheet.create({
   linear: {
@@ -125,6 +152,9 @@ const styles = StyleSheet.create({
     top: 39,
     right: 25,
     borderWidth: 0,
+  },
+  icon: {
+    color: colors.white,
   },
 });
 

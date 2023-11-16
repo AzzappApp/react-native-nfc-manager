@@ -63,14 +63,11 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Top/Bottom margin : {size}"
+              defaultMessage="Top/Bottom margin :"
               description="Margin vertical label in carousel edition"
-              values={{
-                size: marginVertical,
-              }}
             />
           }
-          value={marginVertical}
+          initialValue={marginVertical}
           min={0}
           max={CAROUSEL_MAX_VERTICAL_MARGIN}
           step={1}
@@ -80,14 +77,11 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Left margin : {size}"
+              defaultMessage="Left margin :"
               description="Margin horizontal label in carousel edition"
-              values={{
-                size: marginHorizontal,
-              }}
             />
           }
-          value={marginHorizontal}
+          initialValue={marginHorizontal}
           min={0}
           max={CAROUSEL_MAX_HORIZONTAL_MARGIN}
           step={1}
@@ -97,12 +91,11 @@ const CarouselEditionMarginPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Gap : {size}"
+              defaultMessage="Gap :"
               description="Image gap label in carousel edition"
-              values={{ size: gap }}
             />
           }
-          value={gap}
+          initialValue={gap}
           min={0}
           max={CAROUSEL_MAX_GAP}
           step={1}

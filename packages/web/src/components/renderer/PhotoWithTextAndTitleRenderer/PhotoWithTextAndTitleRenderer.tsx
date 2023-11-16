@@ -120,8 +120,8 @@ const PhotoWithTextAndTitleRenderer = ({
             style={{
               display: 'flex',
               flexDirection: 'column',
-              paddingLeft: marginHorizontal,
-              paddingRight: marginHorizontal,
+              paddingLeft: imageMargin === 'width_full' ? marginHorizontal : 0,
+              paddingRight: imageMargin === 'width_full' ? marginHorizontal : 0,
               maxWidth: `calc(400px - ${gap / 2}px)`,
               width: '100%',
               marginTop: marginVertical,

@@ -18,7 +18,8 @@ import ContactCardEditModalEmails from './ContactCardEditModalEmails';
 import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
 import ContactCardEditModalSocials from './ContactCardEditModalSocials';
-import ContactCardEditModalStyles, {
+import {
+  buildContactCardModalStyleSheet,
   DELETE_BUTTON_WIDTH,
 } from './ContactCardEditModalStyles';
 import ContactCardEditModalUrls from './ContactCardEditModalUrls';
@@ -43,6 +44,7 @@ const reducer = (
       return {
         ...state,
         deleted: true,
+        rect: null,
       };
     case 'OPEN_DELETION_OPTION':
       return {
@@ -99,7 +101,8 @@ const ContactCardEditModal = ({
           selected
         }
         socials {
-          social
+          url
+          label
           selected
         }
         serializedContactCard {
@@ -168,7 +171,7 @@ const ContactCardEditModal = ({
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
             birthday: data.birthday,
-            socials: data.socials.filter(social => social.social),
+            socials: data.socials.filter(social => social.url),
           },
         },
         onCompleted: () => {
@@ -199,9 +202,12 @@ const ContactCardEditModal = ({
 
   return (
     <BottomSheetModal
+      contentContainerStyle={styles.bottomSheetContainerStyle}
+      headerStyle={styles.headerStyle}
       visible={visible}
       height={height - 30 - insets.top}
       onRequestClose={toggleBottomSheet}
+      nestedScroll
       headerTitle={intl.formatMessage({
         defaultMessage: 'Edit Contact Card',
         description: 'Edit Contact Card Modal title',
@@ -235,15 +241,6 @@ const ContactCardEditModal = ({
     >
       <ScrollView scrollEnabled={!state.rect} automaticallyAdjustKeyboardInsets>
         <View style={styles.sectionsContainer}>
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Details"
-                description="Section title fro basic infos of the contact card (firstname, lastname ...)"
-              />
-            </Text>
-          </View>
-
           <Controller
             control={control}
             name="firstName"
@@ -348,15 +345,7 @@ const ContactCardEditModal = ({
             )}
           />
 
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Phone number"
-                description="Section title for phone numbers"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalPhones
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -364,16 +353,7 @@ const ContactCardEditModal = ({
             openDeleteButton={openDeleteButton}
             closeDeleteButton={closeDeleteButton}
           />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="Email"
-                description="Section title for emails"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalEmails
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -381,16 +361,7 @@ const ContactCardEditModal = ({
             openDeleteButton={openDeleteButton}
             closeDeleteButton={closeDeleteButton}
           />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="URL"
-                description="Section title for URL"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalUrls
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -398,16 +369,7 @@ const ContactCardEditModal = ({
             openDeleteButton={openDeleteButton}
             closeDeleteButton={closeDeleteButton}
           />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="address"
-                description="Section title for address"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalAddresses
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -415,16 +377,7 @@ const ContactCardEditModal = ({
             openDeleteButton={openDeleteButton}
             closeDeleteButton={closeDeleteButton}
           />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="birthday"
-                description="Section title for birthday"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalBirthdays
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -432,16 +385,7 @@ const ContactCardEditModal = ({
             openDeleteButton={openDeleteButton}
             closeDeleteButton={closeDeleteButton}
           />
-
-          <View style={styles.sectionTitleContainer}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="social profile"
-                description="Section title for social profile"
-              />
-            </Text>
-          </View>
-
+          <View style={styles.separator} />
           <ContactCardEditModalSocials
             deleted={state.deleted}
             deleteButtonRect={state.rect}
@@ -480,6 +424,8 @@ const ContactCardEditModal = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  bottomSheetContainerStyle: { paddingHorizontal: 0 },
+  headerStyle: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   sectionTitleContainer: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
@@ -493,9 +439,12 @@ const styleSheet = createStyleSheet(appearance => ({
     textTransform: 'uppercase',
   },
   sectionsContainer: {
-    paddingHorizontal: 10,
-    rowGap: 20,
-    paddingVertical: 20,
+    rowGap: 1,
+    paddingBottom: 20,
+    backgroundColor: colors.grey50,
+  },
+  separator: {
+    height: 30,
   },
   overlay: {
     position: 'absolute',
@@ -504,7 +453,7 @@ const styleSheet = createStyleSheet(appearance => ({
     right: 0,
     bottom: 0,
   },
-  ...ContactCardEditModalStyles,
+  ...buildContactCardModalStyleSheet(appearance),
 }));
 
 export default ContactCardEditModal;

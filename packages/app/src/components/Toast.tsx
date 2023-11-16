@@ -6,6 +6,7 @@ import ExternalToast, {
 } from 'react-native-toast-message';
 import { textStyles, shadow, colors } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import type {
@@ -105,28 +106,35 @@ const Toast = ({
         />
       ),
       info: (infoProps: ToastConfigParams<ToastProps>) => (
-        <LinearGradient
-          colors={
-            infoProps.position === 'bottom'
-              ? ['transparent', 'rgba(0,0,0,0.5)']
-              : ['rgba(0,0,0,0.5)', 'transparent']
-          }
-          style={styles.info}
-        >
+        <>
+          <LinearGradient
+            colors={
+              infoProps.position === 'bottom'
+                ? ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.5)']
+                : ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.4)', 'transparent']
+            }
+            style={[
+              styles.info,
+              { bottom: -bottomOffset - BOTTOM_MENU_HEIGHT - 100 },
+            ]}
+            pointerEvents="none"
+          />
           <BaseToast
             {...infoProps}
-            style={[styles.baseToast]}
+            style={styles.baseToast}
             contentContainerStyle={styles.contentContainerToast}
             renderLeadingIcon={() => (
               <Icon icon="tips" style={styles.successToastIcon} />
             )}
             renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
             text1Style={[textStyles.smallbold, styles.toastText]}
+            onPress={ExternalToast.hide}
           />
-        </LinearGradient>
+        </>
       ),
     };
   }, [
+    bottomOffset,
     renderTrailingIcon,
     styles.baseToast,
     styles.contentContainerToast,
@@ -149,9 +157,11 @@ const Toast = ({
 
 export default memo(Toast);
 
+const TOAST_HEIGHT = 44;
+
 const styleSheet = createStyleSheet(appearance => ({
   baseToast: {
-    height: 44,
+    height: TOAST_HEIGHT,
     borderRadius: 15,
     borderLeftWidth: 0,
     alignItems: 'center',
@@ -200,10 +210,9 @@ const styleSheet = createStyleSheet(appearance => ({
     width: undefined,
   },
   info: {
-    height: 200,
+    height: 300,
     paddingTop: 90,
     width: '100%',
-    position: 'relative',
-    bottom: -20,
+    position: 'absolute',
   },
 }));

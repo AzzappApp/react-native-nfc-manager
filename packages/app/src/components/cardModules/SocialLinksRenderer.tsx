@@ -5,6 +5,7 @@ import {
   SOCIAL_LINKS_DEFAULT_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { SOCIAL_LINKS } from '#helpers/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
@@ -121,7 +122,16 @@ const SocialLinksRenderer = ({
     readonly socialId: string;
   }) => {
     const url = SOCIAL_LINKS.find(l => l.id === link.socialId)?.mask;
-    await Linking.openURL(`http://${url}${link.link}`);
+
+    const linkIncludeMethod =
+      link.link?.startsWith('http://') || link.link?.startsWith('https://');
+    let method = linkIncludeMethod ? '' : 'http://';
+
+    if (link.socialId === 'phone') method = `tel:`;
+    if (link.socialId === 'sms') method = 'sms:';
+    if (link.socialId === 'mail') method = 'mailto:';
+
+    await Linking.openURL(`${method}${url}${link.link}`);
   };
 
   return (
@@ -229,33 +239,40 @@ const SocialLinksRenderer = ({
 
 export default SocialLinksRenderer;
 
-export const SOCIAL_LINKS: Array<{ id: SocialIcons; mask: string }> = [
-  { id: 'behance', mask: 'behance.net/' },
-  { id: 'dev', mask: 'dev.to/' },
-  { id: 'discord', mask: 'discord.gg/' },
-  { id: 'dribbble', mask: 'dribbble.com/' },
-  { id: 'facebook', mask: 'facebook.com/' },
-  { id: 'figma', mask: 'figma.com/' },
-  { id: 'github', mask: 'github.com/' },
-  { id: 'gitlab', mask: 'gitlab.com/' },
-  { id: 'glassdoor', mask: 'glassdoor.com/' },
-  { id: 'hashnode', mask: 'hashnode.com/@' },
-  { id: 'instagram', mask: 'instagram.com/' },
-  { id: 'letterboxd', mask: 'letterboxd.com/' },
-  { id: 'linkedin', mask: 'linkedin.com/in/' },
-  { id: 'mastodon', mask: 'mastodon.social/' },
-  { id: 'messenger', mask: 'm.me/' },
-  { id: 'npm', mask: 'npmjs.com/' },
-  { id: 'patreon', mask: 'patreon.com/' },
-  { id: 'pinterest', mask: 'pinterest.com/' },
-  { id: 'snapchat', mask: 'snapchat.com/add/' },
-  { id: 'telegram', mask: 't.me/' },
-  { id: 'tiktok', mask: 'tiktok.com/@' },
-  { id: 'tripadvisor', mask: 'tripadvisor.com/' },
-  { id: 'twitch', mask: 'twitch.tv/' },
-  { id: 'twitter', mask: 'twitter.com/' },
-  { id: 'typefully', mask: 'typefully.app/' },
-  { id: 'whatsapp', mask: 'wa.me/' },
-  { id: 'yelp', mask: 'yelp.com/' },
-  { id: 'youtube', mask: 'youtube.com/' },
-];
+export const measureSocialLinksHeight = async (
+  data: SocialLinksRendererData,
+  cardStyle: CardStyle,
+  maxWidth: number,
+) => {
+  const {
+    links,
+    iconSize,
+    arrangement,
+    columnGap,
+    marginTop,
+    marginBottom,
+    marginHorizontal,
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+    styleValuesMap: null,
+  });
+
+  if (arrangement === 'inline') {
+    return iconSize + marginTop + marginBottom;
+  } else {
+    const [contentHeight] = (links ?? []).reduce(
+      ([height, width], _) => {
+        const nextWidth = width + iconSize + columnGap;
+        if (nextWidth > maxWidth - 2 * marginHorizontal) {
+          return [height + iconSize + columnGap, iconSize];
+        } else {
+          return [height, nextWidth];
+        }
+      },
+      [iconSize, 0],
+    );
+    return contentHeight + marginTop + marginBottom;
+  }
+};

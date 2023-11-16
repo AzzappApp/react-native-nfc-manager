@@ -1,6 +1,7 @@
+import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { insertPostComment } from '#domains';
+import { getPostByIdWithMedia, insertPostComment } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostComment: MutationResolvers['createPostComment'] = async (
@@ -10,14 +11,17 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
 ) => {
   const { profileId } = auth;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const { id: targetId, type } = fromGlobalId(postId);
   if (type !== 'Post') {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   try {
+    const post = await getPostByIdWithMedia(targetId);
+    if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
+
     const postComment = {
       profileId,
       postId: targetId,
@@ -34,7 +38,7 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
     };
   } catch (error) {
     console.error(error);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 

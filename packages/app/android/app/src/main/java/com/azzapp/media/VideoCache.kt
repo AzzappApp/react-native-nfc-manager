@@ -1,16 +1,18 @@
 package com.azzapp.media
 
 import android.net.Uri
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.database.StandaloneDatabaseProvider
 import com.azzapp.MainApplication
 import com.facebook.react.bridge.Promise
-import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
-import com.google.android.exoplayer2.upstream.DataSpec
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheWriter
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import androidx.media3.datasource.DataSpec
+import androidx.media3.datasource.DataSpec.HTTP_METHOD_GET
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.CacheWriter
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -19,7 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-object VideoCache {
+@UnstableApi object VideoCache {
   private val exoPlayerCacheSize: Long = 512 * 1024 * 1024
 
   private var cacheDataSource: CacheDataSource? = null
@@ -117,7 +119,7 @@ object VideoCache {
     onComplete: () -> Unit
   ) : PrefetchTask(onComplete) {
     private var status = "pending"
-    private var error: IOException? = null
+    private var error: Exception? = null
     private var promises = mutableListOf<Promise>()
 
     private var mCacheWriter: CacheWriter? = null
@@ -133,7 +135,7 @@ object VideoCache {
 
           mCacheWriter = cacheWriter
           cacheWriter.cache()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
           status = "failed"
           error = e;
           promises.forEach { promise -> promise.reject(e) }

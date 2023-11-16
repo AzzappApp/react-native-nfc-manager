@@ -40,7 +40,8 @@ export const contactCardEditSchema = z.object({
     .nullable(),
   socials: z.array(
     z.object({
-      social: z.string(),
+      url: z.string(),
+      label: z.string(),
       selected: z.boolean(),
     }),
   ),

@@ -166,12 +166,11 @@ const SocialLinksSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Icon Size : {size}"
+              defaultMessage="Icon Size :"
               description="Icon Size message in SocialLinks edition"
-              values={{ size: iconSize }}
             />
           }
-          value={iconSize}
+          initialValue={iconSize}
           min={SOCIAL_LINKS_MIN_ICON_SIZE}
           max={SOCIAL_LINKS_MAX_ICON_SIZE}
           step={1}
@@ -189,14 +188,11 @@ const SocialLinksSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Border size : {size}"
+              defaultMessage="Border size :"
               description="Border size message in SocialLinks edition"
-              values={{
-                size: borderWidth,
-              }}
             />
           }
-          value={borderWidth}
+          initialValue={borderWidth}
           min={0}
           max={SOCIAL_LINKS_MAX_BORDER_WIDTH}
           step={1}
@@ -216,14 +212,11 @@ const SocialLinksSettingsEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Spacing : {size}"
+              defaultMessage="Spacing :"
               description="Spacing message in SocialLinks edition"
-              values={{
-                size: columnGap,
-              }}
             />
           }
-          value={columnGap}
+          initialValue={columnGap}
           min={0}
           max={SOCIAL_LINKS_MAX_COLUMN_GAP}
           step={1}

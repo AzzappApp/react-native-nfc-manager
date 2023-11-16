@@ -1,4 +1,5 @@
-import { useWindowDimensions } from 'react-native';
+import { useMemo } from 'react';
+import { Platform, StatusBar, useWindowDimensions } from 'react-native';
 import { HEADER_HEIGHT } from '#ui/Header';
 import useScreenInsets from './useScreenInsets';
 
@@ -40,14 +41,27 @@ const useEditorLayout = ({
   const insetTop = inset.top;
   const insetBottom = inset.bottom;
 
-  const contentHeight = windowHeight - insetTop - headerHeight;
-  const topPanelHeight = Math.min(
-    contentHeight - bottomPanelMinHeight,
-    topPanelAspectRatio != null
-      ? windowWidth / topPanelAspectRatio
-      : contentHeight / 2,
-  );
-  const bottomPanelHeight = contentHeight - topPanelHeight;
+  const contentHeight = useMemo(() => {
+    return (
+      windowHeight -
+      insetTop -
+      headerHeight -
+      (Platform.OS === 'android' ? StatusBar?.currentHeight ?? 0 : 0)
+    );
+  }, [headerHeight, insetTop, windowHeight]);
+
+  const topPanelHeight = useMemo(() => {
+    return Math.min(
+      contentHeight - bottomPanelMinHeight,
+      topPanelAspectRatio != null
+        ? windowWidth / topPanelAspectRatio
+        : contentHeight / 2,
+    );
+  }, [bottomPanelMinHeight, contentHeight, topPanelAspectRatio, windowWidth]);
+
+  const bottomPanelHeight = useMemo(() => {
+    return contentHeight - topPanelHeight;
+  }, [contentHeight, topPanelHeight]);
 
   return {
     windowWidth,

@@ -50,14 +50,14 @@ const SimpleButtonRenderer = ({
 
   let href: string | undefined;
   switch (actionType as string) {
-    case 'phone':
-      href = `tel:${actionLink}`;
+    case 'link':
+      href = actionLink;
       break;
     case 'email':
       href = `mailto:${actionLink}`;
       break;
     default:
-      href = actionLink;
+      href = `tel:${actionLink}`;
   }
 
   return (

@@ -45,7 +45,8 @@ const ContactCardExportVcf = ({
           selected
         }
         socials {
-          social
+          url
+          label
           selected
         }
         serializedContactCard {
@@ -65,8 +66,7 @@ const ContactCardExportVcf = ({
         description: 'Share button label',
       })}
       onPress={async () => {
-        const vCard = buildVCard(contactCard.serializedContactCard.data);
-
+        const { vCard } = buildVCard(contactCard.serializedContactCard.data);
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;
         try {

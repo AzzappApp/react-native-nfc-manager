@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View, Platform } from 'react-native';
+import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import { GPUImageView, useFilterList } from './gpu';
+import { FILTERS, GPUImageView, isFilter, useFilterLabels } from './gpu';
 import type { ImageLayer, VideoFrameLayer } from './gpu';
 import type { ScrollViewProps, LayoutChangeEvent } from 'react-native';
 
@@ -27,38 +28,50 @@ const FilterSelectionList = ({
   ...props
 }: FilterSelectionListProps) => {
   const intl = useIntl();
-  const filters = useFilterList().filter(
-    ({ ios, android }) =>
-      (Platform.OS === 'ios' && ios) || (Platform.OS === 'android' && android),
-  );
+  const filters = typedEntries(useFilterLabels());
+
+  const [height, setHeight] = useState(0);
+
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    setHeight(nativeEvent.layout.height / 1.9);
+  }, []);
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} {...props}>
-      <FilterButton
-        layer={layer}
-        aspectRatio={aspectRatio}
-        selected={selectedFilter === null}
-        label={intl.formatMessage({
-          defaultMessage: 'Normal',
-          description:
-            'Name of the default filter (no filter applied) in image edition',
-        })}
-        filter={null}
-        cardRadius={cardRadius}
-        onPress={() => onChange(null)}
-      />
-      {filters.map(({ filter, label }) => (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      {...props}
+      onLayout={onLayout}
+    >
+      <>
         <FilterButton
-          key={filter}
           layer={layer}
           aspectRatio={aspectRatio}
-          selected={filter === selectedFilter}
-          label={label}
-          filter={filter}
+          selected={selectedFilter === null}
+          label={intl.formatMessage({
+            defaultMessage: 'Normal',
+            description:
+              'Name of the default filter (no filter applied) in image edition',
+          })}
+          filter={null}
+          height={height}
           cardRadius={cardRadius}
-          onPress={() => onChange(filter)}
+          onPress={() => onChange(null)}
         />
-      ))}
+        {filters.map(([id, label]) => (
+          <FilterButton
+            key={id}
+            layer={layer}
+            aspectRatio={aspectRatio}
+            selected={id === selectedFilter}
+            label={label}
+            filter={id}
+            height={height}
+            cardRadius={cardRadius}
+            onPress={() => onChange(id)}
+          />
+        ))}
+      </>
     </ScrollView>
   );
 };
@@ -72,6 +85,7 @@ type FilterButtonProps = {
   label: string;
   cardRadius: number;
   onPress(): void;
+  height: number;
 };
 
 const FilterButton = ({
@@ -81,26 +95,22 @@ const FilterButton = ({
   label,
   filter,
   cardRadius,
-
+  height,
   onPress,
 }: FilterButtonProps) => {
-  const [width, setWidth] = useState<number | null>(null);
-  const onLayout = (event: LayoutChangeEvent) => {
-    setWidth(event.nativeEvent.layout.width);
-  };
-
-  const borderRadius = Platform.select({
-    web: cardRadius ? (`${cardRadius}%` as any) : null,
-    default: width != null && cardRadius != null ? cardRadius * width : null,
-  });
+  const borderRadius = useMemo(() => {
+    return Platform.select({
+      web: cardRadius ? (`${cardRadius}%` as any) : null,
+      default:
+        height * aspectRatio != null && cardRadius != null
+          ? cardRadius * height * aspectRatio
+          : null,
+    });
+  }, [aspectRatio, cardRadius, height]);
 
   const styles = useStyleSheet(styleSheet);
   return (
-    <PressableNative
-      onPress={onPress}
-      style={[styles.filterButton]}
-      onLayout={onLayout}
-    >
+    <PressableNative onPress={onPress} style={styles.filterButton}>
       <View
         style={[
           styles.filterImageContainer,
@@ -111,15 +121,20 @@ const FilterButton = ({
           selected && styles.selected,
         ]}
       >
-        <View style={[styles.imageWrapper, { borderRadius }]}>
+        <View style={[styles.imageWrapper, { borderRadius, aspectRatio }]}>
           <GPUImageView
-            style={[styles.filterImage, { aspectRatio, borderRadius }]}
-            layers={[{ ...layer, filters: filter ? [filter] : [] }]}
+            style={[styles.filterImage, { height, aspectRatio, borderRadius }]}
+            layers={[
+              {
+                ...layer,
+                lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+              },
+            ]}
           />
         </View>
       </View>
       <Text
-        variant="small"
+        variant="xsmall"
         style={[styles.filterTitle, selected && styles.filterTitleSelected]}
       >
         {label}
@@ -136,8 +151,9 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: colors.grey200,
   },
   filterButton: {
+    height: '100%',
+    alignItems: 'center',
     marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
-    height: '90%',
   },
   filterImageContainer: [
     {

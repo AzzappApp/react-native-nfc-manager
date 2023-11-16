@@ -9,7 +9,8 @@ import {
   Style,
 } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import LogoutIcon from '@mui/icons-material/Logout';
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
+import MergeTypeIcon from '@mui/icons-material/MergeType';
 import {
   AppBar,
   Box,
@@ -24,7 +25,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import { logout } from '#app/loginActions';
+import LogoutButton from '#components/LogoutButton';
 import getCurrentUser from '#helpers/getCurrentUser';
 import backOfficeSections from '../../backOfficeSections';
 
@@ -81,12 +82,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         <Divider sx={{ mt: 'auto' }} />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="button" formAction={logout}>
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
+            <LogoutButton />
           </ListItem>
         </List>
       </Drawer>
@@ -119,4 +115,6 @@ const SectionIcons: Record<string, React.ComponentType> = {
   '/suggestedMedias': ImageAspectRatio,
   '/coverTemplates': CardGiftcard,
   '/cardTemplates': AddCard,
+  '/cardTemplateTypes': MergeTypeIcon,
+  '/companyActivities': LocalActivityIcon,
 };

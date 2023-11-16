@@ -1,8 +1,9 @@
 'use client';
 import cn from 'classnames';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
+import { updateWebcardViewsCounter } from '#app/actions/statisticsAction';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './ProfilePage.css';
@@ -38,12 +39,20 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
 
   const hasPosts = posts.length > 0;
 
+  useEffect(() => {
+    if (profile?.id) {
+      updateWebcardViewsCounter(profile?.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
-      <div
-        className={styles.background}
-        style={{
-          background: `
+      <div className={styles.wrapper}>
+        <div
+          className={styles.background}
+          style={{
+            background: `
           linear-gradient(
             180deg,
             ${cardBackgroundColor} 0%,
@@ -51,12 +60,11 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
             ${lastModuleBackgroundColor} 50%
           )
         `,
-        }}
-      />
-      <div className={styles.wrapper}>
+          }}
+        />
         {posts.length > 0 && (
           <ProfilePostNavigation
-            postsCount={profile.nbPosts}
+            profile={profile}
             onClickCover={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
@@ -65,7 +73,6 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
               [styles.postNavigationHidden]: postsOpen,
             })}
             cover={media}
-            username={profile.userName}
           />
         )}
         <main
@@ -100,19 +107,22 @@ const ProfilePageLayout = (props: ProfilePageLayoutProps) => {
           </aside>
         )}
 
-        <ButtonIcon
-          Icon={FlipIcon}
-          size={24}
-          height={50}
-          width={50}
-          className={styles.switchContent}
-          color="white"
-          onClick={() => {
-            setDisplay(prevDisplay =>
-              prevDisplay === 'card' ? 'posts' : 'card',
-            );
-          }}
-        />
+        {hasPosts && (
+          <ButtonIcon
+            Icon={FlipIcon}
+            size={24}
+            height={50}
+            width={50}
+            className={styles.switchContent}
+            color="white"
+            onClick={() => {
+              setDisplay(prevDisplay =>
+                prevDisplay === 'card' ? 'posts' : 'card',
+              );
+              window.scrollTo({ top: 0 });
+            }}
+          />
+        )}
         <DownloadVCard
           profileId={profile.id}
           userName={profile.userName}

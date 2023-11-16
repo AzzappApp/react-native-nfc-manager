@@ -188,3 +188,18 @@ const CarouselRenderer = ({
 };
 
 export default CarouselRenderer;
+
+export const measureCarouselHeight = async (
+  data: CarouselRendererData,
+  cardStyle: CardStyle,
+  _maxWidth: number,
+) => {
+  const { borderWidth, marginVertical, imageHeight } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: CAROUSEL_DEFAULT_VALUES,
+    styleValuesMap: CAROUSEL_STYLE_VALUES,
+  });
+
+  return imageHeight + marginVertical * 2 + borderWidth * 2;
+};

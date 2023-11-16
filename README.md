@@ -7,12 +7,12 @@ This is the main repository of the Azzapp application source code.
 Developping and building the project requires **MacOS version 12+**.
 In addition developpers should install the followings dependencies:
 
-- [NodeJS](https://nodejs.org/en/) version **16** (recommanded install through [nvm](https://github.com/nvm-sh/nvm))
+- [NodeJS](https://nodejs.org/en/) version **16** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
 - [yarn](https://yarnpkg.com/)
 - [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **13+**
 - [Android Studio](https://developer.android.com/studio)
 - [watchman](https://facebook.github.io/watchman/)
-- [ruby](https://www.ruby-lang.org/fr/) version **2.7.6**(recommanded install throguh **brew**)
+- [ruby](https://www.ruby-lang.org/fr/) version **2.7.6**(recommended install through **brew**)
 - [bundler](https://bundler.io/) (should come along ruby)
 
 In addition one should follow the react-native-cli setup instruction of the [React Native documentation](https://reactnative.dev/docs/0.69/getting-started).
@@ -26,7 +26,7 @@ To build with xcode, one should first create a .xcode.env.local file under `pack
 ```
 export NODE_BINARY=<PATH_TO_YOUR_NODE_BIN>
 ```
-The path to yout node binary can be obtained with the command : 
+The path to your node binary can be obtained with the command : 
 
 ```sh
 which node
@@ -59,7 +59,7 @@ yarn pod-install
 
 > All the development / build related scripts should be launched using `yarn`.
 
-Before you can start developping, you should build the whole workspace once : 
+Before you can start developing, you should build the whole workspace once : 
 
 ```
 yarn build
@@ -122,7 +122,7 @@ The sources code of the application is mainly written using [TypeScript](https:/
 
 The main database used by this project is [PlanetScale](https://planetscale.com/) a MySQL-compatible serverless database platform. 
 
-In the future the application should use [ElasticSearch](https://www.elastic.co/fr/elasticsearch/) for search request in the application, and might use [JanusGraph](https://janusgraph.org/) or [Neo4j](https://neo4j.com/) for recommandations.
+In the future the application should use [ElasticSearch](https://www.elastic.co/fr/elasticsearch/) for search request in the application, and might use [JanusGraph](https://janusgraph.org/) or [Neo4j](https://neo4j.com/) for recommendations.
 
 ### Web server
 
@@ -184,4 +184,4 @@ Valid platforms are  `IOS` and `ANDROID`.
 ## Resources
 
 - The design / graphic prototype of the application can be found on the[figma shared project](https://www.figma.com/files/project/59265907/MOBILE-APPLICATION).
-- Application speficiation can be found on the [google cloud shared folder](https://drive.google.com/drive/folders/1qXYQMdEyw1u5Etui4tIvRpnI40y172dt)
+- Application specification can be found on the [google cloud shared folder](https://drive.google.com/drive/folders/1qXYQMdEyw1u5Etui4tIvRpnI40y172dt)

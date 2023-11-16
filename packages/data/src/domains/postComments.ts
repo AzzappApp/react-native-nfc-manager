@@ -6,6 +6,7 @@ import db, { cols } from './db';
 import { getMediasByIds } from './medias';
 import { PostTable } from './posts';
 import { ProfileTable } from './profiles';
+import type { DbTransaction } from './db';
 import type { Media } from './medias';
 import type { Profile } from './profiles';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -141,15 +142,18 @@ export const getPostCommentsByDate = async (
  * @returns A list of PostComment
  */
 export const getTopPostsComment = async (
-  postId: string[],
+  postIds: string[],
 ): Promise<Array<PostComment & { author: Profile }>> => {
+  if (!postIds.length) {
+    return [];
+  }
   const comments = await db
     .select({
       postsId: PostCommentTable.postId,
       createdAt: sql<string>`max(createdAt)`,
     })
     .from(PostCommentTable)
-    .where(inArray(PostCommentTable.postId, postId))
+    .where(inArray(PostCommentTable.postId, postIds))
     .groupBy(PostCommentTable.postId);
 
   if (comments.length === 0) return [];
@@ -170,4 +174,25 @@ export const getTopPostsComment = async (
         author: Profile,
       })),
     );
+};
+
+export const getPostCommentById = async (id: string) => {
+  const comments = await db
+    .select()
+    .from(PostCommentTable)
+    .where(eq(PostCommentTable.id, id));
+
+  if (comments.length < 1) return null;
+  return comments[0];
+};
+
+export const updatePostComment = async (id: string, comment: string) => {
+  return db
+    .update(PostCommentTable)
+    .set({ comment })
+    .where(eq(PostCommentTable.id, id));
+};
+
+export const removeComment = async (id: string, trx: DbTransaction = db) => {
+  return trx.delete(PostCommentTable).where(eq(PostCommentTable.id, id));
 };

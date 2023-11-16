@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Platform, Pressable, View, useColorScheme } from 'react-native';
+import { Platform, Pressable, useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,
@@ -9,12 +9,12 @@ import Text from '#ui/Text';
 import ActivityIndicator from './ActivityIndicator';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 export type ButtonProps = PressableProps & {
-  label: string;
-  variant?: 'little_round' | 'primary' | 'secondary';
+  label: ReactNode;
+  variant?: 'little_round_inverted' | 'little_round' | 'primary' | 'secondary';
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
@@ -67,7 +67,13 @@ const Button = (
 
   if (Platform.OS === 'android') {
     return (
-      <View style={[variantStyles.androidContainer, style]}>
+      <View
+        style={[
+          variantStyles.androidContainer,
+          style,
+          variantStyles.androidNoPadding,
+        ]}
+      >
         <Pressable
           {...buttonProps}
           style={[
@@ -121,6 +127,15 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderRadius: 12,
       overflow: 'hidden',
     },
+    androidNoPadding: {
+      padding: 0,
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
   },
   primary: {
     root: {
@@ -163,6 +178,24 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     disabled: {
       color: appearance === 'light' ? colors.grey200 : colors.grey900,
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
+      backgroundColor: 'transparent',
+    },
+  },
+  little_round_inverted: {
+    root: {
+      backgroundColor: appearance === 'light' ? colors.black : colors.white,
+      borderColor: appearance === 'light' ? colors.white : colors.black,
+      borderWidth: 1,
+      height: 29,
+      borderRadius: 29,
+      paddingHorizontal: 15,
+    },
+    label: {
+      color: appearance === 'light' ? colors.white : colors.black,
+    },
+    disabled: {
+      color: appearance === 'light' ? colors.grey900 : colors.grey200,
+      borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
       backgroundColor: 'transparent',
     },
   },

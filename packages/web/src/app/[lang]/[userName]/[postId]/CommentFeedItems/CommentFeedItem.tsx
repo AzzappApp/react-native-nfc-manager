@@ -1,4 +1,4 @@
-import { getElapsedTime } from '@azzapp/shared/timeHelpers';
+import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './CommentFeedItems.css';
 import type { PostCommentWithProfile } from '@azzapp/data/domains';
@@ -9,7 +9,9 @@ type CommentFeedItemProps = {
 
 const CommentFeedItem = (props: CommentFeedItemProps) => {
   const { comment } = props;
-  const elapsedTime = getElapsedTime(new Date(comment.createdAt).getTime());
+  const elapsedTime = getFormatedElapsedTime(
+    new Date(comment.createdAt).getTime(),
+  );
 
   return (
     <div className={styles.item}>
@@ -33,9 +35,7 @@ const CommentFeedItem = (props: CommentFeedItemProps) => {
           </span>{' '}
           {comment.comment}
         </p>
-        <span className={styles.elapsed}>
-          {elapsedTime.value} {elapsedTime.kind} ago
-        </span>
+        <span className={styles.elapsed}>{elapsedTime}</span>
       </div>
     </div>
   );

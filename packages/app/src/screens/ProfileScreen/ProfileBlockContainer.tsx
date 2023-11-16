@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  PixelRatio,
   StyleSheet,
   View,
   useColorScheme,
@@ -8,6 +9,8 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  FadeIn,
+  FadeOut,
   interpolate,
   runOnJS,
   useAnimatedReaction,
@@ -17,6 +20,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
+import {
+  type ModuleRenderInfo,
+  measureModuleHeight,
+} from '#components/cardModules/CardModuleRenderer';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import {
@@ -24,13 +31,22 @@ import {
   EDIT_TRANSITION_DURATION,
   useProfileEditScale,
 } from './profileScreenHelpers';
+import { ProfileScreenScrollViewContext } from './ProfileScreenScrollView';
 import {
   useEditTransition,
   useSelectionModeTransition,
 } from './ProfileScreenTransitions';
-import type { LayoutChangeEvent } from 'react-native';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
 export type ProfileBlockContainerProps = {
+  /**
+   * id of the block
+   */
+  id: string;
+  /**
+   * the index of the block in the list
+   */
+  index: number;
   /**
    * The children of the container
    */
@@ -91,6 +107,9 @@ export type ProfileBlockContainerProps = {
    * The background color of the card
    */
   backgroundColor: string;
+
+  moduleRenderInfo?: ModuleRenderInfo;
+  cardStyle?: CardStyle | null;
   /**
    * Called when the user press a module, only enabled in edit mode
    */
@@ -99,7 +118,6 @@ export type ProfileBlockContainerProps = {
    * Called when the user press the move up button
    */
   onMoveUp?: () => void;
-
   /**
    * Called when the user press the move down button
    */
@@ -127,6 +145,8 @@ export type ProfileBlockContainerProps = {
  * it also handles the interaction with the modules in edit mode
  */
 const ProfileBlockContainer = ({
+  id,
+  index,
   editing,
   visible = true,
   displayEditionButtons = true,
@@ -140,6 +160,8 @@ const ProfileBlockContainer = ({
   selected,
   backgroundColor,
   children,
+  moduleRenderInfo,
+  cardStyle,
   onModulePress,
   onMoveUp,
   onMoveDown,
@@ -150,27 +172,118 @@ const ProfileBlockContainer = ({
 }: ProfileBlockContainerProps) => {
   const intl = useIntl();
 
-  const { width: windowWith } = useWindowDimensions();
-
+  const { width: windowWidth } = useWindowDimensions();
   const [measuredHeight, setMeasuredHeight] = useState(0);
-
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    setMeasuredHeight(event.nativeEvent.layout.height);
-  }, []);
 
   const editScale = useProfileEditScale();
 
   const buttonSize = BUTTON_SIZE / editScale;
   const iconSize = 24 / editScale;
 
-  const height =
-    editing && measuredHeight < buttonSize ? buttonSize : measuredHeight;
+  const editingHeight =
+    measuredHeight < buttonSize ? buttonSize : measuredHeight;
 
   const editingTransition = useEditTransition();
 
+  const {
+    registerBlock,
+    addLayoutChangedListener,
+    getBlockPositions,
+    setBlockInfos,
+    isLayoutReady,
+  } = useContext(ProfileScreenScrollViewContext)!;
+
+  useEffect(
+    () =>
+      registerBlock(id, {
+        index,
+        visible,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id, registerBlock],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    if (moduleRenderInfo) {
+      measureModuleHeight(moduleRenderInfo, cardStyle, windowWidth).then(
+        height => {
+          if (!cancelled) {
+            setMeasuredHeight(PixelRatio.roundToNearestPixel(height));
+          }
+        },
+      );
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [moduleRenderInfo, cardStyle, windowWidth]);
+
+  useEffect(() => {
+    if (measuredHeight === 0) {
+      return;
+    }
+    setBlockInfos(id, {
+      index,
+      visible,
+      height: measuredHeight,
+    });
+  }, [measuredHeight, id, index, setBlockInfos, visible]);
+
+  const { position, editPosition } = getBlockPositions(id) ?? {};
+  const positionSharedValue = useSharedValue(position);
+  const editPositionSharedValue = useSharedValue(editPosition);
+  const layoutReadySharedValue = useSharedValue(
+    id === 'cover' || isLayoutReady() ? 1 : 0,
+  );
+  const [hasBeenDisplayed, setHasBeenDisplayed] = useState(id === 'cover');
+  useEffect(
+    () =>
+      addLayoutChangedListener(() => {
+        const positions = getBlockPositions(id);
+        if (
+          !positions ||
+          positionSharedValue.value === undefined ||
+          editPositionSharedValue.value === undefined ||
+          !editingTransition?.value ||
+          !isLayoutReady() ||
+          id === 'cover'
+        ) {
+          positionSharedValue.value = positions?.position;
+          editPositionSharedValue.value = positions?.editPosition;
+        } else {
+          positionSharedValue.value = withTiming(positions.position, {
+            duration: EDIT_TRANSITION_DURATION,
+          });
+          editPositionSharedValue.value = withTiming(positions.editPosition, {
+            duration: EDIT_TRANSITION_DURATION,
+          });
+        }
+        if (isLayoutReady() && id !== 'cover') {
+          layoutReadySharedValue.value = withTiming(
+            1,
+            { duration: EDIT_TRANSITION_DURATION },
+            () => {
+              runOnJS(setHasBeenDisplayed)(true);
+            },
+          );
+        }
+      }),
+    [
+      addLayoutChangedListener,
+      editPositionSharedValue,
+      getBlockPositions,
+      id,
+      positionSharedValue,
+      isLayoutReady,
+      layoutReadySharedValue,
+      editingTransition,
+    ],
+  );
+
   const dragX = useSharedValue(0);
-  const dragRightLimit = (windowWith * (1 - editScale)) / 2;
-  const dragLeftLimit = (windowWith * (editScale - 1)) / 2;
+  const dragRightLimit = (windowWidth * (1 - editScale)) / 2;
+  const dragLeftLimit = (windowWidth * (editScale - 1)) / 2;
 
   useEffect(() => {
     if (selectionMode && editing) {
@@ -268,28 +381,57 @@ const ProfileBlockContainer = ({
     [activeSection, editing, onModulePress, touchActive],
   );
 
-  // gap doesn't work on reanimated 2
-  const blockStyle = useAnimatedStyle(() => ({
-    marginVertical: editingTransition.value * 20,
-  }));
+  const blockStyle = useAnimatedStyle(() => {
+    const position = positionSharedValue.value;
+    const editPosition = editPositionSharedValue.value;
+    if (position === undefined || editPosition === undefined) {
+      return {
+        display: 'none',
+      };
+    }
+    const editTransitionValue = editingTransition?.value ?? 0;
+    return {
+      display: 'flex',
+      position: 'absolute',
+      width: windowWidth,
+      height: interpolate(
+        editingTransition?.value ?? 0,
+        [0, 1],
+        [measuredHeight, editingHeight],
+      ),
+      zIndex: visible ? 0 : editTransitionValue > 0 ? 0 : -1,
+      left: 0,
+      top: interpolate(
+        editingTransition?.value ?? 0,
+        [0, 1],
+        [position, editPosition],
+      ),
+      opacity:
+        layoutReadySharedValue.value * (visible ? 1 : editTransitionValue),
+    };
+  });
 
   const appearance = useColorScheme() ?? 'light';
   const moduleContainerStyle = useAnimatedStyle(() => ({
     borderRadius:
-      editingTransition.value * (COVER_CARD_RADIUS + 1) * windowWith,
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWidth,
+    overflow: 'visible',
     backgroundColor,
     transform: [{ translateX: dragX.value }],
+    position: 'absolute',
+    width: windowWidth,
   }));
 
   const moduleInnerContainerStyle = useAnimatedStyle(() => ({
-    borderRadius: editingTransition.value * COVER_CARD_RADIUS * windowWith,
+    borderRadius:
+      (editingTransition?.value ?? 0) * COVER_CARD_RADIUS * windowWidth - 2,
     overflow: 'hidden',
     opacity: interpolate(touchActive.value, [0, 1], [1, 0.2]),
   }));
 
   const actionSectionBaseStyle = {
     position: 'absolute',
-    top: height / 2 - buttonSize / 2,
+    top: Math.max(0, measuredHeight / 2 - buttonSize / 2),
     alignItems: 'center',
     flexDirection: 'row',
     gap: 20,
@@ -298,44 +440,34 @@ const ProfileBlockContainer = ({
   const moveButtonStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      editingTransition.value - Math.abs(dragX.value) / dragRightLimit,
+      (editingTransition?.value ?? 0) - Math.abs(dragX.value) / dragRightLimit,
     ),
   }));
 
   const leftSectionStyle = useAnimatedStyle(() => ({
     opacity: Math.max(
       0,
-      dragX.value / dragRightLimit - selectionModeTransition.value,
+      dragX.value / dragRightLimit - (selectionModeTransition?.value ?? 0),
     ),
   }));
 
   const selectionSectionStyle = useAnimatedStyle(() => ({
-    opacity: selectionModeTransition.value,
+    opacity: selectionModeTransition?.value ?? 0,
   }));
 
   const rightSectionStyle = useAnimatedStyle(() => ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
-  if (!visible && !editing) {
-    return null;
-  }
-
   return (
     <Animated.View
-      style={[
-        blockStyle,
-        editing &&
-          measuredHeight < buttonSize && {
-            minHeight: buttonSize,
-            justifyContent: 'center',
-          },
-      ]}
+      style={blockStyle}
+      exiting={id !== 'cover' && hasBeenDisplayed ? FadeOut : undefined}
+      entering={id !== 'cover' && hasBeenDisplayed ? FadeIn : undefined}
     >
       <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
           style={[moduleContainerStyle, editing && shadow(appearance)]}
-          onLayout={onLayout}
         >
           {/** this View is only here because ios bug with shadow and overlow hidden */}
           <Animated.View
@@ -379,9 +511,11 @@ const ProfileBlockContainer = ({
               style={[
                 moveButtonStyle,
                 actionSectionBaseStyle,
-                { left: -buttonSize - 20 },
+                {
+                  left: -buttonSize - 20,
+                  pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
+                },
               ]}
-              pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
             >
               <IconButton
                 onPress={onMoveDown}

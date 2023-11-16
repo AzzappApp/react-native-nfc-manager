@@ -9,12 +9,11 @@ import { FlatList } from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
-  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import type { ForwardedRef, ReactElement, Ref } from 'react';
+import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
 import type {
   ListRenderItem,
   StyleProp,
@@ -22,7 +21,9 @@ import type {
   ViewProps,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  ListRenderItemInfo,
 } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
   /**
@@ -79,6 +80,13 @@ type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
    * Callback called when the user scroll between two items, the index is rounded
    */
   onSelectedIndexChange?: (index: number) => void;
+  /**
+   * Imported from RN Flatlist doc
+   * A marker property for telling the list to re-render (since it implements PureComponent).
+   * If any of your `renderItem`, Header, Footer, etc. functions depend on anything outside of the `data` prop,
+   * stick it here and treat it immutably.
+   */
+  extraData?: any | undefined;
 };
 
 export type CarouselSelectListHandle = {
@@ -107,6 +115,7 @@ function CarouselSelectList<TItem = any>(
     itemContainerStyle,
     contentContainerStyle,
     scaleRatio,
+    extraData,
     onSelectedIndexChangeAnimated,
     onSelectedIndexChange,
     ...props
@@ -115,18 +124,7 @@ function CarouselSelectList<TItem = any>(
 ) {
   const listRef = useRef<FlatList>(null);
 
-  const scrollX = useSharedValue(0);
-
-  const onSelectIndexChangeInner = useMemo(() => {
-    let lastIndex = -1;
-    return (index: number) => {
-      if (index === lastIndex) {
-        return;
-      }
-      lastIndex = index;
-      onSelectedIndexChange?.(index);
-    };
-  }, [onSelectedIndexChange]);
+  const scrollIndex = useSharedValue(0);
 
   useImperativeHandle(ref, () => ({
     scrollToIndex: (index: number, animated = true) => {
@@ -140,11 +138,9 @@ function CarouselSelectList<TItem = any>(
   // Animation
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
-      'worklet';
-      scrollX.value = event.contentOffset.x;
       const index = event.contentOffset.x / itemWidth;
+      scrollIndex.value = index;
       onSelectedIndexChangeAnimated?.(index);
-      runOnJS(onSelectIndexChangeInner)(Math.round(index));
     },
   });
 
@@ -165,76 +161,63 @@ function CarouselSelectList<TItem = any>(
     [itemWidth],
   );
 
-  const CellRenderer = useMemo(() => {
-    const CellRenderer = ({
-      index,
-      children,
-      style: _,
-      ...props
-    }: {
-      index: number;
-      style: StyleProp<ViewStyle>;
-      children: React.ReactElement;
-    }) => {
-      const inputRange = [index - 1, index, index + 1];
-      const offset = (itemWidth - itemWidth * scaleRatio) / 2;
-      const offetCenter = (width - itemWidth) / 2 - itemWidth * scaleRatio;
+  const offset = useMemo(
+    () => (itemWidth - itemWidth * scaleRatio) / 2,
+    [itemWidth, scaleRatio],
+  );
+  const offsetCenter = useMemo(
+    () => (width - itemWidth) / 2 - itemWidth * scaleRatio,
+    [itemWidth, scaleRatio, width],
+  );
+  const ccstyle = useMemo(() => {
+    return [
+      {
+        paddingLeft: (width - itemWidth) / 2,
+        paddingRight: (width - itemWidth) / 2,
+        height,
+      },
+      contentContainerStyle,
+    ];
+  }, [contentContainerStyle, height, itemWidth, width]);
 
-      const animatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
-          scrollX.value / itemWidth,
-          inputRange,
-          [scaleRatio, 1, scaleRatio],
-          Extrapolate.CLAMP,
-        );
-        const translateX = interpolate(
-          scrollX.value / itemWidth,
-          [index - 1, index, index + 1],
-          [-offset + offetCenter / 2, 0, offset - offetCenter / 2],
-          Extrapolate.EXTEND,
-        );
-
-        const zIndex = interpolate(
-          scrollX.value / itemWidth,
-          [index - 1, index, index + 1],
-          [0, 2, 0],
-          Extrapolate.CLAMP,
-        );
-
-        return {
-          transform: [{ translateX }, { scale }],
-          zIndex,
-        };
-      }, [scrollX]);
-
+  const renderAnimatedItem = useCallback(
+    (info: ListRenderItemInfo<TItem>) => {
       return (
-        <Animated.View
-          style={[animatedStyle, itemContainerStyle]}
-          key={index}
-          {...props}
+        <AnimatedItemWrapper
+          index={info.index}
+          scrollIndex={scrollIndex}
+          scaleRatio={scaleRatio}
+          containerStyle={itemContainerStyle}
+          offset={offset}
+          offsetCenter={offsetCenter}
         >
-          {children}
-        </Animated.View>
+          {renderItem(info)}
+        </AnimatedItemWrapper>
       );
-    };
-    return CellRenderer;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemWidth, scrollX, scaleRatio, width]);
+    },
+    [
+      scrollIndex,
+      scaleRatio,
+      itemContainerStyle,
+      offset,
+      offsetCenter,
+      renderItem,
+    ],
+  );
 
   return (
     <AnimatedFlatList
       ref={listRef}
       data={data}
       horizontal
-      renderItem={renderItem}
+      renderItem={renderAnimatedItem}
       keyExtractor={keyExtractor}
       getItemLayout={getItemLayout}
-      CellRendererComponent={CellRenderer}
       scrollEventThrottle={16}
       snapToInterval={itemWidth}
       decelerationRate="fast"
       snapToAlignment="start"
-      removeClippedSubviews
+      //removeClippedSubviews removing this to avoid blank (was use to improve perf)
       pagingEnabled
       bounces={false}
       onScroll={scrollHandler}
@@ -242,17 +225,11 @@ function CarouselSelectList<TItem = any>(
       showsVerticalScrollIndicator={false}
       style={[{ width, height }, style as any]}
       onMomentumScrollEnd={onMomentumScrollEnd}
-      initialNumToRender={3}
+      initialNumToRender={7}
       windowSize={11}
-      contentContainerStyle={[
-        {
-          height,
-          alignItems: 'center',
-          paddingLeft: (width - itemWidth) / 2,
-          paddingRight: (width - itemWidth) / 2,
-        },
-        contentContainerStyle,
-      ]}
+      maxToRenderPerBatch={11}
+      extraData={extraData}
+      contentContainerStyle={ccstyle}
       {...props}
     />
   );
@@ -261,3 +238,47 @@ function CarouselSelectList<TItem = any>(
 export default forwardRef(CarouselSelectList) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
+
+const AnimatedItemWrapper = ({
+  index,
+  scrollIndex,
+  scaleRatio,
+  offset,
+  offsetCenter,
+  containerStyle,
+  children,
+}: {
+  index: number;
+  scrollIndex: SharedValue<number>;
+  offset: number;
+  offsetCenter: number;
+  scaleRatio: number;
+  children: ReactNode;
+  containerStyle: StyleProp<ViewStyle>;
+}) => {
+  const inputRange = [index - 1, index, index + 1];
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(
+      scrollIndex.value,
+      inputRange,
+      [scaleRatio, 1, scaleRatio],
+      Extrapolate.CLAMP,
+    );
+    const translateX = interpolate(
+      scrollIndex.value,
+      inputRange,
+      [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
+      Extrapolate.EXTEND,
+    );
+
+    return {
+      transform: [{ translateX }, { scale }],
+    };
+  });
+  return (
+    <Animated.View style={[animatedStyle, containerStyle]} key={index}>
+      {children}
+    </Animated.View>
+  );
+};

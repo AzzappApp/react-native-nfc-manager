@@ -8,26 +8,18 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
-import {
-  commitLocalUpdate,
-  graphql,
-  useFragment,
-  usePaginationFragment,
-  useRelayEnvironment,
-} from 'react-relay';
+import Animated, { FadeOut } from 'react-native-reanimated';
+import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import CoverLink_profileFragment from '@azzapp/relay/artifacts/CoverLink_profile.graphql';
 
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
-import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggleFollow from '#hooks/useToggleFollow';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
 import type { MediaSuggestionsProfiles_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsProfiles_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -36,6 +28,7 @@ type MediaSuggestionsProfilesProps = {
   viewer: MediaSuggestionsProfiles_viewer$key;
   coverListStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
+  isCurrentTab: boolean;
 };
 
 const NB_PROFILES = 6;
@@ -44,6 +37,7 @@ const MediaSuggestionsProfiles = ({
   viewer,
   coverListStyle,
   header,
+  isCurrentTab,
 }: MediaSuggestionsProfilesProps) => (
   <View>
     {header}
@@ -59,7 +53,11 @@ const MediaSuggestionsProfiles = ({
         </View>
       }
     >
-      <MediaSuggestionsProfilesInner viewer={viewer} style={coverListStyle} />
+      <MediaSuggestionsProfilesInner
+        viewer={viewer}
+        style={coverListStyle}
+        isCurrentTab={isCurrentTab}
+      />
     </Suspense>
   </View>
 );
@@ -67,9 +65,11 @@ const MediaSuggestionsProfiles = ({
 const MediaSuggestionsProfilesInner = ({
   viewer,
   style,
+  isCurrentTab,
 }: {
   viewer: MediaSuggestionsProfiles_viewer$key;
   style?: StyleProp<ViewStyle>;
+  isCurrentTab: boolean;
 }) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -98,22 +98,21 @@ const MediaSuggestionsProfilesInner = ({
       viewer,
     );
 
-  const hasFocus = useScreenHasFocus();
-  const hasFocusRef = useRef(hasFocus);
+  const isCurrentTabRef = useRef(isCurrentTab);
   useEffect(() => {
-    if (hasFocus && !hasFocusRef.current) {
+    if (isCurrentTab && !isCurrentTabRef.current) {
       startTransition(() => {
         refetch(
           {
             first: NB_PROFILES,
             after: null,
           },
-          { fetchPolicy: 'store-only' },
+          { fetchPolicy: 'store-and-network' },
         );
       });
     }
-    hasFocusRef.current = hasFocus;
-  }, [hasFocus, refetch]);
+    isCurrentTabRef.current = isCurrentTab;
+  }, [isCurrentTab, refetch]);
 
   const users = useMemo(() => {
     return convertToNonNullArray(
@@ -147,7 +146,6 @@ const MediaSuggestionsProfilesInner = ({
           profile={item}
           isFollowing={followingMap.get(item.id) ?? false}
           profileId={item.id}
-          viewerProfileID={data.profile?.id}
         />
       )}
     />
@@ -155,27 +153,23 @@ const MediaSuggestionsProfilesInner = ({
 };
 
 const CoverLinkWithOptions = ({
-  viewerProfileID,
   isFollowing,
   ...props
-}: CoverLinkProps & { viewerProfileID?: string; isFollowing: boolean }) => {
+}: CoverLinkProps & { isFollowing: boolean }) => {
   const styles = useStyleSheet(styleSheet);
 
-  const toggleFollow = useToggleFollow(viewerProfileID);
+  const toggleFollow = useToggleFollow();
 
   const { userName } = useFragment(CoverLink_profileFragment, props.profile);
-
-  const environment = useRelayEnvironment();
 
   const intl = useIntl();
 
   return (
-    // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
-    <Animated.View style={styles.coverContainerStyle} /*exiting={FadeOut}*/>
+    <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
       <CoverLink {...props} width={135} />
       <View style={styles.bottomActions}>
         <Button
-          variant="little_round"
+          variant={isFollowing ? 'little_round_inverted' : 'little_round'}
           label={
             isFollowing
               ? intl.formatMessage({
@@ -191,16 +185,6 @@ const CoverLinkWithOptions = ({
           onPress={() => {
             startTransition(() => {
               toggleFollow(props.profileId, userName, !isFollowing);
-            });
-          }}
-        />
-        <IconButton
-          icon="close"
-          size={29}
-          onPress={() => {
-            //TODO: implement real update in database
-            commitLocalUpdate(environment, store => {
-              store.getRoot().getLinkedRecord('viewer');
             });
           }}
         />
@@ -231,4 +215,5 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     alignItems: 'center',
   },
+  followButton: {},
 }));

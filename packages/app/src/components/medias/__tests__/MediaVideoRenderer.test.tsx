@@ -14,7 +14,7 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
+        videoEnabled
         alt="A video"
       />,
     );
@@ -29,7 +29,6 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         thumbnailURI="https://fake-uri.com/id-1.jpg"
         alt="A video"
       />,
@@ -38,29 +37,6 @@ describe('MediaVideoRenderer', () => {
       'accessibilityLabel',
       'A video',
     );
-  });
-
-  it('should hide the thumbnail once the video is ready', () => {
-    const onReadyForDisplay = jest.fn();
-    render(
-      <MediaVideoRenderer
-        source={{
-          uri: 'https://fake-uri.com/id-1.mp4',
-          mediaId: 'id-1',
-          requestedSize: 200,
-        }}
-        aspectRatio={2}
-        thumbnailURI="https://fake-uri.com/id-1.jpg"
-        alt="A video"
-        onReadyForDisplay={onReadyForDisplay}
-      />,
-    );
-    const video = screen.getAllByLabelText('A video')[0];
-    expect(screen.queryByTestId('thumbnail')).toBeTruthy();
-    act(() => {
-      fireEvent(video, 'readyForDisplay');
-    });
-    expect(screen.queryByTestId('thumbnail')).not.toBeTruthy();
   });
 
   it('should dispatch onReadyForDisplay only once by requested media', () => {
@@ -72,7 +48,6 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-1',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         thumbnailURI="https://fake-uri.com/id-1.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -97,7 +72,6 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-2',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         thumbnailURI="https://fake-uri.com/id-2.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -115,7 +89,6 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-3',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         thumbnailURI="https://fake-uri.com/id-3.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
@@ -137,13 +110,11 @@ describe('MediaVideoRenderer', () => {
           mediaId: 'id-3',
           requestedSize: 200,
         }}
-        aspectRatio={2}
         thumbnailURI="https://fake-uri.com/id-3.jpg"
         alt="A video"
         onReadyForDisplay={onReadyForDisplay}
       />,
     );
-    expect(screen.queryByTestId('thumbnail')).not.toBeTruthy();
     act(() => {
       fireEvent(getVideo(), 'readyForDisplay');
     });

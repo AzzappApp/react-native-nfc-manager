@@ -1,6 +1,7 @@
 package com.azzapp.gpu
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.media.effect.EffectContext
 import android.media.effect.EffectFactory
@@ -8,32 +9,40 @@ import android.opengl.EGL14
 import android.opengl.EGLExt
 import android.opengl.GLES20
 import android.view.Surface
-import com.facebook.react.bridge.ReadableMap
-import com.google.android.exoplayer2.util.*
-import com.google.android.exoplayer2.video.ColorInfo
+import androidx.media3.common.ColorInfo
+import androidx.media3.common.DebugViewProvider
+import androidx.media3.common.Effect
+import androidx.media3.common.FrameInfo
+import androidx.media3.common.OnInputFrameProcessedListener
+import androidx.media3.common.SurfaceInfo
+import androidx.media3.common.VideoFrameProcessingException
+import androidx.media3.common.VideoFrameProcessor
+import androidx.media3.common.util.GlUtil
+import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import javax.microedition.khronos.egl.*
 import kotlin.math.round
+import javax.microedition.khronos.egl.*
 
-class GLExoPlayerFrameProcessor(
-  private val outputWidth: Int,
-  private val outputHeight: Int,
-  private val egl: EGL10,
-  private val eglContext: EGLContext,
-  private val eglDisplay: EGLDisplay,
-  private val eglConfig: EGLConfig,
-  private val listener: FrameProcessor.Listener,
-  private val coroutineDispatcher: ExecutorCoroutineDispatcher,
-  private val parameters: GPULayer.EditionParameters?,
-  private val filters: ArrayList<String>?
-) : FrameProcessor {
+@UnstableApi class GLExoPlayerFrameProcessor(
+        private val outputWidth: Int,
+        private val outputHeight: Int,
+        private val egl: EGL10,
+        private val eglContext: EGLContext,
+        private val eglDisplay: EGLDisplay,
+        private val eglConfig: EGLConfig,
+        private val listener: VideoFrameProcessor.Listener,
+        private val coroutineDispatcher: ExecutorCoroutineDispatcher,
+        private val parameters: GPULayer.EditionParameters?,
+        private val lutFilterBitmap: Bitmap?
+) : VideoFrameProcessor {
 
   private var pendingFrames = ConcurrentLinkedQueue<FrameInfo>()
   private var availableFrameCount = AtomicInteger()
@@ -47,7 +56,7 @@ class GLExoPlayerFrameProcessor(
   //private var outputSizeOrRotationChanged = false
   private var outputEglSurface: EGLSurface? = null
 
-  private val externalTexture: Int
+  private val externalTexture: Int = ShaderUtils.createTexture()
   private val surfaceTexture: SurfaceTexture
   private var inputSurface: Surface
 
@@ -60,10 +69,11 @@ class GLExoPlayerFrameProcessor(
 
 
   private var textureRenderer: TextureRenderer
+  private var colorLUTEffect: ColorLUTEffect? = null
+  private var lutImage: GLFrame?  = null
 
 
   init {
-    externalTexture = ShaderUtils.createTexture()
     ShaderUtils.bindExternalTexture(externalTexture)
     surfaceTexture = SurfaceTexture(externalTexture)
     surfaceTexture.setOnFrameAvailableListener {
@@ -71,16 +81,37 @@ class GLExoPlayerFrameProcessor(
       maybeQueueFrame()
     }
 
+
     inputSurface = Surface(surfaceTexture)
     externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
     image = GLFrame.create()
     textureRenderer = TextureRenderer(external = false, flipTexY = true)
 
     frameBuffer = ShaderUtils.createFrameBuffer()
+
+    if (lutFilterBitmap != null) {
+      colorLUTEffect = ColorLUTEffect()
+      lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
+      ShaderUtils.bindImageTexture(lutImage!!.texture, lutFilterBitmap)
+    }
+
+  }
+
+  override fun queueInputBitmap(inputBitmap: Bitmap, durationUs: Long, frameRate: Float) {
+  }
+
+  override fun queueInputTexture(textureId: Int, presentationTimeUs: Long) {
+  }
+
+  override fun setOnInputFrameProcessedListener(listener: OnInputFrameProcessedListener) {
   }
 
 
   override fun getInputSurface(): Surface = inputSurface
+
+  override fun registerInputStream(inputType: Int) {
+
+  }
 
   override fun setInputFrameInfo(inputFrameInfo: FrameInfo) {
     nextInputFrameInfo = inputFrameInfo
@@ -108,15 +139,19 @@ class GLExoPlayerFrameProcessor(
     }
   }
 
-  override fun releaseOutputFrame(releaseTimeNs: Long) {
+  override fun renderOutputFrame(releaseTimeNs: Long) {
     throw RuntimeException("GLExoPlayerFrameProcessor only support automatic frame releasing")
   }
 
   override fun signalEndOfInput() {
     inputStreamEnded.set(true)
     if (pendingFrames.isEmpty()) {
-      listener.onFrameProcessingEnded()
+      listener.onEnded()
     }
+
+  }
+
+  override fun flush() {
   }
 
   override fun release() {
@@ -146,7 +181,7 @@ class GLExoPlayerFrameProcessor(
       surfaceTexture.updateTexImage()
       surfaceTexture.getTransformMatrix(externalTextureTransformMatrix)
       val frameTimeNs = surfaceTexture.timestamp
-      val streamOffsetUs = currentFrame.streamOffsetUs
+      val streamOffsetUs = currentFrame.offsetToAddUs
 
       var retryCount = 0;
       while(true) {
@@ -160,7 +195,7 @@ class GLExoPlayerFrameProcessor(
             retryCount++
             continue
           }
-          listener.onFrameProcessingError(FrameProcessingException.from(e))
+          listener.onError(VideoFrameProcessingException.from(e))
         }
         break;
       }
@@ -170,14 +205,16 @@ class GLExoPlayerFrameProcessor(
         EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW),
         frameTimeNs
       )
+
       egl.eglSwapBuffers(eglDisplay, outputEglSurface)
 
-      listener.onOutputFrameAvailable(frameTimeNs / 1000 - streamOffsetUs)
+      listener.onOutputFrameAvailableForRendering(frameTimeNs / 1000 - streamOffsetUs)
       drawing.set(false)
       if (inputStreamEnded.get() && pendingFrames.isEmpty()) {
-        listener.onFrameProcessingEnded()
+        listener.onEnded()
       }
       maybeQueueFrame()
+
     }
   }
 
@@ -227,21 +264,13 @@ class GLExoPlayerFrameProcessor(
     }
 
     var outputImage = image
-    if (surfaceInfo.orientationDegrees != 0) {
-      outputImage = GLFrameTransformations.applyEffect(
-        image,
-        null,
-        EffectFactory.EFFECT_ROTATE,
-        mapOf("angle" to -surfaceInfo.orientationDegrees),
-        effectContext!!.factory
-      )
-    }
+
 
     if (parameters != null) {
       val croppedImage = GLFrameTransformations.applyEditorTransform(
-        outputImage,
-        parameters,
-        effectContext!!.factory
+              outputImage,
+              parameters,
+              effectContext!!.factory
       ) ?: image
       if (outputImage !== image) {
         outputImage.release()
@@ -249,22 +278,24 @@ class GLExoPlayerFrameProcessor(
       outputImage = croppedImage
     }
 
-    if (filters != null) {
-      for (filter in filters) {
-        val transform = GLFrameTransformations.transformationForName(filter)
-        if (transform != null) {
-          val transformedImage = transform(
-            outputImage,
-            null,
-            null,
-            effectContext!!.factory
-          )
-          if (outputImage !== image) {
-            outputImage.release()
-          }
-          outputImage = transformedImage
+    if (lutImage != null) {
+      val imageWithLut = colorLUTEffect?.apply(outputImage, lutImage!!)
+      if (imageWithLut != null) {
+        if (outputImage !== image) {
+          outputImage.release()
         }
+        outputImage = imageWithLut
       }
+    }
+
+    if (surfaceInfo.orientationDegrees != 0) {
+      outputImage = GLFrameTransformations.applyEffect(
+        outputImage,
+        null,
+        EffectFactory.EFFECT_ROTATE,
+        mapOf("angle" to -surfaceInfo.orientationDegrees),
+        effectContext!!.factory
+      )
     }
 
     textureRenderer.renderTexture(
@@ -285,24 +316,27 @@ class GLExoPlayerFrameProcessor(
     private val outputWidth: Int,
     private val outputHeight: Int,
     private val parameters: GPULayer.EditionParameters?,
-    private val filters: ArrayList<String>?,
-  ) : FrameProcessor.Factory {
+    private val lutFilterBitmap: Bitmap?,
+  ) : VideoFrameProcessor.Factory {
+
     override fun create(
-      context: Context,
-      listener: FrameProcessor.Listener,
-      effects: MutableList<Effect>,
-      debugViewProvider: DebugViewProvider,
-      colorInfo: ColorInfo,
-      releaseFramesAutomatically: Boolean
-    ): FrameProcessor {
-      if (!releaseFramesAutomatically) {
-        throw FrameProcessingException(
-          "GLExoPlayerFrameProcessor can't be used with releaseFramesAutomatically set to false"
+      context: Context, 
+      effects: MutableList<Effect>, 
+      debugViewProvider: DebugViewProvider, 
+      inputColorInfo: ColorInfo, 
+      outputColorInfo: ColorInfo, 
+      renderFramesAutomatically: Boolean,
+      listenerExecutor: Executor,
+      listener: VideoFrameProcessor.Listener): VideoFrameProcessor {
+      
+      if (!renderFramesAutomatically) {
+        throw VideoFrameProcessingException(
+                "GLExoPlayerFrameProcessor can't be used with releaseFramesAutomatically set to false"
         )
       }
+
       val coroutineDispatcher =
         Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
 
       try {
         val frameProcessor = runBlocking(coroutineDispatcher) {
@@ -313,18 +347,18 @@ class GLExoPlayerFrameProcessor(
         }
         return frameProcessor
       } catch (e: ExecutionException) {
-        throw FrameProcessingException(e)
+        throw VideoFrameProcessingException(e)
       } catch (e: InterruptedException) {
         Thread.currentThread().interrupt()
-        throw FrameProcessingException(e)
+        throw VideoFrameProcessingException(e)
       }
     }
 
 
     private fun createOpenGLObjectsAndFrameProcessor(
-      listener: FrameProcessor.Listener,
+      listener: VideoFrameProcessor.Listener,
       coroutineDispatcher: ExecutorCoroutineDispatcher,
-    ): FrameProcessor {
+    ): VideoFrameProcessor {
       val egl = EGLContext.getEGL() as EGL10
       val eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
 
@@ -373,7 +407,7 @@ class GLExoPlayerFrameProcessor(
         listener,
         coroutineDispatcher,
         parameters,
-        filters
+        lutFilterBitmap
       )
     }
   }

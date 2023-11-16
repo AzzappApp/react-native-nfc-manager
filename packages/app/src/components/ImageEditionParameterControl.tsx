@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import { editionParametersSettings } from './gpu';
@@ -16,7 +17,41 @@ type ImageEditionParameterControlProps = ViewProps & {
    * Callback called when the value of the parameter changes.x
    */
   onChange(value: number): void;
+  /**
+   * The label suffix to display after the value.
+   */
+  labelSuffix?: string;
+  /**
+   * The label to display before the value.
+   */
+  label?: string;
 };
+
+function lerp(min: number, max: number, value: number) {
+  'worklet';
+  return min * (1 - value) + max * value;
+}
+
+function clamp(value: number, min = 0, max = 1) {
+  'worklet';
+  return Math.min(max, Math.max(min, value));
+}
+
+function invlerp(min: number, max: number, value: number) {
+  'worklet';
+  return clamp((value - min) / (max - min));
+}
+
+export function range(
+  baseMin: number,
+  baseMax: number,
+  rangeMin: number,
+  rangeMax: number,
+  value: number,
+) {
+  'worklet';
+  return lerp(rangeMin, rangeMax, invlerp(baseMin, baseMax, value));
+}
 
 /**
  * Controls the values of a single parameter of the ImageEditionParameters using a slider.
@@ -27,45 +62,53 @@ const ImageEditionParameterControl = ({
   value: propsValue,
   onChange,
   style,
+  labelSuffix,
+  label,
   ...props
 }: ImageEditionParameterControlProps) => {
   const parameterSettings = parameter && editionParametersSettings[parameter];
+
+  const formatValue = useCallback(
+    (value: number) => {
+      'worklet';
+      let displayedValue = 0;
+      if (parameterSettings) {
+        const { min, max, displayedValues } = parameterSettings;
+        if (displayedValues) {
+          displayedValue = Math.round(
+            range(min, max, displayedValues[0], displayedValues[1], value),
+          );
+        } else if (min < 0) {
+          displayedValue =
+            value >= 0
+              ? Math.round((value * 100) / max)
+              : Math.round((-value * 100) / min);
+        } else {
+          displayedValue = Math.round(((value - min) * 100) / (max - min));
+        }
+      }
+      return labelSuffix ? `${displayedValue}${labelSuffix}` : displayedValue;
+    },
+    [labelSuffix, parameterSettings],
+  );
+
   if (!parameterSettings) {
     return null;
   }
-  const {
-    defaultValue,
-    min,
-    max,
-    step,
-    interval,
-    displayOriginalValue = false,
-  } = parameterSettings;
-
+  const { min, max, step, interval, defaultValue } = parameterSettings;
   const value = propsValue ?? defaultValue;
-
-  let displayedValue: number;
-  if (displayOriginalValue) {
-    displayedValue = value;
-  } else if (min < 0) {
-    displayedValue =
-      value >= 0
-        ? Math.round((value * 100) / max)
-        : Math.round((-value * 100) / min);
-  } else {
-    displayedValue = Math.round(((value - min) * 100) / (max - min));
-  }
 
   return (
     <View style={[styles.root, style]} {...props}>
       <LabeledDashedSlider
-        label={displayedValue}
-        value={value}
+        formatValue={formatValue}
+        initialValue={value}
         min={min}
         max={max}
         step={step}
         interval={interval}
         onChange={onChange}
+        label={label}
       />
     </View>
   );

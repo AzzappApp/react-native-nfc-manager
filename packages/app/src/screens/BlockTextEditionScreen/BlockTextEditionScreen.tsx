@@ -467,10 +467,14 @@ const BlockTextEditionScreen = ({
       <TextAreaModal
         visible={showContentModal}
         value={text ?? ''}
+        headerTitle={intl.formatMessage({
+          defaultMessage: 'Edit text',
+          description:
+            'Title for text area header modal in block text edition screen',
+        })}
         placeholder={intl.formatMessage({
           defaultMessage: 'Enter text',
-          description:
-            'Placeholder for text area in simple text edition screen',
+          description: 'Placeholder for text area in block text edition screen',
         })}
         maxLength={BLOCK_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}

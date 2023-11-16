@@ -2,7 +2,7 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -26,14 +26,13 @@ import {
   type EditionParameters,
 } from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
-import Container from '#ui/Container';
-import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { ColorPalette, CoverStyleData } from './coverEditorTypes';
+import type { CoverStyleData, SourceMedia } from './coverEditorTypes';
 import type { CoverEditorTemplateList_templates$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templates.graphql';
 import type { CoverEditorTemplateList_templatesOthers$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesOthers.graphql';
 import type { CoverEditorTemplateList_templatesPeople$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesPeople.graphql';
@@ -43,6 +42,7 @@ import type {
   CoverEditorTemplateListItem_coverTemplate$key,
   CoverTemplateKind,
 } from '@azzapp/relay/artifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   TextOrientation,
   TextPosition,
@@ -53,35 +53,25 @@ import type { ListRenderItemInfo, ViewToken } from 'react-native';
 export type CoverEditorProps = {
   viewer: CoverEditorTemplateList_viewer$key;
   templateKind: CoverTemplateKind;
-  media: {
-    uri: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
-  } | null;
+  media: SourceMedia | null;
   maskUri: string | null;
   title: string | null;
   subTitle: string | null;
-  width: number;
-  height: number;
   mediaCropParameters: EditionParameters | null;
-  timeRange: TimeRange | null;
   currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
+  timeRange: TimeRange | null;
   mediaComputing: boolean;
-  showTemplatesMedias: boolean;
+  width: number;
+  height: number;
   initialSelectedIndex: number;
-  showSuggestedMedia: boolean;
+  videoPaused: boolean;
   onSelectedIndexChange: (index: number) => void;
-  onCoverStyleChange: (data: CoverStyleData) => void;
-  onColorPaletteChange: (palette: ColorPalette) => void;
-  onPreviewMediaChange: (media: {
-    uri: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
+  onSelectedItemChange: (template: {
+    style: CoverStyleData;
+    media: SourceMedia;
   }) => void;
-  onSelectSuggestedMedia: () => void;
+  onColorPaletteChange: (palette: ColorPalette) => void;
 };
 
 const CoverEditorTemplateList = ({
@@ -98,14 +88,11 @@ const CoverEditorTemplateList = ({
   currentCoverStyle,
   cardColors,
   mediaComputing,
-  showTemplatesMedias,
   initialSelectedIndex,
-  showSuggestedMedia,
-  onCoverStyleChange,
+  onSelectedItemChange,
   onColorPaletteChange,
-  onPreviewMediaChange,
   onSelectedIndexChange,
-  onSelectSuggestedMedia,
+  videoPaused,
 }: CoverEditorProps) => {
   const viewer = useFragment(
     graphql`
@@ -189,6 +176,7 @@ const CoverEditorTemplateList = ({
               __typename
               id
               uri(width: 256, pixelRatio: $cappedPixelRatio)
+              rawUri: uri(raw: true)
               width
               height
             }
@@ -239,7 +227,6 @@ const CoverEditorTemplateList = ({
       const templateEditionParameters =
         mediaParameters as EditionParameters | null;
 
-      const displayTemplateMedia = showTemplatesMedias || !media;
       const templateStyleParameters = templateEditionParameters
         ? extractLayoutParameters(templateEditionParameters)[1]
         : null;
@@ -251,26 +238,24 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
-        media:
-          showSuggestedMedia && media
-            ? media
-            : displayTemplateMedia
-            ? {
-                uri: previewMedia.uri,
-                kind:
-                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-                width: previewMedia.width,
-                height: previewMedia.height,
-              }
-            : media,
-        mediaFilter,
-        mediaParameters: displayTemplateMedia
-          ? (templateEditionParameters as EditionParameters | null) ?? {}
+        media: media
+          ? media
           : {
+              uri: previewMedia.uri,
+              rawUri: previewMedia.rawUri,
+              kind:
+                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+              width: previewMedia.width,
+              height: previewMedia.height,
+            },
+        mediaFilter,
+        mediaParameters: media
+          ? {
               ...templateStyleParameters,
               ...mediaCropParameters,
-            },
-        maskUri: kind === 'people' && !showTemplatesMedias ? maskUri : null,
+            }
+          : (templateEditionParameters as EditionParameters | null) ?? {},
+        maskUri: kind === 'people' ? maskUri : null,
         background: background ?? null,
         backgroundColor,
         backgroundPatternColor,
@@ -329,18 +314,22 @@ const CoverEditorTemplateList = ({
     currentCoverStyle,
     media,
     colorPalettes,
-    showTemplatesMedias,
+    cardColors,
     title,
     subTitle,
-    showSuggestedMedia,
     mediaCropParameters,
     maskUri,
-    cardColors,
   ]);
 
   const [selectedItem, setSelectedItem] = useState<TemplateListItem | null>(
     items[0] ?? null,
   );
+  useEffect(() => {
+    //refreshing the selectedItem when switching between templateKind
+    //fix: https://github.com/AzzappApp/azzapp/issues/1458
+    setSelectedItem(items[initialSelectedIndex] ?? null);
+  }, [initialSelectedIndex, items]);
+
   const [colorPalettesIndexes, setColorPalettesIndexes] = useState<
     Record<string, number>
   >({ cover: cardColors ? -1 : 0 });
@@ -388,32 +377,27 @@ const CoverEditorTemplateList = ({
       merged,
     } = selectedItem;
 
-    onCoverStyleChange({
-      titleStyle,
-      subTitleStyle,
-      textOrientation,
-      textPosition,
-      mediaFilter,
-      mediaParameters,
-      background: background ?? null,
-      backgroundColor,
-      backgroundPatternColor,
-      foreground: foreground ?? null,
-      foregroundColor,
-      merged,
-      segmented: segmented ?? templateKind === 'people',
+    onSelectedItemChange({
+      style: {
+        titleStyle,
+        subTitleStyle,
+        textOrientation,
+        textPosition,
+        mediaFilter,
+        mediaParameters,
+        background: background ?? null,
+        backgroundColor,
+        backgroundPatternColor,
+        foreground: foreground ?? null,
+        foregroundColor,
+        merged,
+        segmented: segmented ?? templateKind === 'people',
+      },
+      media: selectedItem.media,
     });
+  }, [media, onSelectedItemChange, selectedItem, templateKind]);
 
-    if (!media) {
-      onPreviewMediaChange(selectedItem.media);
-    }
-  }, [
-    media,
-    onCoverStyleChange,
-    onPreviewMediaChange,
-    selectedItem,
-    templateKind,
-  ]);
+  const selectedItemId = useMemo(() => selectedItem?.id, [selectedItem?.id]);
 
   const viewableIndexRef = useRef<number[]>([]);
 
@@ -476,11 +460,13 @@ const CoverEditorTemplateList = ({
 
   const carouselHeight = height - PALETTE_LIST_HEIGHT - GAP;
   const templateWidth = COVER_RATIO * carouselHeight;
+  const { width: windowWidth } = useWindowDimensions();
 
   const styles = useStyleSheet(styleSheet);
+
   const renderTemplate = useCallback(
     ({ item, index }: ListRenderItemInfo<TemplateListItem>) => {
-      const isSelectedItem = item.id === selectedItem?.id;
+      const isSelectedItem = item.id === selectedItemId;
       const onPress = () => {
         if (isSelectedItem) {
           onNextColorPalette();
@@ -528,14 +514,14 @@ const CoverEditorTemplateList = ({
             }
             computing={mediaComputing}
             height={carouselHeight}
-            paused={!isSelectedItem}
+            paused={!isSelectedItem || videoPaused}
             style={styles.templateItemContainer}
           />
         </PressableScaleHighlight>
       );
     },
     [
-      selectedItem?.id,
+      selectedItemId,
       colorPalettesIndexes,
       templateWidth,
       timeRange?.startTime,
@@ -543,6 +529,7 @@ const CoverEditorTemplateList = ({
       cardColors,
       mediaComputing,
       carouselHeight,
+      videoPaused,
       styles.templateItemContainer,
       onNextColorPalette,
       scrollToIndex,
@@ -551,8 +538,8 @@ const CoverEditorTemplateList = ({
 
   const renderTryptich = useCallback(
     ({ item, index }: Omit<ListRenderItemInfo<ColorPalette>, 'separators'>) => {
-      const currentColorPaletteIndex = selectedItem
-        ? colorPalettesIndexes[selectedItem?.id] ?? 0
+      const currentColorPaletteIndex = selectedItemId
+        ? colorPalettesIndexes[selectedItemId] ?? 0
         : 0;
 
       const selected = currentColorPaletteIndex === index;
@@ -582,7 +569,7 @@ const CoverEditorTemplateList = ({
     [
       colorPalettesIndexes,
       onSelectColorPalette,
-      selectedItem,
+      selectedItemId,
       styles.colorPaletteContainer,
       styles.colorPaletteSelected,
     ],
@@ -605,7 +592,23 @@ const CoverEditorTemplateList = ({
         initialScrollIndex={initialSelectedIndex}
         onSelectedIndexChange={onSelectedIndexChangeInner}
         onEndReached={onEndTemplateReached}
+        extraData={selectedItemId}
       />
+      {isLoadingNext && (
+        <View
+          style={{
+            position: 'absolute',
+            height: carouselHeight,
+            width: windowWidth / 4,
+            right: (width - windowWidth) / 2,
+            top: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ActivityIndicator />
+        </View>
+      )}
       <View
         style={{
           height: PALETTE_LIST_HEIGHT,
@@ -668,23 +671,6 @@ const CoverEditorTemplateList = ({
             })}
           />
         </MaskedView>
-        {showSuggestedMedia && (
-          <Container
-            style={{
-              height: PALETTE_LIST_HEIGHT,
-              width: 60,
-            }}
-          >
-            <IconButton
-              icon={
-                templateKind === 'video' ? 'suggested_video' : 'suggested_photo'
-              }
-              variant="icon"
-              iconSize={36}
-              onPress={onSelectSuggestedMedia}
-            />
-          </Container>
-        )}
       </View>
     </>
   );
@@ -713,7 +699,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         peopleCoverTemplates: coverTemplates(
           kind: people
@@ -740,7 +726,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         videosCoverTemplates: coverTemplates(
           kind: video
@@ -767,7 +753,7 @@ const useCoverTemplates = (
       @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
       @argumentDefinitions(
         after: { type: String }
-        first: { type: Int, defaultValue: 20 }
+        first: { type: Int, defaultValue: 15 }
       ) {
         othersCoverTemplates: coverTemplates(
           kind: others
@@ -844,7 +830,8 @@ const computeTemplatesPalettes = (
 
 const templateKeyExtractor = (item: TemplateListItem) => item.id;
 
-const paletteKeyExtract = (item: ColorPalette) => item.id ?? 'cover';
+const paletteKeyExtract = (item: ColorPalette & { id?: string }) =>
+  item.id ?? 'cover';
 
 type TemplateListItem = {
   id: string;
@@ -852,6 +839,7 @@ type TemplateListItem = {
   titleStyle: TextStyle;
   media: {
     uri: string;
+    rawUri?: string;
     kind: 'image' | 'video';
     width: number;
     height: number;
@@ -876,7 +864,7 @@ type TemplateListItem = {
   foregroundColor: string | null;
   merged: boolean;
   segmented?: boolean;
-  colorPalettes: ColorPalette[];
+  colorPalettes: Array<ColorPalette & { id?: string }>;
 };
 
 const PALETTE_LIST_HEIGHT = 30;

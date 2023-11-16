@@ -34,7 +34,6 @@ describe('SearchBar component', () => {
 
     expect(
       screen.getByTestId('azzapp__SearchBar__view-inputcontainer'),
-      //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
     ).toHaveAnimatedStyle({ width: 450 });
 
     fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'focus');
@@ -42,7 +41,6 @@ describe('SearchBar component', () => {
 
     expect(
       screen.getByTestId('azzapp__SearchBar__view-inputcontainer'),
-      //@ts-expect-error Property 'toHaveAnimatedStyle' does not exist on type 'JestMatchers<ReactTestInstance | null>
     ).toHaveAnimatedStyle({ width: 440 });
   });
 

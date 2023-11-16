@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
+  FILTERS,
   GPUImageView,
   GPUVideoView,
   Image,
   Video,
   VideoFrame,
+  isFilter,
 } from '#components/gpu';
 import { isFileURL } from '#helpers/fileHelpers';
 import { prefetchVideo } from '#helpers/mediaHelpers';
@@ -186,19 +188,22 @@ const CoverMediaPreview = ({
     uri,
     maskUri,
     parameters: editionParameters,
-    filters: filter ? [filter] : [],
+    lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
     blending: backgroundMultiply ? 'multiply' : 'none',
   } as const;
 
   const GPUView = kind === 'video' ? GPUVideoView : GPUImageView;
 
   return (
-    <View
-      style={[style, backgroundColor != null && { backgroundColor }]}
-      {...props}
-    >
+    <View style={style} {...props}>
       {kind === 'video' && (
-        <GPUImageView {...loadingHandlers} style={StyleSheet.absoluteFill}>
+        <GPUImageView
+          {...loadingHandlers}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: backgroundColor ?? '#000' },
+          ]}
+        >
           {backgroundImageUri && (
             <Image
               uri={backgroundImageUri}
@@ -212,10 +217,13 @@ const CoverMediaPreview = ({
         <GPUView
           {...loadingHandlers}
           paused={paused}
-          style={{
-            flex: 1,
-            opacity: kind !== 'video' || playerReady ? 1 : 0,
-          }}
+          style={[
+            {
+              flex: 1,
+              opacity: kind !== 'video' || playerReady ? 1 : 0,
+            },
+            { backgroundColor: backgroundColor ?? '#FFF' },
+          ]}
         >
           {backgroundImageUri && (
             <Image

@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -161,10 +162,10 @@ const ColorTriptychChooser = ({
             onPress={onPressprimary}
             size={size}
             style={{
-              backgroundColor: colorPalette.primary,
               top: (-size / RATIO_PRESS) * PRESSABLE_OFFSET_FACTOR,
               left: (size - size / RATIO_PRESS) / 2,
             }}
+            color={colorPalette.primary}
             testID={'primary-color-button'}
             disabled={saving}
             disabledOpacity={1}
@@ -173,10 +174,10 @@ const ColorTriptychChooser = ({
             onPress={onPressdark}
             size={size}
             style={{
-              backgroundColor: colorPalette.dark,
               bottom: (-size / RATIO_PRESS) * (1 - PRESSABLE_OFFSET_FACTOR),
               left: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
+            color={colorPalette.dark}
             testID={'dark-color-button'}
             disabled={saving}
             disabledOpacity={1}
@@ -185,10 +186,10 @@ const ColorTriptychChooser = ({
             onPress={onPresslight}
             size={size}
             style={{
-              backgroundColor: colorPalette.light,
               bottom: (-size / RATIO_PRESS) * (1 - PRESSABLE_OFFSET_FACTOR),
               right: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
+            color={colorPalette.light}
             testID={'light-color-button'}
             disabled={saving}
             disabledOpacity={1}
@@ -255,14 +256,17 @@ const RATIO_ICON = 0.279;
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 type PressableSlideComponentProps = PressableOpacityProps & {
   size: number;
+  color: string;
 };
 
 const PressableSliceComponent = ({
   size,
   style,
+  color,
   ...props
 }: PressableSlideComponentProps) => {
   const styles = useStyleSheet(stylesheet);
+  const readableColor = useMemo(() => getTextColor(color), [color]);
   return (
     <PressableOpacity
       activeOpacity={0.5}
@@ -278,6 +282,7 @@ const PressableSliceComponent = ({
           width: size / RATIO_PRESS,
           height: size / RATIO_PRESS,
           borderRadius: size / RATIO_PRESS / 2,
+          backgroundColor: color,
         },
         style,
       ]}
@@ -286,7 +291,7 @@ const PressableSliceComponent = ({
       <Icon
         icon="edit"
         style={{
-          tintColor: colors.white,
+          tintColor: readableColor,
           width: size * RATIO_ICON,
           height: size * RATIO_ICON,
         }}

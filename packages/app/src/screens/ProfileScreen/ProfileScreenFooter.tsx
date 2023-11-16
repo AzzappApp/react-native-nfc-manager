@@ -59,6 +59,10 @@ export type ProfileScreenFooterProps = {
    * Called when the user press the delete button in edit selection mode
    */
   onDelete: () => void;
+  /**
+   * Called when the user press the duplicate button in edit selection mode
+   */
+  onDuplicate: () => void;
 };
 
 const ProfileScreenFooter = ({
@@ -73,6 +77,7 @@ const ProfileScreenFooter = ({
   onRequestWebcardStyle,
   onDelete,
   onToggleVisibility,
+  onDuplicate,
 }: ProfileScreenFooterProps) => {
   const { colorPalette } = useProfileCardColors(profileKey);
 
@@ -166,10 +171,11 @@ const ProfileScreenFooter = ({
   const selectionModeTransition = useSelectionModeTransition();
 
   const bottomMenuStyle = useAnimatedStyle(() => ({
-    opacity: editTransition.value - selectionModeTransition.value,
+    opacity:
+      (editTransition?.value ?? 0) - (selectionModeTransition?.value ?? 0),
   }));
   const selectionMenuStyle = useAnimatedStyle(() => ({
-    opacity: editing ? selectionModeTransition.value : 0,
+    opacity: editing ? selectionModeTransition?.value ?? 0 : 0,
   }));
   return (
     <>
@@ -224,6 +230,22 @@ const ProfileScreenFooter = ({
                 description="Hide button in profile edition screen footer"
               />
             )}
+          </Text>
+        </PressableNative>
+
+        <PressableNative
+          accessibilityRole="button"
+          disabled={!hasSelectedModules}
+          onPress={onDuplicate}
+        >
+          <Text
+            variant="button"
+            style={!hasSelectedModules && { color: colors.grey200 }}
+          >
+            <FormattedMessage
+              defaultMessage="Duplicate"
+              description="Duplicate button in profile edition screen footer"
+            />
           </Text>
         </PressableNative>
 

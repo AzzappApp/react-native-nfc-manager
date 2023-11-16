@@ -184,7 +184,8 @@ describe('ContactCardEditModal', () => {
       socials: [
         {
           selected: false,
-          social: '<mock-value-for-field-"social">',
+          label: '<mock-value-for-field-"label">',
+          url: '<mock-value-for-field-"url">',
         },
       ],
       urls: [

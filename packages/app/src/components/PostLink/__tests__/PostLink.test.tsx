@@ -82,6 +82,7 @@ describe('PostLink', () => {
     });
 
     expect(mockRouter.push).toHaveBeenCalledWith({
+      id: 'fakeId',
       route: 'POST',
       params: { postId: 'fakeId' },
     });
@@ -89,7 +90,6 @@ describe('PostLink', () => {
 
   test('should push to post screen with animation if Post handle is present', async () => {
     mockPostHandle = {
-      getCurrentMediaRenderer: jest.fn(),
       getCurrentVideoTime: jest.fn().mockReturnValue(3.4),
       snapshot: jest.fn(),
     };
@@ -112,6 +112,7 @@ describe('PostLink', () => {
 
     expect(mockRouter.push).toHaveBeenCalledWith({
       route: 'POST',
+      id: 'fakeId',
       params: {
         postId: 'fakeId',
         videoTime: 3.4,

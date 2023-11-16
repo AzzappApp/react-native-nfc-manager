@@ -11,11 +11,14 @@ import hashnode from './assets/hashnode.svg';
 import instagram from './assets/instagram.svg';
 import letterboxd from './assets/letterboxd.svg';
 import linkedin from './assets/linkedin.svg';
+import mail from './assets/mail.svg';
 import mastodon from './assets/mastodon.svg';
 import messenger from './assets/messenger.svg';
 import npm from './assets/npm.svg';
 import patreon from './assets/patreon.svg';
+import phone from './assets/phone.svg';
 import pinterest from './assets/pinterest.svg';
+import sms from './assets/sms.svg';
 import snapchat from './assets/snapchat.svg';
 import telegram from './assets/telegram.svg';
 import tiktok from './assets/tiktok.svg';
@@ -23,6 +26,7 @@ import tripadvisor from './assets/tripadvisor.svg';
 import twitch from './assets/twitch.svg';
 import twitter from './assets/twitter.svg';
 import typefully from './assets/typefully.svg';
+import website from './assets/website.svg';
 import whatsapp from './assets/whatsapp.svg';
 import yelp from './assets/yelp.svg';
 import youtube from './assets/youtube.svg';
@@ -70,6 +74,10 @@ const socialIcons = {
   whatsapp,
   yelp,
   youtube,
+  website,
+  mail,
+  phone,
+  sms,
 };
 
 export type SocialIcons = keyof typeof socialIcons;

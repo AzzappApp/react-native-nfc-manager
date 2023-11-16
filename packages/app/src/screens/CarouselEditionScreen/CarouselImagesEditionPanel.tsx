@@ -133,12 +133,11 @@ const CarouselImagesEditionPanel = ({
         <LabeledDashedSlider
           label={
             <FormattedMessage
-              defaultMessage="Images height : {size}"
+              defaultMessage="Images height :"
               description="Images height label in carousel edition"
-              values={{ size: imageHeight }}
             />
           }
-          value={imageHeight}
+          initialValue={imageHeight}
           min={CAROUSEL_MIN_IMAGE_HEIGHT}
           max={CAROUSEL_MAX_IMAGE_HEIGHT}
           step={5}
@@ -157,7 +156,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
     gap: 15,
   },
   squareRatioButton: {
@@ -171,6 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexGrow: 1,
+    paddingHorizontal: 20,
   },
   settingsContainer: {
     flexDirection: 'row',

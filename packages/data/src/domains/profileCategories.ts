@@ -13,6 +13,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 export const ProfileCategoryTable = mysqlTable('ProfileCategory', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
+  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   labels: cols.labels('labels').notNull(),
   medias: json('medias').$type<string[]>().notNull(),
   order: int('order').notNull(),

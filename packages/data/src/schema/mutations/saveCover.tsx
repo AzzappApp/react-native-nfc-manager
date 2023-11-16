@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
@@ -18,12 +19,12 @@ const saveCover: MutationResolvers['saveCover'] = async (
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
-    throw new Error(ERRORS.UNAUTORIZED);
+    throw new GraphQLError(ERRORS.UNAUTORIZED);
   }
 
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const oldMedias: Array<string | null> = [];
@@ -33,7 +34,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
   const validator = profile.coverData ? updateValidator : creationValidator;
 
   if (!validator.safeParse(input).success) {
-    throw new Error(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (input.mediaId) {
@@ -68,11 +69,11 @@ const saveCover: MutationResolvers['saveCover'] = async (
       };
       const { title, subTitle, ...coverData } = input;
       let hasUpdates = false;
-      if (title) {
+      if (title != null) {
         updates.coverTitle = title;
         hasUpdates = true;
       }
-      if (subTitle) {
+      if (subTitle != null) {
         updates.coverSubTitle = subTitle;
         hasUpdates = true;
       }
@@ -82,7 +83,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
           ...coverData,
         };
         if (!coverDataUpdated.sourceMediaId || !coverDataUpdated.mediaId) {
-          throw new Error(ERRORS.INVALID_REQUEST);
+          throw new GraphQLError(ERRORS.INVALID_REQUEST);
         }
         updates.coverData = {
           ...coverDataUpdated,
@@ -98,6 +99,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
           sourceMediaId: coverDataUpdated.sourceMediaId,
           merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
+          kind: coverDataUpdated.kind ?? null,
         };
         if (input.cardColors) {
           updates.cardColors = input.cardColors;
@@ -105,7 +107,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         hasUpdates = true;
       }
       if (!hasUpdates) {
-        throw new Error(ERRORS.INVALID_REQUEST);
+        throw new GraphQLError(ERRORS.INVALID_REQUEST);
       }
       await updateProfile(profileId, updates, trx);
       updatedProfile = { ...updatedProfile, ...updates };
@@ -115,20 +117,20 @@ const saveCover: MutationResolvers['saveCover'] = async (
     return { profile: updatedProfile };
   } catch (error) {
     console.log(error);
-    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
 
 export default saveCover;
 
 const creationValidator = z.object({
-  title: z.string().min(1).max(191),
+  title: z.string().min(0).max(191).nullable(),
   mediaId: z.string(),
   sourceMediaId: z.string(),
 });
 
 const updateValidator = z.object({
-  title: z.string().min(1).max(191).optional(),
+  title: z.string().min(0).max(191).optional().nullable(),
   mediaId: z.string().optional(),
   sourceMediaId: z.string().optional(),
 });
