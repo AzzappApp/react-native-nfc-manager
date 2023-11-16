@@ -58,13 +58,11 @@ const CoverEditorCropModal = ({
 }: CoverEditorCropModalProps) => {
   const intl = useIntl();
 
-  const [editionParameters, setEditionParameters] = useState(
-    mediaParameters ?? {},
-  );
+  const [editionParameters, setEditionParameters] = useState(mediaParameters);
 
   useEffect(() => {
     if (!visible && !isEqual(mediaParameters, editionParameters)) {
-      setEditionParameters(mediaParameters ?? {});
+      setEditionParameters(mediaParameters);
     }
   }, [editionParameters, mediaParameters, visible]);
 
@@ -76,7 +74,7 @@ const CoverEditorCropModal = ({
   };
 
   const onSaveInner = () => {
-    onSave(editionParameters);
+    onSave(editionParameters ?? {});
   };
 
   const onRollChange = (roll: number) => {
@@ -89,7 +87,7 @@ const CoverEditorCropModal = ({
   const onNextOrientation = () => {
     setEditionParameters(prev => ({
       ...prev,
-      orientation: getNextOrientation(prev.orientation),
+      orientation: getNextOrientation(prev?.orientation),
     }));
   };
 
@@ -184,7 +182,7 @@ const CoverEditorCropModal = ({
               description: 'Cover editor roll parameter label',
             })}
             labelSuffix="°"
-            value={editionParameters.roll}
+            value={editionParameters?.roll ?? 0}
             parameter="roll"
             onChange={onRollChange}
             style={{ flex: 1 }}
