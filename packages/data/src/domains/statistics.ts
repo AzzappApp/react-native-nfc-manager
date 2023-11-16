@@ -1,7 +1,8 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
-import { ProfileTable } from '#domains';
+
 import db, { cols } from './db';
+import { ProfileTable } from './profiles';
 import type { DbTransaction } from './db';
 import type { InferSelectModel } from 'drizzle-orm';
 
