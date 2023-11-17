@@ -1,3 +1,4 @@
+import { decompressFromEncodedURIComponent } from 'lz-string';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
 
@@ -20,68 +21,69 @@ export const matchUrlWithRoute = async (
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
 
-  if (prefix) {
-    const withoutPrefix = url.replace(prefix, '');
-    const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
-    if (matchResetPassword) {
-      const token = decodeURIComponent(
-        getSearchParamFromURL(url, 'token') ?? '',
-      );
+  if (!prefix) {
+    return;
+  }
+  const withoutPrefix = url.replace(prefix, '');
+  const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
+  if (matchResetPassword) {
+    const token = decodeURIComponent(getSearchParamFromURL(url, 'token') ?? '');
 
-      const issuer = decodeURIComponent(
-        getSearchParamFromURL(url, 'issuer') ?? '',
-      );
+    const issuer = decodeURIComponent(
+      getSearchParamFromURL(url, 'issuer') ?? '',
+    );
 
-      if (token) {
+    if (token) {
+      return {
+        route: 'RESET_PASSWORD',
+        params: {
+          token,
+          issuer,
+        },
+      };
+    }
+  }
+
+  const matchProfile = withoutPrefix.match(profileUrl);
+  if (matchProfile) {
+    const username = matchProfile[1];
+    if (!username) {
+      return;
+    }
+
+    const compressedContactCard = getSearchParamFromURL(url, 'c');
+    if (compressedContactCard) {
+      let contactData: string;
+      let signature: string;
+      try {
+        [contactData, signature] = JSON.parse(
+          decompressFromEncodedURIComponent(compressedContactCard),
+        );
+      } catch {
         return {
-          route: 'RESET_PASSWORD',
+          route: 'PROFILE',
           params: {
-            token,
-            issuer,
+            userName: username,
           },
         };
       }
-    }
 
-    const matchProfile = withoutPrefix.match(profileUrl);
+      if (signature && contactData) {
+        try {
+          await verifySign({
+            signature,
+            data: contactData,
+            salt: username,
+          });
 
-    if (matchProfile) {
-      const username = matchProfile[1];
-
-      const signature = decodeURIComponent(
-        getSearchParamFromURL(url, 's') ?? '',
-      );
-
-      const contactData = decodeURIComponent(
-        getSearchParamFromURL(url, 'c') ?? '',
-      );
-
-      if (username) {
-        if (signature && contactData) {
-          try {
-            await verifySign({
-              signature,
-              data: contactData,
-              salt: username,
-            });
-
-            return {
-              route: 'PROFILE',
-              params: {
-                userName: username,
-                contactData,
-              },
-            };
-          } catch (e) {
-            console.error(e);
-            return {
-              route: 'PROFILE',
-              params: {
-                userName: username,
-              },
-            };
-          }
-        } else {
+          return {
+            route: 'PROFILE',
+            params: {
+              userName: username,
+              contactData,
+            },
+          };
+        } catch {
           return {
             route: 'PROFILE',
             params: {
@@ -90,6 +92,13 @@ export const matchUrlWithRoute = async (
           };
         }
       }
+    } else {
+      return {
+        route: 'PROFILE',
+        params: {
+          userName: username,
+        },
+      };
     }
   }
 };

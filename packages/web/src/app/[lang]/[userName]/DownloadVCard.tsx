@@ -1,4 +1,5 @@
 'use client';
+import { decompressFromEncodedURIComponent } from 'lz-string';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
@@ -23,21 +24,33 @@ const DownloadVCard = ({
   const [opened, setOpened] = useState(false);
 
   useEffect(() => {
-    const contactCard = searchParams.get('c');
-    const signature = searchParams.get('s');
+    const compressedContactCard = searchParams.get('c');
+    if (!compressedContactCard) {
+      return;
+    }
 
-    if (contactCard && signature) {
+    let contactData: string;
+    let signature: string;
+    try {
+      [contactData, signature] = JSON.parse(
+        decompressFromEncodedURIComponent(compressedContactCard),
+      );
+    } catch {
+      return;
+    }
+
+    if (contactData && signature) {
       fetch('/api/verifySign', {
         body: JSON.stringify({
           signature,
-          data: contactCard,
+          data: contactData,
           salt: userName,
         }),
         method: 'POST',
       })
         .then(res => {
           if (res.status === 200) {
-            const { vCard, contactId } = buildVCard(decodeURI(contactCard));
+            const { vCard, contactId } = buildVCard(contactData);
             if (contactId === profileId) {
               const file = new Blob([vCard.toString()], { type: 'text/vcard' });
               const fileURL = URL.createObjectURL(file);
