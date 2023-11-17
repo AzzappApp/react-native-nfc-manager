@@ -1,3 +1,4 @@
+import { compressToEncodedURIComponent } from 'lz-string';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { verifySign } from '#helpers/MobileWebAPI';
 
@@ -24,8 +25,12 @@ describe('deeplinkHelpers', () => {
   test('should redirect to profile with contactData', async () => {
     verifySignMock.mockReturnValueOnce(Promise.resolve({ message: 'ok' }));
 
+    const compressedCard = compressToEncodedURIComponent(
+      JSON.stringify(['contact123', 'sign123']),
+    );
+
     const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/123?c=contact123&s=sign123',
+      `https://fake-azzapp.com/123?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -47,8 +52,12 @@ describe('deeplinkHelpers', () => {
   test('should redirect to profile without contactData', async () => {
     verifySignMock.mockRejectedValueOnce(new Error('something bad happened'));
 
+    const compressedCard = compressToEncodedURIComponent(
+      JSON.stringify(['contact124', 'sign124']),
+    );
+
     const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/124?c=contact124&s=sign124',
+      `https://fake-azzapp.com/124?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);

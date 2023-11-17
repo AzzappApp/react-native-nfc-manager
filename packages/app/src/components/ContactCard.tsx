@@ -4,7 +4,10 @@ import QRCode from 'react-native-qrcode-svg';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import {
+  buildUserUrl,
+  buildUserUrlWithContactCard,
+} from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 import type { ContactCard_profile$key } from '@azzapp/relay/artifacts/ContactCard_profile.graphql';
@@ -54,11 +57,7 @@ const ContactCard = ({
       return null;
     }
     const { data, signature } = contactCard.serializedContactCard;
-    return [
-      buildUserUrl(userName),
-      `?c=${encodeURIComponent(data)}`,
-      `&s=${encodeURIComponent(signature)}`,
-    ].join('');
+    return buildUserUrlWithContactCard(userName, data, signature);
   }, [contactCard, userName]);
 
   if (!contactCard) {

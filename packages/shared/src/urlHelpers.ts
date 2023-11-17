@@ -1,3 +1,4 @@
+import { compressToEncodedURIComponent } from 'lz-string';
 /**
  * Builds a user URL from a user name.
  */
@@ -24,8 +25,9 @@ export function buildUserUrlWithContactCard(
   serializedContactCard: string,
   signature: string,
 ) {
-  const c = encodeURIComponent(serializedContactCard);
-  const s = encodeURIComponent(signature);
+  const compressedData = compressToEncodedURIComponent(
+    JSON.stringify([serializedContactCard, signature]),
+  );
 
-  return `${buildUserUrl(userName)}?c=${c}&s=${s}`;
+  return `${buildUserUrl(userName)}?c=${compressedData}`;
 }
