@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     overflow: 'visible',
+    paddingTop: 4,
   },
   container: {
     justifyContent: 'center',
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     ...fontFamilies.extrabold,
     color: colors.white,
     textAlign: 'center',
-    fontSize: 44,
+    fontSize: 42,
   },
   smallText: {
     color: colors.white,

@@ -1,7 +1,8 @@
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
@@ -10,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
+import Text from '#ui/Text';
 import type { HomeStatisticsChart_user$key } from '@azzapp/relay/artifacts/HomeStatisticsChart_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -121,51 +123,86 @@ const HomeStatisticsChart = ({
     [statsScrollIndex],
   );
 
+  const intl = useIntl();
+
+  const displayedDate = useMemo(() => {
+    const dayInterval = 5;
+    const startDate = new Date(new Date().toISOString().split('T')[0]);
+    startDate.setDate(startDate.getDate() - 30 + 1);
+    const result = [];
+    for (let index = 0; index < 6; index++) {
+      if ((index * dayInterval) % (3 * dayInterval) === 0) {
+        const currentMonth = intl.formatDate(startDate, { month: 'short' });
+        result.push(`${startDate.getDate()}${currentMonth}`);
+      } else {
+        result.push(`${startDate.getDate()}`);
+      }
+      startDate.setDate(startDate.getDate() + dayInterval);
+    }
+
+    return result;
+  }, [intl]);
+
   return (
-    <MaskedView
-      style={{
-        width,
-        height,
-        overflow: 'visible',
-      }}
-      maskElement={
-        <View
+    <View>
+      <MaskedView
+        style={{
+          width,
+          height,
+          overflow: 'visible',
+        }}
+        maskElement={
+          <View
+            style={{
+              width,
+              height,
+              flexDirection: 'row',
+              overflow: 'visible',
+              alignItems: 'flex-end',
+            }}
+          >
+            {chartsData.map((item, index) => {
+              return (
+                <AnimatedBarChart
+                  item={item}
+                  maxValues={flattenedMaxValue}
+                  chartBarWidth={chartBarWidth}
+                  key={`statistic_chart_${index}`}
+                  statsScrollIndex={statsScrollIndex}
+                  statsIndex={currentStatsIndex}
+                  animated={animated}
+                  currentProfileIndexSharedValue={
+                    currentProfileIndexSharedValue
+                  }
+                  currentUserIndex={currentUserIndex}
+                />
+              );
+            })}
+          </View>
+        }
+      >
+        <LinearGradient
+          colors={[colors.white, '#ffffff00']}
           style={{
             width,
             height,
             flexDirection: 'row',
-            overflow: 'visible',
             alignItems: 'flex-end',
           }}
-        >
-          {chartsData.map((item, index) => {
-            return (
-              <AnimatedBarChart
-                item={item}
-                maxValues={flattenedMaxValue}
-                chartBarWidth={chartBarWidth}
-                key={`statistic_chart_${index}`}
-                statsScrollIndex={statsScrollIndex}
-                statsIndex={currentStatsIndex}
-                animated={animated}
-                currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-                currentUserIndex={currentUserIndex}
-              />
-            );
-          })}
-        </View>
-      }
-    >
-      <LinearGradient
-        colors={[colors.white, '#ffffff00']}
-        style={{
-          width,
-          height,
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-        }}
-      />
-    </MaskedView>
+        />
+      </MaskedView>
+      <View style={[styles.dateContainer, { width, height }]}>
+        {displayedDate.map((date, index) => (
+          <Text
+            key={date}
+            variant="xsmall"
+            style={[styles.textDate, { left: index * 5 * chartBarWidth }]}
+          >
+            {date}
+          </Text>
+        ))}
+      </View>
+    </View>
   );
 };
 export default memo(HomeStatisticsChart);
@@ -310,3 +347,17 @@ export type StatsDataGroup = {
   day: string;
   data: StatsData[];
 };
+
+const styles = StyleSheet.create({
+  textDate: {
+    opacity: 0.4,
+    color: 'white',
+    fontSize: 9,
+    position: 'absolute',
+    bottom: 0,
+  },
+  dateContainer: {
+    position: 'absolute',
+    bottom: 0,
+  },
+});
