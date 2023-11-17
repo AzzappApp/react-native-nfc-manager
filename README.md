@@ -152,7 +152,7 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
-- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate.
+- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate. 
 
 ### List of environement variables during the build process:
 
