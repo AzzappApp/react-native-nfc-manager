@@ -85,10 +85,8 @@ const ProfileScreen = ({
   });
 
   useEffect(() => {
-    if (ready) {
-      dispatchGlobalEvent({ type: 'READY' });
-    }
-  }, [ready]);
+    dispatchGlobalEvent({ type: 'READY' });
+  }, []);
 
   const router = useRouter();
 
