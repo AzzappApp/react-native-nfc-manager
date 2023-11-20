@@ -1,5 +1,6 @@
-## 0.5.2-canary.7
+## 0.5.2-canary.8
 
+* **fix:**  - **ContactCard:** scan with closed application
 * **build:**  - yarn.lock
 * **fix:**  - **ContactCard:** Compress contact card to avoid too long URL ([#1739](https://github.com/AzzappApp/azzapp/pull/1739))
 * **feat:**  - add date info on stat chart ([#1699](https://github.com/AzzappApp/azzapp/pull/1699))
