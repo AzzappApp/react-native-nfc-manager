@@ -2,6 +2,13 @@ import { isEqual } from 'lodash';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutRectangle } from 'react-native';
 
+export type AboutRoute = {
+  route: 'ABOUT';
+  params: {
+    withProfile: boolean;
+  };
+};
+
 export type HomeRoute = {
   route: 'HOME';
   params?: never;
@@ -157,6 +164,7 @@ export type WebcardParametersRoute = {
 };
 
 export type Route =
+  | AboutRoute
   | AccountDetailsRoute
   | CardModuleEditionRoute
   | ContactCardRoute

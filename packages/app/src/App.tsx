@@ -52,6 +52,7 @@ import {
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
+import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
@@ -169,32 +170,33 @@ export default Sentry.wrap(App);
 
 // #region Routing Definitions
 const screens = {
-  SIGN_IN: SignInScreen,
-  SIGN_UP: SignupScreen,
-  FORGOT_PASSWORD: ForgotPasswordScreen,
-  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
-  RESET_PASSWORD: ResetPasswordScreen,
-  HOME: HomeScreen,
-  MEDIA: MediaScreen,
-  SEARCH: SearchScreen,
-  POST: PostScreen,
-  POST_COMMENTS: PostCommentsMobileScreen,
-  NEW_POST: PostCreationScreen,
-  NEW_WEBCARD: NewWebCardScreen,
+  ABOUT: AboutScreen,
+  ACCOUNT_DETAILS: AccountDetailsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
+  CONTACT_CARD: ContactCardScreen,
   COVER_EDITION: CoverEditionScreen,
-  WEBCARD: WebCardScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
-  ACCOUNT_DETAILS: AccountDetailsScreen,
-  WEBCARD_PARAMETERS: WebcardParametersScreen,
+  FORGOT_PASSWORD: ForgotPasswordScreen,
+  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
+  HOME: HomeScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
-  CONTACT_CARD: ContactCardScreen,
-  ONBOARDING: WelcomeScreen,
   LIKED_POSTS: LikedPostsScreen,
   MULTI_USER: MultiUserScreen,
   MULTI_USER_ADD: MultiUserAddScreen,
+  MEDIA: MediaScreen,
+  NEW_POST: PostCreationScreen,
+  NEW_WEBCARD: NewWebCardScreen,
+  ONBOARDING: WelcomeScreen,
+  POST: PostScreen,
+  POST_COMMENTS: PostCommentsMobileScreen,
+  RESET_PASSWORD: ResetPasswordScreen,
+  SIGN_IN: SignInScreen,
+  SIGN_UP: SignupScreen,
+  SEARCH: SearchScreen,
+  WEBCARD: WebCardScreen,
+  WEBCARD_PARAMETERS: WebcardParametersScreen,
 };
 
 const tabs = {

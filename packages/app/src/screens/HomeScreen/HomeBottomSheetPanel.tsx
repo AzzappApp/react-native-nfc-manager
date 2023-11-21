@@ -222,6 +222,25 @@ const HomeBottomSheetPanel = ({
             </Link>
           ) : null}
         </>
+        <Link route="ABOUT" params={{ withProfile }}>
+          <PressableNative
+            style={styles.bottomSheetOptionButton}
+            onPress={close}
+          >
+            <View style={styles.bottomSheetOptionContainer}>
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon icon="about" />
+                <Text>
+                  <FormattedMessage
+                    defaultMessage="About"
+                    description="About message item in Home bottom sheet panel"
+                  />
+                </Text>
+              </View>
+              <Icon icon="arrow_right" />
+            </View>
+          </PressableNative>
+        </Link>
         <PressableNative
           onPress={onLogout}
           style={styles.bottomSheetOptionButton}
