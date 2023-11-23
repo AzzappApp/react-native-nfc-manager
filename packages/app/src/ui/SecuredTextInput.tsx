@@ -53,6 +53,7 @@ const SecuredTextInput = (
         ref={ref}
         style={inputStyle}
         secureTextEntry={!showPassword}
+        textContentType="password"
       />
       <PressableNative
         style={styles.buttonSecure}

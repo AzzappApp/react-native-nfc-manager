@@ -1,20 +1,16 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  View,
-  StyleSheet,
-  Keyboard,
-} from 'react-native';
+import { Image, View, StyleSheet, Keyboard } from 'react-native';
+
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
+import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -67,6 +63,20 @@ const SignInScreen = () => {
     passwordRef?.current?.focus();
   };
 
+  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
+  const keyboardHeight = useAnimatedKeyboardHeight();
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      flex: 1,
+      transform: [
+        {
+          translateY: keyboardHeight.value,
+        },
+      ],
+    };
+  });
+  // #endregion
+
   const intl = useIntl();
   const insets = useScreenInsets();
 
@@ -78,12 +88,7 @@ const SignInScreen = () => {
           resizeMode="cover"
         />
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={-insets.bottom}
-        style={styles.keyboardVAvoidingiew}
-        pointerEvents={isSubmitting ? 'none' : 'auto'}
-      >
+      <Animated.View style={animatedStyle}>
         <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
             source={require('#assets/logo-full_white.png')}
@@ -134,7 +139,6 @@ const SignInScreen = () => {
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',
               })}
-              value={password}
               onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Enter your password',
@@ -212,7 +216,7 @@ const SignInScreen = () => {
             </View>
           </Form>
         </Container>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </View>
   );
 };

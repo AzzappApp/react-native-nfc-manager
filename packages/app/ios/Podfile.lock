@@ -453,6 +453,8 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
+  - react-native-keyboard-controller (1.9.4):
+    - React-Core
   - react-native-mmkv (2.11.0):
     - MMKV (>= 1.2.13)
     - React-Core
@@ -726,6 +728,7 @@ DEPENDENCIES:
   - react-native-blob-jsi-helper (from `../../../node_modules/react-native-blob-jsi-helper`)
   - react-native-blob-util (from `../../../node_modules/react-native-blob-util`)
   - react-native-encrypted-storage (from `../../../node_modules/react-native-encrypted-storage`)
+  - react-native-keyboard-controller (from `../../../node_modules/react-native-keyboard-controller`)
   - react-native-mmkv (from `../../../node_modules/react-native-mmkv`)
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - "react-native-passkit (from `../../../node_modules/@reeq/react-native-passkit`)"
@@ -880,6 +883,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-blob-util"
   react-native-encrypted-storage:
     :path: "../../../node_modules/react-native-encrypted-storage"
+  react-native-keyboard-controller:
+    :path: "../../../node_modules/react-native-keyboard-controller"
   react-native-mmkv:
     :path: "../../../node_modules/react-native-mmkv"
   react-native-pager-view:
@@ -1020,6 +1025,7 @@ SPEC CHECKSUMS:
   react-native-blob-jsi-helper: 13c10135af4614dbc0712afba5960784cd44f043
   react-native-blob-util: af2dc91365bfde33f61389cbd0c692af9a4a97cb
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
+  react-native-keyboard-controller: 006c8ac9efc61ad5bda50cf974d4d4b236ee2c86
   react-native-mmkv: e97c0c79403fb94577e5d902ab1ebd42b0715b43
   react-native-pager-view: 02a5c4962530f7efc10dd51ee9cdabeff5e6c631
   react-native-passkit: 067931f891bb3a18adb32b497c40d344bdc8dad6
