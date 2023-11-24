@@ -1,6 +1,10 @@
 import type { SocialIcons } from '#ui/Icon';
 
-export const SOCIAL_NETWORK_LINKS: Array<{ id: SocialIcons; mask: string }> = [
+export const SOCIAL_NETWORK_LINKS: Array<{
+  id: SocialIcons;
+  mask: string;
+  label?: string;
+}> = [
   { id: 'behance', mask: 'behance.net/' },
   { id: 'dev', mask: 'dev.to/' },
   { id: 'discord', mask: 'discord.gg/' },
@@ -24,7 +28,7 @@ export const SOCIAL_NETWORK_LINKS: Array<{ id: SocialIcons; mask: string }> = [
   { id: 'tiktok', mask: 'tiktok.com/@' },
   { id: 'tripadvisor', mask: 'tripadvisor.com/@' },
   { id: 'twitch', mask: 'twitch.tv/' },
-  { id: 'twitter', mask: 'twitter.com/' },
+  { id: 'twitter', mask: 'twitter.com/', label: 'X' },
   { id: 'typefully', mask: 'typefully.app/' },
   { id: 'whatsapp', mask: 'wa.me/' },
   { id: 'yelp', mask: 'yelp.com/@' },

@@ -48,7 +48,7 @@ const ContactCardEditModalSocials = ({
           valueKey={`socials.${index}.url`}
           labelValues={SOCIAL_NETWORK_LINKS.map(socialLink => ({
             key: socialLink.id as string,
-            value: socialLink.id as string,
+            value: socialLink.label ?? (socialLink.id as string),
           }))}
           selectedKey={`socials.${index}.selected`}
           deleteField={() => remove(index)}
