@@ -1,6 +1,5 @@
 import { mapValues } from 'lodash';
-import { useCallback, useRef, useState } from 'react';
-import { unstable_batchedUpdates } from 'react-native';
+import { useCallback, useReducer, useRef } from 'react';
 import {
   COVER_SOURCE_MAX_IMAGE_DIMENSION,
   COVER_SOURCE_MAX_VIDEO_DIMENSION,
@@ -17,6 +16,70 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { MaskMedia, SourceMedia, TemplateKind } from './coverEditorTypes';
 
+type CoverMediaEditorState = {
+  sourceMedia: SourceMedia | null;
+  maskMedia: MaskMedia | null;
+  mediaCropParameters: EditionParameters | null;
+  timeRange: TimeRange | null;
+  mediaComputation: MaskComputation | null;
+  mediaComputationError: any;
+};
+
+const reducer = (
+  state: CoverMediaEditorState,
+  action:
+    | {
+        type: 'SET_MEDIA_COMPUTATION';
+        mediaComputation: MaskComputation;
+      }
+    | {
+        type: 'SET_MEDIA_CROP_PARAMETERS';
+        mediaCropParameters: EditionParameters | null;
+      }
+    | {
+        type: 'SET_RESULT_COMPUTATION_ERROR';
+        mediaComputationError: any;
+      }
+    | {
+        type: 'SET_RESULT_COMPUTATION';
+        sourceMedia: SourceMedia;
+        mediaCropParameters: EditionParameters;
+        maskMedia: MaskMedia | null;
+      }
+    | {
+        type: 'SET_SOURCE_FROM_IMAGE_PICKER';
+        sourceMedia: SourceMedia;
+        mediaCropParameters: EditionParameters;
+        timeRange: TimeRange | null;
+      },
+) => {
+  switch (action.type) {
+    case 'SET_MEDIA_COMPUTATION':
+    case 'SET_RESULT_COMPUTATION_ERROR':
+    case 'SET_MEDIA_CROP_PARAMETERS':
+      return {
+        ...state,
+        ...action,
+      };
+    case 'SET_SOURCE_FROM_IMAGE_PICKER':
+      return {
+        ...state,
+        ...action,
+        mediaComputation: null,
+      };
+    case 'SET_RESULT_COMPUTATION':
+      return {
+        ...state,
+        ...action,
+        mediaComputation: null,
+        timeRange: null,
+      };
+
+    default:
+      return state;
+  }
+};
+
 const useCoverMediaEditor = (
   initialData: {
     sourceMedia?: SourceMedia | null;
@@ -24,32 +87,23 @@ const useCoverMediaEditor = (
     mediaCropParameters?: EditionParameters | null;
   } | null,
 ) => {
-  const [sourceMedia, setSourceMedia] = useState<SourceMedia | null>(
-    initialData?.sourceMedia ?? null,
-  );
+  const [state, dispatch] = useReducer(reducer, {
+    sourceMedia: initialData?.sourceMedia ?? null,
+    maskMedia: initialData?.maskMedia ?? null,
+    mediaCropParameters: initialData?.mediaCropParameters ?? null,
+    timeRange: null,
+    mediaComputation: null,
+    mediaComputationError: null,
+  });
 
-  const [maskMedia, setMaskMedia] = useState<MaskMedia | null>(
-    initialData?.maskMedia ?? null,
-  );
-
-  const [mediaCropParameters, setMediaCropParameters] =
-    useState<EditionParameters | null>(
-      initialData?.mediaCropParameters ?? null,
-    );
-
-  const [timeRange, setTimeRange] = useState<TimeRange | null>(null);
-
-  const [mediaComputation, setMediaComputation] =
-    useState<MaskComputation | null>(null);
-  const [mediaComputationError, setMediaComputationError] = useState<any>(null);
   const lastComputedMedia = useRef<ImagePickerResult | null>(null);
 
   const startMediaComputation = useCallback(
     (result: ImagePickerResult) => {
       lastComputedMedia.current = result;
       const { uri, kind, width, height, editionParameters, timeRange } = result;
-      if (mediaComputation) {
-        mediaComputation.cancel();
+      if (state.mediaComputation) {
+        state.mediaComputation.cancel();
       }
       const maxSize =
         kind === 'image'
@@ -61,7 +115,7 @@ const useCoverMediaEditor = (
         width > maxSize || height > maxSize || timeRange != null;
 
       const shouldRecomputeMask: boolean =
-        kind === 'image' && maskMedia?.source !== uri;
+        kind === 'image' && state.maskMedia?.source !== uri;
 
       if (shouldRecomputeMedia || shouldRecomputeMask) {
         const mediaComputation = createMediaComputation({
@@ -75,7 +129,7 @@ const useCoverMediaEditor = (
           computeMask: shouldRecomputeMask,
           downscaleMedia: shouldRecomputeMedia,
         });
-        setMediaComputation(mediaComputation);
+        dispatch({ type: 'SET_MEDIA_COMPUTATION', mediaComputation });
 
         mediaComputation.promise
           .then(result => {
@@ -83,22 +137,24 @@ const useCoverMediaEditor = (
               return;
             }
             const { media, editionParameters, maskURI } = result;
-            unstable_batchedUpdates(() => {
-              setSourceMedia(media);
-              setMediaCropParameters(
+
+            dispatch({
+              type: 'SET_RESULT_COMPUTATION',
+              sourceMedia: media,
+              mediaCropParameters:
                 extractLayoutParameters(editionParameters)[0],
-              );
-              setMaskMedia(maskURI ? { uri: maskURI, source: uri } : null);
-              setMediaComputation(null);
-              setTimeRange(null);
+              maskMedia: maskURI ? { uri: maskURI, source: uri } : null,
             });
           })
           .catch(err => {
-            setMediaComputationError(err);
+            dispatch({
+              type: 'SET_RESULT_COMPUTATION_ERROR',
+              mediaComputationError: err,
+            });
           });
       }
     },
-    [maskMedia?.source, mediaComputation],
+    [state.maskMedia?.source, state.mediaComputation],
   );
 
   const retryMediaComputation = useCallback(() => {
@@ -109,25 +165,31 @@ const useCoverMediaEditor = (
 
   const setSourceMediaFromImagePicker = useCallback(
     (result: ImagePickerResult) => {
-      unstable_batchedUpdates(async () => {
-        const { uri, kind, width, height, editionParameters, timeRange } =
-          result;
-        setSourceMedia({ uri, kind, width, height });
-        setMediaCropParameters(extractLayoutParameters(editionParameters)[0]);
-        setTimeRange(timeRange ?? null);
-        startMediaComputation(result);
+      const { uri, kind, width, height, editionParameters, timeRange } = result;
+      dispatch({
+        type: 'SET_SOURCE_FROM_IMAGE_PICKER',
+        sourceMedia: { uri, kind, width, height },
+        mediaCropParameters: extractLayoutParameters(editionParameters)[0],
+        timeRange: timeRange ?? null,
       });
+      startMediaComputation(result);
     },
     [startMediaComputation],
   );
 
+  const setMediaCropParameters = useCallback(
+    (mediaCropParameters: EditionParameters | null) => {
+      dispatch({
+        type: 'SET_MEDIA_CROP_PARAMETERS',
+        mediaCropParameters,
+      });
+    },
+    [],
+  );
+
   return {
-    sourceMedia,
-    maskMedia,
-    mediaCropParameters,
-    timeRange,
-    mediaComputing: mediaComputation != null,
-    mediaComputationError,
+    ...state,
+    mediaComputing: state.mediaComputation != null,
     setSourceMediaFromImagePicker,
     retryMediaComputation,
     setMediaCropParameters,

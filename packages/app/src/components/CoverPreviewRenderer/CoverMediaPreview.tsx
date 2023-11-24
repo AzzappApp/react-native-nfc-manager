@@ -240,7 +240,11 @@ const CoverMediaPreview = ({
           ) : kind === 'videoFrame' ? (
             <VideoFrame {...mainGPULayerProps} time={time} />
           ) : (
-            <Image {...mainGPULayerProps} />
+            <Image
+              // @ts-expect-error we had a fake prop to force a re-render with mask - see https://github.com/AzzappApp/azzapp/issues/1760
+              fakeProp={`${mainGPULayerProps.uri} - ${mainGPULayerProps.maskUri}`}
+              {...mainGPULayerProps}
+            />
           )}
         </GPUView>
       )}

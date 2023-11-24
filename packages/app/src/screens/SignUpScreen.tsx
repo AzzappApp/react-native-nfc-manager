@@ -1,14 +1,8 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-  Image,
-  Keyboard,
-} from 'react-native';
+import { StyleSheet, View, Image, Keyboard } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -21,6 +15,7 @@ import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
+import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
@@ -167,6 +162,21 @@ const SignupScreen = () => {
   const focusPassword = () => {
     passwordRef?.current?.focus();
   };
+  // #endregion
+
+  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
+  const keyboardHeight = useAnimatedKeyboardHeight();
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      flex: 1,
+      transform: [
+        {
+          translateY: keyboardHeight.value,
+        },
+      ],
+    };
+  });
+  // #endregion
 
   const insets = useScreenInsets();
   return (
@@ -177,12 +187,7 @@ const SignupScreen = () => {
           resizeMode="cover"
         />
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={-insets.bottom}
-        style={styles.content}
-        pointerEvents={isSubmitting ? 'none' : 'auto'}
-      >
+      <Animated.View style={animatedStyle}>
         <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
           <Image
             source={require('#assets/logo-full_white.png')}
@@ -230,7 +235,6 @@ const SignupScreen = () => {
                 defaultMessage: 'Password',
                 description: 'Signup Screen - password textinput placeholder',
               })}
-              value={password}
               onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage:
@@ -289,7 +293,7 @@ const SignupScreen = () => {
                       description:
                         'Signup Screen - Privacy Policy Hyperlink Clickable label',
                     })}
-                    url="http://www.azzapp.com/tos"
+                    url="http://www.azzapp.com/privacy"
                   />
                 </Text>
               }
@@ -345,12 +349,12 @@ const SignupScreen = () => {
             </View>
           </Form>
         </Container>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </View>
   );
 };
 
-export default SignupScreen;
+export default memo(SignupScreen);
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },

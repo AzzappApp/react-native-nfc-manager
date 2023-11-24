@@ -6,18 +6,9 @@ import {
   getAssetsAsync,
   removeAllListeners,
 } from 'expo-media-library';
-import { useCallback, useRef, useState, useEffect, memo, useMemo } from 'react';
+import { useCallback, useRef, useState, useEffect, memo } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions, View } from 'react-native';
-import { ScrollView, PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, {
-  runOnJS,
-  useAnimatedGestureHandler,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -25,16 +16,12 @@ import {
   getImageSize,
   getVideoSize,
 } from '#helpers/mediaHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
-import { HEADER_HEIGHT } from '#ui/Header';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { Media } from './imagePickerTypes';
 
 import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
 import type { Album, Asset } from 'expo-media-library';
-import type { LayoutChangeEvent } from 'react-native';
-import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 type PhotoGalleryMediaListProps = Omit<
   FlashListProps<Asset>,
   'children' | 'data' | 'onEndReached' | 'renderItem'
@@ -61,9 +48,6 @@ type PhotoGalleryMediaListProps = Omit<
   autoSelectFirstItem?: boolean;
 };
 
-const AnimatedFlashList =
-  Animated.createAnimatedComponent<FlashListProps<Asset>>(FlashList);
-
 /**
  * A component that displays a list of media from the camera roll
  * and allows the user to select one of them.
@@ -78,15 +62,12 @@ const PhotoGalleryMediaList = ({
   contentContainerStyle,
   ...props
 }: PhotoGalleryMediaListProps) => {
-  const { height: windowsHeight } = useWindowDimensions();
   const scrollViewRef = useRef<FlashList<Asset>>(null);
-  const panRef = useRef();
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<Asset[]>([]);
   const isLoading = useRef(false);
   const [hasNext, setHasNext] = useState(false);
   const nextCursor = useRef<string | undefined>();
-  const topPosition = useScreenInsets().top + HEADER_HEIGHT;
 
   const load = useCallback(
     async (refreshing = false) => {
@@ -203,100 +184,6 @@ const PhotoGalleryMediaList = ({
     [itemHeight, onMediaPress, selectedMediaID],
   );
 
-  const initialPosition = useRef(0);
-  const maxHeight = useRef(0);
-  const translateY = useSharedValue(0);
-
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      if (initialPosition.current === 0) {
-        initialPosition.current =
-          windowsHeight - event.nativeEvent.layout.height;
-        maxHeight.current = event.nativeEvent.layout.height;
-      }
-    },
-    [windowsHeight],
-  );
-
-  const scrollY = useSharedValue(0);
-  const scrollTo = (offset: number) => {
-    scrollViewRef.current?.scrollToOffset({ offset, animated: false });
-  };
-
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  //determine the position, 0 for not translate, 1 for upper
-  const position = useSharedValue(0);
-  // pan handler for sheet
-  const eventHandler = useAnimatedGestureHandler<
-    PanGestureHandlerGestureEvent,
-    {
-      startY: number;
-      panActive: boolean;
-      saveOffset: number;
-      startTranslationY: number;
-    }
-  >({
-    onStart: (event, ctx) => {
-      ctx.startY = event.y;
-      ctx.panActive = false;
-      ctx.startTranslationY = translateY.value;
-    },
-    onActive: (event, ctx) => {
-      if (position.value === 0) {
-        if (event.y < -30) {
-          ctx.panActive = true;
-          ctx.saveOffset = scrollY.value;
-        } else if (event.y > ctx.startY) {
-          ctx.panActive = false;
-        }
-        if (ctx.panActive) {
-          translateY.value = -event.translationY - ctx.startY - 30;
-          runOnJS(scrollTo)(ctx.saveOffset);
-        }
-      } else if (scrollY.value < 0 && translateY.value > 0) {
-        ctx.panActive = true;
-        runOnJS(scrollTo)(0);
-        translateY.value = Math.max(
-          0,
-          ctx.startTranslationY - event.translationY,
-        );
-      }
-    },
-    onEnd: (event, ctx) => {
-      if (ctx.panActive) {
-        if (
-          event.absoluteY <
-          (windowsHeight - initialPosition.current) / 2 + topPosition
-        ) {
-          translateY.value = withSpring(initialPosition.current - topPosition);
-          position.value = 1;
-        } else {
-          translateY.value = withSpring(0);
-          position.value = 0;
-        }
-      }
-    },
-  });
-
-  const animatedViewStyle = useAnimatedStyle(() => {
-    return {
-      //transformY: translateY.value,
-      transform: [{ translateY: -translateY.value }],
-      minHeight: maxHeight.current + translateY.value,
-    };
-  });
-
-  useEffect(() => {
-    translateY.value = withSpring(0);
-    position.value = 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMediaID]);
-
   //should select the first media when the list if no media is selected
   useEffect(() => {
     if (autoSelectFirstItem && selectedMediaID == null && medias?.length > 0) {
@@ -314,47 +201,26 @@ const PhotoGalleryMediaList = ({
     };
   }, [load]);
 
-  const simultaneousHandlers = useMemo(
-    () => ({
-      simultaneousHandlers: panRef,
-    }),
-    [panRef],
-  );
-
   return (
-    <PanGestureHandler onGestureEvent={eventHandler} ref={panRef}>
-      <Animated.View
-        onLayout={onLayout}
-        style={[
-          styles.container,
-          {
-            minHeight: maxHeight.current ?? 0,
-          },
-          animatedViewStyle,
-        ]}
-      >
-        <AnimatedFlashList
-          ref={scrollViewRef}
-          overrideProps={simultaneousHandlers}
-          numColumns={numColumns}
-          data={medias}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          onEndReachedThreshold={medias.length <= 16 ? 0.1 : 1.5}
-          drawDistance={1200} //this value will need tweaking with android low end device
-          onEndReached={onEndReached}
-          accessibilityRole="list"
-          contentContainerStyle={contentContainerStyle}
-          ItemSeparatorComponent={ItemSeparatorComponent}
-          {...props}
-          estimatedItemSize={itemHeight}
-          renderScrollComponent={ScrollView}
-          onScroll={onScroll}
-          testID="photo-gallery-list"
-        />
-      </Animated.View>
-    </PanGestureHandler>
+    <View style={styles.container}>
+      <FlashList
+        ref={scrollViewRef}
+        numColumns={numColumns}
+        data={medias}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        onEndReachedThreshold={medias.length <= 16 ? 0.1 : 1.5}
+        drawDistance={1200} //this value will need tweaking with android low end device
+        onEndReached={onEndReached}
+        accessibilityRole="list"
+        contentContainerStyle={contentContainerStyle}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        {...props}
+        estimatedItemSize={itemHeight}
+        testID="photo-gallery-list"
+      />
+    </View>
   );
 };
 

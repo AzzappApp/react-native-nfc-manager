@@ -13,6 +13,7 @@ import {
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { BackHandler, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -152,7 +153,9 @@ const App = () => {
     <AppIntlProvider>
       <ErrorBoundary>
         <PermissionProvider>
-          <AppRouter />
+          <KeyboardProvider>
+            <AppRouter />
+          </KeyboardProvider>
         </PermissionProvider>
       </ErrorBoundary>
     </AppIntlProvider>
