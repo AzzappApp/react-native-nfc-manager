@@ -18,7 +18,6 @@ import Animated, {
 import { colors, shadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from './Button';
@@ -231,20 +230,6 @@ const BottomSheetModal = ({
     styles.gestureInteractionIndicator,
   ]);
 
-  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
-  const keyboardHeight = useAnimatedKeyboardHeight();
-  const animatedKeyboardAvoidingStyle = useAnimatedStyle(() => {
-    return {
-      flex: 1,
-      transform: [
-        {
-          translateY: keyboardHeight.value,
-        },
-      ],
-    };
-  });
-  // #endregion
-
   return (
     <Modal
       animationType="none"
@@ -256,7 +241,12 @@ const BottomSheetModal = ({
     >
       {/* required for android */}
       <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
-        <Animated.View style={animatedKeyboardAvoidingStyle}>
+        <KeyboardAvoidingView
+          style={styles.modalContainer}
+          behavior="position"
+          contentContainerStyle={styles.absoluteFill}
+          enabled={!disableKeyboardAvoidingView}
+        >
           <TouchableWithoutFeedback
             style={styles.absoluteFill}
             onPress={onRequestClose}
@@ -299,7 +289,7 @@ const BottomSheetModal = ({
               </GestureDetector>
             )}
           </Animated.View>
-        </Animated.View>
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
       <Toast />
     </Modal>
