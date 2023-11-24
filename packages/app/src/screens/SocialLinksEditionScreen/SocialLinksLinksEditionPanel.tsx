@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -15,7 +15,12 @@ import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { SocialIcons } from '#ui/Icon/SocialIcon';
 import type { SocialLinkInput } from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
-import type { ViewProps, LayoutChangeEvent } from 'react-native';
+import type {
+  ViewProps,
+  LayoutChangeEvent,
+  TextInputEndEditingEventData,
+  NativeSyntheticEvent,
+} from 'react-native';
 import type { PanGesture } from 'react-native-gesture-handler';
 
 type SocialLinksLinksEditionPanelProps = ViewProps & {
@@ -76,8 +81,6 @@ const SocialLinksLinksEditionPanel = ({
     }
   };
 
-  const colorScheme = useColorScheme();
-
   const data = useMemo(() => {
     // consolidate a list of link merged with the selected value
     const consolidatedLinks = [];
@@ -109,53 +112,14 @@ const SocialLinksLinksEditionPanel = ({
     panGesture: PanGesture,
   ) => {
     const value = links.find(link => link?.socialId === item.id)?.link ?? '';
-
-    const onFocus = () => {
-      if (item.id === 'website' && !isNotFalsyString(item.link)) {
-        onChangeLink(item.id, 'https://');
-      }
-    };
-
     return (
-      <View
-        key={item.id}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          height: 56,
-        }}
-      >
-        <SocialIcon
-          icon={item.id as SocialIcons}
-          style={{
-            width: 30,
-            height: 30,
-            tintColor: isNotFalsyString(value)
-              ? colorScheme === 'dark'
-                ? colors.white
-                : colors.black
-              : colors.grey400,
-          }}
-        />
-
-        <Input
-          style={{ flex: 1, marginLeft: 5, marginRight: 5 }}
-          leftElement={
-            <Text variant="textField" style={{ color: colors.grey400 }}>
-              {item.mask}
-            </Text>
-          }
-          clearButtonMode="always"
-          value={value}
-          onChangeText={link => onChangeLink(item.id as SocialIcons, link)}
-          autoCapitalize="none"
-          inputStyle={{ paddingLeft: 0 }}
-          onPressIn={onFocus}
-        />
-        <GestureDetector gesture={panGesture}>
-          <Icon icon="menu" style={{ tintColor: colors.grey400 }} />
-        </GestureDetector>
-      </View>
+      <SocialInput
+        icon={item.id}
+        mask={item.mask}
+        value={value}
+        onChangeLink={onChangeLink}
+        panGesture={panGesture}
+      />
     );
   };
 
@@ -215,9 +179,99 @@ const SocialLinksLinksEditionPanel = ({
   );
 };
 
+const SocialInputComponent = ({
+  icon,
+  link,
+  mask,
+  value,
+  onChangeLink,
+  panGesture,
+}: {
+  icon: SocialIcons;
+  link?: string | undefined;
+  mask: string;
+  value: string;
+  onChangeLink: (id: SocialIcons, value: string) => void;
+  panGesture: PanGesture;
+}) => {
+  const colorScheme = useColorScheme();
+  const [localValue, setLocalValue] = useState(value);
+  const onChangeText = (value: string) => {
+    //handle copy paste from the user with complete link
+    let filterText = value;
+    if (value.includes(mask)) {
+      const index = value.indexOf(mask);
+      filterText = value.substring(index + mask.length);
+      const endIndex = filterText.indexOf('?');
+      if (endIndex !== -1) {
+        filterText = filterText.substring(0, endIndex);
+      }
+    }
+    setLocalValue(filterText);
+  };
+
+  const onFocus = () => {
+    if (icon === 'website' && !isNotFalsyString(link)) {
+      onChangeLink(icon, 'https://');
+    }
+  };
+
+  const onEndEditing = (
+    e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+  ) => {
+    onChangeLink(icon, e.nativeEvent.text);
+  };
+
+  return (
+    <View
+      key={icon}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 56,
+      }}
+    >
+      <SocialIcon
+        icon={icon as SocialIcons}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: isNotFalsyString(value)
+            ? colorScheme === 'dark'
+              ? colors.white
+              : colors.black
+            : colors.grey400,
+        }}
+      />
+
+      <Input
+        style={{ flex: 1, marginLeft: 5, marginRight: 5 }}
+        leftElement={
+          <Text variant="textField" style={{ color: colors.grey400 }}>
+            {mask}
+          </Text>
+        }
+        clearButtonMode="always"
+        value={localValue}
+        onChangeText={onChangeText}
+        onEndEditing={onEndEditing}
+        autoCapitalize="none"
+        inputStyle={styles.inputStyleSocial}
+        onPressIn={onFocus}
+      />
+      <GestureDetector gesture={panGesture}>
+        <Icon icon="menu" style={{ tintColor: colors.grey400 }} />
+      </GestureDetector>
+    </View>
+  );
+};
+
+const SocialInput = memo(SocialInputComponent);
+
 export default SocialLinksLinksEditionPanel;
 
 const styles = StyleSheet.create({
+  inputStyleSocial: { paddingLeft: 0 },
   root: {
     paddingHorizontal: 20,
     rowGap: 15,
