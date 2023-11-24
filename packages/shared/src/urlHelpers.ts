@@ -6,7 +6,10 @@ export function buildUserUrl(
   userName: string,
   base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
 ) {
-  return `${base}${userName}`;
+  if (userName) {
+    return `${base}${userName}`;
+  }
+  return `${base}`; //maybe we should return empty string here
 }
 
 /**
