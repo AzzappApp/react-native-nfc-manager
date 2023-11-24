@@ -240,7 +240,10 @@ const CoverMediaPreview = ({
           ) : kind === 'videoFrame' ? (
             <VideoFrame {...mainGPULayerProps} time={time} />
           ) : (
-            <Image {...mainGPULayerProps} />
+            <Image
+              key={`${mainGPULayerProps.uri} - ${mainGPULayerProps.maskUri}`}
+              {...mainGPULayerProps}
+            />
           )}
         </GPUView>
       )}

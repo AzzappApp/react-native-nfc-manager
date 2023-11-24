@@ -66,7 +66,6 @@ const reducer = (
         ...state,
         ...action,
         mediaComputation: null,
-        maskMedia: null,
       };
     case 'SET_RESULT_COMPUTATION':
       return {
