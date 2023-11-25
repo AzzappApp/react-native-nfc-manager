@@ -89,6 +89,7 @@ const execSyncWithLog = (command, options) => {
     console.log(res.toString());
   } catch (err) {
     console.log(`Error executing ${command}: `, err);
+    console.log('stdout', err.stdout.toString());
     console.log('sdterr', err.stderr.toString());
     throw err;
   }
