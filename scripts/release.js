@@ -39,18 +39,18 @@ const main = async () => {
   setWorkspaceVersions(nextVersion);
 
   console.log('Commiting changes...');
-  execSync(`git add .`);
-  execSync(`git commit -m "chore: release ${nextVersion}"`);
+  execSyncWithLog(`git add .`);
+  execSyncWithLog(`git commit -m "chore: release ${nextVersion}"`);
 
   console.log('Pushing changes...');
-  execSync(`git push origin`);
+  execSyncWithLog(`git push origin`);
 
   console.log('Tagging version...');
   const tagName = `v${nextVersion}`;
-  execSync(`git tag ${tagName}`);
+  execSyncWithLog(`git tag ${tagName}`);
 
   console.log('Pushing tag...');
-  execSync(`git push origin ${tagName}`);
+  execSyncWithLog(`git push origin ${tagName}`);
 
   console.log('Creating github release...');
 
@@ -81,3 +81,15 @@ const main = async () => {
 };
 
 main();
+
+const execSyncWithLog = (command, options) => {
+  try {
+    console.log('executing command', command);
+    const res = execSync(command, options);
+    console.log(res.toString());
+  } catch (err) {
+    console.log(`Error executing ${command}: `, err);
+    console.log('sdterr', err.stderr.toString());
+    throw err;
+  }
+};
