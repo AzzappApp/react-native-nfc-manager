@@ -1,4 +1,4 @@
-## 0.5.2-canary.11
+## 0.5.2-canary.12
 
 * **feat:**  - Add optional label on social link to handle company rename ....
 * **feat:**  - allow copy paste of social link with mask
