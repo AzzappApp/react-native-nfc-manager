@@ -63,3 +63,8 @@ export const getGoogleWalletPass = withFetchFunction(
   WebAPI.getGoogleWalletPass,
   authenticatedFetchJSON,
 );
+
+export const inviteUser = withFetchFunction(
+  WebAPI.inviteUser,
+  authenticatedFetchJSON,
+);

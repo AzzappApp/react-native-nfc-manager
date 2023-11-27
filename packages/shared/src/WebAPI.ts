@@ -241,3 +241,23 @@ export const getGoogleWalletPass: APIMethod<
     ...init,
     method: 'GET',
   });
+
+/**
+ * API call to invite a user to a web card.
+ */
+export const inviteUser: APIMethod<
+  {
+    profileRole: string;
+    email?: string;
+    phoneNumber?: string;
+    contactCard?: Record<string, any>;
+  },
+  {
+    id: string;
+  }
+> = (data, init) =>
+  apiFetch(`${API_ENDPOINT}/inviteUser`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });

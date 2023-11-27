@@ -13,7 +13,7 @@ generates:
       - './codegen-typedefs.js'
     config:
       useTypeImports: true
-      enumsAsTypes: true
+      enumsAsConst: true
       useImplementingTypes: true
       mappers:
         Profile: ../../domains#Profile as ProfileModel
@@ -52,6 +52,12 @@ generates:
         JSON: Record<string, unknown>
         ID: string
       contextType: ../GraphQLContext#GraphQLContext
+  ./packages/data/src/schema/__generated__/validation.ts:
+    plugins:
+      - typescript-validation-schema
+    config: 
+      schema: 'zod'
+      importFrom : '#schema/__generated__/types'
   ./schema.graphql:
     plugins:
       - schema-ast
