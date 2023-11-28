@@ -1,5 +1,10 @@
-## 0.5.2-canary.15
+## 0.5.2-canary.16
 
+* **fix:**  - recomandedWebCards types ([#1866](https://github.com/AzzappApp/azzapp/pull/1866))
+* **fix:**  - **webCard:** [#1832](https://github.com/AzzappApp/azzapp/pull/1832) rotate suggestions ([#1859](https://github.com/AzzappApp/azzapp/pull/1859))
+* **fix:**  - **media:** [#1850](https://github.com/AzzappApp/azzapp/pull/1850) issue on select distinct ([#1862](https://github.com/AzzappApp/azzapp/pull/1862))
+* **Fix:**  - fix and improvement after rework ([#1860](https://github.com/AzzappApp/azzapp/pull/1860))
+* **fix:**  - **webCard:** [#1831](https://github.com/AzzappApp/azzapp/pull/1831) sort by label ([#1861](https://github.com/AzzappApp/azzapp/pull/1861))
 * **fix:**  - Bug-20231020-2 - Browser_view - in post_view comment author "Nam… ([#1828](https://github.com/AzzappApp/azzapp/pull/1828))
 * **fix:**  - Bug-20230624-11 - Account_Details - username field [#563](https://github.com/AzzappApp/azzapp/pull/563)
 * **feat:**  - Webcard Parameters && Redirection ([#1766](https://github.com/AzzappApp/azzapp/pull/1766))
