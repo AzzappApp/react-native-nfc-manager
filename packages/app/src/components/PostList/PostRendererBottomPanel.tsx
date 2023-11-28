@@ -2,10 +2,12 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
@@ -23,10 +25,7 @@ import PostRendererActionBar, {
 } from './PostRendererActionBar';
 import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
-import type {
-  PostRendererBottomPanelUpdatePostMutation,
-  UpdatePostInput,
-} from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
+import type { PostRendererBottomPanelUpdatePostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
 
 type PostRendererBottomPanelProps = {
   /**
@@ -155,17 +154,52 @@ const PostRendererBottomPanel = ({
     `);
 
   const intl = useIntl();
-  const updatePost = (input: UpdatePostInput) => {
-    commitUpdatePost({
+
+  const initialAllow = useRef({
+    allowComments: post.allowComments,
+    allowLikes: post.allowLikes,
+  });
+
+  const [allow, setAllow] = useState({
+    allowComments: post.allowComments,
+    allowLikes: post.allowLikes,
+  });
+
+  useEffect(() => {
+    if (
+      initialAllow.current.allowComments !== post.allowComments ||
+      initialAllow.current.allowLikes !== post.allowLikes
+    ) {
+      setAllow({
+        allowComments: post.allowComments,
+        allowLikes: post.allowLikes,
+      });
+
+      initialAllow.current = {
+        allowComments: post.allowComments,
+        allowLikes: post.allowLikes,
+      };
+    }
+  }, [post.allowComments, post.allowLikes]);
+
+  const [debouncedAllow] = useDebounce(allow, 300);
+
+  useEffect(() => {
+    if (
+      debouncedAllow.allowComments === initialAllow.current.allowComments &&
+      debouncedAllow.allowLikes === initialAllow.current.allowLikes
+    )
+      return;
+
+    const disposable = commitUpdatePost({
       variables: {
-        input,
+        input: { postId: post.id, ...debouncedAllow },
       },
       optimisticResponse: {
         updatePost: {
           post: {
-            id: input.postId,
-            allowComments: input.allowComments ?? post.allowComments,
-            allowLikes: input.allowLikes ?? post.allowLikes,
+            id: post.id,
+            ...debouncedAllow,
           },
         },
       },
@@ -180,14 +214,19 @@ const PostRendererBottomPanel = ({
         });
       },
     });
-  };
-  const setAllowComments = () => {
-    updatePost({ postId: post.id, allowComments: !post.allowComments });
-  };
 
-  const setAllowLikes = () => {
-    updatePost({ postId: post.id, allowLikes: !post.allowLikes });
-  };
+    return () => {
+      disposable.dispose();
+    };
+  }, [debouncedAllow, post.id, intl, commitUpdatePost]);
+
+  const setAllowComments = useCallback(() => {
+    setAllow(prev => ({ ...prev, allowComments: !prev.allowComments }));
+  }, []);
+
+  const setAllowLikes = useCallback(() => {
+    setAllow(prev => ({ ...prev, allowLikes: !prev.allowLikes }));
+  }, []);
 
   const { webCardId, profileRole } = useAuthState();
 
@@ -290,7 +329,7 @@ const PostRendererBottomPanel = ({
               </Text>
               <Switch
                 variant="large"
-                value={post.allowLikes}
+                value={allow.allowLikes}
                 onValueChange={setAllowLikes}
               />
             </View>
@@ -305,7 +344,7 @@ const PostRendererBottomPanel = ({
               </Text>
               <Switch
                 variant="large"
-                value={post.allowComments}
+                value={allow.allowComments}
                 onValueChange={setAllowComments}
               />
             </View>
