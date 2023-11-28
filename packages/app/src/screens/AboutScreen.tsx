@@ -24,8 +24,10 @@ const aboutScreenWithProfileQuery = graphql`
     }
     viewer {
       profile {
-        userName
-        ...AccountHeader_profile
+        webCard {
+          userName
+          ...AccountHeader_webCard
+        }
       }
     }
   }
@@ -67,7 +69,7 @@ const AboutScreen = ({
         }}
       >
         <AccountHeader
-          profile={profile ?? null}
+          webCard={profile?.webCard ?? null}
           title={intl.formatMessage({
             defaultMessage: 'About',
             description: 'Title of the about screen',
@@ -140,7 +142,7 @@ export default relayScreen(AboutScreen, {
     params.withProfile
       ? aboutScreenWithProfileQuery
       : aboutScreenWithoutProfileQuery,
-  profileBound: params => params.withProfile,
+  webCardBound: params => params.withProfile,
 });
 
 const styles = StyleSheet.create({
