@@ -97,7 +97,6 @@
     "@types/react": "^18.2.37",
     "graphql": "^16.8.0",
     "node-pty": "1.0.0",
-    "node-gyp": "10.0.1",
     "cliui": "^8.0.1"
   }
 }
