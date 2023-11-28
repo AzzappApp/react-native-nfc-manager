@@ -30,7 +30,6 @@ const accountDetailsScreenWithProfileQuery = graphql`
     viewer {
       profile {
         webCard {
-          userName
           ...AccountHeader_webCard
         }
       }
@@ -92,41 +91,10 @@ const AccountDetailsScreen = ({
               }}
             />
           </Text>
-          {profile?.webCard?.userName ? (
-            <>
-              <View style={styles.section}>
-                <Text variant="xsmall" style={styles.sectionTitle}>
-                  <FormattedMessage
-                    defaultMessage="Webcard{azzappA} details"
-                    description="Title of the section where user can view their webcard details"
-                    values={{
-                      azzappA: (
-                        <Text style={styles.icon} variant="azzapp">
-                          a
-                        </Text>
-                      ),
-                    }}
-                  />
-                </Text>
-              </View>
-              <View style={styles.sectionField}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Webcard{azzappA} name"
-                    description="Webcard name field in the account details screen"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                </Text>
-                <Text variant="medium">{profile.webCard.userName}</Text>
-              </View>
-            </>
-          ) : null}
           <View style={styles.section}>
             <Text variant="xsmall" style={styles.sectionTitle}>
               <FormattedMessage
-                defaultMessage="Account details"
+                defaultMessage="Details"
                 description="Title of the section where user can view their account details"
               />
             </Text>
