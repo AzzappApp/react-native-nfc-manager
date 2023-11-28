@@ -218,6 +218,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
         </View>
         <View style={styles.titletextContainer}>
           <LabeledDashedSlider
+            key={`${currentTab}-fontSize`}
             label={
               <FormattedMessage
                 defaultMessage="Font size :"
@@ -273,6 +274,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
           />
         </View>
         <LabeledDashedSlider
+          key={`${currentTab}-verticalSpacing`}
           label={
             <FormattedMessage
               defaultMessage="Vertical Spacing:"
