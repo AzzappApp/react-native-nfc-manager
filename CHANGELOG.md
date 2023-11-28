@@ -1,5 +1,8 @@
-## 0.5.2-canary.16
+## 0.5.2-canary.17
 
+* **build:**  - fix yarn.lock
+* **build:**  - upgrade image for ios buid
+* **build:**  - try to force node-gyp
 * **fix:**  - recomandedWebCards types ([#1866](https://github.com/AzzappApp/azzapp/pull/1866))
 * **fix:**  - **webCard:** [#1832](https://github.com/AzzappApp/azzapp/pull/1832) rotate suggestions ([#1859](https://github.com/AzzappApp/azzapp/pull/1859))
 * **fix:**  - **media:** [#1850](https://github.com/AzzappApp/azzapp/pull/1850) issue on select distinct ([#1862](https://github.com/AzzappApp/azzapp/pull/1862))
