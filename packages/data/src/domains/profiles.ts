@@ -149,11 +149,11 @@ export const updateProfile = async (
     .set(updates)
     .where(eq(ProfileTable.id, profileId));
 };
-export const getRecommendedWebCards = async (
-  profileId: string,
-): Promise<WebCard[]> =>
+export const getRecommendedWebCards = async (profileId: string) =>
   db
-    .selectDistinct()
+    .selectDistinct({
+      WebCard: WebCardTable,
+    })
     .from(WebCardTable)
     .innerJoin(ProfileTable, eq(ProfileTable.webCardId, WebCardTable.id))
     .leftJoin(
