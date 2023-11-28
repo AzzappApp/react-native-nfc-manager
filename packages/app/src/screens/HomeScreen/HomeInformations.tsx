@@ -19,7 +19,6 @@ import type { HomeInformations_webCard$key } from '@azzapp/relay/artifacts/HomeI
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
-  animated: boolean;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
 };
@@ -27,14 +26,12 @@ type HomeInformationsProps = {
  *
  *
  * @param {HomeInformationsProps} {
- *   animated,
  *   user,
  *   currentProfileIndexSharedValue,
  * }
  * @return {*}
  */
 const HomeInformations = ({
-  animated,
   height,
   user,
   currentProfileIndexSharedValue,
@@ -117,7 +114,7 @@ const HomeInformations = ({
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && animated) {
+      if (actual >= 0 && profiles && profiles?.length > 1) {
         runOnJS(defineCurrentProfile)(Math.floor(actual));
 
         const prevIndex = Math.floor(actual);
@@ -158,7 +155,7 @@ const HomeInformations = ({
             [previous.nbFollowings, next.nbFollowings],
           ),
         );
-      } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
+      } else if (actual >= 0) {
         nbPosts.value = format(infosShared.value[actual].nbPosts ?? 0);
         nbLikes.value = format(infosShared.value[actual].nbLikes ?? 0);
         nbFollowers.value = format(infosShared.value[actual].nbFollowers ?? 0);
@@ -167,7 +164,7 @@ const HomeInformations = ({
         );
       }
     },
-    [animated, webCards],
+    [webCards],
   );
 
   if (!currentProfile) {

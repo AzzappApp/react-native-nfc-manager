@@ -776,7 +776,6 @@ const HomeBottomPanel = ({
         {selectedPanel === 'INFORMATION' && (
           <HomeInformations
             user={user}
-            animated={selectedPanel === 'INFORMATION'}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />

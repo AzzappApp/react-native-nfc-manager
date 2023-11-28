@@ -142,6 +142,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
                   onChangeText={onChange}
                   onBlur={onBlur}
                   style={styles.input}
+                  clearButtonMode="while-editing"
                   placeholder={intl.formatMessage({
                     defaultMessage: 'Enter a first name',
                     description:

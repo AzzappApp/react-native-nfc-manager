@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { Button, Modal, type ModalProps } from '#ui';
-import { loadWebCardStats } from '#app/actions/profileActions';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
@@ -14,34 +13,10 @@ type DownloadAppModalProps = Omit<ModalProps, 'children'> & {
   webCard: WebCard;
 };
 
-type Stats = {
-  posts: number;
-  followers: number;
-  following: number;
-};
-
 // eslint-disable-next-line react/display-name
 const DownloadAppModal = forwardRef(
   (props: DownloadAppModalProps, ref: ForwardedRef<ModalActions>) => {
     const { media, webCard, ...others } = props;
-
-    const [stats, setStats] = useState<Stats | null>(null);
-
-    useEffect(() => {
-      async function loadStats() {
-        const { nbFollowers, nbPosts, nbFollowings } = await loadWebCardStats(
-          webCard.id,
-        );
-        setStats({
-          posts: nbPosts,
-          followers: nbFollowers,
-          following: nbFollowings,
-        });
-      }
-
-      void loadStats();
-    }, [webCard.id]);
-
     return (
       <Modal ref={ref} {...others}>
         <div className={styles.coverWrapper}>
@@ -56,15 +31,15 @@ const DownloadAppModal = forwardRef(
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.posts}</span>
+            <span className={styles.statValue}>{webCard.nbPosts}</span>
             <span className={styles.statCategory}>Posts</span>
           </div>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.followers}</span>
+            <span className={styles.statValue}>{webCard.nbFollowers}</span>
             <span className={styles.statCategory}>Followers</span>
           </div>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.following}</span>
+            <span className={styles.statValue}>{webCard.nbFollowings}</span>
             <span className={styles.statCategory}>Following</span>
           </div>
         </div>
