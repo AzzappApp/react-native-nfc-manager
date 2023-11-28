@@ -30,9 +30,7 @@ const CommentFeedItem = (props: CommentFeedItemProps) => {
       />
       <div className={styles.content}>
         <p className={styles.comment}>
-          <span className={styles.name}>
-            {comment.firstName} {comment.lastName}
-          </span>{' '}
+          <span className={styles.name}>{comment.userName}</span>{' '}
           {comment.comment}
         </p>
         <span className={styles.elapsed}>{elapsedTime}</span>

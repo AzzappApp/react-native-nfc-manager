@@ -28,7 +28,7 @@ export const PostCommentTable = mysqlTable(
 
 export type PostComment = InferSelectModel<typeof PostCommentTable>;
 export type NewPostComment = InferInsertModel<typeof PostCommentTable>;
-export type PostCommentWithWebCard = Pick<WebCard, 'firstName' | 'lastName'> &
+export type PostCommentWithWebCard = Pick<WebCard, 'userName'> &
   PostComment & { media: Media };
 
 /**
@@ -101,8 +101,7 @@ export const getPostCommentsWithWebCard = async (
     if (!media) continue;
     result.push({
       ...PostComment,
-      firstName: WebCard.firstName,
-      lastName: WebCard.lastName,
+      userName: WebCard.userName,
       media,
     });
   }
