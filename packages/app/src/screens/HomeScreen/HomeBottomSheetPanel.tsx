@@ -1,7 +1,10 @@
+import * as Sentry from '@sentry/react-native';
 import { memo, useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Platform, StyleSheet, View } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Platform, StyleSheet, View, Share } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
@@ -11,6 +14,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { HomeBottomSheetPanel_profile$key } from '@azzapp/relay/artifacts/HomeBottomSheetPanel_profile.graphql';
 
 type HomeBottomSheetPanel = {
   /**
@@ -28,14 +32,29 @@ type HomeBottomSheetPanel = {
    * User has a profile
    */
   withProfile: boolean;
+
+  profile?: HomeBottomSheetPanel_profile$key | null;
 };
 
 const HomeBottomSheetPanel = ({
   visible,
   close,
   withProfile,
+  profile: profileKey,
 }: HomeBottomSheetPanel) => {
   const { profileRole } = useAuthState();
+  const profile = useFragment(
+    graphql`
+      fragment HomeBottomSheetPanel_profile on Profile {
+        id
+        webCard {
+          userName
+          cardIsPublished
+        }
+      }
+    `,
+    profileKey ?? null,
+  );
 
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
@@ -57,6 +76,37 @@ const HomeBottomSheetPanel = ({
       void dispatchGlobalEvent({ type: 'SIGN_OUT' });
     }
   }, [close, toggleRequestLogout]);
+
+  const intl = useIntl();
+  const onShare = async () => {
+    if (profile?.webCard.userName) {
+      // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
+      try {
+        await Share.share(
+          {
+            url: buildUserUrl(profile?.webCard.userName),
+          },
+          {
+            dialogTitle: intl.formatMessage({
+              defaultMessage: 'Azzapp | An app made for your business',
+              description:
+                'Profile WebcardModal, message use when sharing the contact card',
+            }),
+            subject: intl.formatMessage({
+              defaultMessage: 'Azzapp | An app made for your business',
+              description:
+                'Profile WebcardModal, message use when sharing the contact card',
+            }),
+          },
+        );
+        close();
+
+        //TODO: handle result of the share when specified
+      } catch (error: any) {
+        Sentry.captureException(error);
+      }
+    }
+  };
 
   return (
     <BottomSheetModal
@@ -110,6 +160,26 @@ const HomeBottomSheetPanel = ({
                 </View>
               </PressableNative>
             </Link>
+          )}
+          {withProfile && profile && profile?.webCard.cardIsPublished && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onShare}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="share" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Share this WebCard{azzappApp}"
+                      description="Share this webcard"
+                      values={{ azzappApp: <Text variant="azzapp">a</Text> }}
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" />
+              </View>
+            </PressableNative>
           )}
           <Link route="INVITE_FRIENDS">
             <PressableNative

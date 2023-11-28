@@ -3,10 +3,8 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
-import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
-import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeScreenContent from './HomeScreenContent';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeRoute } from '#routes';
@@ -36,17 +34,7 @@ const HomeScreen = ({
     }
   }, [hasFocus]);
 
-  const [showMenu, toggleShowMenu] = useToggle(false);
-  return (
-    <>
-      <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={toggleShowMenu}
-        withProfile
-      />
-    </>
-  );
+  return <HomeScreenContent user={currentUser} />;
 };
 
 const HomeScreenFallback = () => {

@@ -18,9 +18,11 @@ import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeContactCardLandscape from './HomeContactCardLandscape';
 import HomeHeader, { HOME_HEADER_HEIGHT } from './HomeHeader';
 import { HOME_MENU_HEIGHT } from './HomeMenu';
@@ -35,13 +37,9 @@ import type { Disposable } from 'react-relay';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
-  onShowMenu: () => void;
 };
 
-const HomeScreenContent = ({
-  user: userKey,
-  onShowMenu,
-}: HomeScreenContentProps) => {
+const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #regions data
   const user = useFragment(
     graphql`
@@ -54,6 +52,7 @@ const HomeScreenContent = ({
             userName
           }
           ...HomeContactCardLandscape_profile
+          ...HomeBottomSheetPanel_profile
         }
         ...HomeBackground_user
         ...HomeProfileLink_user
@@ -225,6 +224,11 @@ const HomeScreenContent = ({
   );
   // #endregion
 
+  // #region bottomMenu
+  const [showMenu, toggleShowMenu] = useToggle(false);
+
+  // #endregion
+
   return (
     <View style={{ flex: 1 }}>
       <HomeBackground
@@ -233,7 +237,7 @@ const HomeScreenContent = ({
       />
       <View style={styles.contentContainer}>
         <HomeHeader
-          openPanel={onShowMenu}
+          openPanel={toggleShowMenu}
           user={user}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           style={{ marginTop: insets.top }}
@@ -264,6 +268,12 @@ const HomeScreenContent = ({
         webCardId={currentProfile?.webCard?.id ?? null}
       >
         <HomeContactCardLandscape profile={currentProfile ?? null} />
+        <HomeBottomSheetPanel
+          visible={showMenu}
+          close={toggleShowMenu}
+          withProfile
+          profile={currentProfile ?? null}
+        />
       </WebCardBoundRelayEnvironmentProvider>
     </View>
   );
