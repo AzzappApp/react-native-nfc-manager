@@ -205,7 +205,7 @@ const CardTemplateList = (
             cardTemplateType,
           };
         }) ?? [],
-      ),
+      ).sort((a, b) => (a.label ?? '').localeCompare(b.label ?? '')),
     [data?.cardTemplates?.edges, profile],
   );
 
@@ -362,6 +362,10 @@ const CardTemplateList = (
               title: curr.label ?? '-',
               data: [],
             });
+
+            existingSection.data = existingSection.data.sort((a, b) =>
+              a.title.localeCompare(b.title),
+            );
           } else {
             acc.push({
               title: label,
@@ -373,7 +377,7 @@ const CardTemplateList = (
         },
         [],
       ) ?? []
-    );
+    ).sort((a, b) => a.title.localeCompare(b.title));
   }, [cardTemplateTypes]);
 
   const onSelectSection = (item: { id: string; title: string }) => {
