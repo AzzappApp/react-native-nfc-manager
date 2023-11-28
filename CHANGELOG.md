@@ -1,5 +1,6 @@
-## 0.5.2-canary.14
+## 0.5.2-canary.15
 
+* **fix:**  - Bug-20231020-2 - Browser_view - in post_view comment author "Nam… ([#1828](https://github.com/AzzappApp/azzapp/pull/1828))
 * **fix:**  - Bug-20230624-11 - Account_Details - username field [#563](https://github.com/AzzappApp/azzapp/pull/563)
 * **feat:**  - Webcard Parameters && Redirection ([#1766](https://github.com/AzzappApp/azzapp/pull/1766))
 * **feat:**  - Add optional label on social link to handle company rename ....
