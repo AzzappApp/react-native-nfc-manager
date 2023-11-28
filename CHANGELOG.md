@@ -1,5 +1,6 @@
-## 0.5.2-canary.12
+## 0.5.2-canary.13
 
+* **feat:**  - Webcard Parameters && Redirection ([#1766](https://github.com/AzzappApp/azzapp/pull/1766))
 * **feat:**  - Add optional label on social link to handle company rename ....
 * **feat:**  - allow copy paste of social link with mask
 * **fix:**  - dont return undefined url
