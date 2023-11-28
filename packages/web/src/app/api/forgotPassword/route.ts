@@ -1,22 +1,17 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-import { Twilio } from 'twilio';
 import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { twilioVerificationService } from '#helpers/twilioHelpers';
 
 type ForgotPasswordBody = {
   credential: string;
   locale: string;
 };
-
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID!;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
-const TWILIO_ACCOUNT_VERIFY_SERVICE_SID =
-  process.env.TWILIO_ACCOUNT_VERIFY_SERVICE_SID!;
 
 export const POST = async (req: Request) => {
   const { credential, locale } = (await req.json()) as ForgotPasswordBody;
@@ -50,10 +45,13 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ issuer: credential }, { status: 200 });
     }
 
-    const client = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-    const verification = await client.verify.v2
-      .services(TWILIO_ACCOUNT_VERIFY_SERVICE_SID)
-      .verifications.create({ to: issuer, channel, locale });
+    const verification = await twilioVerificationService().verifications.create(
+      {
+        to: issuer,
+        channel,
+        locale,
+      },
+    );
 
     if (verification && verification.status === 'canceled') {
       throw new Error('Verification canceled');

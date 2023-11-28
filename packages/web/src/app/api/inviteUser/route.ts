@@ -123,7 +123,7 @@ export const POST = async (req: Request) => {
     });
 
     if (phoneNumber) {
-      await twilioMessagesService.create({
+      await twilioMessagesService().create({
         body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
         to: phoneNumber,
         from: TWILIO_PHONE_NUMBER,
