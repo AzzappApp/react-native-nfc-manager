@@ -149,7 +149,9 @@ export const updateProfile = async (
     .set(updates)
     .where(eq(ProfileTable.id, profileId));
 };
-export const getRecommendedWebCards = async (profileId: string) =>
+export const getRecommendedWebCards = async (
+  profileId: string,
+): Promise<WebCard[]> =>
   db
     .selectDistinct({
       WebCard: WebCardTable,
