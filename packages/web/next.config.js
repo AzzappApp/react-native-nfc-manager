@@ -10,6 +10,7 @@ const withVanillaExtract = createVanillaExtractPlugin();
 
 /** @type {import('next').NextConfig} */
 const config = {
+  staticPageGenerationTimeout: 60 * 2,
   webpack(config, { nextRuntime }) {
     config.module.rules.push({
       test: /\.svg$/,
