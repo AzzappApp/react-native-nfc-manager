@@ -1,5 +1,6 @@
-## 0.5.2-canary.17
+## 0.5.2-canary.18
 
+* **build:**  - remove version set of nodejs
 * **build:**  - fix yarn.lock
 * **build:**  - upgrade image for ios buid
 * **build:**  - try to force node-gyp
