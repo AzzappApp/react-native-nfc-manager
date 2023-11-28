@@ -112,12 +112,11 @@ const useSuggestedMedias = (
   const onNextSuggestedMedia = useCallback(() => {
     setSuggesteMediaIndex(prev => {
       const currentIndex = prev[mediaKind];
-      if (currentIndex >= (list?.edges?.length ?? 0) - 1) {
-        return prev;
-      }
+
       return {
         ...prev,
-        [mediaKind]: currentIndex + 1,
+        [mediaKind]:
+          currentIndex >= (list?.edges?.length ?? 0) - 1 ? 0 : currentIndex + 1,
       };
     });
   }, [list?.edges?.length, mediaKind]);
