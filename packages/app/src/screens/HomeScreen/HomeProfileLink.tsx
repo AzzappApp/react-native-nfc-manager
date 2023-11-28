@@ -7,10 +7,13 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeProfileLink_user$key } from '@azzapp/relay/artifacts/HomeProfileLink_user.graphql';
+import type { HomeProfileLink_username$key } from '@azzapp/relay/artifacts/HomeProfileLink_username.graphql';
+
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
@@ -29,17 +32,30 @@ const HomeProfileLink = ({
         profiles {
           webCard {
             id
-            userName
           }
+          ...HomeProfileLink_username
         }
       }
     `,
     userKey,
   );
 
+  const profiles = useMultiActorEnvironmentPluralFragment(
+    graphql`
+      fragment HomeProfileLink_username on Profile {
+        webCard {
+          id
+          userName
+        }
+      }
+    `,
+    (profile: any) => profile.webCard?.id,
+    user.profiles as readonly HomeProfileLink_username$key[],
+  );
+
   const userNames = useMemo(
-    () => user?.profiles?.map(p => p.webCard.userName) ?? [],
-    [user?.profiles],
+    () => profiles?.map(p => p.webCard.userName) ?? [],
+    [profiles],
   );
 
   const opacityStyle = useAnimatedStyle(() => {

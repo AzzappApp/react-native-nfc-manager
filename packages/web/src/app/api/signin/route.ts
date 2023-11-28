@@ -51,9 +51,7 @@ const signin = async (req: Request) => {
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);
-      if (profile) {
-        user = await getUserById(profile.userId);
-      }
+      user = profile ? await getUserById(profile.userId) : null;
     }
 
     if (!user?.password) {

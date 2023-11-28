@@ -30,7 +30,6 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 type HomeInformationsProps = {
   user: HomeStatistics_user$key;
   height: number;
-  animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
 };
@@ -38,17 +37,18 @@ type HomeInformationsProps = {
 const HomeStatistics = ({
   user,
   height,
-  animated,
   currentUserIndex,
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
   //TODO: backend part .
+
   const data = useFragment(
     graphql`
       fragment HomeStatistics_user on User {
         profiles {
           id
           webCard {
+            id
             nbLikes
             nbWebCardViews
           }
@@ -67,13 +67,12 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-
   const totalLikes = useSharedValue(format(0));
   const totalScans = useSharedValue(format(0));
   const totalViews = useSharedValue(format(0));
-
   const inputRange = _.range(0, data.profiles?.length);
   const { profiles } = data;
+
   const likes = useMemo(
     () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
     [profiles],
@@ -90,7 +89,7 @@ const HomeStatistics = ({
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      if (profiles && profiles?.length > 1 && actual >= 0 && animated) {
+      if (profiles && profiles?.length > 1 && actual >= 0) {
         totalLikes.value = format(
           interpolate(currentProfileIndexSharedValue.value, inputRange, likes),
         );
@@ -108,7 +107,7 @@ const HomeStatistics = ({
             webCardViews,
           ),
         );
-      } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
+      } else if (actual >= 0 && Math.trunc(actual) === actual) {
         //use to hide animation if not show. few perf gain
         const prevIndex = Math.floor(actual);
         totalLikes.value = format(likes[prevIndex] ?? 0);
@@ -117,7 +116,7 @@ const HomeStatistics = ({
       }
     },
 
-    [currentProfileIndexSharedValue.value, animated, profiles, inputRange],
+    [currentProfileIndexSharedValue.value, profiles, inputRange],
   );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
@@ -125,7 +124,6 @@ const HomeStatistics = ({
   const onSelectStat = (index: number) => {
     scrollViewRef?.current?.scrollTo({ x: index * BOX_NUMBER_WIDTH, y: 0 });
   };
-
   //TODO: if performance issue, inquiry a more complex way to do the chart(skia, D3 etc). it is the simpler using only animated view.
   return (
     <View style={styles.container}>
@@ -133,7 +131,6 @@ const HomeStatistics = ({
         width={width - 2 * PADDING_HORIZONTAL}
         height={height - BOX_NUMBER_HEIGHT}
         statsScrollIndex={scrollIndexOffset}
-        animated={animated}
         currentUserIndex={currentUserIndex}
         currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         user={data}
@@ -165,11 +162,11 @@ const HomeStatistics = ({
           title={
             intl.formatMessage(
               {
-                defaultMessage: 'Webcard{azzappAp} Views',
+                defaultMessage: 'Webcard{azzappA} Views',
                 description: 'Home statistics - webcardView label',
               },
               {
-                azzappAp: (
+                azzappA: (
                   <Text style={styles.icon} variant="azzapp">
                     a
                   </Text>

@@ -153,10 +153,10 @@ const LoadCardTemplateModal = ({
           <Icon icon="warning" style={styles.icon} />
           <Text variant="large" style={{ marginTop: 10 }}>
             <FormattedMessage
-              defaultMessage="Delete your current WebCard{azzappAp} contents?"
+              defaultMessage="Delete your current WebCard{azzappA} contents?"
               description="Confirmation title for load card template modal"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               }}
             />
           </Text>
@@ -168,10 +168,10 @@ const LoadCardTemplateModal = ({
             }}
           >
             <FormattedMessage
-              defaultMessage="Loading a new template will remove current contents of your WebCard{azzappAp} and replace them with the new template. Are you ready to start from the scratch?"
+              defaultMessage="Loading a new template will remove current contents of your WebCard{azzappA} and replace them with the new template. Are you ready to start from the scratch?"
               description="Confirmation description for load card template modal"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               }}
             />
           </Text>

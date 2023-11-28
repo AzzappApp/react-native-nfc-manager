@@ -116,13 +116,12 @@ const WebCardForm = (
                 environment,
                 graphql`
                   query WebCardFormQuery($userName: String!) {
-                    isUserNameUsed(userName: $userName)
+                    userNameAvailable(userName: $userName)
                   }
                 `,
                 { userName: data.userName },
               ).toPromise();
-
-              if (res?.isUserNameUsed) {
+              if (!res?.userNameAvailable) {
                 const { userName, ...values } = data;
 
                 return {
@@ -467,11 +466,11 @@ const WebCardForm = (
               label={
                 intl.formatMessage(
                   {
-                    defaultMessage: 'Webcard{azzappAp} name*',
+                    defaultMessage: 'Webcard{azzappA} name*',
                     description: 'ProfileForm username textinput label',
                   },
                   {
-                    azzappAp: <Text variant="azzapp">a</Text>,
+                    azzappA: <Text variant="azzapp">a</Text>,
                   },
                 ) as string
               }

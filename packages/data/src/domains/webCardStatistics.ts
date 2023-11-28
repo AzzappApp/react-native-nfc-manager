@@ -43,9 +43,9 @@ export const getStatisticForWebCard = async (
  * ID, incrementing the value by 1 if `increase` is true.
  * @param {string} webCardId - A string representing the webcard ID for whom the statistics
  * are being updated.
- * @param {'likes' | 'webcardViews'} field - The `field` parameter is a string
+ * @param {'likes' | 'webCardViews'} field - The `field` parameter is a string
  * that specifies which field in the statistics table should be updated. It can have one of three
- * values: 'contactcardScans', 'likes', or 'webcardViews'.
+ * values: 'contactcardScans', 'likes', or 'webCardViews'.
  * @param increase - The `increase` parameter is a boolean value that determines whether the statistics
  * should be increased or decreased. If `increase` is `true`, the statistics will be increased by 1. If
  * `increase` is `false`, the statistics will be decreased by 1.
@@ -66,7 +66,7 @@ export const updateStatistics = async (
     field === 'webCardViews'
       ? {
           set: {
-            webcardViews: increase
+            webCardViews: increase
               ? sql`${WebCardStatisticTable.webCardViews} + 1`
               : sql`${WebCardStatisticTable.webCardViews} - 1`,
           },

@@ -87,6 +87,30 @@ const HomeBottomSheetPanel = ({
               </View>
             </PressableNative>
           </Link>
+          {withProfile && profileRole && isAdmin(profileRole) && (
+            <Link route="WEBCARD_PARAMETERS">
+              <PressableNative
+                style={styles.bottomSheetOptionButton}
+                onPress={close}
+              >
+                <View style={styles.bottomSheetOptionContainer}>
+                  <View style={styles.bottomSheetOptionIconLabel}>
+                    <Icon icon="parameters" />
+                    <Text>
+                      <FormattedMessage
+                        defaultMessage="WebCard{azzappA} parameters"
+                        description="Link to open webcard parameters form to change webcard parameters"
+                        values={{
+                          azzappA: <Text variant="azzapp">a</Text>,
+                        }}
+                      />
+                    </Text>
+                  </View>
+                  <Icon icon="arrow_right" />
+                </View>
+              </PressableNative>
+            </Link>
+          )}
           <Link route="INVITE_FRIENDS">
             <PressableNative
               style={styles.bottomSheetOptionButton}

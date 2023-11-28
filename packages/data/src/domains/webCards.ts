@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, sql, lt, desc, and } from 'drizzle-orm';
+import { eq, sql, lt, desc, and, or } from 'drizzle-orm';
 import {
   mysqlEnum,
   uniqueIndex,
@@ -12,6 +12,7 @@ import {
 import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { ProfileTable } from './profiles';
+import { RedirectWebCardTable } from './redirectWebCard';
 import { getUserById, UserTable } from './users';
 import type { DbTransaction } from './db';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
@@ -32,6 +33,7 @@ export const WebCardTable = mysqlTable(
     /* Profile infos */
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userName: cols.defaultVarchar('userName').notNull(),
+    lastUserNameUpdate: cols.dateTime('lastUserNameUpdate').notNull(),
     webCardKind: mysqlEnum('webCardKind', ['personal', 'business']).notNull(),
     webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
@@ -52,6 +54,7 @@ export const WebCardTable = mysqlTable(
     cardStyle: json('cardStyle').$type<CardStyle>(),
     cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
     cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
+    alreadyPublished: boolean('alreadyPublished').default(false).notNull(),
     lastCardUpdate: cols.dateTime('lastCardUpdate').notNull(),
 
     /* Covers infos */
@@ -234,8 +237,6 @@ export const updateWebCard = async (
     ...updates,
   };
 
-  console.log({ updates });
-
   await tx
     .update(WebCardTable)
     .set(updatedWebCard)
@@ -291,6 +292,60 @@ export const getWebCardByUserName = async (webCardName: string) => {
     .where(eq(WebCardTable.userName, webCardName))
     .then(res => res.pop() ?? null);
 };
+
+/**
+ * Retrieves a webcard by their webcard handling redirection
+ *
+ * @param userName - The username of the webcard to retrieve
+ * @returns - The profile if found, otherwise null
+ */
+export const getWebCardByUserNameWithRedirection = async (
+  profileName: string,
+) => {
+  return db
+    .select()
+    .from(WebCardTable)
+    .leftJoin(
+      RedirectWebCardTable,
+      eq(WebCardTable.userName, RedirectWebCardTable.toUserName),
+    )
+    .where(
+      or(
+        eq(WebCardTable.userName, profileName),
+        eq(RedirectWebCardTable.fromUserName, profileName),
+      ),
+    )
+    .then(res => {
+      const result = res.pop();
+      if (result) {
+        const { WebCard, RedirectWebCard } = result;
+        if (WebCard?.userName) {
+          //TODO: use a cron task should be better, for now check if the redirection is expired
+          if (
+            RedirectWebCard?.expiresAt &&
+            RedirectWebCard.expiresAt > new Date()
+          ) {
+            //delete the expired redirection
+            db.delete(RedirectWebCardTable).where(
+              eq(RedirectWebCardTable.fromUserName, profileName),
+            );
+          }
+
+          return WebCard;
+        } else if (RedirectWebCard?.toUserName) {
+          // with the join, it should match all redirections,Secruity, not sure it will be required.If a profile was not found in the ProfileTable, but a redirect profile was found,
+          // get the profile with the toUserName
+          return db
+            .select()
+            .from(WebCardTable)
+            .where(eq(WebCardTable.userName, RedirectWebCard.toUserName))
+            .then(res => res.pop() ?? null);
+        }
+      }
+      return null;
+    });
+};
+
 export const getOwner = async (webCardId: string) => {
   return db
     .select()

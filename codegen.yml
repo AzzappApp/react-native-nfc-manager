@@ -45,6 +45,7 @@ generates:
         ProfileStatistic: ../../domains#ProfileStatistic as ProfileStatisticModel
         WebCard: ../../domains#WebCard as WebCardModel
         User: ../../domains#User as UserModel
+        RedirectWebCard: ../../domains#RedirectWebCard as RedirectWebCard
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

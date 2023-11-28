@@ -1,3 +1,4 @@
+import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -45,8 +46,9 @@ export const matchUrlWithRoute = async (
   }
 
   const matchProfile = withoutPrefix.match(profileUrl);
+
   if (matchProfile) {
-    const username = matchProfile[1];
+    let username = matchProfile[1];
     if (!username) {
       return;
     }
@@ -93,6 +95,22 @@ export const matchUrlWithRoute = async (
         }
       }
     } else {
+      //check if there is a post
+      let postId;
+      const profileWithPost = username.split('/');
+      if (profileWithPost.length > 1) {
+        username = profileWithPost[0];
+        postId = profileWithPost[1];
+      }
+
+      if (postId) {
+        return {
+          route: 'POST',
+          params: {
+            postId: toGlobalId('Post', postId),
+          },
+        };
+      }
       return {
         route: 'WEBCARD',
         params: {

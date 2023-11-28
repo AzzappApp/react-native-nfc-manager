@@ -17,6 +17,7 @@ export * from './postReactions';
 export * from './posts';
 export * from './webCardCategories';
 export * from './profiles';
+export * from './redirectWebCard';
 export * from './staticMedias';
 export * from './users';
 export * from './webCardStatistics';

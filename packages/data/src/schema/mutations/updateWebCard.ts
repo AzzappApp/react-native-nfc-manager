@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
+import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { updateWebCard, type Profile, type WebCard } from '#domains';
@@ -26,7 +27,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { ...profileUpdates } = args.input;
+  const {
+    webCardCategoryId: graphqlWebCardCategoryId,
+    companyActivityId: graphqlCompanyActivityId,
+    ...profileUpdates
+  } = args.input;
 
   const partialWebCard: Partial<
     Omit<WebCard, 'createdAt' | 'id' | 'updatedAt' | 'webCardKind'>
@@ -35,13 +40,35 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   };
 
   try {
-    await updateWebCard(profile.webCardId, partialWebCard);
-
     const webCard = await loaders.WebCard.load(profile.webCardId);
 
     if (!webCard) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
+
+    if (graphqlWebCardCategoryId) {
+      const { id: webCardCategoryId, type } = fromGlobalId(
+        graphqlWebCardCategoryId,
+      );
+      if (type !== 'WebCardCategory') {
+        throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      }
+      partialWebCard.webCardCategoryId = webCardCategoryId;
+      if (webCardCategoryId !== webCard.webCardCategoryId) {
+        partialWebCard.companyActivityId = undefined;
+      }
+    }
+    if (graphqlCompanyActivityId) {
+      const { id: companyActivityId, type } = fromGlobalId(
+        graphqlCompanyActivityId,
+      );
+      if (type !== 'CompanyActivity') {
+        throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      }
+      partialWebCard.companyActivityId = companyActivityId;
+    }
+
+    await updateWebCard(profile.webCardId, partialWebCard);
 
     return {
       webCard: { ...webCard, ...partialWebCard },

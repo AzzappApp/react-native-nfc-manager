@@ -85,10 +85,10 @@ const AccountDetailsScreen = ({
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
             <FormattedMessage
-              defaultMessage="Your account details are linked to all your webcards{azzappAp}."
+              defaultMessage="Your account details are linked to all your webcards{azzappA}."
               description="Warning label displayed at the top on the screen to indicate that updates go through all profiles"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               }}
             />
           </Text>
@@ -97,10 +97,10 @@ const AccountDetailsScreen = ({
               <View style={styles.section}>
                 <Text variant="xsmall" style={styles.sectionTitle}>
                   <FormattedMessage
-                    defaultMessage="Webcard{azzappAp} details"
+                    defaultMessage="Webcard{azzappA} details"
                     description="Title of the section where user can view their webcard details"
                     values={{
-                      azzappAp: (
+                      azzappA: (
                         <Text style={styles.icon} variant="azzapp">
                           a
                         </Text>
@@ -112,10 +112,10 @@ const AccountDetailsScreen = ({
               <View style={styles.sectionField}>
                 <Text variant="smallbold">
                   <FormattedMessage
-                    defaultMessage="Webcard{azzappAp} name"
+                    defaultMessage="Webcard{azzappA} name"
                     description="Webcard name field in the account details screen"
                     values={{
-                      azzappAp: <Text variant="azzapp">a</Text>,
+                      azzappA: <Text variant="azzapp">a</Text>,
                     }}
                   />
                 </Text>

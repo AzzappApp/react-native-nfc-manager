@@ -35,11 +35,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            'Nothing better than a nice transition between the sections of your webcard{azzappAp}',
+            'Nothing better than a nice transition between the sections of your webcard{azzappA}',
           description: 'Progress loading modal message 1',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>
@@ -53,11 +53,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            'Did you know you can customize each section of your webcard{azzappAp}? Make it a unique experience!',
+            'Did you know you can customize each section of your webcard{azzappA}? Make it a unique experience!',
           description: 'Progress loading modal message 3',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>
@@ -67,11 +67,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            "Your webcard{azzappAp}, your style. Don't forget to explore all the customization options available.",
+            "Your webcard{azzappA}, your style. Don't forget to explore all the customization options available.",
           description: 'Progress loading modal message 4',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>
@@ -81,11 +81,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            "Take a deep breath and envision your perfect webcard{azzappAp}. It's coming soon!",
+            "Take a deep breath and envision your perfect webcard{azzappA}. It's coming soon!",
           description: 'Progress loading modal message 5',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>
@@ -100,11 +100,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            'As the pixels come together, think about using transition effects to add dynamism to your webcard{azzappAp}',
+            'As the pixels come together, think about using transition effects to add dynamism to your webcard{azzappA}',
           description: 'Progress loading modal message 7',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>
@@ -114,11 +114,11 @@ const UploadProgressModal = ({
       intl.formatMessage(
         {
           defaultMessage:
-            'The most beautiful things take time to come to life. Your webcard{azzappAp} is taking shape.',
+            'The most beautiful things take time to come to life. Your webcard{azzappA} is taking shape.',
           description: 'Progress loading modal message 8',
         },
         {
-          azzappAp: (
+          azzappA: (
             <Text style={styles.icon} variant="azzapp">
               a
             </Text>

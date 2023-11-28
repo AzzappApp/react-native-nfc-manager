@@ -15,6 +15,10 @@ type WebCard implements Node {
   """
   userName: String!
   """
+  The user name of the profile
+  """
+  lastUserNameUpdate: DateTime!
+  """
   The kind of the webCard (business, personal)
   """
   webCardKind: WebCardKind
@@ -58,6 +62,10 @@ type WebCard implements Node {
   Is the webCard published
   """
   cardIsPublished: Boolean!
+  """
+  Is the webcard was already published
+  """
+  alreadyPublished: Boolean!
   """
   The webCard common information for contact cards
   """

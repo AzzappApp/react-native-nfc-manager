@@ -6,10 +6,10 @@ import {
   incrementContactCardScans,
 } from '@azzapp/data/domains';
 
-export const updateWebCardViewsCounter = async (profileId: string) => {
+export const updateWebCardViewsCounter = async (webcardId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  return incrementWebCardViews(profileId);
+  return incrementWebCardViews(webcardId);
 };
 
 export const updateContactCardScanCounter = async (profileId: string) => {

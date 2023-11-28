@@ -99,10 +99,10 @@ const WebCardScrenHeader = ({
                 />
               ) : (
                 <FormattedMessage
-                  defaultMessage="Webcard{azzappAp} builder"
+                  defaultMessage="Webcard{azzappA} builder"
                   description="Webcard builder header title"
                   values={{
-                    azzappAp: <Text variant="azzapp">a</Text>,
+                    azzappA: <Text variant="azzapp">a</Text>,
                   }}
                 />
               )}

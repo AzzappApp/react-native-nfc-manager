@@ -1,9 +1,8 @@
-import { eq, sql } from 'drizzle-orm';
 import {
-  WebCardTable,
-  db,
+  getRedirectWebCardByUserName,
   getWebCardByUserName,
   getWebCardCategories,
+  getWebCardByUserNameWithRedirection,
 } from '#domains';
 import { fetchNode } from './NodeResolvers';
 import type { QueryResolvers } from './__generated__/types';
@@ -26,19 +25,15 @@ export const Query: QueryResolvers = {
     return Promise.all(ids.map(id => fetchNode(id, context)));
   },
   webCardCategories: async () => getWebCardCategories(),
-  isUserNameUsed: async (_, { userName }) => {
-    const count = await db
-      .select({ count: sql`count(*)`.mapWith(Number) })
-      .from(WebCardTable)
-      .where(eq(WebCardTable.userName, userName));
-
-    return count[0].count > 0;
-  },
   webCard: async (_, { userName }) => {
-    const webCard = await getWebCardByUserName(userName);
-    if (webCard?.cardIsPublished) {
-      return webCard;
+    return getWebCardByUserNameWithRedirection(userName);
+  },
+  userNameAvailable: async (_, { userName }) => {
+    const profile = await getWebCardByUserName(userName);
+    const redirection = await getRedirectWebCardByUserName(userName);
+    if (redirection.length === 0 && !profile) {
+      return true;
     }
-    return null;
+    return false;
   },
 };

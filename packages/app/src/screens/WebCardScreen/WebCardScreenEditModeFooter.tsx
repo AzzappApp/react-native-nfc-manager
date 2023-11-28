@@ -22,11 +22,11 @@ const WebCardScreenEditModeFooter = ({
         {intl.formatMessage(
           {
             defaultMessage:
-              'You can completely change your WebCard{azzappAp} by loading a new template',
+              'You can completly change your WebCard{azzappA} by loading a new template',
             description: 'ProfileScreenBody description to load a new template',
           },
           {
-            azzappAp: <Text variant="azzapp">a</Text>,
+            azzappA: <Text variant="azzapp">a</Text>,
           },
         )}
       </Text>
@@ -35,11 +35,11 @@ const WebCardScreenEditModeFooter = ({
         label={
           intl.formatMessage(
             {
-              defaultMessage: 'Load a new WebCard{azzappAp} template',
+              defaultMessage: 'Load a new WebCard{azzappA} template',
               description: 'ProfileScreenBody button to load a new template',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           ) as string
         }

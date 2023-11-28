@@ -20,7 +20,6 @@ type HomeStatisticsChartProps = {
   width: number;
   height: number;
   statsScrollIndex: SharedValue<number>;
-  animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
 };
@@ -31,7 +30,6 @@ const HomeStatisticsChart = ({
   width,
   height,
   statsScrollIndex,
-  animated,
   currentProfileIndexSharedValue,
   currentUserIndex,
 }: HomeStatisticsChartProps) => {
@@ -45,6 +43,7 @@ const HomeStatisticsChart = ({
           }
           webCard {
             statsSummary {
+              day
               webCardViews
               likes
             }
@@ -66,7 +65,7 @@ const HomeStatisticsChart = ({
           day: d.toISOString(),
           data: Array(profiles?.length ?? 0).fill({
             contactcardScans: 0,
-            webcardViews: 0,
+            webCardViews: 0,
             likes: 0,
           }),
         };
@@ -76,8 +75,20 @@ const HomeStatisticsChart = ({
           profile.statsSummary.forEach(stats => {
             if (stats) {
               const index = result.findIndex(item => item.day === stats.day);
+              //find the stats in webcard stats for the day
 
               result[index].data[indexProfile] = stats;
+            }
+          });
+          profile.webCard?.statsSummary?.forEach(stats => {
+            if (stats) {
+              const index = result.findIndex(item => item.day === stats.day);
+              //find the stats in webcard stats for the day
+              result[index].data[indexProfile] = {
+                ...result[index].data[indexProfile],
+                webCardViews: stats.webCardViews,
+                likes: stats.likes,
+              };
             }
           });
         }
@@ -95,16 +106,16 @@ const HomeStatisticsChart = ({
     const filtered = chartsData.reduce((acc: StatsData[], group) => {
       group.data.forEach((data, index) => {
         if (!acc[index]) {
-          acc[index] = { contactcardScans: 0, webcardViews: 0, likes: 0 };
+          acc[index] = { contactcardScans: 0, webCardViews: 0, likes: 0 };
         }
 
         acc[index].contactcardScans = Math.max(
           acc[index].contactcardScans,
           data.contactcardScans,
         );
-        acc[index].webcardViews = Math.max(
-          acc[index].webcardViews,
-          data.webcardViews,
+        acc[index].webCardViews = Math.max(
+          acc[index].webCardViews,
+          data.webCardViews,
         );
         acc[index].likes = Math.max(acc[index].likes, data.likes);
       });
@@ -112,7 +123,7 @@ const HomeStatisticsChart = ({
       return acc;
     }, []);
     return filtered.flatMap(obj => [
-      obj.webcardViews,
+      obj.webCardViews,
       obj.contactcardScans,
       obj.likes,
     ]);
@@ -174,7 +185,6 @@ const HomeStatisticsChart = ({
                   key={`statistic_chart_${index}`}
                   statsScrollIndex={statsScrollIndex}
                   statsIndex={currentStatsIndex}
-                  animated={animated}
                   currentProfileIndexSharedValue={
                     currentProfileIndexSharedValue
                   }
@@ -218,7 +228,6 @@ type AnimatedBarChartItemProps = {
   chartBarWidth: number;
   statsIndex: number;
   statsScrollIndex: SharedValue<number>;
-  animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
 };
@@ -229,82 +238,76 @@ const AnimatedBarChartItem = ({
   currentProfileIndexSharedValue,
   chartBarWidth,
   maxValues,
-  animated,
   currentUserIndex,
 }: AnimatedBarChartItemProps) => {
   //we need to flatten the matrixTransform, cannot find a way to interpolate a matrix
   const flattenedData = item.data.flatMap(obj => [
-    obj.webcardViews,
+    obj.webCardViews,
     obj.contactcardScans,
     obj.likes,
   ]);
   const animatedStyle = useAnimatedStyle(() => {
     const currentValue = flattenedData[currentUserIndex * 3 + statsIndex];
     const currentMax = maxValues[currentUserIndex * 3 + statsIndex];
-    if (animated) {
-      const interpolateValuePanel = interpolate(
-        statsScrollIndex.value,
-        [statsIndex - 1, statsIndex, statsIndex + 1],
-        [
-          flattenedData[currentUserIndex * 3 + statsIndex - 1] ?? 0,
-          currentValue,
-          flattenedData[currentUserIndex * 3 + statsIndex + 1] ?? 0,
-        ],
-      );
 
-      const interpolateValueProfile = interpolate(
-        currentProfileIndexSharedValue.value * 3,
-        [
-          (currentUserIndex - 1) * 3,
-          currentUserIndex * 3,
-          (currentUserIndex + 1) * 3,
-        ],
-        [
-          flattenedData[(currentUserIndex - 1) * 3 + statsIndex] ?? 0,
-          currentValue,
-          flattenedData[(currentUserIndex + 1) * 3 + statsIndex] ?? 0,
-        ],
-      );
+    const interpolateValuePanel = interpolate(
+      statsScrollIndex.value,
+      [statsIndex - 1, statsIndex, statsIndex + 1],
+      [
+        flattenedData[currentUserIndex * 3 + statsIndex - 1] ?? 0,
+        currentValue,
+        flattenedData[currentUserIndex * 3 + statsIndex + 1] ?? 0,
+      ],
+    );
 
-      const maxValuePanel = interpolate(
-        statsScrollIndex.value,
-        [statsIndex - 1, statsIndex, statsIndex + 1],
-        [
-          maxValues[currentUserIndex * 3 + statsIndex - 1] ?? 0,
-          currentMax,
-          maxValues[currentUserIndex * 3 + statsIndex + 1] ?? 0,
-        ],
-      );
+    const interpolateValueProfile = interpolate(
+      currentProfileIndexSharedValue.value * 3,
+      [
+        (currentUserIndex - 1) * 3,
+        currentUserIndex * 3,
+        (currentUserIndex + 1) * 3,
+      ],
+      [
+        flattenedData[(currentUserIndex - 1) * 3 + statsIndex] ?? 0,
+        currentValue,
+        flattenedData[(currentUserIndex + 1) * 3 + statsIndex] ?? 0,
+      ],
+    );
 
-      const maxValueProfile = interpolate(
-        currentProfileIndexSharedValue.value * 3,
-        [
-          (currentUserIndex - 1) * 3,
-          currentUserIndex * 3,
-          (currentUserIndex + 1) * 3,
-        ],
-        [
-          maxValues[(currentUserIndex - 1) * 3 + statsIndex] ?? 0,
-          currentMax,
-          maxValues[(currentUserIndex + 1) * 3 + statsIndex] ?? 0,
-        ],
-      );
+    const maxValuePanel = interpolate(
+      statsScrollIndex.value,
+      [statsIndex - 1, statsIndex, statsIndex + 1],
+      [
+        maxValues[currentUserIndex * 3 + statsIndex - 1] ?? 0,
+        currentMax,
+        maxValues[currentUserIndex * 3 + statsIndex + 1] ?? 0,
+      ],
+    );
 
-      const max = Math.max(1, maxValuePanel + maxValueProfile - currentMax); //Avoid max =0, division by zero what broke animation transition
+    const maxValueProfile = interpolate(
+      currentProfileIndexSharedValue.value * 3,
+      [
+        (currentUserIndex - 1) * 3,
+        currentUserIndex * 3,
+        (currentUserIndex + 1) * 3,
+      ],
+      [
+        maxValues[(currentUserIndex - 1) * 3 + statsIndex] ?? 0,
+        currentMax,
+        maxValues[(currentUserIndex + 1) * 3 + statsIndex] ?? 0,
+      ],
+    );
 
-      return {
-        height: `${
-          ((interpolateValueProfile + interpolateValuePanel - currentValue) /
-            max) *
-            95 +
-          5
-        }%`,
-      };
-    } else {
-      return {
-        height: `${(currentValue / currentMax) * 100}%`,
-      };
-    }
+    const max = Math.max(1, maxValuePanel + maxValueProfile - currentMax); //Avoid max =0, division by zero what broke animation transition
+
+    return {
+      height: `${
+        ((interpolateValueProfile + interpolateValuePanel - currentValue) /
+          max) *
+          95 +
+        5
+      }%`,
+    };
   });
   return (
     <View
@@ -343,7 +346,7 @@ const AnimatedBarChart = memo(AnimatedBarChartItem);
 
 export type StatsData = {
   contactcardScans: number;
-  webcardViews: number;
+  webCardViews: number;
   likes: number;
 };
 

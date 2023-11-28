@@ -18,26 +18,15 @@ type Query {
     """
     id: ID!
   ): Node
-
   """
   Fetches objects given their IDs
   """
   nodes(
-    """
+  """
     The IDs of objects
     """
     ids: [ID!]!
   ): [Node]!
-
-  """
-  Check if webCard is used
-  """
-  isUserNameUsed(
-    """
-    The user name of the webCard
-    """
-    userName: String!
-  ): Boolean!
    """
   Fetches a published webCard given its user name
   """
@@ -47,10 +36,17 @@ type Query {
     """
     userName: String!
   ): WebCard
-
-
   """
-  Return a list of webcard categories
+  Fetches a profile given its user name
+  """
+  userNameAvailable(
+    """
+    The user name of the profile
+    """
+    userName: String!
+  ): Boolean!
+  """
+  Return a list of profile categories
   """
   webCardCategories: [WebCardCategory!]!
 }

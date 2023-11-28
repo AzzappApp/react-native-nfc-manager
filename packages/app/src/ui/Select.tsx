@@ -8,7 +8,7 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectList from './SelectList';
 import type { SelectListItemInfo } from './SelectList';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 export type SelectItemInfo<ItemT> = SelectListItemInfo<ItemT> & {
@@ -79,6 +79,11 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    * Style of the item container when it is selected in the dropdown list
    */
   selectedItemContainerStyle?: StyleProp<ViewStyle>;
+
+  /**
+   * Style of the input text line
+   * */
+  inputTextStyle?: StyleProp<TextStyle>;
 };
 
 /**
@@ -98,6 +103,7 @@ const Select = <ItemT,>({
   itemContainerStyle,
   selectedItemContainerStyle,
   isErrored,
+  inputTextStyle,
   style,
   ...props
 }: SelectProps<ItemT>) => {
@@ -123,11 +129,18 @@ const Select = <ItemT,>({
     }
     const label = (selectedItem as any)[labelField ?? 'label'];
     return (
-      <Text variant="textField" style={styles.inputText}>
+      <Text variant="textField" style={[styles.inputText, inputTextStyle]}>
         {label}
       </Text>
     );
-  }, [styles.inputText, data, labelField, renderItem, selectedItemIndex]);
+  }, [
+    data,
+    selectedItemIndex,
+    renderItem,
+    labelField,
+    styles.inputText,
+    inputTextStyle,
+  ]);
 
   const onSelectListItemSelected = useCallback(
     (item: ItemT) => {

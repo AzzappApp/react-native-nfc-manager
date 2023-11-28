@@ -193,10 +193,10 @@ const WebCardColorPicker = ({
             />
           ) : (
             <FormattedMessage
-              defaultMessage="Webcard{azzappAp} colors"
+              defaultMessage="Webcard{azzappA} colors"
               description="Webcard ColorPicker component hearder title"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               }}
             />
           )}

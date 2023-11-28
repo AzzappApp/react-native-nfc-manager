@@ -70,10 +70,10 @@ const MediaScreen = ({
                 header={
                   <Text variant="large" style={styles.coversTitleStyle}>
                     <FormattedMessage
-                      defaultMessage="Webcards{azzappAp} to follow"
+                      defaultMessage="Webcards{azzappA} to follow"
                       description="List of suggested profiles"
                       values={{
-                        azzappAp: <Text variant="azzapp">a</Text>,
+                        azzappA: <Text variant="azzapp">a</Text>,
                       }}
                     />
                   </Text>

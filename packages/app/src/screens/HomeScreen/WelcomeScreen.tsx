@@ -74,10 +74,10 @@ const WelcomeScreen = () => {
         </Text>
         <Text style={styles.subtitle}>
           <FormattedMessage
-            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappA}."
             description="Subtitle for welcome screen"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
         </Text>
@@ -85,11 +85,11 @@ const WelcomeScreen = () => {
           <Button
             label={intl.formatMessage(
               {
-                defaultMessage: 'Create my first webcard{azzappAp}',
+                defaultMessage: 'Create my first webcard{azzappA}',
                 description: 'Button label for welcome screen',
               },
               {
-                azzappAp: (
+                azzappA: (
                   <Text style={styles.icon} variant="azzapp">
                     a
                   </Text>

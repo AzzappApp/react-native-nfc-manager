@@ -132,20 +132,20 @@ const useToggleFollow = (userNameFilter?: string) => {
       text1: (follow
         ? intl.formatMessage(
             {
-              defaultMessage: 'You started to follow this Webcard{azzappAp}',
+              defaultMessage: 'You started to follow this Webcard{azzappA}',
               description: 'Toast message when user follows a profile',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           )
         : intl.formatMessage(
             {
-              defaultMessage: 'You no longer follow this Webcard{azzappAp}',
+              defaultMessage: 'You no longer follow this Webcard{azzappA}',
               description: 'Toast message when user unfollows a profile',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           )) as string,
     });

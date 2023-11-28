@@ -148,11 +148,11 @@ const MainTabBar = ({
       key: 'HOME',
       label: intl.formatMessage(
         {
-          defaultMessage: 'Webcards{azzappAp}',
+          defaultMessage: 'Webcards{azzappA}',
           description: 'Main tab bar title for webcards',
         },
         {
-          azzappAp: <Text variant="azzapp">a</Text>,
+          azzappA: <Text variant="azzapp">a</Text>,
         },
       ),
       IconComponent: <HomeIcon />,

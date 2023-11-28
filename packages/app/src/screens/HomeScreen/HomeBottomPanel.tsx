@@ -155,11 +155,11 @@ const HomeBottomPanel = ({
             type: 'success',
             text1: intl.formatMessage(
               {
-                defaultMessage: 'Your WebCard{azzappAp} has been published.',
+                defaultMessage: 'Your WebCard{azzappA} has been published.',
                 description: 'Home Screen - webcard published toast',
               },
               {
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               },
             ) as string,
           });
@@ -171,12 +171,12 @@ const HomeBottomPanel = ({
             text1: intl.formatMessage(
               {
                 defaultMessage:
-                  'Error, could not publish your WebCard{azzappAp}, please try again later',
+                  'Error, could not publish your WebCard{azzappA}, please try again later',
                 description:
                   'Error message displayed when the publication of the webcard failed in Home Screen',
               },
               {
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               },
             ) as string,
           });
@@ -515,10 +515,10 @@ const HomeBottomPanel = ({
       <Animated.View style={[styles.informationPanel, newCardPanelStyle]}>
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="Create a new WebCard{azzappAp}"
+            defaultMessage="Create a new WebCard{azzappA}"
             description="Home Screen - Create a new WebCard"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text variant="azzapp" style={styles.icon}>
                   a
                 </Text>
@@ -528,10 +528,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappA}."
             description="Home Screen - Create a new webcard description"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text variant="azzapp" style={styles.icon}>
                   a
                 </Text>
@@ -545,10 +545,10 @@ const HomeBottomPanel = ({
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} needs a cover"
+            defaultMessage="This WebCard{azzappA} needs a cover"
             description="Home Screen - Missing cover title"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -558,10 +558,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} has no cover and can’t be published."
+            defaultMessage="This WebCard{azzappA} has no cover and can’t be published."
             description="Home Screen - Missing cover text"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -582,10 +582,10 @@ const HomeBottomPanel = ({
             appearance="dark"
             label={
               <FormattedMessage
-                defaultMessage="Create your WebCard{azzappAp} cover"
+                defaultMessage="Create your WebCard{azzappA} cover"
                 description="Home Screen - Missing cover button"
                 values={{
-                  azzappAp: (
+                  azzappA: (
                     <Text style={styles.icon} variant="azzapp">
                       a
                     </Text>
@@ -604,10 +604,10 @@ const HomeBottomPanel = ({
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} is not published"
+            defaultMessage="This WebCard{azzappA} is not published"
             description="Home Screen - webcard not published title"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -617,10 +617,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} has not been published, nobody can see it for the moment."
+            defaultMessage="This WebCard{azzappA} has not been published, nobody can see it for the moment."
             description="Home Screen - webcard not published text"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -633,10 +633,10 @@ const HomeBottomPanel = ({
           appearance="dark"
           label={
             <FormattedMessage
-              defaultMessage="Publish this WebCard{azzappAp}"
+              defaultMessage="Publish this WebCard{azzappA}"
               description="Home Screen - webcard not published button"
               values={{
-                azzappAp: (
+                azzappA: (
                   <Text style={styles.icon} variant="azzapp">
                     a
                   </Text>
@@ -658,11 +658,11 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage={`{email} invited you to the WebCard{azzappAp} {company}`}
+            defaultMessage={`{email} invited you to the WebCard{azzappA} {company}`}
             description="Home bottom panel invitation"
             values={{
               email: currentProfile?.webCard?.owner?.email ?? '',
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -709,11 +709,11 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage={`{email} wants to transfer the ownership of this WebCard{azzappAp} to your`}
+            defaultMessage={`{email} wants to transfer the ownership of this WebCard{azzappA} to your`}
             description="Home bottom panel transfer ownership request"
             values={{
               email: currentProfile?.webCard?.owner?.email ?? '',
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -769,7 +769,6 @@ const HomeBottomPanel = ({
           <HomeStatistics
             user={user}
             height={panelHeight}
-            animated={selectedPanel === 'STATS'}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             currentUserIndex={currentProfileIndex}
           />

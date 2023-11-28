@@ -78,6 +78,7 @@ import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
+import WebcardParametersScreen from '#screens/WebcardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -187,6 +188,7 @@ const screens = {
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
+  WEBCARD_PARAMETERS: WebcardParametersScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
   CONTACT_CARD: ContactCardScreen,
   ONBOARDING: WelcomeScreen,

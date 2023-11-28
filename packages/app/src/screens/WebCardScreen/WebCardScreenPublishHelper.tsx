@@ -62,12 +62,12 @@ const WebCardScreenPublishHelper = ({
         text1: intl.formatMessage(
           {
             defaultMessage:
-              'Tap on a section of your WebCard{azzappAp} to modify it',
+              'Tap on a section of your WebCard{azzappA} to modify it',
             description:
               'Toast info message that appears when the user is in webcard edit mode for the first time',
           },
           {
-            azzappAp: <Text variant="azzapp">a</Text>,
+            azzappA: <Text variant="azzapp">a</Text>,
           },
         ) as string,
         props: {
@@ -106,11 +106,11 @@ const WebCardScreenPublishHelper = ({
           text1: intl.formatMessage(
             {
               defaultMessage:
-                'Error, could not publish your WebCard{azzappAp}, try again later',
+                'Error, could not publish your WebCard{azzappA}, try again later',
               description: 'Publish modal error toast',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           ) as string,
         });
@@ -172,10 +172,10 @@ const WebCardScreenPublishHelper = ({
             onPress={onPublish}
             label={
               <FormattedMessage
-                defaultMessage="Ok, publish my WebCard{azzappApp}!"
+                defaultMessage="Ok, publish my WebCard{azzappA}!"
                 description="Publish modal publish button label"
                 values={{
-                  azzappApp: (
+                  azzappA: (
                     <Text style={styles.icon} variant="azzapp">
                       a
                     </Text>

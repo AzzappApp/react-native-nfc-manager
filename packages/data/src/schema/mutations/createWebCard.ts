@@ -8,9 +8,9 @@ import {
   db,
   getCompanyActivitiesByWebCardCategory,
   getWebCardCategoryById,
-  getWebCardByUserName,
   buildDefaultContactCard,
   createProfile,
+  getWebCardByUserNameWithRedirection,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
@@ -67,8 +67,8 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (await getWebCardByUserName(userName)) {
-    throw new Error(ERRORS.USERNAME_ALREADY_EXISTS);
+  if (await getWebCardByUserNameWithRedirection(userName)) {
+    throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
   }
 
   const inputWebCard = {
@@ -79,6 +79,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     webCardCategoryId,
     companyActivityId: companyActivityId ?? null,
     companyName: companyName ?? null,
+    lastUserNameUpdate: new Date(),
   };
 
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);

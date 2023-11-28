@@ -180,10 +180,10 @@ const WebCardModal = ({
                 <Icon icon="share" />
                 <Text>
                   <FormattedMessage
-                    defaultMessage="Share this Webcard{azzappAp}"
+                    defaultMessage="Share this Webcard{azzappA}"
                     description="Profile webcard modal - Share thie Webcard"
                     values={{
-                      azzappAp: <Text variant="azzapp">a</Text>,
+                      azzappA: <Text variant="azzapp">a</Text>,
                     }}
                   />
                 </Text>

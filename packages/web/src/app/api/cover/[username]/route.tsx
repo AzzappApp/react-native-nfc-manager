@@ -1,7 +1,10 @@
 import { ImageResponse } from '@vercel/og';
 import cx from 'classnames';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getMediasByIds, getWebCardByUserName } from '@azzapp/data/domains';
+import {
+  getMediasByIds,
+  getWebCardByUserNameWithRedirection,
+} from '@azzapp/data/domains';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -79,7 +82,7 @@ export const GET = async (
     return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
   }
 
-  const webCard = await getWebCardByUserName(username);
+  const webCard = await getWebCardByUserNameWithRedirection(username);
 
   if (webCard?.cardIsPublished) {
     const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;

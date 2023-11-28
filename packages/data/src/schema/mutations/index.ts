@@ -21,7 +21,7 @@ import {
   saveSocialLinksModule,
 } from './ModulesMutationsResolvers';
 import togglePostReaction from './postReaction';
-import publishCard from './publishCard';
+import { publishCard, unpublishCard } from './publishCard';
 import removeFollower from './removeFollower';
 import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
@@ -40,6 +40,7 @@ import {
 } from './updateStatistic';
 import updateUser from './updateUser';
 import updateWebCard from './updateWebCard';
+import updateWebCardUserName from './updateWebCardUserName';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 export const Mutation: MutationResolvers = {
@@ -51,6 +52,7 @@ export const Mutation: MutationResolvers = {
   duplicateModule,
   loadCardTemplate,
   publishCard,
+  unpublishCard,
   removeFollower,
   reorderModules,
   saveSimpleTextModule,
@@ -81,4 +83,5 @@ export const Mutation: MutationResolvers = {
   acceptOwnership,
   declineOwnership,
   inviteUser,
+  updateWebCardUserName,
 };

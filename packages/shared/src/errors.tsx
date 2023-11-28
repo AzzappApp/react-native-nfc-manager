@@ -28,6 +28,11 @@ const ERRORS = {
    */
   USERNAME_ALREADY_EXISTS: 'USERNAME_ALREADY_EXISTS',
   /**
+   * The username cannot be changed
+   * This may happen when a user tries to change is userName to often(minimum delay between change not fill).
+   */
+  USERNAME_CHANGE_NOT_ALLOWED_DELAY: 'USERNAME_CHANGE_NOT_ALLOWED_DELAY',
+  /**
    * The requested resource was not found.
    * This may happen when a user tries to access a resource that does not exist.
    */

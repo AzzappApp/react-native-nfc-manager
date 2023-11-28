@@ -33,8 +33,6 @@ describe('Signin Screen', () => {
 
     expect(buttonComponent).toBeDisabled();
     act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
-    console.log(passwordInput);
-    console.log(passwordInput.props.value);
     expect(passwordInput.props.value).toBe('myPassword');
   });
 

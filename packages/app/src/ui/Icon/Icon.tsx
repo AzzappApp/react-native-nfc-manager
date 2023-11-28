@@ -283,11 +283,17 @@ const icons = {
   get more() {
     return require('./assets/more.png');
   },
+  get multi_user() {
+    return require('./assets/multi-user.png');
+  },
   get notification() {
     return require('./assets/notification.png');
   },
   get palette() {
     return require('./assets/palette.png');
+  },
+  get parameters() {
+    return require('./assets/parameters.png');
   },
   get preview() {
     return require('./assets/preview.png');
@@ -417,9 +423,6 @@ const icons = {
   },
   get trash() {
     return require('./assets/trash.png');
-  },
-  get multi_user() {
-    return require('./assets/multi-user.png');
   },
 } as const;
 

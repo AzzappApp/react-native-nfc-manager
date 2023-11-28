@@ -29,7 +29,6 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
 
   try {
     await db.transaction(async trx => {
-      console.log('coucoup');
       await updateWebCard(profile.webCardId, updates, trx);
       if (!isMultiUser) {
         await trx
@@ -47,7 +46,6 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
   const webCard = await loaders.WebCard.load(profile.webCardId);
-  console.log({ webCard });
   if (!webCard) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }

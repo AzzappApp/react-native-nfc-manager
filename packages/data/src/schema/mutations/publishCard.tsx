@@ -22,6 +22,7 @@ const publishCard: MutationResolvers['publishCard'] = async (
 
   const updates = {
     cardIsPublished: true,
+    alreadyPublished: true,
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
   };
@@ -48,4 +49,45 @@ const publishCard: MutationResolvers['publishCard'] = async (
   };
 };
 
-export default publishCard;
+const unpublishCard: MutationResolvers['unpublishCard'] = async (
+  _,
+  _args,
+  { auth, loaders, cardUsernamesToRevalidate },
+) => {
+  const profileId = auth.profileId;
+  if (!profileId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile || !isAdmin(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const updates = {
+    cardIsPublished: false,
+    updatedAt: new Date(),
+    lastCardUpdate: new Date(),
+  };
+  try {
+    await updateWebCard(profile.webCardId, updates);
+  } catch (e) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
+  return {
+    webCard: {
+      ...webCard,
+      ...updates,
+    },
+  };
+};
+
+export { publishCard, unpublishCard };

@@ -5,9 +5,9 @@ extend type Mutation {
 input UpdateWebCardInput {
   firstName: String
   lastName: String
-  profileKind: WebCardKind
+  webCardKind: WebCardKind
   companyName: String
-  profileCategoryId: ID
+  webCardCategoryId: ID
   companyActivityId: ID
 }
 

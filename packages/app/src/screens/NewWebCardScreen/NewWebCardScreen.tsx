@@ -177,11 +177,11 @@ export const NewWebCardScreen = ({
     {
       title: intl.formatMessage(
         {
-          defaultMessage: 'Select a WebCard{azzappAp} type',
+          defaultMessage: 'Select a WebCard{azzappA} type',
           description: 'WebCard kind selection screen title',
         },
         {
-          azzappAp: <Text variant="azzapp">a</Text>,
+          azzappA: <Text variant="azzapp">a</Text>,
         },
       ) as string,
       element: (

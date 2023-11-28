@@ -11,7 +11,6 @@ type Profile implements Node {
   contactCardIsPrivate: Boolean!
   contactCardDisplayedOnWebCard: Boolean!
   lastContactCardUpdate: DateTime!
-
   """
   the number of total time the card was scan
   """
