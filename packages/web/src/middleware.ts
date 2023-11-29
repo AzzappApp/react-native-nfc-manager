@@ -3,7 +3,6 @@ import { getRedirectWebCardByUserName } from '@azzapp/data/domains';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import type { NextRequest } from 'next/server';
 
-const PUBLIC_FILE = /\.(.*)$/;
 export async function middleware(request: NextRequest) {
   const { nextUrl, headers } = request;
   let locale =
@@ -15,13 +14,6 @@ export async function middleware(request: NextRequest) {
 
   if (!SUPPORTED_LOCALES.includes(locale)) {
     locale = DEFAULT_LOCALE;
-  }
-
-  if (
-    PUBLIC_FILE.test(nextUrl.pathname) ||
-    nextUrl.pathname.startsWith('/api')
-  ) {
-    return undefined;
   }
 
   const url = nextUrl.clone();
@@ -52,6 +44,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.*|site.*).*)',
   ],
 };
