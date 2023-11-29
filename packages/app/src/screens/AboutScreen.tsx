@@ -31,9 +31,7 @@ const aboutScreenWebCardQuery = graphql`
 const AboutScreen = ({
   preloadedQuery,
 }: RelayScreenProps<AboutRoute, AboutScreenWithoutProfileQuery>) => {
-  const preloaded = usePreloadedQuery(aboutScreenWebCardQuery, preloadedQuery);
-  const viewer = 'viewer' in preloaded ? preloaded.viewer : null;
-  const profile = viewer?.profile;
+  const { viewer } = usePreloadedQuery(aboutScreenWebCardQuery, preloadedQuery);
 
   const intl = useIntl();
 
@@ -46,7 +44,7 @@ const AboutScreen = ({
         }}
       >
         <AccountHeader
-          webCard={profile?.webCard ?? null}
+          webCard={viewer?.profile?.webCard ?? null}
           title={intl.formatMessage({
             defaultMessage: 'About',
             description: 'Title of the about screen',

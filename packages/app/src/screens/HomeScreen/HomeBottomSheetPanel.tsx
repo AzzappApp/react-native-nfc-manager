@@ -111,7 +111,7 @@ const HomeBottomSheetPanel = ({
   return (
     <BottomSheetModal
       visible={visible}
-      height={bottom + 300}
+      height={bottom + (withProfile ? 330 : 220)}
       contentContainerStyle={styles.bottomSheetContainer}
       onDismiss={onDismiss}
       onRequestClose={close}
