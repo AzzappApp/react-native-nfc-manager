@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -61,37 +62,15 @@ const AccountDetailsPhoneNumberForm = ({
     control,
     handleSubmit,
     setError,
-    clearErrors,
     formState: { isSubmitting, errors },
   } = useForm<PhoneNumberForm>({
-    resolver: data => {
-      clearErrors();
-      const res = phoneNumberFormSchema.safeParse(data);
-
-      if (res.success) {
-        return {
-          values: data,
-          errors: {},
-        };
-      } else {
-        return {
-          values: {},
-          errors: {
-            phoneNumber: {
-              type: 'validation',
-              message: res.error.errors[0].message,
-            },
-          },
-        };
-      }
-    },
+    resolver: zodResolver(phoneNumberFormSchema),
     defaultValues: {
       phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
       countryCode:
         parsedPhoneNumber?.country ??
         (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
     },
-    mode: 'onChange',
   });
 
   const intl = useIntl();
