@@ -1,5 +1,6 @@
-## 0.5.2-canary.20
+## 0.5.2-canary.21
 
+* **fix:**  - **post:** [#1804](https://github.com/AzzappApp/azzapp/pull/1804) add singular version of likes ([#1873](https://github.com/AzzappApp/azzapp/pull/1873))
 * **build:**  - fix podfile.lock
 * **build:**  - rollback upgrade of reanimated
 * **build:**  - remove version set of nodejs
