@@ -1,3 +1,4 @@
+import { capitalize } from 'lodash';
 import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import {
@@ -19,7 +20,9 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { CoverRenderer, ModuleRenderer } from '#components';
+import { getMetaData } from '#helpers/seo';
 import WebCardPageLayout from './WebCardPageLayout';
+import type { Metadata } from 'next';
 
 type ProfilePageProps = {
   params: {
@@ -141,5 +144,21 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
 export default ProfilePage;
 
 export const dynamic = 'force-static';
+
+export async function generateMetadata({
+  params,
+}: ProfilePageProps): Promise<Metadata> {
+  const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
+    params.userName
+  }?width=${1200}&height=${1200}&keepAspectRatio=left_pad`;
+
+  const meta = getMetaData({
+    url: params.userName,
+    title: capitalize(params.userName),
+    ogImage: imageUrl,
+    description: `${params.userName} | Azzapp WebCard`,
+  });
+  return meta;
+}
 
 export const revalidate = 3600;

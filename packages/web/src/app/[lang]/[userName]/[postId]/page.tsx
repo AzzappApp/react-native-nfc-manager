@@ -1,3 +1,4 @@
+import { capitalize } from 'lodash';
 import { unstable_cache } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 import {
@@ -7,12 +8,15 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
+import { getImageURL, getImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import PostFeedHeader from '../PostFeed/PostFeedHeader';
 import CommentFeed from './CommentFeed';
 import CommentFeedSeeMore from './CommentFeedSeeMore';
 import styles from './PostPage.css';
+import type { SocialMetas } from '#helpers/seo';
 import type { Metadata } from 'next';
 
 type PostPageProps = {
@@ -123,9 +127,18 @@ const PostPage = async (props: PostPageProps) => {
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  return {
-    title: params.userName,
-  };
+  const post = await getPostByIdWithMedia(params.postId);
+
+  const metaData = {
+    url: `${params.userName}/${params.postId}`,
+    title: `${capitalize(params.userName)} Post`,
+    description: `Post for Azzapp WebCard ${params.userName} `,
+  } as SocialMetas;
+
+  if (post?.medias && post.medias.length > 0) {
+    metaData.ogImage = getImageURLForSize(post.medias[0].id, 1200, null);
+  }
+  return getMetaData(metaData);
 }
 
 export default PostPage;
