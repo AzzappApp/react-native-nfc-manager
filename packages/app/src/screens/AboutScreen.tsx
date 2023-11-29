@@ -13,15 +13,10 @@ import Text from '#ui/Text';
 
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AboutRoute } from '#routes';
-import type { AboutScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AboutScreenWithoutProfileQuery.graphql';
-import type { AboutScreenWithProfileQuery } from '@azzapp/relay/artifacts/AboutScreenWithProfileQuery.graphql';
+import type { AboutScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AboutScreenWebCardQuery.graphql';
 
-const aboutScreenWithProfileQuery = graphql`
-  query AboutScreenWithProfileQuery {
-    currentUser {
-      email
-      phoneNumber
-    }
+const aboutScreenWebCardQuery = graphql`
+  query AboutScreenWithWebCardQuery {
     viewer {
       profile {
         webCard {
@@ -33,28 +28,10 @@ const aboutScreenWithProfileQuery = graphql`
   }
 `;
 
-const aboutScreenWithoutProfileQuery = graphql`
-  query AboutScreenWithoutProfileQuery {
-    currentUser {
-      email
-      phoneNumber
-    }
-  }
-`;
-
 const AboutScreen = ({
   preloadedQuery,
-  route: { params },
-}: RelayScreenProps<
-  AboutRoute,
-  AboutScreenWithoutProfileQuery | AboutScreenWithProfileQuery
->) => {
-  const preloaded = usePreloadedQuery(
-    params.withProfile
-      ? aboutScreenWithProfileQuery
-      : aboutScreenWithoutProfileQuery,
-    preloadedQuery,
-  );
+}: RelayScreenProps<AboutRoute, AboutScreenWithoutProfileQuery>) => {
+  const preloaded = usePreloadedQuery(aboutScreenWebCardQuery, preloadedQuery);
   const viewer = 'viewer' in preloaded ? preloaded.viewer : null;
   const profile = viewer?.profile;
 
@@ -138,11 +115,7 @@ const AboutScreen = ({
 };
 
 export default relayScreen(AboutScreen, {
-  query: params =>
-    params.withProfile
-      ? aboutScreenWithProfileQuery
-      : aboutScreenWithoutProfileQuery,
-  webCardBound: params => params.withProfile,
+  query: aboutScreenWebCardQuery,
 });
 
 const styles = StyleSheet.create({
