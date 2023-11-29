@@ -13,8 +13,15 @@ import {
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
-const MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME = 30;
-const REDIRECTION_DAY_EXPIRATION = 30;
+const USERNAME_CHANGE_DELAY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
+  10,
+);
+
+const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
+  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '30',
+  10,
+);
 
 const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] =
   async (
@@ -43,25 +50,31 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     if (!webCard) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-
+    // Get the current date and time
     const now = new Date();
-    const previousDate = new Date();
-    previousDate.setDate(
-      now.getDate() - MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME,
-    );
-
     // Convert lastUpdate to a Date object
     const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
-
-    // Check if lastUpdate is earlier than thirtyDaysAgo
-    if (lastUpdateDate >= previousDate) {
+    // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
+    const nextChangeDate = new Date();
+    nextChangeDate.setDate(
+      lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+    );
+    // Check if lastUpdate is earlier than thirtyDaysAgo;
+    if (nextChangeDate > now) {
       throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY);
     }
 
     const { userName } = args.input;
 
+    //avoid h4ving the same value
+    if (webCard.userName === userName) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + REDIRECTION_DAY_EXPIRATION);
+    expiresAt.setDate(
+      expiresAt.getDate() + USERNAME_REDIRECTION_AVAILABILITY_DAY,
+    );
 
     try {
       await db.transaction(async trx => {

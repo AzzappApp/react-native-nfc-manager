@@ -28,7 +28,10 @@ import type {
 import type { WebcardParametersScreenUnPublishMutation } from '@azzapp/relay/artifacts/WebcardParametersScreenUnPublishMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
-const MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME = 0;
+const USERNAME_CHANGE_DELAY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
+  10,
+);
 
 const webcardParametersScreenQuery = graphql`
   query WebcardParametersScreenQuery {
@@ -170,23 +173,23 @@ const WebcardParametersScreen = ({
   );
 
   const canChangeUserName = useMemo(() => {
-    if (!webCard?.alreadyPublished) {
+    if (!webCard || webCard?.alreadyPublished === false) {
       return true;
     }
     // Get the current date and time
     const now = new Date();
 
-    // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-    const previousDate = new Date();
-    previousDate.setDate(
-      now.getDate() - MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME,
-    );
-
     // Convert lastUpdate to a Date object
     const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
 
-    // Check if lastUpdate is earlier than thirtyDaysAgo
-    if (lastUpdateDate < previousDate) {
+    // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
+    const nextChangeDate = new Date();
+    nextChangeDate.setDate(
+      lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+    );
+
+    // Check if lastUpdate is earlier than USERNAME_CHANGE_DELAY_DAY day
+    if (nextChangeDate < now) {
       return true;
     } else {
       return false;
@@ -197,11 +200,11 @@ const WebcardParametersScreen = ({
     // Calculate the next available date for changing the username
     if (webCard) {
       const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
-
-      lastUpdateDate.setDate(
-        lastUpdateDate.getDate() + MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME,
+      // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
+      const nextChangeDate = new Date();
+      nextChangeDate.setDate(
+        lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
       );
-
       // Get the current date
       const currentDate = new Date();
 
@@ -209,7 +212,8 @@ const WebcardParametersScreen = ({
       const diffTime = Math.abs(
         lastUpdateDate.getTime() - currentDate.getTime(),
       );
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return Math.round(diffTime / (1000 * 60 * 60 * 24));
     }
     return 0;
   }, [webCard]);
@@ -290,7 +294,7 @@ const WebcardParametersScreen = ({
             defaultMessage="You can only change your WebCard{azzappA} name every {dayInterval} days."
             description="Description message for userName field in webcard parameters"
             values={{
-              dayInterval: MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME,
+              dayInterval: USERNAME_CHANGE_DELAY_DAY,
               azzappA: <Text variant="azzapp">a</Text>,
             }}
           />

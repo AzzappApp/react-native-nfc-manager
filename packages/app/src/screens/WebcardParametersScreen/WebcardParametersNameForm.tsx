@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import {
   fetchQuery,
@@ -12,6 +12,7 @@ import { useDebounce } from 'use-debounce';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
+import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -19,6 +20,11 @@ import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { WebcardParametersNameFormQuery } from '@azzapp/relay/artifacts/WebcardParametersNameFormQuery.graphql';
 import type { GraphQLError } from 'graphql';
+
+const USERNAME_CHANGE_DELAY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
+  10,
+);
 
 const userNameFormSchema = z.object({
   userName: z.string().refine(userName => isValidUserName(userName), {
@@ -80,7 +86,7 @@ const WebcardParametersNameForm = ({
               };
             }
           } catch (e) {
-            //waiting for submit
+            //waiting for submi5
           }
         }
 
@@ -158,6 +164,30 @@ const WebcardParametersNameForm = ({
                 'WebcardParameters Name form - Error This userName is already used ',
             }),
           });
+        } else if (
+          response?.errors.some(
+            r => r.message === ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY,
+          )
+        ) {
+          //it should not happen unless we have different value between server and client
+          setError('root.server', {
+            message: intl.formatMessage(
+              {
+                defaultMessage:
+                  'You can only change your WebCard{azzappA} name every {dayInterval} days.',
+                description:
+                  'WebcardParameters Name form - Error This userName is already used ',
+              },
+              {
+                azzappA: (
+                  <Text variant="azzapp" style={{ color: colors.red400 }}>
+                    a
+                  </Text>
+                ),
+                dayInterval: USERNAME_CHANGE_DELAY_DAY,
+              },
+            ) as string,
+          });
         } else {
           setError('root.server', {
             message: intl.formatMessage({
@@ -204,7 +234,7 @@ const WebcardParametersNameForm = ({
       headerRightButton={
         <Button
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || webCard.userName === userName}
           label={intl.formatMessage({
             defaultMessage: 'Save',
             description: 'Edit Webcard Name modal save button label',
@@ -242,12 +272,7 @@ const WebcardParametersNameForm = ({
         />
       </View>
       {errors.userName ? (
-        <Text variant="error">
-          <FormattedMessage
-            defaultMessage="Please enter a valid userName"
-            description="Error message when the user enters an invalid userName"
-          />
-        </Text>
+        <Text variant="error">{errors.userName.message}</Text>
       ) : null}
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>
