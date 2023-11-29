@@ -13,10 +13,10 @@ import Text from '#ui/Text';
 
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AboutRoute } from '#routes';
-import type { AboutScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AboutScreenWebCardQuery.graphql';
+import type { AboutScreenWebCardQuery } from '@azzapp/relay/artifacts/AboutScreenWebCardQuery.graphql';
 
 const aboutScreenWebCardQuery = graphql`
-  query AboutScreenWithWebCardQuery {
+  query AboutScreenWebCardQuery {
     viewer {
       profile {
         webCard {
@@ -30,7 +30,7 @@ const aboutScreenWebCardQuery = graphql`
 
 const AboutScreen = ({
   preloadedQuery,
-}: RelayScreenProps<AboutRoute, AboutScreenWithoutProfileQuery>) => {
+}: RelayScreenProps<AboutRoute, AboutScreenWebCardQuery>) => {
   const { viewer } = usePreloadedQuery(aboutScreenWebCardQuery, preloadedQuery);
 
   const intl = useIntl();
