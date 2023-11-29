@@ -1,5 +1,6 @@
-## 0.5.2-canary.18
+## 0.5.2-canary.19
 
+* **build:**  - rollback upgrade of reanimated
 * **build:**  - remove version set of nodejs
 * **build:**  - fix yarn.lock
 * **build:**  - upgrade image for ios buid
