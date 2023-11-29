@@ -237,7 +237,11 @@ const PostRendererActionBar = ({
         {allowLikes && (
           <Text variant="smallbold">
             <FormattedMessage
-              defaultMessage="{countReactions} likes"
+              defaultMessage="{countReactions, plural,
+                                    =0 {0 like}
+                                    one {1 like}
+                                    other {# likes}
+                                }"
               description="PastRendererActionBar - Like Counter"
               values={{ countReactions }}
             />
