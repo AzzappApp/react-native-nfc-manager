@@ -1,5 +1,6 @@
-## 0.5.2-canary.19
+## 0.5.2-canary.20
 
+* **build:**  - fix podfile.lock
 * **build:**  - rollback upgrade of reanimated
 * **build:**  - remove version set of nodejs
 * **build:**  - fix yarn.lock
