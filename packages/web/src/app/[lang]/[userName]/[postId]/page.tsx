@@ -8,7 +8,7 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
-import { getImageURL, getImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
