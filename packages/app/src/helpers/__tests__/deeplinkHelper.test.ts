@@ -23,7 +23,22 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile with contactData', async () => {
-    verifySignMock.mockReturnValueOnce(Promise.resolve({ message: 'ok' }));
+    verifySignMock.mockReturnValueOnce(
+      Promise.resolve({
+        urls: [
+          {
+            selected: true,
+            url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+          },
+        ],
+        socials: [
+          {
+            selected: true,
+            url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+          },
+        ],
+      }),
+    );
 
     const compressedCard = compressToEncodedURIComponent(
       JSON.stringify(['contact123', 'sign123']),
@@ -45,6 +60,20 @@ describe('deeplinkHelpers', () => {
       params: {
         userName: '123',
         contactData: 'contact123',
+        additionalContactData: {
+          urls: [
+            {
+              selected: true,
+              url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+            },
+          ],
+          socials: [
+            {
+              selected: true,
+              url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+            },
+          ],
+        },
       },
     });
   });
