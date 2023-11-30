@@ -207,7 +207,7 @@ describe('SignUpScreen', () => {
     act(() => fireEvent(checkboxes[1], 'onPress'));
 
     const passwordError =
-      'Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter';
+      'Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter';
     expect(screen.queryByText(passwordError)).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));
