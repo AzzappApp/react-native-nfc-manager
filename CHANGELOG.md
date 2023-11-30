@@ -1,5 +1,11 @@
-## 0.5.2-canary.24
+## 0.5.2-canary.25
 
+* **fix:**  - clear error message after typing new phone number
+* **fix:**  - renaming request
+* **fix:**  - simplify
+* **fix:**  - completion
+* **followup:**  - multi user refactor
+* **feat:**  - implement About Screen (waiting more spec)
 * **fix:**  - **account:** [#1798](https://github.com/AzzappApp/azzapp/pull/1798) reset password form on opening bottom sheet
 * **feat:**  - improve matcher (checked with logs)
 * **fix:**  - **cover:** [#1765](https://github.com/AzzappApp/azzapp/pull/1765) change border color on dark mode
