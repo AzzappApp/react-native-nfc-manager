@@ -1,5 +1,6 @@
-## 0.5.2-canary.23
+## 0.5.2-canary.24
 
+* **fix:**  - **account:** [#1798](https://github.com/AzzappApp/azzapp/pull/1798) reset password form on opening bottom sheet
 * **feat:**  - improve matcher (checked with logs)
 * **fix:**  - **cover:** [#1765](https://github.com/AzzappApp/azzapp/pull/1765) change border color on dark mode
 * **ui:**  - enhance borders with borderCurve
