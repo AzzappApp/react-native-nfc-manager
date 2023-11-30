@@ -249,7 +249,7 @@ const SignupScreen = () => {
             <Text style={styles.error} variant="error">
               {showPasswordError && (
                 <FormattedMessage
-                  defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                  defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
                   description="Signup Screen - error message when password is not compliant with our rules"
                 />
               )}
