@@ -1,10 +1,11 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
 import { FLOATING_BUTTON_SIZE } from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -54,6 +55,7 @@ const CoverEditorSuggestionButton = ({
       ),
     };
   });
+  const styles = useStyleSheet(styleSheet);
 
   if (!sourceMedia && !hasSuggestedMedia) {
     return null;
@@ -113,12 +115,12 @@ const CoverEditorSuggestionButton = ({
 
 export default CoverEditorSuggestionButton;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   mediaHideButton: {
     width: FLOATING_BUTTON_SIZE,
     height: FLOATING_BUTTON_SIZE,
     borderRadius: FLOATING_BUTTON_SIZE / 2,
-    borderColor: colors.black,
+    borderColor: appearance === 'light' ? colors.black : colors.white,
     borderWidth: 1,
     borderStyle: 'solid',
     display: 'flex',
@@ -137,4 +139,4 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-});
+}));
