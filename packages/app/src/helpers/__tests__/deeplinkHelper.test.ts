@@ -28,12 +28,13 @@ describe('deeplinkHelpers', () => {
         urls: [
           {
             selected: true,
-            url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+            address: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
           },
         ],
         socials: [
           {
             selected: true,
+            label: 'LinkedIn',
             url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
           },
         ],
@@ -64,12 +65,13 @@ describe('deeplinkHelpers', () => {
           urls: [
             {
               selected: true,
-              url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+              address: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
             },
           ],
           socials: [
             {
               selected: true,
+              label: 'LinkedIn',
               url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
             },
           ],
