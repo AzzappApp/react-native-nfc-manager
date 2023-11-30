@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     aspectRatio: CONTACT_CARD_RATIO,
     overflow: 'visible',
     flexDirection: 'row',
+    borderCurve: 'continuous',
   },
   logo: { zIndex: 1 },
   webCardBackground: {
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
     top: 0,
     overflow: 'hidden',
     bottom: 0,
+    borderCurve: 'continuous',
   },
   webCardBackgroundImage: {
     position: 'absolute',

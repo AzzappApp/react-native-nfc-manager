@@ -352,6 +352,7 @@ const styles = StyleSheet.create({
   root: {
     aspectRatio: COVER_RATIO,
     overflow: 'hidden',
+    borderCurve: 'continuous',
   },
   layer: {
     position: 'absolute',

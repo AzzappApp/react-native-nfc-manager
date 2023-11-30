@@ -118,6 +118,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
+      borderCurve: 'continuous',
       paddingHorizontal: 20,
     },
     label: {
