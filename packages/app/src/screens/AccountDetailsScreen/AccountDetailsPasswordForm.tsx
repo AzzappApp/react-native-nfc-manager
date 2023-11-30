@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -34,6 +34,7 @@ const AccountDetailsPasswordForm = ({
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
+    reset,
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordFormSchema),
     defaultValues: {
@@ -41,6 +42,12 @@ const AccountDetailsPasswordForm = ({
       newPassword: '',
     },
   });
+
+  useEffect(() => {
+    if (visible) {
+      reset();
+    }
+  }, [reset, visible]);
 
   const intl = useIntl();
 
