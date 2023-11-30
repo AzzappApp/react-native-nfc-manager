@@ -72,7 +72,7 @@ export const matchUrlWithRoute = async (
 
       if (signature && contactData) {
         try {
-          await verifySign({
+          const additionalContactData = await verifySign({
             signature,
             data: contactData,
             salt: username,
@@ -83,6 +83,7 @@ export const matchUrlWithRoute = async (
             params: {
               userName: username,
               contactData,
+              additionalContactData,
             },
           };
         } catch {

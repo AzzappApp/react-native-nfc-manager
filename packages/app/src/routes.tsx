@@ -1,5 +1,6 @@
 import { isEqual } from 'lodash';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { LayoutRectangle } from 'react-native';
 
 export type AboutRoute = {
@@ -61,6 +62,7 @@ export type WebCardRoute = {
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
+    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
     editing?: boolean;
   };
 };

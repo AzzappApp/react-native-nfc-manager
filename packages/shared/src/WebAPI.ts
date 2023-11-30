@@ -3,6 +3,7 @@
  */
 import { fetchJSON, postFormData } from './networkHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
+import type { ContactCard } from 'contactCardHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
 
@@ -210,7 +211,7 @@ export const uploadMedia = (
  */
 export const verifySign: APIMethod<
   { signature: string; data: string; salt: string },
-  { message: string }
+  Pick<ContactCard, 'socials' | 'urls'>
 > = async ({ signature, data, salt }, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {
     ...init,

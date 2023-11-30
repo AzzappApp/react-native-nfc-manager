@@ -11,6 +11,8 @@ import { useIntl } from 'react-intl';
 import { Alert, Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { Contact } from 'expo-contacts';
 
 export const storage = new MMKV({
@@ -18,7 +20,9 @@ export const storage = new MMKV({
 });
 
 type WebCardScreenContactDownloaderProps = {
+  userName?: string;
   contactData: string | null | undefined;
+  additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
   webCard:
     | {
         readonly id: string;
@@ -30,12 +34,17 @@ type WebCardScreenContactDownloaderProps = {
 
 const WebCardScreenContactDownloader = ({
   contactData,
+  additionalContactData,
   webCard,
 }: WebCardScreenContactDownloaderProps) => {
   const intl = useIntl();
   useEffect(() => {
     if (contactData && webCard) {
-      const { contact, webCardId } = buildContact(contactData);
+      const { contact, webCardId } = buildContact(
+        contactData,
+        additionalContactData,
+        webCard.userName,
+      );
       if (webCardId === fromGlobalId(webCard.id).id) {
         Alert.alert(
           intl.formatMessage(
@@ -97,14 +106,18 @@ const WebCardScreenContactDownloader = ({
         );
       }
     }
-  }, [intl, contactData, webCard]);
+  }, [intl, contactData, webCard, additionalContactData]);
 
   return null;
 };
 
 export default WebCardScreenContactDownloader;
 
-const buildContact = (contactCardData: string) => {
+const buildContact = (
+  contactCardData: string,
+  additionalContactData: WebCardScreenContactDownloaderProps['additionalContactData'],
+  userName?: string,
+) => {
   const {
     profileId,
     webCardId,
@@ -114,7 +127,6 @@ const buildContact = (contactCardData: string) => {
     title,
     phoneNumbers,
     emails,
-    urls,
   } = parseContactCard(contactCardData);
 
   const contact: Contact = {
@@ -137,11 +149,22 @@ const buildContact = (contactCardData: string) => {
       isPrimary: email[0] === 'Main',
       id: `${profileId}-${email[1]}`,
     })),
-    urlAddresses: urls.map(url => ({
-      label: url[0],
-      url: url[1],
-      id: `${profileId}-${url[1]}`,
-    })),
+    urlAddresses: (userName
+      ? [
+          {
+            label: 'azzapp',
+            url: buildUserUrl(userName),
+            id: `${profileId}-azzapp`,
+          },
+        ]
+      : []
+    ).concat(
+      additionalContactData?.urls?.map(url => ({
+        label: '',
+        url: url.address,
+        id: `${profileId}-${url.address}`,
+      })) ?? [],
+    ),
   };
 
   return { contact, webCardId };

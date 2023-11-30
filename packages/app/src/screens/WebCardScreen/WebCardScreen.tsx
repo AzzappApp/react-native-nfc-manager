@@ -396,8 +396,10 @@ const WebCardScreen = ({
         />
       </WebCardScreenTransitionsProvider>
       <WebCardScreenContactDownloader
+        userName={data.webCard.userName}
         webCard={data.webCard}
         contactData={params.contactData}
+        additionalContactData={params.additionalContactData}
       />
       <Suspense fallback={null}>
         <WebCardScreenPublishHelper webCard={data.webCard} editMode={editing} />

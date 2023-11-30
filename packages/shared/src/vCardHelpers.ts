@@ -1,12 +1,18 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
+import { buildUserUrl } from './urlHelpers';
+import type { ContactCard } from './contactCardHelpers';
 
 /**
  * Generates a vCard from a serialized contact card
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
-export const buildVCard = (contactCardData: string) => {
+export const buildVCard = (
+  userName: string,
+  contactCardData: string,
+  additionalData?: Pick<ContactCard, 'socials' | 'urls'> | null,
+) => {
   const contactCard = parseContactCard(contactCardData);
 
   const vcard = new VCard();
@@ -38,8 +44,10 @@ export const buildVCard = (contactCardData: string) => {
         : `type=${phone[0].toLocaleUpperCase()}`,
     );
   });
-  contactCard.urls.forEach(url => {
-    vcard.addURL(url[1], url[0]);
+
+  vcard.addURL(buildUserUrl(userName), 'azzapp');
+  additionalData?.urls?.forEach(url => {
+    vcard.addURL(url.address, '');
   });
 
   contactCard.addresses.forEach(address => {
@@ -49,10 +57,10 @@ export const buildVCard = (contactCardData: string) => {
   if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday)))
     vcard.addBirthday(contactCard.birthday.split('T')[0]);
 
-  contactCard.socials.forEach(social => {
+  additionalData?.socials?.forEach(social => {
     vcard.addSocial(
-      `https://${social[1].replace(/^https?:\/\//, '')}`,
-      social[0],
+      `https://${social.url.replace(/^https?:\/\//, '')}`,
+      social.label,
     );
   });
 

@@ -158,6 +158,7 @@ const ContactCard = ({
                 size={80}
                 color={readableColor}
                 backgroundColor={'transparent'}
+                ecl="L"
               />
             )}
           </View>

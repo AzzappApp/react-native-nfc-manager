@@ -6,6 +6,7 @@ import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import Button from '#ui/Button';
 import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/ContactCardExportVcf_card.graphql';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 const ContactCardExportVcf = ({
   userName,
@@ -20,6 +21,15 @@ const ContactCardExportVcf = ({
         contactCard {
           firstName
           lastName
+          urls {
+            address
+            selected
+          }
+          socials {
+            url
+            label
+            selected
+          }
         }
         serializedContactCard {
           data
@@ -38,7 +48,11 @@ const ContactCardExportVcf = ({
         description: 'Share button label',
       })}
       onPress={async () => {
-        const { vCard } = buildVCard(profile.serializedContactCard.data);
+        const { vCard } = buildVCard(
+          userName,
+          profile.serializedContactCard.data,
+          profile.contactCard as Pick<ContactCard, 'socials' | 'urls'>,
+        );
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;
         try {

@@ -1,7 +1,5 @@
 import { json2csv, csv2json } from 'csv42';
 
-import { buildUserUrl } from './urlHelpers';
-
 /**
  * A contact card
  */
@@ -76,9 +74,7 @@ type ParsedContactCard = [
   Array<[string, string]>,
   Array<[string, string]>,
   Array<[string, string]>,
-  Array<[string, string]>,
   string | undefined,
-  Array<[string, string]>,
 ];
 
 /**
@@ -91,15 +87,6 @@ export const serializeContactCard = (
   card: ContactCard | null,
   commonInformation?: CommonInformation | null,
 ) => {
-  const urls: Array<[string, string]> = [['azzapp', buildUserUrl(username)]];
-  if (card?.urls) {
-    urls.push(
-      ...(commonInformation?.urls ?? [])
-        .concat(card.urls.filter(url => url.selected) ?? [])
-        .map(({ address }) => ['', address] as [string, string]),
-    );
-  }
-
   const serializedContactCard: ParsedContactCard = [
     profileId,
     webCardId,
@@ -113,14 +100,10 @@ export const serializeContactCard = (
     (commonInformation?.emails ?? [])
       .concat(card?.emails?.filter(e => e.selected) ?? [])
       .map(({ label, address }) => [label, address]),
-    urls,
     (commonInformation?.addresses ?? [])
       .concat(card?.addresses?.filter(address => address.selected) ?? [])
       .map(({ label, address }) => [label, address]),
     card?.birthday?.selected ? card?.birthday.birthday : undefined,
-    (commonInformation?.socials ?? [])
-      .concat(card?.socials?.filter(social => social.selected) ?? [])
-      .map(({ label, url }) => [label, url]),
   ];
 
   return json2csv([serializedContactCard], { header: false });
@@ -146,10 +129,8 @@ export const parseContactCard = (contactCardData: string) => {
       title,
       phoneNumbers,
       emails,
-      urls,
       addresses,
       birthday,
-      socials,
     ],
   ] = Object.values(data[0]);
 
@@ -162,10 +143,8 @@ export const parseContactCard = (contactCardData: string) => {
     title,
     phoneNumbers,
     emails,
-    urls,
     addresses,
     birthday,
-    socials,
   };
 };
 

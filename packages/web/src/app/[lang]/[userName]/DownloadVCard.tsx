@@ -46,9 +46,15 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
         }),
         method: 'POST',
       })
-        .then(res => {
+        .then(async res => {
           if (res.status === 200) {
-            const { vCard, contact } = buildVCard(contactData);
+            const additionalData = await res.json();
+
+            const { vCard, contact } = buildVCard(
+              webCard.userName,
+              contactData,
+              additionalData,
+            );
 
             if (contact.webCardId === webCard.id) {
               setContact(contact);
