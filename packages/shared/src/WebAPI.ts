@@ -2,8 +2,8 @@
  * This modules contains helper functions to make API calls to the backend.
  */
 import { fetchJSON, postFormData } from './networkHelpers';
+import type { ContactCard } from './contactCardHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
-import type { ContactCard } from 'contactCardHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
 
