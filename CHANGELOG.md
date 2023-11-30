@@ -1,5 +1,8 @@
-## 0.5.2-canary.22
+## 0.5.2-canary.23
 
+* **feat:**  - improve matcher (checked with logs)
+* **fix:**  - **cover:** [#1765](https://github.com/AzzappApp/azzapp/pull/1765) change border color on dark mode
+* **ui:**  - enhance borders with borderCurve
 * **feat:**  - implement initial openGraph metadata
 * **fix:**  - **post:** [#1804](https://github.com/AzzappApp/azzapp/pull/1804) add singular version of likes ([#1873](https://github.com/AzzappApp/azzapp/pull/1873))
 * **build:**  - fix podfile.lock
