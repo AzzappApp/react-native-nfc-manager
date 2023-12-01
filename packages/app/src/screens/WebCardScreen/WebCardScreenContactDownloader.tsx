@@ -149,6 +149,12 @@ const buildContact = (
       isPrimary: email[0] === 'Main',
       id: `${profileId}-${email[1]}`,
     })),
+    socialProfiles:
+      additionalContactData?.socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+        id: `${profileId}-${social.label}`,
+      })) ?? [],
     urlAddresses: (userName
       ? [
           {
