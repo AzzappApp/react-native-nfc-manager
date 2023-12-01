@@ -122,6 +122,7 @@ const buildContact = (
     profileId,
     webCardId,
     firstName,
+    addresses,
     lastName,
     company,
     title,
@@ -137,6 +138,12 @@ const buildContact = (
     name: `${firstName ?? ''} ${lastName ?? ''}`,
     company: company ?? '',
     jobTitle: title ?? '',
+    addresses: addresses.map(address => ({
+      label: address[0],
+      street: address[1],
+      isPrimary: address[0] === 'Main',
+      id: `${profileId}-${address[1]}`,
+    })),
     phoneNumbers: phoneNumbers.map(phone => ({
       label: phone[0],
       number: phone[1],
