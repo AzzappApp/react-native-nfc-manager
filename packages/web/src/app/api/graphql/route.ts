@@ -5,7 +5,7 @@ import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
@@ -26,14 +26,14 @@ import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 const LAST_SUPPORTED_APP_VERSION =
   process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
 
-function useRevalidateTag(): Plugin<GraphQLContext> {
+function useRevalidatePages(): Plugin<GraphQLContext> {
   return {
     onExecute: () => {
       return {
         onExecuteDone(payload) {
           payload.args.contextValue.cardUsernamesToRevalidate.forEach(
             username => {
-              revalidateTag(username);
+              revalidatePath(`/${username}`, 'page');
             },
           );
         },
@@ -191,7 +191,7 @@ const { handleRequest } = createYoga({
       },
       mode: 'protect-all',
     }),
-    useRevalidateTag(),
+    useRevalidatePages(),
     useDisableIntrospection({
       disableIf: () => process.env.NODE_ENV === 'production',
     }),

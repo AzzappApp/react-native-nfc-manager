@@ -1,5 +1,4 @@
 import { capitalize } from 'lodash';
-import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import {
   getCardModules,
@@ -31,60 +30,29 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
-  const { webCard, modules, media, posts, backgrounds } = await unstable_cache(
-    async () => {
-      console.info(`Caching webcard for user ${userName}`);
+  const webCard = await getWebCardByUserName(userName);
 
-      const webCard = await getWebCardByUserName(userName);
+  if (!webCard?.cardIsPublished) {
+    return notFound();
+  }
 
-      try {
-        if (webCard?.cardIsPublished) {
-          const [posts, modules, media] = await Promise.all([
-            getProfilesPostsWithTopComment(webCard.id, 5, 0),
-            getCardModules(webCard.id),
-            webCard.coverData?.mediaId
-              ? getMediasByIds([webCard.coverData.mediaId]).then(
-                  ([media]) => media,
-                )
-              : null,
-          ]);
+  const [posts, modules, media] = await Promise.all([
+    getProfilesPostsWithTopComment(webCard.id, 5, 0),
+    getCardModules(webCard.id),
+    webCard.coverData?.mediaId
+      ? getMediasByIds([webCard.coverData.mediaId]).then(([media]) => media)
+      : null,
+  ]);
 
-          const backgroundIds = convertToNonNullArray(
-            modules.map(module => (module.data as any).backgroundId),
-          );
+  const backgroundIds = convertToNonNullArray(
+    modules.map(module => (module.data as any).backgroundId),
+  );
 
-          const backgrounds = backgroundIds.length
-            ? await getStaticMediasByIds(backgroundIds)
-            : [];
+  const backgrounds = backgroundIds.length
+    ? await getStaticMediasByIds(backgroundIds)
+    : [];
 
-          return {
-            webCard,
-            modules,
-            media,
-            posts,
-            backgrounds,
-          };
-        }
-      } catch (e) {
-        console.error(e);
-      }
-
-      return {
-        webCard,
-        card: undefined,
-        cover: undefined,
-        modules: [],
-        media: undefined,
-        posts: [],
-        postsCount: 0,
-        backgrounds: [],
-      };
-    },
-    [userName],
-    { tags: [userName] },
-  )();
-
-  if (!webCard?.cardIsPublished || !media) {
+  if (!media) {
     return notFound();
   }
 

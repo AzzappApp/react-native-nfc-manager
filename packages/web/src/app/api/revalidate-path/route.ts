@@ -1,4 +1,4 @@
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { getUserById } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
@@ -22,20 +22,23 @@ async function revalidate(req: Request) {
     return NextResponse.json({ error: ERRORS.FORBIDDEN }, { status: 403 });
   }
 
-  const tagToRevalidate = new URL(req.url).searchParams.get('tag');
+  const { searchParams } = new URL(req.url);
+  const path = searchParams.get('path');
+  const layout =
+    (searchParams.get('layout') as 'layout' | 'page' | null) ?? undefined;
 
-  if (!tagToRevalidate) {
+  if (!path || (layout && !['page', 'layout'].includes(layout))) {
     return NextResponse.json(
       { error: ERRORS.INVALID_REQUEST },
       { status: 400 },
     );
   }
 
-  console.info(`Manualy revalidate tag ${tagToRevalidate}`);
-  revalidateTag(tagToRevalidate);
+  revalidatePath(path, layout);
 
   return NextResponse.json({
-    tag: tagToRevalidate,
+    path,
+    layout,
   });
 }
 

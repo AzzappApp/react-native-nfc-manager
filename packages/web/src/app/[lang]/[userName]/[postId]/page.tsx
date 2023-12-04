@@ -1,5 +1,4 @@
 import { capitalize } from 'lodash';
-import { unstable_cache } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 import {
   getMediasByIds,
@@ -31,33 +30,19 @@ const PostPage = async (props: PostPageProps) => {
     params: { userName, postId },
   } = props;
 
-  const { post, seeMorePosts, media, comments, author } = await unstable_cache(
-    async () => {
-      const post = await getPostByIdWithMedia(postId);
-      const author = post ? await getWebCardById(post.webCardId) : null;
-      const seeMorePosts =
-        author && post
-          ? await getWebCardsPostsWithMedias(author.id, 3, 0, post.id)
-          : [];
-      const comments = post?.allowComments
-        ? await getPostCommentsWithWebCard(post.id, 5)
-        : [];
+  const post = await getPostByIdWithMedia(postId);
+  const author = post ? await getWebCardById(post.webCardId) : null;
+  const seeMorePosts =
+    author && post
+      ? await getWebCardsPostsWithMedias(author.id, 3, 0, post.id)
+      : [];
+  const comments = post?.allowComments
+    ? await getPostCommentsWithWebCard(post.id, 5)
+    : [];
 
-      const [media] = author?.coverData?.mediaId
-        ? await getMediasByIds([author.coverData.mediaId])
-        : [];
-
-      return {
-        post,
-        seeMorePosts,
-        media,
-        comments,
-        author,
-      };
-    },
-    [`post-${userName}-${postId}`],
-    { tags: [`post-${userName}-${postId}`] },
-  )();
+  const [media] = author?.coverData?.mediaId
+    ? await getMediasByIds([author.coverData.mediaId])
+    : [];
 
   if (post && author && author.userName !== userName) {
     redirect(`/${author.userName}/${post.id}`);
